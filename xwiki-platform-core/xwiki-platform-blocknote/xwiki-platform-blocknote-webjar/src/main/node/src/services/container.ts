@@ -21,7 +21,6 @@ import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAu
 import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
-import { DefaultDocumentService } from "./document/DefaultDocumentService";
 import { DefaultImageWizard } from "./image/DefaultImageWizard";
 import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
@@ -39,6 +38,7 @@ import { ComponentInit as AuthenticationXWikiComponentList } from "@xwiki/platfo
 import { ComponentInit as BackendXWikiComponentList } from "@xwiki/platform-backend-xwiki";
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
+import { ComponentInit as DocumentXWikiComponentList } from "@xwiki/platform-document-xwiki";
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
 import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
 import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
@@ -52,7 +52,7 @@ const container: Container = new Container();
 container.bind("Container").toConstantValue(container);
 container.bind("Logger").to(DefaultLogger).inSingletonScope();
 
-DefaultDocumentService.bind(container);
+new DocumentXWikiComponentList(container);
 
 DefaultModelReferenceParserProvider.bind(container);
 DefaultModelReferenceSerializerProvider.bind(container);

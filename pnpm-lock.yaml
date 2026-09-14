@@ -353,6 +353,9 @@ importers:
       '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/document/document-api
+      '@xwiki/platform-document-xwiki':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/document/document-xwiki
       '@xwiki/platform-dsapi':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/ds/api
@@ -1565,6 +1568,64 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(happy-dom@20.9.0)(jsdom@30.0.1)(vite@8.3.0(@types/node@24.13.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.42(typescript@5.9.3)
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-xwiki:
+    dependencies:
+      '@xwiki/platform-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/platform-document-api':
+        specifier: workspace:*
+        version: link:../document-api
+      '@xwiki/platform-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
+      '@xwiki/platform-model-xwiki':
+        specifier: workspace:*
+        version: link:../../model/model-xwiki
+      '@xwiki/platform-xwiki-utils':
+        specifier: workspace:*
+        version: link:../../xwiki/xwiki-utils
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.59.0(@types/node@24.13.3)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 10.10.0(jiti@2.7.0)
+      inversify:
+        specifier: 'catalog:'
+        version: 8.2.3(reflect-metadata@0.2.2)
+      reflect-metadata:
+        specifier: 'catalog:'
+        version: 0.2.2
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@30.0.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)

@@ -24,6 +24,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-inversify
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/configuration/configuration-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/ds/api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/fn-utils
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/hierarchy/hierarchy-api

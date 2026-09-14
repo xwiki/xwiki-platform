@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
-import { Container, inject, injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { ref } from "vue";
 import type { PageData } from "@xwiki/platform-api";
 import type {
@@ -29,15 +29,8 @@ import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 import type { Ref } from "vue";
 
-@injectable("Singleton")
-export class DefaultDocumentService implements DocumentService {
-  public static bind(container: Container): void {
-    container
-      .bind("DocumentService")
-      .to(DefaultDocumentService)
-      .inSingletonScope();
-  }
-
+@injectable()
+class XWikiDocumentService implements DocumentService {
   constructor(@inject("XWikiMeta") private readonly xwikiMeta: XWikiMeta) {}
 
   public getCurrentDocument(): Ref<PageData | undefined> {
@@ -127,3 +120,5 @@ export class DefaultDocumentService implements DocumentService {
     throw new Error("Method not implemented.");
   }
 }
+
+export { XWikiDocumentService };

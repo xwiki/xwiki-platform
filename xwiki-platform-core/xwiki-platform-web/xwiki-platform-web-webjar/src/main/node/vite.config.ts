@@ -26,11 +26,24 @@ const minify = process.env.MINIFY === "true";
 // Vite pass, selected through this environment variable.
 const entry = process.env.ENTRY ?? "entityReference";
 
+// The entity reference API is the one bundle that carries the model API: it is the script that publishes it on the
+// global XWiki object, for every page. Any other bundle built here reads it back from that global rather than
+// shipping a second copy of the resolver and the serializer, which would be tens of KB each time. The source code
+// still imports the API, which is what keeps it typed and unit-testable; only the bundler maps the import back to
+// the instance the page already has.
+const sharesModelApi = entry !== "entityReference";
+
 // Note that the shared generateWebjarNodeConfig() helper is deliberately not used here: it forces the "es" format,
 // while these bundles have to be classic scripts, and it defines "define.amd" as false, which would remove the AMD
 // registration done by the entry points.
 export default defineConfig({
   build: {
+    rollupOptions: {
+      external: sharesModelApi ? ["@xwiki/platform-xwiki-model-api"] : [],
+      output: {
+        globals: { "@xwiki/platform-xwiki-model-api": "XWiki" },
+      },
+    },
     // The webjar-node packaging copies this directory to META-INF/resources/webjars/<artifactId>/<version>/.
     outDir: "../../../target/node-dist",
     // Keep the minified and the non minified builds of each entry point side by side.

@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { debug } from "./log";
 import { SaveTarget } from "@xwiki/platform-autosave-api";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { loadById } from "@xwiki/platform-xwiki-utils";
 import type { DocumentVersion, XWikiFormSaveContext } from "./types";
+import type { Logger } from "@xwiki/platform-api";
 import type {
   SaveResult,
   Saver,
@@ -66,6 +66,12 @@ type XWikiFormSaveTargetConfig = {
    * Called when a new version of the document exists, whoever created it.
    */
   onCreateVersion?: (version: DocumentVersion) => void;
+
+  /**
+   * Where to report what the target is doing. The caller passes the logger it resolved from the component manager,
+   * with the module name it wants the messages attributed to.
+   */
+  logger?: Logger;
 };
 
 /**
@@ -83,6 +89,8 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
   private readonly autoSaveVersionSummary?: string;
 
   private readonly onCreateVersion: (version: DocumentVersion) => void;
+
+  private readonly logger?: Logger;
 
   private readonly revertList: (() => void)[] = [];
 
@@ -105,6 +113,7 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     this.formId = config.formId ?? "edit";
     this.autoSaveVersionSummary = config.autoSaveVersionSummary;
     this.onCreateVersion = config.onCreateVersion ?? ((): void => {});
+    this.logger = config.logger;
   }
 
   public override async initialize(): Promise<void> {
@@ -273,7 +282,10 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
       return;
     }
     this.loadInitialVersion().catch((error: unknown) => {
-      debug("Failed to retrieve information about the initial version.", error);
+      this.logger?.debug(
+        "Failed to retrieve information about the initial version.",
+        error,
+      );
     });
   }
 
@@ -294,6 +306,7 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
    */
   private overwriteAjaxSaveAndContinue(): void {
     const saver = this.saver;
+    const logger = this.logger;
     const prototype = XWiki.actionButtons?.AjaxSaveAndContinue.prototype;
     if (!prototype) {
       return;
@@ -329,7 +342,10 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
             .whenSettled()
             .then(() => original.maybeRedirect.apply(this, args as never))
             .catch((error: unknown) => {
-              debug("Failed to wait for the saver state to settle.", error);
+              logger?.debug(
+                "Failed to wait for the saver state to settle.",
+                error,
+              );
             });
           return true;
         }
@@ -427,7 +443,7 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
           if (
             (data as { response: { status: number } }).response.status === 409
           ) {
-            debug("Save blocked by merge conflict");
+            this.logger?.debug("Save blocked by merge conflict");
             // Keep the saving flag while the user deals with the merge conflict modal (i.e. we don't want the merge
             // conflict to be handled by multiple users because this leads to more merge conflicts).
             this.waitForMergeConflictResolution(form)
@@ -511,9 +527,11 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
       // The version didn't change because the document hasn't been modified.
       return {};
     } else if (newVersion === "1.1") {
-      debug("Created document version 1.1");
+      this.logger?.debug("Created document version 1.1");
     } else {
-      debug(`Version bumped from ${this.document.version} to ${newVersion}.`);
+      this.logger?.debug(
+        `Version bumped from ${this.document.version} to ${newVersion}.`,
+      );
     }
     this.onCreateVersion({
       number: newVersion!,

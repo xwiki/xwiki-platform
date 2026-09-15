@@ -33,17 +33,35 @@ define('xwiki-realtime-saver', [
 
   const {SaveTransport, Saver, XWikiFormSaveTarget} = AutoSave;
 
-  function warn(...args) {
-    log('warn', ...args);
-  }
+  // The auto-save modules report what they do through the Logger role of the component API. This WebJar has no
+  // component container to resolve the default implementation from, so it passes this console backed one.
+  const logger = {
+    module: 'Saver',
 
-  function debug(...args) {
-    log('debug', ...args);
-  }
+    setModule(module) {
+      this.module = module;
+    },
 
-  function log(level, ...args) {
-    console[level]('[Saver] ', ...args);
-  }
+    debug(...args) {
+      this._log('debug', ...args);
+    },
+
+    info(...args) {
+      this._log('info', ...args);
+    },
+
+    warn(...args) {
+      this._log('warn', ...args);
+    },
+
+    error(...args) {
+      this._log('error', ...args);
+    },
+
+    _log(level, ...args) {
+      console[level](this.module + ':', ...args);
+    }
+  };
 
   /**
    * Synchronizes the saver states using ChainPad.
@@ -165,7 +183,7 @@ define('xwiki-realtime-saver', [
       }
 
       const remoteStates = this._chainpad.getUserDoc();
-      debug('Received remote states: ', remoteStates);
+      logger.debug('Received remote states: ', remoteStates);
 
       try {
         this._states = JSON.parse(remoteStates);
@@ -174,7 +192,7 @@ define('xwiki-realtime-saver', [
         this.state = this._states[this.getClientId()] || this.state;
         this.saver.onRemoteStatesChanged();
       } catch (e) {
-        warn("Unable to parse remote states.", e);
+        logger.warn('Unable to parse remote states.', e);
       }
     }
 
@@ -183,11 +201,11 @@ define('xwiki-realtime-saver', [
         return;
       }
       const localStates = jsonSortify(this._states);
-      debug('Push local states: ', localStates);
+      logger.debug('Push local states: ', localStates);
       this._chainpad.contentUpdate(localStates);
       const remoteStates = this._chainpad.getUserDoc();
       if (remoteStates !== localStates) {
-        warn("Unexpected remote states after synchronization: ", {
+        logger.warn('Unexpected remote states after synchronization: ', {
           expected: localStates,
           actual: remoteStates
         });
@@ -215,14 +233,15 @@ define('xwiki-realtime-saver', [
         onCreateVersion: () => {},
         ...config
       };
-      this._saver = new Saver(config,
+      this._saver = new Saver({...config, logger},
         saver => new ChainPadSaveTransport(config, saver),
         // Keep the target, because it is the one that knows which button performs the save we are asked for.
         saver => (this._target = new XWikiFormSaveTarget(saver, {
           document: xwikiDocument,
           formId: config.formId,
           autoSaveVersionSummary: Messages.autoSaveSummary,
-          onCreateVersion: config.onCreateVersion
+          onCreateVersion: config.onCreateVersion,
+          logger
         }))
       );
     }

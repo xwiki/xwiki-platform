@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="TourCode.TourTranslations" locale="pt_BR">
@@ -72,10 +72,11 @@ TourCode.StepClass_element=Elemento (seletor CSS que identifica um elemento)
 TourCode.StepClass_title=Título
 TourCode.StepClass_content=Conteúdo
 TourCode.StepClass_backdrop=Plano de fundo
-### Missing: TourCode.StepClass_placement=Placement
+TourCode.StepClass_placement=Placement
 TourCode.StepClass_targetPage=Página de Destino
 TourCode.StepClass_action=Ação alvo
 TourCode.StepClass_queryString=String de Consulta
+### Missing: TourCode.StepClass_reflex=
 tour.steps=Passos
 tour.steps.new_step=Novo Passo
 tour.steps.add_step=Adicionar Passo

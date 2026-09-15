@@ -26,6 +26,8 @@ package org.xwiki.rendering.wikimacro.internal;
  * @since 14.6RC1
  */
 @Deprecated(since = "14.6RC1")
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("java:S1214")
 public interface LegacyWikiMacroConstants
 {
     /**

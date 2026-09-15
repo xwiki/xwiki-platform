@@ -62,6 +62,10 @@
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

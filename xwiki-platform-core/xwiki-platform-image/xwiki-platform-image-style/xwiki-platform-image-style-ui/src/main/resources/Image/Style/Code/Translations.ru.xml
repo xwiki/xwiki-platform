@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.4" reference="Image.Style.Code.Translations" locale="ru">
@@ -53,6 +53,9 @@ image.style.administation.newImageStyle.label=Новый стиль изобра
 image.style.administation.newImageStyle.hint=Идентификатор нового стиля изображений.
 image.style.administation.newImageStyle.placeHolder=Идентификатор
 image.style.administation.newImageStyle.normalizedTitle=Новый стиль изображения, в соответствии с соглашениями об именовании, имеет вид [{0}].
+### Missing: image.style.administation.newImageStyle.invalidIdentifier=
+### Missing: image.style.administation.newImageStyle.tokenExpired=
+### Missing: image.style.administation.newImageStyle.validationFailed=
 Image.Style.Code.ImageStyleClass_adjustableAlignment=Настраиваемое выравнивание
 Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=Если галочка установлена, пользователь может настраивать выравнивание изображения.
 Image.Style.Code.ImageStyleClass_adjustableBorder=Настраиваемая рамка

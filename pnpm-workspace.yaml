@@ -14,6 +14,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/authentication/authentication-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/authentication/authentication-default
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/authentication/authentication-xwiki
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/autosave/autosave-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-api

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="Panels.Translations" locale="fr">
@@ -42,12 +42,20 @@ panels.description=Description
 panels.type=Type
 panels.category=Catégorie
 panels._actions=Actions
-panels.emptyvalue=
+### Missing: panels.emptyvalue=
 panels.children.title=Pages enfants
 panels.siblings.title=Pages sœurs
 panels.customize=Vous pouvez personnaliser les colonnes latérales en utilisant les {0}
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
 panels.documentInformation.configureSyntaxes=Configurer d'autres syntaxes
 panels.documentInformation.confirmChangeSyntaxWysiwyg=Souhaitez vous également convertir le contenu du document et ses objets dans la syntaxe sélectionnée ? Choisir 'Annuler' rétablira la syntaxe précédente et ne fera rien. Veuillez noter que si vous choisissez 'Ok' vous perdrez vos modifications et le document sera automatiquement enregistré, vous pourrez annuler ces modifications en allant dans l'historique du document et en restaurant la version précédente.
 panels.documentInformation.confirmChangeSyntax=Souhaitez vous également convertir le contenu du document et ses objets dans la syntaxe sélectionnée ? Choisir 'Annuler' modifiera uniquement l'identifiant de syntaxe, sans modifier le contenu du document. Veuillez noter que si vous choisissez 'Ok' cela enregistrera automatiquement le document. Vous pourrez annuler ces modifications en allant dans l'historique du document et en restaurant la version précédente.
-panels.documentInformation.failedSyntaxConversion=Impossible de convertir la syntaxe sélectionnée. Si vous souhaitez néanmoins utiliser cette syntaxe, vous pouvez la sélectionner à nouveau et choisir de ne pas la convertir.</content>
+panels.documentInformation.failedSyntaxConversion=Impossible de convertir la syntaxe sélectionnée. Si vous souhaitez néanmoins utiliser cette syntaxe, vous pouvez la sélectionner à nouveau et choisir de ne pas la convertir.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

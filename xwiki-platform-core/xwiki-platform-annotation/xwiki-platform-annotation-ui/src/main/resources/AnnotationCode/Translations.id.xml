@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="AnnotationCode.Translations" locale="id">
@@ -48,6 +48,8 @@ annotations.annotated.loaderror=Gagal:
 annotations.annotated.loaderror.wrongresponse=Respons server dengan format salah
 annotations.annotated.error.noannotatedelement=Anotasi tidak dapat dimuat karena isi tidak tersedia.
 annotations.annotated.error.wrongsyntax=Anotasi tidak tersedia untuk halaman yang ditulis dengan sintaksis XWiki/1.0.
+### Missing: annotations.annotated.highlight.toggle.hint=
+### Missing: annotations.annotated.bubble.toggle.hint=
 annotations.action.edit.text=[Edit]
 annotations.action.edit.tooltip=Edit notasi
 annotations.action.edit.submit.text=Perbarui

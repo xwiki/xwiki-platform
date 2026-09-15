@@ -45,6 +45,10 @@ import org.xwiki.wiki.manager.WikiManagerException;
 @Component
 @Named(WikisDefaultUIDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+// 'transient' is deliberate here: DistributionJobStatus holds the step list and the job status
+// store serializes it with XStream, which honours 'transient' independently of
+// java.io.Serializable. Removing it would write the injected components into the stored status.
+@SuppressWarnings("java:S2065")
 public class WikisDefaultUIDistributionStep extends AbstractExtensionDistributionStep
 {
     public static final String ID = "extension.defaultui.wikis";

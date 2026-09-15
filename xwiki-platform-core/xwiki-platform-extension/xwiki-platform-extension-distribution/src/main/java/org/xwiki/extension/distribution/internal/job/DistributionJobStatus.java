@@ -70,6 +70,10 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
 
     private int currentStateIndex;
 
+    // 'transient' is deliberate here: the job status store serializes this class with XStream, which
+    // honours 'transient' independently of java.io.Serializable. Removing it would write this runtime
+    // state into the stored job status.
+    @SuppressWarnings("java:S2065")
     private final transient Map<String, Object> properties = new ConcurrentHashMap<>();
 
     public DistributionJobStatus(JobStatus status, ObservationManager observationManager, LoggerManager loggerManager)

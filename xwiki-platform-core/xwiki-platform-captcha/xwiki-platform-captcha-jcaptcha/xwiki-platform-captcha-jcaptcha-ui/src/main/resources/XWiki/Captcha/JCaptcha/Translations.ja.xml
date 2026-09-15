@@ -56,7 +56,7 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEn
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=Hotmail
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Deformed Baffle List Gimpy
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Baffle List Gimpy
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=シンプルなリスト
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=シンプルな算数

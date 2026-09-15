@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc locale="uk">
@@ -43,5 +43,6 @@
 help.syntaxtitle=Синтаксис XWiki {0}
 help.syntaxall=Усе
 help.changesyntax=Змінити синтаксис
-help.choose_syntax=Вибрати синтаксис</content>
+help.choose_syntax=Вибрати синтаксис
+</content>
 </xwikidoc>

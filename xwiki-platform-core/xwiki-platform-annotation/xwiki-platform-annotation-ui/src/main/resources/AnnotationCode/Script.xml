@@ -1397,15 +1397,19 @@ XWiki.Annotation = Class.create({
       this.hideBubble(bubble);
     } else {
       // Show the bubble and fetch the annotation display in it.
-      // If the event is triggered via keyboard, we use the annotation highlight position instead of the event position
-      let bubbleCoordX,bubbleCoordY ;
-      if (event.pageX === 0 &amp;&amp; event.pageY === 0) {
+      // If the event isn't triggered by a pointer (keyboard activation, or a programmatic click), we use the
+      // annotation highlight position instead of the event position. 'detail' holds the click count, which is 0 for
+      // such events. Their coordinates cannot be used to detect them: the client coordinates are 0, but 'pageX' and
+      // 'pageY' add the scroll offset on top of them in some browsers, so they are only 0 when the page isn't
+      // scrolled.
+      let bubbleCoordX;
+      let bubbleCoordY;
+      if (event.detail === 0) {
         let highlight = event.target;
         let rect = highlight.getBoundingClientRect();
         bubbleCoordX = rect.left + window.scrollX + highlight.offsetWidth / 2;
         bubbleCoordY = rect.top + window.scrollY + highlight.offsetHeight / 2;
-      }
-      else {
+      } else {
         bubbleCoordX = event.pageX;
         bubbleCoordY = event.pageY;
       }

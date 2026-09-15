@@ -1446,6 +1446,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return isValid;
     }
 
+    // Catching Throwable is deliberate here: the validation script is user-provided wiki content and must not be able
+    // to break the object it validates; the failure is reported through the validation status instead.
+    @SuppressWarnings("java:S1181")
     private boolean executeValidationScript(BaseObject obj, String validationScript, XWikiContext context)
     {
         try {

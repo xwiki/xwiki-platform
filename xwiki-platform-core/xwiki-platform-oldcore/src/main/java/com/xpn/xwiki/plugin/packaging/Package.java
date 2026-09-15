@@ -509,6 +509,9 @@ public class Package
      * @throws XWikiException when package content is broken
      * @since 2.3M2
      */
+    // Catching Throwable is deliberate here: a document that cannot be parsed must not abort the whole import, it is
+    // listed in the failed documents instead.
+    @SuppressWarnings("java:S1181")
     public String Import(InputStream file, XWikiContext context) throws IOException, XWikiException
     {
         ZipArchiveInputStream zis;

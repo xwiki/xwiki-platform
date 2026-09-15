@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="Menu.MenuTranslations" locale="mr">
@@ -80,10 +80,18 @@ rendering.macro.menu.name=मेनू
 ### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
 ### Missing: rendering.macro.menu.parameter.id.name=Id
 ### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+### Missing: rendering.macro.menu.parameter.label.name=
+### Missing: rendering.macro.menu.parameter.label.description=
 ### Missing: rendering.macro.menu.parameter.type.name=Type
 ### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
 ### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
 
+# Menu UI
+### Missing: menu.ui.openSubMenu=
+### Missing: menu.ui.closeSubMenu=
+### Missing: menu.ui.horizontal.toggler.description=
+
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>
+### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
+</content>
 </xwikidoc>

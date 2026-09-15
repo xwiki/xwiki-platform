@@ -58,9 +58,9 @@ user.profile.network.unfollow=Przestań obserwować
 user.profile.network.done=Gotowe
 user.profile.network.saving=zapisywanie...
 user.profile.network.error=Błąd podczas zapisywania ustawienia powiadomienia
-### Missing: user.profile.status.done=Done
-### Missing: user.profile.status.saving=Saving...
-### Missing: user.profile.status.error=Error saving the user status
+user.profile.status.done=Done
+user.profile.status.saving=Saving...
+user.profile.status.error=Error saving the user status
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

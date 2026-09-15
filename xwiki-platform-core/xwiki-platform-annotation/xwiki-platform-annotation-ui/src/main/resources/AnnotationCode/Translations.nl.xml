@@ -40,7 +40,7 @@
 annotations.menu.loading=Loading annotation settings
 annotations.menu.loaderror=Failed:
 annotations.tab.info.noannotations=No annotations on this page
-### Missing: annotations.settings.display=Show annotations
+annotations.settings.display=Show annotations
 annotations.settings.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
 annotations.settings.error.notarget=No page specified to get annotations settings for.
 annotations.annotated.loading=Loading annotated page

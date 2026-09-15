@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="AppWithinMinutes.Translations" locale="ru">
@@ -192,6 +192,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Для изменени�
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Удалить
 platform.appwithinminutes.liveTableEditorAddColumnHint=Добавить выбранный столбец
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их?
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=
 platform.appwithinminutes.liveTableEditorIcon=Иконка
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Значок приложения. Вы можете выбрать значок в палитре значков или сослаться на прикрепленное изображение.
 
@@ -272,5 +274,6 @@ appWithinMinutes.templateProviderEditor.title={0} Записей
 
 ### Since 18.6.0
 #@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их? &lt;a href=""&gt;Да&lt;/a&gt; / &lt;a href=""&gt;Нет&lt;/a&gt;</content>
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их? &lt;a href=""&gt;Да&lt;/a&gt; / &lt;a href=""&gt;Нет&lt;/a&gt;
+</content>
 </xwikidoc>

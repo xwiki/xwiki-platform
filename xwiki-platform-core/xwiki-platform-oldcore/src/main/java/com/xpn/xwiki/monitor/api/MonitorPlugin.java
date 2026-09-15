@@ -79,6 +79,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         return "monitor";
     }
 
+    // Catching Throwable is deliberate here: monitoring must never break the request it monitors.
+    @SuppressWarnings("java:S1181")
     public void startRequest(String page, String action, URL url)
     {
         if (!isActive()) {
@@ -107,6 +109,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         this.lastUnfinishedTimerDataList.add(mdata);
     }
 
+    // Catching Throwable is deliberate here: monitoring must never break the request it monitors.
+    @SuppressWarnings("java:S1181")
     public void endRequest()
     {
         if (!isActive()) {
@@ -142,6 +146,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         this.lastTimerDataList.add(mdata);
     }
 
+    // Catching Throwable is deliberate here: monitoring must never break the request it monitors.
+    @SuppressWarnings("java:S1181")
     public void setWikiPage(String page)
     {
         if (!isActive()) {
@@ -197,6 +203,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         startTimer(timername, null);
     }
 
+    // Catching Throwable is deliberate here: monitoring must never break the request it monitors.
+    @SuppressWarnings("java:S1181")
     public void startTimer(String timername, String desc)
     {
         if (!isActive()) {
@@ -214,6 +222,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         }
     }
 
+    // Catching Throwable is deliberate here: monitoring must never break the request it monitors.
+    @SuppressWarnings("java:S1181")
     public void setTimerDesc(String timername, String desc)
     {
         if (!isActive()) {
@@ -231,6 +241,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         }
     }
 
+    // Catching Throwable is deliberate here: monitoring must never break the request it monitors.
+    @SuppressWarnings("java:S1181")
     public void endTimer(String timername)
     {
         if (!isActive()) {

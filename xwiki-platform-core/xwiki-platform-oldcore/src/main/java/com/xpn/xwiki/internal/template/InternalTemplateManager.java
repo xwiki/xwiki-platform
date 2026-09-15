@@ -685,6 +685,9 @@ public class InternalTemplateManager implements Initializable, Disposable
      * @param templateName the template to parse
      * @return the result of the template parsing
      */
+    // Catching Throwable is deliberate here and is the contract this method is named after: it never throws, it renders
+    // the error instead.
+    @SuppressWarnings("java:S1181")
     public XDOM getXDOMNoException(String templateName)
     {
         XDOM xdom;
@@ -705,6 +708,9 @@ public class InternalTemplateManager implements Initializable, Disposable
      * @return the result of the template parsing
      * @since 8.3RC1
      */
+    // Catching Throwable is deliberate here and is the contract this method is named after: it never throws, it renders
+    // the error instead.
+    @SuppressWarnings("java:S1181")
     public XDOM getXDOMNoException(Template template)
     {
         XDOM xdom;
@@ -893,6 +899,9 @@ public class InternalTemplateManager implements Initializable, Disposable
         blockRenderer.render(block, printer);
     }
 
+    // Catching Throwable is deliberate here and is the contract this method is named after: it never throws, it renders
+    // the error instead.
+    @SuppressWarnings("java:S1181")
     public Block executeNoException(String templateName, boolean inline)
     {
         Block block;
@@ -911,6 +920,9 @@ public class InternalTemplateManager implements Initializable, Disposable
     /**
      * @since 14.0RC1
      */
+    // Catching Throwable is deliberate here and is the contract this method is named after: it never throws, it renders
+    // the error instead.
+    @SuppressWarnings("java:S1181")
     public Block executeNoException(Template template, boolean inline)
     {
         Block block;

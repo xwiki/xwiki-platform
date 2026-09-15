@@ -63,6 +63,9 @@ public class AttachInputSocket extends AbstractInputSocket<AttachNode>
     }
 
     @Override
+    // Catching Throwable is deliberate here: nothing is recovered from, the buffer is released and the original
+    // Throwable is rethrown with the release failure attached as a suppressed exception.
+    @SuppressWarnings("java:S1181")
     public SeekableByteChannel channel(final OutputSocket<? extends Entry> peer) throws IOException
     {
         final IoBuffer buffer = entry.getPool().allocate();

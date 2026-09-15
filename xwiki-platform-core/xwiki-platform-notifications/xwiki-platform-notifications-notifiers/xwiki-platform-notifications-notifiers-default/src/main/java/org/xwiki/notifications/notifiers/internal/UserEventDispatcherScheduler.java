@@ -105,6 +105,9 @@ public class UserEventDispatcherScheduler implements Disposable
         this.scheduler.shutdownNow();
     }
 
+    // Catching Throwable is deliberate here, as the comment in the catch block states: the scheduler that triggered
+    // this run must survive any failure of the pre-filtering.
+    @SuppressWarnings("java:S1181")
     private void run()
     {
         // Indicate the pre-filtering is running

@@ -65,6 +65,14 @@
   #end
 #end
 #########################
+## Load a single tab on demand only
+#########################
+## When a "uix" request parameter is present, this page is being requested as an AJAX fragment by the "loadTab"
+## JavaScript below: render only that tab's content and skip the rest of the page. The requested id is matched
+## against $categories, so that only a tab actually registered on this extension point can be rendered this way.
+#set($requestedUixId = "$!request.uix")
+#if($requestedUixId == "")
+#########################
 ## Current category
 #########################
 #set($currentCategory = "$!request.category")
@@ -125,12 +133,22 @@
   #foreach($category in $userMenu)
     #foreach($subcategory in $category.get('children'))
       #set($tabKey = $services.rendering.escape($subcategory.get('id'), 'xwiki/2.1'))
-      (% id="${tabKey}Pane" class="user-page-pane#if($subcategory.get('id') != $currentCategory) hidden#end" %)
+      #set($uixId = $services.rendering.escape($subcategory.uix.id, 'xwiki/2.1'))
+      #if($subcategory.get('id') == $currentCategory)
+      ## Render the selected tab right away, since its content was requested by this very page load.
+      (% id="${tabKey}Pane" class="user-page-pane" %)
       (((
 
-{{uiextension id="$services.rendering.escape($subcategory.uix.id, 'xwiki/2.1')"/}}
+{{uiextension id="$uixId"/}}
 
       )))
+      #else
+      ## Load the other tabs on demand only: contribute an empty placeholder whose content is fetched through AJAX
+      ## the first time the tab gets selected (see the JavaScript below).
+      (% id="${tabKey}Pane" class="user-page-pane hidden empty" data-uix="$uixId" %)
+      (((
+      )))
+      #end
     #end
   #end
 )))
@@ -143,6 +161,23 @@
   #end
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
 {{/html}}
+#else
+#set($requestedUix = $NULL)
+#foreach($category in $categories)
+  #if($category.uix.id == $requestedUixId)
+    #set($requestedUix = $category.uix)
+  #end
+#end
+#if($requestedUix)
+#template('display_macros.vm')
+#initRequiredSkinExtensions()
+## The rendered output is already HTML: pass it through as-is instead of letting it be escaped as wiki text.
+{{html clean="false"}}
+$services.uix.render($requestedUix, 'html/5.0')
+{{/html}}
+#sendRequiredSkinExtensions()
+#end
+#end
 {{/velocity}}</content>
   <attachment>
     <filename>noavatar.png</filename>
@@ -270,20 +305,61 @@ Object.extend(XWiki, {
 
     switchTab : function(tab, pushHistory) {
       var tabName = tab.substring(14); // 14 = len('vertical-menu-')
-      $("user-page-content").select("div.user-page-pane").each(function(pane){
-        pane.addClassName('hidden');
-      });
-      $(tabName + 'Pane').removeClassName('hidden');
-      $("user-vertical-menu").select("span.category-tab").each(function(tab){
-        tab.removeClassName('current');
-      });
-      $(tab).addClassName('current');
-      this.updateCategoryFields(tab);
-      if (pushHistory) {
-        this.updateURL(tabName);
+      var targetPane = document.getElementById(tabName + 'Pane');
+      var activateTab = function() {
+        $("user-page-content").select("div.user-page-pane").each(function(pane){
+          pane.addClassName('hidden');
+        });
+        targetPane.classList.remove('hidden');
+        $("user-vertical-menu").select("span.category-tab").each(function(tab){
+          tab.removeClassName('current');
+        });
+        $(tab).addClassName('current');
+        this.updateCategoryFields(tab);
+        if (pushHistory) {
+          this.updateURL(tabName);
+        }
+        document.fire('xwiki:profile:switchedCategory', {'category' : tab});
+        document.fire('xwiki:dom:refresh');
+      }.bind(this);
+
+      // Load the tab's content on demand, the first time it is selected.
+      if (targetPane.classList.contains('empty')) {
+        this.loadTab(targetPane, activateTab);
+      } else {
+        activateTab();
       }
-      document.fire('xwiki:profile:switchedCategory', {'category' : tab});
-      document.fire('xwiki:dom:refresh');
+    },
+
+    loadTab : function(pane, callback) {
+      pane.classList.add('loading');
+      // See https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/FrontendResources/UsingJQuery/ for why
+      // jQuery needs to be required explicitly like this, instead of relying on the global (Prototype's) $.
+      require(['jquery'], function($) {
+        // "xpage=plain" renders this very page (XWikiUserSheet) without the skin chrome, while keeping the "view"
+        // action (unlike the "get" action) so that tab content relying on the action being "view" still works. The
+        // "uix" parameter, handled at the top of this page's own content, makes it render only that one tab instead
+        // of the whole page.
+        var queryString = $.param({
+          xpage: 'plain',
+          uix: pane.getAttribute('data-uix'),
+          language: document.documentElement.dataset.xwikiLocale
+        });
+        $.get(XWiki.currentDocument.getURL('view', queryString)).done(function(html) {
+          // Required skin extensions (CSS/JS) are added to the page head automatically, from the
+          // X-XWIKI-HTML-HEAD/X-XWIKI-HTML-SCRIPTS response headers sent by the server (see xwiki.js).
+          $(pane).html(html);
+          pane.classList.remove('empty');
+          $(document).trigger('xwiki:dom:updated', {elements: [pane]});
+        }).fail(function(jqXHR) {
+          if (jqXHR.status === 401) {
+            document.location.reload();
+          }
+        }).always(function() {
+          pane.classList.remove('loading');
+          callback();
+        });
+      });
     },
 
     updateCategoryFields : function (category) {

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.Notifications.Code.Translations" locale="es">
@@ -255,6 +255,7 @@ notifications.switches.changeStatusError=Error al cambiar el estado de las notif
 ### Missing: notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page and its children: you won't receive any notifications for it.
 ### Missing: notifications.watch.modal.title.CUSTOM=Custom watch settings
 ### Missing: notifications.watch.modal.description.CUSTOM=You are using custom notification settings for this page: you might be following or blocking specific events for the page or you might target only specific channels for the notifications. We invite you to review your notification settings from your profile.
+### Missing: notifications.watch.modal.option.hint.toggle=
 ### Missing: notifications.watch.modal.option.watchpage.title=Follow current page
 ### Missing: notifications.watch.modal.option.watchpage.hint=You will receive notifications for that page only.
 ### Missing: notifications.watch.modal.option.watchspace.title=Follow current page and its children

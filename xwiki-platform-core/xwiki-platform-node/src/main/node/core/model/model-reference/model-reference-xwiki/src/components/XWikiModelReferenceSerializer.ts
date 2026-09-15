@@ -19,6 +19,7 @@
  */
 import { EntityType } from "@xwiki/platform-model-api";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
+import { Model } from "@xwiki/platform-xwiki-model-api";
 import { injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
@@ -31,7 +32,7 @@ class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
     }
     return (
       this.getPrefix(reference.type) +
-      XWiki.Model.serialize(toXWikiEntityReference(reference))
+      Model.serialize(toXWikiEntityReference(reference))
     );
   }
 

@@ -19,6 +19,7 @@
  */
 import { XWikiDocument } from "../XWikiDocument";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
+import { Model } from "@xwiki/platform-xwiki-model-api";
 import { inject, injectable } from "inversify";
 import { ref } from "vue";
 import type { PageData } from "@xwiki/platform-api";
@@ -58,7 +59,7 @@ class XWikiDocumentService implements DocumentService {
 
   public getCurrentDocumentReferenceString(): Ref<string | undefined> {
     return ref(
-      XWiki.Model.serialize(this.getCurrentXWikiDocument().documentReference),
+      Model.serialize(this.getCurrentXWikiDocument().documentReference),
     );
   }
 

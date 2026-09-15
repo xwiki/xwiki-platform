@@ -1066,6 +1066,9 @@ importers:
       '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../authentication-api
+      '@xwiki/platform-xwiki-model-api':
+        specifier: workspace:*
+        version: link:../../xwiki/xwiki-model-api
       '@xwiki/platform-xwiki-utils':
         specifier: workspace:*
         version: link:../../xwiki/xwiki-utils
@@ -2746,6 +2749,9 @@ importers:
       '@xwiki/platform-rendering-api':
         specifier: workspace:*
         version: link:../../../rendering/rendering-api
+      '@xwiki/platform-xwiki-model-api':
+        specifier: workspace:*
+        version: link:../../../xwiki/xwiki-model-api
       '@xwiki/platform-xwiki-utils':
         specifier: workspace:*
         version: link:../../../xwiki/xwiki-utils

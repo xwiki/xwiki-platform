@@ -5,12 +5,16 @@
 ```ts
 
 import { EntityReference } from '@xwiki/platform-xwiki-model-api';
-import { EntityTypeApi } from '@xwiki/platform-xwiki-model-api';
-import { ModelApi } from '@xwiki/platform-xwiki-model-api';
 import { WikiConfig } from '@xwiki/platform-api';
 
 // @beta
 export function getRestSpacesApiUrl(wikiConfig: WikiConfig, documentId: string): string;
+
+// @beta
+export interface LegacyAjaxSaveAndContinue {
+    maybeRedirect(continueEditing: boolean): boolean;
+    reloadEditor(): void;
+}
 
 // @beta
 export interface LegacyXWikiAttachment {
@@ -31,6 +35,11 @@ export function loadById<T = unknown>(...ids: string[]): Promise<T>;
 
 // @beta
 export interface XWikiGlobal {
+    actionButtons?: {
+        AjaxSaveAndContinue: {
+            prototype: LegacyAjaxSaveAndContinue;
+        };
+    };
     // (undocumented)
     Attachment: new (reference: EntityReference) => LegacyXWikiAttachment;
     contextPath: string;
@@ -41,12 +50,6 @@ export interface XWikiGlobal {
     docsyntax: string;
     // (undocumented)
     Document: new (reference: EntityReference) => LegacyXWikiDocument;
-    // (undocumented)
-    EntityReference: new (name: string, type: number, parent?: EntityReference | null, locale?: string) => EntityReference;
-    // (undocumented)
-    EntityType: EntityTypeApi;
-    // (undocumented)
-    Model: ModelApi;
 }
 
 // @beta

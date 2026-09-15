@@ -42,6 +42,7 @@
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-xwiki": "workspace:*",
     "@xwiki/platform-rendering-api": "workspace:*",
+    "@xwiki/platform-xwiki-model-api": "workspace:*",
     "@xwiki/platform-xwiki-utils": "workspace:*"
   },
   "peerDependencies": {

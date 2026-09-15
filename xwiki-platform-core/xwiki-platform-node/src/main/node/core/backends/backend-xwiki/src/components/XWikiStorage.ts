@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { AbstractStorage } from "@xwiki/platform-backend-api";
+import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { inject, injectable } from "inversify";
 import type {
   AttachmentsData,
@@ -125,9 +126,9 @@ class XWikiStorage extends AbstractStorage {
   }
 
   private getUploadURL(page: string, initiator: string): string {
-    const documentReference = XWiki.Model.resolve(
+    const documentReference = Model.resolve(
       page,
-      XWiki.EntityType.DOCUMENT,
+      EntityType.DOCUMENT,
       XWiki.currentDocument.documentReference,
     );
     const language = document.documentElement.getAttribute("lang") || "";

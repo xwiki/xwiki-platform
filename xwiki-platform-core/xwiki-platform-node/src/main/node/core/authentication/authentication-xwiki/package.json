@@ -39,6 +39,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-xwiki-model-api": "workspace:*",
     "@xwiki/platform-xwiki-utils": "workspace:*"
   },
   "peerDependencies": {

@@ -34,6 +34,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections.EnumerationUtils;
+import org.xwiki.classloader.internal.ClassLoaderUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
@@ -108,7 +109,7 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
 
         Enumeration<URL> urls;
         try {
-            urls = getClass().getClassLoader().getResources(resourceName);
+            urls = ClassLoaderUtils.getResources(getClass().getClassLoader(), resourceName);
         } catch (IOException e) {
             this.logger.error("Failed to get resource URLs from class loader for name [{}]", resourceName, e);
 

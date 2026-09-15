@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.4" reference="XWiki.AdminTranslations" locale="ko">
@@ -139,12 +139,12 @@ administration.section.users.deleteUser.newAuthor.error=선택한 사용자에�
 administration.section.users.deleteUser.newAuthor.programming=프로그램 작성
 administration.section.users.deleteUser.newAuthor.script=스크립트
 admin.usersgroups.extensionrights=확장 권한
-### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
-### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
+admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
-### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
-### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
 administration.section.groups.deleteUserFromGroup.failure=그룹에서 멤버를 제거하지 못했습니다
 
 # Rights for page section
@@ -164,8 +164,8 @@ admin.social=소셜
 admin.social.description=소셜 기능에 대한 구성입니다.
 
 # Network category
-### Missing: admin.network=Network
-### Missing: admin.network.description=Network related features.
+admin.network=Network
+admin.network.description=Network related features.
 
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=섹션에 표시

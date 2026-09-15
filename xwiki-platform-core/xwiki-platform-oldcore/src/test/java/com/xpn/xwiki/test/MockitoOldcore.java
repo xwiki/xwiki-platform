@@ -905,7 +905,6 @@ public class MockitoOldcore
                     XWikiDocument document = invocation.getArgument(0);
                     String comment = invocation.getArgument(1);
                     boolean minorEdit = invocation.getArgument(2);
-                    boolean modifiedByContextUser = invocation.getArgument(3);
                     XWikiContext xcontext = invocation.getArgument(4);
 
                     boolean isNew = document.isNew();

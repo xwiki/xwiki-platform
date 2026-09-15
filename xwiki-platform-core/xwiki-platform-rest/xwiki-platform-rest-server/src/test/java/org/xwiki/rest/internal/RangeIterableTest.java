@@ -21,6 +21,7 @@ package org.xwiki.rest.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
 
@@ -86,12 +87,9 @@ class RangeIterableTest
     @Test
     void nextBeyondEndThrows()
     {
-        // Documents current behaviour: next() is unguarded and relies on the caller checking
-        // hasNext(). Exhausting the iterator and calling next() again reaches list.get() out of
-        // range.
         var it = new RangeIterable<>(List.of("a"), 0, 1).iterator();
         it.next();
         assertFalse(it.hasNext());
-        assertThrows(IndexOutOfBoundsException.class, it::next);
+        assertThrows(NoSuchElementException.class, it::next);
     }
 }

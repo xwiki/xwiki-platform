@@ -120,7 +120,7 @@ public abstract class AbstractNotificationPreference implements NotificationPref
         if (this == o) {
             return true;
         }
-        if (o == null) {
+        if (!(o instanceof AbstractNotificationPreference)) {
             return false;
         }
         // Here, we only compute a subset of the properties, because we want to say equals() == true if the other

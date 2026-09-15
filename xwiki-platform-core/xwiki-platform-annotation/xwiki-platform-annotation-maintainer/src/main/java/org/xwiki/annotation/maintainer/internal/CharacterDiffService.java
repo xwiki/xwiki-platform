@@ -23,6 +23,7 @@ package org.xwiki.annotation.maintainer.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Singleton;
 
@@ -83,7 +84,8 @@ public class CharacterDiffService implements DiffService
 
         // deleted is from previous, added is in current
 
-        if (diff.getDeletedStart() == Difference.NONE || diff.getAddedStart() == Difference.NONE) {
+        if (Objects.equals(diff.getDeletedStart(), Difference.NONE)
+            || Objects.equals(diff.getAddedStart(), Difference.NONE)) {
             // this diff doesn't make sense, ignore it
             return null;
         }
@@ -91,12 +93,12 @@ public class CharacterDiffService implements DiffService
         position = diff.getDeletedStart();
 
         // the content that was deleted
-        if (diff.getDeletedEnd() != Difference.NONE) {
+        if (!Objects.equals(diff.getDeletedEnd(), Difference.NONE)) {
             original = previous.substring(diff.getDeletedStart(), diff.getDeletedEnd() + 1);
         }
 
         // the content that was added
-        if (diff.getAddedEnd() != Difference.NONE) {
+        if (!Objects.equals(diff.getAddedEnd(), Difference.NONE)) {
             modified = current.substring(diff.getAddedStart(), diff.getAddedEnd() + 1);
         }
 

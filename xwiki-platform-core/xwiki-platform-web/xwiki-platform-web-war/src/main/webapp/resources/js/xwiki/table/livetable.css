@@ -152,7 +152,6 @@ thead.xwiki-livetable-display-header th.xwiki-livetable-display-header-text {
   padding: 3px 16px 3px 5px;
   font-weight: normal;
   text-align: left;
-  /*cursor:pointer;*/
   white-space: nowrap;
 }
 thead.xwiki-livetable-display-header th.sortable a {
@@ -368,7 +367,6 @@ div.xwiki-livetable-pagination-content span.pagenumber:focus {
 
 #ajax-loader {
   margin: 0px;
-  padding: 0px;
   position: absolute;
   top: 50%;
   left: 35%;

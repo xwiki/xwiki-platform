@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="ko">
@@ -52,32 +52,93 @@ extension.repository.installedCount=설치
 admin.repository=확장 기능 저장소
 
 ## Support
-### Missing: repository.support.createsupporter=Register
+repository.support.createsupporter=Register
 
 ## Supporters
-### Missing: repository.supporter.sheet.description=This page controls how ExtensionSupporter pages are displayed in both view and edit modes.
-### Missing: repository.supporter.sheet.noObject=The current page doesn't have the expected ExtensionSupporter object.
+repository.supporter.sheet.description=This page controls how ExtensionSupporter pages are displayed in both view and edit modes.
+repository.supporter.sheet.noObject=The current page doesn't have the expected ExtensionSupporter object.
 repository.supporter.sheet.createplan=추가
-### Missing: repository.supporter.sheet.plans=Plans
+repository.supporter.sheet.plans=Plans
 ### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
-### Missing: ExtensionCode.ExtensionSupporterClass_doc.title=Name
-### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
-### Missing: ExtensionCode.ExtensionSupporterClass_url=URL
+ExtensionCode.ExtensionSupporterClass_doc.title=Name
+ExtensionCode.ExtensionSupporterClass_summary=Summary
+ExtensionCode.ExtensionSupporterClass_url=URL
 ExtensionCode.ExtensionSupporterClass_email=이메일
 ExtensionCode.ExtensionSupporterClass_content=세부사항
 ExtensionCode.ExtensionSupporterClass_active=활성화
 
 ## Support plans
-### Missing: repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
-### Missing: repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
-### Missing: repository.supportplan.sheet.supportedExtensions=Supported extensions
+repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
+repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
+repository.supportplan.sheet.supportedExtensions=Supported extensions
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
-### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
-### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
-### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
-### Missing: ExtensionCode.ExtensionSupportPlanClass_url=URL
+ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
+ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
+ExtensionCode.ExtensionSupportPlanClass_summary=Summary
+ExtensionCode.ExtensionSupportPlanClass_url=URL
 ExtensionCode.ExtensionSupportPlanClass_content=세부사항
 ExtensionCode.ExtensionSupportPlanClass_active=활성화
-### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+
+## Extension sheet
+### Missing: repository.extension.sheet.name=
+### Missing: repository.extension.sheet.project=
+### Missing: repository.extension.sheet.type=
+### Missing: repository.extension.sheet.category=
+### Missing: repository.extension.sheet.summary=
+### Missing: repository.extension.sheet.authors=
+### Missing: repository.extension.sheet.rating=
+### Missing: repository.extension.sheet.title=
+### Missing: repository.extension.sheet.imported=
+### Missing: repository.extension.sheet.updateExtension=
+### Missing: repository.extension.sheet.developedBy=
+### Missing: repository.extension.sheet.unknown=
+### Missing: repository.extension.sheet.support=
+### Missing: repository.extension.sheet.activeInstalls=
+### Missing: repository.extension.sheet.license=
+### Missing: repository.extension.sheet.installable=
+### Missing: repository.extension.sheet.documentation=
+### Missing: repository.extension.sheet.sources=
+### Missing: repository.extension.sheet.issues=
+### Missing: repository.extension.sheet.download=
+### Missing: repository.extension.sheet.toc=
+### Missing: repository.extension.sheet.documentationHelp=
+### Missing: repository.extension.sheet.rulesIntro=
+### Missing: repository.extension.sheet.ruleSummary=
+### Missing: repository.extension.sheet.ruleImported=
+### Missing: repository.extension.sheet.autoSync=
+### Missing: repository.extension.sheet.source=
+### Missing: repository.extension.sheet.iconLocation=
+### Missing: repository.extension.sheet.iconLocationSyntax=
+### Missing: repository.extension.sheet.iconLocationLinkText=
+### Missing: repository.extension.sheet.showActiveInstalls=
+### Missing: repository.extension.sheet.supportPlans=
+### Missing: repository.extension.sheet.description=
+### Missing: repository.extension.sheet.prerequisites=
+### Missing: repository.extension.sheet.customInstallationOnly=
+### Missing: repository.extension.sheet.standardInstallationInstructions=
+### Missing: repository.extension.sheet.customInstallationInstructions=
+### Missing: repository.extension.sheet.versions=
+### Missing: repository.extension.sheet.releaseNotes=
+### Missing: repository.extension.sheet.dependencies=
+### Missing: repository.extension.sheet.dependenciesIntro=
+### Missing: repository.extension.sheet.currentDownloads=
+### Missing: repository.extension.sheet.addDownloads=
+### Missing: repository.extension.sheet.addDownloadsSaveFirst=
+### Missing: repository.extension.sheet.addDownloadsWarning=
+### Missing: repository.extension.sheet.addDownloadsProcess=
+## Sentences that contain a link keep the whole sentence in a single key (so translators stay free
+## to reorder words and reposition the link). The link markup boundaries ([[ and &gt;&gt;target]]) are
+## passed as parameters {0}/{1} built by the sheet (trusted code) following the standard XWiki
+## pattern, and any untrusted data injected into the markup is escaped by the sheet.
+### Missing: repository.extension.sheet.addDownloadsAttach=
+### Missing: repository.extension.sheet.addDownloadsInfo=
+### Missing: repository.extension.sheet.currentDependencies=
+### Missing: repository.extension.sheet.addDependencies=
+### Missing: repository.extension.sheet.addDependenciesIntro=
+### Missing: repository.extension.sheet.addDependenciesVersion=
+### Missing: repository.extension.sheet.addDependenciesId=
+### Missing: repository.extension.sheet.addDependenciesConstraint=
+### Missing: repository.extension.sheet.wrongObject=
 </content>
 </xwikidoc>

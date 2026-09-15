@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc reference="Tour.HomepageTour.Translations" locale="es">
@@ -62,5 +62,6 @@ tour.homepageTour.header.contentA=Puedes buscar contenido, seguir los cambios en
 tour.homepageTour.header.contentB=El botón {0} abre un cajón que contiene acciones relacionadas con la wiki como Administración e Índices.
 tour.homepageTour.tourComplete.title=Tour completado
 tour.homepageTour.tourComplete.contentA=Esto completa tu recorrido por la interfaz y funcionalidades básicas de XWiki.
-tour.homepageTour.tourComplete.contentB=Para obtener más detalles de cada funcionalidad, accede a la {0}documentación{1}.</content>
+tour.homepageTour.tourComplete.contentB=Para obtener más detalles de cada funcionalidad, accede a la {0}documentación{1}.
+</content>
 </xwikidoc>

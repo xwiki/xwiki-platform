@@ -3440,16 +3440,7 @@ public class XWiki implements EventListener
         }
 
         // Get navigator language setting
-        if (context.getRequest() != null) {
-            String accept = context.getRequest().getHeader("Accept-Language");
-            if ((accept != null) && (!accept.isEmpty())) {
-                String[] alist = StringUtils.split(accept, ",;-");
-                if ((alist != null) && !(alist.length == 0)) {
-                    context.setLanguage(alist[0]);
-                    navigatorLanguage = alist[0];
-                }
-            }
-        }
+        navigatorLanguage = getNavigatorLanguage(context);
 
         // Get language from cookie
         try {
@@ -3547,16 +3538,7 @@ public class XWiki implements EventListener
         }
 
         // Get navigator language setting
-        if (context.getRequest() != null) {
-            String accept = context.getRequest().getHeader("Accept-Language");
-            if ((accept != null) && (!accept.isEmpty())) {
-                String[] alist = StringUtils.split(accept, ",;-");
-                if ((alist != null) && !(alist.length == 0)) {
-                    context.setLanguage(alist[0]);
-                    navigatorLanguage = alist[0];
-                }
-            }
-        }
+        navigatorLanguage = getNavigatorLanguage(context);
 
         // Get language from cookie
         try {
@@ -3599,6 +3581,32 @@ public class XWiki implements EventListener
             addLanguageCookie(INTERFACE_LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
         }
         return language;
+    }
+
+    /**
+     * Get the language preferred by the browser, as declared by the {@code Accept-Language} header of the current
+     * request, and set it as the current language in the context when there is one.
+     *
+     * @param context the XWiki context holding the request
+     * @return the language preferred by the browser, or an empty string when there is no request or no usable
+     *         {@code Accept-Language} header
+     */
+    private String getNavigatorLanguage(XWikiContext context)
+    {
+        String navigatorLanguage = "";
+
+        if (context.getRequest() != null) {
+            String accept = context.getRequest().getHeader("Accept-Language");
+            if ((accept != null) && (!accept.isEmpty())) {
+                String[] alist = StringUtils.split(accept, ",;-");
+                if ((alist != null) && (alist.length != 0)) {
+                    context.setLanguage(alist[0]);
+                    navigatorLanguage = alist[0];
+                }
+            }
+        }
+
+        return navigatorLanguage;
     }
 
     public long getXWikiPreferenceAsLong(String preference, XWikiContext context)

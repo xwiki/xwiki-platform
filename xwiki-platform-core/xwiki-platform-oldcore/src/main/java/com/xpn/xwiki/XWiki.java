@@ -4757,13 +4757,18 @@ public class XWiki implements EventListener
      * @param userReference the user responsible for the delete
      * @param document the document to delete
      * @param context the XWiki context
-     * @throws XWikiException when failing to delete
+     * @throws XWikiException when failing to delete or when the passed document is {@code null}
      * @since 11.6
      * @since 10.11.10
      */
     public void checkDeletingDocument(DocumentReference userReference, XWikiDocument document, XWikiContext context)
         throws XWikiException
     {
+        if (document == null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Cannot check the deletion of a null document");
+        }
+
         String currentWiki = null;
 
         currentWiki = context.getWikiId();
@@ -5969,9 +5974,7 @@ public class XWiki implements EventListener
                 reference = getDefaultDocumentReference().setWikiReference(new WikiReference(context.getWikiId()));
             }
         } else if (context.getMode() == XWikiContext.MODE_XMLRPC) {
-            reference = new DocumentReference(context.getWikiId(),
-                context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
-                context.getDoc().getDocumentReference().getName());
+            reference = getXMLRPCDocumentReference(context);
         } else {
             ResourceReference resourceReference = getResourceReferenceManager().getResourceReference();
             if (resourceReference instanceof EntityResourceReference entityResource) {
@@ -5991,6 +5994,22 @@ public class XWiki implements EventListener
         }
 
         return reference;
+    }
+
+    private DocumentReference getXMLRPCDocumentReference(XWikiContext context)
+    {
+        XWikiDocument document = context.getDoc();
+
+        if (document == null) {
+            // There's no current document yet (this method is precisely what's used to find out which document is
+            // requested), so point to this wiki's home page, as in portlet mode.
+            return getDefaultDocumentReference().setWikiReference(new WikiReference(context.getWikiId()));
+        }
+
+        DocumentReference documentReference = document.getDocumentReference();
+
+        return new DocumentReference(context.getWikiId(), documentReference.getLastSpaceReference().getName(),
+            documentReference.getName());
     }
 
     /**

@@ -19,11 +19,11 @@
  */
 
 import { SAVE_DELAY, SAVE_INTERVAL } from "./constants";
-import { debug, warn } from "./log";
 import { SaveStatus } from "./saveStatus";
 import type { SaveTarget } from "./saveTarget";
 import type { SaveTransport } from "./saveTransport";
 import type { SaverState } from "./saverState";
+import type { Logger } from "@xwiki/platform-api";
 
 /**
  * How the saver reports its progress.
@@ -42,6 +42,12 @@ type SaverConfig = {
    * account.
    */
   onStatusChange?: (status: SaveStatus) => void;
+
+  /**
+   * Where to report what the saver is doing. The caller passes the logger it resolved from the component manager,
+   * with the module name it wants the messages attributed to.
+   */
+  logger?: Logger;
 };
 
 /**
@@ -57,6 +63,8 @@ class Saver<C extends object = object> {
   private readonly onLocalStatusChange: (status: SaveStatus) => void;
 
   private readonly onStatusChange: (status: SaveStatus) => void;
+
+  private readonly logger?: Logger;
 
   private readonly transport: SaveTransport<C>;
 
@@ -95,6 +103,7 @@ class Saver<C extends object = object> {
   ) {
     this.onLocalStatusChange = config.onLocalStatusChange ?? ((): void => {});
     this.onStatusChange = config.onStatusChange ?? ((): void => {});
+    this.logger = config.logger;
 
     this.transport = createTransport(this);
     this.target = createTarget(this);
@@ -177,7 +186,7 @@ class Saver<C extends object = object> {
     try {
       await this.saveIfElected(saveContext);
     } catch (error) {
-      warn("Failed to save.", error);
+      this.logger?.warn("Failed to save.", error);
       // Let the caller know that the content has not been saved.
       throw error;
     } finally {
@@ -195,7 +204,7 @@ class Saver<C extends object = object> {
     }
 
     const savedUpdateCount = this.getUpdateCounts();
-    debug("Saving ", savedUpdateCount);
+    this.logger?.debug("Saving ", savedUpdateCount);
 
     const { version } = await this.target.submit(context);
     // Record the save result locally: afterSave() propagates it to the other clients.

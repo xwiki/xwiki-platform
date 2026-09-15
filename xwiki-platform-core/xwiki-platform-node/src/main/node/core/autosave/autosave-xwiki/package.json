@@ -37,6 +37,13 @@
     "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@xwiki/platform-api": "workspace:*",
+    "@xwiki/platform-autosave-api": "workspace:*",
+    "@xwiki/platform-document-xwiki": "workspace:*",
+    "@xwiki/platform-xwiki-model-api": "workspace:*",
+    "@xwiki/platform-xwiki-utils": "workspace:*"
+  },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@types/jquery": "catalog:",
@@ -68,11 +75,5 @@
     },
     "main": "./dist/index.es.js",
     "types": "./dist/index.d.ts"
-  },
-  "dependencies": {
-    "@xwiki/platform-autosave-api": "workspace:*",
-    "@xwiki/platform-document-xwiki": "workspace:*",
-    "@xwiki/platform-xwiki-model-api": "workspace:*",
-    "@xwiki/platform-xwiki-utils": "workspace:*"
   }
 }

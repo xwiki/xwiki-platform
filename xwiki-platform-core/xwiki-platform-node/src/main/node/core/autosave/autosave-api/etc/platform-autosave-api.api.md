@@ -4,6 +4,8 @@
 
 ```ts
 
+import { Logger } from '@xwiki/platform-api';
+
 // @beta
 export class Saver<C extends object = object> {
     constructor(config: SaverConfig, createTransport: (saver: Saver<C>) => SaveTransport<C>, createTarget: (saver: Saver<C>) => SaveTarget<C>);
@@ -27,6 +29,7 @@ export class Saver<C extends object = object> {
 export type SaverConfig = {
     onLocalStatusChange?: (status: SaveStatus) => void;
     onStatusChange?: (status: SaveStatus) => void;
+    logger?: Logger;
 };
 
 // @beta

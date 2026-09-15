@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Logger } from '@xwiki/platform-api';
 import { Saver } from '@xwiki/platform-autosave-api';
 import { SaveResult } from '@xwiki/platform-autosave-api';
 import { SaverState } from '@xwiki/platform-autosave-api';
@@ -51,6 +52,7 @@ export type XWikiFormSaveTargetConfig = {
     formId?: string;
     autoSaveVersionSummary?: string;
     onCreateVersion?: (version: DocumentVersion) => void;
+    logger?: Logger;
 };
 
 // (No @packageDocumentation comment for this package)

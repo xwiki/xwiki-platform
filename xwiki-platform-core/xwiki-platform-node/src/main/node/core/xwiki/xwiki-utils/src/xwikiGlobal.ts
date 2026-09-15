@@ -68,7 +68,9 @@ interface LegacyXWikiAttachment {
  */
 interface LegacyAjaxSaveAndContinue {
   /**
-   * Called after a successful save, to load the saved content back into the editor.
+   * Called after a save, to load the saved content back into the editor. The merge of concurrent changes happens
+   * server side, so when a save ran into a merge conflict that was resolved automatically the editor has no way of
+   * knowing the merged content and has to fetch it back.
    */
   reloadEditor(): void;
 

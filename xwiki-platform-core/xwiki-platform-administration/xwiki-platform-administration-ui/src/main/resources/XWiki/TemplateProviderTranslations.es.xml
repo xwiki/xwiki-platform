@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.TemplateProviderTranslations" locale="es">
@@ -44,5 +44,10 @@ administration.templateProvider.creationRestrictions=Restricciones de creación
 administration.templateProvider.creationRestrictions.hint=La lista de ubicaciones (incluyendo sus hijos) donde se permite crear páginas con esta plantilla
 administration.templateProvider.creationRestrictions.none=Esta plantilla puede crear páginas en cualquier lugar
 administration.templateProvider.creationRestrictionsAreSuggestions=Limitaciones de creación como sugerencias
-administration.templateProvider.creationRestrictionsAreSuggestions.hint=Permite al usuario seleccionar cualquier ubicación para crear la página con esta plantilla, utilizando la primera restricción de creación como ubicación predeterminada cuando se selecciona la plantilla de la lista.</content>
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Permite al usuario seleccionar cualquier ubicación para crear la página con esta plantilla, utilizando la primera restricción de creación como ubicación predeterminada cuando se selecciona la plantilla de la lista.
+### Missing: administration.templateProvider.creationRestrictions.add=
+### Missing: administration.templateProvider.creationRestrictions.remove=
+### Missing: administration.templateProvider.visibilityRestrictions.add=
+### Missing: administration.templateProvider.visibilityRestrictions.remove=
+</content>
 </xwikidoc>

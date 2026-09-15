@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.Ratings.RatingsTranslations" locale="de">
@@ -58,7 +58,7 @@ admin.ratings.ratingsactivated=Bewertungen wurden aktiviert
 admin.ratings.ratingsdeactivated=Bewertungen wurden deaktiviert
 admin.ratings.illegalrequest=Unzulässige Anfrage
 rating.yourvote=Ihre Stimme
-### Missing: rating.logintorate=Login to rate
+rating.logintorate=Login to rate
 rating.novotes=Noch keine Stimmen
 
 ## Used to indicate where deprecated keys end

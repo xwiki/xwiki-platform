@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="WikiManager.Translations" locale="pl">
@@ -124,9 +124,9 @@ platform.wiki.users.leave.confirmation.no=Nie
 platform.wiki.users.leave.success=Użytkownik {0}{1}{2} pomyślnie opuścił wiki {3}{4}{5}.
 platform.wiki.users.join.title=Dołącz do wiki
 platform.wiki.users.leave.title=Opuść wiki "{0}"
-### Missing: platform.wiki.users.leave.empty=Leave Wiki
+platform.wiki.users.leave.empty=Leave Wiki
 platform.wiki.users.delete.title=Usuń wiki "{0}"
-### Missing: platform.wiki.users.delete.empty=Delete Wiki
+platform.wiki.users.delete.empty=Delete Wiki
 platform.wiki.users.invitation.reply.hint=Wiadomość zwrotna do wysłania, widoczna przez administratora wiki, w której możesz zmotywować swoją decyzję.
 platform.wiki.users.join.request.hint=Aby dołączyć do wiki {0} {1} {2}, musisz najpierw wysłać prośbę o dołączenie. Po wykonaniu tej czynności administrator wiki przejrzy i rozpatrzy Twoją prośbę.
 platform.wiki.users.join.request.message.hint=Wiadomość do wysłania, widoczna przez administratora Wiki, w której możesz zmotywować tę prośbę o dołączenie.

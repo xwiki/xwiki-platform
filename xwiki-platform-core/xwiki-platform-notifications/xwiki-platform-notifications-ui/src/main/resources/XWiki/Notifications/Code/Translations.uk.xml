@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.4" reference="XWiki.Notifications.Code.Translations" locale="uk">
@@ -291,7 +291,7 @@ notifications.settings.filters.preferences.hint=Створіть фільтри,
 notifications.settings.filters.preferences.forGuest=Увійдіть або зареєструйтеся, щоб керувати своїми фільтрами сповіщень.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.table.name=Назва
-### Missing: notifications.settings.filters.preferences.table.filterType=Filter Type
+notifications.settings.filters.preferences.table.filterType=Filter Type
 notifications.settings.filters.preferences.table.eventTypes=Події
 notifications.settings.filters.preferences.table.notificationFormats=Формати
 notifications.settings.filters.preferences.table.isEnabled=Увімкнуто?

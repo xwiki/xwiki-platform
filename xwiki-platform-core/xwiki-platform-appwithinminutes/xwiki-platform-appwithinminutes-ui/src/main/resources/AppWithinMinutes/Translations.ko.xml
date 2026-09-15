@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.5" reference="AppWithinMinutes.Translations" locale="ko">
@@ -129,7 +129,7 @@ platform.appwithinminutes.classEditorPreviewFieldHint=구성 패널 숨기기 �
 platform.appwithinminutes.classEditorMoveFieldLabel=이동하다
 platform.appwithinminutes.classEditorMoveFieldHint=드래그 앤 드롭하여 순서를 변경하세요
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=기본값
-### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Pretty Name
+platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Pretty Name
 platform.appwithinminutes.classEditorFieldHintToolTip=힌트
 
 ### Date Picker
@@ -154,7 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=항목을 생�
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=위치를 선택하지 않으면 Wiki의 어느 위치에나 항목을 만들 수 있습니다.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=진입 위치를 강요하지 마세요
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=위에 지정된 위치는 제안용으로만 사용하여 사용자가 애플리케이션 항목을 생성할 때 다른 위치를 선택할 수 있도록 합니다 .
-### Missing: appWithinMinutes.templateProviderEditor.terminal.name=Terminal
+appWithinMinutes.templateProviderEditor.terminal.name=Terminal
 appWithinMinutes.templateProviderEditor.terminal.hint=애플리케이션 항목이 터미널 페이지여야 하는지 여부입니다.
 
 ### Wizard Step 3: Application Presentation
@@ -192,6 +192,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=드래그 앤 드롭하�
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=삭제
 platform.appwithinminutes.liveTableEditorAddColumnHint=선택한 열 추가
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=일부 열은 더 이상 사용되지 않습니다. 해당 응용 프로그램 필드가 삭제되었기 때문일 수 있습니다. 제거하시겠습니까?
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=
 platform.appwithinminutes.liveTableEditorIcon=아이콘
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=애플리케이션 아이콘입니다. 아이콘 선택기에서 아이콘을 선택하거나 첨부된 이미지를 참조할 수 있습니다.
 
@@ -270,5 +272,6 @@ appWithinMinutes.templateProviderEditor.title={0} 항목
 
 ### Since 18.6.0
 #@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=일부 열은 더 이상 사용되지 않습니다. 해당 응용 프로그램 필드가 삭제되었기 때문일 수 있습니다. 제거하시겠습니까?&lt;a href=""&gt;예&lt;/a&gt; / &lt;a href=""&gt;아니요&lt;/a&gt;</content>
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=일부 열은 더 이상 사용되지 않습니다. 해당 응용 프로그램 필드가 삭제되었기 때문일 수 있습니다. 제거하시겠습니까?&lt;a href=""&gt;예&lt;/a&gt; / &lt;a href=""&gt;아니요&lt;/a&gt;
+</content>
   </xwikidoc>

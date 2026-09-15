@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.2" reference="Rendering.Translations" locale="fr">
@@ -39,5 +39,6 @@
   <content>admin.syntaxes=Syntaxes
 admin.syntaxes.description=Sélectionnez la syntaxe de page par défaut et indiquez les autres syntaxes disponibles.
 Rendering.RenderingConfigClass_disabledSyntaxes=Syntaxes désactivées
-Rendering.RenderingConfigClass_disabledSyntaxes.hint=Liste des syntaxes dans lesquelles les pages ne peuvent pas être rédigées.</content>
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Liste des syntaxes dans lesquelles les pages ne peuvent pas être rédigées.
+</content>
 </xwikidoc>

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="IconThemesCode.Translations" locale="sk">
@@ -36,15 +36,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>platform.icon.picker.preview=Náhľad s\:
+  <content>platform.icon.picker.preview=Náhľad s:
 platform.icon.picker.loading=Načítava sa
-
 rendering.macro.iconPicker.name=Icon Picker
 rendering.macro.iconPicker.description=Vyberte si ikonu.
 rendering.macro.iconPicker.parameter.id.name=Id
-### Missing: rendering.macro.iconPicker.parameter.id.description=DOM id of the input field where the picker will apply to
+rendering.macro.iconPicker.parameter.id.description=DOM id of the input field where the picker will apply to
 rendering.macro.iconPicker.parameter.class.name=Trieda
-### Missing: rendering.macro.iconPicker.parameter.class.description=CSS class of inputs where the picker will apply to
+rendering.macro.iconPicker.parameter.class.description=CSS class of inputs where the picker will apply to
 rendering.macro.iconPicker.parameter.prefix.name=Prefix
-### Missing: rendering.macro.iconPicker.parameter.prefix.description=Prefix to add before the name of the icon in the input field (default: "image:icon:")</content>
+rendering.macro.iconPicker.parameter.prefix.description=Prefix to add before the name of the icon in the input field (default: "image:icon:")
+</content>
 </xwikidoc>

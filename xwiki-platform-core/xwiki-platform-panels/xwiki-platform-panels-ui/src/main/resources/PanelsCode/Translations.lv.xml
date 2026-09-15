@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="PanelsCode.Translations" locale="lv">
@@ -47,13 +47,12 @@ platform.panels.applications.ajax.noright=Jums nav tiesību mainīt PanelsCode.A
 platform.panels.applications.ajax.error=Neizdevās saglabāt izmaiņas.
 admin.panels.applications=Lietotņu panelis
 admin.panels.applications.description=Pārvaldīt, kuras lietotnes ir parādītas Lietotņu panelī.
-
 admin.panels.navigation=Pārvietošanās panelis
 admin.panels.navigation.description=Pārvaldīt, kuras lietotnes ir parādītas Pārvietošanās panelī.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Izslēgt augšējā līmeņa lapas
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Ja šīs lapas nav paredzēts mainīt, ar šo dinamisko filtru var izlaist uzstādītā paplašinājuma koka augšējā līmeņa lapas.
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Exclude Top Level Application Pages
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an application created with App Within Minutes.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Exclude Top Level Application Pages
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an application created with App Within Minutes.
 PanelsCode.NavigationConfigurationClass_exclusions=Izņēmumi
 PanelsCode.NavigationConfigurationClass_exclusions.hint=Saraksts ar lapām, kuras izlaist no pārvietošanās koka.
 PanelsCode.NavigationConfigurationClass_inclusions=Iekļaut
@@ -62,7 +61,8 @@ platform.panels.navigation.configuration.excludedPages=Izlaistās lapas
 platform.panels.navigation.configuration.excludedPages.hint=Velciet un nometiet lapas, lai iekļautu vai izņemu tās no koka.
 platform.panels.navigation.configuration.excludedPages.empty=Nevienu
 platform.panels.navigation.configuration.topLevelExtensionPages=Paplašinājumu augšējā līmeņa lapas
-### Missing: platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
+platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
 platform.panels.navigation.configuration.otherPages=Citas lapas
-platform.panels.navigation.configuration.saveComment=Pārvietošanās paneļa iestatījumi ir saglabāti</content>
+platform.panels.navigation.configuration.saveComment=Pārvietošanās paneļa iestatījumi ir saglabāti
+</content>
 </xwikidoc>

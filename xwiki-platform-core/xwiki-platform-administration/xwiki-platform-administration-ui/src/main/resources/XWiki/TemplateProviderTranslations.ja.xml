@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.TemplateProviderTranslations" locale="ja">
@@ -45,5 +45,9 @@ administration.templateProvider.creationRestrictions.hint=このテンプレー�
 administration.templateProvider.creationRestrictions.none=このテンプレートはどこでもページを作成できます
 administration.templateProvider.creationRestrictionsAreSuggestions=作成制限の候補
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=このテンプレートでページを作成する任意の場所を選択することをユーザーに許可。テンプレートを一覧から選択する際に、最初の作成制限を事前入力した既定の場所として使用します。
+### Missing: administration.templateProvider.creationRestrictions.add=
+### Missing: administration.templateProvider.creationRestrictions.remove=
+### Missing: administration.templateProvider.visibilityRestrictions.add=
+### Missing: administration.templateProvider.visibilityRestrictions.remove=
 </content>
 </xwikidoc>

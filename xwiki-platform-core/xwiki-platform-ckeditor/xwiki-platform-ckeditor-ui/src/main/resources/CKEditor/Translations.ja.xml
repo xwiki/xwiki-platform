@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.6" reference="CKEditor.Translations" locale="ja">
@@ -58,12 +58,17 @@ ckeditor.plugin.link.anchor=アンカー
 ckeditor.plugin.link.queryString=クエリー文字列
 ckeditor.plugin.link.defaultLabel=リンクのラベルを入力
 ckeditor.plugin.link.openInNewTab=リンクを新しいタブで開く
+### Missing: ckeditor.plugin.link.upload=
+### Missing: ckeditor.plugin.link.uploadHint=
 ckeditor.plugin.list.listType.none=なし
 ckeditor.plugin.macro.placeholder=マクロ：{0}
 ckeditor.plugin.macro.buttonHint=XWikiマクロ
 ckeditor.plugin.macro.editButtonHint=マクロを編集
 ckeditor.plugin.macro.refreshFailed=編集したコンテンツを再読み込みできませんでした。
 ckeditor.plugin.macro.dedicatedInsertButtonHint={0}マクロを挿入
+### Missing: ckeditor.plugin.macro.installPending=
+### Missing: ckeditor.plugin.macro.installSuccessful=
+### Missing: ckeditor.plugin.macro.installFailed=
 ckeditor.plugin.office.importer.title=Officeファイルをインポート
 ckeditor.plugin.office.importer.filePath=ファイルのパス
 ckeditor.plugin.office.importer.filePath.hint=インポートするOfficeファイルを選択してください。ファイルをアップロードしてページに添付し、ファイルの内容をページのコンテンツに挿入します。
@@ -79,9 +84,12 @@ ckeditor.plugin.office.importer.fail=Officeファイルをインポートでき�
 ckeditor.plugin.office.importer.noUploadURL=ファイルのアップロードURLが設定されていません。
 ckeditor.plugin.office.importer.failedToLoadForm=フォームを読み込めませんでした。
 ckeditor.plugin.resource.notSpecified={0}は指定されていません。
+### Missing: ckeditor.plugin.resource.selectValue=
 ckeditor.plugin.save.leaveConfirmationMessage=保存していない変更があります。変更を破棄してよろしいですか？
 ckeditor.plugin.save.failed=CKEditorの内部エラーのためコンテンツを保存できません。重要な変更をコピーして、エディターを再読み込みしてください。
 ckeditor.plugin.source.conversionFailed=変換できませんでした。
+### Missing: ckeditor.plugin.selection.restoring=
+### Missing: ckeditor.plugin.table.header.accessibilityWarning=
 ckeditor.plugin.toolbar.basicStyles=基本的なスタイル
 ckeditor.plugin.toolbar.lists=リスト
 ckeditor.plugin.toolbar.bulletedlist=箇条書きリスト
@@ -101,6 +109,132 @@ ckeditor.plugin.syntax.update.inProgress=WYSIWYGエディターを更新して�
 ckeditor.plugin.syntax.update.done=WYSIWYGエディターを更新しました
 ckeditor.plugin.syntax.update.failed=WYSIWYGエディターを更新できませんでした
 ckeditor.plugin.syntax.wysiwygModeUnsupported={0}のシンタックスはWYSIWYGの編集モードをサポートしていません。
+### Missing: ckeditor.plugin.icon.iconsFetchFailed=
+### Missing: ckeditor.plugin.icon.iconThemesFetchFailed=
+### Missing: ckeditor.plugin.image.slash.currentPageBadge=
+### Missing: ckeditor.plugin.image.slash.externalBadge=
+### Missing: ckeditor.plugin.image.slash.loading=
+### Missing: ckeditor.plugin.image.slash.upload=
+### Missing: ckeditor.plugin.slash.group.Layout=
+### Missing: ckeditor.plugin.slash.group.Content=
+### Missing: ckeditor.plugin.slash.group.Formatting=
+### Missing: ckeditor.plugin.slash.group.Navigation=
+### Missing: ckeditor.plugin.slash.group.Actions=
+### Missing: ckeditor.plugin.slash.group.Table=
+### Missing: ckeditor.plugin.slash.group.Macro=
+### Missing: ckeditor.plugin.slash.action.h1.hint=
+### Missing: ckeditor.plugin.slash.action.h2.hint=
+### Missing: ckeditor.plugin.slash.action.h3.hint=
+### Missing: ckeditor.plugin.slash.action.h4.hint=
+### Missing: ckeditor.plugin.slash.action.h5.hint=
+### Missing: ckeditor.plugin.slash.action.h6.hint=
+### Missing: ckeditor.plugin.slash.action.p.name=
+### Missing: ckeditor.plugin.slash.action.p.hint=
+### Missing: ckeditor.plugin.slash.action.ul.hint=
+### Missing: ckeditor.plugin.slash.action.ol.hint=
+### Missing: ckeditor.plugin.slash.action.table.hint=
+### Missing: ckeditor.plugin.slash.action.blockquote.name=
+### Missing: ckeditor.plugin.slash.action.blockquote.hint=
+### Missing: ckeditor.plugin.slash.action.info.hint=
+### Missing: ckeditor.plugin.slash.action.info.defaultContent=
+### Missing: ckeditor.plugin.slash.action.success.hint=
+### Missing: ckeditor.plugin.slash.action.success.defaultContent=
+### Missing: ckeditor.plugin.slash.action.warning.hint=
+### Missing: ckeditor.plugin.slash.action.warning.defaultContent=
+### Missing: ckeditor.plugin.slash.action.error.hint=
+### Missing: ckeditor.plugin.slash.action.error.defaultContent=
+### Missing: ckeditor.plugin.slash.action.hr.hint=
+### Missing: ckeditor.plugin.slash.action.a.hint=
+### Missing: ckeditor.plugin.slash.action.img.hint=
+### Missing: ckeditor.plugin.slash.action.icon.name=
+### Missing: ckeditor.plugin.slash.action.icon.hint=
+### Missing: ckeditor.plugin.slash.action.mention.name=
+### Missing: ckeditor.plugin.slash.action.mention.hint=
+### Missing: ckeditor.plugin.slash.action.emoji.name=
+### Missing: ckeditor.plugin.slash.action.emoji.hint=
+### Missing: ckeditor.plugin.slash.action.code.hint=
+### Missing: ckeditor.plugin.slash.action.toc.hint=
+### Missing: ckeditor.plugin.slash.action.include.hint=
+### Missing: ckeditor.plugin.slash.action.macros.name=
+### Missing: ckeditor.plugin.slash.action.macros.hint=
+### Missing: ckeditor.plugin.slash.action.find.hint=
+### Missing: ckeditor.plugin.slash.action.table_row_before.hint=
+### Missing: ckeditor.plugin.slash.action.table_row_after.hint=
+### Missing: ckeditor.plugin.slash.action.table_row_delete.name=
+### Missing: ckeditor.plugin.slash.action.table_row_delete.hint=
+### Missing: ckeditor.plugin.slash.action.table_col_before.hint=
+### Missing: ckeditor.plugin.slash.action.table_col_after.hint=
+### Missing: ckeditor.plugin.slash.action.table_col_delete.name=
+### Missing: ckeditor.plugin.slash.action.table_col_delete.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_split_horizontal.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_split_vertical.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_merge_right.name=
+### Missing: ckeditor.plugin.slash.action.table_cell_merge_right.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_merge_down.name=
+### Missing: ckeditor.plugin.slash.action.table_cell_merge_down.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_before.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_after.hint=
+### Missing: ckeditor.plugin.slash.action.table_cell_delete.name=
+### Missing: ckeditor.plugin.slash.action.table_cell_delete.hint=
+### Missing: ckeditor.plugin.slash.action.table_delete.hint=
+### Missing: ckeditor.plugin.slash.placeholder=
+### Missing: ckeditor.plugin.slash.dropdown.hint=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.body=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.address=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.aside=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.footer=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.header=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h1=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h2=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h3=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h4=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h5=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.h6=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.main=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.nav=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.section=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.blockquote=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.dl=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.dt=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.dd=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.figcaption=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.figure=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.ol=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.ul=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.menu=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.li=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.p=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.pre=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.caption=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.th=
+### Missing: ckeditor.plugin.focusedplaceholder.placeholder.td=
+### Missing: ckeditor.plugin.realtime.leavingCollaboration=
+### Missing: ckeditor.plugin.realtime.joiningCollaboration=
+### Missing: ckeditor.plugin.upload.downloadingPastedImages=
+### Missing: ckeditor.plugin.upload.imageDownloadFailed=
+### Missing: ckeditor.plugin.upload.starting=
+### Missing: ckeditor.plugin.upload.uploadingPastedImages=
+### Missing: ckeditor.plugin.upload.imageUploadFailed=
+ckeditor.inline.failedToInit=CKEditorを初期化できませんでした。
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=ドキュメントツリー
+
+## Deprecated since 16.10.10, 17.4.3, 17.6.0RC1
+### Missing: ckeditor.plugin.link.uploadProgress=
+### Missing: ckeditor.plugin.link.uploadSuccess=
+### Missing: ckeditor.plugin.link.uploadError=
+### Missing: ckeditor.plugin.image.slash.uploadProgress=
+### Missing: ckeditor.plugin.image.slash.uploadSuccess=
+### Missing: ckeditor.plugin.image.slash.uploadError=
+
+## Deprecated since 16.10.12, 17.4.5, 17.8.0
+### Missing: ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=
+### Missing: ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=
+### Missing: ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=
+### Missing: ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=
 ckeditor.plugin.image.imageEditor.standardTab.title=標準
 ckeditor.plugin.image.imageEditor.advancedTab.title=高度
 ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=画像のスタイル
@@ -137,77 +271,8 @@ ckeditor.plugin.image.imageSelector.urlTab.title=URL
 ckeditor.plugin.image.imageSelector.urlTab.url.title=URL
 ckeditor.plugin.image.imageSelector.urlTab.url.hint=表示する画像のURL。
 ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
-ckeditor.inline.failedToInit=CKEditorを初期化できませんでした。
 ckeditor.upload.error.csrf=CSRFトークンがありません。
 ckeditor.upload.error.emptyReturn=ファイルのアップロードの際のエラー：設定されている最大のアップロードのサイズを超えているかもしれません。
-modal.ok=OK
-modal.cancel=キャンセル
-modal.close=閉じる
-resource.attach.label=添付ファイル
-resource.attach.placeholder=ページ.への.パス@attachment.png
-### Missing: resource.data.label=Data URI
-resource.doc.label=ページ
-resource.doc.placeholder=ページ.への.パス
-resource.icon.label=アイコン
-resource.mailto.label=メールアドレス
-resource.mailto.placeholder=user@example.org
-resource.path.label=パス
-resource.path.placeholder=/ファイル/への/パス
-resource.unc.label=UNCパス
-resource.unc.placeholder=//server/share/ファイルへのパス
-resource.unknown.label=不明
-resource.url.label=URL
-### Missing: resource.url.placeholder=http://www.example.org/image.png
-resource.user.label=ユーザー
-resource.user.placeholder=エイリアス
-resourcePicker.attach.hint=添付ファイルを選択
-resourcePicker.doc.hint=ページを選択してください
-entityResourceSuggester.doc.placeholder=ページを探す…
-entityResourceSuggester.attach.placeholder=添付ファイルを探す…
-entityResourcePicker.select=選択
-entityResourcePicker.doc.title=ページを選択
-entityResourcePicker.attach.title=添付ファイルを選択
-macroSelector.title=マクロを選択
-macroSelector.filter.text.placeholder=入力してフィルタリング
-macroSelector.filter.category.all=全てのマクロ
-macroSelector.filter.category.other=その他
-macroSelector.filter.category.notinstalled=インストールされていません
-macroSelector.failedToRetrieveMacros=利用できるマクロのリストを取得できませんでした。
-macroSelector.select=選択
-macroSelector.recommended=推奨
-macroSelector.install=インストール
-macroSelector.install.confirm=拡張機能{0} {1}をインストールします。続行してよろしいですか？
-macroSelector.install.notAllowed=この拡張機能のインストールは許可されていません
-macroSelector.filter.category.placeholder=カテゴリーを選択…
-macroEditor.title=マクロを編集
-macroEditor.more=その他
-macroEditor.changeMacro=マクロを変更
-macroEditor.submit=送信
-macroEditor.content=内容
-macroEditor.noParameters=このマクロにはパラメーターがありません。
-macroEditor.descriptorRequestFailed={0}のマクロの記述子を取得できませんでした。
-macroEditor.installRequestFailed={0}のマクロをインストールできませんでした。
-
-
-imageEditor.modal.changeImage.button=画像を変更
-imageEditor.modal.loadFail.message=画像エディターフォームを取得できませんでした。
-imageEditor.modal.title=画像を編集
-imageEditor.modal.insertButton=挿入
-imageEditor.modal.initialization.fail=画像の選択フォームを取得できませんでした。
-imageSelector.modal.title=画像を選択
-imageSelector.modal.selectButton=選択
-imageSelector.modal.loadFail.message=画像の選択フォームを取得できませんでした。
-imageSelector.modal.fileUpload.success=ファイルをアップロードしました。
-imageSelector.modal.fileUpload.fail=ファイルをアップロードできませんでした。
-imageSelector.modal.fileUpload.abort=ファイルのアップロードを中止しました。
-imageSelector.modal.initialization.fail=画像の選択フォームを取得できませんでした。
-
-## Used to indicate where deprecated keys start
-#@deprecatedstart
-
-## Deprecated since 14.10
-imageEditor.modal.backToEditor.button=戻る
-ckeditor.plugin.image.imageSelector.documentTreeTab.title=ドキュメントツリー
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

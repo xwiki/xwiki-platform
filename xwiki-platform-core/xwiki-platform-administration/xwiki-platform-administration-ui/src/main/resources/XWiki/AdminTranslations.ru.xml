@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.AdminTranslations" locale="ru">
@@ -139,8 +139,8 @@ administration.section.users.deleteUser.newAuthor.error=Выбранный по�
 administration.section.users.deleteUser.newAuthor.programming=программирование
 administration.section.users.deleteUser.newAuthor.script=скрипт
 admin.usersgroups.extensionrights=Права расширений: Страница и дочерние
-### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
-### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
+admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Исключение участника из группы

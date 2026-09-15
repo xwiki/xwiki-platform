@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.4" reference="XWiki.EditTranslations" locale="ru">
@@ -42,7 +42,6 @@ edit.inplace.page.loadFailed=Не удалось загрузить страни
 edit.inplace.page.renderFailed=Не удалось отрисовать страницу.
 edit.inplace.page.translate.messageBefore=Вы редактируете перевод {0} этой страницы (ее исходную версию), поскольку эта страница еще не была переведена на {1} (текущий языковой стандарт).
 edit.inplace.page.translate.messageAfter=Вы редактируете перевод {0}. Начните с перевода заголовка страницы.
-
 edit.inplace.actionButtons.loadFailed=Не удалось загрузить кнопки действий.
 
 ###############################################################################

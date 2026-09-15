@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.TemplateProviderTranslations" locale="ro">
@@ -45,5 +45,9 @@ administration.templateProvider.creationRestrictions.hint=Lista locațiilor (inc
 administration.templateProvider.creationRestrictions.none=Acest șablon poate crea pagini peste tot
 administration.templateProvider.creationRestrictionsAreSuggestions=Restricții de creare ca sugestii
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=Permite utilizatorului să selecteze orice locație pentru a crea pagina cu acest șablon, folosind prima restricție de creare ca locație implicită completată în prealabil atunci când șablonul este selectat din listă.
+### Missing: administration.templateProvider.creationRestrictions.add=
+### Missing: administration.templateProvider.creationRestrictions.remove=
+### Missing: administration.templateProvider.visibilityRestrictions.add=
+### Missing: administration.templateProvider.visibilityRestrictions.remove=
 </content>
 </xwikidoc>

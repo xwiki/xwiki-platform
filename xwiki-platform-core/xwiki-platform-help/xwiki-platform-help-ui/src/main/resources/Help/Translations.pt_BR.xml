@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="Help.Translations" locale="pt_BR">
@@ -46,10 +46,10 @@ help.tipsPanel.advancedHiddenShortcutTip=Pressione a combinação de teclas x+x+
 help.tipsPanel.linkAutocompleteWYSIWYGTip=Ao editar em WYSIWYG, digite ##[## e comece a digitar letras para obter sugestões para criar um link.
 help.tipsPanel.WYSIWYGEditorTip=Ao editar no modo WYSIWYG, o atalho {0}Alt + 0{1} ({0}⌥0{1} no macOS) abre um modal de ajuda com informações sobre como usar o teclado para navegar no editor.
 help.macroList.title=Macros Disponíveis
-### Missing: help.macroList.id=Id
-### Missing: help.macroList.name=Name
+help.macroList.id=Id
+help.macroList.name=Name
 help.macroList.categories=Categorias
-### Missing: help.macroList.description=Description
+help.macroList.description=Description
 help.macroList.visibility=Visibilidade
 
 ###############################################################################

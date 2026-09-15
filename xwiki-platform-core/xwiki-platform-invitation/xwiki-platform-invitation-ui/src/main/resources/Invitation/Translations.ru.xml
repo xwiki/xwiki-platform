@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.2" reference="Invitation.Translations" locale="ru">
@@ -44,5 +44,6 @@ Invitation.WebHome_smtp_server_password.hint=Пароль для подключ�
 Invitation.WebHome_smtp_server_username.hint=Имя пользователя для подключения к SMTP-серверу, если требуется аутентификация.
 Invitation.WebHome_smtp_port.hint=Порт SMTP-сервера.
 Invitation.WebHome_smtp_server.hint=SMTP-сервер для отправки.
-Invitation.WebHome_javamail_extra_props.hint=Список дополнительных свойств JavaMail.</content>
+Invitation.WebHome_javamail_extra_props.hint=Список дополнительных свойств JavaMail.
+</content>
 </xwikidoc>

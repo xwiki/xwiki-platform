@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.4" reference="XWiki.Like.LikeTranslations" locale="ko">
@@ -53,7 +53,7 @@ like.toggle.hint.like.noright=이 페이지에서는 '좋아요'를 설정할 �
 like.likers.link.zero={0} 좋아요
 like.likers.link.one={0} 좋아요
 like.likers.link.many={0} 좋아요
-### Missing: like.likers.link.title=Number of likes on this page: {0}. Click to see who liked this page.
+like.likers.link.title=Number of likes on this page: {0}. Click to see who liked this page.
 like.likers.empty=아직 이 페이지를 좋아하는 사람이 없습니다.
 like.likers.number={0}명이 이 페이지를 좋아합니다:
 like.likers.title={0}을(를) 좋아하는 사람들

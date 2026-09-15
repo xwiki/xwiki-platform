@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="WikiManager.Translations" locale="es">
@@ -280,8 +280,8 @@ platform.wiki.dependencies.applicationmanager.missing=El {0}Plugin Application M
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
-### Missing: admin.wikis.template=Wiki Template
+admin.wikis=Wikis
+admin.wikis.template=Wiki Template
 
 #######################################
 ## until 7.0M2

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.5" reference="AppWithinMinutes.Translations" locale="ja">
@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=設定パネルを非表�
 platform.appwithinminutes.classEditorMoveFieldLabel=移動
 platform.appwithinminutes.classEditorMoveFieldHint=ドラッグアンドドロップで順番を変更
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=既定の値
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -142,7 +144,9 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=追加
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=削除
 appWithinMinutes.templateProviderEditor.hint=アプリケーションのエントリーは、構造化データを含むウィキのページです。
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=
 appWithinMinutes.templateProviderEditor.icon.hint=アプリケーションのエントリーに関係付けるアイコン。
+### Missing: appWithinMinutes.templateProviderEditor.description.name=
 appWithinMinutes.templateProviderEditor.description.hint=アプリケーションのエントリーの短い説明。
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=エントリーを作成する元の場所
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=場所の指定がない場合、どのページからもエントリーを作成できます。
@@ -150,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=エントリ�
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=場所の指定がない場合、ウィキのどの場所にもエントリーを作成できます。
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=エントリーの場所を強制しない
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=上で指定した場所は候補としてのみ使用し、アプリケーションエントリーを作成する際に異なる場所を選択することをユーザーに許可。
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=
 appWithinMinutes.templateProviderEditor.terminal.hint=アプリケーションのエントリーをターミナルページとするか否かを選択。
 
 ### Wizard Step 3: Application Presentation
@@ -187,6 +192,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=ドラッグアンドド
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=削除
 platform.appwithinminutes.liveTableEditorAddColumnHint=選択したカラムを追加
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=いくつかのカラムは、対応するアプリケーションのフィールドが削除されたため非推奨です。削除してよろしいですか？
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=
 platform.appwithinminutes.liveTableEditorIcon=アイコン
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=アプリケーションのアイコン。アイコンピッカーからアイコンを選択するか、添付したイメージを参照できます。
 
@@ -265,5 +272,6 @@ appWithinMinutes.templateProviderEditor.title={0}件のエントリー
 
 ### Since 18.6.0
 #@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=いくつかのカラムは、対応するアプリケーションのフィールドが削除されたため非推奨です。削除してよろしいですか？&lt;a href=""&gt;はい&lt;/a&gt; / &lt;a href=""&gt;いいえ&lt;/a&gt;</content>
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=いくつかのカラムは、対応するアプリケーションのフィールドが削除されたため非推奨です。削除してよろしいですか？&lt;a href=""&gt;はい&lt;/a&gt; / &lt;a href=""&gt;いいえ&lt;/a&gt;
+</content>
 </xwikidoc>

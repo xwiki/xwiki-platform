@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.4" reference="XWiki.AdminTranslations" locale="ja">
@@ -44,7 +44,7 @@ administration.sectionTitle=管理：{0}
 administration.sectionTitle.page=ページの管理：{0}
 administration.sectionTitle.wiki=ウィキの管理：{0}
 administration.sectionTitle.global=共通設定：{0}
-### Missing: administration.menu.label=Administration sections.
+administration.menu.label=Administration sections.
 administration.menu.search.hint=検索…
 administration.menu.search.noResults=結果がありません。
 
@@ -139,13 +139,13 @@ administration.section.users.deleteUser.newAuthor.error=選択したユーザー
 administration.section.users.deleteUser.newAuthor.programming=プログラミング
 administration.section.users.deleteUser.newAuthor.script=スクリプト
 admin.usersgroups.extensionrights=拡張機能の権限
-### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
-### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
+admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
-### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
-### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
-### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
+administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
 
 # Rights for page section
 ### Missing: administration.section.pagerights.hint=These rights apply on this page only. They do not affect the {0}children{1}.
@@ -164,8 +164,8 @@ admin.social=ソーシャル
 admin.social.description=ソーシャル機能を設定。
 
 # Network category
-### Missing: admin.network=Network
-### Missing: admin.network.description=Network related features.
+admin.network=Network
+admin.network.description=Network related features.
 
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=セクションに表示

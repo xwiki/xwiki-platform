@@ -348,6 +348,7 @@ public class SaveAction extends EditAction
                 try {
                     createJob.join();
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     throw new XWikiException(String.format(
                         "Interrupted while waiting for template [%s] to be processed when creating the document [%s]",
                         form.getTemplate(), tdoc.getDocumentReference()), e);

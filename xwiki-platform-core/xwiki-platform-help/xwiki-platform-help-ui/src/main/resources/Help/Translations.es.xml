@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="Help.Translations" locale="es">
@@ -44,21 +44,24 @@ help.tipsPanel.improveXWikiTip=¿Sabías que puedes mejorar XWiki? ¡Dedique 5 m
 help.tipsPanel.breadcrumbsTip=Puede hacer clic en las flechas junto a los elementos de la miga de pan para navegar rápidamente a las páginas para hermanas e hijas.
 help.tipsPanel.advancedHiddenShortcutTip=Presione la combinación de teclas x+x+x+a para alternar entre [[Modo avanzado&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] y x+x+x+h para alternar la visualización de [[páginas ocultas&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 help.tipsPanel.linkAutocompleteWYSIWYGTip=Cuando edite en WYSIWYG, escriba ##[## y luego empiece a escribir letras para obtener sugerencias para crear un enlace.
+### Missing: help.tipsPanel.WYSIWYGEditorTip=
 help.macroList.title=Macros disponibles
 help.macroList.id=Id
 help.macroList.name=Nombre
+### Missing: help.macroList.categories=
 help.macroList.description=Descripción
 help.macroList.visibility=Visibilidad
 
 ###############################################################################
 ## Deprecated
 ## Note: each element should be removed when the last branch using it is no longer supported
-###############################################################################
+############################################################################### 
 
 #@deprecatedstart
 
 ## until 14.6RC1
 help.macroList.category=Categoría
 
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

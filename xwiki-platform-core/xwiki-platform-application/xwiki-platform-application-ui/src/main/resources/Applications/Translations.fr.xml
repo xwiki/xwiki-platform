@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="Applications.Translations" locale="fr">
@@ -37,5 +37,6 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>application.index.title=Liste des applications
-application.index.drawer=Liste des applications</content>
+application.index.drawer=Liste des applications
+</content>
 </xwikidoc>

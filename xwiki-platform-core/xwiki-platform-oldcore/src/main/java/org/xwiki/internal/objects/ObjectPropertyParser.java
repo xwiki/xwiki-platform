@@ -40,6 +40,8 @@ public interface ObjectPropertyParser
      * @return an instance of an xproperty with the value properly set.
      * @throws XWikiException in case of problem to create the instance or parse its value.
      */
+    // The property subclass returned depends on the xproperty type, so its type parameter cannot be named.
+    @SuppressWarnings("java:S1452")
     BaseProperty<?> fromString(String value) throws XWikiException;
 
     /**
@@ -49,5 +51,7 @@ public interface ObjectPropertyParser
      * @return an instance of an xproperty with the value properly set.
      * @throws XWikiException in case of problem to create the instance or parse its value.
      */
+    // The property subclass returned depends on the xproperty type, so its type parameter cannot be named.
+    @SuppressWarnings("java:S1452")
     BaseProperty<?> fromValue(Object value) throws XWikiException;
 }

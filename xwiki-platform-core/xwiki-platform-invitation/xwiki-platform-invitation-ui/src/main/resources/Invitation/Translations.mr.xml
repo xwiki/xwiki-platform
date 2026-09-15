@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.2" reference="Invitation.Translations" locale="mr">
@@ -44,5 +44,6 @@ Invitation.WebHome_smtp_server_password.hint=एसएमटीपी सर्�
 Invitation.WebHome_smtp_server_username.hint=एसएमटीपी सर्व्हरशी कनेक्ट होण्यासाठी वापरकर्तानाव, केवळ जेव्हा प्रमाणीकरण आवश्यक असेल.
 Invitation.WebHome_smtp_port.hint=वापरण्यासाठी एसएमटीपी सर्व्हरचे पोर्ट.
 Invitation.WebHome_smtp_server.hint=पाठविण्यासाठी एसएमटीपी सर्व्हर.
-Invitation.WebHome_javamail_extra_props.hint=वापरण्यासाठी अतिरिक्त जावामेल गुणधर्मांची यादी.</content>
+Invitation.WebHome_javamail_extra_props.hint=वापरण्यासाठी अतिरिक्त जावामेल गुणधर्मांची यादी.
+</content>
 </xwikidoc>

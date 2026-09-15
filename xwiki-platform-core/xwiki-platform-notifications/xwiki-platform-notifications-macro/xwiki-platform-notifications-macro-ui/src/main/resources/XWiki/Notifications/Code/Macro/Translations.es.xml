@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.Notifications.Code.Macro.Translations" locale="es">
@@ -68,7 +68,10 @@ rendering.macro.notifications.parameter.tags.name=Etiquetas
 rendering.macro.notifications.parameter.tags.description=Lista de etiquetas a considerar (separadas por comas). Sólo funciona en el wiki actual. Ignorado si "useUserPreferences" está ajustado a "true".
 notifications.macro.noWatchedUsers=No estás siguiendo a nadie.
 notifications.macro.whenNotView=Notificaciones Macro. Se puede ver en el modo 'ver'.
+### Missing: notifications.macro.markEventAsRead=
+### Missing: notifications.macro.showEventDetails=
 notifications.menu.nothing=¡No hay notificaciones disponibles!
 notifications.menu.more=Cargar notificaciones más antiguas
-notifications.menu.details=Detalles ({0})</content>
+notifications.menu.details=Detalles ({0})
+</content>
 </xwikidoc>

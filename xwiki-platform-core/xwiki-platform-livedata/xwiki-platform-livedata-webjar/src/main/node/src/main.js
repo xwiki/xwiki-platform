@@ -40,6 +40,9 @@ globalThis.require(["jquery", "xwiki-page-ready"], ($, pageReady) => {
         });
         // Mark the element as displayed synchronously, before the asynchronous initialization completes: this method
         // is called again for every xwiki:dom:updated event and displaying the same element twice destroys it.
+        // While the live data is loading, the "liveData" key thus holds a promise rather than the live data API: the
+        // live data component replaces it with the API once it is mounted. Code reading this key before the live data
+        // is mounted must not assume it gets the API.
         $(this).data("liveData", displayed);
         pageReady.delayPageReady(displayed, "livedata:display");
       }

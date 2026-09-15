@@ -20,6 +20,7 @@
 package org.xwiki.livedata.test.ui;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.edit.test.po.InplaceEditablePage;
@@ -65,6 +66,7 @@ class LiveDataInplaceEditIT
      * table by an empty element.
      */
     @Test
+    @Order(1)
     void liveDataIsStillDisplayedAfterSourceRoundTrip(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();

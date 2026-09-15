@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="AppWithinMinutes.Translations" locale="zh">
@@ -192,6 +192,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=拖放以更改顺序
 ### Missing: platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
 platform.appwithinminutes.liveTableEditorAddColumnHint=添加选中的列
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=一些列已失效，可能是因为相应的应用字段已被删除。要删除这些列吗？
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=应用图标。你可以直接选择一个，或者引用附件中的图像。
 
@@ -272,5 +274,6 @@ appWithinMinutes.templateProviderEditor.title={0} 个条目
 
 ### Since 18.6.0
 #@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=一些列已失效，可能是因为相应的应用字段已被删除。要删除这些列吗？ &lt;a href=""&gt;是&lt;/a&gt; / &lt;a href=""&gt;否&lt;/a&gt;</content>
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=一些列已失效，可能是因为相应的应用字段已被删除。要删除这些列吗？ &lt;a href=""&gt;是&lt;/a&gt; / &lt;a href=""&gt;否&lt;/a&gt;
+</content>
 </xwikidoc>

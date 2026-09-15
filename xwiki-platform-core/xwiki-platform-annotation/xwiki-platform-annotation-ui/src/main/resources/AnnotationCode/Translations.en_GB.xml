@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.6" reference="AnnotationCode.Translations" locale="en_GB">
@@ -49,6 +49,7 @@ annotations.tab.info.noannotations=No annotations on this page
 ### Missing: annotations.annotated.error.noannotatedelement=Annotations could not be loaded because the content is not available.
 ### Missing: annotations.annotated.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
 ### Missing: annotations.annotated.highlight.toggle.hint=Open the annotation about this text.
+### Missing: annotations.annotated.bubble.toggle.hint=
 ### Missing: annotations.action.edit.text=[Edit]
 ### Missing: annotations.action.edit.tooltip=Edit annotation
 ### Missing: annotations.action.edit.submit.text=Update

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="AppWithinMinutes.Translations" locale="pt_BR">
@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=Esconder painel de configu
 platform.appwithinminutes.classEditorMoveFieldLabel=Mover
 platform.appwithinminutes.classEditorMoveFieldHint=Arrastar e soltar para mudar a ordem
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Valor padrão
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -142,7 +144,9 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Adicionar
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Remover
 appWithinMinutes.templateProviderEditor.hint=As entradas do aplicativo são páginas wiki que contêm dados estruturados.
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=
 appWithinMinutes.templateProviderEditor.icon.hint=O ícone associado a uma entrada de aplicativo.
+### Missing: appWithinMinutes.templateProviderEditor.description.name=
 appWithinMinutes.templateProviderEditor.description.hint=Breve descrição de uma entrada de aplicativo.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=De onde criar as entradas
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Se nenhum local for selecionado, as entradas podem ser criadas a partir de qualquer página.
@@ -150,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Onde criar as 
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Se nenhum local for selecionado, as entradas podem ser criadas em qualquer lugar do wiki.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Não imponha o local de entrada
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use os locais especificados acima apenas como sugestões, permitindo que o usuário selecione um local diferente ao criar uma entrada de aplicativo.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=
 appWithinMinutes.templateProviderEditor.terminal.hint=Se as entradas do aplicativo devem ser páginas terminais ou não.
 
 ### Wizard Step 3: Application Presentation
@@ -187,6 +192,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Arraste e solte para mud
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Remover
 platform.appwithinminutes.liveTableEditorAddColumnHint=Adicionar
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Algumas colunas estão obsoletas. Possivelmente porque os campos correspondentes foram removidos. Você deseja removê-las?
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=
 platform.appwithinminutes.liveTableEditorIcon=Ícone
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=O ícone do aplicativo. Você pode selecionar um ícone no seletor de ícones ou fazer referência a uma imagem anexada.
 
@@ -267,5 +274,6 @@ appWithinMinutes.templateProviderEditor.title={0} Entradas
 
 ### Since 18.6.0
 #@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algumas colunas estão obsoletas. Possivelmente porque os campos correspondentes foram removidos. Você deseja removê-las? &lt;a href\=""&gt;Yes&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;</content>
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algumas colunas estão obsoletas. Possivelmente porque os campos correspondentes foram removidos. Você deseja removê-las? &lt;a href\=""&gt;Yes&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;
+</content>
 </xwikidoc>

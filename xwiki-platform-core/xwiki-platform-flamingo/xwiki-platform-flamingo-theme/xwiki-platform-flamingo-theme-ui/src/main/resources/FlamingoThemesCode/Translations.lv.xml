@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="FlamingoThemesCode.Translations" locale="lv">
@@ -53,6 +53,7 @@ platform.flamingo.themes.title.preview=Priekšskatīt
 platform.flamingo.themes.autorefresh=Atjaunot automātiski
 platform.flamingo.themes.refresh=Atjaunot
 platform.flamingo.themes.refreshwarning=Atjaunošana prasīs vairākas sekundes un priešskats var nebūt 100% pareizs.
+### Missing: platform.flamingo.themes.preview.iframe.label=
 platform.flamingo.themes.loading=Ielādē...
 platform.flamingo.themes.category.logos=Logo
 platform.flamingo.themes.category.base-colors=Pamatkrāsas
@@ -69,6 +70,7 @@ platform.flamingo.themes.defaultvalue=Noklusētais
 platform.flamingo.themes.lessCode.description=Šajā laukā varat tieši ierakstīt LESS kodu, kurš tiks pievienots apdarei.
 platform.flamingo.themes.local=Lokāla
 platform.flamingo.themes.global=Globāla
+### Missing: FlamingoThemesCode.ThemeClass_logo-description_hint=
 
 ###############################################################################
 ## Deprecated

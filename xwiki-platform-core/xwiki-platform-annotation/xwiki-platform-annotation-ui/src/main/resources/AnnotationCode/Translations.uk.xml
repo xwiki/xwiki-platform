@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="AnnotationCode.Translations" locale="uk">
@@ -49,6 +49,7 @@ annotations.annotated.loaderror.wrongresponse=Неправильно відфо�
 annotations.annotated.error.noannotatedelement=Примітки неможливо завантажити оскільки вміст недоступний.
 annotations.annotated.error.wrongsyntax=Примітки не доступні для документів написаних синтаксисом XWiki/1.0.
 annotations.annotated.highlight.toggle.hint=Відкрити анотацію про цей текст.
+### Missing: annotations.annotated.bubble.toggle.hint=
 annotations.action.edit.text=[Змінити]
 annotations.action.edit.tooltip=Змінити цю примітку
 annotations.action.edit.submit.text=Оновити

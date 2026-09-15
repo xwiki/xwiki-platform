@@ -94,6 +94,9 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         }
     }
 
+    /**
+     * @deprecated use {@link #getContentInputStream()} instead
+     */
     @Override
     @Deprecated
     public byte[] getContent()

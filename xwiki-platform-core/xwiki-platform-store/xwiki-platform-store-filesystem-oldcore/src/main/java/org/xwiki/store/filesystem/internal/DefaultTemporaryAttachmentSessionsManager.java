@@ -105,6 +105,9 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
         return uploadAttachment(documentReference, part, null);
     }
 
+    /**
+     * @deprecated use {@link #uploadAttachment(DocumentReference, Part, String)} instead
+     */
     @Override
     @Deprecated
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, javax.servlet.http.Part part,

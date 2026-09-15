@@ -72,6 +72,22 @@ public class ExportAction extends XWikiAction
 {
     private static final String EXCEPTION = "exception";
 
+    /**
+     * Template listing the parameters of an export that was requested with a method the action doesn't export on, and
+     * offering to submit that same export again with a POST request.
+     */
+    private static final String RESUBMIT_TEMPLATE = "exportresubmit";
+
+    /**
+     * Define the different format supported by the export.
+     */
+    private enum ExportFormat
+    {
+        XAR,
+        HTML,
+        OTHER
+    }
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -82,7 +98,7 @@ public class ExportAction extends XWikiAction
             String format = request.get("format");
 
             if (!validateExportRequest(request)) {
-                return "docdoesnotexist";
+                return RESUBMIT_TEMPLATE;
             } else if (format == null || "xar".equals(format)) {
                 defaultPage = exportXAR(context);
             } else if ("html".equals(format)) {
@@ -103,30 +119,17 @@ public class ExportAction extends XWikiAction
      * many resources and we want to allocate those resources only when there is a clear intent.
      *
      * @param request the export request to validate
-     * @return {@code true} if the request is a valid (e.g. the user intended to perform an export), {@code false} otherwise
+     * @return {@code true} if the request is a valid export request (e.g. the user intended to perform an export),
+     *         {@code false} otherwise
      */
     private boolean validateExportRequest(XWikiRequest request)
     {
-        // We used to consider all requests to the /export/ action as export requests but this was causing problems with
-        // the PDF export where resources loaded by the print preview page using relative URLs ended up targeting the
-        // export action and thus triggering a backup XAR export. See XWIKI-23768: Missing RequireJS module can slow
-        // down or even block the PDF export
-        //
-        // Ideally we should ask for a CSRF token, but this would break backwards compatibility. We can't rely on the
-        // Accept HTTP header either because it includes */* most of the time, even when the request originates from a
-        // script or image HTML tag. The best option seems to be to rely on the Sec-Fetch-Dest header which is set by
-        // modern browsers to indicate the context in which the request is made.
-        // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest
-        //
-        // As such, we validate the export request if:
-        String secFetchDest = request.getHeader("Sec-Fetch-Dest");
-        return
-            // either the Sec-Fetch-Dest header is missing, which is a sign that the request was made by a non-browser
-            // user agent (e.g. curl, wget),
-            secFetchDest == null
-            // or the Sec-Fetch-Dest header is set to "document", which is a sign that the export request is the result
-            // of a user navigating to an export URL (e.g. by clicking on a link or submitting a form).
-            || "document".equals(secFetchDest);
+        // A GET request to this action can be triggered without any user intent, for instance by a resource loaded
+        // with a relative URL from a page that is itself served by the export action (this is the case of the PDF
+        // export print preview), and an unintended backup XAR export is very expensive. Requiring POST means an export
+        // can only be started by submitting one of the export forms. Requests that are refused here get the
+        // RESUBMIT_TEMPLATE, from which the user can start the same export again with a POST request.
+        return "POST".equalsIgnoreCase(request.getMethod());
     }
 
     /**

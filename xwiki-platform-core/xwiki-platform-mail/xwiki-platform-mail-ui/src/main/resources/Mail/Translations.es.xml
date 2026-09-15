@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.1">
@@ -74,6 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Error
 Mail.SendMailStatus_livetable.actions=Acciones
 Mail.SendMailStatus_livetable.resend=Reenviar
+### Missing: Mail.SendMailStatus_livetable.delete=
 mailSender.admin.resendSuccess=El mensaje de correo electrónico se ha reenviado exitosamente
-mailSender.admin.resendFailure=Error al reenviar. Clica para más detalles.</content>
+mailSender.admin.resendFailure=Error al reenviar. Clica para más detalles.
+### Missing: mailSender.admin.deleteSuccess=
+### Missing: mailSender.admin.deleteFailure=
+</content>
 </xwikidoc>

@@ -154,6 +154,8 @@ public final class VersioningStoreQueryFactory<T>
      * @param id the id of the document
      * @return the created query
      */
+    // This is a DML delete statement, so the Hibernate query has no result type to name.
+    @SuppressWarnings("java:S1452")
     public static Query<?> getDeleteArchiveQuery(Session session, final long id)
     {
         return

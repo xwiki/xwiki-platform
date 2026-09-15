@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.1">
@@ -38,7 +38,6 @@
   <parent>IconThemes.WebHome</parent>
   <content>platform.icon.picker.preview=预览：
 platform.icon.picker.loading=载入中
-
 rendering.macro.iconPicker.name=图标选择器
 rendering.macro.iconPicker.description=在XWiki图标集中选择一个图标。
 rendering.macro.iconPicker.parameter.id.name=Id
@@ -46,5 +45,6 @@ rendering.macro.iconPicker.parameter.id.description=选择器将应用于的输�
 rendering.macro.iconPicker.parameter.class.name=类
 rendering.macro.iconPicker.parameter.class.description=选择器将应用于的CSS输入类
 rendering.macro.iconPicker.parameter.prefix.name=前缀
-rendering.macro.iconPicker.parameter.prefix.description=在输入字段中的图标名称之前添加前缀（默认："image:icon:"）</content>
+rendering.macro.iconPicker.parameter.prefix.description=在输入字段中的图标名称之前添加前缀（默认："image:icon:"）
+</content>
 </xwikidoc>

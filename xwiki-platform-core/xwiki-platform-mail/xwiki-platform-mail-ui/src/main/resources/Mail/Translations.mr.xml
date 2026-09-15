@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.1">
@@ -46,7 +46,7 @@ admin.emailstatus=मेल पाठविण्याची स्थिती
 admin.emailstatus.description=पाठविलेल्या मेलची स्थिती पहा आणि अयशस्वी होणारे मेल पुन्हा पाठवा.
 ### Missing: admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
 ### Missing: Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
-### Missing: Mail.GeneralMailConfigClass_obfuscate.hint=This only affects the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
+### Missing: Mail.GeneralMailConfigClass_obfuscate.hint=This affects only the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
 ### Missing: Mail.SendMailConfigClass_from=Email address to send from
 ### Missing: Mail.SendMailConfigClass_from.hint=The default email address used to send notification emails from
 ### Missing: Mail.SendMailConfigClass_bcc=BCC email addresses
@@ -74,6 +74,10 @@ admin.emailstatus.description=पाठविलेल्या मेलची 
 ### Missing: Mail.SendMailStatus_livetable.error=Error
 ### Missing: Mail.SendMailStatus_livetable.actions=Actions
 ### Missing: Mail.SendMailStatus_livetable.resend=Resend
+### Missing: Mail.SendMailStatus_livetable.delete=
 ### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
-### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.</content>
+### Missing: mailSender.admin.resendFailure=Failed to resend mail. Click for more details.
+### Missing: mailSender.admin.deleteSuccess=
+### Missing: mailSender.admin.deleteFailure=
+</content>
 </xwikidoc>

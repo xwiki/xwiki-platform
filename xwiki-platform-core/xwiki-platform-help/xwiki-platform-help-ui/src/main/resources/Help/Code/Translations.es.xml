@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="Help.Code.Translations" locale="es">
@@ -192,6 +192,12 @@ help.videos.videoCard5.topic2=Aprende como utilizar tu aplicación
 help.videos.videoCard6.title=Añadir / Eliminar extensiones
 help.videos.videoCard6.topic1=Descubre como añadir/eliminar extensiones utilizando el Administrador de extensiones
 help.videos.videoCard6.topic2=Descubre la interfaz usuario de la Administración de XWiki
+### Missing: help.videos.hint=
 help.videos.watch=Seguir
+
+## Example Macro
+### Missing: rendering.macro.example.name=
+### Missing: rendering.macro.example.description=
+### Missing: rendering.macro.example.content.description=
 </content>
 </xwikidoc>

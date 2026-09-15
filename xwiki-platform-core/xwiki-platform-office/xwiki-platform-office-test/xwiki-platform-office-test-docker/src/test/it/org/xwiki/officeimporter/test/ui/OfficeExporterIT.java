@@ -21,6 +21,7 @@ package org.xwiki.officeimporter.test.ui;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -83,7 +84,10 @@ class OfficeExporterIT
     {
         setup.createPage(testReference, "content", "title");
         String exportURL = setup.toHttpClientUri(setup.getURL(testReference, "export", "format=" + format));
-        try (InputStream inputStream = new URL(exportURL).openStream()) {
+        HttpURLConnection connection = (HttpURLConnection) new URL(exportURL).openConnection();
+        // The export action only performs an export on POST requests.
+        connection.setRequestMethod("POST");
+        try (InputStream inputStream = connection.getInputStream()) {
             assertEquals(expectedTikaDetect, TikaUtils.detect(inputStream));
         }
     }

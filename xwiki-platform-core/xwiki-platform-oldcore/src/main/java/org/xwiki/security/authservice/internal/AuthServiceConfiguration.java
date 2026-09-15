@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.authservice.internal;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,7 +54,7 @@ public class AuthServiceConfiguration
     /**
      * The spaces in which the authentication configuration is stored.
      */
-    public static final List<String> SPACES = Arrays.asList("XWiki", "AuthService");
+    public static final List<String> SPACES = List.of("XWiki", "AuthService");
 
     /**
      * The spaces in which the authentication configuration is stored.

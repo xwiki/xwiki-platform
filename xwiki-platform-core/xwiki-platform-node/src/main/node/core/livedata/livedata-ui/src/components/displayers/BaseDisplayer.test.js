@@ -163,7 +163,7 @@ describe("BaseDisplayer.vue", () => {
       },
     });
 
-    expect(wrapper.find("div .view > div").text()).toBe("");
+    expect(wrapper.find("div.view > div").text()).toBe("");
   });
 
   it("Renders an entry when isEmpty is set to false", () => {

@@ -43,7 +43,7 @@ public abstract class AbstractMandatoryClassInitializer extends AbstractMandator
      * @param reference the reference of the document to update. Can be either local or absolute, depending on whether
      *                  the document is associated to a specific wiki or not
      */
-    public AbstractMandatoryClassInitializer(EntityReference reference)
+    protected AbstractMandatoryClassInitializer(EntityReference reference)
     {
         super(reference);
     }
@@ -53,7 +53,7 @@ public abstract class AbstractMandatoryClassInitializer extends AbstractMandator
      *                  the document is associated to a specific wiki or not
      * @param title the title of the document
      */
-    public AbstractMandatoryClassInitializer(EntityReference reference, String title)
+    protected AbstractMandatoryClassInitializer(EntityReference reference, String title)
     {
         super(reference, title);
     }

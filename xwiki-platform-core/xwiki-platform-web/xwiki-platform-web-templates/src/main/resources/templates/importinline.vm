@@ -224,8 +224,7 @@
                     $escapetool.xml($services.localization.render('core.importer.resetHistory'))
                   </div>
                 </div>
-                ## TODO: replace with a new API to introduce (impossible to safely test right on a different wiki from velocity without PR)
-                #if($xwiki.package.hasBackupPackImportRights())
+                #if ($services.security.authorization.hasAccess('admin', $services.model.createWikiReference($xcontext.mainWikiName)))
                 <div class="importOption">
                   <input type="checkbox" name="importAsBackup" value="true" #if($packager.isBackupPack())checked="checked"#end/>
                   $escapetool.xml($services.localization.render('core.importer.importAsBackup'))

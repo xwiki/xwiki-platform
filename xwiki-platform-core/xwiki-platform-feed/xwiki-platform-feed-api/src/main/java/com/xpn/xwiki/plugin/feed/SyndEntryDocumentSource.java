@@ -50,6 +50,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.TidyMessageLogger;
 
 /**
@@ -144,6 +145,28 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      * The JTidy configuration property name holding the input encoding.
      */
     private static final String INPUT_ENCODING = "input-encoding";
+
+    /**
+     * The opening of the HTML macro that {@link XWikiDocument#display(String, String, BaseObject, XWikiContext)} wraps
+     * its output in when it is called from wiki content.
+     * <p>
+     * TODO: this repeats the wrapper that {@code XWikiDocument} builds, and that the
+     * {@code unwrapXPropertyDisplay} Velocity macro and its callers repeat as well. The wrapper is an implementation
+     * detail of {@code display}, so every copy of it silently breaks the day it changes. Remove these constants and
+     * the unwrapping once there is a way to ask {@code display} for a result that is not meant to be inserted in wiki
+     * content.
+     */
+    private static final String HTML_MACRO_START = "{{html clean=\"false\" wiki=\"false\"}}";
+
+    /**
+     * The closing of {@link #HTML_MACRO_START}.
+     */
+    private static final String HTML_MACRO_END = "{{/html}}";
+
+    /**
+     * The mode in which the properties are displayed.
+     */
+    private static final String VIEW_MODE = "view";
 
     public static final Properties TIDY_FEED_CONFIG;
 
@@ -370,7 +393,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         } else if (isVelocityCode(mapping)) {
             description = parseString(mapping, doc, context);
         } else {
-            description = doc.getRenderedContent(getStringValue(mapping, doc, context), doc.getSyntaxId());
+            description = displayValue(mapping, doc);
         }
         String contentType = (String) params.get(CONTENT_TYPE);
         int contentLength = ((Number) params.get(CONTENT_LENGTH)).intValue();
@@ -561,6 +584,36 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         } else {
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Displays the property targeted by the given mapping, in view mode, using the standard object property display.
+     * This is what applies the rights of the effective metadata author of the document holding the property, and what
+     * honours the restricted flag of the property and of its document, instead of executing the raw property value
+     * with the rights of whoever asks for the feed.
+     *
+     * <p>
+     * The property is displayed from the given document as it is: when that document was modified through the public
+     * API, the modification made the script author its metadata author, so their rights apply.
+     *
+     * @param mapping the property selector, see {@link PropertySelector}
+     * @param doc the document holding the property
+     * @return the displayed property, as HTML
+     */
+    protected String displayValue(String mapping, Document doc)
+    {
+        PropertySelector propertySelector = new PropertySelector(mapping);
+        String propertyName = propertySelector.getPropertyName();
+
+        String display;
+        if (propertySelector.getClassName() == null) {
+            display = doc.display(propertyName, VIEW_MODE);
+        } else {
+            display = doc.display(propertyName, VIEW_MODE,
+                doc.getObject(propertySelector.getClassName(), propertySelector.getObjectIndex()));
+        }
+
+        return unwrapPropertyDisplay(display);
     }
 
     /**
@@ -763,14 +816,29 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      */
     protected Document castDocument(Object obj, XWikiContext context) throws XWikiException
     {
-        if (obj instanceof Document document) {
-            return document;
-        } else if (obj instanceof XWikiDocument xwikiDocument) {
-            return xwikiDocument.newDocument(context);
-        } else if (obj instanceof String string) {
-            return context.getWiki().getDocument(string, context).newDocument(context);
-        } else {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "");
+        return switch (obj) {
+            case Document document -> document;
+            case XWikiDocument xwikiDocument -> xwikiDocument.newDocument(context);
+            case String string -> context.getWiki().getDocument(string, context).newDocument(context);
+            case null, default -> throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+                XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "");
+        };
+    }
+
+    /**
+     * Removes the HTML macro that the display of an object property is wrapped in when it is asked for from wiki
+     * content, since a feed entry holds HTML and not wiki syntax. This is the counterpart of the
+     * {@code unwrapXPropertyDisplay} Velocity macro.
+     *
+     * @param display the output of a property display
+     * @return the display without its wrapping HTML macro
+     */
+    private static String unwrapPropertyDisplay(String display)
+    {
+        if (display.startsWith(HTML_MACRO_START) && display.endsWith(HTML_MACRO_END)) {
+            return display.substring(HTML_MACRO_START.length(), display.length() - HTML_MACRO_END.length());
         }
+
+        return display;
     }
 }

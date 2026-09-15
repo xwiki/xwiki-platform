@@ -28,7 +28,7 @@ import com.xpn.xwiki.plugin.PluginException;
 @Deprecated(since = "5.2")
 public class PackageException extends PluginException
 {
-    static String plugName = "Package";
+    static final String PLUG_NAME = "Package";
 
     public static final int ERROR_PACKAGE_UNKNOWN = 1;
 
@@ -38,17 +38,17 @@ public class PackageException extends PluginException
 
     public PackageException(int code, String message, Throwable e, Object[] args)
     {
-        super(plugName, code, message, e, args);
+        super(PLUG_NAME, code, message, e, args);
     }
 
     public PackageException(int code, String message, Throwable e)
     {
-        super(plugName, code, message, e);
+        super(PLUG_NAME, code, message, e);
     }
 
     public PackageException(int code, String message)
     {
-        super(plugName, code, message);
+        super(PLUG_NAME, code, message);
     }
 
     public PackageException()

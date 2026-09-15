@@ -23,8 +23,8 @@ import java.util.Optional;
 
 import javax.xml.bind.JAXBContext;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -69,13 +69,13 @@ class UserIT
 
         setup.createUser(user, password, null);
 
-        GetMethod get = setup.rest().executeGet(UserResource.class, "xwiki", user);
+        CloseableHttpResponse get = setup.rest().executeGet(UserResource.class, "xwiki", user);
 
         try {
-            assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, get.getCode());
 
             JAXBContext userContext = JAXBContext.newInstance(User.class);
-            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getResponseBodyAsStream());
+            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getEntity().getContent());
 
             assertEquals("xwiki:XWiki.user", parsedUser.getId());
             assertEquals("user", parsedUser.getDisplayName());
@@ -91,7 +91,7 @@ class UserIT
             assertEquals(String.format("%s/wikis/xwiki/spaces/XWiki/pages/user", setup.rest().getBaseURL()),
                 pageLink.get().getHref());
         } finally {
-            get.releaseConnection();
+            get.close();
         }
 
         // Cleaning.
@@ -111,13 +111,13 @@ class UserIT
         setup.setCurrentWiki(wiki);
         setup.createUser(user, password, null);
 
-        GetMethod get = setup.rest().executeGet(UserResource.class, "xwiki", qualifiedUser);
+        CloseableHttpResponse get = setup.rest().executeGet(UserResource.class, "xwiki", qualifiedUser);
 
         try {
-            assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, get.getCode());
 
             JAXBContext userContext = JAXBContext.newInstance(User.class);
-            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getResponseBodyAsStream());
+            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getEntity().getContent());
 
             assertEquals(qualifiedUser, parsedUser.getId());
             assertEquals(user, parsedUser.getDisplayName());
@@ -138,7 +138,7 @@ class UserIT
             assertEquals(String.format("%s/wikis/%s/spaces/XWiki/pages/localuser", setup.rest().getBaseURL(), wiki),
                 pageLink.get().getHref());
         } finally {
-            get.releaseConnection();
+            get.close();
         }
 
         // Cleaning.

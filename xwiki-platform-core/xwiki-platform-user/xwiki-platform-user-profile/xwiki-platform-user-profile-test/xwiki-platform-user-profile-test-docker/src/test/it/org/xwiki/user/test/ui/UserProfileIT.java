@@ -355,7 +355,7 @@ class UserProfileIT
         try {
             setup.rest().savePage(testReference, "Some content", "A title");
         } catch (Throwable e) {
-            assertTrue(e.getMessage().startsWith("Unexpected code [401], was expecting one of [[201, 202]] for "));
+            assertEquals("Unexpected code [401], was expecting one of [[201, 202]]", e.getMessage());
             gotException = true;
         }
         setup.loginAsSuperAdmin();

@@ -61,6 +61,11 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
         // Note that the 'data-xwiki-locale' attribute is set since XWiki 10.4RC1 but it hasn't been exposed here.
         this.locale = html.dataset.xwikiLocale;
         this.action = html.dataset.xwikiAction;
+        // The locale of the current document translation. Unlike the raw locale above, which is empty for the
+        // original translation, this identifies the translation, because it falls back on the default locale of the
+        // document. It is empty only for technical documents, that don't have a default locale.
+        // Since 18.8.0RC1
+        this.realLocale = html.dataset.xwikiRealLocale;
         // Since 18.6.0RC1
         this.isUserAdvanced = html.dataset.xwikiUserAdvanced;
       } else {

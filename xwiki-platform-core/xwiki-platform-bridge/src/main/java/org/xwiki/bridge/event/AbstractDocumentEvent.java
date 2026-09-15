@@ -58,7 +58,7 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
      * reference in the event, it is recommended to use the constructor with the explicit parameter when generating the
      * event.
      */
-    public AbstractDocumentEvent()
+    protected AbstractDocumentEvent()
     {
         this.documentReference = null;
     }
@@ -68,7 +68,7 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
      * 
      * @param documentReference the reference of the document relater to this event
      */
-    public AbstractDocumentEvent(DocumentReference documentReference)
+    protected AbstractDocumentEvent(DocumentReference documentReference)
     {
         super(SERIALIZER.serialize(documentReference));
         this.documentReference = documentReference;
@@ -79,7 +79,7 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractDocumentEvent(EventFilter eventFilter)
+    protected AbstractDocumentEvent(EventFilter eventFilter)
     {
         super(eventFilter);
         this.documentReference = null;

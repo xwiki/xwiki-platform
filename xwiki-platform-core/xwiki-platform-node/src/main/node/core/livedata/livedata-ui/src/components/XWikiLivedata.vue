@@ -81,65 +81,98 @@ onMounted(async () => {
   logic.setElement(elementValue);
   // Register the logic on the parent of the root element to make its API accessible publicly.
   jQuery(elementValue).parent().data("liveData", logic);
-  // Waits for the layout to be (lazily) loaded before hiding the loader.
-  logic.onEvent("layoutLoaded", () => {
-    layoutLoaded.value = true;
+  // Waits for the layout to be (lazily) loaded before hiding the loader. The promise is rejected when no layout
+  // can be loaded at all, so that we never wait for one indefinitely.
+  const layoutReady = new Promise<void>((resolve, reject) => {
+    logic.onEvent("layoutLoaded", (event) => {
+      const { error } = (event as CustomEvent).detail;
+      if (error) {
+        reject(error);
+      } else {
+        // Hide the loader and show the footnotes only when a layout was actually loaded. When none could be
+        // loaded the loader keeps running: there is nothing to display in its place yet, and it is also what
+        // tells the functional tests that the live data is not usable.
+        // TODO: XWIKI-24835: The Live Data displays an endless loading animation instead of an error when no
+        // layout can be loaded
+        layoutLoaded.value = true;
+        resolve();
+      }
+    });
   });
+  // We await this promise only at the end, after the translations and the entries, so we register the rejection
+  // handler right away to keep the failure from being reported as unhandled meanwhile.
+  layoutReady.catch(() => {});
 
+  let error: unknown;
   try {
-    await logic.translationsLoaded();
-  } finally {
-    translationsLoaded.value = true;
-  }
-
-  logic.registerPanel({
-    id: "propertiesPanel",
-    title: logic.t("livedata.panel.properties.title"),
-    name: logic.t("livedata.dropdownMenu.panels.properties"),
-    icon: "list-bullets",
-    component: "LivedataAdvancedPanelProperties",
-    order: 1000,
-  });
-  logic.registerPanel({
-    id: "sortPanel",
-    title: logic.t("livedata.panel.sort.title"),
-    name: logic.t("livedata.dropdownMenu.panels.sort"),
-    icon: "table_sort",
-    component: "LivedataAdvancedPanelSort",
-    order: 2000,
-  });
-  logic.registerPanel({
-    id: "filterPanel",
-    title: logic.t("livedata.panel.filter.title"),
-    name: logic.t("livedata.dropdownMenu.panels.filter"),
-    icon: "filter",
-    component: "LivedataAdvancedPanelFilter",
-    order: 3000,
-  });
-
-  // Fetch the data if we don't have any. This call must be made just after the main Vue
-  // component is initialized as  LivedataPersistentConfiguration must be mounted for the
-  // persisted filters to be loaded and applied when fetching  the entries. We use a dedicated
-  // field (firstEntriesLoading) for the first load as the fetch start/end events can be
-  // triggered  before the loader components is loaded (and in this case the loader is never
-  // hidden even once the entries are displayed).
-  if (!logic.data.data.entries.length) {
     try {
-      await logic.updateEntries();
+      await logic.translationsLoaded();
     } finally {
-      // Mark the loader as finished, even if it fails as the loader should stop and a message be
-      // displayed to the user in this case.
+      translationsLoaded.value = true;
+    }
+
+    logic.registerPanel({
+      id: "propertiesPanel",
+      title: logic.t("livedata.panel.properties.title"),
+      name: logic.t("livedata.dropdownMenu.panels.properties"),
+      icon: "list-bullets",
+      component: "LivedataAdvancedPanelProperties",
+      order: 1000,
+    });
+    logic.registerPanel({
+      id: "sortPanel",
+      title: logic.t("livedata.panel.sort.title"),
+      name: logic.t("livedata.dropdownMenu.panels.sort"),
+      icon: "table_sort",
+      component: "LivedataAdvancedPanelSort",
+      order: 2000,
+    });
+    logic.registerPanel({
+      id: "filterPanel",
+      title: logic.t("livedata.panel.filter.title"),
+      name: logic.t("livedata.dropdownMenu.panels.filter"),
+      icon: "filter",
+      component: "LivedataAdvancedPanelFilter",
+      order: 3000,
+    });
+
+    // Fetch the data if we don't have any. This call must be made just after the main Vue
+    // component is initialized as  LivedataPersistentConfiguration must be mounted for the
+    // persisted filters to be loaded and applied when fetching  the entries. We use a dedicated
+    // field (firstEntriesLoading) for the first load as the fetch start/end events can be
+    // triggered  before the loader components is loaded (and in this case the loader is never
+    // hidden even once the entries are displayed).
+    if (!logic.data.data.entries.length) {
+      try {
+        await logic.updateEntries();
+      } finally {
+        // Mark the loader as finished, even if it fails as the loader should stop and a message be
+        // displayed to the user in this case.
+        logic.firstEntriesLoading.value = false;
+      }
+    } else {
       logic.firstEntriesLoading.value = false;
     }
-  } else {
-    logic.firstEntriesLoading.value = false;
-  }
 
-  // Trigger the "instanceCreated" event on the next tick to ensure that the constructor has
-  // returned, and thus all references to the logic instance have been initialized.
-  nextTick(() => {
-    logic.triggerEvent("instanceCreated", {});
-  });
+    // Trigger the "instanceCreated" event on the next tick to ensure that the constructor has
+    // returned, and thus all references to the logic instance have been initialized.
+    nextTick(() => {
+      logic.triggerEvent("instanceCreated", {});
+    });
+
+    // The layout is loaded in parallel with the entries so we have to wait for it too, and for
+    // the tick that renders it, before the live data can be considered fully displayed.
+    await layoutReady;
+    await nextTick();
+  } catch (e) {
+    error = e;
+  } finally {
+    // Notify that the live data is fully loaded and displayed, or that it failed, because there are
+    // listeners that can't wait indefinitely, such as the page ready detection used by the PDF
+    // export. The "error" event data tells the two cases apart: it is undefined on success, and the
+    // live data instance is always available as the "livedata" event data.
+    logic.triggerEvent("instanceReady", { error });
+  }
 });
 </script>
 

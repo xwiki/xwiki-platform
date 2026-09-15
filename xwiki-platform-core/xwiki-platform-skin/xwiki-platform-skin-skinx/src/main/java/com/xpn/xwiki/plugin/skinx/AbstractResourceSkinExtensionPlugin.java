@@ -40,7 +40,7 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
      * @param context The current request context.
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
-    public AbstractResourceSkinExtensionPlugin(String name, String className, XWikiContext context)
+    protected AbstractResourceSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
     }

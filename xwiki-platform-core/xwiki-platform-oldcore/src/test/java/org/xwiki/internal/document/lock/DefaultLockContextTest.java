@@ -109,6 +109,20 @@ class DefaultLockContextTest
     }
 
     @Test
+    void getEditModeWhenUnknown()
+    {
+        when(this.editModeResolver.getEditMode()).thenReturn("object");
+
+        assertNull(this.lockContext.getEditMode());
+    }
+
+    @Test
+    void getEditModeWhenNone()
+    {
+        assertNull(this.lockContext.getEditMode());
+    }
+
+    @Test
     void getContentEditorIsResolvedOnlyOnce()
     {
         when(this.editModeResolver.getEditMode()).thenReturn(EditModeResolver.INPLACE);

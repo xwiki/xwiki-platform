@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +46,8 @@ import org.xwiki.url.URLSecurityManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+
+import com.google.common.base.Suppliers;
 
 /**
  * Default implementation of {@link URLSecurityManager}. This implementation keeps a HashSet in memory containing the
@@ -89,15 +92,17 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     @Inject
     private Logger logger;
 
-    private Set<String> trustedDomains;
+    private volatile Supplier<Set<String>> trustedDomains = newTrustedDomainsSupplier();
 
-    private synchronized void computeTrustedDomains()
+    private Supplier<Set<String>> newTrustedDomainsSupplier()
     {
-        // Check if another thread already computed the list of trusted domains.
-        if (this.trustedDomains != null) {
-            return;
-        }
+        // The supplier computes the trusted domains at most once, in a thread-safe way, and only when they are
+        // actually needed.
+        return Suppliers.memoize(this::computeTrustedDomains);
+    }
 
+    private Set<String> computeTrustedDomains()
+    {
         Set<String> result = ConcurrentHashMap.newKeySet();
         result.addAll(this.urlConfiguration.getTrustedDomains());
 
@@ -112,9 +117,7 @@ public class DefaultURLSecurityManager implements URLSecurityManager
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
-        // Set the list of trusted domains only at the end to avoid exposing an incomplete list of trusted domains to
-        // other threads.
-        this.trustedDomains = result;
+        return result;
     }
 
     private String getCurrentDomain()
@@ -139,11 +142,12 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     public boolean isDomainTrusted(URL urlToCheck)
     {
         if (this.urlConfiguration.isTrustedDomainsEnabled()) {
-            maybeInitializeWithDomain(this.getCurrentDomain());
+            // Keep a reference to the set of trusted domains as it can be invalidated by another thread at any time.
+            Set<String> domains = maybeInitializeWithDomain(this.getCurrentDomain());
             String host = urlToCheck.getHost();
 
             do {
-                if (trustedDomains.contains(host)) {
+                if (domains.contains(host)) {
                     return true;
                 } else if (StringUtils.contains(host, DOT)) {
                     host = host.substring(host.indexOf(DOT) + 1);
@@ -172,16 +176,18 @@ public class DefaultURLSecurityManager implements URLSecurityManager
      * enabled.
      *
      * @param domain the domain to add to the trusted domains
+     * @return the set of trusted domains, or {@code null} when trusted domains are disabled
      */
-    private void maybeInitializeWithDomain(String domain)
+    private Set<String> maybeInitializeWithDomain(String domain)
     {
-        if (this.urlConfiguration.isTrustedDomainsEnabled()) {
-            if (this.trustedDomains == null) {
-                computeTrustedDomains();
-            }
+        Set<String> domains = null;
 
-            this.trustedDomains.add(domain);
+        if (this.urlConfiguration.isTrustedDomainsEnabled()) {
+            domains = this.trustedDomains.get();
+            domains.add(domain);
         }
+
+        return domains;
     }
 
     /**
@@ -189,7 +195,9 @@ public class DefaultURLSecurityManager implements URLSecurityManager
      */
     public void invalidateCache()
     {
-        this.trustedDomains = null;
+        // Replace the supplier instead of clearing its value so that a computation that is currently running, and
+        // that is thus based on outdated descriptors, cannot be stored in the new supplier.
+        this.trustedDomains = newTrustedDomainsSupplier();
     }
 
     @Override

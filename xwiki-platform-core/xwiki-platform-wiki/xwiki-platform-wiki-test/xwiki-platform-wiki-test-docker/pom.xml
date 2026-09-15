@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-test</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-test-docker</artifactId>
   <name>XWiki Platform - Wiki - Tests - Functional Docker Tests</name>
@@ -81,7 +81,8 @@
       <scope>runtime</scope>
     </dependency>
     <!-- The ExtensionTest.Service page, used by ExtensionTestUtils to install extensions and to query the installed
-         ones, is written in Groovy -->
+         ones, is written in Groovy, and WikiManagerRestIT#checkTableRowFormat() reads the store APIs from a Groovy
+         script -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
@@ -119,6 +120,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-test-pageobjects</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

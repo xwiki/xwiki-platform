@@ -19,7 +19,7 @@
 -->
 <script setup lang="ts">
 import { translations } from "../translations";
-import { ref, watch } from "vue";
+import { nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkData, LinkTarget } from "../data/linkType";
 
@@ -62,12 +62,31 @@ watch(linkTargetTypeSelect, (label) => {
   const targetType = targetTypes.find((c) => c.label === label)!;
   linkData.value.target = targetType.default;
 });
+
+const displayTextField = useTemplateRef("displayTextField");
+
+onMounted(() => {
+  // The modal can open while a rich text editor still holds focus (e.g. after picking this action from a slash
+  // menu), and that editor may reclaim focus synchronously right after opening it. Deferring past that with a
+  // double rAF (matching the settle delay used in this component's tests) ensures our focus request runs last.
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = displayTextField.value?.$el as HTMLElement | undefined;
+        const focusable =
+          el?.querySelector<HTMLElement>("input, textarea, select") ?? el;
+        focusable?.focus();
+      });
+    });
+  });
+});
 </script>
 
 <template>
   <!-- NOTE: 'v-bind' is used here as it is more flexible
              'data-*' attributes would not be allowed due to not being present in `BtnProps` -->
   <x-text-field
+    ref="displayTextField"
     v-bind="{ 'data-test': 'linkDisplayText' }"
     :label="t('link-modal.config.display-text')"
     v-model="linkData.displayText"

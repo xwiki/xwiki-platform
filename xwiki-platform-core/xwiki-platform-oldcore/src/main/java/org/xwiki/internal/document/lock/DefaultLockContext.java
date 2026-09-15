@@ -21,6 +21,8 @@ package org.xwiki.internal.document.lock;
 
 import java.util.Locale;
 
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.doc.lock.LockContext;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorManager;
@@ -86,7 +88,9 @@ public class DefaultLockContext implements LockContext
     {
         if (!this.editModeResolved) {
             String editModeString = this.editModeResolver.getEditMode();
-            this.editMode = editModeString == null ? null : EditMode.valueOf(editModeString.toUpperCase());
+            // The resolved edit mode is not necessarily one of the modes we know about: the editor request parameter
+            // can name any edit mode, including one contributed by an extension (e.g. "object" or "class").
+            this.editMode = EnumUtils.getEnum(EditMode.class, StringUtils.upperCase(editModeString));
             this.editModeResolved = true;
         }
         return this.editMode;

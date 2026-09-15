@@ -73,19 +73,9 @@ public class LegacyNotificationDispatcher implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return new ArrayList<Event>()
-        {
-            {
-                add(new DocumentDeletedEvent());
-                add(new DocumentCreatedEvent());
-                add(new DocumentUpdatedEvent());
-                add(new DocumentDeletingEvent());
-                add(new DocumentCreatingEvent());
-                add(new DocumentUpdatingEvent());
-                add(new ActionExecutedEvent());
-                add(new ActionExecutingEvent());
-            }
-        };
+        return new ArrayList<>(List.of(new DocumentDeletedEvent(), new DocumentCreatedEvent(),
+            new DocumentUpdatedEvent(), new DocumentDeletingEvent(), new DocumentCreatingEvent(),
+            new DocumentUpdatingEvent(), new ActionExecutedEvent(), new ActionExecutingEvent()));
     }
 
     private XWikiNotificationManager getNotificationManager(XWikiContext context)

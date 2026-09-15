@@ -25,8 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-
-import org.xwiki.icon.rest.model.jaxb.Icons;
+import javax.ws.rs.core.Response;
 
 /**
  * Exposes the wiki icon themes and their icons through REST.
@@ -47,7 +46,7 @@ public interface IconThemesResource
      */
     @GET
     @Path("/{iconTheme}/icons")
-    Icons getIconsByTheme(@PathParam("wikiName") String wikiName, @PathParam("iconTheme") String iconTheme,
+    Response getIconsByTheme(@PathParam("wikiName") String wikiName, @PathParam("iconTheme") String iconTheme,
         @QueryParam("name") List<String> names);
 
     /**
@@ -59,5 +58,5 @@ public interface IconThemesResource
      */
     @GET
     @Path("/icons")
-    Icons getIcons(@PathParam("wikiName") String wikiName, @QueryParam("name") List<String> names);
+    Response getIcons(@PathParam("wikiName") String wikiName, @QueryParam("name") List<String> names);
 }

@@ -145,12 +145,18 @@ public class AdministrationSectionPage extends ViewPage
             saveButton = getDriver().findElement(By.xpath("//input[@type='submit'][@name='action_saveandcontinue']"));
         } else {
             saveButton = getDriver().findElement(By.xpath("//input[@type='submit'][@name='formactionsac']"));
+            // The button triggers a full page reload. Mark the current page so that we can be sure the reload has
+            // actually happened before continuing, otherwise the caller can race the navigation and interact with
+            // an element from the page being unloaded, causing a StaleElementReferenceException.
+            getDriver().addPageNotYetReloadedMarker();
         }
         saveButton.click();
 
         if (wait) {
             // Wait until the page is really saved.
             waitForNotificationSuccessMessage("Saved");
+        } else if (!this.asyncSave) {
+            getDriver().waitUntilPageIsReloaded();
         }
     }
 

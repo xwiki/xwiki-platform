@@ -40,7 +40,7 @@ public abstract class AbstractRatingEvent implements Event
      *
      * @param newRating the new rating information
      */
-    public AbstractRatingEvent(Rating newRating)
+    protected AbstractRatingEvent(Rating newRating)
     {
         this.rating = newRating;
     }

@@ -259,8 +259,7 @@ class NotificationsEmailsIT
             "from", ADMIN_EMAIL);
 
         // To ensure that this configuration is taken into account inside mail links.
-        setup.updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0, "server", "externaldomain",
-            "port", "4242", "secure", "1");
+        setup.setMainWikiDescriptorTarget("externaldomain", 4242, true);
 
         this.mail = new GreenMail(ServerSetupTest.SMTP);
         this.mail.start();

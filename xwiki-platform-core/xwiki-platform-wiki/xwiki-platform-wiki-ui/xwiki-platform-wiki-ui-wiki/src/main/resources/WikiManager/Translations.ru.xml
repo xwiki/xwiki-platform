@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="WikiManager.Translations" locale="ru">
@@ -131,7 +131,8 @@ admin.xwiki.workspaceusers.description=Управление участникам
 admin.xwiki.usersconfiguration.title=Настройка
 admin.xwiki.members.title=Текущие участники
 admin.xwiki.users.title=Все пользователи
-    
+
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Домашняя страница</content>
+platform.wiki.drawer.homeWiki=Домашняя страница
+</content>
 </xwikidoc>

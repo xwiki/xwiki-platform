@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.Captcha.Translations" locale="mr">
@@ -38,5 +38,9 @@
   <hidden>true</hidden>
   <content>admin.captcha=कॅप्चा
 captcha.admin.defaultCaptchaName.label=डीफॉल्ट कॅप्चा
-captcha.admin.defaultCaptchaName.hint=वापरण्यासाठी डीफॉल्ट कॅप्चा अंमलबजावणी. आपण स्थापित आणि वापर करता येण्यासारख्या इतर अंमलबजावणी शोधण्यासाठी विस्तार व्यवस्थापक वापरा.</content>
+captcha.admin.defaultCaptchaName.hint=वापरण्यासाठी डीफॉल्ट कॅप्चा अंमलबजावणी. आपण स्थापित आणि वापर करता येण्यासारख्या इतर अंमलबजावणी शोधण्यासाठी विस्तार व्यवस्थापक वापरा.
+### Missing: captcha.admin.configure.title=Configure {0}
+### Missing: captcha.admin.sample.title=Sample CAPTCHA
+### Missing: captcha.admin.sample.description=How the configured CAPTCHA looks like when it will be displayed in a form, for example.
+</content>
 </xwikidoc>

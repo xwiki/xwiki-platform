@@ -23,13 +23,15 @@ import { defineConfig, mergeConfig } from "vite";
 
 const defaults = generateConfigVue(import.meta.url);
 
-// Exclude @xwiki/platform-api from external dependencies because it is currently not distributed as a webjar.
+// Exclude @xwiki/platform-api and @xwiki/platform-xwiki-utils from external dependencies because they are currently
+// not distributed as webjars.
 // TODO: See XWIKI-XYZ
 // We proceed by mutation of the default configuration because the merge strategy of vite does not propose a
 // subtractive operation (i.e., it's only possible to add new externals, but not to remove them).
+const bundled = ["@xwiki/platform-api", "@xwiki/platform-xwiki-utils"];
 const originalExternal = defaults.build.rollupOptions.external;
 defaults.build.rollupOptions.external = (it) => {
-  return originalExternal(it) && it !== "@xwiki/platform-api";
+  return originalExternal(it) && !bundled.includes(it);
 };
 
 export default mergeConfig(

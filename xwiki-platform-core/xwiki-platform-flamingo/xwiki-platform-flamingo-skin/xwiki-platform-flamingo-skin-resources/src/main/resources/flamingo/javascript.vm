@@ -270,7 +270,7 @@ XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
 XWiki.hasEdit = $hasEdit;
 XWiki.hasProgramming = $hasProgramming;
-XWiki.hasBackupPackImportRights =#if ($xwiki.package) $xwiki.package.hasBackupPackImportRights()#else false#end;
+XWiki.hasBackupPackImportRights = $services.security.authorization.hasAccess('admin', $services.model.createWikiReference($xcontext.mainWikiName));
 XWiki.hasRenderer = $services.rendering.availableRendererSyntaxes.contains($!doc.getSyntax());
 window.docviewurl = "${doc.getURL('view')}";
 window.docediturl = "${doc.getURL('edit')}";
@@ -317,7 +317,7 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
     <script src="${services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar',
       'searchSuggest' + $jsExtension)}" defer="defer"></script>##
     $xwiki.linkx.use(
-      $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css', {'evaluate': true}),
+      $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css'),
       {'type': 'text/css', 'rel': 'stylesheet'})##
   #end
 #end

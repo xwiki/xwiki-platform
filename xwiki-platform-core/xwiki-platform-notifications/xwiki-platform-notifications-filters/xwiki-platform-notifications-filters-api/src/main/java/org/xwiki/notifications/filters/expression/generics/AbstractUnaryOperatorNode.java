@@ -35,7 +35,7 @@ public abstract class AbstractUnaryOperatorNode extends AbstractOperatorNode
      *
      * @param operand the node operand
      */
-    public AbstractUnaryOperatorNode(AbstractNode operand)
+    protected AbstractUnaryOperatorNode(AbstractNode operand)
     {
         if (operand == null) {
             throw new NullPointerException("A unary operand should have its operand defined.");

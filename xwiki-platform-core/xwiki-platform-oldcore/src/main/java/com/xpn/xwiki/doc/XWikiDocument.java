@@ -73,6 +73,7 @@ import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.DocumentResult;
 import org.dom4j.io.OutputFormat;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -935,13 +936,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         return this.uidStringEntityReferenceSerializer;
     }
 
-    private JobProgressManager getProgress()
+    private @NonNull JobProgressManager getProgress()
     {
         if (this.progress == null) {
             this.progress = Utils.getComponent(JobProgressManager.class);
         }
 
-        return this.progress;
+        return Objects.requireNonNull(this.progress);
     }
 
     private VelocityContextFactory getVelocityContextFactory()
@@ -1386,7 +1387,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             getProgress().startStep(getDocumentReference(), "document.progress.render.translatedcontent",
                 "Get translated content");
 
-            XWikiContext xcontext = getXWikiContext();
+            // There's nothing to display without a context: the translated content, the rendering cache and
+            // the display itself below are all resolved through it.
+            XWikiContext xcontext = Objects.requireNonNull(getXWikiContext());
 
             XWikiDocument tdoc = translate ? getTranslatedDocument(xcontext) : this;
             String translatedContent = tdoc.getContent();
@@ -9005,6 +9008,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         Execution execution = Utils.getComponent(Execution.class);
         execution.popContext();
 
+        // The Execution Context is popped first so that backupContext()'s push is undone whatever happens next.
+        // Everything restored below is written to the XWiki Context, which backupContext() also requires.
+        Objects.requireNonNull(context);
+
         // Restore the current document on the XWiki Context.
         context.setDoc((XWikiDocument) backup.get("doc"));
 
@@ -9537,7 +9544,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             modified = true;
         }
 
-        if (isHidden() != document.isHidden()) {
+        if (!Objects.equals(isHidden(), document.isHidden())) {
             setHidden(document.isHidden());
             modified = true;
         }
@@ -9601,6 +9608,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             for (XWikiAttachment attachment : new ArrayList<XWikiAttachment>(getAttachmentList())) {
                 if (document.getAttachment(attachment.getFilename()) == null) {
                     removeAttachment(attachment);
+                    modified = true;
                 }
             }
         }
@@ -9609,8 +9617,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             XWikiAttachment originalAttachment = getAttachment(attachment.getFilename());
             if (originalAttachment == null) {
                 addAttachment(attachment);
+                modified = true;
             } else {
-                originalAttachment.apply(attachment);
+                modified |= originalAttachment.apply(attachment);
             }
         }
 

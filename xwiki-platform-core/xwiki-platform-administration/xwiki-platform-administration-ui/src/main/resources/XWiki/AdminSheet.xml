@@ -241,7 +241,7 @@
   #set ($sortedSections = [])
   #sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections)
   #foreach ($section in $sortedSections)
-    * [[[[image:${section.iconReference}]] **${section.name}**&gt;&gt;path:${section.url}]] (% class="description" %)$!{section.description}
+    * [[[[image:${services.rendering.escape($section.iconReference, 'xwiki/2.1')}]] **${services.rendering.escape($services.rendering.escape($section.name, 'xwiki/2.1'), 'xwiki/2.1')}**&gt;&gt;path:${section.url}]] (% class="description" %)$!services.rendering.escape($section.description, 'xwiki/2.1')
   #end
 #end
 
@@ -270,7 +270,7 @@
 #macro(admin_displayCategories $adminMenu $translationPrefix)
 (% class="admin-category" %)
   #foreach ($category in $adminMenu)
-    * [[[[image:${category.iconReference}]] **${category.name}**&gt;&gt;path:${category.url}]] (% class="description" %)$!{category.description}
+    * [[[[image:${services.rendering.escape($category.iconReference, 'xwiki/2.1')}]] **${services.rendering.escape($services.rendering.escape($category.name, 'xwiki/2.1'), 'xwiki/2.1')}**&gt;&gt;path:${category.url}]] (% class="description" %)$!services.rendering.escape($category.description, 'xwiki/2.1')
   #end
 #end
 

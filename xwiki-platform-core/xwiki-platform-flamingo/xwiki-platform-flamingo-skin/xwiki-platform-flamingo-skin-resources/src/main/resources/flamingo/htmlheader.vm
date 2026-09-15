@@ -60,6 +60,9 @@
   #addMetaAttribute($metaAttributes, 'version', $version)
   #addMetaAttribute($metaAttributes, 'rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
   #addMetaAttribute($metaAttributes, 'locale', $tdoc.locale)
+  ## The raw locale above is empty for the original document translation, so it doesn't identify it. The real
+  ## locale falls back on the default locale of the document, which is empty only for technical documents.
+  #addMetaAttribute($metaAttributes, 'real-locale', $tdoc.realLocale)
 #end
 #addMetaAttribute($metaAttributes, 'form-token', "$!{services.csrf.token}")
 ## Don't put any user-reference tag when the user is not logged in
@@ -131,9 +134,7 @@
     ## ---------------------------------------------------------------------------------------------------------------
     ## Add all HTML tags contributed by UIX for the "org.xwiki.platform.html.head" UIXP.
     ## ---------------------------------------------------------------------------------------------------------------
-    #foreach($uix in $services.uix.getExtensions("org.xwiki.platform.html.head", {'sortByParameter' : 'order'}))
-      $services.rendering.render($uix.execute(), 'xhtml/1.0')
-    #end
+    $services.uix.renderExtensions('org.xwiki.platform.html.head', 'html/5.0', {'sortByParameter': 'order'})
     ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     ## ---------------------------------------------------------------------------------------------------------------

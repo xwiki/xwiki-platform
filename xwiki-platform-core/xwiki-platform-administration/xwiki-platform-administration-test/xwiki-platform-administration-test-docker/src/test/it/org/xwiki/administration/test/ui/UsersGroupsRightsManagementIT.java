@@ -139,6 +139,7 @@ class UsersGroupsRightsManagementIT
      * <li>Validate adding sub-groups</li>
      * <li>Validate removing user members.</li>
      * <li>Validate removing sub-groups.</li>
+     * <li>Validate that the alias of a member is displayed as text.</li>
      * </ul>
      */
     @Test
@@ -244,6 +245,23 @@ class UsersGroupsRightsManagementIT
         // Close the modal and check the updated member count.
         devsGroupModal.close();
         assertEquals("2", groupsPage.getMemberCount(devs));
+
+        //
+        // Check the display of the alias of a member.
+        //
+
+        // The alias is only displayed for a member whose display name differs from its page name, so this member
+        // needs a first and a last name.
+        String carol = String.format("%s_%s", testName, "Carol");
+        setup.rest().deletePage("XWiki", carol);
+        setup.createUser(carol, carol, "", "first_name", "Carol", "last_name", "Smith");
+
+        // Verify that the alias is part of the text of the member cell, separator space and parentheses included.
+        groupsPage = GroupsPage.gotoPage();
+        devsGroupModal = groupsPage.clickEditGroup(devs);
+        devsGroupModal.addUsers(carol);
+        devsGroupModal.getMembersTable().assertRow("Member", String.format("Carol Smith (%s)", carol));
+        devsGroupModal.close();
     }
 
     /**
@@ -884,6 +902,75 @@ class UsersGroupsRightsManagementIT
         wikiRightsPane.switchToUsers();
         wikiRightsPane.getRightsTable().filterColumn("name", userName);
         wikiRightsPane.setRight(userName, EditRightsPane.Right.EDIT, EditRightsPane.State.NONE);
+    }
+
+    /**
+     * Verify that a right denied to a user at page level takes precedence over that same right granted at page level
+     * to a group the user is a member of: the user has no Edit option on that page but still has one on the other
+     * pages of the wiki. The scenario is also run on a subwiki, with a user local to that subwiki.
+     */
+    @ParameterizedTest
+    @Order(16)
+    @WikisSource(extensions = { "org.xwiki.platform:xwiki-platform-administration-ui" })
+    void denyUserRightAtPageLevelWhenAllowedToGroupAtPageLevel(WikiReference wiki, TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setCurrentWiki(wiki.getName());
+
+        String userName = "userDeniedAtPageLevel";
+        String groupName = "groupOfUserDeniedAtPageLevel";
+
+        // The page the rights are set on, and a page located outside of it and thus not covered by those rights.
+        DocumentReference testPage = new DocumentReference(wiki.getName(), "DenyUserAtPageLevel", "WebHome");
+        DocumentReference otherPage = new DocumentReference(wiki.getName(), "DenyUserAtPageLevelOther", "WebHome");
+
+        // Make sure the user, the group and the pages don't exist yet.
+        setup.deletePage("XWiki", userName);
+        setup.deletePage("XWiki", groupName);
+        setup.deletePage(testPage);
+        setup.deletePage(otherPage);
+
+        // Create a new user, a new group and add the user to the group.
+        setup.createUser(userName, userName, "");
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        groupsPage = groupsPage.addNewGroup(groupName);
+        groupsPage.clickEditGroup(groupName).addMember(userName, true).close();
+
+        // Create the page on which the rights are set, and the page on which they aren't.
+        setup.createPage(testPage, "Group allowed content", "Group Allowed Page");
+        setup.createPage(otherPage, "No right set content", "No Right Set Page");
+
+        // Give the "view", "comment" and "edit" rights to the group and deny the "edit" right to the user, both from
+        // Administer Page > Users & Rights > Rights: Page, so that both rules are set at the same level.
+        AdministrationPage pageAdministrationPage =
+            AdministrationPage.gotoSpaceAdministrationPage(testPage.getLastSpaceReference());
+        pageAdministrationPage.clickSection("Users & Rights", "Rights: Page");
+        EditRightsPane pageRightsPane = new EditRightsPane();
+        pageRightsPane.switchToGroups();
+        pageRightsPane.getRightsTable().filterColumn("name", groupName);
+        assertTrue(pageRightsPane.hasEntity(groupName));
+        pageRightsPane.setRight(groupName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+        pageRightsPane.setRight(groupName, EditRightsPane.Right.COMMENT, EditRightsPane.State.ALLOW);
+        pageRightsPane.setRight(groupName, EditRightsPane.Right.EDIT, EditRightsPane.State.ALLOW);
+        pageRightsPane.switchToUsers();
+        pageRightsPane.getRightsTable().filterColumn("name", userName);
+        assertTrue(pageRightsPane.hasEntity(userName));
+        pageRightsPane.setRight(userName, EditRightsPane.Right.EDIT, EditRightsPane.State.DENY);
+
+        setup.login(userName, userName);
+
+        // The rule targeting the user takes precedence over the one targeting its group: the user still views the
+        // page, since "view" is only granted through the group, but has no Edit option on it.
+        ViewPage viewPage = setup.gotoPage(testPage);
+        assertEquals("Group allowed content", viewPage.getContent());
+        assertFalse(viewPage.isEditAvailable(),
+            "The Edit option should not be available since \"edit\" is denied to the user at page level");
+
+        // The deny is limited to that page: the Edit option is still available on the other pages of the wiki.
+        viewPage = setup.gotoPage(otherPage);
+        assertEquals("No right set content", viewPage.getContent());
+        assertTrue(viewPage.isEditAvailable(),
+            "The Edit option should be available on a page on which \"edit\" is not denied to the user");
     }
 
     private void assertRightsTableShowsUsersAndGroups(EditRightsPane editRightsPane)

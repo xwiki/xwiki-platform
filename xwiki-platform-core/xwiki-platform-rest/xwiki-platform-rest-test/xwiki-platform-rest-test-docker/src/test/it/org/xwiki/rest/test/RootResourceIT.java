@@ -19,8 +19,8 @@
  */
 package org.xwiki.rest.test;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
@@ -37,10 +37,10 @@ class RootResourceIT extends AbstractHttpIT
     @Test
     protected void testRepresentation() throws Exception
     {
-        GetMethod getMethod = executeGet(getFullUri(RootResource.class));
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(getFullUri(RootResource.class));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        Xwiki xwiki = (Xwiki) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Xwiki xwiki = (Xwiki) unmarshaller.unmarshal(getMethod.getEntity().getContent());
 
         Link link = getFirstLinkByRelation(xwiki, Relations.WIKIS);
         assertNotNull(link);

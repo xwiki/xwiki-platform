@@ -85,7 +85,7 @@ XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ConfirmationBox,
       }.bind(this),
       onFailure : function(response) {
         if (this.interactionParameters.displayFailureMessage) {
-          var failureReason = response.statusText || 'Server not responding';
+          const failureReason = response.statusText || 'Server not responding';
           if (this.progressNotification) {
             this.progressNotification.replace(new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error"));
           } else {

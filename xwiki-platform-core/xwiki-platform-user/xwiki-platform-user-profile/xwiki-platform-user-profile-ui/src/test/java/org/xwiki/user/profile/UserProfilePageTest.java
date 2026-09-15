@@ -38,6 +38,7 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax20ComponentList;
+import org.xwiki.uiextension.internal.macro.UIExtensionMacro;
 import org.xwiki.uiextension.script.UIExtensionScriptServiceComponentList;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -60,7 +61,7 @@ import static org.mockito.Mockito.when;
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
 @UIExtensionScriptServiceComponentList
-@ComponentList({XWikiUsersDocumentInitializer.class})
+@ComponentList({XWikiUsersDocumentInitializer.class, UIExtensionMacro.class})
 class UserProfilePageTest extends PageTest
 {
     private static final DocumentReference USER_SHEET = new DocumentReference("xwiki", "XWiki", "XWikiUserSheet");

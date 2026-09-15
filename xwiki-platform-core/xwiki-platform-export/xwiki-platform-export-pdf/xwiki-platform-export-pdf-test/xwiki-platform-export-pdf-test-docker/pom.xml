@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf-test</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf-test-docker</artifactId>
   <name>XWiki Platform - Export - PDF - Test - Functional Tests in Docker</name>
@@ -74,6 +74,20 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Provides the Live Data macro used to test how the Live Data is exported to PDF. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Provides the Live Data source used by the page that tests the PDF export of the Live Data. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!--Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -84,6 +98,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-export-pdf-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used to drive the Live Data before exporting it to PDF. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

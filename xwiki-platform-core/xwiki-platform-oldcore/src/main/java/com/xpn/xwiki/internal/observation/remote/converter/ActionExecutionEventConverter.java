@@ -54,12 +54,7 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
     /**
      * The events supported by this converter.
      */
-    private Set<String> actions = new HashSet<String>()
-    {
-        {
-            add("upload");
-        }
-    };
+    private Set<String> actions = new HashSet<>(Set.of("upload"));
 
     @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)

@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { loadById } from "@xwiki/platform-xwiki-utils";
 import { Container, injectable } from "inversify";
 import type { MacroCall, MacroWizard, MacroWizardOptions } from "./MacroWizard";
 
@@ -35,23 +36,13 @@ export class DefaultMacroWizard implements MacroWizard {
     container.bind("MacroWizard").to(DefaultMacroWizard).inSingletonScope();
   }
 
-  public insertOrUpdate(
+  public async insertOrUpdate(
     macroCall: Partial<MacroCall>,
     options: MacroWizardOptions,
   ): Promise<MacroCall> {
-    return new Promise((resolve, reject) => {
-      requirejs(
-        ["xwiki-wysiwyg-macro-wizard"],
-        (macroWizard) => {
-          (macroWizard as XWikiMacroWizard)({
-            macroCall,
-            ...options,
-          })
-            .then(resolve)
-            .catch(reject);
-        },
-        reject,
-      );
-    });
+    const macroWizard = await loadById<XWikiMacroWizard>(
+      "xwiki-wysiwyg-macro-wizard",
+    );
+    return macroWizard({ macroCall, ...options });
   }
 }

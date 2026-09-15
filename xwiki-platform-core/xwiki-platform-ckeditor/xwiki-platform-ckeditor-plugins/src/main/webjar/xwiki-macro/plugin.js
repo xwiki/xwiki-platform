@@ -305,6 +305,19 @@
           // update the attribute ourselves in order to have a dynamic path name (since the user can change the macro).
           this.wrapper.data('cke-display-name', this.pathName);
           $(this.element.$).children('.macro-placeholder').text(this.pathName);
+          // Show the macro name next to the move handle. The drag handler container is part of the widget wrapper, so
+          // this doesn't modify the edited content. Only draggable widgets have a drag handler.
+          if (this.dragHandlerContainer) {
+            let macroName = this.dragHandlerContainer.findOne('.macro-name');
+            if (!macroName) {
+              macroName = new CKEDITOR.dom.element('span', editor.document);
+              macroName.addClass('macro-name');
+              // The widget wrapper is already labelled with the macro name.
+              macroName.setAttribute('aria-hidden', 'true');
+              this.dragHandlerContainer.append(macroName);
+            }
+            macroName.setText(this.data.name);
+          }
         },
         edit: function(event) {
           // Prevent the default behavior because we want to use our custom dialog.

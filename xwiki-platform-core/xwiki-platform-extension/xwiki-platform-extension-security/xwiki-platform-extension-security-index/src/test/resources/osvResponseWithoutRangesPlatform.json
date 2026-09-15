@@ -1,0 +1,32 @@
+{
+  "vulns": [
+    {
+      "affected": [
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-my-ext",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-my-ext"
+          },
+          "versions": [
+            "7.5"
+          ]
+        }
+      ],
+      "id": "VULN_ID",
+      "aliases": ["CVE-1"],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://main.ref/"
+        }
+      ],
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.0/AV:N/AC:L/PR:H/UI:R/S:C/C:H/I:L/A:L"
+        }
+      ]
+    }
+  ]
+}

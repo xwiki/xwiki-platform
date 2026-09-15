@@ -59,7 +59,7 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
      * @param descriptionTranslationKey the name of the translation key that describe the event
      * @param applicationTranslationKey the translation key of the name of the application that send this event
      */
-    public AbstractRecordableEventDescriptor(String descriptionTranslationKey,
+    protected AbstractRecordableEventDescriptor(String descriptionTranslationKey,
             String applicationTranslationKey)
     {
         this.descriptionTranslationKey = descriptionTranslationKey;

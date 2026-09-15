@@ -883,16 +883,16 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         // FIXME: this whole code should be refactored and factorized: some parts are also duplicated in BaseObject.
         ArrayList<ObjectDiff> difflist = new ArrayList<>();
-        BaseCollection oldCollection = (BaseCollection) oldObject;
+        BaseCollection<?> oldCollection = (BaseCollection<?>) oldObject;
 
         // Iterate over the new properties first, to handle changed and added objects
-        for (Object key : this.getFields().keySet()) {
-            addOrChangePropertyDiff((String) key, oldCollection, context, difflist);
+        for (String key : this.getFields().keySet()) {
+            addOrChangePropertyDiff(key, oldCollection, context, difflist);
         }
 
         // Iterate over the old properties, in case there are some removed properties
-        for (Object key : oldCollection.getFields().keySet()) {
-            removedPropertyDiff((String) key, oldCollection, context, difflist);
+        for (String key : oldCollection.getFields().keySet()) {
+            removedPropertyDiff(key, oldCollection, context, difflist);
         }
 
         return difflist;
@@ -943,16 +943,24 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             oldPropertyValue = getPropertyDisplayValue(oldProperty, pclass, oldCollection, propertyName, context);
         } else {
             // Cannot get property definition, so use the plain value
-            newPropertyValue = newProperty.toText();
+            newPropertyValue = (newProperty == null) ? "" : newProperty.toText();
             oldPropertyValue = oldProperty.toText();
         }
         difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
             propertyName, propertyType, oldPropertyValue, newPropertyValue, isSensitive));
     }
 
+    /**
+     * @return the value of the property as it would be displayed in the interface, or the empty string when the
+     *         property is not set in the collection, matching how addOrChangePropertyDiff() compares the two sides
+     */
     private String getPropertyDisplayValue(BaseProperty property, PropertyClass pclass, BaseCollection collection,
         String propertyName, XWikiContext context)
     {
+        if (property == null) {
+            return "";
+        }
+
         return (property.getValue() instanceof String) ? property.toText()
             : pclass.displayView(propertyName, collection, context);
     }

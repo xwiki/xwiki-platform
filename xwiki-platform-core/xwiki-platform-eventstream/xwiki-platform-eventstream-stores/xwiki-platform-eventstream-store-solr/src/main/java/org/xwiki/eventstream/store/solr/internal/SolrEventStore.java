@@ -568,23 +568,14 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
     private String serializeCondition(QueryCondition condition)
     {
-        String conditionString;
-
-        if (condition instanceof CompareQueryCondition compareCondition) {
-            conditionString = serializeCompareCondition(compareCondition);
-        } else if (condition instanceof StatusQueryCondition statusCondition) {
-            conditionString = serializeStatusCondition(statusCondition);
-        } else if (condition instanceof MailEntityQueryCondition mailCondition) {
-            conditionString = serializeMailCondition(mailCondition);
-        } else if (condition instanceof InQueryCondition inCondition) {
-            conditionString = serializeInCondition(inCondition);
-        } else if (condition instanceof GroupQueryCondition groupCondition) {
-            conditionString = serializeGroupCondition(groupCondition);
-        } else {
-            conditionString = null;
-        }
-
-        return conditionString;
+        return switch (condition) {
+            case CompareQueryCondition compareCondition -> serializeCompareCondition(compareCondition);
+            case StatusQueryCondition statusCondition -> serializeStatusCondition(statusCondition);
+            case MailEntityQueryCondition mailCondition -> serializeMailCondition(mailCondition);
+            case InQueryCondition inCondition -> serializeInCondition(inCondition);
+            case GroupQueryCondition groupCondition -> serializeGroupCondition(groupCondition);
+            case null, default -> null;
+        };
     }
 
     private String serializeStatusCondition(StatusQueryCondition condition)

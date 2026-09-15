@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
@@ -35,6 +34,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.extension.RestExtensionInstaller;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
@@ -130,7 +130,7 @@ public class ExtensionInstaller
      */
     public void installExtensions(String username, String password, String installUserReference) throws Exception
     {
-        installExtensions(new UsernamePasswordCredentials(username, password), installUserReference, null);
+        installExtensions(new XWikiCredentials(username, password), installUserReference, null);
     }
 
     /**
@@ -146,7 +146,7 @@ public class ExtensionInstaller
      * null they'll be installed in the main wiki
      * @throws Exception if there's a failure to install the extensions in the running XWiki instance
      */
-    public void installExtensions(UsernamePasswordCredentials credentials, String installUserReference,
+    public void installExtensions(XWikiCredentials credentials, String installUserReference,
         List<String> namespaces) throws Exception
     {
         Set<ExtensionId> extensions = new LinkedHashSet<>();
@@ -259,7 +259,7 @@ public class ExtensionInstaller
      *            namespaces
      * @throws Exception if there's a failure to install the extensions in the running XWiki instance
      */
-    public void installExtensions(Collection<ExtensionId> extensions, UsernamePasswordCredentials credentials,
+    public void installExtensions(Collection<ExtensionId> extensions, XWikiCredentials credentials,
         String installUserReference, List<String> namespaces, boolean failOnExist) throws Exception
     {
         try {

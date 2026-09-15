@@ -19,9 +19,9 @@
  */
 import { depsContainerMock } from "./depsContainer.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
-import { LinkEditionHandler } from "../../components/links/linkEdition";
 import { useMemo } from "react";
 import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
+import type { LinkEditionHandler } from "../../components/links/linkEdition";
 
 export type BlockNoteForTestProps = Omit<
   BlockNoteViewWrapperProps,

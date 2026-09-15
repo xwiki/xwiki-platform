@@ -26,11 +26,9 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.List;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.http.internal.XWikiHTTPClient;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.webstandards.framework.AbstractValidationTest;
 import org.xwiki.test.webstandards.framework.Target;
 import org.xwiki.validator.ValidationError;
@@ -70,10 +68,9 @@ public class RSSValidationTest extends AbstractValidationTest
      */
     protected ByteArrayOutputStream err;
 
-    public RSSValidationTest(Target target, HttpClient client, Validator validator, String credentials)
-        throws Exception
+    public RSSValidationTest(Target target, XWikiHTTPClient client, Validator validator) throws Exception
     {
-        super("testDocumentValidity", target, client, credentials);
+        super("testDocumentValidity", target, client);
 
         this.validator = validator;
     }
@@ -83,13 +80,12 @@ public class RSSValidationTest extends AbstractValidationTest
     {
         TestSuite suite = new TestSuite();
 
-        HttpClient adminClient = new HttpClient();
-        Credentials defaultcreds = new UsernamePasswordCredentials("Admin", "admin");
-        adminClient.getState().setCredentials(AuthScope.ANY, defaultcreds);
+        XWikiHTTPClient adminClient = new XWikiHTTPClient();
+        adminClient.setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
 
         addRSSURLsForAdmin(validationTest, validator, suite, adminClient);
 
-        HttpClient guestClient = new HttpClient();
+        XWikiHTTPClient guestClient = new XWikiHTTPClient();
 
         addRSSURLsForGuest(validationTest, validator, suite, guestClient);
 
@@ -97,21 +93,21 @@ public class RSSValidationTest extends AbstractValidationTest
     }
 
     private static void addRSSURLsForGuest(Class< ? extends AbstractValidationTest> validationTest,
-        Validator validator, TestSuite suite, HttpClient client) throws Exception
+        Validator validator, TestSuite suite, XWikiHTTPClient client) throws Exception
     {
-        addRSSURLs("rssUrlsToTestAsAdmin", validationTest, validator, suite, client, "Admin:admin");
+        addRSSURLs("rssUrlsToTestAsGuest", validationTest, validator, suite, client);
     }
 
     private static void addRSSURLsForAdmin(Class< ? extends AbstractValidationTest> validationTest,
-        Validator validator, TestSuite suite, HttpClient client) throws Exception
+        Validator validator, TestSuite suite, XWikiHTTPClient client) throws Exception
     {
-        addRSSURLs("rssUrlsToTestAsGuest", validationTest, validator, suite, client, null);
+        addRSSURLs("rssUrlsToTestAsAdmin", validationTest, validator, suite, client);
     }
 
     public static void addRSSURLs(String property, Class< ? extends AbstractValidationTest> validationTest,
-        Validator validator, TestSuite suite, HttpClient client, String credentials) throws Exception
+        Validator validator, TestSuite suite, XWikiHTTPClient client) throws Exception
     {
-        addURLs(property, validationTest, validator, suite, client, credentials);
+        addURLs(property, validationTest, validator, suite, client);
     }
 
     @Override
@@ -159,7 +155,7 @@ public class RSSValidationTest extends AbstractValidationTest
     public String getName()
     {
         return "Validating " + this.validator.getName() + " validity for: " + this.target.getName() + " executed "
-            + (credentials == null ? "as guest" : "with credentials " + credentials);
+            + getExecutionUser();
     }
 
     public void testDocumentValidity() throws Exception

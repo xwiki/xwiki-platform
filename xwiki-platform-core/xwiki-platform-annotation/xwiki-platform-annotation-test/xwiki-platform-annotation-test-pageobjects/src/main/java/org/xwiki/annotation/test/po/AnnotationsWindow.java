@@ -32,10 +32,10 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class AnnotationsWindow extends BaseElement
 {
-    @FindBy(xpath = "//div[contains(@class, 'annotation-box')]//input[@type='submit']")
+    @FindBy(xpath = "//div[contains(@class, 'annotation-box')]//button[contains(@class, 'tool-submit')]")
     private WebElement submitButton;
 
-    @FindBy(xpath = "//div[contains(@class, 'annotation-box')]//input[@type='reset']")
+    @FindBy(xpath = "//div[contains(@class, 'annotation-box')]//button[contains(@class, 'tool-cancel')]")
     private WebElement cancelButton;
 
     @FindBy(xpath = "//textarea[@id='comment']")

@@ -19,11 +19,16 @@
  */
 package org.xwiki.uiextension;
 
+import java.util.List;
+
 import javax.script.ScriptContext;
 
 import org.apache.commons.collections.MapUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
@@ -61,6 +66,7 @@ import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -156,5 +162,34 @@ class WikiUIExtensionTest
         InOrder inOrder = inOrder(this.scriptContext);
         inOrder.verify(this.scriptContext).setAttribute(eq("uix"), isNotNull(), eq(ENGINE_SCOPE));
         inOrder.verify(this.scriptContext).setAttribute(eq("uix"), isNull(), eq(ENGINE_SCOPE));
+    }
+
+    @ParameterizedTest
+    @CsvSource(nullValues = "null", value = {
+        "html/5.0, false",
+        "html/5.0, true",
+        "plain/1.0, false",
+        // No target syntax in the rendering context: the identifier must not contain a null element.
+        "null, false"
+    })
+    void configureIdentifiesTheExecutionByTargetSyntaxAndInline(String targetSyntaxId, boolean inline)
+        throws Exception
+    {
+        Syntax targetSyntax = targetSyntaxId == null ? null : Syntax.valueOf(targetSyntaxId);
+        when(this.renderingContext.getTargetSyntax()).thenReturn(targetSyntax);
+        when(this.contentParser.parse("", Syntax.XWIKI_2_1, DOC_REF)).thenReturn(XDOM.EMPTY);
+
+        this.wikiUIX.initialize(this.baseObject, "roleHint", "id", "epId");
+        this.wikiUIX.execute(inline);
+
+        ArgumentCaptor<BlockAsyncRendererConfiguration> configuration =
+            ArgumentCaptor.forClass(BlockAsyncRendererConfiguration.class);
+        verify(this.blockAsyncRendererExecutor).execute(configuration.capture());
+
+        // Both the target syntax and the inline flag influence the result of the execution, so they must be part of
+        // the identifier that is used as cache key.
+        assertEquals(List.of("uix", "id", targetSyntaxId == null ? "" : targetSyntaxId, String.valueOf(inline)),
+            configuration.getValue().getId());
+        assertEquals(targetSyntax, configuration.getValue().getTargetSyntax());
     }
 }

@@ -60,7 +60,7 @@
     ## We need to set this because the panelheader macro used in panels needs it
     #set ($paneldoc = $xwiki.getDocument($panelUIExtension.id))
     #if ($paneldoc && $!xwiki.hasAccessLevel('view', $paneldoc))
-      $services.rendering.render($panelUIExtension.execute(), "xhtml/1.0")
+      $services.uix.render($panelUIExtension, 'html/5.0')
     #end
   #end
   ## Similar to the resize handle defined in rightpanels.vm

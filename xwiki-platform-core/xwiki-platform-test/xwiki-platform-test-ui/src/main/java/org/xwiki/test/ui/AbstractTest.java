@@ -91,6 +91,7 @@ public abstract class AbstractTest
         AbstractTest.setContext(context);
         BaseElement.setContext(context);
         TestUtils.setContext(context);
+
         AbstractTest.componentManager = new EmbeddableComponentManager();
 
         // Only load the minimal number of components required for the test framework, for both performance reasons

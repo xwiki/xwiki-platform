@@ -304,6 +304,17 @@ class DownloadActionTest
     }
 
     @Test
+    void downloadWhenNoDocumentInContext()
+    {
+        setRequestExpectations("/xwiki/bin/download/space/page/file.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
+        this.oldcore.getXWikiContext().setDoc(null);
+
+        XWikiException xWikiException =
+            assertThrows(XWikiException.class, () -> this.action.render(this.oldcore.getXWikiContext()));
+        assertEquals("Error number 11003 in 11: Attachment [file.txt] not found", xWikiException.getMessage());
+    }
+
+    @Test
     void downloadWhenURLNotPointingToAttachment()
     {
         ResourceReference rr = new EntityResourceReference(this.documentReference, EntityResourceAction.VIEW);

@@ -80,12 +80,12 @@ class DefaultCSRFTokenTest
     /**
      * URL of the current document.
      */
-    private static final String mockDocumentUrl = "http://host/xwiki/bin/save/Main/Test";
+    private static final String MOCK_DOCUMENT_URL = "http://host/xwiki/bin/save/Main/Test";
 
     /**
      * Resubmission URL.
      */
-    private static final String resubmitUrl = mockDocumentUrl;
+    private static final String RESUBMIT_URL = MOCK_DOCUMENT_URL;
 
     /**
      * Tested CSRF token component.
@@ -127,11 +127,11 @@ class DefaultCSRFTokenTest
     void configure(MockitoComponentManager componentManager) throws Exception
     {
         // set up mocked dependencies
-        final CopyStringMatcher returnValue = new CopyStringMatcher(resubmitUrl + "?", "");
+        final CopyStringMatcher returnValue = new CopyStringMatcher(RESUBMIT_URL + "?", "");
         when(mockDocumentAccessBridge.getDocumentURL(any(DocumentReference.class), eq("view"), argThat(returnValue),
             anyString())).thenAnswer(returnValue);
         when(mockDocumentAccessBridge.getDocumentURL(isNull(), eq("view"), isNull(), isNull()))
-            .thenReturn(mockDocumentUrl);
+            .thenReturn(MOCK_DOCUMENT_URL);
 
         // configuration
         final CSRFTokenConfiguration mockConfiguration = componentManager.getInstance(CSRFTokenConfiguration.class);
@@ -141,8 +141,8 @@ class DefaultCSRFTokenTest
         final HttpSession mockSession = mock(HttpSession.class);
         final ServletRequest servletRequest = new ServletRequest(httpRequest);
 
-        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(mockDocumentUrl));
-        when(httpRequest.getRequestURI()).thenReturn(mockDocumentUrl);
+        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(MOCK_DOCUMENT_URL));
+        when(httpRequest.getRequestURI()).thenReturn(MOCK_DOCUMENT_URL);
         when(httpRequest.getParameterMap()).thenReturn(new HashMap<>());
         when(httpRequest.getSession()).thenReturn(mockSession);
         when(mockSession.getAttribute(anyString())).thenReturn(new HashMap<>());
@@ -267,9 +267,9 @@ class DefaultCSRFTokenTest
         // srid is random, extract it from the url
         Matcher matcher = Pattern.compile(".*srid%3D([a-zA-Z0-9]+).*").matcher(url);
         String srid = matcher.matches() ? matcher.group(1) : "asdf";
-        String resubmit = URLEncoder.encode(mockDocumentUrl + "?srid=" + srid, StandardCharsets.UTF_8);
-        String back = URLEncoder.encode(mockDocumentUrl, StandardCharsets.UTF_8);
-        String expected = resubmitUrl + "?xpage=resubmit&xback=" + back + "&resubmit=" + resubmit + "&sridKey=" + srid;
+        String resubmit = URLEncoder.encode(MOCK_DOCUMENT_URL + "?srid=" + srid, StandardCharsets.UTF_8);
+        String back = URLEncoder.encode(MOCK_DOCUMENT_URL, StandardCharsets.UTF_8);
+        String expected = RESUBMIT_URL + "?xpage=resubmit&xback=" + back + "&resubmit=" + resubmit + "&sridKey=" + srid;
         assertEquals(expected, url, "Invalid resubmission URL");
     }
 
@@ -283,7 +283,7 @@ class DefaultCSRFTokenTest
 
         when(this.httpRequest.getMethod()).thenReturn("GET");
         String url = this.csrf.getResubmissionURL();
-        String expected = resubmitUrl + "?xpage=resubmit";
+        String expected = RESUBMIT_URL + "?xpage=resubmit";
         assertEquals(expected, url, "Invalid resubmission URL");
     }
 
@@ -323,7 +323,7 @@ class DefaultCSRFTokenTest
         // srid is random, extract it from the url
         Matcher matcher = Pattern.compile(".*srid=([a-zA-Z0-9]+)$").matcher(requestURI);
         String srid = matcher.matches() ? matcher.group(1) : "asdf";
-        String resubmit = mockDocumentUrl + "?srid=" + srid;
+        String resubmit = MOCK_DOCUMENT_URL + "?srid=" + srid;
         assertEquals(resubmit, requestURI, "Invalid request URI URL");
     }
 

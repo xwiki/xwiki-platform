@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.TemplateProviderTranslations" locale="ru">
@@ -44,5 +44,10 @@ administration.templateProvider.creationRestrictions=Ограничения со
 administration.templateProvider.creationRestrictions.hint=Список мест (включая дочерние), где этот шаблон может использоваться для создания страниц
 administration.templateProvider.creationRestrictions.none=Этот шаблон может создавать страницы везде
 administration.templateProvider.creationRestrictionsAreSuggestions=Ограничения создания как рекомендации
-administration.templateProvider.creationRestrictionsAreSuggestions.hint=Позволяет пользователю выбрать любое место для создания страницы с этим шаблоном, при выборе шаблона из списка первое ограничение используется в качестве предустановленного расположения по умолчанию.</content>
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Позволяет пользователю выбрать любое место для создания страницы с этим шаблоном, при выборе шаблона из списка первое ограничение используется в качестве предустановленного расположения по умолчанию.
+### Missing: administration.templateProvider.creationRestrictions.add=
+### Missing: administration.templateProvider.creationRestrictions.remove=
+### Missing: administration.templateProvider.visibilityRestrictions.add=
+### Missing: administration.templateProvider.visibilityRestrictions.remove=
+</content>
 </xwikidoc>

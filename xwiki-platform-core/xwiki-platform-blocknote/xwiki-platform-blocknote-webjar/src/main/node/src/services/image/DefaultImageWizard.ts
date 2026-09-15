@@ -17,6 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import {
+  EntityType as XWikiEntityType,
+  Model,
+} from "@xwiki/platform-xwiki-model-api";
 import { loadById } from "@xwiki/platform-xwiki-utils";
 import { Container, inject, injectable } from "inversify";
 import type {
@@ -228,7 +232,7 @@ export class DefaultImageWizard implements ImageWizard {
    */
   private async upload(file: File, callback: UploadCallback): Promise<void> {
     // For now, we assume the current document is being edited.
-    const currentDocumentReference = XWiki.Model.serialize(
+    const currentDocumentReference = Model.serialize(
       XWiki.currentDocument.documentReference,
     );
     try {
@@ -238,7 +242,7 @@ export class DefaultImageWizard implements ImageWizard {
       if (result?.[0]) {
         callback.onSuccess(
           // The upload result is a non empty attachment reference string, so it always resolves.
-          XWiki.Model.resolve(result[0], XWiki.EntityType.ATTACHMENT)!,
+          Model.resolve(result[0], XWikiEntityType.ATTACHMENT)!,
         );
       } else {
         callback.onAbort();

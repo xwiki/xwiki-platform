@@ -87,6 +87,7 @@ import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
 import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
+import { Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
 import { uuidv4 } from "lib0/random";
 import {
@@ -147,9 +148,7 @@ const {
   inputSyntax = "blocknote/1.0",
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
-  documentReference = XWiki.Model.serialize(
-    XWiki.currentDocument.documentReference,
-  ),
+  documentReference = Model.serialize(XWiki.currentDocument.documentReference),
   locale,
 } = defineProps<{
   // The key used to submit the edited content.

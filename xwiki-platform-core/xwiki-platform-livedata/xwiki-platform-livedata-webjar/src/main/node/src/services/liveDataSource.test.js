@@ -68,6 +68,29 @@ describe("liveDataSource.js", () => {
       expect(res).toEqual({ count: 0, entries: [] });
     });
 
+    it("sends the constraints without operator with an empty operator, without modifying them", async () => {
+      global.XWiki = {};
+
+      const liveDataSource = init($);
+      const constraint = { value: "help" };
+
+      await liveDataSource.getEntries({
+        source: { id: "test" },
+        properties: ["doc.location"],
+        offset: 0,
+        limit: 15,
+        filters: [{ property: "doc.location", constraints: [constraint] }],
+        sort: [],
+        descending: [],
+      });
+
+      expect(getJSONStub.lastCall.args[1]).toContain(
+        "filters.doc.location=%3Ahelp",
+      );
+      // The constraint is part of the Live Data query, which is also encoded to persist the Live Data state, and that
+      // encoding only accepts a known operator.
+      expect(constraint).toEqual({ value: "help" });
+    });
   });
 
 });

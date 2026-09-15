@@ -19,6 +19,10 @@
  */
 import { EntityType } from "@xwiki/platform-model-api";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
+import {
+  EntityType as XWikiEntityType,
+  Model,
+} from "@xwiki/platform-xwiki-model-api";
 import { inject, injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type {
@@ -66,11 +70,11 @@ class XWikiModelReferenceParser implements ModelReferenceParser {
   ): number | undefined {
     switch (resourceReference.type) {
       case "space":
-        return XWiki.EntityType.SPACE;
+        return XWikiEntityType.SPACE;
       case "doc":
-        return XWiki.EntityType.DOCUMENT;
+        return XWikiEntityType.DOCUMENT;
       case "attach":
-        return XWiki.EntityType.ATTACHMENT;
+        return XWikiEntityType.ATTACHMENT;
       default:
         return undefined;
     }
@@ -80,7 +84,7 @@ class XWikiModelReferenceParser implements ModelReferenceParser {
     reference: string,
     type: number,
   ): EntityReference {
-    return toCristalEntityReference(XWiki.Model.resolve(reference, type))!;
+    return toCristalEntityReference(Model.resolve(reference, type))!;
   }
 }
 

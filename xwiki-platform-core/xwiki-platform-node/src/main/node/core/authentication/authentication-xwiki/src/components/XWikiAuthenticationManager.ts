@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { Model } from "@xwiki/platform-xwiki-model-api";
 import { inject, injectable } from "inversify";
 import type {
   AuthenticationManager,
@@ -93,7 +94,7 @@ class XWikiAuthenticationManager implements AuthenticationManager {
 
   public getUserId(): string | undefined {
     return this.xwikiMeta.userReference
-      ? XWiki.Model.serialize(this.xwikiMeta.userReference)
+      ? Model.serialize(this.xwikiMeta.userReference)
       : undefined;
   }
 }

@@ -18,11 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type {
-  EntityReference,
-  EntityTypeApi,
-  ModelApi,
-} from "@xwiki/platform-xwiki-model-api";
+import type { EntityReference } from "@xwiki/platform-xwiki-model-api";
 
 /**
  * A document from the global XWiki object, able to compute its own URLs. It is the legacy counterpart of the
@@ -64,9 +60,34 @@ interface LegacyXWikiAttachment {
 }
 
 /**
- * The global `XWiki` object exposed by the XWiki web pages. Its entity reference API comes from
- * `@xwiki/platform-xwiki-model-api`, which the web WebJar assigns onto the global object on page load; the rest is
- * contributed by the legacy `xwiki.js` script.
+ * The save button behaviour of the legacy `actionbuttons.js` script, which the editors override in order to stay on
+ * the page after a save.
+ *
+ * @since 18.8.0RC1
+ * @beta
+ */
+interface LegacyAjaxSaveAndContinue {
+  /**
+   * Called after a successful save, to load the saved content back into the editor.
+   */
+  reloadEditor(): void;
+
+  /**
+   * Called after a successful save, to leave the edit mode when the user asked for it.
+   *
+   * @param continueEditing - whether the user asked to stay in the edit mode
+   * @returns whether the redirect was handled
+   */
+  maybeRedirect(continueEditing: boolean): boolean;
+}
+
+/**
+ * The global `XWiki` object exposed by the XWiki web pages, contributed by the legacy `xwiki.js` and
+ * `actionbuttons.js` scripts.
+ *
+ * The entity reference API that the web WebJar also assigns onto the global object is deliberately left out: import
+ * it from `@xwiki/platform-xwiki-model-api` instead, which is the same code, without the load order dependency and
+ * without needing a global to be stubbed in the tests.
  *
  * Declare the global in the modules that need it with:
  *
@@ -81,17 +102,6 @@ interface LegacyXWikiAttachment {
  * @beta
  */
 interface XWikiGlobal {
-  EntityReference: new (
-    name: string,
-    type: number,
-    parent?: EntityReference | null,
-    locale?: string,
-  ) => EntityReference;
-
-  EntityType: EntityTypeApi;
-
-  Model: ModelApi;
-
   Document: new (reference: EntityReference) => LegacyXWikiDocument;
 
   Attachment: new (reference: EntityReference) => LegacyXWikiAttachment;
@@ -115,6 +125,18 @@ interface XWikiGlobal {
    * The syntax identifier of the current document, e.g. `xwiki/2.1`.
    */
   docsyntax: string;
+
+  /**
+   * The behaviour of the save buttons. Available only in edit mode.
+   */
+  actionButtons?: {
+    AjaxSaveAndContinue: { prototype: LegacyAjaxSaveAndContinue };
+  };
 }
 
-export type { LegacyXWikiAttachment, LegacyXWikiDocument, XWikiGlobal };
+export type {
+  LegacyAjaxSaveAndContinue,
+  LegacyXWikiAttachment,
+  LegacyXWikiDocument,
+  XWikiGlobal,
+};

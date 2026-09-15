@@ -18,6 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
+import {
+  AttachmentLinkTargetType,
+  EmailLinkTargetType,
+  PageLinkTargetType,
+  UrlLinkTargetType,
+} from "@xwiki/platform-link-type-default";
 import {
   AttachmentReference,
   DocumentReference,
@@ -37,6 +44,7 @@ import type {
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
 import type { Container } from "inversify";
+import type { MockProxy } from "vitest-mock-extended";
 
 export function depsContainerMock(): Container {
   const container = mock<Container>();
@@ -136,6 +144,25 @@ export function depsContainerMock(): Container {
 
   container.get.calledWith("AttachmentsService").mockReturnValue(null);
   container.get.calledWith("DocumentService").mockReturnValue(null);
+
+  return withBuiltInLinkTargetTypes(container);
+}
+
+/**
+ * The link modal resolves the link target types it can offer out of the container, so the built-in ones must be
+ * registered here the same way the BlockNote webjar registers them in production (see its container.ts).
+ */
+function withBuiltInLinkTargetTypes(
+  container: MockProxy<Container>,
+): Container {
+  container.getAll
+    .calledWith(linkTargetTypeExtensionRole)
+    .mockReturnValue([
+      new PageLinkTargetType(),
+      new AttachmentLinkTargetType(),
+      new EmailLinkTargetType(),
+      new UrlLinkTargetType(),
+    ]);
 
   return container;
 }

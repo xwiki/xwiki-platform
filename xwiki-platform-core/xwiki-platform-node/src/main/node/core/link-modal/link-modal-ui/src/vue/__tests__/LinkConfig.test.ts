@@ -22,7 +22,10 @@ import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, test } from "vitest";
 import { defineComponent, nextTick } from "vue";
 import { createI18n } from "vue-i18n";
-import type { LinkData } from "../../data/linkType";
+import type {
+  LinkData,
+  LinkTargetTypeExtension,
+} from "@xwiki/platform-link-type-api";
 
 // Minimal stand-ins for the design system components used by LinkConfig.vue. XTextFieldStub mirrors the contract
 // the real component (and the one used by the blocknote-headless Playwright fixtures) must honor: a *single* root
@@ -63,6 +66,18 @@ const XCheckboxStub = defineComponent({
   `,
 });
 
+// LinkConfig.vue only needs the registered link target types to resolve the labels of the type selector, so a
+// single stand-in matching the type used by buildLinkData() below is enough; the parsing/serializing part of the
+// contract is never exercised here.
+const urlExtensionStub: LinkTargetTypeExtension = {
+  type: "url",
+  getLabel: () => "URL",
+  createDefaultConfig: () => ({ url: "" }),
+  component: () => defineComponent({ template: "<div />" }),
+  tryParseUrl: () => null,
+  serializeUrl: () => "",
+};
+
 function buildLinkData(): LinkData {
   return {
     displayText: "",
@@ -89,6 +104,9 @@ function mountLinkConfig() {
     attachTo: document.body,
     global: {
       plugins: [i18n],
+      // Normally provided by LinkModal.vue, which resolves the registered link target types out of the
+      // depsContainer before rendering LinkConfig.
+      provide: { linkTargetTypeExtensions: [urlExtensionStub] },
       components: {
         "x-text-field": XTextFieldStub,
         "x-select": XSelectStub,

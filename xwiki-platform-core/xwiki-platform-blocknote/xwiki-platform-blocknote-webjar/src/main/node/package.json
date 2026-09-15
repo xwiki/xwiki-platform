@@ -23,6 +23,7 @@
     "@xwiki/platform-editors-blocknote-react": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
     "@xwiki/platform-link-suggest-xwiki": "workspace:*",
+    "@xwiki/platform-link-type-default": "workspace:*",
     "@xwiki/platform-markdown-syntax-config": "workspace:*",
     "@xwiki/platform-minimal-syntax-config": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",

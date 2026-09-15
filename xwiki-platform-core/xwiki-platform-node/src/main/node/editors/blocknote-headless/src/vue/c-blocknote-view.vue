@@ -20,15 +20,17 @@
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
+import { LinkModal } from "@xwiki/platform-link-modal-ui";
 import {
-  LinkModal,
   linkTargetToResourceReference,
   parseLinkTarget,
   resourceReferenceToLinkTarget,
-} from "@xwiki/platform-link-modal-ui";
+  serializeLinkTarget,
+} from "@xwiki/platform-link-type-api";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
+  computed,
   onBeforeUnmount,
   onMounted,
   onUnmounted,
@@ -46,7 +48,7 @@ import type {
   LinkEditionData,
   LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkData, LinkTarget } from "@xwiki/platform-link-modal-ui";
+import type { LinkData, LinkTarget } from "@xwiki/platform-link-type-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type {
   ModelReferenceParserProvider,
@@ -162,35 +164,23 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
 };
 
-/**
- * The reference of the linked resource is the authoritative link target (the URL is only a rendering
- * of it), so build the target to configure in the link modal from that reference when the
- * integration provides one, and fall back on reverse-engineering the URL otherwise.
- */
-function currentLinkTarget(current: LinkEditionData): LinkTarget {
-  return (
-    (current.reference &&
-      resourceReferenceToLinkTarget(current.reference, modelReferenceParser)) ??
-    parseLinkTarget(current.url, remoteURLParser)
-  );
-}
-
 const submitEditedLink = ({ displayText, target }: LinkData) => {
-  const { type, config } = target;
+  const referenceCtx = { modelReferenceParser, modelReferenceSerializer };
 
-  // TODO: support
-
-  const url =
-    type === "url"
-      ? config.url
-      : type === "email"
-        ? `mailto:${config.address}`
-        : remoteURLSerializer.serialize(config.ref!)!;
+  const url = serializeLinkTarget(target, depsContainer, {
+    remoteURLParser,
+    remoteURLSerializer,
+  });
+  const reference = linkTargetToResourceReference(
+    target,
+    depsContainer,
+    referenceCtx,
+  );
 
   editingLink.value?.onSubmit({
     title: displayText,
     url,
-    reference: linkTargetToResourceReference(target, modelReferenceSerializer),
+    reference,
   });
 
   editingLink.value = null;
@@ -202,6 +192,42 @@ const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 const mountedBlockNote = ref<{ unmount: () => void }>();
 
 const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
+
+/**
+ * The reference of the linked resource is the authoritative link target (the URL is only a rendering
+ * of it), so build the target to configure in the link modal from that reference when the
+ * integration provides one, and fall back on reverse-engineering the URL otherwise.
+ */
+function currentLinkTarget(current: LinkEditionData): LinkTarget {
+  const referenceCtx = { modelReferenceParser, modelReferenceSerializer };
+
+  const target =
+    current.reference &&
+    resourceReferenceToLinkTarget(
+      current.reference,
+      depsContainer,
+      referenceCtx,
+    );
+
+  return (
+    target ??
+    parseLinkTarget(current.url, depsContainer, {
+      remoteURLParser,
+      remoteURLSerializer,
+    })
+  );
+}
+
+const currentLinkData = computed<LinkData | null>(() => {
+  if (!editingLink.value) {
+    return null;
+  }
+
+  return {
+    displayText: editingLink.value.current.title,
+    target: currentLinkTarget(editingLink.value.current),
+  };
+});
 
 function handleLinkEditorOutsideClick(e: MouseEvent) {
   if (!editingLink.value || !linkModalContainer.value) {
@@ -242,12 +268,9 @@ onUnmounted(() => {
 <template>
   <div ref="blocknote-container" />
 
-  <div ref="link-modal-container" v-if="editingLink">
+  <div ref="link-modal-container" v-if="currentLinkData">
     <LinkModal
-      :current="{
-        displayText: editingLink.current.title,
-        target: currentLinkTarget(editingLink.current),
-      }"
+      :current="currentLinkData"
       :deps-container="depsContainer"
       @submit="submitEditedLink"
       @cancel="editingLink = null"

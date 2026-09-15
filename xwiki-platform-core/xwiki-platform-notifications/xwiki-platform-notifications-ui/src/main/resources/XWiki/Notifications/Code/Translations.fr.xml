@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.Notifications.Code.Translations" locale="fr">
@@ -114,15 +114,15 @@ notifications.filters.type.custom.exclusive=Ignorer l'événement
 notifications.settings.addFilter=Ajouter un filtre
 notifications.settings.addFilter.hint=Créez un filtre d'emplacement personnalisé : ce filtre s'applique aux événements liés à des emplacements spécifiques et permet de les notifier ou de les ignorer en fonction du type d'événement et du format de notification.
 notifications.filters.preferences.custom.addFilter.location.label=Emplacement
-### Missing: notifications.filters.preferences.custom.addFilter.location.hint=This filter applies when an event is sent from the selected location. Multiple locations can be selected.
+### Missing: notifications.filters.preferences.custom.addFilter.location.hint=This filter applies on the events happening on the locations selected here. Select one or more locations.
 notifications.filters.preferences.custom.addFilter.type.label=Action
 notifications.filters.preferences.custom.addFilter.type.hint=Ce filtre peut soit notifier ou ignorer les évènements se produisant dans l'emplacement choisi. Choisissez l'action que vous souhaitez définir pour les évènements.
 notifications.filters.preferences.custom.addFilter.filterType.inclusive=Notifier sur l'événement
 notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignorer l'événement
 notifications.filters.preferences.custom.addFilter.notificationFormat.label=Canal
-### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.hint=This filter applies when a notification is sent for the selected format. Multiple formats can be selected.
+### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.hint=This filter applies only to the notifications sent on the communication channels selected below. Choose one or more communication channels.
 notifications.filters.preferences.custom.addFilter.eventType.label=Événements
-### Missing: notifications.filters.preferences.custom.addFilter.eventType.hint=This filter applies when an event of selected type is sent. Multiple types can be selected. If nothing is selected, then the filter will apply for any type.
+### Missing: notifications.filters.preferences.custom.addFilter.eventType.hint=This filter applies to the events selected here, in the locations selected above. Choose one or more events.
 notifications.menu.header=Notifications
 notifications.menu.header.settings=Préférences
 notifications.menu.clear=Effacer tout

@@ -4762,10 +4762,6 @@ public class XWiki implements EventListener
      * @since 11.6
      * @since 10.11.10
      */
-    // The document is never null on the only path that reaches this method: DeleteAction#delete() already
-    // dereferences the same context document (doc.isNew()) before calling it. Guarding here would also be the wrong
-    // shape for a permission check, since silently returning would report "allowed" without having checked anything.
-    @SuppressWarnings("javabugs:S2259")
     public void checkDeletingDocument(DocumentReference userReference, XWikiDocument document, XWikiContext context)
         throws XWikiException
     {

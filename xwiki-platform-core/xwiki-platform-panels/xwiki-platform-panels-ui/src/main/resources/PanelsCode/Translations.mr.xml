@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="PanelsCode.Translations" locale="mr">
@@ -47,7 +47,6 @@ platform.panels.applications.ajax.noright=आपल्याला  PanelsCode.A
 platform.panels.applications.ajax.error=Failed to save your changes.
 admin.panels.applications=अनुप्रयोग पॅनेल
 admin.panels.applications.description=अ‍ॅप्लीकेशन पॅनेलमध्ये कोणते अ‍ॅप्लिकेशन्स दाखवले जातात ते व्यवस्थापित करा.
-
 admin.panels.navigation=पथदर्शक पॅनेल
 admin.panels.navigation.description=नॅव्हिगेशन पॅनेलमध्ये कोणती पृष्ठे प्रदर्शित केली जातील हे व्यवस्थापित करा.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=उच्च स्तरीय विस्तार पृष्ठे वगळा
@@ -64,5 +63,6 @@ platform.panels.navigation.configuration.excludedPages.empty=कोणतेह�
 platform.panels.navigation.configuration.topLevelExtensionPages=उच्च स्तरीय विस्तार पृष्ठे
 platform.panels.navigation.configuration.topLevelApplicationPages=शीर्ष स्तरीय अनुप्रयोग पृष्ठे
 platform.panels.navigation.configuration.otherPages=इतर पृष्ठे
-platform.panels.navigation.configuration.saveComment=प्रशासनाकडून नेव्हिगेशन पॅनेल कॉन्फिगरेशन अद्यतनित केले</content>
+platform.panels.navigation.configuration.saveComment=प्रशासनाकडून नेव्हिगेशन पॅनेल कॉन्फिगरेशन अद्यतनित केले
+</content>
 </xwikidoc>

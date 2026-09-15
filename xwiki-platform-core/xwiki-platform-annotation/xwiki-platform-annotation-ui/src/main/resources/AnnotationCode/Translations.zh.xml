@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="AnnotationCode.Translations" locale="zh">
@@ -48,6 +48,8 @@ annotations.annotated.loaderror=失败：
 annotations.annotated.loaderror.wrongresponse=服务器返回了错误格式的响应
 annotations.annotated.error.noannotatedelement=由于内容无效，注解无法载入。
 annotations.annotated.error.wrongsyntax=使用XWiki/1.0语法编写的页面中注解不可用。
+### Missing: annotations.annotated.highlight.toggle.hint=
+### Missing: annotations.annotated.bubble.toggle.hint=
 annotations.action.edit.text=[编辑]
 annotations.action.edit.tooltip=编辑注解
 annotations.action.edit.submit.text=更新

@@ -21,14 +21,17 @@ define('xwiki-realtime-saver', [
   'chainpad',
   'chainpad-netflux',
   'json.sortify',
+  'xwiki-autosave',
   'xwiki-realtime-crypto',
   'xwiki-realtime-document',
   'xwiki-l10n!xwiki-realtime-messages'
 ], function(
   /* jshint maxparams:false */
-  ChainPad, ChainPadNetflux, jsonSortify, Crypto, xwikiDocument, Messages
+  ChainPad, ChainPadNetflux, jsonSortify, AutoSave, Crypto, xwikiDocument, Messages
 ) {
   'use strict';
+
+  const {SaveTarget, SaveTransport, Saver} = AutoSave;
 
   function warn(...args) {
     log('warn', ...args);
@@ -57,14 +60,6 @@ define('xwiki-realtime-saver', [
     });
   }
 
-  // The interval between two consecutive saves (when the content is modified). Using a slightly different value for
-  // each client may help reduce the chances of conflicts.
-  const SAVE_INTERVAL = 60000 + Math.random() * 6000;
-
-  // How long to wait after broadcasting the intention to save, before actually saving the content. This helps reduce
-  // the chances of concurrent saves (which often lead to merge conflicts).
-  const SAVE_DELAY = 1000;
-
   // How long to wait for the result of a save request before giving up. This is a safety net for the case where neither
   // the save success nor the save failure event is fired, which would otherwise block the autosave forever. The value
   // is well above any realistic save round-trip because on timeout the content remains dirty and is saved again, so a
@@ -72,124 +67,13 @@ define('xwiki-realtime-saver', [
   const SUBMIT_TIMEOUT = 120000;
 
   /**
-   * Replicates the saver state of each client taking part in the realtime editing session.
-   */
-  class SaveTransport {
-    /**
-     * @param {Object} config the saver configuration
-     * @param {Saver} saver the saver using this transport, notified when the remote states change
-     */
-    constructor(config, saver) {
-      this._config = config;
-      this._saver = saver;
-
-      // The state of the local client, that gets propagated to the other clients.
-      this._state = {
-        // The number of local changes since this saver was created. This is used to determine if there are unsaved
-        // local changes.
-        updateCount: 0,
-
-        // The number of changes for each client that were last saved by this client.
-        savedUpdateCount: {},
-
-        // Whether there are unsaved local changes. This is determined by comparing the local update count with the
-        // saved update count of all clients.
-        dirty: false,
-
-        // Whether this client is currently saving the content. A value greater than 0 means the client is currently
-        // attempting to save with that priority. Depending on the save target, manual save may have for instance
-        // higher priority than autosave.
-        saving: 0
-      };
-    }
-
-    /**
-     * Connect to the realtime channel and start receiving the states of the other clients. Called after both the
-     * transport and the target have been created, so that the saver is ready to be notified.
-     */
-    initialize() {
-      // Must be implemented by subclasses.
-    }
-
-    /**
-     * @returns {Promise} a promise that resolves when the transport is connected and the states of the other clients
-     *   are available
-     */
-    async toBeReady() {
-      // Must be implemented by subclasses.
-    }
-
-    /**
-     * @returns {String} the identifier of the local client, used as key in the map returned by {@link #getStates()}
-     */
-    getClientId() {
-      // Must be implemented by subclasses.
-      return '';
-    }
-
-    /**
-     * @returns {Object} the saver state of each client taking part in the editing session, keyed by client identifier
-     */
-    getStates() {
-      // Must be implemented by subclasses.
-      return {};
-    }
-
-    /**
-     * This is normally the entry that {@link #getStates()} holds for {@link #getClientId()}, but not always: a
-     * transport can receive a remote snapshot that doesn't include the local client yet, in which case it has to keep
-     * the local state aside until the next push re-inserts it in the map. Reading the local state through this method,
-     * rather than from the map, is what makes the saver immune to that window.
-     *
-     * @returns {Object} the saver state of the local client
-     */
-    getLocalState() {
-      return this._state;
-    }
-
-    /**
-     * Apply the given changes to the local saver state and optionally propagate them to the other clients.
-     *
-     * @param {Object} patch the state properties to modify
-     * @param {Object} [options] the options of this update
-     * @param {boolean} [options.push] whether to propagate the new state to the other clients
-     * @param {boolean} [options.immediate] whether to wait for the new state to reach the other clients
-     * @returns {Promise} a promise that resolves when the update has been applied (and propagated, when asked to)
-     */
-    async updateLocalState(patch, {push, immediate} = {}) {
-      // Must be implemented by subclasses.
-    }
-
-    /**
-     * @param {Object} state the saver state of a client
-     * @returns {boolean} whether the client owning the given state is still taking part in the editing session
-     */
-    isConnected(state) {
-      return true;
-    }
-
-    /**
-     * @returns {Promise} a promise that resolves when the local state has been received by the other clients
-     */
-    whenSettled() {
-      return Promise.resolve();
-    }
-
-    /**
-     * Disconnect from the realtime channel and revert the changes made to the environment.
-     */
-    async dispose() {
-      // Must be implemented by subclasses.
-    }
-  }
-
-  /**
    * Synchronizes the saver states using ChainPad.
    */
   class ChainPadSaveTransport extends SaveTransport {
     constructor(config, saver) {
-      super(config, saver);
+      super(saver);
 
+      this._config = config;
       this._revertList = [];
 
       this._initializing = new Promise(resolve => {
@@ -203,7 +87,7 @@ define('xwiki-realtime-saver', [
 
       // The cached states of all the clients.
       this._states = {
-        [this.getClientId()]: this._state
+        [this.getClientId()]: this.state
       };
     }
 
@@ -241,13 +125,13 @@ define('xwiki-realtime-saver', [
     }
 
     async updateLocalState(patch, {push, immediate} = {}) {
-      Object.assign(this._state, patch);
+      Object.assign(this.state, patch);
       if (!this._chainpad) {
         // We're not connected (yet, or anymore) so we can only keep the new state locally.
         return;
       }
-      this._state.id = this._myId;
-      this._states[this.getClientId()] = this._state;
+      this.state.id = this._myId;
+      this._states[this.getClientId()] = this.state;
       if (push) {
         this._onLocal();
       }
@@ -284,7 +168,7 @@ define('xwiki-realtime-saver', [
         onRemote: this._onRemote.bind(this),
         onReady: this._onReady.bind(this),
         onLocal: this._onLocal.bind(this),
-        onAbort: () => this._saver.stop()
+        onAbort: () => this.saver.stop()
       };
     }
 
@@ -308,8 +192,8 @@ define('xwiki-realtime-saver', [
         this._states = JSON.parse(remoteStates);
         // The remote document may not include our own state yet, in which case we keep the state we have until the
         // next push re-inserts it in the map.
-        this._state = this._states[this.getClientId()] || this._state;
-        this._saver.onRemoteStatesChanged();
+        this.state = this._states[this.getClientId()] || this.state;
+        this.saver.onRemoteStatesChanged();
       } catch (e) {
         warn("Unable to parse remote states.", e);
       }
@@ -340,76 +224,13 @@ define('xwiki-realtime-saver', [
   }
 
   /**
-   * Saves the edited content, and reports what the other clients need to know about the result.
-   */
-  class SaveTarget {
-    /**
-     * @param {Object} config the saver configuration
-     * @param {Saver} saver the saver using this target, asked to perform the manual saves
-     */
-    constructor(config, saver) {
-      this._config = config;
-      this._saver = saver;
-    }
-
-    /**
-     * Called when the transport is ready, to install the listeners used to detect and intercept the save requests
-     * (e.g. when the user clicks on the save button). This has to wait for the transport because a save accepted
-     * before the states of the other clients are known would elect no client and thus save nothing.
-     *
-     * @returns {Promise} a promise that resolves when the target is ready to intercept the save requests
-     */
-    async initialize() {
-      // Must be implemented by subclasses.
-    }
-
-    /**
-     * @param {Object} context the save context, holding the save button in case of a manual save
-     * @returns {Number} the priority of this save; the client with the highest priority wins the save election
-     */
-    getSavePriority(context) {
-      // By default all clients have the same priority when saving. Subclasses may override this method to give higher
-      // priority to manual saves, for instance (i.e. when the user clicks on the save button).
-      return 1;
-    }
-
-    /**
-     * Save the edited content.
-     *
-     * @param {Object} context the save context, holding the save button in case of a manual save
-     * @returns {Promise<Object>} a promise that resolves with the save result, holding the created version, if any
-     */
-    async submit(context) {
-      // Must be implemented by subclasses.
-      return {};
-    }
-
-    /**
-     * Called whenever the saver states change, so that the target can react (e.g. take into account the version
-     * created by another client, in order to prevent a merge conflict on the next save).
-     *
-     * @param {Object} states the saver state of each client, keyed by client identifier
-     * @param {String} localClientId the identifier of the local client
-     */
-    onStatesChanged(states, localClientId) {
-      // Must be implemented by subclasses.
-    }
-
-    /**
-     * Revert the changes made to the environment.
-     */
-    dispose() {
-      // Must be implemented by subclasses.
-    }
-  }
-
-  /**
    * Saves the content edited with an XWiki edit form, by submitting that form.
    */
   class XWikiFormSaveTarget extends SaveTarget {
     constructor(config, saver) {
-      super(config, saver);
+      super(saver);
 
+      this._config = config;
       this._revertList = [];
     }
 
@@ -431,11 +252,11 @@ define('xwiki-realtime-saver', [
       this._overwriteAjaxSaveAndContinue(form);
 
       const beforeSaveHandler = event => {
-        if (!this._saver.isSaving()) {
+        if (!this.saver.isSaving()) {
           event.preventDefault();
           event.stopImmediatePropagation();
           // The save failure is already logged by the saver and reported to the user by the save notification.
-          this._saver.save({button: event.target}).catch(() => {});
+          this.saver.save({button: event.target}).catch(() => {});
         }
       };
       this._$(form).on('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
@@ -469,7 +290,7 @@ define('xwiki-realtime-saver', [
     }
 
     _overwriteAjaxSaveAndContinue(form) {
-      const saver = this._saver;
+      const saver = this.saver;
       const prototype = XWiki.actionButtons.AjaxSaveAndContinue.prototype;
       // Keep a reference to the methods we override, in order to call and later restore them.
       const originalAjaxSaveAndContinue = {
@@ -710,7 +531,7 @@ define('xwiki-realtime-saver', [
       this._config.onCreateVersion({
         number: newVersion,
         date: Date.now(),
-        author: this._saver.getClientId()
+        author: this.saver.getClientId()
       });
       return {version: newVersion};
     }
@@ -722,279 +543,10 @@ define('xwiki-realtime-saver', [
   }
 
   /**
-   * Generic auto-saver that keeps track of the local update count and schedules saves when the content is modified.
-   * The way the saver states are synchronized between the clients is delegated to a {@link SaveTransport} and the way
-   * the content is saved is delegated to a {@link SaveTarget}.
-   */
-  class Saver {
-    /**
-     * @param {Object} config the saver configuration
-     * @param {Function} createTransport creates the transport used to synchronize the saver states, called with this
-     *   saver
-     * @param {Function} createTarget creates the target used to save the edited content, called with this saver
-     */
-    constructor(config, createTransport, createTarget) {
-      this._config = config;
-
-      // The highest number of local changes that we know have been saved, by us or by another client. We remember the
-      // highest value ever seen rather than looking it up in the saver states each time, because the state of the
-      // client that performed the save can disappear (e.g. when that client leaves the editing session) and we would
-      // then wrongly consider our changes unsaved.
-      this._savedUpdateCount = 0;
-
-      // Whether this saver was stopped, in which case no new save must be scheduled.
-      this._stopped = false;
-
-      this._transport = createTransport(this);
-      this._target = createTarget(this);
-
-      // Connect only after both the transport and the target have been created, because the transport starts notifying
-      // us as soon as it is initialized.
-      this._transport.initialize();
-    }
-
-    /**
-     * @returns {Promise} a promise that resolves when the saver is connected and ready to save
-     */
-    async toBeReady() {
-      await this._transport.toBeReady();
-      await this._target.initialize();
-      this._notifyStatusChange();
-    }
-
-    /**
-     * Called each time the edited content is modified locally.
-     */
-    contentModifiedLocally() {
-      const updateCount = this._transport.getLocalState().updateCount + 1;
-      this._updateState({updateCount}, true);
-      this._scheduleSave();
-    }
-
-    isDirty() {
-      return !!this._transport.getLocalState().dirty;
-    }
-
-    isSaving() {
-      return !!this._transport.getLocalState().saving;
-    }
-
-    getClientId() {
-      return this._transport.getClientId();
-    }
-
-    getSaveButton(continueEditing) {
-      return this._target.getSaveButton(continueEditing);
-    }
-
-    /**
-     * @returns {Promise} a promise that resolves when the local state has been received by the other clients
-     */
-    whenSettled() {
-      return this._transport.whenSettled();
-    }
-
-    /**
-     * Called by the transport when the saver states of the other clients have changed.
-     */
-    onRemoteStatesChanged() {
-      this._updateState();
-    }
-
-    _scheduleSave() {
-      // Cancel the previous scheduled save.
-      clearTimeout(this._saveTimer);
-      if (this._stopped) {
-        // Don't schedule a new save after the saver was stopped (e.g. when the user leaves the edit mode).
-        return;
-      }
-      if (!this._dirtyTimestamp || Date.now() - this._dirtyTimestamp < SAVE_INTERVAL) {
-        this._saveTimer = setTimeout(this._maybeSave.bind(this), SAVE_INTERVAL);
-      } else {
-        // Save right away because too much time has passed since the last time the content became dirty.
-        this._maybeSave();
-      }
-    }
-
-    /**
-     * Recompute the local state, optionally propagating it to the other clients.
-     *
-     * @param {Object} [patch] the local state properties to modify
-     * @param {boolean} [push] whether to propagate the new state to the other clients
-     * @param {boolean} [immediate] whether to wait for the new state to reach the other clients
-     */
-    _updateState(patch, push, immediate) {
-      const localState = {...this._transport.getLocalState(), ...patch};
-      const wasDirty = !!this._transport.getLocalState().dirty;
-      const dirty = this._isDirty(localState);
-      if (wasDirty !== dirty) {
-        // Dirty state changed.
-        if (wasDirty) {
-          // Notify immediately that the content is clean, otherwise, if the user saving the content is not the one that
-          // made the changes, the save status will remain dirty after the save success notification.
-          push = immediate = true;
-        } else {
-          // Remember the last time when the content became dirty in order to be able to save immediately when the save
-          // interval is reached (even if the user is still making changes).
-          this._dirtyTimestamp = Date.now();
-        }
-      } else if (this._isSomeoneSaving()) {
-        // Avoid auto-saving more often than the SAVE_INTERVAL. It's possible that the SAVE_INTERVAL is reached for
-        // multiple users that are editing at the same time. In this case the auto-save should be triggered for only one
-        // of them. For the others the auto-save should be delayed until the SAVE_INTERVAL is reached again.
-        delete this._dirtyTimestamp;
-      }
-      // We don't wait for the new state to reach the other clients because the callers don't depend on it.
-      this._transport.updateLocalState({...patch, dirty}, {push, immediate});
-
-      this._notifyStatusChange();
-      this._target.onStatesChanged(this._transport.getStates(), this._transport.getClientId());
-    }
-
-    /**
-     * @param {Object} localState the new local state
-     * @returns {boolean} whether the local content has changes that no client has saved yet
-     */
-    _isDirty(localState) {
-      const clientId = this._transport.getClientId();
-      for (const state of Object.values(this._transport.getStates())) {
-        this._savedUpdateCount = Math.max(this._savedUpdateCount, state.savedUpdateCount?.[clientId] || 0);
-      }
-      return (localState.updateCount || 0) > this._savedUpdateCount;
-    }
-
-    _notifyStatusChange() {
-      const localState = this._transport.getLocalState();
-      const localStatus = (localState.saving && 1) || (localState.dirty ? 0 : 2);
-      if (this._previousLocalStatus !== localStatus) {
-        this._previousLocalStatus = localStatus;
-        this._config.onLocalStatusChange(localStatus);
-      }
-
-      const globalStatus = (this._isSomeoneSaving() && 1) || (this._isSomeoneDirty() ? 0 : 2);
-      if (this._previousGlobalStatus !== globalStatus) {
-        this._previousGlobalStatus = globalStatus;
-        this._config.onStatusChange(globalStatus);
-      }
-    }
-
-    _maybeSave() {
-      if (!this._isSomeoneSaving() && this._isSomeoneDirty()) {
-        // The autosave failure is already logged by the saver and a new save attempt is scheduled.
-        this.save().catch(() => {});
-      }
-    }
-
-    _isSomeoneSaving() {
-      return this._someState(state => state.saving && this._transport.isConnected(state));
-    }
-
-    _isSomeoneDirty() {
-      return this._someState(state => state.dirty && this._transport.isConnected(state));
-    }
-
-    _someState(predicate) {
-      return Object.values(this._transport.getStates()).some(state => predicate(state));
-    }
-
-    _getConnectedStates() {
-      return Object.fromEntries(Object.entries(this._transport.getStates())
-        .filter(([clientId, state]) => this._transport.isConnected(state)));
-    }
-
-    /**
-     * Save the edited content, provided that this client wins the save election.
-     *
-     * @param {Object} [context] the save context, holding the save button in case of a manual save
-     * @returns {Promise} a promise that rejects if the content could not be saved
-     */
-    async save(context) {
-      context = context || {};
-
-      // Let the others know immediately that we are saving, in order to reduce concurrent saves.
-      this._updateState({saving: this._target.getSavePriority(context)}, true, true);
-
-      try {
-        const savingClientId = await this._getSavingClientId();
-        if (savingClientId === this._transport.getClientId()) {
-          const savedUpdateCount = this._getUpdateCounts();
-          debug("Saving ", savedUpdateCount);
-
-          const {version} = await this._target.submit(context) || {};
-          // Record the save result locally: the finally block below propagates it to the other clients.
-          await this._transport.updateLocalState(version ? {savedUpdateCount, version} : {savedUpdateCount});
-        }
-      } catch (error) {
-        warn("Failed to save.", error);
-        // Let the caller know that the content has not been saved.
-        throw error;
-      } finally {
-        // Propagate the state immediately after the save attempt because the user may leave the edit mode and this will
-        // close the WebSocket connection.
-        this._updateState({saving: 0}, true, true);
-
-        if (this.isDirty()) {
-          // The content is still dirty, either because the save failed or because another client was elected to save
-          // and didn't manage to save yet. Schedule a new save attempt.
-          this._scheduleSave();
-        }
-      }
-    }
-
-    /**
-     * The autosave can be triggered on multiple clients at the same time (i.e. multiple clients can set their own
-     * saving flag before they received the saving flag from the other clients). This method is used to determine which
-     * client should save the content in this case. By default the client with the highest save priority and the lowest
-     * id (in alphabetical order) wins.
-     *
-     * @returns the id of the client that should save the content
-     */
-    _getSavingClientId() {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          // Initialize with minimum save priority.
-          let savePriority = 1, savingClientId;
-          for (const [clientId, state] of Object.entries(this._getConnectedStates())) {
-            if (state.saving > savePriority || (state.saving === savePriority &&
-                (!savingClientId || savingClientId > clientId))) {
-              savePriority = state.saving;
-              savingClientId = clientId;
-            }
-          }
-          resolve(savingClientId);
-        }, SAVE_DELAY);
-      });
-    }
-
-    _getUpdateCounts() {
-      const updateCounts = {};
-      for (const [clientId, state] of Object.entries(this._transport.getStates())) {
-        updateCounts[clientId] = state.updateCount || 0;
-      }
-      return updateCounts;
-    }
-
-    /**
-     * Stop the autosave when the user disallows realtime or when the WebSocket is disconnected.
-     */
-    async stop() {
-      this._stopped = true;
-      // Cancel the scheduled save.
-      clearTimeout(this._saveTimer);
-
-      // Push uncommitted changes to the server before disconnecting.
-      await this._transport.updateLocalState({}, {push: true, immediate: true});
-
-      await this._transport.dispose();
-      this._target.dispose();
-    }
-  }
-
-  /**
    * An auto-saver that synchronizes the saver states using ChainPad and that saves the content by submitting the XWiki
    * edit form.
    */
-  class XWikiSaver {
+  class ChainPadXWikiFormSaver {
     constructor(config) {
       config = {
         formId: 'edit',
@@ -1005,7 +557,8 @@ define('xwiki-realtime-saver', [
       };
       this._saver = new Saver(config,
         saver => new ChainPadSaveTransport(config, saver),
-        saver => new XWikiFormSaveTarget(config, saver)
+        // Keep the target, because it is the one that knows which button performs the save we are asked for.
+        saver => (this._target = new XWikiFormSaveTarget(config, saver))
       );
     }
 
@@ -1023,7 +576,7 @@ define('xwiki-realtime-saver', [
     }
 
     save(continueEditing) {
-      return this._saver.save({button: this._saver.getSaveButton(continueEditing)});
+      return this._saver.save({button: this._target.getSaveButton(continueEditing)});
     }
 
     stop() {
@@ -1031,5 +584,5 @@ define('xwiki-realtime-saver', [
     }
   }
 
-  return XWikiSaver;
+  return ChainPadXWikiFormSaver;
 });

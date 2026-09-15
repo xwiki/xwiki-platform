@@ -96,6 +96,7 @@
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
     'tom-select': "#removeJsSuffix($services.webjars.url('org.webjars.npm:tom-select', ""dist/js/tom-select.complete${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
+    'xwiki-autosave': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-web-webjar', ""autosave${jsExtension}""))",
     'xwiki-document': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-web-webjar', ""document${jsExtension}""))",
     'xwiki-document-lock': $xwiki.getSkinFile('uicomponents/lock/lock.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),

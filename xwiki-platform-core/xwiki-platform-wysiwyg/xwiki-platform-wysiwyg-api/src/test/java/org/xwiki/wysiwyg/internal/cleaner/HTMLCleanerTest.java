@@ -190,11 +190,9 @@ class HTMLCleanerTest
             }
             this.componentManager = mockitoComponentManager;
         }
-    }
 
-    @BeforeEach
-    void callInitializers()
-    {
+        // Note that this used to be a separate @BeforeEach method. JUnit 5 doesn't guarantee the execution order of
+        // several @BeforeEach methods and the initializers need the Component Manager to have been created first.
         callAnnotatedMethods(Initialized.class);
     }
 

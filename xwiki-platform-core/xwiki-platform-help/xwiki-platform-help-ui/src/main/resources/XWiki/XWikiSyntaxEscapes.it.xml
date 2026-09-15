@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.XWikiSyntaxEscapes" locale="it">
@@ -46,7 +46,7 @@
 Consente di commentare e quindi non valutare la sintassi XWiki
 
 |=Caratteristica|=Sintassi XWiki 1.0|=Risultato
-|Commentare un carattere|{{{Questo non è un \[link\]}}}|{{{Questo non è un [link]}}}
+|Commentare un carattere|{{{Questo non è un [link]}}}|{{{Questo non è un [link]}}}
 
 === 2.0 Escapes ===
 

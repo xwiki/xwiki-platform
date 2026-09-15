@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@xwiki/platform-autosave-api": "workspace:*",
+    "@xwiki/platform-autosave-xwiki": "workspace:*",
     "@xwiki/platform-document-xwiki": "workspace:*",
     "@xwiki/platform-xwiki-model-api": "workspace:*"
   },

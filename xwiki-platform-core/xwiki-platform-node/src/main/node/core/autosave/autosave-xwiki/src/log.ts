@@ -18,24 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
-  SaveStatus,
-  SaveTarget,
-  SaveTransport,
-  Saver,
-} from "@xwiki/platform-autosave-api";
-import { XWikiFormSaveTarget } from "@xwiki/platform-autosave-xwiki";
-
-// Register the auto-save API as a RequireJS module, for the editors that are not bundled with it. Like the document
-// API, this bundle is declared in the RequireJS paths configuration rather than loaded by every page, so that the
-// code that needs it loads it on demand. It depends on xwiki-entityReference because the model API it uses is the
-// one that module publishes, rather than a copy of its own.
-if (typeof define === "function" && define.amd) {
-  define("xwiki-autosave", ["xwiki-entityReference"], () => ({
-    SaveStatus,
-    SaveTarget,
-    SaveTransport,
-    Saver,
-    XWikiFormSaveTarget,
-  }));
+/**
+ * Log a message on behalf of the saver. The prefix is what tells the saver messages apart in the browser console.
+ */
+function debug(...args: unknown[]): void {
+  console.debug("[Saver] ", ...args);
 }
+
+export { debug };

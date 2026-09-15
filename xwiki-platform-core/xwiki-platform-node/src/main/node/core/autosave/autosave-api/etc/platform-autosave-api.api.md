@@ -77,7 +77,7 @@ export abstract class SaveTransport<C extends object = object> {
     isConnected(state: SaverState): boolean;
     // (undocumented)
     protected readonly saver: Saver<C>;
-    protected readonly state: SaverState;
+    protected state: SaverState;
     // (undocumented)
     abstract toBeReady(): Promise<void>;
     abstract updateLocalState(patch: Partial<SaverState>, options?: {

@@ -17,25 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import {
-  SaveStatus,
-  SaveTarget,
-  SaveTransport,
-  Saver,
-} from "@xwiki/platform-autosave-api";
-import { XWikiFormSaveTarget } from "@xwiki/platform-autosave-xwiki";
-
-// Register the auto-save API as a RequireJS module, for the editors that are not bundled with it. Like the document
-// API, this bundle is declared in the RequireJS paths configuration rather than loaded by every page, so that the
-// code that needs it loads it on demand. It depends on xwiki-entityReference because the model API it uses is the
-// one that module publishes, rather than a copy of its own.
-if (typeof define === "function" && define.amd) {
-  define("xwiki-autosave", ["xwiki-entityReference"], () => ({
-    SaveStatus,
-    SaveTarget,
-    SaveTransport,
-    Saver,
-    XWikiFormSaveTarget,
-  }));
+declare global {
+  const XWiki: import("@xwiki/platform-xwiki-utils").XWikiGlobal;
 }
+
+export {};

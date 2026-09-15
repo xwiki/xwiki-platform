@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="AppWithinMinutes.Translations" locale="da">
@@ -94,26 +94,22 @@ platform.appwithinminutes.appNameEmptyError=Giv værktøjet et navn
 platform.appwithinminutes.classEditorPaletteTitle=Felt-palette
 platform.appwithinminutes.classEditorPaletteHint=Træk og slip felter fra paletten til data feltet.
 platform.appwithinminutes.classEditorCanvasHint=Træk felter fra paletten og slip dem i dette område.
-
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Opdater skema-klasse
 platform.appwithinminutes.classEditorUpdateTemplateHint=Gem standard værdier for skema-klasse ({0}).
 platform.appwithinminutes.classEditorUpdateSheetLabel=Opdater klasse-formular
 platform.appwithinminutes.classEditorUpdateSheetHint=Gendan standardformularen for skema-klasse ({0}).
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Opdatér samlinger af klasse-oversættelser
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Opdatér oversættelse af feltnavne og listeværdier ({0}).
-
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Denne klasse har flere formularer.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=Klassen har to felter med det samme navn: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Opdaterer standard værdier
 platform.appwithinminutes.classEditorBindSheetSaveComment=Bind klasse-formular
 platform.appwithinminutes.classEditorSheetSaveComment=Opdater klasse-formular
 platform.appwithinminutes.classEditorTranslationsSaveComment=Opdatér oversættelser
-
 platform.appwithinminutes.classEditorStandardCategoryName=Standard
 platform.appwithinminutes.classEditorPickersCategoryName=Udvælgere
 platform.appwithinminutes.classEditorDocumentCategoryName=Dokument
 platform.appwithinminutes.classEditorAdvancedCategoryName=Avanceret
-
 platform.appwithinminutes.classEditorDBListFieldName=Databaseliste
 platform.appwithinminutes.classEditorGroupsFieldName=Gruppe
 platform.appwithinminutes.classEditorUsersFieldName=Bruger
@@ -126,15 +122,15 @@ platform.appwithinminutes.classEditorStringFieldName=Kort tekst
 platform.appwithinminutes.classEditorContentFieldName=Indhold
 platform.appwithinminutes.classEditorTitleFieldName=Titel
 ### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
-
 platform.appwithinminutes.classEditorDeleteFieldLabel=Slet
 platform.appwithinminutes.classEditorConfigureFieldLabel=Konfigurér
 platform.appwithinminutes.classEditorPreviewFieldLabel=Forhåndsvis
 platform.appwithinminutes.classEditorPreviewFieldHint=Skjul forhåndsvisning og gem ændringer
 platform.appwithinminutes.classEditorMoveFieldLabel=Flyt
 platform.appwithinminutes.classEditorMoveFieldHint=Træk og slip for at ændre rækkefølge
-
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Standardværdi
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -147,9 +143,10 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Værdi
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Tilføj
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Fjern
-
 ### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=
 ### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.description.name=
 ### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
 ### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
 ### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
@@ -157,6 +154,7 @@ platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Fjern
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
 ### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=
 ### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
 
 ### Wizard Step 3: Application Presentation
@@ -194,6 +192,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Træk og slip for at æn
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Slet
 platform.appwithinminutes.liveTableEditorAddColumnHint=Tilføj
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Nogle kolonner er forældede, måske fordi de tilsvarende felter i klassen er blevet slettet. Ønsker du at slette disse kolonner?
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=
 platform.appwithinminutes.liveTableEditorIcon=Ikon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 
@@ -210,6 +210,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Ret elementets navn
 platform.appwithinminutes.appHomePageTranslateAppLabel=Oversæt minut-app
 platform.appwithinminutes.appHomePageDeleteAppLabel=Slet anvendelse
 ### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: platform.appwithinminutes.appHomePageNoScriptRight=
 ### Missing: AppWithinMinutes.LiveTableClass_description=Description
 ### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
@@ -219,6 +220,10 @@ platform.appwithinminutes.appHomePageDeleteAppLabel=Slet anvendelse
 ### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 ### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
 ### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.label=
+### Missing: appWithinMinutes.renameApp.close=
 
 ### Rename Application
 ### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
@@ -238,7 +243,6 @@ platform.appwithinminutes.appHomePageDeleteAppLabel=Slet anvendelse
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=Minut-app'ens klasse
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Dataområde for Minut-app
-
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Område
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Navn på det område, der indeholder funktionen
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sidens fulde navn
@@ -270,5 +274,6 @@ platform.appwithinminutes.appsLiveTable.doc.space=Minut-app navn
 
 ### Since 18.6.0
 #@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Nogle kolonner er forældede, måske fordi de tilsvarende felter i klassen er blevet slettet. Ønsker du at slette disse kolonner? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;</content>
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Nogle kolonner er forældede, måske fordi de tilsvarende felter i klassen er blevet slettet. Ønsker du at slette disse kolonner? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
+</content>
 </xwikidoc>

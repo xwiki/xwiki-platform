@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="ru">
@@ -79,5 +79,66 @@ ExtensionCode.ExtensionSupportPlanClass_url=URL
 ExtensionCode.ExtensionSupportPlanClass_content=Подробности
 ExtensionCode.ExtensionSupportPlanClass_active=Активный
 ExtensionCode.ExtensionSupportPlanClass_paying=Оплата
+
+## Extension sheet
+### Missing: repository.extension.sheet.name=
+### Missing: repository.extension.sheet.project=
+### Missing: repository.extension.sheet.type=
+### Missing: repository.extension.sheet.category=
+### Missing: repository.extension.sheet.summary=
+### Missing: repository.extension.sheet.authors=
+### Missing: repository.extension.sheet.rating=
+### Missing: repository.extension.sheet.title=
+### Missing: repository.extension.sheet.imported=
+### Missing: repository.extension.sheet.updateExtension=
+### Missing: repository.extension.sheet.developedBy=
+### Missing: repository.extension.sheet.unknown=
+### Missing: repository.extension.sheet.support=
+### Missing: repository.extension.sheet.activeInstalls=
+### Missing: repository.extension.sheet.license=
+### Missing: repository.extension.sheet.installable=
+### Missing: repository.extension.sheet.documentation=
+### Missing: repository.extension.sheet.sources=
+### Missing: repository.extension.sheet.issues=
+### Missing: repository.extension.sheet.download=
+### Missing: repository.extension.sheet.toc=
+### Missing: repository.extension.sheet.documentationHelp=
+### Missing: repository.extension.sheet.rulesIntro=
+### Missing: repository.extension.sheet.ruleSummary=
+### Missing: repository.extension.sheet.ruleImported=
+### Missing: repository.extension.sheet.autoSync=
+### Missing: repository.extension.sheet.source=
+### Missing: repository.extension.sheet.iconLocation=
+### Missing: repository.extension.sheet.iconLocationSyntax=
+### Missing: repository.extension.sheet.iconLocationLinkText=
+### Missing: repository.extension.sheet.showActiveInstalls=
+### Missing: repository.extension.sheet.supportPlans=
+### Missing: repository.extension.sheet.description=
+### Missing: repository.extension.sheet.prerequisites=
+### Missing: repository.extension.sheet.customInstallationOnly=
+### Missing: repository.extension.sheet.standardInstallationInstructions=
+### Missing: repository.extension.sheet.customInstallationInstructions=
+### Missing: repository.extension.sheet.versions=
+### Missing: repository.extension.sheet.releaseNotes=
+### Missing: repository.extension.sheet.dependencies=
+### Missing: repository.extension.sheet.dependenciesIntro=
+### Missing: repository.extension.sheet.currentDownloads=
+### Missing: repository.extension.sheet.addDownloads=
+### Missing: repository.extension.sheet.addDownloadsSaveFirst=
+### Missing: repository.extension.sheet.addDownloadsWarning=
+### Missing: repository.extension.sheet.addDownloadsProcess=
+## Sentences that contain a link keep the whole sentence in a single key (so translators stay free
+## to reorder words and reposition the link). The link markup boundaries ([[ and &gt;&gt;target]]) are
+## passed as parameters {0}/{1} built by the sheet (trusted code) following the standard XWiki
+## pattern, and any untrusted data injected into the markup is escaped by the sheet.
+### Missing: repository.extension.sheet.addDownloadsAttach=
+### Missing: repository.extension.sheet.addDownloadsInfo=
+### Missing: repository.extension.sheet.currentDependencies=
+### Missing: repository.extension.sheet.addDependencies=
+### Missing: repository.extension.sheet.addDependenciesIntro=
+### Missing: repository.extension.sheet.addDependenciesVersion=
+### Missing: repository.extension.sheet.addDependenciesId=
+### Missing: repository.extension.sheet.addDependenciesConstraint=
+### Missing: repository.extension.sheet.wrongObject=
 </content>
 </xwikidoc>

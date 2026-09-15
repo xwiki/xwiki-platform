@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.2" reference="Rendering.Translations" locale="pl">
@@ -39,5 +39,6 @@
   <content>admin.syntaxes=Składnie
 admin.syntaxes.description=Wybierz domyślną stronę składni i skonfiguruj dostępne znaczniki składni.
 Rendering.RenderingConfigClass_disabledSyntaxes=wyłączone składnie
-Rendering.RenderingConfigClass_disabledSyntaxes.hint=Lista znaczników składni, w których stron nie można zapisać</content>
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Lista znaczników składni, w których stron nie można zapisać
+</content>
 </xwikidoc>

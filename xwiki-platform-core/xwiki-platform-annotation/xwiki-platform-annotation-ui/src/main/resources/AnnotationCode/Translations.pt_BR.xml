@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="AnnotationCode.Translations" locale="pt_BR">
@@ -48,6 +48,8 @@ annotations.annotated.loaderror=Falha:
 annotations.annotated.loaderror.wrongresponse=Resposta do servidor formatada erroneamente
 annotations.annotated.error.noannotatedelement=As anotações não puderam ser carregadas porque o conteúdo não está disponível.
 annotations.annotated.error.wrongsyntax=Anotações não estão disponíveis para documentos com a sintaxe XWiki/1.0.
+### Missing: annotations.annotated.highlight.toggle.hint=
+### Missing: annotations.annotated.bubble.toggle.hint=
 annotations.action.edit.text=[Editar]
 annotations.action.edit.tooltip=Editar essa anotação
 annotations.action.edit.submit.text=Atualizar

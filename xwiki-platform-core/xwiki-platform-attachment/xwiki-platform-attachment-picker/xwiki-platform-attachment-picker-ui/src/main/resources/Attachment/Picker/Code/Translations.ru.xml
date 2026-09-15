@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: attachment.picker.wysiwyg.imageSelector.title=Gallery
+  <content>### Missing: attachment.picker.wysiwyg.imageSelector.title=
 attachment.picker.searchField.placeholder=Поиск...
 attachment.picker.searchField.scope.currentPage=Текущая страница
 attachment.picker.searchField.scope.allPages=Все страницы

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.2" reference="TourCode.TourTranslations" locale="ru">
@@ -76,6 +76,7 @@ TourCode.StepClass_placement=Размещение
 TourCode.StepClass_targetPage=Целевая страница
 TourCode.StepClass_action=Целевое действие
 TourCode.StepClass_queryString=Строка запроса
+### Missing: TourCode.StepClass_reflex=
 tour.steps=Шаги
 tour.steps.new_step=Новый шаг
 tour.steps.add_step=Добавить шаг

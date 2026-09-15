@@ -17,28 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.livedata.test.ui;
+import { describe, expect, it, vi } from "vitest";
 
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
+vi.mock("@xwiki/platform-livedata-ui", () => ({ XWikiLivedata: {} }));
+vi.mock("@xwiki/platform-livedata-xwiki", () => ({
+  XWikiLiveDataSource: class {},
+  initTranslationsBuilder: () => () => () => {},
+}));
+vi.mock("xwiki-platform-localization-webjar", () => ({ resolver: {} }));
 
-/**
- * All UI tests for the livedata extension.
- *
- * @version $Id$
- * @since 13.4RC1
- * @since 12.10.9
- */
-@UITest
-class AllIT
-{
-    @Nested
-    class NestedLiveDataIT extends LiveDataIT
-    {
-    }
+const { init } = await import("../init.js");
 
-    @Nested
-    class NestedLiveDataInplaceEditIT extends LiveDataInplaceEditIT
-    {
-    }
-}
+describe("init", () => {
+  it("leaves the element untouched when it has no configuration", async () => {
+    document.body.innerHTML = '<div class="liveData"><table id="displayed"></table></div>';
+    const element = document.querySelector(".liveData");
+
+    await expect(init(element, undefined)).rejects.toThrow(/Missing data-config attribute/);
+
+    // An already displayed live data must survive a redundant initialization attempt.
+    expect(element.querySelector("#displayed")).not.toBeNull();
+  });
+});

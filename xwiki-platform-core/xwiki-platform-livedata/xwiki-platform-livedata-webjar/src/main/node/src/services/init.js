@@ -38,11 +38,17 @@ import { resolver } from "xwiki-platform-localization-webjar";
  */
 function init(element, $) {
 
+  const data = element.dataset.config
+  if (data === undefined) {
+    // Mounting the application replaces the content of the element, so it must not be attempted without a
+    // configuration: that would discard an already displayed live data and leave an empty element behind.
+    return Promise.reject(new Error("Missing data-config attribute, the live data cannot be displayed."));
+  }
+  element.removeAttribute("data-config")
+
   const locale = document.documentElement.getAttribute("lang");
   const i18n = createI18n({ legacy: false, locale });
 
-  const data = element.dataset.config
-  element.removeAttribute("data-config")
   let contentTrusted = false;
   try {
     const scriptEl = element.querySelector(':scope > script[type="application/json"]');

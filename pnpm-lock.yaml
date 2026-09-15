@@ -109,8 +109,8 @@ catalogs:
       specifier: 10.1.0
       version: 10.1.0
     dompurify:
-      specifier: 3.4.14
-      version: 3.4.14
+      specifier: 3.4.15
+      version: 3.4.15
     eslint:
       specifier: 10.10.0
       version: 10.10.0
@@ -1974,7 +1974,7 @@ importers:
         version: link:../../xwiki/xwiki-utils
       dompurify:
         specifier: 'catalog:'
-        version: 3.4.14
+        version: 3.4.15
       eventemitter3:
         specifier: 'catalog:'
         version: 5.0.4
@@ -5352,8 +5352,8 @@ packages:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
 
-  dompurify@3.4.14:
-    resolution: {integrity: sha512-dVoH9z+MY+C9IilgGCk3YfFqjLi3fChm2OiKJMzh6axrJ5qwxqWaZamgmHrpv22CN/KdbZJuGEGgfQoL00LTdg==}
+  dompurify@3.4.15:
+    resolution: {integrity: sha512-EUBjM+B+lkDE41iE82DDSCfkoPGfXx8IxFxPMjNzm/Uk4xDet77rTN9wqlxlVg71kK7XGuUMv6wUxJUwwv+Xyw==}
 
   dotenv-expand@12.0.3:
     resolution: {integrity: sha512-uc47g4b+4k/M/SeaW1y4OApx+mtLWl92l5LMPP0GNXctZqELk+YGgOPIIC5elYmUH4OuoK3JLhuRUYegeySiFA==}
@@ -9661,7 +9661,7 @@ snapshots:
     dependencies:
       path-type: 4.0.0
 
-  dompurify@3.4.14:
+  dompurify@3.4.15:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 

@@ -74,7 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Feil
 Mail.SendMailStatus_livetable.actions=Handlinger
 Mail.SendMailStatus_livetable.resend=Send på nytt
+### Missing: Mail.SendMailStatus_livetable.delete=
 mailSender.admin.resendSuccess=Meldingen er sendt på nytt
 mailSender.admin.resendFailure=Kunne ikke sende om igjen. Klikk for flere detaljer.
+### Missing: mailSender.admin.deleteSuccess=
+### Missing: mailSender.admin.deleteFailure=
 </content>
 </xwikidoc>

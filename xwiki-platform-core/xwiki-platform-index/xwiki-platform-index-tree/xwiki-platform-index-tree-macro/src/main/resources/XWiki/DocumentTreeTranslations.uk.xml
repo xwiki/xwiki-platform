@@ -99,12 +99,12 @@ index.documentTree.empty=Нічого не знайдено
 index.documentTree.more=ще {0}...
 index.documentTree.addDocument=Нова сторінка...
 index.documentTree.documentSortDisplayer.field=Поле сортування
-### Missing: index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.default=---
 index.documentTree.documentSortDisplayer.field.title=Назва
 index.documentTree.documentSortDisplayer.field.date=Дата останньої зміни
 index.documentTree.documentSortDisplayer.field.creationDate=Дата створення
 index.documentTree.documentSortDisplayer.order=Порядок сортування
-### Missing: index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.default=---
 index.documentTree.documentSortDisplayer.order.asc=За зростанням
 index.documentTree.documentSortDisplayer.order.desc=За спаданням
 

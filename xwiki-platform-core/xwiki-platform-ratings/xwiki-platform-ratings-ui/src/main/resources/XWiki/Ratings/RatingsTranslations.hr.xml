@@ -37,16 +37,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.ratings=Ocjene
-
-rating.rate=Ocijenite\!
-### Missing: rating.saveexception=Error when saving the rating.
-### Missing: rating.votenotvalid=You cannot vote with 0 value.
-### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
-### Missing: rating.setvote.inprogress=Your vote is being saved...
-### Missing: rating.setvote.success=Your vote has been saved!
-### Missing: rating.setvote.error=Error when saving your vote.
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled=Enable Ratings
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Enabling ratings allows users to vote on pages and display the average votes. Disabling them doesn't remove the existing vote, it just hides the interface.
+rating.rate=Ocijenite!
+rating.saveexception=Error when saving the rating.
+rating.votenotvalid=You cannot vote with 0 value.
+rating.voteoutofbounds=The vote is out of the scale limit.
+rating.setvote.inprogress=Your vote is being saved...
+rating.setvote.success=Your vote has been saved!
+rating.setvote.error=Error when saving your vote.
+XWiki.Ratings.RatingsConfigurationClass_enabled=Enable Ratings
+XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Enabling ratings allows users to vote on pages and display the average votes. Disabling them doesn't remove the existing vote, it just hides the interface.
 
 #@deprecatedstart
 
@@ -58,11 +57,11 @@ admin.ratings.uninstallratings=Deinstalacija aplikacije Ocjene obrisat će dokum
 admin.ratings.ratingsactivated=Ocjene su uključene
 admin.ratings.ratingsdeactivated=Ocjene su isključene
 admin.ratings.illegalrequest=Nevaljani zahtjev
-
 rating.yourvote=Vaš glas
 rating.logintorate=Prijavite se za ocjenjivanje
 rating.novotes=Još nema glasova
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

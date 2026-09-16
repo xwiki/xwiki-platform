@@ -284,7 +284,7 @@ platform.wiki.dependencies.applicationmanager.missing=Подключаемый �
 ## until 6.4RC1
 #######################################
 admin.wikis=Вики
-### Missing: admin.wikis.template=Wiki Template
+admin.wikis.template=Wiki Template
 
 #######################################
 ## until 7.0M2

@@ -192,6 +192,12 @@ help.videos.videoCard5.topic2=Aprende como utilizar tu aplicación
 help.videos.videoCard6.title=Añadir / Eliminar extensiones
 help.videos.videoCard6.topic1=Descubre como añadir/eliminar extensiones utilizando el Administrador de extensiones
 help.videos.videoCard6.topic2=Descubre la interfaz usuario de la Administración de XWiki
+### Missing: help.videos.hint=
 help.videos.watch=Seguir
+
+## Example Macro
+### Missing: rendering.macro.example.name=
+### Missing: rendering.macro.example.description=
+### Missing: rendering.macro.example.content.description=
 </content>
 </xwikidoc>

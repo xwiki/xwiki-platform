@@ -36,25 +36,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: panels.available=
-### Missing: panels.name=
-### Missing: panels.description=
-### Missing: panels.type=
-### Missing: panels.category=
-### Missing: panels._actions=
+  <content>### Missing: panels.available=Available Panels
+### Missing: panels.name=Name
+### Missing: panels.description=Description
+### Missing: panels.type=Type
+### Missing: panels.category=Category
+### Missing: panels._actions=Actions
 ### Missing: panels.emptyvalue=
-### Missing: panels.children.title=
-### Missing: panels.siblings.title=
+### Missing: panels.children.title=Child Pages
+### Missing: panels.siblings.title=Sibling Pages
 ### Missing: panels.customize=
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
 ## Deprecated since 12.6.3, 12.9RC1
-### Missing: panels.documentInformation.configureSyntaxes=
-### Missing: panels.documentInformation.confirmChangeSyntaxWysiwyg=
-### Missing: panels.documentInformation.confirmChangeSyntax=
-### Missing: panels.documentInformation.failedSyntaxConversion=
+### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
+### Missing: panels.documentInformation.confirmChangeSyntaxWysiwyg=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will reset the syntax to the previous one and do nothing. Note that if you choose 'ok' you will loose modifications and this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
+### Missing: panels.documentInformation.confirmChangeSyntax=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
+### Missing: panels.documentInformation.failedSyntaxConversion=Failed to convert to the selected syntax. If you want to use this syntax anyway, you can select it again and choose not to perform the conversion.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -141,6 +141,9 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         }
     }
 
+    /**
+     * @deprecated please do not use this, it is bound to a jrcs based implementation
+     */
     @Override
     @Deprecated
     public Archive getRCSArchive()
@@ -148,6 +151,9 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         throw new RuntimeException(NOT_IMPLEMENTED_MESSAGE);
     }
 
+    /**
+     * @deprecated please do not use this, it is bound to a jrcs based implementation
+     */
     @Override
     @Deprecated
     public void setRCSArchive(final Archive rcsArchive)

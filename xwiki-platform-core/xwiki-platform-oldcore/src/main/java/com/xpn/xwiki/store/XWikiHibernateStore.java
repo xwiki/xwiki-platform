@@ -2169,6 +2169,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     // Links
     // ---------------------------------------
 
+    /**
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
+     */
     @Override
     @Deprecated(since = "14.8RC1")
     public List<XWikiLink> loadLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
@@ -2187,6 +2190,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         });
     }
 
+    /**
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
+     */
     @Override
     @Deprecated(since = "14.8RC1")
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
@@ -2208,6 +2214,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         });
     }
 
+    /**
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
+     */
     @Override
     @Deprecated(since = "14.8RC1")
     public List<DocumentReference> loadBacklinks(AttachmentReference attachmentReference, boolean bTransaction,
@@ -2332,6 +2341,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return links;
     }
 
+    /**
+     * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
+     */
     @Override
     @Deprecated(since = "14.8RC1")
     public void saveLinks(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
@@ -2391,6 +2403,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return documentReference;
     }
 
+    /**
+     * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
+     */
     @Override
     @Deprecated(since = "14.8RC1")
     public void deleteLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
@@ -2921,6 +2936,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return HqlQueryUtils.getColumnsForSelectStatement(whereSQL);
     }
 
+    /**
+     * @deprecated use {@link #isCustomMappingValid(BaseClass, String)} instead
+     */
     @Override
     @Deprecated
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context)

@@ -68,7 +68,7 @@ public class AnnotationsWindow extends BaseElement
     /**
      * Clicks the close button displayed at the top right of the annotation creation dialog.
      *
-     * @since 18.9.0RC1
+     * @since 18.8.0RC1
      */
     public void clickCloseAnnotation()
     {
@@ -96,7 +96,7 @@ public class AnnotationsWindow extends BaseElement
     /**
      * Waits until the annotation creation dialog is dismissed.
      *
-     * @since 18.9.0RC1
+     * @since 18.8.0RC1
      */
     public void waitUntilClosed()
     {

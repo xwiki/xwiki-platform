@@ -40,5 +40,6 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>application.index.title=Applikasjonsliste
-application.index.drawer=Applikasjonsliste</content>
+application.index.drawer=Applikasjonsliste
+</content>
 </xwikidoc>

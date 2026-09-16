@@ -97,6 +97,10 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     @Inject
     private Logger logger;
 
+    // The only mutation of this field is the wholesale replacement of the supplier by invalidateCache(), so volatile
+    // is exactly what is needed here: the supplier returned by Suppliers.memoize() and the set it computes (a
+    // ConcurrentHashMap key set) are both thread-safe on their own.
+    @SuppressWarnings("java:S3077")
     private volatile Supplier<Set<String>> trustedDomains = newTrustedDomainsSupplier();
 
     private Supplier<Set<String>> newTrustedDomainsSupplier()
@@ -148,7 +152,7 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     {
         if (this.urlConfiguration.isTrustedDomainsEnabled()) {
             // Keep a reference to the set of trusted domains as it can be invalidated by another thread at any time.
-            Set<String> domains = maybeInitializeWithDomain(this.getCurrentDomain());
+            Set<String> domains = initializeWithDomain(this.getCurrentDomain());
             String host = urlToCheck.getHost();
 
             do {
@@ -177,20 +181,17 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     }
 
     /**
-     * Initialize the trusted domains with the given domain as additional trusted domains if trusted domains are
-     * enabled.
+     * Initialize the trusted domains with the given domain as an additional trusted domain.
+     * <p>
+     * It's up to the caller to check that trusted domains are enabled before calling this method.
      *
      * @param domain the domain to add to the trusted domains
-     * @return the set of trusted domains, or {@code null} when trusted domains are disabled
+     * @return the set of trusted domains, never {@code null}
      */
-    private Set<String> maybeInitializeWithDomain(String domain)
+    private Set<String> initializeWithDomain(String domain)
     {
-        Set<String> domains = null;
-
-        if (this.urlConfiguration.isTrustedDomainsEnabled()) {
-            domains = this.trustedDomains.get();
-            domains.add(domain);
-        }
+        Set<String> domains = this.trustedDomains.get();
+        domains.add(domain);
 
         return domains;
     }
@@ -295,7 +296,9 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     @Override
     public URI parseToSafeURI(String serializedURI, String requestHost) throws URISyntaxException, SecurityException
     {
-        maybeInitializeWithDomain(requestHost);
+        if (this.urlConfiguration.isTrustedDomainsEnabled()) {
+            initializeWithDomain(requestHost);
+        }
 
         return parseToSafeURI(serializedURI);
     }

@@ -36,30 +36,30 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: captcha.jcaptcha=
-### Missing: captcha.jcaptcha.displayer.image.alt=
-### Missing: captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=
-### Missing: captcha.jcaptcha.displayer.audio.play=
-### Missing: captcha.jcaptcha.displayer.error.unsupportedType=
-### Missing: captcha.jcaptcha.displayer.refresh=
-### Missing: captcha.jcaptcha.displayer.answer.placeholder=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_hint=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_image=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_sound=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_text=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_engine=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=
-### Missing: captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=
+  <content>### Missing: captcha.jcaptcha=JCaptcha
+### Missing: captcha.jcaptcha.displayer.image.alt=Image CAPTCHA
+### Missing: captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=Your browser does not support the audio element.
+### Missing: captcha.jcaptcha.displayer.audio.play=Listen
+### Missing: captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha is not properly configured
+### Missing: captcha.jcaptcha.displayer.refresh=Reload
+### Missing: captcha.jcaptcha.displayer.answer.placeholder=Answer
+### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type=Type
+### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_hint=The type of CAPTCHA to display.
+### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_image=Image
+### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_sound=Sound
+### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_text=Text
+### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_engine=Engine
+### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=The CaptchaEngine implementation to use when displaying the selected type of CAPTCHA.
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=Default Gimpy (Gmail)
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Simple List
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Non Linear Text Gimpy
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=Hotmail
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Deformed Baffle List Gimpy
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Baffle List Gimpy
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
+### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Simple List
+### Missing: captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simple Math
 ### Missing: captcha.jcaptcha.engine.custom=
 </content>
 </xwikidoc>

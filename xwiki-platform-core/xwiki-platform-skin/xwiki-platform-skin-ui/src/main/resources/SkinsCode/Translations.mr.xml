@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>skin.sheet.title=स्कीन
 skin.sheet.properties=स्कीन गुणधर्म
+### Missing: skin.sheet.properties.logo.warning=
 skin.sheet.deprecatedProperties=नापसंत केलेले गुणधर्म
 skin.sheet.overriddenTemplates=अधिलिखित टेम्पलेट्स
 skin.sheet.addTemplate=नवीन अधिलिखित टेम्पलेट जोडा
@@ -45,7 +46,6 @@ skin.sheet.add=जोडा
 skin.sheet.overrideTemplateWarning=हा विभाग आपल्याला स्कीनची टेम्पलेट अधिलिखित करण्याची परवानगी देतो. ही तांत्रिक बाब आहे आणि आपल्याला त्याचे परिणाम माहित असले पाहिजेत.
 skin.sheet.deprecatedPropertiesWarning=हा विभाग रेट्रो-अनुकूलतेसाठी येथे आहे. आपण वरील येथे 'अधिलिखित टेम्पलेट्स' यंत्रणा वापरली पाहिजे.
 skin.sheet.nojs=JavaScript शिवाय आपण हा विभाग वापरू शकत नाही. परंतु आपण त्याऐवजी {0} ऑब्जेक्ट एडिटर {1} वापरू शकता आणि व्यक्तिचलितरित्या {2} ऑब्जेक्ट्स जोडू शकता.
-
 skin.sheet.js.deleting=हटवित आहे ...
 skin.sheet.js.deletingDone=टेम्पलेट हटविले गेले आहे!
 skin.sheet.js.error.csrf=जतन करताना CSRF प्रमाणीकरण अयशस्वी. पुन्हा प्रयत्न करण्यासाठी आपल्या ब्राउझरला रीफ्रेश करा.
@@ -67,8 +67,9 @@ skin.sheet.js.addingDone=टेम्पलेट जोडले गेले �
 #######################################
 ## until 7.1M1
 #######################################
-### Missing: skin.sheet.overridedTemplates=Overridden templates
+skin.sheet.overridedTemplates=Overridden templates
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

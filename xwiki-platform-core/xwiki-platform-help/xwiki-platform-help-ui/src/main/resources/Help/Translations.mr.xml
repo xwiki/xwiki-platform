@@ -44,21 +44,24 @@ help.tipsPanel.improveXWikiTip=आपणास माहित आहे की 
 help.tipsPanel.breadcrumbsTip=सोबतच्या आणि आतील पृष्ठांवर द्रुत नेव्हिगेट करण्यासाठी आपण ब्रेडक्रंब घटकांच्या पुढील बाणांवर क्लिक करू शकता.
 help.tipsPanel.advancedHiddenShortcutTip=[[Advanced mode&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] आणि x + टॉगल करण्यासाठी x + x + x + की की कॉम्बो दाबा. [[hidden pages&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]] चे प्रदर्शन टॉगल करण्यासाठी x + x + एच.
 help.tipsPanel.linkAutocompleteWYSIWYGTip=WYSIWYG मध्ये संपादन करताना, ## [## टाइप करा आणि नंतर दुवा तयार करण्यासाठी सूचना मिळविण्यासाठी अक्षरे टाइप करण्यास प्रारंभ करा.
+### Missing: help.tipsPanel.WYSIWYGEditorTip=
 help.macroList.title=उपलब्ध मॅक्रो
 help.macroList.id=आयडी
 help.macroList.name=नाव
+### Missing: help.macroList.categories=
 help.macroList.description=वर्णन
 help.macroList.visibility=दृश्यमानता
 
 ###############################################################################
 ## Deprecated
 ## Note: each element should be removed when the last branch using it is no longer supported
-###############################################################################
+############################################################################### 
 
 #@deprecatedstart
 
 ## until 14.6RC1
 help.macroList.category=वर्ग
 
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

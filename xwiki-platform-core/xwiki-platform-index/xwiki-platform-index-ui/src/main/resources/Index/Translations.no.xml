@@ -36,7 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Rom
+  <content>index.deletedDocuments.deleteAll=Slett alle
+### Missing: index.administration.remainingTasks.heading=
+### Missing: index.administration.remainingTasks.emptyQueue=
+### Missing: admin.documentanalysis=
+
+#######################################
+## until 16.3.0RC1
+#######################################
+
+index.spacesMacro.title=Rom
 index.spacesMacro.spaceIndex.title=Se rominnhold
 index.spacesMacro.spaceIndex.alt=Romindeks
 index.spacesMacro.spaceAdministration.title=Se romadministrering
@@ -44,5 +53,5 @@ index.spacesMacro.spaceAdministration.alt=Administrer rom
 index.spacesMacro.createSpace.link=Opprett nytt rom
 index.spacesMacro.createSpace.defaultSpaceName=Romnavn
 index.spacesMacro.createSpace.submit=Opprett
-index.deletedDocuments.deleteAll=Slett alle</content>
+</content>
 </xwikidoc>

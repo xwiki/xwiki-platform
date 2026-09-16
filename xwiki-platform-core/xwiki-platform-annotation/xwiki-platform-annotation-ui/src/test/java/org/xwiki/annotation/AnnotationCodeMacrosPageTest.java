@@ -216,7 +216,7 @@ class AnnotationCodeMacrosPageTest extends PageTest
     @Test
     void closeButtonIsNotDisplayedInListMode() throws Exception
     {
-        // The list mode displays the annotation inside the Comments tab, where there is nothing to close.
+        // The list mode displays the annotation inside the Annotations tab, where there is nothing to close.
         assertNull(renderAnnotation("list").selectFirst(".annotation-bubble-close"),
             "The close button was rendered in the list mode");
     }

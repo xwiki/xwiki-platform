@@ -203,7 +203,7 @@
     &lt;div class="annotation-bubble-header"&gt;
       #displayAnnotationTitle($ann)
     &lt;/div&gt;
-## The 'list' mode displays the annotation inside the Comments tab, where there is nothing to close.
+## The 'list' mode displays the annotation inside the Annotations tab, where there is nothing to close.
     #if ($mode != 'list')
       &lt;div class="annotation-bubble-close"&gt;
         &lt;button class="btn btn-default btn-xs" type="button"

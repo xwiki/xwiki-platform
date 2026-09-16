@@ -38,7 +38,6 @@
   <parent>IconThemes.WebHome</parent>
   <content>platform.icon.picker.preview=Vista previa con:
 platform.icon.picker.loading=Cargando
-
 rendering.macro.iconPicker.name=Selector de iconos
 rendering.macro.iconPicker.description=Selecciona un icono dentro del conjunto de iconos de XWiki.
 rendering.macro.iconPicker.parameter.id.name=Id
@@ -46,5 +45,6 @@ rendering.macro.iconPicker.parameter.id.description=Id en el DOM del campo de en
 rendering.macro.iconPicker.parameter.class.name=Clase
 rendering.macro.iconPicker.parameter.class.description=Clase de entradas CSS con las que trabajará el selector
 rendering.macro.iconPicker.parameter.prefix.name=Prefijo
-rendering.macro.iconPicker.parameter.prefix.description=Prefijo a añadir antes del nombre del icono en el campo de entrada (por defecto: "image:icon:")</content>
+rendering.macro.iconPicker.parameter.prefix.description=Prefijo a añadir antes del nombre del icono en el campo de entrada (por defecto: "image:icon:")
+</content>
 </xwikidoc>

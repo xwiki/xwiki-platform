@@ -37,11 +37,11 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>dashboard.templateProvider.description=सानुकूल करण्यासारखे गॅझेट
-
 dashboard.gadgetSelector.title=गॅझेट निवडा
 dashboard.gadgetEditor.title=गॅझेट संपादित करा
 dashboard.gadgetEditor.changeGadget.label=गॅझेट बदला
 dashboard.gadgetEditor.gadgetTitle.label=गॅझेट शीर्षक
 dashboard.gadgetEditor.gadgetTitle.hint=या गॅझेटचे शीर्षक डॅशबोर्डवरील गॅझेट पॅनेलच्या शीर्षस्थानी दिसते (यात वेग कोड असू शकतो).
-dashboard.initialization.saveMessage=डीफॉल्ट डॅशबोर्ड वापरकर्ता सेटअप प्रारंभ करा</content>
+dashboard.initialization.saveMessage=डीफॉल्ट डॅशबोर्ड वापरकर्ता सेटअप प्रारंभ करा
+</content>
 </xwikidoc>

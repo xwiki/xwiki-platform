@@ -23,7 +23,7 @@ import { SaveStatus } from "../saveStatus";
 import { SaveTarget } from "../saveTarget";
 import { SaveTransport } from "../saveTransport";
 import { Saver } from "../saver";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SaveResult } from "../saveTarget";
 import type { SaverState } from "../saverState";
 
@@ -105,7 +105,13 @@ class FakeTarget extends SaveTarget<TestContext> {
 
   public failure?: Error;
 
+  public saveInterval?: number;
+
   public override async initialize(): Promise<void> {}
+
+  public override getSaveInterval(): number | undefined {
+    return this.saveInterval;
+  }
 
   public override getSavePriority(context: TestContext): number {
     return context.priority ?? 1;
@@ -145,8 +151,15 @@ function createSaver(clientId: string = "alice"): Saver<TestContext> {
 describe("Saver", () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    // The saver adds a random amount to the save interval. Remove it so that the scheduling tests can advance the
+    // timers by an exact amount.
+    vi.spyOn(Math, "random").mockReturnValue(0);
     localStatuses = [];
     globalStatuses = [];
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   describe("dirty state", () => {
@@ -238,6 +251,47 @@ describe("Saver", () => {
       await vi.advanceTimersByTimeAsync(SAVE_INTERVAL + SAVE_DELAY);
 
       expect(target.submitted).toHaveLength(0);
+    });
+
+    it("uses the save interval asked for by the target", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      target.saveInterval = 5000;
+      saver.contentModifiedLocally();
+
+      await vi.advanceTimersByTimeAsync(5000 - 1);
+      expect(target.submitted).toHaveLength(0);
+
+      await vi.advanceTimersByTimeAsync(1 + SAVE_DELAY);
+      expect(target.submitted).toHaveLength(1);
+    });
+
+    it("picks up a save interval that changes during the editing session", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      saver.contentModifiedLocally();
+
+      // The interval is read each time a save is scheduled, so the new value applies to the next one.
+      target.saveInterval = 5000;
+      saver.contentModifiedLocally();
+
+      await vi.advanceTimersByTimeAsync(5000 + SAVE_DELAY);
+      expect(target.submitted).toHaveLength(1);
+    });
+
+    it("adds a random amount to the save interval", async () => {
+      vi.spyOn(Math, "random").mockReturnValue(0.5);
+      const saver = createSaver();
+      await saver.toBeReady();
+      target.saveInterval = 5000;
+      saver.contentModifiedLocally();
+
+      // Half of a tenth of the interval on top of it.
+      await vi.advanceTimersByTimeAsync(5250 - 1);
+      expect(target.submitted).toHaveLength(0);
+
+      await vi.advanceTimersByTimeAsync(1 + SAVE_DELAY);
+      expect(target.submitted).toHaveLength(1);
     });
 
     it("schedules a new attempt when the save fails", async () => {

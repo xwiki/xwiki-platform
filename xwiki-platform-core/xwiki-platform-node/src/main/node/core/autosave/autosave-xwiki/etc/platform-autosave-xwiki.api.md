@@ -37,6 +37,8 @@ export class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     // (undocumented)
     getSaveButton(continueEditing?: boolean): HTMLInputElement | null;
     // (undocumented)
+    getSaveInterval(): number | undefined;
+    // (undocumented)
     getSavePriority(input: XWikiFormSaveContext): number;
     // (undocumented)
     initialize(): Promise<void>;

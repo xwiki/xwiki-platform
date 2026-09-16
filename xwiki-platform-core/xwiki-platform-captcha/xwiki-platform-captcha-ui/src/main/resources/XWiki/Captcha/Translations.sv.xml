@@ -39,5 +39,8 @@
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=Förvald CAPTCHA
 captcha.admin.defaultCaptchaName.hint=CAPTCHA-implementationen som skall appliceras. Använd tilläggshanteraren för att söka efter andra implementationer som kan installeras och användas.
+### Missing: captcha.admin.configure.title=
+### Missing: captcha.admin.sample.title=
+### Missing: captcha.admin.sample.description=
 </content>
 </xwikidoc>

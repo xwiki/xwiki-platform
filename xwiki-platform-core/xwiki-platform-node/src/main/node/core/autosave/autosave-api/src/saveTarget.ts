@@ -70,6 +70,15 @@ abstract class SaveTarget<C extends object = object> {
   }
 
   /**
+   * @returns the interval between two consecutive saves, in milliseconds, or undefined to let the saver use its
+   *   default; called each time a save is scheduled, so the value can change during the editing session
+   */
+  public getSaveInterval(): number | undefined {
+    // Subclasses may override this method to read the interval from the environment they save to.
+    return undefined;
+  }
+
+  /**
    * Save the edited content.
    *
    * @param context - the save context, e.g. holding the save button in case of a manual save

@@ -78,6 +78,9 @@ type XWikiFormSaveTargetConfig = {
  * Saves the content edited with an XWiki edit form, by submitting that form. It works with any transport, so the
  * same target serves both the ChainPad and the Yjs real-time sessions.
  *
+ * The save interval can be overridden per edit form, by setting the number of seconds between two consecutive
+ * saves as the `data-auto-save-interval` attribute of that form.
+ *
  * @since 18.8.0RC1
  * @beta
  */
@@ -267,6 +270,13 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     return this.getForm().querySelector(
       `input[name="action_save${continueEditing ? "andcontinue" : ""}"]`,
     );
+  }
+
+  public override getSaveInterval(): number | undefined {
+    // Read the value on each call rather than caching it, so that it can be set after the editor has loaded.
+    const seconds = Number(this.getForm()?.dataset.autoSaveInterval);
+    // Fall back on the default interval when the attribute is missing, empty, not a number or not positive.
+    return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : undefined;
   }
 
   private getForm(): HTMLFormElement {

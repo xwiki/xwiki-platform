@@ -19,10 +19,11 @@
  */
 
 /**
- * The interval between two consecutive saves (when the content is modified). Using a slightly different value for
- * each client may help reduce the chances of conflicts.
+ * The interval between two consecutive saves (when the content is modified), used when the save target doesn't
+ * specify one. The saver adds a small random amount to it, so that the clients of a session don't all save at the
+ * same time.
  */
-const SAVE_INTERVAL: number = 60000 + Math.random() * 6000;
+const SAVE_INTERVAL: number = 60000;
 
 /**
  * How long to wait after broadcasting the intention to save, before actually saving the content. This helps reduce

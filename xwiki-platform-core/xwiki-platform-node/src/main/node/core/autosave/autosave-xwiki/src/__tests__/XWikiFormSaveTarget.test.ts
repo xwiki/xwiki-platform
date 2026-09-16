@@ -183,6 +183,40 @@ describe("XWikiFormSaveTarget", () => {
     });
   });
 
+  describe("save interval", () => {
+    it("falls back on the default when the form doesn't specify one", async () => {
+      target = await createTarget();
+
+      expect(target.getSaveInterval()).toBeUndefined();
+    });
+
+    it("reads the number of seconds from the form, in milliseconds", async () => {
+      target = await createTarget();
+      $("#edit").attr("data-auto-save-interval", "5");
+
+      expect(target.getSaveInterval()).toBe(5000);
+    });
+
+    it("reads the value again on each call, so that it can change during the editing session", async () => {
+      target = await createTarget();
+      $("#edit").attr("data-auto-save-interval", "5");
+      expect(target.getSaveInterval()).toBe(5000);
+
+      $("#edit").attr("data-auto-save-interval", "10");
+      expect(target.getSaveInterval()).toBe(10000);
+    });
+
+    it.each(["", "   ", "soon", "0", "-5"])(
+      "falls back on the default when the value is %j",
+      async (value) => {
+        target = await createTarget();
+        $("#edit").attr("data-auto-save-interval", value);
+
+        expect(target.getSaveInterval()).toBeUndefined();
+      },
+    );
+  });
+
   describe("initialize", () => {
     it("hides the preview button and restores it when disposed", async () => {
       target = await createTarget();

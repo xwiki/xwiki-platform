@@ -58,6 +58,8 @@ export abstract class SaveTarget<C extends object = object> {
     constructor(saver: Saver<C>);
     abstract dispose(): void;
     // (undocumented)
+    getSaveInterval(): number | undefined;
+    // (undocumented)
     getSavePriority(context: C): number;
     abstract initialize(): Promise<void>;
     abstract onStatesChanged(states: Record<string, SaverState>, localClientId: string): void;

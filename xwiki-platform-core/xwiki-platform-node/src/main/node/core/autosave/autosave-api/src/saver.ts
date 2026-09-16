@@ -247,15 +247,25 @@ class Saver<C extends object = object> {
       // Don't schedule a new save after the saver was stopped (e.g. when the user leaves the edit mode).
       return;
     }
+    const saveInterval = this.getSaveInterval();
     if (
       !this.dirtyTimestamp ||
-      Date.now() - this.dirtyTimestamp < SAVE_INTERVAL
+      Date.now() - this.dirtyTimestamp < saveInterval
     ) {
-      this.saveTimer = setTimeout(this.maybeSave.bind(this), SAVE_INTERVAL);
+      this.saveTimer = setTimeout(this.maybeSave.bind(this), saveInterval);
     } else {
       // Save right away because too much time has passed since the last time the content became dirty.
       this.maybeSave();
     }
+  }
+
+  /**
+   * @returns how long to wait before the next save, the interval the target asks for (or the default) plus a small
+   *   random amount, so that the clients of a session don't all save at the same time
+   */
+  private getSaveInterval(): number {
+    const base = this.target.getSaveInterval() ?? SAVE_INTERVAL;
+    return base + Math.random() * (base / 10);
   }
 
   /**
@@ -301,9 +311,9 @@ class Saver<C extends object = object> {
         this.dirtyTimestamp = Date.now();
       }
     } else if (this.isSomeoneSaving()) {
-      // Avoid auto-saving more often than the SAVE_INTERVAL. It's possible that the SAVE_INTERVAL is reached for
+      // Avoid auto-saving more often than the save interval. It's possible that the save interval is reached for
       // multiple users that are editing at the same time. In this case the auto-save should be triggered for only
-      // one of them. For the others the auto-save should be delayed until the SAVE_INTERVAL is reached again.
+      // one of them. For the others the auto-save should be delayed until the save interval is reached again.
       delete this.dirtyTimestamp;
     }
   }

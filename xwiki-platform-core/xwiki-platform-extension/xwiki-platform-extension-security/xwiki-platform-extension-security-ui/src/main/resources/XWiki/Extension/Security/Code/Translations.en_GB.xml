@@ -36,22 +36,22 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: extension.security.admin.title=
-### Missing: extension.security.indexed.started=
-### Missing: extension.security.indexed.on=
-### Missing: extension.security.indexed.nojob=
-### Missing: extension.security.admin.generalWarning=
-### Missing: extension.security.admin.configuration.title=
-### Missing: extension.security.admin.environment.explanation=
-### Missing: extension.security.notification.message=
-### Missing: extension.security.experimental.warning=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanEnabled=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanDelay=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanURL=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=
+  <content>### Missing: extension.security.admin.title=Security Vulnerabilities
+### Missing: extension.security.indexed.started=Index started on {0}.
+### Missing: extension.security.indexed.on=Indexed on {0}. Any extension installed after this date, or security vulnerabilities released after this date won''t appear. New security scans are performed periodically.
+### Missing: extension.security.indexed.nojob=Could not find any previous indexation processing.
+### Missing: extension.security.admin.generalWarning=Please note that this security scan does not include all installed extensions. Extensions that can't be updated through the Extension Manager are currently not included.
+### Missing: extension.security.admin.configuration.title=Configuration
+### Missing: extension.security.admin.environment.explanation=Extensions listed in this section have known vulnerabilities, but can't be upgraded from the Extension Manager. This means that they can only be fixed by upgrading XWiki itself or its environment (e.g., servlet engine, or docker container).
+### Missing: extension.security.notification.message=We have identified {0} extensions with known security vulnerabilities, see the detail in the {1} report
+### Missing: extension.security.experimental.warning=Be aware that this extension is currently experimental and can lead the presentation of inacurrate analysis. Therefore, the presented results are to be read carefully before taking any action. 
+### Missing: XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Scan Enabled
+### Missing: XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=When unchecked, the security scan won't be executed anymore
+### Missing: XWiki.Extension.Security.Code.ConfigClass_scanDelay=Scan Delay
+### Missing: XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=The number of hours to wait between two security scan (default: 24h)
+### Missing: XWiki.Extension.Security.Code.ConfigClass_scanURL=Scan URL
+### Missing: XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=The url to use as the remote source for the security scan (default value: https://api.osv.dev/v1/query)
+### Missing: XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=Reviews URL
+### Missing: XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=The url to use as the remote source for the security scan reviews (default value: https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)
 </content>
 </xwikidoc>

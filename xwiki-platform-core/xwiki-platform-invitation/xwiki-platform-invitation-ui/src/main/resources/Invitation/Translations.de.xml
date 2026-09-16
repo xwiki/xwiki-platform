@@ -44,5 +44,6 @@ Invitation.WebHome_smtp_server_password.hint=Das Kennwort für die Verbindung mi
 Invitation.WebHome_smtp_server_username.hint=Der Benutzername zur Verbindung mit dem SMTP-Server, nur wenn eine Authentifizierung erforderlich ist.
 Invitation.WebHome_smtp_port.hint=Der Port des zu verwendenden SMTP-Servers.
 Invitation.WebHome_smtp_server.hint=Der SMTP-Server, an den gesendet werden soll.
-Invitation.WebHome_javamail_extra_props.hint=Die Liste der zusätzlich zu verwendenden JavaMail-Eigenschaften.</content>
+Invitation.WebHome_javamail_extra_props.hint=Die Liste der zusätzlich zu verwendenden JavaMail-Eigenschaften.
+</content>
 </xwikidoc>

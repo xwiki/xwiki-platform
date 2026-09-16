@@ -44,9 +44,9 @@ admin.emailsend=Odosielanie e-mailov
 admin.emailsend.description=Konfigurovať parametre odosielanej pošty
 admin.emailstatus=Stav odoslaných emailov
 admin.emailstatus.description=Zobraziť stav odoslaných mailov.
-### Missing: admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
+admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
 Mail.GeneralMailConfigClass_obfuscate=Skryť e-mailové adresy
-Mail.GeneralMailConfigClass_obfuscate.hint=Týka sa len e-mailové adresy uložené v objektoch typu email. Napr.\: a...@domain.org
+Mail.GeneralMailConfigClass_obfuscate.hint=Týka sa len e-mailové adresy uložené v objektoch typu email. Napr.: a...@domain.org
 Mail.SendMailConfigClass_from=Email adresa servera
 Mail.SendMailConfigClass_from.hint=Email adresa na posielanie oznámení.
 Mail.SendMailConfigClass_bcc=BCC email adresy
@@ -60,7 +60,7 @@ Mail.SendMailConfigClass_username.hint=Užívateľské meno pre pripojenie k ser
 Mail.SendMailConfigClass_password=Email Server Heslo
 Mail.SendMailConfigClass_password.hint=Heslo pre pripojenie k serveru SMTP, ak je to potrebné.
 Mail.SendMailConfigClass_properties=Ďalšie možnosti
-Mail.SendMailConfigClass_properties.hint=Zoznam JavaMail nastavení. (napr. "mail.smtp.starttls.enable\=true")
+Mail.SendMailConfigClass_properties.hint=Zoznam JavaMail nastavení. (napr. "mail.smtp.starttls.enable=true")
 Mail.SendMailConfigClass_sendWaitTime=Čas čakania
 Mail.SendMailConfigClass_sendWaitTime.hint=Čas čakania v ms. (Predvolená hodnota je 8s)
 Mail.SendMailConfigClass_discardSuccessStatuses=Zahodiť úspešné stavy?
@@ -74,6 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Chyba
 Mail.SendMailStatus_livetable.actions=Akcie
 Mail.SendMailStatus_livetable.resend=Znovu poslať
-### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
-### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.</content>
+### Missing: Mail.SendMailStatus_livetable.delete=
+mailSender.admin.resendSuccess=The mail has been resent successfully
+mailSender.admin.resendFailure=Failed to resend. Click for more details.
+### Missing: mailSender.admin.deleteSuccess=
+### Missing: mailSender.admin.deleteFailure=
+</content>
 </xwikidoc>

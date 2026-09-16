@@ -50,5 +50,10 @@ platform.userdirectory.customizeNotAllowed=이 사용자 디렉토리를 사용�
 platform.userdirectory.configTitle=사용자 디렉터리 구성
 platform.userdirectory.configSheetTitle=사용자 디렉터리 구성 시트
 platform.userdirectory.configSheetApplyOnConfiguration=이 시트는 UserDirectory 구성 문서에 적용되어야 합니다.
+### Missing: platform.userdirectory.isCustomizedWarning=
+### Missing: platform.userdirectory.canCustomizeInfo=
+### Missing: platform.userdirectory.canCustomizeInfoGuest=
+### Missing: platform.userdirectory.customizeButton=
+### Missing: platform.userdirectory.resetButton=
 </content>
   </xwikidoc>

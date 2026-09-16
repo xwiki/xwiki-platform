@@ -53,6 +53,7 @@ platform.flamingo.themes.title.preview=Priekšskatīt
 platform.flamingo.themes.autorefresh=Atjaunot automātiski
 platform.flamingo.themes.refresh=Atjaunot
 platform.flamingo.themes.refreshwarning=Atjaunošana prasīs vairākas sekundes un priešskats var nebūt 100% pareizs.
+### Missing: platform.flamingo.themes.preview.iframe.label=
 platform.flamingo.themes.loading=Ielādē...
 platform.flamingo.themes.category.logos=Logo
 platform.flamingo.themes.category.base-colors=Pamatkrāsas
@@ -69,6 +70,7 @@ platform.flamingo.themes.defaultvalue=Noklusētais
 platform.flamingo.themes.lessCode.description=Šajā laukā varat tieši ierakstīt LESS kodu, kurš tiks pievienots apdarei.
 platform.flamingo.themes.local=Lokāla
 platform.flamingo.themes.global=Globāla
+### Missing: FlamingoThemesCode.ThemeClass_logo-description_hint=
 
 ###############################################################################
 ## Deprecated

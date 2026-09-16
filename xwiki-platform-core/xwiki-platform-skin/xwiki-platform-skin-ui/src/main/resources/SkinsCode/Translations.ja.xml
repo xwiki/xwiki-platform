@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>skin.sheet.title=スキン
 skin.sheet.properties=スキンのプロパティー
+### Missing: skin.sheet.properties.logo.warning=
 skin.sheet.deprecatedProperties=非推奨のプロパティー
 skin.sheet.overriddenTemplates=上書きされるテンプレート
 skin.sheet.addTemplate=上書きを行う新しいテンプレートを追加

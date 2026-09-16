@@ -45,6 +45,7 @@ panels._actions=アクション
 ### Missing: panels.emptyvalue=
 panels.children.title=下位ページ
 panels.siblings.title=同レベルのページ
+### Missing: panels.customize=
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

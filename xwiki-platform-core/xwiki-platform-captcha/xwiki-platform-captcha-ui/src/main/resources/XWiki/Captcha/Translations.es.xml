@@ -39,5 +39,8 @@
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=CAPTCHA predeterminado
 captcha.admin.defaultCaptchaName.hint=La implementación predeterminada de CAPTCHA a utilizar. Accede al Administrador de extensiones para buscar otras implementaciones que puedas instalar y usar.
+### Missing: captcha.admin.configure.title=
+### Missing: captcha.admin.sample.title=
+### Missing: captcha.admin.sample.description=
 </content>
 </xwikidoc>

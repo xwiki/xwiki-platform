@@ -38,10 +38,10 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Solr meklēšanas pārvaldība
 solr.admin.submit=Pielietot
-### Missing: solr.admin.error.action={0} failed:
+solr.admin.error.action={0} failed:
 solr.admin.error.notallowed=Jums nav atļauts izpildīt šo darbību.
 solr.admin.error.norights=Lai piekļūtu šai sadaļai, ir nepieciešamas administratora tiesības.
-### Missing: solr.admin.success.action={0} successfully triggered.
+solr.admin.success.action={0} successfully triggered.
 solr.admin.status.title=Statuss
 solr.admin.status.queueSize.label=Rindas izmērs
 solr.admin.status.queueSize.hint=Atlikušo vienumu skaits, kurus ir nepieciešams indeksēt, pārindeksēt vai dzēst no indeksa (atkarībā no izvēlētās darbības).
@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=Viki, kura visiem dokumentiem tiks veikta izvēlē
 solr.admin.indexing.wiki.select_farm=Visai fermai
 solr.admin.indexing.query.label=Pielāgots pieprasījums
 solr.admin.indexing.query.hint=Neobligāts dokumentu skaita ierobežojums, kuriem indeksā tiks pielietota izvēlētā darbība.
-### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-solr.sortBy=Kārtot pēc:
-solr.sortBy.score=Atbilstība
-solr.sortBy.title_sort=Virsraksts
-solr.sortBy.date=Pēdējo izmaiņu laiks
-solr.sortBy.author_display_sort=Mainījis
-solr.sortBy.filename_sort=Faila nosaukums
-solr.sortBy.attsize_sort=Faila izmērs
-solr.sortBy.attdate_sort=Augšuplādēts
-solr.sortBy.attauthor_display_sort=Augšuplādējis
-solr.sortOrder.asc=Augoši
-solr.sortOrder.desc=Dilstoši
-solr.options=Rādīt:
-solr.options.highlight=Izgaismošana
+### Missing: solr.admin.indexing.query.language.label=
+solr.admin.info.affectedDocuments=Affected documents in the index:
+### Missing: search.solr.sortBy.hint=
+### Missing: search.solr.sortBy.field.score=
+### Missing: search.solr.sortBy.field.titleSort=
+### Missing: search.solr.sortBy.field.date=
+### Missing: search.solr.sortBy.field.authorDisplaySort=
+### Missing: search.solr.sortBy.field.filenameSort=
+### Missing: search.solr.sortBy.field.attsizeSort=
+### Missing: search.solr.sortBy.field.attdateSort=
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=
+### Missing: search.solr.sortOrder.asc=
+### Missing: search.solr.sortOrder.desc=
+### Missing: search.solr.options.showHighlight=
 solr.options.highlight.title=Parādīt iztvērumu ar atbilstošo rezultātu
-solr.options.facet=Aspekti
+### Missing: search.solr.options.showFacet=
 solr.options.facet.title=Atļaut papildu meklēšanu rezultātos
 solr.result.language=Valoda
 solr.result.locatedIn=Atrodas
@@ -172,6 +172,18 @@ solr.result.location=Atrodas {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Vieta
+solr.sortBy=Kārtot pēc:
+solr.sortBy.score=Atbilstība
+solr.sortBy.title_sort=Virsraksts
+solr.sortBy.date=Pēdējo izmaiņu laiks
+solr.sortBy.author_display_sort=Mainījis
+solr.sortBy.filename_sort=Faila nosaukums
+solr.sortBy.attsize_sort=Faila izmērs
+solr.sortBy.attdate_sort=Augšuplādēts
+solr.sortBy.attauthor_display_sort=Augšuplādējis
+solr.options=Rādīt:
+solr.options.highlight=Izgaismošana
+solr.options.facet=Aspekti
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

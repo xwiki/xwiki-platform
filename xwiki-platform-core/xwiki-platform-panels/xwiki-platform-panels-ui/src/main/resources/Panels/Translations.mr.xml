@@ -42,11 +42,20 @@ panels.description=वर्णन
 panels.type=प्रकार
 panels.category=श्रेणी
 panels._actions=क्रिया
-panels.emptyvalue=
+### Missing: panels.emptyvalue=
 panels.children.title=आतील पृष्ठे
 panels.siblings.title=सोबतची पृष्ठे
+### Missing: panels.customize=
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
 panels.documentInformation.configureSyntaxes=अधिक वाक्यरचना कॉन्फिगर करा
 panels.documentInformation.confirmChangeSyntaxWysiwyg=आपण दस्तऐवजाची सामग्री  देखील निवडलेल्या वाक्यरचनामध्ये रूपांतरित करू इच्छिता? 'रद्द करा' निवडणे मागील सिंटॅक्सला रीसेट करेल आणि काहीही करणार नाही. लक्षात ठेवा की आपण 'ओके' निवडल्यास आपले बदल आणि हे दस्तऐवज स्वयंचलितपणे जतन होईल, आपण दस्तऐवज इतिहास इंटरफेसवर जाऊन ही बदल रद्द करू शकता आणि मागील आवृत्ती परत प्राप्त करू शकता.
 panels.documentInformation.confirmChangeSyntax=आपण दस्तऐवजाची सामग्री आणि वस्तू देखील निवडलेल्या वाक्यरचनामध्ये रूपांतरित करू इच्छिता? 'रद्द करा' निवडल्यास दस्तऐवजाची सामग्री सुधारित केल्याशिवाय केवळ वाक्यरचना अभिज्ञापकच बदलेल. लक्षात ठेवा आपण 'ओके' निवडल्यास हे दस्तऐवज स्वयंचलितरित्या जतन होईल, आपण दस्तऐवज इतिहास इंटरफेसवर जाऊन ही बदल रद्द करू शकता आणि मागील आवृत्ती परत प्राप्त करू शकता.
-panels.documentInformation.failedSyntaxConversion=निवडलेल्या वाक्यरचनामध्ये रूपांतरित करण्यात अयशस्वी. आपण तरीही हा वाक्यरचना वापरू इच्छित असल्यास आपण तो पुन्हा निवडू शकता आणि रूपांतरण न करणे निवडू शकता.</content>
+panels.documentInformation.failedSyntaxConversion=निवडलेल्या वाक्यरचनामध्ये रूपांतरित करण्यात अयशस्वी. आपण तरीही हा वाक्यरचना वापरू इच्छित असल्यास आपण तो पुन्हा निवडू शकता आणि रूपांतरण न करणे निवडू शकता.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

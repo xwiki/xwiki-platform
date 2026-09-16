@@ -48,7 +48,7 @@ public interface LiveDataEntryStore
      * @param properties the properties the returned entry must include
      * @return the specified entry
      * @throws LiveDataException if retrieving the specified entry fails
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     default Optional<Map<String, Object>> get(Object entryId, List<String> properties) throws LiveDataException
     {

@@ -185,6 +185,11 @@ var XWiki = (function (XWiki) {
         shownoresults: false,
         propagateEventKeyCodes : [ Event.KEY_RETURN ]
       });
+      // The widget is only created once the user reaches for the search field, so some text can already have been
+      // typed in it by the time it is ready. The suggest ignores values shorter than its minimum length on its own.
+      if (this.searchInput.value) {
+        this.suggest.getSuggestions(this.searchInput.value);
+      }
     }
 
   });
@@ -192,9 +197,29 @@ var XWiki = (function (XWiki) {
   const sourcesUrl = new XWiki.Document(XWiki.Model.resolve('XWiki.SearchSuggestCode', XWiki.EntityType.DOCUMENT))
     .getURL('get');
 
-  var init = async function() {
+  var createSearchSuggest = async function(searchInput) {
+    // The widget needs both the sources and the translations, each of them costing a request to the server. Start
+    // loading the translations here so that they are fetched in parallel with the sources rather than after them.
+    require(['xwiki-l10n!search-suggest-messages']);
     var sources = await (await fetch(sourcesUrl)).json();
-    new XWiki.SearchSuggest($('headerglobalsearchinput'), sources);
+    new XWiki.SearchSuggest(searchInput, sources);
+  };
+
+  var init = function() {
+    var searchInput = $('headerglobalsearchinput');
+    if (searchInput) {
+      // The suggestion sources have to be fetched from the server, so we wait for the user to reach for the search
+      // field before doing it, in order to not pay that cost on every page view. The pointer entering the field is
+      // taken into account as well as the focus, so that the suggest has a chance to be ready by the time enough
+      // characters have been typed.
+      var load = function() {
+        searchInput.removeEventListener('mouseenter', load);
+        searchInput.removeEventListener('focus', load);
+        createSearchSuggest(searchInput);
+      };
+      searchInput.addEventListener('mouseenter', load);
+      searchInput.addEventListener('focus', load);
+    }
     return true;
   };
 

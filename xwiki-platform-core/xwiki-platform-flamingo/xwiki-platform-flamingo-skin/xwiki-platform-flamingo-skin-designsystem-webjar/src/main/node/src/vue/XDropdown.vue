@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import XBtn from "./XBtn.vue";
 import { dropdownKey } from "./inject/keys";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 import { onMounted, provide, useId, useTemplateRef } from "vue";
 import type { DropdownProps } from "@xwiki/platform-dsapi";
 
@@ -34,11 +35,11 @@ const toggle = useTemplateRef("toggle");
 defineProps<DropdownProps>();
 defineSlots<{ default(): void; activator(): void }>();
 
-const jQuery: Promise<JQueryStatic> = new Promise((resolve) => {
-  // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require(["jquery", "bootstrap"], ($: JQueryStatic) => resolve($));
-});
+// requiring bootstrap is needed to be able to access the modal method once the component is mounted.
+const jQuery: Promise<JQueryStatic> = loadById<[JQueryStatic, unknown]>(
+  "jquery",
+  "bootstrap",
+).then(([$]) => $);
 
 onMounted(async () => {
   const $ = await jQuery;

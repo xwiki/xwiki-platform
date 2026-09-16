@@ -301,7 +301,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
     @Override
     public void endUser(String name, FilterEventParameters parameters) throws FilterException
     {
-
+        // Nothing to do: the user document is entirely written by beginUser().
     }
 
     @Override

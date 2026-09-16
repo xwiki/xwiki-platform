@@ -18,6 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { loadById } from "@xwiki/platform-xwiki-utils";
 import { onMounted, useTemplateRef } from "vue";
 // Preemptively import XTab and XTabPanel to make sure they are available during onMounted. Otherwise, they can be
 // rendered with a delay since DS components are loaded lazily, and that breaks the modal initialization.
@@ -26,11 +27,11 @@ import "./XTabPanel.vue";
 
 const tabs = useTemplateRef("tabs");
 
-const jQuery: Promise<JQueryStatic> = new Promise((resolve) => {
-  // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require(["jquery", "bootstrap"], ($: JQueryStatic) => resolve($));
-});
+// requiring bootstrap is needed to be able to access the modal method once the component is mounted.
+const jQuery: Promise<JQueryStatic> = loadById<[JQueryStatic, unknown]>(
+  "jquery",
+  "bootstrap",
+).then(([$]) => $);
 
 onMounted(async () => {
   const $ = await jQuery;

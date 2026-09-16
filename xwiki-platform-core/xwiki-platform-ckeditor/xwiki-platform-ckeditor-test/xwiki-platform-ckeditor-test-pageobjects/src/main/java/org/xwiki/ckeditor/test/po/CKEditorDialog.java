@@ -51,8 +51,20 @@ public class CKEditorDialog extends BaseElement
      */
     public void submit()
     {
-        getDriver().findElement(By.className("cke_dialog_ui_button_ok")).click();
+        clickOk();
         getDriver().waitUntilElementDisappears(DIALOG_CONTENTS);
+    }
+
+    /**
+     * Clicks the OK button without waiting for the dialog to be closed, e.g. because the dialog is expected to reject
+     * the submission.
+     *
+     * @since 18.4.6
+     * @since 18.8.0RC1
+     */
+    protected void clickOk()
+    {
+        getDriver().findElement(By.className("cke_dialog_ui_button_ok")).click();
     }
 
     /**

@@ -427,59 +427,60 @@ export class LiveDataLogic implements Logic {
     }
   }
 
-  async updateEntries() {
-    return this.fetchEntries()
-      .then(async (data) => {
-        // We need to keep drafts to insert them back in the entries.
-        const drafts = this.data.data.entries.filter((entry) => entry._new);
-        data.entries = await this.restoreFrozenView(data.entries);
-        // Refreeze the values (the restore operation might have unfrozen them).
-        this.freezeView(data.entries);
-        data.entries.push(...drafts);
+  updateEntries() {
+    return (
+      this.fetchEntries()
+        // eslint-disable-next-line promise/always-return
+        .then(async (data) => {
+          // We need to keep drafts to insert them back in the entries.
+          const drafts = this.data.data.entries.filter((entry) => entry._new);
+          data.entries = await this.restoreFrozenView(data.entries);
+          // Refreeze the values (the restore operation might have unfrozen them).
+          this.freezeView(data.entries);
+          data.entries.push(...drafts);
 
-        this.data.data = data;
-        // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated
-        // first.
-        // It turns out this is not enough when components are resolved asynchronously.
-        // Therefore, we preemptively resolve the components that are going to be displayed here. Since they are
-        // cached, the rendering of the displayers will not be delayed later on, and listeners of entriesUpdated
-        // have access to a fully rendered DOM. Note that this approach is not optimal, and we should aim for a
-        // mechanism that does not rely on direct DOM access. Instead, we should provide way to alter the data
-        // externally before starting the rendering. (see https://jira.xwiki.org/browse/XWIKI-23423)
-        const preloadDisplayer = this.getPropertyDescriptors()
-          .filter((it) => it != undefined && this.isPropertyVisible(it.id))
-          .map((it) =>
-            componentStore.load(
-              "displayer",
-              (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
-            ),
-          );
-        // eslint-disable-next-line promise/catch-or-return,promise/always-return,promise/no-nesting
-        Promise.all(preloadDisplayer).then(() => {
-          nextTick(() => this.triggerEvent("entriesUpdated", {}));
-        });
-        // Remove the outdated footnotes, they will be recomputed by the new entries.
-        this.footnotes.reset();
-        return;
-      })
-      .catch((err) => {
-        // Prevent undesired notifications of the end user for non business related errors (for
-        // instance, the user left the page before the request was completed). See
-        // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
-        if (err.readyState === 4) {
-          // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
-          this.translate("livedata.error.updateEntriesFailed").then(
-            // @ts-expect-error XWiki.widget is excepted to be globally accessible
-            (value) => new XWiki.widgets.Notification(value, "error"),
-          );
-        }
+          this.data.data = data;
+          // Remove the outdated footnotes, they will be recomputed by the new entries.
+          this.footnotes.reset();
+          // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated
+          // first.
+          // It turns out this is not enough when components are resolved asynchronously.
+          // Therefore, we preemptively resolve the components that are going to be displayed here. Since they are
+          // cached, the rendering of the displayers will not be delayed later on, and listeners of entriesUpdated
+          // have access to a fully rendered DOM. Note that this approach is not optimal, and we should aim for a
+          // mechanism that does not rely on direct DOM access. Instead, we should provide way to alter the data
+          // externally before starting the rendering. (see https://jira.xwiki.org/browse/XWIKI-23423)
+          const preloadDisplayer = this.getPropertyDescriptors()
+            .filter((it) => it != undefined && this.isPropertyVisible(it.id))
+            .map((it) =>
+              componentStore.load(
+                "displayer",
+                (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
+              ),
+            );
+          await Promise.all(preloadDisplayer);
+          await nextTick();
+          this.triggerEvent("entriesUpdated", {});
+        })
+        .catch((err) => {
+          // Prevent undesired notifications of the end user for non business related errors (for
+          // instance, the user left the page before the request was completed). See
+          // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
+          if (err.readyState === 4) {
+            // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
+            this.translate("livedata.error.updateEntriesFailed").then(
+              // @ts-expect-error XWiki.widget is excepted to be globally accessible
+              (value) => new XWiki.widgets.Notification(value, "error"),
+            );
+          }
 
-        // Do not log if the request has been aborted (e.g., because a second request was started
-        // for the same LD with new criteria).
-        if (err.statusText !== "abort") {
-          console.error("Failed to fetch the entries", err);
-        }
-      });
+          // Do not log if the request has been aborted (e.g., because a second request was started
+          // for the same LD with new criteria).
+          if (err.statusText !== "abort") {
+            console.error("Failed to fetch the entries", err);
+          }
+        })
+    );
   }
 
   /**
@@ -533,7 +534,7 @@ export class LiveDataLogic implements Logic {
   /**
    * Indicate whether the view is frozen, meaning the entries should keep their position.
    * @returns true if the view is frozen, false otherwise
-   * @since 18.8.0RC1
+   * @since 18.9.0RC1
    */
   isViewFrozen(): boolean {
     return this.editMode.value && this.frozenView !== undefined;

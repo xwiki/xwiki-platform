@@ -328,10 +328,8 @@ public class CreateAction extends XWikiAction
         newDocument.setAuthorReference(currentUserReference);
         newDocument.setCreatorReference(currentUserReference);
 
-        // Make sure the user is allowed to make this modification
-        xwiki.checkSavingDocument(currentUserReference, newDocument, context);
-
-        xwiki.saveDocument(newDocument, context);
+        // Save the document
+        xwiki.saveDocument(newDocument, "", false, true, context);
     }
 
     private String getRedirectParameters(String parent, String title, String template, ActionOnCreate actionOnCreate,

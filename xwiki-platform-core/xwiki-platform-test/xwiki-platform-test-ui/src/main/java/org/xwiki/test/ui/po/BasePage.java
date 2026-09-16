@@ -66,6 +66,14 @@ public class BasePage extends BaseElement
     private static final int WCAG_ANALYZE_ATTEMPTS = 3;
 
     /**
+     * Message fragments identifying a JavaScript error raised because axe-core was not present in the frame when the
+     * analysis probed it. Browsers word it differently: Chrome reports the failing property read on the axe object
+     * ({@code runPartial} is the axe entry point the analysis calls), while Firefox reports the missing binding itself.
+     */
+    private static final List<String> AXE_NOT_READY_ERRORS =
+        List.of("runPartial", "window.axe", "axe is not defined", "axe is undefined");
+
+    /**
      * Used for sending keyboard shortcuts to.
      */
     @FindBy(id = "xwikimaincontainer")
@@ -755,7 +763,7 @@ public class BasePage extends BaseElement
             try {
                 return axeBuilder.analyze(driver);
             } catch (JavascriptException e) {
-                if (e.getMessage() == null || !e.getMessage().contains("window.axe")) {
+                if (!isAxeNotReadyError(e)) {
                     throw e;
                 }
                 lastError = e;
@@ -763,6 +771,12 @@ public class BasePage extends BaseElement
             }
         }
         throw lastError;
+    }
+
+    static boolean isAxeNotReadyError(JavascriptException error)
+    {
+        String message = error.getMessage();
+        return message != null && AXE_NOT_READY_ERRORS.stream().anyMatch(message::contains);
     }
 
     /**

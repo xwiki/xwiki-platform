@@ -37,6 +37,7 @@ import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -226,10 +227,10 @@ class DefaultModelBridgeTest
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         DocumentReference copyReference = new DocumentReference("wiki", "Space", "Copy");
 
-        when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, true,
+        when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, true, false,
             this.xcontext)).thenReturn(true);
 
-        assertTrue(this.modelBridge.copy(sourceReference, copyReference));
+        assertTrue(this.modelBridge.copy(sourceReference, copyReference, false));
         assertLog(Level.INFO, "Document [{}] has been copied to [{}].", sourceReference, copyReference);
     }
 
@@ -303,7 +304,8 @@ class DefaultModelBridgeTest
         BaseObject baseObjectMock = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
             .thenReturn(baseObjectMock);
-        when(oldDocument.getAuthors()).thenReturn(mock());
+        DocumentAuthors documentAuthorsMock = mock();
+        when(oldDocument.getAuthors()).thenReturn(documentAuthorsMock);
         when(oldDocument.isNew()).thenReturn(true);
 
         UserReference userReference = mock();
@@ -333,7 +335,8 @@ class DefaultModelBridgeTest
         BaseObject baseObjectMock2 = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
             .thenReturn(baseObjectMock2);
-        when(oldDocument.getAuthors()).thenReturn(mock());
+        DocumentAuthors documentAuthorsMock = mock();
+        when(oldDocument.getAuthors()).thenReturn(documentAuthorsMock);
         when(oldDocument.isNew()).thenReturn(false);
 
         UserReference userReference = mock();
@@ -961,10 +964,10 @@ class DefaultModelBridgeTest
         DocumentReference source = new DocumentReference("wiki", "space", "sourcePage");
         DocumentReference target = new DocumentReference("wiki", "space", "targetPage");
 
-        when(this.xwiki.renameDocument(source, target, true, List.of(), List.of(), this.xcontext)).thenReturn(true);
-        assertTrue(this.modelBridge.rename(source, target));
+        when(this.xwiki.renameDocument(source, target, true, List.of(), List.of(), false, this.xcontext)).thenReturn(true);
+        assertTrue(this.modelBridge.rename(source, target, false));
 
-        verify(this.xwiki).renameDocument(source, target, true, List.of(), List.of(), this.xcontext);
+        verify(this.xwiki).renameDocument(source, target, true, List.of(), List.of(), false, this.xcontext);
     }
 
     @Test

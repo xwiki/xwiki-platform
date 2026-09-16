@@ -111,8 +111,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar (we can't click the link
         // because the browser would follow it, and hovering it with synthetic mouse events is not reliable), then
         // change the link title.
-        textArea.click();
-        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setTitleAndSubmit("2nd");
 
         // The link title must be updated without touching the rest of the line.
@@ -172,8 +171,7 @@ class LinkIT extends AbstractBlockNoteIT
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal,
         // change the title, but cancel the modal instead of submitting.
-        textArea.click();
-        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.click().moveCaretTo(8);
         BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
         linkModal.setDisplayText("2nd");
         linkModal.cancel();
@@ -311,8 +309,7 @@ class LinkIT extends AbstractBlockNoteIT
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
         // and switch the target type from URL to E-mail.
-        textArea.click();
-        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setEmailTargetAndSubmit("second@xwiki.org");
 
         // The link text must be left untouched.
@@ -339,8 +336,7 @@ class LinkIT extends AbstractBlockNoteIT
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
         // and change the target URL.
-        textArea.click();
-        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setTargetAndSubmit("https://example.org");
 
         // The link text must be left untouched.
@@ -382,8 +378,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
         // and change the target page. Search by title since suggestions are matched (and rendered) using the page
         // title, not its reference.
-        textArea.click();
-        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setPageTargetAndSubmit("New Page Link Target", "New Page Link Target");
 
         // The link text must be left untouched.
@@ -426,8 +421,7 @@ class LinkIT extends AbstractBlockNoteIT
         // and change the target attachment. Search by filename (as a real user would), but disambiguate the suggestion
         // to select using the test page name, since other tests running in the same wiki may also attach a file with
         // the same name.
-        textArea.click();
-        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setAttachmentTargetAndSubmit(attachmentName, attachmentName,
             testReference.getLastSpaceReference().getName());
 
@@ -456,8 +450,7 @@ class LinkIT extends AbstractBlockNoteIT
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
         // and change the target e-mail address.
-        textArea.click();
-        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setEmailTargetAndSubmit("other@xwiki.org");
 
         // The link text must be left untouched.
@@ -485,7 +478,7 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Place the caret after the first link.
-        textArea.click().sendKeys(Keys.HOME).sendKeys(Keys.chord(Keys.CONTROL, Keys.RIGHT, Keys.RIGHT));
+        textArea.click().moveCaretTo(0).sendKeys(Keys.chord(Keys.CONTROL, Keys.RIGHT, Keys.RIGHT));
 
         // Change the generated link label
         textArea.sendKeys(Keys.LEFT, Keys.BACK_SPACE, "z");
@@ -517,8 +510,7 @@ class LinkIT extends AbstractBlockNoteIT
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
         // and change the target page.
-        textArea.click();
-        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setPageTargetAndSubmit("New Link Target", "New Link Target");
 
         // The link text must be left untouched.

@@ -84,7 +84,7 @@
         $uix.parameters.excludeNestedPagesByDefault == 'true'))
       #set ($discard = $exportFormatsForCategory.add($exportFormat))
       ## Include the resources and configuration required by this export format.
-      $!services.rendering.render($uix.execute(), 'html/5.0')
+      $!services.uix.render($uix, 'html/5.0')
     #end
   #end
   #addLegacyExportFormats($exportFormatsByCategory)
@@ -176,12 +176,12 @@
   ## Legacy way of providing export formats.
   #foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.menu.export.buttons'))
     #set ($exportURL = $NULL)
-    #set ($html = $services.rendering.render($uix.execute(), 'html/5.0'))
+    #set ($html = $services.uix.render($uix, 'html/5.0'))
     #set ($results = $regextool.find($html, 'href=[''"]([^''"]+)[''"]'))
     #if ($results.size() == 2)
       #set ($exportURL = $results.get(1).group)
     #end
-    #set ($exportName = $services.rendering.render($uix.execute(), 'plain/1.0'))
+    #set ($exportName = $services.uix.render($uix, 'plain/1.0'))
     #if ("$!exportName" != '' && "$!exportURL" != '')
       #set ($categoryId = $uix.parameters.category)
       #if ("$!categoryId" == '')

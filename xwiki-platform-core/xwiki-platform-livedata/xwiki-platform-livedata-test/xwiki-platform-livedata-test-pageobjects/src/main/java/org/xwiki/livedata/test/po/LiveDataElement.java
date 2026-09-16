@@ -252,6 +252,19 @@ public class LiveDataElement extends BaseElement
     }
 
     /**
+     * Open the panel listing the properties, from which a property is displayed as a column or hidden.
+     *
+     * @return an instance of {@link PropertiesPanelElement} once it's opened.
+     * @since 18.8.0RC1
+     */
+    public PropertiesPanelElement openPropertiesPanel()
+    {
+        openDropDownMenu().findElement(By.linkText("Properties...")).click();
+        return new PropertiesPanelElement(this,
+            getRootElement().findElement(By.className("livedata-advanced-panel-properties")));
+    }
+
+    /**
      * Open the panel for advanced sorting and returns it.
      * @return an instance of {@link SortPanelElement} once it's opened.
      * @since 16.3.0RC1

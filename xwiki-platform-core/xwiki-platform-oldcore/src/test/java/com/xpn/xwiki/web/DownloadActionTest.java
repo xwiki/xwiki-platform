@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
@@ -219,18 +218,13 @@ class DownloadActionTest
 
     private void verifyOutputExpectations(final int start, final int end) throws IOException
     {
-        verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
-        {
-            @Override
-            public boolean matches(byte[] argument)
-            {
-                for (int i = start; i < end; ++i) {
-                    if (argument[i - start] != DownloadActionTest.this.fileContent[i]) {
-                        return false;
-                    }
+        verify(this.out).write(argThat(argument -> {
+            for (int i = start; i < end; ++i) {
+                if (argument[i - start] != this.fileContent[i]) {
+                    return false;
                 }
-                return true;
             }
+            return true;
         }), eq(0), eq(end - start));
     }
 
@@ -304,6 +298,17 @@ class DownloadActionTest
     void downloadWhenMissingFile()
     {
         setRequestExpectations("/xwiki/bin/download/space/page/nofile.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
+        XWikiException xWikiException =
+            assertThrows(XWikiException.class, () -> this.action.render(this.oldcore.getXWikiContext()));
+        assertEquals("Error number 11003 in 11: Attachment [file.txt] not found", xWikiException.getMessage());
+    }
+
+    @Test
+    void downloadWhenNoDocumentInContext()
+    {
+        setRequestExpectations("/xwiki/bin/download/space/page/file.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
+        this.oldcore.getXWikiContext().setDoc(null);
+
         XWikiException xWikiException =
             assertThrows(XWikiException.class, () -> this.action.render(this.oldcore.getXWikiContext()));
         assertEquals("Error number 11003 in 11: Attachment [file.txt] not found", xWikiException.getMessage());

@@ -22,9 +22,9 @@ package org.xwiki.rest.test;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -50,10 +50,10 @@ class ClassesResourceIT extends AbstractHttpIT
     @Test
     protected void testRepresentation() throws Exception
     {
-        GetMethod getMethod = executeGet(buildURI(ClassesResource.class, getWiki()));
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(buildURI(ClassesResource.class, getWiki()));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        Classes classes = (Classes) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Classes classes = (Classes) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
 
         for (Class clazz : classes.getClazzs()) {
             checkLinks(clazz);
@@ -68,27 +68,27 @@ class ClassesResourceIT extends AbstractHttpIT
     void testClassesResourcePaginationAndErrors() throws Exception
     {
         // Test: number=-1 should return error
-        GetMethod getMethod = executeGet(buildURI(ClassesResource.class, getWiki()) + "?number=-1");
-        assertEquals(400, getMethod.getStatusCode());
-        assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+        CloseableHttpResponse getMethod = executeGet(buildURI(ClassesResource.class, getWiki()) + "?number=-1");
+        assertEquals(400, getMethod.getCode());
+        assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
 
         // Test: number=1001 should return error
         getMethod = executeGet(buildURI(ClassesResource.class, getWiki()) + "?number=1001");
-        assertEquals(400, getMethod.getStatusCode());
-        assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+        assertEquals(400, getMethod.getCode());
+        assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
 
         // Test: pagination with number=1
         getMethod = executeGet(buildURI(ClassesResource.class, getWiki()) + "?number=1");
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-        Classes classes = (Classes) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode());
+        Classes classes = (Classes) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
         assertEquals(1, classes.getClazzs().size());
 
         String firstName = classes.getClazzs().get(0).getName();
 
         // Test: pagination with number=1 and start=1
         getMethod = executeGet(buildURI(ClassesResource.class, getWiki()) + "?number=1&start=1");
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-        classes = (Classes) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode());
+        classes = (Classes) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
         assertEquals(1, classes.getClazzs().size());
         assertNotEquals(firstName, classes.getClazzs().get(0).getName());
     }
@@ -128,17 +128,17 @@ class ClassesResourceIT extends AbstractHttpIT
                     .map(SpaceReference::getName)
                     .toList();
 
-                PostMethod postMethod = executePostXml(
+                CloseableHttpResponse postMethod = executePostXml(
                     buildURI(ObjectsResource.class, getWiki(), spaces, reference.getName()), tagObject,
                     TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-                assertEquals(HttpStatus.SC_CREATED, postMethod.getStatusCode());
+                assertEquals(HttpStatus.SC_CREATED, postMethod.getCode());
             }
 
             // Test: basic retrieval
-            GetMethod getMethod = executeGet(
+            CloseableHttpResponse getMethod = executeGet(
                 buildURI(ClassPropertyValuesResource.class, getWiki(), className, propertyName) + "?fp=tag");
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-            PropertyValues values = (PropertyValues) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode());
+            PropertyValues values = (PropertyValues) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
 
             List<String> foundValues = values.getPropertyValues().stream()
                 .map(PropertyValue::getValue)
@@ -152,21 +152,21 @@ class ClassesResourceIT extends AbstractHttpIT
             // Test: pagination with limit=1
             getMethod = executeGet(
                 buildURI(ClassPropertyValuesResource.class, getWiki(), className, propertyName) + "?fp=tag&limit=1");
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-            values = (PropertyValues) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode());
+            values = (PropertyValues) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
             assertEquals(1, values.getPropertyValues().size());
 
             // Test: error for limit=-1
             getMethod = executeGet(
                 buildURI(ClassPropertyValuesResource.class, getWiki(), className, propertyName) + "?limit=-1");
-            assertEquals(400, getMethod.getStatusCode());
-            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
 
             // Test: error for limit=1001
             getMethod = executeGet(
                 buildURI(ClassPropertyValuesResource.class, getWiki(), className, propertyName) + "?limit=1001");
-            assertEquals(400, getMethod.getStatusCode());
-            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
         } finally {
             getUtil().rest().delete(reference1);
             getUtil().rest().delete(reference2);

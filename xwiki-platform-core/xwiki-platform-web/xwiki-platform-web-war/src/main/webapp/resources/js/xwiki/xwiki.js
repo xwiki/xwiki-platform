@@ -358,7 +358,7 @@ Object.extend(XWiki, {
               // starting with "_"
               var values = anchor.getAttribute("rel").split(" ");
               for (var j = 0; j < values.length; j++) {
-                  if (values[j].charAt(0) == "_") {
+                  if (values[j].startsWith("_")) {
                       anchor.target = values[j].substring(1);
                       break;
                   } else if (values[j] == "external") {
@@ -484,10 +484,10 @@ Object.extend(XWiki, {
         var ca = document.cookie.split(';');
         for(var i=0;i < ca.length;i++) {
             var c = ca[i];
-            while (c.charAt(0)==' ') {
+            while (c.startsWith(' ')) {
                 c = c.substring(1,c.length);
             }
-            if (c.indexOf(nameEQ) == 0) {
+            if (c.startsWith(nameEQ)) {
                 return decodeURIComponent(c.substring(nameEQ.length,c.length));
             }
         }

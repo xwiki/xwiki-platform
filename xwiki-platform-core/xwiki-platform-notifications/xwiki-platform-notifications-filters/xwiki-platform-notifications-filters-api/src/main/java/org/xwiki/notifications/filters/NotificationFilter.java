@@ -208,7 +208,7 @@ public interface NotificationFilter extends Comparable
     default int compareTo(Object o)
     {
         if (o instanceof NotificationFilter other) {
-            return other.getPriority() - this.getPriority();
+            return Integer.compare(other.getPriority(), this.getPriority());
         }
         return 0;
     }

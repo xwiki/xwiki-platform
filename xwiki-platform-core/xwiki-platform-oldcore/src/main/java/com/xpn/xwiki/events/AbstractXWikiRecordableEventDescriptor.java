@@ -36,7 +36,7 @@ public abstract class AbstractXWikiRecordableEventDescriptor extends AbstractRec
      * @param descriptionTranslationKey the name of the translation key that describe the event
      * @param applicationTranslationKey the translation key of the name of the application that send this event
      */
-    public AbstractXWikiRecordableEventDescriptor(String descriptionTranslationKey, String applicationTranslationKey)
+    protected AbstractXWikiRecordableEventDescriptor(String descriptionTranslationKey, String applicationTranslationKey)
     {
         super(descriptionTranslationKey, applicationTranslationKey);
     }

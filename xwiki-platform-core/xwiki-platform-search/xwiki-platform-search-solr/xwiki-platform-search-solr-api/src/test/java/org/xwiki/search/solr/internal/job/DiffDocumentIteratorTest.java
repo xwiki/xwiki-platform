@@ -78,6 +78,7 @@ class DiffDocumentIteratorTest
         @Override
         public void setRootReference(EntityReference rootReference)
         {
+            // Nothing to do: this test iterator always iterates over the same fixed list of entries.
         }
 
         @Override

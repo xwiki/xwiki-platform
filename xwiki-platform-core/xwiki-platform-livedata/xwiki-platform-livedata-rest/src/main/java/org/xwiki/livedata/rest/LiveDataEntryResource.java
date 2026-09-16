@@ -49,7 +49,7 @@ public interface LiveDataEntryResource
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
      * @param entryId identifies the entry to retrieve
-     * @param properties (since 18.8.0RC1) the list of properties to include in the returned live data entry
+     * @param properties (since 18.9.0RC1) the list of properties to include in the returned live data entry
      * @return the specified entry
      * @throws Exception if retrieving the entry fails
      */

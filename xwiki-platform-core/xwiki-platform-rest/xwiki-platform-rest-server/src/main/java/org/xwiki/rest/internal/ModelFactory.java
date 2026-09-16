@@ -879,14 +879,14 @@ public class ModelFactory
         DocumentReference reference = xwikiClass.getReference();
         String wikiName = reference.getWikiReference().getName();
 
-        for (java.lang.Object xwikiPropertyClassObject : xwikiClass.getProperties()) {
+        for (com.xpn.xwiki.api.Element xwikiPropertyClassObject : xwikiClass.getProperties()) {
             PropertyClass xwikiPropertyClass = (PropertyClass) xwikiPropertyClassObject;
 
             Property property = this.objectFactory.createProperty();
             property.setName(xwikiPropertyClass.getName());
             property.setType(xwikiPropertyClass.getxWikiClass().getName());
 
-            for (java.lang.Object xwikiPropertyObject : xwikiPropertyClass.getProperties()) {
+            for (com.xpn.xwiki.api.Element xwikiPropertyObject : xwikiPropertyClass.getProperties()) {
                 com.xpn.xwiki.api.Property xwikiProperty = (com.xpn.xwiki.api.Property) xwikiPropertyObject;
                 java.lang.Object value = xwikiProperty.getValue();
 

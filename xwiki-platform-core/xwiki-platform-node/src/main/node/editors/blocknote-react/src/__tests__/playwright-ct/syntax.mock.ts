@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 export const FULL_SYNTAX: SyntaxConfig = {
   id: "default-syntax",

@@ -26,11 +26,11 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.junit.jupiter.api.Test;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
@@ -64,28 +64,28 @@ class TagsResourceIT extends AbstractHttpIT
 
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME, "Test");
 
-        GetMethod getMethod = executeGet(
+        CloseableHttpResponse getMethod = executeGet(
             buildURI(PageResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME)
                 .toString());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
         Tags tags = objectFactory.createTags();
         Tag tag = objectFactory.createTag();
         tag.setName(tagName);
         tags.getTags().add(tag);
 
-        PutMethod putMethod = executePutXml(
+        CloseableHttpResponse putMethod = executePutXml(
             buildURI(PageTagsResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME)
                 .toString(),
             tags, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+        assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getCode(), getHttpResponseInfo(putMethod));
 
         getMethod = executeGet(
             buildURI(PageTagsResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME)
                 .toString());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        tags = (Tags) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        tags = (Tags) unmarshaller.unmarshal(getMethod.getEntity().getContent());
         boolean found = false;
         for (Tag t : tags.getTags()) {
             if (tagName.equals(t.getName())) {
@@ -96,9 +96,9 @@ class TagsResourceIT extends AbstractHttpIT
         assertTrue(found);
 
         getMethod = executeGet(buildURI(TagsResource.class, getWiki()).toString());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        tags = (Tags) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        tags = (Tags) unmarshaller.unmarshal(getMethod.getEntity().getContent());
         found = false;
         for (Tag t : tags.getTags()) {
             if (tagName.equals(t.getName())) {
@@ -109,9 +109,9 @@ class TagsResourceIT extends AbstractHttpIT
         assertTrue(found);
 
         getMethod = executeGet(buildURI(PagesForTagsResource.class, getWiki(), tagName).toString());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        Pages pages = (Pages) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Pages pages = (Pages) unmarshaller.unmarshal(getMethod.getEntity().getContent());
 
         found = false;
         for (PageSummary pageSummary : pages.getPageSummaries()) {
@@ -125,9 +125,9 @@ class TagsResourceIT extends AbstractHttpIT
         getMethod = executeGet(
             buildURI(PageResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME)
                 .toString());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        Page page = (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Page page = (Page) unmarshaller.unmarshal(getMethod.getEntity().getContent());
         Link tagsLink = getFirstLinkByRelation(page, Relations.TAGS);
         assertNotNull(tagsLink);
     }
@@ -139,24 +139,24 @@ class TagsResourceIT extends AbstractHttpIT
 
         String tagName = UUID.randomUUID().toString();
 
-        GetMethod getMethod = executeGet(
+        CloseableHttpResponse getMethod = executeGet(
             buildURI(PageResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME)
                 .toString());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        PutMethod putMethod = executePut(
+        CloseableHttpResponse putMethod = executePut(
             buildURI(PageTagsResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME)
                 .toString(),
             tagName, MediaType.TEXT_PLAIN, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+        assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getCode(), getHttpResponseInfo(putMethod));
 
         getMethod = executeGet(
             buildURI(PageTagsResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME)
                 .toString());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        Tags tags = (Tags) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Tags tags = (Tags) unmarshaller.unmarshal(getMethod.getEntity().getContent());
         boolean found = false;
         for (Tag t : tags.getTags()) {
             if (tagName.equals(t.getName())) {
@@ -174,29 +174,29 @@ class TagsResourceIT extends AbstractHttpIT
 
         String tagName = UUID.randomUUID().toString();
 
-        GetMethod getMethod = executeGet(
+        CloseableHttpResponse getMethod = executeGet(
             buildURI(PageResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME)
                 .toString());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
         NameValuePair[] nameValuePairs = new NameValuePair[1];
-        nameValuePairs[0] = new NameValuePair("tags", tagName);
+        nameValuePairs[0] = new BasicNameValuePair("tags", tagName);
 
-        PostMethod postMethod =
+        CloseableHttpResponse postMethod =
             executePostForm(
                 String.format("%s?method=PUT",
                     buildURI(PageTagsResource.class, getWiki(), TestConstants.TEST_SPACE_NAME,
                         TestConstants.TEST_PAGE_NAME).toString()),
                 nameValuePairs, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(HttpStatus.SC_ACCEPTED, postMethod.getStatusCode(), getHttpMethodInfo(postMethod));
+        assertEquals(HttpStatus.SC_ACCEPTED, postMethod.getCode(), getHttpResponseInfo(postMethod));
 
         getMethod = executeGet(
             buildURI(PageTagsResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TEST_PAGE_NAME)
                 .toString());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        Tags tags = (Tags) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Tags tags = (Tags) unmarshaller.unmarshal(getMethod.getEntity().getContent());
         boolean found = false;
         for (Tag t : tags.getTags()) {
             if (tagName.equals(t.getName())) {
@@ -248,10 +248,10 @@ class TagsResourceIT extends AbstractHttpIT
 
         // Query for both tags
         String tagQuery = tagA + "," + tagB;
-        GetMethod getMethod = executeGet(
+        CloseableHttpResponse getMethod = executeGet(
             buildURI(PagesForTagsResource.class, getWiki(), tagQuery));
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
-        Pages returnedPages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+        Pages returnedPages = (Pages) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
 
         // Verify all pages are returned in alphabetical order
         List<String> expectedOrder = Arrays.stream(pages).sorted().collect(Collectors.toList());
@@ -263,29 +263,29 @@ class TagsResourceIT extends AbstractHttpIT
         // Test pagination: number=1
         getMethod = executeGet(
             buildURI(PagesForTagsResource.class, getWiki(), tagQuery) + "?number=1");
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
-        returnedPages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+        returnedPages = (Pages) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
         assertEquals(1, returnedPages.getPageSummaries().size());
         assertEquals(expectedOrder.get(0), returnedPages.getPageSummaries().get(0).getName());
 
         // Test pagination: number=1, start=1
         getMethod = executeGet(
             buildURI(PagesForTagsResource.class, getWiki(), tagQuery) + "?number=1&start=1");
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
-        returnedPages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+        returnedPages = (Pages) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
         assertEquals(1, returnedPages.getPageSummaries().size());
         assertEquals(expectedOrder.get(1), returnedPages.getPageSummaries().get(0).getName());
 
         // Test error: number=-1
         getMethod = executeGet(
             buildURI(PagesForTagsResource.class, getWiki(), tagQuery) + "?number=-1");
-        assertEquals(400, getMethod.getStatusCode());
-        assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+        assertEquals(400, getMethod.getCode());
+        assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
 
         // Test error: number=1001
         getMethod = executeGet(
             buildURI(PagesForTagsResource.class, getWiki(), tagQuery) + "?number=1001");
-        assertEquals(400, getMethod.getStatusCode());
-        assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+        assertEquals(400, getMethod.getCode());
+        assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
     }
 }

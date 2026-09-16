@@ -63,7 +63,7 @@ public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
     @Override
     protected boolean atomicOperation(DocumentReference source, DocumentReference target)
     {
-        return this.modelBridge.copy(source, target);
+        return this.modelBridge.copy(source, target, this.request.isCheckRights());
     }
 
     @Override

@@ -40,6 +40,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class LightboxPage extends ViewPage
 {
     /**
+     * The JSON configuration that the lightbox UI extension only adds to a page when the lightbox is enabled, and
+     * without which the lightbox JavaScript is neither loaded nor able to build a popover.
+     */
+    private static final By LIGHTBOX_CONFIGURATION = By.id("lightbox-config");
+
+    /**
+     * Static so that it can be called on a page for which no page object is wanted, e.g. right after saving the
+     * lightbox configuration, to check that the new configuration is the one pages are rendered with.
+     *
+     * @return {@code true} when the page currently displayed in the browser has been rendered with the lightbox
+     *     enabled, i.e. when hovering one of its images is expected to display an {@link ImagePopover}
+     * @since 18.8.0RC1
+     */
+    public static boolean isLightboxEnabled()
+    {
+        return getUtil().getDriver().hasElementWithoutWaitingWithoutScrolling(LIGHTBOX_CONFIGURATION);
+    }
+
+    /**
      * Hovers on an image until the popover is displayed. We don't wait for a popover to be displayed, because we don't
      * know if the feature is activated. If you want to make sure that a popover is displayed after the hover, you
      * should call {@link ImagePopover#waitUntilReady()} before calling any other method of {@link ImagePopover}.

@@ -154,8 +154,7 @@ public class LiveDataRenderer
             // the content of the script can be wrapped in a CDATA in situation where the Live Data is wrapped in an
             // HTML macro with clean=true (see XCOMMONS-2487).
             output.addChild(new RawBlock(
-                """
-                    <script type='application/json' data-config-content-trusted="%s"></script>""".formatted(
+                "<script type='application/json' data-config-content-trusted=\"%s\"></script>".formatted(
                     trustedContent), HTML_5_0));
         } catch (Exception e) {
             throw new LiveDataException("Failed to generate live data configuration from macro parameters.", e);

@@ -252,7 +252,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         }
     }
 
-    private void reduceDashboardRecursionCounter() throws MacroExecutionException
+    private void reduceDashboardRecursionCounter()
     {
         ExecutionContext ec = this.execution.getContext();
         if (ec != null) {

@@ -56,7 +56,5 @@
 ## Display any existing UI Extensions, sorted by order.
 ##
 #macro (showExtensions)
-  #foreach ($extension in $services.uix.getExtensions('org.xwiki.platform.docdoesnotexist', {'sortByParameter' : 'order'}))
-    $services.rendering.render($extension.execute(), 'html/5.0')
-  #end
+  $services.uix.renderExtensions('org.xwiki.platform.docdoesnotexist', 'html/5.0', {'sortByParameter': 'order'})
 #end

@@ -328,8 +328,9 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 7.3M1, use {@link ModelFactory#toRestClass(URI, String, com.xpn.xwiki.api.Class)}
+     * @deprecated use {@link ModelFactory#toRestClass(URI, String, com.xpn.xwiki.api.Class)}
      */
+    @Deprecated(since = "7.3M1")
     public static org.xwiki.rest.model.jaxb.Class createClass(ObjectFactory objectFactory, URI baseUri, String wikiName,
         com.xpn.xwiki.api.Class xwikiClass)
     {

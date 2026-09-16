@@ -33,6 +33,7 @@ import org.xwiki.rendering.async.internal.block.BlockAsyncRendererDecorator;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.uiextension.UIExtension;
@@ -118,8 +119,17 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
         // transformation
         transformedBlock = transformedBlock.clone();
 
-        BlockAsyncRendererConfiguration executorConfiguration =
-            new BlockAsyncRendererConfiguration(Arrays.asList("uix", getId()), transformedBlock);
+        // The syntax in which the result will be rendered.
+        Syntax targetSyntax = this.renderingContext.getTargetSyntax();
+
+        // The target syntax and the inline flag are part of the identifier because they both influence the result of
+        // the execution and this identifier is used as cache key. Note that no element of the identifier can be null
+        // because the identifier is also used to build the URL used to retrieve the result of an asynchronous
+        // execution.
+        BlockAsyncRendererConfiguration executorConfiguration = new BlockAsyncRendererConfiguration(
+            Arrays.asList("uix", getId(), targetSyntax != null ? targetSyntax.toIdString() : "",
+                String.valueOf(inline)),
+            transformedBlock);
 
         // The transformation id
         executorConfiguration.setTransformationId(getRoleHint());
@@ -133,8 +143,7 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
         // The author of the source
         executorConfiguration.setSecureReference(getDocumentReference(), getAuthorReference());
 
-        // The syntax in which the result will be rendered
-        executorConfiguration.setTargetSyntax(this.renderingContext.getTargetSyntax());
+        executorConfiguration.setTargetSyntax(targetSyntax);
 
         // Add decorator
         if (this instanceof BlockAsyncRendererDecorator decorator) {

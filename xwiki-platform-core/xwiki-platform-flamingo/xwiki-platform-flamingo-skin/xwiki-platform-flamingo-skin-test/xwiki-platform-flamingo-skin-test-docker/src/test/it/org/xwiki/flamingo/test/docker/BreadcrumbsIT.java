@@ -21,6 +21,7 @@ package org.xwiki.flamingo.test.docker;
 
 import java.util.Arrays;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,16 @@ class BreadcrumbsIT
     void setUp(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
+    }
+
+    @AfterEach
+    void tearDown(TestUtils setup)
+    {
+        // Restore the default hierarchy mode, whatever happened during the test. The hierarchy mode is a wiki-wide
+        // configuration, so leaving it set to "parentchild" breaks the breadcrumb of all the tests executing after
+        // this one in the same XWiki instance. Note that we need to log back in since a test can have logged out.
+        setup.loginAsSuperAdmin();
+        setup.setHierarchyMode("reference");
     }
 
     @Test
@@ -93,10 +104,6 @@ class BreadcrumbsIT
         assertFalse(vp.hasBreadcrumbContent(PARENT_TITLE, false, true));
         assertTrue(vp.hasBreadcrumbContent(CHILD_TITLE, true, true));
         assertTrue(vp.hasBreadcrumbContent(parentPageName, false, false));
-
-        // Set back the default hierarchy mode (but first we need to log back).
-        setup.loginAsSuperAdmin();
-        setup.setHierarchyMode("reference");
     }
 
     @Test

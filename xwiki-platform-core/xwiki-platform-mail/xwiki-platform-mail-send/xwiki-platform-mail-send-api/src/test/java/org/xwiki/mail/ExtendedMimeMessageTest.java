@@ -137,7 +137,7 @@ class ExtendedMimeMessageTest
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setText(TEST_CONTENT);
         message.setMessageId(TEST_MESSAGE_ID);
-        message.writeTo(new OutputStream() { @Override public void write(int b) { } });
+        message.writeTo(OutputStream.nullOutputStream());
 
         assertThat(message.getMessageID(), equalTo(TEST_MESSAGE_ID));
     }

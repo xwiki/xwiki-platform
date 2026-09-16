@@ -20,8 +20,8 @@
 
 import DisplayerXObjectProperty from "./DisplayerXObjectProperty.vue";
 import { initWrapper } from "./displayerTestsHelper";
-import { loadById } from "../../services/require.js";
 import { edit } from "../displayerXObjectPropertyHelper.js";
+import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import flushPromises from "flush-promises";
 import $ from "jquery";
 import { restore } from "sinon";
@@ -39,15 +39,9 @@ vi.mock("../displayerXObjectPropertyHelper.js", () => {
   };
 });
 
-// The edit confirmation modal is loaded as a RequireJS module through loadById; mock the require service so that
-// loadById resolves with stubs instead of trying to load the real modules.
-vi.mock("../../services/require.js", () => {
-  return {
-    loadById: vi.fn(),
-  };
-});
-
 describe("DisplayerXObjectProperty.vue", () => {
+  let requireJS;
+
   const editConfirmationStub = {
     parseConfirmationResponse: vi.fn((error) => {
       if (error && error.status === 423) {
@@ -63,16 +57,16 @@ describe("DisplayerXObjectProperty.vue", () => {
     vi.mocked(edit).mockResolvedValue(EDIT_FORM);
     editConfirmationStub.parseConfirmationResponse.mockClear();
     editConfirmationStub.showConfirmationModal.mockClear();
-    vi.mocked(loadById).mockImplementation((id) => {
-      if (id === "xwiki-edit-confirmation") {
-        return Promise.resolve(editConfirmationStub);
-      }
-      // xwiki-meta
-      return Promise.resolve({ locale: "en", form_token: "token" });
+    // The edit confirmation modal and the XWiki context are loaded as RequireJS modules; register stubs so that
+    // the tests don't need the real modules.
+    requireJS = mockRequireJS({
+      "xwiki-edit-confirmation": editConfirmationStub,
+      "xwiki-meta": { locale: "en", form_token: "token" },
     });
   });
 
   afterEach(function () {
+    requireJS.restore();
     // completely restore all fakes created through the sandbox
     restore();
   });

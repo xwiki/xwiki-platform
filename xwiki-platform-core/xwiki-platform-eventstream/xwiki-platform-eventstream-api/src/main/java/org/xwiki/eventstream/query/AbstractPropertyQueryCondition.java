@@ -44,7 +44,7 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
      * @param reversed true if the condition should be reversed
      * @param property the name of the property
      */
-    public AbstractPropertyQueryCondition(boolean reversed, String property)
+    protected AbstractPropertyQueryCondition(boolean reversed, String property)
     {
         this(reversed, property, false);
     }
@@ -55,7 +55,7 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
      * @param custom true if it's a custom event property
      * @since 13.9RC1
      */
-    public AbstractPropertyQueryCondition(boolean reversed, String property, boolean custom)
+    protected AbstractPropertyQueryCondition(boolean reversed, String property, boolean custom)
     {
         this(reversed, property, custom, null);
     }
@@ -67,7 +67,7 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
      * @param customType the type in which that property was stored
      * @since 14.2RC1
      */
-    public AbstractPropertyQueryCondition(boolean reversed, String property, boolean custom, Type customType)
+    protected AbstractPropertyQueryCondition(boolean reversed, String property, boolean custom, Type customType)
     {
         super(reversed);
 

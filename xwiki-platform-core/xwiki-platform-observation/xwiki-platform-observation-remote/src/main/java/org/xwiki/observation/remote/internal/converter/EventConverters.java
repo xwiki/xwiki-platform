@@ -66,8 +66,8 @@ public class EventConverters
     public List<LocalEventConverter> getLocalEventConverters()
     {
         if (this.localEventConverters == null) {
-            this.localEventConverters =
-                loadConverters(LocalEventConverter.class, (c1, c2) -> c1.getPriority() - c2.getPriority());
+            this.localEventConverters = loadConverters(LocalEventConverter.class,
+                (c1, c2) -> Integer.compare(c1.getPriority(), c2.getPriority()));
         }
 
         return this.localEventConverters;
@@ -79,8 +79,8 @@ public class EventConverters
     public List<RemoteEventConverter> getRemoteEventConverters()
     {
         if (this.remoteEventConverters == null) {
-            this.remoteEventConverters =
-                loadConverters(RemoteEventConverter.class, (c1, c2) -> c1.getPriority() - c2.getPriority());
+            this.remoteEventConverters = loadConverters(RemoteEventConverter.class,
+                (c1, c2) -> Integer.compare(c1.getPriority(), c2.getPriority()));
         }
 
         return this.remoteEventConverters;

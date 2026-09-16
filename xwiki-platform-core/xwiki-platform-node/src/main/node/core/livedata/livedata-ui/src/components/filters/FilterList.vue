@@ -20,8 +20,8 @@
 
 <script>
 import filterMixin from "./filterMixin.js";
-import { loadById } from "../../services/require.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 
 export default {
   name: "filter-list",

@@ -43,7 +43,7 @@ public abstract class AbstractCopyOrMoveRequest extends EntityRequest
     /**
      * Default constructor.
      */
-    public AbstractCopyOrMoveRequest()
+    protected AbstractCopyOrMoveRequest()
     {
     }
 

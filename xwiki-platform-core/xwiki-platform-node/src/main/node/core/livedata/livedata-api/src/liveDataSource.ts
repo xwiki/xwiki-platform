@@ -42,7 +42,7 @@ interface LiveDataSource {
    * @param entryId - the id of the entry to fetch
    * @param properties - the properties to include in the fetched entry
    * @returns a promise with the values of the entry, or undefined if the source returns none
-   * @since 18.8.0RC1
+   * @since 18.9.0RC1
    */
   getEntry(
     source: Source,
@@ -79,7 +79,7 @@ interface LiveDataSource {
    * @param source - the source description
    * @param values - the values of the new entry
    * @returns a promise with the values of the newly created entry, or undefined if the source returns none
-   * @since 18.8.0RC1
+   * @since 18.9.0RC1
    */
   addEntry(source: Source, values: unknown): Promise<Values | undefined>;
 }

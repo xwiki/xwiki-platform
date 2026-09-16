@@ -41,18 +41,16 @@ import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
@@ -68,9 +66,6 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     private static final String AUTHENTICATION_REALM_NAME = "xwiki.authentication.realmname";
     private static final String MESSAGE_CONTEXT_KEY = "message";
     private static final String USER_AUTHENTIFIED_MESSAGE = "User [{}] is authentified";
-
-    private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
-        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     /**
      * Used to convert a string into a proper Document Name.
@@ -442,11 +437,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             boolean result = false;
 
             final XWikiDocument doc = context.getWiki().getDocument(username, context);
-            final BaseObject userObject = doc.getXObject(USERCLASS_REFERENCE);
-            // We only allow empty password from users having a XWikiUsers object.
+            final BaseObject userObject = doc.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE);
             if (userObject != null) {
-                final String stored = userObject.getStringValue("password");
-                result = new PasswordClass().getEquivalentPassword(stored, password).equals(stored);
+                result = userObject.isPasswordValueMatching(XWikiUsersDocumentInitializer.PASSWORD_FIELD, password);
             }
 
             if (LOGGER.isDebugEnabled()) {

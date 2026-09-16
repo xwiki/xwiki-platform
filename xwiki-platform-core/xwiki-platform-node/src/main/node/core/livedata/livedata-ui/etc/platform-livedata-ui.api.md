@@ -11,7 +11,7 @@ import { DefineComponent } from 'vue';
 import { default as displayerMixin } from './components/displayers/displayerMixin';
 import { I18n } from 'vue-i18n';
 import { LiveDataSource } from '@xwiki/platform-livedata-api';
-import { loadById } from './services/require.js';
+import { loadById as loadById_2 } from '@xwiki/platform-xwiki-utils';
 import { populateStore } from './components/populateStore.js';
 import { PublicProps } from 'vue';
 import { Query } from '@xwiki/platform-localization-api';
@@ -22,7 +22,8 @@ export { BaseDisplayer }
 
 export { displayerMixin }
 
-export { loadById }
+// @public @deprecated
+export const loadById: typeof loadById_2;
 
 export { populateStore }
 

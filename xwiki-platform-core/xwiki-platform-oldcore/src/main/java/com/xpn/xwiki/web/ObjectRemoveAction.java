@@ -102,10 +102,7 @@ public class ObjectRemoveAction extends XWikiAction
 
         String comment = localizePlainOrKey("core.comment.deleteObject");
 
-        // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(userReference, doc, comment, true, context);
-
-        xwiki.saveDocument(doc, comment, true, context);
+        xwiki.saveDocument(doc, comment, true, true, context);
 
         if (Utils.isAjaxRequest(context)) {
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);

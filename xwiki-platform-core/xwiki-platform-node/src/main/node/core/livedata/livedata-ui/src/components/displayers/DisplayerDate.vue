@@ -61,7 +61,7 @@
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin";
-import { loadById } from "../../services/require.js";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 
 export default {
   name: "displayer-date",

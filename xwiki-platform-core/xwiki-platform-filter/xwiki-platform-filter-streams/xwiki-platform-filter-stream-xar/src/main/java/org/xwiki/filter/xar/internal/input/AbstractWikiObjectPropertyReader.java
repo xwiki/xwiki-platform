@@ -23,6 +23,8 @@ import javax.inject.Inject;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import jakarta.inject.Provider;
+
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.FilterEventParameters;
@@ -42,6 +44,9 @@ public abstract class AbstractWikiObjectPropertyReader extends AbstractReader
 {
     @Inject
     private XarObjectPropertySerializerManager propertySerializerManager;
+
+    @Inject
+    private Provider<CurrentXClassLoader> currentXClassLoaderProvider;
 
     /**
      * Class holding information about wiki object property.
@@ -76,7 +81,7 @@ public abstract class AbstractWikiObjectPropertyReader extends AbstractReader
     }
 
     protected WikiObjectProperty readObjectProperty(XMLStreamReader xmlReader, XARInputProperties properties,
-        WikiClass wikiClass) throws XMLStreamException, FilterException
+        WikiClass wikiClass, String classReference) throws XMLStreamException, FilterException
     {
         String typeAttribute = xmlReader.getAttributeValue(null, XarObjectPropertyModel.ATTRIBUTE_TYPE);
         xmlReader.nextTag();
@@ -93,9 +98,13 @@ public abstract class AbstractWikiObjectPropertyReader extends AbstractReader
             type = properties.getObjectPropertyType();
         }
         boolean useTypeAttribute = false;
-        if (type == null && !StringUtils.isEmpty(typeAttribute)) {
+        if (type == null && StringUtils.isNotEmpty(typeAttribute)) {
             type = typeAttribute;
             useTypeAttribute = true;
+        }
+        // last fallback: try to load the type from current xclass
+        if (type == null && StringUtils.isNotEmpty(classReference)) {
+            type = this.currentXClassLoaderProvider.get().getXClassPropertyType(classReference, property.name);
         }
 
         try {

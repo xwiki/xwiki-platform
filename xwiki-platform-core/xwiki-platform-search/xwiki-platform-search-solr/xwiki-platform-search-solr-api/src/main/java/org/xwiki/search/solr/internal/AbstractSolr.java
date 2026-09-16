@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.slf4j.Logger;
@@ -106,7 +105,7 @@ public abstract class AbstractSolr implements Solr, Disposable
     }
 
     private synchronized XWikiSolrCore getCoreInternal(String xwikiCoreName)
-        throws SolrServerException, IOException, SolrException
+        throws IOException, SolrException
     {
         // Get the existing client designed for the current Solr version
         XWikiSolrCore solrCore = getCore(xwikiCoreName, getSolrMajorVersion());

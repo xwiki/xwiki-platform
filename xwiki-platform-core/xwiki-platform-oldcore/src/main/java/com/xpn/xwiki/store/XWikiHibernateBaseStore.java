@@ -477,11 +477,11 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     /**
      * Checks if this xwiki setup is virtual meaning if multiple wikis can be accessed using the same database pool
      *
-     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
+     * @deprecated Virtual mode is on by default.
      * @param context the XWiki context.
      * @return true if multi-wiki, false otherwise.
      */
-    @Deprecated
+    @Deprecated(since = "5.0M2")
     protected boolean isVirtual(XWikiContext context)
     {
         return true;

@@ -369,14 +369,10 @@ public class DefaultNotificationParametersFactory
             notificationParameters.format = NotificationFormat.ALERT;
         }
 
-        try {
-            if (Boolean.parseBoolean(parameters.get(ParametersKey.USE_USER_PREFERENCES))) {
-                this.useUserPreferences(notificationParameters);
-            } else {
-                this.dontUseUserPreferences(notificationParameters, parameters);
-            }
-        } catch (EventStreamException e) {
-            throw new NotificationException("Error while adding the filters to the notification parameters.", e);
+        if (Boolean.parseBoolean(parameters.get(ParametersKey.USE_USER_PREFERENCES))) {
+            this.useUserPreferences(notificationParameters);
+        } else {
+            this.dontUseUserPreferences(notificationParameters, parameters);
         }
 
         return notificationParameters;
@@ -427,7 +423,7 @@ public class DefaultNotificationParametersFactory
     }
 
     private void dontUseUserPreferences(NotificationParameters notificationParameters,
-        Map<ParametersKey, String> parameters) throws NotificationException, EventStreamException
+        Map<ParametersKey, String> parameters) throws NotificationException
     {
         List<String> excludedFilters = new ArrayList<>();
         if (Boolean.parseBoolean(parameters.get(ParametersKey.DISPLAY_OWN_EVENTS))) {

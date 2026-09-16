@@ -38,7 +38,7 @@ public class ListMetaClass extends PropertyMetaClass
      */
     public ListMetaClass()
     {
-        addPresentationMetaProperties();
+        addListPresentationMetaProperties();
 
         BooleanClass relationalStorageClass = newCheckBox(false);
         relationalStorageClass.setName("relationalStorage");
@@ -61,7 +61,7 @@ public class ListMetaClass extends PropertyMetaClass
     /**
      * Adds the meta properties that control how the XClass property is displayed in edit and view mode.
      */
-    private void addPresentationMetaProperties()
+    private void addListPresentationMetaProperties()
     {
         StaticListClass displayTypeClass = new StaticListClass(this);
         displayTypeClass.setName("displayType");

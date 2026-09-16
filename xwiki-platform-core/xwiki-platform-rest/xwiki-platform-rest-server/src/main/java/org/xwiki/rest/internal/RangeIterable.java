@@ -115,6 +115,7 @@ public class RangeIterable<T> implements Iterable<T>
             @Override
             public void remove()
             {
+                // Not supported: this iterator only exposes a read-only range of the underlying list.
             }
         };
     }

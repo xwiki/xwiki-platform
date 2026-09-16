@@ -25,17 +25,22 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
+import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.messagetool.internal.MessageToolTranslationMessageParser;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -51,6 +56,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ComponentTest
 class RootClassLoaderTranslationBundleTest
 {
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
+
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
@@ -88,5 +96,26 @@ class RootClassLoaderTranslationBundleTest
         assertTranslation("test.key", "default translation", Locale.ROOT);
         assertTranslation("test.key", "en translation", Locale.ENGLISH);
         assertTranslation("test.key", "en_US translation", Locale.US);
+    }
+
+    @Test
+    void getTranslationsWithPathTraversalInLocale() throws Exception
+    {
+        TranslationBundle bundle = this.componentManager.getInstance(TranslationBundle.class, "rootclassloader");
+
+        // The variant part of a Locale is free-form, so it can carry path traversal syntax, and it ends up
+        // concatenated into the name of the class loader resource to load. Such a name must not be allowed to escape
+        // the class loader root, since that would expose any .properties file of the web application.
+        assertNull(bundle.getTranslation("test.key", LocaleUtils.toLocale("en_US_../../../xwiki")),
+            "A Locale whose variant escapes the class loader root must not resolve anything");
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Failed to get localization bundle", this.logCapture.getMessage(0));
+
+        // A variant which stays inside the class loader root is not a traversal attempt: it finds no resource of its
+        // own and falls back on the parent Locale, as any unknown variant does.
+        Translation fallback = bundle.getTranslation("test.key", LocaleUtils.toLocale("en_US_variant"));
+        assertNotNull(fallback);
+        assertEquals("en_US translation", fallback.getRawSource());
     }
 }

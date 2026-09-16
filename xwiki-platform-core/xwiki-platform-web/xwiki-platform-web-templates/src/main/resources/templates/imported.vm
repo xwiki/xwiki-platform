@@ -18,29 +18,42 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template("xwikivars.vm")
-#macro(showfilelist $list $text)
-  #if($list.size()>0)
+## Sets $importedDocuments to the documents that the importer reported under $contextKey.
+#macro(_getImportedDocuments $contextKey)
+  #set($importedDocuments = $xcontext.get($contextKey))
+  #if("$!importedDocuments" == '')
+    #set($importedDocuments = [])
+  #end
+#end
+#macro(_showFileList $contextKey $text)
+  #_getImportedDocuments($contextKey)
+  #if($importedDocuments.size() > 0)
     <h4 class="legend">
       $escapetool.xml($services.localization.render("import_listof${text}files"))
     </h4>
     <ul>
-      #foreach($item in $list)
+      #foreach($item in $importedDocuments)
         <li><a href="$xwiki.getURL($item)">$escapetool.xml($item)</a></li>
       #end
     </ul>
   #end
 #end
+#macro(_showImportedCount $contextKey $translationKey)
+  #_getImportedDocuments($contextKey)
+  <li>$importedDocuments.size() $escapetool.xml($services.localization.render($translationKey))</li>
+#end
 #if($hasAdmin)
-  #set($status = $escapetool.xml($services.localization.render("import_install_${xwiki.package.status}")))
+  #set($importStatus = $xcontext.get('install_status'))
+  #set($status = $escapetool.xml($services.localization.render("import_install_${importStatus}")))
   #info("$escapetool.xml($services.localization.render('importing')) $!escapetool.xml($request.name): $status")
   <ul>
-    <li>$xwiki.package.installed.size() $escapetool.xml($services.localization.render('import_documentinstalled'))</li>
-    <li>$xwiki.package.skipped.size() $escapetool.xml($services.localization.render('import_documentskipped'))</li>
-    <li>$xwiki.package.errors.size() $escapetool.xml($services.localization.render('import_documenterrors'))</li>
+    #_showImportedCount('install_installed' 'import_documentinstalled')
+    #_showImportedCount('install_skipped' 'import_documentskipped')
+    #_showImportedCount('install_errors' 'import_documenterrors')
   </ul>
-  #showfilelist($xwiki.package.installed 'installed')
-  #showfilelist($xwiki.package.skipped 'skipped')
-  #showfilelist($xwiki.package.errors 'error')
+  #_showFileList('install_installed' 'installed')
+  #_showFileList('install_skipped' 'skipped')
+  #_showFileList('install_errors' 'error')
 #else
   ## If the current user does not have admin and this template is being displayed
   ## it means security settings have been changed with the import (probably a default XE XAR import)

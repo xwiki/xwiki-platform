@@ -26,8 +26,6 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.VerificationMode;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
@@ -160,15 +158,10 @@ class MessageStreamTest
 
     private void verifyLimitQueries(int expectedLimit, int expectedOffset) throws EventStreamException
     {
-        verify(this.mockEventStore, new VerificationMode()
-        {
-            @Override
-            public void verify(VerificationData data)
-            {
-                SimpleEventQuery query = data.getAllInvocations().get(0).getArgument(0);
-                assertEquals(expectedLimit, query.getLimit());
-                assertEquals(expectedOffset, query.getOffset());
-            }
+        verify(this.mockEventStore, data -> {
+            SimpleEventQuery query = data.getAllInvocations().get(0).getArgument(0);
+            assertEquals(expectedLimit, query.getLimit());
+            assertEquals(expectedOffset, query.getOffset());
         }).search(any());
     }
 

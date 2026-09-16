@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WindowType;
 import org.xwiki.administration.test.po.AdministrationPage;
@@ -37,12 +38,8 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.ForceEditLockModal;
-import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -100,7 +97,7 @@ class CollaborationIT extends AbstractBlockNoteIT
 
         setup.gotoPage(testReference);
         InplaceEditablePage secondEditPage = new InplaceEditablePage();
-        editAndForceLock(secondEditPage, "John", setup);
+        joinSession(secondEditPage, setup);
         BlockNoteEditor secondEditor = new BlockNoteEditor("content");
         BlockNoteRichTextArea secondTextArea = secondEditor.getRichTextArea();
 
@@ -459,7 +456,6 @@ class CollaborationIT extends AbstractBlockNoteIT
 
         // Edit the default page translation in the second browser tab (standalone).
         setup.gotoPage(testReferenceEn).editWYSIWYG();
-        new ForceEditLockPage().clickForceEdit();
         WYSIWYGEditPage secondEditPage = new WYSIWYGEditPage();
         BlockNoteEditor secondEditor = new BlockNoteEditor("content");
         BlockNoteRichTextArea secondTextArea = secondEditor.getRichTextArea();
@@ -494,7 +490,6 @@ class CollaborationIT extends AbstractBlockNoteIT
         // Leave the default (English) translation and join the German translation.
         secondEditPage.clickCancel().openInformationDocExtraPane().clickTranslationLink(Locale.GERMAN);
         new ViewPage().editWYSIWYG();
-        new ForceEditLockPage().clickForceEdit();
         secondEditPage = new WYSIWYGEditPage();
         secondEditor = new BlockNoteEditor("content");
         secondTextArea = secondEditor.getRichTextArea();
@@ -578,7 +573,6 @@ class CollaborationIT extends AbstractBlockNoteIT
         String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
         setup.loginAsSuperAdmin();
         setup.gotoPage(testReferenceEn).editWYSIWYG();
-        new ForceEditLockPage().clickForceEdit();
         WYSIWYGEditPage secondEditPage = new WYSIWYGEditPage();
         BlockNoteEditor secondEditor = new BlockNoteEditor("content");
         BlockNoteRichTextArea secondTextArea = secondEditor.getRichTextArea();
@@ -623,7 +617,7 @@ class CollaborationIT extends AbstractBlockNoteIT
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         // Join the new collaboration session.
-        editAndForceLock(firstEditPage, "superadmin", setup);
+        joinSession(firstEditPage, setup);
         firstEditor = new BlockNoteEditor("content");
         firstTextArea = firstEditor.getRichTextArea();
         firstTextArea.waitUntilTextContains("four");
@@ -652,7 +646,7 @@ class CollaborationIT extends AbstractBlockNoteIT
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         // Re-join the collaboration session.
-        editAndForceLock(firstEditPage, "superadmin", setup);
+        joinSession(firstEditPage, setup);
         firstEditor = new BlockNoteEditor("content");
         firstTextArea = firstEditor.getRichTextArea();
         firstTextArea.waitUntilTextContains("five");
@@ -680,14 +674,21 @@ class CollaborationIT extends AbstractBlockNoteIT
             "Unexpected content: " + content);
     }
 
-    private void editAndForceLock(InplaceEditablePage inplaceEditablePage, String lockedBy, TestUtils setup)
+    /**
+     * Joins an existing collaboration session, checking that the user is not asked to confirm that they want to take
+     * over the edit lock held by the users that are already in the session.
+     *
+     * @param inplaceEditablePage the page to edit in place
+     * @param setup the test setup
+     */
+    private void joinSession(InplaceEditablePage inplaceEditablePage, TestUtils setup)
     {
         inplaceEditablePage.edit();
-        ForceEditLockModal forceEditLockModal = new ForceEditLockModal();
-        setup.getDriver().waitUntilCondition(driver -> forceEditLockModal.isDisplayed());
-        assertThat(forceEditLockModal.getMessage(), containsString("This page is currently locked by " + lockedBy));
-        forceEditLockModal.clickOk();
+        // If the user was asked to confirm that they want to take over the edit lock then the in-place editor
+        // wouldn't be loaded and this would time out.
         inplaceEditablePage.waitForInplaceEditor();
+        assertTrue(setup.getDriver().findElementsWithoutWaiting(By.className("force-edit-lock-modal")).isEmpty(),
+            "The user was asked to force the edit lock instead of joining the collaboration session.");
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

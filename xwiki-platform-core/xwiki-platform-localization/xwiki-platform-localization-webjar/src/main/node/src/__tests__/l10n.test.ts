@@ -55,6 +55,22 @@ function mockModuleLoad(
   });
 }
 
+/**
+ * Request the l10n requirejs module for a query the resolver fails to resolve.
+ * @param query - the query
+ */
+function mockRejectedModuleLoad(
+  query: Query,
+): Promise<Record<string, string> & { get: typeof transformTranslation }> {
+  return new Promise((resolve) => {
+    capturedLoader.load(
+      "xwiki-l10n!somemodule",
+      (_names, cb) => cb(query),
+      resolve as () => Record<string, string>,
+    );
+  });
+}
+
 describe("l10n module", () => {
   beforeEach(() => mockResolve.mockReset());
 
@@ -92,23 +108,33 @@ describe("l10n module", () => {
     expect(mod["x"]).toBe("X");
   });
 
-  it("logs an error when resolver rejects", async () => {
+  it("logs an error and falls back to the keys when resolver rejects", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const error = new Error("network failure");
+    mockResolve.mockRejectedValueOnce(error);
+
+    const mod = await mockRejectedModuleLoad(["k"]);
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'An issue occurred during the resolution of localization query ["k"]',
+      error,
+    );
+    expect(mod["k"]).toBe("k");
+    expect(mod.get("k")).toBe("k");
+    consoleSpy.mockRestore();
+  });
+
+  it("removes the prefix from the fallback keys when resolver rejects", async () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     mockResolve.mockRejectedValueOnce(new Error("network failure"));
 
-    await new Promise<void>((resolve) => {
-      capturedLoader.load(
-        "ignored",
-        (_names, cb) => cb(["k"]),
-        () => {},
-      );
-      setTimeout(resolve, 50);
-    });
+    const mod = await mockRejectedModuleLoad({ prefix: "ns.", keys: ["foo"] });
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      "An issue occurred during the resolution of localization query k",
+      'An issue occurred during the resolution of localization query {"prefix":"ns.","keys":["foo"]}',
       expect.any(Error),
     );
+    expect(mod["foo"]).toBe("foo");
     consoleSpy.mockRestore();
   });
 });

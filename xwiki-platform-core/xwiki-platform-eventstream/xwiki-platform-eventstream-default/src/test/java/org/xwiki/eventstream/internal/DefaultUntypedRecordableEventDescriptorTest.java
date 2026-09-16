@@ -25,7 +25,6 @@ import java.util.concurrent.Callable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.Extensions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.component.namespace.Namespace;
@@ -52,7 +51,7 @@ import static org.mockito.Mockito.when;
  * @since 10.6RC1
  * @since 9.11.6
  */
-@Extensions({ @ExtendWith({ MockitoComponentManagerExtension.class }) })
+@ExtendWith({ MockitoComponentManagerExtension.class })
 class DefaultUntypedRecordableEventDescriptorTest
 {
     @Mock

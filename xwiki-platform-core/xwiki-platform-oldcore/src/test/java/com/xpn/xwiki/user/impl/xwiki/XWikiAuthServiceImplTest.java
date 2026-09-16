@@ -130,6 +130,23 @@ class XWikiAuthServiceImplTest
     }
 
     /**
+     * Test the superadmin password can be hashed with bcrypt.
+     */
+    @Test
+    void authenticateWithSuperAdminWithBcryptPassword() throws Exception
+    {
+        // The password is "pass"
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.superadminpassword",
+            "{bcrypt}$2y$08$2Mel30blRQ7E.XievLW00.AltivcBuU1HEl2mPG2qRGrd7FmWIwB6");
+
+        Principal principal = this.authService.authenticate(XWikiRightService.SUPERADMIN_USER, "pass",
+            this.oldcore.getXWikiContext());
+
+        assertNotNull(principal);
+        assertEquals(XWikiRightService.SUPERADMIN_USER_FULLNAME, principal.getName());
+    }
+
+    /**
      * Test that SomeUser is correctly authenticated as XWiki.SomeUser when xwiki:SomeUser is entered as username.
      */
     @Test
@@ -140,7 +157,7 @@ class XWikiAuthServiceImplTest
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "SomeUser"));
         BaseObject mockUserObj =
             userDoc.newXObject(new LocalDocumentReference("XWiki", "XWikiUsers"), this.oldcore.getXWikiContext());
-        mockUserObj.setStringValue("password", "pass");
+        mockUserObj.setPasswordValue("password", "pass");
 
         // Save the user
         this.oldcore.getSpyXWiki().saveDocument(userDoc, this.oldcore.getXWikiContext());
@@ -163,7 +180,7 @@ class XWikiAuthServiceImplTest
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getMainXWiki(), "XWiki", "Admin"));
         BaseObject mockUserObj =
             userDocLocal.newXObject(new LocalDocumentReference("XWiki", "XWikiUsers"), this.oldcore.getXWikiContext());
-        mockUserObj.setStringValue("password", "admin");
+        mockUserObj.setPasswordValue("password", "admin");
 
         // Save the user
         this.oldcore.getSpyXWiki().saveDocument(userDocLocal, this.oldcore.getXWikiContext());

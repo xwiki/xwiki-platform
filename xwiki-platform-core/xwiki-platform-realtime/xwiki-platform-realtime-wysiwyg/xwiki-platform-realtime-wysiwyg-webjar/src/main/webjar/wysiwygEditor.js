@@ -92,15 +92,17 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     async lockDocument() {
-      const getDocumentLock = new Promise((resolve, reject) => {
-        if (XWiki.DocumentLock) {
-          resolve(XWiki.DocumentLock);
-        } else {
+      if (!XWiki.DocumentLock) {
+        await new Promise((resolve, reject) => {
           require(['xwiki-document-lock'], resolve, reject);
-        }
-      });
-      XWiki.DocumentLock = await getDocumentLock;
-      XWiki.EditLock = new XWiki.DocumentLock();
+        });
+      }
+      // Reuse the lock instance associated with the current document, if there is one, so that we don't end up with
+      // multiple instances, each of them sending its own unlock request when the page is unloaded.
+      XWiki.EditLock = XWiki.DocumentLock.getOrCreate();
+      // Take the lock again even if we think we already have it, because it may have been removed in the mean time
+      // (e.g. by a collaborator that left the realtime session using Save & View). The lock options are preserved.
+      XWiki.EditLock.setLocked(false);
       return XWiki.EditLock.lock();
     }
 
@@ -420,13 +422,13 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     async _resetContent() {
-      const html = await $.get(xwikiDocument.getURL('get', $.param({
+      const html = await $.get(xwikiDocument.getURL('get', {
         xpage:'get',
         outputSyntax:'annotatedhtml',
         outputSyntaxVersion:'5.0',
         transformations:'macro',
-        language: xwikiDocument.language
-      })));
+        language: xwikiDocument.realLocale
+      }));
       this._hideChangesFromSaver(this._patchedEditor.setHTML(html, true));
     }
 

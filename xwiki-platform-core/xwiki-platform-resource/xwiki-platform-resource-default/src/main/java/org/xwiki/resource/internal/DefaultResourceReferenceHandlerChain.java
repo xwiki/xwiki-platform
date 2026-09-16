@@ -49,7 +49,7 @@ public class DefaultResourceReferenceHandlerChain implements ResourceReferenceHa
     /**
      * Contains all remaining Handlers to execute with Handlers on top executing first.
      */
-    private final Queue<ResourceReferenceHandler> handlerStack;
+    private final Queue<ResourceReferenceHandler<?>> handlerStack;
 
     private final ObservationManager observation;
 
@@ -57,7 +57,7 @@ public class DefaultResourceReferenceHandlerChain implements ResourceReferenceHa
      * @param orderedHandlers the sorted list of Handlers to execute
      * @param observation used to send event around executed handlers
      */
-    public DefaultResourceReferenceHandlerChain(Collection<ResourceReferenceHandler> orderedHandlers,
+    public DefaultResourceReferenceHandlerChain(Collection<ResourceReferenceHandler<?>> orderedHandlers,
         ObservationManager observation)
     {
         this.handlerStack = new LinkedList<>(orderedHandlers);

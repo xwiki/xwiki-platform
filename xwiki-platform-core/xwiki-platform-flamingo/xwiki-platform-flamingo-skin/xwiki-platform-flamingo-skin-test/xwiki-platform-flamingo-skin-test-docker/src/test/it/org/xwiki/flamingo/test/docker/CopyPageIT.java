@@ -35,6 +35,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestLocalReference;
+import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
@@ -43,6 +44,8 @@ import org.xwiki.test.ui.po.CopyOverwritePromptPage;
 import org.xwiki.test.ui.po.CopyPage;
 import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,6 +56,10 @@ class CopyPageIT
     private static final String PAGE_CONTENT = "This page is used for copying purposes";
 
     private static final String OVERWRITTEN_PAGE_CONTENT = "This page is used for overwritten copy purposes";
+
+    private static final String RIGHTS_USER = "CopyRightsUser";
+
+    private static final String XWIKI_RIGHTS_CLASS = "XWiki.XWikiRights";
 
     private static final String COPY_SUCCESSFUL = "Done.";
 
@@ -299,5 +306,103 @@ class CopyPageIT
         // Verify the child page was preserved during the copy
         assertTrue(setup.pageExists(targetChildSpaces, "WebHome"),
             String.format("Child page [%s.WebHome] should have been copied", targetChildSpaces));
+    }
+
+    /**
+     * Verify that a user copying a page cannot bring along a right that this user is not allowed to grant at the target
+     * location. The source page grants {@code admin} to the user through an {@code XWiki.XWikiRights} object and the
+     * user is not administrator of the target space, so copying the page there must not carry the right over:
+     * otherwise the user would gain administration rights simply by copying a page.
+     */
+    @Test
+    void copyDoesNotCarryOverRightsTheUserCannotGrant(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        SpaceReference sourceSpace = new SpaceReference("Source", testSpace);
+        SpaceReference targetSpace = new SpaceReference("Target", testSpace);
+        DocumentReference sourcePage = new DocumentReference("Page", sourceSpace);
+        DocumentReference targetPage = new DocumentReference("Page", targetSpace);
+
+        setup.rest().delete(sourcePage);
+        setup.rest().delete(targetPage);
+
+        setup.createUser(RIGHTS_USER, RIGHTS_USER, null, "usertype", "Advanced");
+        String userFullName = "XWiki." + RIGHTS_USER;
+
+        // The user may read the source and create in the target space, so it is allowed to perform the copy itself,
+        // but it is administrator of neither space.
+        setup.setRightsOnSpace(sourceSpace, "", userFullName, "view", true);
+        setup.setRightsOnSpace(targetSpace, "", userFullName, "view,edit", true);
+
+        // The source page carries a right granting admin to the user. It has been set by an administrator, so it is
+        // legitimate at this location.
+        setup.rest().savePage(sourcePage, PAGE_CONTENT, "Source Page");
+        setup.addObject(sourcePage, XWIKI_RIGHTS_CLASS, "levels", "admin", "users", userFullName, "allow", 1);
+
+        // Copy the page as the restricted user.
+        setup.login(RIGHTS_USER, RIGHTS_USER);
+        setup.gotoPage(sourcePage).copy();
+        CopyPage copyPage = new CopyPage();
+        copyPage.getDocumentPicker().setParent(setup.serializeReference(targetSpace)).setName("Page");
+        CopyOrRenameOrDeleteStatusPage statusPage = copyPage.clickCopyButton().waitUntilFinished();
+
+        // The copy itself is allowed and must succeed.
+        assertEquals(COPY_SUCCESSFUL, statusPage.getInfoMessage());
+        assertEquals(PAGE_CONTENT, statusPage.gotoNewPage().getContent());
+
+        setup.loginAsSuperAdmin();
+
+        // The right the user is not allowed to grant at the target must have been filtered out of the copy.
+        setup.gotoPage(targetPage, "edit", "editor=object");
+        List<ObjectEditPane> targetRightObjects = new ObjectEditPage().getObjectsOfClass(XWIKI_RIGHTS_CLASS, true);
+        assertTrue(targetRightObjects.isEmpty(),
+            "The copy must not keep the [admin] right at a location where the user copying it is not admin.");
+
+        // The source page must be left untouched.
+        setup.gotoPage(sourcePage, "edit", "editor=object");
+        List<ObjectEditPane> sourceRightObjects = new ObjectEditPage().getObjectsOfClass(XWIKI_RIGHTS_CLASS, true);
+        assertEquals(1, sourceRightObjects.size(), "The copy must not remove the right from the source page.");
+    }
+
+    /**
+     * Verify that a user who is not an administrator, but who is allowed to edit and delete the target page, can copy
+     * a page over that existing page.
+     */
+    @Test
+    void copyOverwriteExistingPageAsSimpleUser(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        SpaceReference sourceSpace = new SpaceReference("Source", testSpace);
+        SpaceReference targetSpace = new SpaceReference("Target", testSpace);
+        DocumentReference sourcePage = new DocumentReference("Page", sourceSpace);
+        DocumentReference targetPage = new DocumentReference("Page", targetSpace);
+
+        setup.rest().delete(sourcePage);
+        setup.rest().delete(targetPage);
+
+        setup.createUser(RIGHTS_USER, RIGHTS_USER, null, "usertype", "Advanced");
+        String userFullName = "XWiki." + RIGHTS_USER;
+
+        setup.setRightsOnSpace(sourceSpace, "", userFullName, "view", true);
+        setup.setRightsOnSpace(targetSpace, "", userFullName, "view,edit,delete", true);
+
+        setup.rest().savePage(sourcePage, PAGE_CONTENT, "Source Page");
+        setup.rest().savePage(targetPage, OVERWRITTEN_PAGE_CONTENT, "Target Page");
+
+        // Copy over the existing target page as the simple user.
+        setup.login(RIGHTS_USER, RIGHTS_USER);
+        setup.gotoPage(sourcePage).copy();
+        CopyPage copyPage = new CopyPage();
+        copyPage.getDocumentPicker().setParent(setup.serializeReference(targetSpace)).setName("Page");
+        CopyOverwritePromptPage overwritePrompt = copyPage.clickCopyButtonExpectingOverwritePrompt();
+        CopyOrRenameOrDeleteStatusPage statusPage = overwritePrompt.clickCopyButton().waitUntilFinished();
+
+        // The content of the target page is the assertion that the overwrite really happened: a copy refused by a
+        // listener leaves the target untouched.
+        assertEquals(PAGE_CONTENT, statusPage.gotoNewPage().getContent());
     }
 }

@@ -244,7 +244,7 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
 
     private NotificationFilterPreference getScopeFilterPreference(NotificationFilterType type,
         Set<NotificationFormat> formats,
-        List<String> eventTypes, EntityReference reference) throws NotificationException
+        List<String> eventTypes, EntityReference reference)
     {
         DefaultNotificationFilterPreference preference = new DefaultNotificationFilterPreference();
         preference.setFilterType(type);

@@ -32,10 +32,14 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionFilter;
 import org.xwiki.uiextension.UIExtensionManager;
+import org.xwiki.uiextension.internal.UIExtensionRenderer;
 
 /**
  * Allows scripts to easily access Interface Extensions APIs.
@@ -68,6 +72,12 @@ public class UIExtensionScriptService implements ScriptService
      */
     @Inject
     private UIExtensionManager uiExtensionManager;
+
+    /**
+     * Used to execute and render the UI extensions in a given output syntax.
+     */
+    @Inject
+    private UIExtensionRenderer uiExtensionRenderer;
     
     /**
      * Utility method to split a list of extension names, for example {code}"Panels.Apps,Panels.QuickLinks"{code} to get
@@ -134,5 +144,104 @@ public class UIExtensionScriptService implements ScriptService
         }
 
         return extensions;
+    }
+
+    /**
+     * Executes and renders the specified UI extension in the given output syntax.
+     * <p>
+     * Contrary to {@code $services.rendering.render($uix.execute(), 'html/5.0')}, the UI extension is also
+     * <em>executed</em> with the given output syntax as target syntax. This matters for UI extensions based on
+     * templates or wiki pages: the content they produce (e.g. a raw block) is tagged with the target syntax found in
+     * the rendering context, which can be different from the syntax used afterwards to render it (e.g. when the page
+     * is loaded with {@code ?outputSyntax=plain}), in which case that content is silently dropped.
+     * <p>
+     * Example: {@code $services.uix.render($uix, 'html/5.0')}
+     * <p>
+     * Note that a UI extension for which asynchronous execution is enabled is still rendered as a placeholder that is
+     * replaced on the client side: forcing the output syntax doesn't make the execution synchronous.
+     *
+     * @param extension the UI extension to execute and render
+     * @param outputSyntax the syntax to execute and render the UI extension in, e.g. {@code html/5.0}
+     * @return the result of rendering the given UI extension in the given output syntax, or {@code null} if the UI
+     *         extension could not be rendered (in which case a warning is logged)
+     * @since 18.8.0RC1
+     */
+    @Unstable
+    public String render(UIExtension extension, Syntax outputSyntax)
+    {
+        if (extension == null) {
+            this.logger.warn("Can't render a null UI extension.");
+            return null;
+        }
+
+        return render(List.of(extension), outputSyntax, null);
+    }
+
+    /**
+     * Executes and renders all the UI extensions of the specified extension point in the given output syntax. The
+     * results are concatenated, without any separator, in the order in which the UI extensions are returned by
+     * {@link #getExtensions(String)}.
+     * <p>
+     * Example: {@code $services.uix.renderExtensions('org.xwiki.platform.attachment.actions', 'html/5.0')}
+     *
+     * @param extensionPointId the identifier of the extension point whose UI extensions to execute and render
+     * @param outputSyntax the syntax to execute and render the UI extensions in, e.g. {@code html/5.0}
+     * @return the concatenated result of rendering the UI extensions of the given extension point, or {@code null} if
+     *         they could not be rendered (in which case a warning is logged)
+     * @see #render(UIExtension, Syntax)
+     * @since 18.8.0RC1
+     */
+    @Unstable
+    public String renderExtensions(String extensionPointId, Syntax outputSyntax)
+    {
+        return render(getExtensions(extensionPointId), outputSyntax, extensionPointId);
+    }
+
+    /**
+     * Executes and renders the UI extensions of the specified extension point that match the given filters, in the
+     * given output syntax. The results are concatenated, without any separator, in the order in which the UI
+     * extensions are returned by {@link #getExtensions(String, Map)}.
+     * <p>
+     * Example:
+     * {@code $services.uix.renderExtensions('org.xwiki.platform.html.head', 'html/5.0', {'sortByParameter': 'order'})}
+     *
+     * @param extensionPointId the identifier of the extension point whose UI extensions to execute and render
+     * @param outputSyntax the syntax to execute and render the UI extensions in, e.g. {@code html/5.0}
+     * @param filters the filters to apply before rendering, see {@link #getExtensions(String, Map)}
+     * @return the concatenated result of rendering the matching UI extensions, or {@code null} if they could not be
+     *         rendered (in which case a warning is logged)
+     * @see #render(UIExtension, Syntax)
+     * @see #getExtensions(String, Map)
+     * @since 18.8.0RC1
+     */
+    @Unstable
+    public String renderExtensions(String extensionPointId, Syntax outputSyntax, Map<String, String> filters)
+    {
+        List<UIExtension> extensions =
+            filters == null ? getExtensions(extensionPointId) : getExtensions(extensionPointId, filters);
+
+        return render(extensions, outputSyntax, extensionPointId);
+    }
+
+    private String render(List<UIExtension> extensions, Syntax outputSyntax, String extensionPointId)
+    {
+        // Mention the extension point in the logs when we have one, to make a bad output syntax easier to locate.
+        String origin =
+            extensionPointId == null ? "" : String.format(" of the extension point [%s]", extensionPointId);
+
+        if (outputSyntax == null) {
+            this.logger.warn("Can't render the UI extensions{} without an output syntax.", origin);
+            return null;
+        }
+
+        try {
+            // All the call sites we know of render standalone content, so we don't execute the UI extensions in an
+            // inline context.
+            return this.uiExtensionRenderer.render(extensions, outputSyntax, false);
+        } catch (RenderingException e) {
+            this.logger.warn("Failed to render the UI extensions{} in syntax [{}]. Root cause is [{}]", origin,
+                outputSyntax.toIdString(), ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
     }
 }

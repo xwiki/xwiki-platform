@@ -158,9 +158,8 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
      * @param session the current session
      * @param entity the entity to select the rows from
      * @param tableName the table name of the entity
-     * @throws SQLException in case of error when retrieving the rows
      */
-    private void saveTasks(SessionImplementor session, PersistentClass entity, String tableName) throws SQLException
+    private void saveTasks(SessionImplementor session, PersistentClass entity, String tableName)
     {
         String docIdColumnName = this.hibernateStore.getConfiguredColumnName(entity, "docId");
         String versionColumnName = this.hibernateStore.getConfiguredColumnName(entity, "version");

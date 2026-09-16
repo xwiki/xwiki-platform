@@ -40,7 +40,7 @@ public abstract class AbstractAverageRatingEvent implements Event
     /**
      * Default constructor.
      */
-    public AbstractAverageRatingEvent()
+    protected AbstractAverageRatingEvent()
     {
     }
 
@@ -51,7 +51,7 @@ public abstract class AbstractAverageRatingEvent implements Event
      * @param oldAverageVote the old average value, before the update.
      * @param oldTotalVote the old total number of vote, before the update.
      */
-    public AbstractAverageRatingEvent(AverageRating newAverageRating, float oldAverageVote, int oldTotalVote)
+    protected AbstractAverageRatingEvent(AverageRating newAverageRating, float oldAverageVote, int oldTotalVote)
     {
         this.newAverageRating = newAverageRating;
         this.oldAverageVote = oldAverageVote;

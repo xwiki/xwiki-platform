@@ -99,32 +99,33 @@ public class R72000XWIKI12153DataMigration extends AbstractHibernateDataMigratio
                 }
             }
         }
-    }
 
-    private void convert(Connection connection, ResultSet result) throws SQLException
-    {
-        if (result.next()) {
-            try (PreparedStatement statement =
-                connection.prepareStatement("UPDATE xwikidoc set XWD_WEB = ? WHERE XWD_WEB = ?")) {
-                do {
-                    addBatch(statement, result.getString(1));
-                } while (result.next());
+        private void convert(Connection connection, ResultSet result) throws SQLException
+        {
+            if (result.next()) {
+                try (PreparedStatement statement =
+                    connection.prepareStatement("UPDATE xwikidoc set XWD_WEB = ? WHERE XWD_WEB = ?")) {
+                    do {
+                        addBatch(statement, result.getString(1));
+                    } while (result.next());
 
-                // Do all the changes
-                statement.executeBatch();
+                    // Do all the changes
+                    statement.executeBatch();
+                }
             }
         }
-    }
 
-    private void addBatch(PreparedStatement statement, String spaceName) throws SQLException
-    {
-        // Convert the space name into a space reference
-        String spaceReference = this.serializer.serialize(new EntityReference(spaceName, EntityType.SPACE));
+        private void addBatch(PreparedStatement statement, String spaceName) throws SQLException
+        {
+            // Convert the space name into a space reference
+            String spaceReference = R72000XWIKI12153DataMigration.this.serializer
+                .serialize(new EntityReference(spaceName, EntityType.SPACE));
 
-        statement.setString(1, spaceReference);
-        statement.setString(2, spaceName);
+            statement.setString(1, spaceReference);
+            statement.setString(2, spaceName);
 
-        // Add a conversion to the list
-        statement.addBatch();
+            // Add a conversion to the list
+            statement.addBatch();
+        }
     }
 }

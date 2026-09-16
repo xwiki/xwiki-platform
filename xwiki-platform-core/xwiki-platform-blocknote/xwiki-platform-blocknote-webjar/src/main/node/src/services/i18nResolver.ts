@@ -17,16 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { loadById } from "@xwiki/platform-xwiki-utils";
 import type { I18n } from "vue-i18n";
 
 declare global {
   // RequireJS API.
   const define: (moduleName: string, moduleDefinition: unknown) => void;
-  const requirejs: (
-    modules: string[],
-    onLoad: (...args: unknown[]) => void,
-    onError?: (error: Error) => void,
-  ) => void;
 }
 
 type Config = {
@@ -46,29 +42,20 @@ async function fetchTranslation(): Promise<Translation> {
     prefix: "blocknote.",
     keys: [],
   });
-  const translation = await new Promise<Translation>((resolve, reject) => {
-    requirejs(
-      [
-        "xwiki-blocknote-translation-keys",
-        "xwiki-l10n!xwiki-blocknote-translation-keys",
-      ],
-      (config, messages) => {
-        resolve({
-          config: config as Config,
-          messages: messages as Record<string, string>,
-        });
-      },
-      reject,
-    );
-  });
+  const [config, translatedMessages] = await loadById<
+    [Config, Record<string, string>]
+  >(
+    "xwiki-blocknote-translation-keys",
+    "xwiki-l10n!xwiki-blocknote-translation-keys",
+  );
   // Add back the prefix to the keys.
   const messages: Record<string, string> = {};
-  for (const [key, value] of Object.entries(translation.messages)) {
+  for (const [key, value] of Object.entries(translatedMessages)) {
     if (typeof value === "string") {
-      messages[`${translation.config.prefix}${key}`] = value;
+      messages[`${config.prefix}${key}`] = value;
     }
   }
-  return { config: translation.config, messages };
+  return { config, messages };
 }
 
 export async function i18nResolver(i18n: I18n): Promise<I18n> {

@@ -90,10 +90,6 @@ public class NumberClass extends PropertyClass
     private static final String STEP_INTEGER = "1";
     private static final String MIN = "min";
     private static final String MAX = "max";
-
-    // The largest magnitude a double can still represent every integer of, used as a safe stand-in for the long
-    // type's real range in the min/max attributes.
-    private static final long SAFE_INTEGER_LIMIT = 1L << 53;
     private static final String DATA_VALIDATION_BAD_INPUT = "data-validation-bad-input";
     private static final String DATA_VALIDATION_STEP_MISMATCH = "data-validation-step-mismatch";
     private static final String DATA_VALIDATION_RANGE_OVERFLOW = "data-validation-range-overflow";
@@ -227,33 +223,32 @@ public class NumberClass extends PropertyClass
         input.setType(INPUT_TYPE_NUMBER);
         input.setName(prefix + name);
         input.setID(prefix + name);
-        // The "size" attribute is ignored on type="number" inputs, kept here only for API compatibility.
-        input.setSize(getSize());
         input.setDisabled(isDisabled());
 
         String ntype = getNumberType();
-        String invalidFormatMessage = localizePlainOrKey("core.validation.number.message.invalidformat");
-        input.addAttribute(DATA_VALIDATION_BAD_INPUT, invalidFormatMessage);
-        input.addAttribute(DATA_VALIDATION_STEP_MISMATCH, invalidFormatMessage);
+        input.addAttribute(DATA_VALIDATION_BAD_INPUT,
+            localizePlainOrKey("core.validation.number.message.invalidformat"));
         if (TYPE_FLOAT.equals(ntype) || TYPE_DOUBLE.equals(ntype)) {
             // Without an explicit step, the HTML5 default (step=1) makes any decimal value a stepMismatch.
             input.addAttribute(STEP, STEP_ANY);
         } else {
             input.addAttribute(STEP, STEP_INTEGER);
-            String min;
-            String max;
+            // A step mismatch can only be a decimal value here, which is a valid number, so the message asks for a
+            // whole number rather than reporting an invalid one.
+            input.addAttribute(DATA_VALIDATION_STEP_MISMATCH,
+                localizePlainOrKey("core.validation.number.message.wholenumberrequired"));
+            // Only the integer type gets a range. Browsers evaluate min and max in double arithmetic, so a min set at
+            // the magnitude of the long range makes them skip the step check altogether, letting decimals through on
+            // the default number type. Values outside the long range are reported by fromString instead.
             if (TYPE_INTEGER.equals(ntype)) {
-                min = String.valueOf(Integer.MIN_VALUE);
-                max = String.valueOf(Integer.MAX_VALUE);
-            } else {
-                min = String.valueOf(-SAFE_INTEGER_LIMIT);
-                max = String.valueOf(SAFE_INTEGER_LIMIT);
+                String min = String.valueOf(Integer.MIN_VALUE);
+                String max = String.valueOf(Integer.MAX_VALUE);
+                input.addAttribute(MIN, min);
+                input.addAttribute(MAX, max);
+                String outOfRangeMessage = localizePlainOrKey("core.validation.number.message.outofrange", min, max);
+                input.addAttribute(DATA_VALIDATION_RANGE_OVERFLOW, outOfRangeMessage);
+                input.addAttribute(DATA_VALIDATION_RANGE_UNDERFLOW, outOfRangeMessage);
             }
-            input.addAttribute(MIN, min);
-            input.addAttribute(MAX, max);
-            String outOfRangeMessage = localizePlainOrKey("core.validation.number.message.outofrange", min, max);
-            input.addAttribute(DATA_VALIDATION_RANGE_OVERFLOW, outOfRangeMessage);
-            input.addAttribute(DATA_VALIDATION_RANGE_UNDERFLOW, outOfRangeMessage);
         }
 
         buffer.append(input.toString());

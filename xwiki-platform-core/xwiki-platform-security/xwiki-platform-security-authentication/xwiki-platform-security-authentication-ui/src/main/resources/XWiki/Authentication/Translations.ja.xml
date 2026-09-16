@@ -49,5 +49,12 @@ authentication.admin.isAuthenticationSecurityEnabled.hint=認証セキュリテ�
 authentication.admin.isAuthenticationSecurityEnabled.disabled=無効
 authentication.admin.isAuthenticationSecurityEnabled.enabled=有効
 authentication.admin.heading=認証セキュリティー
+### Missing: security.authservice.admin.title=
+### Missing: security.authservice.admin.currentAuthService=
+### Missing: security.authservice.admin.component.label=
+### Missing: security.authservice.admin.component.save=
+### Missing: security.authservice.admin.component.noService=
+### Missing: security.authservice.admin.other.warning=
+### Missing: security.authservice.admin.class.warning=
 </content>
 </xwikidoc>

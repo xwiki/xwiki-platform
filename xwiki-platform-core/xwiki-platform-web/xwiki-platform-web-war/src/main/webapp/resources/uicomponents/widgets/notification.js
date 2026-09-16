@@ -32,8 +32,8 @@ const widgets = XWiki.widgets = XWiki.widgets || {};
  * <li> After hiding, call the function specified in the options.</li>
  * <li>Configurable icon, background and text color.</li>
  * </ul>
- * To display a notification, call XWiki.widgets.Notification.show, or create a new XWiki.widgets.Notification
- * object, which displays itself. Constructor parameters:
+ * The preferred way to display a notification is to call XWiki.widgets.Notification.show. Creating a new
+ * XWiki.widgets.Notification object displays it as well. Constructor parameters:
  * <dl>
  *   <dt>text</dt>
  *   <dd>The notification text. Since 18.4.0RC1 and 17.10.9, its values is used as plain text unless textHtml is true.

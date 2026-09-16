@@ -34,9 +34,17 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 public abstract class AbstractDistributionStep implements DistributionStep
 {
     @Inject
+    // 'transient' is deliberate here: DistributionJobStatus holds the step list and the job status
+    // store serializes it with XStream, which honours 'transient' independently of
+    // java.io.Serializable. Removing it would write the injected components into the stored status.
+    @SuppressWarnings("java:S2065")
     protected transient TemplateManager renderer;
 
     @Inject
+    // 'transient' is deliberate here: DistributionJobStatus holds the step list and the job status
+    // store serializes it with XStream, which honours 'transient' independently of
+    // java.io.Serializable. Removing it would write the injected components into the stored status.
+    @SuppressWarnings("java:S2065")
     protected transient Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     private final String stepId;

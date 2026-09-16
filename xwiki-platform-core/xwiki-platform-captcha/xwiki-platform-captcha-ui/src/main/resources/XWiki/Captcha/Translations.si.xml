@@ -37,7 +37,10 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.captcha=CAPTCHA
-### Missing: captcha.admin.defaultCaptchaName.label=Default CAPTCHA
-### Missing: captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.
+captcha.admin.defaultCaptchaName.label=Default CAPTCHA
+captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.
+### Missing: captcha.admin.configure.title=
+### Missing: captcha.admin.sample.title=
+### Missing: captcha.admin.sample.description=
 </content>
 </xwikidoc>

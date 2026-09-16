@@ -46,7 +46,10 @@ vi.mock("@xwiki/platform-livedata-ui", async (importOriginal) => {
   };
 });
 
-function initWrapper(props = {}) {
+function initWrapper(
+  props = {},
+  propertyDescriptor: object = { name: "Notify" },
+) {
   return mount(DisplayerToggle, {
     props: {
       propertyId: "notify",
@@ -63,7 +66,7 @@ function initWrapper(props = {}) {
         jQuery: jQueryMock,
         logic: {
           triggerEvent: vi.fn(),
-          getPropertyDescriptor: vi.fn(() => ({ name: "Notify" })),
+          getPropertyDescriptor: vi.fn(() => propertyDescriptor),
         },
       },
     },
@@ -133,26 +136,7 @@ describe("DisplayerToggle", () => {
   });
 
   it("does NOT set an aria-label when the property descriptor has no name", async () => {
-    const wrapper = mount(DisplayerToggle, {
-      props: {
-        propertyId: "notify",
-        entry: {
-          notify_checked: true,
-          notify_disabled: false,
-          notify_data: { id: 42 },
-        },
-        iconName: "bell",
-      },
-      global: {
-        provide: {
-          jQuery: jQueryMock,
-          logic: {
-            triggerEvent: vi.fn(),
-            getPropertyDescriptor: vi.fn(() => ({})),
-          },
-        },
-      },
-    });
+    const wrapper = initWrapper({}, {});
     wrapper.vm.iconReady = true;
     await flushPromises();
     expect(wrapper.find("input").attributes("aria-label")).toBeUndefined();

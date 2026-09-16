@@ -39,5 +39,6 @@
   <content>admin.syntaxes=वाक्यरचना
 admin.syntaxes.description=डीफॉल्ट पृष्ठ वाक्यरचना निवडा आणि उपलब्ध मार्कअप वाक्यरचना कॉन्फिगर करा.
 Rendering.RenderingConfigClass_disabledSyntaxes=अक्षम केलेल्या वाक्यरचना
-Rendering.RenderingConfigClass_disabledSyntaxes.hint=पृष्ठे लिहिता येणार नाहीत अशा मार्कअप सिंटॅक्सची यादी</content>
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=पृष्ठे लिहिता येणार नाहीत अशा मार्कअप सिंटॅक्सची यादी
+</content>
 </xwikidoc>

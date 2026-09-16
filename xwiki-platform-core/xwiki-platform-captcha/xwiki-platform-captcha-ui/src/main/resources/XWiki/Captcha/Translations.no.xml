@@ -38,5 +38,9 @@
   <hidden>true</hidden>
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=Standard CAPTCHA
-captcha.admin.defaultCaptchaName.hint=Standard CAPTCHA implementering som brukes. Bruk utvidelsesbehandler for å søke etter andre implementeringer du kan installere og bruke.</content>
+captcha.admin.defaultCaptchaName.hint=Standard CAPTCHA implementering som brukes. Bruk utvidelsesbehandler for å søke etter andre implementeringer du kan installere og bruke.
+### Missing: captcha.admin.configure.title=
+### Missing: captcha.admin.sample.title=
+### Missing: captcha.admin.sample.description=
+</content>
 </xwikidoc>

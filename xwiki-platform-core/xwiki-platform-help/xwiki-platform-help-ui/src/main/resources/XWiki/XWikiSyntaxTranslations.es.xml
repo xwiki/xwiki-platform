@@ -43,5 +43,6 @@
 help.syntaxtitle=Sintaxis XWiki {0}
 help.syntaxall=Todo
 help.changesyntax=Cambiar sintaxis
-help.choose_syntax=Seleccionar sintaxis</content>
+help.choose_syntax=Seleccionar sintaxis
+</content>
 </xwikidoc>

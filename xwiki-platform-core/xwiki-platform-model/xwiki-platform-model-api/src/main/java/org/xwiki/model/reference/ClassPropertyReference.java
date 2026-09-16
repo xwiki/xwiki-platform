@@ -84,6 +84,7 @@ public class ClassPropertyReference extends EntityReference
      * @param space the space of the document where the parent class of this property is
      * @param page the document where the parent class of this property is
      * @param propertyName the name of the property to refer to
+     * @deprecated use {@link #ClassPropertyReference(String, DocumentReference)} instead
      */
     @Deprecated
     public ClassPropertyReference(String wiki, String space, String page, String propertyName)

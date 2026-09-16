@@ -38,18 +38,18 @@
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
 ### Missing: extension.repository.emptyvalue=
-### Missing: extension.repository.name=
-### Missing: extension.repository.summary=
-### Missing: extension.repository.type=
-### Missing: extension.repository.category=
-### Missing: extension.repository.authors=
-### Missing: extension.repository.doc.creationDate=
-### Missing: extension.repository.doc.date=
-### Missing: extension.repository.rating=
-### Missing: extension.repository.installedCount=
+### Missing: extension.repository.name=Name
+### Missing: extension.repository.summary=Summary
+### Missing: extension.repository.type=Type
+### Missing: extension.repository.category=Category
+### Missing: extension.repository.authors=Authors
+### Missing: extension.repository.doc.creationDate=Created On
+### Missing: extension.repository.doc.date=Last Modified
+### Missing: extension.repository.rating=Rating
+### Missing: extension.repository.installedCount=Installs
 
 ## Administration UI
-### Missing: admin.repository=
+### Missing: admin.repository=Extension Repository
 
 ## Support
 ### Missing: repository.support.createsupporter=

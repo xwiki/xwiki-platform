@@ -45,6 +45,7 @@
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "lib0": "catalog:",
+    "y-protocols": "catalog:",
     "y-websocket": "catalog:",
     "yjs": "catalog:"
   },

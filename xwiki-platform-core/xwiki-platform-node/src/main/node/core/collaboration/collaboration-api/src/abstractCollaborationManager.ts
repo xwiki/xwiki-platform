@@ -169,7 +169,11 @@ export abstract class AbstractCollaborationManager
   ): Promise<void> {
     this.collaborations.delete(key);
     console.debug("Leaving realtime collaboration.");
-    this.disconnect(await collaboration.promise);
+    const joined = await collaboration.promise;
+    // Stop the auto-saver before disconnecting, so that it gets to tell the other collaborators what it leaves
+    // unsaved while the connection is still up. We're the ones who know that nobody is using this session anymore.
+    await joined.saver?.stop();
+    this.disconnect(joined);
   }
 
   protected abstract createProvider(

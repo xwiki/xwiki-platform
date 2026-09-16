@@ -332,6 +332,12 @@ importers:
       '@xwiki/platform-authentication-xwiki':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/authentication/authentication-xwiki
+      '@xwiki/platform-autosave-api':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/autosave/autosave-api
+      '@xwiki/platform-autosave-xwiki':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/autosave/autosave-xwiki
       '@xwiki/platform-backend-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/backends/backend-api
@@ -1311,6 +1317,9 @@ importers:
       '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
+      '@xwiki/platform-autosave-api':
+        specifier: workspace:*
+        version: link:../../autosave/autosave-api
       '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../document/document-api
@@ -1320,6 +1329,9 @@ importers:
       '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api
+      y-protocols:
+        specifier: 'catalog:'
+        version: 1.0.7(yjs@13.6.32)
       yjs:
         specifier: 'catalog:'
         version: 13.6.32
@@ -1390,6 +1402,9 @@ importers:
       lib0:
         specifier: 'catalog:'
         version: 0.2.117
+      y-protocols:
+        specifier: 'catalog:'
+        version: 1.0.7(yjs@13.6.32)
       y-websocket:
         specifier: 'catalog:'
         version: 3.1.0(yjs@13.6.32)

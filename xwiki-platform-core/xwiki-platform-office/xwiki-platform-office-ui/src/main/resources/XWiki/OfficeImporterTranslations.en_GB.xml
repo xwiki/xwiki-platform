@@ -36,9 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: office.createForm.type.name=
-### Missing: office.createForm.type.description=
-### Missing: office.form.error.noDocument=
+  <content>### Missing: office.createForm.type.name=Page from Office
+### Missing: office.createForm.type.description=Import Office documents into wiki pages
+### Missing: office.form.error.noDocument=You must use the {0}create action{1} to import an Office document.
 ### Missing: office.import.document.hint=
 ### Missing: office.import.target.hint=
 ### Missing: office.import.overwriteContent=
@@ -52,14 +52,14 @@
 ### Missing: office.import.inProgress=
 ### Missing: office.import.done=
 ### Missing: office.import.failed=
-### Missing: office.config.serverType.hint=
-### Missing: office.config.serverPort.hint=
-### Missing: office.config.autoStart.hint=
-### Missing: office.config.serverPath.hint=
-### Missing: office.config.serverState.connected=
-### Missing: office.config.serverState.notConnected=
-### Missing: office.config.serverState.confError=
-### Missing: office.config.serverState.error=
+### Missing: office.config.serverType.hint=The Office server type. It can be internally managed (local) or external (remote).
+### Missing: office.config.serverPort.hint=The port number used for connecting to the Office server instance
+### Missing: office.config.autoStart.hint=Specify if the Office server should be started / connected automatically at XWiki startup
+### Missing: office.config.serverPath.hint=The path to the Office installation
+### Missing: office.config.serverState.connected=Connected
+### Missing: office.config.serverState.notConnected=Not Connected
+### Missing: office.config.serverState.confError=Invalid Configuration
+### Missing: office.config.serverState.error=Error
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
@@ -67,7 +67,7 @@
 #######################################
 ## until 14.10.2, 15.0RC1
 #######################################
-### Missing: office.form.append.hint=
+### Missing: office.form.append.hint=The document already exists! Append the result to the existing wiki page
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

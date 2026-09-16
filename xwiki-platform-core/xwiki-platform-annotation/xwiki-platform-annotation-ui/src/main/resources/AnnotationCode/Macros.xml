@@ -207,7 +207,7 @@
     #if ($mode != 'list')
       &lt;div class="annotation-bubble-close"&gt;
         &lt;button class="btn btn-default btn-xs" type="button"
-          title="$services.localization.render('annotations.annotated.bubble.toggle.hint')"&gt;
+          title="$escapetool.xml($services.localization.render('annotations.annotated.bubble.toggle.hint'))"&gt;
           $services.icon.renderHTML('cross')
           &lt;span class="sr-only"&gt;
             $escapetool.xml($services.localization.render('annotations.annotated.bubble.toggle.hint'))

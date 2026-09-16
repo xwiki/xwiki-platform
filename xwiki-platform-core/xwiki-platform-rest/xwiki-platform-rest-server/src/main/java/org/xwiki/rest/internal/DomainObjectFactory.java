@@ -149,6 +149,8 @@ public final class DomainObjectFactory
         return getModelFactory().toRestPage(baseUri, self, doc, useVersion, withPrettyNames, false, false, false);
     }
 
+    // Published static factory of the REST module: one parameter per field of the returned HistorySummary.
+    @SuppressWarnings("java:S107")
     public static HistorySummary createHistorySummary(ObjectFactory objectFactory, URI baseUri, String wikiName,
         List<String> spaces, String pageName, String language, Version version, String modifier, Date modified,
         String comment, XWiki xwikiApi, Boolean withPrettyNames)
@@ -274,6 +276,8 @@ public final class DomainObjectFactory
      *             instead
      */
     @Deprecated(since = "7.3M1")
+    // Deprecated but still published static factory, kept for backward compatibility: the signature cannot change.
+    @SuppressWarnings("java:S107")
     public static ObjectSummary createObjectSummary(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
         Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames)
         throws XWikiException
@@ -287,6 +291,8 @@ public final class DomainObjectFactory
      *             instead
      */
     @Deprecated(since = "7.3M1")
+    // Deprecated but still published static factory, kept for backward compatibility: the signature cannot change.
+    @SuppressWarnings("java:S107")
     public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext, Document doc,
         BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {

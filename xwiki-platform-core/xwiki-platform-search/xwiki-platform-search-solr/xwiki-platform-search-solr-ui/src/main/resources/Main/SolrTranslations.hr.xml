@@ -38,10 +38,10 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Upravljanje Solr pretragom
 solr.admin.submit=Primijeni
-### Missing: solr.admin.error.action={0} failed:
+solr.admin.error.action={0} failed:
 solr.admin.error.notallowed=Nije vam dozvoljeno obavljanje ove akcije.
 solr.admin.error.norights=Za pristup ovoj rubrici potrebne su administratorske ovlasti.
-### Missing: solr.admin.success.action={0} successfully triggered.
+solr.admin.success.action={0} successfully triggered.
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Veličina reda čekanja
 solr.admin.status.queueSize.hint=Broj preostalih entiteta za indeksiranje, ponovno indeksiranje ili brisanje iz indeksa (ovisno o izvršenoj akciji).
@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=Wiki na čije sve dokumente će odabrana akcija im
 solr.admin.indexing.wiki.select_farm=Cijela farma
 solr.admin.indexing.query.label=Korisnički upit
 solr.admin.indexing.query.hint=Neobavezni upit za ograničavanje dokumenata na koje će odabrana akcija nad indeksom imati utjecaj.
-### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-solr.sortBy=Poredaj po\:
-solr.sortBy.score=Relevantnosti
-solr.sortBy.title_sort=Naslovu
-solr.sortBy.date=Datumu posljednje izmjene
-solr.sortBy.author_display_sort=Posljednjem autoru
-solr.sortBy.filename_sort=Imenu datoteke
-solr.sortBy.attsize_sort=Veličini datoteke
-solr.sortBy.attdate_sort=Datumu otpreme
-solr.sortBy.attauthor_display_sort=Otpremitelju
-solr.sortOrder.asc=Uzlazno
-solr.sortOrder.desc=Silazno
-solr.options=Prikaži\:
-solr.options.highlight=Označavanje
+### Missing: solr.admin.indexing.query.language.label=
+solr.admin.info.affectedDocuments=Affected documents in the index:
+### Missing: search.solr.sortBy.hint=
+### Missing: search.solr.sortBy.field.score=
+### Missing: search.solr.sortBy.field.titleSort=
+### Missing: search.solr.sortBy.field.date=
+### Missing: search.solr.sortBy.field.authorDisplaySort=
+### Missing: search.solr.sortBy.field.filenameSort=
+### Missing: search.solr.sortBy.field.attsizeSort=
+### Missing: search.solr.sortBy.field.attdateSort=
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=
+### Missing: search.solr.sortOrder.asc=
+### Missing: search.solr.sortOrder.desc=
+### Missing: search.solr.options.showHighlight=
 solr.options.highlight.title=Prikaži ekstrakt podudaranja u svakom rezultatu
-solr.options.facet=Facete
+### Missing: search.solr.options.showFacet=
 solr.options.facet.title=Omogući dodatno filtriranje rezultata
 solr.result.language=Jezik
 solr.result.locatedIn=Na lokaciji
@@ -172,6 +172,18 @@ solr.result.location=Na lokaciji {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Lokacija
+solr.sortBy=Poredaj po:
+solr.sortBy.score=Relevantnosti
+solr.sortBy.title_sort=Naslovu
+solr.sortBy.date=Datumu posljednje izmjene
+solr.sortBy.author_display_sort=Posljednjem autoru
+solr.sortBy.filename_sort=Imenu datoteke
+solr.sortBy.attsize_sort=Veličini datoteke
+solr.sortBy.attdate_sort=Datumu otpreme
+solr.sortBy.attauthor_display_sort=Otpremitelju
+solr.options=Prikaži:
+solr.options.highlight=Označavanje
+solr.options.facet=Facete
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

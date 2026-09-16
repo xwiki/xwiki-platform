@@ -47,7 +47,6 @@ platform.panels.applications.ajax.noright=您没有修改PanelsCode.Applications
 platform.panels.applications.ajax.error=无法保存您的更改。
 admin.panels.applications=应用面板
 admin.panels.applications.description=管理应用程序面板中显示的应用程序。
-
 admin.panels.navigation=导航面板
 admin.panels.navigation.description=管理导航面板中显示的页面。
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=排除顶级扩展页面
@@ -64,5 +63,6 @@ platform.panels.navigation.configuration.excludedPages.empty=无
 platform.panels.navigation.configuration.topLevelExtensionPages=顶级扩展页面
 platform.panels.navigation.configuration.topLevelApplicationPages=顶级应用页面
 platform.panels.navigation.configuration.otherPages=其他页面
-platform.panels.navigation.configuration.saveComment=从管理中更新了导航面板配置</content>
+platform.panels.navigation.configuration.saveComment=从管理中更新了导航面板配置
+</content>
 </xwikidoc>

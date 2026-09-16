@@ -80,9 +80,16 @@ rendering.macro.menu.name=メニュー
 rendering.macro.menu.description=単純なウィキシンタックス（入れ子式のリストとリンク）で作成したメニューを表示。
 rendering.macro.menu.parameter.id.name=ID
 rendering.macro.menu.parameter.id.description=メニューを囲むHTMLの要素に設定する識別子（オプション）。この識別子は、メニューのDOMにアクセスするJavaScriptのコードや、メニューの項目をアサートする機能テストで使用できます。
+### Missing: rendering.macro.menu.parameter.label.name=
+### Missing: rendering.macro.menu.parameter.label.description=
 rendering.macro.menu.parameter.type.name=種類
 rendering.macro.menu.parameter.type.description=メニューの種類は、メニューの表示と動作を決定します（オプション）。サポートする値はhorizontal（既定値）とverticalです。
 rendering.macro.menu.content.description=メニューの構造をウィキのシンタックスで規定。メニューの各項目はリストの項目とし、メニュー項目のラベルあるいはリンクを含めてください。サブメニューの項目には入れ子式のリストが使えます。
+
+# Menu UI
+### Missing: menu.ui.openSubMenu=
+### Missing: menu.ui.closeSubMenu=
+### Missing: menu.ui.horizontal.toggler.description=
 
 # Menu WebHome
 menu.description=これはナビゲーションのメニューを、ページのヘッダーの直後にトップバーとして水平に、あるいはサイドパネルの中で垂直に表示するためのシンプルなアプリケーションです。

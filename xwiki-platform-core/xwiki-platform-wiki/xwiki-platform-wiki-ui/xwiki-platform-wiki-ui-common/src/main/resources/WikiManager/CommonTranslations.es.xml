@@ -56,7 +56,7 @@ platform.wiki.admin.wiki.ownerWarning=Advertencia: Una vez que cambies esto, el 
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wiki=Wiki
+admin.wiki=Wiki
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

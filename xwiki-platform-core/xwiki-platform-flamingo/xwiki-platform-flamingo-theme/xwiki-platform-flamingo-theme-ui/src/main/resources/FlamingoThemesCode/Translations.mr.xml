@@ -56,6 +56,7 @@ platform.flamingo.themes.title.preview=पूर्वावलोकन
 platform.flamingo.themes.autorefresh=स्वयं रीफ्रेश
 platform.flamingo.themes.refresh=रीफ्रेश
 platform.flamingo.themes.refreshwarning=रीफ्रेशला काही सेकंद लागू शकतात.
+### Missing: platform.flamingo.themes.preview.iframe.label=
 platform.flamingo.themes.loading=लोड करीत आहे...
 platform.flamingo.themes.category.logos=लोगो
 platform.flamingo.themes.category.base-colors=बेस रंग
@@ -72,6 +73,7 @@ platform.flamingo.themes.defaultvalue=डीफॉल्ट
 platform.flamingo.themes.lessCode.description=या फील्डमध्ये आपण थेट LESS कोड लिहू शकता जो skin मध्ये जोडला जाईल.
 platform.flamingo.themes.local=लोकॅल
 platform.flamingo.themes.global=वैश्विक
+### Missing: FlamingoThemesCode.ThemeClass_logo-description_hint=
 
 ###############################################################################
 ## Deprecated

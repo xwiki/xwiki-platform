@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=这个Wiki中的所有文档将受到选定操作�
 solr.admin.indexing.wiki.select_farm=整个站点
 solr.admin.indexing.query.label=自定义查询
 solr.admin.indexing.query.hint=可选查询，用于限制索引中将受到选定操作影响的文档。
+### Missing: solr.admin.indexing.query.language.label=
 solr.admin.info.affectedDocuments=索引中受影响的文档：
-solr.sortBy=排序：
-solr.sortBy.score=相关性
-solr.sortBy.title_sort=标题
-solr.sortBy.date=上次修改时间
-solr.sortBy.author_display_sort=最后的作者
-solr.sortBy.filename_sort=文件名
-solr.sortBy.attsize_sort=文件大小
-solr.sortBy.attdate_sort=上传时间
-solr.sortBy.attauthor_display_sort=上传人
-solr.sortOrder.asc=正序
-solr.sortOrder.desc=倒序
-solr.options=显示：
-solr.options.highlight=高亮
+### Missing: search.solr.sortBy.hint=
+### Missing: search.solr.sortBy.field.score=
+### Missing: search.solr.sortBy.field.titleSort=
+### Missing: search.solr.sortBy.field.date=
+### Missing: search.solr.sortBy.field.authorDisplaySort=
+### Missing: search.solr.sortBy.field.filenameSort=
+### Missing: search.solr.sortBy.field.attsizeSort=
+### Missing: search.solr.sortBy.field.attdateSort=
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=
+### Missing: search.solr.sortOrder.asc=
+### Missing: search.solr.sortOrder.desc=
+### Missing: search.solr.options.showHighlight=
 solr.options.highlight.title=显示每个结果中匹配到的内容
-solr.options.facet=侧边栏
+### Missing: search.solr.options.showFacet=
 solr.options.facet.title=允许对结果应用额外的过滤器
 solr.result.language=语言
 solr.result.locatedIn=位于
@@ -172,6 +172,18 @@ solr.result.location=位于 {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=位置
+solr.sortBy=排序：
+solr.sortBy.score=相关性
+solr.sortBy.title_sort=标题
+solr.sortBy.date=上次修改时间
+solr.sortBy.author_display_sort=最后的作者
+solr.sortBy.filename_sort=文件名
+solr.sortBy.attsize_sort=文件大小
+solr.sortBy.attdate_sort=上传时间
+solr.sortBy.attauthor_display_sort=上传人
+solr.options=显示：
+solr.options.highlight=高亮
+solr.options.facet=侧边栏
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

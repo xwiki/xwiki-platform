@@ -62,7 +62,7 @@ platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=U heeft verzocht lid 
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Uw verzoek om lid te worden van de wiki ''{0}'' is geaccepteerd.
 platform.wiki.currentwiki.joinRequestRejectedNotification=Uw verzoek om lid te worden van de wiki ''{0}'' is geweigerd.
 platform.wiki.currentwiki.candidateHandledSaveComment=Kandidaat {0} ({1}) afgehandeld
-platform.wiki.currentwiki.candidateHandledComment=Opmerking\:
+platform.wiki.currentwiki.candidateHandledComment=Opmerking:
 platform.wiki.currentwiki.candidateAcceptedSuccess=Verzoek succesvol geaccepteerd.
 platform.wiki.currentwiki.candidateRejectedSuccess=Verzoek succesvol afgewezen.
 platform.wiki.currentwiki.inviteUserAlreadyMember={0} is al lid van de wiki.
@@ -98,11 +98,11 @@ platform.wiki.currentwiki.invite.username.label=Naam gebruiker
 platform.wiki.currentwiki.invite.message.label=Bericht
 platform.wiki.currentwiki.invite.button.label=Uitnodigen
 platform.wiki.currentwiki.candidates.label=Kandidaten
-platform.wiki.currentwiki.candidates.status.label=Status\:
-platform.wiki.currentwiki.candidates.type.label=Type\:
-platform.wiki.currentwiki.candidates.reviewer.label=Admin\:
-platform.wiki.currentwiki.candidates.reviewermessage.label=Admin's bericht\:
-platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privé-opmerking\:
+platform.wiki.currentwiki.candidates.status.label=Status:
+platform.wiki.currentwiki.candidates.type.label=Type:
+platform.wiki.currentwiki.candidates.reviewer.label=Admin:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Admin's bericht:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privé-opmerking:
 platform.wiki.currentwiki.candidates.accept.label=Accepteren
 platform.wiki.currentwiki.candidates.reject.label=Afwijzen
 platform.wiki.currentwiki.candidates.invitation.cancel.label=Uitnodiging annuleren
@@ -119,19 +119,20 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=De weergavenaam van de wiki.
 platform.wiki.currentwiki.prop.description.hint=Een korte omschrijving van deze wiki en zijn functie.
 platform.wiki.currentwiki.prop.owner.hint=Een gebruiker die alle rechten heeft op de wiki.
 platform.wiki.currentwiki.prop.membershipType.hint=De wijze waarop gebruikers lid kunnen worden van deze wiki.
-platform.wiki.currentwiki.prop.secure.hint=Indien geselecteerd zullen alle door deze wiki gegenereerde externe URLs starten met {0}https\://{1}.
+platform.wiki.currentwiki.prop.secure.hint=Indien geselecteerd zullen alle door deze wiki gegenereerde externe URLs starten met {0}https://{1}.
 platform.wiki.currentwiki.invite.username.hint=De naam van de gebruiker die moet worden toegevoegd aan de wiki.
 platform.wiki.currentwiki.invite.message.hint=Het bericht dat aan de gebruiker wordt gestuurd.
 platform.wiki.currentwiki.candidates.hint=Gebruikers die hebben verzocht of zijn uitgenodigd om lid te worden van de wiki.
-### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
+platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Beheer instellingen, zoals de naam van de wiki, omschrijving, eigenaar en het type lidmaatschap
-admin.xwiki.workspaceusers.description=Beheer wiki deelnemers\: toevoegen, verwijderen, uitnodigen, accepteren of afwijzen van wiki leden.
+admin.xwiki.workspaceusers.description=Beheer wiki deelnemers: toevoegen, verwijderen, uitnodigen, accepteren of afwijzen van wiki leden.
 admin.xwiki.usersconfiguration.title=Configuratie
 admin.xwiki.members.title=Huidige leden
-### Missing: admin.xwiki.users.title=All Users
-    
+admin.xwiki.users.title=All Users
+
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Home</content>
+platform.wiki.drawer.homeWiki=Home
+</content>
 </xwikidoc>

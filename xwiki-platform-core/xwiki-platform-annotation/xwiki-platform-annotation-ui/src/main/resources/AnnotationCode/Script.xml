@@ -626,7 +626,7 @@ XWiki.Annotation = Class.create({
     if (!this.annotatedElement) {
       // and show a warning if the annotations should be shown by default
       if (displayedByDefault) {
-        new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.error.noannotatedelement')", 'warning');
+        XWiki.widgets.Notification.show("$services.localization.render('annotations.annotated.error.noannotatedelement')", 'warning');
       }
       return;
     }
@@ -692,7 +692,7 @@ XWiki.Annotation = Class.create({
         this.fetchAnnotations(true);
       } else {
         // if the document syntax is 1.0, and annotations should be displayed by default, display a warning, and not display annotations
-        new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.error.wrongsyntax')", 'warning');
+        XWiki.widgets.Notification.show("$services.localization.render('annotations.annotated.error.wrongsyntax')", 'warning');
       }
     }
   },
@@ -1760,7 +1760,7 @@ XWiki.Annotation = Class.create({
   onAddAnnotationShortcut : function() {
     // if the document is in 1.0 syntax, prevent the create dialog to be displayed, display a warning and stop everything
     if (XWiki.docsyntax == 'xwiki/1.0') {
-      new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.error.wrongsyntax')", 'warning');
+      XWiki.widgets.Notification.show("$services.localization.render('annotations.action.create.error.wrongsyntax')", 'warning');
       return;
     } else if ($('tmAnnotationsTrigger')?.up('li')?.hasClassName('disabled')) {
       // Annotations are disabled (probably because the annotated content is being edited in-place).
@@ -1771,7 +1771,7 @@ XWiki.Annotation = Class.create({
     var selectionText = this.selectionService.selectionText;
     if (!selectionText) {
       // show an 'invalid selection message'. Shorter time here, otherwise it's a bit confusing...
-      new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.selection.invalid')", 'error', {timeout : 5});
+      XWiki.widgets.Notification.show("$services.localization.render('annotations.action.create.selection.invalid')", 'error', {timeout : 5});
     } else {
       this.selectionService.computeContext();
       require(['xwiki-meta'], function (xm) {

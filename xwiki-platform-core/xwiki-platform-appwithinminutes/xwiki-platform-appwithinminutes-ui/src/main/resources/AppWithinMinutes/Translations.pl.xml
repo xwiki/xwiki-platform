@@ -94,26 +94,22 @@ platform.appwithinminutes.appNameEmptyError=Wprowadź nazwę aplikacji.
 platform.appwithinminutes.classEditorPaletteTitle=pole palet
 platform.appwithinminutes.classEditorPaletteHint=Przeciągnij i upuść pola z palety, aby utworzyć formularz, który będzie używany do wprowadzania danych.
 platform.appwithinminutes.classEditorCanvasHint=Przeciągnij pola z palety i upuść je w tym obszarze.
-
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Zaktualizuj szablon
 platform.appwithinminutes.classEditorUpdateTemplateHint=Szablon ({0}) przechowuje domyślne wartości pól.
 platform.appwithinminutes.classEditorUpdateSheetLabel=Zaktualizuj arkusz
 platform.appwithinminutes.classEditorUpdateSheetHint=Arkusz ({0}) służy do wyświetlania i edycji danych strukturalnych.
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Zaktualizuj tłumaczenie
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Zaktualizuj tłumaczenie pięknych nazw pól i wartości listy ({0}).
-
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Ta klasa ma wiele arkuszy.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=Klasa ma dwa pola o tej samej nazwie: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Zaktualizuj wartości domyślne
 platform.appwithinminutes.classEditorBindSheetSaveComment=Arkusz klasy Bind
 platform.appwithinminutes.classEditorSheetSaveComment=Zaktualizuj arkusz zajęć
 platform.appwithinminutes.classEditorTranslationsSaveComment=zaaktualizuj tłumaczenie
-
 platform.appwithinminutes.classEditorStandardCategoryName=standard
 platform.appwithinminutes.classEditorPickersCategoryName=zbieracze
 platform.appwithinminutes.classEditorDocumentCategoryName=strona
 platform.appwithinminutes.classEditorAdvancedCategoryName=zaawansowane
-
 platform.appwithinminutes.classEditorDBListFieldName=Lista baz danych
 platform.appwithinminutes.classEditorGroupsFieldName=grupa
 platform.appwithinminutes.classEditorUsersFieldName=użytkownik
@@ -126,15 +122,15 @@ platform.appwithinminutes.classEditorStringFieldName=krótki tekst
 platform.appwithinminutes.classEditorContentFieldName=kontent
 platform.appwithinminutes.classEditorTitleFieldName=tytuł
 platform.appwithinminutes.classEditorPageFieldName=strona
-
 platform.appwithinminutes.classEditorDeleteFieldLabel=usuń
 platform.appwithinminutes.classEditorConfigureFieldLabel=konfiguruj
 platform.appwithinminutes.classEditorPreviewFieldLabel=poprzedni
 platform.appwithinminutes.classEditorPreviewFieldHint=Ukryj panel konfiguracji i zastosuj zmiany
 platform.appwithinminutes.classEditorMoveFieldLabel=ruch
 platform.appwithinminutes.classEditorMoveFieldHint=Przeciągnij i upuść, aby zmienić kolejność
-
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Domyślna wartość
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=okej
@@ -147,9 +143,10 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=wartość
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=dodaj
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=usuń
-
 appWithinMinutes.templateProviderEditor.hint=Wpisy aplikacji to strony wiki zawierające dane strukturalne.
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=
 appWithinMinutes.templateProviderEditor.icon.hint=Ikona powiązana z wpisem aplikacji.
+### Missing: appWithinMinutes.templateProviderEditor.description.name=
 appWithinMinutes.templateProviderEditor.description.hint=Krótki opis wpisu aplikacji.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Skąd tworzyć wpisy
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Jeśli nie zostanie wybrana żadna lokalizacja, wpisy można utworzyć z dowolnej strony.
@@ -157,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Gdzie utworzy�
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Jeśli nie zostanie wybrana żadna lokalizacja, wpisy można utworzyć w dowolnym miejscu na wiki.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Nie wymuszaj lokalizacji wejścia
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Lokalizacji określonych powyżej należy używać tylko jako sugestii, umożliwiając użytkownikowi wybranie innej lokalizacji podczas tworzenia wpisu aplikacji.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=
 appWithinMinutes.templateProviderEditor.terminal.hint=Określa, czy wpisy aplikacji powinny być stronami końcowymi, czy nie.
 
 ### Wizard Step 3: Application Presentation
@@ -210,6 +208,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=edytuj aplikacje
 platform.appwithinminutes.appHomePageTranslateAppLabel=przetłumacz aplikacje
 platform.appwithinminutes.appHomePageDeleteAppLabel=usuń aplikacje
 platform.appwithinminutes.appHomePageMovedWarning=Aplikacja może nie działać poprawnie, ponieważ została zmieniona jej nazwa lub przeniesiona bez aktualizacji kodu. Edytuj aplikację i postępuj zgodnie z instrukcjami, aby zaktualizować kod.
+### Missing: platform.appwithinminutes.appHomePageNoScriptRight=
 AppWithinMinutes.LiveTableClass_description=opis
 AppWithinMinutes.LiveTableClass_columns=Kolumny na żywo
 
@@ -219,6 +218,10 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=Aplikacja {0} i WSZYSTKIE
 platform.appwithinminutes.deleteAppDoesNotExistError=Określona aplikacja nie istnieje.
 platform.appwithinminutes.deleteAppInvalidAppError=Podana nazwa nie jest prawidłową aplikacją App Within Minutes.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Nie podano nazwy aplikacji.
+
+### Rename Application
+### Missing: appWithinMinutes.renameApp.label=
+### Missing: appWithinMinutes.renameApp.close=
 
 ### Rename Application
 appWithinMinutes.renameApp.changeAppTitleInfo=Możesz zmienić tytuł aplikacji bez zmiany nazwy aplikacji, po prostu edytując stronę główną aplikacji.
@@ -238,7 +241,6 @@ appWithinMinutes.renameApp.failed=Nie można zmienić nazwy aplikacji
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=klasa aplikacji
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Lokalizacja danych aplikacji
-
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=przestrzeń
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Nazwa przestrzeni zawierającej wpis aplikacji
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=pełna nazwa strony
@@ -266,5 +268,6 @@ platform.appwithinminutes.wizardStep3Description=Dostosuj stronę główną apli
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=nazwa aplikacji
 appWithinMinutes.classEditor.title=Struktura {0}
-appWithinMinutes.templateProviderEditor.title=Wpisy {0}</content>
+appWithinMinutes.templateProviderEditor.title=Wpisy {0}
+</content>
 </xwikidoc>

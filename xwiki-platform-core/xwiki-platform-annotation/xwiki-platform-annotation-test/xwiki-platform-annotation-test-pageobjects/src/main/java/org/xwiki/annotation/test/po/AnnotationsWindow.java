@@ -38,6 +38,10 @@ public class AnnotationsWindow extends BaseElement
     @FindBy(xpath = "//div[contains(@class, 'annotation-box')]//button[contains(@class, 'tool-cancel')]")
     private WebElement cancelButton;
 
+    @FindBy(xpath = "//div[contains(@class, 'annotation-box')]"
+        + "//div[contains(@class, 'annotation-bubble-close')]//button")
+    private WebElement closeButton;
+
     @FindBy(xpath = "//textarea[@id='comment']")
     private WebElement inputText;
 
@@ -61,6 +65,16 @@ public class AnnotationsWindow extends BaseElement
         this.cancelButton.click();
     }
 
+    /**
+     * Clicks the close button displayed at the top right of the annotation creation dialog.
+     *
+     * @since 18.9.0RC1
+     */
+    public void clickCloseAnnotation()
+    {
+        this.closeButton.click();
+    }
+
     public void addAnnotation(String annotationText)
     {
         enterAnnotationText(annotationText);
@@ -77,5 +91,15 @@ public class AnnotationsWindow extends BaseElement
     public void waitUntilReady()
     {
         getDriver().waitUntilElementIsVisible(By.className("annotation-box-create"));
+    }
+
+    /**
+     * Waits until the annotation creation dialog is dismissed.
+     *
+     * @since 18.9.0RC1
+     */
+    public void waitUntilClosed()
+    {
+        getDriver().waitUntilElementDisappears(By.className("annotation-box-create"));
     }
 }

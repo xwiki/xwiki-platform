@@ -286,8 +286,8 @@ catalogs:
       specifier: 5.3.1
       version: 5.3.1
     vue-tippy:
-      specifier: 6.7.1
-      version: 6.7.1
+      specifier: 6.8.0
+      version: 6.8.0
     vue-tsc:
       specifier: 3.3.11
       version: 3.3.11
@@ -1989,7 +1989,7 @@ importers:
         version: 0.0.8
       vue-tippy:
         specifier: 'catalog:'
-        version: 6.7.1(vue@3.5.42(typescript@5.9.3))
+        version: 6.8.0(vue@3.5.42(typescript@5.9.3))
       vuedraggable:
         specifier: 'catalog:'
         version: 4.1.0(vue@3.5.42(typescript@5.9.3))
@@ -7697,8 +7697,8 @@ packages:
       vite:
         optional: true
 
-  vue-tippy@6.7.1:
-    resolution: {integrity: sha512-gdHbBV5/Vc8gH87hQHLA7TN1K4BlLco3MAPrTb70ZYGXxx+55rAU4a4mt0fIoP+gB3etu1khUZ6c29Br1n0CiA==}
+  vue-tippy@6.8.0:
+    resolution: {integrity: sha512-NiWpwncli2vXpestHyvuFPDgQ51qLbBKpZQj7FeSOm1mFbPhzMeaRxWBQQEhl/FqGRXasfGvETgAUW4md6SAbA==}
     peerDependencies:
       vue: ^3.2.0
 
@@ -12393,7 +12393,7 @@ snapshots:
       - unloader
       - webpack
 
-  vue-tippy@6.7.1(vue@3.5.42(typescript@5.9.3)):
+  vue-tippy@6.8.0(vue@3.5.42(typescript@5.9.3)):
     dependencies:
       tippy.js: 6.3.7
       vue: 3.5.42(typescript@5.9.3)

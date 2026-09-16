@@ -64,6 +64,18 @@
       <artifactId>xwiki-commons-script</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Needed to wait for the asynchronous work a document save triggers, so that it cannot interfere with what
+         the test measures. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

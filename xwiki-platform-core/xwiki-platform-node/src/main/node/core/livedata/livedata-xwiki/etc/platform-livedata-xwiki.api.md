@@ -29,6 +29,8 @@ export class XWikiLiveDataSource implements LiveDataSource {
     // (undocumented)
     getEntry(source: Source, entryId: string, properties: string[]): Promise<Values | undefined>;
     // (undocumented)
+    removeEntry(source: Source, entryId: string): Promise<void>;
+    // (undocumented)
     updateEntry(source: Source, entryId: string, values: unknown): Promise<void>;
     // (undocumented)
     updateEntryProperty(source: Source, entryId: string, propertyId: string, propertyValue: unknown): Promise<void>;

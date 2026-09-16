@@ -82,6 +82,15 @@ interface LiveDataSource {
    * @since 18.9.0RC1
    */
   addEntry(source: Source, values: unknown): Promise<Values | undefined>;
+
+  /**
+   * Delete an entry.
+   * @param source - the source description
+   * @param entryId - the entry id
+   * @returns a promise that completes when the entry is deleted
+   * @since 18.9.0RC1
+   */
+  removeEntry(source: Source, entryId: string): Promise<void>;
 }
 
 export type { LiveDataSource };

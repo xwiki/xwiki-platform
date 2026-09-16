@@ -61,7 +61,7 @@
       -->
       <LayoutCardsCard
         v-for="(entry, idx) in entries"
-        :key="`card-${logic.getEntryId(entry)}-${idx}`"
+        :key="logic.getEntryKey(entry)"
         :entry="entry"
         :entry-idx="idx"
       />

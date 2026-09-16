@@ -318,12 +318,12 @@ export default {
       }
     },
     async onEnter(addNewEntry) {
+      // Applying the edit creates the entry of a new row, through the edit bus.
+      const wasNew = this.entry?._new;
       await this.applyEdit();
-      if (this.entry?._new) {
-        await this.logic.saveNewEntry();
-        if (addNewEntry) {
-          this.logic.addEntry();
-        }
+      await this.logic.getEditBus().whenSaved();
+      if (addNewEntry && wasNew) {
+        this.logic.addEntry();
       }
     },
   },

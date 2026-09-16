@@ -47,24 +47,22 @@
     <td v-if="logic.isEditMode()" class="actions-column">
       <!-- Footnote for frozen entries. -->
       <sup v-if="isEntryFrozen">2</sup>
-      <template v-if="entry._new">
-        <button
-          type="button"
-          class="btn btn-default"
-          :title="$t('livedata.table.action.save')"
-          @click="logic.saveNewEntry()"
-        >
-          <XWikiIcon :icon-descriptor="{ name: 'check' }" />
-        </button>
-        <button
-          type="button"
-          class="btn btn-default"
-          :title="$t('livedata.table.action.cancel')"
-          @click="logic.cancelNewEntry()"
-        >
-          <XWikiIcon :icon-descriptor="{ name: 'cross' }" />
-        </button>
-      </template>
+      <button
+        type="button"
+        class="btn btn-default"
+        :title="
+          $t(
+            isEntrySaved
+              ? 'livedata.table.action.delete'
+              : 'livedata.table.action.cancel',
+          )
+        "
+        @click="logic.deleteEntry(entry)"
+      >
+        <XWikiIcon
+          :icon-descriptor="{ name: isEntrySaved ? 'trash' : 'cross' }"
+        />
+      </button>
     </td>
   </tr>
 </template>
@@ -111,6 +109,9 @@ export default {
       return this.logic.isSelectionEnabled({ entry: this.entry });
     },
     // The entries are frozen when the live data is in edit mode.
+    isEntrySaved() {
+      return this.logic.getEntryId(this.entry) !== undefined;
+    },
     isEntryFrozen() {
       const frozen = this.logic.isViewFrozen() && !this.entry._new;
       if (frozen) {
@@ -157,7 +158,8 @@ export default {
 }
 
 .layout-table tbody {
-  tr:first-child td.cell {
+  tr:first-child td.cell,
+  tr:first-child td.actions-column {
     /* Removes the top border on the first line of the table, it's unnecessary since the header itself has a background color */
     border-top: 0;
   }

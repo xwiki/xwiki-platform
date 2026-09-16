@@ -50,6 +50,7 @@ import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Adds missing live data configuration values specific to the live table source.
@@ -84,6 +85,10 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
+
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
     {
@@ -107,6 +112,8 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
                 if (strategy.isCreationAllowed(sourceParams)) {
                     LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
                     addEntry.setId("addEntry");
+                    strategy.getNewEntryLocation(sourceParams).ifPresent(location -> addEntry.getParameters()
+                        .put("location", this.stringEntityReferenceSerializer.serialize(location)));
                     mergedConfig.getMeta().getActions().add(addEntry);
                 }
             } catch (ComponentLookupException e) {

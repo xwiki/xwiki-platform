@@ -37,6 +37,8 @@ export class EditBusService {
       [key: string]: { editing: boolean; tosave: boolean; content: unknown };
     };
   }>;
+  // The save started by the last save event, since events cannot carry it back to the emitter.
+  private runningSave: Promise<void> = Promise.resolve();
 
   /**
    * Default constructor.
@@ -113,12 +115,15 @@ export class EditBusService {
     // If a cell to save is found, we get its content and save it.
     if (canBeSaved && keyEntry) {
       const vals = values[keyEntry].content;
+      const savedKey = keyEntry;
 
-      this.logic
+      this.runningSave = this.logic
         .setValues({ entryId, values: vals })
         // eslint-disable-next-line promise/always-return
         .then(() => {
-          delete this.editStates[entryId][keyEntry];
+          // The states are deleted where they are now, which is not necessarily where they were read
+          // from, since the entry may have got an identifier in the meantime.
+          delete values[savedKey];
         })
         .catch(() => {
           // @ts-expect-error leftover from initial javascript implementation
@@ -209,5 +214,38 @@ export class EditBusService {
    */
   save(entry: Values, propertyId: string, content: unknown) {
     this.saveEvent(entry, propertyId, content);
+    return this.runningSave;
+  }
+
+  /**
+   * Discard the edit states of an entry that is not displayed anymore.
+   * @param entry - the entry whose edit states are discarded
+   * @since 18.9.0RC1
+   */
+  public discard(entry: Values) {
+    delete this.editStates[this.logic.getEntryId(entry) as string];
+  }
+
+  /**
+   * Move the edit states of an entry to the identifier it just got.
+   * @param previousEntryId - the identifier the edit states are registered on
+   * @param entryId - the identifier to move them to
+   * @since 18.9.0RC1
+   */
+  public reassign(previousEntryId: string | undefined, entryId: string) {
+    const editStates = this.editStates[previousEntryId as string];
+    if (editStates) {
+      this.editStates[entryId] = editStates;
+      delete this.editStates[previousEntryId as string];
+    }
+  }
+
+  /**
+   * Waits for the save started by the last {@link save} call.
+   * @returns a promise that completes when the running save is done
+   * @since 18.9.0RC1
+   */
+  public whenSaved() {
+    return this.runningSave;
   }
 }

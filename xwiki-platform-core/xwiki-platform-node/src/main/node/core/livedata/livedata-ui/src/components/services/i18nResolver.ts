@@ -97,9 +97,11 @@ export async function i18nResolver(
       "bottombar.noEntries",
       "error.updateEntriesFailed",
       "error.addEntryFailed",
+      "error.deleteEntryFailed",
       "table.action.header",
-      "table.action.save",
       "table.action.cancel",
+      "table.action.delete",
+      "table.action.delete.confirm",
     ],
   });
 }

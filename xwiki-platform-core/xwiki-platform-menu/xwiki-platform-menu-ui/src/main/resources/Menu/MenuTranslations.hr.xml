@@ -61,7 +61,7 @@ menu.livetable.emptyvalue=-
 menu.livetable.content1=Struktura izbornika
 
 # Administration keys
-### Missing: admin.menu.name=Menus
+admin.menu.name=Menus
 
 # UIX keys
 menu.uix.extensionPoint.label=Lokacija prikaza izbornika
@@ -76,14 +76,22 @@ menu.uix.scope.label=Doseg vidljivosti izbornika
 menu.uix.scope.hint=Naznačava u kojem kontekstu je vidljiv izbornik.
 
 # Menu Macro
-### Missing: rendering.macro.menu.name=Menu
-### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
-### Missing: rendering.macro.menu.parameter.id.name=Id
-### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
-### Missing: rendering.macro.menu.parameter.type.name=Type
-### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
-### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+rendering.macro.menu.name=Menu
+rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+rendering.macro.menu.parameter.id.name=Id
+rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+### Missing: rendering.macro.menu.parameter.label.name=
+### Missing: rendering.macro.menu.parameter.label.description=
+rendering.macro.menu.parameter.type.name=Type
+rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
+rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+
+# Menu UI
+### Missing: menu.ui.openSubMenu=
+### Missing: menu.ui.closeSubMenu=
+### Missing: menu.ui.horizontal.toggler.description=
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>
+menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
+</content>
 </xwikidoc>

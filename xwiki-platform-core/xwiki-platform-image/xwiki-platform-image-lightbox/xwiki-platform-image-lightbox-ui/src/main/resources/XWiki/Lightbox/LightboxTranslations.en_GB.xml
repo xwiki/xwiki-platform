@@ -37,27 +37,27 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Admin section
-### Missing: admin.lightbox=
-### Missing: admin.lightbox.description=
-### Missing: XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=
-### Missing: XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=
+### Missing: admin.lightbox=Lightbox
+### Missing: admin.lightbox.description=Configure the image lightbox gallery
+### Missing: XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=Enable the lightbox
+### Missing: XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=Enable the possibility to open content images in a lightbox.
 
 # Gallery template
-### Missing: image.lightbox.autoPlay.title=
-### Missing: image.lightbox.caption.label=
-### Missing: image.lightbox.imageId.title=
-### Missing: image.lightbox.imageId.copy.title=
-### Missing: image.lightbox.imageId.copy.copied=
-### Missing: image.lightbox.imageId.permalink=
-### Missing: image.lightbox.date.label=
-### Missing: image.lightbox.download.title=
-### Missing: image.lightbox.escape.title=
-### Missing: image.lightbox.fileName.label=
-### Missing: image.lightbox.fullscreen.title=
-### Missing: image.lightbox.gallery.title=
-### Missing: image.lightbox.nextSlide.title=
-### Missing: image.lightbox.prevSlide.title=
-### Missing: image.lightbox.publisher.label=
-### Missing: image.lightbox.toggler.label=
+### Missing: image.lightbox.autoPlay.title=Slideshow
+### Missing: image.lightbox.caption.label=Caption
+### Missing: image.lightbox.imageId.title=Image ID
+### Missing: image.lightbox.imageId.copy.title=Copy image ID
+### Missing: image.lightbox.imageId.copy.copied=Copied to clipboard
+### Missing: image.lightbox.imageId.permalink=Permalink
+### Missing: image.lightbox.date.label=Date
+### Missing: image.lightbox.download.title=Download
+### Missing: image.lightbox.escape.title=Escape
+### Missing: image.lightbox.fileName.label=File name
+### Missing: image.lightbox.fullscreen.title=Fullscreen
+### Missing: image.lightbox.gallery.title=Image gallery
+### Missing: image.lightbox.nextSlide.title=Next image
+### Missing: image.lightbox.prevSlide.title=Previous image
+### Missing: image.lightbox.publisher.label=Image publisher
+### Missing: image.lightbox.toggler.label=Open the image actions
 </content>
 </xwikidoc>

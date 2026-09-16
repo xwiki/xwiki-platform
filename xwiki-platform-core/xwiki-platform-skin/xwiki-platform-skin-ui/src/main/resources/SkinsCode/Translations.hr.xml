@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>skin.sheet.title=Koža
 skin.sheet.properties=Svojstva kože
+### Missing: skin.sheet.properties.logo.warning=
 skin.sheet.deprecatedProperties=Precrtana svojstva
 skin.sheet.overriddenTemplates=Nadvladani predlošci
 skin.sheet.addTemplate=Dodaj novi nadvladavajući predložak
@@ -45,16 +46,15 @@ skin.sheet.add=Dodaj
 skin.sheet.overrideTemplateWarning=Ovaj odjeljak omogućava vam da nadvladate predložak kože. Ovo je tehničko i trebali biste biti svjesni posljedica.
 skin.sheet.deprecatedPropertiesWarning=Ovaj odjeljak je ovdje zbog razloga retro-kompatibilnosti. Trebali biste koristiti mehanizam 'nadvladavajućih predložaka' poviše.
 skin.sheet.nojs=Bez Javascripta ne možete koristiti ovaj odjeljak. No, umjesto toga možete koristiti {0}Uređivač objekata{1} i ručno dodavati {2} objekte.
-
 skin.sheet.js.deleting=Brisanje...
-skin.sheet.js.deletingDone=Predložak je obrisan\!
+skin.sheet.js.deletingDone=Predložak je obrisan!
 skin.sheet.js.error.csrf=Prilikom spremanja nije uspjela CSRF validacija. Najprije pokušajte osvježiti vaš preglednik.
 skin.sheet.js.error.rights=Spremanje koža nije uspjelo jer za to nemate ovlasti.
 skin.sheet.js.deleteConfirmationText=Jeste li sigurni da želite obrisati ovaj predložak?
 skin.sheet.js.deleteConfirmationYes=Da, obriši ga
 skin.sheet.js.deleteConfirmationNo=Ne, otkaži
 skin.sheet.js.adding=Dodavanje...
-skin.sheet.js.addingDone=Predložak je dodan\!
+skin.sheet.js.addingDone=Predložak je dodan!
 
 ###############################################################################
 ## Deprecated
@@ -67,8 +67,9 @@ skin.sheet.js.addingDone=Predložak je dodan\!
 #######################################
 ## until 7.1M1
 #######################################
-### Missing: skin.sheet.overridedTemplates=Overridden templates
+skin.sheet.overridedTemplates=Overridden templates
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

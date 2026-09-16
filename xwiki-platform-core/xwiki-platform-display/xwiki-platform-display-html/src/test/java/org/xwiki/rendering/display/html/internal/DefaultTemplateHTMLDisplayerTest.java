@@ -149,33 +149,21 @@ class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    void getTemplateWithNestedParameterizedTypeTest() throws Exception
+    void getTemplateWithComplexParameterizedTypeTest() throws Exception
     {
         // The short name shortens every level of the type, so that a name is either fully qualified or fully
         // shortened, never a mix of both.
-        this.defaultTemplateHTMLDisplayer.display(
-            new DefaultParameterizedType(null, List.class, new DefaultParameterizedType(null, List.class,
-                Block.class)), null);
+        this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(null, Map.class, String.class,
+            new DefaultParameterizedType(null, List.class, Block.class)), null);
         InOrder inOrder = inOrder(this.templateManager);
-        inOrder.verify(this.templateManager).getTemplate("html_displayer/java.util.list(java.util.list(org.xwiki."
-            + "rendering.block.block))/view.vm");
-        inOrder.verify(this.templateManager).getTemplate("html_displayer/java.util.list(java.util.list(org.xwiki."
-            + "rendering.block.block)).vm");
-        inOrder.verify(this.templateManager).getTemplate("html_displayer/list(list(block))/view.vm");
-        inOrder.verify(this.templateManager).getTemplate("html_displayer/list(list(block)).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/java.util.map(java.lang.string,java.util."
+            + "list(org.xwiki.rendering.block.block))/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/java.util.map(java.lang.string,java.util."
+            + "list(org.xwiki.rendering.block.block)).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/map(string,list(block))/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/map(string,list(block)).vm");
         inOrder.verify(this.templateManager).getTemplate("html_displayer/view.vm");
         inOrder.verify(this.templateManager).getTemplate("html_displayer/default.vm");
-    }
-
-    @Test
-    void getTemplateWithSeveralTypeArgumentsTest() throws Exception
-    {
-        this.defaultTemplateHTMLDisplayer.display(
-            new DefaultParameterizedType(null, Map.class, String.class, Block.class), null);
-        InOrder inOrder = inOrder(this.templateManager);
-        inOrder.verify(this.templateManager)
-            .getTemplate("html_displayer/java.util.map(java.lang.string,org.xwiki.rendering.block.block)/view.vm");
-        inOrder.verify(this.templateManager).getTemplate("html_displayer/map(string,block)/view.vm");
     }
 
     @Test

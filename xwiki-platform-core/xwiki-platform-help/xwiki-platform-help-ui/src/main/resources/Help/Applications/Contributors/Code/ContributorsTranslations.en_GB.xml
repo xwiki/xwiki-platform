@@ -37,49 +37,49 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Class fields
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_longText1=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_title1=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_date1=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_actor=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_composer=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_director=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_editor=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_hairdresser=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_make_up_artist=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_producer=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_writer=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_content1=
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_longText1=Picture
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_title1=Name
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_date1=Birthdate
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1=Type
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_actor=Actor
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_composer=Composer
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_director=Director
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_editor=Editor
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_hairdresser=Hairdresser
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_make_up_artist=Make-up Artist
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_producer=Producer
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_writer=Writer
+### Missing: Help.Applications.Contributors.Code.ContributorsClass_content1=Bio
 
 # Live table generic keys
-### Missing: contributors.livetable.doc.title=
-### Missing: contributors.livetable.doc.name=
-### Missing: contributors.livetable.doc.space=
-### Missing: contributors.livetable.doc.fullname=
-### Missing: contributors.livetable.doc.location=
-### Missing: contributors.livetable.doc.author=
-### Missing: contributors.livetable.doc.creator=
-### Missing: contributors.livetable.doc.date=
-### Missing: contributors.livetable.doc.creationDate=
-### Missing: contributors.livetable._avatar=
-### Missing: contributors.livetable._images=
-### Missing: contributors.livetable._attachments=
-### Missing: contributors.livetable._actions=
-### Missing: contributors.livetable._actions.edit=
-### Missing: contributors.livetable._actions.delete=
-### Missing: contributors.livetable.emptyvalue=
+### Missing: contributors.livetable.doc.title=Page Title
+### Missing: contributors.livetable.doc.name=Page Name
+### Missing: contributors.livetable.doc.space=Space
+### Missing: contributors.livetable.doc.fullname=Page full name
+### Missing: contributors.livetable.doc.location=Location
+### Missing: contributors.livetable.doc.author=Last Author
+### Missing: contributors.livetable.doc.creator=Creator
+### Missing: contributors.livetable.doc.date=Date
+### Missing: contributors.livetable.doc.creationDate=Creation Date
+### Missing: contributors.livetable._avatar=Avatar
+### Missing: contributors.livetable._images=Images
+### Missing: contributors.livetable._attachments=Attachments
+### Missing: contributors.livetable._actions=Actions
+### Missing: contributors.livetable._actions.edit=Edit
+### Missing: contributors.livetable._actions.delete=Delete
+### Missing: contributors.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: contributors.livetable.longText1=
-### Missing: contributors.livetable.title1=
-### Missing: contributors.livetable.date1=
-### Missing: contributors.livetable.staticList1=
-### Missing: contributors.livetable.content1=
+### Missing: contributors.livetable.longText1=Picture
+### Missing: contributors.livetable.title1=Name
+### Missing: contributors.livetable.date1=Birthdate
+### Missing: contributors.livetable.staticList1=Type
+### Missing: contributors.livetable.content1=Bio
 
 # Other keys
-### Missing: contributors.entry.name=
+### Missing: contributors.entry.name=Contributors
 
 # Deprecated keys
-### Missing: contributors.dataSpace.title=
+### Missing: contributors.dataSpace.title=Data
 </content>
 </xwikidoc>

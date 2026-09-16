@@ -1497,6 +1497,18 @@ XWiki.Annotation = Class.create({
   },
 
   /**
+   * Adds the passed close action to the close button of the passed container, if that container has one. The close
+   * button is displayed in every mode that can be dismissed, so each caller passes the way its own display is
+   * dismissed.
+   */
+  addCloseListener : function(container, closeAction) {
+    const closeButton = container.querySelector('.annotation-bubble-close button');
+    if (closeButton) {
+      closeButton.addEventListener('click', closeAction);
+    }
+  },
+
+  /**
    * Fills the edit form in the passed container, with the content passed (which should be the edit form) and sets all
    * listeners for the annotation with the passed id. If inBubble is true, the edit form is in a bubble, not in the
    * bottom panel.
@@ -1518,7 +1530,9 @@ XWiki.Annotation = Class.create({
     // and add the button listeners
     container.querySelector('button.tool-submit').addEventListener('click',
       event =&gt; this.onAnnotationEdit(event, container, annotationId, inBubble));
-    container.querySelector('button.tool-cancel').addEventListener('click', () =&gt; {
+    // Closing the edit form and cancelling it are the same action: the edit is dropped and the annotation goes back
+    // to the way it was displayed before.
+    const cancelEdit = () =&gt; {
       if (inBubble) {
         // close this bubble.
         this.hideBubble(container);
@@ -1526,7 +1540,9 @@ XWiki.Annotation = Class.create({
         // reload the original content on cancel
         this.fillViewPanel(container, container.originalContentHTML, annotationId, false);
       }
-    });
+    };
+    container.querySelector('button.tool-cancel').addEventListener('click', cancelEdit);
+    this.addCloseListener(container, cancelEdit);
   },
 
   onAnnotationEdit : function(event, container, annotationId, inBubble) {
@@ -1614,9 +1630,8 @@ XWiki.Annotation = Class.create({
     if (editButton) {
       this.addEditListener(editButton, annotationId, container, inBubble);
     }
-    let closeButton = container.querySelector('.annotation-bubble-close button');
-    if (closeButton &amp;&amp; inBubble) {
-      closeButton.addEventListener('click', () =&gt; this.hideBubble(container));
+    if (inBubble) {
+      this.addCloseListener(container, () =&gt; this.hideBubble(container));
     }
     // Forward the click to the button in the comment tab instead of handling it in the bubble.
     let threadToggleButton = container.querySelector('.thread-toggle');
@@ -1827,7 +1842,9 @@ XWiki.Annotation = Class.create({
     this.createPanel.querySelector('form').focusFirstElement();
     // and add the button observers
     this.createPanel.querySelector('button.tool-submit').addEventListener('click', this.onAnnotationAdd.bind(this));
-    this.createPanel.querySelector('button.tool-cancel').addEventListener('click', () =&gt; this.hideAnnotationCreationForm());
+    const cancelCreation = () =&gt; this.hideAnnotationCreationForm();
+    this.createPanel.querySelector('button.tool-cancel').addEventListener('click', cancelCreation);
+    this.addCloseListener(this.createPanel, cancelCreation);
   },
 
   hideAnnotationCreationForm : function(skipSelectionHighlightClear) {

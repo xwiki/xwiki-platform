@@ -62,7 +62,7 @@ platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Zatražili ste da se 
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Vaš zahtjev da se pridružite wikiju ''{0}'' je prihvaćen.
 platform.wiki.currentwiki.joinRequestRejectedNotification=Vaš zahtjev da se pridružite wikiju ''{0}'' je odbijen.
 platform.wiki.currentwiki.candidateHandledSaveComment=Obrađeni kandidat {0} ({1})
-platform.wiki.currentwiki.candidateHandledComment=Komentar\:
+platform.wiki.currentwiki.candidateHandledComment=Komentar:
 platform.wiki.currentwiki.candidateAcceptedSuccess=Zahtjev uspješno prihvaćen.
 platform.wiki.currentwiki.candidateRejectedSuccess=Zahtjev uspješno odbijen.
 platform.wiki.currentwiki.inviteUserAlreadyMember={0} je već član wikija.
@@ -98,11 +98,11 @@ platform.wiki.currentwiki.invite.username.label=Korisničko ime
 platform.wiki.currentwiki.invite.message.label=Poruka
 platform.wiki.currentwiki.invite.button.label=Pozovi
 platform.wiki.currentwiki.candidates.label=Kandidati
-platform.wiki.currentwiki.candidates.status.label=Status\:
-platform.wiki.currentwiki.candidates.type.label=Tip\:
-platform.wiki.currentwiki.candidates.reviewer.label=Administrator\:
-platform.wiki.currentwiki.candidates.reviewermessage.label=Administratorova poruka\:
-platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privatni komentar\:
+platform.wiki.currentwiki.candidates.status.label=Status:
+platform.wiki.currentwiki.candidates.type.label=Tip:
+platform.wiki.currentwiki.candidates.reviewer.label=Administrator:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Administratorova poruka:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privatni komentar:
 platform.wiki.currentwiki.candidates.accept.label=Prihvati
 platform.wiki.currentwiki.candidates.reject.label=Odbij
 platform.wiki.currentwiki.candidates.invitation.cancel.label=Otkaži pozivnicu
@@ -119,19 +119,20 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=Prikazno ime wikija.
 platform.wiki.currentwiki.prop.description.hint=Kratki opis wikija i njegove svrhe.
 platform.wiki.currentwiki.prop.owner.hint=Korisnik koji će imati sve ovlasti nad wikijem.
 platform.wiki.currentwiki.prop.membershipType.hint=Način na koji se korisnici mogu pridružiti wikiju.
-platform.wiki.currentwiki.prop.secure.hint=Ukoliko je omogućeno, svi generirani vanjski URL-ovi ovog wikija će započinjati s {0}https\:~/~/{1}.
+platform.wiki.currentwiki.prop.secure.hint=Ukoliko je omogućeno, svi generirani vanjski URL-ovi ovog wikija će započinjati s {0}https:~/~/{1}.
 platform.wiki.currentwiki.invite.username.hint=Ime korisnika za dodati wikiju.
 platform.wiki.currentwiki.invite.message.hint=Poruka za poslati korisniku.
 platform.wiki.currentwiki.candidates.hint=Korisnici koji su zatražili ili koji su pozvani da se pridruže wikiju.
-### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
+platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Upravljajte postavkama kao što su ime wikija, opis, vlasnik i tip članstva.
-admin.xwiki.workspaceusers.description=Upravljajte članovima wikija\: dodajte, uklonite, pozovite, prihvatite ili odbijte članove wikija.
+admin.xwiki.workspaceusers.description=Upravljajte članovima wikija: dodajte, uklonite, pozovite, prihvatite ili odbijte članove wikija.
 admin.xwiki.usersconfiguration.title=Konfiguracija
 admin.xwiki.members.title=Trenutni članovi
-### Missing: admin.xwiki.users.title=All Users
-    
+admin.xwiki.users.title=All Users
+
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Početni wiki</content>
+platform.wiki.drawer.homeWiki=Početni wiki
+</content>
 </xwikidoc>

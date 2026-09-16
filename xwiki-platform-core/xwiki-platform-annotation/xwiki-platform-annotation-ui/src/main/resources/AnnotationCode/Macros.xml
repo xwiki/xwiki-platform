@@ -203,15 +203,18 @@
     &lt;div class="annotation-bubble-header"&gt;
       #displayAnnotationTitle($ann)
     &lt;/div&gt;
-    &lt;div class="annotation-bubble-close"&gt;
-      &lt;button class="btn btn-default btn-xs"  type="button"
-        title="$services.localization.render('annotations.annotated.bubble.toggle.hint')"&gt;
-        $services.icon.renderHTML('cross')
-        &lt;span class="sr-only"&gt;
-          $escapetool.xml($services.localization.render('annotations.annotated.bubble.toggle.hint'))
-        &lt;/span&gt;
-      &lt;/button&gt;
-    &lt;/div&gt;
+## The 'list' mode displays the annotation inside the Annotations tab, where there is nothing to close.
+    #if ($mode != 'list')
+      &lt;div class="annotation-bubble-close"&gt;
+        &lt;button class="btn btn-default btn-xs" type="button"
+          title="$escapetool.xml($services.localization.render('annotations.annotated.bubble.toggle.hint'))"&gt;
+          $services.icon.renderHTML('cross')
+          &lt;span class="sr-only"&gt;
+            $escapetool.xml($services.localization.render('annotations.annotated.bubble.toggle.hint'))
+          &lt;/span&gt;
+        &lt;/button&gt;
+      &lt;/div&gt;
+    #end
     &lt;div class="annotation-bubble-content"&gt;
       #displayAnnotationBody($ann $mode $docRef)
     &lt;/div&gt;

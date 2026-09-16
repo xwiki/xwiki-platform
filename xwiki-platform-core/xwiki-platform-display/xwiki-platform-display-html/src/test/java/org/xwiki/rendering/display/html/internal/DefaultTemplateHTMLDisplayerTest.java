@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.script.ScriptContext;
 
@@ -150,15 +151,31 @@ class DefaultTemplateHTMLDisplayerTest
     @Test
     void getTemplateWithNestedParameterizedTypeTest() throws Exception
     {
-        // A type argument that isn't a plain Class (here, List<Block> nested inside another List) must not be cast
-        // directly to Class, but fall back to serializing its type name.
+        // The short name shortens every level of the type, so that a name is either fully qualified or fully
+        // shortened, never a mix of both.
         this.defaultTemplateHTMLDisplayer.display(
             new DefaultParameterizedType(null, List.class, new DefaultParameterizedType(null, List.class,
                 Block.class)), null);
-        verify(this.templateManager).getTemplate("html_displayer/java.util.list(java.util.list(org.xwiki.rendering."
-            + "block.block))/view.vm");
-        verify(this.templateManager).getTemplate("html_displayer/list(java.util.list(org.xwiki.rendering.block."
-            + "block))/view.vm");
+        InOrder inOrder = inOrder(this.templateManager);
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/java.util.list(java.util.list(org.xwiki."
+            + "rendering.block.block))/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/java.util.list(java.util.list(org.xwiki."
+            + "rendering.block.block)).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/list(list(block))/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/list(list(block)).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/default.vm");
+    }
+
+    @Test
+    void getTemplateWithSeveralTypeArgumentsTest() throws Exception
+    {
+        this.defaultTemplateHTMLDisplayer.display(
+            new DefaultParameterizedType(null, Map.class, String.class, Block.class), null);
+        InOrder inOrder = inOrder(this.templateManager);
+        inOrder.verify(this.templateManager)
+            .getTemplate("html_displayer/java.util.map(java.lang.string,org.xwiki.rendering.block.block)/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/map(string,block)/view.vm");
     }
 
     @Test

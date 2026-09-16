@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>platform.panels.applications.helper=Ovdje možete odabrati koje aplikacije su dostupne u traci aplikacija (zadano na lijevoj strani). Tamo će biti prikazana bilo koja nova aplikacija. Ako neke od njih želite ukloniti, samo trebate povući i ispustiti ikonu iz prve kućice u drugu. Također možete po vašoj želji promijeniti poredak aplikacija. Ne zaboravite spremiti vaše izmjene\!
+  <content>platform.panels.applications.helper=Ovdje možete odabrati koje aplikacije su dostupne u traci aplikacija (zadano na lijevoj strani). Tamo će biti prikazana bilo koja nova aplikacija. Ako neke od njih želite ukloniti, samo trebate povući i ispustiti ikonu iz prve kućice u drugu. Također možete po vašoj želji promijeniti poredak aplikacija. Ne zaboravite spremiti vaše izmjene!
 platform.panels.applications.displayedapps=Aplikacije u traci
 platform.panels.applications.blacklistedapps=Aplikacije koje nisu u traci
 platform.panels.applications.save=Spremi
@@ -47,22 +47,22 @@ platform.panels.applications.ajax.noright=Nemate ovlast za uređivanje PanelsCod
 platform.panels.applications.ajax.error=Spremanje vaše izmjene nije uspjelo.
 admin.panels.applications=Panel aplikacija
 admin.panels.applications.description=Upravljajte s prikazom aplikacija u panelu aplikacija.
-
-### Missing: admin.panels.navigation=Navigation Panel
-### Missing: admin.panels.navigation.description=Manage what pages are displayed in the Navigation Panel.
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Exclude Top Level Application Pages
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an application created with App Within Minutes.
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
-### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
-### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
-### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
-### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
-### Missing: platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
-### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
-### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration</content>
+admin.panels.navigation=Navigation Panel
+admin.panels.navigation.description=Manage what pages are displayed in the Navigation Panel.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude Top Level Extension Pages
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an installed extension, if they are not meant to be modified.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Exclude Top Level Application Pages
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an application created with App Within Minutes.
+PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
+PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
+PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
+PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
+platform.panels.navigation.configuration.excludedPages=Excluded Pages
+platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
+platform.panels.navigation.configuration.excludedPages.empty=None
+platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
+platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
+platform.panels.navigation.configuration.otherPages=Other Pages
+platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
+</content>
 </xwikidoc>

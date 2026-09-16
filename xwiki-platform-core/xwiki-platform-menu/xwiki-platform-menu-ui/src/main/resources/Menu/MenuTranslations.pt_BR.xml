@@ -44,24 +44,24 @@ menu.livetable.doc.title=Título da página
 menu.livetable.doc.name=Nome da página
 menu.livetable.doc.location=Localização
 menu.livetable.doc.space=Espaço
-### Missing: menu.livetable.doc.fullname=Page full name
+menu.livetable.doc.fullname=Page full name
 menu.livetable.doc.author=Último Autor
 menu.livetable.doc.creator=Criador
 menu.livetable.doc.date=Data de atualização
-### Missing: menu.livetable.doc.creationDate=Creation date
-### Missing: menu.livetable._avatar=Avatar
+menu.livetable.doc.creationDate=Creation date
+menu.livetable._avatar=Avatar
 menu.livetable._images=Imagens
 menu.livetable._attachments=Anexos
-### Missing: menu.livetable._actions=Actions
+menu.livetable._actions=Actions
 menu.livetable._actions.edit=Editar
-### Missing: menu.livetable._actions.delete=Delete
-### Missing: menu.livetable.emptyvalue=-
+menu.livetable._actions.delete=Delete
+menu.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: menu.livetable.content1=Menu Structure
+menu.livetable.content1=Menu Structure
 
 # Administration keys
-### Missing: admin.menu.name=Menus
+admin.menu.name=Menus
 
 # UIX keys
 menu.uix.extensionPoint.label=Local de Exibição do Menu
@@ -70,19 +70,19 @@ menu.uix.extensionPoint.value.nowhere=Em lugar nenhum
 menu.uix.extensionPoint.value.template.header.after=Após o cabeçalho da página
 menu.uix.extensionPoint.value.panels.rightPanels=Dentro de um painel direito
 menu.uix.extensionPoint.value.panels.leftPanels=Dentro de um painel esquerdo
-### Missing: menu.uix.content.label=UI Extension Content
+menu.uix.content.label=UI Extension Content
 menu.uix.content.hint=Se você pode ver isso, provavelmente significa que você desativou o JavaScript. Você deve selecionar o mesmo valor para o local de exibição do menu.
 menu.uix.scope.label=Escopo de visibilidade do menu
 menu.uix.scope.hint=Especifica em qual contexto o menu é visível.
 
 # Menu Macro
-### Missing: rendering.macro.menu.name=Menu
+rendering.macro.menu.name=Menu
 rendering.macro.menu.description=Exibe um menu criado usando sintaxe wiki simples (listas e links aninhados).
-### Missing: rendering.macro.menu.parameter.id.name=Id
+rendering.macro.menu.parameter.id.name=Id
 rendering.macro.menu.parameter.id.description=Identificador de menu opcional que será definido no elemento HTML que envolve o menu. Você pode usar esse identificador no código JavaScript para acessar o menu DOM ou em testes funcionais para afirmar os itens do menu.
 rendering.macro.menu.parameter.label.name=Rótulo
 rendering.macro.menu.parameter.label.description=Rótulo de menu opcional usado para descrever o conteúdo do menu. Especialmente importante para tecnologias assistivas e acessibilidade do menu.
-### Missing: rendering.macro.menu.parameter.type.name=Type
+rendering.macro.menu.parameter.type.name=Type
 rendering.macro.menu.parameter.type.description=O tipo de menu opcional determina a aparência e o comportamento do menu. Os valores suportados são: horizontal (valor padrão) e vertical.
 rendering.macro.menu.content.description=Defina a estrutura do menu usando a sintaxe wiki. Cada item de menu deve ser um item de lista e deve conter o rótulo ou link do item de menu. Você pode usar listas aninhadas para itens de submenu.
 

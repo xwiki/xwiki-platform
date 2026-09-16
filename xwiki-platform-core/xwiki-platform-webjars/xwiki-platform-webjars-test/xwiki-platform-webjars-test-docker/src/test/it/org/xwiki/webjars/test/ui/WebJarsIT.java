@@ -21,8 +21,8 @@ package org.xwiki.webjars.test.ui;
 
 import java.net.URI;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.Strings;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -81,10 +81,10 @@ class WebJarsIT
         URI uri = new URI(Strings.CS.removeEnd(setup.rest().getBaseURL(), "rest")
             + "webjars/wiki%3Axwiki/..%2F..%2F..%2F..%2F..%2FWEB-INF%2Fxwiki.cfg");
 
-        GetMethod response = setup.rest().executeGet(uri);
+        CloseableHttpResponse response = setup.rest().executeGet(uri);
 
-        assertNotEquals(200, response.getStatusCode());
+        assertNotEquals(200, response.getCode());
 
-        response.releaseConnection();
+        response.close();
     }
 }

@@ -1496,19 +1496,12 @@ public class XWiki implements EventListener
 
     public XWikiHibernateStore getHibernateStore()
     {
-        XWikiStoreInterface resolvedStore = getStore();
-        if (resolvedStore instanceof XWikiHibernateStore hibernateStore) {
-            return hibernateStore;
-        } else if (resolvedStore instanceof XWikiCacheStoreInterface cacheStore) {
-            resolvedStore = cacheStore.getStore();
-            if (resolvedStore instanceof XWikiHibernateStore hibernateStore) {
-                return hibernateStore;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
+        return switch (getStore()) {
+            case XWikiHibernateStore hibernateStore -> hibernateStore;
+            case XWikiCacheStoreInterface cacheStore ->
+                cacheStore.getStore() instanceof XWikiHibernateStore hibernateStore ? hibernateStore : null;
+            case null, default -> null;
+        };
     }
 
     /**
@@ -3447,16 +3440,7 @@ public class XWiki implements EventListener
         }
 
         // Get navigator language setting
-        if (context.getRequest() != null) {
-            String accept = context.getRequest().getHeader("Accept-Language");
-            if ((accept != null) && (!accept.isEmpty())) {
-                String[] alist = StringUtils.split(accept, ",;-");
-                if ((alist != null) && !(alist.length == 0)) {
-                    context.setLanguage(alist[0]);
-                    navigatorLanguage = alist[0];
-                }
-            }
-        }
+        navigatorLanguage = getNavigatorLanguage(context);
 
         // Get language from cookie
         try {
@@ -3554,16 +3538,7 @@ public class XWiki implements EventListener
         }
 
         // Get navigator language setting
-        if (context.getRequest() != null) {
-            String accept = context.getRequest().getHeader("Accept-Language");
-            if ((accept != null) && (!accept.isEmpty())) {
-                String[] alist = StringUtils.split(accept, ",;-");
-                if ((alist != null) && !(alist.length == 0)) {
-                    context.setLanguage(alist[0]);
-                    navigatorLanguage = alist[0];
-                }
-            }
-        }
+        navigatorLanguage = getNavigatorLanguage(context);
 
         // Get language from cookie
         try {
@@ -3606,6 +3581,32 @@ public class XWiki implements EventListener
             addLanguageCookie(INTERFACE_LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
         }
         return language;
+    }
+
+    /**
+     * Get the language preferred by the browser, as declared by the {@code Accept-Language} header of the current
+     * request, and set it as the current language in the context when there is one.
+     *
+     * @param context the XWiki context holding the request
+     * @return the language preferred by the browser, or an empty string when there is no request or no usable
+     *         {@code Accept-Language} header
+     */
+    private String getNavigatorLanguage(XWikiContext context)
+    {
+        String navigatorLanguage = "";
+
+        if (context.getRequest() != null) {
+            String accept = context.getRequest().getHeader("Accept-Language");
+            if ((accept != null) && (!accept.isEmpty())) {
+                String[] alist = StringUtils.split(accept, ",;-");
+                if ((alist != null) && (alist.length != 0)) {
+                    context.setLanguage(alist[0]);
+                    navigatorLanguage = alist[0];
+                }
+            }
+        }
+
+        return navigatorLanguage;
     }
 
     public long getXWikiPreferenceAsLong(String preference, XWikiContext context)
@@ -4757,13 +4758,18 @@ public class XWiki implements EventListener
      * @param userReference the user responsible for the delete
      * @param document the document to delete
      * @param context the XWiki context
-     * @throws XWikiException when failing to delete
+     * @throws XWikiException when failing to delete or when the passed document is {@code null}
      * @since 11.6
      * @since 10.11.10
      */
     public void checkDeletingDocument(DocumentReference userReference, XWikiDocument document, XWikiContext context)
         throws XWikiException
     {
+        if (document == null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Cannot check the deletion of a null document");
+        }
+
         String currentWiki = null;
 
         currentWiki = context.getWikiId();
@@ -5969,9 +5975,7 @@ public class XWiki implements EventListener
                 reference = getDefaultDocumentReference().setWikiReference(new WikiReference(context.getWikiId()));
             }
         } else if (context.getMode() == XWikiContext.MODE_XMLRPC) {
-            reference = new DocumentReference(context.getWikiId(),
-                context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
-                context.getDoc().getDocumentReference().getName());
+            reference = getXMLRPCDocumentReference(context);
         } else {
             ResourceReference resourceReference = getResourceReferenceManager().getResourceReference();
             if (resourceReference instanceof EntityResourceReference entityResource) {
@@ -5991,6 +5995,22 @@ public class XWiki implements EventListener
         }
 
         return reference;
+    }
+
+    private DocumentReference getXMLRPCDocumentReference(XWikiContext context)
+    {
+        XWikiDocument document = context.getDoc();
+
+        if (document == null) {
+            // There's no current document yet (this method is precisely what's used to find out which document is
+            // requested), so point to this wiki's home page, as in portlet mode.
+            return getDefaultDocumentReference().setWikiReference(new WikiReference(context.getWikiId()));
+        }
+
+        DocumentReference documentReference = document.getDocumentReference();
+
+        return new DocumentReference(context.getWikiId(), documentReference.getLastSpaceReference().getName(),
+            documentReference.getName());
     }
 
     /**
@@ -8025,26 +8045,25 @@ public class XWiki implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof JobFinishedEvent jobFinishedEvent) {
+        switch (event) {
             // An extension just been initialized (after an install or upgrade for example)
-            onJobFinished(jobFinishedEvent);
-        } else if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            case JobFinishedEvent jobFinishedEvent -> onJobFinished(jobFinishedEvent);
             // A wiki has been deleted
-            onWikiDeletedEvent(wikiDeletedEvent);
-        } else if (event instanceof ComponentDescriptorAddedEvent componentDescriptorAddedEvent) {
+            case WikiDeletedEvent wikiDeletedEvent -> onWikiDeletedEvent(wikiDeletedEvent);
             // A new mandatory document initializer has been installed
-            onMandatoryDocumentInitializerAdded(componentDescriptorAddedEvent, (ComponentManager) source);
-        } else {
+            case ComponentDescriptorAddedEvent componentDescriptorAddedEvent ->
+                onMandatoryDocumentInitializerAdded(componentDescriptorAddedEvent, (ComponentManager) source);
             // Document modifications
+            case null, default -> {
+                XWikiDocument doc = (XWikiDocument) source;
 
-            XWikiDocument doc = (XWikiDocument) source;
-
-            if (event instanceof XObjectPropertyEvent xObjectPropertyEvent) {
-                EntityReference reference = xObjectPropertyEvent.getReference();
-                String modifiedProperty = reference.getName();
-                if (BACKLINKS.equals(modifiedProperty)) {
-                    this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue(BACKLINKS,
-                        getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
+                if (event instanceof XObjectPropertyEvent xObjectPropertyEvent) {
+                    EntityReference reference = xObjectPropertyEvent.getReference();
+                    String modifiedProperty = reference.getName();
+                    if (BACKLINKS.equals(modifiedProperty)) {
+                        this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent())
+                            .getIntValue(BACKLINKS, getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
+                    }
                 }
             }
         }

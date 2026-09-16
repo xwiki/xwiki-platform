@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.TestUtils;
 
@@ -58,7 +58,7 @@ public abstract class AbstractExtensionTestUtils
 
     private final Map<Integer, Boolean> initialized = new ConcurrentHashMap<>();
 
-    private UsernamePasswordCredentials adminCredentials = TestUtils.SUPER_ADMIN_CREDENTIALS;
+    private XWikiCredentials adminCredentials = TestUtils.SUPER_ADMIN_CREDENTIALS;
 
     /**
      * Creates a new instance.
@@ -76,7 +76,7 @@ public abstract class AbstractExtensionTestUtils
      * @param utils the generic test utility methods
      * @param adminCredentials the admin credentials to use
      */
-    protected AbstractExtensionTestUtils(TestUtils utils, UsernamePasswordCredentials adminCredentials)
+    protected AbstractExtensionTestUtils(TestUtils utils, XWikiCredentials adminCredentials)
     {
         this.utils = utils;
         this.adminCredentials = adminCredentials;
@@ -90,7 +90,7 @@ public abstract class AbstractExtensionTestUtils
             // Create the service page if it does not exist
             try (InputStream extensionTestService = this.getClass().getResourceAsStream("/extensionTestService.wiki")) {
                 // Make sure to save the service with superadmin
-                UsernamePasswordCredentials currentCredentials =
+                XWikiCredentials currentCredentials =
                     this.utils.setDefaultCredentials(this.adminCredentials);
 
                 // Save the service

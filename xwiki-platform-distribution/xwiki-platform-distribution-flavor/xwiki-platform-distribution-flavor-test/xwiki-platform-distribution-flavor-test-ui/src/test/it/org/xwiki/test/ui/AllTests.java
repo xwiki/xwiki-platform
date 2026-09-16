@@ -37,6 +37,7 @@ public class AllTests
     @PageObjectSuite.PostStart
     public void postStart(PersistentTestContext context) throws Exception
     {
+        context.getUtil().setPrivilegedCredentials(TestUtils.ADMIN_CREDENTIALS);
         context.getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
 
         // Use the text editor by default to speed up and simplify the tests. We test the WYSIWYG editor separately.

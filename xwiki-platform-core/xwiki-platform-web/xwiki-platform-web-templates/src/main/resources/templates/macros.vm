@@ -298,7 +298,7 @@ $xwiki.getUserName("xwiki:${username}")
     #set ($discard = $types.add("${type}s"))
     #set ($userAliasDisplay = '')
     #if ($macro.options.showAlias && $userAlias != $userName)
-      #set ($userAliasDisplay = "<span class=""${type}-alias"">" + $escapetool.xml($userAlias) + '</span>')
+      #set ($userAliasDisplay = " <span class=""${type}-alias"">(" + $escapetool.xml($userAlias) + ')</span>')
     #end
     #set ($escapedUserName = $escapetool.xml($userName))
     #getUserAvatarURL($userReference $avatarURL 120)

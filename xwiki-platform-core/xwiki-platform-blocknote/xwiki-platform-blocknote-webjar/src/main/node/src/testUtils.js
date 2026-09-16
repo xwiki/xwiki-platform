@@ -25,8 +25,11 @@ import { useI18n } from "vue-i18n";
 // the global define, or through the returned mock.
 const requireJS = mockRequireJS();
 
+// vi.mock is hoisted above the imports of every module importing this one, so it must be declared at the top
+// level to reflect where it actually runs.
+vi.mock("vue-i18n");
+
 function mockI18n() {
-  vi.mock("vue-i18n");
   useI18n.mockReturnValue({
     t: (tKey) => tKey,
   });

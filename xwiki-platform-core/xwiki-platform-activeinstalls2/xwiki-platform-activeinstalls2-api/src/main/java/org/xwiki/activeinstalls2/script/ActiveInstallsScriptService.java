@@ -66,7 +66,10 @@ public class ActiveInstallsScriptService implements ScriptService
     }
 
     /**
-     * Executes a Search query for Active Installs.
+     * Executes a Search query for Active Installs. Note that this returns only some of the matching pings, and which
+     * ones it returns is not defined, so it answers "what does a matching ping look like" rather than "give me every
+     * matching ping". Use {@link #countInstalls(String)} or {@link #countDistinctInstalls(String)} to count the
+     * matching pings or instances, since they count server-side instead of retrieving anything.
      *
      * @param jsonQuery the Elastic Search JSON query used to search for installs. For example:
      *        <pre>{@code
@@ -74,8 +77,11 @@ public class ActiveInstallsScriptService implements ScriptService
      *                "term": { "distribution.extension.version" : "5.2" }
      *            }
      *        }</pre>
-     * @return the parsed JSON result coming from Elastic Search, as a list of {@link Ping} object.
+     *      Passing an empty or null json string matches all the data found in the index (i.e no query constraint)
+     * @return the parsed JSON result coming from Elastic Search, as a list of {@link Ping} object. With the default
+     *      implementation, at most 10 pings are returned, however many of them match
      * @throws Exception when an error happens while retrieving the data
+     * @see DataManager#searchInstalls(String)
      * @since 14.4RC1
      */
     public List<Ping> searchInstalls(String jsonQuery) throws Exception

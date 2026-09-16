@@ -210,7 +210,7 @@ sort-descending = sort-amount-desc
 ## Since 18.0.0RC1
 note = sticky-note
 
-## Since 18.8.0RC1
+## Since 18.9.0RC1
 maximize = expand
 minimize = compress
 

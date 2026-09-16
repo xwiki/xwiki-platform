@@ -394,7 +394,7 @@ public class PasswordClass extends StringClass
     public String getPasswordHash(String password, String algorithmName)
     {
         PasswordEncoder passwordEncoder = getPasswordEncoder(algorithmName);
-        String encodedPassword = this.ENCODERS_MAP.get(algorithmName).encode(password);
+        String encodedPassword = ENCODERS_MAP.get(algorithmName).encode(password);
         if (passwordEncoder.upgradeEncoding(encodedPassword)
             || isDeprecatedEncoder(passwordEncoder.getClass())) {
             warnAboutOutdatedAlgorithm(algorithmName);
@@ -404,8 +404,8 @@ public class PasswordClass extends StringClass
 
     private @NonNull PasswordEncoder getPasswordEncoder(String algorithmName)
     {
-        if (this.ENCODERS_MAP.containsKey(algorithmName)) {
-            PasswordEncoder passwordEncoder = this.ENCODERS_MAP.get(algorithmName);
+        if (ENCODERS_MAP.containsKey(algorithmName)) {
+            PasswordEncoder passwordEncoder = ENCODERS_MAP.get(algorithmName);
             if (isDeprecatedEncoder(passwordEncoder.getClass())) {
                 warnAboutOutdatedAlgorithm(algorithmName);
             }

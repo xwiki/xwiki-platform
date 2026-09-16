@@ -233,13 +233,13 @@ export interface Logic {
    * Indicates whether the view is currently maximized.
    *
    * @returns whether the Live Data is currently displayed maximized
-   * @since 18.8.0RC1
+   * @since 18.9.0RC1
    */
   isMaximized(): boolean;
 
   /**
    * Switches between the maximized view and the normal view.
-   * @since 18.8.0RC1
+   * @since 18.9.0RC1
    */
   toggleMaximized(): void;
 }

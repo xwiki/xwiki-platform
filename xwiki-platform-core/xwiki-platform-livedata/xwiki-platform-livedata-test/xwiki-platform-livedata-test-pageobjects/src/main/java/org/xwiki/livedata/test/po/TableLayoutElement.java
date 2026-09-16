@@ -980,7 +980,7 @@ public class TableLayoutElement extends BaseElement
      * @param rowNumber the number of the row (the first line is number 1)
      * @param fieldName the name of the edited XClass property
      * @param editing {@code true} to wait for the editor to be displayed, {@code false} to wait for it to be closed
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void waitUntilCellIsEditing(String columnLabel, int rowNumber, String fieldName, boolean editing)
     {

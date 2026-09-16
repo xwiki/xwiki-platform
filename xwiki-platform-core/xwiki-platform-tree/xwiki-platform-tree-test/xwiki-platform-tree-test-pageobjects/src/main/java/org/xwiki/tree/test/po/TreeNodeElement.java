@@ -47,6 +47,11 @@ public class TreeNodeElement extends BaseElement
     private static final String ID = "id";
 
     /**
+     * The XPath locator of the node's anchor, relative to the node.
+     */
+    private static final String ANCHOR_XPATH = "./a";
+
+    /**
      * The tree that contains this node.
      */
     private WebElement treeElement;
@@ -100,7 +105,7 @@ public class TreeNodeElement extends BaseElement
      */
     public WebElement getLabelElement()
     {
-        return getElement().findElement(By.xpath("./a"));
+        return getElement().findElement(By.xpath(ANCHOR_XPATH));
     }
 
     /**
@@ -209,8 +214,7 @@ public class TreeNodeElement extends BaseElement
             try {
                 // The aria-busy attribute is not directly on the li element, but it's on the element located as a
                 // child of the li in the DOM.
-                WebElement anchor = getDriver().findElementWithoutWaiting(getElement(), By.id(String.format("%s_anchor",
-                    getId())));
+                WebElement anchor = getDriver().findElementWithoutWaiting(getElement(), By.xpath(ANCHOR_XPATH));
                 return !Boolean.parseBoolean(anchor.getAttribute("aria-busy"));
             } catch (StaleElementReferenceException e) {
                 // The element has just been replaced. Try again.

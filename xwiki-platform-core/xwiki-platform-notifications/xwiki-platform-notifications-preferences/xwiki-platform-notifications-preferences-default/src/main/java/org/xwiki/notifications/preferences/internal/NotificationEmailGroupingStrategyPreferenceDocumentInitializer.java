@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.preferences.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Named;
@@ -45,7 +44,7 @@ public class NotificationEmailGroupingStrategyPreferenceDocumentInitializer exte
     /**
      * The path to the class parent document.
      */
-    public static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
+    public static final List<String> PARENT_PATH = List.of("XWiki", "Notifications", "Code");
 
     /**
      * The reference of the class of the object holding the notification email preferences.

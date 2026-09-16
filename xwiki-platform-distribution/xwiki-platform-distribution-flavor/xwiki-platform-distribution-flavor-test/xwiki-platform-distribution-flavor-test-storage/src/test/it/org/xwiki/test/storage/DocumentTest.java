@@ -21,7 +21,6 @@ package org.xwiki.test.storage;
 
 import java.util.HashMap;
 
-import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -83,12 +82,12 @@ public class DocumentTest extends AbstractTest
         Assert.assertEquals("<p>" + versionOne + "</p>", StoreTestUtils.getPageAsString(pageURL));
 
         // Make sure the latest current version is actually v3.1
-        HttpMethod ret =
+        StoreTestUtils.Response ret =
             doPostAsAdmin(spaceName, pageName, null, "preview", "xpage=plain",
                 new HashMap<String, String>() {{
                     put("content", "{{velocity}}$doc.getVersion(){{/velocity}}");
                 }});
-        Assert.assertEquals("<p>3.1</p>", new String(ret.getResponseBody(), "UTF-8"));
+        Assert.assertEquals("<p>3.1</p>", ret.bodyAsString());
     }
 
     /**
@@ -102,13 +101,13 @@ public class DocumentTest extends AbstractTest
     public void testSaveOfThreeHundredKilobyteDocument() throws Exception
     {
         final String content = RandomStringUtils.secure().nextAlphanumeric(300000);
-        final HttpMethod ret =
+        final StoreTestUtils.Response ret =
             this.doPostAsAdmin(this.spaceName, this.pageName, null, "save", null,
                 new HashMap<String, String>() {{
                     put("content", content);
                 }});
         // save forwards the user to view, if it's too big, jetty gives you some error response code (400+)
-        Assert.assertEquals(302, ret.getStatusCode());
+        Assert.assertEquals(302, ret.code());
     }
 
     @Test

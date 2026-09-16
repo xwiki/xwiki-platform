@@ -25,13 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-xclass-test</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-xclass-test-docker</artifactId>
   <name>XWiki Platform - XClass - Tests - Functional Docker Tests</name>
   <packaging>jar</packaging>
   <description>Tests for the XClass Application with Docker</description>
   <properties>
+    <!-- We must specify a value as otherwise 1.00 is expected because we have some class in src/main/java -->
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -49,6 +51,30 @@
       <artifactId>xwiki-platform-administration-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <!-- Needed to compile the test-only script service in src/main/java. Nothing is shipped from here: the docker
+         test framework copies target/classes into WEB-INF/classes, where the distribution already provides these. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <!-- Needed to wait for the asynchronous work a document save triggers, so that it cannot interfere with what
+         the test measures. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

@@ -36,4 +36,9 @@ class AllIT
     class NestedLiveDataIT extends LiveDataIT
     {
     }
+
+    @Nested
+    class NestedLiveDataInplaceEditIT extends LiveDataInplaceEditIT
+    {
+    }
 }

@@ -53,6 +53,7 @@ public class AllTests
     @PageObjectSuite.PostStart
     public void postStart(PersistentTestContext context)
     {
+        context.getUtil().setPrivilegedCredentials(TestUtils.ADMIN_CREDENTIALS);
         context.getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
     }
 }

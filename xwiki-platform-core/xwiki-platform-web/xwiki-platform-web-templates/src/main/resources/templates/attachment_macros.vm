@@ -218,9 +218,7 @@
         </span>
       </a>
     #end
-    #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.attachment.actions'))
-      $services.rendering.render($uix.execute(), 'html/5.0')
-    #end
+    $services.uix.renderExtensions('org.xwiki.platform.attachment.actions', 'html/5.0')
   </div>
 #end
 

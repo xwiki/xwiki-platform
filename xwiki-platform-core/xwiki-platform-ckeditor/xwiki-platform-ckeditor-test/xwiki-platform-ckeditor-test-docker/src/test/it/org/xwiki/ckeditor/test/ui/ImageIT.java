@@ -445,13 +445,16 @@ class ImageIT extends AbstractCKEditorIT
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
-        // The reference (suggest) input is focused when the link dialog is opened so the dropdown is opened.
-        linkDialog.getResourceSuggestInput().waitForSuggestions().hideSuggestions();
+        // The reference (suggest) input is focused when the link dialog is opened so the dropdown is opened. We
+        // currently have to select a link target. See XWIKI-24860: Preselect the image resource reference as link
+        // target when creating a link from an image selection
+        linkDialog.getResourceSuggestInput().waitForSuggestions()
+            .sendKeys(testReference.getLastSpaceReference().getName()).waitForSuggestions().selectByIndex(0);
         linkDialog.submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
-        assertEquals("[[~[~[image:image.gif~]~]>>]]", savedPage.editWiki().getContent());
+        assertEquals("[[~[~[image:image.gif~]~]>>doc:]]", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -915,8 +918,10 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage page = setup.createPage(testReference, "[[image:image.gif||data-widget='uploadimage']]");
         WYSIWYGEditPage wysiwygEditPage = page.editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
-        // Make sure the image can be clicked as a proof that the editor did not crash.
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        // Make sure the editor did not crash.
+        editor.getRichTextArea().verifyContent(content -> assertTrue(
+            content.getImages().stream().anyMatch(image -> image.getDomAttribute("src").endsWith("/image.gif")),
+            "The image is missing from the edited content."));
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
         assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
     }

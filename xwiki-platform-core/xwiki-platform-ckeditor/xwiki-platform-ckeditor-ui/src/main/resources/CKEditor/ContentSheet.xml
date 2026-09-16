@@ -64,9 +64,7 @@
       &lt;meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" /&gt;
       ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the
       ## "org.xwiki.platform.html.head" Extension Point. This extension point is also used in htmlheader.vm
-      #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter' : 'order'}))
-        $services.rendering.render($uix.execute(), 'xhtml/1.0')
-      #end
+      $services.uix.renderExtensions('org.xwiki.platform.html.head', 'html/5.0', {'sortByParameter': 'order'})
       ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
       &lt;!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin --&gt;
       ## Fix some issues caused by the fact that we put the content directly under the BODY element.
@@ -248,6 +246,58 @@ a[data-linktype="create"]::after {
 }
 .macro[data-widget="xwiki-macro"] &gt; div.macro-placeholder {
   display: block;
+}
+
+/* Display the macro name next to the move handle, in order to be able to identify the macros that are nested or that
+  don't have a visible output. The move handle is hidden by collapsing its container, which doesn't hide the
+  overflowing macro name, so the macro name is displayed only while the macro is hovered. */
+.cke_widget_xwiki-macro &gt; .cke_widget_drag_handler_container {
+  /* CKEditor paints the move handle as a background image and sizes the container after it, so the container has to
+    grow with the macro name. The image comes from a background shorthand set in a style attribute, which resets the
+    repetition and wins over a plain declaration, hence the important one needed to keep the handle from being tiled
+    over the whole width. */
+  background-repeat: no-repeat !important;
+  /* Keep the room of the move handle even when the macro name is missing. */
+  min-width: 15px;
+  width: auto;
+}
+.cke_widget_drag_handler_container &gt; .macro-name {
+  /* Match the grey CKEditor hard-codes for the move handle, rather than a color theme value that would drift away
+    from it. The handle container is painted with an opacity of 0.75, applied after the text is drawn, so the text has
+    to be black to stay readable through it. */
+  background-color: #dcdcdc;
+  color: #000;
+  display: block;
+  font-family: monospace;
+  /* Fit the text in the 15px band of the move handle, whose size CKEditor hard-codes as well. */
+  font-size: 12px;
+  line-height: 15px;
+  /* Leave the move handle visible on the left of the macro name. */
+  margin-inline-start: 15px;
+  padding: 0 .3em;
+  /* Let the move handle stretched above the macro name receive the mouse events. */
+  pointer-events: none;
+  /* CKEditor delays the collapsing of the move handle container by 0.2s, so hide the macro name with the same delay
+    and let the two disappear together. Hovering the macro drops the delay, so both appear at once. The duration is
+    left to its default of zero rather than written down, the stylesheet minifier turning an explicit 0s into a
+    unitless 0 that invalidates the whole declaration. */
+  transition-delay: .2s;
+  transition-property: visibility;
+  visibility: hidden;
+  white-space: nowrap;
+}
+.cke_widget_wrapper:hover &gt; .cke_widget_drag_handler_container &gt; .macro-name {
+  transition: none;
+  visibility: visible;
+}
+.cke_widget_xwiki-macro &gt; .cke_widget_drag_handler_container &gt; img.cke_widget_drag_handler {
+  /* Stretch the move handle over the macro name, so that the macro can be dragged from the whole band. CKEditor
+    listens for the drag on this image only. The stretch applies whether the macro is hovered or not, so that the
+    macro name keeps its place in the band while it is being hidden. */
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
 }
 
 /* Inline widgets (macros) have display:inline-block and thus don't inherit the text-decoration styles. We fix this by

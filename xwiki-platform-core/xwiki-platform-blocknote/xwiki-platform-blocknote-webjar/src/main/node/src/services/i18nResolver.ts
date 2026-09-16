@@ -25,6 +25,11 @@ declare global {
   const define: (moduleName: string, moduleDefinition: unknown) => void;
 }
 
+/**
+ * The translation keys the editor needs, without the prefix that the localization module adds back.
+ */
+const TRANSLATION_KEYS = ["editor.label", "autoSaveSummary"];
+
 type Config = {
   locale: string;
   prefix: string;
@@ -40,7 +45,7 @@ async function fetchTranslation(): Promise<Translation> {
   define("xwiki-blocknote-translation-keys", {
     locale: document.documentElement.getAttribute("lang"),
     prefix: "blocknote.",
-    keys: [],
+    keys: TRANSLATION_KEYS,
   });
   const [config, translatedMessages] = await loadById<
     [Config, Record<string, string>]

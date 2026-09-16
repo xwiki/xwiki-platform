@@ -19,6 +19,7 @@
  */
 import * as decoding from "lib0/decoding";
 import * as encoding from "lib0/encoding";
+import { removeAwarenessStates } from "y-protocols/awareness";
 import { WebsocketProvider } from "y-websocket";
 import { Doc } from "yjs";
 
@@ -86,7 +87,13 @@ export function createXWikiWebSocketProvider(
     provider: WebsocketProvider,
   ): void => {
     const disconnectedClientId = readClientId(decoder);
-    provider.awareness.getStates().delete(disconnectedClientId);
+    // Go through the awareness protocol rather than dropping the entry from the map, so that the local listeners
+    // are notified that the client left and the awareness meta data stays consistent.
+    removeAwarenessStates(
+      provider.awareness,
+      [disconnectedClientId],
+      "disconnected",
+    );
   };
   // Send the client id to the server once on connect.
   websocketProvider.once("status", ({ status }) => {

@@ -52,6 +52,10 @@ image.style.administration.liveData.type.hint=画像のスタイルの種類（C
 image.style.administation.newImageStyle.label=新しい画像のスタイル
 image.style.administation.newImageStyle.hint=新しい画像のスタイルの識別子。
 image.style.administation.newImageStyle.placeHolder=識別子
+### Missing: image.style.administation.newImageStyle.normalizedTitle=
+### Missing: image.style.administation.newImageStyle.invalidIdentifier=
+### Missing: image.style.administation.newImageStyle.tokenExpired=
+### Missing: image.style.administation.newImageStyle.validationFailed=
 Image.Style.Code.ImageStyleClass_adjustableAlignment=並べ方を調整できるようにする
 Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=チェックすると、画像の並べ方をカスタマイズできるようになります。
 Image.Style.Code.ImageStyleClass_adjustableBorder=ボーダーを調整できるようにする
@@ -82,5 +86,7 @@ Image.Style.Code.ImageStyleClass_type=種類
 Image.Style.Code.ImageStyleClass_type_hint=画像のスタイルの種類（CSSのクラスに使用されます）。
 Image.Style.Code.ConfigurationClass_defaultStyle=既定のスタイル
 Image.Style.Code.ConfigurationClass_defaultStyle_hint=このウィキの既定の画像のスタイル。
+### Missing: Image.Style.Code.ConfigurationClass_forceDefaultStyle=
+### Missing: Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=
 </content>
 </xwikidoc>

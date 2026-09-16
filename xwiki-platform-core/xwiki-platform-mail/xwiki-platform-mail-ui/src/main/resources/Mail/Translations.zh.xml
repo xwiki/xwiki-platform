@@ -57,7 +57,7 @@ Mail.SendMailConfigClass_port=电子邮件服务器的端口号
 Mail.SendMailConfigClass_port.hint=SMTP服务器的端口，留空则为默认值25
 Mail.SendMailConfigClass_username=电子邮件服务器用户名
 Mail.SendMailConfigClass_username.hint=访问SMTP服务器需要的用户名，留空则为无需认证
-### Missing: Mail.SendMailConfigClass_password=Email Server Password
+Mail.SendMailConfigClass_password=Email Server Password
 Mail.SendMailConfigClass_password.hint=访问SMTP服务器需要的密码，留空则为无需认证
 Mail.SendMailConfigClass_properties=技术配置
 Mail.SendMailConfigClass_properties.hint=上文没有定义的其他JavaMail属性，例如此语句将启用tls选项：mail.smtp.starttls.enable=true
@@ -70,7 +70,7 @@ Mail.SendMailStatus_livetable.batchId=批处理 ID
 Mail.SendMailStatus_livetable.type=类型
 Mail.SendMailStatus_livetable.recipients=收件人
 Mail.SendMailStatus_livetable.state=地位
-### Missing: Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=错误
 Mail.SendMailStatus_livetable.actions=行动
 Mail.SendMailStatus_livetable.resend=发送

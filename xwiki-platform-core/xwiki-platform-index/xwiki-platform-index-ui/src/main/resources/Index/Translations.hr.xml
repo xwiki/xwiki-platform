@@ -36,7 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Prostori
+  <content>index.deletedDocuments.deleteAll=Delete all
+### Missing: index.administration.remainingTasks.heading=
+### Missing: index.administration.remainingTasks.emptyQueue=
+### Missing: admin.documentanalysis=
+
+#######################################
+## until 16.3.0RC1
+#######################################
+
+index.spacesMacro.title=Prostori
 index.spacesMacro.spaceIndex.title=Vidi imenik prostora
 index.spacesMacro.spaceIndex.alt=Imenik prostora
 index.spacesMacro.spaceAdministration.title=Vidi upravljanje prostorom
@@ -44,5 +53,5 @@ index.spacesMacro.spaceAdministration.alt=Upravljaj prostorom
 index.spacesMacro.createSpace.link=Izradi novi prostor
 index.spacesMacro.createSpace.defaultSpaceName=Ime prostora
 index.spacesMacro.createSpace.submit=Izradi
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+</content>
 </xwikidoc>

@@ -166,7 +166,7 @@ rendering.macro.workspaces.description=已弃用的宏，由于兼容性问题�
 
 ## Browse
 platform.wiki.browse=浏览Wiki
-### Missing: platform.wiki.browse.emptyvalue=N/A
+platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=名称
 platform.wiki.browse.description=描述
 platform.wiki.browse.owner=所有者

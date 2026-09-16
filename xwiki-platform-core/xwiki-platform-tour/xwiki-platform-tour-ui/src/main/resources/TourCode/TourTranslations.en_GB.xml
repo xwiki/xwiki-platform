@@ -37,65 +37,66 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># App name
-### Missing: tour.app.name=
+### Missing: tour.app.name=Tour
 
 # Class fields
-### Missing: TourCode.TourClass_description=
-### Missing: TourCode.TourClass_isActive=
-### Missing: TourCode.TourClass_targetPage=
+### Missing: TourCode.TourClass_description=Description
+### Missing: TourCode.TourClass_isActive=Active
+### Missing: TourCode.TourClass_targetPage=Target Page
 
 # Live table generic keys
-### Missing: tour.livetable.doc.title=
-### Missing: tour.livetable._actions=
-### Missing: tour.livetable._actions.edit=
-### Missing: tour.livetable._actions.delete=
-### Missing: tour.livetable._actions.launch=
-### Missing: tour.livetable.emptyvalue=
+### Missing: tour.livetable.doc.title=Tour name
+### Missing: tour.livetable._actions=Actions
+### Missing: tour.livetable._actions.edit=Edit
+### Missing: tour.livetable._actions.delete=Delete
+### Missing: tour.livetable._actions.launch=Launch
+### Missing: tour.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: tour.livetable.description=
-### Missing: tour.livetable.isActive=
-### Missing: tour.livetable.targetPage=
-### Missing: tour.livetable.targetClass=
+### Missing: tour.livetable.description=Description
+### Missing: tour.livetable.isActive=Active
+### Missing: tour.livetable.targetPage=Target Page
+### Missing: tour.livetable.targetClass=Target Class
 
 # Tour popover
-### Missing: tour.popover.previous=
-### Missing: tour.popover.next=
-### Missing: tour.popover.end=
+### Missing: tour.popover.previous=« Prev
+### Missing: tour.popover.next=Next »
+### Missing: tour.popover.end=End tour
 ### Missing: tour.popover.quit=
-### Missing: tour.popover.show=
-### Missing: tour.popover.show.hint=
+### Missing: tour.popover.show=Show tour
+### Missing: tour.popover.show.hint=You can restart the tour by clicking this button at anytime
 
 # Steps
-### Missing: TourCode.StepClass_order=
-### Missing: TourCode.StepClass_element=
-### Missing: TourCode.StepClass_title=
-### Missing: TourCode.StepClass_content=
-### Missing: TourCode.StepClass_backdrop=
-### Missing: TourCode.StepClass_placement=
-### Missing: TourCode.StepClass_targetPage=
-### Missing: TourCode.StepClass_action=
-### Missing: TourCode.StepClass_queryString=
-### Missing: tour.steps=
-### Missing: tour.steps.new_step=
-### Missing: tour.steps.add_step=
-### Missing: tour.steps.edit_step=
-### Missing: tour.steps.save_step=
-### Missing: tour.steps.delete_confirm=
-### Missing: tour.steps.delete_done=
-### Missing: tour.steps.deleting=
-### Missing: tour.steps.yes=
-### Missing: tour.steps.no=
-### Missing: tour.steps.edit=
-### Missing: tour.steps.delete=
+### Missing: TourCode.StepClass_order=Order
+### Missing: TourCode.StepClass_element=Element (CSS selector that identify an element)
+### Missing: TourCode.StepClass_title=Title
+### Missing: TourCode.StepClass_content=Content
+### Missing: TourCode.StepClass_backdrop=Backdrop
+### Missing: TourCode.StepClass_placement=Placement
+### Missing: TourCode.StepClass_targetPage=Target Page
+### Missing: TourCode.StepClass_action=Target Action
+### Missing: TourCode.StepClass_queryString=Query String
+### Missing: TourCode.StepClass_reflex=
+### Missing: tour.steps=Steps
+### Missing: tour.steps.new_step=New step
+### Missing: tour.steps.add_step=Add step
+### Missing: tour.steps.edit_step=Edit step
+### Missing: tour.steps.save_step=Save
+### Missing: tour.steps.delete_confirm=Are you sure you want to delete the step?
+### Missing: tour.steps.delete_done=Delete step done!
+### Missing: tour.steps.deleting=Deleting step...
+### Missing: tour.steps.yes=Yes
+### Missing: tour.steps.no=No
+### Missing: tour.steps.edit=Edit
+### Missing: tour.steps.delete=Delete
 
 # Upgrade
-### Missing: tour.upgrade.title=
-### Missing: tour.upgrade.successList=
-### Missing: tour.upgrade.successNothing=
+### Missing: tour.upgrade.title=Upgrade
+### Missing: tour.upgrade.successList=Successfully converted the following pages:
+### Missing: tour.upgrade.successNothing=You have nothing to upgrade!
 
 # Template
-### Missing: tour.template.name=
-### Missing: tour.template.description=
+### Missing: tour.template.name=Tour
+### Missing: tour.template.description=Step by step tour
 </content>
 </xwikidoc>

@@ -741,6 +741,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
      * @param vcontext Velocity context passed to the velocity renderer
      * @return True if the email has been sent
      */
+    // Published API of the mail sender plugin, also reachable from wiki scripts: the signature cannot change.
+    @SuppressWarnings("java:S107")
     public int sendMailFromTemplate(String templateDocFullName, String from, String to, String cc, String bcc,
         String language, VelocityContext vcontext, XWikiContext context) throws XWikiException
     {
@@ -826,6 +828,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
      * @param parameters variables to be passed to the velocity context
      * @return True if the email has been sent
      */
+    // Published API of the mail sender plugin, also reachable from wiki scripts: the signature cannot change.
+    @SuppressWarnings("java:S107")
     public int sendMailFromTemplate(String templateDocFullName, String from, String to, String cc, String bcc,
         String language, Map<String, Object> parameters, XWikiContext context) throws XWikiException
     {

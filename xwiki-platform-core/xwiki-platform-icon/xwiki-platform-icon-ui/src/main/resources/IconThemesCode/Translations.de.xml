@@ -38,7 +38,6 @@
   <parent>IconThemes.WebHome</parent>
   <content>platform.icon.picker.preview=Vorschau mit:
 platform.icon.picker.loading=Lade
-
 rendering.macro.iconPicker.name=Symbolauswahl
 rendering.macro.iconPicker.description=Wählen Sie ein Symbol aus dem XWiki-Symbolsatz aus.
 rendering.macro.iconPicker.parameter.id.name=id
@@ -46,5 +45,6 @@ rendering.macro.iconPicker.parameter.id.description=DOM id des Eingabefeldes, au
 rendering.macro.iconPicker.parameter.class.name=Klasse
 rendering.macro.iconPicker.parameter.class.description=CSS-Klasse der Eingaben, auf die der Picker angewendet werden soll
 rendering.macro.iconPicker.parameter.prefix.name=Präfix
-rendering.macro.iconPicker.parameter.prefix.description=Präfix, das dem Namen des Symbols im Eingabefeld vorangestellt wird (Standard: "image:icon:")</content>
+rendering.macro.iconPicker.parameter.prefix.description=Präfix, das dem Namen des Symbols im Eingabefeld vorangestellt wird (Standard: "image:icon:")
+</content>
 </xwikidoc>

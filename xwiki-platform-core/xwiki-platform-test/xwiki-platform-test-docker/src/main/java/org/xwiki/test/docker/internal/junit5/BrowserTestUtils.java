@@ -23,17 +23,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.images.ImagePullPolicy;
+import org.testcontainers.images.RemoteDockerImage;
 import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.browser.XWikiBrowserWebDriverContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.browser.Browser;
 
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.async.ResultCallbackTemplate;
-import com.github.dockerjava.api.command.PullImageResultCallback;
+import com.github.dockerjava.api.exception.NotFoundException;
 
 import static org.xwiki.test.docker.junit5.browser.Browser.CHROME;
 
@@ -58,6 +60,8 @@ public final class BrowserTestUtils
 
     private static final boolean IS_ARM64 = "aarch64".equals(System.getProperty("os.arch"));
 
+    private static final long DAY = 1000L * 60L * 60L * 24L;
+
     private static List<String> pulledImages = new ArrayList<>();
 
     private BrowserTestUtils()
@@ -77,7 +81,7 @@ public final class BrowserTestUtils
         if (container instanceof XWikiBrowserWebDriverContainer && !testConfiguration.isOffline()) {
             DockerImageName din = getSeleniumDockerImageName(testConfiguration);
             if (!pulledImages.contains(din.asCanonicalNameString())) {
-                pullImage(container.getDockerClient(), din.asCanonicalNameString());
+                pullImage(din);
                 pulledImages.add(din.asCanonicalNameString());
             }
         }
@@ -96,23 +100,59 @@ public final class BrowserTestUtils
             : DockerImageName.parse(getImageName(testConfiguration, false));
     }
 
-    private static void pullImage(DockerClient dockerClient, String imageName)
-    {
-        PullImageResultCallback pullImageResultCallback = dockerClient
-            .pullImageCmd(imageName)
-            .exec(new PullImageResultCallback());
-        wait(pullImageResultCallback);
-    }
-
-    private static void wait(ResultCallbackTemplate template)
+    private static void pullImage(DockerImageName imageName)
     {
         try {
-            template.awaitCompletion();
-        } catch (InterruptedException e) {
-            LOGGER.warn("Interrupted thread [{}]. Root cause: [{}]", Thread.currentThread().getName(),
-                org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage(e));
-            // Restore interrupted state to be a good citizen...
-            Thread.currentThread().interrupt();
+            // Delegate the pull to TestContainers so that we benefit from its retry logic on transient registry
+            // errors, from its image name substitution and from its local image cache handling.
+            //
+            // Note that we can't simply set this policy on the container: BrowserWebDriverContainer#configure()
+            // calls GenericContainer#setDockerImageName() which replaces the RemoteDockerImage (and thus drops any
+            // policy set on the container) with one using the default policy. That's the very bug this class works
+            // around, see https://github.com/testcontainers/testcontainers-java/issues/4608. Since we create and
+            // resolve the RemoteDockerImage ourselves here, the policy is honored.
+            new RemoteDockerImage(imageName).withImagePullPolicy(getImagePullPolicy()).get();
+        } catch (Exception e) {
+            if (e instanceof InterruptedException) {
+                // Restore interrupted state to be a good citizen...
+                Thread.currentThread().interrupt();
+            }
+
+            // We couldn't reach the registry. We only pull this image to make sure we test with the latest browser
+            // version, and it's normally already cached on the agent from previous builds. Thus, when a local copy
+            // exists, use it instead of failing the whole test module because of an infrastructure problem. We only
+            // fail when there's no image to fall back to, i.e. when the tests cannot run at all.
+            if (isImageAvailableLocally(imageName)) {
+                LOGGER.warn("Failed to pull image [{}]. Continuing with the locally-available image, which may not "
+                    + "be the latest one. Root cause: [{}]", imageName, ExceptionUtils.getRootCauseMessage(e));
+            } else {
+                throw new RuntimeException(String.format(
+                    "Failed to pull image [%s] and no local copy of that image is available", imageName), e);
+            }
+        }
+    }
+
+    private static ImagePullPolicy getImagePullPolicy()
+    {
+        // Only pull once a day to avoid the dockerhub pull rate limit, and to reduce the number of times a registry
+        // outage can break the build. Also pull whenever there's no local copy to fall back to, since
+        // DurationImagePullPolicy only looks at the date of the last pull and not at what's actually available
+        // locally (e.g. the image could have been pruned on the agent since then).
+        DurationImagePullPolicy durationPolicy = new DurationImagePullPolicy(DAY);
+        return imageName -> durationPolicy.shouldPull(imageName) || !isImageAvailableLocally(imageName);
+    }
+
+    private static boolean isImageAvailableLocally(DockerImageName imageName)
+    {
+        try {
+            DockerClientFactory.instance().client().inspectImageCmd(imageName.asCanonicalNameString()).exec();
+            return true;
+        } catch (NotFoundException e) {
+            return false;
+        } catch (RuntimeException e) {
+            LOGGER.warn("Failed to check if image [{}] is available locally. Root cause: [{}]", imageName,
+                ExceptionUtils.getRootCauseMessage(e));
+            return false;
         }
     }
 

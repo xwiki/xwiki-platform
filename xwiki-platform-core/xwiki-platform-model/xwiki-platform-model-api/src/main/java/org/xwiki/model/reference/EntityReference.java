@@ -216,6 +216,9 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @param name the name for this entity
      * @exception IllegalArgumentException if the passed name is null or empty
      */
+    // The IllegalArgumentException is the documented contract of this setter, not a defect: an entity reference with
+    // an empty name is invalid and must be rejected at construction time rather than produce a broken reference.
+    @SuppressWarnings("javabugs:S6416")
     protected void setName(String name)
     {
         if (StringUtils.isEmpty(name)) {

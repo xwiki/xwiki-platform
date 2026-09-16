@@ -41,14 +41,14 @@ platform.appwithinminutes.homePageTitle=Aplikacija u nekoliko minuta
 platform.appwithinminutes.description=U nekoliko minuta izradite kolaboracijske mrežne aplikacije temeljene na XWikijevom moćnom sustavu upravljanja strukturiranim podatcima.
 platform.appwithinminutes.createAppButtonLabel=Izradi aplikaciju
 platform.appwithinminutes.appsLiveTableHeading=Aplikacije
-### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
+platform.appwithinminutes.appsLiveTable.doc.title=Application
 platform.appwithinminutes.appsLiveTable.doc.author=Posljednji autor
 platform.appwithinminutes.appsLiveTable.doc.date=Datum ažuriranja
 platform.appwithinminutes.appsLiveTable._actions=Akcije
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Odobri ovlasti za upravljanje prostorom.
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Izradite vlastitu\!
+platform.appwithinminutes.appPanelCreateEntry=Izradite vlastitu!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Korak {0} — {1}
@@ -71,7 +71,7 @@ platform.appwithinminutes.wizardStepFinishButtonTip=Idite na početnu stranicu a
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Prethodni korak
 platform.appwithinminutes.wizardStepPreviousButtonTip=Idite na prethodni korak
 platform.appwithinminutes.wizardStepHelpTitle=Koraci
-platform.appwithinminutes.wizardStepHelpDescription=Ovaj čarobnjak će vas voditi kroz proces izrade aplikacije. Ovo su koraci koje ćete poduzeti\:
+platform.appwithinminutes.wizardStepHelpDescription=Ovaj čarobnjak će vas voditi kroz proces izrade aplikacije. Ovo su koraci koje ćete poduzeti:
 
 ### Wizard Step 1: Application Name
 appWithinMinutes.createApp.location.label=Lokacija
@@ -94,26 +94,22 @@ platform.appwithinminutes.appNameEmptyError=Molim unesite ime aplikacije.
 platform.appwithinminutes.classEditorPaletteTitle=Paleta polja
 platform.appwithinminutes.classEditorPaletteHint=Povucite i ispustite polja iz palete kako biste izradili formu koja će biti korištena za unos vaših podataka.
 platform.appwithinminutes.classEditorCanvasHint=Povucite polja iz palete te ih ispustite u ovaj okvir.
-
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Ažuriraj predložak
 platform.appwithinminutes.classEditorUpdateTemplateHint=Predložak ({0}) pohranjuje zadane vrijednosti polja.
 platform.appwithinminutes.classEditorUpdateSheetLabel=Ažuriraj plahtu
 platform.appwithinminutes.classEditorUpdateSheetHint=Plahta ({0}) koristi se za prikaz i uređivanje strukturiranih podataka.
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Ažuriraj prijevod
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Ažurirajte prijevod prikaznih imena polja i vrijednosti liste ({0}).
-
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Ova klasa ima višestruke plahte.
-platform.appwithinminutes.classEditorDuplicateFieldNameError=Klasa ima dva polja s istim imenom\: {0}
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Klasa ima dva polja s istim imenom: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Ažuriraj zadane vrijednosti
 platform.appwithinminutes.classEditorBindSheetSaveComment=Poveži plahtu klase
 platform.appwithinminutes.classEditorSheetSaveComment=Ažuriraj plahtu klase
 platform.appwithinminutes.classEditorTranslationsSaveComment=Ažuriraj prijevode
-
 platform.appwithinminutes.classEditorStandardCategoryName=Standardno
 platform.appwithinminutes.classEditorPickersCategoryName=Odabirači
 platform.appwithinminutes.classEditorDocumentCategoryName=Stranica
 platform.appwithinminutes.classEditorAdvancedCategoryName=Napredno
-
 platform.appwithinminutes.classEditorDBListFieldName=Lista baza podataka
 platform.appwithinminutes.classEditorGroupsFieldName=Grupa
 platform.appwithinminutes.classEditorUsersFieldName=Korisnik
@@ -125,16 +121,16 @@ platform.appwithinminutes.classEditorTextAreaFieldName=Dugi tekst
 platform.appwithinminutes.classEditorStringFieldName=Kratki tekst
 platform.appwithinminutes.classEditorContentFieldName=Sadržaj
 platform.appwithinminutes.classEditorTitleFieldName=Naslov
-### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
-
+platform.appwithinminutes.classEditorPageFieldName=Page
 platform.appwithinminutes.classEditorDeleteFieldLabel=Obriši
 platform.appwithinminutes.classEditorConfigureFieldLabel=Podesi
 platform.appwithinminutes.classEditorPreviewFieldLabel=Pretpregledaj
 platform.appwithinminutes.classEditorPreviewFieldHint=Sakrij konfiguracijski panel i primijeni izmjene
 platform.appwithinminutes.classEditorMoveFieldLabel=Prebaci
 platform.appwithinminutes.classEditorMoveFieldHint=Povucite i ispustite za promjenu poretka
-
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Zadana vrijednost
+### Missing: platform.appwithinminutes.classEditorFieldPrettyNameToolTip=
+### Missing: platform.appwithinminutes.classEditorFieldHintToolTip=
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -147,9 +143,10 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Vrijednost
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Identifikator
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Dodaj
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Obriši
-
 appWithinMinutes.templateProviderEditor.hint=Aplikacijski zapisi su wiki stranice koje sadrže strukturirane podatke.
+### Missing: appWithinMinutes.templateProviderEditor.icon.name=
 appWithinMinutes.templateProviderEditor.icon.hint=Ikona pridružena aplikacijskom zapisu.
+### Missing: appWithinMinutes.templateProviderEditor.description.name=
 appWithinMinutes.templateProviderEditor.description.hint=Kratki opis aplikacijskog zapisa.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Odakle izraditi zapise
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Ako nije odabrana nijedna lokacija, zapisi mogu biti izrađeni s bilo koje stranice.
@@ -157,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Gdje izraditi 
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Ako nije odabrana nijedna lokacija, zapisi mogu biti izrađeni bilo gdje u wikiju.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Nemoj nametati lokaciju zapisa
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Koristite gore naznačene lokacije samo kao prijedloge, dozvoljavajući korisniku odabir drukčije lokacije prilikom izrade aplikacijskog zapisa.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=
 appWithinMinutes.templateProviderEditor.terminal.hint=Bi li aplikacijski zapisi trebali biti terminalne stranice ili ne.
 
 ### Wizard Step 3: Application Presentation
@@ -186,14 +184,14 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=Slike
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=Poseban stupac za prikaz slika pridruženih podatkovnoj stranici
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Poseban stupac za prikaz korisnikovog avatara. Radi samo za tablicu povezanu s klasom XWiki.XWikiUsers.
-### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
+platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
 platform.appwithinminutes.liveTableEditorDescriptionHint=Sadržaj koji će biti prikazan na početnoj stranici iznad tablice s podacima aplikacije. Upotrijebite ga za opis aplikacije.
 platform.appwithinminutes.liveTableEditorColumnsHint=Odaberite stupce koje biste željeli uključiti u tablicu koja se prikazuje na početnoj stranici aplikacije.
 platform.appwithinminutes.liveTableEditorSaveComment=Ažuriraj tablicu
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Povucite i ispustite za promjenu poretka
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Obrišite
 platform.appwithinminutes.liveTableEditorAddColumnHint=Dodajte
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Neki stupci su precrtani, vjerojatno zato što su pripadna aplikacijska polja obrisana. Želite li ih ukloniti? &lt;a href\=""&gt;Da&lt;/a&gt; / &lt;a href\=""&gt;Ne&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Neki stupci su precrtani, vjerojatno zato što su pripadna aplikacijska polja obrisana. Želite li ih ukloniti? &lt;a href=""&gt;Da&lt;/a&gt; / &lt;a href=""&gt;Ne&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Ikona aplikacije. Možete odabrati ikonu iz odabirača ikona ili možete referencirati pridruženu sliku.
 
@@ -204,14 +202,15 @@ platform.appwithinminutes.appLiveTableDeleteEntryActionName=Obriši
 platform.appwithinminutes.appHomePageActionsHeading=Akcije
 platform.appwithinminutes.appHomePageAddEntryLabel=Dodaj
 platform.appwithinminutes.appHomePageAddEntryHint=Dodajte novi zapis
-platform.appwithinminutes.appHomePageEntryNameLabel=Ime zapisa\:
+platform.appwithinminutes.appHomePageEntryNameLabel=Ime zapisa:
 platform.appwithinminutes.appHomePageDeleteEntriesLabel=Obriši sve zapise
 platform.appwithinminutes.appHomePageEditAppLabel=Uredi aplikaciju
 platform.appwithinminutes.appHomePageTranslateAppLabel=Prevedi aplikaciju
 platform.appwithinminutes.appHomePageDeleteAppLabel=Obriši aplikaciju
-### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
-### Missing: AppWithinMinutes.LiveTableClass_description=Description
-### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: platform.appwithinminutes.appHomePageNoScriptRight=
+AppWithinMinutes.LiveTableClass_description=Description
+AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Aplikacija {0} i SVI njeni zapisi bit će obrisani. Jeste li sigurni da želite nastaviti?
@@ -221,24 +220,27 @@ platform.appwithinminutes.deleteAppInvalidAppError=Naznačeno ime nije valjana a
 platform.appwithinminutes.deleteAppNotSpecifiedError=Nije naznačeno nikakvo ime aplikacije.
 
 ### Rename Application
-### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
-### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
-### Missing: appWithinMinutes.renameApp.newName.label=New Name
-### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
-### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
-### Missing: appWithinMinutes.renameApp.location.label=New Location
-### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
-### Missing: appWithinMinutes.renameApp.parent.label=New Parent
-### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
-### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
-### Missing: appWithinMinutes.renameApp.done=Application renamed
-### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
+### Missing: appWithinMinutes.renameApp.label=
+### Missing: appWithinMinutes.renameApp.close=
+
+### Rename Application
+appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+appWithinMinutes.renameApp.newName.label=New Name
+appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+appWithinMinutes.renameApp.location.label=New Location
+appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+appWithinMinutes.renameApp.parent.label=New Parent
+appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+appWithinMinutes.renameApp.inProgress=Renaming application...
+appWithinMinutes.renameApp.done=Application renamed
+appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=Klasa aplikacije
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Lokacija podataka aplikacije
-
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Prostor
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Ime prostora koji sadrži zapis aplikacije
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Puno ime stranice
@@ -266,5 +268,6 @@ platform.appwithinminutes.wizardStep3Description=Prilagodite početnu stranicu a
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Ime aplikacije
 appWithinMinutes.classEditor.title=Struktura aplikacije {0}
-appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}</content>
+appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}
+</content>
 </xwikidoc>

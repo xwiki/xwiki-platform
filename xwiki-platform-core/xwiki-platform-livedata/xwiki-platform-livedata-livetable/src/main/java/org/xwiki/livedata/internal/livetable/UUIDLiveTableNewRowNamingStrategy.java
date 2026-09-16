@@ -20,6 +20,7 @@
 package org.xwiki.livedata.internal.livetable;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -32,6 +33,7 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -90,5 +92,15 @@ public class UUIDLiveTableNewRowNamingStrategy implements LiveTableNewRowNamingS
             return false;
         }
         return this.authorization.hasAccess(Right.EDIT, this.currentSpaceReferenceResolver.resolve(location));
+    }
+
+    @Override
+    public Optional<SpaceReference> getNewEntryLocation(Map<String, Object> parameters)
+    {
+        String location = (String) parameters.get(NEW_ROW_LOCATION_PARAMETER_KEY);
+        if (StringUtils.isBlank(location)) {
+            return Optional.empty();
+        }
+        return Optional.of(this.currentSpaceReferenceResolver.resolve(location));
     }
 }

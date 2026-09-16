@@ -204,6 +204,11 @@ public class ModelBridge
         // Avoid modifying the cache document
         document = document.clone();
 
+        // The object is what makes the document an entry, so it is created even without object properties.
+        if (create && classReference != null && document.getXObject(classReference, objectNumber) == null) {
+            document.newXObject(classReference, xcontext);
+        }
+
         convertPropertiesFromHtml(properties, classReference, propertyClassReferences, objectNumber);
 
         for (Map.Entry<String, Object> property : properties.entrySet()) {
@@ -379,5 +384,23 @@ public class ModelBridge
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         return xcontext.getWiki().exists(documentReference, xcontext);
+    }
+
+    /**
+     * Delete a document, if it exists.
+     *
+     * @param documentReference the reference of the document to delete
+     * @throws AccessDeniedException in case the current user is not allowed to delete the document
+     * @throws XWikiException in case of error when loading or deleting the document
+     * @since 18.9.0RC1
+     */
+    public void delete(DocumentReference documentReference) throws AccessDeniedException, XWikiException
+    {
+        this.authorization.checkAccess(Right.DELETE, documentReference);
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+        if (!document.isNew()) {
+            xcontext.getWiki().deleteDocument(document, xcontext);
+        }
     }
 }

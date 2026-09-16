@@ -35,6 +35,7 @@ import { nextTick } from "vue";
  *     logic: {
  *       canAddEntry: () => false,
  *       getEntryId: (e) => e.id,
+ *       getEntryKey: (e) => `entry-${e.id}`,
  *       data: {
  *         data: {
  *           entries: []
@@ -64,6 +65,7 @@ function initWrapper({ options, afterEntryFetchWrapper }) {
             logic: {
               canAddEntry: () => false,
               getEntryId: (e) => e.id,
+              getEntryKey: (e) => `entry-${e.id}`,
               onEvent: (eventName, callback) => {
                 if (afterEntryFetchWrapper) {
                   afterEntryFetchWrapper.callback = callback;

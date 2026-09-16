@@ -58,7 +58,7 @@ admin.ratings.ratingsactivated=Bewertungen wurden aktiviert
 admin.ratings.ratingsdeactivated=Bewertungen wurden deaktiviert
 admin.ratings.illegalrequest=Unzulässige Anfrage
 rating.yourvote=Ihre Stimme
-### Missing: rating.logintorate=Login to rate
+rating.logintorate=Login to rate
 rating.novotes=Noch keine Stimmen
 
 ## Used to indicate where deprecated keys end

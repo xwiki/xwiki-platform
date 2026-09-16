@@ -36,36 +36,36 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: XWiki.XWikiUsers_displayHiddenDocuments.hint=
+  <content>### Missing: XWiki.XWikiUsers_displayHiddenDocuments.hint=The wiki contains documents that are not displayed by default. These hidden documents represent technical content, like application classes, configuration pages, macros, styles, scripts, etc.
 ### Missing: XWiki.XWikiUsers_underline.hint=
-### Missing: XWiki.XWikiUsers_timezone.hint=
-### Missing: XWiki.XWikiUsers_editor.hint=
-### Missing: XWiki.XWikiUsers_usertype.hint=
-### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=
-### Missing: userprofile.default=
-### Missing: user.profile.groups.title=
-### Missing: user.profile.groups.description=
-### Missing: user.profile.groups.table.group=
-### Missing: platform.core.profile.category.groups=
-### Missing: user.profile.notifications=
-### Missing: user.profile.network.unfollow.question=
-### Missing: user.profile.network.unfollow.question.yes=
-### Missing: user.profile.network.unfollow.question.no=
-### Missing: user.profile.network.following=
-### Missing: user.profile.network.notfollowing=
-### Missing: user.profile.network.follow=
-### Missing: user.profile.network.unfollow=
-### Missing: user.profile.network.done=
-### Missing: user.profile.network.saving=
-### Missing: user.profile.network.error=
-### Missing: user.profile.status.done=
-### Missing: user.profile.status.saving=
-### Missing: user.profile.status.error=
+### Missing: XWiki.XWikiUsers_timezone.hint=Use a specific timezone so that the dates reflect your current location.
+### Missing: XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.
+### Missing: XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.
+### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=Indicate if you want Extension Manager to ask you to confirm conflict resolution default rules (for example tell Extension Manager to ask you what to do if the document to upgrade has been removed from the wiki).
+### Missing: userprofile.default=Default
+### Missing: user.profile.groups.title=Groups
+### Missing: user.profile.groups.description=Here are listed all the groups your user belongs to.
+### Missing: user.profile.groups.table.group=Group
+### Missing: platform.core.profile.category.groups=Groups
+### Missing: user.profile.notifications=Notifications
+### Missing: user.profile.network.unfollow.question=Are you sure you want to unfollow this user?
+### Missing: user.profile.network.unfollow.question.yes=Yes, unfollow
+### Missing: user.profile.network.unfollow.question.no=No, cancel
+### Missing: user.profile.network.following=Following
+### Missing: user.profile.network.notfollowing=Not following
+### Missing: user.profile.network.follow=Start following
+### Missing: user.profile.network.unfollow=Stop following
+### Missing: user.profile.network.done=Done
+### Missing: user.profile.network.saving=Saving...
+### Missing: user.profile.network.error=Error saving the notification setting
+### Missing: user.profile.status.done=Done
+### Missing: user.profile.status.saving=Saving...
+### Missing: user.profile.status.error=Error saving the user status
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
-### Missing: XWiki.XWikiUsers_accessibility.hint=
+### Missing: XWiki.XWikiUsers_accessibility.hint=Extra accessibility will enable various visual enhancements like: bigger fonts, underlined links, etc.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

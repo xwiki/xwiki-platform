@@ -20,7 +20,6 @@
 package org.xwiki.xclass.test.ui;
 
 import java.sql.Connection;
-import java.time.Duration;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -33,14 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Verifies that an XClass document stays visible to the store while it is being created concurrently with a document
- * that uses it.
+ * Verifies that an XClass document stays visible to the store while a document using it is being loaded.
  * <p>
  * Loading a document resolves the XClass of each of its objects inside the transaction opened for that load. On a
- * database whose transaction isolation is {@code REPEATABLE READ} — the InnoDB default, so MySQL and MariaDB — that
+ * database whose transaction isolation is {@code REPEATABLE READ} - the InnoDB default, so MySQL and MariaDB - that
  * nested read is answered from the snapshot taken when the load started, so an XClass committed after that point is
- * invisible. {@code XWikiCacheStore} then caches that verdict with no expiry, which leaves the XClass permanently
- * unusable: administration sections render without their fields, and the Solr indexer silently skips the document.
+ * invisible. {@code XWikiCacheStore} then caches that verdict with no expiry, which leaves the class definition
+ * unusable: property display returns an empty string, edit forms and administration sections lose their fields, and a
+ * XAR export of the class carries the outdated definition.
  *
  * @version $Id$
  * @since 18.9.0RC1
@@ -48,26 +47,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class XClassCacheVisibilityIT
 {
-    /**
-     * One object of each of this many distinct XClasses, so that loading the probe document has to read that many
-     * separate XClass documents. Distinct classes rather than many objects of one class deliberately: batching the
-     * loading of an object's properties would be a welcome optimisation, and it must not silently shrink the window
-     * this test aims at.
-     * <p>
-     * Sized from measurement rather than taste: 50 classes made the probe load in 37 ms on a developer machine, too
-     * short to aim a sweep of 20 rounds at. Each class costs roughly 0.75 ms there, so this gives about 300 ms, and
-     * more on a slower machine.
-     */
-    private static final int FILLER_CLASS_COUNT = 400;
-
-    /**
-     * Also the resolution of the delay sweep across the load window.
-     */
-    private static final int ROUNDS = 20;
-
     private static final String TEST_SCRIPT = """
         {{velocity wiki="false"}}
-        $services.xclassVisibilityTest.perform(%d, %d)
+        $services.xclassVisibilityTest.perform()
         {{/velocity}}
         """;
 
@@ -77,28 +59,26 @@ class XClassCacheVisibilityIT
         {{/velocity}}
         """;
 
+    /**
+     * Covers both an XClass that is created and one that gains a property while a document using it is being loaded.
+     * The ordering of the load, the snapshot it reads from and the save is decided by latches rather than by timing,
+     * so this either reproduces the problem or doesn't, the same way on every machine.
+     */
     @Test
-    void xclassStaysVisibleWhileBeingRecreated(TestUtils setup) throws Exception
+    void xclassStaysVisibleWhileBeingSaved(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
 
-        Duration previousTimeout = setup.getDriver().manage().timeouts().getPageLoadTimeout();
-        setup.getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMinutes(10));
-        try {
-            String result = setup.executeWiki(TEST_SCRIPT.formatted(FILLER_CLASS_COUNT, ROUNDS), Syntax.XWIKI_2_1,
-                Map.of("outputSyntax", "plain"));
+        String result = setup.executeWiki(TEST_SCRIPT, Syntax.XWIKI_2_1, Map.of("outputSyntax", "plain"));
 
-            assertTrue(StringUtils.isBlank(result), result);
-        } finally {
-            setup.getDriver().manage().timeouts().pageLoadTimeout(previousTimeout);
-        }
+        assertTrue(StringUtils.isBlank(result), result);
     }
 
     /**
-     * Guards the configuration side of the fix. XWiki does not set {@code hibernate.connection.isolation}, so it
-     * inherits whatever the driver defaults to; on MySQL and MariaDB that is {@code REPEATABLE READ}, under which the
-     * nested XClass read above can be served from a stale snapshot. This fails loudly if that setting is ever dropped
-     * again, instead of the problem resurfacing as unrelated tests failing at random.
+     * Guards the configuration side of the fix. XWiki sets {@code hibernate.connection.isolation} to READ COMMITTED
+     * when the Hibernate configuration doesn't, because it would otherwise inherit the driver default, which is
+     * REPEATABLE READ on MySQL and MariaDB. This fails loudly if that setting is ever dropped again, instead of the
+     * problem resurfacing as unrelated tests failing at random.
      */
     @Test
     void transactionIsolationIsNotRepeatableRead(TestUtils setup) throws Exception
@@ -113,8 +93,6 @@ class XClassCacheVisibilityIT
         assertEquals(Connection.TRANSACTION_READ_COMMITTED, Integer.parseInt(result),
             "The store is not running at READ COMMITTED (2). A document load resolves its objects' XClasses inside "
                 + "the load's own transaction, so at REPEATABLE READ (4) an XClass committed by another thread during "
-                + "that load is invisible, and the document cache keeps that verdict indefinitely. XWiki does not set "
-                + "hibernate.connection.isolation by default, so it inherits the driver default, which is REPEATABLE "
-                + "READ on MySQL and MariaDB.");
+                + "that load is invisible, and the document cache keeps that verdict indefinitely.");
     }
 }

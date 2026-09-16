@@ -558,4 +558,19 @@ class DefaultURLSecurityManagerTest
 
         assertEquals("The given URI [https://example.com] is not safe on this server.", securityException.getMessage());
     }
+
+    @Test
+    void parseToSafeURIWithDomainWhenCheckSkipped() throws URISyntaxException
+    {
+        when(this.urlConfiguration.isTrustedDomainsEnabled()).thenReturn(false);
+        when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("https"));
+
+        String url = "https://example.com/path";
+        assertEquals(url, this.urlSecurityManager.parseToSafeURI(url, "www.example.com").toString());
+
+        // The request host must not have been added to the trusted domains since the check is disabled.
+        when(this.urlConfiguration.isTrustedDomainsEnabled()).thenReturn(true);
+        assertThrows(SecurityException.class,
+            () -> this.urlSecurityManager.parseToSafeURI("https://www.example.com", "other.example.com"));
+    }
 }

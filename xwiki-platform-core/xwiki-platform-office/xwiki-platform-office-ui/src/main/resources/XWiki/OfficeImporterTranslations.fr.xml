@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
 <xwikidoc version="1.3" reference="XWiki.OfficeImporterTranslations" locale="fr">
@@ -45,7 +45,7 @@ office.import.overwriteContent=Écraser le contenu existant
 office.import.overwriteContent.hint=La page cible existe déjà. Vous pouvez soit écraser son contenu soit ajouter le nouveau contenu à la fin du contenu existant.
 office.import.overwriteContent.confirmationMessage=Êtes-vous certain de vouloir écraser le contenu de la page cible ?
 office.import.overwriteContent.confirmationAction=Écraser
-office.import.headingLevelsToSplit.hint=Importe les niveaux de titre sélectionnés et leurs sections correspondantes dans des pages enfants séparées et liées à la page parent.
+office.import.headingLevelsToSplit.hint=Importe les niveaux de titre sélectionnés et leurs sections correspondantes dans des pages enfants séparées, et liées à la page parent.
 office.import.childPagesNaming.hint=Définissez comment nommer les pages enfants créées lorsque le contenu importé sera divisé.
 office.import.terminalChildPages=Pages enfants terminales
 office.import.terminalChildPages.hint=Avancé : créer les pages enfants en tant que pages terminales. Les pages terminales ne peuvent pas avoir d'enfants. Ces pages sont généralement utilisées dans les applications, pour du développement ou dans les anciennes versions de XWiki.

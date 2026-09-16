@@ -36,30 +36,30 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: admin.ratings=
-### Missing: rating.rate=
-### Missing: rating.saveexception=
-### Missing: rating.votenotvalid=
-### Missing: rating.voteoutofbounds=
-### Missing: rating.setvote.inprogress=
-### Missing: rating.setvote.success=
-### Missing: rating.setvote.error=
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled=
-### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled.hint=
+  <content>### Missing: admin.ratings=Ratings
+### Missing: rating.rate=Rate!
+### Missing: rating.saveexception=Error when saving the rating.
+### Missing: rating.votenotvalid=You cannot vote with 0 value.
+### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
+### Missing: rating.setvote.inprogress=Your vote is being saved...
+### Missing: rating.setvote.success=Your vote has been saved!
+### Missing: rating.setvote.error=Error when saving your vote.
+### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled=Enable Ratings
+### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Enabling ratings allows users to vote on pages and display the average votes. Disabling them doesn't remove the existing vote, it just hides the interface.
 
 #@deprecatedstart
 
 ## until 12.9RC1
-### Missing: admin.ratings.activateratings=
-### Missing: admin.ratings.activateratingsinfo=
-### Missing: admin.ratings.resetratings=
-### Missing: admin.ratings.uninstallratings=
-### Missing: admin.ratings.ratingsactivated=
-### Missing: admin.ratings.ratingsdeactivated=
-### Missing: admin.ratings.illegalrequest=
-### Missing: rating.yourvote=
-### Missing: rating.logintorate=
-### Missing: rating.novotes=
+### Missing: admin.ratings.activateratings=Activate the ratings on this wiki
+### Missing: admin.ratings.activateratingsinfo=Activating the ratings on this wiki will display a visual average rating (composed of stars) at the top right corner of each document of this wiki (except the ones in the *XWiki* space). Authenticated users will be able to rate documents by clicking on the stars. An alternative to this is to use the *Ratings Panel*, for example to only enable ratings in the desired spaces. To use the Ratings Panel, please visit the *Panel Wizard* administration section.
+### Missing: admin.ratings.resetratings=Reset all the ratings on this wiki. This will make all documents start over with no vote. Be aware that this operation is irreversible, besides on a document-per-document rollback basis. Resetting all ratings can take a while if the wiki has a large amount of documents already rated.
+### Missing: admin.ratings.uninstallratings=Uninstalling the ratings application will delete the documents that compose the application, but *all votes on rated document will be preserved*. If you reinstall the application later on, the documents will start over with the saved average rating they had before uninstalling the application. Finally, uninstalling the ratings application will *remove the ratings category* from the wiki administration.
+### Missing: admin.ratings.ratingsactivated=Ratings have been activated
+### Missing: admin.ratings.ratingsdeactivated=Ratings have been deactivated
+### Missing: admin.ratings.illegalrequest=Illegal request
+### Missing: rating.yourvote=Your vote
+### Missing: rating.logintorate=Login to rate
+### Missing: rating.novotes=No votes yet
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

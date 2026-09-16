@@ -47,6 +47,9 @@ import org.xwiki.url.ExtendedURL;
 @Component
 @Named("contextpath+actionservletpath")
 @Singleton
+// The shadowing is deliberate: this is the standard URL scheme variant of the normalizer it extends. Both
+// implement the same normalization and are told apart by their package and their component hint.
+@SuppressWarnings("java:S2176")
 public class ContextAndActionURLNormalizer extends org.xwiki.url.internal.container.ContextAndActionURLNormalizer
     implements Initializable
 {

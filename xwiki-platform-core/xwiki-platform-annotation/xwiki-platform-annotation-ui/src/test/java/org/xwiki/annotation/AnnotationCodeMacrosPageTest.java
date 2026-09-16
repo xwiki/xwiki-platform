@@ -24,6 +24,8 @@ import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.annotation.internal.AnnotationClassDocumentInitializer;
 import org.xwiki.annotation.internal.AnnotationConfigurationSource;
 import org.xwiki.annotation.internal.DefaultAnnotationConfiguration;
@@ -60,6 +62,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -69,7 +72,7 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 import static org.xwiki.test.LogLevel.INFO;
 
 /**
- * Test of the annotation reply button rendered by {@code AnnotationCode.Macros}.
+ * Test of the annotation markup rendered by {@code AnnotationCode.Macros}.
  *
  * @version $Id$
  */
@@ -200,6 +203,44 @@ class AnnotationCodeMacrosPageTest extends PageTest
         Element replyButton = renderReplyButton();
 
         assertEquals("/xwiki/bin/view/Sandbox/WebHome&replyto=0#xwikicomment_0", replyButton.attr("href"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "edit", "create" })
+    void closeButtonIsDisplayedWhenTheAnnotationCanBeDismissed(String mode) throws Exception
+    {
+        assertNotNull(renderAnnotation(mode).selectFirst(".annotation-bubble-close button"),
+            String.format("The close button was not rendered in the [%s] mode", mode));
+    }
+
+    @Test
+    void closeButtonIsNotDisplayedInListMode() throws Exception
+    {
+        // The list mode displays the annotation inside the Annotations tab, where there is nothing to close.
+        assertNull(renderAnnotation("list").selectFirst(".annotation-bubble-close"),
+            "The close button was rendered in the list mode");
+    }
+
+    private Element renderAnnotation(String mode) throws Exception
+    {
+        XWikiDocument testPage = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "TestPage"),
+            this.context);
+        testPage.setSyntax(XWIKI_2_0);
+        testPage.setContent(String.format(
+            """
+                {{include reference="AnnotationCode.Macros" /}}
+
+                {{velocity}}
+                {{html clean="false" wiki="false"}}
+                #set($docRef = $services.model.createDocumentReference('xwiki', 'Space', 'Target'))
+                #set($ann = $services.annotations.getAnnotation('Space.Target', '0'))
+                #displayAnnotationFromReference($ann, '%s', $docRef)
+                {{/html}}
+                {{/velocity}}""", mode));
+
+        Element annotation = renderHTMLPage(testPage).selectFirst(".annotation");
+        assertNotNull(annotation, String.format("The annotation was not rendered in the [%s] mode", mode));
+        return annotation;
     }
 
     private Element renderReplyButton() throws Exception

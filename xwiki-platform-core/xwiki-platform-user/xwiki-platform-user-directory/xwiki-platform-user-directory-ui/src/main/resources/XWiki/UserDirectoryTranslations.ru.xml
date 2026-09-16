@@ -50,5 +50,10 @@ platform.userdirectory.customizeNotAllowed=Вам не разрешено нас
 platform.userdirectory.configTitle=Настройки каталога пользователя
 platform.userdirectory.configSheetTitle=Лист настроек каталога пользователя
 platform.userdirectory.configSheetApplyOnConfiguration=Этот лист должен быть применен к документу Настройки каталога пользователей.
+### Missing: platform.userdirectory.isCustomizedWarning=
+### Missing: platform.userdirectory.canCustomizeInfo=
+### Missing: platform.userdirectory.canCustomizeInfoGuest=
+### Missing: platform.userdirectory.customizeButton=
+### Missing: platform.userdirectory.resetButton=
 </content>
 </xwikidoc>

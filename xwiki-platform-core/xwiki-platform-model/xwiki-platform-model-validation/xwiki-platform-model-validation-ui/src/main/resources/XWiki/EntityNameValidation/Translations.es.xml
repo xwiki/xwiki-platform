@@ -70,5 +70,6 @@ entitynamevalidation.replacementCharacter.remove.done=Se ha borrado el carácter
 entitynamevalidation.replacementCharacter.remove.failed=Error al borrar el carácter prohibido.
 entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Ninguno
 entitynamevalidation.admin.heading=Estrategias de nomenclatura
+### Missing: admin.namestrategies=
 </content>
 </xwikidoc>

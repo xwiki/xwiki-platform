@@ -201,13 +201,10 @@ public class LoggingScriptService implements ScriptService
      * @param message the message to be displayed for explaining the deprecation.
      * @since 13.1RC1
      */
-    // The flattened message is the contract here: LoggingScriptServiceTest#deprecate asserts that
-    // LogEvent#getMessage() is the concatenated string, and warn is always enabled anyway.
-    @SuppressWarnings("java:S2629")
     public void deprecate(String loggerName, String message)
     {
         if (this.loggerConfiguration.isDeprecatedLogEnabled()) {
-            this.getLogger(loggerName).warn("[DEPRECATED] " + message);
+            this.getLogger(loggerName).warn("[DEPRECATED] {}", message);
         }
     }
 }

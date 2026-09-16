@@ -43,5 +43,6 @@
 help.syntaxtitle=Синтаксис XWiki {0}
 help.syntaxall=Усе
 help.changesyntax=Змінити синтаксис
-help.choose_syntax=Вибрати синтаксис</content>
+help.choose_syntax=Вибрати синтаксис
+</content>
 </xwikidoc>

@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=全てのドキュメントに選択したアク�
 solr.admin.indexing.wiki.select_farm=全てのウィキ
 solr.admin.indexing.query.label=カスタムクエリー
 solr.admin.indexing.query.hint=選択したアクションを実行するインデックスのドキュメントを制限するクエリー（オプション）。
+### Missing: solr.admin.indexing.query.language.label=
 solr.admin.info.affectedDocuments=影響を受けるインデックス内のドキュメント：
-solr.sortBy=並び替え：
-solr.sortBy.score=関連性
-solr.sortBy.title_sort=タイトル
-solr.sortBy.date=最終更新日
-solr.sortBy.author_display_sort=最終更新者
-solr.sortBy.filename_sort=ファイル名
-solr.sortBy.attsize_sort=ファイルのサイズ
-solr.sortBy.attdate_sort=アップロード日
-solr.sortBy.attauthor_display_sort=アップロードした人
-solr.sortOrder.asc=昇順
-solr.sortOrder.desc=降順
-solr.options=表示：
-solr.options.highlight=ハイライト
+### Missing: search.solr.sortBy.hint=
+### Missing: search.solr.sortBy.field.score=
+### Missing: search.solr.sortBy.field.titleSort=
+### Missing: search.solr.sortBy.field.date=
+### Missing: search.solr.sortBy.field.authorDisplaySort=
+### Missing: search.solr.sortBy.field.filenameSort=
+### Missing: search.solr.sortBy.field.attsizeSort=
+### Missing: search.solr.sortBy.field.attdateSort=
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=
+### Missing: search.solr.sortOrder.asc=
+### Missing: search.solr.sortOrder.desc=
+### Missing: search.solr.options.showHighlight=
 solr.options.highlight.title=各結果で該当するものを抽出して表示
-solr.options.facet=ファセット
+### Missing: search.solr.options.showFacet=
 solr.options.facet.title=結果を追加でフィルタリングすることを許可
 solr.result.language=言語
 solr.result.locatedIn=保存場所
@@ -172,6 +172,18 @@ solr.result.location={0} » {1} » {2} に位置
 
 ## until 7.2RC1
 solr.field.space=場所
+solr.sortBy=並び替え：
+solr.sortBy.score=関連性
+solr.sortBy.title_sort=タイトル
+solr.sortBy.date=最終更新日
+solr.sortBy.author_display_sort=最終更新者
+solr.sortBy.filename_sort=ファイル名
+solr.sortBy.attsize_sort=ファイルのサイズ
+solr.sortBy.attdate_sort=アップロード日
+solr.sortBy.attauthor_display_sort=アップロードした人
+solr.options=表示：
+solr.options.highlight=ハイライト
+solr.options.facet=ファセット
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

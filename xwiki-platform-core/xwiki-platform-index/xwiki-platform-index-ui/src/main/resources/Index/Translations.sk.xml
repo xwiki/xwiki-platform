@@ -36,13 +36,22 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Priestory
+  <content>index.deletedDocuments.deleteAll=Delete all
+### Missing: index.administration.remainingTasks.heading=
+### Missing: index.administration.remainingTasks.emptyQueue=
+### Missing: admin.documentanalysis=
+
+#######################################
+## until 16.3.0RC1
+#######################################
+
+index.spacesMacro.title=Priestory
 index.spacesMacro.spaceIndex.title=Pozri index priestoru
 index.spacesMacro.spaceIndex.alt=Index priestoru
 index.spacesMacro.spaceAdministration.title=Pozri v správe priestoru
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.spaceAdministration.alt=Administer Space
 index.spacesMacro.createSpace.link=Vytvoriť nový priestor
 index.spacesMacro.createSpace.defaultSpaceName=Názov priestoru
 index.spacesMacro.createSpace.submit=Vytvoriť
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+</content>
 </xwikidoc>

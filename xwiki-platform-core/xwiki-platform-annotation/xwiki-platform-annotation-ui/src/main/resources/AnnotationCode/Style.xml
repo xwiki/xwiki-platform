@@ -39,42 +39,6 @@
   <enforceRequiredRights>true</enforceRequiredRights>
   <content>
 </content>
-  <attachment>
-    <filename>notesmall.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABmJLR0QA/wD/AP+gvaeTAAAApklEQVR4Xn3MMQrCMBTG8XfNnEBv4KKXEC/gIigiDoo4aKGgBIeCQ0UoVMRSKB1EEboUPvMloEMgw58XXn48qbSK6qSLZzrAOx/iU4wZ33bHPxopDwpAFYxGHrGBbRaMRm57A5tjMBrJtga+FsFo5LI2sB4FoxE9Uai067pRQNn3Oi8NnPXEYjQadt47XsncQMBFxJD7naY/+MdF7Mp3CulK8RoPRF+Jn0pthmUzfAAAAABJRU5ErkJggg==</content>
-    <filesize>241</filesize>
-  </attachment>
-  <attachment>
-    <filename>notesmallblue.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAAUVBMVEX///9Bhr+qdwAuYItnnswuYIs9f7g2cKGVu9xzpdBMjMM7erBBhr84dak/hL4xZ5RYlMejxOB0ptBtoc5/rdSdwN4za5o3cqUvYo46ea+LtdgK7jyvAAAABHRSTlMAvwC/Jk9xqgAAAAFiS0dEAIgFHUgAAABDSURBVAgdLcEHEoAgDATAQ1PoYC//f6gyk1242CkE6tGhLqZCDiNI3iSU1xTobhSc87UOJyb2vA0NADMNN34s8mibPzGkBTZkbmtqAAAAAElFTkSuQmCC</content>
-    <filesize>246</filesize>
-  </attachment>
-  <attachment>
-    <filename>notesmallorange.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABmJLR0QA/wD/AP+gvaeTAAAAo0lEQVR4Xn3PoQoCQRRG4R+bzSo+wTaDz+BL+BDKlglbDKJF26JYjYpZQWTRpsliFMuCbavxyL3FsDDhY4aZw3BHrHsFmz7sB3BM4TIxtvczu7NGrLrweURZI/IEyluUNWLRgdcpyhoxa8FzF2WNGDfgvoyyRu+h7FeOSROu05pvJrQNsthn8fWc1VRBCJzHhsOopkw9/PMwTxzzts9WBX+g+AES6zbKoIphxwAAAABJRU5ErkJggg==</content>
-    <filesize>238</filesize>
-  </attachment>
-  <attachment>
-    <filename>notesmallred.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABmJLR0QA/wD/AP+gvaeTAAAAnUlEQVQYV2O4x8qw/xsTx/8/Sm7//3j0/P+TtAmCQWygGEgOpIbhFgPD/49fn+PFIDUMV4DE79Pv8GKQGoZzQOLPmvt4MUgNwwmQie378GKQGoYDIIXx3XgxSA3DKiAB9BUYHwFpsvTGwLvACssZwIr/rHv4H0T/UpPBwFtACv//h2CQIhD+r8qIgdchK4QpvgbFZ4AY5DaQaUDx/QA3/AflhUcmKgAAAABJRU5ErkJggg==</content>
-    <filesize>232</filesize>
-  </attachment>
   <object>
     <name>AnnotationCode.Style</name>
     <number>0</number>
@@ -472,13 +436,6 @@ mark.annotation:not(.annotation-highlight) {
   padding: 0 36px 0 0;
   text-align: justify;
 }
-#allAnnotations .UPDATED .annotationText {
-  background-image: #attImgURL('notesmallorange');
-}
-#allAnnotations .ALTERED annotationText {
-  background-image: #attImgURL('notesmallred');
-}
-
 .annotatedText {
   font-style: italic;
   font-size: 1.2em;
@@ -510,9 +467,46 @@ dt.annotationLabel label {
   font-variant: small-caps;
 }
 
-.annotationOriginalSelection {
-  color: $theme.textPrimaryColor;
-  font-size: 80%;
+/* Why an annotation is not simply sitting on its text: repositioned after an edit, or lost altogether. The
+   accent bar carries the severity, so the note reads as a status without a coloured background behind the text. */
+.annotation-state {
+  border-left: 3px solid;
+  font-size: .9em;
+  margin: .5em 0;
+  padding: .15em 0 .15em .6em;
+}
+
+/* The same two colors the in-text highlight of an updated or altered annotation is mixed from, so the note in
+   the tab and the mark in the page read as the same state. */
+.annotation-state-updated {
+  border-color: var(--btn-warning-bg);
+}
+
+.annotation-state-altered {
+  border-color: var(--btn-danger-bg);
+}
+
+details.annotation-state > summary {
+  cursor: pointer;
+  /* Bootstrap resets summary to display block, which drops the native disclosure triangle with it. */
+  display: list-item;
+  list-style: disclosure-closed inside;
+}
+
+details.annotation-state[open] > summary {
+  list-style-type: disclosure-open;
+}
+
+/* The original selection is history, so it stays quieter than the selection the annotation points at now, and
+   drops the decorative quote that marks the live one. */
+.originalAnnotatedText {
+  color: $theme.textSecondaryColor;
+  font-size: .95em;
+  padding-top: .3em;
+
+  &amp;:before {
+    content: none;
+  }
 }
 
 .annotation-bubble-content dt {

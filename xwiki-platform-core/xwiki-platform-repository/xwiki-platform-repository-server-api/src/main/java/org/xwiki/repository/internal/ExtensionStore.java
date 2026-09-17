@@ -507,7 +507,9 @@ public class ExtensionStore implements Initializable, Disposable
      * @return the reference of the version document, or the reference of the given extension document when the
      *         extension does not use dedicated version pages
      * @since 18.9.0RC1
+     * @since 18.8.0RC1
      * @since 18.4.6
+     * @since 17.10.14
      */
     public DocumentReference getExtensionVersionDocumentReference(XWikiDocument extensionDocument,
         String extensionVersion, XWikiContext xcontext)
@@ -527,6 +529,7 @@ public class ExtensionStore implements Initializable, Disposable
      * @param xcontext the current context
      * @return the reference of the version document
      * @since 18.9.0RC1
+     * @since 18.8.0RC1
      * @since 18.4.6
      */
     public DocumentReference getProjectVersionDocumentReference(XWikiDocument projectDocument, String projectVersion,

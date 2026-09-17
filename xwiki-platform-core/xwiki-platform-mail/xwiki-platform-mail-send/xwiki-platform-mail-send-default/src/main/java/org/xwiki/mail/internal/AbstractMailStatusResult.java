@@ -69,6 +69,7 @@ public abstract class AbstractMailStatusResult implements UpdateableMailStatusRe
             try {
                 Thread.sleep(100L);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 // Ignore but consider that the mail was sent
                 LOGGER.warn("Interrupted while waiting for mails to be sent. Reason [{}]",
                     ExceptionUtils.getRootCauseMessage(e));

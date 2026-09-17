@@ -232,7 +232,7 @@
  * @param $ann the annotation object
  *#
 #macro(displayAnnotationTitle $ann)
-  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'dd/MM/yyyy hh:mm'))
+  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'dd/MM/yyyy HH:mm'))
   $!xwiki.getUserName($ann.author)
 ## Do not indent this, or the comma will be misplaced
 #if("$!{ann.date}" != '')#set($annotationISODate = $xwiki.formatDate($ann.date, "yyyy-MM-dd'T'HH:mm:ssXXX"))#set($annotationFullDate = $xwiki.formatDate($ann.date, 'EEEE d MMMM yyyy HH:mm:ss'))&lt;time class="annotationDate" datetime="$escapetool.xml($annotationISODate)" title="$escapetool.xml($annotationFullDate)"&gt;$xwiki.formatDate($ann.date, $dateFormat)&lt;/time&gt;#end
@@ -265,7 +265,8 @@
  * @param $docRef the reference of the annotated document
  *#
 #macro(displayAnnotationToolboxFromReference $ann $mode $docRef)
-  #if ($mode == 'view')
+  ## There is nothing to act on while an annotation is being created: $ann.id doesn't exist yet.
+  #if ($mode != 'create')
   ## xwikivars.vm binds $hasAdmin/$hasEdit for the Comments tab but not for the annotation bubble, which
   ## fetches its content through the "get" action, so compute the rights here against $docRef instead of
   ## relying on the caller or on $xcontext.doc. Keep the $ann prefix: a #set in a macro body writes to the
@@ -273,6 +274,16 @@
   #set($annHasAdmin = $services.security.authorization.hasAccess('admin', $docRef))
   #set($annHasEdit = $services.security.authorization.hasAccess('edit', $docRef))
   #set($annHasComment = $services.security.authorization.hasAccess('comment', $docRef))
+  ## Validating accepts the new position of an annotation that was moved after a page edit. It only resets the
+  ## annotation state, so it goes through the annotation REST API whatever the annotation class is.
+  #if ("$!{ann.state}" == 'UPDATED' &amp;&amp; $services.annotations.canEditAnnotation($ann.id, $docRef))
+    #set($validateURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=PUT&amp;media=json")
+    &lt;a class="validate btn btn-default infomessage" href="$escapetool.xml($validateURL)"
+      title="$escapetool.xml($services.localization.render('annotations.action.validate.tooltip'))"&gt;
+      $services.icon.renderHTML('check')
+      &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('annotations.action.validate.tooltip'))&lt;/span&gt;
+    &lt;/a&gt;##
+  #end
   #if ($annotationClassDocName == 'XWiki.XWikiComments')
     ## Same reasoning as the rights above: use $annoDoc rather than the calling template's $doc, since
     ## it isn't guaranteed to point at the annotated document (or to be bound at all) for every caller.
@@ -284,21 +295,26 @@
     #set($replyFallbackURL = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
     #getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $replyFallbackURL, $xredirect)
     #set($isUserComment = "$!ann.get('author')" != '' &amp;&amp; $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
-    #if($threadCount &gt; 0)
+    ## The thread toggle, the reply and the share buttons hand over to the Comments tab, which only the bubble
+    ## forwards them to, so the Annotations tab and the edit form leave them out.
+    #if($mode == 'view' &amp;&amp; $threadCount &gt; 0)
       &lt;button class="thread-toggle btn btn-default infomessage"&gt;
         $services.icon.renderHTML('comments') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
       &lt;/button&gt;##
     #end
-    #if($annHasComment)
+    #if($mode == 'view' &amp;&amp; $annHasComment)
       &lt;a class="commentreply btn btn-default infomessage" rel="nofollow" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')&amp;replyto=${ann.id}#xwikicomment_${ann.id}"#if("$!replyTo" == "${ann.id}") style="display: none;"#end&gt;##
       $services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))
       &lt;/a&gt;##
     #end
-    &lt;a class="permalink btn btn-default infomessage" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
-      href="$annoDoc.getURL('view', 'viewer=comments')#xwikicomment_${ann.id}"&gt;##
-      $services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
-    &lt;/a&gt;##
-    #if($annHasComment &amp;&amp; ($annHasAdmin || $isUserComment))
+    #if($mode == 'view')
+      &lt;a class="permalink btn btn-default infomessage" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
+        href="$annoDoc.getURL('view', 'viewer=comments')#xwikicomment_${ann.id}"&gt;##
+        $services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
+      &lt;/a&gt;##
+    #end
+    ## No Edit button in the edit form itself.
+    #if($mode != 'edit' &amp;&amp; $annHasComment &amp;&amp; ($annHasAdmin || $isUserComment))
       #set ($editQueryString = $escapetool.url({
         'viewer': 'comments',
         'number': $ann.id,
@@ -326,22 +342,17 @@
   #else
     ## Annotation classes other than XWiki.XWikiComments render the toolbox as plain REST-method-override
     ## links rather than the Comments-tab-style buttons above, since the Comments-tab actions only apply to
-    ## the default comment class. Skip the check in 'create' mode: $ann.id doesn't exist yet for an
-    ## annotation that hasn't been created.
-    #if($mode != 'create' &amp;&amp; $services.annotations.canEditAnnotation($ann.id, $docRef))
+    ## the default comment class.
+    #if($services.annotations.canEditAnnotation($ann.id, $docRef))
       #set($isUserComment = $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
       #set($editURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=PUT&amp;media=json")
-      #if ("$!{ann.state}" == 'UPDATED')
-        &lt;a class="validate btn btn-default infomessage" href="${editURL}"
-          title="$services.localization.render('annotations.action.validate.tooltip')"&gt;
-          $services.icon.renderHTML('check')
-        &lt;/a&gt;##
-      #end
       #if ($annHasAdmin || $isUserComment)
-        &lt;a class="edit btn btn-default infomessage" href="${editURL}"
-          title="$services.localization.render('annotations.action.edit.tooltip')"&gt;
-          $services.icon.renderHTML('pencil')
-        &lt;/a&gt;##
+        #if ($mode != 'edit')
+          &lt;a class="edit btn btn-default infomessage" href="$escapetool.xml($editURL)"
+            title="$escapetool.xml($services.localization.render('annotations.action.edit.tooltip'))"&gt;
+            $services.icon.renderHTML('pencil')
+          &lt;/a&gt;##
+        #end
         #set($deleteURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=DELETE&amp;media=json")
         &lt;a class="delete btn btn-default infomessage" href="${deleteURL}"
           title="$services.localization.render('annotations.action.delete.tooltip')"&gt;

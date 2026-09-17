@@ -108,10 +108,10 @@ public class ExhaustiveCheckTagsSelector extends AbstractTagsSelector
                 continue;
             }
             String documentReferenceStr = (String) cols[1];
-            if (viewableDocuments.computeIfAbsent(documentReferenceStr,
+            boolean viewable = viewableDocuments.computeIfAbsent(documentReferenceStr,
                 reference -> this.contextualAuthorizationManager.hasAccess(VIEW,
-                    this.stringDocumentReferenceResolver.resolve(reference))))
-            {
+                    this.stringDocumentReferenceResolver.resolve(reference)));
+            if (viewable) {
                 tagsList.add(tag);
                 acceptedTag = tag;
             }

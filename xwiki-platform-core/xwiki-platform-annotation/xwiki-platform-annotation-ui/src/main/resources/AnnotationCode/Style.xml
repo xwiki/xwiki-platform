@@ -422,27 +422,6 @@ mark.annotation:not(.annotation-highlight) {
   width: 99%;
 }
 
-.annotationAvatar {
-  float: left;
-  width: 55px;
-  text-align: left;
-}
-.annotationAvatar img {
-  max-width: 50px;
-  max-height: 50px;
-}
-
-#allAnnotations .annotationAvatar  {
-  padding-top: 5px;
-}
-
-#allAnnotations .annotationHeader, #allAnnotations .annotationContent {
-  margin-left: 60px;
-}
-#allAnnotations .annotationTitle * {
-  line-height: 1.4em;
-}
-
 .annotation-bubble-header {
   display: flex;
   gap: .5em;
@@ -452,9 +431,6 @@ mark.annotation:not(.annotation-highlight) {
   padding-top: 3px;
   margin-right: 51px;
   display: block;
-}
-.annotation-bubble .annotationContent {
-  clear: both;
 }
 
 .annotation-box .links {
@@ -467,10 +443,31 @@ mark.annotation:not(.annotation-highlight) {
   background-image: #imgURL('note_add');
 }
 
-/* Annotations list (extra-tab) */
+/* Annotations list (extra-tab).
+   The Annotations tab sits next to the Comments tab and uses the same author line, so it reuses the gutter of a
+   comment: the annotation reserves the space with a padding and the avatar is pulled into it, exactly like
+   .reply and .commentavatar do in comments.css. */
 #allAnnotations .annotation {
   margin: 0 0 8px;
+  padding-left: 60px;
+  /* Keep the floated avatar inside its own annotation. */
+  display: flow-root;
+
+  .annotation-bubble-avatar {
+    float: left;
+    margin-left: -60px;
+    padding-top: 5px;
+    text-align: center;
+    width: 50px;
+
+    /* Override the 30px of the bubble avatar, the tab shows the same size as a comment avatar. */
+    img {
+      max-height: 50px;
+      max-width: 50px;
+    }
+  }
 }
+
 .annotationText {
   padding: 0 36px 0 0;
   text-align: justify;
@@ -480,11 +477,6 @@ mark.annotation:not(.annotation-highlight) {
 }
 #allAnnotations .ALTERED annotationText {
   background-image: #attImgURL('notesmallred');
-}
-
-/* General display of an annotation */
-.annotationHeader{
-  padding: 2px 0px 6px;
 }
 
 .annotatedText {
@@ -508,25 +500,9 @@ mark.annotation:not(.annotation-highlight) {
   }
 }
 
-#allAnnotations .annotationHeader:hover {
-  background-color: $theme.highlightColor;
-}
 .annotationDate {
   color: $theme.textSecondaryColor;
   font-size: 80%;
-}
-.annotationTools {
-  display: block;
-  float: right;
-  margin-top: -1.2em;
-}
-
-.annotationTools .reply {
-  padding: 1px 3px;
-}
-
-.annotationComment {
-  padding: 4px 0;
 }
 
 dt.annotationLabel label {
@@ -539,13 +515,13 @@ dt.annotationLabel label {
   font-size: 80%;
 }
 
-.annotationContent dt {
+.annotation-bubble-content dt {
   margin: 0;
 }
-.annotationContent dd, .annotationContent blockquote {
+.annotation-bubble-content dd, .annotation-bubble-content blockquote {
   margin-bottom: 10px;
 }
-.annotationContent blockquote {
+.annotation-bubble-content blockquote {
   padding-left: 12px;
 }</code>
     </property>

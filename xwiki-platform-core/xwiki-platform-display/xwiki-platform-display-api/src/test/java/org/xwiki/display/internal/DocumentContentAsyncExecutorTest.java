@@ -21,16 +21,22 @@ package org.xwiki.display.internal;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -40,7 +46,9 @@ import org.xwiki.velocity.VelocityManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -60,8 +68,17 @@ class DocumentContentAsyncExecutorTest
     @MockComponent
     private VelocityManager velocityManager;
 
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private TransformationManager transformationManager;
+
     @Mock
     private DocumentModelBridge document;
+
+    @Mock
+    private DocumentModelBridge translatedDocument;
 
     private Map<Object, Object> xcontext = new HashMap<>();
 
@@ -100,5 +117,52 @@ class DocumentContentAsyncExecutorTest
 
         // Verify the image id has been adapted.
         assertEquals("Ilogo-1", image.getId());
+    }
+
+    @Test
+    void initializeWithTranslatedContent() throws Exception
+    {
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.document.getLocale()).thenReturn(Locale.ROOT);
+        when(this.translatedDocument.getSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
+        when(this.translatedDocument.getLocale()).thenReturn(Locale.FRENCH);
+        XDOM translatedXDOM = new XDOM(List.of());
+        when(this.translatedDocument.getPreparedXDOM()).thenReturn(translatedXDOM);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(this.document))
+            .thenReturn(this.translatedDocument);
+
+        this.parameters.setContentTranslated(true);
+
+        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters);
+        assertSame(translatedXDOM, this.documentContentAsyncExecutor.execute(true));
+
+        // The transformations must be executed with the syntax of the translation, not the one of the default
+        // translation.
+        ArgumentCaptor<TransformationContext> txContext = ArgumentCaptor.forClass(TransformationContext.class);
+        verify(this.transformationManager).performTransformations(eq(translatedXDOM), txContext.capture());
+        assertEquals(Syntax.MARKDOWN_1_1, txContext.getValue().getSyntax());
+    }
+
+    @Test
+    void initializeWithTranslatedContentWhenTheDocumentIsAlreadyTheTranslation() throws Exception
+    {
+        // The given document is already the variant matching the context locale, so its content must be executed, even
+        // though the document access bridge returns a distinct instance of that same translation.
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.document.getLocale()).thenReturn(Locale.FRENCH);
+        XDOM preparedXDOM = new XDOM(List.of());
+        when(this.document.getPreparedXDOM()).thenReturn(preparedXDOM);
+        when(this.translatedDocument.getLocale()).thenReturn(Locale.FRENCH);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(this.document))
+            .thenReturn(this.translatedDocument);
+
+        this.parameters.setContentTranslated(true);
+
+        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters);
+        assertSame(preparedXDOM, this.documentContentAsyncExecutor.execute(true));
+
+        ArgumentCaptor<TransformationContext> txContext = ArgumentCaptor.forClass(TransformationContext.class);
+        verify(this.transformationManager).performTransformations(eq(preparedXDOM), txContext.capture());
+        assertEquals(Syntax.XWIKI_2_1, txContext.getValue().getSyntax());
     }
 }

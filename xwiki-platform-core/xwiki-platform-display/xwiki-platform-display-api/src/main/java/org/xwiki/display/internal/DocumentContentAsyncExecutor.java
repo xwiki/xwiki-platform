@@ -43,7 +43,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -83,9 +82,6 @@ public class DocumentContentAsyncExecutor
     private ModelContext modelContext;
 
     @Inject
-    private ContentParser parser;
-
-    @Inject
     private TransformationManager transformationManager;
 
     @Inject
@@ -114,23 +110,25 @@ public class DocumentContentAsyncExecutor
         this.parameters = parameters;
 
         this.transformationId = transformationId;
-        this.xdom = getPreparedContent(document, parameters);
+        // The executed content can be the one of a translation, which can have a syntax of its own.
+        DocumentModelBridge contentSource = getContentSource(document, parameters);
+        this.xdom = getPreparedContent(contentSource, parameters);
         this.documentReference = document.getDocumentReference();
-        this.syntax = document.getSyntax();
+        this.syntax = contentSource.getSyntax();
         this.document = document;
     }
 
     /**
-     * Get the content to display (either the entire document content or the content of a specific section).
+     * Get the content to display (either the entire content of the given document or the content of a specific
+     * section).
      * 
-     * @param document the source document
+     * @param document the document the content is taken from
      * @param parameters the display parameters
      * @return the content as an XDOM tree
      */
     private XDOM getPreparedContent(DocumentModelBridge document, final DocumentDisplayerParameters parameters)
     {
-        XDOM content =
-            parameters.isContentTranslated() ? getPreparedTranslatedContent(document) : document.getPreparedXDOM();
+        XDOM content = document.getPreparedXDOM();
 
         if (parameters.getSectionId() != null) {
             HeaderBlock headerBlock =
@@ -155,55 +153,35 @@ public class DocumentContentAsyncExecutor
     }
 
     /**
-     * Get the translated content of the given document as XDOM tree. If the language of the given document matches the
-     * context language (meaning that the given document is the current translation) then we use the content of the
-     * given document (including the content changes that could have been made prior to calling this method). Otherwise
-     * we load the current translation from the database/cache and use its content.
+     * Get the document the executed content has to be taken from. When a translated content is requested and the given
+     * document is not the variant matching the context locale, the matching translation is loaded from the
+     * database/cache. Otherwise the given document is used, so that the content changes that could have been made prior
+     * to calling this method are taken into account.
      * 
      * @param document the source document
-     * @return the translated content of the given document, as XDOM tree
+     * @param parameters the display parameters
+     * @return the document holding the content to execute
      */
-    private XDOM getPreparedTranslatedContent(DocumentModelBridge document)
+    private DocumentModelBridge getContentSource(DocumentModelBridge document,
+        DocumentDisplayerParameters parameters)
     {
-        try {
-            DocumentModelBridge translatedDocument = this.documentAccessBridge.getTranslatedDocumentInstance(document);
+        if (parameters.isContentTranslated()) {
+            try {
+                DocumentModelBridge translatedDocument =
+                    this.documentAccessBridge.getTranslatedDocumentInstance(document);
 
-            // FIXME: This is not a reliable way to determine if the language of the given document matches the context
-            // language. For instance the given document can have "en" language set while the translated document
-            // returned by the document access bridge can have "" or "default" language set.
-            if (!document.getRealLanguage().equals(translatedDocument.getRealLanguage())) {
-                // The language of the given document doesn't match the context language. Use the translated content.
-                if (document.getSyntax().equals(translatedDocument.getSyntax())) {
-                    // Use getXDOM() because it caches the XDOM.
-                    return translatedDocument.getPreparedXDOM();
-                } else {
-                    // If the translated document has a different syntax then we have to parse its content using the
-                    // syntax of the given document.
-                    return parseContent(translatedDocument.getContent(), document.getSyntax(),
-                        document.getDocumentReference());
+                // Compare the locales and not the languages: getRealLanguage() falls back on the default language of
+                // the document when the translation has none, so it can report the same language for two different
+                // translations of the document.
+                if (!document.getLocale().equals(translatedDocument.getLocale())) {
+                    return translatedDocument;
                 }
+            } catch (Exception e) {
+                // Use the content of the given document.
             }
-        } catch (Exception e) {
-            // Use the content of the given document.
         }
 
-        return document.getPreparedXDOM();
-    }
-
-    /**
-     * Parses a string content.
-     * 
-     * @param content the content to parse
-     * @param syntax the syntax of the given content
-     * @return the result of parsing the given content
-     */
-    private XDOM parseContent(String content, Syntax syntax, DocumentReference source)
-    {
-        try {
-            return this.parser.parse(content, syntax, source);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return document;
     }
 
     /**

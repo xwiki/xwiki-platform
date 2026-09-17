@@ -20,6 +20,7 @@
 package org.xwiki.bridge;
 
 import java.util.Date;
+import java.util.Locale;
 
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -58,6 +59,26 @@ public interface DocumentModelBridge
      * @return The document's language in a 2-letter code.
      */
     String getRealLanguage();
+
+    /**
+     * Retrieve the locale that identifies this translation among the translations of the same document. Unlike
+     * {@link #getRealLanguage()}, it does not fall back on the default locale of the document, which makes it the
+     * reliable way of telling two translations of the same document apart.
+     * 
+     * <p>
+     * The default implementation reports every document as the original one: an implementation that supports
+     * translations has to override it, otherwise its translations cannot be told apart from the document they
+     * translate.
+     * 
+     * @return the locale of this translation, {@link Locale#ROOT} for the original document
+     * @since 17.10.14
+     * @since 18.4.6
+     * @since 18.8.0
+     */
+    default Locale getLocale()
+    {
+        return Locale.ROOT;
+    }
 
     /**
      * Retrieves the textual content of the document.

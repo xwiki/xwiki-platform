@@ -44,6 +44,14 @@
     <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
     <property name="hibernate.jdbc.use_scrollable_resultset">false</property>
 
+    <!-- XWiki needs an isolation level of at most READ COMMITTED: loading a document resolves the XClass of each of
+         its objects inside the transaction opened for that load, so with REPEATABLE READ (the InnoDB default, and
+         thus the MySQL and MariaDB default) an XClass saved by someone else while the document is being loaded is
+         invisible to that load and gets cached as non-existing. XWiki therefore uses READ COMMITTED (2) when this
+         property isn't set. Uncomment it only to force a different level, knowing the above.
+    -->
+    <!-- <property name="hibernate.connection.isolation">2</property> -->
+
     <!-- DBCP Connection Pooling configuration. Only some properties are shown. All available properties can be found
          at https://commons.apache.org/proper/commons-dbcp/configuration.html
     -->

@@ -41,10 +41,11 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.internal.BridgeAuthorizationManager;
+import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.template.InternalTemplateManager;
 
 /**
  * Override {@link BridgeAuthorizationManager} to forbid programming right in wiki content.
@@ -66,6 +67,10 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
 
     @Inject
     private Logger prlogger;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> pruserReferenceResolver;
 
     private Pattern excludePattern;
 
@@ -134,8 +139,10 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
         // Try to make sure we are in a script associated to a wiki page: a secure document has been set and
         // it's not the author/secure document used for things authorized to have PR by definition (like
         // filesystem templates)
-        if (sdoc != null && (!InternalTemplateManager.SUPERADMIN_REFERENCE.equals(userReference)
-            || !SUREFERENCE.equals(sdoc.getDocumentReference().getLocalDocumentReference()))) {
+        if (sdoc != null
+            && (!SuperAdminUserReference.isSuperAdmin(this.pruserReferenceResolver.resolve(userReference))
+                || !SUREFERENCE.equals(sdoc.getDocumentReference().getLocalDocumentReference())))
+        {
             DocumentReference sref = sdoc.getDocumentReference();
 
             if (this.excludePattern != null && this.excludePattern.matcher(sref.toString()).matches()) {

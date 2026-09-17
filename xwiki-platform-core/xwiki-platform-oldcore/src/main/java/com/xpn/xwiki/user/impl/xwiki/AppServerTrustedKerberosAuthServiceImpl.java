@@ -22,6 +22,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.user.SuperAdminUserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -72,6 +73,11 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
             return super.checkAuth(context);
         } else {
             user = this.extractUsernameFromPrincipal(user);
+            if (SuperAdminUserReference.isSuperAdminName(user)) {
+                // The superadmin user is virtual, it has no user document and is only ever authenticated against the
+                // password from the configuration, so it is never taken from the application server.
+                return super.checkAuth(context);
+            }
             user = createUser(user, context);
             user = XWIKI_SPACE + DOT + user;
         }

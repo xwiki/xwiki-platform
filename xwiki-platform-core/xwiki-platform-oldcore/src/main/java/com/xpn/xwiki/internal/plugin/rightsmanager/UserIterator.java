@@ -35,6 +35,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.user.SuperAdminUserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -271,8 +272,7 @@ public class UserIterator<T> implements Iterator<T>
 
     private boolean isSuperAdmin(DocumentReference reference)
     {
-        return reference.getLastSpaceReference().getName().equals(RightsManager.DEFAULT_USERORGROUP_SPACE)
-            && reference.getName().equalsIgnoreCase(XWikiRightService.SUPERADMIN_USER);
+        return SuperAdminUserReference.isSuperAdminReference(reference);
     }
 
     private boolean isGuest(DocumentReference reference)

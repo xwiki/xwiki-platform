@@ -65,7 +65,7 @@ public class DefaultUserManager implements UserManager
             normalizedUserReference = CurrentUserReference.INSTANCE;
         }
         if (GuestUserReference.INSTANCE == normalizedUserReference
-            || SuperAdminUserReference.INSTANCE == normalizedUserReference)
+            || SuperAdminUserReference.isSuperAdmin(normalizedUserReference))
         {
             exists = false;
         } else {
@@ -108,7 +108,7 @@ public class DefaultUserManager implements UserManager
             normalizedTargetReference = CurrentUserReference.INSTANCE;
         }
 
-        if (target == GuestUserReference.INSTANCE || target == SuperAdminUserReference.INSTANCE) {
+        if (target == GuestUserReference.INSTANCE || SuperAdminUserReference.isSuperAdmin(target)) {
             // The target is not an actual resource, its metadata is always readable.
             hasAccess = true;
         } else if (normalizedUserReference == CurrentUserReference.INSTANCE

@@ -73,7 +73,7 @@ public class CurrentUserManager implements UserManager
         } else {
             // Resolve the current user reference into a real reference.
             UserReference resolvedUserReference = this.userReferenceResolver.resolve(currentUserReference);
-            if (SuperAdminUserReference.INSTANCE == resolvedUserReference
+            if (SuperAdminUserReference.isSuperAdmin(resolvedUserReference)
                 || GuestUserReference.INSTANCE == resolvedUserReference)
             {
                 exists = false;
@@ -104,7 +104,7 @@ public class CurrentUserManager implements UserManager
         }
 
         if (resolvedTargetReference == GuestUserReference.INSTANCE
-            || resolvedTargetReference == SuperAdminUserReference.INSTANCE)
+            || SuperAdminUserReference.isSuperAdmin(resolvedTargetReference))
         {
             // The target is not an actual resource, its metadata is always readable.
             hasAccess = true;

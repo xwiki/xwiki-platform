@@ -26,16 +26,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.images.ImagePullPolicy;
 import org.testcontainers.images.RemoteDockerImage;
 import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.browser.XWikiBrowserWebDriverContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.browser.Browser;
-
-import com.github.dockerjava.api.exception.NotFoundException;
 
 import static org.xwiki.test.docker.junit5.browser.Browser.CHROME;
 
@@ -111,48 +107,23 @@ public final class BrowserTestUtils
             // policy set on the container) with one using the default policy. That's the very bug this class works
             // around, see https://github.com/testcontainers/testcontainers-java/issues/4608. Since we create and
             // resolve the RemoteDockerImage ourselves here, the policy is honored.
-            new RemoteDockerImage(imageName).withImagePullPolicy(getImagePullPolicy()).get();
+            //
+            // Only pull once a day to avoid the dockerhub pull rate limit, and to reduce the number of times a
+            // registry outage can break the build.
+            new RemoteDockerImage(imageName).withImagePullPolicy(new DurationImagePullPolicy(DAY)).get();
         } catch (Exception e) {
             if (e instanceof InterruptedException) {
                 // Restore interrupted state to be a good citizen...
                 Thread.currentThread().interrupt();
             }
 
-            // We couldn't reach the registry. We only pull this image to make sure we test with the latest browser
-            // version, and it's normally already cached on the agent from previous builds. Thus, when a local copy
-            // exists, use it instead of failing the whole test module because of an infrastructure problem. We only
-            // fail when there's no image to fall back to, i.e. when the tests cannot run at all.
-            if (isImageAvailableLocally(imageName)) {
-                LOGGER.warn("Failed to pull image [{}]. Continuing with the locally-available image, which may not "
-                    + "be the latest one. Root cause: [{}]", imageName, ExceptionUtils.getRootCauseMessage(e));
-            } else {
-                throw new RuntimeException(String.format(
-                    "Failed to pull image [%s] and no local copy of that image is available", imageName), e);
-            }
-        }
-    }
-
-    private static ImagePullPolicy getImagePullPolicy()
-    {
-        // Only pull once a day to avoid the dockerhub pull rate limit, and to reduce the number of times a registry
-        // outage can break the build. Also pull whenever there's no local copy to fall back to, since
-        // DurationImagePullPolicy only looks at the date of the last pull and not at what's actually available
-        // locally (e.g. the image could have been pruned on the agent since then).
-        DurationImagePullPolicy durationPolicy = new DurationImagePullPolicy(DAY);
-        return imageName -> durationPolicy.shouldPull(imageName) || !isImageAvailableLocally(imageName);
-    }
-
-    private static boolean isImageAvailableLocally(DockerImageName imageName)
-    {
-        try {
-            DockerClientFactory.instance().client().inspectImageCmd(imageName.asCanonicalNameString()).exec();
-            return true;
-        } catch (NotFoundException e) {
-            return false;
-        } catch (RuntimeException e) {
-            LOGGER.warn("Failed to check if image [{}] is available locally. Root cause: [{}]", imageName,
-                ExceptionUtils.getRootCauseMessage(e));
-            return false;
+            // We couldn't reach the registry. We only pull here to make sure that we test with the latest browser
+            // version, so don't fail the whole test module because of an infrastructure problem: TestContainers
+            // still pulls the image itself when starting the container if it's missing locally (that's its default
+            // pull policy, only the "keep it up to date" part is broken by the bug mentioned above), and otherwise
+            // the tests run with the locally-available image.
+            LOGGER.warn("Failed to pull image [{}]. The tests will run with the locally-available image, which may "
+                + "not be the latest one. Root cause: [{}]", imageName, ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

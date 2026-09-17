@@ -199,6 +199,13 @@ Object.extend(XWiki, {
         document.fire("xwiki:docextra:activated", {"id": extraID});
      };
 
+     // Remember which pane was requested last. Since the panes are loaded asynchronously and their responses can
+     // arrive in any order, a pane must only be displayed if it's still the one requested last, otherwise a pane
+     // that is slow to load steals the display from a pane requested after it. This happens for instance when the
+     // first pane, which is loaded automatically when the page is loaded, is still loading when the user clicks on
+     // another pane.
+     window.lastRequestedDocExtra = extraID;
+
      // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
      // On complete :
      //   1. Call dhtmlSwitch()
@@ -289,22 +296,30 @@ Object.extend(XWiki, {
 
                       $("docextrapanes").className="";
 
+                      // The content is in the pane, so it must not be fetched again, even when the pane is not
+                      // displayed below because another pane has been requested in the meantime. Note that the pane
+                      // keeps its "hidden" class in that case, and that dhtmlSwitch() is what drops it.
+                      $(extraID + "pane").removeClassName("empty");
+
                       // Let other know new content has been loaded
                       document.fire("xwiki:docextra:loaded", {
                         "id" : extraID,
                         "element": $(extraID + "pane")
                       });
 
-                      // switch tab
-                      dhtmlSwitch(extraID);
+                      // Switch tab, but only if this pane is still the one requested last, so that a pane that is
+                      // slow to load doesn't replace a pane the user has requested after it.
+                      if (window.lastRequestedDocExtra === extraID) {
+                        dhtmlSwitch(extraID);
 
-                      if (scrollToAnchor) {
-                        // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
-                        // prevents the anchor 'jump' after a click event but enable it
-                        // when the user is arriving from a direct /Space/Page#Section URL
-                        $(extraID + 'anchor').id = extraID;
-                        location.href='#' + extraID;
-                        $(extraID).id = extraID + 'anchor';
+                        if (scrollToAnchor) {
+                          // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
+                          // prevents the anchor 'jump' after a click event but enable it
+                          // when the user is arriving from a direct /Space/Page#Section URL
+                          $(extraID + 'anchor').id = extraID;
+                          location.href='#' + extraID;
+                          $(extraID).id = extraID + 'anchor';
+                        }
                       }
                     }
                 });

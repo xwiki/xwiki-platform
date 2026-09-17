@@ -98,6 +98,7 @@ public final class BrowserTestUtils
 
     private static void pullImage(DockerImageName imageName)
     {
+        DurationImagePullPolicy pullPolicy = new DurationImagePullPolicy(DAY);
         try {
             // Delegate the pull to TestContainers so that we benefit from its retry logic on transient registry
             // errors, from its image name substitution and from its local image cache handling.
@@ -110,12 +111,16 @@ public final class BrowserTestUtils
             //
             // Only pull once a day to avoid the dockerhub pull rate limit, and to reduce the number of times a
             // registry outage can break the build.
-            new RemoteDockerImage(imageName).withImagePullPolicy(new DurationImagePullPolicy(DAY)).get();
+            new RemoteDockerImage(imageName).withImagePullPolicy(pullPolicy).get();
         } catch (Exception e) {
             if (e instanceof InterruptedException) {
                 // Restore interrupted state to be a good citizen...
                 Thread.currentThread().interrupt();
             }
+
+            // The policy records the pull date before the pull actually happens, so forget it again: we don't want a
+            // registry outage to freeze the browser version for a whole day.
+            pullPolicy.clearPullDate(imageName);
 
             // We couldn't reach the registry. We only pull here to make sure that we test with the latest browser
             // version, so don't fail the whole test module because of an infrastructure problem: TestContainers

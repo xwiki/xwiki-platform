@@ -97,6 +97,24 @@ public class DurationImagePullPolicy implements ImagePullPolicy
         return shouldPull;
     }
 
+    /**
+     * Forget when the passed image has last been pulled, so that the next call to
+     * {@link #shouldPull(DockerImageName)} pulls it again. Meant to be called when the pull that
+     * {@link #shouldPull(DockerImageName)} optimistically recorded actually failed, so that a failing registry doesn't
+     * freeze the image version for the whole duration.
+     *
+     * @param dockerImageName the image whose last pull date should be forgotten
+     * @since 18.9.0RC1
+     */
+    public void clearPullDate(DockerImageName dockerImageName)
+    {
+        loadPersistedData();
+
+        if (durationCache.remove(dockerImageName.asCanonicalNameString()) != null) {
+            writeFile();
+        }
+    }
+
     private void loadPersistedData()
     {
         if (durationCache == null) {

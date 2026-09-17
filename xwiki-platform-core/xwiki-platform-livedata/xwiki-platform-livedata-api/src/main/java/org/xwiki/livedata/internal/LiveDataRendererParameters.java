@@ -280,8 +280,8 @@ public class LiveDataRendererParameters
     }
 
     /**
+     * @return whether the pagination is shown when there is a single page of entries
      * @since 18.8.0RC1
-     * @return whether to show or not the pagination list when there is only one page.
      */
     @Unstable
     public Boolean getShowPaginationOnSinglePage()
@@ -290,11 +290,10 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * Sets whether to show or not the pagination list when there is only one page.
+     * Sets whether the pagination is shown when there is a single page of entries.
      *
-     * @param showPaginationOnSinglePage {@code true} to always show the page list, 
-     * {@code false} only show it when there's multiple pages;
-     * leave {@code null} to inherit from the default configuration
+     * @param showPaginationOnSinglePage {@code true} to show the pagination on a single page, {@code false} to show
+     *     it only when there are several pages, {@code null} to inherit from the default configuration
      * @since 18.8.0RC1
      */
     @Unstable

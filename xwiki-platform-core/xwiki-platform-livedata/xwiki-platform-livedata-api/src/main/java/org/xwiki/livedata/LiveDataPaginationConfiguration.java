@@ -23,10 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.xwiki.stability.Unstable;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.stability.Unstable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -52,7 +51,7 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
     private Boolean showFirstLast;
 
     private Boolean showPageSizeDropdown;
-    
+
     private Boolean showPaginationOnSinglePage;
 
     /**
@@ -166,8 +165,8 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
     }
 
     /**
+     * @return whether the pagination is shown when there is a single page of entries
      * @since 18.8.0RC1
-     * @return whether to show or not the pagination should be shown when there's only one page.
      */
     @Unstable
     public Boolean getShowPaginationOnSinglePage()
@@ -176,9 +175,10 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
     }
 
     /**
-     * Sets whether to show or not the pagination should be shown when there's only one page.
+     * Sets whether the pagination is shown when there is a single page of entries.
+     *
+     * @param showPaginationOnSinglePage {@code true} to show the pagination on a single page, {@code false} otherwise
      * @since 18.8.0RC1
-     * @param showPaginationOnSinglePage {@code true} to always show the pagination, {@code false} otherwise
      */
     @Unstable
     public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)

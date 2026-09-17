@@ -38,6 +38,7 @@ import { describe, expect, it } from "vitest";
  *           maxShownPages: 10,
  *           showEntryRange: true,
  *           showPageSizeDropdown: true,
+ *           showPaginationOnSinglePage: true,
  *           pageSizes: [10, 20, 30]
  *         }
  *       },
@@ -80,6 +81,7 @@ function initWrapper({ provide } = {}) {
                   maxShownPages: 10,
                   showEntryRange: true,
                   showPageSizeDropdown: true,
+                  showPaginationOnSinglePage: true,
                   pageSizes: [10, 20, 30, 100],
                 },
               },
@@ -194,5 +196,58 @@ describe("LivedataPagination.vue", () => {
       "livedata.pagination.loadPageByNumber",
     );
     await assertAxe(wrapper);
+  });
+
+  it("Hides the pagination on a single page when showPaginationOnSinglePage is false", () => {
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          data: {
+            meta: { pagination: { showPaginationOnSinglePage: false } },
+            data: { count: 5 },
+          },
+          getPageCount: () => 1,
+          getPageIndex: () => 0,
+        },
+      },
+    });
+    expect(wrapper.find(".livedata-pagination").exists()).toBe(false);
+  });
+
+  it("Displays the pagination on several pages when showPaginationOnSinglePage is false", () => {
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          data: {
+            meta: { pagination: { showPaginationOnSinglePage: false } },
+            data: { count: 25 },
+          },
+          getPageCount: () => 2,
+          getPageIndex: () => 0,
+        },
+      },
+    });
+    expect(wrapper.find(".livedata-pagination").exists()).toBe(true);
+  });
+
+  it("Displays the pagination when showPaginationOnSinglePage is false but the current page is not the first one", () => {
+    // The entries the user was paginating through have disappeared, leaving a single page while the user is still
+    // on the second one. The pagination is the only way back to the first page.
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          data: {
+            meta: { pagination: { showPaginationOnSinglePage: false } },
+            query: { limit: 20, offset: 20 },
+            data: { count: 5 },
+          },
+          getPageCount: () => 1,
+          getPageIndex: () => 1,
+        },
+      },
+    });
+    expect(wrapper.find(".livedata-pagination").exists()).toBe(true);
+    const pageNavs = wrapper.findAll(".pagination-indexes .page-nav");
+    expect(pageNavs.at(0).text()).toContain("1");
   });
 });

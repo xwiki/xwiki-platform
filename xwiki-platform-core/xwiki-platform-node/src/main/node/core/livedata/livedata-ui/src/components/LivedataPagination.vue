@@ -29,12 +29,14 @@
 <template>
   <!-- Pagination -->
   <nav
+    v-if="showPagination"
     class="livedata-pagination"
     :aria-label="
       this.data.id
         ? $t('livedata.pagination.label', [this.data.id])
-        : $t('livedata.pagination.label.empty')"
-       v-if="showPagination">
+        : $t('livedata.pagination.label.empty')
+    "
+  >
     <!--
       The actual pagination widget
       It displays the the available pages numbers, and change to them on click.
@@ -330,9 +332,16 @@ export default {
     showEntryRange() {
       return this.data.meta.pagination.showEntryRange;
     },
+    // The pagination is also kept when the current page index is not the first one, even though a single page of
+    // entries is left. This happens when entries disappear while the user is on a later page, and without the
+    // pagination the user would have no way to get back to the first page.
     showPagination() {
-      return this.logic.getPageCount() > 1 || this.data.meta.pagination.showPaginationOnSinglePage;
-    }
+      return (
+        this.logic.getPageCount() > 1 ||
+        this.data.meta.pagination.showPaginationOnSinglePage ||
+        this.logic.getPageIndex() > 0
+      );
+    },
   },
 
   methods: {

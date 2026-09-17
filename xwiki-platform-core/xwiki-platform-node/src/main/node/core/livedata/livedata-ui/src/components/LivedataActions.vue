@@ -45,7 +45,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .livedata-actions {
   display: flex;
   gap: var(--button-spacing);
@@ -55,7 +55,8 @@ export default {
   padding-left: 0;
 }
 
-.livedata-actions .btn span {
+/* The buttons are rendered by the child components, hence the deep selector. */
+.livedata-actions :deep(.btn span) {
   vertical-align: middle;
 }
 </style>

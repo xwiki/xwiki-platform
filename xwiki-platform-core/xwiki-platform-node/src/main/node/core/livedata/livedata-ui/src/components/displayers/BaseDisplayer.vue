@@ -85,7 +85,10 @@
         </span>
       </div>
 
-      <!-- The slot containing the displayer Editor widget -->
+      <!--
+        The slot containing the displayer Editor widget.
+        We stop the Escape signal here to close the editor without also leaving the maximized view.
+      -->
       <div
         @keydown.esc.capture.stop="cancelEdit"
         @focusin="editorFocused = true"

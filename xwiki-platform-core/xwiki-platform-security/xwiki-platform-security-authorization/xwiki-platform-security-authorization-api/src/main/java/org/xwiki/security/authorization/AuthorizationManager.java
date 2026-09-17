@@ -76,6 +76,9 @@ public interface AuthorizationManager
      * @param user the reference of the user identity to check, as resolved by a {@code UserReferenceResolver}
      * @return {@code true} if and only if the user is determined to be the superuser
      * @since 18.9.0RC1
+     * @since 18.4.6
+     * @since 17.10.14
+     * @since 16.10.19
      */
     default boolean isSuperAdmin(UserReference user)
     {

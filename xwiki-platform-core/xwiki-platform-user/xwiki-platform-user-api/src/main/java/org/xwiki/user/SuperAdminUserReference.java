@@ -40,6 +40,9 @@ public final class SuperAdminUserReference implements UserReference
      * name, see {@link #isSuperAdminName(String)}.
      *
      * @since 18.9.0RC1
+     * @since 18.4.6
+     * @since 17.10.14
+     * @since 16.10.19
      */
     public static final String SUPERADMIN_USER_NAME = "superadmin";
 
@@ -48,6 +51,9 @@ public final class SuperAdminUserReference implements UserReference
      * Super Admin user.
      *
      * @since 18.9.0RC1
+     * @since 18.4.6
+     * @since 17.10.14
+     * @since 16.10.19
      */
     public static final String SUPERADMIN_USER_SPACE = "XWiki";
 
@@ -57,6 +63,9 @@ public final class SuperAdminUserReference implements UserReference
      * it.
      *
      * @since 18.9.0RC1
+     * @since 18.4.6
+     * @since 17.10.14
+     * @since 16.10.19
      */
     public static final LocalDocumentReference SUPERADMIN_LOCAL_REFERENCE =
         new LocalDocumentReference(SUPERADMIN_USER_SPACE, SUPERADMIN_USER_NAME);
@@ -76,6 +85,9 @@ public final class SuperAdminUserReference implements UserReference
      *            is never the Super Admin user, resolve it first with a {@link UserReferenceResolver} if needed
      * @return {@code true} if the passed reference is the Super Admin user reference
      * @since 18.9.0RC1
+     * @since 18.4.6
+     * @since 17.10.14
+     * @since 16.10.19
      */
     public static boolean isSuperAdmin(UserReference userReference)
     {
@@ -90,6 +102,9 @@ public final class SuperAdminUserReference implements UserReference
      * @param userReference the reference of the user document to check, in any wiki
      * @return {@code true} if the passed reference denotes the Super Admin user
      * @since 18.9.0RC1
+     * @since 18.4.6
+     * @since 17.10.14
+     * @since 16.10.19
      */
     public static boolean isSuperAdminReference(EntityReference userReference)
     {
@@ -131,6 +146,9 @@ public final class SuperAdminUserReference implements UserReference
      *            {@code xwiki:XWiki.superadmin})
      * @return {@code true} if the passed name is the Super Admin user name, whatever its case
      * @since 18.9.0RC1
+     * @since 18.4.6
+     * @since 17.10.14
+     * @since 16.10.19
      */
     public static boolean isSuperAdminName(String userName)
     {

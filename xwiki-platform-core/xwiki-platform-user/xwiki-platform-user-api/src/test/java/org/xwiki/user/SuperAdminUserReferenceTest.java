@@ -131,7 +131,9 @@ class SuperAdminUserReferenceTest
     @Test
     void superAdminLocalReference()
     {
-        assertEquals(new LocalDocumentReference("XWiki", "superadmin"),
-            SuperAdminUserReference.SUPERADMIN_LOCAL_REFERENCE);
+        assertEquals(SuperAdminUserReference.SUPERADMIN_USER_NAME,
+            SuperAdminUserReference.SUPERADMIN_LOCAL_REFERENCE.getName());
+        assertEquals(SuperAdminUserReference.SUPERADMIN_USER_SPACE,
+            SuperAdminUserReference.SUPERADMIN_LOCAL_REFERENCE.getParent().getName());
     }
 }

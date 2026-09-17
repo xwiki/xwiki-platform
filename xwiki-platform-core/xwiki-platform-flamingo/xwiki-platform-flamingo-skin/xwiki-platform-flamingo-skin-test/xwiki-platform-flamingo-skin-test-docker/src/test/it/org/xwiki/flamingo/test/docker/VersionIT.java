@@ -107,10 +107,6 @@ class VersionIT
         wikiEditPage.setContent(CONTENT2);
         wikiEditPage.clickSaveAndView();
 
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
-
         // Verify that we can rollback to the first version
         HistoryPane historyTab = vp.openHistoryDocExtraPane();
         vp = historyTab.rollbackToVersion("1.1");
@@ -148,10 +144,6 @@ class VersionIT
         WikiEditPage wikiEditPage = new WikiEditPage();
         wikiEditPage.setContent(CONTENT2);
         wikiEditPage.clickSaveAndView();
-
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
 
         // Verify and delete the latest version.
         HistoryPane historyTab = vp.openHistoryDocExtraPane();
@@ -292,19 +284,11 @@ class VersionIT
 
         assertEquals(CONTENT2, vp.getContent());
 
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
-
         HistoryPane historyTab = vp.openHistoryDocExtraPane();
         vp = historyTab.viewVersion("1.1");
 
         // In the preview the Velocity macro should be forbidden.
         assertThat(vp.getContent(), startsWith("Failed to execute the [velocity] macro."));
-
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
 
         historyTab = vp.openHistoryDocExtraPane();
         vp = historyTab.rollbackToVersion("1.1");
@@ -337,9 +321,6 @@ class VersionIT
 
         // View the page
         ViewPage vp = setup.gotoPage(testReference);
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
 
         // Verify and delete the latest version.
         HistoryPane historyTab = vp.openHistoryDocExtraPane();

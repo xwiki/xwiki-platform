@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "xwiki-platform-web-war",
+  "version": "0.0.0",
+  "description": "Unit tests for the JavaScript located in src/main/webapp of xwiki-platform-web-war",
+  "type": "module",
+  "scripts": {
+    "test:unit": "vitest --run"
+  },
+  "devDependencies": {
+    "jsdom": "catalog:",
+    "vitest": "catalog:"
+  },
+  "nx": {
+    "targets": {
+      "test:unit": {
+        "cache": false
+      }
+    }
+  }
+}

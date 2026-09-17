@@ -128,6 +128,77 @@
               <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
             </configuration>
           </execution>
+          <!-- Extract Prototype for the JavaScript unit tests, which load it the way the browser does in order to run
+               the JavaScript of this module. Prototype isn't published on npm, so it can't be a dependency of the node
+               package that holds those tests. -->
+          <execution>
+            <id>unpack-prototype-for-javascript-tests</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>prototype</artifactId>
+                  <type>jar</type>
+                  <includes>**/prototype.js</includes>
+                  <!-- Drop the "META-INF/resources/webjars/prototype/<version>" prefix so that the tests don't need to
+                       know the version. -->
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+                  </fileMappers>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/test-webjars</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Run the JavaScript unit tests located in src/test/node. -->
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <executions>
+          <!-- All the executions are bound to the test phase so that the plugin skips them when the tests are
+               skipped. -->
+          <execution>
+            <id>install-node-and-pnpm</id>
+            <phase>test</phase>
+            <goals>
+              <goal>install-node-and-pnpm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>${node.version}</nodeVersion>
+              <pnpmVersion>${pnpm.version}</pnpmVersion>
+              <installDirectory>${basedir}/target</installDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-install</id>
+            <phase>test</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+              <workingDirectory>${basedir}/src/test/node</workingDirectory>
+              <installDirectory>${basedir}/target</installDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run test:unit</arguments>
+              <workingDirectory>${basedir}/src/test/node</workingDirectory>
+              <installDirectory>${basedir}/target</installDirectory>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <!-- Minify and optimize the JavaScript code. -->
@@ -260,6 +331,8 @@
           <licenseSets>
             <licenseSet>
               <excludes>
+                <!-- Adding the node_modules of src/test/node is not needed and slows down the license plugin. -->
+                <exclude>**/node_modules/**</exclude>
                 <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
                 <exclude>src/**/xwiki/accordion/accordion.js</exclude>
                 <exclude>src/**/xwiki/panelwizard/ieemu.js</exclude>

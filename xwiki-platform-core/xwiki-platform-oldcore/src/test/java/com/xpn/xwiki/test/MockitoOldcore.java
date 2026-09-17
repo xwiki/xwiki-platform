@@ -1252,14 +1252,14 @@ public class MockitoOldcore
                 .then(invocationOnMock -> invocationOnMock.<TestDocumentUserReference>getArgument(0).documentReference);
         }
 
-        // Same for the resolution of a user id into a UserReference: resolve it the way the document based
-        // UserReferenceResolver does, i.e. relatively to the space users live in, so that the virtual SuperAdmin user
-        // is recognized from any of the forms its id can take.
+        // Same for the resolution of a user id into a UserReference: resolve it the way the document store does,
+        // i.e. relatively to the space users live in, so that the virtual SuperAdmin user is recognized from any of
+        // the forms its id can take. The document store is the default one.
         DefaultParameterizedType userReferenceStringResolverType =
             new DefaultParameterizedType(null, UserReferenceResolver.class, String.class);
-        if (!this.componentManager.hasComponent(userReferenceStringResolverType, "document")) {
+        if (!this.componentManager.hasComponent(userReferenceStringResolverType)) {
             UserReferenceResolver<String> stringUserReferenceResolver =
-                getMocker().registerMockComponent(userReferenceStringResolverType, "document");
+                getMocker().registerMockComponent(userReferenceStringResolverType);
             when(stringUserReferenceResolver.resolve(any())).then(invocationOnMock -> {
                 String userId = invocationOnMock.getArgument(0);
                 if (StringUtils.isEmpty(userId)) {

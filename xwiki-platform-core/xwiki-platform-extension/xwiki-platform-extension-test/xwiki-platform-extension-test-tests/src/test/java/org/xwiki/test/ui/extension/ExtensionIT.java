@@ -59,6 +59,8 @@ import org.xwiki.extension.test.po.SearchResultsPane;
 import org.xwiki.extension.test.po.SimpleSearchPane;
 import org.xwiki.extension.test.po.UnusedPagesPane;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.repository.test.TestExtension;
 import org.xwiki.test.ui.AbstractExtensionAdminAuthenticatedIT;
 import org.xwiki.test.ui.po.ViewPage;
@@ -79,6 +81,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 {
+    private static final String RESET_USER = "resetuser";
+
+    private static final String RESET_USER_PASSWORD = "resetpassword";
+
     @Override
     public void setUp() throws Exception
     {
@@ -1015,5 +1021,66 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         searchResults = searchBar.search("bob-xar-extension");
         assertNull(searchResults.getExtension(supportedExtensionId));
         assertNotNull(searchResults.getExtension(notSupportedExtensionId));
+    }
+
+    /**
+     * Make sure that only users allowed to edit a document coming from an installed extension can reset it to its
+     * standard version.
+     */
+    @Test
+    public void testResetDocument() throws Exception
+    {
+        // Setup the extension.
+        ExtensionId extensionId = new ExtensionId("alice-xar-extension", "1.3");
+        getRepositoryTestUtils().addExtension(getRepositoryTestUtils().getTestExtension(extensionId, "xar"));
+        getExtensionTestUtils().install(extensionId);
+
+        // Modify the installed document so that resetting it has a visible effect.
+        Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("title", "Alice Modified");
+        queryParameters.put("content", "Alice was here.");
+        getUtil().gotoPage("ExtensionTest", "Alice", "save", queryParameters);
+        assertEquals("Alice Modified", getUtil().gotoPage("ExtensionTest", "Alice").getDocumentTitle());
+
+        // Create, as superadmin (so that the author of the script is allowed to edit ExtensionTest.Alice), a page
+        // which resets ExtensionTest.Alice when it's displayed. The page is saved through REST so that it's not
+        // displayed (and thus not executed) yet.
+        LocalDocumentReference testReference = new LocalDocumentReference(getTestClassName(), getTestMethodName());
+        getUtil().rest().savePage(testReference, "{{velocity}}\n"
+            // The reset API expects a reference with a locale, like the Extension Manager UI passes.
+            + "#set ($aliceReference = $services.model.createDocumentReference("
+            + "$services.model.resolveDocument('ExtensionTest.Alice'), $services.localization.toLocale('')))\n"
+            + "#set ($jobId = $services.extension.xar.getDiffJobId('alice-xar-extension', 'wiki:xwiki'))\n"
+            + "reset=[$services.extension.xar.reset($aliceReference, $jobId)] "
+            + "error=[$services.extension.xar.lastError.message]\n"
+            + "{{/velocity}}", "");
+
+        // A user who is not allowed to edit the document must not be able to reset it, even when the author of the
+        // script asking for the reset is allowed to.
+        getUtil().createUser(RESET_USER, RESET_USER_PASSWORD, null);
+        getUtil().setRightsOnSpace(new SpaceReference("xwiki", "ExtensionTest"), null, "XWiki." + RESET_USER, "edit",
+            false);
+        getUtil().login(RESET_USER, RESET_USER_PASSWORD);
+
+        String resetResult = getUtil().gotoPage(getTestClassName(), getTestMethodName()).getContent();
+        assertTrue(resetResult, resetResult.contains("reset=[false]"));
+        // Make sure the reset is refused because of the context user and not because of the script author.
+        assertTrue(resetResult, resetResult.contains("Access denied when checking [edit] access to"));
+        assertTrue(resetResult, resetResult.contains("for user [xwiki:XWiki." + RESET_USER + "]"));
+
+        // The document is left untouched.
+        getUtil().loginAsSuperAdmin();
+        assertEquals("Alice Modified", getUtil().gotoPage("ExtensionTest", "Alice").getDocumentTitle());
+
+        // A user allowed to edit the document can reset it.
+        resetResult = getUtil().gotoPage(getTestClassName(), getTestMethodName()).getContent();
+        assertTrue(resetResult, resetResult.contains("reset=[true]"));
+
+        ViewPage alicePage = getUtil().gotoPage("ExtensionTest", "Alice");
+        assertEquals("Alice Macro", alicePage.getDocumentTitle());
+        assertTrue(alicePage.getContent().contains("Alice says hello!"));
+
+        // Don't leave the rights of the ExtensionTest space behind for the other tests.
+        getUtil().rest().deletePage("ExtensionTest", "WebPreferences");
     }
 }

@@ -459,6 +459,47 @@ public class ExtensionStore implements Initializable, Disposable
     }
 
     /**
+     * Retrieve the reference of the extension version document, without loading it.
+     * 
+     * @param extensionDocument the document of the extension
+     * @param extensionVersion the version for which to retrieve the document reference
+     * @param xcontext the current context
+     * @return the reference of the version document, or the reference of the given extension document when the
+     *         extension does not use dedicated version pages
+     * @since 17.10.14
+     * @since 18.4.6
+     * @since 18.8.0RC1
+     * @since 18.9.0RC1
+     */
+    public DocumentReference getExtensionVersionDocumentReference(XWikiDocument extensionDocument,
+        String extensionVersion, XWikiContext xcontext)
+    {
+        if (isVersionPageEnabled(extensionDocument)) {
+            return getVersionDocumentReference(extensionDocument, extensionVersion, xcontext);
+        }
+
+        return extensionDocument.getDocumentReference();
+    }
+
+    private DocumentReference getVersionDocumentReference(XWikiDocument mainDocument, String version,
+        XWikiContext xcontext)
+    {
+        return xcontext.getWiki().getDocumentReference(getVersionPageReference(mainDocument, version), xcontext);
+    }
+
+    private PageReference getVersionPageReference(XWikiDocument mainDocument, String version)
+    {
+        return new PageReference(version,
+            new PageReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME, mainDocument.getPageReference()));
+    }
+
+    private XWikiDocument getVersionDocument(XWikiDocument mainDocument, String version, XWikiContext xcontext)
+        throws XWikiException
+    {
+        return xcontext.getWiki().getDocument(getVersionPageReference(mainDocument, version), xcontext);
+    }
+
+    /**
      * Retrieve the xobject of the version for given extension.
      * 
      * @param extensionVersionDocument the document that might contain the version object

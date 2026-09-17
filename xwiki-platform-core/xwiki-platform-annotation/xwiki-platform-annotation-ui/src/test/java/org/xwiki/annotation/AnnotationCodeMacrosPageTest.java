@@ -19,6 +19,10 @@
  */
 package org.xwiki.annotation;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.function.Consumer;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +62,7 @@ import org.xwiki.xml.html.script.HTMLScriptService;
 
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -110,6 +115,8 @@ class AnnotationCodeMacrosPageTest extends PageTest
     private static final DocumentReference COMMENTS_CLASS = new DocumentReference("xwiki", "XWiki", "XWikiComments");
 
     private static final DocumentReference TARGET = new DocumentReference("xwiki", "Space", "Target");
+
+    private static final DocumentReference AUTHOR = new DocumentReference("xwiki", "XWiki", "Author");
 
     // Required by DefaultIOService, but not exercised since the tested annotations carry no uploaded files.
     @MockComponent
@@ -219,6 +226,79 @@ class AnnotationCodeMacrosPageTest extends PageTest
         // The list mode displays the annotation inside the Annotations tab, where there is nothing to close.
         assertNull(renderAnnotation("list").selectFirst(".annotation-bubble-close"),
             "The close button was rendered in the list mode");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "list" })
+    void editAndDeleteButtonsAreDisplayedOutsideTheEditForm(String mode) throws Exception
+    {
+        this.context.setUserReference(AUTHOR);
+
+        Element annotation = renderAnnotation(mode);
+
+        assertNotNull(annotation.selectFirst(".annotation-bubble-tools a.edit"),
+            String.format("The edit button was not rendered in the [%s] mode", mode));
+        assertNotNull(annotation.selectFirst(".annotation-bubble-tools button.delete"),
+            String.format("The delete button was not rendered in the [%s] mode", mode));
+    }
+
+    @Test
+    void editFormKeepsTheDeleteButtonButNotTheEditOne() throws Exception
+    {
+        this.context.setUserReference(AUTHOR);
+
+        Element annotation = renderAnnotation("edit");
+
+        assertNull(annotation.selectFirst(".annotation-bubble-tools a.edit"),
+            "The edit button was rendered in the edit form");
+        assertNotNull(annotation.selectFirst(".annotation-bubble-tools button.delete"),
+            "The delete button was not rendered in the edit form");
+    }
+
+    @Test
+    void toolboxIsEmptyInCreateMode() throws Exception
+    {
+        this.context.setUserReference(AUTHOR);
+        updateStoredAnnotation(object -> object.setStringValue("state", "UPDATED"));
+
+        Element tools = renderAnnotation("create").selectFirst(".annotation-bubble-tools");
+
+        assertNotNull(tools);
+        assertEquals(0, tools.select("a, button").size(), "The toolbox rendered actions in the create mode");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "list", "edit" })
+    void validateButtonIsDisplayedForAnUpdatedAnnotation(String mode) throws Exception
+    {
+        updateStoredAnnotation(object -> object.setStringValue("state", "UPDATED"));
+
+        assertNotNull(renderAnnotation(mode).selectFirst(".annotation-bubble-tools a.validate"),
+            String.format("The validate button was not rendered in the [%s] mode", mode));
+    }
+
+    @Test
+    void validateButtonIsNotDisplayedForAnAnnotationThatWasNotMoved() throws Exception
+    {
+        assertNull(renderAnnotation("view").selectFirst(".annotation-bubble-tools a.validate"),
+            "The validate button was rendered for an annotation that doesn't need validation");
+    }
+
+    @Test
+    void dateUsesA24HourClockByDefault() throws Exception
+    {
+        updateStoredAnnotation(object -> object.setDateValue("date",
+            new GregorianCalendar(2026, Calendar.SEPTEMBER, 17, 15, 43).getTime()));
+
+        // Without a dateformat preference, an afternoon time must not be displayed as the matching morning one.
+        assertEquals("17/09/2026 15:43", renderAnnotation("view").selectFirst("time.annotationDate").text());
+    }
+
+    private void updateStoredAnnotation(Consumer<BaseObject> update) throws Exception
+    {
+        XWikiDocument target = this.xwiki.getDocument(TARGET, this.context);
+        update.accept(target.getXObject(COMMENTS_CLASS, 0));
+        this.xwiki.saveDocument(target, this.context);
     }
 
     private Element renderAnnotation(String mode) throws Exception

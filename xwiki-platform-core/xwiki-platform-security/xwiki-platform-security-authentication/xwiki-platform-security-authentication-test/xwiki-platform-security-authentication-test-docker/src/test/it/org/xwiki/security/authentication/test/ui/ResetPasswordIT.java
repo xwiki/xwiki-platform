@@ -114,6 +114,10 @@ public class ResetPasswordIT
         setup.createUser(userName, password, null);
         ResetPasswordPage resetPasswordPage = ResetPasswordPage.gotoPage();
 
+        // The user name field must expose its purpose so that browsers and password managers can offer the stored
+        // user name.
+        assertEquals("username", resetPasswordPage.getUserNameAutocomplete());
+
         // Try to reset the password of a non existent user
         resetPasswordPage.setUserName("SomeUserThatDoesNotExist");
         resetPasswordPage = resetPasswordPage.clickResetPassword();

@@ -74,7 +74,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /*
  * The edit mode is a state the user stays in, so the button has to look pressed when it's on.
  */

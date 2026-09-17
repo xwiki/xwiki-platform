@@ -800,9 +800,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
     private boolean isSuperAdmin(String username)
     {
         // We use a resolver since the passed username could contain the wiki and/or the space too.
-        return SuperAdminUserReference.isSuperAdmin(Utils
-            .<UserReferenceResolver<String>>getComponent(UserReferenceResolver.TYPE_STRING, "document")
-            .resolve(username));
+        return SuperAdminUserReference.isSuperAdmin(
+            Utils.<UserReferenceResolver<String>>getComponent(UserReferenceResolver.TYPE_STRING).resolve(username));
     }
 
     private boolean isSuperAdminOrProgramming(String name, String resourceKey, String accessLevel, boolean user,

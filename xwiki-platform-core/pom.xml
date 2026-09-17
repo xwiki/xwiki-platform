@@ -155,6 +155,21 @@
             -->
             <revapi.differences>
               <justification>
+                The live table new row naming strategies now receive the values the entry is created with, so that a
+                strategy can name the entry after one of them. This API is still @Unstable.
+              </justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method org.xwiki.model.reference.DocumentReference org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy::generate(java.util.Map&lt;java.lang.String, java.lang.Object&gt;) throws org.xwiki.livedata.LiveDataException, com.xpn.xwiki.XWikiException</old>
+                  <new>method org.xwiki.model.reference.DocumentReference org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy::generate(java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;) throws org.xwiki.livedata.LiveDataException, com.xpn.xwiki.XWikiException</new>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
                 Fetching a live data entry might require an optional list of properties to fetch, which was missing.
                 The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
                 parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.

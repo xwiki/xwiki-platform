@@ -746,3 +746,88 @@ describe("Saving the cells of an entry", () => {
     expect(editBus.isEditable()).toBe(false);
   });
 });
+
+describe("Creating the entry of a new row with mandatory properties", () => {
+  /**
+   * @returns a logic holding a single placeholder row, in a live data whose "name" property must
+   * hold a value before an entry can be created
+   */
+  async function initLogicWithMandatoryName() {
+    const created = initLogic([]);
+    created.logic.data.meta.propertyDescriptors.find(
+      (propertyDescriptor) => propertyDescriptor.id === "name",
+    ).mandatory = true;
+    await created.logic.addEntry();
+    created.logic.updateEntries = vi.fn().mockResolvedValue(undefined);
+    return created;
+  }
+
+  it("waits for the mandatory value before creating the entry", async () => {
+    const { logic, liveDataSource } = await initLogicWithMandatoryName();
+
+    await logic.setValues({ entryId: undefined, values: { status: "done" } });
+
+    // The name is what the entry is named after, so there is nothing to create yet.
+    expect(liveDataSource.addEntry).not.toHaveBeenCalled();
+    // The value stays on the row, both to be displayed and to be part of the entry later on.
+    const row = logic.data.data.entries.find((entry) => entry._new);
+    expect(row.status).toBe("done");
+  });
+
+  it("creates the entry with the values collected while it was waiting", async () => {
+    const { logic, liveDataSource } = await initLogicWithMandatoryName();
+    liveDataSource.addEntry.mockResolvedValue({ id: "4", name: "Esther" });
+
+    await logic.setValues({ entryId: undefined, values: { status: "done" } });
+    await logic.setValues({ entryId: undefined, values: { name: "Esther" } });
+
+    expect(liveDataSource.addEntry).toHaveBeenCalledOnce();
+    expect(liveDataSource.addEntry.mock.calls[0][1]).toEqual({
+      name: "Esther",
+      status: "done",
+    });
+  });
+
+  it("keeps waiting when the mandatory value is left empty", async () => {
+    const { logic, liveDataSource } = await initLogicWithMandatoryName();
+
+    await logic.setValues({ entryId: undefined, values: { status: "done" } });
+    await logic.setValues({ entryId: undefined, values: { name: "  " } });
+
+    expect(liveDataSource.addEntry).not.toHaveBeenCalled();
+  });
+
+  it("creates the entry with the HTML conversions of every cell edited on the row", async () => {
+    const { logic, liveDataSource } = await initLogicWithMandatoryName();
+    liveDataSource.addEntry.mockResolvedValue({ id: "4", name: "Esther" });
+
+    await logic.setValues({
+      entryId: undefined,
+      values: {
+        description: "<p>Some description</p>",
+        description_syntax: "xwiki/2.1",
+        RequiresHTMLConversion: "description",
+      },
+    });
+    await logic.setValues({
+      entryId: undefined,
+      values: {
+        name: "Esther",
+        summary: "<p>Some summary</p>",
+        summary_syntax: "xwiki/2.1",
+        RequiresHTMLConversion: "summary",
+      },
+    });
+
+    // Each cell only declares its own conversion, so the declaration of the cell edited first would
+    // be lost and its HTML stored as is.
+    expect(liveDataSource.addEntry.mock.calls[0][1]).toEqual({
+      name: "Esther",
+      description: "<p>Some description</p>",
+      description_syntax: "xwiki/2.1",
+      summary: "<p>Some summary</p>",
+      summary_syntax: "xwiki/2.1",
+      RequiresHTMLConversion: "description,summary",
+    });
+  });
+});

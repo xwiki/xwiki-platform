@@ -42,6 +42,9 @@ import type { Query, Translations } from "@xwiki/platform-localization-api";
 import type { Reactive, Ref } from "vue";
 import type { ComposerTranslation } from "vue-i18n";
 
+// Lists the properties whose value is submitted as HTML, which the server converts to their syntax.
+const HTML_CONVERSION_KEY = "RequiresHTMLConversion";
+
 /**
  * Defines the internal logic of the Live Data.
  * This component expects a LiveDataSource providing the logic required to retrieve or update data from a remote source.
@@ -759,15 +762,10 @@ export class LiveDataLogic implements Logic {
    */
   setValues({ entryId, values }: { entryId: string; values: unknown }) {
     const newEntry = this.data.data.entries.find((entry) => entry._new);
-    // The first edited value of a new row is what creates the entry. Until then the row is only a
-    // placeholder and clicking "add entry" has no effect on the wiki.
+    // A new row is only a placeholder: its edits are held on it until they are enough to create the
+    // entry, which is what makes the row appear on the wiki.
     if (!entryId && newEntry) {
-      // Leaving a cell without entering anything must not create an entry: the row keeps waiting for
-      // a value. Clearing a value stays a normal update on an entry that already exists.
-      if (!this.hasAnyValue(this.getCreationValues(values as Values))) {
-        return Promise.resolve();
-      }
-      return this.createEntry(newEntry, values as Values);
+      return this.editPendingRow(newEntry, values as Values);
     } else {
       return this.updateEntry(entryId, values);
     }
@@ -1785,17 +1783,87 @@ export class LiveDataLogic implements Logic {
   }
 
   /**
-   * Create the entry of a row from the first values edited on it.
+   * Apply an edit to a row whose entry does not exist yet, and create that entry as soon as the row
+   * holds every value it cannot be created without.
    *
-   * @param newEntry - the row being created
+   * @param newEntry - the row being edited
+   * @param values - the values edited on that row
+   * @returns a promise completing when the entry is created, or right away while the row is still
+   * waiting for values
+   */
+  private editPendingRow(newEntry: Values, values: Values): Promise<void> {
+    this.collectCreationValues(newEntry, values);
+    const creationValues = this.getCreationValues(newEntry);
+    // Leaving a cell without entering anything must not create an entry, and neither must an edit
+    // that leaves a mandatory property empty: the row keeps waiting for those values.
+    if (
+      !this.hasAnyValue(creationValues) ||
+      this.getMissingMandatoryProperties(creationValues).length > 0
+    ) {
+      return Promise.resolve();
+    }
+    return this.createEntry(newEntry, creationValues);
+  }
+
+  /**
+   * Hold on a row that has no entry yet the values edited on it, so that they all end up in the
+   * entry once it is created.
+   *
+   * @param newEntry - the row being edited
    * @param values - the values edited on that row
    */
-  private async createEntry(newEntry: Values, values: Values) {
+  private collectCreationValues(newEntry: Values, values: Values) {
+    // Each cell only declares its own HTML conversions, so the declarations of the cells edited
+    // before this one would be lost.
+    const htmlConversions = LiveDataLogic.mergeHTMLConversions(
+      newEntry[HTML_CONVERSION_KEY],
+      values[HTML_CONVERSION_KEY],
+    );
+    Object.assign(newEntry, values);
+    if (htmlConversions) {
+      newEntry[HTML_CONVERSION_KEY] = htmlConversions;
+    }
+  }
+
+  /**
+   * @param conversions - the properties requiring an HTML conversion, as comma separated lists
+   * @returns the properties of every list, or undefined when none of them holds any
+   */
+  private static mergeHTMLConversions(
+    ...conversions: (string | undefined)[]
+  ): string | undefined {
+    const properties = new Set(
+      conversions
+        .filter((conversion) => conversion)
+        .flatMap((conversion) => conversion!.split(","))
+        .filter((property) => property),
+    );
+    return properties.size > 0 ? [...properties].join(",") : undefined;
+  }
+
+  /**
+   * @param values - the values an entry would be created with
+   * @returns the properties that must hold a value for an entry to be created, and do not
+   */
+  private getMissingMandatoryProperties(values: Values): string[] {
+    return this.data.meta.propertyDescriptors
+      .filter((propertyDescriptor) => propertyDescriptor.mandatory)
+      .map((propertyDescriptor) => propertyDescriptor.id)
+      .filter((propertyId) => this.isBlank(values[propertyId]));
+  }
+
+  /**
+   * Create the entry of a row from the values collected on it.
+   *
+   * @param newEntry - the row being created
+   * @param creationValues - the values the entry is created with
+   */
+  private async createEntry(newEntry: Values, creationValues: Values) {
     let createdEntry;
     try {
       createdEntry = await this.liveDataSource.addEntry(
         this.data.query.source,
-        this.getCreationValues(values),
+        creationValues,
       );
     } catch (e) {
       console.error("Failed to create entry", e);
@@ -1852,7 +1920,7 @@ export class LiveDataLogic implements Logic {
 
   /**
    * Compute the values an entry is created with.
-   * @param values - the values edited on the row
+   * @param values - the values collected on the row
    * @returns the values to create the entry with, without the internal ones
    */
   private getCreationValues(values: Values): Values {
@@ -1867,8 +1935,8 @@ export class LiveDataLogic implements Logic {
   }
 
   /**
-   * Return whether an edit carries a value.
-   * @param values - the values of an edit
+   * Return whether a row carries a value.
+   * @param values - the values collected on a row
    * @returns true when at least one property is set, ignoring the encoding fields
    */
   private hasAnyValue(values: Values): boolean {
@@ -1883,7 +1951,7 @@ export class LiveDataLogic implements Logic {
    */
   private isEncodingKey(key: string): boolean {
     return (
-      key === "RequiresHTMLConversion" ||
+      key === HTML_CONVERSION_KEY ||
       key.endsWith("_syntax") ||
       key.endsWith("_cache")
     );

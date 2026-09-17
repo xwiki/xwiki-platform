@@ -367,14 +367,23 @@
 #macro(displayAnnotationBody $ann $mode $annotatedDocumentReference)
   #if ($mode == 'list')
       #if ($ann.state == 'ALTERED')
-        &lt;div class="annotationOriginalSelection"&gt;$services.localization.render('annotations.altered.text')&lt;/div&gt;
+        &lt;div class="annotation-state annotation-state-altered" role="note"&gt;
+          $services.icon.renderHTML('error')
+          &lt;span&gt;$escapetool.xml($services.localization.render('annotations.altered.text'))&lt;/span&gt;
+        &lt;/div&gt;
       #end
     &lt;blockquote class="annotatedText"&gt;$!escapetool.xml($ann.selection)&lt;/blockquote&gt;
   #end
-  ## in view mode and list mode, also display the original selection of this annotation
+  ## in view mode and list mode, also display the original selection of this annotation. The message ends on
+  ## "Originally:", which makes it the label of the disclosure holding that original selection.
   #if (($mode == 'view' || $mode == 'list') &amp;&amp; $ann.state == 'UPDATED')
-    &lt;div class="annotationOriginalSelection"&gt;$services.localization.render('annotations.updated.text')&lt;/div&gt;
-    &lt;blockquote class="annotatedText originalAnnotatedText"&gt;$!escapetool.xml($ann.originalSelection)&lt;/blockquote&gt;
+    &lt;details class="annotation-state annotation-state-updated"&gt;
+      &lt;summary&gt;
+        $services.icon.renderHTML('warning')
+        &lt;span&gt;$escapetool.xml($services.localization.render('annotations.updated.text'))&lt;/span&gt;
+      &lt;/summary&gt;
+      &lt;blockquote class="annotatedText originalAnnotatedText"&gt;$!escapetool.xml($ann.originalSelection)&lt;/blockquote&gt;
+    &lt;/details&gt;
   #end
   #set ($annotatedDocument = $xwiki.getDocument($annotatedDocumentReference))
   ## Fake object that allows to use the API to generate the display

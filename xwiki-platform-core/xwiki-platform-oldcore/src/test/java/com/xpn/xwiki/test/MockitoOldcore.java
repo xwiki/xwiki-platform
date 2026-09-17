@@ -65,10 +65,12 @@ import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.logging.LoggerConfiguration;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
@@ -91,6 +93,7 @@ import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -153,6 +156,12 @@ public class MockitoOldcore
 
     public static final LocalDocumentReference GLOBAL_RIGHTS_CLASS =
         new LocalDocumentReference("XWiki", "XWikiGlobalRights");
+
+    /**
+     * The space users live in, used as the base reference when resolving a user id.
+     */
+    private static final EntityReference USER_SPACE_REFERENCE =
+        new EntityReference(SuperAdminUserReference.SUPERADMIN_USER_SPACE, EntityType.SPACE);
 
     private final MockitoComponentManager componentManager;
 
@@ -1241,6 +1250,27 @@ public class MockitoOldcore
                 .then(invocationOnMock -> new TestDocumentUserReference(invocationOnMock.getArgument(0)));
             when(this.documentReferenceUserReferenceSerializer.serialize(any(TestDocumentUserReference.class)))
                 .then(invocationOnMock -> invocationOnMock.<TestDocumentUserReference>getArgument(0).documentReference);
+        }
+
+        // Same for the resolution of a user id into a UserReference: resolve it the way the document based
+        // UserReferenceResolver does, i.e. relatively to the space users live in, so that the virtual SuperAdmin user
+        // is recognized from any of the forms its id can take.
+        DefaultParameterizedType userReferenceStringResolverType =
+            new DefaultParameterizedType(null, UserReferenceResolver.class, String.class);
+        if (!this.componentManager.hasComponent(userReferenceStringResolverType, "document")) {
+            UserReferenceResolver<String> stringUserReferenceResolver =
+                getMocker().registerMockComponent(userReferenceStringResolverType, "document");
+            when(stringUserReferenceResolver.resolve(any())).then(invocationOnMock -> {
+                String userId = invocationOnMock.getArgument(0);
+                if (StringUtils.isEmpty(userId)) {
+                    return CurrentUserReference.INSTANCE;
+                }
+                DocumentReference reference = getMocker()
+                    .<DocumentReferenceResolver<String>>getInstance(DocumentReferenceResolver.TYPE_STRING)
+                    .resolve(userId, USER_SPACE_REFERENCE);
+                return SuperAdminUserReference.isSuperAdminReference(reference)
+                    ? SuperAdminUserReference.INSTANCE : new TestDocumentUserReference(reference);
+            });
         }
     }
 

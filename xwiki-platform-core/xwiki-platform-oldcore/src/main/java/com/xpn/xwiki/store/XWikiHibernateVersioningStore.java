@@ -27,6 +27,7 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.hibernate.Session;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -247,6 +248,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         try {
             executeWrite(context, session -> {
                 XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
+                // The existing nodes are removed below with a bulk delete query, which Hibernate does not apply to the
+                // entities already loaded in the session. Detach them explicitly: the archive is then rebuilt with a
+                // node reusing the identifier of one of the deleted ones (the reset archive gets a single node, at the
+                // current version of the document), and saving it would otherwise fail with a NonUniqueObjectException.
+                detachArchiveNodes(session, archive);
                 archive.resetArchive();
                 archive.getDeletedNodeInfo().clear();
                 doc.setMinorEdit(false);
@@ -256,6 +262,27 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             });
         } finally {
             restoreExecutionXContext();
+        }
+    }
+
+    /**
+     * Remove the nodes of the passed archive from the Hibernate session, so that saving new nodes with the same
+     * identifiers does not clash with them. Nodes that are not in the session are left untouched.
+     *
+     * @param session the Hibernate session holding the nodes
+     * @param archive the archive whose nodes must be detached
+     * @throws XWikiException if the content of a node cannot be accessed
+     */
+    private void detachArchiveNodes(Session session, XWikiDocumentArchive archive) throws XWikiException
+    {
+        for (XWikiRCSNodeInfo node : archive.getNodes()) {
+            session.evict(node);
+            // Both the node information and the node content are mapped on the same table row, so the content must be
+            // detached too. Pass a null context to only get the content when it has already been loaded.
+            XWikiRCSNodeContent content = node.getContent(null);
+            if (content != null) {
+                session.evict(content);
+            }
         }
     }
 

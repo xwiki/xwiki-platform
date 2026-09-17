@@ -87,6 +87,8 @@ class VersionIT
 
     private static final String CONTENT2 = "Second version of Content";
 
+    private static final String CONTENT3 = "Third version of Content";
+
     @BeforeEach
     void beforeEach(TestUtils testUtils)
     {
@@ -1407,5 +1409,49 @@ class VersionIT
         // We shouldn't have any occurrence of the password field
         assertFalse(xmlViewerContent.contains("<mypass>foobar</mypass>"),
             "Current source is: " + xmlViewerContent);
+    }
+
+    /**
+     * Verify that resetting the history of a document drops all its versions but one, holding the current content of
+     * the document, and that resetting an already reset history works too.
+     */
+    @Test
+    @Order(13)
+    void resetVersions(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.rest().delete(testReference);
+
+        // Create a page with 3 versions.
+        setup.rest().savePage(testReference, CONTENT1, TITLE);
+        setup.rest().savePage(testReference, CONTENT2, TITLE);
+        setup.rest().savePage(testReference, CONTENT3, TITLE);
+
+        HistoryPane historyTab = openHistoryTab(setup, testReference);
+        assertEquals(3, historyTab.getNumberOfVersions());
+        assertEquals("3.1", historyTab.getCurrentVersion());
+
+        // Reset the history. This is the URL behind the "yes" button of the reset confirmation page.
+        setup.gotoPage(testReference, "reset", "confirm=1");
+
+        // The history now holds a single version: the one the document was at.
+        historyTab = openHistoryTab(setup, testReference);
+        assertEquals("3.1", historyTab.getCurrentVersion());
+        assertFalse(historyTab.hasVersion("2.1"));
+        assertFalse(historyTab.hasVersion("1.1"));
+
+        // The document itself is left untouched.
+        Page page = (Page) setup.rest().get(testReference);
+        assertEquals("3.1", page.getVersion());
+        assertEquals(CONTENT3, page.getContent());
+
+        // Resetting a history that already holds a single version works too.
+        setup.gotoPage(testReference, "reset", "confirm=1");
+        historyTab = openHistoryTab(setup, testReference);
+        assertEquals("3.1", historyTab.getCurrentVersion());
+    }
+
+    private HistoryPane openHistoryTab(TestUtils setup, TestReference testReference)
+    {
+        return setup.gotoPage(testReference).openHistoryDocExtraPane();
     }
 }

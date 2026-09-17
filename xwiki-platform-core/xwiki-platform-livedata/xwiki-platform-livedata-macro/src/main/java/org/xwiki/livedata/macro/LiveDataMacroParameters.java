@@ -162,7 +162,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      *
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     @Override
     @Unstable

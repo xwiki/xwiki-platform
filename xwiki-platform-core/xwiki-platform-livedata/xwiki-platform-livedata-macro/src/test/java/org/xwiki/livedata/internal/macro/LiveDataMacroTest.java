@@ -248,6 +248,7 @@ class LiveDataMacroTest
         paginationConfiguration.setPageSizes(List.of(15, 25, 50, 100));
         paginationConfiguration.setShowEntryRange(true);
         paginationConfiguration.setShowNextPrevious(true);
+        paginationConfiguration.setShowPaginationOnSinglePage(true);
         meta.setPagination(paginationConfiguration);
 
         meta.setPropertyDescriptors(List.of());

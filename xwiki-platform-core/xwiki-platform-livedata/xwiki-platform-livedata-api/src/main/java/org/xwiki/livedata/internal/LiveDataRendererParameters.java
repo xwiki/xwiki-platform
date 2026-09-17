@@ -281,7 +281,7 @@ public class LiveDataRendererParameters
 
     /**
      * @return whether the pagination is shown when there is a single page of entries
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     @Unstable
     public Boolean getShowPaginationOnSinglePage()
@@ -294,7 +294,7 @@ public class LiveDataRendererParameters
      *
      * @param showPaginationOnSinglePage {@code true} to show the pagination on a single page, {@code false} to show
      *     it only when there are several pages, {@code null} to inherit from the default configuration
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     @Unstable
     public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)

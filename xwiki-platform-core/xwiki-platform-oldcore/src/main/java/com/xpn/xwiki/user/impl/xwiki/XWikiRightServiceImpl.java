@@ -38,6 +38,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.user.SuperAdminUserReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -794,7 +795,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
      * @param username Any flavor of username. Examples: "xwiki:XWiki.superadmin", "XWiki.superAdmin", "superadmin", etc
      * @return true if the username is that of the superadmin (whatever the case) or false otherwise
      */
-    // TODO: this method is a candidate for the the XWikiRightService API.
     private boolean isSuperAdmin(String username)
     {
         // Note 1: we use the default document reference resolver here but it doesn't matter since we only care about
@@ -804,7 +804,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         DocumentReference userReference =
             Utils.<DocumentReferenceResolver<String>>getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
                 username);
-        return StringUtils.equalsIgnoreCase(userReference.getName(), SUPERADMIN_USER);
+        return SuperAdminUserReference.isSuperAdminName(userReference.getName());
     }
 
     private boolean isSuperAdminOrProgramming(String name, String resourceKey, String accessLevel, boolean user,

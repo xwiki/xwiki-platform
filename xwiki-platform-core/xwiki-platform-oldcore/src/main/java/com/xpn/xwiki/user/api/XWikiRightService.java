@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -34,7 +36,7 @@ public interface XWikiRightService
     /**
      * The Superadmin username.
      */
-    String SUPERADMIN_USER = "superadmin";
+    String SUPERADMIN_USER = SuperAdminUserReference.SUPERADMIN_USER_NAME;
 
     /**
      * The Superadmin full name.
@@ -65,11 +67,13 @@ public interface XWikiRightService
      * @param userReference the user reference
      * @return true if the passed reference belong to superadmin
      * @since 9.2RC1
+     * @deprecated use {@link SuperAdminUserReference#isSuperAdmin(UserReference)} on a reference resolved with a
+     *             {@code UserReferenceResolver} instead
      */
+    @Deprecated(since = "18.9.0RC1")
     static boolean isSuperAdmin(EntityReference userReference)
     {
-        return userReference != null
-            && StringUtils.equalsIgnoreCase(userReference.getName(), XWikiRightService.SUPERADMIN_USER);
+        return SuperAdminUserReference.isSuperAdminReference(userReference);
     }
 
     /**

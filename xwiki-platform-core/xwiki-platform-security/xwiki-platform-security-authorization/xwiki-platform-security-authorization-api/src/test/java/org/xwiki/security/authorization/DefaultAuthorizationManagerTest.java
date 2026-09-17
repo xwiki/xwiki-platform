@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,9 +44,13 @@ class DefaultAuthorizationManagerTest
     @Test
     void isSuperAdminExpectTrue()
     {
+        // The Super Admin user of any wiki is the Super Admin user.
         assertTrue(
             this.defaultAuthorizationManager.isSuperAdmin(
-                new DocumentReference("s1", "Space", SUPERADMIN_USER)));
+                new DocumentReference("s1", "XWiki", SUPERADMIN_USER)));
+        assertTrue(
+            this.defaultAuthorizationManager.isSuperAdmin(
+                new DocumentReference("xwiki", "XWiki", "SuperAdmin")));
     }
 
     @Test
@@ -52,5 +58,22 @@ class DefaultAuthorizationManagerTest
     {
         assertFalse(
             this.defaultAuthorizationManager.isSuperAdmin(new DocumentReference("xwiki", "XWiki", "Admin")));
+        assertFalse(this.defaultAuthorizationManager.isSuperAdmin((DocumentReference) null));
+        // A document named superadmin outside of the XWiki space is an ordinary user document.
+        assertFalse(
+            this.defaultAuthorizationManager.isSuperAdmin(
+                new DocumentReference("xwiki", "Space", SUPERADMIN_USER)));
+    }
+
+    @Test
+    void isSuperAdminUserReferenceExpectTrue()
+    {
+        assertTrue(this.defaultAuthorizationManager.isSuperAdmin(SuperAdminUserReference.INSTANCE));
+    }
+
+    @Test
+    void isSuperAdminUserReferenceExpectFalse()
+    {
+        assertFalse(this.defaultAuthorizationManager.isSuperAdmin(GuestUserReference.INSTANCE));
     }
 }

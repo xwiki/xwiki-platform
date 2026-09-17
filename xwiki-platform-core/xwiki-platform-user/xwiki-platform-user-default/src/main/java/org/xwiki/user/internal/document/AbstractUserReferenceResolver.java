@@ -19,8 +19,7 @@
  */
 package org.xwiki.user.internal.document;
 
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.user.CurrentUserReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
@@ -37,31 +36,22 @@ public abstract class AbstractUserReferenceResolver<T> implements UserReferenceR
 {
     private static final String GUEST_STRING = "XWikiGuest";
 
-    private static final String SUPERADMIN_STRING = "superadmin";
-
     private boolean isGuest(String userName)
     {
         return GUEST_STRING.equalsIgnoreCase(userName);
     }
 
-    private boolean isSuperAdmin(String userName)
-    {
-        return SUPERADMIN_STRING.equalsIgnoreCase(userName);
-    }
-
     /**
-     * @param userName the user id (e.g. for a full reference of {@code xwiki:XWiki.JohnDoe}, the id is
-     *                  {@code JohnDoe}). If null or empty then resolve to the current user reference
-     * @return the full User reference. Also handles Guest and SuperAdmin users.
+     * @param documentReference the reference of the user document (e.g. {@code xwiki:XWiki.JohnDoe})
+     * @return the reference of the virtual user the passed document reference denotes, or {@code null} when it
+     *         denotes an ordinary user. Handles the Guest and SuperAdmin users.
      */
-    protected UserReference resolveName(String userName)
+    protected UserReference resolveVirtualUser(DocumentReference documentReference)
     {
         UserReference reference = null;
-        if (StringUtils.isEmpty(userName)) {
-            reference = CurrentUserReference.INSTANCE;
-        } else if (isGuest(userName)) {
+        if (isGuest(documentReference.getName())) {
             reference = GuestUserReference.INSTANCE;
-        } else if (isSuperAdmin(userName)) {
+        } else if (SuperAdminUserReference.isSuperAdminReference(documentReference)) {
             reference = SuperAdminUserReference.INSTANCE;
         }
         return reference;

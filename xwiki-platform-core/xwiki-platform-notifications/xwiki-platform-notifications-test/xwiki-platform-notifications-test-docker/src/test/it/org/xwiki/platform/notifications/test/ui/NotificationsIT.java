@@ -558,6 +558,51 @@ class NotificationsIT
         assertTrue(notificationsContainerElement.getNotificationPage(5).startsWith("Profile of "));
     }
 
+    /**
+     * Check that the watch button and its modal work on a subwiki page: the options offered are the ones of the
+     * subwiki page, saving a watch filter is taken into account, and re-opening the modal reflects the new state.
+     *
+     * @param wikiReference the reference of the subwiki in which the test is performed
+     * @param setup the test setup used to save pages and to log in
+     * @param testReference the reference of the test page, resolved in the main wiki
+     * @throws Exception in case of error when saving the test page through REST
+     */
+    @ParameterizedTest
+    @Order(7)
+    @WikisSource(mainWiki = false, extensions = { "org.xwiki.platform:xwiki-platform-notifications-ui" })
+    void watchModalOnSubwiki(WikiReference wikiReference, TestUtils setup, TestReference testReference)
+        throws Exception
+    {
+        DocumentReference subWikiPage = testReference.replaceParent(new WikiReference("xwiki"), wikiReference);
+        // Save the page with the REST user so that the auto watch filters of the user do not apply to it.
+        setup.rest().savePage(subWikiPage, "Some content", "Subwiki watch page");
+
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        setup.gotoPage(subWikiPage);
+
+        // The modal is loaded from the server when the button is clicked, so this also asserts that the button points
+        // to the subwiki and that the reference it carries is understood there.
+        NotificationWatchButtonElement watchButtonElement = new NotificationWatchButtonElement();
+        assertTrue(watchButtonElement.isNotSet());
+        NotificationsWatchModal watchModal = watchButtonElement.openModal();
+        assertEquals(List.of(
+            NotificationsWatchModal.WatchOptions.WATCH_PAGE,
+            NotificationsWatchModal.WatchOptions.WATCH_SPACE,
+            NotificationsWatchModal.WatchOptions.WATCH_WIKI
+        ), watchModal.getAvailableOptions());
+        watchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_PAGE);
+
+        // Re-opening the modal must offer the options of the subwiki page, and not the ones of a page that a partial
+        // reference would resolve to in another wiki.
+        watchButtonElement = new NotificationWatchButtonElement();
+        assertTrue(watchButtonElement.isWatched());
+        watchModal = watchButtonElement.openModal();
+        assertEquals(List.of(
+            NotificationsWatchModal.WatchOptions.UNWATCH_PAGE,
+            NotificationsWatchModal.WatchOptions.UNWATCH_PAGE_WATCH_SPACE
+        ), watchModal.getAvailableOptions());
+    }
+
     private SyndEntry getEntryByTitle(NotificationsRSS rss, String title)
     {
         return rss.getEntries().stream()

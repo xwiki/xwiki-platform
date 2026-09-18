@@ -47,10 +47,6 @@
     <!-- Tika Parsers modules -->
     <dependency>
       <groupId>org.apache.tika</groupId>
-      <artifactId>tika-parser-advancedmedia-module</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tika</groupId>
       <artifactId>tika-parser-crypto-module</artifactId>
     </dependency>
     <dependency>

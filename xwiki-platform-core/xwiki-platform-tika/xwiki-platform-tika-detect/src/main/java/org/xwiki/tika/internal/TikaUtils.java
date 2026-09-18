@@ -27,37 +27,20 @@ import java.net.URL;
 import java.nio.file.Path;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.Tika;
-import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.exception.ZeroByteFileException;
 import org.apache.tika.metadata.Metadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Provide a pre-configured {@link Tika} instance.
+ * Provide a shared {@link Tika} instance.
  * 
  * @version $Id$
  * @since 10.1RC1
  */
 public final class TikaUtils
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(TikaUtils.class);
-
-    private static Tika tika;
-
-    static {
-        try {
-            tika = new Tika(new TikaConfig(TikaUtils.class.getResource("/tika-config.xml")));
-        } catch (Exception e) {
-            LOGGER.warn("Failed to load tika configuration (default configuration will be used): [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
-
-            tika = new Tika();
-        }
-    }
+    private static final Tika TIKA = new Tika();
 
     private TikaUtils()
     {
@@ -69,7 +52,7 @@ public final class TikaUtils
      */
     public static Tika getTika()
     {
-        return tika;
+        return TIKA;
     }
 
     // TODO: Remove when https://issues.apache.org/jira/browse/IO-568 is fixed (AutoCloseInputStream does not properly
@@ -92,7 +75,7 @@ public final class TikaUtils
      */
     public static String detect(File file) throws IOException
     {
-        return tika.detect(file);
+        return TIKA.detect(file);
     }
 
     /**
@@ -103,7 +86,7 @@ public final class TikaUtils
      */
     public static String detect(Path path) throws IOException
     {
-        return tika.detect(path);
+        return TIKA.detect(path);
     }
 
     /**
@@ -115,7 +98,7 @@ public final class TikaUtils
      */
     public static String detect(InputStream stream, String name) throws IOException
     {
-        return tika.detect(safeInputStream(stream), name);
+        return TIKA.detect(safeInputStream(stream), name);
     }
 
     /**
@@ -126,7 +109,7 @@ public final class TikaUtils
      */
     public static String detect(InputStream stream) throws IOException
     {
-        return tika.detect(stream);
+        return TIKA.detect(stream);
     }
 
     /**
@@ -136,7 +119,7 @@ public final class TikaUtils
      */
     public static String detect(String name)
     {
-        return tika.detect(name);
+        return TIKA.detect(name);
     }
 
     /**
@@ -150,7 +133,7 @@ public final class TikaUtils
     public static String parseToString(InputStream stream, Metadata metadata) throws IOException, TikaException
     {
         try {
-            return tika.parseToString(safeInputStream(stream), metadata);
+            return TIKA.parseToString(safeInputStream(stream), metadata);
         } catch (ZeroByteFileException e) {
             // How is empty file an issue ?
             return "";
@@ -167,7 +150,7 @@ public final class TikaUtils
     public static String parseToString(InputStream stream) throws IOException, TikaException
     {
         try {
-            return tika.parseToString(safeInputStream(stream));
+            return TIKA.parseToString(safeInputStream(stream));
         } catch (ZeroByteFileException e) {
             // How is empty file an issue ?
             return "";
@@ -184,7 +167,7 @@ public final class TikaUtils
     public static String parseToString(Path path) throws IOException, TikaException
     {
         try {
-            return tika.parseToString(path);
+            return TIKA.parseToString(path);
         } catch (ZeroByteFileException e) {
             // How is empty file an issue ?
             return "";
@@ -202,7 +185,7 @@ public final class TikaUtils
     public static String parseToString(File file) throws IOException, TikaException
     {
         try {
-            return tika.parseToString(file);
+            return TIKA.parseToString(file);
         } catch (ZeroByteFileException e) {
             // How is empty file an issue ?
             return "";
@@ -219,7 +202,7 @@ public final class TikaUtils
     public static String parseToString(URL url) throws IOException, TikaException
     {
         try {
-            return tika.parseToString(url);
+            return TIKA.parseToString(url);
         } catch (ZeroByteFileException e) {
             // How is empty file an issue ?
             return "";

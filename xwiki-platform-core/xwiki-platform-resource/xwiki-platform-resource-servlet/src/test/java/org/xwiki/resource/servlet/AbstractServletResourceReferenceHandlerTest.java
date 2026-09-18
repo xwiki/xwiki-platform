@@ -19,8 +19,11 @@
  */
 package org.xwiki.resource.servlet;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +44,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import ch.qos.logback.classic.Level;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -167,5 +171,22 @@ class AbstractServletResourceReferenceHandlerTest
         this.referenceHandler.handle(mock(ResourceReference.class), mock(ResourceReferenceHandlerChain.class));
 
         verify(this.inputStream, times(2)).close();
+    }
+
+    /**
+     * Verify that the resource is served whole, even though detecting its content type reads from its stream.
+     */
+    @Test
+    void handleServesCompleteResource() throws Exception
+    {
+        byte[] content = "/* a resource whose content type is detected from its content */\n".repeat(100)
+            .getBytes(StandardCharsets.UTF_8);
+        ByteArrayOutputStream servedContent = new ByteArrayOutputStream();
+        when(this.response.getOutputStream()).thenReturn(servedContent);
+        this.referenceHandler.filterStream = new ByteArrayInputStream(content);
+
+        this.referenceHandler.handle(mock(ResourceReference.class), mock(ResourceReferenceHandlerChain.class));
+
+        assertArrayEquals(content, servedContent.toByteArray());
     }
 }

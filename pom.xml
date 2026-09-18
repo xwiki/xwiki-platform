@@ -57,7 +57,7 @@
 
     <!-- Dependencies versions -->
     <batik.version>1.19</batik.version>
-    <tika.version>3.3.2</tika.version>
+    <tika.version>4.0.0</tika.version>
     <pdfbox.version>3.0.8</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
@@ -189,11 +189,6 @@
         <version>${tika.version}</version>
       </dependency>
       <!-- Tika Parsers modules -->
-      <dependency>
-        <groupId>org.apache.tika</groupId>
-        <artifactId>tika-parser-advancedmedia-module</artifactId>
-        <version>${tika.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-scientific-module</artifactId>

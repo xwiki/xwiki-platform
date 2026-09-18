@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Routing for incoming Resource Requests in a Servlet Container</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Servlets for the Resource API</xwiki.extension.name>
   </properties>

@@ -260,6 +260,14 @@ public class TestUtils
     private RestTestUtils rest;
 
     /**
+     * The credentials of a user that has full rights on the wiki under test, used for the REST calls that the test
+     * framework performs on behalf of the tests. Defaults to the superadmin, but not every wiki under test has one:
+     * the distribution enables it only when {@code xwiki.superadminpassword} is set in {@code xwiki.cfg}, which the
+     * shipped configuration doesn't do.
+     */
+    private XWikiCredentials privilegedCredentials = SUPER_ADMIN_CREDENTIALS;
+
+    /**
      * The host/port the main wiki descriptor currently points to, to avoid updating it when it's already the expected
      * one.
      */
@@ -389,6 +397,28 @@ public class TestUtils
     public XWikiCredentials getDefaultCredentials()
     {
         return this.httpClient.getDefaultCredentials();
+    }
+
+    /**
+     * @return the credentials of a user that has full rights on the wiki under test
+     * @since 18.8.0RC1
+     */
+    public XWikiCredentials getPrivilegedCredentials()
+    {
+        return this.privilegedCredentials;
+    }
+
+    /**
+     * Declare which user the test framework has to authenticate as for the REST calls it performs on behalf of the
+     * tests when they need full rights on the wiki, typically to save a page whose content is executed as a script.
+     * The superadmin is used by default, so this only needs to be called for a wiki that doesn't have one.
+     *
+     * @param privilegedCredentials the credentials of a user that has full rights on the wiki under test
+     * @since 18.8.0RC1
+     */
+    public void setPrivilegedCredentials(XWikiCredentials privilegedCredentials)
+    {
+        this.privilegedCredentials = privilegedCredentials;
     }
 
     public void loginAsSuperAdmin()
@@ -1499,7 +1529,8 @@ public class TestUtils
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        rest().savePageAs(SUPER_ADMIN_CREDENTIALS, reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
+        rest().savePageAs(getPrivilegedCredentials(), reference, wikiContent, wikiSyntax.toIdString(), null, null,
+            false);
 
         // Execute the content and return the result
         return executeAndGetBodyAsString(reference, queryParameters);
@@ -1875,7 +1906,8 @@ public class TestUtils
     }
 
     /**
-     * Forces the current user to be the Guest user by clearing all coookies.
+     * Forces the current user to be the Guest user by clearing all the cookies, both in the browser and in the HTTP
+     * client used for REST calls.
      */
     public void forceGuestUser()
     {
@@ -2462,7 +2494,7 @@ public class TestUtils
 
         // Note: the test may have logged in as another user, and thus have changed the credentials used for REST
         // calls.
-        XWikiCredentials previousCredentials = setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
+        XWikiCredentials previousCredentials = setDefaultCredentials(getPrivilegedCredentials());
         try {
             org.xwiki.rest.model.jaxb.Object descriptorObject = rest().object(MAIN_WIKI_DESCRIPTOR, SERVER_CLASS_NAME);
             descriptorObject.withProperties(RestTestUtils.property("server", host),

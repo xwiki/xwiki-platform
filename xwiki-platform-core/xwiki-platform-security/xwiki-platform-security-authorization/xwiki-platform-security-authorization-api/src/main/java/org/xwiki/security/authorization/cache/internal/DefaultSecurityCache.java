@@ -609,13 +609,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private String getEntryKey(SecurityEntry entry)
     {
-        if (entry instanceof SecurityAccessEntry securityAccessEntry) {
-            return getEntryKey(securityAccessEntry);
-        } else if (entry instanceof SecurityRuleEntry securityRuleEntry) {
-            return getEntryKey(securityRuleEntry);
-        } else {
-            return getEntryKey((SecurityShadowEntry) entry);
-        }
+        return switch (entry) {
+            case SecurityAccessEntry securityAccessEntry -> getEntryKey(securityAccessEntry);
+            case SecurityRuleEntry securityRuleEntry -> getEntryKey(securityRuleEntry);
+            case null, default -> getEntryKey((SecurityShadowEntry) entry);
+        };
     }
 
     /**

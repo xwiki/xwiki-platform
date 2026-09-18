@@ -47,6 +47,7 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.InputStreamEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -383,13 +384,30 @@ public abstract class AbstractHttpIT
     /**
      * Executes the passed request with the passed credentials, and restores the credentials used by the rest of the
      * test framework afterwards. Passing null credentials sends the request as guest.
+     * <p>
+     * The response is closed before being returned, which gives its connection back to the pool of the shared HTTP
+     * client. The tests keep reading the response after this method returned and hardly ever close it themselves, so
+     * without this the pool would run out of connections and the following requests would block until the connection
+     * request timeout expires. The content is buffered in memory first so that it stays readable after the close.
      */
     private CloseableHttpResponse execute(ClassicHttpRequest request, XWikiCredentials credentials) throws Exception
     {
         XWikiCredentials previousCredentials = getUtil().setDefaultCredentials(credentials);
 
-        try {
-            return getUtil().execute(request);
+        // try-with-resources evaluates the returned value before closing the resource, so the content below is always
+        // buffered before the response is closed.
+        try (CloseableHttpResponse response = getUtil().execute(request)) {
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                // Buffering reads the whole content, and that is what makes the close give the connection back to the
+                // pool for reuse: closing a response whose content hasn't been consumed does free the slot in the pool
+                // as well, but by tearing the connection down instead of keeping it alive.
+                // Closing the response doesn't drop the entity, it only closes it, and a BufferedHttpEntity keeps
+                // serving its in-memory copy afterwards, so the tests can still read the content of the response.
+                response.setEntity(new BufferedHttpEntity(entity));
+            }
+
+            return response;
         } finally {
             getUtil().setDefaultCredentials(previousCredentials);
         }

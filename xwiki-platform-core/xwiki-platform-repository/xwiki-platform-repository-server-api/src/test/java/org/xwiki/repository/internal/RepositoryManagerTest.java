@@ -89,13 +89,10 @@ class RepositoryManagerTest
         when(this.xcontextProvider.get()).thenReturn(xcontext);
         when(xcontext.getWiki()).thenReturn(xwiki);
 
-        XWikiDocument existingDocument = mock(XWikiDocument.class);
-        XWikiDocument clonedDocument = mock(XWikiDocument.class);
         DocumentReference extensionReference =
             new DocumentReference("xwiki", List.of("Extension", "MyExt"), "WebHome");
-        when(this.extensionStore.getExistingExtensionDocumentById(extensionIdString)).thenReturn(existingDocument);
-        when(existingDocument.clone()).thenReturn(clonedDocument);
-        when(clonedDocument.getDocumentReference()).thenReturn(extensionReference);
+        when(this.extensionStore.getExistingExtensionDocumentReferenceById(extensionIdString))
+            .thenReturn(extensionReference);
 
         doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.EDIT, extensionReference);
 

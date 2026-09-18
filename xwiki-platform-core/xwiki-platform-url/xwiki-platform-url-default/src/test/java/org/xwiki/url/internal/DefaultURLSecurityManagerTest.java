@@ -23,8 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Provider;
@@ -108,19 +106,19 @@ class DefaultURLSecurityManagerTest
     @Test
     void isDomainTrusted() throws Exception
     {
-        when(urlConfiguration.getTrustedDomains()).thenReturn(Arrays.asList(
+        when(urlConfiguration.getTrustedDomains()).thenReturn(List.of(
             "foo.acme.org",
             "localdomain"
         ));
 
         WikiDescriptor wikiDescriptor1 = mock(WikiDescriptor.class);
-        when(wikiDescriptor1.getAliases()).thenReturn(Arrays.asList(
+        when(wikiDescriptor1.getAliases()).thenReturn(List.of(
             "www.xwiki.org",
             "something.bar.com"
         ));
 
         WikiDescriptor wikiDescriptor2 = mock(WikiDescriptor.class);
-        when(wikiDescriptor2.getAliases()).thenReturn(Collections.singletonList(
+        when(wikiDescriptor2.getAliases()).thenReturn(List.of(
             "enterprise.eu"
         ));
 
@@ -130,7 +128,7 @@ class DefaultURLSecurityManagerTest
         when(request.getRequest()).thenReturn(servletRequest);
         when(servletRequest.getScheme()).thenReturn("http");
         when(servletRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/xwiki/bin/register/"));
-        when(this.wikiDescriptorManager.getAll()).thenReturn(Arrays.asList(wikiDescriptor1, wikiDescriptor2));
+        when(this.wikiDescriptorManager.getAll()).thenReturn(List.of(wikiDescriptor1, wikiDescriptor2));
 
         assertThat("www.xwiki.org is trusted", this.urlSecurityManager
             .isDomainTrusted(new URL("http://www.xwiki.org/xwiki/bin/view/XWiki/Login")));
@@ -169,7 +167,7 @@ class DefaultURLSecurityManagerTest
     @Test
     void invalidateCache() throws Exception
     {
-        when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
+        when(urlConfiguration.getTrustedDomains()).thenReturn(List.of(
             "xwiki.org"
         ));
         assertThat("www.xwiki.org is trusted", this.urlSecurityManager
@@ -177,7 +175,7 @@ class DefaultURLSecurityManagerTest
         assertThat("foo.acme.org is not trusted", !this.urlSecurityManager
             .isDomainTrusted(new URL("https://foo.acme.org/something/else")));
 
-        when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
+        when(urlConfiguration.getTrustedDomains()).thenReturn(List.of(
             "foo.acme.org"
         ));
 
@@ -196,9 +194,35 @@ class DefaultURLSecurityManagerTest
     }
 
     @Test
+    void invalidateCacheDuringComputation() throws Exception
+    {
+        WikiDescriptor firstDescriptor = mock();
+        when(firstDescriptor.getAliases()).thenReturn(List.of("first.acme.org"));
+        WikiDescriptor secondDescriptor = mock();
+        when(secondDescriptor.getAliases()).thenReturn(List.of("second.acme.org"));
+
+        // Simulate a wiki descriptor that is modified while the trusted domains are being computed: the listener
+        // invalidates the cache after the (outdated) descriptors have been read.
+        when(this.wikiDescriptorManager.getAll()).thenAnswer(invocation -> {
+            this.urlSecurityManager.invalidateCache();
+            return List.of(firstDescriptor);
+        }).thenReturn(List.of(secondDescriptor));
+
+        assertThat("first.acme.org is trusted", this.urlSecurityManager
+            .isDomainTrusted(new URL("http://first.acme.org")));
+
+        // The outdated set must not have been cached, so the next check computes it again from the new descriptors.
+        assertThat("second.acme.org is trusted after the recomputation", this.urlSecurityManager
+            .isDomainTrusted(new URL("http://second.acme.org")));
+        assertThat("first.acme.org is not trusted anymore", !this.urlSecurityManager
+            .isDomainTrusted(new URL("http://first.acme.org")));
+        verify(this.wikiDescriptorManager, times(2)).getAll();
+    }
+
+    @Test
     void isDomainTrustedWhenCheckSkipped() throws MalformedURLException
     {
-        when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
+        when(urlConfiguration.getTrustedDomains()).thenReturn(List.of(
             "foo.acme.org"
         ));
         when(urlConfiguration.isTrustedDomainsEnabled()).thenReturn(false);
@@ -283,7 +307,7 @@ class DefaultURLSecurityManagerTest
 
         // invalidate cache so that we can call inject other trustedDomains
         this.urlSecurityManager.invalidateCache();
-        when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
+        when(urlConfiguration.getTrustedDomains()).thenReturn(List.of(
             "xwiki.org"
         ));
         when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("http", "ftp", "sftp"));
@@ -393,7 +417,7 @@ class DefaultURLSecurityManagerTest
 
         // invalidate cache so that we can call inject other trustedDomains
         this.urlSecurityManager.invalidateCache();
-        when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
+        when(urlConfiguration.getTrustedDomains()).thenReturn(List.of(
             "xwiki.org"
         ));
         when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("http", "ftp", "sftp"));
@@ -454,7 +478,7 @@ class DefaultURLSecurityManagerTest
 
         // invalidate cache so that we can call inject other trustedDomains
         this.urlSecurityManager.invalidateCache();
-        when(urlConfiguration.getTrustedDomains()).thenReturn(Collections.singletonList(
+        when(urlConfiguration.getTrustedDomains()).thenReturn(List.of(
             "anotherserver.com"
         ));
         uri = this.urlSecurityManager.parseToSafeURI(location);
@@ -533,5 +557,20 @@ class DefaultURLSecurityManagerTest
                 "www.example.com"));
 
         assertEquals("The given URI [https://example.com] is not safe on this server.", securityException.getMessage());
+    }
+
+    @Test
+    void parseToSafeURIWithDomainWhenCheckSkipped() throws URISyntaxException
+    {
+        when(this.urlConfiguration.isTrustedDomainsEnabled()).thenReturn(false);
+        when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("https"));
+
+        String url = "https://example.com/path";
+        assertEquals(url, this.urlSecurityManager.parseToSafeURI(url, "www.example.com").toString());
+
+        // The request host must not have been added to the trusted domains since the check is disabled.
+        when(this.urlConfiguration.isTrustedDomainsEnabled()).thenReturn(true);
+        assertThrows(SecurityException.class,
+            () -> this.urlSecurityManager.parseToSafeURI("https://www.example.com", "other.example.com"));
     }
 }

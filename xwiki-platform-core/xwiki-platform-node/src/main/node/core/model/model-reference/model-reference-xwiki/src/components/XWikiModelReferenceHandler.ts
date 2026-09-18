@@ -1,0 +1,65 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+import {
+  DocumentReference,
+  EntityType,
+  SpaceReference,
+} from "@xwiki/platform-model-api";
+import { AbstractModelReferenceHandler } from "@xwiki/platform-model-reference-api";
+import { absoluteCristalEntityReference } from "@xwiki/platform-model-xwiki";
+import { injectable } from "inversify";
+import type { EntityReference } from "@xwiki/platform-model-api";
+
+@injectable()
+class XWikiModelReferenceHandler extends AbstractModelReferenceHandler {
+  public createDocumentReference(
+    name: string,
+    space: SpaceReference,
+  ): DocumentReference {
+    const newSpace = new SpaceReference(space.wiki, ...space.names, name);
+    return new DocumentReference("WebHome", newSpace);
+  }
+
+  public getTitle(reference: EntityReference): string {
+    const absoluteReference = absoluteCristalEntityReference(
+      reference,
+      XWiki.currentDocument.documentReference,
+    );
+    switch (absoluteReference?.type) {
+      case EntityType.WIKI:
+        return absoluteReference.name;
+      case EntityType.SPACE:
+        return [...absoluteReference.names].pop()!;
+      case EntityType.DOCUMENT: {
+        const name = absoluteReference.name;
+        if (name === "WebHome") {
+          return this.getTitle(absoluteReference.space!);
+        } else {
+          return name;
+        }
+      }
+      case EntityType.ATTACHMENT:
+        return absoluteReference.name;
+    }
+    return "";
+  }
+}
+
+export { XWikiModelReferenceHandler };

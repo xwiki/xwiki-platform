@@ -177,11 +177,10 @@ define('xwiki-document-api', [
       this.renderedContent = $('#xwikicontent').html();
 
       if (!this.language) {
-        // We know this is the original document translation, but we don't know it's actual (real) locale (which may be
-        // different from the current UI locale if this document doesn't have a translation for the current UI locale).
-        const docVariant = new URLSearchParams(XWiki.docvariant);
+        // We know this is the original document translation, whose raw locale is empty, so we take its actual (real)
+        // locale from the meta information.
         this.translations = this.translations || {};
-        this.translations['default'] = docVariant.get('language');
+        this.translations['default'] = xcontext.realLocale;
       }
     }
 
@@ -210,8 +209,10 @@ define('xwiki-document-api', [
       if (this.translations &amp;&amp; typeof this.translations['default'] === 'string') {
         return this.translations['default'];
       } else {
-        // The default locale is not specified. Use the UI locale.
-        return $('html').attr('lang');
+        // The default locale is not specified. Note that we must not fall back on the UI locale, which has nothing to
+        // do with this document: the server resolves the empty locale to the original document translation, while the
+        // UI locale would target a translation that may not exist.
+        return '';
       }
     }
 
@@ -1214,12 +1215,14 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
       'data-xwiki-version': xwikiDocument.version || '',
       'data-xwiki-modified': xwikiDocument.modified,
       'data-xwiki-locale': xwikiDocument.language,
+      'data-xwiki-real-locale': xwikiDocument.getRealLocale(),
       'data-xwiki-rest-url': xwikiDocument.getRestURL()
     }).data({
       'xwiki-isnew': xwikiDocument.isNew,
       'xwiki-version': xwikiDocument.version || '',
       'xwiki-modified': xwikiDocument.modified,
       'xwiki-locale': xwikiDocument.language,
+      'xwiki-real-locale': xwikiDocument.getRealLocale(),
       'xwiki-rest-url': xwikiDocument.getRestURL()
     });
 
@@ -1287,8 +1290,8 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
     var locale = xwikiDocument.getRealLocale();
     // Look for the language query string parameter, either inside or at the end.
     var localeSelector = 'a[href*="language=' + locale + '&amp;"], a[href$="language=' + locale + '"]';
-    // Check if the language menu is present (multilingual is on) and the document locale is not listed.
-    if (languageMenu.length &amp;&amp; !languageMenu.find(localeSelector).length) {
+    // Check if the language menu is present (multilingual is on), we know the document locale, and it is not listed.
+    if (locale &amp;&amp; languageMenu.length &amp;&amp; !languageMenu.find(localeSelector).length) {
       // If we get here then it means a new document translation was created, and it needs to be listed in the drawer.
       $('&lt;div/&gt;').load(xwikiDocument.getURL('get', $.param({
         'xpage': 'xpart',

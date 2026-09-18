@@ -72,16 +72,6 @@ public class ExportAction extends XWikiAction
 {
     private static final String EXCEPTION = "exception";
 
-    /**
-     * Define the different format supported by the export.
-     */
-    private enum ExportFormat
-    {
-        XAR,
-        HTML,
-        OTHER
-    }
-
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

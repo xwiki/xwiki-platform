@@ -30,6 +30,7 @@
         :collaboration
         @instant-change="dirty = true"
         @debounced-change="updateValue"
+        @local-instant-change="onLocalInstantChange"
       ></BlocknoteEditor>
     </suspense>
     <input
@@ -77,6 +78,7 @@
 </template>
 
 <script setup lang="ts">
+import { createAutoSaver } from "../services/autosave";
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import {
   extractLinkId,
@@ -84,9 +86,11 @@ import {
   stripLinkId,
 } from "../services/blocknote/linkId";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
+import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
 import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
+import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
 import { uuidv4 } from "lib0/random";
 import {
@@ -96,12 +100,12 @@ import {
   ref,
   shallowRef,
   useTemplateRef,
+  watch,
 } from "vue";
-import { resolver } from "xwiki-platform-localization-webjar";
+import type { Logic } from "../services/Logic";
 import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
-import type { XWikiMeta } from "../services/meta/XWikiMeta";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -119,12 +123,14 @@ import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 import type { Ref } from "vue";
 
 //
 // Injected
 //
 const container = inject<Container>("container")!;
+const logic = inject<Logic>("logic")!;
 const blockNoteProcessor: BlockNoteProcessor = container.get(
   "BlockNoteProcessor",
   {
@@ -147,9 +153,7 @@ const {
   inputSyntax = "blocknote/1.0",
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
-  documentReference = XWiki.Model.serialize(
-    XWiki.currentDocument.documentReference,
-  ),
+  documentReference = Model.serialize(XWiki.currentDocument.documentReference),
   locale,
 } = defineProps<{
   // The key used to submit the edited content.
@@ -336,33 +340,87 @@ const collaboration: Ref<Collaboration | undefined> = ref(undefined);
 let collaborationManager: CollaborationManager | undefined = undefined;
 const collaborationKey: Ref<string | undefined> = ref();
 
+// Resolved before the collaboration session is joined, so that creating the auto-saver doesn't have to wait for it.
+let autoSaveVersionSummary: string | undefined;
+
 onBeforeMount(async () => {
   blockNoteDocument = blockNoteProcessor.load(initialValue);
   editorContent.value = blockNoteDocument.content;
 
-  editorProps.value.label =
-    (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
-      "platform.blocknote.editor.label"
-    ] ?? defaultLabel;
+  editorProps.value.label = await translate("editor.label", defaultLabel);
+  autoSaveVersionSummary = await translate("autoSaveSummary");
 
   if (collaborationURL && docRef) {
-    const cristalApp = container.get<CristalApp>("CristalApp");
-    cristalApp.getWikiConfig().realtimeURL = collaborationURL;
-
-    collaborationManager = container
-      .get<CollaborationManagerProvider>(collaborationManagerProviderName)
-      .get();
-    // Join the realtime collaboration session for the specified XWiki document.
-    collaboration.value = await collaborationManager.join(docRef);
-    collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
+    await joinCollaborationSession(collaborationURL, docRef);
   }
 
   isLoading.value = false;
 });
 
+/**
+ * Join the realtime collaboration session for the edited XWiki document.
+ *
+ * @param url - the URL of the collaboration server
+ * @param reference - the reference of the document to collaborate on
+ */
+async function joinCollaborationSession(
+  url: string,
+  reference: DocumentReference,
+): Promise<void> {
+  const cristalApp = container.get<CristalApp>("CristalApp");
+  cristalApp.getWikiConfig().realtimeURL = url;
+
+  collaborationManager = container
+    .get<CollaborationManagerProvider>(collaborationManagerProviderName)
+    .get();
+  collaboration.value = await collaborationManager.join(reference);
+  collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
+}
+
 onUnmounted(() => {
+  // The collaboration manager stops the auto-saver when the last editor leaves the session.
   collaborationManager?.leave();
 });
+
+/**
+ * Tell the auto-saver that the local user changed the content. The editor reports only the local changes here, so
+ * neither the initial content load nor the updates received from the other collaborators are counted.
+ */
+function onLocalInstantChange(): void {
+  collaboration.value?.saver?.contentModifiedLocally();
+}
+
+/**
+ * @param key - the translation key, without the prefix the localization module adds back
+ * @param fallback - what to return when the key has no translation
+ * @returns the translated message
+ */
+async function translate(key: string, fallback?: string): Promise<string> {
+  const fullKey = `blocknote.${key}`;
+  const translation = await logic.translate(fullKey);
+  // vue-i18n echoes the key back when it has no translation for it.
+  return translation === fullKey ? (fallback ?? translation) : translation;
+}
+
+/**
+ * @returns the document being edited, which the auto-saver keeps up to date with the versions the other clients
+ *   create, so that the next save doesn't run into a merge conflict
+ */
+function getEditedDocument(): XWikiDocument {
+  if (
+    Model.serialize(xwikiMeta.documentReference) === documentReference &&
+    actualLocale === xwikiMeta.locale
+  ) {
+    // The page displays the very document we're editing, so use the factory that also keeps the page meta data and
+    // the hidden fields of the edit form in sync after each save.
+    return XWikiDocument.currentDocument(xwikiMeta);
+  }
+  return new XWikiDocument({
+    documentReference:
+      Model.resolve(documentReference, EntityType.DOCUMENT) ?? undefined,
+    language: actualLocale,
+  });
+}
 
 // This is passed to the BlockNote editor component. Macros are inserted / edited directly as the server-rendered
 // xwikiMacroBlock / xwikiInlineMacro blocks: the wizard operates on macro invocations, and the editor stores the
@@ -410,6 +468,28 @@ const macros: BlockNoteViewWrapperProps["macros"] = {
 const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
 const editorInstance =
   useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
+
+// Create the auto-saver only once the editor is there, because the first client joining a session loads the initial
+// content into the shared document, and that is a local Yjs change: counting it would make the session dirty and
+// trigger an auto-save before anyone typed anything.
+watch(editorInstance, (editor) => {
+  const session = collaboration.value;
+  if (!editor || !session || session.saver) {
+    return;
+  }
+  // The auto-saver belongs to the collaboration session, shared by every editor taking part in it, so the first one
+  // to get here creates it. Nothing is awaited between the test above and this assignment, which is what makes it
+  // safe against a second editor initializing at the same time.
+  session.saver = createAutoSaver({
+    collaboration: session,
+    document: getEditedDocument(),
+    formId: form,
+    autoSaveVersionSummary,
+  });
+  session.saver.toBeReady().catch((error: unknown) => {
+    console.error("Failed to start the auto-save.", error);
+  });
+});
 
 //
 // Methods

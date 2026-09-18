@@ -17,6 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import {
+  EntityType as XWikiEntityType,
+  Model,
+} from "@xwiki/platform-xwiki-model-api";
 import { loadById } from "@xwiki/platform-xwiki-utils";
 import { Container, inject, injectable } from "inversify";
 import type {
@@ -24,13 +28,13 @@ import type {
   ImageWizard,
   ImageWizardCallback,
 } from "./ImageWizard";
-import type { XWikiEntityReference } from "../model/reference/XWikiEntityReference";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
 import type {
   ResourceReference,
   ResourceReferenceParser,
 } from "@xwiki/platform-rendering-api";
+import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xwiki-model-api";
 
 // The image alignment options supported by the Image Wizard.
 type ImageAlignment = "none" | "start" | "center" | "end";
@@ -228,7 +232,7 @@ export class DefaultImageWizard implements ImageWizard {
    */
   private async upload(file: File, callback: UploadCallback): Promise<void> {
     // For now, we assume the current document is being edited.
-    const currentDocumentReference = XWiki.Model.serialize(
+    const currentDocumentReference = Model.serialize(
       XWiki.currentDocument.documentReference,
     );
     try {
@@ -237,7 +241,8 @@ export class DefaultImageWizard implements ImageWizard {
         .saveAttachments(currentDocumentReference, [file]);
       if (result?.[0]) {
         callback.onSuccess(
-          XWiki.Model.resolve(result[0], XWiki.EntityType.ATTACHMENT),
+          // The upload result is a non empty attachment reference string, so it always resolves.
+          Model.resolve(result[0], XWikiEntityType.ATTACHMENT)!,
         );
       } else {
         callback.onAbort();

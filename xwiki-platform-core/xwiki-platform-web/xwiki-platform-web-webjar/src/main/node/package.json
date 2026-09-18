@@ -1,0 +1,35 @@
+{
+  "private": true,
+  "name": "xwiki-platform-web-webjar",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/entityReference.ts",
+  "scripts": {
+    "build": "run-s type-check build-only",
+    "build-only": "run-s build-entityReference build-document build-autosave",
+    "build-entityReference": "cross-env ENTRY=entityReference MINIFY=false vite build && cross-env ENTRY=entityReference MINIFY=true vite build",
+    "build-document": "cross-env ENTRY=document MINIFY=false vite build && cross-env ENTRY=document MINIFY=true vite build",
+    "build-autosave": "cross-env ENTRY=autosave MINIFY=false vite build && cross-env ENTRY=autosave MINIFY=true vite build",
+    "lint": "eslint .",
+    "test:unit": "vitest --run --passWithNoTests",
+    "type-check": "tsc --build"
+  },
+  "dependencies": {
+    "@xwiki/platform-autosave-api": "workspace:*",
+    "@xwiki/platform-autosave-xwiki": "workspace:*",
+    "@xwiki/platform-document-xwiki": "workspace:*",
+    "@xwiki/platform-xwiki-model-api": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/requirejs": "catalog:",
+    "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "cross-env": "catalog:",
+    "eslint": "catalog:",
+    "npm-run-all": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

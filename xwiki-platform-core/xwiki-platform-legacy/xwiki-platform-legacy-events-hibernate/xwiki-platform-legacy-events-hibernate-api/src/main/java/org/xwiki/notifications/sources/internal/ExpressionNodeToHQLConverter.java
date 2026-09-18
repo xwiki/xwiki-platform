@@ -132,17 +132,13 @@ public class ExpressionNodeToHQLConverter
 
     private String parseBlock(ExpressionNode node, HQLQuery result)
     {
-        if (node instanceof AbstractValueNode valueNode) {
-            return parseValue(valueNode, result);
-        } else if (node instanceof AbstractUnaryOperatorNode unaryNode) {
-            return parseUnaryOperator(unaryNode, result);
-        } else if (node instanceof AbstractBinaryOperatorNode binaryNode) {
-            return parseBinaryOperator(binaryNode, result);
-        } else if (node instanceof AbstractOperatorNode operatorNode) {
-            return parseOtherOperation(operatorNode, result);
-        } else {
-            return StringUtils.EMPTY;
-        }
+        return switch (node) {
+            case AbstractValueNode valueNode -> parseValue(valueNode, result);
+            case AbstractUnaryOperatorNode unaryNode -> parseUnaryOperator(unaryNode, result);
+            case AbstractBinaryOperatorNode binaryNode -> parseBinaryOperator(binaryNode, result);
+            case AbstractOperatorNode operatorNode -> parseOtherOperation(operatorNode, result);
+            case null, default -> StringUtils.EMPTY;
+        };
     }
 
     private String parseValue(AbstractValueNode value, HQLQuery result)

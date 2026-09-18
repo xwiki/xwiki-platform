@@ -1430,6 +1430,15 @@ class VersionIT
         assertEquals(3, historyTab.getNumberOfVersions());
         assertEquals("3.1", historyTab.getCurrentVersion());
 
+        // Put the wiki in the state it is in whenever the page being reset is not one that was just edited: no longer
+        // in the document cache. The reset then has to load the document and its history itself, in the very
+        // transaction that resets them, and that is the case it fails in. This is the common case on a real wiki,
+        // since the cache holds a limited number of documents and the history hangs off the cached document through a
+        // soft reference that the JVM drops as soon as memory gets tight. A page that was just created, on the other
+        // hand, is still cached with a history loaded by an earlier transaction, and resetting it takes another path
+        // which works even when this one is broken.
+        setup.executeWikiPlain("{{velocity}}$xwiki.flushCache(){{/velocity}}", Syntax.XWIKI_2_1);
+
         // Reset the history. This is the URL behind the "yes" button of the reset confirmation page.
         setup.gotoPage(testReference, "reset", "confirm=1");
 

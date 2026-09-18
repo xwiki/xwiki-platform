@@ -460,38 +460,7 @@ dt.annotationLabel label {
   font-variant: small-caps;
 }
 
-/* Why an annotation is not simply sitting on its text: repositioned after an edit, or lost altogether. The
-   accent bar carries the severity, so the note reads as a status without a coloured background behind the text. */
-.annotation-state {
-  border-left: 3px solid;
-  font-size: .9em;
-  margin: .5em 0;
-  padding: .15em 0 .15em .6em;
-}
-
-/* The same two colors the in-text highlight of an updated or altered annotation is mixed from, so the note in
-   the tab and the mark in the page read as the same state. */
-.annotation-state-updated {
-  border-color: var(--btn-warning-bg);
-}
-
-.annotation-state-altered {
-  border-color: var(--btn-danger-bg);
-}
-
-details.annotation-state > summary {
-  cursor: pointer;
-  /* Bootstrap resets summary to display block, which drops the native disclosure triangle with it. */
-  display: list-item;
-  list-style: disclosure-closed inside;
-}
-
-details.annotation-state[open] > summary {
-  list-style-type: disclosure-open;
-}
-
-/* The original selection is history, so it stays quieter than the selection the annotation points at now, and
-   drops the decorative quote that marks the live one. */
+/* Quieter than the selection the annotation points at now, without the decorative quote of the live one. */
 .originalAnnotatedText {
   color: $theme.textSecondaryColor;
   font-size: .95em;

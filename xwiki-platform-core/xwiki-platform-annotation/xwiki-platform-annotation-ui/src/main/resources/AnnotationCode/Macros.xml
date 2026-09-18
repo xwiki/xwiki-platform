@@ -198,7 +198,13 @@
   #end
   &lt;div class="annotation $!{ann.state}" id="annotation_${mode}_$!{ann.id}"&gt;
     &lt;div class="annotation-bubble-avatar"&gt;
-      #smallUserAvatar($ann.author)
+      ## The Annotations tab sits next to the Comments tab and matches its author line, which is built on a 50px
+      ## avatar. The bubble is compact and keeps the 30px one.
+      #if ($mode == 'list')
+        #mediumUserAvatar($ann.author)
+      #else
+        #smallUserAvatar($ann.author)
+      #end
     &lt;/div&gt;
     &lt;div class="annotation-bubble-header"&gt;
       #displayAnnotationTitle($ann)
@@ -324,7 +330,10 @@
       $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
       &lt;/a&gt;##
     #end
-    #if ($annHasAdmin || ($annHasEdit &amp;&amp; $isUserComment))
+    ## Not in the edit form: it already wraps the annotation in a &lt;form&gt;, and HTML drops a nested one, which would
+    ## leave this button submitting the edit form. The annotation REST API would be the way around that, the way the
+    ## other annotation classes delete below, but its delete fails without a request body.
+    #if ($mode != 'edit' &amp;&amp; ($annHasAdmin || ($annHasEdit &amp;&amp; $isUserComment)))
       ## Delete mutates state, so it's a real POST form (not a link) - a link's href can be followed by a
       ## crawler, prefetched, opened in a new tab, or navigated to directly if JavaScript never attaches.
       #set ($deleteActionURL = $xwiki.getURL($annoDoc.fullName, 'objectremove'))
@@ -385,7 +394,7 @@
       #end
     &lt;blockquote class="annotatedText"&gt;$!escapetool.xml($ann.selection)&lt;/blockquote&gt;
   #end
-  ## in view mode and list mode, also display the original selection of this annotation. The message ends on
+  ## In view mode and list mode, also display the original selection of this annotation. The message ends on
   ## "Originally:", which makes it the label of the disclosure holding that original selection.
   #if (($mode == 'view' || $mode == 'list') &amp;&amp; $ann.state == 'UPDATED')
     &lt;details class="annotation-state annotation-state-updated"&gt;

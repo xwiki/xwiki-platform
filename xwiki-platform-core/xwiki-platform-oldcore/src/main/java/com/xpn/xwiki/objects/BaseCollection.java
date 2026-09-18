@@ -584,6 +584,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * @param name the name of the property
      * @return the set value of the property, or an empty set if the property doesn't exist
      */
+    // The set is built from the property's own values, whose element type depends on the xproperty.
+    @SuppressWarnings("java:S1452")
     public Set<?> getSetValue(String name)
     {
         ListProperty prop = (ListProperty) safeget(name);

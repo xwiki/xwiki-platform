@@ -542,14 +542,24 @@ public class ExtensionStore implements Initializable, Disposable
 
     private PageReference getVersionPageReference(XWikiDocument mainDocument, String version)
     {
-        return new PageReference(version,
-            new PageReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME, mainDocument.getPageReference()));
+        if (mainDocument != null) {
+            return new PageReference(version,
+                new PageReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME, mainDocument.getPageReference()));
+        }
+
+        return null;
     }
 
     private XWikiDocument getVersionDocument(XWikiDocument mainDocument, String version, XWikiContext xcontext)
         throws XWikiException
     {
-        return xcontext.getWiki().getDocument(getVersionPageReference(mainDocument, version), xcontext);
+        PageReference versionPageReference = getVersionPageReference(mainDocument, version);
+
+        if (versionPageReference != null) {
+            return xcontext.getWiki().getDocument(versionPageReference, xcontext);
+        }
+
+        return null;
     }
 
     /**

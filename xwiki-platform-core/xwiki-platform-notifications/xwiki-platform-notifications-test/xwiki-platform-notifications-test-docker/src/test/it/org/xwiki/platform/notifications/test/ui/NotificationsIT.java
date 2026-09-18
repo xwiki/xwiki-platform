@@ -52,6 +52,7 @@ import com.rometools.rome.feed.synd.SyndEntry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -240,10 +241,14 @@ class NotificationsIT
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.OFF);
         p.setEventTypeState(SYSTEM, DELETE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
-        // Delete the "Deletion test page" and test the notification
-        setup.rest().runAs(FIRST_USER_CREDENTIALS,
-            rest -> rest.delete(new LocalDocumentReference(space, "DTP")));
+        // Delete the "Deletion test page" and test the notification. The deletion goes through the browser and not
+        // over REST, because the date of the event has no milliseconds while the date from which the preference
+        // enabled just above applies has some: a deletion happening within that same second produces an event that
+        // is dated before the preference, and so is filtered out.
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        setup.deletePage(space, "DTP");
 
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         setup.gotoPage(space, "WebHome");
         // Ensure the notification has been received.
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 1);
@@ -314,8 +319,10 @@ class NotificationsIT
         // The comment is added right after the last page update, so the comment event and the page-update
         // composite event share the same instant and the tray returns them in either order, just as the RSS feed
         // does (see XWIKI-21059). Match them by type rather than by position.
-        int commentIndex = getNotificationIndex(tray, ADD_COMMENT);
-        int updateIndex = getNotificationIndex(tray, UPDATE);
+        int commentIndex = tray.getNotificationIndex(ADD_COMMENT);
+        int updateIndex = tray.getNotificationIndex(UPDATE);
+        assertNotEquals(-1, commentIndex, "No comment notification in the tray.");
+        assertNotEquals(-1, updateIndex, "No update notification in the tray.");
 
         assertEquals("Linux as a title", tray.getNotificationPage(commentIndex));
         String expectedComment = String.format("commented by %s", FIRST_USER_NAME);
@@ -554,23 +561,6 @@ class NotificationsIT
 
         assertTrue(notificationsContainerElement.getNotificationPage(4).startsWith("Profile of "));
         assertTrue(notificationsContainerElement.getNotificationPage(5).startsWith("Profile of "));
-    }
-
-    /**
-     * @param tray the notification tray to search
-     * @param type the type of the notification to find, for instance {@code update} or {@code addComment}
-     * @return the index of the first notification of that type in the tray
-     */
-    private static int getNotificationIndex(NotificationsTrayPage tray, String type)
-    {
-        int count = tray.getNotificationsListCount();
-        for (int i = 0; i < count; i++) {
-            if (type.equals(tray.getNotificationType(i))) {
-                return i;
-            }
-        }
-        throw new AssertionError(
-            String.format("No notification of type [%s] among the [%s] notifications of the tray.", type, count));
     }
 
     private SyndEntry getEntryByTitle(NotificationsRSS rss, String title)

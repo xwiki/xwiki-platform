@@ -356,6 +356,19 @@ public class NotificationsTrayPage extends ViewPage
     }
 
     /**
+     * Get the index of the first notification of a given type. Useful when several notifications share the same date,
+     * since their order in the list is then not deterministic.
+     *
+     * @param type the type of the notification to find, for instance {@code update} or {@code addComment}
+     * @return the index of the first notification of that type in the list, or {@code -1} if there is none
+     * @since 18.9.0RC1
+     */
+    public int getNotificationIndex(String type)
+    {
+        return getNotificationsContainerElement().getNotificationIndex(type);
+    }
+
+    /**
      * Get the content of a notification.
      *
      * @param notificationNumber index of the notification in the list

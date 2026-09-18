@@ -214,125 +214,70 @@ class AnnotationCodeMacrosPageTest extends PageTest
 
     @ParameterizedTest
     @ValueSource(strings = { "view", "edit", "create" })
-    void closeButtonIsDisplayedWhenTheAnnotationCanBeDismissed(String mode) throws Exception
+    void annotationIsDisplayedForTheBubble(String mode) throws Exception
     {
-        assertNotNull(renderAnnotation(mode).selectFirst(".annotation-bubble-close button"),
-            String.format("The close button was not rendered in the [%s] mode", mode));
-    }
-
-    @Test
-    void closeButtonIsNotDisplayedInListMode() throws Exception
-    {
-        // The list mode displays the annotation inside the Annotations tab, where there is nothing to close.
-        assertNull(renderAnnotation("list").selectFirst(".annotation-bubble-close"),
-            "The close button was rendered in the list mode");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "view", "list" })
-    void editAndDeleteButtonsAreDisplayedOutsideTheEditForm(String mode) throws Exception
-    {
-        this.context.setUserReference(AUTHOR);
-
         Element annotation = renderAnnotation(mode);
 
-        assertNotNull(annotation.selectFirst(".annotation-bubble-tools a.edit"),
-            String.format("The edit button was not rendered in the [%s] mode", mode));
-        assertNotNull(annotation.selectFirst(".annotation-bubble-tools button.delete"),
-            String.format("The delete button was not rendered in the [%s] mode", mode));
+        assertNotNull(annotation.selectFirst(".annotation-bubble-close button"),
+            String.format("The close button was not rendered in the [%s] mode", mode));
+        assertNotNull(annotation.selectFirst(".annotation-bubble-avatar img.avatar_30"),
+            String.format("The [%s] mode did not keep the compact avatar", mode));
     }
 
     @Test
-    void editFormShowsNeitherTheEditNorTheDeleteAction() throws Exception
-    {
-        this.context.setUserReference(AUTHOR);
-
-        Element annotation = renderAnnotation("edit");
-
-        assertNull(annotation.selectFirst(".annotation-bubble-tools a.edit"),
-            "The edit button was rendered in the edit form");
-        // A delete form cannot be nested in the edit form, see deleteIsNotRenderedInsideTheEditForm.
-        assertNull(annotation.selectFirst(".annotation-bubble-tools .delete"),
-            "The delete action was rendered in the edit form");
-    }
-
-    @Test
-    void toolboxIsEmptyInCreateMode() throws Exception
-    {
-        this.context.setUserReference(AUTHOR);
-        updateStoredAnnotation(object -> object.setStringValue("state", "UPDATED"));
-
-        Element tools = renderAnnotation("create").selectFirst(".annotation-bubble-tools");
-
-        assertNotNull(tools);
-        assertEquals(0, tools.select("a, button").size(), "The toolbox rendered actions in the create mode");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "view", "list", "edit" })
-    void validateButtonIsDisplayedForAnUpdatedAnnotation(String mode) throws Exception
-    {
-        updateStoredAnnotation(object -> object.setStringValue("state", "UPDATED"));
-
-        assertNotNull(renderAnnotation(mode).selectFirst(".annotation-bubble-tools a.validate"),
-            String.format("The validate button was not rendered in the [%s] mode", mode));
-    }
-
-    @Test
-    void validateButtonIsNotDisplayedForAnAnnotationThatWasNotMoved() throws Exception
-    {
-        assertNull(renderAnnotation("view").selectFirst(".annotation-bubble-tools a.validate"),
-            "The validate button was rendered for an annotation that doesn't need validation");
-    }
-
-    @Test
-    void dateUsesA24HourClockByDefault() throws Exception
+    void annotationIsDisplayedForTheAnnotationsTab() throws Exception
     {
         updateStoredAnnotation(object -> object.setDateValue("date",
             new GregorianCalendar(2026, Calendar.SEPTEMBER, 17, 15, 43).getTime()));
 
+        Element annotation = renderAnnotation("list");
+
+        // The tab displays the annotation inside the Annotations tab, where there is nothing to close and where the
+        // author line is the one of a comment: a 50px avatar, which has to be asked for since a CSS cap cannot
+        // enlarge the 30px image the bubble requests.
+        assertNull(annotation.selectFirst(".annotation-bubble-close"),
+            "The close button was rendered in the list mode");
+        assertNotNull(annotation.selectFirst(".annotation-bubble-avatar img.avatar_50"),
+            "The Annotations tab did not request the avatar size of a comment");
         // Without a dateformat preference, an afternoon time must not be displayed as the matching morning one.
-        assertEquals("17/09/2026 15:43", renderAnnotation("view").selectFirst("time.annotationDate").text());
-    }
-
-    @Test
-    void deleteIsNotRenderedInsideTheEditForm() throws Exception
-    {
-        this.context.setUserReference(AUTHOR);
-
-        Element annotation = renderAnnotation("edit");
-
-        // The edit form wraps the annotation in a <form>, and the HTML parser drops a nested one, which would leave
-        // the delete button submitting the edit form and saving the annotation instead of deleting it.
-        assertNull(annotation.selectFirst(".annotation-bubble-tools form"),
-            "A delete form was nested in the edit form");
+        assertEquals("17/09/2026 15:43", annotation.selectFirst("time.annotationDate").text());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "view", "list" })
-    void deleteIsAFormOutsideTheEditForm(String mode) throws Exception
+    @ValueSource(strings = { "view", "list", "edit", "create" })
+    void toolboxMatchesTheMode(String mode) throws Exception
     {
         this.context.setUserReference(AUTHOR);
 
-        assertNotNull(renderAnnotation(mode).selectFirst(".annotation-bubble-tools form.delete-form button.delete"),
-            String.format("The delete action was not rendered as a form in the [%s] mode", mode));
+        Element tools = renderAnnotation(mode).selectFirst(".annotation-bubble-tools");
+
+        assertNotNull(tools, String.format("The toolbox was not rendered in the [%s] mode", mode));
+        if ("create".equals(mode)) {
+            // The annotation doesn't exist yet, so there is nothing to act on.
+            assertEquals(0, tools.select("a, button").size(), "The toolbox rendered actions in the create mode");
+        } else if ("edit".equals(mode)) {
+            // Editing already, and the edit form wraps the annotation in a form that a delete form cannot nest in.
+            assertNull(tools.selectFirst("a.edit"), "The edit button was rendered in the edit form");
+            assertNull(tools.selectFirst(".delete"), "The delete action was rendered in the edit form");
+            assertNull(tools.selectFirst("form"), "A delete form was nested in the edit form");
+        } else {
+            assertNotNull(tools.selectFirst("a.edit"),
+                String.format("The edit button was not rendered in the [%s] mode", mode));
+            assertNotNull(tools.selectFirst("form.delete-form button.delete"),
+                String.format("The delete form was not rendered in the [%s] mode", mode));
+        }
+        assertNull(tools.selectFirst("a.validate"),
+            String.format("The validate button was rendered in the [%s] mode for an annotation that didn't move",
+                mode));
     }
 
     @Test
-    void annotationsTabUsesTheAvatarSizeOfAComment() throws Exception
+    void validateIsDisplayedForAnAnnotationMovedByAPageEdit() throws Exception
     {
-        // The tab matches the Comments tab author line, which is built on a 50px avatar. A CSS cap cannot enlarge
-        // the 30px image the bubble asks the server for, so the size has to be requested here.
-        assertNotNull(renderAnnotation("list").selectFirst(".annotation-bubble-avatar img.avatar_50"),
-            "The Annotations tab did not request a 50px avatar");
-    }
+        updateStoredAnnotation(object -> object.setStringValue("state", "UPDATED"));
 
-    @ParameterizedTest
-    @ValueSource(strings = { "view", "edit", "create" })
-    void theBubbleKeepsTheCompactAvatar(String mode) throws Exception
-    {
-        assertNotNull(renderAnnotation(mode).selectFirst(".annotation-bubble-avatar img.avatar_30"),
-            String.format("The [%s] mode did not keep the 30px avatar", mode));
+        assertNotNull(renderAnnotation("view").selectFirst(".annotation-bubble-tools a.validate"),
+            "The validate button was not rendered for an annotation moved by a page edit");
     }
 
     private void updateStoredAnnotation(Consumer<BaseObject> update) throws Exception

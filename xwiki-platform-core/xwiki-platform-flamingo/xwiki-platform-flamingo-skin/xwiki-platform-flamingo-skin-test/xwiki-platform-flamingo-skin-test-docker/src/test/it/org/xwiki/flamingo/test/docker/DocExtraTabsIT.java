@@ -23,9 +23,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -48,8 +46,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     // The slow document extra tab of openDocExtraTabWhileAnotherOneIsStillLoading uses the Groovy macro, which needs
-    // Programming Rights, and functional tests deny that right to wiki content unless the page is excluded here.
-    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:DocExtraTabsIT\\..*"
+    // Programming Rights, and functional tests deny that right to wiki content unless the page is excluded here. The
+    // pattern matches the name of this class prefixed with "Nested" too, since the pages are named after the test
+    // class and this test also runs nested inside AllIT.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*DocExtraTabsIT\\..*"
 })
 class DocExtraTabsIT
 {
@@ -92,13 +92,11 @@ class DocExtraTabsIT
 
         // Start loading the slow tab and, without waiting for it, open the history tab, which loads fast. The
         // response of the slow tab thus arrives while the history tab is displayed.
-        setup.getDriver().findElement(By.id(slowTabId + "link")).click();
+        viewPage.startOpeningDocExtraPane(slowTabId);
         viewPage.openHistoryDocExtraPane();
 
-        // Wait for the content of the slow tab to arrive. We look at the text content because the pane is hidden.
-        WebElement slowPane = setup.getDriver().findElement(By.id(slowTabId + "pane"));
-        setup.getDriver().waitUntilCondition(driver -> !slowPane.getAttribute("textContent").isBlank());
-        assertEquals("Slow tab content.", slowPane.getAttribute("textContent").trim());
+        // Wait for the content of the slow tab to arrive. The pane is hidden, so we look at its text content.
+        assertEquals("Slow tab content.", viewPage.waitForDocExtraPaneContent(slowTabId));
 
         // The slow tab must not have taken the place of the history tab.
         assertTrue(viewPage.isDocExtraPaneActive("History"));

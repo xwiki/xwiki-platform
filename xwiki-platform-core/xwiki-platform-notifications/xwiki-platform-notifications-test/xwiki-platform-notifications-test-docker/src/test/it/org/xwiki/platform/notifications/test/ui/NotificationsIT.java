@@ -22,14 +22,15 @@ package org.xwiki.platform.notifications.test.ui;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
@@ -46,15 +47,12 @@ import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.CommentsTab;
-import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.ObjectEditPage;
-import org.xwiki.test.ui.po.editor.ObjectEditPane;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -86,8 +84,20 @@ class NotificationsIT
 
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";
 
+    private static final XWikiCredentials FIRST_USER_CREDENTIALS =
+        new XWikiCredentials(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+
+    private static final XWikiCredentials SECOND_USER_CREDENTIALS =
+        new XWikiCredentials(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+
     // Number of pages that have to be created in order for the notifications badge to show «X+»
     private static final int PAGES_TOP_CREATION_COUNT = 21;
+
+    // Number of times the page of compositeNotifications is updated. The update composite event holds exactly
+    // these updates, and not the page update that adding the comment triggers: events fired by a single request
+    // share an event group id, and an update sharing the group id of a more specific event is grouped with it
+    // rather than with the content updates, then hidden from the details of that group.
+    private static final int PAGE_UPDATE_COUNT = 21;
 
     private static final String SYSTEM = "org.xwiki.platform";
 
@@ -104,10 +114,12 @@ class NotificationsIT
     @BeforeEach
     public void setup(TestUtils setup) throws Exception
     {
-        setup.loginAsSuperAdmin();
+        // The REST client acts as superadmin, which is allowed to create the users, without the browser having to
+        // log in as superadmin.
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
         // Create the two users we will be using
-        setup.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
-        setup.createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "");
+        setup.rest().createUser(FIRST_USER_CREDENTIALS);
+        setup.rest().createUser(SECOND_USER_CREDENTIALS);
 
         NotificationsUserProfilePage p;
 
@@ -131,11 +143,11 @@ class NotificationsIT
     }
 
     @AfterEach
-    public void tearDown(TestUtils setup)
+    public void tearDown(TestUtils setup) throws Exception
     {
-        setup.loginAsSuperAdmin();
-        setup.deletePage("XWiki", FIRST_USER_NAME);
-        setup.deletePage("XWiki", SECOND_USER_NAME);
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+        setup.rest().deletePage("XWiki", FIRST_USER_NAME);
+        setup.rest().deletePage("XWiki", SECOND_USER_NAME);
         setup.forceGuestUser();
     }
 
@@ -146,10 +158,13 @@ class NotificationsIT
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
 
-        // The user 1 creates a new page, the user 2 shouldn’t receive any notification
-        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        // The user 1 creates a new page, the user 2 shouldn’t receive any notification. Only the user 2 logs in:
+        // the pages of the user 1 are created over REST, since the subject of this test is the notification tray of
+        // the user 2, not the page creation itself.
         String space = testReference.getLastSpaceReference().getName();
-        setup.createPage(space, "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
+        setup.rest().runAs(FIRST_USER_CREDENTIALS,
+            rest -> rest.savePage(new LocalDocumentReference(space, "WebHome"),
+                "Content from " + FIRST_USER_NAME, "Page title"));
 
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         setup.gotoPage(space, "WebHome");
@@ -172,7 +187,11 @@ class NotificationsIT
         ), notificationsWatchModal.getAvailableOptions());
         notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
 
-        // We create a lot of pages in order to test the notification badge
+        // We create a lot of pages in order to test the notification badge. They are created through the browser and
+        // not over REST, because the date of a page event is the date of the page, which has no milliseconds: over REST
+        // many pages are created within the same second, so the tray orders their notifications arbitrarily. Marking
+        // a notification as read re-indexes its event, which can then move behind the others of the same second, out
+        // of the 10 notifications displayed by the tray.
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
             setup.deletePage(space, "Page" + i);
@@ -222,11 +241,16 @@ class NotificationsIT
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.OFF);
         p.setEventTypeState(SYSTEM, DELETE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
-        // Delete the "Deletion test page" and test the notification
-        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        setup.deletePage(space, "DTP");
+        // The date of a deletion event has no milliseconds, while the date from which the preference enabled just
+        // above applies has some: an event fired within that same second is dated before the preference, and the
+        // notification is then filtered out. Wait for the next second, which is the granularity of the event dates
+        // and not an asynchronous operation, so there is nothing to poll on.
+        Thread.sleep(1000);
 
-        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        // Delete the "Deletion test page" and test the notification
+        setup.rest().runAs(FIRST_USER_CREDENTIALS,
+            rest -> rest.delete(new LocalDocumentReference(space, "DTP")));
+
         setup.gotoPage(space, "WebHome");
         // Ensure the notification has been received.
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 1);
@@ -275,47 +299,46 @@ class NotificationsIT
         tray.clearAllNotifications();
 
 
-        // Create a page, edit it 20 times, and finally add a comment
-        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        ViewPage page = setup.createPage(testReference, "Simple content", "Linux as a title");
-        page.edit();
-        WikiEditPage edit = new WikiEditPage();
-        StringBuilder originalContent = new StringBuilder("Linux is a part of GNU/Linux - it's the kernel");
-        edit.setContent(originalContent.toString());
-        page = edit.clickSaveAndView();
-        page.edit();
-        edit = new WikiEditPage();
+        // Create a page, edit it several times, and finally add a comment. What this test is about is how the
+        // resulting events are grouped in the tray of the user 2, so the user 1 produces them over REST rather than
+        // through the editor.
+        setup.rest().runAs(FIRST_USER_CREDENTIALS, rest -> {
+            StringBuilder content = new StringBuilder("Linux is a part of GNU/Linux - it's the kernel");
+            rest.savePage(testReference, content.toString(), "Linux as a title");
 
-        for (int i = 0; i < 20; i++) {
-            String newContent = String.format("\nAdding some content iteration %s", i);
-            originalContent.append(newContent);
-            edit.setContent(originalContent.toString());
-            edit.clickSaveAndContinue();
-        }
-        page = edit.clickSaveAndView();
-        CommentsTab commentsTab = page.openCommentsDocExtraPane();
-        commentsTab.postComment("Linux is a great OS", true);
+            for (int i = 0; i < PAGE_UPDATE_COUNT; i++) {
+                content.append(String.format("%nAdding some content iteration %s", i));
+                rest.savePage(testReference, content.toString(), "Linux as a title");
+            }
+            CommentsTab.restPostComment(testReference, "Linux is a great OS");
+        });
 
         // Check that events have been grouped together (see: https://jira.xwiki.org/browse/XWIKI-14114)
-        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         setup.gotoPage("Main", "WebHome");
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 2);
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
-        assertEquals("Linux as a title", tray.getNotificationPage(0));
+        // The comment is added right after the last page update, so the comment event and the page-update
+        // composite event share the same instant and the tray returns them in either order, just as the RSS feed
+        // does (see XWIKI-21059). Match them by type rather than by position.
+        int commentIndex = tray.getNotificationIndex(ADD_COMMENT);
+        int updateIndex = tray.getNotificationIndex(UPDATE);
+        assertNotEquals(-1, commentIndex, "No comment notification in the tray.");
+        assertNotEquals(-1, updateIndex, "No update notification in the tray.");
+
+        assertEquals("Linux as a title", tray.getNotificationPage(commentIndex));
         String expectedComment = String.format("commented by %s", FIRST_USER_NAME);
-        String obtainedComment = tray.getNotificationDescription(0);
+        String obtainedComment = tray.getNotificationDescription(commentIndex);
         assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
             + "Actual description: [%s]", expectedComment, obtainedComment));
-        assertEquals("Linux as a title", tray.getNotificationPage(1));
-        assertEquals("update", tray.getNotificationType(1));
+        assertEquals("Linux as a title", tray.getNotificationPage(updateIndex));
         expectedComment = String.format("edited by %s", FIRST_USER_NAME);
-        obtainedComment = tray.getNotificationDescription(1);
+        obtainedComment = tray.getNotificationDescription(updateIndex);
         assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
             + "Actual description: [%s]", expectedComment, obtainedComment));
         GroupedNotificationElementPage groupedNotificationsPage = tray.getGroupedNotificationsPage();
-        groupedNotificationsPage.openGroup(1);
-        assertEquals(22, groupedNotificationsPage.getNumberOfElements(1));
+        groupedNotificationsPage.openGroup(updateIndex);
+        assertEquals(PAGE_UPDATE_COUNT, groupedNotificationsPage.getNumberOfElements(updateIndex));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         notificationsRSS.loadEntries(setup);
@@ -354,31 +377,21 @@ class NotificationsIT
     @Order(3)
     void notificationDisplayerClass(TestUtils setup, TestReference testReference) throws Exception
     {
+        String space = testReference.getLastSpaceReference().getName();
+        LocalDocumentReference modifiedPage = new LocalDocumentReference(space, "ARandomPageThatShouldBeModified");
+        LocalDocumentReference displayerPage = new LocalDocumentReference(space, "NotificationDisplayerClassTest");
         try {
-            // Create the pages and a custom displayer for "update" events
-            setup.loginAsSuperAdmin();
-
-            setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
-            setup.createPage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified",
+            // Create the pages and a custom displayer for "update" events. None of this is asserted by the test, so
+            // it is done over REST as superadmin rather than by logging the browser in as superadmin and going
+            // through the object editor.
+            setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+            setup.rest().savePage(modifiedPage,
                 "Page used for the tests of the NotificationDisplayerClass XObject.", "Test page");
-
-            setup.createPage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest",
+            setup.rest().savePage(displayerPage,
                 "Page used for the tests of the NotificationDisplayerClass XObject.", "Test page 2");
-
-            Map<String, String> notificationDisplayerParameters = Map.of(
-                "XWiki.Notifications.Code.NotificationDisplayerClass_0_eventType", "update",
-                "XWiki.Notifications.Code.NotificationDisplayerClass_0_notificationTemplate",
-                    "This is a test template"
-            );
-
-            ObjectEditPage editObjects = setup.editObjects(testReference.getLastSpaceReference().getName(),
-                "NotificationDisplayerClassTest");
-            editObjects.addObject("XWiki.Notifications.Code.NotificationDisplayerClass");
-            ObjectEditPane objectEditPane =
-                editObjects.getObjectsOfClass("XWiki.Notifications.Code.NotificationDisplayerClass").get(0);
-            objectEditPane.displayObject();
-            objectEditPane.fillFieldsByName(notificationDisplayerParameters);
-            editObjects.clickSaveAndContinue(true);
+            setup.rest().addObject(displayerPage, "XWiki.Notifications.Code.NotificationDisplayerClass",
+                "eventType", "update",
+                "notificationTemplate", "This is a test template");
 
             // Login as first user, and enable notifications on document updates
             setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
@@ -398,28 +411,22 @@ class NotificationsIT
             ), notificationsWatchModal.getAvailableOptions());
             notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
 
-            // Login as second user and modify ARandomPageThatShouldBeModified
-            setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+            // Modify ARandomPageThatShouldBeModified as the second user over REST, so that the browser stays
+            // logged in as the first user, whose notification tray is the subject of this test.
+            setup.rest().runAs(SECOND_USER_CREDENTIALS,
+                rest -> rest.savePage(modifiedPage, "Something", "Test page"));
 
-            ViewPage viewPage =
-                setup.gotoPage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified");
-            viewPage.edit();
-            WikiEditPage editPage = new WikiEditPage();
-            editPage.setContent("Something");
-            editPage.clickSaveAndView(true);
-
-            // Login as the first user, ensure that the notification is displayed with a custom template
-            setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-            setup.gotoPage(testReference.getLastSpaceReference().getName(), "WebHome");
+            // Ensure that the notification is displayed with a custom template
+            setup.gotoPage(space, "WebHome");
 
             // Ensure the notification has been received.
             NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 1);
             NotificationsTrayPage tray = new NotificationsTrayPage();
             assertEquals("This is a test template", tray.getNotificationRawContent(0));
         } finally {
-            setup.loginAsSuperAdmin();
-            setup.deletePage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest");
-            setup.deletePage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified");
+            setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+            setup.rest().delete(displayerPage);
+            setup.rest().delete(modifiedPage);
         }
     }
 

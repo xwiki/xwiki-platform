@@ -138,7 +138,7 @@ public class CommentsTab extends BaseElement
      * @param properties the extra properties of the comment (name1, value1, name2, value2, ...), for instance an
      *     {@code author} or a {@code date} differing from the ones the server would set
      * @throws Exception in case of error while calling the REST API
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public static void restPostComment(EntityReference pageReference, String content, Object... properties)
         throws Exception
@@ -310,7 +310,7 @@ public class CommentsTab extends BaseElement
      *
      * @param id the comment id
      * @return the opened permalink modal
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public PermalinkModal openPermalinkModalByID(int id)
     {

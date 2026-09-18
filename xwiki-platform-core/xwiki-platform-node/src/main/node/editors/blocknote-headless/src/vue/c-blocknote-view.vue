@@ -291,41 +291,51 @@ onUnmounted(() => {
 
   /* Note: font sizes are inconsistent here, but that's how they are rendered at the end. So we keep it the same here. */
   /*
-   * Also reset margin-top to 0: with "defaultStyles: false" (set in XWikiBlockNote.vue so the
-   * XWiki skin controls typography instead of BlockNote), BlockNote's own
+   * Also reset margin-top and line-height: with "defaultStyles: false" (set in XWikiBlockNote.vue
+   * so the XWiki skin controls typography instead of BlockNote), BlockNote's own
    * ".bn-default-styles h1, ..., h6 { margin: 0 }" reset no longer applies, so bare "h1"-"h6"
-   * elements fall back to Bootstrap's global margin-top (see type.less) - unlike "p", which
-   * Bootstrap already sets to "margin: 0 0 ..." (margin-top: 0) regardless. That stray margin-top
-   * throws off the block handle's vertical alignment below, which assumes - like BlockNote itself
-   * - that all block spacing above the first line comes from padding, not margin.
+   * elements fall back to Bootstrap's global "h1, ..., h6 { line-height: @headings-line-height;
+   * ...}" and "h1, h2, h3 { margin-top: @line-height-computed; ...}" /
+   * "h4, h5, h6 { margin-top: @line-height-computed / 2; ...}" rules (type.less) - unlike "p",
+   * which Bootstrap sets to "line-height" inherited normally and "margin: 0 0 ..."
+   * (margin-top: 0) regardless. That stray margin-top and line-height (1.1, instead of the
+   * inherited --cr-line-height-normal) throw off the block handle's vertical alignment below,
+   * which assumes - like BlockNote itself - that all block spacing above the first line comes
+   * from padding, not margin, and that every block type shares the same line-height.
    */
   & h1 {
     font-size: var(--cr-font-size-x-large);
+    line-height: var(--cr-line-height-normal);
     margin-top: 0;
   }
 
   & h2 {
     font-size: var(--cr-font-size-x-large);
+    line-height: var(--cr-line-height-normal);
     margin-top: 0;
   }
 
   & h3 {
     font-size: var(--cr-font-size-large);
+    line-height: var(--cr-line-height-normal);
     margin-top: 0;
   }
 
   & h4 {
     font-size: var(--cr-font-size-medium);
+    line-height: var(--cr-line-height-normal);
     margin-top: 0;
   }
 
   & h5 {
     font-size: var(--cr-font-size-medium);
+    line-height: var(--cr-line-height-normal);
     margin-top: 0;
   }
 
   & h6 {
     font-size: var(--cr-font-size-medium);
+    line-height: var(--cr-line-height-normal);
     margin-top: 0;
   }
 
@@ -410,6 +420,11 @@ onUnmounted(() => {
     font-size: var(--cr-font-size-large);
     border-inline-start: 2px solid var(--cr-color-neutral-200);
     padding-inline-start: var(--cr-spacing-large);
+    /* Bootstrap's own "blockquote { padding: 10px 20px; ... }" (type.less) otherwise leaves a
+       stray 10px padding-top on the bare "blockquote" element, on top of the padding-top we set
+       on its ".bn-block-content" wrapper below to align the block handle - throwing it off by
+       that same 10px, for the same reason as the heading margin-top/line-height resets above. */
+    padding-top: 0;
     margin: 0;
   }
 

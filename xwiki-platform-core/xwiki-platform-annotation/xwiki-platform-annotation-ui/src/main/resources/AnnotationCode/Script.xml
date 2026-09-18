@@ -1276,7 +1276,9 @@ XWiki.Annotation = Class.create({
     // annotation classes, see the other branch in Macros.xml) goes through the annotation REST API instead.
     // Both are submitted as a confirmed AJAX request (rather than following the link/submitting the form
     // natively) so the bubble/list can be updated in place, without a page reload.
-    const form = item.closest('form');
+    // Match the delete action's own form, never an enclosing one: an enclosing form would be submitted with its
+    // own action and fields, saving the annotation instead of deleting it.
+    const form = item.closest('form.delete-form');
     item.observe('click', function(event) {
       item.blur();
       event.stop();

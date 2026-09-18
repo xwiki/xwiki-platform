@@ -243,7 +243,7 @@ class AnnotationCodeMacrosPageTest extends PageTest
     }
 
     @Test
-    void editFormKeepsTheDeleteButtonButNotTheEditOne() throws Exception
+    void editFormShowsNeitherTheEditNorTheDeleteAction() throws Exception
     {
         this.context.setUserReference(AUTHOR);
 
@@ -251,8 +251,9 @@ class AnnotationCodeMacrosPageTest extends PageTest
 
         assertNull(annotation.selectFirst(".annotation-bubble-tools a.edit"),
             "The edit button was rendered in the edit form");
-        assertNotNull(annotation.selectFirst(".annotation-bubble-tools button.delete"),
-            "The delete button was not rendered in the edit form");
+        // A delete form cannot be nested in the edit form, see deleteIsNotRenderedInsideTheEditForm.
+        assertNull(annotation.selectFirst(".annotation-bubble-tools .delete"),
+            "The delete action was rendered in the edit form");
     }
 
     @Test
@@ -292,6 +293,46 @@ class AnnotationCodeMacrosPageTest extends PageTest
 
         // Without a dateformat preference, an afternoon time must not be displayed as the matching morning one.
         assertEquals("17/09/2026 15:43", renderAnnotation("view").selectFirst("time.annotationDate").text());
+    }
+
+    @Test
+    void deleteIsNotRenderedInsideTheEditForm() throws Exception
+    {
+        this.context.setUserReference(AUTHOR);
+
+        Element annotation = renderAnnotation("edit");
+
+        // The edit form wraps the annotation in a <form>, and the HTML parser drops a nested one, which would leave
+        // the delete button submitting the edit form and saving the annotation instead of deleting it.
+        assertNull(annotation.selectFirst(".annotation-bubble-tools form"),
+            "A delete form was nested in the edit form");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "list" })
+    void deleteIsAFormOutsideTheEditForm(String mode) throws Exception
+    {
+        this.context.setUserReference(AUTHOR);
+
+        assertNotNull(renderAnnotation(mode).selectFirst(".annotation-bubble-tools form.delete-form button.delete"),
+            String.format("The delete action was not rendered as a form in the [%s] mode", mode));
+    }
+
+    @Test
+    void annotationsTabUsesTheAvatarSizeOfAComment() throws Exception
+    {
+        // The tab matches the Comments tab author line, which is built on a 50px avatar. A CSS cap cannot enlarge
+        // the 30px image the bubble asks the server for, so the size has to be requested here.
+        assertNotNull(renderAnnotation("list").selectFirst(".annotation-bubble-avatar img.avatar_50"),
+            "The Annotations tab did not request a 50px avatar");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "edit", "create" })
+    void theBubbleKeepsTheCompactAvatar(String mode) throws Exception
+    {
+        assertNotNull(renderAnnotation(mode).selectFirst(".annotation-bubble-avatar img.avatar_30"),
+            String.format("The [%s] mode did not keep the 30px avatar", mode));
     }
 
     private void updateStoredAnnotation(Consumer<BaseObject> update) throws Exception

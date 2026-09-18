@@ -426,7 +426,7 @@ mark.annotation:not(.annotation-highlight) {
     text-align: center;
     width: 50px;
 
-    /* Override the 30px of the bubble avatar, the tab shows the same size as a comment avatar. */
+    /* Cap the 50px avatar the tab asks for, overriding the 30px the bubble avatar is capped to. */
     img {
       max-height: 50px;
       max-width: 50px;

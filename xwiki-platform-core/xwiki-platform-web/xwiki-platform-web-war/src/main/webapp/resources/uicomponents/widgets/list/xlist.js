@@ -66,8 +66,8 @@ var XWiki = function(XWiki){
             'class' : 'xlist' + (this.options.classes ? (' ' + this.options.classes) : '')
           });
           if (this.items && this.items.length > 0) {
-            for (var i=0;i<this.items.length;i++) {
-              this.addItem(this.items[i]);
+            for (const listItem of this.items) {
+              this.addItem(listItem);
             }
           }
         },
@@ -136,8 +136,8 @@ var XWiki = function(XWiki){
         },
         bindEventListeners: function(eventListeners) {
           var events = Object.keys(eventListeners);
-          for (var i=0;i<events.length;i++) {
-            this.listItemElement.observe(events[i], eventListeners[events[i]].bindAsEventListener(this.options.eventCallbackScope ? this.options.eventCallbackScope : this));
+          for (const eventName of events) {
+            this.listItemElement.observe(eventName, eventListeners[eventName].bindAsEventListener(this.options.eventCallbackScope ? this.options.eventCallbackScope : this));
           }
         }
     });

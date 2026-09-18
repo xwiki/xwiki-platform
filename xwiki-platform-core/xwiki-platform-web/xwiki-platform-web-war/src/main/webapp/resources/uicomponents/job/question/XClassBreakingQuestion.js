@@ -40,8 +40,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-tree'], function($, xm) {
         var selectedNodes = deleteTree.jstree().get_selected(true);
 
         answerProperties.selectAllFreePages = false;
-        for (var i = 0; i < selectedNodes.length; ++i) {
-          var node = selectedNodes[i];
+        for (const node of selectedNodes) {
           if (node.id == 'freePages') {
             // For free pages, we can rely on the state of the "freePage" node
             answerProperties.selectAllFreePages = true;
@@ -70,8 +69,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-tree'], function($, xm) {
           var treeReference = deleteTree.jstree();
           var nodes = treeReference.get_json(deleteTree, {flat: true});
 
-          for (var i = 0; i < nodes.length; i++) {
-            var node = nodes[i];
+          for (const node of nodes) {
             if (typeof node.data != "undefined" && node.data.type == "object") {
               var nodeDom = treeReference.get_node(node.id, true);
               nodeDom.find('.jstree-checkbox').remove();

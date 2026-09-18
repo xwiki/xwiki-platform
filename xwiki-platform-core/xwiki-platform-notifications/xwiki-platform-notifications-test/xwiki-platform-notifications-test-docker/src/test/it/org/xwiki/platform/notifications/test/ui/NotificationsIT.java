@@ -92,9 +92,10 @@ class NotificationsIT
     // Number of pages that have to be created in order for the notifications badge to show «X+»
     private static final int PAGES_TOP_CREATION_COUNT = 21;
 
-    // Number of times the page of compositeNotifications is updated. Adding the comment over REST creates the
-    // comment object without updating the page content, so it produces a comment event of its own and does not add
-    // to the update composite event.
+    // Number of times the page of compositeNotifications is updated. The update composite event holds exactly
+    // these updates, and not the page update that adding the comment triggers: events fired by a single request
+    // share an event group id, and an update sharing the group id of a more specific event is grouped with it
+    // rather than with the content updates, then hidden from the details of that group.
     private static final int PAGE_UPDATE_COUNT = 21;
 
     private static final String SYSTEM = "org.xwiki.platform";

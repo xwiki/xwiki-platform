@@ -551,6 +551,26 @@ defineExpose({
       font-size: 13px; /* --font-size-h6 */
     }
 
+    /*
+     * Levels 5 and 6 override the heading font-size set in c-blocknote-view.vue above (level 5
+     * falls back to the block's own font-size, i.e. BlockNote's default "--level: 0.9em" relative
+     * to --cr-base-font-size; level 6 is a flat 13px). margin-top is already reset to 0 by the
+     * "h5"/"h6" rules in c-blocknote-view.vue. See the comment next to the level 1-4 padding-top
+     * rules there for why this is needed and how it's computed: padding-top = 15px (BlockNote's
+     * target distance for a block with no built-in handle offset) minus half the block's actual
+     * line height.
+     */
+    .bn-block-content[data-content-type="heading"][data-level="5"] {
+      padding-top: calc(
+        15px - (0.9 * var(--cr-base-font-size) * var(--cr-line-height-normal)) /
+          2
+      );
+    }
+
+    .bn-block-content[data-content-type="heading"][data-level="6"] {
+      padding-top: calc(15px - (13px * var(--cr-line-height-normal)) / 2);
+    }
+
     [data-content-type="bulletListItem"] > p.bn-inline-content,
     [data-content-type="numberedListItem"] > p.bn-inline-content {
       margin: 0;

@@ -255,6 +255,9 @@ public class TransactionRunnable<T>
      * onPreRun() functions, also may contain exceptions thrown by one or more
      * of the chained runnables' onComplete() functions.
      */
+    // Catching Throwable is deliberate here: a transaction must be rolled back whatever failed, and the Throwable is
+    // not swallowed, it is collected into the TransactionException that is thrown.
+    @SuppressWarnings("java:S1181")
     protected final void preRun() throws TransactionException
     {
         final ListIterator<TransactionRunnable> runPathIterator = this.getRunPath().listIterator();
@@ -310,6 +313,9 @@ public class TransactionRunnable<T>
      * chained runnables' onRun() functions and whatever might be thrown by
      * onRollback() or onComplete() which are called if something goes wrong.
      */
+    // Catching Throwable is deliberate here: a transaction must be rolled back whatever failed, and the Throwable is
+    // not swallowed, it is collected into the TransactionException that is thrown.
+    @SuppressWarnings("java:S1181")
     protected final void run() throws TransactionException
     {
         final ListIterator<TransactionRunnable> runPathIterator = this.getRunPath().listIterator();
@@ -344,6 +350,9 @@ public class TransactionRunnable<T>
      * @throws TransactionException made from the exception thrown by this or one of the child runnables'
      * onCommit function or rollback or complete.
      */
+    // Catching Throwable is deliberate here: a transaction must be rolled back whatever failed, and the Throwable is
+    // not swallowed, it is collected into the TransactionException that is thrown.
+    @SuppressWarnings("java:S1181")
     protected final void commit() throws TransactionException
     {
         final List<TransactionRunnable> runPath = this.getRunPath();
@@ -471,6 +480,9 @@ public class TransactionRunnable<T>
      * from eg: storage corruption.
      * @throws TransactionException made by grouping all of the exceptions from the runnables together.
      */
+    // Catching Throwable is deliberate here: every runnable must be given its chance and the Throwable is not
+    // swallowed, it is collected into the TransactionException that is thrown.
+    @SuppressWarnings("java:S1181")
     private static void doAllAndCollectThrowables(final List<ExceptionThrowingRunnable> runnables,
         final String message,
         final boolean isNonRecoverable)

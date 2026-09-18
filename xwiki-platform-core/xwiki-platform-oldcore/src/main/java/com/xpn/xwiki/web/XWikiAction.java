@@ -389,6 +389,10 @@ public abstract class XWikiAction implements LegacyAction
         }
     }
 
+    // Catching Throwable is deliberate in this method: it is the top level of a request, so a failure of a notification
+    // listener, of the response flush or of the action itself has to be turned into an error page rather than reach the
+    // servlet container.
+    @SuppressWarnings("java:S1181")
     public void execute(XWikiContext context) throws Exception
     {
         MonitorPlugin monitor = null;

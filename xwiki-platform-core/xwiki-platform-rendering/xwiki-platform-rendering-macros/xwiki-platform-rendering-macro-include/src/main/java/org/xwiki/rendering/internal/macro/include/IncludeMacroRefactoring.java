@@ -277,6 +277,9 @@ public class IncludeMacroRefactoring implements MacroRefactoring
                 currentReference.extractReference(EntityType.WIKI));
     }
 
+    // Catching Throwable is deliberate here: nothing is recovered from, the Throwable is wrapped and rethrown so that
+    // an invalid macro parameter cancels the refactoring.
+    @SuppressWarnings("java:S1181")
     private IncludeMacroParameters getMacroParameters(MacroBlock macroBlock) throws MacroRefactoringException
     {
         // Populate and validate macro parameters.

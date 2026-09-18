@@ -795,6 +795,11 @@
         <artifactId>netty-transport-classes-kqueue</artifactId>
         <version>${netty.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-native-epoll</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
 
       <!-- Fast Diff -->
       <dependency>

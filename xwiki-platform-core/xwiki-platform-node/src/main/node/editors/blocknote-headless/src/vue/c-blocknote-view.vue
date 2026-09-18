@@ -291,17 +291,11 @@ onUnmounted(() => {
 
   /* Note: font sizes are inconsistent here, but that's how they are rendered at the end. So we keep it the same here. */
   /*
-   * Also reset margin-top and line-height: with "defaultStyles: false" (set in XWikiBlockNote.vue
-   * so the XWiki skin controls typography instead of BlockNote), BlockNote's own
-   * ".bn-default-styles h1, ..., h6 { margin: 0 }" reset no longer applies, so bare "h1"-"h6"
-   * elements fall back to Bootstrap's global "h1, ..., h6 { line-height: @headings-line-height;
-   * ...}" and "h1, h2, h3 { margin-top: @line-height-computed; ...}" /
-   * "h4, h5, h6 { margin-top: @line-height-computed / 2; ...}" rules (type.less) - unlike "p",
-   * which Bootstrap sets to "line-height" inherited normally and "margin: 0 0 ..."
-   * (margin-top: 0) regardless. That stray margin-top and line-height (1.1, instead of the
-   * inherited --cr-line-height-normal) throw off the block handle's vertical alignment below,
-   * which assumes - like BlockNote itself - that all block spacing above the first line comes
-   * from padding, not margin, and that every block type shares the same line-height.
+   * Headings need margin-top: 0 and line-height: var(--cr-line-height-normal) for the padding-top
+   * formula below to hold. Bootstrap's global heading rule (type.less) sets both directly on bare
+   * "h1"-"h6" elements; BlockNote's own reset for this, ".bn-default-styles h1, ..., h6
+   * { margin: 0 }", only applies with "defaultStyles: true", which XWikiBlockNote.vue sets to
+   * false so the wiki skin controls the editor's typography instead.
    */
   & h1 {
     font-size: var(--cr-font-size-x-large);
@@ -340,30 +334,24 @@ onUnmounted(() => {
   }
 
   /*
-   * On hover, BlockNote shows a "block handle" (drag handle + "+" button) to the left of each
-   * block, vertically centered on the block's first line. It centers it by nudging it down from
-   * the block's top edge with a fixed pixel offset that's hardcoded per block type in BlockNote's
-   * own source (see SideMenuController.getBlockOffset() in @blocknote/react): 39px for heading
-   * level 1, 27px for level 2, 18.5px for level 3, 0px for every other block type (including
-   * heading levels 4-6, paragraphs and list items). That table was derived by BlockNote from its
-   * own default font-size/line-height for each type, as "(first line height - 30px handle
-   * height) / 2" measured from the block's top edge - i.e. it assumes a fixed distance between
-   * a block's top edge and its first line's vertical center, per type: 54px/42px/33.5px for
-   * heading level 1/2/3, and 15px for everything else. Since we override font-size/line-height
-   * above to match the XWiki skin (and XWikiBlockNote.vue resets every block's own padding-top
-   * to 0), that distance no longer matches what BlockNote's table assumes, so the handle floats
-   * at the wrong height. We restore it explicitly for each block type we re-style:
-   *   padding-top = <target distance for the type> - (effective line-height / 2)
-   * If a block type's font-size or line-height changes again, its padding-top below must be
-   * recomputed with the same formula to keep the handle aligned. This only works because we reset
-   * margin-top to 0 above: a positive margin-top can't be compensated the same way, since padding
-   * can't go negative to make room for it (see heading level 4's case, where BlockNote's own
-   * target distance is smaller than half of Bootstrap's default heading line height).
+   * On hover, BlockNote positions the block handle (drag handle + "+" button) by anchoring it to
+   * a block's top edge and nudging it down by a fixed offset, hardcoded per block type in
+   * SideMenuController.getBlockOffset() (@blocknote/react): 39px for heading level 1, 27px for
+   * level 2, 18.5px for level 3, 0px for every other type (heading levels 4-6, paragraphs, list
+   * items, quotes). That offset bakes in BlockNote's own default font-size, line-height and
+   * padding as a target distance from a block's top edge to its first line's vertical center:
+   * 54px/42px/33.5px for heading level 1/2/3, 15px otherwise. The font-size and line-height set
+   * above change that distance for every block type restyled here, so each one's padding-top is
+   * set below to keep the distance at the value BlockNote's offset assumes:
+   *   padding-top = <target distance for the type> - (line-height / 2)
+   * A margin-top other than 0 cannot be compensated this way, since padding-top cannot go
+   * negative to make room for it - which is why headings keep margin-top: 0 above. A block type's
+   * padding-top here must be recomputed with this formula whenever its font-size, line-height or
+   * margin changes.
    *
-   * These target ".bn-block-content" explicitly (rather than just the "[data-content-type]"
-   * attribute BlockNote's own Block.css uses) so that they reliably win, regardless of stylesheet
-   * order, over the ".bn-block-content { padding: 0 }" reset in XWikiBlockNote.vue, which has the
-   * same specificity as a bare attribute selector.
+   * These target ".bn-block-content" (not the bare "[data-content-type]" attribute BlockNote's
+   * own Block.css uses) for enough specificity to win over the ".bn-block-content { padding: 0 }"
+   * rule in XWikiBlockNote.vue regardless of stylesheet order.
    */
   & .bn-block-content[data-content-type="heading"] {
     padding-top: calc(
@@ -420,10 +408,10 @@ onUnmounted(() => {
     font-size: var(--cr-font-size-large);
     border-inline-start: 2px solid var(--cr-color-neutral-200);
     padding-inline-start: var(--cr-spacing-large);
-    /* Bootstrap's own "blockquote { padding: 10px 20px; ... }" (type.less) otherwise leaves a
-       stray 10px padding-top on the bare "blockquote" element, on top of the padding-top we set
-       on its ".bn-block-content" wrapper below to align the block handle - throwing it off by
-       that same 10px, for the same reason as the heading margin-top/line-height resets above. */
+    /* Bootstrap's global blockquote rule (type.less) also sets a 10px padding-top directly on
+       the bare "blockquote" element. The padding-top formula above only accounts for its
+       ".bn-block-content" wrapper's own padding-top, so this needs the same reset as the heading
+       margin-top and line-height above. */
     padding-top: 0;
     margin: 0;
   }

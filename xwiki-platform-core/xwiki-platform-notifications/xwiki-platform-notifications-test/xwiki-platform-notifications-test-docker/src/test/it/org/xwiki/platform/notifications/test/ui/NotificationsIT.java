@@ -92,8 +92,9 @@ class NotificationsIT
     // Number of pages that have to be created in order for the notifications badge to show «X+»
     private static final int PAGES_TOP_CREATION_COUNT = 21;
 
-    // Number of times the page of compositeNotifications is updated before the comment is added. The comment itself
-    // updates the page, so the update composite event holds one more event than that.
+    // Number of times the page of compositeNotifications is updated. Adding the comment over REST creates the
+    // comment object without updating the page content, so it produces a comment event of its own and does not add
+    // to the update composite event.
     private static final int PAGE_UPDATE_COUNT = 21;
 
     private static final String SYSTEM = "org.xwiki.platform";
@@ -155,13 +156,10 @@ class NotificationsIT
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
 
-        // The user 1 creates a new page, the user 2 shouldn’t receive any notification. Only the user 2 logs in:
-        // the pages of the user 1 are created over REST, since the subject of this test is the notification tray of
-        // the user 2, not the page creation itself.
+        // The user 1 creates a new page, the user 2 shouldn’t receive any notification
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         String space = testReference.getLastSpaceReference().getName();
-        setup.rest().runAs(FIRST_USER_CREDENTIALS,
-            rest -> rest.savePage(new LocalDocumentReference(space, "WebHome"),
-                "Content from " + FIRST_USER_NAME, "Page title"));
+        setup.createPage(space, "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
 
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         setup.gotoPage(space, "WebHome");
@@ -185,17 +183,15 @@ class NotificationsIT
         notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
 
         // We create a lot of pages in order to test the notification badge
-        setup.rest().runAs(FIRST_USER_CREDENTIALS, rest -> {
-            for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
-                LocalDocumentReference page = new LocalDocumentReference(space, "Page" + i);
-                // Make sure the page is created, and not updated, so that a "create" event is sent.
-                rest.delete(page);
-                rest.savePage(page, "Simple content", "Simple title");
-            }
-            rest.savePage(new LocalDocumentReference(space, "DTP"), "Deletion test page", "Deletion test content");
-        });
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
+            setup.deletePage(space, "Page" + i);
+            setup.createPage(space, "Page" + i, "Simple content", "Simple title");
+        }
+        setup.createPage(space, "DTP", "Deletion test page", "Deletion test content");
 
         // Check that the badge is showing «20+»
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         setup.gotoPage(space, "WebHome");
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
             PAGES_TOP_CREATION_COUNT);
@@ -237,9 +233,10 @@ class NotificationsIT
         p.setEventTypeState(SYSTEM, DELETE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
         // Delete the "Deletion test page" and test the notification
-        setup.rest().runAs(FIRST_USER_CREDENTIALS,
-            rest -> rest.delete(new LocalDocumentReference(space, "DTP")));
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        setup.deletePage(space, "DTP");
 
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         setup.gotoPage(space, "WebHome");
         // Ensure the notification has been received.
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 1);
@@ -307,20 +304,25 @@ class NotificationsIT
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 2);
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
-        assertEquals("Linux as a title", tray.getNotificationPage(0));
+        // The comment is added right after the last page update, so the comment event and the page-update
+        // composite event share the same instant and the tray returns them in either order, just as the RSS feed
+        // does (see XWIKI-21059). Match them by type rather than by position.
+        int commentIndex = getNotificationIndex(tray, ADD_COMMENT);
+        int updateIndex = getNotificationIndex(tray, UPDATE);
+
+        assertEquals("Linux as a title", tray.getNotificationPage(commentIndex));
         String expectedComment = String.format("commented by %s", FIRST_USER_NAME);
-        String obtainedComment = tray.getNotificationDescription(0);
+        String obtainedComment = tray.getNotificationDescription(commentIndex);
         assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
             + "Actual description: [%s]", expectedComment, obtainedComment));
-        assertEquals("Linux as a title", tray.getNotificationPage(1));
-        assertEquals("update", tray.getNotificationType(1));
+        assertEquals("Linux as a title", tray.getNotificationPage(updateIndex));
         expectedComment = String.format("edited by %s", FIRST_USER_NAME);
-        obtainedComment = tray.getNotificationDescription(1);
+        obtainedComment = tray.getNotificationDescription(updateIndex);
         assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
             + "Actual description: [%s]", expectedComment, obtainedComment));
         GroupedNotificationElementPage groupedNotificationsPage = tray.getGroupedNotificationsPage();
-        groupedNotificationsPage.openGroup(1);
-        assertEquals(PAGE_UPDATE_COUNT + 1, groupedNotificationsPage.getNumberOfElements(1));
+        groupedNotificationsPage.openGroup(updateIndex);
+        assertEquals(PAGE_UPDATE_COUNT, groupedNotificationsPage.getNumberOfElements(updateIndex));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         notificationsRSS.loadEntries(setup);
@@ -545,6 +547,23 @@ class NotificationsIT
 
         assertTrue(notificationsContainerElement.getNotificationPage(4).startsWith("Profile of "));
         assertTrue(notificationsContainerElement.getNotificationPage(5).startsWith("Profile of "));
+    }
+
+    /**
+     * @param tray the notification tray to search
+     * @param type the type of the notification to find, for instance {@code update} or {@code addComment}
+     * @return the index of the first notification of that type in the tray
+     */
+    private static int getNotificationIndex(NotificationsTrayPage tray, String type)
+    {
+        int count = tray.getNotificationsListCount();
+        for (int i = 0; i < count; i++) {
+            if (type.equals(tray.getNotificationType(i))) {
+                return i;
+            }
+        }
+        throw new AssertionError(
+            String.format("No notification of type [%s] among the [%s] notifications of the tray.", type, count));
     }
 
     private SyndEntry getEntryByTitle(NotificationsRSS rss, String title)

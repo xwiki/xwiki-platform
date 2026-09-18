@@ -280,7 +280,7 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * @return whether the pagination is shown when there is a single page of entries
+     * @return whether the pagination is shown when the live data has a single page of entries
      * @since 18.9.0RC1
      */
     @Unstable
@@ -290,10 +290,13 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * Sets whether the pagination is shown when there is a single page of entries.
+     * Sets whether the pagination is shown when the live data has a single page of entries. The decision is taken
+     * when the entries are loaded and the pagination is kept once it has been displayed, so that the controls it
+     * holds, such as the page size selector, cannot disappear while the user works with the live data.
      *
      * @param showPaginationOnSinglePage {@code true} to show the pagination on a single page, {@code false} to show
-     *     it only when there are several pages, {@code null} to inherit from the default configuration
+     *     it only once the entries span more than one page, {@code null} to inherit from the default configuration,
+     *     which shows it
      * @since 18.9.0RC1
      */
     @Unstable

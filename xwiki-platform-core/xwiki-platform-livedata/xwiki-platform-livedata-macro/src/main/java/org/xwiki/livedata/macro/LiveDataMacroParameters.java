@@ -166,7 +166,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
      */
     @Override
     @Unstable
-    @PropertyDescription("Show or hide the page list that allows the user to switch pages when there is only one page.")
+    @PropertyDescription("Show or hide the pagination when the live data has a single page of entries.")
     @PropertyAdvanced
     public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)
     {

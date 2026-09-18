@@ -330,6 +330,7 @@ class LiveDataMacroTest
         LiveDataPaginationConfiguration pagination = this.liveDataConfiguration.getMeta().getPagination();
         pagination.setPageSizes(List.of(10, 15, 25, 50));
         pagination.setShowPageSizeDropdown(true);
+        pagination.setShowPaginationOnSinglePage(false);
 
         this.liveDataConfiguration.getMeta().setDescription("A description");
 
@@ -350,6 +351,7 @@ class LiveDataMacroTest
         parameters.setOffset(20L);
         parameters.setLayouts("table, cards");
         parameters.setShowPageSizeDropdown(true);
+        parameters.setShowPaginationOnSinglePage(false);
         parameters.setPageSizes("15, 25, 50");
         parameters.setDescription("A description");
 

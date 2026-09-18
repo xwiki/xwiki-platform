@@ -19,6 +19,10 @@
  */
 package org.xwiki.annotation;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.function.Consumer;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +62,7 @@ import org.xwiki.xml.html.script.HTMLScriptService;
 
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -110,6 +115,8 @@ class AnnotationCodeMacrosPageTest extends PageTest
     private static final DocumentReference COMMENTS_CLASS = new DocumentReference("xwiki", "XWiki", "XWikiComments");
 
     private static final DocumentReference TARGET = new DocumentReference("xwiki", "Space", "Target");
+
+    private static final DocumentReference AUTHOR = new DocumentReference("xwiki", "XWiki", "Author");
 
     // Required by DefaultIOService, but not exercised since the tested annotations carry no uploaded files.
     @MockComponent
@@ -207,18 +214,77 @@ class AnnotationCodeMacrosPageTest extends PageTest
 
     @ParameterizedTest
     @ValueSource(strings = { "view", "edit", "create" })
-    void closeButtonIsDisplayedWhenTheAnnotationCanBeDismissed(String mode) throws Exception
+    void annotationIsDisplayedForTheBubble(String mode) throws Exception
     {
-        assertNotNull(renderAnnotation(mode).selectFirst(".annotation-bubble-close button"),
+        Element annotation = renderAnnotation(mode);
+
+        assertNotNull(annotation.selectFirst(".annotation-bubble-close button"),
             String.format("The close button was not rendered in the [%s] mode", mode));
+        assertNotNull(annotation.selectFirst(".annotation-bubble-avatar img.avatar_30"),
+            String.format("The [%s] mode did not keep the compact avatar", mode));
     }
 
     @Test
-    void closeButtonIsNotDisplayedInListMode() throws Exception
+    void annotationIsDisplayedForTheAnnotationsTab() throws Exception
     {
-        // The list mode displays the annotation inside the Annotations tab, where there is nothing to close.
-        assertNull(renderAnnotation("list").selectFirst(".annotation-bubble-close"),
+        updateStoredAnnotation(object -> object.setDateValue("date",
+            new GregorianCalendar(2026, Calendar.SEPTEMBER, 17, 15, 43).getTime()));
+
+        Element annotation = renderAnnotation("list");
+
+        // The tab displays the annotation inside the Annotations tab, where there is nothing to close and where the
+        // author line is the one of a comment: a 50px avatar, which has to be asked for since a CSS cap cannot
+        // enlarge the 30px image the bubble requests.
+        assertNull(annotation.selectFirst(".annotation-bubble-close"),
             "The close button was rendered in the list mode");
+        assertNotNull(annotation.selectFirst(".annotation-bubble-avatar img.avatar_50"),
+            "The Annotations tab did not request the avatar size of a comment");
+        // Without a dateformat preference, an afternoon time must not be displayed as the matching morning one.
+        assertEquals("17/09/2026 15:43", annotation.selectFirst("time.annotationDate").text());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "list", "edit", "create" })
+    void toolboxMatchesTheMode(String mode) throws Exception
+    {
+        this.context.setUserReference(AUTHOR);
+
+        Element tools = renderAnnotation(mode).selectFirst(".annotation-bubble-tools");
+
+        assertNotNull(tools, String.format("The toolbox was not rendered in the [%s] mode", mode));
+        if ("create".equals(mode)) {
+            // The annotation doesn't exist yet, so there is nothing to act on.
+            assertEquals(0, tools.select("a, button").size(), "The toolbox rendered actions in the create mode");
+        } else if ("edit".equals(mode)) {
+            // Editing already, and the edit form wraps the annotation in a form that a delete form cannot nest in.
+            assertNull(tools.selectFirst("a.edit"), "The edit button was rendered in the edit form");
+            assertNull(tools.selectFirst(".delete"), "The delete action was rendered in the edit form");
+            assertNull(tools.selectFirst("form"), "A delete form was nested in the edit form");
+        } else {
+            assertNotNull(tools.selectFirst("a.edit"),
+                String.format("The edit button was not rendered in the [%s] mode", mode));
+            assertNotNull(tools.selectFirst("form.delete-form button.delete"),
+                String.format("The delete form was not rendered in the [%s] mode", mode));
+        }
+        assertNull(tools.selectFirst("a.validate"),
+            String.format("The validate button was rendered in the [%s] mode for an annotation that didn't move",
+                mode));
+    }
+
+    @Test
+    void validateIsDisplayedForAnAnnotationMovedByAPageEdit() throws Exception
+    {
+        updateStoredAnnotation(object -> object.setStringValue("state", "UPDATED"));
+
+        assertNotNull(renderAnnotation("view").selectFirst(".annotation-bubble-tools a.validate"),
+            "The validate button was not rendered for an annotation moved by a page edit");
+    }
+
+    private void updateStoredAnnotation(Consumer<BaseObject> update) throws Exception
+    {
+        XWikiDocument target = this.xwiki.getDocument(TARGET, this.context);
+        update.accept(target.getXObject(COMMENTS_CLASS, 0));
+        this.xwiki.saveDocument(target, this.context);
     }
 
     private Element renderAnnotation(String mode) throws Exception

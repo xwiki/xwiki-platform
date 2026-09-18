@@ -241,14 +241,16 @@ class NotificationsIT
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.OFF);
         p.setEventTypeState(SYSTEM, DELETE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
-        // Delete the "Deletion test page" and test the notification. The deletion goes through the browser and not
-        // over REST, because the date of the event has no milliseconds while the date from which the preference
-        // enabled just above applies has some: a deletion happening within that same second produces an event that
-        // is dated before the preference, and so is filtered out.
-        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        setup.deletePage(space, "DTP");
+        // The date of a deletion event has no milliseconds, while the date from which the preference enabled just
+        // above applies has some: an event fired within that same second is dated before the preference, and the
+        // notification is then filtered out. Wait for the next second, which is the granularity of the event dates
+        // and not an asynchronous operation, so there is nothing to poll on.
+        Thread.sleep(1000);
 
-        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        // Delete the "Deletion test page" and test the notification
+        setup.rest().runAs(FIRST_USER_CREDENTIALS,
+            rest -> rest.delete(new LocalDocumentReference(space, "DTP")));
+
         setup.gotoPage(space, "WebHome");
         // Ensure the notification has been received.
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 1);

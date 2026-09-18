@@ -32,4 +32,9 @@ export interface ActionDescriptor {
    * given entry.
    */
   allowProperty?: string;
+  /**
+   * For the `addEntry` action, where the new entries are created.
+   * @since 18.9.0RC1
+   */
+  location?: string;
 }

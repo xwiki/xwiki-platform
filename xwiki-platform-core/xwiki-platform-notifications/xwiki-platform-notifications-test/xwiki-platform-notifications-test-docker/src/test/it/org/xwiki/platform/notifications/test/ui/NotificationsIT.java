@@ -157,10 +157,13 @@ class NotificationsIT
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
 
-        // The user 1 creates a new page, the user 2 shouldn’t receive any notification
-        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        // The user 1 creates a new page, the user 2 shouldn’t receive any notification. Only the user 2 logs in:
+        // the pages of the user 1 are created over REST, since the subject of this test is the notification tray of
+        // the user 2, not the page creation itself.
         String space = testReference.getLastSpaceReference().getName();
-        setup.createPage(space, "WebHome", "Content from " + FIRST_USER_NAME, "Page title");
+        setup.rest().runAs(FIRST_USER_CREDENTIALS,
+            rest -> rest.savePage(new LocalDocumentReference(space, "WebHome"),
+                "Content from " + FIRST_USER_NAME, "Page title"));
 
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         setup.gotoPage(space, "WebHome");
@@ -183,7 +186,11 @@ class NotificationsIT
         ), notificationsWatchModal.getAvailableOptions());
         notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
 
-        // We create a lot of pages in order to test the notification badge
+        // We create a lot of pages in order to test the notification badge. They are created through the browser and
+        // not over REST, because the date of a page event is the date of the page, which has no milliseconds: over REST
+        // many pages are created within the same second, so the tray orders their notifications arbitrarily. Marking
+        // a notification as read re-indexes its event, which can then move behind the others of the same second, out
+        // of the 10 notifications displayed by the tray.
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
             setup.deletePage(space, "Page" + i);
@@ -234,10 +241,9 @@ class NotificationsIT
         p.setEventTypeState(SYSTEM, DELETE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
         // Delete the "Deletion test page" and test the notification
-        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        setup.deletePage(space, "DTP");
+        setup.rest().runAs(FIRST_USER_CREDENTIALS,
+            rest -> rest.delete(new LocalDocumentReference(space, "DTP")));
 
-        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         setup.gotoPage(space, "WebHome");
         // Ensure the notification has been received.
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 1);

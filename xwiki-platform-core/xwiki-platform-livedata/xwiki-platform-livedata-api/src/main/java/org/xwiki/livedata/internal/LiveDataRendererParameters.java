@@ -21,6 +21,7 @@ package org.xwiki.livedata.internal;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for {@link LiveDataRenderer}.
@@ -53,6 +54,8 @@ public class LiveDataRendererParameters
     private String pageSizes;
 
     private String description;
+
+    private Boolean showPaginationOnSinglePage;
 
     /**
      * @return the Live Data instance id
@@ -276,6 +279,32 @@ public class LiveDataRendererParameters
         this.description = description;
     }
 
+    /**
+     * @return whether the pagination is shown when the live data has a single page of entries
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public Boolean getShowPaginationOnSinglePage()
+    {
+        return this.showPaginationOnSinglePage;
+    }
+
+    /**
+     * Sets whether the pagination is shown when the live data has a single page of entries. The decision is taken
+     * when the entries are loaded and the pagination is kept once it has been displayed, so that the controls it
+     * holds, such as the page size selector, cannot disappear while the user works with the live data.
+     *
+     * @param showPaginationOnSinglePage {@code true} to show the pagination on a single page, {@code false} to show
+     *     it only once the entries span more than one page, {@code null} to inherit from the default configuration,
+     *     which shows it
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)
+    {
+        this.showPaginationOnSinglePage = showPaginationOnSinglePage;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -302,6 +331,7 @@ public class LiveDataRendererParameters
             .append(this.showPageSizeDropdown, that.showPageSizeDropdown)
             .append(this.pageSizes, that.pageSizes)
             .append(this.description, that.description)
+            .append(this.showPaginationOnSinglePage, that.showPaginationOnSinglePage)
             .isEquals();
     }
 
@@ -321,6 +351,7 @@ public class LiveDataRendererParameters
             .append(this.showPageSizeDropdown)
             .append(this.pageSizes)
             .append(this.description)
+            .append(this.showPaginationOnSinglePage)
             .toHashCode();
     }
 }

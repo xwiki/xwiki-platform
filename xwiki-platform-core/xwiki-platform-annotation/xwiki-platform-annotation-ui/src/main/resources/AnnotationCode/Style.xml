@@ -409,10 +409,7 @@ mark.annotation:not(.annotation-highlight) {
   background-image: #imgURL('note_add');
 }
 
-/* Annotations list (extra-tab).
-   The Annotations tab sits next to the Comments tab and uses the same author line, so it reuses the gutter of a
-   comment: the annotation reserves the space with a padding and the avatar is pulled into it, exactly like
-   .reply and .commentavatar do in comments.css. */
+/* Annotations list (extra-tab) */
 #allAnnotations .annotation {
   margin: 0 0 8px;
   padding-left: 60px;
@@ -425,12 +422,6 @@ mark.annotation:not(.annotation-highlight) {
     padding-top: 5px;
     text-align: center;
     width: 50px;
-
-    /* Cap the 50px avatar the tab asks for, overriding the 30px the bubble avatar is capped to. */
-    img {
-      max-height: 50px;
-      max-width: 50px;
-    }
   }
 }
 

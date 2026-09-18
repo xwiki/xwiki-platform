@@ -271,7 +271,6 @@
  * @param $docRef the reference of the annotated document
  *#
 #macro(displayAnnotationToolboxFromReference $ann $mode $docRef)
-  ## There is nothing to act on while an annotation is being created: $ann.id doesn't exist yet.
   #if ($mode != 'create')
   ## xwikivars.vm binds $hasAdmin/$hasEdit for the Comments tab but not for the annotation bubble, which
   ## fetches its content through the "get" action, so compute the rights here against $docRef instead of
@@ -301,8 +300,7 @@
     #set($replyFallbackURL = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
     #getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $replyFallbackURL, $xredirect)
     #set($isUserComment = "$!ann.get('author')" != '' &amp;&amp; $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
-    ## The thread toggle, the reply and the share buttons hand over to the Comments tab, which only the bubble
-    ## forwards them to, so the Annotations tab and the edit form leave them out.
+    ## Only the bubble forwards these three to the Comments tab.
     #if($mode == 'view' &amp;&amp; $threadCount &gt; 0)
       &lt;button class="thread-toggle btn btn-default infomessage"&gt;
         $services.icon.renderHTML('comments') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
@@ -330,9 +328,8 @@
       $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
       &lt;/a&gt;##
     #end
-    ## Not in the edit form: it already wraps the annotation in a &lt;form&gt;, and HTML drops a nested one, which would
-    ## leave this button submitting the edit form. The annotation REST API would be the way around that, the way the
-    ## other annotation classes delete below, but its delete fails without a request body.
+    ## Not in the edit form, which already wraps the annotation in a &lt;form&gt;: HTML drops a nested one and the
+    ## button would submit the edit form instead.
     #if ($mode != 'edit' &amp;&amp; ($annHasAdmin || ($annHasEdit &amp;&amp; $isUserComment)))
       ## Delete mutates state, so it's a real POST form (not a link) - a link's href can be followed by a
       ## crawler, prefetched, opened in a new tab, or navigated to directly if JavaScript never attaches.

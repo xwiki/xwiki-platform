@@ -26,7 +26,7 @@ package org.xwiki.eventstream;
  * @since 16.0.0RC1
  */
 // Old interface not describing a type, hard to remove for backward-compatibility reasons.
-@SuppressWarnings("checkstyle:InterfaceIsType")
+@SuppressWarnings({"checkstyle:InterfaceIsType", "java:S1214"})
 public interface DocumentEventType
 {
     /**

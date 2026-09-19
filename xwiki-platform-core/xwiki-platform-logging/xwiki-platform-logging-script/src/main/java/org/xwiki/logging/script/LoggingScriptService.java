@@ -204,7 +204,7 @@ public class LoggingScriptService implements ScriptService
     public void deprecate(String loggerName, String message)
     {
         if (this.loggerConfiguration.isDeprecatedLogEnabled()) {
-            this.getLogger(loggerName).warn("[DEPRECATED] " + message);
+            this.getLogger(loggerName).warn("[DEPRECATED] {}", message);
         }
     }
 }

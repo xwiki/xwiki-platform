@@ -494,6 +494,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return this.updateFeed("", feedname, feedurl, fullContent, oneDocPerEntry, force, space, context);
     }
 
+    // Published API of the feed plugin, also reachable from wiki scripts: the signature cannot change.
+    @SuppressWarnings("java:S107")
     public int updateFeed(String feedDocumentName, String feedname, String feedurl, boolean fullContent,
         boolean oneDocPerEntry, boolean force, String space, XWikiContext context)
     {
@@ -520,6 +522,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return -1;
     }
 
+    // Private helper carrying the parameter list of the published updateFeed(...) that delegates to it.
+    @SuppressWarnings("java:S107")
     private int saveFeed(String feedDocumentName, String feedname, String feedurl, SyndFeed feed, boolean fullContent,
         boolean oneDocPerEntry, boolean force, String space, XWikiContext context) throws XWikiException
     {
@@ -1026,6 +1030,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     /**
      * @see FeedPluginApi#getFeedOutput(String, int, int, SyndEntrySourceApi, Map, Map, String)
      */
+    // Published API of the feed plugin, also reachable from wiki scripts: the signature cannot change.
+    @SuppressWarnings("java:S107")
     public String getFeedOutput(String query, int count, int start, SyndEntrySource source,
         Map<String, Object> sourceParams, Map<String, Object> metadata, String type, XWikiContext context)
         throws XWikiException

@@ -36,6 +36,8 @@ import org.xwiki.rest.model.jaxb.SearchResult;
 @Role
 public interface SearchSource
 {
+    // Published component role implemented outside this module: the parameters are the REST search query parameters.
+    @SuppressWarnings("java:S107")
     List<SearchResult> search(String query, String wikiName, String wikis, boolean hasProgrammingRights,
         String orderField, String order, boolean distinct, int number, int start, Boolean withPrettyNames,
         String className, UriInfo uriInfo) throws Exception;

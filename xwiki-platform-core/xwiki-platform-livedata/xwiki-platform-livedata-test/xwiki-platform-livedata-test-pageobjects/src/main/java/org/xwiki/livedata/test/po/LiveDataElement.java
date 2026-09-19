@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -132,30 +134,113 @@ public class LiveDataElement extends BaseElement
     /**
      * Check if the livedata supports edit mode.
      *
-     * @return {@code true} if the "Edit mode" toggle is available in the dropdown menu, {@code false} otherwise
+     * @return {@code true} if the edit mode button is available in the top bar, {@code false} otherwise
      * @since 18.7.0RC1
      */
     public boolean hasEditModeAction()
     {
-        WebElement dropdownMenu = openDropDownMenu();
-        boolean present = dropdownMenu.findElements(By.cssSelector(".livedata-action-edit-mode"))
+        return getRootElement().findElements(By.cssSelector(".livedata-edit-button"))
             .stream().anyMatch(WebElement::isDisplayed);
-        // Close the dropdown menu back so it doesn't overlap the layout.
-        dropdownMenu.click();
-        return present;
     }
 
     /**
      * Toggle edit mode.
-     * 
+     *
      * @since 18.7.0RC1
      */
     public void toggleEditMode()
     {
+        getRootElement().findElement(By.cssSelector(".livedata-edit-button")).click();
+    }
+
+    /**
+     * Check if edit mode is currently enabled. The edit mode button stays pressed as long as the user is in edit mode.
+     * Only a Live Data whose source supports the edit mode displays that button, so call {@link #hasEditModeAction()}
+     * first when the source is not known to support it.
+     *
+     * @return {@code true} if edit mode is enabled, {@code false} otherwise
+     * @throws NoSuchElementException if the Live Data does not offer the edit mode
+     * @since 18.9.0RC1
+     */
+    public boolean isEditMode()
+    {
+        WebElement editModeButton = getRootElement().findElement(By.cssSelector(".livedata-edit-button"));
+        return Boolean.parseBoolean(editModeButton.getDomAttribute("aria-pressed"))
+            && Arrays.asList(editModeButton.getDomAttribute("class").split("\\s+")).contains("active");
+    }
+
+    /**
+     * Toggle the maximized view from the actions menu. The maximized view displays the Live Data over the rest of the
+     * page.
+     *
+     * @since 18.9.0RC1
+     */
+    public void toggleMaximized()
+    {
+        openDropDownMenu().findElement(By.cssSelector(".livedata-action-maximize")).click();
+    }
+
+    /**
+     * @return the label of the action toggling the maximized view, which describes the view the user switches to
+     *     (e.g., "Maximize" or "Minimize")
+     * @since 18.9.0RC1
+     */
+    public String getMaximizedActionLabel()
+    {
         WebElement dropdownMenu = openDropDownMenu();
-        dropdownMenu.findElement(By.cssSelector(".livedata-action-edit-mode input[type='checkbox']")).click();
+        String label = dropdownMenu.findElement(By.cssSelector(".livedata-action-maximize")).getText();
         // Close the dropdown menu back so it doesn't overlap the layout.
-        dropdownMenu.click();
+        dropdownMenu.findElement(By.cssSelector(".dropdown-toggle")).click();
+        return label;
+    }
+
+    /**
+     * Check that the icon of the action toggling the maximized view is known by the current icon theme. An icon name
+     * that the theme does not map is displayed as an empty placeholder.
+     *
+     * @return {@code true} if the action displays an actual icon, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean hasMaximizedActionIcon()
+    {
+        WebElement dropdownMenu = openDropDownMenu();
+        // The placeholder is expected to be absent, so looking for it must not wait for it to appear.
+        boolean resolved = !getDriver().hasElementWithoutWaiting(dropdownMenu,
+            By.cssSelector(".livedata-action-maximize .icon-placeholder"));
+        // Close the dropdown menu back so it doesn't overlap the layout.
+        dropdownMenu.findElement(By.cssSelector(".dropdown-toggle")).click();
+        return resolved;
+    }
+
+    /**
+     * @return {@code true} if the Live Data is displayed over the rest of the page, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean isMaximized()
+    {
+        return getDriver().hasElementWithoutWaiting(getRootElement(),
+            By.cssSelector(".xwiki-livedata.livedata-maximized"));
+    }
+
+    /**
+     * Wait until the Live Data enters or leaves the maximized view.
+     *
+     * @param maximized {@code true} to wait for the maximized view, {@code false} to wait for the normal view
+     * @since 18.9.0RC1
+     */
+    public void waitUntilMaximized(boolean maximized)
+    {
+        getDriver().waitUntilCondition(input -> isMaximized() == maximized);
+    }
+
+    /**
+     * Press the escape key, which exits the maximized view when no other component consumes it.
+     *
+     * @since 18.9.0RC1
+     */
+    public void pressEscape()
+    {
+        new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
     }
 
     /**

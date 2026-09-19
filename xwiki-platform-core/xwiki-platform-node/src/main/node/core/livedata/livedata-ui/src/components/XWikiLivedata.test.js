@@ -23,12 +23,56 @@ import { shallowMount } from "@vue/test-utils";
 import flushPromises from "flush-promises";
 import jQuery from "jquery";
 import _ from "lodash-es";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ref } from "vue";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { nextTick, ref } from "vue";
 
 vi.mock("./services/LiveDataLogic", () => ({
   LiveDataLogic: vi.fn(),
 }));
+
+const MAXIMIZED_CLASS = "livedata-maximized";
+
+// The escape key is listened to on the document, because the focus can be on any element of the
+// maximized Live Data. We count those listeners to check that they are only registered while
+// maximized.
+let keydownListeners;
+
+/**
+ * @returns the number of keydown listeners currently registered on the document
+ */
+function countKeydownListeners() {
+  return keydownListeners;
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+
+  keydownListeners = 0;
+  const addEventListener = document.addEventListener.bind(document);
+  const removeEventListener = document.removeEventListener.bind(document);
+  vi.spyOn(document, "addEventListener").mockImplementation(
+    (type, ...parameters) => {
+      if (type === "keydown") {
+        keydownListeners++;
+      }
+      addEventListener(type, ...parameters);
+    },
+  );
+  vi.spyOn(document, "removeEventListener").mockImplementation(
+    (type, ...parameters) => {
+      if (type === "keydown") {
+        keydownListeners--;
+      }
+      removeEventListener(type, ...parameters);
+    },
+  );
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  // The tests mounting in the document leave their elements behind otherwise.
+  document.body.innerHTML = "";
+});
 
 /**
  * @param overrides - the properties overriding the default mock logic
@@ -36,6 +80,7 @@ vi.mock("./services/LiveDataLogic", () => ({
  */
 function mockLogic(overrides) {
   const listeners = {};
+  const maximized = ref(false);
   return _.merge(
     {
       listeners,
@@ -47,6 +92,11 @@ function mockLogic(overrides) {
       translationsLoaded: vi.fn().mockResolvedValue(true),
       registerPanel: vi.fn(),
       updateEntries: vi.fn().mockResolvedValue(undefined),
+      // Mirrors LiveDataLogic's own implementation, so that the maximized state actually toggles.
+      isMaximized: vi.fn(() => maximized.value),
+      toggleMaximized: vi.fn(() => {
+        maximized.value = !maximized.value;
+      }),
       t: (key) => key,
       firstEntriesLoading: ref(true),
       currentLayoutId: ref("table"),
@@ -64,9 +114,11 @@ function mockLogic(overrides) {
  * Mount a shallow XWikiLivedata component and let it initialize as far as it can.
  *
  * @param logic - the mock logic the component is expected to create
+ * @param attachTo - an optional element to mount the component into, needed by the tests looking
+ *   at the elements surrounding the Live Data
  * @returns the initialized shallow wrapper
  */
-async function mount(logic) {
+async function mount(logic, attachTo) {
   // The component creates its own logic, which we replace with the mock the test drives.
   LiveDataLogic.mockImplementation(
     class {
@@ -76,6 +128,7 @@ async function mount(logic) {
     },
   );
   const wrapper = shallowMount(XWikiLivedata, {
+    attachTo,
     props: {
       liveDataSource: {},
       data: "{}",
@@ -114,54 +167,216 @@ function instanceReadyData(logic) {
   )?.[1];
 }
 
+/**
+ * Presses a key on the document, where the maximized view listens for the escape key.
+ *
+ * @param key - the key to press
+ */
+async function pressKey(key) {
+  document.dispatchEvent(new KeyboardEvent("keydown", { key }));
+  await nextTick();
+}
+
+/**
+ * Mounts a Live Data in the document, next to an element standing for the rest of the page.
+ *
+ * @param logic - the mock logic the component is expected to create
+ * @returns the mounted wrapper, plus the element displayed next to the Live Data
+ */
+async function mountWithSibling(logic) {
+  const sibling = document.createElement("div");
+  document.body.appendChild(sibling);
+  return { sibling, wrapper: await mount(logic, document.body) };
+}
+
+/**
+ * @param overrides - the properties overriding the default mock logic
+ * @returns the mock logic and the mounted wrapper for a new XWikiLivedata component
+ */
+async function mountWithLogic(overrides) {
+  const logic = mockLogic(overrides);
+  return { logic, wrapper: await mount(logic) };
+}
+
 describe("XWikiLivedata.vue", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  describe("instance readiness", () => {
+    it("Triggers instanceReady once the layout is displayed", async () => {
+      const logic = mockLogic();
+      const wrapper = await mount(logic);
 
-  it("Triggers instanceReady once the layout is displayed", async () => {
-    const logic = mockLogic();
-    const wrapper = await mount(logic);
+      // The live data is not displayed until its layout is loaded.
+      expect(instanceReadyData(logic)).toBeUndefined();
+      expect(wrapper.find(".loading").exists()).toBe(true);
 
-    // The live data is not displayed until its layout is loaded.
-    expect(instanceReadyData(logic)).toBeUndefined();
-    expect(wrapper.find(".loading").exists()).toBe(true);
+      await fireLayoutLoaded(logic);
 
-    await fireLayoutLoaded(logic);
-
-    expect(instanceReadyData(logic)).toStrictEqual({ error: undefined });
-    expect(wrapper.find(".loading").exists()).toBe(false);
-  });
-
-  it("Triggers instanceReady with the error when no layout can be displayed", async () => {
-    const logic = mockLogic();
-    const wrapper = await mount(logic);
-    const error = new Error("Unknown layout [table]");
-
-    await fireLayoutLoaded(logic, { error });
-
-    expect(instanceReadyData(logic)).toStrictEqual({ error });
-    // There's nothing to display in place of the loader, so it keeps running.
-    expect(wrapper.find(".loading").exists()).toBe(true);
-  });
-
-  it("Waits for the entries to be fetched before triggering instanceReady", async () => {
-    let fetchEntries;
-    const logic = mockLogic({
-      updateEntries: vi.fn(
-        () => new Promise((resolve) => (fetchEntries = resolve)),
-      ),
+      expect(instanceReadyData(logic)).toStrictEqual({ error: undefined });
+      expect(wrapper.find(".loading").exists()).toBe(false);
     });
-    await mount(logic);
-    await fireLayoutLoaded(logic);
 
-    // The layout is displayed but the entries are still being fetched.
-    expect(logic.updateEntries).toHaveBeenCalled();
-    expect(instanceReadyData(logic)).toBeUndefined();
+    it("Triggers instanceReady with the error when no layout can be displayed", async () => {
+      const logic = mockLogic();
+      const wrapper = await mount(logic);
+      const error = new Error("Unknown layout [table]");
 
-    fetchEntries();
-    await flushPromises();
+      await fireLayoutLoaded(logic, { error });
 
-    expect(instanceReadyData(logic)).toStrictEqual({ error: undefined });
+      expect(instanceReadyData(logic)).toStrictEqual({ error });
+      // There's nothing to display in place of the loader, so it keeps running.
+      expect(wrapper.find(".loading").exists()).toBe(true);
+    });
+
+    it("Waits for the entries to be fetched before triggering instanceReady", async () => {
+      let fetchEntries;
+      const logic = mockLogic({
+        updateEntries: vi.fn(
+          () => new Promise((resolve) => (fetchEntries = resolve)),
+        ),
+      });
+      await mount(logic);
+      await fireLayoutLoaded(logic);
+
+      // The layout is displayed but the entries are still being fetched.
+      expect(logic.updateEntries).toHaveBeenCalled();
+      expect(instanceReadyData(logic)).toBeUndefined();
+
+      fetchEntries();
+      await flushPromises();
+
+      expect(instanceReadyData(logic)).toStrictEqual({ error: undefined });
+    });
+  });
+
+  describe("maximized view", () => {
+    it("Is not maximized by default", async () => {
+      const wrapper = await mount(mockLogic());
+
+      expect(wrapper.classes()).not.toContain(MAXIMIZED_CLASS);
+    });
+
+    it("Covers the page once maximized", async () => {
+      const logic = mockLogic();
+      const wrapper = await mount(logic);
+
+      logic.toggleMaximized();
+      await nextTick();
+
+      expect(wrapper.classes()).toContain(MAXIMIZED_CLASS);
+    });
+
+    it("Escape exits the maximized view", async () => {
+      const logic = mockLogic();
+      const wrapper = await mount(logic);
+
+      logic.toggleMaximized();
+      await nextTick();
+
+      await pressKey("Escape");
+
+      expect(logic.isMaximized()).toBe(false);
+      expect(wrapper.classes()).not.toContain(MAXIMIZED_CLASS);
+    });
+
+    it("Keys other than escape don't exit the maximized view", async () => {
+      const logic = mockLogic();
+      const wrapper = await mount(logic);
+
+      logic.toggleMaximized();
+      await nextTick();
+
+      await pressKey("Enter");
+
+      expect(wrapper.classes()).toContain(MAXIMIZED_CLASS);
+    });
+
+    it("Only listens to the document while maximized", async () => {
+      const logic = mockLogic();
+      await mount(logic);
+
+      expect(countKeydownListeners()).toBe(0);
+
+      logic.toggleMaximized();
+      await nextTick();
+      expect(countKeydownListeners()).toBe(1);
+
+      logic.toggleMaximized();
+      await nextTick();
+      expect(countKeydownListeners()).toBe(0);
+    });
+
+    it("Stops listening to escape once unmounted", async () => {
+      const logic = mockLogic();
+      const wrapper = await mount(logic);
+
+      logic.toggleMaximized();
+      await nextTick();
+
+      wrapper.unmount();
+      expect(countKeydownListeners()).toBe(0);
+
+      await pressKey("Escape");
+
+      expect(logic.isMaximized()).toBe(true);
+    });
+
+    it("Makes the rest of the page inert while maximized", async () => {
+      const logic = mockLogic();
+      const { sibling } = await mountWithSibling(logic);
+
+      expect(sibling.hasAttribute("inert")).toBe(false);
+
+      logic.toggleMaximized();
+      await nextTick();
+      expect(sibling.hasAttribute("inert")).toBe(true);
+
+      logic.toggleMaximized();
+      await nextTick();
+      expect(sibling.hasAttribute("inert")).toBe(false);
+    });
+
+    it("Leaves the rest of the page inert as it found it", async () => {
+      const logic = mockLogic();
+      const sibling = document.createElement("div");
+      sibling.setAttribute("inert", "");
+      document.body.appendChild(sibling);
+      await mount(logic, document.body);
+
+      logic.toggleMaximized();
+      await nextTick();
+      logic.toggleMaximized();
+      await nextTick();
+
+      // The element was inert before the Live Data was maximized, so it stays inert.
+      expect(sibling.hasAttribute("inert")).toBe(true);
+    });
+
+    it("Restores the rest of the page when unmounted while maximized", async () => {
+      const logic = mockLogic();
+      const { wrapper, sibling } = await mountWithSibling(logic);
+
+      logic.toggleMaximized();
+      await nextTick();
+      expect(sibling.hasAttribute("inert")).toBe(true);
+
+      wrapper.unmount();
+
+      expect(sibling.hasAttribute("inert")).toBe(false);
+    });
+
+    it("Escape only exits the maximized Live Data when several are displayed", async () => {
+      const first = await mountWithLogic();
+      const second = await mountWithLogic();
+
+      second.logic.toggleMaximized();
+      await nextTick();
+      // Only the maximized Live Data listens to the document.
+      expect(countKeydownListeners()).toBe(1);
+
+      await pressKey("Escape");
+
+      expect(second.logic.isMaximized()).toBe(false);
+      expect(first.logic.isMaximized()).toBe(false);
+      expect(first.wrapper.classes()).not.toContain(MAXIMIZED_CLASS);
+    });
   });
 });

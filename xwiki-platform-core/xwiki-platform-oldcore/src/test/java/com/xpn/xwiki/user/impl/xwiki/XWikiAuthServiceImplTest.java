@@ -26,6 +26,8 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.stubbing.Answer;
 import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -142,6 +144,35 @@ class XWikiAuthServiceImplTest
         Principal principal = this.authService.authenticate(XWikiRightService.SUPERADMIN_USER, "pass",
             this.oldcore.getXWikiContext());
 
+        assertNotNull(principal);
+        assertEquals(XWikiRightService.SUPERADMIN_USER_FULLNAME, principal.getName());
+    }
+
+    /**
+     * The superadmin user is virtual and has no user document: it is only ever authenticated against the password
+     * from the configuration, whatever the spelling used to enter its name.
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "superadmin", "SUPERADMIN", "XWiki.superadmin", "xwiki:XWiki.superadmin",
+        "xwiki:superadmin", "\\.superadmin", "Zz\\.superadmin" })
+    void authenticateWithSuperAdminWhenAUserDocumentExistsAtItsReference(String username) throws Exception
+    {
+        // Set up a user document at the superadmin reference, which is never supposed to be used to authenticate.
+        XWikiDocument userDoc = new XWikiDocument(
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "superadmin"));
+        BaseObject userObject =
+            userDoc.newXObject(new LocalDocumentReference("XWiki", "XWikiUsers"), this.oldcore.getXWikiContext());
+        userObject.setPasswordValue("password", "docpass");
+        this.oldcore.getSpyXWiki().saveDocument(userDoc, this.oldcore.getXWikiContext());
+
+        // The superadmin password is turned off, so nothing can authenticate as superadmin.
+        assertNull(this.authService.authenticate(username, "docpass", this.oldcore.getXWikiContext()));
+
+        // Once the superadmin password is configured, only it authenticates as superadmin.
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.superadminpassword", "configpass");
+        assertNull(this.authService.authenticate(username, "docpass", this.oldcore.getXWikiContext()));
+
+        Principal principal = this.authService.authenticate(username, "configpass", this.oldcore.getXWikiContext());
         assertNotNull(principal);
         assertEquals(XWikiRightService.SUPERADMIN_USER_FULLNAME, principal.getName());
     }

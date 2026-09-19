@@ -133,7 +133,7 @@ public class UserPreferencesConfigurationSource extends AbstractSystemOverwriteC
     {
         ConfigurationSource configurationSource;
         UserReference userReference = this.userReferenceResolver.resolve(getCurrentUserDocumentReference());
-        if (SuperAdminUserReference.INSTANCE == userReference) {
+        if (SuperAdminUserReference.isSuperAdmin(userReference)) {
             configurationSource = this.superAdminConfigurationSource;
         } else if (GuestUserReference.INSTANCE == userReference) {
             configurationSource = this.guestConfigurationSource;

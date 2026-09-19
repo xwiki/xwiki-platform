@@ -43,24 +43,37 @@ def builds = [
     )
   },
   'Distribution' : {
-    build(
-      name: 'Distribution',
-      profiles: 'legacy,integration-tests,snapshot',
-      pom: 'xwiki-platform-distribution/pom.xml'
-    )
+    build(distributionSpec())
   },
-  'Flavor Test - POM' : {
-    buildFunctionalTest(
-      name: 'Flavor Test - POM',
-      pom: 'pom.xml',
-      properties: '-N'
-    )
-  },
-  'Flavor Test - PageObjects' : {
-    buildFunctionalTest(
-      name: 'Flavor Test - PageObjects',
-      pom: 'xwiki-platform-distribution-flavor-test-pageobjects/pom.xml'
-    )
+  // Builds the distribution and everything the functional (flavor) tests need, all on a SINGLE node. These are short,
+  // strictly sequential steps; building each on its own node pays the agent acquisition + checkout + queue-wait cost
+  // several times over and risks being starved by the parallel integration tests while waiting for a node.
+  'Distribution and Flavor Test Setup' : {
+    node() {
+      // Build the distributions.
+      buildInsideNode(distributionSpec())
+      // Build the Flavor Test POM, required for the pageobjects module below. We reuse the workspace checked out
+      // above (skipCheckout) instead of acquiring a fresh node.
+      buildInsideNode(functionalTestSpec(
+        name: 'Flavor Test - POM',
+        pom: 'pom.xml',
+        properties: '-N'
+      ) + [skipCheckout: true])
+      // Build the Flavor Test PageObjects required by the functional tests that need an XWiki UI.
+      buildInsideNode(functionalTestSpec(
+        name: 'Flavor Test - PageObjects',
+        pom: 'xwiki-platform-distribution-flavor-test-pageobjects/pom.xml'
+      ) + [skipCheckout: true])
+      // The flavor upgrade tests are heavy and run once per day in the environment test build rather than on every
+      // commit (see JenkinsfileEnvironmentTests). Here we only build and *deploy* their modules, without executing
+      // them (-DskipTests also skips the large distribution/data unpacks, since xwiki.test.skipUnpack defaults to
+      // skipTests), so that their SNAPSHOTs are published alongside the other flavor modules.
+      buildInsideNode(functionalTestSpec(
+        name: 'Flavor Test - Upgrade (deploy only)',
+        pom: 'xwiki-platform-distribution-flavor-test-upgrade/pom.xml',
+        properties: '-DskipTests -DskipITs'
+      ) + [skipCheckout: true])
+    }
   },
   'Flavor Test - UI' : {
     buildFunctionalTest(
@@ -84,12 +97,6 @@ def builds = [
     buildFunctionalTest(
       name: 'Flavor Test - Escaping',
       pom: 'xwiki-platform-distribution-flavor-test-escaping/pom.xml'
-    )
-  },
-  'Flavor Test - Upgrade' : {
-    buildFunctionalTest(
-      name: 'Flavor Test - Upgrade',
-      pom: 'xwiki-platform-distribution-flavor-test-upgrade/pom.xml'
     )
   },
   'Flavor Test - Webstandards' : {
@@ -186,18 +193,11 @@ private void buildStandardAll(builds)
           //   since failures can be test flickers for ex, and it could still be interesting to get a distribution to
           //   test xwiki manually.
 
-          // Build the distributions
-          builds['Distribution'].call()
+          // Build the distribution and everything the functional tests need (all on a single node - see the
+          // 'Distribution and Flavor Test Setup' build definition for the rationale) before running the tests.
+          builds['Distribution and Flavor Test Setup'].call()
 
-          // Building the various functional tests, after the distribution has been built successfully.
-
-          // Build the Flavor Test POM, required for the pageobjects module below.
-          builds['Flavor Test - POM'].call()
-
-          // Build the Flavor Test PageObjects required by the functional test below that need an XWiki UI
-          builds['Flavor Test - PageObjects'].call()
-
-          // Now run all tests in parallel
+          // Now run all functional tests in parallel, each on its own node.
           parallel(
             'flavor-test-ui': {
               // Run the Flavor UI tests
@@ -220,10 +220,6 @@ private void buildStandardAll(builds)
               // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
               // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
               builds['Flavor Test - Webstandards'].call()
-            },
-            'flavor-test-upgrade': {
-              // Run the Flavor Upgrade tests
-              builds['Flavor Test - Upgrade'].call()
             },
             'flavor-test-security': {
               // Run the Flavor Security tests
@@ -267,20 +263,8 @@ private void build(map)
 
 private void buildInsideNode(map)
 {
-    // We want to get a memory dump on OOM errors.
-    // Make sure the memory dump directory exists (see below)
-    // Note that the user used to run the job on the agent must have the permission to create these directories
-    // Verify existence of /home/hudsonagent/jenkins_root so that we only set the oomPath if it does
-    def heapDumpPath = ''
-    def exists = fileExists '/home/hudsonagent/jenkins_root'
-    if (exists) {
-        def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
-        sh "mkdir -p \"${oomPath}\""
-        heapDumpPath = "-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
-    }
-
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
+      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${getOOMHeapDumpMavenOpts()}".trim()
       javadoc = false
       if (map.goals != null) {
         goals = map.goals
@@ -326,15 +310,29 @@ private void buildInsideNode(map)
 
 private void buildFunctionalTest(map)
 {
-  def sharedPOMPrefix =
-    'xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-test'
+  build(functionalTestSpec(map))
+}
 
-  build(
-    name: map.name,
-    profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
-    mavenOpts: map.mavenOpts,
-    pom: "${sharedPOMPrefix}/${map.pom}",
+// Build specification (profiles + shared-prefixed pom) shared by all the flavor functional-test builds. Kept separate
+// from buildFunctionalTest() so it can be reused to run several of these builds sequentially on a single node.
+private Map functionalTestSpec(map)
+{
+  return [
+    name      : map.name,
+    profiles  : 'legacy,integration-tests,jetty,hsqldb,firefox',
+    mavenOpts : map.mavenOpts,
+    pom       : "${getFlavorTestPrefix()}/${map.pom}",
     properties: map.properties
-  )
+  ]
+}
+
+// Build specification for the distribution, shared between the 'Distribution' entry and the flavor-test setup node.
+private Map distributionSpec()
+{
+  return [
+    name    : 'Distribution',
+    profiles: 'legacy,integration-tests,snapshot',
+    pom     : 'xwiki-platform-distribution/pom.xml'
+  ]
 }
 

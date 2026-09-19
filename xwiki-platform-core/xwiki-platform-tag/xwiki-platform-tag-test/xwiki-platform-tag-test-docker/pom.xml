@@ -44,6 +44,15 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- The {{groovy}} macro is not part of the minimal WAR but UnsafeTagsSelectorIT uses it to switch the tag right
+         check strategy from within the tests. Declared as a runtime dependency so that the Docker test framework
+         provisions it as an extension into the running XWiki. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

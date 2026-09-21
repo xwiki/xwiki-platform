@@ -343,6 +343,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
                         setMergeConflictAnswer(question.getType(), question.getGlobalAction());
                     }
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     // TODO: log something ?
                 }
             }

@@ -307,6 +307,21 @@ public class AttachmentsPane extends BaseElement
     }
 
     /**
+     * Waits until the attachments count displayed next to the "Attachments" document extra tab reaches the passed
+     * value. Once an upload is done, that count is refreshed asynchronously, at the very end of a chain that also
+     * refreshes the attachments live data and rewrites the "Attachments" entry of the "More actions" menu. Waiting
+     * for the count is thus how a test makes sure the upload is completely over before interacting with the page
+     * again, and it is required before opening the "More actions" menu, whose entries that same refresh replaces.
+     *
+     * @param expectedCount the number of attachments to wait for
+     * @since 18.9.0RC1
+     */
+    public void waitForNumberOfAttachments(int expectedCount)
+    {
+        getDriver().waitUntilCondition(driver -> getNumberOfAttachments() == expectedCount);
+    }
+
+    /**
      * Get the number of displayed attachments, regardless of the total number.
      *
      * @return the number of attachments displayed.

@@ -34,7 +34,9 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -112,6 +114,20 @@ class BaseCollectionTest
         assertEquals("", diff.getPropType());
         assertEquals("oldValue", diff.getPrevValue());
         assertEquals("", diff.getNewValue());
+    }
+
+    @Test
+    void isPasswordValueMatchingWhenClearPasswordStoredInStringProperty()
+    {
+        // A password stored in clear in a StringProperty is the legacy case: the property type predates
+        // PasswordProperty and the value is not hashed, so the comparison is done on the raw values.
+        BaseCollection<EntityReference> collection = createCollection(null);
+        collection.setStringValue(FIELD, "secret");
+
+        assertTrue(collection.isPasswordValueMatching(FIELD, "secret"));
+        // Passwords are case sensitive: PasswordClass#arePasswordsMatching compares clear passwords with Strings.CS
+        // and the same must hold here.
+        assertFalse(collection.isPasswordValueMatching(FIELD, "SECRET"));
     }
 
     /**

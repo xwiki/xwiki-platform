@@ -48,4 +48,25 @@ public class BaseCollectionTest extends AbstractBridgedComponentTestCase
 
         Assert.assertNull(collection.getXClass(getContext()));
     }
+
+    @Test
+    public void isPasswordValueMatchingWhenClearPasswordStoredInStringProperty()
+    {
+        BaseCollection collection = new BaseCollection()
+        {
+            @Override
+            public Element toXML(BaseClass bclass)
+            {
+                return null;
+            }
+        };
+        // A password stored in clear in a StringProperty is the legacy case: the property type predates
+        // PasswordProperty and the value is not hashed, so the comparison is done on the raw values.
+        collection.setStringValue("password", "secret");
+
+        Assert.assertTrue(collection.isPasswordValueMatching("password", "secret"));
+        // Passwords are case sensitive: PasswordClass#arePasswordsMatching compares clear passwords with Strings.CS
+        // and the same must hold here.
+        Assert.assertFalse(collection.isPasswordValueMatching("password", "SECRET"));
+    }
 }

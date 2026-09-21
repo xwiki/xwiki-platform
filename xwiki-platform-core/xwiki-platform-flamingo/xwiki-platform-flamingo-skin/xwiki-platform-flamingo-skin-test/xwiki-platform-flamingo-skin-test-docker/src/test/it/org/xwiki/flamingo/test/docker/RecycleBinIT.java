@@ -55,6 +55,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class RecycleBinIT
 {
+    private static final String ATTACHMENT_NAME = "SmallAttachment.txt";
+
     /**
      * @see "XWIKI-9421: Attachment version is incremented when a document is restored from recycle bin"
      */
@@ -70,10 +72,15 @@ class RecycleBinIT
         // Create a new page.
         ViewPage page = setup.createPage(testReference, "Once upon a time..", "A story");
 
-        // Add an attachment.
-        new AttachmentsViewPage().openAttachmentsDocExtraPane().setFileToUpload(
-            new File(testConfiguration.getBrowser().getTestResourcesPath(),
-                "RecycleBinIT/SmallAttachment.txt").getAbsolutePath());
+        // Add an attachment. The upload is asynchronous and, once it's over, it refreshes the attachments live data
+        // and then rewrites the "Attachments" entry of the "More actions" menu. Wait for that whole chain to be over
+        // (i.e. for the attachments count to be refreshed, which is its last step) before going on: otherwise it
+        // races with the click on the "Delete" entry of that same menu just below, and the click can be lost.
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane.setFileToUpload(new File(testConfiguration.getBrowser().getTestResourcesPath(),
+            "RecycleBinIT/" + ATTACHMENT_NAME).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(ATTACHMENT_NAME);
+        attachmentsPane.waitForNumberOfAttachments(1);
 
         // Delete the page.
         page.delete().clickYes();
@@ -103,12 +110,12 @@ class RecycleBinIT
         assertEquals("2.1", historyPane.getCurrentVersion());
 
         // Check the attachment.
-        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
-        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("SmallAttachment.txt"));
+        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment(ATTACHMENT_NAME));
 
         // Check the attachment content.
-        attachmentsPane.getAttachmentLink("SmallAttachment.txt").click();
+        attachmentsPane.getAttachmentLink(ATTACHMENT_NAME).click();
         assertEquals("This is a small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
     }
 

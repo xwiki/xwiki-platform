@@ -275,8 +275,6 @@ mark.annotation:not(.annotation-highlight) {
   color: unset;
 }
 
-/* The toolbox looks the same wherever an annotation is displayed: the bubble, the Annotations tab and the edit
-   form. Only its placement is specific to the bubble grid below. */
 .annotation .annotation-bubble-tools .btn, .annotation .annotation-bubble-close .btn {
   --padding-base-horizontal: 12px;
   background: transparent;
@@ -412,10 +410,13 @@ mark.annotation:not(.annotation-highlight) {
 /* Annotations list (extra-tab) */
 #allAnnotations .annotation {
   margin: 0 0 8px;
+  /* The gutter a comment reserves for its avatar, see .reply in comments.css. */
   padding-left: 60px;
   /* Keep the floated avatar inside its own annotation. */
   display: flow-root;
 
+  /* Same values as .commentavatar in comments.css: a 50px avatar pulled into the 60px gutter, centered in it, and
+     nudged down to sit level with the author name. */
   .annotation-bubble-avatar {
     float: left;
     margin-left: -60px;
@@ -462,8 +463,10 @@ dt.annotationLabel label {
 
 /* Quieter than the selection the annotation points at now, without the decorative quote of the live one. */
 .originalAnnotatedText {
-  color: $theme.textSecondaryColor;
+  color: var(--annotation-original-selection-text);
+  /* Barely smaller, enough to rank it below the live selection without making it hard to read. */
   font-size: .95em;
+  /* Separate it from the message introducing it. */
   padding-top: .3em;
 
   &amp;:before {

@@ -110,6 +110,8 @@ public class StatsService extends Api
      * @param range The sub-range to return from the entire result set. Use this parameter for pagination
      * @return A list of DocumentStats objects
      */
+    // The statistics are returned as-is by XWikiStatsService, which types them with a wildcard too.
+    @SuppressWarnings("java:S1452")
     public List<?> getDocumentStatistics(String action, Scope scope, Period period, Range range)
     {
         List<?> stats = Collections.emptyList();
@@ -131,6 +133,8 @@ public class StatsService extends Api
      * @param range The sub-range to return from the entire result set. Use this parameter for pagination
      * @return A list of VisitStats objects
      */
+    // The statistics are returned as-is by XWikiStatsService, which types them with a wildcard too.
+    @SuppressWarnings("java:S1452")
     public List<?> getVisitStatistics(String action, Period period, Range range)
     {
         List<?> stats = Collections.emptyList();
@@ -153,6 +157,8 @@ public class StatsService extends Api
      * @param range The sub-range to return from the entire result set. Use this parameter for pagination
      * @return A list of RefererStats objects
      */
+    // The statistics are returned as-is by XWikiStatsService, which types them with a wildcard too.
+    @SuppressWarnings("java:S1452")
     public List<?> getRefererStatistics(String domain, Scope scope, Period period, Range range)
     {
         List<?> stats = Collections.emptyList();
@@ -174,6 +180,8 @@ public class StatsService extends Api
      * @param range the sub-range to return from the entire result set. Use this parameter for pagination
      * @return a list of DocumentStats objects
      */
+    // The statistics are returned as-is by XWikiStatsService, which types them with a wildcard too.
+    @SuppressWarnings("java:S1452")
     public List<?> getBackLinkStatistics(String domain, Scope scope, Period period, Range range)
     {
         List<?> stats = Collections.emptyList();
@@ -195,6 +203,8 @@ public class StatsService extends Api
      * @param step the step used for sampling the period.
      * @return a map of (date, actionCount) pairs.
      */
+    // The statistics are returned as-is by XWikiStatsService, which types them with a wildcard too.
+    @SuppressWarnings("java:S1452")
     public Map<?, ?> getActionStatistics(String action, Scope scope, Period period,
         Duration step)
     {
@@ -215,6 +225,8 @@ public class StatsService extends Api
      * @param size how many recent actions to retrieve.
      * @return a ArrayList of document names.
      */
+    // The statistics are returned as-is by XWikiStatsService, which types them with a wildcard too.
+    @SuppressWarnings("java:S1452")
     public java.util.Collection<?> getRecentActions(String action, int size)
     {
         java.util.Collection<?> stats = Collections.emptyList();

@@ -291,30 +291,46 @@ onUnmounted(() => {
 
   /* Note: font sizes are inconsistent here, but that's how they are rendered at the end. So we keep it the same here. */
   /*
-   * Headings need margin-top: 0 and line-height: var(--cr-line-height-normal) for the padding-top
-   * formula below to hold. Bootstrap's global heading rule (type.less) sets both directly on bare
-   * "h1"-"h6" elements; BlockNote's own reset for this, ".bn-default-styles h1, ..., h6
-   * { margin: 0 }", only applies with "defaultStyles: true", which XWikiBlockNote.vue sets to
-   * false so the wiki skin controls the editor's typography instead.
+   * Bootstrap's global heading rule (type.less) gives h1-h3 a margin-top of @line-height-computed, computed from the
+   * base (not the heading's own) font-size and line-height. We keep it, rather than resetting it to 0, so a heading
+   * looks the same being edited as it does once saved (the point of a WYSIWYG editor) - and subtract it in the
+   * padding-top formula below instead, alongside line-height, the same way BlockNote's own reset would if
+   * "defaultStyles: true" (XWikiBlockNote.vue sets it to false so the wiki skin controls the editor's typography
+   * instead, so that reset doesn't apply here). This only works because h1-h3's target distance (see below) is
+   * generous enough to absorb it - h4-h6 don't have that room, see the comment on their own margin-top below.
+   *
+   * --font-size-base and --line-height-base mirror the LESS @font-size-base/@line-height-base of the active skin
+   * (see xwiki-platform-flamingo-skin-resources' variablelist.vm and less/variablesInit.vm), so this stays correct
+   * across skins/themes without hardcoding a pixel value here.
    */
+  --heading-margin-top: calc(var(--font-size-base) * var(--line-height-base));
+
   & h1 {
     font-size: var(--cr-font-size-x-large);
     line-height: var(--cr-line-height-normal);
-    margin-top: 0;
+    margin-top: var(--heading-margin-top);
   }
 
   & h2 {
     font-size: var(--cr-font-size-x-large);
     line-height: var(--cr-line-height-normal);
-    margin-top: 0;
+    margin-top: var(--heading-margin-top);
   }
 
   & h3 {
     font-size: var(--cr-font-size-large);
     line-height: var(--cr-line-height-normal);
-    margin-top: 0;
+    margin-top: var(--heading-margin-top);
   }
 
+  /*
+   * Unlike h1-h3, h4-h6 keep margin-top: 0 (rather than Bootstrap's @line-height-computed / 2) because their target
+   * distance is only 15px (see below), which isn't enough room for half of --heading-margin-top (typically ~10px)
+   * on top of half their own line-height (also ~9-10px at these smaller font-sizes): the padding-top that would be
+   * needed to compensate goes negative, which padding cannot express, so it would just clamp to 0 and the heading
+   * would sit ~5px too low. There is no WYSIWYG-preserving option here - this is the one case where resetting the
+   * margin (as before) is the only formula that can hit the target at all.
+   */
   & h4 {
     font-size: var(--cr-font-size-medium);
     line-height: var(--cr-line-height-normal);
@@ -340,14 +356,13 @@ onUnmounted(() => {
    * level 2, 18.5px for level 3, 0px for every other type (heading levels 4-6, paragraphs, list
    * items, quotes). That offset bakes in BlockNote's own default font-size, line-height and
    * padding as a target distance from a block's top edge to its first line's vertical center:
-   * 54px/42px/33.5px for heading level 1/2/3, 15px otherwise. The font-size and line-height set
-   * above change that distance for every block type restyled here, so each one's padding-top is
-   * set below to keep the distance at the value BlockNote's offset assumes:
-   *   padding-top = <target distance for the type> - (line-height / 2)
-   * A margin-top other than 0 cannot be compensated this way, since padding-top cannot go
-   * negative to make room for it - which is why headings keep margin-top: 0 above. A block type's
-   * padding-top here must be recomputed with this formula whenever its font-size, line-height or
-   * margin changes.
+   * 54px/42px/33.5px for heading level 1/2/3, 15px otherwise. The font-size, line-height and
+   * margin-top set above change that distance for every block type restyled here, so each one's
+   * padding-top is set below to keep the distance at the value BlockNote's offset assumes:
+   *   padding-top = <target distance for the type> - margin-top - (line-height / 2)
+   * padding-top cannot go negative, so this only holds as long as margin-top plus half the
+   * line-height doesn't exceed the target - true for every type below, but worth checking again
+   * whenever one of those three changes.
    *
    * These target ".bn-block-content" (not the bare "[data-content-type]" attribute BlockNote's
    * own Block.css uses) for enough specificity to win over the ".bn-block-content { padding: 0 }"
@@ -355,19 +370,19 @@ onUnmounted(() => {
    */
   & .bn-block-content[data-content-type="heading"] {
     padding-top: calc(
-      54px - (var(--cr-font-size-x-large) * var(--cr-line-height-normal)) / 2
+      54px - var(--heading-margin-top) - (var(--cr-font-size-x-large) * var(--cr-line-height-normal)) / 2
     );
   }
 
   & .bn-block-content[data-content-type="heading"][data-level="2"] {
     padding-top: calc(
-      42px - (var(--cr-font-size-x-large) * var(--cr-line-height-normal)) / 2
+      42px - var(--heading-margin-top) - (var(--cr-font-size-x-large) * var(--cr-line-height-normal)) / 2
     );
   }
 
   & .bn-block-content[data-content-type="heading"][data-level="3"] {
     padding-top: calc(
-      33.5px - (var(--cr-font-size-large) * var(--cr-line-height-normal)) / 2
+      33.5px - var(--heading-margin-top) - (var(--cr-font-size-large) * var(--cr-line-height-normal)) / 2
     );
   }
 
@@ -390,6 +405,22 @@ onUnmounted(() => {
     padding-top: calc(
       15px - (var(--cr-font-size-large) * var(--cr-line-height-normal)) / 2
     );
+  }
+
+  /* A divider is rendered as a bare "hr", which Bootstrap's global rule (scaffolding.less) gives a margin-top,
+     fighting the padding-top formula below the same way a heading's margin-top would (see above), so it is reset
+     here for the same reason. Like paragraphs, list items and quotes, BlockNote's own handle positioning
+     (SideMenuController.getBlockOffset(), see above) doesn't add any extra offset for a divider (it assumes 0), which
+     does NOT mean the target distance from the block's top to its own content is 0: it means the 15px target those
+     other block types already resolve to is exactly what a divider should get too, so its thin line ends up as far
+     from the top as their first line of text is. There is no line-height to subtract here, only the negligible
+     height of the line itself. */
+  & .bn-block-content[data-content-type="divider"] {
+    padding-top: 15px;
+  }
+
+  & hr {
+    margin: 0;
   }
 
   /* Remove left border on lists */

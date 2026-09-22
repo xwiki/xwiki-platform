@@ -556,8 +556,10 @@ defineExpose({
      * back to the block's own font-size (BlockNote's default "--level: 0.9em" relative to
      * --cr-base-font-size), since "font-size: unset" above only cancels the
      * "--cr-font-size-medium" set in c-blocknote-view.vue; level 6 is a flat 13px. Their
-     * margin-top is already 0 from the "h5"/"h6" rules there, and their padding-top follows the
-     * same formula as the other heading levels, documented next to the padding-top rules there.
+     * margin-top is already 0 from the "h5"/"h6" rules there (same as h4, see the comment next to
+     * it for why, unlike h1-h3, it isn't kept and compensated for here), and their padding-top
+     * follows the same formula as the other heading levels, documented next to the padding-top
+     * rules there.
      */
     .bn-block-content[data-content-type="heading"][data-level="5"] {
       padding-top: calc(

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -456,6 +457,9 @@ public class ExtensionStore implements Initializable, Disposable
     public XWikiDocument getExtensionVersionDocument(XWikiDocument extensionDocument, String extensionVersion,
         XWikiContext xcontext) throws XWikiException
     {
+        // It's not possible to find the version document if there is no main document
+        Objects.requireNonNull(extensionDocument);
+
         if (isVersionPageEnabled(extensionDocument)) {
             return getVersionDocument(extensionDocument, extensionVersion, xcontext);
         }
@@ -494,6 +498,9 @@ public class ExtensionStore implements Initializable, Disposable
     public XWikiDocument getProjectVersionDocument(XWikiDocument projectDocument, String projectVersion,
         XWikiContext xcontext) throws XWikiException
     {
+        // It's not possible to find the version document if there is no main document
+        Objects.requireNonNull(projectDocument);
+
         return getVersionDocument(projectDocument, projectVersion, xcontext);
     }
 

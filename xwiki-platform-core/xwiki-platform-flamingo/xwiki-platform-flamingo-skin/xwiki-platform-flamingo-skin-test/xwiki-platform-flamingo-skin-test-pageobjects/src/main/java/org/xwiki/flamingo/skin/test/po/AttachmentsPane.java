@@ -133,6 +133,13 @@ public class AttachmentsPane extends BaseElement
      */
     public void setFileToUpload(final String filePath, final boolean local)
     {
+        // The upload is started by the change listener that the HTML5 uploader attaches to the file input, and that
+        // uploader is initialized asynchronously, once attachments.js has resolved the 'xwiki-upload' module through
+        // RequireJS. Wait for the marker that the uploader sets on the form when it is initialized, otherwise the
+        // change event triggered below can be fired before the listener exists, in which case it is lost and no upload
+        // happens at all.
+        getDriver().waitUntilElementIsVisible(this.pane, By.cssSelector("form.html5upload-initialized #attachform"));
+
         final List<WebElement> inputs = this.pane.findElements(By.className("uploadFileInput"));
         WebElement input = inputs.get(inputs.size() - 1);
         if (local) {

@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.docker.junit5.UITest;
@@ -61,7 +62,7 @@ class SecurityCacheStressIT
             .mapToObj(i -> "SecurityCacheStressITUser" + i)
             .toList();
         for (String user : users) {
-            testUtils.createUser(user, user, null);
+            testUtils.rest().createUser(new XWikiCredentials(user, user));
         }
 
         String usersParameter =

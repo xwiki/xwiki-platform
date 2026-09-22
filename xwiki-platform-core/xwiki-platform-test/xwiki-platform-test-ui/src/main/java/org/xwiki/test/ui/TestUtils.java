@@ -203,6 +203,11 @@ public class TestUtils
 
     private static final String USER_CLASS_NAME = "XWiki.XWikiUsers";
 
+    private static final String GROUP_CLASS_NAME = "XWiki.XWikiGroups";
+
+    private static final LocalDocumentReference ALL_GROUP_REFERENCE =
+        new LocalDocumentReference("XWiki", "XWikiAllGroup");
+
     private static final String SERVER_CLASS_NAME = "XWiki.XWikiServerClass";
 
     private static final DocumentReference MAIN_WIKI_DESCRIPTOR =
@@ -3257,7 +3262,8 @@ public class TestUtils
         /**
          * Create a user, without going through the browser as {@link TestUtils#createUser(String, String, String,
          * Object...)} does. The user is created active, and its password is hashed by the class' password property
-         * when it is set, so that the user can log in with it.
+         * when it is set, so that the user can log in with it. It is added to {@code XWiki.XWikiAllGroup}, like the
+         * registration does, so that it gets the rights that are granted to that group.
          * <p>
          * The user must not exist yet: this adds a new user object, it does not update an existing one.
          *
@@ -3270,8 +3276,34 @@ public class TestUtils
          */
         public void createUser(XWikiCredentials credentials, Object... properties) throws Exception
         {
-            addObject(new LocalDocumentReference("XWiki", credentials.getUserName()), USER_CLASS_NAME,
+            String userName = credentials.getUserName();
+
+            addObject(new LocalDocumentReference("XWiki", userName), USER_CLASS_NAME,
                 ArrayUtils.addAll(new Object[] {"password", credentials.getPassword(), "active", "1"}, properties));
+
+            // The registration adds the new user to XWikiAllGroup, see XWiki#setUserDefaultGroup(). A lot of rights
+            // are usually granted to that group, so a user created here would otherwise be less privileged than a
+            // registered one.
+            addUserToAllGroup(userName);
+        }
+
+        private void addUserToAllGroup(String userName) throws Exception
+        {
+            String member = "XWiki." + userName;
+
+            // Don't add the user twice, like XWiki#addUserToGroup() does: the group document outlives the user
+            // documents, so the membership can still be there when a user of the same name is created again.
+            org.xwiki.rest.model.jaxb.Objects objects = get(ObjectsResource.class, ALL_GROUP_REFERENCE, false);
+            // The headline of an object summary is the value of the first property of the object, which is the
+            // member for XWiki.XWikiGroups as that's the only property of that class.
+            boolean isMember = objects != null
+                && objects.getObjectSummaries().stream()
+                    .anyMatch(object -> GROUP_CLASS_NAME.equals(object.getClassName())
+                        && member.equals(object.getHeadline()));
+
+            if (!isMember) {
+                addObject(ALL_GROUP_REFERENCE, GROUP_CLASS_NAME, "member", member);
+            }
         }
 
         /**

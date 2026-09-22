@@ -563,13 +563,16 @@ defineExpose({
      */
     .bn-block-content[data-content-type="heading"][data-level="5"] {
       padding-top: calc(
-        15px - (0.9 * var(--cr-base-font-size) * var(--cr-line-height-normal)) /
-          2
+        var(--xwiki-bn-handle-target-default) -
+          (0.9 * var(--cr-base-font-size) * var(--cr-line-height-normal)) / 2
       );
     }
 
     .bn-block-content[data-content-type="heading"][data-level="6"] {
-      padding-top: calc(15px - (13px * var(--cr-line-height-normal)) / 2);
+      padding-top: calc(
+        var(--xwiki-bn-handle-target-default) -
+          (13px * var(--cr-line-height-normal)) / 2
+      );
     }
 
     [data-content-type="bulletListItem"] > p.bn-inline-content,

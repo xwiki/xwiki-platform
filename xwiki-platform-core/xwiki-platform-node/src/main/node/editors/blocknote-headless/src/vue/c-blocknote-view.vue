@@ -305,6 +305,28 @@ onUnmounted(() => {
    */
   --heading-margin-top: calc(var(--font-size-base) * var(--line-height-base));
 
+  /* @blocknote/react src/editor/styles.css: ".bn-side-menu { height: 30px }" */
+  --xwiki-bn-side-menu-height: 30px;
+  /* @blocknote/react src/components/SideMenu/SideMenuController.tsx getBlockOffset(), heading level 1/2/3 */
+  --xwiki-bn-heading-offset-1: 39px;
+  --xwiki-bn-heading-offset-2: 27px;
+  --xwiki-bn-heading-offset-3: 18.5px;
+
+  /* Target distance from a block's top edge to its first line's vertical center that each offset
+     above assumes: the offset plus half the side menu's own height. */
+  --xwiki-bn-handle-target-h1: calc(
+    var(--xwiki-bn-heading-offset-1) + var(--xwiki-bn-side-menu-height) / 2
+  );
+  --xwiki-bn-handle-target-h2: calc(
+    var(--xwiki-bn-heading-offset-2) + var(--xwiki-bn-side-menu-height) / 2
+  );
+  --xwiki-bn-handle-target-h3: calc(
+    var(--xwiki-bn-heading-offset-3) + var(--xwiki-bn-side-menu-height) / 2
+  );
+  /* getBlockOffset() returns 0 for every other block type (heading levels 4-6, paragraphs, list
+     items, quotes, dividers), so their target distance is just half the side menu's height. */
+  --xwiki-bn-handle-target-default: calc(var(--xwiki-bn-side-menu-height) / 2);
+
   & h1 {
     font-size: var(--cr-font-size-x-large);
     line-height: var(--cr-line-height-normal);
@@ -328,8 +350,8 @@ onUnmounted(() => {
    * distance is only 15px (see below), which isn't enough room for half of --heading-margin-top (typically ~10px)
    * on top of half their own line-height (also ~9-10px at these smaller font-sizes): the padding-top that would be
    * needed to compensate goes negative, which padding cannot express, so it would just clamp to 0 and the heading
-   * would sit ~5px too low. There is no WYSIWYG-preserving option here - this is the one case where resetting the
-   * margin (as before) is the only formula that can hit the target at all.
+   * would sit ~5px too low. There is no WYSIWYG-preserving option here - resetting the margin is the only formula
+   * that can hit the target at all.
    */
   & h4 {
     font-size: var(--cr-font-size-medium);
@@ -351,15 +373,12 @@ onUnmounted(() => {
 
   /*
    * On hover, BlockNote positions the block handle (drag handle + "+" button) by anchoring it to
-   * a block's top edge and nudging it down by a fixed offset, hardcoded per block type in
-   * SideMenuController.getBlockOffset() (@blocknote/react): 39px for heading level 1, 27px for
-   * level 2, 18.5px for level 3, 0px for every other type (heading levels 4-6, paragraphs, list
-   * items, quotes). That offset bakes in BlockNote's own default font-size, line-height and
-   * padding as a target distance from a block's top edge to its first line's vertical center:
-   * 54px/42px/33.5px for heading level 1/2/3, 15px otherwise. The font-size, line-height and
-   * margin-top set above change that distance for every block type restyled here, so each one's
-   * padding-top is set below to keep the distance at the value BlockNote's offset assumes:
-   *   padding-top = <target distance for the type> - margin-top - (line-height / 2)
+   * a block's top edge and nudging it down by the offset named above, hardcoded per block type in
+   * SideMenuController.getBlockOffset() (@blocknote/react). The font-size, line-height and
+   * margin-top set above change the actual distance to the first line's vertical center for every
+   * block type restyled here, so each one's padding-top is set below to keep that distance at the
+   * value its --xwiki-bn-handle-target-* assumes:
+   *   padding-top = <the type's --xwiki-bn-handle-target-*> - margin-top - (line-height / 2)
    * padding-top cannot go negative, so this only holds as long as margin-top plus half the
    * line-height doesn't exceed the target - true for every type below, but worth checking again
    * whenever one of those three changes.
@@ -370,25 +389,29 @@ onUnmounted(() => {
    */
   & .bn-block-content[data-content-type="heading"] {
     padding-top: calc(
-      54px - var(--heading-margin-top) - (var(--cr-font-size-x-large) * var(--cr-line-height-normal)) / 2
+      var(--xwiki-bn-handle-target-h1) - var(--heading-margin-top) -
+        (var(--cr-font-size-x-large) * var(--cr-line-height-normal)) / 2
     );
   }
 
   & .bn-block-content[data-content-type="heading"][data-level="2"] {
     padding-top: calc(
-      42px - var(--heading-margin-top) - (var(--cr-font-size-x-large) * var(--cr-line-height-normal)) / 2
+      var(--xwiki-bn-handle-target-h2) - var(--heading-margin-top) -
+        (var(--cr-font-size-x-large) * var(--cr-line-height-normal)) / 2
     );
   }
 
   & .bn-block-content[data-content-type="heading"][data-level="3"] {
     padding-top: calc(
-      33.5px - var(--heading-margin-top) - (var(--cr-font-size-large) * var(--cr-line-height-normal)) / 2
+      var(--xwiki-bn-handle-target-h3) - var(--heading-margin-top) -
+        (var(--cr-font-size-large) * var(--cr-line-height-normal)) / 2
     );
   }
 
   & .bn-block-content[data-content-type="heading"][data-level="4"] {
     padding-top: calc(
-      15px - (var(--cr-font-size-medium) * var(--cr-line-height-normal)) / 2
+      var(--xwiki-bn-handle-target-default) -
+        (var(--cr-font-size-medium) * var(--cr-line-height-normal)) / 2
     );
   }
 
@@ -397,13 +420,15 @@ onUnmounted(() => {
   & .bn-block-content[data-content-type="numberedListItem"],
   & .bn-block-content[data-content-type="checkListItem"] {
     padding-top: calc(
-      15px - (var(--cr-base-font-size) * var(--cr-line-height-normal)) / 2
+      var(--xwiki-bn-handle-target-default) -
+        (var(--cr-base-font-size) * var(--cr-line-height-normal)) / 2
     );
   }
 
   & .bn-block-content[data-content-type="quote"] {
     padding-top: calc(
-      15px - (var(--cr-font-size-large) * var(--cr-line-height-normal)) / 2
+      var(--xwiki-bn-handle-target-default) -
+        (var(--cr-font-size-large) * var(--cr-line-height-normal)) / 2
     );
   }
 
@@ -411,12 +436,12 @@ onUnmounted(() => {
      fighting the padding-top formula below the same way a heading's margin-top would (see above), so it is reset
      here for the same reason. Like paragraphs, list items and quotes, BlockNote's own handle positioning
      (SideMenuController.getBlockOffset(), see above) doesn't add any extra offset for a divider (it assumes 0), which
-     does NOT mean the target distance from the block's top to its own content is 0: it means the 15px target those
-     other block types already resolve to is exactly what a divider should get too, so its thin line ends up as far
-     from the top as their first line of text is. There is no line-height to subtract here, only the negligible
-     height of the line itself. */
+     does NOT mean the target distance from the block's top to its own content is 0: it means the
+     --xwiki-bn-handle-target-default those other block types already resolve to is exactly what a divider should
+     get too, so its thin line ends up as far from the top as their first line of text is. There is no line-height to
+     subtract here, only the negligible height of the line itself. */
   & .bn-block-content[data-content-type="divider"] {
-    padding-top: 15px;
+    padding-top: var(--xwiki-bn-handle-target-default);
   }
 
   & hr {

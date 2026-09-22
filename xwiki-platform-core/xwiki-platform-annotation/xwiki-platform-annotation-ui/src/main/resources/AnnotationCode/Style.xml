@@ -463,7 +463,7 @@ dt.annotationLabel label {
 
 /* Quieter than the selection the annotation points at now, without the decorative quote of the live one. */
 .originalAnnotatedText {
-  color: var(--annotation-original-selection-text);
+  color: var(--text-muted);
   /* Barely smaller, enough to rank it below the live selection without making it hard to read. */
   font-size: .95em;
   /* Separate it from the message introducing it. */

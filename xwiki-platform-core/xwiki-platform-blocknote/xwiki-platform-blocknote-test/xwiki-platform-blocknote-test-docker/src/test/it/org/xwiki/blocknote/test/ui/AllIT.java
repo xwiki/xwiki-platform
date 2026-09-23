@@ -57,7 +57,7 @@ class AllIT
     }
 
     @Nested
-    class NestedBlockHandleAlignmentIT extends BlockHandleAlignmentIT
+    class NestedSideMenuAlignmentIT extends SideMenuAlignmentIT
     {
     }
 

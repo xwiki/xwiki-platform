@@ -22,6 +22,8 @@ package org.xwiki.blocknote.test.po;
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -317,33 +319,6 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Returns the content element ({@code .bn-block-content}) of the top-level block with the specified index.
-     *
-     * @param index the index of the block to return, starting from 0
-     * @return the block content element
-     * @since 18.9.0RC1
-     */
-    public WebElement getBlockContent(int index)
-    {
-        return this.container.findElements(By.className("bn-block-content")).get(index);
-    }
-
-    /**
-     * Hovers over the specified block to reveal its side menu (drag handle) and returns the drag handle element.
-     *
-     * @param blockContent the content element of the block to hover, as returned by {@link #getBlockContent(int)}
-     * @return the drag handle element of the block's side menu
-     * @since 18.9.0RC1
-     */
-    public WebElement hoverAndGetBlockHandle(WebElement blockContent)
-    {
-        getDriver().createActions().moveToElement(blockContent).perform();
-        By handle = By.cssSelector(".bn-side-menu [data-test='dragHandle']");
-        getDriver().waitUntilElementIsVisible(handle);
-        return getDriver().findElement(handle);
-    }
-
-    /**
      * Waits until the rich text area is focused. This is especially needed when switching between browser tabs because:
      * <ul>
      * <li>when a browser tab becomes inactive its active element gets blurred (loses the focus)</li>
@@ -434,5 +409,68 @@ public class BlockNoteRichTextArea extends BaseElement
         String script = "return arguments[0].editor.view.state.selection.$from.parentOffset";
         getDriver().waitUntilCondition(
             driver -> ((Number) getDriver().executeScript(script, this.container)).intValue() == offset);
+    }
+
+    /**
+     * Hovers the block with the specified index, in order to show its side menu, and waits for the side menu to be
+     * displayed at its final position (it is positioned asynchronously, relative to the hovered block).
+     *
+     * @param index the index of the block to hover, starting from 0
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea hoverBlock(int index)
+    {
+        WebElement block = this.container.findElements(By.className("bn-block-content")).get(index);
+        getDriver().createActions().moveToElement(block).perform();
+
+        By sideMenuLocator = By.className("bn-side-menu");
+        getDriver().waitUntilElementIsVisible(sideMenuLocator);
+        WebElement sideMenu = getDriver().findElement(sideMenuLocator);
+
+        // The side menu keeps its place in the DOM while moving from one block to another, so waiting for it to be
+        // displayed is not enough: we also have to wait for it to stop moving, i.e. to report the same position twice
+        // in a row, otherwise we could look at it while it is still aligned on the previously hovered block.
+        Point[] previousPosition = new Point[] {null};
+        getDriver().waitUntilCondition(driver -> {
+            Point position = sideMenu.getLocation();
+            boolean stable = position.equals(previousPosition[0]);
+            previousPosition[0] = position;
+            return stable;
+        });
+
+        return this;
+    }
+
+    /**
+     * Hides the caret (text cursor), which blinks and would thus make the screenshots taken with
+     * {@link #getContentScreenshot()} unstable.
+     *
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea hideCaret()
+    {
+        getDriver().executeScript("""
+            const style = document.createElement('style');
+            style.textContent = '.bn-editor { caret-color: transparent; }';
+            document.head.appendChild(style);
+            """);
+        return this;
+    }
+
+    /**
+     * Takes a screenshot of the document content area, which includes both the rich text area and the floating user
+     * interface displayed next to it, such as the block side menu. Note that we can't take a screenshot of the rich
+     * text area itself because the side menu is displayed outside of it, on its left, and would thus be cropped.
+     * <p>
+     * This works only when editing the document content in-place, since the content area is part of the view mode.
+     *
+     * @return the screenshot of the document content area, in PNG format
+     * @since 18.9.0RC1
+     */
+    public byte[] getContentScreenshot()
+    {
+        return getDriver().findElement(By.id("xwikicontent")).getScreenshotAs(OutputType.BYTES);
     }
 }

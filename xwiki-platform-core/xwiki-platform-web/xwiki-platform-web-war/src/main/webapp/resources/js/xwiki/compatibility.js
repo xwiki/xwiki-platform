@@ -496,6 +496,21 @@ Object.extend(XWiki.watchlist, {
 });
 
 /**
+ * Rendering errors are made expandable by default. Trigger the xwiki:dom:updated event on the content you inserted
+ * instead, passing it in the elements property of the event data, which also initializes everything else that content
+ * needs.
+ *
+ * Deprecated since 18.8.0RC1
+ */
+XWiki.makeRenderingErrorsExpandable = function(content) {
+  warn("XWiki.makeRenderingErrorsExpandable is deprecated since XWiki 18.8.0RC1. Rendering errors are made expandable "
+    + "by default, trigger the xwiki:dom:updated event on the new content instead.");
+  require(['jquery'], function($) {
+    $(document).trigger('xwiki:dom:updated', {'elements': $(content || 'body').toArray()});
+  });
+}
+
+/**
  * Add some deprecated <meta> tags in the header of the page so that old script can still work. It is added via the
  * JavaScript since these <meta> tags are invalid with HTML5 and we want to have valid static HTML code.
  *

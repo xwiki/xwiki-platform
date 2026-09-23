@@ -200,15 +200,7 @@ define('xwiki-realtime-wysiwyg-patches', [
     _updateRangeBoundaryOnNodeReplaced(boundary, diff) {
       if (this._containsBoundary(diff.route, boundary)) {
         if (diff.action === 'modifyTextElement') {
-          // The boundary is inside the modified text node. We have to invalidate the selection if there are changes
-          // before the boundary offset because those changes can be the result of splitting the text node (e.g. in
-          // order to apply formatting to a part of the text), in which case we can't preserve the selection by using
-          // the diff (the result wouldn't preserve the user intent).
-          const ops = ChainPad.Diff.diff(diff.oldValue, diff.newValue);
-          const minOffset = Math.min(...ops.map(op => op.offset));
-          if (boundary.at(-1) > minOffset) {
-            return null;
-          }
+          return this._updateRangeBoundaryOnTextModified(boundary, diff);
         } else {
           // The boundary is inside the replaced node, so we invalidate the selection. We can't simply place the
           // boundary before the replaced node because that might not be a valid caret position (even if we can
@@ -217,6 +209,29 @@ define('xwiki-realtime-wysiwyg-patches', [
           return null;
         }
       }
+      return boundary;
+    }
+
+    _updateRangeBoundaryOnTextModified(boundary, diff) {
+      // The boundary is inside the modified text node. We have to invalidate the selection if there are changes before
+      // the boundary offset because those changes can be the result of splitting the text node (e.g. in order to apply
+      // formatting to a part of the text), in which case we can't preserve the selection by using the diff (the result
+      // wouldn't preserve the user intent). The only exception is when the changes before the boundary offset only
+      // remove text, which happens for instance when the filling character sequence inserted by CKEditor (on Chrome) in
+      // the text node where the user types is removed (it's not present in the remote content). In this case we can
+      // simply move the boundary to the left.
+      const offset = boundary.at(-1);
+      let removedLength = 0;
+      for (const op of ChainPad.Diff.diff(diff.oldValue, diff.newValue)) {
+        if (op.offset >= offset) {
+          // Changes after the boundary don't affect it.
+          continue;
+        } else if (op.toInsert || op.offset + op.toRemove > offset) {
+          return null;
+        }
+        removedLength += op.toRemove;
+      }
+      boundary[boundary.length - 1] -= removedLength;
       return boundary;
     }
 

@@ -112,6 +112,7 @@ define('xwiki-ckeditor-realtime-adapter', [
         updatedNodes = updater(this.getContentWrapper());
       } finally {
         restoreTemporaryElements();
+        this._forgetRemovedFillingChar();
         await this._updateWidgets(updatedNodes);
 
         // Push the updated content to remote users, when saving the snapshot, if this is a local change.
@@ -245,6 +246,24 @@ define('xwiki-ckeditor-realtime-adapter', [
         contentWrapper.prepend(...leadingElements);
         contentWrapper.append(...trailingElements);
       };
+    }
+
+    /**
+     * On WebKit-based browsers CKEditor inserts a filling character sequence in the text node where the user is typing
+     * and remembers that text node in order to remove the filling characters later, adjusting the selection offsets.
+     * The filling characters are not part of the synchronized content so applying a remote patch can remove them. When
+     * this happens CKEditor must forget the filling character node, because it removes the filling characters later
+     * (e.g. on the next selection change) assuming they are still there: if the text node has no more characters than
+     * the filling character sequence it resets the text, which moves the caret to the start of the text node, otherwise
+     * it subtracts the length of the filling character sequence from the caret offset.
+     */
+    _forgetRemovedFillingChar() {
+      const editable = this._ckeditor.editable();
+      const fillingChar = editable?.getCustomData('cke-fillingChar');
+      if (fillingChar && (!fillingChar.$.isConnected ||
+          !fillingChar.getText().startsWith(this._CKEDITOR.dom.selection.FILLING_CHAR_SEQUENCE))) {
+        editable.removeCustomData('cke-fillingChar');
+      }
     }
 
     _ensureSameContentWrapper(root) {

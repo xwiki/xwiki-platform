@@ -49,7 +49,7 @@
                 </dt>
                 <dd class="input-group">
                   <span class="input-group-addon">$services.icon.renderHTML('envelope')</span>
-                  <input type="text" id="e" name="e" class="form-control" size="60" />
+                  <input type="email" id="e" name="e" class="form-control" size="60" autocomplete="email" />
                 </dd>
             </dl>
             <div class="forgotusernamelinks">

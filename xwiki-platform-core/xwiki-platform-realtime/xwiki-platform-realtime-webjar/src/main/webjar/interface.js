@@ -41,7 +41,7 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
           allowRealtimeCheckbox.prop('disabled', true);
           join().catch(() => {
             // We failed to join to the realtime editing session.
-            new XWiki.widgets.Notification(Messages['join.error'], 'error');
+            XWiki.widgets.Notification.show(Messages['join.error'], 'error');
             allowRealtimeCheckbox.prop('checked', false);
           }).finally(() => {
             // Re-enable the checkbox so that the user can try again.

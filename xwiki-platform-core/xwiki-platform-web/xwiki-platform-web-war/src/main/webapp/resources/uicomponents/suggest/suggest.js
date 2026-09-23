@@ -396,7 +396,7 @@ var XWiki = (function(XWiki){
       onCreate: this.fld.addClassName.bind(this.fld, 'loading'),
       onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
       onFailure: function (response) {
-        new XWiki.widgets.Notification("$services.localization.render('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
+        XWiki.widgets.Notification.show("$services.localization.render('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
       },
       onComplete: this.fld.removeClassName.bind(this.fld, 'loading')
     }

@@ -55,7 +55,7 @@
         const rejectWithNotification = (reason, ...args) => {
           if (reason) {
             const message = reason.message || reason;
-            new XWiki.widgets.Notification(message, 'error');
+            XWiki.widgets.Notification.show(message, 'error');
           }
           reject(reason, ...args);
         };

@@ -90,6 +90,7 @@ catalog:
   "@blocknote/react": 0.54.2
   "@eslint/config-helpers": 0.7.0
   "@eslint/js": 10.0.1
+  "@floating-ui/react": 0.27.20
   "@jridgewell/remapping": 2.3.5
   "@mantine/core": 9.6.2
   "@mantine/hooks": 9.6.2

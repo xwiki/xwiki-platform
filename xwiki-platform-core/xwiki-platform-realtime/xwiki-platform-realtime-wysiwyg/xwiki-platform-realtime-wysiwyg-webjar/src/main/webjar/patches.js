@@ -145,15 +145,28 @@ define('xwiki-realtime-wysiwyg-patches', [
 
         case 'relocateGroup':
           return this._updateRangeBoundaryOnGroupRelocated(boundary, diff);
+
+        default:
+          // The other changes (attributes, comments, form field values) don't modify the DOM structure, so they don't
+          // affect the range boundary.
+          return boundary;
       }
     }
 
+    /**
+     * @param {Array[Number]} path the path of a DOM node
+     * @param {Array[Number]} boundary a range boundary, i.e. the path of the boundary container followed by the
+     *   boundary offset
+     * @returns {boolean} true if the specified node is the boundary container or one of its ancestors
+     */
+    _containsBoundary(path, boundary) {
+      return path.length < boundary.length && path.every((index, level) => index === boundary[level]);
+    }
+
     _updateRangeBoundaryOnNodeAdded(boundary, diff) {
-      const boundaryParentPath = boundary.slice(0, -1).join('/');
       const changeParentPath = diff.route.slice(0, -1);
-      // Check if the change parent is an ancestor of the boundary.
-      if (boundaryParentPath.startsWith(changeParentPath.join('/')) &&
-          // And if the node is added before the boundary.
+      if (this._containsBoundary(changeParentPath, boundary) &&
+          // Check if the node is added before the boundary.
           diff.route.at(-1) <= boundary[changeParentPath.length]) {
         // Increment the boundary offset to account for the added node.
         boundary[changeParentPath.length]++;
@@ -162,16 +175,18 @@ define('xwiki-realtime-wysiwyg-patches', [
     }
 
     _updateRangeBoundaryOnNodeRemoved(boundary, diff) {
-      const boundaryParentPath = boundary.slice(0, -1).join('/');
       const changeParentPath = diff.route.slice(0, -1);
-      // Check if the change parent is an ancestor of the boundary.
-      if (boundaryParentPath.startsWith(changeParentPath.join('/'))) {
+      if (this._containsBoundary(changeParentPath, boundary)) {
         const changeIndex = diff.route.at(-1);
         const boundaryIndex = boundary[changeParentPath.length];
+        // The boundary is inside the removed node only if the removed node is an ancestor of the boundary container
+        // (or the container itself). When the change parent is the boundary container the boundary index is the
+        // boundary offset, so removing the node found at that offset (i.e. just after the boundary) is fine.
+        const isBoundaryOffset = changeParentPath.length === boundary.length - 1;
         if (changeIndex < boundaryIndex) {
           // Decrement the boundary offset to account for the removed node.
           boundary[changeParentPath.length]--;
-        } else if (changeIndex === boundaryIndex) {
+        } else if (changeIndex === boundaryIndex && !isBoundaryOffset) {
           // The boundary is inside the removed node, so we can't restore it anymore. We can't simply place the
           // boundary before the removed node because that might not be a valid caret position (even if we can
           // technically place the caret there, the browser might not display the caret and might ignore the typed
@@ -183,9 +198,7 @@ define('xwiki-realtime-wysiwyg-patches', [
     }
 
     _updateRangeBoundaryOnNodeReplaced(boundary, diff) {
-      const boundaryParentPath = boundary.slice(0, -1).join('/');
-      // Check if the change target is an ancestor of the boundary.
-      if (boundaryParentPath.startsWith(diff.route.join('/'))) {
+      if (this._containsBoundary(diff.route, boundary)) {
         if (diff.action === 'modifyTextElement') {
           // The boundary is inside the modified text node. We have to invalidate the selection if there are changes
           // before the boundary offset because those changes can be the result of splitting the text node (e.g. in
@@ -208,30 +221,35 @@ define('xwiki-realtime-wysiwyg-patches', [
     }
 
     _updateRangeBoundaryOnGroupRelocated(boundary, diff) {
-      const boundaryParentPath = boundary.slice(0, -1).join('/');
-      const changePath = diff.route;
-      // Check if the change target is an ancestor of the boundary.
-      if (boundaryParentPath.startsWith(changePath.join('/'))) {
-        const boundaryIndex = boundary[changePath.length];
-        if (diff.from <= boundaryIndex && boundaryIndex < (diff.from + diff.groupLength)) {
-          // The boundary is inside the relocated group, so we have to update its offset.
-          if (diff.from < diff.to) {
-            // Nodes are moved, along with the boundary, to the right, so we have to increment the boundary offset.
-            boundary[changePath.length] += diff.to - (diff.from + diff.groupLength);
-          } else {
-            // Nodes are moved, along with the boundary, to the left, so we have to decrement the boundary offset.
-            boundary[changePath.length] -= diff.from - diff.to;
-          }
-          boundary[changePath.length] += diff.to - (diff.from + diff.groupLength);
-        } else if (diff.from < boundaryIndex && boundaryIndex < diff.to) {
-          // Nodes are relocated from before the boundary to after it, so we have to decrement the boundary offset.
-          boundary[changePath.length] -= diff.groupLength;
-        } else if (diff.to <= boundaryIndex && boundaryIndex < diff.from) {
-          // Nodes are relocated from after the boundary to before it, so we have to increment the boundary offset.
-          boundary[changePath.length] += diff.groupLength;
+      const level = diff.route.length;
+      if (this._containsBoundary(diff.route, boundary)) {
+        if (level < boundary.length - 1) {
+          // The boundary is inside one of the children of the change target, so it follows that child.
+          boundary[level] = this._getRelocatedIndex(boundary[level], diff);
+        } else if (boundary[level] > 0) {
+          // The change target is the boundary container so the boundary index is the boundary offset. We make the
+          // boundary follow the node before it.
+          boundary[level] = this._getRelocatedIndex(boundary[level] - 1, diff) + 1;
         }
       }
       return boundary;
+    }
+
+    /**
+     * DiffDOM relocates a group of nodes by first removing them and then inserting them before the node found at the
+     * target index, in the list of child nodes left after the removal.
+     *
+     * @param {Number} index the index of a child node before the relocation
+     * @param {Object} diff the relocation change
+     * @returns {Number} the index of the same child node after the relocation
+     */
+    _getRelocatedIndex(index, diff) {
+      if (diff.from <= index && index < diff.from + diff.groupLength) {
+        // The node is part of the relocated group.
+        return diff.to + index - diff.from;
+      }
+      const indexAfterRemoval = index < diff.from ? index : index - diff.groupLength;
+      return indexAfterRemoval < diff.to ? indexAfterRemoval : indexAfterRemoval + diff.groupLength;
     }
 
     /**

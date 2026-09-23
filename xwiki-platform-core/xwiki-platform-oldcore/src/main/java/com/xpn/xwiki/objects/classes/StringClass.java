@@ -52,6 +52,12 @@ public class StringClass extends PropertyClass
 
     private static final String XCLASSNAME = "string";
 
+    /**
+     * The maximum number of characters the store accepts for a string property value, read lazily from the store
+     * since the lookup queries the database metadata. {@code -1} when not yet computed.
+     */
+    private transient int maxLength = -1;
+
     public StringClass(String name, String prettyname, PropertyMetaClass wclass)
     {
         super(name, prettyname, wclass);
@@ -125,6 +131,11 @@ public class StringClass extends PropertyClass
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());
+        // Prevent the user from entering a value that the store would fail to save.
+        int valueMaxLength = getMaxLength(context);
+        if (valueMaxLength > 0) {
+            input.addAttribute("maxlength", valueMaxLength);
+        }
         input.setDisabled(isDisabled());
         /* This is a text alternative fallback to explain what the input is about. 
          If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
@@ -146,6 +157,15 @@ public class StringClass extends PropertyClass
         if (property != null) {
             buffer.append(XMLUtils.escapeElementText(property.toText()));
         }
+    }
+
+    private int getMaxLength(XWikiContext context)
+    {
+        if (this.maxLength == -1) {
+            this.maxLength = context.getWiki().getStore().getLimitSize(context, StringProperty.class, "value");
+        }
+
+        return this.maxLength;
     }
 
     private void displayPickerEdit(input input)

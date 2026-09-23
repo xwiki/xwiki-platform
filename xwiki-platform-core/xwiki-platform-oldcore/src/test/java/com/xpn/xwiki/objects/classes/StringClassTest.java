@@ -26,6 +26,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
@@ -33,6 +35,10 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -81,7 +87,46 @@ class StringClassTest
             + "class='suggested' "
             + "id='&#34; + alert(1) + &#34;.WebHome_0_test' "
             + "name='&#34; + alert(1) + &#34;.WebHome_0_test' "
+            + "maxlength='255' "
             + "size='30' "
             + "type='text'/>", stringBuffer.toString());
+    }
+
+    @Test
+    void displayEditReadsStoreLimitOnce() throws Exception
+    {
+        this.oldCore.getMocker().registerMockComponent(ContextualLocalizationManager.class);
+        XWikiContext xWikiContext = this.oldCore.getXWikiContext();
+        when(this.oldCore.getMockStore().getLimitSize(xWikiContext, StringProperty.class, "value")).thenReturn(768);
+
+        StringClass stringClass = new StringClass();
+        stringClass.setName("test");
+        BaseObject object = new BaseObject();
+
+        StringBuffer firstBuffer = new StringBuffer();
+        stringClass.displayEdit(firstBuffer, "test", "Space.Page_0_", object, xWikiContext);
+        assertTrue(firstBuffer.toString().contains(" maxlength='768' "), firstBuffer.toString());
+
+        StringBuffer secondBuffer = new StringBuffer();
+        stringClass.displayEdit(secondBuffer, "test", "Space.Page_0_", object, xWikiContext);
+        assertEquals(firstBuffer.toString(), secondBuffer.toString());
+
+        // The limit requires a database metadata query so it must be read from the store only once.
+        verify(this.oldCore.getMockStore(), times(1)).getLimitSize(xWikiContext, StringProperty.class, "value");
+    }
+
+    @Test
+    void displayEditWithoutStoreLimit() throws Exception
+    {
+        this.oldCore.getMocker().registerMockComponent(ContextualLocalizationManager.class);
+        XWikiContext xWikiContext = this.oldCore.getXWikiContext();
+        when(this.oldCore.getMockStore().getLimitSize(xWikiContext, StringProperty.class, "value")).thenReturn(0);
+
+        StringClass stringClass = new StringClass();
+        stringClass.setName("test");
+        StringBuffer buffer = new StringBuffer();
+        stringClass.displayEdit(buffer, "test", "Space.Page_0_", new BaseObject(), xWikiContext);
+
+        assertFalse(buffer.toString().contains("maxlength"), buffer.toString());
     }
 }

@@ -1,7 +1,6 @@
 #template('colorThemeInit.vm')
 /* Attachment form style */
 .attachmentActionButton {
-  background-color: transparent;
   border: none;
   padding: 2px 4px;
   font-size: 80%;

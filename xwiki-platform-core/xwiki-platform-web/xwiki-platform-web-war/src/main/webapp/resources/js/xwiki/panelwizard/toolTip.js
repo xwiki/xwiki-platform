@@ -23,7 +23,7 @@ var ie=document.all
 var ns6=document.getElementById && !document.all
 var enabletip=false;
 var tipobj=$("dhtmltooltip");
-var tippedNode = undefined;
+var tippedNode;
 
 function ietruebody(){
   return (document.compatMode && document.compatMode!="BackCompat")? document.documentElement : document.body

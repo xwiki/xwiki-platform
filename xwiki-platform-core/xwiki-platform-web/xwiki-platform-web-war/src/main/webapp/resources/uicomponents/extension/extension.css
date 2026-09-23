@@ -245,8 +245,6 @@ ul.dependencies li:hover {
   border-right: 7px solid var(--xwiki-page-content-bg);
   padding: 0.3em 0 0.3em 20px;
   position: relative;
-}
-.dependency-item {
   line-height: 1.4em;
 }
 .dependency-item .extension-status {
@@ -404,6 +402,7 @@ ul.innerMenu {
   margin-top: 0;
   border-radius: 0 0 8px 8px;
   box-shadow: 3px;
+  text-decoration: none;
 }
 .innerMenu li a.current:after {
   border-style: solid;
@@ -417,10 +416,6 @@ ul.innerMenu {
   top: -5px;
   right: -5px;
 }
-.innerMenu li a.current {
-  text-decoration: none;
-}
-
 .extensionUpdater > .ui-progress {
   margin-bottom: .5em;
 }

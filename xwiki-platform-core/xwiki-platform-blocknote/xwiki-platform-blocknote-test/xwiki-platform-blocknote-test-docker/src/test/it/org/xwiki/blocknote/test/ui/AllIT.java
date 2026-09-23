@@ -56,6 +56,11 @@ class AllIT
     {
     }
 
+    @Nested
+    class NestedBlockHandleAlignmentIT extends BlockHandleAlignmentIT
+    {
+    }
+
     // CollaborationIT's multi-user scenario triggers a ClassCastException in DocumentUserReferenceModelSerializer
     // (superadmin isn't handled) when resolving a collaborator's user details, which the collaboration manager
     // doesn't catch. This can leave the shared browser/server session degraded, so this class must run last to

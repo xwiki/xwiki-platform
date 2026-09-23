@@ -19,6 +19,7 @@
  */
 
 import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
+import { centerOnFirstLine } from "./SideMenu/centerOnFirstLine";
 import { FilePanel } from "./files/FilePanel";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import {
@@ -37,6 +38,7 @@ import {
   FormattingToolbar,
   FormattingToolbarController,
   LinkToolbarController,
+  SideMenuController,
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
@@ -218,6 +220,17 @@ type BlockNoteViewWrapperProps = {
 };
 
 /**
+ * Replaces the fixed, per-block-type vertical offset BlockNote positions the side menu with, which only matches its
+ * own styling. Defined once, outside the component, since it depends on nothing: the middleware measures the block it
+ * is positioning against every time the menu is placed.
+ */
+const SIDE_MENU_FLOATING_OPTIONS = {
+  useFloatingOptions: {
+    middleware: [centerOnFirstLine()],
+  },
+};
+
+/**
  * BlockNote editor wrapper
  */
 
@@ -353,8 +366,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           linkToolbar={false}
           filePanel={false}
           slashMenu={false}
+          sideMenu={false}
           onChange={(editor) => onChange?.(editor)}
         >
+          <SideMenuController floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS} />
+
           <SuggestionMenuController
             triggerCharacter={"/"}
             getItems={async (query) =>

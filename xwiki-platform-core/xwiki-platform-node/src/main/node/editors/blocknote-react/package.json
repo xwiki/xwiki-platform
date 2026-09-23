@@ -47,6 +47,7 @@
     "@blocknote/core": "catalog:",
     "@blocknote/mantine": "catalog:",
     "@blocknote/react": "catalog:",
+    "@floating-ui/react": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
     "@types/react-dom": "catalog:",

@@ -55,8 +55,11 @@
     #if ($placeholder == $services.model.getEntityReference('DOCUMENT').name)
       #set ($placeholder = $doc.documentReference.lastSpaceReference.name)
     #end
+    ## Prevent entering a title that the store would fail to save.
+    #set ($titleMaxLength = $doc.titleMaxLength)
     #if ($wysiwygWithOptionalTitle)<h1 class="editable">#end
     <input type="text" id="xwikidoctitleinput" name="title" value="$!escapetool.xml($docTitle)"
+      #if ($titleMaxLength > 0)maxlength="$titleMaxLength" #end
       #if ($titleIsMandatory)required #{else}placeholder="$!escapetool.xml($placeholder)" #end
       data-validation-value-missing="$escapetool.xml($services.localization.render('core.validation.required.message'))"
     />

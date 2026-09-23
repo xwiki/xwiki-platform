@@ -2032,4 +2032,13 @@ class XWikiDocumentMockitoTest
         assertEquals(xclassRelativeReference, cloneObj.getRelativeXClassReference());
         assertSame(cloneObj, cloneDoc.getXObject(xclassReference));
     }
+
+    @Test
+    void getTitleMaxLength()
+    {
+        when(this.oldcore.getMockStore().getLimitSize(this.oldcore.getXWikiContext(), XWikiDocument.class, "title"))
+            .thenReturn(768);
+
+        assertEquals(768, this.document.getTitleMaxLength());
+    }
 }

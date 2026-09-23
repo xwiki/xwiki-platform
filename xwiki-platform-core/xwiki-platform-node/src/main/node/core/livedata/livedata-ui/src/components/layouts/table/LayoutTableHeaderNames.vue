@@ -304,6 +304,9 @@ export default {
 }
 
 .layout-table .column-name {
+  /* The column name is the handle the column is dragged from, so the whole of it, and not only the button it holds,
+  tells with the cursor that the column can be moved. */
+  cursor: grab;
   display: flex;
   font-weight: var(--font-weight-semibold);
   justify-content: space-between;
@@ -404,7 +407,6 @@ export default {
   color: currentColor;
   opacity: 0;
   padding-left: var(--table-cell-padding);
-  cursor: pointer;
 }
 
 .layout-table .sort-icon.sorted {

@@ -63,7 +63,7 @@
       allowedContent = $.extend(true, {}, config.allowedContentBySyntax[config.sourceSyntax]);
 
       // Forbid script tags if JavaScript skin extensions are not loaded.
-      if (!config.loadJavaScriptSkinExtensions && '$1' in allowedContent && 'elements' in allowedContent.$1) {
+      if (config.loadJavaScriptSkinExtensions === 0 && '$1' in allowedContent && 'elements' in allowedContent.$1) {
         delete allowedContent.$1.elements.script;
       }
 

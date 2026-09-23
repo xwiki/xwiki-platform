@@ -238,8 +238,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement waitForSuggestionsClearance()
     {
-        getDriver().waitUntilCondition(driver -> getDriver()
-            .findElementsWithoutWaiting(this.container, By.cssSelector(".selectize-input.dropdown-active")).isEmpty());
+        getDriver().waitUntilCondition(driver -> !isDropDownOpened());
         return this;
     }
 
@@ -339,10 +338,14 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement hideSuggestions()
     {
-        if (isDropDownOpened()) {
-            getTextInput().sendKeys(Keys.ESCAPE);
-            waitForSuggestionsClearance();
-        }
+        // Remove the focus rather than press Escape: the widget opens the suggestions again on its own whenever a
+        // suggestion request completes while the text input still has the focus, so Escape leaves the panel free to
+        // re-appear a moment later, either after this method returned or before it had a chance to see it closed.
+        // An unfocused widget both closes the panel and ignores the responses that come back afterwards.
+        getDriver().waitUntilCondition(driver -> {
+            getDriver().executeScript("arguments[0].blur()", getTextInput());
+            return !isDropDownOpened();
+        });
         return this;
     }
 

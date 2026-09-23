@@ -125,6 +125,12 @@ public class StringClass extends PropertyClass
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());
+        // Prevent the user from entering a value that the store would fail to save. The limit is cached by the store
+        // (XWikiCacheStore), so reading it for each rendered field doesn't query the database metadata each time.
+        int valueMaxLength = context.getWiki().getStore().getLimitSize(context, StringProperty.class, "value");
+        if (valueMaxLength > 0) {
+            input.addAttribute("maxlength", valueMaxLength);
+        }
         input.setDisabled(isDisabled());
         /* This is a text alternative fallback to explain what the input is about. 
          If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.

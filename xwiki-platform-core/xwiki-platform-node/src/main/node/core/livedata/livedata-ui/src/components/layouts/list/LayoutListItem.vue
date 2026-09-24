@@ -85,23 +85,26 @@ export default {
 </script>
 
 <style>
+/*
+  The items are displayed as regular text lines: they inherit the font, color and line height of the surrounding
+  content, without the borders and backgrounds of the table layout.
+*/
 .layout-list .layout-list-item {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 2rem;
-  padding: 2px 0.5rem;
-  border-bottom: 1px solid var(--table-border-color);
-}
-
-.layout-list .layout-list-item:hover {
-  background-color: var(--table-bg-hover);
+  align-items: baseline;
+  gap: 0.5em;
+  padding: 0.125em 0;
 }
 
 .layout-list .layout-list-item .livedata-entry-selector {
   width: unset;
+  height: auto;
   padding: 0;
+}
+
+.layout-list .layout-list-item .livedata-entry-selector input {
+  margin: 0;
 }
 
 .layout-list .layout-list-item-value {
@@ -110,5 +113,18 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/*
+  The displayers are sized to fill a table cell by default. In a list, their value is displayed inline, like regular
+  text, so that it is aligned on the start of the line and truncated with an ellipsis when too long.
+*/
+.layout-list .layout-list-item-value .livedata-displayer,
+.layout-list .layout-list-item-value .livedata-displayer > .view,
+.layout-list .layout-list-item-value .livedata-displayer > .view > div {
+  display: inline;
+  width: auto;
+  height: auto;
+  text-align: inherit;
 }
 </style>

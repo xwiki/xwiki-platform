@@ -133,7 +133,6 @@ export default {
   margin: 0 0 0.5rem;
   padding: 0;
   list-style: none;
-  border-top: 1px solid var(--table-border-color);
 }
 
 .layout-list .layout-loader {

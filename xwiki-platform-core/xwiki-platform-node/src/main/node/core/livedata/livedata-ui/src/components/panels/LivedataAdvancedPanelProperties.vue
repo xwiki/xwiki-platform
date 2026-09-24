@@ -24,6 +24,7 @@
   It allows:
   - Toggling property visibility
   - Changing property order
+  - Choosing the property used as the card cover, in the cards layout
 -->
 <template>
   <!--
@@ -42,6 +43,15 @@
 
     <!-- Define panel content inside the `body` slot -->
     <template #body>
+      <!-- Toggle the card cover, only available in the cards layout -->
+      <label v-if="isCardsLayout" class="use-cover">
+        <input
+          type="checkbox"
+          :checked="isCoverEnabled"
+          @change="toggleCover($event.target.checked)"
+        />
+        {{ $t("livedata.panel.properties.useCover") }}
+      </label>
       <!--
         The properties are wrapped inside a XWikiDraggable component
         in order to allow the user to reorder them easily
@@ -80,6 +90,27 @@
               <!-- Property name -->
               <span class="property-name">{{ property.name }}</span>
             </label>
+
+            <!-- Card cover selection, when the card cover is enabled -->
+            <label
+              v-if="isCardsLayout && isCoverEnabled"
+              class="cover"
+              :title="
+                $t('livedata.panel.properties.cover.hint', [property.name])
+              "
+            >
+              <input
+                type="radio"
+                :name="coverInputName"
+                :value="property.id"
+                :checked="coverPropertyId === property.id"
+                :aria-label="
+                  $t('livedata.panel.properties.cover.hint', [property.name])
+                "
+                @change="setCover(property.id)"
+              />
+              {{ $t("livedata.panel.properties.cover") }}
+            </label>
           </XWikiDraggableItem>
         </template>
       </draggable>
@@ -89,6 +120,12 @@
 
 <script>
 import LivedataBaseAdvancedPanel from "./LivedataBaseAdvancedPanel.vue";
+import {
+  CARDS_LAYOUT_ID,
+  getCoverPropertyId,
+  getDefaultCoverPropertyId,
+  setCoverPropertyId,
+} from "../layouts/cards/cardsLayout.js";
 import XWikiDraggableItem from "../utilities/XWikiDraggableItem.vue";
 import XWikiIcon from "../utilities/XWikiIcon.vue";
 import draggable from "vuedraggable/src/vuedraggable";
@@ -115,9 +152,39 @@ export default {
     properties() {
       return this.logic.getPropertyDescriptors();
     },
+
+    // The card cover can only be chosen in the cards layout.
+    isCardsLayout() {
+      return this.logic.currentLayoutId?.value === CARDS_LAYOUT_ID;
+    },
+
+    coverPropertyId() {
+      return getCoverPropertyId(this.logic);
+    },
+
+    isCoverEnabled() {
+      return !!this.coverPropertyId;
+    },
+
+    // The name grouping the cover radio buttons of this Live Data.
+    coverInputName() {
+      return `${this.data.id}-card-cover`;
+    },
   },
 
   methods: {
+    // Enable the card cover with a default property, or remove it.
+    toggleCover(enabled) {
+      setCoverPropertyId(
+        this.logic,
+        enabled ? getDefaultCoverPropertyId(this.logic) : "",
+      );
+    },
+
+    setCover(propertyId) {
+      setCoverPropertyId(this.logic, propertyId);
+    },
+
     // event handler called when properties are dragged and dropped
     reorderProperty(e) {
       this.logic.reorderProperty(e.moved.oldIndex, e.moved.newIndex);
@@ -127,6 +194,30 @@ export default {
 </script>
 
 <style>
+.livedata-advanced-panel-properties .use-cover {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0;
+  padding: 6px 1rem 6px calc(1rem + 6px);
+  border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  font-weight: var(--font-weight-regular);
+}
+
+.livedata-advanced-panel-properties .use-cover input,
+.livedata-advanced-panel-properties .cover input {
+  margin: 0;
+}
+
+.livedata-advanced-panel-properties .cover {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  margin: 0 1rem 0 auto;
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+}
+
 .livedata-advanced-panel-properties .property {
   display: flex;
   flex-direction: row;

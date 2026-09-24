@@ -20,9 +20,8 @@
 
 <!--
   LayoutListItem is an item component for the List Layout.
-  It displays an entry on a compact line: its main property on the left, and its
-  secondary properties pushed to the right, in reverse order, separated by a small
-  circle.
+  It displays an entry on a compact line: its main property, in semibold, followed
+  by its secondary properties, all separated by a small circle.
   The values are read-only: they cannot be edited from the List layout.
 -->
 <template>
@@ -41,21 +40,16 @@
     <div v-if="propertyId" class="layout-list-item-value layout-list-item-main">
       <LivedataDisplayer :property-id="propertyId" :entry="entry" />
     </div>
-    <!-- Secondary property values, in reverse order -->
+    <!-- Secondary property values, right after the main one -->
     <div
-      v-if="reversedSecondaryPropertyIds.length"
+      v-if="displayedSecondaryPropertyIds.length"
       class="layout-list-item-secondary"
     >
       <template
-        v-for="(secondaryPropertyId, idx) in reversedSecondaryPropertyIds"
+        v-for="secondaryPropertyId in displayedSecondaryPropertyIds"
         :key="secondaryPropertyId"
       >
-        <span
-          v-if="idx > 0"
-          class="layout-list-item-separator"
-          aria-hidden="true"
-          >•</span
-        >
+        <span class="layout-list-item-separator" aria-hidden="true">•</span>
         <span class="layout-list-item-value layout-list-item-secondary-value">
           <LivedataDisplayer
             :property-id="secondaryPropertyId"
@@ -112,17 +106,15 @@ export default {
   },
 
   computed: {
-    // The secondary properties are displayed in reverse order, so that the first one ends the line. The properties
-    // without a value for this entry are skipped, to avoid displaying separators with nothing between them.
-    reversedSecondaryPropertyIds() {
-      return this.secondaryPropertyIds
-        .filter((propertyId) => {
-          const value = this.entry[propertyId];
-          return (
-            value !== undefined && value !== null && String(value).trim() !== ""
-          );
-        })
-        .reverse();
+    // The secondary properties without a value for this entry are skipped, to avoid displaying separators with
+    // nothing between them.
+    displayedSecondaryPropertyIds() {
+      return this.secondaryPropertyIds.filter((propertyId) => {
+        const value = this.entry[propertyId];
+        return (
+          value !== undefined && value !== null && String(value).trim() !== ""
+        );
+      });
     },
 
     isSelectionEnabled() {
@@ -166,20 +158,23 @@ export default {
   white-space: nowrap;
 }
 
-/* The main property takes the available space, keeping some room when the secondary properties are long. */
+/*
+  The main property is displayed in semibold. It keeps its size, unless it is too long, so that the secondary
+  properties are truncated first.
+*/
 .layout-list .layout-list-item-main {
-  flex: 1 1 auto;
-  min-width: 6em;
+  flex: 0 0 auto;
+  max-width: 60%;
+  font-weight: var(--font-weight-semibold);
 }
 
-/* The secondary properties are pushed to the right of the line. */
+/* The secondary properties follow the main property, in the order of the Live Data properties. */
 .layout-list .layout-list-item-secondary {
   display: flex;
   flex: 0 1 auto;
   align-items: baseline;
   gap: 0.5em;
   min-width: 0;
-  margin-left: auto;
   overflow: hidden;
   white-space: nowrap;
 }

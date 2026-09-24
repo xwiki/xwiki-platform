@@ -85,7 +85,7 @@ describe("LayoutListItem.vue", () => {
     expect(providedLogic.getEntryId({ id: "idB" })).toBe("idB");
   });
 
-  it("Displays the secondary properties in reverse order, separated by a circle", () => {
+  it("Displays the secondary properties after the main one, separated by a circle", () => {
     const wrapper = initWrapper(
       {},
       {
@@ -108,13 +108,29 @@ describe("LayoutListItem.vue", () => {
       secondary
         .findAllComponents(LivedataDisplayer)
         .map((displayer) => displayer.props("propertyId")),
-    ).toStrictEqual(["genre", "director", "year"]);
+    ).toStrictEqual(["year", "director", "genre"]);
+    // A separator precedes each secondary property, the first one separating it from the main property.
     const separators = secondary.findAll(".layout-list-item-separator");
     expect(separators.map((separator) => separator.text())).toStrictEqual([
       "•",
       "•",
+      "•",
     ]);
     expect(separators[0].attributes("aria-hidden")).toBe("true");
+    expect(
+      secondary
+        .findAll(
+          ".layout-list-item-separator, .layout-list-item-secondary-value",
+        )
+        .map((element) => element.classes()[0]),
+    ).toStrictEqual([
+      "layout-list-item-separator",
+      "layout-list-item-value",
+      "layout-list-item-separator",
+      "layout-list-item-value",
+      "layout-list-item-separator",
+      "layout-list-item-value",
+    ]);
   });
 
   it("Skips the secondary properties without a value", () => {
@@ -131,7 +147,7 @@ describe("LayoutListItem.vue", () => {
         .findAllComponents(LivedataDisplayer)
         .map((displayer) => displayer.props("propertyId")),
     ).toStrictEqual(["year"]);
-    expect(secondary.findAll(".layout-list-item-separator")).toHaveLength(0);
+    expect(secondary.findAll(".layout-list-item-separator")).toHaveLength(1);
   });
 
   it("Has no secondary properties by default", () => {

@@ -122,8 +122,34 @@ describe("LayoutList.vue", () => {
       entry: { id: 2 },
       entryIdx: 1,
       propertyId: "title",
+      secondaryPropertyIds: [],
     });
     expect(wrapper.find(".noentries-list").exists()).toBe(false);
+  });
+
+  it("Renders the other visible properties as secondary properties", () => {
+    const wrapper = initWrapper({
+      options: {
+        global: {
+          provide: {
+            logic: {
+              getPropertyDescriptor: (propertyId) => ({
+                id: propertyId,
+                visible: propertyId !== "hidden",
+              }),
+              data: {
+                query: { properties: ["title", "hidden", "year", "genre"] },
+                data: { entries: [{ id: 1 }] },
+              },
+            },
+          },
+        },
+      },
+    });
+    expect(wrapper.findComponent(LayoutListItem).props()).toMatchObject({
+      propertyId: "title",
+      secondaryPropertyIds: ["year", "genre"],
+    });
   });
 
   it("Has pagination at the top and at the bottom", () => {

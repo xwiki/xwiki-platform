@@ -17,7 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { getListPropertyId } from "./listLayout.js";
+import {
+  getListPropertyId,
+  getListSecondaryPropertyIds,
+} from "./listLayout.js";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -60,6 +63,36 @@ describe("listLayout.js", () => {
 
     it("Returns undefined when there are no properties", () => {
       expect(getListPropertyId(initLogic([]))).toBeUndefined();
+    });
+  });
+
+  describe("getListSecondaryPropertyIds", () => {
+    it("Returns the other visible properties in the configured order", () => {
+      const logic = initLogic([
+        { id: "a" },
+        { id: "b", visible: true },
+        { id: "c", visible: true },
+        { id: "d" },
+        { id: "e", visible: true },
+      ]);
+      expect(getListSecondaryPropertyIds(logic)).toStrictEqual(["c", "e"]);
+      // Follows the order changes.
+      logic.data.query.properties = ["e", "a", "b", "c", "d"];
+      expect(getListSecondaryPropertyIds(logic)).toStrictEqual(["b", "c"]);
+    });
+
+    it("Returns no property when only one property is visible", () => {
+      expect(
+        getListSecondaryPropertyIds(
+          initLogic([{ id: "a" }, { id: "b", visible: true }]),
+        ),
+      ).toStrictEqual([]);
+    });
+
+    it("Returns no property when none is visible", () => {
+      expect(
+        getListSecondaryPropertyIds(initLogic([{ id: "a" }, { id: "b" }])),
+      ).toStrictEqual([]);
     });
   });
 });

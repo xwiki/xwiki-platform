@@ -19,23 +19,42 @@
  */
 
 /**
- * Return the id of the property displayed by the List layout.
- *
- * The List layout displays a single property per entry: the first visible property, following the order of the
- * properties configured for the Live Data. When no property is visible, we fall back on the first property.
- *
  * @param logic - the Live Data logic
- * @returns the id of the displayed property, or undefined when there are no properties
+ * @returns the ids of the visible properties, following the order of the properties configured for the Live Data
  */
-function getListPropertyId(logic) {
-  const propertyIds = logic.data.query.properties;
+function getVisiblePropertyIds(logic) {
   // Read the visibility from the descriptor rather than with `isPropertyVisible`, which considers every property
   // visible in edit mode.
-  return (
-    propertyIds.find(
-      (propertyId) => logic.getPropertyDescriptor(propertyId)?.visible,
-    ) ?? propertyIds[0]
+  return logic.data.query.properties.filter(
+    (propertyId) => logic.getPropertyDescriptor(propertyId)?.visible,
   );
 }
 
-export { getListPropertyId };
+/**
+ * Return the id of the main property displayed by the List layout.
+ *
+ * The List layout displays the first visible property of each entry as its main property, following the order of the
+ * properties configured for the Live Data. When no property is visible, we fall back on the first property.
+ *
+ * @param logic - the Live Data logic
+ * @returns the id of the main property, or undefined when there are no properties
+ */
+function getListPropertyId(logic) {
+  return getVisiblePropertyIds(logic)[0] ?? logic.data.query.properties[0];
+}
+
+/**
+ * Return the ids of the secondary properties displayed by the List layout: the other visible properties, following the
+ * order of the properties configured for the Live Data.
+ *
+ * @param logic - the Live Data logic
+ * @returns the ids of the secondary properties
+ */
+function getListSecondaryPropertyIds(logic) {
+  const mainPropertyId = getListPropertyId(logic);
+  return getVisiblePropertyIds(logic).filter(
+    (propertyId) => propertyId !== mainPropertyId,
+  );
+}
+
+export { getListPropertyId, getListSecondaryPropertyIds };

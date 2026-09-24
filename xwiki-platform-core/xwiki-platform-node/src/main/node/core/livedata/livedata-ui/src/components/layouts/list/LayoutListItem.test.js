@@ -85,6 +85,61 @@ describe("LayoutListItem.vue", () => {
     expect(providedLogic.getEntryId({ id: "idB" })).toBe("idB");
   });
 
+  it("Displays the secondary properties in reverse order, separated by a circle", () => {
+    const wrapper = initWrapper(
+      {},
+      {
+        entry: {
+          id: "idA",
+          title: "Title A",
+          year: 2001,
+          director: "Director A",
+          genre: "Genre A",
+        },
+        secondaryPropertyIds: ["year", "director", "genre"],
+      },
+    );
+    const main = wrapper.find(".layout-list-item-main");
+    expect(main.findComponent(LivedataDisplayer).props("propertyId")).toBe(
+      "title",
+    );
+    const secondary = wrapper.find(".layout-list-item-secondary");
+    expect(
+      secondary
+        .findAllComponents(LivedataDisplayer)
+        .map((displayer) => displayer.props("propertyId")),
+    ).toStrictEqual(["genre", "director", "year"]);
+    const separators = secondary.findAll(".layout-list-item-separator");
+    expect(separators.map((separator) => separator.text())).toStrictEqual([
+      "•",
+      "•",
+    ]);
+    expect(separators[0].attributes("aria-hidden")).toBe("true");
+  });
+
+  it("Skips the secondary properties without a value", () => {
+    const wrapper = initWrapper(
+      {},
+      {
+        entry: { id: "idA", title: "Title A", year: 0, poster: " ", genre: "" },
+        secondaryPropertyIds: ["year", "poster", "genre", "director"],
+      },
+    );
+    const secondary = wrapper.find(".layout-list-item-secondary");
+    expect(
+      secondary
+        .findAllComponents(LivedataDisplayer)
+        .map((displayer) => displayer.props("propertyId")),
+    ).toStrictEqual(["year"]);
+    expect(secondary.findAll(".layout-list-item-separator")).toHaveLength(0);
+  });
+
+  it("Has no secondary properties by default", () => {
+    expect(initWrapper().find(".layout-list-item-secondary").exists()).toBe(
+      false,
+    );
+  });
+
   it("Displays nothing when there is no property", () => {
     const wrapper = initWrapper({}, { propertyId: undefined });
     expect(wrapper.findComponent(LivedataDisplayer).exists()).toBe(false);

@@ -20,8 +20,10 @@
 
 <!--
   LayoutListItem is an item component for the List Layout.
-  It displays a single property of an entry, on a compact line.
-  The value is read-only: it cannot be edited from the List layout.
+  It displays an entry on a compact line: its main property on the left, and its
+  secondary properties pushed to the right, in reverse order, separated by a small
+  circle.
+  The values are read-only: they cannot be edited from the List layout.
 -->
 <template>
   <li
@@ -35,9 +37,32 @@
       v-show="isEntrySelectable"
       :entry="entry"
     />
-    <!-- Displayed property value -->
-    <div v-if="propertyId" class="layout-list-item-value">
+    <!-- Main property value -->
+    <div v-if="propertyId" class="layout-list-item-value layout-list-item-main">
       <LivedataDisplayer :property-id="propertyId" :entry="entry" />
+    </div>
+    <!-- Secondary property values, in reverse order -->
+    <div
+      v-if="reversedSecondaryPropertyIds.length"
+      class="layout-list-item-secondary"
+    >
+      <template
+        v-for="(secondaryPropertyId, idx) in reversedSecondaryPropertyIds"
+        :key="secondaryPropertyId"
+      >
+        <span
+          v-if="idx > 0"
+          class="layout-list-item-separator"
+          aria-hidden="true"
+          >•</span
+        >
+        <span class="layout-list-item-value layout-list-item-secondary-value">
+          <LivedataDisplayer
+            :property-id="secondaryPropertyId"
+            :entry="entry"
+          />
+        </span>
+      </template>
     </div>
   </li>
 </template>
@@ -74,14 +99,32 @@ export default {
       type: Number,
       required: true,
     },
-    // The id of the property to display.
+    // The id of the main property to display.
     propertyId: {
       type: String,
       default: undefined,
     },
+    // The ids of the secondary properties to display, in the order of the Live Data properties.
+    secondaryPropertyIds: {
+      type: Array,
+      default: () => [],
+    },
   },
 
   computed: {
+    // The secondary properties are displayed in reverse order, so that the first one ends the line. The properties
+    // without a value for this entry are skipped, to avoid displaying separators with nothing between them.
+    reversedSecondaryPropertyIds() {
+      return this.secondaryPropertyIds
+        .filter((propertyId) => {
+          const value = this.entry[propertyId];
+          return (
+            value !== undefined && value !== null && String(value).trim() !== ""
+          );
+        })
+        .reverse();
+    },
+
     isSelectionEnabled() {
       return this.logic.isSelectionEnabled();
     },
@@ -117,11 +160,49 @@ export default {
 }
 
 .layout-list .layout-list-item-value {
-  flex-grow: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* The main property takes the available space, keeping some room when the secondary properties are long. */
+.layout-list .layout-list-item-main {
+  flex: 1 1 auto;
+  min-width: 6em;
+}
+
+/* The secondary properties are pushed to the right of the line. */
+.layout-list .layout-list-item-secondary {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: baseline;
+  gap: 0.5em;
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.layout-list .layout-list-item-secondary-value {
+  flex: 0 1 auto;
+}
+
+.layout-list .layout-list-item-separator {
+  flex: none;
+  color: var(--text-muted);
+}
+
+/* Keep the items on one compact line, whatever the displayed values. */
+.layout-list .layout-list-item-value p {
+  display: inline;
+  margin: 0;
+}
+
+.layout-list .layout-list-item-value img {
+  width: auto;
+  max-height: 1.5em;
+  vertical-align: middle;
 }
 
 /*

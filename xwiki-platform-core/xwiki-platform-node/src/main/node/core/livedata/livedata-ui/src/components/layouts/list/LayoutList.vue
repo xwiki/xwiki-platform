@@ -20,8 +20,9 @@
 
 <!--
   LayoutList.vue is the main file for the List layout component.
-  It displays the entries as a compact, read-only list, showing a single property
-  per entry: the first visible property, in the order of the Livedata properties.
+  It displays the entries as a compact, read-only list. Each entry shows its first
+  visible property, in the order of the Livedata properties, as its main property,
+  and its other visible properties on the right of the line.
 -->
 <template>
   <div class="layout-list">
@@ -60,6 +61,7 @@
         :entry="entry"
         :entry-idx="idx"
         :property-id="propertyId"
+        :secondary-property-ids="secondaryPropertyIds"
       />
     </ul>
     <LivedataBottombar>
@@ -73,7 +75,10 @@
 
 <script>
 import LayoutListItem from "./LayoutListItem.vue";
-import { getListPropertyId } from "./listLayout.js";
+import {
+  getListPropertyId,
+  getListSecondaryPropertyIds,
+} from "./listLayout.js";
 import LivedataBottombar from "../../LivedataBottombar.vue";
 import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
@@ -106,9 +111,13 @@ export default {
     entries() {
       return this.logic.data.data.entries;
     },
-    // The id of the property displayed for each entry
+    // The id of the main property displayed for each entry
     propertyId() {
       return getListPropertyId(this.logic);
+    },
+    // The ids of the other visible properties, displayed on the right of each entry
+    secondaryPropertyIds() {
+      return getListSecondaryPropertyIds(this.logic);
     },
     isSelectionEnabled() {
       return this.logic.isSelectionEnabled();

@@ -176,6 +176,7 @@ import org.xwiki.security.authservice.internal.AuthServiceManager;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
+import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
@@ -8078,6 +8079,19 @@ public class XWiki implements EventListener
     public boolean isTitleInCompatibilityMode()
     {
         return "1".equals(getConfiguration().getProperty("xwiki.title.compatibility", "0"));
+    }
+
+    /**
+     * Compute and return the maximum authorized length for a document title, based on the current store limitation.
+     *
+     * @param context the XWiki context
+     * @return the maximum authorized length for a document title
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public int getDocumentTitleMaxLength(XWikiContext context)
+    {
+        return getStore().getLimitSize(context, XWikiDocument.class, "title");
     }
 
     @Override

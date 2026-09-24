@@ -199,7 +199,7 @@
   &lt;div class="annotation $!{ann.state}" id="annotation_${mode}_$!{ann.id}"&gt;
     &lt;div class="annotation-bubble-avatar"&gt;
       ## The Annotations tab sits next to the Comments tab and matches its author line, which is built on a 50px
-      ## avatar. The bubble is compact and keeps the 30px one.
+      ## avatar. The bubble is compact and uses the 30px one.
       #if ($mode == 'list')
         #mediumUserAvatar($ann.author)
       #else

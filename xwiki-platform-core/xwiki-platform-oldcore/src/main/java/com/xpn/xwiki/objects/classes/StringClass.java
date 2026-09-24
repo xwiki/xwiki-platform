@@ -53,10 +53,10 @@ public class StringClass extends PropertyClass
     private static final String XCLASSNAME = "string";
 
     /**
-     * The maximum number of characters the store accepts for a string property value, read lazily from the store
-     * since the lookup queries the database metadata. {@code -1} when not yet computed.
+     * The prefix of the context key under which the maximum number of characters the store accepts for a string
+     * property value is cached for the current request, since reading it queries the database metadata.
      */
-    private transient int maxLength = -1;
+    private static final String MAX_LENGTH_CONTEXT_KEY_PREFIX = StringClass.class.getName() + ".maxLength.";
 
     public StringClass(String name, String prettyname, PropertyMetaClass wclass)
     {
@@ -161,11 +161,16 @@ public class StringClass extends PropertyClass
 
     private int getMaxLength(XWikiContext context)
     {
-        if (this.maxLength == -1) {
-            this.maxLength = context.getWiki().getStore().getLimitSize(context, StringProperty.class, "value");
+        // Cached in the context rather than in this instance: a field would be ignored by the inherited equals(), and
+        // the limit depends on the database of the current wiki.
+        String key = MAX_LENGTH_CONTEXT_KEY_PREFIX + context.getWikiId();
+        Integer maxLength = (Integer) context.get(key);
+        if (maxLength == null) {
+            maxLength = context.getWiki().getStore().getLimitSize(context, StringProperty.class, "value");
+            context.put(key, maxLength);
         }
 
-        return this.maxLength;
+        return maxLength;
     }
 
     private void displayPickerEdit(input input)

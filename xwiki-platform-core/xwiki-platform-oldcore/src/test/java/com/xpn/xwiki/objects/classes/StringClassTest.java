@@ -93,7 +93,7 @@ class StringClassTest
     }
 
     @Test
-    void displayEditReadsStoreLimitOnce() throws Exception
+    void displayEditReadsStoreLimitOncePerRequest() throws Exception
     {
         this.oldCore.getMocker().registerMockComponent(ContextualLocalizationManager.class);
         XWikiContext xWikiContext = this.oldCore.getXWikiContext();
@@ -107,11 +107,14 @@ class StringClassTest
         stringClass.displayEdit(firstBuffer, "test", "Space.Page_0_", object, xWikiContext);
         assertTrue(firstBuffer.toString().contains(" maxlength='768' "), firstBuffer.toString());
 
+        // Another string property rendered during the same request reuses the limit.
+        StringClass otherStringClass = new StringClass();
+        otherStringClass.setName("test");
         StringBuffer secondBuffer = new StringBuffer();
-        stringClass.displayEdit(secondBuffer, "test", "Space.Page_0_", object, xWikiContext);
+        otherStringClass.displayEdit(secondBuffer, "test", "Space.Page_0_", object, xWikiContext);
         assertEquals(firstBuffer.toString(), secondBuffer.toString());
 
-        // The limit requires a database metadata query so it must be read from the store only once.
+        // The limit requires a database metadata query so it must be read from the store only once per request.
         verify(this.oldCore.getMockStore(), times(1)).getLimitSize(xWikiContext, StringProperty.class, "value");
     }
 

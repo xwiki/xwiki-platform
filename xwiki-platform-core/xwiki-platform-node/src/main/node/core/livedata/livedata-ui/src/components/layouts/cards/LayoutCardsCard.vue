@@ -288,11 +288,16 @@ export default {
   border-radius: var(--border-radius-base);
 }
 
+/*
+  Align the title with the property names: the properties are inside a container with a padding of 8px, and they
+  start after the space of their drag handle (30px, shifted by -8px).
+*/
 .layout-cards .card-title {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  padding: 0 8px 0 30px;
 }
 
 .layout-cards .card-title h2 {

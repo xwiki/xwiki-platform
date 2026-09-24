@@ -60,6 +60,8 @@ export async function i18nResolver(
       "action.editMode",
       "action.resizeColumn.hint",
       "table.entrySelector.hint",
+      "layout.list.property",
+      "layout.list.property.hint",
       "panel.heading.actions.collapse.hint",
       "panel.heading.actions.close.hint",
       "panel.filter.title",

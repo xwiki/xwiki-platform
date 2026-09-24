@@ -35,6 +35,10 @@
 </template>
 
 <script>
+import {
+  LIST_LAYOUT_ID,
+  setListPropertyId,
+} from "./layouts/list/listLayout.js";
 import { XWiki } from "../services/xwiki.js";
 // lz-string is used to compress / decompress the encoded config
 import LZString from "lz-string";
@@ -149,6 +153,23 @@ export default {
       },
     },
 
+    // Property displayed by the List layout
+    $_listProperty: {
+      get() {
+        // Only save the property explicitly chosen, so that the fallback keeps following the property visibility.
+        return (
+          this.logic.getLayoutDescriptor(LIST_LAYOUT_ID)?.displayedProperty ??
+          ""
+        );
+      },
+      set(value) {
+        // The value is missing when decoding a config saved with an older encoding version.
+        if (value) {
+          setListPropertyId(this.logic, value);
+        }
+      },
+    },
+
     // Return the u-node domain used to encode properties
     encodingSpecsProperties() {
       // The whole list of property ids
@@ -212,6 +233,19 @@ export default {
       };
     },
 
+    // Add the property displayed by the List layout.
+    encodingSpecsV2() {
+      return {
+        ...this.encodingSpecsV1,
+        $_listProperty: ["varchar"],
+      };
+    },
+
+    // The encoding specs used to save the config
+    encodingSpecs() {
+      return this.encodingSpecsV2;
+    },
+
     // The coders that are going to be used for encoding the config
     // It is an array so that we can specify several encoding specs.
     // Using several encoding specs can be useful to keep backward
@@ -220,6 +254,7 @@ export default {
       return [
         // the first parameter is the encoding version
         fromJson(1, this.encodingSpecsV1),
+        fromJson(2, this.encodingSpecsV2),
       ];
     },
 
@@ -228,7 +263,7 @@ export default {
     // to map the specs keys to the values to save
     dataToSave() {
       const dataToSave = {};
-      for (const key in this.encodingSpecsV1) {
+      for (const key in this.encodingSpecs) {
         dataToSave[key] = this[key];
       }
       return dataToSave;

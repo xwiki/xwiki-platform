@@ -55,7 +55,8 @@
   "meta":{
     "layouts":[
       {"id":"table","name":"Table","icon":{"cssClass":"fa fa-table"}},
-      {"id":"cards","name":"cards","icon":{}}
+      {"id":"cards","name":"cards","icon":{}},
+      {"id":"list","name":"list","icon":{}}
     ],
     "defaultLayout":"table",
     "propertyDescriptors":[

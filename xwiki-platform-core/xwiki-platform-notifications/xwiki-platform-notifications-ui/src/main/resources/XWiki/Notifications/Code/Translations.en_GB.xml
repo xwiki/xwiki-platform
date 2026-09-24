@@ -54,10 +54,10 @@ notifications.filters.advanced.modal.close=Close
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=System Filter
-### Missing: notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user unless the event specifically targets you
-### Missing: notifications.filters.name.ownEventsNotificationFilter=Own Events Filter
-### Missing: notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity unless the event specifically targets you
-### Missing: notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
+notifications.filters.description.systemUserNotificationFilter=Hide notifications from the System user unless the event specifically targets you
+notifications.filters.name.ownEventsNotificationFilter=Own Events Filter
+notifications.filters.description.ownEventsNotificationFilter=Hide notifications about your own activity unless the event specifically targets you
+notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
 ### Missing: notifications.filters.description.eventReadAlertFilter=Hide notifications that you have marked as read
 ### Missing: notifications.filters.name.eventReadEmailFilter=Read Event Filter (Email)
 ### Missing: notifications.filters.description.eventReadEmailFilter=Hide notifications that you have marked as read

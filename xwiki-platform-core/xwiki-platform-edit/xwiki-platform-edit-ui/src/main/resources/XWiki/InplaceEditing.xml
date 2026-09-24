@@ -967,6 +967,10 @@ define('editInPlace', [
       .text(l10n['core.editors.content.titleField.label']);
     var input = $('&lt;input type="text" id="document-title-input" name="title" form="inplace-editing" /&gt;')
       .val(xwikiDocument.rawTitle);
+    // Prevent entering a title that the store would fail to save.
+    if (config.titleMaxLength &gt; 0) {
+      input.attr('maxlength', config.titleMaxLength);
+    }
     if (config.titleIsMandatory) {
       input.attr({
         'required': '',
@@ -1664,6 +1668,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'l10n': $l10n
     })
     #set ($inplaceEditingConfig.titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
+    #set ($inplaceEditingConfig.titleMaxLength = $doc.titleMaxLength)
     &lt;div class="hidden" data-inplace-editing-config="$escapetool.xml($jsontool.serialize($inplaceEditingConfig))"&gt;&lt;/div&gt;
     ## We didn't move this to the file system because it uses LESS and we didn't want to include it in the skin.
     #set ($discard = $xwiki.ssx.use('XWiki.InplaceEditing'))

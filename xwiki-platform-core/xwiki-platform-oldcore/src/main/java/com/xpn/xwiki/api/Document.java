@@ -3605,6 +3605,17 @@ public class Document extends Api
     }
 
     /**
+     * @return the maximum authorized length for the document title (see {@link #getTitle()}), or {@code -1} if it
+     *         cannot be determined
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public int getTitleMaxLength()
+    {
+        return this.doc.getTitleMaxLength();
+    }
+
+    /**
      * @return the authors of the document.
      * @since 14.0RC1
      */

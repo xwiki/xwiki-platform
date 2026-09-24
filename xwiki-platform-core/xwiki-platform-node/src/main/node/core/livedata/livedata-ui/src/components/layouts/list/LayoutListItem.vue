@@ -21,6 +21,7 @@
 <!--
   LayoutListItem is an item component for the List Layout.
   It displays a single property of an entry, on a compact line.
+  The value is read-only: it cannot be edited from the List layout.
 -->
 <template>
   <li
@@ -42,6 +43,7 @@
 </template>
 
 <script>
+import { createReadOnlyLogic } from "./listLayout.js";
 import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
 
@@ -54,6 +56,13 @@ export default {
   },
 
   inject: ["logic"],
+
+  // Provide a read-only logic to the displayers, so that they don't offer to edit the value.
+  provide() {
+    return {
+      logic: createReadOnlyLogic(this.logic),
+    };
+  },
 
   props: {
     entry: {

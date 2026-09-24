@@ -19,28 +19,16 @@
  */
 
 /**
- * The id of the List layout.
- */
-const LIST_LAYOUT_ID = "list";
-
-/**
  * Return the id of the property displayed by the List layout.
  *
- * The List layout displays a single property per entry. It is kept on the layout descriptor (in its
- * `displayedProperty` field) rather than in the property visibility, so that choosing it does not change the
- * properties displayed by the other layouts. When it is not set, or does not match a property of the query, we fall
- * back on the first visible property, then on the first property.
+ * The List layout displays a single property per entry: the first visible property, following the order of the
+ * properties configured for the Live Data. When no property is visible, we fall back on the first property.
  *
  * @param logic - the Live Data logic
  * @returns the id of the displayed property, or undefined when there are no properties
  */
 function getListPropertyId(logic) {
   const propertyIds = logic.data.query.properties;
-  const displayedProperty =
-    logic.getLayoutDescriptor(LIST_LAYOUT_ID)?.displayedProperty;
-  if (displayedProperty && propertyIds.includes(displayedProperty)) {
-    return displayedProperty;
-  }
   // Read the visibility from the descriptor rather than with `isPropertyVisible`, which considers every property
   // visible in edit mode.
   return (
@@ -51,16 +39,23 @@ function getListPropertyId(logic) {
 }
 
 /**
- * Set the property displayed by the List layout. Unknown properties are ignored.
+ * Wrap the Live Data logic so that nothing can be edited through it. The List layout is read-only: its displayers use
+ * this logic, which prevents them from offering the edit action or switching to their editor.
  *
  * @param logic - the Live Data logic
- * @param propertyId - the id of the property to display
+ * @returns a logic behaving like the given one, except that no entry or property is editable
  */
-function setListPropertyId(logic, propertyId) {
-  const layoutDescriptor = logic.getLayoutDescriptor(LIST_LAYOUT_ID);
-  if (layoutDescriptor && logic.data.query.properties.includes(propertyId)) {
-    layoutDescriptor.displayedProperty = propertyId;
-  }
+function createReadOnlyLogic(logic) {
+  return new Proxy(logic, {
+    get(target, property) {
+      if (property === "isEditable") {
+        return () => false;
+      }
+      const value = Reflect.get(target, property, target);
+      // Call the methods on the actual logic, so that they keep working with its internal state.
+      return typeof value === "function" ? value.bind(target) : value;
+    },
+  });
 }
 
-export { LIST_LAYOUT_ID, getListPropertyId, setListPropertyId };
+export { createReadOnlyLogic, getListPropertyId };

@@ -17,71 +17,79 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  LIST_LAYOUT_ID,
-  getListPropertyId,
-  setListPropertyId,
-} from "./listLayout.js";
+import { createReadOnlyLogic, getListPropertyId } from "./listLayout.js";
 import { describe, expect, it } from "vitest";
 
 /**
- * Create a minimal logic with the given properties and List layout descriptor.
+ * Create a minimal logic with the given properties.
  *
  * @param properties - the property descriptors, in the query order
- * @param layoutDescriptor - the descriptor of the List layout, or undefined when the layout is not available
  * @returns the logic
  */
-function initLogic(properties, layoutDescriptor = { id: LIST_LAYOUT_ID }) {
+function initLogic(properties) {
   return {
     data: {
       query: {
         properties: properties.map((property) => property.id),
       },
     },
-    getLayoutDescriptor: (layoutId) =>
-      layoutId === LIST_LAYOUT_ID ? layoutDescriptor : undefined,
     getPropertyDescriptor: (propertyId) =>
       properties.find((property) => property.id === propertyId),
   };
 }
 
 describe("listLayout.js", () => {
-  it("Returns the configured displayed property", () => {
-    const logic = initLogic([{ id: "a", visible: true }, { id: "b" }], {
-      id: LIST_LAYOUT_ID,
-      displayedProperty: "b",
+  describe("getListPropertyId", () => {
+    it("Returns the first visible property in the configured order", () => {
+      const logic = initLogic([
+        { id: "a" },
+        { id: "b", visible: true },
+        { id: "c", visible: true },
+      ]);
+      expect(getListPropertyId(logic)).toBe("b");
+      // Follows the order changes.
+      logic.data.query.properties = ["c", "a", "b"];
+      expect(getListPropertyId(logic)).toBe("c");
     });
-    expect(getListPropertyId(logic)).toBe("b");
-  });
 
-  it("Falls back on the first visible property", () => {
-    const logic = initLogic([{ id: "a" }, { id: "b", visible: true }], {
-      id: LIST_LAYOUT_ID,
-      displayedProperty: "unknown",
+    it("Falls back on the first property when none is visible", () => {
+      expect(getListPropertyId(initLogic([{ id: "a" }, { id: "b" }]))).toBe(
+        "a",
+      );
     });
-    expect(getListPropertyId(logic)).toBe("b");
+
+    it("Returns undefined when there are no properties", () => {
+      expect(getListPropertyId(initLogic([]))).toBeUndefined();
+    });
   });
 
-  it("Falls back on the first property when none is visible", () => {
-    const logic = initLogic([{ id: "a" }, { id: "b" }], undefined);
-    expect(getListPropertyId(logic)).toBe("a");
-  });
+  describe("createReadOnlyLogic", () => {
+    class Logic {
+      constructor() {
+        this.data = { id: "ld" };
+        this.editable = true;
+      }
+      isEditable() {
+        return this.editable;
+      }
+      getId() {
+        return this.data.id;
+      }
+    }
 
-  it("Returns undefined when there are no properties", () => {
-    expect(getListPropertyId(initLogic([]))).toBeUndefined();
-  });
+    it("Makes nothing editable", () => {
+      const logic = new Logic();
+      const readOnlyLogic = createReadOnlyLogic(logic);
+      expect(logic.isEditable()).toBe(true);
+      expect(readOnlyLogic.isEditable({ propertyId: "a" })).toBe(false);
+    });
 
-  it("Sets the displayed property without changing the property visibility", () => {
-    const properties = [{ id: "a", visible: true }, { id: "b" }];
-    const logic = initLogic(properties);
-    setListPropertyId(logic, "b");
-    expect(getListPropertyId(logic)).toBe("b");
-    expect(properties).toStrictEqual([{ id: "a", visible: true }, { id: "b" }]);
-  });
-
-  it("Ignores unknown properties", () => {
-    const logic = initLogic([{ id: "a" }, { id: "b", visible: true }]);
-    setListPropertyId(logic, "unknown");
-    expect(getListPropertyId(logic)).toBe("b");
+    it("Delegates everything else to the logic", () => {
+      const readOnlyLogic = createReadOnlyLogic(new Logic());
+      expect(readOnlyLogic.data.id).toBe("ld");
+      // Detached methods are still called on the logic.
+      const { getId } = readOnlyLogic;
+      expect(getId()).toBe("ld");
+    });
   });
 });

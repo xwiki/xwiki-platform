@@ -74,6 +74,17 @@ describe("LayoutListItem.vue", () => {
     });
   });
 
+  it("Provides a read-only logic to the displayer", () => {
+    const wrapper = initWrapper({
+      global: { provide: { logic: { isEditable: () => true } } },
+    });
+    const providedLogic = wrapper.vm.$.provides.logic;
+    expect(providedLogic.isEditable({ entry: {}, propertyId: "title" })).toBe(
+      false,
+    );
+    expect(providedLogic.getEntryId({ id: "idB" })).toBe("idB");
+  });
+
   it("Displays nothing when there is no property", () => {
     const wrapper = initWrapper({}, { propertyId: undefined });
     expect(wrapper.findComponent(LivedataDisplayer).exists()).toBe(false);

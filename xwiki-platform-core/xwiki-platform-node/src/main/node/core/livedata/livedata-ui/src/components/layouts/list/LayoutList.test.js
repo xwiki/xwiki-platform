@@ -19,7 +19,6 @@
  */
 import LayoutList from "./LayoutList.vue";
 import LayoutListItem from "./LayoutListItem.vue";
-import { LIST_LAYOUT_ID } from "./listLayout.js";
 import LivedataPagination from "../../LivedataPagination.vue";
 import { shallowMount } from "@vue/test-utils";
 import _ from "lodash-es";
@@ -45,11 +44,11 @@ function initWrapper({ options, afterEntryFetchWrapper } = {}) {
             logic: {
               getEntryId: (e) => e.id,
               isSelectionEnabled: () => false,
-              getLayoutDescriptor: (layoutId) =>
-                layoutId === LIST_LAYOUT_ID
-                  ? { id: LIST_LAYOUT_ID, displayedProperty: "title" }
-                  : undefined,
-              getPropertyDescriptor: (propertyId) => ({ id: propertyId }),
+              // Only the second property is visible.
+              getPropertyDescriptor: (propertyId) => ({
+                id: propertyId,
+                visible: propertyId === "title",
+              }),
               onEvent: (eventName, callback) => {
                 if (afterEntryFetchWrapper) {
                   afterEntryFetchWrapper.callback = callback;
@@ -70,7 +69,7 @@ function initWrapper({ options, afterEntryFetchWrapper } = {}) {
           },
           renderStubDefaultSlot: true,
           stubs: {
-            // Render the named slots of the top bar, holding the pagination and the property picker.
+            // Render the named slots of the top bar, holding the pagination.
             LivedataTopbar: {
               setup(props, { slots }) {
                 return () => h("div", [slots.left?.(), slots.right?.()]);
@@ -97,7 +96,7 @@ describe("LayoutList.vue", () => {
     );
   });
 
-  it("Renders the entries with the displayed property", async () => {
+  it("Renders the entries with the first visible property", async () => {
     const afterEntryFetchWrapper = {};
     const wrapper = initWrapper({
       options: {

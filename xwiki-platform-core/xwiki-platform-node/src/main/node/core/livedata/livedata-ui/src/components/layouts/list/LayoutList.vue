@@ -20,10 +20,8 @@
 
 <!--
   LayoutList.vue is the main file for the List layout component.
-  It displays the entries as a compact list, showing a single property per entry.
-  The displayed property can be chosen by the user, and its default value can be
-  specified in the `displayedProperty` property of its layout descriptor, inside
-  the Livedata configuration.
+  It displays the entries as a compact, read-only list, showing a single property
+  per entry: the first visible property, in the order of the Livedata properties.
 -->
 <template>
   <div class="layout-list">
@@ -31,14 +29,13 @@
       The layout Topbar
       Add common layout utilities, like the dropdown menu, the refresh button,
       and the pagination.
-      It also has the displayed property picker and the "select all" button
+      It also has the "select all" button
     -->
     <LivedataTopbar>
       <template #left>
         <LivedataPagination side="left" />
       </template>
       <template #right>
-        <LayoutListPropertyPicker />
         <LivedataPagination side="right" />
         <LivedataEntrySelectorAll v-if="isSelectionEnabled" />
         <LivedataDropdownMenu />
@@ -76,7 +73,6 @@
 
 <script>
 import LayoutListItem from "./LayoutListItem.vue";
-import LayoutListPropertyPicker from "./LayoutListPropertyPicker.vue";
 import { getListPropertyId } from "./listLayout.js";
 import LivedataBottombar from "../../LivedataBottombar.vue";
 import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
@@ -97,7 +93,6 @@ export default {
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
     LayoutListItem,
-    LayoutListPropertyPicker,
     LayoutLoader,
   },
 

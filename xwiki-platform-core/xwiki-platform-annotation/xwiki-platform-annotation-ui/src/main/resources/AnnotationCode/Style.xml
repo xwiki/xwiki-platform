@@ -276,7 +276,6 @@ mark.annotation:not(.annotation-highlight) {
 }
 
 .annotation .annotation-bubble-tools .btn, .annotation .annotation-bubble-close .btn {
-  --padding-base-horizontal: 12px;
   background: transparent;
   border: none;
   /* Align first button with the annotation text. */

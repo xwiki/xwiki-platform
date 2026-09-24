@@ -261,10 +261,25 @@
   #displayAnnotationToolboxFromReference($ann, $mode, $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
 #end
 #**
- * Display the annotation toolbox:
- * - 'verify' button for modified annotations
- * - 'edit' button for annotation authors and other users with edit rights, unless already editing
- * - 'delete' button for annotation authors and other users with edit rights
+ * Display the annotation toolbox. The actions available in each mode are, 'view' being the bubble and 'list' the
+ * Annotations tab:
+ *
+ *   Action                   | view | list | edit | create
+ *   -------------------------+------+------+------+-------
+ *   Validate                 |  x   |  x   |  x   |
+ *   Thread, Reply, Share     |  x   |      |      |
+ *   Edit                     |  x   |  x   |      |
+ *   Delete, XWikiComments    |  x   |  x   |      |
+ *   Delete, any other class  |  x   |  x   |  x   |
+ *
+ * Thread, Reply and Share only exist for the XWiki.XWikiComments class. On top of the mode, each action requires:
+ * - Validate: an annotation moved by a page edit, that the current user can edit
+ * - Thread: at least one reply to the annotation
+ * - Reply: comment right on the annotated document
+ * - Edit: comment right, and being the annotation author or an admin
+ * - Delete: edit right and being the annotation author, or admin right
+ * For any other class, Edit and Delete both require the right to edit the annotation, and being its author or an
+ * admin.
  *
  * @param $ann the annotation object
  * @param $mode view (default), list, create or edit
@@ -300,7 +315,6 @@
     #set($replyFallbackURL = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
     #getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $replyFallbackURL, $xredirect)
     #set($isUserComment = "$!ann.get('author')" != '' &amp;&amp; $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
-    ## Only the bubble forwards these three to the Comments tab.
     #if($mode == 'view' &amp;&amp; $threadCount &gt; 0)
       &lt;button class="thread-toggle btn btn-default infomessage"&gt;
         $services.icon.renderHTML('comments') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
@@ -317,7 +331,6 @@
         $services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
       &lt;/a&gt;##
     #end
-    ## No Edit button in the edit form itself.
     #if($mode != 'edit' &amp;&amp; $annHasComment &amp;&amp; ($annHasAdmin || $isUserComment))
       #set ($editQueryString = $escapetool.url({
         'viewer': 'comments',

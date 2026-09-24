@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
@@ -2040,5 +2041,14 @@ class XWikiDocumentMockitoTest
             .thenReturn(768);
 
         assertEquals(768, this.document.getTitleMaxLength());
+    }
+
+    @Test
+    void getTitleMaxLengthWithoutContext() throws Exception
+    {
+        Provider<XWikiContext> xcontextProvider = this.oldcore.getMocker().getInstance(XWikiContext.TYPE_PROVIDER);
+        when(xcontextProvider.get()).thenReturn(null);
+
+        assertEquals(-1, this.document.getTitleMaxLength());
     }
 }

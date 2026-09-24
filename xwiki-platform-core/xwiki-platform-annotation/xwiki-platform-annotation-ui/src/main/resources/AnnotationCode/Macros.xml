@@ -269,8 +269,7 @@
  *   Validate                 |  x   |  x   |  x   |
  *   Thread, Reply, Share     |  x   |      |      |
  *   Edit                     |  x   |  x   |      |
- *   Delete, XWikiComments    |  x   |  x   |      |
- *   Delete, any other class  |  x   |  x   |  x   |
+ *   Delete                   |  x   |  x   |      |
  *
  * Thread, Reply and Share only exist for the XWiki.XWikiComments class. On top of the mode, each action requires:
  * - Validate: an annotation moved by a page edit, that the current user can edit
@@ -371,12 +370,12 @@
             title="$escapetool.xml($services.localization.render('annotations.action.edit.tooltip'))"&gt;
             $services.icon.renderHTML('pencil')
           &lt;/a&gt;##
+          #set($deleteURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=DELETE&amp;media=json")
+          &lt;a class="delete btn btn-default infomessage" href="$escapetool.xml($deleteURL)"
+            title="$escapetool.xml($services.localization.render('annotations.action.delete.tooltip'))"&gt;
+            $services.icon.renderHTML('cross')
+          &lt;/a&gt;
         #end
-        #set($deleteURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=DELETE&amp;media=json")
-        &lt;a class="delete btn btn-default infomessage" href="${deleteURL}"
-          title="$services.localization.render('annotations.action.delete.tooltip')"&gt;
-          $services.icon.renderHTML('cross')
-        &lt;/a&gt;
       #end
     #end
   #end

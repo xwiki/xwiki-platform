@@ -271,6 +271,25 @@ class AnnotationCodeMacrosPageTest extends PageTest
                 mode));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "list", "edit" })
+    void toolboxOfAnotherAnnotationClassMatchesTheMode(String mode) throws Exception
+    {
+        this.context.setUserReference(AUTHOR);
+
+        Element tools = renderOtherClassToolbox(mode);
+
+        if ("edit".equals(mode)) {
+            assertNull(tools.selectFirst("a.edit"), "The edit button was rendered in the edit form");
+            assertNull(tools.selectFirst("a.delete"), "The delete button was rendered in the edit form");
+        } else {
+            assertNotNull(tools.selectFirst("a.edit"),
+                String.format("The edit button was not rendered in the [%s] mode", mode));
+            assertNotNull(tools.selectFirst("a.delete"),
+                String.format("The delete button was not rendered in the [%s] mode", mode));
+        }
+    }
+
     @Test
     void validateIsDisplayedForAnAnnotationMovedByAPageEdit() throws Exception
     {
@@ -307,6 +326,31 @@ class AnnotationCodeMacrosPageTest extends PageTest
         Element annotation = renderHTMLPage(testPage).selectFirst(".annotation");
         assertNotNull(annotation, String.format("The annotation was not rendered in the [%s] mode", mode));
         return annotation;
+    }
+
+    private Element renderOtherClassToolbox(String mode) throws Exception
+    {
+        XWikiDocument testPage = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "TestPage"),
+            this.context);
+        testPage.setSyntax(XWIKI_2_0);
+        // Overriding the configured class after the include is enough for the toolbox, which only compares the class
+        // name to pick the actions to render.
+        testPage.setContent(String.format(
+            """
+                {{include reference="AnnotationCode.Macros" /}}
+
+                {{velocity}}
+                {{html clean="false" wiki="false"}}
+                #set($annotationClassDocName = 'Space.CustomAnnotationClass')
+                #set($docRef = $services.model.createDocumentReference('xwiki', 'Space', 'Target'))
+                #set($ann = $services.annotations.getAnnotation('Space.Target', '0'))
+                <div class="tools">#displayAnnotationToolboxFromReference($ann, '%s', $docRef)</div>
+                {{/html}}
+                {{/velocity}}""", mode));
+
+        Element tools = renderHTMLPage(testPage).selectFirst("div.tools");
+        assertNotNull(tools, String.format("The toolbox was not rendered in the [%s] mode", mode));
+        return tools;
     }
 
     private Element renderReplyButton() throws Exception

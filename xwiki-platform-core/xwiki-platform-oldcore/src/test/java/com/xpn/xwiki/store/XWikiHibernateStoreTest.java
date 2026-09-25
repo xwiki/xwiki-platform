@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.store;
 
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,10 +32,12 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,6 +90,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -317,6 +321,81 @@ class XWikiHibernateStoreTest
         verify(query).setParameter("docId", 13L);
         verify(this.session, never()).update(any());
         verify(this.hibernateStore).endTransaction(true);
+    }
+
+    @Test
+    void saveLockRetriesWhenTheDatabaseRefusesTheLocks() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        when(this.hibernateStore.beginTransaction()).thenReturn(true);
+        // The insert is executed when the session is flushed, so that's where the database reports the deadlock.
+        doThrow(new LockAcquisitionException("Deadlock found", new SQLException("Deadlock found"))).doNothing()
+            .when(this.session).flush();
+
+        XWikiLock lock = new XWikiLock(13L, "XWiki.Alice");
+        this.store.saveLock(lock, this.xcontext, true);
+
+        // The whole transaction is run again, so the lock is saved even though the first attempt was rolled back.
+        verify(this.session, times(2)).save(lock);
+        verify(this.hibernateStore).endTransaction(false);
+        verify(this.hibernateStore).endTransaction(true);
+
+        assertEquals("The database refused the locks needed by attempt [1] out of [3], retrying. "
+            + "Cause: [SQLException: Deadlock found]", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void saveLockGivesUpWhenTheDatabaseKeepsRefusingTheLocks() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        when(this.hibernateStore.beginTransaction()).thenReturn(true);
+        doThrow(new LockAcquisitionException("Deadlock found", new SQLException("Deadlock found"))).when(this.session).flush();
+
+        XWikiLock lock = new XWikiLock(13L, "XWiki.Alice");
+        assertThrows(XWikiException.class, () -> this.store.saveLock(lock, this.xcontext, true));
+
+        verify(this.session, times(3)).save(lock);
+        verify(this.hibernateStore, times(3)).endTransaction(false);
+
+        assertEquals("The database refused the locks needed by attempt [1] out of [3], retrying. "
+            + "Cause: [SQLException: Deadlock found]", this.logCapture.getMessage(0));
+        assertEquals("The database refused the locks needed by attempt [2] out of [3], retrying. "
+            + "Cause: [SQLException: Deadlock found]", this.logCapture.getMessage(1));
+    }
+
+    @Test
+    void saveLockDoesNotRetryOtherFailures() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        when(this.hibernateStore.beginTransaction()).thenReturn(true);
+        when(this.session.save(any())).thenThrow(new HibernateException("Not a lock problem"));
+
+        XWikiLock lock = new XWikiLock(13L, "XWiki.Alice");
+        assertThrows(XWikiException.class, () -> this.store.saveLock(lock, this.xcontext, true));
+
+        verify(this.session).save(lock);
+    }
+
+    @Test
+    void deleteLockRetriesWhenTheDatabaseRefusesTheLocks() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        when(this.hibernateStore.beginTransaction()).thenReturn(true);
+        when(query.executeUpdate())
+            .thenThrow(new LockAcquisitionException("Deadlock found", new SQLException("Deadlock found"))).thenReturn(1);
+
+        this.store.deleteLock(new XWikiLock(13L, "XWiki.Alice"), this.xcontext, true);
+
+        verify(query, times(2)).executeUpdate();
+        verify(this.hibernateStore).endTransaction(false);
+        verify(this.hibernateStore).endTransaction(true);
+
+        assertEquals("The database refused the locks needed by attempt [1] out of [3], retrying. "
+            + "Cause: [SQLException: Deadlock found]", this.logCapture.getMessage(0));
     }
 
     @Test

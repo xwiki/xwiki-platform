@@ -35,6 +35,7 @@ import org.xwiki.user.UserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -90,11 +91,22 @@ class DocumentDocumentReferenceUserReferenceResolverTest
     @Test
     void resolveSuperAdmin()
     {
-        UserReference reference = this.resolver.resolve(new DocumentReference("wiki", "space", "superadmin"));
+        UserReference reference = this.resolver.resolve(new DocumentReference("wiki", "XWiki", "superadmin"));
         assertSame(SuperAdminUserReference.INSTANCE, reference);
 
-        reference = this.resolver.resolve(new DocumentReference("wiki", "space", "sUpErAdMiN"));
+        reference = this.resolver.resolve(new DocumentReference("wiki", "XWiki", "sUpErAdMiN"));
         assertSame(SuperAdminUserReference.INSTANCE, reference);
+    }
+
+    @Test
+    void resolveSuperAdminNameOutsideOfTheXWikiSpace()
+    {
+        // Only XWiki.superadmin is the SuperAdmin user: a document with that name in another space is an ordinary
+        // user document.
+        UserReference reference = this.resolver.resolve(new DocumentReference("wiki", "space", "superadmin"));
+        assertNotSame(SuperAdminUserReference.INSTANCE, reference);
+        assertEquals(new DocumentReference("wiki", "space", "superadmin"),
+            ((DocumentUserReference) reference).getReference());
     }
 
     @Test

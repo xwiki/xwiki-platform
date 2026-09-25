@@ -44,6 +44,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.user.SuperAdminUserReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -356,6 +357,14 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             } else if (j > 0) {
                 // The username could be in the format xwiki:Username, so strip the wiki prefix.
                 susername = cannonicalUsername.substring(j + 1);
+            }
+
+            // findUser() always looks the user up in the XWiki space of the target wiki, so the name computed above
+            // is what identifies the user. The superadmin user is virtual and is only ever authenticated against the
+            // password from the configuration, so the check above is repeated here on that name: the two do not parse
+            // the entered string the same way, and it is this name that decides which document is loaded.
+            if (SuperAdminUserReference.isSuperAdminName(susername)) {
+                return authenticateSuperAdmin(password, context);
             }
 
             String db = context.getWikiId();

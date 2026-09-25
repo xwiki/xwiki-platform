@@ -72,7 +72,7 @@ public class ConfiguredUserResourceReferenceSerializer
             normalizedReference = new UserResourceReference(this.currentUserReferenceResolver.resolve(null));
         }
         // SuperAdmin and Guest do not have profile URLs!
-        if (SuperAdminUserReference.INSTANCE == normalizedReference.getUserReference()
+        if (SuperAdminUserReference.isSuperAdmin(normalizedReference.getUserReference())
             || GuestUserReference.INSTANCE == normalizedReference.getUserReference())
         {
             // Guest and SuperAdmin are virtual users and currently don't have a profile URL

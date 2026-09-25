@@ -44,6 +44,9 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
  *
  * @version $Id$
  */
+// The hiding is deliberate: this static gives user lists their own parsing defaults, and callers pick it
+// explicitly through UsersClass. It is public API of oldcore, so it cannot be renamed either.
+@SuppressWarnings("java:S9149")
 public class UsersClass extends ListClass
 {
     /**

@@ -234,6 +234,7 @@
     "list-group-link-color": "#555",
     "list-group-link-hover-color": "var(--list-group-link-color)",
     "navbar-height" : "50px",
+    "padding-base-horizontal": "12px",
     "padding-large-vertical": "10px",
     "table-bg-hover": "#f5f5f5",
     "table-border-color": "#ddd",

@@ -1241,9 +1241,9 @@ XWiki.Annotation = Class.create({
   },
 
   addDeleteListenersInTab : function() {
-    // This applies only to the annotations tab because merged annotations are currently displayed and deleted by the Comments system.
-    // NOTE: don't forget to change this too if, in the future, annotations are no longer deleted by the Comments system from the Comments tab.
-    $$('#Annotationspane .annotation a.delete').each(function(item) {
+    // Only the annotations tab: the Comments tab is handled by the Comments system.
+    // Match both markups, .delete being a button in a form or a plain link depending on the annotation class.
+    $$('#Annotationspane .annotation .delete').each(function(item) {
       this.addDeleteListener(item);
     }.bind(this));
   },
@@ -1270,11 +1270,10 @@ XWiki.Annotation = Class.create({
   },
 
   addDeleteListener : function(item, inBubble, container) {
-    // The button-in-a-form markup (Comments) posts to the objectremove action; the plain-link markup (custom
-    // annotation classes, see the other branch in Macros.xml) goes through the annotation REST API instead.
-    // Both are submitted as a confirmed AJAX request (rather than following the link/submitting the form
-    // natively) so the bubble/list can be updated in place, without a page reload.
-    const form = item.closest('form');
+    // A form posts to objectremove, a link goes through the annotation REST API; both are sent as a confirmed
+    // AJAX request so the list updates in place. Never match an enclosing form: it would be submitted with its
+    // own action, saving the annotation instead of deleting it.
+    const form = item.closest('form.delete-form');
     item.observe('click', function(event) {
       item.blur();
       event.stop();

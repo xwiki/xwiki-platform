@@ -170,7 +170,7 @@ define('xwiki-suggestGroups', ['jquery', 'xwiki-selectize-utils', 'xwiki-selecti
 
 require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    var container = $(data?.elements || document);
     container.find('.suggest-users').suggestUsers();
     container.find('.suggest-groups').suggestGroups();
   };

@@ -337,7 +337,7 @@ XWiki.widgets.LiveTable = Class.create({
       $(table.domNodeName + '-inaccessible-docs').removeClassName('hidden');
     }
     var showFilterNote = false;
-    if (table.options.columns.indexOf('doc.title') >= 0) {
+    if (table.options.columns.includes('doc.title')) {
       var titleColumnDescriptor = table.options.columnDescriptors['doc.title'] || {};
       if (titleColumnDescriptor.filterable !== false || titleColumnDescriptor.sortable !== false) {
         showFilterNote = true;
@@ -395,7 +395,7 @@ XWiki.widgets.LiveTable = Class.create({
     td.toggleClassName('hide-labels', descriptor.labels === false);
     (descriptor.actions || []).forEach(function(action) {
       if (row['doc_has' + action.id] || action.id === 'view' || (row['doc_has' + action.id] === undefined &&
-        (row['doc_hasadmin'] || adminActions.indexOf(action.id) < 0)))
+        (row['doc_hasadmin'] || !adminActions.includes(action.id))))
       {
         const link = new Element('a', {
           'href': row['doc_' + action.id + '_url'] || row['doc_url'],
@@ -762,7 +762,7 @@ var LiveTableHash = Class.create({
     var hashString = window.location.hash.substring(1);
     if (!hashString.blank()) {
       // Recover from encoding done by URI implementations (like java.net.URI) that don't allow | in the fragment.
-      if (hashString.indexOf('%7Ct=') !== -1) {
+      if (hashString.includes('%7Ct=')) {
       // The string "%7Ct=" is safe to replace as it cannot occur in a filter as there the "=" would have been encoded,
       // too.
         hashString = hashString.replaceAll('%7Ct=', '|t=');
@@ -773,7 +773,7 @@ var LiveTableHash = Class.create({
         var params = tables[i].toQueryParams();
         if (params["t"] == this.table.domNodeName) {
           for (var param in params) {
-            if (param.length == 1 && "tplsd".indexOf(param) != -1) {
+            if (param.length == 1 && "tplsd".includes(param)) {
               this.params[param] = params[param];
             } else {
               this.filters[param] = params[param];
@@ -1105,7 +1105,7 @@ var LiveTableFilter = Class.create({
         var filter = this.filters[key];
         if (filter) {
           if (Array.isArray(filter)) {
-            this.inputs[i].checked = (filter.indexOf(this.inputs[i].value.strip()) != -1);
+            this.inputs[i].checked = filter.includes(this.inputs[i].value.strip());
           } else {
             this.inputs[i].checked = (filter == this.inputs[i].value.strip());
           }
@@ -1126,14 +1126,14 @@ var LiveTableFilter = Class.create({
       var selectedValues = [];
       for (var i = 0; i < select.options.length; i++) {
         var option = select.options[i];
-        option.selected = values.indexOf(option.value) >= 0;
+        option.selected = values.includes(option.value);
         if (option.selected) {
           selectedValues.push(option.value);
         }
       };
       values.each(function(value) {
         // Add missing values.
-        if (typeof value === 'string' && selectedValues.indexOf(value) < 0) {
+        if (typeof value === 'string' && !selectedValues.includes(value)) {
           var option = document.createElement('option');
           option.value = value;
           option.selected = true;
@@ -1224,10 +1224,10 @@ var LiveTableFilter = Class.create({
    * Apply style to livetable filters that are applied
    */
   applyActiveFilterStyle: function(element) {
-    if(element && element.tagName && ((element.tagName.toLowerCase() == "input" && element.type == "text") || element.tagName.toLowerCase() == "select")) {
+    if(element?.tagName && ((element.tagName.toLowerCase() == "input" && element.type == "text") || element.tagName.toLowerCase() == "select")) {
       // The filter value can be a string, an array or null.
       var filterValue = $F(element);
-      if (filterValue != null && filterValue.length) {
+      if (filterValue?.length) {
         element.addClassName('xwiki-livetable-filter-active');
       } else {
         element.removeClassName('xwiki-livetable-filter-active');
@@ -1433,7 +1433,7 @@ var init = function(event) {
     // We have to keep firing this event for backward compatibility reasons (e.g. rightsUI.vm).
     document.fire('xwiki:livetable:loading');
   }
-  var elements = (event && event.memo.elements) || [document.body];
+  var elements = event?.memo.elements || [document.body];
   elements.forEach(function(element) {
     var liveTableElements = element.classList.contains('xwiki-livetable') ? [element] :
       element.querySelectorAll('.xwiki-livetable');

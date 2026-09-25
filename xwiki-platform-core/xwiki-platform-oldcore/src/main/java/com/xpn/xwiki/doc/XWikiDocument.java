@@ -4939,9 +4939,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             return true;
         }
 
+        if (!(object instanceof XWikiDocument doc)) {
+            return false;
+        }
+
         // Reference/language (document identifier)
 
-        XWikiDocument doc = (XWikiDocument) object;
         if (!getDocumentReference().equals(doc.getDocumentReference())) {
             return false;
         }

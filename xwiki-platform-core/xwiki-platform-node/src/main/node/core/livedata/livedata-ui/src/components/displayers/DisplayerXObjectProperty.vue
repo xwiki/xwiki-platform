@@ -139,7 +139,10 @@ export default {
      */
     update(updateMethod) {
       this.isLoading = true;
-      const documentName = this.logic.getEntryId(this.entry);
+      // A row that has no entry yet is displayed against the location it is created in.
+      const documentName = this.entry._new
+        ? this.entry._displayReference
+        : this.logic.getEntryId(this.entry);
       const className = this.getClassName();
       const property = this.propertyId;
       return updateMethod(documentName, className, property);

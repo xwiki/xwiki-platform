@@ -37,8 +37,8 @@ export class EditBusService {
       [key: string]: { editing: boolean; tosave: boolean; content: unknown };
     };
   }>;
-  // This variable stores an edit request made while an edition is in progress.
-  private pendingEdit?: { entryId: string; propertyId: string };
+  // The save started by the last save event, since events cannot carry it back to the emitter.
+  private runningSave: Promise<void> = Promise.resolve();
 
   /**
    * Default constructor.
@@ -115,12 +115,15 @@ export class EditBusService {
     // If a cell to save is found, we get its content and save it.
     if (canBeSaved && keyEntry) {
       const vals = values[keyEntry].content;
+      const savedKey = keyEntry;
 
-      this.logic
+      this.runningSave = this.logic
         .setValues({ entryId, values: vals })
         // eslint-disable-next-line promise/always-return
         .then(() => {
-          delete this.editStates[entryId][keyEntry];
+          // The states are deleted where they are now, which is not necessarily where they were read
+          // from, since the entry may have got an identifier in the meantime.
+          delete values[savedKey];
         })
         .catch(() => {
           // @ts-expect-error leftover from initial javascript implementation
@@ -149,54 +152,6 @@ export class EditBusService {
       }
     }
     return true;
-  }
-
-  /**
-   * Indicates whether a cell has been edited and is in the middle of the save
-   * process. In that state, opening a new cell for edition should be deferred
-   * (see {@link requestEdit}), since a refresh will happen and re-render the
-   * cells.
-   *
-   * @returns true if a save is in progress, false otherwise
-   */
-  public hasPendingSave() {
-    for (const propertyStates of Object.values(this.editStates)) {
-      for (const propertyState of Object.values(propertyStates)) {
-        if (propertyState.tosave) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Stores a request for edition, to perform it later (once all save processes
-   * have completed). See {@link enablePendingEdit} to apply it.
-   *
-   * @param entryId - the entry id of the cell to edit
-   * @param propertyId - the property id of the cell to edit
-   */
-  public requestEdit(entryId: string, propertyId: string) {
-    this.pendingEdit = { entryId, propertyId };
-  }
-
-  /**
-   * Enables a pending edit request if it targets the given cell.
-   *
-   * @param entryId - the entry id of the cell
-   * @param propertyId - the property id of the cell
-   * @returns true if the given cell had a pending edit request, false otherwise
-   */
-  public enablePendingEdit(entryId: string, propertyId: string) {
-    if (
-      this.pendingEdit?.entryId === entryId &&
-      this.pendingEdit?.propertyId === propertyId
-    ) {
-      this.pendingEdit = undefined;
-      return true;
-    }
-    return false;
   }
 
   onAnyEvent(callback: () => unknown) {
@@ -259,5 +214,38 @@ export class EditBusService {
    */
   save(entry: Values, propertyId: string, content: unknown) {
     this.saveEvent(entry, propertyId, content);
+    return this.runningSave;
+  }
+
+  /**
+   * Discard the edit states of an entry that is not displayed anymore.
+   * @param entry - the entry whose edit states are discarded
+   * @since 18.9.0RC1
+   */
+  public discard(entry: Values) {
+    delete this.editStates[this.logic.getEntryId(entry) as string];
+  }
+
+  /**
+   * Move the edit states of an entry to the identifier it just got.
+   * @param previousEntryId - the identifier the edit states are registered on
+   * @param entryId - the identifier to move them to
+   * @since 18.9.0RC1
+   */
+  public reassign(previousEntryId: string | undefined, entryId: string) {
+    const editStates = this.editStates[previousEntryId as string];
+    if (editStates) {
+      this.editStates[entryId] = editStates;
+      delete this.editStates[previousEntryId as string];
+    }
+  }
+
+  /**
+   * Waits for the save started by the last {@link save} call.
+   * @returns a promise that completes when the running save is done
+   * @since 18.9.0RC1
+   */
+  public whenSaved() {
+    return this.runningSave;
   }
 }

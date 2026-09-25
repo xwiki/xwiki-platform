@@ -20,6 +20,7 @@
 package org.xwiki.livedata.internal.livetable;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Named;
@@ -139,5 +140,20 @@ class UUIDLiveTableNewRowNamingStrategyTest
     void isCreationAllowedWithMissingLocation()
     {
         assertFalse(this.strategy.isCreationAllowed(Map.of()));
+    }
+
+    @Test
+    void getNewEntryLocation()
+    {
+        SpaceReference space = new SpaceReference("wiki", "NewRows");
+        when(this.currentSpaceReferenceResolver.resolve("NewRows")).thenReturn(space);
+
+        assertEquals(Optional.of(space), this.strategy.getNewEntryLocation(Map.of("newRowLocation", "NewRows")));
+    }
+
+    @Test
+    void getNewEntryLocationWithMissingLocation()
+    {
+        assertEquals(Optional.empty(), this.strategy.getNewEntryLocation(Map.of()));
     }
 }

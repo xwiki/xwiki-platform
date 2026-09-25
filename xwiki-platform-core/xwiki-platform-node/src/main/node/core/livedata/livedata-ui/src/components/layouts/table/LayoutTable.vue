@@ -75,7 +75,7 @@
         -->
           <LayoutTableRow
             v-for="(entry, idx) in entries"
-            :key="`table-${logic.getEntryId(entry)}-${idx}`"
+            :key="logic.getEntryKey(entry)"
             :entry="entry"
             :entry-idx="idx"
           />

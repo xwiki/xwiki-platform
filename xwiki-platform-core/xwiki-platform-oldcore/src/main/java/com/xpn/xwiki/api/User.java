@@ -170,6 +170,9 @@ public class User extends Api
      * @return true if password is really the user password.
      * @throws XWikiException error if authorization denied.
      */
+    // Catching Throwable is deliberate here: checking a password must fail closed, so any failure of the configured
+    // authenticator has to answer false rather than propagate to the caller.
+    @SuppressWarnings("java:S1181")
     public boolean checkPassword(String password) throws XWikiException
     {
         EntityReference userReference = REFERENCE_RESOLVER.resolve(this.user.getUser());

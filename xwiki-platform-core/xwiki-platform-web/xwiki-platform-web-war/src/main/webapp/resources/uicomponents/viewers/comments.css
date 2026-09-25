@@ -52,10 +52,6 @@ ul.commentreplies {
   max-width: 50px;
   max-height: 50px;
 }
-.annotation-bubble-avatar img {
-  max-width: 30px;
-  max-height: 30px;
-}
 .commentthread .commentavatar img {
   max-width: 30px;
   max-height: 30px;

@@ -100,54 +100,8 @@
 ###########################################
 ##        ADD KEYBOARD SHORTCUTS
 ###########################################
-<script>
-  #if($!xcontext.user != 'XWiki.XWikiGuest')
-    //<![CDATA[
-    /**
-     * Perform a PUT on the given REST API. If the request is successful, reload the page.
-     *
-     * We use this function in order to quickly edit the user properties for developer shortcuts.
-     * Also note that JQuery is not supported here, so we use a starndard XMLHttpRequest.
-     *
-     * @param restUrl the URL to use
-     * @param errorMessage the message to display if an error occurred in the request
-     */
-    var developerShortcutsRestCall = function(restUrl, errorMessage) {
-        const req = new XMLHttpRequest();
-        var notification = new XWiki.widgets.Notification(
-            "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.ajax.inprogress'))",
-            'inprogress');
-
-        req.onreadystatechange = function(event) {
-            if (this.readyState === XMLHttpRequest.DONE) {
-                if (this.status >= 200 && this.status < 300) {
-                    // Reload the page to apply the user modifications
-                    notification.replace(new XWiki.widgets.Notification(
-                        "$escapetool.javascript($services.localization.render(
-                                'core.shortcuts.developer.user.ajax.success'))", 'done'));
-                    location.reload()
-                } else if (this.status == 500) {
-                    notification.replace(new XWiki.widgets.Notification(this.data, 'error'));
-                } else {
-                    notification.replace(new XWiki.widgets.Notification(errorMessage, 'error'));
-                }
-            }
-        };
-
-        req.open('PUT', restUrl, true);
-        req.send(null);
-    };
-
-    // Append developer shortcuts for toggling userType and hiddenDocuments in the current user profile
-    shortcut.add("$services.localization.render('core.shortcuts.developer.user.type')", function() {
-        developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/usertype/next",
-                "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.type.error'))");
-    }, {'type': shortcut.type.SEQUENCE, 'disable_in_input': true });
-
-    shortcut.add("$services.localization.render('core.shortcuts.developer.user.displayHiddenDocs')", function () {
-        developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/displayHiddenDocuments/next",
-                "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.displayHiddenDocs.error'))");
-    }, {'type': shortcut.type.SEQUENCE, 'disable_in_input': true });
-    //]]>
-  #end
-</script>
+#if($!xcontext.user != 'XWiki.XWikiGuest')
+  ## The developer shortcuts do not depend on the page, so they are served as a cacheable static skin file instead of
+  ## being inlined in every page. The script gets its translations from the xwiki-l10n RequireJS plugin.
+  #set ($discard = $xwiki.jsfx.use('js/xwiki/developerShortcuts.js'))
+#end

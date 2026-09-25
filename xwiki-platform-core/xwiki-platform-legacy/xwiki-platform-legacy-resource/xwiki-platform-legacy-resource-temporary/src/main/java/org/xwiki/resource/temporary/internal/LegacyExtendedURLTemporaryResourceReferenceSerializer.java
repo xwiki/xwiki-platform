@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
  *
  * @version $Id$
  * @since 14.7
+ * @deprecated use {@link ExtendedURLTemporaryResourceReferenceSerializer}, registered with the default hint, instead
  */
 @Component
 @Named("standard/tmp")

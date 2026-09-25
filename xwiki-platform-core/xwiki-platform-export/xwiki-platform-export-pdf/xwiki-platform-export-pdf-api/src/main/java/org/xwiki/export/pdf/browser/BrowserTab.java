@@ -114,6 +114,7 @@ public interface BrowserTab extends AutoCloseable
      * @param wait {@code true} to wait for the page to be ready, {@code false} otherwise
      * @return {@code true} if the navigation was successful, {@code false} otherwise
      * @throws IOException if navigating to the specified web page fails
+     * @deprecated use {@link #navigate(URL, Cookie[], boolean)} instead
      */
     @Deprecated(since = "17.0.0RC1")
     default boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait) throws IOException

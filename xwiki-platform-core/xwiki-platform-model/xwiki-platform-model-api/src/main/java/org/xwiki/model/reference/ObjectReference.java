@@ -81,6 +81,7 @@ public class ObjectReference extends EntityReference
      * @param space space where the parent document of the object is
      * @param document parent document of the object
      * @param objectName the name of the object
+     * @deprecated use {@link #ObjectReference(String, DocumentReference)} instead
      */
     @Deprecated
     public ObjectReference(String wiki, String space, String document, String objectName)

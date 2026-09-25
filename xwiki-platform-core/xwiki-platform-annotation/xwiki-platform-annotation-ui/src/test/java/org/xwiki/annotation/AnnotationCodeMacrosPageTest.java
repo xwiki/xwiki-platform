@@ -251,21 +251,16 @@ class AnnotationCodeMacrosPageTest extends PageTest
 
         Element tools = renderAnnotation(mode).selectFirst(".annotation-bubble-tools");
 
-        assertNotNull(tools, String.format("The toolbox was not rendered in the [%s] mode", mode));
-        if ("create".equals(mode)) {
-            // The annotation doesn't exist yet, so there is nothing to act on.
-            assertEquals(0, tools.select("a, button").size(), "The toolbox rendered actions in the create mode");
-        } else if ("edit".equals(mode)) {
-            // Editing already, and the edit form wraps the annotation in a form that a delete form cannot nest in.
-            assertNull(tools.selectFirst("a.edit"), "The edit button was rendered in the edit form");
-            assertNull(tools.selectFirst(".delete"), "The delete action was rendered in the edit form");
-            assertNull(tools.selectFirst("form"), "A delete form was nested in the edit form");
-        } else {
-            assertNotNull(tools.selectFirst("a.edit"),
-                String.format("The edit button was not rendered in the [%s] mode", mode));
-            assertNotNull(tools.selectFirst("form.delete-form button.delete"),
-                String.format("The delete form was not rendered in the [%s] mode", mode));
+        if ("edit".equals(mode) || "create".equals(mode)) {
+            // The edit and create forms have nothing to act on.
+            assertNull(tools, String.format("The toolbox was rendered in the [%s] mode", mode));
+            return;
         }
+        assertNotNull(tools, String.format("The toolbox was not rendered in the [%s] mode", mode));
+        assertNotNull(tools.selectFirst("a.edit"),
+            String.format("The edit button was not rendered in the [%s] mode", mode));
+        assertNotNull(tools.selectFirst("form.delete-form button.delete"),
+            String.format("The delete form was not rendered in the [%s] mode", mode));
         assertNull(tools.selectFirst("a.validate"),
             String.format("The validate button was rendered in the [%s] mode for an annotation that didn't move",
                 mode));
@@ -290,13 +285,21 @@ class AnnotationCodeMacrosPageTest extends PageTest
         }
     }
 
-    @Test
-    void validateIsDisplayedForAnAnnotationMovedByAPageEdit() throws Exception
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "list", "edit" })
+    void validateMatchesTheModeForAnAnnotationMovedByAPageEdit(String mode) throws Exception
     {
         updateStoredAnnotation(object -> object.setStringValue("state", "UPDATED"));
 
-        assertNotNull(renderAnnotation("view").selectFirst(".annotation-bubble-tools a.validate"),
-            "The validate button was not rendered for an annotation moved by a page edit");
+        Element validate = renderAnnotation(mode).selectFirst("a.validate");
+
+        if ("edit".equals(mode)) {
+            // Validating reloads the annotation and would discard the text being edited.
+            assertNull(validate, "The validate button was rendered in the edit form");
+        } else {
+            assertNotNull(validate,
+                String.format("The validate button was not rendered in the [%s] mode for a moved annotation", mode));
+        }
     }
 
     private void updateStoredAnnotation(Consumer<BaseObject> update) throws Exception

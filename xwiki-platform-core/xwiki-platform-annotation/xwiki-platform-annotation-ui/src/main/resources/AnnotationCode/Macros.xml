@@ -224,9 +224,13 @@
     &lt;div class="annotation-bubble-content"&gt;
       #displayAnnotationBody($ann $mode $docRef)
     &lt;/div&gt;
-    &lt;div class="annotation-bubble-tools"&gt;
-      #displayAnnotationToolboxFromReference($ann $mode $docRef)
-    &lt;/div&gt;
+    ## The edit and create forms have nothing to act on: validating from the edit form would discard the text being
+    ## edited, and a new annotation doesn't exist yet.
+    #if ($mode == 'view' || $mode == 'list')
+      &lt;div class="annotation-bubble-tools"&gt;
+        #displayAnnotationToolboxFromReference($ann $mode $docRef)
+      &lt;/div&gt;
+    #end
     #if (($mode == 'edit') || ($mode == 'create'))#displayAnnotationBoxButtons($mode)#end
   &lt;/div&gt;
 #end
@@ -261,15 +265,15 @@
   #displayAnnotationToolboxFromReference($ann, $mode, $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
 #end
 #**
- * Display the annotation toolbox. The actions available in each mode are, 'view' being the bubble and 'list' the
- * Annotations tab:
+ * Display the annotation toolbox. Nothing is displayed in the edit and create modes, and the actions available in
+ * the other modes are, 'view' being the bubble and 'list' the Annotations tab:
  *
- *   Action                   | view | list | edit | create
- *   -------------------------+------+------+------+-------
- *   Validate                 |  x   |  x   |  x   |
- *   Thread, Reply, Share     |  x   |      |      |
- *   Edit                     |  x   |  x   |      |
- *   Delete                   |  x   |  x   |      |
+ *   Action                   | view | list
+ *   -------------------------+------+-----
+ *   Validate                 |  x   |  x
+ *   Thread, Reply, Share     |  x   |
+ *   Edit                     |  x   |  x
+ *   Delete                   |  x   |  x
  *
  * Thread, Reply and Share only exist for the XWiki.XWikiComments class. On top of the mode, each action requires:
  * - Validate: an annotation moved by a page edit, that the current user can edit
@@ -285,7 +289,7 @@
  * @param $docRef the reference of the annotated document
  *#
 #macro(displayAnnotationToolboxFromReference $ann $mode $docRef)
-  #if ($mode != 'create')
+  #if ($mode == 'view' || $mode == 'list')
   ## xwikivars.vm binds $hasAdmin/$hasEdit for the Comments tab but not for the annotation bubble, which
   ## fetches its content through the "get" action, so compute the rights here against $docRef instead of
   ## relying on the caller or on $xcontext.doc. Keep the $ann prefix: a #set in a macro body writes to the
@@ -330,7 +334,7 @@
         $services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
       &lt;/a&gt;##
     #end
-    #if($mode != 'edit' &amp;&amp; $annHasComment &amp;&amp; ($annHasAdmin || $isUserComment))
+    #if($annHasComment &amp;&amp; ($annHasAdmin || $isUserComment))
       #set ($editQueryString = $escapetool.url({
         'viewer': 'comments',
         'number': $ann.id,
@@ -340,9 +344,7 @@
       $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
       &lt;/a&gt;##
     #end
-    ## Not in the edit form, which already wraps the annotation in a &lt;form&gt;: HTML drops a nested one and the
-    ## button would submit the edit form instead.
-    #if ($mode != 'edit' &amp;&amp; ($annHasAdmin || ($annHasEdit &amp;&amp; $isUserComment)))
+    #if ($annHasAdmin || ($annHasEdit &amp;&amp; $isUserComment))
       ## Delete mutates state, so it's a real POST form (not a link) - a link's href can be followed by a
       ## crawler, prefetched, opened in a new tab, or navigated to directly if JavaScript never attaches.
       #set ($deleteActionURL = $xwiki.getURL($annoDoc.fullName, 'objectremove'))
@@ -365,17 +367,15 @@
       #set($isUserComment = $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
       #set($editURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=PUT&amp;media=json")
       #if ($annHasAdmin || $isUserComment)
-        #if ($mode != 'edit')
-          &lt;a class="edit btn btn-default infomessage" href="$escapetool.xml($editURL)"
-            title="$escapetool.xml($services.localization.render('annotations.action.edit.tooltip'))"&gt;
-            $services.icon.renderHTML('pencil')
-          &lt;/a&gt;##
-          #set($deleteURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=DELETE&amp;media=json")
-          &lt;a class="delete btn btn-default infomessage" href="$escapetool.xml($deleteURL)"
-            title="$escapetool.xml($services.localization.render('annotations.action.delete.tooltip'))"&gt;
-            $services.icon.renderHTML('cross')
-          &lt;/a&gt;
-        #end
+        &lt;a class="edit btn btn-default infomessage" href="$escapetool.xml($editURL)"
+          title="$escapetool.xml($services.localization.render('annotations.action.edit.tooltip'))"&gt;
+          $services.icon.renderHTML('pencil')
+        &lt;/a&gt;##
+        #set($deleteURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=DELETE&amp;media=json")
+        &lt;a class="delete btn btn-default infomessage" href="$escapetool.xml($deleteURL)"
+          title="$escapetool.xml($services.localization.render('annotations.action.delete.tooltip'))"&gt;
+          $services.icon.renderHTML('cross')
+        &lt;/a&gt;
       #end
     #end
   #end

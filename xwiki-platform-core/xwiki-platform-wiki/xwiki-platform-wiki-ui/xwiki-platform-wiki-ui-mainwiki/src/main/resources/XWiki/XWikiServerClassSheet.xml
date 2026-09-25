@@ -175,6 +175,51 @@
     #pagePicker($homePagePickerParams)
   #end
 #end
+
+#macro (aliasHomePage $alias)
+
+  ## 1. Extract alias server and homepage (default to Main.WebHome if blank)
+  #set ($aliasServer = "$!alias.getValue('server')")
+  #set ($aliasHomepage = "$!alias.getValue('homepage')")
+  #if ($aliasHomepage == '')
+    #set ($aliasHomepage = 'Main.WebHome')
+  #end
+
+  ## 2. Explicitly resolve the document reference against the subwiki context
+  #set ($homeDocRef = $services.model.resolveDocument($aliasHomepage, 'default', $services.model.createWikiReference($wikiId)))
+  #set ($homeDoc = $xwiki.getDocument($homeDocRef))
+
+  ## 3. Safely retrieve the page title (fallback to document name if empty)
+  #set ($pageTitle = "$!homeDoc.plainTitle")
+  #if ($pageTitle.trim() == '')
+    #set ($pageTitle = $homeDocRef.name)
+  #end
+
+  ## 4. Generate the canonical external URL
+  #set ($homeUrl = $homeDoc.getExternalURL('view'))
+
+  ## 5. Determine the primary alias or wiki identifier to replace
+  #set ($primaryAlias = "$!descriptorObj.getValue('server')")
+  #if ($primaryAlias == '')
+    #set ($primaryAlias = $wikiId)
+  #end
+
+  ## 6. Swap the primary identifier for the alias (supports path-based and domain-based routing)
+  #set ($customUrl = $homeUrl)
+  #if ($aliasServer != '')
+    #if ($customUrl.contains("/wiki/${primaryAlias}/"))
+      #set ($customUrl = $customUrl.replaceFirst("/wiki/${primaryAlias}/", "/wiki/${aliasServer}/"))
+    #elseif ($customUrl.contains("/wiki/${wikiId}/"))
+      #set ($customUrl = $customUrl.replaceFirst("/wiki/${wikiId}/", "/wiki/${aliasServer}/"))
+    #else
+      #set ($customUrl = $customUrl.replaceFirst("(?i)://[^:/]+", "://${aliasServer}"))
+    #end
+  #end
+
+  ## 7. Render the custom wiki link using XML-safe syntax
+  [[$pageTitle&gt;&gt;url:$customUrl]]
+#end
+
 #############################
 ##    DISPLAY ALIASES
 #############################
@@ -190,7 +235,7 @@
         &lt;div class="xform"&gt;
           &lt;dl&gt;
             #displayField('description', $alias)
-            #displayField('homepage', $alias)
+            #displayField('homepage', $alias, "#aliasHomePage($alias)")
           &lt;/dl&gt;
         &lt;/div&gt;
         {{/html}}

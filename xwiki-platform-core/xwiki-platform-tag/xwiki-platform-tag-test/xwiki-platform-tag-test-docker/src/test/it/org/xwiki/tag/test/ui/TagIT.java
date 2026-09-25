@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.tag.test.po.AddTagsPane;
 import org.xwiki.tag.test.po.TagPage;
 import org.xwiki.tag.test.po.TaggablePage;
@@ -290,5 +291,23 @@ class TagIT
         this.tagPage.clickDeleteButton();
         this.tagPage.clickConfirmDeleteTag();
         assertTrue(this.tagPage.hasConfirmationMessage());
+    }
+
+    /**
+     * Checks the tags returned by the default (exhaustive) right check strategy, which orders them by tag so that the
+     * pages of an already returned tag don't need to be checked for the view right.
+     */
+    @Test
+    @Order(10)
+    void getAllTags(TestUtils setup) throws Exception
+    {
+        DocumentReference page = new DocumentReference("xwiki", List.of("TagITAllTags"), "Page1");
+        setup.rest().delete(page);
+        setup.rest().addObject(page, "XWiki.TagClass", "tags", "AllTagsAlpha|AllTagsBeta");
+
+        assertEquals("alpha=[true] beta=[true] missing=[false]", setup.executeWikiPlain(
+            "{{velocity}}#set ($allTags = $xwiki.tag.getAllTags())"
+            + "alpha=[$allTags.contains('AllTagsAlpha')] beta=[$allTags.contains('AllTagsBeta')] "
+            + "missing=[$allTags.contains('NoSuchTag')]{{/velocity}}", Syntax.XWIKI_2_1));
     }
 }

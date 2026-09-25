@@ -20,11 +20,10 @@
 package org.xwiki.tag.internal.selector;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.inject.Named;
@@ -62,13 +61,16 @@ public class ExhaustiveCheckTagsSelector extends AbstractTagsSelector
     @Override
     public List<String> getAllTags() throws TagException
     {
-        String hql = "select distinct doc.fullName as fullName, elements(prop.list) "
-            + "from XWikiDocument as doc, BaseObject as obj, DBStringListProperty as prop "
+        // The results are ordered by tag so that the documents of a tag can be skipped as soon as one of them is
+        // viewable, which keeps the number of right checks close to the number of tags instead of the number of
+        // tagged documents.
+        String hql = "select distinct item, doc.fullName "
+            + "from XWikiDocument as doc, BaseObject as obj, DBStringListProperty as prop join prop.list item "
             + "where obj.name=doc.fullName "
             + "and obj.className='XWiki.TagClass' "
             + "and obj.id=prop.id.id "
             + "and prop.id.name='tags' "
-            + "order by fullName";
+            + "order by item";
 
         try {
             List<Object[]> results = this.contextProvider.get()
@@ -93,30 +95,28 @@ public class ExhaustiveCheckTagsSelector extends AbstractTagsSelector
 
     private List<String> computedTagsFromQuery(List<Object[]> results)
     {
-        Set<String> tagsSet = new HashSet<>();
-        String previousDoc = null;
-        boolean previousDocViewRight = false;
+        List<String> tagsList = new ArrayList<>();
+        // The same document usually carries several tags, so remember the result of its right check to avoid
+        // performing it again for each of them.
+        Map<String, Boolean> viewableDocuments = new HashMap<>();
+        String acceptedTag = null;
         for (Object[] cols : results) {
-            String documentReferenceStr = (String) cols[0];
-            // Since the documents are sorted by their document reference, we know that we have to re-compute the 
-            // rights only for the first result, or when we pass to the next document reference.
-            String tag = (String) cols[1];
-            // If the tag is already added to the list, there is no point in checking again if it's allowed to add it.
-            if (tagsSet.contains(tag)) {
+            String tag = (String) cols[0];
+            // Since the results are sorted by tag, once a tag has been found on a viewable document there is no point
+            // in checking the rights of the remaining documents carrying it.
+            if (Objects.equals(acceptedTag, tag)) {
                 continue;
             }
-            if (!Objects.equals(previousDoc, documentReferenceStr)) {
-                DocumentReference documentReference =
-                    this.stringDocumentReferenceResolver.resolve(documentReferenceStr);
-                previousDocViewRight = this.contextualAuthorizationManager.hasAccess(VIEW, documentReference);
-                previousDoc = documentReferenceStr;
-            }
-            if (previousDocViewRight) {
-                tagsSet.add(tag);
+            String documentReferenceStr = (String) cols[1];
+            boolean viewable = viewableDocuments.computeIfAbsent(documentReferenceStr,
+                reference -> this.contextualAuthorizationManager.hasAccess(VIEW,
+                    this.stringDocumentReferenceResolver.resolve(reference)));
+            if (viewable) {
+                tagsList.add(tag);
+                acceptedTag = tag;
             }
         }
 
-        List<String> tagsList = new ArrayList<>(tagsSet);
         tagsList.sort(CASE_INSENSITIVE_ORDER);
         return tagsList;
     }

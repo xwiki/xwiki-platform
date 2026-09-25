@@ -268,29 +268,6 @@ export default {
     onDisplayerFocus() {
       // In edit mode, focusing an editable cell should make it editable.
       if (this.logic.isEditMode()) {
-        const editBus = this.logic.getEditBus();
-
-        // If another cell is currently being saved, that save will then
-        // refresh the table and re-render this cell. Opening the editor now
-        // would just lock the edit bus before the editor gets destroyed.
-        if (editBus.hasPendingSave()) {
-          editBus.requestEdit(
-            this.logic.getEntryId(this.entry),
-            this.propertyId,
-          );
-        } else {
-          this.setEdit();
-        }
-      }
-    },
-    // Resume an edit that was requested on this cell.
-    resumeRequestedEdit() {
-      if (
-        this.logic.isEditMode() &&
-        this.logic
-          .getEditBus()
-          .enablePendingEdit(this.logic.getEntryId(this.entry), this.propertyId)
-      ) {
         this.setEdit();
       }
     },
@@ -355,9 +332,6 @@ export default {
     this.logic.getEditBus().onAnyEvent(() => {
       this.duringEditing = !this.logic.getEditBus().isEditable();
     });
-    // This cell might have been re-created by a refresh following a save,
-    // so we try to resume any edit that could have been requested on it.
-    this.resumeRequestedEdit();
   },
   watch: {
     // The disable prop behaves weirdly, so we handle that manually instead.
@@ -367,11 +341,6 @@ export default {
       } else {
         this.$refs.tippy.tippy.enable();
       }
-    },
-    // This cell might have been re-used as-is by a refresh following a save,
-    // so we try to resume any edit that could have been requested on it.
-    entry() {
-      this.resumeRequestedEdit();
     },
   },
 };

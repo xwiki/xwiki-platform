@@ -38,14 +38,213 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 ### Choose the page elements to display, globally and at space level.
+#set ($docExtraFields = ['showdocumenttabs'])
+### The tabs contributed to the org.xwiki.plaftorm.template.docextra extension point have no preference of their own:
+### their visibility is stored as '+&lt;id&gt;' / '-&lt;id&gt;' entries of the documentTabsVisibility property, so a
+### tab left out of the list inherits the value set on the wiki or on a parent space. Their fields are therefore
+### built here instead of being named in the list passed to XWiki.AdminFieldsDisplaySheet.
+#set ($customTabs = $services.uix.getExtensions('org.xwiki.plaftorm.template.docextra', {'sortByParameter': 'order'}))
+#define ($bulkActions)
+  &lt;dt class="documentTabsBulkActions"&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;button type="button" class="btn btn-link" data-documenttabs-bulk="show"&gt;##
+$escapetool.xml($services.localization.render('admin.presentation.documenttabs.showAll'))&lt;/button&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;button type="button" class="btn btn-link" data-documenttabs-bulk="hide"&gt;##
+$escapetool.xml($services.localization.render('admin.presentation.documenttabs.hideAll'))&lt;/button&gt;&lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;&lt;span class="xHint documentTabsHiddenNotice hidden"&gt;##
+$escapetool.xml($services.localization.render('admin.presentation.documenttabs.hiddenNotice'))&lt;/span&gt;&lt;/dd&gt;
+#end
+#set ($discard = $docExtraFields.add({'html': "$bulkActions"}))
+#if (!$customTabs.isEmpty())
+  #set ($objectNumber = 0)
+  #set ($tabsVisibility = [])
+  #set ($preferences = $doc.getObject('XWiki.XWikiPreferences'))
+  #if ($preferences)
+    #set ($objectNumber = $preferences.number)
+    #set ($storedVisibility = $preferences.getValue('documentTabsVisibility'))
+    #if ($storedVisibility)
+      #set ($tabsVisibility = $storedVisibility)
+    #end
+  #end
+  #set ($visibilityFieldName = "XWiki.XWikiPreferences_${objectNumber}_documentTabsVisibility")
+#end
+#set ($discard = $docExtraFields.addAll(['showannotations', 'showcomments', 'showattachments', 'showhistory',
+  'showinformation']))
+#foreach ($customTab in $customTabs)
+  #set ($tabParameters = $customTab.parameters)
+  #set ($tabLabel = "$!tabParameters.title")
+  #if ($tabLabel == '')
+    #set ($tabLabel = "$!tabParameters.name")
+  #end
+  #if ($tabLabel == '')
+    #set ($tabLabel = $customTab.id)
+  #end
+  #set ($fieldId = "documentTabVisibility_${foreach.index}")
+  #set ($shownEntry = "+${customTab.id}")
+  #set ($hiddenEntry = "-${customTab.id}")
+  #define ($customTabField)
+    &lt;dt&gt;
+      &lt;label for="$escapetool.xml($fieldId)"&gt;$escapetool.xml($tabLabel)&lt;/label&gt;
+      &lt;span class="xHint"&gt;##
+$escapetool.xml($services.localization.render('admin.presentation.documenttabs.hint', [$customTab.id]))&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;select id="$escapetool.xml($fieldId)" name="$escapetool.xml($visibilityFieldName)"##
+ class="documentTabVisibility"&gt;
+        &lt;option value=""##
+#if (!$tabsVisibility.contains($shownEntry) &amp;&amp; !$tabsVisibility.contains($hiddenEntry))##
+ selected="selected"#end&gt;---&lt;/option&gt;
+        &lt;option value="$escapetool.xml($shownEntry)"##
+#if ($tabsVisibility.contains($shownEntry)) selected="selected"#end&gt;##
+$escapetool.xml($services.localization.render('yesno_1'))&lt;/option&gt;
+        &lt;option value="$escapetool.xml($hiddenEntry)"##
+#if ($tabsVisibility.contains($hiddenEntry)) selected="selected"#end&gt;##
+$escapetool.xml($services.localization.render('yesno_0'))&lt;/option&gt;
+      &lt;/select&gt;
+    &lt;/dd&gt;
+  #end
+  #set ($discard = $docExtraFields.add({'html': "$customTabField"}))
+#end
 #set ($params = {
-  'docextra': ['showannotations', 'showcomments', 'showattachments', 'showhistory', 'showinformation'],
+  'docextra': $docExtraFields,
   'header': ['title', 'meta']
 })
 #if ("$!editor" == 'globaladmin')
   #set ($params.footer = ['webcopyright', 'version'])
 #end
+$xwiki.jsx.use('XWiki.AdminPresentationSheet')##
 {{/velocity}}
 
 {{include reference="XWiki.AdminFieldsDisplaySheet" /}}</content>
+  <object>
+    <name>XWiki.AdminPresentationSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>3c2f1a48-6b5e-4a71-9c0d-2f8e7d4a1b63</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function($) {
+  'use strict';
+
+  var fieldset = $('fieldset.docextra');
+  if (fieldset.length === 0) {
+    return;
+  }
+  var master = fieldset.find('select[name$="_showdocumenttabs"]');
+  var tabFields = fieldset.find('select').not(master);
+
+  /**
+   * Set every tab field at once. The tabs built in the skin have a yes/no property of their own while the tabs
+   * contributed to the docextra extension point store a '+&lt;id&gt;' / '-&lt;id&gt;' entry in a shared list property,
+   * so the value to select is not the same.
+   */
+  var setAllTabs = function(shown) {
+    tabFields.each(function() {
+      var field = $(this);
+      var value = field.hasClass('documentTabVisibility') ?
+        field.find('option[value^="' + (shown ? '+' : '-') + '"]').val() : (shown ? '1' : '0');
+      field.val(value).trigger('change');
+    });
+  };
+
+  fieldset.find('[data-documenttabs-bulk]').on('click', function(event) {
+    event.preventDefault();
+    setAllTabs($(this).attr('data-documenttabs-bulk') === 'show');
+  });
+
+  // The per tab settings have no effect while the whole tab area is hidden. The fields are left enabled so that
+  // saving the form keeps them, but the administrator is told that they are not applied.
+  var updateHiddenNotice = function() {
+    fieldset.find('.documentTabsHiddenNotice').toggleClass('hidden', master.val() !== '0');
+  };
+  master.on('change', updateHiddenNotice);
+  updateHiddenNotice();
+});
+</code>
+    </property>
+    <property>
+      <name>Document tabs bulk actions</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
 </xwikidoc>

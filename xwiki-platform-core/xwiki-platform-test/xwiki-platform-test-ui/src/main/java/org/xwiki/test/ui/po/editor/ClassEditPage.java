@@ -150,7 +150,7 @@ public class ClassEditPage extends EditPage
      * one.
      *
      * @param propertyToMove the property to move one position up
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void movePropertyUp(String propertyToMove)
     {
@@ -162,7 +162,7 @@ public class ClassEditPage extends EditPage
      * one.
      *
      * @param propertyToMove the property to move one position down
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void movePropertyDown(String propertyToMove)
     {
@@ -174,7 +174,7 @@ public class ClassEditPage extends EditPage
      * position when it is already the first one.
      *
      * @param propertyToMove the property to move one position up
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void movePropertyUpWithKeyboard(String propertyToMove)
     {
@@ -186,7 +186,7 @@ public class ClassEditPage extends EditPage
      * its position when it is already the last one.
      *
      * @param propertyToMove the property to move one position down
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void movePropertyDownWithKeyboard(String propertyToMove)
     {
@@ -196,7 +196,7 @@ public class ClassEditPage extends EditPage
     /**
      * @param propertyName the name of a property of this class
      * @return the button moving the given property one position up
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public WebElement getMovePropertyUpButton(String propertyName)
     {
@@ -206,7 +206,7 @@ public class ClassEditPage extends EditPage
     /**
      * @param propertyName the name of a property of this class
      * @return the button moving the given property one position down
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public WebElement getMovePropertyDownButton(String propertyName)
     {
@@ -216,7 +216,7 @@ public class ClassEditPage extends EditPage
     /**
      * @param propertyName the name of a property of this class
      * @return whether the button moving the given property up currently holds the focus
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public boolean isMovePropertyUpButtonFocused(String propertyName)
     {
@@ -227,7 +227,7 @@ public class ClassEditPage extends EditPage
      * @param propertyName the name of a property of this class
      * @return the accessible name of the button moving the given property up, which is displayed to screen readers
      *     only
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public String getMovePropertyUpButtonName(String propertyName)
     {
@@ -238,7 +238,7 @@ public class ClassEditPage extends EditPage
      * @param propertyName the name of a property of this class
      * @return the accessible name of the button moving the given property down, which is displayed to screen readers
      *     only
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public String getMovePropertyDownButtonName(String propertyName)
     {
@@ -248,7 +248,7 @@ public class ClassEditPage extends EditPage
     /**
      * @param propertyName the name of a property of this class
      * @return the tooltip of the button moving the given property up
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public String getMovePropertyUpButtonTooltip(String propertyName)
     {
@@ -258,7 +258,7 @@ public class ClassEditPage extends EditPage
     /**
      * @param propertyName the name of a property of this class
      * @return the tooltip of the button moving the given property down
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public String getMovePropertyDownButtonTooltip(String propertyName)
     {
@@ -269,7 +269,7 @@ public class ClassEditPage extends EditPage
      * @param propertyName the name of a property of this class
      * @return the number of move buttons displayed for the given property, which stays at two however many times
      *     properties are added to the editor
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public int getMovePropertyButtonCount(String propertyName)
     {
@@ -289,7 +289,7 @@ public class ClassEditPage extends EditPage
      * Waits until the move buttons have announced the given text to the screen readers.
      *
      * @param announcement the expected announcement
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void waitForReorderAnnouncement(String announcement)
     {
@@ -302,7 +302,7 @@ public class ClassEditPage extends EditPage
      * {@link #waitForReorderAnnouncement(String)}, which waits for the announcement to be set.
      *
      * @return the text currently held by the live region the move buttons announce their moves in
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public String getReorderAnnouncement()
     {

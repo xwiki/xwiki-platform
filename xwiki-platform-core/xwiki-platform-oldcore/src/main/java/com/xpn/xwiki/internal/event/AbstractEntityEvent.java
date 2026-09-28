@@ -39,14 +39,14 @@ public abstract class AbstractEntityEvent implements EntityEvent
     /**
      * Default constructor. Matches any {@link EntityEvent}.
      */
-    public AbstractEntityEvent()
+    protected AbstractEntityEvent()
     {
     }
 
     /**
      * @param reference the reference
      */
-    public AbstractEntityEvent(EntityReference reference)
+    protected AbstractEntityEvent(EntityReference reference)
     {
         this.reference = reference;
     }

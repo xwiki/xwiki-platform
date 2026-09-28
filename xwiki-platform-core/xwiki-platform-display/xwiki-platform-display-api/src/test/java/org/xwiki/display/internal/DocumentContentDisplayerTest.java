@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
@@ -32,7 +30,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -93,14 +90,8 @@ class DocumentContentDisplayerTest
     @Test
     void baseMetaDataIsSetBeforeExecutingTransformations() throws Exception
     {
-        when(this.executor.execute(any(), any())).then(new Answer<Block>()
-        {
-            @Override
-            public Block answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.<DocumentContentAsyncRenderer>getArgument(0).render(false, false).getBlock();
-            }
-        });
+        when(this.executor.execute(any(), any())).then(
+            invocation -> invocation.<DocumentContentAsyncRenderer>getArgument(0).render(false, false).getBlock());
 
         // The execution context is expected to have the "xwikicontext" property set.
         ExecutionContext executionContext = new ExecutionContext();
@@ -122,16 +113,11 @@ class DocumentContentDisplayerTest
 
         // We can't verify the meta data after the display method is called because we want to make sure the BASE meta
         // data is correctly set before XDOM transformations are executed, not after.
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation)
-            {
-                XDOM xdom = (XDOM) invocation.getArguments()[0];
-                // We have to assert the meta data before the transformations are executed, not at the end!
-                assertEquals("foo", xdom.getMetaData().getMetaData(MetaData.BASE));
-                return null;
-            }
+        doAnswer(invocation -> {
+            XDOM xdom = (XDOM) invocation.getArguments()[0];
+            // We have to assert the meta data before the transformations are executed, not at the end!
+            assertEquals("foo", xdom.getMetaData().getMetaData(MetaData.BASE));
+            return null;
         }).when(this.transformationManager).performTransformations(any(XDOM.class), any(TransformationContext.class));
 
         // Note: we use a non-isolated tx context simply to simplify the test and avoid having to setup a

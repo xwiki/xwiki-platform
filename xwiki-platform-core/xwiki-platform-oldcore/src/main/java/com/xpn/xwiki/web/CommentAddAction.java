@@ -137,11 +137,8 @@ public class CommentAddAction extends XWikiAction
             // upload an image to be inserted in the comment).
             handleTemporaryUploadedFiles(doc, context.getRequest());
 
-            // Make sure the user is allowed to make this modification
-            context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
-
             // Save the new comment.
-            xwiki.saveDocument(doc, comment, true, context);
+            xwiki.saveDocument(doc, comment, true, true, context);
         }
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {
@@ -169,10 +166,9 @@ public class CommentAddAction extends XWikiAction
      *
      * @param context The XWikiContext for getting the request and whether guest comment requires a CAPTCHA
      * @return true if the CAPTCHA answer is correct or if CAPTCHA is not required
-     * @throws XWikiException if something goes wrong in the CAPTCHA module
      * @since 2.3M1
      */
-    private boolean checkCaptcha(XWikiContext context) throws XWikiException
+    private boolean checkCaptcha(XWikiContext context)
     {
         if (context.getWiki().getSpacePreferenceAsInt("guest_comment_requires_captcha", 0, context) == 1) {
             CaptchaConfiguration captchaConfiguration =

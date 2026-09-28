@@ -21,7 +21,7 @@ require([ "jquery", "$!services.webjars.url('jstree', 'jstree.js')" ], function(
   // Create the tree and open all nodes when ready
   $('#extension_clean_tree')
     .on("changed.jstree", function(e, data) {
-      var uninstalledExtensions = $('#uninstalled_extensions');
+      const uninstalledExtensions = $('#uninstalled_extensions');
       uninstalledExtensions.empty();
       data.selected.forEach(function(e) {
         uninstalledExtensions.append($('<input/>').attr({
@@ -45,7 +45,7 @@ require([ "jquery", "$!services.webjars.url('jstree', 'jstree.js')" ], function(
     });
 
 
-  var maybeScheduleRefresh = function(jobStatus) {
+  const maybeScheduleRefresh = function(jobStatus) {
     // Refresh if the job is running (if the progress bar is displayed).
     if (jobStatus.children('.ui-progress').length) {
       setTimeout(maybeScheduleRefresh, 500, jobStatus);

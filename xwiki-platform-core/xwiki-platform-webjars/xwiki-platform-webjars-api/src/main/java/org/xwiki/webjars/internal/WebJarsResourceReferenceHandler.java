@@ -112,11 +112,17 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
     }
 
     /**
+     * @param namespace the namespace for which to look for WebJars resources
      * @return the Class Loader from which to look for WebJars resources
      */
     protected ClassLoader getClassLoader(String namespace)
     {
-        return this.classLoaderManager.getURLClassLoader(namespace, true);
+        // Never ask for the namespace class loader to be created: the namespace comes straight from the URL and is
+        // thus fully controlled by the caller, so creating one would let any caller add an arbitrary entry to the
+        // class loader map, which is never emptied. A namespace that has no class loader also has no WebJar of its
+        // own, and the class loader that would be created for it is empty and delegates everything to the root one,
+        // so falling back to the root class loader resolves exactly the same resources.
+        return this.classLoaderManager.getURLClassLoader(namespace, false);
     }
 
     @Override

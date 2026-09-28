@@ -78,15 +78,15 @@ public class XARWikiWriter implements Closeable
         OutputTarget target = this.xarProperties.getTarget();
 
         try {
-            if (target instanceof FileOutputTarget fileOutputTarget && fileOutputTarget.getFile().isDirectory()) {
-                this.zipStream =
-                    new ZipArchiveOutputStream(new File(fileOutputTarget.getFile(), name + ".xar"));
-            } else if (target instanceof OutputStreamOutputTarget outputStreamOutputTarget) {
-                this.zipStream = new ZipArchiveOutputStream(
-                    new CloseShieldOutputStream(outputStreamOutputTarget.getOutputStream()));
-            } else {
-                throw new FilterException(String.format("Unsupported output target [%s]. Only [%s] is supported",
-                    target, OutputStreamOutputTarget.class));
+            switch (target) {
+                case FileOutputTarget fileOutputTarget when fileOutputTarget.getFile().isDirectory() ->
+                    this.zipStream = new ZipArchiveOutputStream(new File(fileOutputTarget.getFile(), name + ".xar"));
+                case OutputStreamOutputTarget outputStreamOutputTarget ->
+                    this.zipStream = new ZipArchiveOutputStream(
+                        new CloseShieldOutputStream(outputStreamOutputTarget.getOutputStream()));
+                case null, default ->
+                    throw new FilterException(String.format("Unsupported output target [%s]. Only [%s] is supported",
+                        target, OutputStreamOutputTarget.class));
             }
         } catch (IOException e) {
             throw new FilterException("Failed to create zip output stream", e);

@@ -28,19 +28,13 @@ import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -111,10 +105,10 @@ class AttachmentsResourceIT extends AbstractHttpIT
 
         // Now get all the attachments.
         String attachmentsUri = buildURIForThisPage(AttachmentsResource.class);
-        GetMethod getMethod = executeGet(attachmentsUri);
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(attachmentsUri);
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
         assertEquals(8, attachments.getAttachments().size());
 
         // Clean the wiki for further tests: WikisResourceTest use a list of attachments and might fail
@@ -134,17 +128,17 @@ class AttachmentsResourceIT extends AbstractHttpIT
         String content = "ATTACHMENT CONTENT";
         String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentName);
 
-        GetMethod getMethod = executeGet(attachmentURI);
-        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(attachmentURI);
+        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
+        CloseableHttpResponse putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+        assertEquals(HttpStatus.SC_CREATED, putMethod.getCode(), getHttpResponseInfo(putMethod));
 
         getMethod = executeGet(attachmentURI);
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        assertEquals(content, getMethod.getResponseBodyAsString());
+        assertEquals(content, EntityUtils.toString(getMethod.getEntity()));
     }
 
     @Test
@@ -155,11 +149,11 @@ class AttachmentsResourceIT extends AbstractHttpIT
 
         String content = "ATTACHMENT CONTENT";
 
-        GetMethod getMethod = executeGet(attachmentURI);
-        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(attachmentURI);
+        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+        CloseableHttpResponse putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN);
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, putMethod.getCode(), getHttpResponseInfo(putMethod));
     }
 
     @Test
@@ -169,19 +163,20 @@ class AttachmentsResourceIT extends AbstractHttpIT
         String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentName);
         String content = "ATTACHMENT CONTENT";
 
-        PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
+        CloseableHttpResponse putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+        assertEquals(HttpStatus.SC_CREATED, putMethod.getCode(), getHttpResponseInfo(putMethod));
 
-        GetMethod getMethod = executeGet(attachmentURI);
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(attachmentURI);
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        DeleteMethod deleteMethod = executeDelete(attachmentURI, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+        CloseableHttpResponse deleteMethod =
+            executeDelete(attachmentURI, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(HttpStatus.SC_NO_CONTENT, deleteMethod.getStatusCode(), getHttpMethodInfo(deleteMethod));
+        assertEquals(HttpStatus.SC_NO_CONTENT, deleteMethod.getCode(), getHttpResponseInfo(deleteMethod));
 
         getMethod = executeGet(attachmentURI);
-        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getCode(), getHttpResponseInfo(getMethod));
     }
 
     @Test
@@ -192,15 +187,15 @@ class AttachmentsResourceIT extends AbstractHttpIT
 
         String content = "ATTACHMENT CONTENT";
 
-        PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
+        CloseableHttpResponse putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+        assertEquals(HttpStatus.SC_CREATED, putMethod.getCode(), getHttpResponseInfo(putMethod));
 
-        DeleteMethod deleteMethod = executeDelete(attachmentURI);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, deleteMethod.getStatusCode(), getHttpMethodInfo(deleteMethod));
+        CloseableHttpResponse deleteMethod = executeDelete(attachmentURI);
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, deleteMethod.getCode(), getHttpResponseInfo(deleteMethod));
 
-        GetMethod getMethod = executeGet(attachmentURI);
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(attachmentURI);
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
     }
 
     @Test
@@ -220,11 +215,11 @@ class AttachmentsResourceIT extends AbstractHttpIT
         for (int i = 0; i < NUMBER_OF_ATTACHMENTS; i++) {
             String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentNames[i]);
 
-            PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
+            CloseableHttpResponse putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-            assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+            assertEquals(HttpStatus.SC_CREATED, putMethod.getCode(), getHttpResponseInfo(putMethod));
 
-            Attachment attachment = (Attachment) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
+            Attachment attachment = (Attachment) this.unmarshaller.unmarshal(putMethod.getEntity().getContent());
             pageVersions[i] = attachment.getPageVersion();
         }
 
@@ -232,10 +227,10 @@ class AttachmentsResourceIT extends AbstractHttpIT
         // We do the following: at pageVersion[i] we check that all attachmentNames[0..i] are there.
         for (int i = 0; i < NUMBER_OF_ATTACHMENTS; i++) {
             String attachmentsUri = buildURIForThisPage(AttachmentsAtPageVersionResource.class, pageVersions[i]);
-            GetMethod getMethod = executeGet(attachmentsUri);
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+            CloseableHttpResponse getMethod = executeGet(attachmentsUri);
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
 
             // Check that all attachmentNames[0..i] are present in the list of attachments of page at version
             // pageVersions[i]
@@ -272,31 +267,31 @@ class AttachmentsResourceIT extends AbstractHttpIT
         for (int i = 0; i < NUMBER_OF_VERSIONS; i++) {
             String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentName);
             String content = String.format("CONTENT %d", i);
-            PutMethod putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
+            CloseableHttpResponse putMethod = executePut(attachmentURI, content, MediaType.TEXT_PLAIN,
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
             if (i == 0) {
-                assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+                assertEquals(HttpStatus.SC_CREATED, putMethod.getCode(), getHttpResponseInfo(putMethod));
             } else {
-                assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+                assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getCode(), getHttpResponseInfo(putMethod));
             }
 
-            Attachment attachment = (Attachment) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
+            Attachment attachment = (Attachment) this.unmarshaller.unmarshal(putMethod.getEntity().getContent());
 
             versionToContentMap.put(attachment.getVersion(), content);
         }
 
         String attachmentsUri = buildURIForThisPage(AttachmentHistoryResource.class, attachmentName);
-        GetMethod getMethod = executeGet(attachmentsUri);
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(attachmentsUri);
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
         assertEquals(NUMBER_OF_VERSIONS, attachments.getAttachments().size());
 
         for (Attachment attachment : attachments.getAttachments()) {
             getMethod = executeGet(getFirstLinkByRelation(attachment, Relations.ATTACHMENT_DATA).getHref());
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-            assertEquals(versionToContentMap.get(attachment.getVersion()), getMethod.getResponseBodyAsString());
+            assertEquals(versionToContentMap.get(attachment.getVersion()), EntityUtils.toString(getMethod.getEntity()));
         }
     }
 
@@ -308,32 +303,26 @@ class AttachmentsResourceIT extends AbstractHttpIT
 
         String attachmentsUri = buildURIForThisPage(AttachmentsResource.class, attachmentName);
 
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword()));
-        httpClient.getParams().setAuthenticationPreemptive(true);
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+        entityBuilder.addBinaryBody(attachmentName, content.getBytes(), ContentType.DEFAULT_BINARY, attachmentName);
 
-        Part[] parts = new Part[1];
-
-        ByteArrayPartSource baps = new ByteArrayPartSource(attachmentName, content.getBytes());
-        parts[0] = new FilePart(attachmentName, baps);
-
-        PostMethod postMethod = new PostMethod(attachmentsUri);
-        MultipartRequestEntity mpre = new MultipartRequestEntity(parts, postMethod.getParams());
-        postMethod.setRequestEntity(mpre);
-        postMethod.setRequestHeader("XWiki-Form-Token", getFormToken(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+        HttpPost postMethod = new HttpPost(attachmentsUri);
+        postMethod.setEntity(entityBuilder.build());
+        postMethod.addHeader("XWiki-Form-Token", getFormToken(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword()));
-        httpClient.executeMethod(postMethod);
-        assertEquals(HttpStatus.SC_CREATED, postMethod.getStatusCode(), getHttpMethodInfo(postMethod));
 
-        this.unmarshaller.unmarshal(postMethod.getResponseBodyAsStream());
+        CloseableHttpResponse postResponse = execute(postMethod, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        assertEquals(HttpStatus.SC_CREATED, postResponse.getCode(), getHttpResponseInfo(postResponse));
 
-        Header location = postMethod.getResponseHeader("location");
+        this.unmarshaller.unmarshal(postResponse.getEntity().getContent());
 
-        GetMethod getMethod = executeGet(location.getValue());
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        Header location = postResponse.getHeader("location");
 
-        assertEquals(content, getMethod.getResponseBodyAsString());
+        CloseableHttpResponse getMethod = executeGet(location.getValue());
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        assertEquals(content, EntityUtils.toString(getMethod.getEntity()));
     }
 
     @Test
@@ -349,27 +338,27 @@ class AttachmentsResourceIT extends AbstractHttpIT
             String attachmentsUri = buildURIForThisPage(AttachmentsResource.class);
 
             // Test: number=-1 should return error
-            GetMethod getMethod = executeGet(attachmentsUri + "?number=-1");
-            assertEquals(400, getMethod.getStatusCode());
-            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            CloseableHttpResponse getMethod = executeGet(attachmentsUri + "?number=-1");
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
 
             // Test: number=1001 should return error
             getMethod = executeGet(attachmentsUri + "?number=1001");
-            assertEquals(400, getMethod.getStatusCode());
-            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
 
             // Test: pagination with number=1
             getMethod = executeGet(attachmentsUri + "?number=1");
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode());
+            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
             assertEquals(1, attachments.getAttachments().size());
 
             String firstName = attachments.getAttachments().get(0).getName();
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet(attachmentsUri + "?number=1&start=1");
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-            attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode());
+            attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
             assertEquals(1, attachments.getAttachments().size());
             assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
         } finally {
@@ -387,42 +376,42 @@ class AttachmentsResourceIT extends AbstractHttpIT
             int versionCount = 3;
             for (int i = 0; i < versionCount; i++) {
                 String content = "Content version " + i;
-                PutMethod putMethod =
+                CloseableHttpResponse putMethod =
                     executePut(buildURIForThisPage(AttachmentResource.class, attachmentName), content,
                         MediaType.TEXT_PLAIN,
                         TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
                         TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
                 if (i == 0) {
-                    assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode());
+                    assertEquals(HttpStatus.SC_CREATED, putMethod.getCode());
                 } else {
-                    assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+                    assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getCode());
                 }
             }
 
             String historyUri = buildURIForThisPage(AttachmentHistoryResource.class, attachmentName);
 
             // Test: number=-1 should return error
-            GetMethod getMethod = executeGet(historyUri + "?number=-1");
-            assertEquals(400, getMethod.getStatusCode());
-            assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+            CloseableHttpResponse getMethod = executeGet(historyUri + "?number=-1");
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
 
             // Test: number=1001 should return error
             getMethod = executeGet(historyUri + "?number=1001");
-            assertEquals(400, getMethod.getStatusCode());
-            assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
 
             // Test: pagination with number=1
             getMethod = executeGet(historyUri + "?number=1");
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode());
+            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
             assertEquals(1, attachments.getAttachments().size());
 
             String firstVersion = attachments.getAttachments().get(0).getVersion();
 
             // Test: pagination with number=1 and start=1
             getMethod = executeGet(historyUri + "?number=1&start=1");
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
-            attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode());
+            attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
             assertEquals(1, attachments.getAttachments().size());
             assertNotEquals(firstVersion, attachments.getAttachments().get(0).getVersion());
         } finally {

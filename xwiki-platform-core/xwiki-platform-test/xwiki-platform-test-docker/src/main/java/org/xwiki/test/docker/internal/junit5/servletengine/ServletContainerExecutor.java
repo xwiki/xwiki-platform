@@ -200,8 +200,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
             executor = new XWikiExecutor(this.index, dockerInstanceHost, dockerInstancePort, dockerInstanceHost,
                 dockerInstancePort, httpHost, httpPort);
-        } else if (this.jettyStandaloneExecutor != null) {
-            executor = this.jettyStandaloneExecutor.start();
         }
 
         return executor;

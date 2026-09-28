@@ -37,7 +37,7 @@ public abstract class AbstractSkinExtensionDocumentInitializer extends AbstractM
      * @param reference the reference of the document to update. Can be either local or absolute depending if the
      *            document is associated to a specific wiki or not
      */
-    public AbstractSkinExtensionDocumentInitializer(EntityReference reference)
+    protected AbstractSkinExtensionDocumentInitializer(EntityReference reference)
     {
         super(reference);
     }

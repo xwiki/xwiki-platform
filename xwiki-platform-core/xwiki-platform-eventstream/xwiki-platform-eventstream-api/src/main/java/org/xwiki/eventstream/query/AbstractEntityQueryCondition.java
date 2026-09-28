@@ -38,7 +38,7 @@ public abstract class AbstractEntityQueryCondition extends QueryCondition
      * @param statusEntityId the entity associated with the events
      * @param reversed true if the condition should be reversed
      */
-    public AbstractEntityQueryCondition(String statusEntityId, boolean reversed)
+    protected AbstractEntityQueryCondition(String statusEntityId, boolean reversed)
     {
         super(reversed);
 

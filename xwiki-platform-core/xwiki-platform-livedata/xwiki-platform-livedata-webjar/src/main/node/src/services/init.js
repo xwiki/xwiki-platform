@@ -33,14 +33,22 @@ import { resolver } from "xwiki-platform-localization-webjar";
  * If the data does not exist yet, create it from the element
  * @param {HTMLElement} element The HTML Element corresponding to the Livedata component
  * @param $ a jquery instance
+ * @returns {Promise} a promise that resolves with the Livedata API once the Livedata is fully displayed, or that
+ *   rejects with the error that prevented the Livedata from being displayed
  */
 function init(element, $) {
+
+  const data = element.dataset.config
+  if (data === undefined) {
+    // Mounting the application replaces the content of the element, so it must not be attempted without a
+    // configuration: that would discard an already displayed live data and leave an empty element behind.
+    return Promise.reject(new Error("Missing data-config attribute, the live data cannot be displayed."));
+  }
+  element.removeAttribute("data-config")
 
   const locale = document.documentElement.getAttribute("lang");
   const i18n = createI18n({ legacy: false, locale });
 
-  const data = element.dataset.config
-  element.removeAttribute("data-config")
   let contentTrusted = false;
   try {
     const scriptEl = element.querySelector(':scope > script[type="application/json"]');
@@ -60,6 +68,20 @@ function init(element, $) {
 
   const buildTranslations = initTranslationsBuilder(resolver);
 
+  // The live data is displayed asynchronously: the layout and the displayers are loaded with dynamic imports and the
+  // entries are fetched from the live data source. Listen for the event that marks the end of this process, before
+  // mounting the application, so that the caller can know when the live data is fully displayed. The event is
+  // triggered whatever the outcome, with the error that prevented the display, if any.
+  const displayed = new Promise((resolve, reject) => {
+    element.addEventListener("xwiki:livedata:instanceReady", ({detail}) => {
+      if (detail.error) {
+        reject(detail.error);
+      } else {
+        resolve(detail.livedata);
+      }
+    }, {once: true});
+  });
+
   createApp(XWikiLivedata, {
     data,
     liveDataSource: new XWikiLiveDataSource($),
@@ -75,6 +97,8 @@ function init(element, $) {
     .use(i18n)
     .use(Vue3TouchEvents)
     .mount(element)
+
+  return displayed;
 }
 
 export { init };

@@ -43,7 +43,7 @@ public abstract class AbstractXWikiURL implements XWikiURL
      */
     private Map<String, List<String>> parameters = new LinkedHashMap<>();
 
-    public AbstractXWikiURL(XWikiURLType type)
+    protected AbstractXWikiURL(XWikiURLType type)
     {
         setType(type);
     }

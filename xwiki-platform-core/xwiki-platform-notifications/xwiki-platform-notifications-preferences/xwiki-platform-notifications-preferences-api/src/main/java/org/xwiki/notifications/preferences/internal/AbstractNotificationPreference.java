@@ -61,7 +61,7 @@ public abstract class AbstractNotificationPreference implements NotificationPref
      *
      * @since 9.7RC1
      */
-    public AbstractNotificationPreference(boolean isNotificationEnabled, NotificationFormat format,
+    protected AbstractNotificationPreference(boolean isNotificationEnabled, NotificationFormat format,
             NotificationPreferenceCategory category, Date startDate, String providerHint,
             Map<NotificationPreferenceProperty, Object> properties)
     {

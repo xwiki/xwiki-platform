@@ -248,7 +248,7 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
         return retrieveAverageRatingXObject(actualDoc);
     }
 
-    private BaseObject retrieveAverageRatingXObject(XWikiDocument actualDoc) throws Exception
+    private BaseObject retrieveAverageRatingXObject(XWikiDocument actualDoc)
     {
         String serializedReference =
             this.entityReferenceConverter.convert(String.class, actualDoc.getDocumentReference());

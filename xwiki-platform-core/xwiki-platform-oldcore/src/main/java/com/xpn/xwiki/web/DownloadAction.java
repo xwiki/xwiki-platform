@@ -22,7 +22,6 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +78,7 @@ public class DownloadAction extends XWikiAction
 
     /** List of authorized attachment mimetypes. */
     public static final List<String> MIMETYPE_WHITELIST =
-        Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
+        List.of("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
             "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg",
             "image/png", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf", "video/mpeg",
             "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", "video/x-flv");
@@ -421,6 +420,12 @@ public class DownloadAction extends XWikiAction
 
     private XWikiAttachment getAttachment(XWikiRequest request, XWikiDocument document, String filename)
     {
+        // The document comes from the context and is null when the URL didn't resolve to one. There's then no
+        // attachment to look for here and the caller falls back on re-parsing the URL.
+        if (document == null) {
+            return null;
+        }
+
         XWikiAttachment attachment = null;
 
         String idStr = request.getParameter("id");

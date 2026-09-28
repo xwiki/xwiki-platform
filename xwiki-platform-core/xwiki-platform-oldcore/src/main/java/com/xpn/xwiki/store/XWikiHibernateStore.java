@@ -343,12 +343,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     statement.close();
                 }
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the statement must not hide the original error.
             }
             try {
                 if (bTransaction) {
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the transaction must not hide the original error.
             }
         }
     }
@@ -418,12 +422,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     statement.close();
                 }
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the statement must not hide the original error.
             }
             try {
                 if (bTransaction) {
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the transaction must not hide the original error.
             }
         }
     }
@@ -760,6 +768,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         try {
                             endTransaction(context, false);
                         } catch (Exception e) {
+                            // TODO: log a warning instead of ignoring this exception.
+                            // A failure to close the transaction must not hide the original error.
                         }
                     }
                 }
@@ -1198,6 +1208,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         try {
                             endTransaction(context, false);
                         } catch (Exception e) {
+                            // TODO: log a warning instead of ignoring this exception.
+                            // A failure to close the transaction must not hide the original error.
                         }
                     }
                 }
@@ -1301,6 +1313,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         try {
                             endTransaction(context, false);
                         } catch (Exception e) {
+                            // TODO: log a warning instead of ignoring this exception.
+                            // A failure to close the transaction must not hide the original error.
                         }
                     }
                 }
@@ -1491,6 +1505,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         endTransaction(context, true);
                     } catch (Exception e) {
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -1655,6 +1671,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -1745,6 +1763,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -2028,14 +2048,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         executeWrite(inputxcontext, session -> {
             try {
-                Query<Long> query = session
-                    .createQuery("select lock.docId from XWikiLock as lock where lock.docId = :docId", Long.class);
-                query.setParameter(DOC_ID, lock.getDocId());
-                if (query.uniqueResult() == null) {
-                    session.save(lock);
-                } else {
-                    session.update(lock);
-                }
+                // Remove the previous lock, if any, before inserting the new one, rather than updating it in place.
+                // An update would fail if the previous lock was removed concurrently, in the mean time (Hibernate
+                // expects an update statement to modify exactly one row).
+                deleteLock(session, lock.getDocId());
+                session.save(lock);
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_LOCK,
@@ -2051,7 +2068,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         executeWrite(inputxcontext, session -> {
             try {
-                session.delete(lock);
+                deleteLock(session, lock.getDocId());
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_LOCK, "Exception while deleting lock", e);
@@ -2059,6 +2076,21 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             return null;
         });
+    }
+
+    /**
+     * Removes the lock of the specified document, if there is one. A bulk delete is used, rather than deleting the
+     * corresponding entity, because removing a lock that has been removed in the mean time must be a no-op: Hibernate
+     * expects the delete statement generated for an entity to remove exactly one row.
+     *
+     * @param session the Hibernate session to use
+     * @param docId the id of the document whose lock to remove
+     */
+    private void deleteLock(Session session, long docId)
+    {
+        Query<?> query = session.createQuery("delete from XWikiLock as lock where lock.docId = :docId");
+        query.setParameter(DOC_ID, docId);
+        query.executeUpdate();
     }
 
     private void registerLogoutListener()
@@ -2809,6 +2841,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }

@@ -39,7 +39,7 @@ public abstract class AbstractWikiEvent extends AbstractFilterableEvent implemen
     /**
      * This event will match any other document event of the same type.
      */
-    public AbstractWikiEvent()
+    protected AbstractWikiEvent()
     {
         // Voluntarily empty, default constructor is called automatically.
     }
@@ -49,7 +49,7 @@ public abstract class AbstractWikiEvent extends AbstractFilterableEvent implemen
      * 
      * @param wikiId the wiki identifier
      */
-    public AbstractWikiEvent(String wikiId)
+    protected AbstractWikiEvent(String wikiId)
     {
         super(wikiId);
     }
@@ -59,7 +59,7 @@ public abstract class AbstractWikiEvent extends AbstractFilterableEvent implemen
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractWikiEvent(EventFilter eventFilter)
+    protected AbstractWikiEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

@@ -18,277 +18,77 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-saver', [
-  'jquery',
   'chainpad',
   'chainpad-netflux',
   'json.sortify',
+  'xwiki-autosave',
   'xwiki-realtime-crypto',
   'xwiki-realtime-document',
   'xwiki-l10n!xwiki-realtime-messages'
 ], function(
   /* jshint maxparams:false */
-  $, ChainPad, ChainPadNetflux, jsonSortify, Crypto, xwikiDocument, Messages
+  ChainPad, ChainPadNetflux, jsonSortify, AutoSave, Crypto, xwikiDocument, Messages
 ) {
   'use strict';
 
-  function warn(...args) {
-    log('warn', ...args);
-  }
+  const {SaveTransport, Saver, XWikiFormSaveTarget} = AutoSave;
 
-  function debug(...args) {
-    log('debug', ...args);
-  }
+  // The auto-save modules report what they do through the Logger role of the component API. This WebJar has no
+  // component container to resolve the default implementation from, so it passes this console backed one.
+  const logger = {
+    module: 'Saver',
 
-  function log(level, ...args) {
-    console[level]('[Saver] ', ...args);
-  }
+    setModule(module) {
+      this.module = module;
+    },
 
-  // The interval between two consecutive saves (when the content is modified). Using a slightly different value for
-  // each client may help reduce the chances of conflicts.
-  const SAVE_INTERVAL = 60000 + Math.random() * 6000;
+    debug(...args) {
+      this._log('debug', ...args);
+    },
 
-  // How long to wait after broadcasting the intention to save, before actually saving the content. This helps reduce
-  // the chances of concurrent saves (which often lead to merge conflicts).
-  const SAVE_DELAY = 1000;
+    info(...args) {
+      this._log('info', ...args);
+    },
 
-  // How long to wait for the result of a save request before giving up. This is a safety net for the case where neither
-  // the save success nor the save failure event is fired, which would otherwise block the autosave forever. The value
-  // is well above any realistic save round-trip because on timeout the content remains dirty and is saved again, so a
-  // shorter value would risk saving twice (creating an extra version) when the request is only slow.
-  const SUBMIT_TIMEOUT = 120000;
+    warn(...args) {
+      this._log('warn', ...args);
+    },
+
+    error(...args) {
+      this._log('error', ...args);
+    },
+
+    _log(level, ...args) {
+      console[level](this.module + ':', ...args);
+    }
+  };
 
   /**
-   * Generic auto-saver that keeps track of local update count and schedules saves when the content is modified.
+   * Synchronizes the saver states using ChainPad.
    */
-  class GenericSaver {
-    constructor() {
-      // The state of this saver instance, that gets pushed to the other clients.
-      this._state = {
-        // The number of local changes since this saver was created. This is used to determine if there are unsaved
-        // local changes.
-        updateCount: 0,
+  class ChainPadSaveTransport extends SaveTransport {
+    constructor(config, saver) {
+      super(saver);
 
-        // The number of changes for each client that were last saved by this saver.
-        savedUpdateCount: {},
-
-        // Whether there are unsaved local changes. This is deterimned by comparing the local update count with the
-        // saved updated count of all clients.
-        dirty: false,
-
-        // Whether this saver is currently saving the content. A value greater than 0 means the saver is currently
-        // attempting to save with that priority. Depending on the saver implementation, manual save may have for
-        // instance higher priority than autosave.
-        saving: 0,
-      };
-
-      // Whether this saver was stopped, in which case no new save must be scheduled.
-      this._stopped = false;
-    }
-
-    /**
-     * Called each time the edited content is modified locally.
-     */
-    contentModifiedLocally() {
-      this._state.updateCount++;
-      this._updateState(true);
-      this._scheduleSave();
-    }
-
-    isDirty() {
-      return this._state.dirty;
-    }
-
-    _scheduleSave() {
-      // Cancel the previous scheduled save.
-      clearTimeout(this._saveTimer);
-      if (this._stopped) {
-        // Don't schedule a new save after the saver was stopped (e.g. when the user leaves the edit mode).
-        return;
-      }
-      if (!this._dirtyTimestamp || Date.now() - this._dirtyTimestamp < SAVE_INTERVAL) {
-        this._saveTimer = setTimeout(this._maybeSave.bind(this), SAVE_INTERVAL);
-      } else {
-        // Save right away because too much time has passed since the last time the content became dirty.
-        this._maybeSave();
-      }
-    }
-
-    _updateState(push, immediate) {
-      const wasDirty = this._state.dirty;
-      this._state.dirty =
-        // The content can't be dirty if there are no local changes.
-        this._state.updateCount > 0 &&
-        // Check if there is a client that has saved all our local changes.
-        !this._someState(state => state.savedUpdateCount[this._getClientId()] >= this._state.updateCount);
-      if (wasDirty !== this._state.dirty) {
-        // Dirty state changed.
-        if (wasDirty) {
-          // Notify immediately that the content is clean, otherwise, if the user saving the content is not the one that
-          // made the changes, the save status will remain dirty after the save success notification.
-          push = immediate = true;
-        } else {
-          // Remember the last time when the content became dirty in order to be able to save immediately when the save
-          // interval is reached (even if the user is still making changes).
-          this._dirtyTimestamp = Date.now();
-        }
-      } else if (this._isSomeoneSaving()) {
-        // Avoid auto-saving more often than the SAVE_INTERVAL. It's possible that the SAVE_INTERVAL is reached for
-        // multiple users that are editing at the same time. In this case the auto-save should be triggered for only one
-        // of them. For the others the auto-save should be delayed until the SAVE_INTERVAL is reached again.
-        delete this._dirtyTimestamp;
-      }
-      if (push) {
-        // Push the state of this saver to the other clients.
-        this._pushState(immediate);
-      }
-    }
-
-    _getClientId() {
-      // Must be implemented by subclasses.
-      return '';
-    }
-
-    async _pushState(immediate) {
-      // Must be implemented by subclasses.
-    }
-
-    _maybeSave() {
-      if (!this._isSomeoneSaving() && this._isSomeoneDirty()) {
-        // The autosave failure is already logged by the saver and a new save attempt is scheduled.
-        this._save().catch(() => {});
-      }
-    }
-
-    _isSomeoneSaving() {
-      return this._someState(state => state.saving && this._isConnected(state));
-    }
-
-    _isSomeoneDirty() {
-      return this._someState(state => state.dirty && this._isConnected(state));
-    }
-
-    _someState(predicate) {
-      return Object.values(this._getStates()).some(state => predicate(state));
-    }
-
-    _getStates() {
-      // Must be implemented by subclasses.
-      return {};
-    }
-
-    _getConnectedStates() {
-      return Object.fromEntries(Object.entries(this._getStates())
-        .filter(([clientId, state]) => this._isConnected(state)));
-    }
-
-    _isConnected(state) {
-      // Must be overridden by subclasses to indicate if the user associated with the given state is connected to the
-      // realtime editing session.
-      return true;
-    }
-
-    async _save(options) {
-      options = options || {};
-
-      this._state.saving = this._getSavePriority(options);
-      // Let the others know immediately that we are saving, in order to reduce concurrent saves.
-      this._updateState(true, true);
-
-      try {
-        const savingClientId = await this._getSavingClientId();
-        if (savingClientId === this._getClientId()) {
-          const savedUpdateCount = this._getUpdateCounts();
-          debug("Saving ", savedUpdateCount);
-
-          await this._submit(options);
-          this._state.savedUpdateCount = savedUpdateCount;
-        }
-      } catch (error) {
-        warn("Failed to save.", error);
-        // Let the caller know that the content has not been saved.
-        throw error;
-      } finally {
-        this._state.saving = 0;
-        // Propagate the state immediately after the save attempt because the user may leave the edit mode and this will
-        // close the WebSocket connection.
-        this._updateState(true, true);
-
-        if (this._state.dirty) {
-          // The content is still dirty, either because the save failed or because another client was elected to save
-          // and didn't manage to save yet. Schedule a new save attempt.
-          this._scheduleSave();
-        }
-      }
-    }
-
-    _getSavePriority() {
-      // By default all clients have the same priority when saving. Subclasses may override this method to give higher
-      // priority to manual saves, for instance (i.e. when the user clicks on the same button).
-      return 1;
-    }
-
-    /**
-     * The autosave can be triggered on multiple clients at the same time (i.e. multiple clients can set their own
-     * saving flag before they received the saving flag from the other clients). This method is used to determine which
-     * client should save the content in this case. By default the client with the highest save priority and the lowest
-     * id (in alphabetical order) wins.
-     *
-     * @returns the id of the client that should save the content
-     */
-    _getSavingClientId() {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          // Initialize with minimum save priority.
-          let savePriority = 1, savingClientId;
-          for (const [clientId, state] of Object.entries(this._getConnectedStates())) {
-            if (state.saving > savePriority || (state.saving === savePriority &&
-                (!savingClientId || savingClientId > clientId))) {
-              savePriority = state.saving;
-              savingClientId = clientId;
-            }
-          }
-          resolve(savingClientId);
-        }, SAVE_DELAY);
-      });
-    }
-
-    _getUpdateCounts() {
-      const updateCounts = {};
-      for (const [clientId, state] of Object.entries(this._getStates())) {
-        updateCounts[clientId] = state.updateCount || 0;
-      }
-      return updateCounts;
-    }
-
-    async _submit(options) {
-      // Must be implemented by subclasses.
-    }
-  }
-
-  /**
-   * Autosaver that synchronizes the states of the clients using ChainPad.
-   */
-  class ChainPadSaver extends GenericSaver {
-    constructor(config) {
-      super();
-
+      this._config = config;
       this._revertList = [];
 
       this._initializing = new Promise(resolve => {
         this._notifyReady = () => {
-          // Mark the Saver as ready right away (rather than using a promise callback which would be called on the next
-          // tick), to be visible to the code executed right after _notifyReady is called.
+          // Mark the transport as ready right away (rather than using a promise callback which would be called on the
+          // next tick), to be visible to the code executed right after _notifyReady is called.
           this._initializing = false;
           resolve();
         };
       });
 
-      this._config = {...config};
       // The cached states of all the clients.
       this._states = {
-        [this._getClientId()]: this._state
+        [this.getClientId()]: this.state
       };
+    }
 
+    initialize() {
       this._realtimeInput = ChainPadNetflux.start(this._getRealtimeConfig());
       this._revertList.push(() => {
         this._realtimeInput?.stop();
@@ -299,7 +99,7 @@ define('xwiki-realtime-saver', [
         if (document.visibilityState === 'hidden') {
           // Push uncommitted changes to the server because when a document is hidden its window can be closed without
           // notice, so this might be the last chance to propagate our local state to the other collaborators.
-          this._pushState(true);
+          this.updateLocalState({}, {push: true, immediate: true});
         }
       };
       document.addEventListener('visibilitychange', visibilityChangeListener);
@@ -308,33 +108,48 @@ define('xwiki-realtime-saver', [
       });
     }
 
-    _getClientId() {
+    async toBeReady() {
+      // Resolved right away once we're connected, because _initializing is set to false by then.
+      await this._initializing;
+    }
+
+    getClientId() {
       return this._config.userName;
     }
 
-    _getStates() {
+    getStates() {
       return this._states;
     }
 
-    async _pushState(immediate) {
-      this._state.id = this._myId;
-      this._getStates()[this._getClientId()] = this._state;
-      this._onLocal();
+    async updateLocalState(patch, {push, immediate} = {}) {
+      Object.assign(this.state, patch);
+      if (!this._chainpad) {
+        // We're not connected (yet, or anymore) so we can only keep the new state locally.
+        return;
+      }
+      this.state.id = this._myId;
+      this._states[this.getClientId()] = this.state;
+      if (push) {
+        this._onLocal();
+      }
       if (immediate) {
         this._chainpad.sync();
-        await new Promise(resolve => this._chainpad.onSettle(resolve));
+        await this.whenSettled();
       }
     }
 
-    _isConnected(state) {
+    isConnected(state) {
       return this._userList.users.includes(state.id);
     }
 
-    async toBeReady() {
-      if (this._initializing) {
-        await this._initializing;
-      }
-      return this;
+    whenSettled() {
+      return new Promise(resolve => {
+        if (this._chainpad) {
+          this._chainpad.onSettle(resolve);
+        } else {
+          resolve();
+        }
+      });
     }
 
     _getRealtimeConfig() {
@@ -346,11 +161,11 @@ define('xwiki-realtime-saver', [
         crypto: Crypto,
         // Operational Transformation
         patchTransformer: ChainPad.SmartJSONTransformer,
-  
+
         onRemote: this._onRemote.bind(this),
         onReady: this._onReady.bind(this),
         onLocal: this._onLocal.bind(this),
-        onAbort: this.stop.bind(this)
+        onAbort: () => this.saver.stop()
       };
     }
 
@@ -368,14 +183,16 @@ define('xwiki-realtime-saver', [
       }
 
       const remoteStates = this._chainpad.getUserDoc();
-      debug('Received remote states: ', remoteStates);
+      logger.debug('Received remote states: ', remoteStates);
 
       try {
         this._states = JSON.parse(remoteStates);
-        this._state = this._getStates()[this._getClientId()] || this._state;
-        this._updateState();
+        // The remote document may not include our own state yet, in which case we keep the state we have until the
+        // next push re-inserts it in the map.
+        this.state = this._states[this.getClientId()] || this.state;
+        this.saver.onRemoteStatesChanged();
       } catch (e) {
-        warn("Unable to parse remote states.", e);
+        logger.warn('Unable to parse remote states.', e);
       }
     }
 
@@ -384,366 +201,72 @@ define('xwiki-realtime-saver', [
         return;
       }
       const localStates = jsonSortify(this._states);
-      debug('Push local states: ', localStates);
+      logger.debug('Push local states: ', localStates);
       this._chainpad.contentUpdate(localStates);
       const remoteStates = this._chainpad.getUserDoc();
       if (remoteStates !== localStates) {
-        warn("Unexpected remote states after synchronization: ", {
+        logger.warn('Unexpected remote states after synchronization: ', {
           expected: localStates,
           actual: remoteStates
         });
       }
     }
 
-    /**
-     * Stop the autosave when the user disallows realtime or when the WebSocket is disconnected.
-     */
-    async stop() {
-      this._stopped = true;
-      // Cancel the scheduled save.
-      clearTimeout(this._saveTimer);
+    async dispose() {
+      delete this._chainpad;
 
-      if (this._chainpad) {
-        // Push uncommitted changes to the server before disconnecting.
-        await this._pushState(true);
-        delete this._chainpad;
-      }
-
-      // Disconnect from the realtime channel and revert the changes made by this saver (i.e. remove event listeners,
-      // restore action buttons behaviour).
+      // Disconnect from the realtime channel and remove the event listeners.
       this._revertList.forEach(revert => revert());
     }
   }
 
   /**
-   * A ChainPadSaver implementation specific to XWiki.
+   * An auto-saver that synchronizes the saver states using ChainPad and that saves the content by submitting the XWiki
+   * edit form.
    */
-  class XWikiSaver extends ChainPadSaver {
+  class ChainPadXWikiFormSaver {
     constructor(config) {
-      super({
+      config = {
         formId: 'edit',
         onLocalStatusChange: () => {},
         onStatusChange: () => {},
         onCreateVersion: () => {},
         ...config
-      });
-    }
-
-    _onReady(info) {
-      super._onReady(info);
-
-      // There's a very small chance that the preview button might cause problems, so let's just get rid of it.
-      const form = document.getElementById(this._config.formId);
-      const $previewButton = $(form).find('input[name="action_preview"]');
-      if ($previewButton.is(':visible')) {
-        $previewButton.hide();
-        this._revertList.push(() => {
-          $previewButton.show();
-        });
-      }
-
-      this._overwriteAjaxSaveAndContinue(form);
-
-      const beforeSaveHandler = event => {
-        if (!this._state.saving) {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          // The save failure is already logged by the saver and reported to the user by the save notification.
-          this._save({button: event.target}).catch(() => {});
-        }
       };
-      $(form).on('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
-      this._revertList.push(() => {
-        $(form).off('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
-      });
-    }
-
-    _overwriteAjaxSaveAndContinue(form) {
-      const self = this;
-      const originalAjaxSaveAndContinue = $.extend({}, XWiki.actionButtons.AjaxSaveAndContinue.prototype);
-      const newAjaxSaveAndContinue = {
-        // Prevent the save buttons from reloading the page. Instead, reset the editor's content.
-        // FIXME: The in-place editor is also overriding reloadEditor, before this code is executed, so here we're
-        // actually overwriting in-place editor's behavior.
-        reloadEditor: () => {
-          xwikiDocument.reload();
-          // HACK: Replicate the behavior from the in-place editor.
-          setTimeout(() => {
-            $(form).trigger('xwiki:actions:reload');
-          }, 0);
-        },
-        // Redirect only after we have confirmation that the saver state has been propagated to all clients.
-        maybeRedirect: function(continueEditing) {
-          if (continueEditing) {
-            return originalAjaxSaveAndContinue.maybeRedirect.apply(this, arguments);
-          } else {
-            self._chainpad.onSettle(() => {
-              originalAjaxSaveAndContinue.maybeRedirect.apply(this, arguments);
-            });
-            return true;
-          }
-        }
-      };
-      $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, newAjaxSaveAndContinue);
-      this._revertList.push(() => {
-        // Revert only if the method has not been overridden by another script.
-        for(const [methodName, method] of Object.entries(newAjaxSaveAndContinue)) {
-          if (XWiki.actionButtons.AjaxSaveAndContinue.prototype[methodName] === method) {
-            XWiki.actionButtons.AjaxSaveAndContinue.prototype[methodName] = originalAjaxSaveAndContinue[methodName];
-          }
-        }
-      });
-    }
-
-    _updateState(push, immediate) {
-      super._updateState(push, immediate);
-
-      this._notifyStatusChange();
-
-      let latestVersion = '0.0';
-      let savedBy;
-      for (const [clientId, state] of Object.entries(this._getStates())) {
-        if (this._compareVersions(state.version || '0.0', latestVersion) > 0) {
-          latestVersion = state.version;
-          savedBy = clientId;
-        }
-      }
-      if (this._compareVersions(latestVersion, xwikiDocument.version) > 0) {
-        xwikiDocument.update({
-          version: latestVersion,
-          modified: Date.now(),
-          isNew: false
-        });
-        if (savedBy !== this._getClientId()) {
-          this._config.onCreateVersion({
-            number: latestVersion,
-            date: xwikiDocument.modified,
-            author: savedBy
-          });
-        }
-      }
-    }
-
-    _notifyStatusChange() {
-      const localStatus = (this._state.saving && 1) || (this._state.dirty ? 0 : 2);
-      if (this._previousLocalStatus !== localStatus) {
-        this._previousLocalStatus = localStatus;
-        this._config.onLocalStatusChange(localStatus);
-      }
-
-      const globalStatus = (this._isSomeoneSaving() && 1) || (this._isSomeoneDirty() ? 0 : 2);
-      if (this._previousGlobalStatus !== globalStatus) {
-        this._previousGlobalStatus = globalStatus;
-        this._config.onStatusChange(globalStatus);
-      }
+      this._saver = new Saver({...config, logger},
+        saver => new ChainPadSaveTransport(config, saver),
+        // Keep the target, because it is the one that knows which button performs the save we are asked for.
+        saver => (this._target = new XWikiFormSaveTarget(saver, {
+          document: xwikiDocument,
+          formId: config.formId,
+          autoSaveVersionSummary: Messages.autoSaveSummary,
+          onCreateVersion: config.onCreateVersion,
+          logger
+        }))
+      );
     }
 
     async toBeReady() {
-      const result = await super.toBeReady();
-      this._notifyStatusChange();
-      if (!xwikiDocument.isNew) {
-        // Retrieve information about the initial version, when joining the editing session, but without blocking the
-        // saver ready state.
-        xwikiDocument.getRevision(xwikiDocument.version).then(revision => {
-          this._config.onCreateVersion({
-            number: revision.version,
-            date: new Date(revision.modified).getTime(),
-            author: {
-              reference: this._getAbsoluteUserReference(revision.author),
-              name: revision.authorName
-            }
-          });
-        }).catch(error => {
-          console.debug('Failed to retrieve information about the initial version.', error);
-        });
-      }
-      return result;
+      await this._saver.toBeReady();
+      return this;
     }
 
-    _getAbsoluteUserReference(userReference) {
-      const usersSpaceReference = XWiki.Model.resolve('XWiki', XWiki.EntityType.SPACE, xwikiDocument.documentReference);
-      return XWiki.Model.serialize(XWiki.Model.resolve(userReference, XWiki.EntityType.DOCUMENT, usersSpaceReference));
+    contentModifiedLocally() {
+      this._saver.contentModifiedLocally();
     }
 
-    _compareVersions(a, b) {
-      const [aMajor, aMinor] = (a + '').split('.').map(Number);
-      const [bMajor, bMinor] = (b + '').split('.').map(Number);
-      return aMajor - bMajor || aMinor - bMinor;
-    }
-
-    _getSavePriority({button}) {
-      // Give higher priority to manual saves (when the user clicks on the save button). Also give higher priority to
-      // Save & View over Save & Continue. The former leaves the edit mode so we want to make sure we don't lose unsaved
-      // changes, while the latter keeps the user in the edit mode where we have autosave.
-      if (button) {
-        // Manual save
-        return button.getAttribute('name') === 'action_save' ? 3 : 2;
-      } else {
-        // Autosave
-        return super._getSavePriority();
-      }
-    }
-
-    async _submit({button}) {
-      // The merge conflict modal is already displayed (from a previous save attempt). Clicking the save button again
-      // would reopen the same modal and reset the fields the user did not submit yet. We don't want that.
-      if ($('#previewDiffModal').is(':visible')) {
-        throw new Error('Merge conflict prevents save.');
-      }
-
-      const isAutoSave = !button;
-      button = button || this._getSaveButton(true);
-      if (!$(button).is(':enabled')) {
-        throw new Error('The save button is disabled or missing.');
-      }
-
-      const form = document.getElementById(this._config.formId);
-      const removeListeners = [];
-      const submitResultPromise = this._getSubmitResult(form, removeListeners, SUBMIT_TIMEOUT);
-
-      let savePrevented = true;
-      $(button).on('xwiki:actions:save.realtime-saver', event => {
-        savePrevented = event.isDefaultPrevented();
-      });
-
-      const restoreVersionSummary = this._maybeSetAutoSaveVersionSummary(form, isAutoSave);
-      $(button).click();
-      $(button).off('xwiki:actions:save.realtime-saver');
-      restoreVersionSummary?.();
-
-      if (savePrevented) {
-        // The save is prevented if the form has invalid data (e.g. missing mandatory title). In this case the
-        // xwiki:document:saved and xwiki:document:saveFailed events are not triggered, so we need to remove the
-        // corresponding event listeners and reject the save.
-        removeListeners.forEach(removeListener => removeListener());
-        throw new Error('Save prevented. Verify that the form has valid data.');
-      }
-
-      this._afterSave(await submitResultPromise);
-    }
-
-    _maybeSetAutoSaveVersionSummary(form, isAutoSave) {
-      const commentInput = form?.querySelector('input[name="comment"]');
-      if (commentInput && isAutoSave) {
-        // Backup the version summary before setting the auto-save value.
-        const versionSummary = commentInput.value;
-        commentInput.value = Messages.autoSaveSummary;
-        return () => {
-          // Restore the version summary after the auto-save was triggered.
-          commentInput.value = versionSummary;
-        };
-      }
-    }
-
-    _getSaveButton(continueEditing) {
-      const form = document.getElementById(this._config.formId);
-      return form.querySelector('input[name="action_save' + (continueEditing ? 'andcontinue' : '') + '"]');
-    }
-
-    /**
-     * @param {Element} form the edit form that is being submitted
-     * @param {Array<Function>} removeListeners the list of functions to call in order to stop waiting for the result
-     * @param {Number} [timeout] how long to wait for the save result before rejecting; when not specified we wait
-     *   indefinitely (e.g. while the user is dealing with the merge conflict modal)
-     * @returns {Promise} a promise that resolves with the save result or rejects if the save fails
-     */
-    _getSubmitResult(form, removeListeners, timeout) {
-      return new Promise((resolve, reject) => {
-        if (timeout) {
-          const timer = setTimeout(() => {
-            // Stop waiting for the save result, including for the events that are part of the same group.
-            removeListeners.forEach(removeListener => removeListener());
-            reject(new Error('Timeout while waiting for the save result.'));
-          }, timeout);
-          // Disarm the timer as soon as we receive the save result.
-          removeListeners.push(() => clearTimeout(timer));
-        }
-        this._once(form, removeListeners, 'xwiki:document:saved.realtime-saver', (event, data) => {
-          resolve(data);
-        });
-        this._once(form, removeListeners, 'xwiki:document:saveFailed.realtime-saver', (event, data) => {
-          if (data.response.status === 409) {
-            debug('Save blocked by merge conflict');
-            // Keep the saving flag while the user deals with the merge conflict modal (i.e. we don't want the merge
-            // conflict to be handled by multiple users because this leads to more merge conflicts).
-            this._waitForMergeConflictResolution(form).then(resolve, reject);
-          } else {
-            reject(new Error('Failed to save.'));
-          }
-        });
-      });
-    }
-
-    async _waitForMergeConflictResolution(form) {
-      // There are multiple events that signal the merge conflict resolution. We want to wait for which one comes first
-      // and then remove the other listeners. For this, we collect all the remove listener functions.
-      const removeListeners = [];
-      return new Promise((resolve, reject) => {
-        // Wait for the document to be saved (after the merge conflict is resolved) or for the save to fail (which is
-        // triggered also when the merge conflict modal fails to be fetched from the server).
-        this._getSubmitResult(form, removeListeners).then(resolve, reject);
-        // ... or for the editor to be reloaded, if the user decides to discard the local changes.
-        this._once(form, removeListeners, 'xwiki:actions:reload', () => {
-          reject(new Error('Discarding local changes by reloading the editor.'));
-        });
-        // ... or for the merge conflict modal to be closed without resolving the conflict.
-        this._once(document, removeListeners, 'hide.bs.modal.realtime-saver', '#previewDiffModal', () => {
-          if ($('#previewDiffModal').data('action') === 'cancel') {
-            reject(new Error('Save canceled.'));
-          } else {
-            // The modal was closed but not canceled so we still need to wait for a save (successful or not) or reload
-            // event. Keep the other event listeners in the group.
-            return true;
-          }
-        });
-      });
-    }
-
-    /**
-     * Do something when any of the events from a group is triggered for the first time (once).
-     *
-     * @param {Element} target the target element on which the event listener is registered
-     * @param {Array<Function>} removeListeners the list of event listeners to remove after an event from the group is
-     *   triggered
-     * @param {...any} args the arguments passed when registering the event listener
-     */
-    _once(target, removeListeners, ...args) {
-      // Wrap the original handler so that we can remove all the event listeners in the group after one of them is
-      // triggered.
-      const originalHandler = args.at(-1);
-      args[args.length - 1] = (...params) => {
-        const result = originalHandler(...params);
-        if (result !== true) {
-          // Cleanup.
-          removeListeners.forEach(removeListener => removeListener());
-        }
-        return result;
-      };
-      $(target).one(...args);
-      removeListeners.push(() => $(target).off(...args));
-    }
-
-    _afterSave({newVersion}) {
-      if (newVersion === xwikiDocument.version) {
-        // The version didn't change because the document hasn't been modified.
-        return;
-      } else if (newVersion === '1.1') {
-        debug('Created document version 1.1');
-      } else {
-        debug(`Version bumped from ${xwikiDocument.version} to ${newVersion}.`);
-      }
-      this._state.version = newVersion;
-      this._config.onCreateVersion({
-        number: newVersion,
-        date: Date.now(),
-        author: this._getClientId()
-      });
+    isDirty() {
+      return this._saver.isDirty();
     }
 
     save(continueEditing) {
-      return this._save({button: this._getSaveButton(continueEditing)});
+      return this._saver.save({button: this._target.getSaveButton(continueEditing)});
+    }
+
+    stop() {
+      return this._saver.stop();
     }
   }
 
-  return XWikiSaver;
+  return ChainPadXWikiFormSaver;
 });

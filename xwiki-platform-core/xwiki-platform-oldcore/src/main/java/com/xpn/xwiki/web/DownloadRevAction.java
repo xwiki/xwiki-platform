@@ -55,7 +55,7 @@ public class DownloadRevAction extends DownloadAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         String rev = request.getParameter("rev");
-        String filename = getFileName();
+        String filename = getAttachmentFileName();
         XWikiAttachment attachment;
 
         // Compute a XWikiAttachment object from the filename passed in the request
@@ -122,7 +122,7 @@ public class DownloadRevAction extends DownloadAction
     /**
      * @return the filename of the attachment.
      */
-    private String getFileName()
+    private String getAttachmentFileName()
     {
         // Extract the Attachment file name from the parsed request URL that was done before this Action is called
         ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();

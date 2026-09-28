@@ -216,7 +216,7 @@
         ## Fallback for incomplete/invalid extension orders to avoid breaking the display.
         #set ($order = 0)
       #end
-      #set ($uixMap = { 'content'  : $services.rendering.render($uix.execute(), 'html/5.0'),
+      #set ($uixMap = { 'content'  : $services.uix.render($uix, 'html/5.0'),
                         'order'    : $order,
                         'separator': $separator})
       #set ($discard = $extensions.add($uixMap))

@@ -28,13 +28,13 @@ import java.util.regex.Pattern;
 
 import jakarta.mail.internet.MimeMessage;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.mail.test.po.MailStatusAdministrationSectionPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
@@ -42,6 +42,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.UseWikiDescriptorTarget;
+import org.xwiki.test.docker.junit5.WikiDescriptorTarget;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -120,6 +122,8 @@ class MailIT
 
     @Test
     @Order(1)
+    // It's already the default, but we force it in case the default changes because the test relies on it
+    @UseWikiDescriptorTarget(WikiDescriptorTarget.BROWSER)
     void verifyMail(TestUtils setup, XWikiWebDriver webDriver, TestConfiguration testConfiguration)
         throws Exception
     {
@@ -204,7 +208,8 @@ class MailIT
         // - "$request"
         // Note: We also use the $name and $doc bindings to show that the user can add new bindings ($doc is not bound
         // by default since there isn't always a notion of current doc in all places where mail sending is done).
-        // Note: We use $xwiki.getURL() in the content to verify that we generate full external URLs.
+        // Note: We use $xwiki.getURL() in the content to verify that we generate full external URLs, based on
+        // the request that sends the mail.
         String velocityContent = "Hello $name from $escapetool.xml($services.model.resolveDocument("
             + "$xcontext.getUser()).getName()) - Served from $request.getRequestURL().toString() - "
             + "url: $xwiki.getURL('Main.WebHome')";
@@ -216,7 +221,7 @@ class MailIT
         // We also add an attachment to the Mail Template page to verify that it is sent in the mail
         ByteArrayInputStream bais = new ByteArrayInputStream("Content of attachment".getBytes());
         setup.attachFile(this.testClassName, "MailTemplate", "something.txt", bais, true,
-            new UsernamePasswordCredentials("superadmin", "pass"));
+            new XWikiCredentials("superadmin", "pass"));
 
         // The base URL used in generated emails
         String requestURLPrefix = setup.getCurrentExecutor().getBrowserBaseURL() + "bin/view";
@@ -408,7 +413,7 @@ class MailIT
             "\\QSubject: Status for John on " + this.testClassName + ".SendMail\\E",
             "\\QHello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMail\\E",
             "\\Q<strong>Hello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMail - "
-                + "url: http://\\E.*\\Q/Main/</strong>\\E",
+                + "url: " + requestURLPrefix + "/Main/</strong>\\E",
             "\\QX-MailType: Test\\E",
             "\\QContent-Type: text/plain; name=something.txt\\E",
             "\\QContent-ID: <something.txt>\\E",
@@ -466,7 +471,7 @@ class MailIT
         assertReceivedMessages(2,
             "\\QSubject: Status for John on " + this.testClassName + ".SendMailGroupAndUsers\\E",
             "\\QHello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMailGroupAndUsers - "
-                + "url: http://\\E.*\\Q/Main/\\E");
+                + "url: " + requestURLPrefix + "/Main/\\E");
         this.mail.purgeEmailFromAllMailboxes();
     }
 

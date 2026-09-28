@@ -46,8 +46,8 @@ public abstract class AbstractWikiResource<R extends EntityReference, I extends 
 
     protected final DocumentReference documentReference;
 
-    public AbstractWikiResource(String id, String path, String resourceName, ResourceRepository repository, R reference,
-        DocumentReference authorReference, Provider<XWikiContext> xcontextProvider)
+    protected AbstractWikiResource(String id, String path, String resourceName, ResourceRepository repository,
+        R reference, DocumentReference authorReference, Provider<XWikiContext> xcontextProvider)
     {
         super(id, path, resourceName, repository);
 

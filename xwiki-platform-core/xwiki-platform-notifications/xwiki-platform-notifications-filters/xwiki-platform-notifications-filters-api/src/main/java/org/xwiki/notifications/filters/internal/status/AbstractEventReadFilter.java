@@ -35,7 +35,7 @@ public abstract class AbstractEventReadFilter extends AbstractForUserEventFilter
      * @param filterName name of the filter
      * @param format format on which the filter applies
      */
-    public AbstractEventReadFilter(String filterName, NotificationFormat format)
+    protected AbstractEventReadFilter(String filterName, NotificationFormat format)
     {
         super(filterName, format, true, true);
     }

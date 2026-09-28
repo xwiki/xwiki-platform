@@ -84,10 +84,10 @@ public class ComponentScriptService implements ScriptService
      * A Component Manager which read in contextual Component Manager and write in root component manager.
      *
      * @return the Component Manager if the document has Programming Rights or null otherwise
-     * @deprecated since 6.4.1, 6.2.6, use {@link #getContextComponentManager()} or
+     * @deprecated use {@link #getContextComponentManager()} or
      *             {@link #getContextComponentManager()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.4.1,6.2.6")
     public ComponentManager getComponentManager()
     {
         return this.contextualAuthorizationManager.hasAccess(PROGRAM) ? this.contextrootComponentManagerProvider.get()

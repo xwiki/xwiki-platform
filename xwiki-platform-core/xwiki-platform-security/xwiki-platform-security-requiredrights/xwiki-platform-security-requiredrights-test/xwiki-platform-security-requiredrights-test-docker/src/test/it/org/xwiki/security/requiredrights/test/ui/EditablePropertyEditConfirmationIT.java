@@ -75,20 +75,18 @@ class EditablePropertyEditConfirmationIT
         EditablePropertyPane<Boolean> hiddenProperty = new EditablePropertyPane<>("hidden");
 
         // Click the edit pencil. The edit confirmation check in display.vm returns a 423 (warning), so the
-        // ForceEditLockModal is shown instead of the editor.
+        // ForceEditLockModal is shown instead of the editor. Creating the page object waits for the modal.
         hiddenProperty.clickEditWithoutWaiting();
         ForceEditLockModal modal = new ForceEditLockModal();
-        // The fade animation takes a while to complete, so we wait until the modal is actually displayed.
-        setup.getDriver().waitUntilCondition(driver -> modal.isDisplayed());
 
         // Cancel: the editor must not open.
         modal.clickCancel();
         assertFalse(hiddenProperty.isEditing());
 
         // Click edit again; since we canceled, the confirmation was not stored in the session, so the modal reappears.
+        // Again, creating the page object waits for the modal to be displayed.
         hiddenProperty.clickEditWithoutWaiting();
         ForceEditLockModal modal2 = new ForceEditLockModal();
-        assertTrue(modal2.isDisplayed());
 
         // Confirm: the editor should open after the modal closes.
         modal2.clickOk();

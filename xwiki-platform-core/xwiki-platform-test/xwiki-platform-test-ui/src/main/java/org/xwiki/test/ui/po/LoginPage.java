@@ -80,11 +80,36 @@ public class LoginPage extends ViewPage
             this.submitButton.click();
             getDriver().waitUntilPageIsReloaded();
         }
+
+        synchronizeRESTCredentials(username, password);
     }
 
     public void loginAs(String username, String password)
     {
         loginAs(username, password, false);
+    }
+
+    /**
+     * Make the REST client authenticate as the user the browser was just logged in as, so that the two don't drift
+     * apart. The browser session and the credentials used for REST calls are independent states, and a test that logs
+     * in through this page object would otherwise keep performing its REST calls as whoever was set before, typically
+     * the superadmin the {@link TestUtils} constructor defaults to.
+     * <p>
+     * This method is only ever called with a displayed page, so the login state it reads is the one the server just
+     * rendered. A page that shows the requested user as logged in is a definitive answer: only a page the server
+     * rendered for that user can show them as logged in. The opposite isn't definitive, since the displayed page may
+     * not show any login state at all (the login may have failed, but the redirect may also have landed on a page
+     * that isn't skinned), so the credentials are left untouched in that case rather than guessed. Leaving them
+     * untouched is also what the tests that log in with wrong credentials on purpose need.
+     *
+     * @param username the user the browser was asked to log in as
+     * @param password the password the browser was asked to log in with
+     */
+    private void synchronizeRESTCredentials(String username, String password)
+    {
+        if (username.equals(getUtil().getLoggedInUserName())) {
+            getUtil().setDefaultCredentials(username, password);
+        }
     }
 
     public boolean hasInvalidCredentialsErrorMessage()

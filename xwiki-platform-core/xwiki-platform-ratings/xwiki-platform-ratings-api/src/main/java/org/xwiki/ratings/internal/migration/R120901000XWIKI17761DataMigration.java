@@ -403,7 +403,7 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
         return migrateRating;
     }
 
-    private List<String> getAllPagesWithRatingXObject(Session session) throws HibernateException, XWikiException
+    private List<String> getAllPagesWithRatingXObject(Session session) throws HibernateException
     {
         Query<String> query = session.createQuery("select distinct obj.name from BaseObject obj"
                 + " where obj.className = 'XWiki.RatingsClass'",

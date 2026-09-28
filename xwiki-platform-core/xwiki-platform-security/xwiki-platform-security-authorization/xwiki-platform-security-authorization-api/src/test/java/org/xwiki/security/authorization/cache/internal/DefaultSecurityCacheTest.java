@@ -777,14 +777,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         entries.putAll(InsertEntities());
         entries.putAll(InsertAccess());
 
-        removerTest(entries, new Remover()
-        {
-            @Override
-            public void remove(SecurityReference ref)
-            {
-                securityCache.remove(ref);
-            }
-        });
+        removerTest(entries, ref -> securityCache.remove(ref));
     }
 
     @Test

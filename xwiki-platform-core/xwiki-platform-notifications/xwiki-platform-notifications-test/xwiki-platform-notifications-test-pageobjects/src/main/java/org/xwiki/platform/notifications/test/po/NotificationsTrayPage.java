@@ -28,8 +28,8 @@ import java.util.Set;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -137,9 +137,9 @@ public class NotificationsTrayPage extends ViewPage
             .queryParam("_", System.currentTimeMillis())
             .build();
         try {
-            GetMethod getMethod = testUtils.rest().executeGet(attemptURI);
-            if (Set.of(200, 202).contains(getMethod.getStatusCode())) {
-                String responseBody = IOUtils.toString(getMethod.getResponseBodyAsStream(), UTF_8);
+            CloseableHttpResponse response = testUtils.rest().executeGet(attemptURI);
+            if (Set.of(200, 202).contains(response.getCode())) {
+                String responseBody = IOUtils.toString(response.getEntity().getContent(), UTF_8);
                 Map<?, ?> map = new ObjectMapper().readValue(responseBody, Map.class);
                 return getOptionalLong(String.valueOf(map.get("unread")));
             } else {
@@ -353,6 +353,19 @@ public class NotificationsTrayPage extends ViewPage
     public String getNotificationType(int notificationNumber)
     {
         return getNotificationsContainerElement().getNotificationType(notificationNumber);
+    }
+
+    /**
+     * Get the index of the first notification of a given type. Useful when several notifications share the same date,
+     * since their order in the list is then not deterministic.
+     *
+     * @param type the type of the notification to find, for instance {@code update} or {@code addComment}
+     * @return the index of the first notification of that type in the list, or {@code -1} if there is none
+     * @since 18.9.0RC1
+     */
+    public int getNotificationIndex(String type)
+    {
+        return getNotificationsContainerElement().getNotificationIndex(type);
     }
 
     /**

@@ -80,8 +80,20 @@ public class NumberClass extends PropertyClass
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "number";
+    // The HTML input type happens to have the same value as the XClass name, so it's defined from it instead of
+    // repeating the literal.
+    private static final String INPUT_TYPE_NUMBER = XCLASSNAME;
     private static final String SIZE = "size";
     private static final String NUMBER_TYPE = "numberType";
+    private static final String STEP = "step";
+    private static final String STEP_ANY = "any";
+    private static final String STEP_INTEGER = "1";
+    private static final String MIN = "min";
+    private static final String MAX = "max";
+    private static final String DATA_VALIDATION_BAD_INPUT = "data-validation-bad-input";
+    private static final String DATA_VALIDATION_STEP_MISMATCH = "data-validation-step-mismatch";
+    private static final String DATA_VALIDATION_RANGE_OVERFLOW = "data-validation-range-overflow";
+    private static final String DATA_VALIDATION_RANGE_UNDERFLOW = "data-validation-range-underflow";
 
     /**
      * Constructor with a meta class.
@@ -186,7 +198,10 @@ public class NumberClass extends PropertyClass
                 }
             }
         } catch (NumberFormatException e) {
-            throw new XWikiException(String.format("Error when parsing [%s] to type [%s]", value, ntype), e);
+            String message =
+                localizePlainOrKey("core.model.xclass.classProperty.error.invalidNumberFormat", value, ntype);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
+                XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID, message, e);
         }
 
         property.setValue(nvalue);
@@ -205,11 +220,37 @@ public class NumberClass extends PropertyClass
             input.setValue(prop.toText());
         }
 
-        input.setType("text");
+        input.setType(INPUT_TYPE_NUMBER);
         input.setName(prefix + name);
         input.setID(prefix + name);
-        input.setSize(getSize());
         input.setDisabled(isDisabled());
+
+        String ntype = getNumberType();
+        input.addAttribute(DATA_VALIDATION_BAD_INPUT,
+            localizePlainOrKey("core.validation.number.message.invalidformat"));
+        if (TYPE_FLOAT.equals(ntype) || TYPE_DOUBLE.equals(ntype)) {
+            // Without an explicit step, the HTML5 default (step=1) makes any decimal value a stepMismatch.
+            input.addAttribute(STEP, STEP_ANY);
+        } else {
+            input.addAttribute(STEP, STEP_INTEGER);
+            // A step mismatch can only be a decimal value here, which is a valid number, so the message asks for a
+            // whole number rather than reporting an invalid one.
+            input.addAttribute(DATA_VALIDATION_STEP_MISMATCH,
+                localizePlainOrKey("core.validation.number.message.wholenumberrequired"));
+            // Only the integer type gets a range. Browsers evaluate min and max in double arithmetic, so a min set at
+            // the magnitude of the long range makes them skip the step check altogether, letting decimals through on
+            // the default number type. Values outside the long range are reported by fromString instead.
+            if (TYPE_INTEGER.equals(ntype)) {
+                String min = String.valueOf(Integer.MIN_VALUE);
+                String max = String.valueOf(Integer.MAX_VALUE);
+                input.addAttribute(MIN, min);
+                input.addAttribute(MAX, max);
+                String outOfRangeMessage = localizePlainOrKey("core.validation.number.message.outofrange", min, max);
+                input.addAttribute(DATA_VALIDATION_RANGE_OVERFLOW, outOfRangeMessage);
+                input.addAttribute(DATA_VALIDATION_RANGE_UNDERFLOW, outOfRangeMessage);
+            }
+        }
+
         buffer.append(input.toString());
     }
 

@@ -87,7 +87,8 @@ class InternalTemplateManagerTest
     @Test
     void getFilesystemTemplateWhenTemplateDoesNotExistAnymore()
     {
-        when(this.cache.get(FS_TEMPLATE_ID)).thenReturn(mock());
+        Template templateMock = mock();
+        when(this.cache.get(FS_TEMPLATE_ID)).thenReturn(templateMock);
 
         assertNull(this.templates.getTemplate("template"));
 

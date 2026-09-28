@@ -244,7 +244,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             Boolean bAjax = (Boolean) context.get("ajax");
             if ((bAjax == null) || (!bAjax.booleanValue())) {
                 // This is the url that the user was initially accessing before being prompted for login.
-                String continueToURL = getContinueToURL(request);
+                String continueToURL = computeContinueToURL(request);
                 response.sendRedirect(response.encodeRedirectURL(continueToURL));
             }
         } else {
@@ -266,7 +266,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * @param request
      * @return a URL to send the user to after logging in
      */
-    private String getContinueToURL(HttpServletRequest request)
+    private String computeContinueToURL(HttpServletRequest request)
     {
         String savedURL = request.getParameter("xredirect");
         if (StringUtils.isEmpty(savedURL)) {

@@ -78,7 +78,7 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
      * @param translationMessageParser used to parse translation messages
      * @throws ComponentLookupException failed to lookup some component
      */
-    public AbstractURLResourceTranslationBundle(URL baseURL, ComponentManager componentManager,
+    protected AbstractURLResourceTranslationBundle(URL baseURL, ComponentManager componentManager,
         TranslationMessageParser translationMessageParser) throws ComponentLookupException
     {
         this.bundleContext = componentManager.getInstance(TranslationBundleContext.class);

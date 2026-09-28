@@ -413,6 +413,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                     endTransaction(context, true);
                 }
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the transaction must not hide the original error.
             }
 
             restoreExecutionXContext();
@@ -475,11 +477,11 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     /**
      * Checks if this xwiki setup is virtual meaning if multiple wikis can be accessed using the same database pool
      *
-     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
+     * @deprecated Virtual mode is on by default.
      * @param context the XWiki context.
      * @return true if multi-wiki, false otherwise.
      */
-    @Deprecated
+    @Deprecated(since = "5.0M2")
     protected boolean isVirtual(XWikiContext context)
     {
         return true;
@@ -613,6 +615,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                 this.store.endTransaction(false);
             }
         } catch (HibernateException e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // Cleaning up the session at shutdown time is only a best effort.
         }
     }
 

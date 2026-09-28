@@ -35,7 +35,11 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link CreateJob}.
@@ -73,7 +77,7 @@ class CreateJobTest extends AbstractEntityJobTest
         run(request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).copy(templateReference, documentReference);
+        verify(this.modelBridge).copy(templateReference, documentReference, false);
         verify(this.modelBridge).removeLock(documentReference);
     }
 
@@ -101,7 +105,7 @@ class CreateJobTest extends AbstractEntityJobTest
         run(request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).copy(templateDocumentReference, newDocumentReference);
+        verify(this.modelBridge).copy(templateDocumentReference, newDocumentReference, false);
         verify(this.modelBridge, never()).removeLock(any(DocumentReference.class));
     }
 
@@ -118,7 +122,7 @@ class CreateJobTest extends AbstractEntityJobTest
 
         verify(this.modelBridge).create(documentReference);
         verify(this.modelBridge).removeLock(documentReference);
-        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge, never()).copy(any(), any(), anyBoolean());
     }
 
     @Test
@@ -134,8 +138,8 @@ class CreateJobTest extends AbstractEntityJobTest
         run(request);
 
         verify(this.modelBridge).create(spaceHomeReference);
-        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class));
-        verify(this.modelBridge, never()).removeLock(any(DocumentReference.class));
+        verify(this.modelBridge, never()).copy(any(), any(), anyBoolean());
+        verify(this.modelBridge, never()).removeLock(any());
     }
 
     @Test
@@ -161,7 +165,7 @@ class CreateJobTest extends AbstractEntityJobTest
         request.setDeep(true);
         run(request);
 
-        verify(this.modelBridge).copy(templateDocumentReference, newDocumentReference);
+        verify(this.modelBridge).copy(templateDocumentReference, newDocumentReference, false);
     }
 
     @Test
@@ -289,7 +293,7 @@ class CreateJobTest extends AbstractEntityJobTest
 
     private void verifyNoCreate()
     {
-        verify(this.modelBridge, never()).create(any(DocumentReference.class));
-        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge, never()).create(any());
+        verify(this.modelBridge, never()).copy(any(), any(), anyBoolean());
     }
 }

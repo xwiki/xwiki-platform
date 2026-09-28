@@ -127,7 +127,9 @@
       #set($tabKey = $services.rendering.escape($subcategory.get('id'), 'xwiki/2.1'))
       (% id="${tabKey}Pane" class="user-page-pane#if($subcategory.get('id') != $currentCategory) hidden#end" %)
       (((
-        {{html}}$services.rendering.render($subcategory.uix.execute(), 'html/5.0'){{/html}}
+
+{{uiextension id="$services.rendering.escape($subcategory.uix.id, 'xwiki/2.1')"/}}
+
       )))
     #end
   #end

@@ -53,7 +53,7 @@ public abstract class AbstractResourceSkin extends AbstractSkin
      * @param configuration the skin internal configuration, used to access the default parent skin id
      * @param logger a logger used to log warning in case of error when parsing a skin's syntax
      */
-    public AbstractResourceSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
+    protected AbstractResourceSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
         Logger logger)
     {
         super(id, skinManager, configuration, logger);

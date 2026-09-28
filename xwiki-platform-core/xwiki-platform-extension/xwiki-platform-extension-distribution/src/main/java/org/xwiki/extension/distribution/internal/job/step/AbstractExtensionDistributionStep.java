@@ -48,7 +48,7 @@ public abstract class AbstractExtensionDistributionStep extends AbstractDistribu
     /**
      * @param stepId the identifier of the step
      */
-    public AbstractExtensionDistributionStep(String stepId)
+    protected AbstractExtensionDistributionStep(String stepId)
     {
         super(stepId);
     }

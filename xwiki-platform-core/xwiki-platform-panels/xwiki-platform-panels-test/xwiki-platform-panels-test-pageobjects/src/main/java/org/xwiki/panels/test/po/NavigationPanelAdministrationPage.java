@@ -19,13 +19,17 @@
  */
 package org.xwiki.panels.test.po;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.administration.test.po.AdministrationPage;
@@ -109,6 +113,11 @@ public class NavigationPanelAdministrationPage extends ViewPage
         }
         if (source != null) {
             getDriver().dragAndDrop(source, this.excludedPagesPane);
+            // The drop is handled by synchronous client-side JavaScript (no server round-trip), but the resulting DOM
+            // mutation (hiding the tree nodes, toggling the "No pages found" placeholder) may not be reflected yet by
+            // the time the drag-and-drop Selenium command returns. Wait for it explicitly so callers don't read the
+            // tree state mid-mutation.
+            waitUntilTopLevelPagesState(Arrays.asList(pages), false);
         }
     }
 
@@ -133,6 +142,58 @@ public class NavigationPanelAdministrationPage extends ViewPage
         }
         if (source != null) {
             getDriver().dragAndDrop(source, this.treeElement);
+            // See the comment in #exclude(String...) about why we need to wait for the drop to be fully processed.
+            waitUntilTopLevelPagesState(Arrays.asList(pages), true);
+        }
+    }
+
+    /**
+     * Wait until the given pages are (or aren't) part of the visible top level pages of the navigation tree.
+     *
+     * @param pages the pages to check
+     * @param visible {@code true} to wait until the pages are visible top level pages, {@code false} to wait until
+     *     they aren't anymore
+     */
+    private void waitUntilTopLevelPagesState(List<String> pages, boolean visible)
+    {
+        // Remember the last observed state so that we can report it if we time out, without having to query the tree
+        // again from the catch block (which could fail on its own and thus hide the actual failure).
+        AtomicReference<List<String>> lastTopLevelPages = new AtomicReference<>();
+        try {
+            getDriver().waitUntilCondition(driver -> {
+                List<String> topLevelPages = getNavigationTree().getTopLevelPages();
+                lastTopLevelPages.set(topLevelPages);
+                // The navigation tree always displays at least the "no pages found" placeholder, so a tree without any
+                // visible top level page means the tree is in an inconsistent state. Don't consider the expected state
+                // reached in this case, otherwise the failure would surface much later, in an unrelated assertion.
+                return !topLevelPages.isEmpty()
+                    && pages.stream().allMatch(page -> topLevelPages.contains(page) == visible);
+            });
+        } catch (TimeoutException e) {
+            // Report the state that we could observe, in order to be able to diagnose the failure without access to
+            // the browser console.
+            throw new TimeoutException(String.format(
+                "Timed out waiting for %s to %s the top level pages of the navigation tree. Visible top level pages: "
+                    + "%s. Node types accepted by the tree root: %s.",
+                pages, visible ? "appear in" : "disappear from", lastTopLevelPages.get(),
+                getNavigationTreeRootValidChildren()), e);
+        }
+    }
+
+    /**
+     * @return the node types that the navigation tree accepts as children of its root node; the tree silently ignores
+     *     the attempts to create a node of a different type, so this is useful to diagnose why a page didn't show up
+     *     in (or disappear from) the tree
+     */
+    private Object getNavigationTreeRootValidChildren()
+    {
+        try {
+            return getDriver().executeScript(
+                "return jQuery.jstree.reference(jQuery(arguments[0]))?.get_node('#')?.data?.validChildren",
+                this.treeElement);
+        } catch (Exception e) {
+            // This is only used to enrich a failure message, so it must never hide the actual failure.
+            return "unknown (" + ExceptionUtils.getRootCauseMessage(e) + ")";
         }
     }
 
@@ -169,6 +230,9 @@ public class NavigationPanelAdministrationPage extends ViewPage
 
     private WebElement getPageByTitle(String pageTitle)
     {
+        // Make sure the tree has finished (re)loading before looking up a node in it, otherwise we might race with
+        // its initial AJAX load, e.g. right after the page was reloaded.
+        getNavigationTree();
         return getDriver().findElementWithoutWaiting(this.treeElement,
             By.xpath("(.//li[contains(@class, 'jstree-node')]/a[. = '" + pageTitle + "'])"));
     }

@@ -31,7 +31,7 @@ public abstract class AbstractInputSourceResource<I extends InputSource> extends
 {
     protected I source;
 
-    public AbstractInputSourceResource(String path, String resourceName, ResourceRepository repository, I source)
+    protected AbstractInputSourceResource(String path, String resourceName, ResourceRepository repository, I source)
     {
         super(path, path, resourceName, repository);
 

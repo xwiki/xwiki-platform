@@ -52,7 +52,7 @@ public class ObjectAddAction extends XWikiAction
      * A pattern that matches the {@code xobjectNumber} request parameter which is used to pass the number of the added
      * object to the redirect URL.
      */
-    private static final Pattern XOBJECT_NUMBER_PARAMETER = Pattern.compile("(\\?|&)xobjectNumber=?(&|#|$)");
+    private static final Pattern XOBJECT_NUMBER_PARAMETER = Pattern.compile("([?&])xobjectNumber=?(&|#|$)");
 
     /**
      * Used to resolve XClass references.
@@ -115,10 +115,7 @@ public class ObjectAddAction extends XWikiAction
 
         String comment = localizePlainOrKey("core.comment.addObject");
 
-        // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(userReference, doc, comment, true, context);
-
-        xwiki.saveDocument(doc, comment, true, context);
+        xwiki.saveDocument(doc, comment, true, true, context);
 
         // If this is an ajax request, no need to redirect.
         if (Utils.isAjaxRequest(context)) {

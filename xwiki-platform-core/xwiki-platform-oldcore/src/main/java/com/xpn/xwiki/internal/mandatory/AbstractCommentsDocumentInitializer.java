@@ -39,7 +39,7 @@ public abstract class AbstractCommentsDocumentInitializer extends AbstractMandat
      *
      * @param reference the entity reference
      */
-    public AbstractCommentsDocumentInitializer(EntityReference reference)
+    protected AbstractCommentsDocumentInitializer(EntityReference reference)
     {
         super(reference);
     }

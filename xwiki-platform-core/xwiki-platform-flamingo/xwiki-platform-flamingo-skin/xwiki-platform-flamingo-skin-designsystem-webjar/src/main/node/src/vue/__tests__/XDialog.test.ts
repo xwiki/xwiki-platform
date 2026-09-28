@@ -19,13 +19,18 @@
  */
 import XDialog from "../XDialog.vue";
 import { mountHelper, runTest } from "@xwiki/platform-test-accessibility";
+import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import { describe, expect } from "vitest";
-import Module from "module";
 import type { DialogProps } from "@xwiki/platform-dsapi";
 
+// Bootstrap is not loaded in the tests, so stub the jQuery plugin the component initializes on mount.
+const modalStub = {
+  modal: () => modalStub,
+  on: () => modalStub,
+};
+
 function getAccessibilityMount() {
-  // Override require used globally but resolved to node's required by default.
-  Module.prototype.require = () => {};
+  mockRequireJS({ jquery: () => modalStub, bootstrap: {} });
   return mountHelper(XDialog);
 }
 

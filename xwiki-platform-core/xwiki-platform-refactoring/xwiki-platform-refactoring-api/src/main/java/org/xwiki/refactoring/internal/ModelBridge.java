@@ -55,9 +55,13 @@ public interface ModelBridge
      * 
      * @param source the document to copy
      * @param destination the reference of the document copy that is going to be created
+     * @param modifiedByContextUser if the rename was triggered by a user and should be validated
      * @return {@code true} if the document was copied successfully, {@code false} if the copy failed
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     * @since 17.10.13
      */
-    boolean copy(DocumentReference source, DocumentReference destination);
+    boolean copy(DocumentReference source, DocumentReference destination, boolean modifiedByContextUser);
 
     /**
      * Delete the specified document.
@@ -196,8 +200,11 @@ public interface ModelBridge
      *
      * @param source the document to rename
      * @param destination the reference of the document that is going to be created
+     * @param modifiedByContextUser if the rename was triggered by a user and should be validated
      * @return {@code true} if the document was renamed successfully, {@code false} if the rename failed
-     * @since 12.5RC1
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     * @since 17.10.13
      */
-    boolean rename(DocumentReference source, DocumentReference destination);
+    boolean rename(DocumentReference source, DocumentReference destination, boolean modifiedByContextUser);
 }

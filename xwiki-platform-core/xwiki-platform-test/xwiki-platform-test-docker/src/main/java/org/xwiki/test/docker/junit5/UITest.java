@@ -291,4 +291,13 @@ public @interface UITest
      * @since 18.3.0RC1
      */
     XWikiInstances xwikiInstances() default @XWikiInstances;
+
+    /**
+     * @return the host/port to set as the default one in the wiki descriptor, and which is thus used to generate
+     *         external URLs from background threads, that is when no request is available to get the host/port from.
+     *         This is the value used by all the tests of the XWiki instance, unless they override it with
+     *         {@link UseWikiDescriptorTarget}.
+     * @since 18.8.0RC1
+     */
+    WikiDescriptorTarget wikiDescriptorTarget() default WikiDescriptorTarget.BROWSER;
 }

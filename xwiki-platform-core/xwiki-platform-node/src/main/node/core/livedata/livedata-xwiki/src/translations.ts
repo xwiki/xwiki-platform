@@ -41,7 +41,12 @@ function initTranslationsBuilder(
     return async function resolveTranslations(
       query: Query,
     ): Promise<Translations> {
-      const translations = (await resolver.resolve(query)).translations;
+      // The query is resolved in the locale the translations are stored under, unless it pins a locale of its own.
+      const localizedQuery: Query = Array.isArray(query)
+        ? { keys: query, locale }
+        : { ...query, locale: query.locale ?? locale };
+      const translations = (await resolver.resolve(localizedQuery))
+        .translations;
       i18n.global.setLocaleMessage(locale, translations);
       return translations;
     };

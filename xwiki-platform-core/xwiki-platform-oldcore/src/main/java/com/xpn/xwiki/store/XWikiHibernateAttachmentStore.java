@@ -136,6 +136,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                         try {
                             endTransaction(context, false);
                         } catch (Exception e) {
+                            // TODO: log a warning instead of ignoring this exception.
+                            // A failure to close the transaction must not hide the original error.
                         }
                     }
                 }
@@ -185,6 +187,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -352,6 +356,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }

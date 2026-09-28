@@ -59,7 +59,7 @@ import com.xpn.xwiki.api.Attachment;
 public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
 {
     private static final Pattern CID_PATTERN =
-        Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+        Pattern.compile("src=(['\"])cid:([^'\"]*)(['\"])", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
     private static final String TEXT_HTML_CONTENT_TYPE = "text/html; charset=" + StandardCharsets.UTF_8.name();
 

@@ -322,6 +322,6 @@ class PropertyComparator implements Comparator<PropertyClass>
     @Override
     public int compare(PropertyClass o1, PropertyClass o2)
     {
-        return o1.getNumber() - o2.getNumber();
+        return Integer.compare(o1.getNumber(), o2.getNumber());
     }
 }

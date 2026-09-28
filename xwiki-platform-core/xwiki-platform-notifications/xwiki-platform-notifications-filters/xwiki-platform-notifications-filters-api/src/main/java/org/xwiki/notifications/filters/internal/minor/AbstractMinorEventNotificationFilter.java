@@ -57,7 +57,7 @@ public abstract class AbstractMinorEventNotificationFilter implements Notificati
      * @param filterName name of the filter
      * @param format format on which the filter applies
      */
-    public AbstractMinorEventNotificationFilter(String filterName, NotificationFormat format)
+    protected AbstractMinorEventNotificationFilter(String filterName, NotificationFormat format)
     {
         this.filterName = filterName;
         this.format = format;

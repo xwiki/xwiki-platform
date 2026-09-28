@@ -144,11 +144,11 @@ public class DocumentUserManager implements UserManager
     }
 
     @Override
-    public boolean hasAccess(Right right, UserReference user, UserReference target)
+    public boolean hasViewAccess(UserReference user, UserReference target)
     {
         DocumentReference userReference = this.documentUserReferenceSerializer.serialize(user);
         DocumentReference targetReference = this.documentUserReferenceSerializer.serialize(target);
 
-        return this.authorizationManager.hasAccess(right, userReference, targetReference);
+        return this.authorizationManager.hasAccess(Right.VIEW, userReference, targetReference);
     }
 }

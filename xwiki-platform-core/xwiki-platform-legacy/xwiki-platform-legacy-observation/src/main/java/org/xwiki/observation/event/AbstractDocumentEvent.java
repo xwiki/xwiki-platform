@@ -41,7 +41,7 @@ public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
     /**
      * This event will match any other document event of the same type.
      */
-    public AbstractDocumentEvent()
+    protected AbstractDocumentEvent()
     {
          super();
     }
@@ -51,7 +51,7 @@ public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
      * 
      * @param documentReference the reference of the document relater to this event
      */
-    public AbstractDocumentEvent(DocumentReference documentReference)
+    protected AbstractDocumentEvent(DocumentReference documentReference)
     {
         super(new DefaultStringEntityReferenceSerializer().serialize(documentReference));
     }
@@ -63,7 +63,7 @@ public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
      * @deprecated use {@link #AbstractDocumentEvent(DocumentReference)} instead
      */
     @Deprecated
-    public AbstractDocumentEvent(String documentName)
+    protected AbstractDocumentEvent(String documentName)
     {
         super(documentName);
     }
@@ -73,7 +73,7 @@ public abstract class AbstractDocumentEvent extends AbstractFilterableEvent
      * 
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractDocumentEvent(EventFilter eventFilter)
+    protected AbstractDocumentEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

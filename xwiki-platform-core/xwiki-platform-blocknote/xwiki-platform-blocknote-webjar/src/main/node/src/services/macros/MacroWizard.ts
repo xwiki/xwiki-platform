@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { Container, inject, injectable } from "inversify";
-import type { XWikiEntityReference } from "../model/reference/XWikiEntityReference";
 import type {
   InlineMacroInvocation,
   MacroBlockInvocation,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xwiki-model-api";
 
 /**
  * A macro invocation, either block-level or inline. This is the editor-level representation of a macro call, used by

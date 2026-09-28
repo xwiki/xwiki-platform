@@ -83,12 +83,14 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.mockito.OldcoreMatchers;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -308,6 +310,39 @@ class XWikiMockitoTest
             same(this.context));
 
         verifyNoMoreInteractions(observation);
+    }
+
+    @Test
+    void checkDeletingDocumentWithNullDocument()
+    {
+        XWikiException exception = assertThrows(XWikiException.class,
+            () -> this.xwiki.checkDeletingDocument(new DocumentReference("wiki", "XWiki", "User"), null,
+                this.context));
+
+        assertEquals("Error number 0 in 2: Cannot check the deletion of a null document", exception.getMessage());
+    }
+
+    @Test
+    void getDocumentReferenceInXMLRPCMode()
+    {
+        this.context.setMode(XWikiContext.MODE_XMLRPC);
+        this.context.setWikiId("wiki");
+        this.context.setDoc(new XWikiDocument(new DocumentReference("otherwiki", "Space", "Page")));
+
+        assertEquals(new DocumentReference("wiki", "Space", "Page"),
+            this.xwiki.getDocumentReference(mock(XWikiRequest.class), this.context));
+    }
+
+    @Test
+    void getDocumentReferenceInXMLRPCModeWithoutCurrentDocument()
+    {
+        this.context.setMode(XWikiContext.MODE_XMLRPC);
+        this.context.setWikiId("wiki");
+        this.context.setDoc(null);
+
+        // Fall back on the wiki's home page since there's no current document to get the space and name from.
+        assertEquals(new DocumentReference("wiki", "Main", "WebHome"),
+            this.xwiki.getDocumentReference(mock(XWikiRequest.class), this.context));
     }
 
     @Test

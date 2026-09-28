@@ -36,7 +36,7 @@ public abstract class AbstractRightsDocumentInitializer extends AbstractMandator
     /**
      * @param pageName the document name of the rights class
      */
-    public AbstractRightsDocumentInitializer(String pageName)
+    protected AbstractRightsDocumentInitializer(String pageName)
     {
         super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, pageName));
     }

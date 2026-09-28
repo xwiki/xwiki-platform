@@ -38,6 +38,8 @@ public class InplaceEditablePage extends ViewPage
 {
     private static final By TITLE_INPUT = By.id("document-title-input");
 
+    private static final By EDIT_LOCK_CONFIRMATION = By.cssSelector(".force-edit-lock-modal.in .modal-body");
+
     @FindBy(id = "commentinput")
     private WebElement versionSummaryInput;
 
@@ -74,6 +76,46 @@ public class InplaceEditablePage extends ViewPage
     {
         getTranslateButton().click();
         return waitForInplaceEditor();
+    }
+
+    /**
+     * Click on the Translate button without waiting for the in-place editor, e.g. because the translation is locked by
+     * another user and thus the edit lock confirmation is expected instead.
+     * 
+     * @return this page object
+     * @since 18.8.0RC1
+     */
+    public InplaceEditablePage clickTranslate()
+    {
+        getTranslateButton().click();
+        return this;
+    }
+
+    /**
+     * Wait for the modal asking the user to confirm that they want to take over the edit lock held by another user.
+     * 
+     * @return the message displayed by the edit lock confirmation modal
+     * @since 18.8.0RC1
+     */
+    public String waitForEditLockConfirmation()
+    {
+        getDriver().waitUntilElementIsVisible(EDIT_LOCK_CONFIRMATION);
+        return getDriver().findElement(EDIT_LOCK_CONFIRMATION).getText();
+    }
+
+    /**
+     * Wait until the in-place editor is editing the document translation for the given locale. Needed when switching
+     * from editing one translation to editing another (e.g. from the original translation to a new one), because
+     * {@link #waitForInplaceEditor()} returns right away in that case, while the editor is still switching.
+     * 
+     * @param locale the locale of the translation being edited, the empty string for the default translation
+     * @return this page object
+     * @since 18.8.0RC1
+     */
+    public InplaceEditablePage waitForEditedLocale(String locale)
+    {
+        getDriver().waitUntilElementHasAttributeValue(By.tagName("html"), "data-xwiki-locale", locale);
+        return this;
     }
 
     /**

@@ -68,7 +68,7 @@ public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implemen
      *5005
      * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      */
-    public AbstractSignableMacro(String name)
+    protected AbstractSignableMacro(String name)
     {
         super(name);
     }
@@ -79,7 +79,7 @@ public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implemen
      * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      * @param description a string describing this macro.
      */
-    public AbstractSignableMacro(String name, String description)
+    protected AbstractSignableMacro(String name, String description)
     {
         super(name, description);
     }
@@ -91,7 +91,7 @@ public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implemen
      * @param description a string describing this macro.
      * @param contentDescriptor {@link ContentDescriptor} for this macro.
      */
-    public AbstractSignableMacro(String name, String description,
+    protected AbstractSignableMacro(String name, String description,
         ContentDescriptor contentDescriptor)
     {
         super(name, description, contentDescriptor);
@@ -104,7 +104,7 @@ public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implemen
      * @param description a string describing this macro.
      * @param parametersBeanClass class of the parameters bean of this macro.
      */
-    public AbstractSignableMacro(String name, String description, Class<?> parametersBeanClass)
+    protected AbstractSignableMacro(String name, String description, Class<?> parametersBeanClass)
     {
         super(name, description, parametersBeanClass);
     }
@@ -117,7 +117,7 @@ public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implemen
      * @param contentDescriptor the {@link ContentDescriptor} describing the content of this macro.
      * @param parametersBeanClass class of the parameters bean.
      */
-    public AbstractSignableMacro(String name, String description,
+    protected AbstractSignableMacro(String name, String description,
         ContentDescriptor contentDescriptor, Class<?> parametersBeanClass)
     {
         super(name, description, contentDescriptor, parametersBeanClass);

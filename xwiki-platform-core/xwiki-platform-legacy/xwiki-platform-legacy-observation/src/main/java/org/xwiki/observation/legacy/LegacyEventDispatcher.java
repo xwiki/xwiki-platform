@@ -82,15 +82,8 @@ public class LegacyEventDispatcher implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return new ArrayList<Event>()
-        {
-            {
-                add(new DocumentDeletedEvent());
-                add(new DocumentCreatedEvent());
-                add(new DocumentUpdatedEvent());
-                add(new ActionExecutedEvent());
-            }
-        };
+        return new ArrayList<>(List.of(new DocumentDeletedEvent(), new DocumentCreatedEvent(),
+            new DocumentUpdatedEvent(), new ActionExecutedEvent()));
     }
 
     @Override

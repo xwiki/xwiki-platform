@@ -114,7 +114,7 @@ public class BaseObjects extends AbstractList<BaseObject>
     public void add(int index, BaseObject element)
     {
         // Check if the index is valid
-        rangeCheckForAdd(index);
+        checkRangeForAdd(index);
 
         // Shifts right values to the right
         if (index < this.size) {
@@ -196,18 +196,18 @@ public class BaseObjects extends AbstractList<BaseObject>
     private void rangeCheck(int index)
     {
         if (index < 0 || index >= this.size) {
-            throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
         }
     }
 
-    private void rangeCheckForAdd(int index)
+    private void checkRangeForAdd(int index)
     {
         if (index < 0 || index > this.size || index == Integer.MAX_VALUE) {
-            throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
         }
     }
 
-    private String outOfBoundsMsg(int index)
+    private String getOutOfBoundsMessage(int index)
     {
         return "Index: " + index + ", Size: " + size;
     }

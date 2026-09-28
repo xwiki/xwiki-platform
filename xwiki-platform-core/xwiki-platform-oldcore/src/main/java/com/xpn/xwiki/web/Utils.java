@@ -238,6 +238,8 @@ public class Utils
             try {
                 response.getWriter().flush();
             } catch (Throwable ex2) {
+                // TODO: log a warning instead of ignoring this exception.
+                // There is nothing else we can do to flush the response.
             }
         }
     }
@@ -451,6 +453,8 @@ public class Utils
                     bytes = data.getBytes(encoding);
                 }
             } catch (UnsupportedEncodingException uee) {
+                // TODO: log a warning instead of ignoring this exception.
+                // The bytes are then left null and no parameter is parsed.
             }
 
             return parseParameters(bytes, encoding);

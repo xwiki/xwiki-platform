@@ -160,6 +160,8 @@ public class XWikiPluginManager
             try {
                 plugin.virtualInit(context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
     }
@@ -181,6 +183,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.commonTagsHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -192,6 +196,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.startRenderingHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -203,6 +209,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.outsidePREHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -214,6 +222,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.insidePREHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -225,6 +235,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.endRenderingHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -236,6 +248,8 @@ public class XWikiPluginManager
             try {
                 plugin.beginRendering(context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
     }
@@ -246,6 +260,8 @@ public class XWikiPluginManager
             try {
                 plugin.endRendering(context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
     }
@@ -256,6 +272,8 @@ public class XWikiPluginManager
             try {
                 plugin.beginParsing(context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
     }
@@ -266,6 +284,8 @@ public class XWikiPluginManager
             try {
                 content = plugin.endParsing(content, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return content;

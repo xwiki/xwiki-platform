@@ -286,9 +286,7 @@ public class ModelBridge
             UserReference userReference = this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE);
             document.setAuthor(userReference);
             String comment = "LiveData update.";
-            DocumentReference documentUserReference = xcontext.getUserReference();
-            xcontext.getWiki().checkSavingDocument(documentUserReference, document, comment, true, xcontext);
-            xcontext.getWiki().saveDocument(document, comment, true, xcontext);
+            xcontext.getWiki().saveDocument(document, comment, true, true, xcontext);
         }
     }
 

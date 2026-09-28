@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.annotation.test.po.AnnotatableViewPage;
+import org.xwiki.annotation.test.po.AnnotationsWindow;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -108,6 +109,11 @@ class AnnotationsIT
         AnnotatableViewPage annotatableViewPage =
             new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
         CommentsTab commentsTab = annotatableViewPage.getWrappedViewPage().openCommentsDocExtraPane();
+
+        // The close button of the creation dialog dismisses it, like its cancel button does.
+        AnnotationsWindow annotationsWindow = annotatableViewPage.beginAddAnnotation(ANNOTATED_TEXT_1);
+        annotationsWindow.clickCloseAnnotation();
+        annotationsWindow.waitUntilClosed();
 
         annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
         annotatableViewPage.addAnnotation(ANNOTATED_TEXT_2, ANNOTATION_TEXT_2);

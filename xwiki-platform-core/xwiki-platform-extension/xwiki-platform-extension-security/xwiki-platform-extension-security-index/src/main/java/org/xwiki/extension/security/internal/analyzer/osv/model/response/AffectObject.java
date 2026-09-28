@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.extension.security.internal.analyzer.osv.model.PackageObject;
@@ -35,7 +36,7 @@ public class AffectObject
 {
     private PackageObject packag;
 
-    private List<RangeObject> ranges;
+    private List<RangeObject> ranges = new ArrayList<>();
 
     /**
      * @return the package
@@ -54,7 +55,8 @@ public class AffectObject
     }
 
     /**
-     * @return the ranges
+     * @return the ranges, never {@code null} but empty when the affected entry has no ranges (the field is optional in
+     *     the OSV schema, an affected entry can instead enumerate the affected versions)
      */
     public List<RangeObject> getRanges()
     {
@@ -62,11 +64,11 @@ public class AffectObject
     }
 
     /**
-     * @param ranges the ranges
+     * @param ranges the ranges, {@code null} being stored as an empty list
      */
     public void setRanges(List<RangeObject> ranges)
     {
-        this.ranges = ranges;
+        this.ranges = (ranges == null) ? new ArrayList<>() : ranges;
     }
 
     @Override

@@ -92,7 +92,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     /**
      * @param macroName the name of the macro (eg "groovy")
      */
-    public AbstractJSR223ScriptMacro(String macroName)
+    protected AbstractJSR223ScriptMacro(String macroName)
     {
         super(macroName, null, JSR223ScriptMacroParameters.class);
     }
@@ -101,7 +101,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param macroName the name of the macro (eg "groovy")
      * @param macroDescription the text description of the macro.
      */
-    public AbstractJSR223ScriptMacro(String macroName, String macroDescription)
+    protected AbstractJSR223ScriptMacro(String macroName, String macroDescription)
     {
         super(macroName, macroDescription, JSR223ScriptMacroParameters.class);
     }
@@ -111,7 +111,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param macroDescription the text description of the macro.
      * @param contentDescriptor the description of the macro content.
      */
-    public AbstractJSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor)
+    protected AbstractJSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor)
     {
         super(macroName, macroDescription, contentDescriptor, JSR223ScriptMacroParameters.class);
     }
@@ -121,7 +121,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param macroDescription the text description of the macro.
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
-    public AbstractJSR223ScriptMacro(String macroName, String macroDescription,
+    protected AbstractJSR223ScriptMacro(String macroName, String macroDescription,
         Class<? extends JSR223ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, parametersBeanClass);
@@ -133,7 +133,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param contentDescriptor the description of the macro content.
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
-    public AbstractJSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor,
+    protected AbstractJSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor,
         Class<? extends JSR223ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);

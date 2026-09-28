@@ -80,7 +80,7 @@ public abstract class AbstractSkin implements Skin
 
     private Logger logger;
 
-    public AbstractSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
+    protected AbstractSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
         Logger logger)
     {
         this.id = id;

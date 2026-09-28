@@ -1003,6 +1003,8 @@ public class XWiki extends Api
                         }
                     }
                 } catch (XWikiException ex) {
+                    // TODO: log a warning instead of ignoring this exception.
+                    // A document that cannot be wrapped is simply not added to the result.
                 }
             }
         }
@@ -2329,9 +2331,10 @@ public class XWiki extends Api
         return this.xwiki.formatDate(date, format, getXWikiContext());
     }
 
-    /*
-     * Allow to read user setting providing the user timezone All dates will be expressed with this timezone @return the
-     * timezone
+    /**
+     * Allow to read the user setting providing the user timezone. All dates are expressed with this timezone.
+     *
+     * @return the timezone
      */
     public String getUserTimeZone()
     {

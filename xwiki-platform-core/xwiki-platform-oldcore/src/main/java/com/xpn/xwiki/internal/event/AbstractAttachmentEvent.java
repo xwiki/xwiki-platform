@@ -47,7 +47,7 @@ public abstract class AbstractAttachmentEvent extends AbstractDocumentEvent
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
      * other attachment event (add, update, delete).
      */
-    public AbstractAttachmentEvent()
+    protected AbstractAttachmentEvent()
     {
         // Nothing to do.
     }
@@ -60,7 +60,7 @@ public abstract class AbstractAttachmentEvent extends AbstractDocumentEvent
      * @param documentName the name of the updated document to match
      * @param name the name of the attachment added/updated/deleted
      */
-    public AbstractAttachmentEvent(String documentName, String name)
+    protected AbstractAttachmentEvent(String documentName, String name)
     {
         // TODO: depreciate this constructor and add a constructor taking a document reference instead
         super(new FixedNameEventFilter(documentName));
@@ -72,7 +72,7 @@ public abstract class AbstractAttachmentEvent extends AbstractDocumentEvent
      *
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractAttachmentEvent(EventFilter eventFilter)
+    protected AbstractAttachmentEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

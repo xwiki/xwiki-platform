@@ -47,7 +47,7 @@ public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent impl
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
      * other annotation event (add, update, delete).
      */
-    public AbstractAnnotationEvent()
+    protected AbstractAnnotationEvent()
     {
         // Nothing to do.
     }
@@ -59,7 +59,7 @@ public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent impl
      * @param documentName the name of the updated document to match
      * @param identifier the identifier of the annotation added/updated/deleted
      */
-    public AbstractAnnotationEvent(String documentName, String identifier)
+    protected AbstractAnnotationEvent(String documentName, String identifier)
     {
         // TODO refactor annotation event to take a document reference as constructor and depreciate this constructor
         super(new FixedNameEventFilter(documentName));
@@ -71,7 +71,7 @@ public abstract class AbstractAnnotationEvent extends AbstractDocumentEvent impl
      *
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractAnnotationEvent(EventFilter eventFilter)
+    protected AbstractAnnotationEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

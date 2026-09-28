@@ -135,7 +135,7 @@ class RenameJobTest extends AbstractMoveJobTest
 
         // We verify that job fetches the space children.
         verify(this.modelBridge, times(2)).getDocumentReferences(aliceReference);
-        verify(this.modelBridge).rename(aliceWebHomeReference, bobWebHomeReference);
+        verify(this.modelBridge).rename(aliceWebHomeReference, bobWebHomeReference, false);
     }
 
     @Test
@@ -147,7 +147,7 @@ class RenameJobTest extends AbstractMoveJobTest
         DocumentReference newReference = new DocumentReference("wiki", "Space", "New");
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
 
-        when(this.modelBridge.rename(oldReference, newReference)).thenReturn(true);
+        when(this.modelBridge.rename(oldReference, newReference, true)).thenReturn(true);
 
         MoveRequest request = createRequest(oldReference, newReference);
         request.setCheckRights(false);
@@ -157,6 +157,6 @@ class RenameJobTest extends AbstractMoveJobTest
         run(request);
 
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).rename(oldReference, newReference);
+        verify(this.modelBridge).rename(oldReference, newReference, false);
     }
 }

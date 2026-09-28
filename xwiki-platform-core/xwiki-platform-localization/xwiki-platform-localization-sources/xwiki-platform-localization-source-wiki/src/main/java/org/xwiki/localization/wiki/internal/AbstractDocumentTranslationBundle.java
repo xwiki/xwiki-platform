@@ -98,7 +98,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
      */
     protected String idPrefix;
 
-    public AbstractDocumentTranslationBundle(String idPrefix, DocumentReference reference,
+    protected AbstractDocumentTranslationBundle(String idPrefix, DocumentReference reference,
         ComponentManager componentManager, TranslationMessageParser translationMessageParser)
         throws ComponentLookupException
     {

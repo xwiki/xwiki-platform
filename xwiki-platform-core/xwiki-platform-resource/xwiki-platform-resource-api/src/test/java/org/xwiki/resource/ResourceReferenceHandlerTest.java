@@ -51,17 +51,18 @@ class ResourceReferenceHandlerTest
         public void handle(ResourceReference reference, ResourceReferenceHandlerChain chain) throws
             ResourceReferenceHandlerException
         {
+            // Does nothing: this test handler only needs to declare a priority and a supported resource type.
         }
     }
 
     @Test
     void priority()
     {
-        ResourceReferenceHandler handler1 = new TestableResourceReferenceHandler(500);
+        ResourceReferenceHandler<ResourceType> handler1 = new TestableResourceReferenceHandler(500);
         assertEquals(500, handler1.getPriority());
         assertTrue(handler1.getSupportedResourceReferences().contains(new ResourceType("test")));
 
-        ResourceReferenceHandler handler2 = new TestableResourceReferenceHandler(200);
-        assertEquals(300, handler1.compareTo(handler2));
+        ResourceReferenceHandler<ResourceType> handler2 = new TestableResourceReferenceHandler(200);
+        assertTrue(handler1.compareTo(handler2) > 0);
     }
 }

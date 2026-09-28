@@ -348,8 +348,7 @@
   {{notificationsCustomFiltersPreferences user="$userDoc" /}}
 )))
 #end
-      {{/velocity}}
-      </content>
+      {{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>

@@ -20,9 +20,11 @@
 package org.xwiki.activeinstalls2;
 
 import java.util.List;
+import java.util.SequencedMap;
 
 import org.xwiki.activeinstalls2.internal.data.Ping;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides access to stored ping data.
@@ -34,23 +36,31 @@ import org.xwiki.component.annotation.Role;
 public interface DataManager
 {
     /**
-     * Executes a Search query for Active Installs.
+     * Executes a Search query for Active Installs. Note that this returns a bounded number of the matching pings and
+     * not all of them: a ping holds the whole extension list of an instance, and an instance sends a ping every day
+     * as well as every time it's restarted, so the matching pings are far too many and too big to be held in memory.
+     * Which pings of the matching ones are returned is not defined either, since they are not sorted. So this answers
+     * "what does a matching ping look like". It answers neither "how many instances match", which
+     * {@link #countDistinctInstalls(String)} does, nor "give me every matching ping", which is not supported.
      *
      * @param jsonQuery the Elastic Search JSON query used to search for installs. For example:
      *        <pre>{@code
      *            {
-     *                "term": { "distributionVersion" : "5.2" }
+     *                "term": { "distribution.extension.version" : "5.2" }
      *            }
      *        }</pre>
-     * @return the parsed JSON result coming from Elastic Search, as a list of {@link Ping} object. Passing an empty
-     *      or null json string results in returning all data found in the index (i.e no query constraint)
+     *      Passing an empty or null json string matches all the data found in the index (i.e no query constraint)
+     * @return the parsed JSON result coming from Elastic Search, as a list of {@link Ping} object. Implementations
+     *      are allowed to return only some of the matching pings, and document the number above which they do
      * @throws Exception when an error happens while retrieving the data
      * @since 14.4RC1
      */
     List<Ping> searchInstalls(String jsonQuery) throws Exception;
 
     /**
-     * Executes a Count query for Active Installs.
+     * Executes a Count query for Active Installs. Note that this counts matching pings and not matching instances,
+     * despite its name: an instance sends a ping every day but also every time it's restarted, and thus matches
+     * several pings. Use {@link #countDistinctInstalls(String)} to count instances.
      *
      * @param jsonQuery the Elastic Search JSON query used to search for installs. Passing an empty
      *      or null json string results in returning a count of all data in the index (i.e no query constraint)
@@ -59,4 +69,74 @@ public interface DataManager
      * @since 14.4RC1
      */
     long countInstalls(String jsonQuery) throws Exception;
+
+    /**
+     * Counts the distinct XWiki instances having sent a matching ping. Contrary to {@link #countInstalls(String)},
+     * which counts pings, this counts installs: an instance sends a ping every day but also every time it's
+     * restarted, and thus matches several pings.
+     *
+     * @param jsonQuery the Elastic Search JSON query used to search for installs. Note that counting over the whole
+     *      index counts every instance that ever pinged, so restricting to the instances that are actually active is
+     *      a matter of passing a query on the ping date. For example:
+     *        <pre>{@code
+     *            {
+     *                "range": { "date.current": { "gte": "now-1d" } }
+     *            }
+     *        }</pre>
+     *      Passing an empty or null json string results in counting the instances found in the whole index (i.e no
+     *      query constraint)
+     * @return the number of distinct instances. Implementations are allowed to return an approximation for large
+     *      counts, and document the count above which they do
+     * @throws Exception when an error happens while retrieving the data, or when the implementation doesn't support
+     *      counting distinct installs
+     * @since 18.8.0RC1
+     */
+    @Unstable
+    default long countDistinctInstalls(String jsonQuery) throws Exception
+    {
+        throw new Exception(String.format("[%s] doesn't support counting distinct installs",
+            getClass().getName()));
+    }
+
+    /**
+     * Counts, for each extension, the distinct XWiki instances having that extension installed and having sent a
+     * matching ping. This is computed with a single query, and is thus much cheaper than calling
+     * {@link #countDistinctInstalls(String)} once per extension.
+     * <p>
+     * The counts are keyed by the id under which each extension is installed, and are not resolved through the
+     * features an extension provides. Thus an extension that has been renamed, and whose former id is a feature of
+     * its new id, is reported as two separate entries.
+     * <p>
+     * Note that a query on the extensions themselves does not restrict the extensions being counted: a nested query
+     * selects the pings holding a matching extension, and every extension of those pings is then counted. So counting
+     * the instances of a single extension is a matter of reading its entry from the returned map, not of querying for
+     * it.
+     *
+     * @param jsonQuery the Elastic Search JSON query used to search for installs. Note that counting over the whole
+     *      index counts every instance that ever pinged, so restricting to the instances that are actually active is
+     *      a matter of passing a query on the ping date. For example:
+     *        <pre>{@code
+     *            {
+     *                "range": { "date.current": { "gte": "now-1d" } }
+     *            }
+     *        }</pre>
+     *      Passing an empty or null json string results in counting the instances found in the whole index (i.e no
+     *      query constraint)
+     * @return the number of distinct instances, keyed by extension id, ordered by descending number of matching
+     *      pings (which is close to, but not exactly, ordering by the returned counts). Implementations are allowed
+     *      to return an approximation for the extensions installed on a large number of instances, and document the
+     *      count above which they do
+     * @throws TooManyExtensionsException when there are more extensions than can be returned in a single query. Note
+     *      that this is a subclass of the {@link Exception} below, and is thus not listed separately in the throws
+     *      clause, where it would be redundant
+     * @throws Exception when an error happens while retrieving the data, or when the implementation doesn't support
+     *      counting distinct installs
+     * @since 18.8.0RC1
+     */
+    @Unstable
+    default SequencedMap<String, Long> countDistinctInstallsByExtension(String jsonQuery) throws Exception
+    {
+        throw new Exception(String.format("[%s] doesn't support counting distinct installs per extension",
+            getClass().getName()));
+    }
 }

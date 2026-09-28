@@ -20,18 +20,22 @@
 package org.xwiki.test.extension;
 
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.xwiki.http.internal.XWikiCredentials;
+import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.job.JobException;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.model.jaxb.JobStatus;
@@ -46,59 +50,65 @@ import org.xwiki.rest.model.jaxb.JobStatus;
 public class JobExecutor
 {
     /**
+     * The connection and socket timeout to use. Installing a flavor is a long running operation and it's executed
+     * synchronously (see the {@code async=false} parameter below), so the request can legitimately take a lot of time,
+     * especially on a loaded CI agent. The default timeout of the HTTP client is only 3 minutes, which is not enough.
+     */
+    private static final int TIMEOUT = (int) Duration.ofMinutes(15).toMillis();
+
+    /**
      * @param jobType the type of job to execute
      * @param request the Job request to send
      * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhsot:8080/xwiki/rest})
      * @param credentials the xwiki user and password to use to connect for the REST endpoint
      * @throws Exception if an error occurred when connecting to the REST endpoint
      */
-    public void execute(String jobType, JobRequest request, String xwikiRESTURL,
-        UsernamePasswordCredentials credentials) throws Exception
+    public void execute(String jobType, JobRequest request, String xwikiRESTURL, XWikiCredentials credentials)
+        throws Exception
     {
-        JAXBContext context = JAXBContext.newInstance("org.xwiki.rest.model.jaxb");
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        Marshaller marshaller = context.createMarshaller();
+        JAXBContext jaxbContext = JAXBContext.newInstance("org.xwiki.rest.model.jaxb");
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        Marshaller marshaller = jaxbContext.createMarshaller();
 
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        httpClient.getParams().setAuthenticationPreemptive(true);
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(request, writer);
 
-        String uri = String.format("%s/jobs?jobType=%s&async=false", xwikiRESTURL, jobType);
-        PutMethod putMethod = executePutXml(uri, request, marshaller, httpClient);
+        try (XWikiHTTPClient httpClient = new XWikiHTTPClient("XWiki", TIMEOUT)) {
+            httpClient.setDefaultCredentials(credentials);
 
+            String uri = String.format("%s/jobs?jobType=%s&async=false", xwikiRESTURL, jobType);
+
+            HttpPut putMethod = new HttpPut(uri);
+            putMethod.addHeader("Accept", MediaType.APPLICATION_XML);
+            putMethod.setEntity(
+                new StringEntity(writer.toString(), ContentType.APPLICATION_XML.withCharset(StandardCharsets.UTF_8)));
+
+            httpClient.execute(putMethod, (response, context) -> {
+                try {
+                    handleResponse(response, unmarshaller);
+                } catch (Exception e) {
+                    throw new HttpException("Failed to handle response", e);
+                }
+
+                return null;
+            });
+        }
+    }
+
+    private void handleResponse(ClassicHttpResponse response, Unmarshaller unmarshaller) throws Exception
+    {
         // Verify results
         // Verify that we got a 200 response
-        int statusCode = putMethod.getStatusCode();
+        int statusCode = response.getCode();
         if (statusCode < 200 || statusCode >= 300) {
             throw new JobException(String.format("Job execution failed. Response status code [%s], reason [%s]",
-                statusCode, putMethod.getResponseBodyAsString()));
+                statusCode, EntityUtils.toString(response.getEntity())));
         }
 
         // Get the job status
-        JobStatus jobStatus = (JobStatus) unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
+        JobStatus jobStatus = (JobStatus) unmarshaller.unmarshal(response.getEntity().getContent());
         if (jobStatus.getErrorMessage() != null && jobStatus.getErrorMessage().length() > 0) {
             throw new JobException(String.format("Job execution failed. Reason [%s]", jobStatus.getErrorMessage()));
         }
-
-        // Release connection
-        putMethod.releaseConnection();
-    }
-
-    private PutMethod executePutXml(String uri, Object object, Marshaller marshaller, HttpClient httpClient)
-        throws Exception
-    {
-        PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(object, writer);
-
-        RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
-        putMethod.setRequestEntity(entity);
-
-        httpClient.executeMethod(putMethod);
-
-        return putMethod;
     }
 }

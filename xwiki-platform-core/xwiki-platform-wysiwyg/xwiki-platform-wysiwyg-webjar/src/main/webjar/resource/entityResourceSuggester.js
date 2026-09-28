@@ -60,7 +60,7 @@ define('xwiki-wysiwyg-entity-resource-suggester', [
       }
 
       if (!containsExactMatch && withCreateSuggestions) {
-        suggestions = await suggestCreateDocument(input, base, suggestions);
+        suggestions = await addCreateDocumentSuggestions(input, base, suggestions);
       }
     } catch (error) {
       console.error("Failed to get suggestions.", error);
@@ -73,7 +73,7 @@ define('xwiki-wysiwyg-entity-resource-suggester', [
     return JSON.stringify(resource1) === JSON.stringify(resource2);
   }
 
-  async function suggestCreateDocument(input, base, suggestions) {
+  async function addCreateDocumentSuggestions(input, base, suggestions) {
     try {
       const serviceReference = XWiki.Model.resolve('XWiki.WYSIWYG.LinkNameStrategyHelper', XWiki.EntityType.DOCUMENT,
         XWiki.currentDocument.documentReference);
@@ -105,6 +105,38 @@ define('xwiki-wysiwyg-entity-resource-suggester', [
     return suggestions;
   }
 
+  // The kinds of suggestions we can preselect: either the page already exists, or it's the page that would be created
+  // from the given text, inside the base page. We never preselect 'fullyResolvedInput' because it interprets the given
+  // text as a resource reference (e.g. dots become space separators), which is wrong for a free text label like
+  // "Version 1.2", and because it is suggested only to advanced users.
+  const preselectableCreationTypes = ['exactMatch', 'resolvedInSpace'];
+
+  /**
+   * Compute the document resource that corresponds to the given free text, following the configured page name
+   * strategy: either the page that already exists or the page that would be created. This is the resource behind the
+   * "Create new page..." suggestion, computed without searching for existing pages.
+   *
+   * @param label the free text to compute the resource from, e.g. the text selected in the rich text area; it is not
+   *          interpreted as a resource reference
+   * @param base the entity reference relative to which the resource is computed
+   * @return a promise resolved with the resource to select, or with undefined when there's nothing to suggest for the
+   *          given text (it's empty, it doesn't lead to a valid page name, or the request failed)
+   */
+  async function suggestNewDocument(label, base) {
+    // Normalize the white space because the given text may span multiple lines.
+    const input = (label || '').trim().replace(/\s+/g, ' ');
+    if (!input) {
+      return;
+    }
+    // Note that addCreateDocumentSuggestions() doesn't reject: it logs the error and returns the suggestions it has.
+    const suggestions = await addCreateDocumentSuggestions(input, base, []);
+    const suggestion = suggestions.find(candidate => preselectableCreationTypes.includes(candidate.creationType) &&
+      // The page name strategy may transform the given text into an empty name, e.g. when it has only punctuation.
+      getEntityName(candidate.entityReference));
+    // The suggestions computed by addCreateDocumentSuggestions() are not adapted yet, see search().
+    return suggestion && adaptSuggestion(suggestion);
+  }
+
   function createDocumentFromLinkNameStrategyHelperResult(item, base) {
     const entityReference = XWiki.Model.resolve(item.reference, XWiki.EntityType.DOCUMENT);
     const entityName = getEntityName(entityReference);
@@ -119,6 +151,10 @@ define('xwiki-wysiwyg-entity-resource-suggester', [
       entityReference,
       label,
       toCreate: true,
+      // The kind of suggestion computed by the page name strategy: 'exactMatch' (the page already exists),
+      // 'resolvedInSpace' (the page that would be created from the given text, inside the base page) or
+      // 'fullyResolvedInput' (the page that would be created from the given text used as a resource reference).
+      creationType: item.type,
       // Use a different label when this resource to be created is selected.
       labelWhenSelected: entityName,
       hint: item.location,
@@ -223,7 +259,8 @@ define('xwiki-wysiwyg-entity-resource-suggester', [
       return search(query, input, XWiki.EntityType.DOCUMENT, base, withCreateSuggestions);
     },
     retrieveSelected,
-    resolve
+    resolve,
+    suggestNew: suggestNewDocument
   };
 
   $resource.types.attach.placeholder = translations.get('attach.placeholder');

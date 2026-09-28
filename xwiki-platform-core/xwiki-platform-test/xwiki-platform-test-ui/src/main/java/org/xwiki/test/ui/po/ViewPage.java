@@ -103,6 +103,34 @@ public class ViewPage extends BasePage
         getDriver().waitUntilElementIsVisible(By.id(id + "pane"));
     }
 
+    /**
+     * Requests the document extra tab with the given id without waiting for it to be displayed, so that another tab
+     * can be requested while this one is still loading. Use {@link #openDocExtraPane(String)} in all other cases.
+     *
+     * @param id the tab identifier
+     * @since 18.9.0RC1
+     */
+    public void startOpeningDocExtraPane(String id)
+    {
+        getDriver().findElement(By.id(id + "link")).click();
+    }
+
+    /**
+     * Waits for the content of the document extra tab with the given id to be loaded and returns it. The tab doesn't
+     * need to be displayed, which is what allows getting the content of a tab whose response arrived while another tab
+     * was displayed.
+     *
+     * @param id the tab identifier
+     * @return the text content of the tab, trimmed
+     * @since 18.9.0RC1
+     */
+    public String waitForDocExtraPaneContent(String id)
+    {
+        WebElement pane = getDriver().findElement(By.id(id + "pane"));
+        getDriver().waitUntilCondition(driver -> !pane.getDomProperty("textContent").isBlank());
+        return pane.getDomProperty("textContent").trim();
+    }
+
     public DocExtraPane useShortcutForDocExtraPane(String id, CharSequence... shortcut)
     {
         // We send the shortcut to the active element because using the Actions API doesn't seem to work with key
@@ -230,13 +258,16 @@ public class ViewPage extends BasePage
     }
 
     /**
-     * @return {@code true} if the "Translate" page button is present, {@code false} otherwise
+     * @return {@code true} if the "Translate" page button is displayed, {@code false} otherwise; note that the button
+     *         can be present in the page but hidden, e.g. because the in-place editor hides it while the translation
+     *         is being created
      * @since 12.10.6
      * @since 13.2RC1
      */
     public boolean hasTranslateButton()
     {
-        return getDriver().hasElementWithoutWaiting(By.id("#tmTranslate"));
+        return getDriver().findElementsWithoutWaiting(By.cssSelector("#tmTranslate > a.btn")).stream()
+            .anyMatch(WebElement::isDisplayed);
     }
 
     /**

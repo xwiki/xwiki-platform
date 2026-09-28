@@ -320,9 +320,9 @@ define('xwiki-realtime-toolbar', [
       const template = document.querySelector('template#realtime-version');
       const versionElement = template.content.querySelector('.realtime-version').cloneNode(true);
       versionElement.dataset.version = JSON.stringify(version);
-      versionElement.href = xwikiDocument.getURL('view', $.param({
+      versionElement.href = xwikiDocument.getURL('view', new URLSearchParams({
         'rev': version.number,
-        'language': xwikiDocument.language
+        'language': xwikiDocument.realLocale ?? ''
       }));
       versionElement.querySelector('.realtime-version-number').textContent = version.number;
       versionElement.querySelector('.realtime-version-date').textContent = moment(version.date)

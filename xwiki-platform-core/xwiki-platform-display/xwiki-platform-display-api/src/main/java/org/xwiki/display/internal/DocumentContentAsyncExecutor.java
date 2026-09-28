@@ -170,9 +170,9 @@ public class DocumentContentAsyncExecutor
                 DocumentModelBridge translatedDocument =
                     this.documentAccessBridge.getTranslatedDocumentInstance(document);
 
-                // Compare the locales and not the languages: getRealLanguage() falls back on the default language of
-                // the document when the translation has none, so it can report the same language for two different
-                // translations of the document.
+                // Compare the locales returned by getLocale(): getRealLanguage() returns the default locale of the
+                // document for the original document (whose locale is empty), so it returns the same value for the
+                // original document and for a translation in the default locale of the document.
                 if (!document.getLocale().equals(translatedDocument.getLocale())) {
                     return translatedDocument;
                 }

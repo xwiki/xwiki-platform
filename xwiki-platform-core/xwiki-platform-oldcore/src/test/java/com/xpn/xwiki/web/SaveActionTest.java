@@ -29,6 +29,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
@@ -42,6 +43,7 @@ import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.refactoring.script.RequestFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -216,6 +218,8 @@ class SaveActionTest
         when(mockClonedDocument.getTranslatedDocument("fr", this.context)).thenReturn(mockClonedDocument);
         when(mockClonedDocument.getDocumentReference()).thenReturn(new DocumentReference("xwiki", "My", "Page"));
         when(mockClonedDocument.getStore()).thenReturn(this.oldcore.getMockStore());
+        // The form doesn't submit the syntax, as with in-place editing.
+        when(mockClonedDocument.getSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
         when(xWiki.getStore()).thenReturn(this.oldcore.getMockStore());
         context.put("ajax", true);
         when(xWiki.isMultiLingual(this.context)).thenReturn(true);
@@ -225,7 +229,9 @@ class SaveActionTest
         assertEquals(Map.of("newVersion", "1.1"), saveAction.getJSONAnswer(context));
         verify(this.xWiki).checkSavingDocument(eq(USER_REFERENCE), any(XWikiDocument.class), eq(""), eq(false),
             eq(this.context));
-        verify(this.xWiki).saveDocument(any(XWikiDocument.class), eq(""), eq(false), eq(this.context));
+        ArgumentCaptor<XWikiDocument> savedDocument = ArgumentCaptor.forClass(XWikiDocument.class);
+        verify(this.xWiki).saveDocument(savedDocument.capture(), eq(""), eq(false), eq(this.context));
+        assertEquals(Syntax.MARKDOWN_1_1, savedDocument.getValue().getSyntax());
     }
 
     @Test

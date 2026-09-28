@@ -521,7 +521,7 @@ class DBTreeListClassTest
         // The picker is disabled by default, so this displays the select input and not the tree widget.
         dbtlc.displayEdit(buffer, "prop", "", object, this.oldcore.getXWikiContext());
 
-        assertEquals("<select id='prop' name='prop' size='1'>"
+        assertEquals("<select size='1' id='prop' aria-label='DB Tree List' name='prop'>"
             + "<option value='root&#39;id' label='Root &#38; &#60;b&#62;'>Root &#38; &#60;b&#62;</option>"
             + "<option selected='selected' value='child'"
             + " label='\u00A0&#123;&#123;macro}}Child&#60;em&#62;'>"

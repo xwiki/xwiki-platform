@@ -160,8 +160,8 @@ catalogs:
       specifier: 30.1.1
       version: 30.1.1
     lib0:
-      specifier: 0.2.117
-      version: 0.2.117
+      specifier: 0.2.118
+      version: 0.2.118
     lodash-es:
       specifier: 4.18.1
       version: 4.18.1
@@ -421,7 +421,7 @@ importers:
         version: 8.2.3(reflect-metadata@0.2.2)
       lib0:
         specifier: 'catalog:'
-        version: 0.2.117
+        version: 0.2.118
       pinia:
         specifier: 'catalog:'
         version: 4.0.3(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
@@ -1401,7 +1401,7 @@ importers:
         version: link:../../model/model-reference/model-reference-api
       lib0:
         specifier: 'catalog:'
-        version: 0.2.117
+        version: 0.2.118
       y-protocols:
         specifier: 'catalog:'
         version: 1.0.7(yjs@13.6.32)
@@ -6714,8 +6714,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  lib0@0.2.117:
-    resolution: {integrity: sha512-DeXj9X5xDCjgKLU/7RR+/HQEVzuuEUiwldwOGsHK/sfAfELGWEyTcf0x+uOvCvK3O2zPmZePXWL85vtia6GyZw==}
+  lib0@0.2.118:
+    resolution: {integrity: sha512-Ip97lrGhycLAkNrC9/tkORm4yPei9pKuP/Ah1eqCdDx8jnKSs7wY2xvOSlvg/r5UqtgfaC4O3NsFdzwWDDs1Wg==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -11091,7 +11091,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  lib0@0.2.117:
+  lib0@0.2.118:
     dependencies:
       isomorphic.js: 0.2.5
 
@@ -13037,7 +13037,7 @@ snapshots:
 
   y-prosemirror@1.3.7(prosemirror-model@1.25.11)(prosemirror-state@1.4.4)(prosemirror-view@1.42.3)(y-protocols@1.0.7(yjs@13.6.32))(yjs@13.6.32):
     dependencies:
-      lib0: 0.2.117
+      lib0: 0.2.118
       prosemirror-model: 1.25.11
       prosemirror-state: 1.4.4
       prosemirror-view: 1.42.3
@@ -13046,12 +13046,12 @@ snapshots:
 
   y-protocols@1.0.7(yjs@13.6.32):
     dependencies:
-      lib0: 0.2.117
+      lib0: 0.2.118
       yjs: 13.6.32
 
   y-websocket@3.1.0(yjs@13.6.32):
     dependencies:
-      lib0: 0.2.117
+      lib0: 0.2.118
       y-protocols: 1.0.7(yjs@13.6.32)
       yjs: 13.6.32
 
@@ -13077,7 +13077,7 @@ snapshots:
 
   yjs@13.6.32:
     dependencies:
-      lib0: 0.2.117
+      lib0: 0.2.118
 
   yocto-queue@0.1.0: {}
 

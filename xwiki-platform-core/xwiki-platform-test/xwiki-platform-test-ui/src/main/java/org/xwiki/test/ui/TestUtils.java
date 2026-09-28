@@ -30,7 +30,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,12 +67,14 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.InputStreamEntity;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Keys;
@@ -2611,6 +2615,25 @@ public class TestUtils
     }
 
     /**
+     * Same as {@link #getString(String, Map)} but waits for the response at most the given time instead of the default
+     * socket timeout of the HTTP client (3 minutes), for requests that take long to be processed on the server.
+     *
+     * @param path the path to request, relative to the base URL of the HTTP client
+     * @param queryParams additional query parameters added to the computed URL
+     * @param timeout how long to wait for the response
+     * @return the content of the computed URL
+     * @throws Exception in case of error when executing the request
+     * @since 18.8.0
+     */
+    public String getString(String path, Map<String, ?> queryParams, Duration timeout) throws Exception
+    {
+        String url = getURL(getCurrentExecutor().getHttpClientBaseURL(), path, queryParams);
+        try (InputStream inputStream = executeGet(url, timeout, Status.OK.getStatusCode()).getEntity().getContent()) {
+            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
      * Extended version to work in a docker context.
      *
      * @param baseURL the base url
@@ -2628,6 +2651,13 @@ public class TestUtils
 
     public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
         throws Exception
+    {
+        String url = getURL(prefix, path, queryParams, elements);
+
+        return executeGet(url, Status.OK.getStatusCode()).getEntity().getContent();
+    }
+
+    private String getURL(String prefix, String path, Map<String, ?> queryParams, Object... elements)
     {
         String cleanPrefix = Strings.CS.removeEnd(prefix, "/");
         if (path.startsWith(cleanPrefix)) {
@@ -2647,9 +2677,7 @@ public class TestUtils
             }
         }
 
-        String url = builder.build(elements).toString();
-
-        return executeGet(url, Status.OK.getStatusCode()).getEntity().getContent();
+        return builder.build(elements).toString();
     }
 
     protected CloseableHttpResponse executeGet(String uri) throws Exception
@@ -2668,6 +2696,26 @@ public class TestUtils
     protected CloseableHttpResponse executeGet(String uri, boolean release, int... expectedCodes) throws Exception
     {
         return assertStatusCodes(executeGet(uri), release, expectedCodes);
+    }
+
+    /**
+     * Execute a GET request, waiting for the response at most the given time instead of the default socket timeout of
+     * the HTTP client (3 minutes).
+     *
+     * @param uri the URI to request
+     * @param timeout how long to wait for the response
+     * @param expectedCodes the accepted status codes of the response
+     * @return the response, which the caller is responsible for closing
+     * @throws Exception when failing to execute the request or when the response has an unexpected status code
+     * @since 18.8.0
+     */
+    protected CloseableHttpResponse executeGet(String uri, Duration timeout, int... expectedCodes) throws Exception
+    {
+        HttpGet request = new HttpGet(uri);
+        // The response timeout replaces the socket timeout of the connection for this request.
+        request.setConfig(RequestConfig.custom().setResponseTimeout(Timeout.of(timeout)).build());
+
+        return assertStatusCodes(execute(request), false, expectedCodes);
     }
 
     /**

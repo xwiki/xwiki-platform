@@ -19,6 +19,7 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -71,14 +72,14 @@ class SecurityCacheStressIT
         // Don't use TestUtils#executeWiki(): it loads the page in the browser and the stress test can run
         // longer than the 3 minutes after which the Selenium HTTP client gives up on the "get" command (a timeout
         // that, unlike the page load timeout, cannot be changed on an existing driver). Request the page over HTTP
-        // instead, straight from the test JVM, where no such timeout applies.
+        // instead, straight from the test JVM, with a timeout that is longer than the default one of 3 minutes.
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
         testUtils.rest().savePageAs(testUtils.getPrivilegedCredentials(), reference,
             STRESS_TEST_SCRIPT.formatted(usersParameter), Syntax.XWIKI_2_1.toIdString(), null, null, false);
 
         String result = testUtils.getString(testUtils.getBaseBinPath(null) + "get/Test/Execute/" + reference.getName(),
-            Map.of("outputSyntax", "plain"));
+            Map.of("outputSyntax", "plain"), Duration.ofMinutes(10));
 
         assertTrue(StringUtils.isBlank(result), result);
     }

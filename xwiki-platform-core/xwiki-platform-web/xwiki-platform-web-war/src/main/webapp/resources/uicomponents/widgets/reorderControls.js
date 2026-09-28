@@ -25,6 +25,8 @@
  *
  * Lists that can also be reordered by dragging and dropping keep their own drag and drop implementation and pass the
  * same persistence callback to it, so that the two paths stay in sync.
+ *
+ * @since 18.9.0RC1
  */
 define('xwiki-reorder-controls', ['jquery'], function ($) {
   'use strict';

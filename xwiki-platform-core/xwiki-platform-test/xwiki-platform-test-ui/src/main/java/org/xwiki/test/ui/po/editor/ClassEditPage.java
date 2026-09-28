@@ -170,8 +170,8 @@ public class ClassEditPage extends EditPage
     }
 
     /**
-     * Presses the up arrow key on the move buttons of the given property, which both answer it. The property keeps its
-     * position when it is already the first one.
+     * Presses the up arrow key on the move up button of the given property. The property keeps its position when it is
+     * already the first one.
      *
      * @param propertyToMove the property to move one position up
      * @since 18.9.0RC1
@@ -182,8 +182,8 @@ public class ClassEditPage extends EditPage
     }
 
     /**
-     * Presses the down arrow key on the move buttons of the given property, which both answer it. The property keeps
-     * its position when it is already the last one.
+     * Presses the down arrow key on the move down button of the given property. The property keeps its position when
+     * it is already the last one.
      *
      * @param propertyToMove the property to move one position down
      * @since 18.9.0RC1

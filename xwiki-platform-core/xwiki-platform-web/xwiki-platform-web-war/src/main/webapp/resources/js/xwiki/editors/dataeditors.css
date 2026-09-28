@@ -124,9 +124,9 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 }
 
 /* The title is the part of a property that is visible whether the property is expanded or collapsed, so it is the area
-users are expected to grab to drag the property. The grab cursor is what tells them the property can be dragged at all,
-now that there is no drag handle. The vertical padding widens that band, so that the drag is comfortable to start even
-though the title is a single line of text. */
+users are expected to grab to drag the property. The property has no separate drag handle, so the grab cursor is what
+tells them the property can be dragged at all. The vertical padding widens that band, so that the drag is comfortable
+to start even though the title is a single line of text. */
 .xproperty-title {
   cursor: grab;
   padding: 4px 0;

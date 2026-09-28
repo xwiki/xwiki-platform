@@ -247,7 +247,7 @@ class EditClassIT
         assertEquals(List.of("testC", "testA", "testB"), classEditPage.getProperties());
         classEditPage.waitForReorderAnnouncement("Property already at the bottom of the list");
 
-        // The arrow keys move the property too, and both buttons answer both keys.
+        // The arrow keys move the property too.
         classEditPage.movePropertyDownWithKeyboard("testC");
         assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
         classEditPage.movePropertyUpWithKeyboard("testC");

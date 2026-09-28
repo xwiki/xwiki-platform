@@ -79,7 +79,8 @@ public class DefaultDocumentDisplayer implements DocumentDisplayer
         if (parameters.isTitleDisplayed()) {
             displayer = this.titleDisplayer;
 
-            // The title is taken from the passed document, so the syntax of the passed document is the right one.
+            // The title displayer displays the title of the passed document and ignores isContentTranslated(), so
+            // the title is in the syntax of the passed document.
             String titleHint = "title/" + document.getSyntax().toIdString();
             if (this.componentManager.hasComponent(DocumentDisplayer.class, titleHint)) {
                 try {

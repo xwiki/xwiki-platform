@@ -185,6 +185,10 @@ public class SaveAction extends EditAction
                 // Saving a new document translation.
                 tdoc = new XWikiDocument(doc.getDocumentReference());
                 tdoc.setLanguage(language);
+                // A new translation starts as a copy of the original document content, so it has the same syntax
+                // unless the submitted form sets another one. Without this, a form that doesn't submit the syntax
+                // (e.g. in-place editing) would save the translation with the default syntax of the wiki.
+                tdoc.setSyntax(doc.getSyntax());
                 tdoc.setStore(doc.getStore());
                 // In that specific case, we want the original doc to be the translation document so that we
                 // never raised a conflict.

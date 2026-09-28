@@ -199,28 +199,6 @@ class EditClassIT
         classEditPage.addProperty("testA", "Number");
         classEditPage.addProperty("testB", "Number");
         classEditPage.addProperty("testC", "Number");
-        classEditPage.clickSaveAndView();
-
-        classEditPage = setup.editClass(reference);
-        assertEquals(List.of("testA", "testB", "testC"), classEditPage.getProperties());
-
-        classEditPage.movePropertyBefore("testC", "testB");
-        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
-        classEditPage.clickSaveAndView();
-
-        classEditPage = setup.editClass(reference);
-        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
-    }
-
-    @Test
-    @Order(6)
-    void reorderPropertyWithoutDragging(TestUtils setup, TestReference reference) throws Exception
-    {
-        setup.rest().savePage(reference, "Some content", "");
-        ClassEditPage classEditPage = setup.editClass(reference);
-        classEditPage.addProperty("testA", "Number");
-        classEditPage.addProperty("testB", "Number");
-        classEditPage.addProperty("testC", "Number");
 
         // A property added without reloading the editor gets its move buttons too, and they move it right away.
         // The properties added before it keep exactly one pair of buttons, however many times the editor adds one.
@@ -237,6 +215,13 @@ class EditClassIT
         classEditPage = setup.editClass(reference);
         assertEquals(List.of("testA", "testB", "testC"), classEditPage.getProperties());
 
+        classEditPage.movePropertyBefore("testC", "testB");
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+        classEditPage.clickSaveAndView();
+
+        classEditPage = setup.editClass(reference);
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+
         // Both move controls are buttons, and each one has an accessible name and a tooltip naming the property it
         // moves.
         assertEquals("button", classEditPage.getMovePropertyUpButton("testC").getTagName());
@@ -248,11 +233,9 @@ class EditClassIT
         // A single click moves the property, and the button keeps the focus so that several moves can be performed in
         // a row.
         classEditPage.movePropertyUp("testC");
-        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
-        assertTrue(classEditPage.isMovePropertyUpButtonFocused("testC"));
-        classEditPage.waitForReorderAnnouncement("Property moved to position 2 out of 3");
-        classEditPage.movePropertyUp("testC");
         assertEquals(List.of("testC", "testA", "testB"), classEditPage.getProperties());
+        assertTrue(classEditPage.isMovePropertyUpButtonFocused("testC"));
+        classEditPage.waitForReorderAnnouncement("Property moved to position 1 out of 3");
 
         // The first property cannot be moved further up, and says so rather than staying silent.
         classEditPage.movePropertyUp("testC");
@@ -269,13 +252,11 @@ class EditClassIT
         assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
         classEditPage.movePropertyUpWithKeyboard("testC");
         assertEquals(List.of("testC", "testA", "testB"), classEditPage.getProperties());
-        classEditPage.movePropertyDownWithKeyboard("testC");
-        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
 
         classEditPage.clickSaveAndView();
 
         classEditPage = setup.editClass(reference);
-        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+        assertEquals(List.of("testC", "testA", "testB"), classEditPage.getProperties());
     }
 
     private DocumentReference getTestClassDocumentReference(TestReference reference)

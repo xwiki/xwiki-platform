@@ -54,7 +54,7 @@ public class QuickSearchElement extends BaseElement
      *
      * @param terms the terms currently in the quick search box
      * @since 18.4.5
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void reopenSuggestions(String terms)
     {
@@ -80,7 +80,7 @@ public class QuickSearchElement extends BaseElement
     /**
      * @return {@code true} if the "Go to search page..." row is the last suggestion item
      * @since 18.4.5
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public boolean isShowAllResultsLast()
     {
@@ -95,7 +95,7 @@ public class QuickSearchElement extends BaseElement
      * Closes the suggestions panel by pressing the Escape key.
      *
      * @since 18.4.5
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void closeSuggestions()
     {

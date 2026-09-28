@@ -24,6 +24,8 @@
    as if they didn't exist, which breaks the layout */
 .container-columns .column {
   min-height: 10px;
+  padding-right: $columnPadding%;
+  padding-left: $columnPadding%;
 }
 
 .container-columns .first-column {
@@ -41,8 +43,6 @@
   #set($computedColumnWidth = $mathtool.roundTo(2, $rawComputedColumnWidth))
   .container-columns-$columns .column{
     width: $computedColumnWidth%;
-    padding-right: $columnPadding%;
-    padding-left: $columnPadding%;
   }
 #end
 

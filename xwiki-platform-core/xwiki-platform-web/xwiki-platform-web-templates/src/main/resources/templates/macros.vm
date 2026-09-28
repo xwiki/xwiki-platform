@@ -246,7 +246,7 @@ $xwiki.getUserName("xwiki:${username}")
  *                    // are "small-avatar"/"medium-avatar"/"large-avatar" for the size and "circle-avatar"
  *                    // for a fully rounded avatar
  *   displayName: true // @since 18.9.0RC1 ; whether to visually display the name
- *   disabled: false // @since 18.1.0 whether to show or not that the user got removed.
+ *   disabled: false // @since 18.9.0RC1 whether to show or not that the user got removed.
  * }
  *#
 #macro (displayUser $arg $options)

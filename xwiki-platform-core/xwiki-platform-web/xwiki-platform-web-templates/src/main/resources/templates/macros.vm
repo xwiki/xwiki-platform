@@ -242,10 +242,10 @@ $xwiki.getUserName("xwiki:${username}")
  *   useInlineHTML: false, // whether to use in-line HTML elements to display the user or not
  *   wrapAvatar: false // whether to wrap the avatar image with a span or not
  *   displayLink: true // @since 15.9 ; whether to wrap the user name in a link to the user profile
- *   avatarCssClass: '' // @since 18.7.0RC1 ; extra CSS class(es) to add on the avatar image; available classes
+ *   avatarCssClass: '' // @since 18.9.0RC1 ; extra CSS class(es) to add on the avatar image; available classes
  *                       // are "small-avatar"/"medium-avatar"/"large-avatar" for the size and "circle-avatar"
  *                       // for a fully rounded avatar
- *   displayName: true // @since 18.7.0RC1 ; whether to visually display the name
+ *   displayName: true // @since 18.9.0RC1 ; whether to visually display the name
  * }
  *#
 #macro (displayUser $arg $options)

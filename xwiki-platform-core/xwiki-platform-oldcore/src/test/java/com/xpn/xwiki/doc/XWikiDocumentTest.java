@@ -67,6 +67,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -367,6 +368,54 @@ class XWikiDocumentTest
 
         // Only the links from the document content are returned, the xobjects are skipped.
         assertEquals(Set.of("Space.TargetPage.WebHome"), linkedPages);
+    }
+
+    @Test
+    void getUniqueLinkedEntitiesFromDBListProperties() throws XWikiException
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        xcontext.setDoc(
+            new XWikiDocument(new DocumentReference("contextdocwiki", "contextdocspace", "contextdocpage")));
+
+        this.document.setSyntax(Syntax.XWIKI_2_1);
+        this.document.setContent("");
+
+        addDBListField("idfield", null, null, "doc.fullName", null, false);
+        addDBListField("valuefield", null, null, null, "doc.fullName", false);
+        addDBListField("classnameonly", null, "Space.SomeClass", null, null, false);
+        addDBListField("multi", null, null, "doc.fullName", "doc.title", true);
+        addDBListField("customsql", "select doc.fullName from XWikiDocument doc", null, null, null, false);
+        addDBListField("otheridfield", null, null, "id", "doc.fullName", false);
+
+        this.baseObject.set("idfield", "IdSpace.IdPage", xcontext);
+        this.baseObject.set("valuefield", "ValueSpace.ValuePage", xcontext);
+        this.baseObject.set("classnameonly", "ClassSpace.ClassPage", xcontext);
+        this.baseObject.set("multi", "MultiSpace.Page1|otherwiki:MultiSpace.Page2|PageWithoutSpace", xcontext);
+        this.baseObject.set("customsql", "SqlSpace.SqlPage", xcontext);
+        this.baseObject.set("otheridfield", "IdFieldSpace.IdFieldPage", xcontext);
+
+        Set<EntityReference> linkedEntities = this.document.getUniqueLinkedEntities(xcontext);
+
+        assertEquals(Set.of(
+            new DocumentReference(DOCWIKI, "IdSpace", "IdPage"),
+            new DocumentReference(DOCWIKI, "ValueSpace", "ValuePage"),
+            new DocumentReference(DOCWIKI, "ClassSpace", "ClassPage"),
+            new DocumentReference(DOCWIKI, "MultiSpace", "Page1"),
+            new DocumentReference("otherwiki", "MultiSpace", "Page2")
+        ), new HashSet<>(linkedEntities));
+    }
+
+    private void addDBListField(String name, String sql, String classname, String idField, String valueField,
+        boolean multiSelect)
+    {
+        DBListClass dbListClass = new DBListClass();
+        dbListClass.setName(name);
+        dbListClass.setSql(sql);
+        dbListClass.setClassname(classname);
+        dbListClass.setIdField(idField);
+        dbListClass.setValueField(valueField);
+        dbListClass.setMultiSelect(multiSelect);
+        this.baseClass.addField(name, dbListClass);
     }
 
     @Test

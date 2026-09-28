@@ -41,10 +41,14 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
+import org.xwiki.model.internal.reference.ExplicitStringDocumentReferenceResolver;
+import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -85,9 +89,13 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringListProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 import ch.qos.logback.classic.Level;
@@ -98,6 +106,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -111,7 +120,11 @@ import static org.mockito.Mockito.when;
 // @formatter:off
 @ComponentList({
     ResourceReferenceRenamer.class,
-    DefaultReferenceRenamer.class
+    DefaultReferenceRenamer.class,
+    DefaultSymbolScheme.class,
+    ExplicitStringEntityReferenceResolver.class,
+    ExplicitStringDocumentReferenceResolver.class,
+    CompactWikiStringEntityReferenceSerializer.class
 })
 // @formatter:on
 class DefaultReferenceUpdaterTest
@@ -186,6 +199,13 @@ class DefaultReferenceUpdaterTest
     @MockComponent
     private LocalizationManager localizationManager;
 
+    @MockComponent
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @MockComponent
+    @Named("current")
+    private EntityReferenceProvider currentEntityReferenceProvider;
+
     @InjectMockComponents
     private DefaultReferenceUpdater updater;
 
@@ -255,6 +275,150 @@ class DefaultReferenceUpdaterTest
             .thenReturn(Map.of(documentReference, List.of(baseObject)));
 
         when(this.contentParser.parse("areacontent", Syntax.XWIKI_2_1, documentReference)).thenReturn(xdom);
+    }
+
+    private XWikiDocument mockDocument(DocumentReference documentReference)
+        throws XWikiException
+    {
+        XWikiDocument document = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(document.getAuthors()).thenReturn(authors);
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(document.getXDOM()).thenReturn(new XDOM(List.of()));
+
+        return document;
+    }
+
+    private DBListClass newDBListClass(String name, String idField, boolean multiSelect)
+    {
+        DBListClass dbListClass = new DBListClass();
+        dbListClass.setName(name);
+        dbListClass.setIdField(idField);
+        dbListClass.setMultiSelect(multiSelect);
+
+        return dbListClass;
+    }
+
+    /**
+     * Add to the passed document an xobject with a single select and a multi select database list properties holding
+     * document full names, and a single select database list property holding identifiers.
+     */
+    private void setDBLists(XWikiDocument document, StringProperty singleProperty,
+        StringListProperty multiProperty, StringProperty idProperty)
+    {
+        BaseClass baseClass = mock(BaseClass.class);
+        when(baseClass.getProperties()).thenReturn(new Object[] {
+            newDBListClass("single", "doc.fullName", false),
+            newDBListClass("multi", "doc.fullName", true),
+            newDBListClass("id", "id", false)
+        });
+
+        BaseObject baseObject = mock(BaseObject.class);
+        when(baseObject.getXClass(any())).thenReturn(baseClass);
+        when(baseObject.getField("single")).thenReturn(singleProperty);
+        when(baseObject.getField("multi")).thenReturn(multiProperty);
+        when(baseObject.getField("id")).thenReturn(idProperty);
+
+        DocumentReference documentReference = document.getDocumentReference();
+        when(document.getXObjects()).thenReturn(Map.of(documentReference, List.of(baseObject)));
+    }
+
+    private StringProperty newStringProperty(String value)
+    {
+        StringProperty property = new StringProperty();
+        property.setValue(value);
+
+        return property;
+    }
+
+    private StringListProperty newStringListProperty(String... values)
+    {
+        StringListProperty property = new StringListProperty();
+        property.setList(List.of(values));
+
+        return property;
+    }
+
+    @Test
+    void updateDBListValues() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mockDocument(documentReference);
+
+        StringProperty singleProperty = newStringProperty("A.B");
+        StringListProperty multiProperty = newStringListProperty("C.D", "A.B", "wiki:A.B", "otherwiki:A.B");
+        StringProperty idProperty = newStringProperty("A.B");
+        setDBLists(document, singleProperty, multiProperty, idProperty);
+
+        this.updater.update(documentReference, new DocumentReference("wiki", "A", "B"),
+            new DocumentReference("wiki", "X", "Y"));
+
+        assertEquals("X.Y", singleProperty.getValue());
+        assertEquals(List.of("C.D", "X.Y", "X.Y", "otherwiki:A.B"), multiProperty.getList());
+        assertEquals("A.B", idProperty.getValue());
+        verifyDocumentSave(document, false);
+    }
+
+    @Test
+    void updateDBListValuesWithTargetInOtherWiki() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mockDocument(documentReference);
+
+        StringProperty singleProperty = newStringProperty("A.B");
+        StringListProperty multiProperty = newStringListProperty("A.B", "C.D");
+        StringProperty idProperty = newStringProperty("A.B");
+        setDBLists(document, singleProperty, multiProperty, idProperty);
+
+        this.updater.update(documentReference, new DocumentReference("wiki", "A", "B"),
+            new DocumentReference("otherwiki", "X", "Y"));
+
+        assertEquals("otherwiki:X.Y", singleProperty.getValue());
+        assertEquals(List.of("otherwiki:X.Y", "C.D"), multiProperty.getList());
+        assertEquals("A.B", idProperty.getValue());
+        verifyDocumentSave(document, false);
+    }
+
+    @Test
+    void updateDBListValuesInRelativeMode() throws Exception
+    {
+        DocumentReference newReference = new DocumentReference("otherwiki", "X", "Y");
+        XWikiDocument document = mockDocument(newReference);
+
+        StringProperty singleProperty = newStringProperty("A.B");
+        StringListProperty multiProperty = newStringListProperty("A.B", "C.D");
+        StringProperty idProperty = newStringProperty("A.B");
+        setDBLists(document, singleProperty, multiProperty, idProperty);
+
+        this.updater.update(newReference, new DocumentReference("wiki", "A", "B"), newReference);
+
+        assertEquals("A.B", singleProperty.getValue());
+        assertEquals(List.of("A.B", "C.D"), multiProperty.getList());
+        verify(this.xcontext.getWiki(), never()).saveDocument(any(), any(), anyBoolean(), any());
+        assertEquals("No relative links to update in [otherwiki:X.Y].", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void updateDBListValuesWhenNoValueMatches() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mockDocument(documentReference);
+
+        StringProperty singleProperty = newStringProperty("C.D");
+        StringListProperty multiProperty = newStringListProperty("C.D", "otherwiki:A.B", "B", "");
+        StringProperty idProperty = newStringProperty("A.B");
+        setDBLists(document, singleProperty, multiProperty, idProperty);
+
+        this.updater.update(documentReference, new DocumentReference("wiki", "A", "B"),
+            new DocumentReference("wiki", "X", "Y"));
+
+        assertEquals("C.D", singleProperty.getValue());
+        assertEquals(List.of("C.D", "otherwiki:A.B", "B", ""), multiProperty.getList());
+        assertEquals("A.B", idProperty.getValue());
+        verify(this.xcontext.getWiki(), never()).saveDocument(any(), any(), anyBoolean(), any());
+        assertEquals("No back-links to update in [wiki:Space.Page].", this.logCapture.getMessage(0));
     }
 
     @Test

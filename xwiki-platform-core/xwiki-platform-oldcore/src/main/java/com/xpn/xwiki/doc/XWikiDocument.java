@@ -200,6 +200,7 @@ import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
@@ -5933,8 +5934,63 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                             largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
+            } else if (fieldClass instanceof DBListClass dbListClass && entityTypes.containsKey(EntityType.DOCUMENT)
+                && isDocumentReferenceDBList(dbListClass)) {
+                // Document references stored in database list xobject properties
+                getUniqueLinkedDocumentReferences(xobject, dbListClass, references);
             }
         }
+    }
+
+    private void getUniqueLinkedDocumentReferences(BaseObject xobject, DBListClass dbListClass,
+        Set<EntityReference> references)
+    {
+        PropertyInterface field = xobject.getField(dbListClass.getName());
+
+        if (field instanceof BaseProperty<?> property && property.getValue() != null) {
+            // The values are produced by a query that runs in the wiki of the document, so they are resolved against
+            // that wiki and not against the space of the document.
+            WikiReference wikiReference = getDocumentReference().getWikiReference();
+            for (String value : dbListClass.toList(property)) {
+                if (StringUtils.isNotBlank(value)) {
+                    try {
+                        references.add(getExplicitDocumentReferenceResolver().resolve(value, wikiReference));
+                    } catch (IllegalArgumentException e) {
+                        // The value doesn't hold a complete document reference, it cannot be a link.
+                        LOGGER.debug("Skipping the database list value [{}] of [{}] which is not a document reference.",
+                            value, property.getReference(), e);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if the values of the passed database list property are document full names. That is the case only when no
+     * custom query is used and the generated query selects {@code doc.fullName} as the stored value. The same rule is
+     * duplicated in {@code DefaultReferenceUpdater#isDocumentReferenceDBList} and both copies must be kept in sync.
+     *
+     * @param dbListClass the database list property to check
+     * @return {@code true} if the values of the property are document full names
+     */
+    private static boolean isDocumentReferenceDBList(DBListClass dbListClass)
+    {
+        if (StringUtils.isNotBlank(dbListClass.getSql())) {
+            return false;
+        }
+
+        String idField = dbListClass.getIdField();
+        String valueField = dbListClass.getValueField();
+
+        if (StringUtils.isBlank(idField) && StringUtils.isBlank(valueField)) {
+            // The generated query selects the full name of the documents holding an object of the class.
+            return StringUtils.isNotBlank(dbListClass.getClassname());
+        }
+
+        // The generated query uses the value field as stored value when the id field is blank.
+        String effectiveIdField = StringUtils.isBlank(idField) ? valueField : idField;
+
+        return "doc.fullName".equals(effectiveIdField);
     }
 
     private void getUniqueLinkedEntityReferences(XDOM dom, Map<EntityType, Set<ResourceType>> entityTypes,

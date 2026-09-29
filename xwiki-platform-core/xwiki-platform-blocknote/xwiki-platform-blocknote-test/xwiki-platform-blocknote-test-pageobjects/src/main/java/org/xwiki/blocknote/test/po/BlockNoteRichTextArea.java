@@ -427,11 +427,9 @@ public class BlockNoteRichTextArea extends BaseElement
         getDriver().waitUntilElementIsVisible(SIDE_MENU);
         WebElement sideMenu = getDriver().findElement(SIDE_MENU);
 
-        // Waiting for the side menu to be visible is not enough to avoid flaky screenshots: the side menu fades in when
-        // it is first shown, and there is a single side menu that stays visible while moving from one block to
-        // another, its new position being computed asynchronously. We thus wait for it to stop moving, i.e. to report
-        // the same position twice in a row, which also leaves enough time for the fade-in to end (the position is
-        // checked every 500ms, while the fade-in lasts 250ms).
+        // Waiting for the side menu to be visible is not enough to avoid flaky screenshots, as there is a fade in
+        // animation. To be sure, we wait for the side menu to be stable, i.e. to be at the same position for two
+        // consecutive ticks.
         Point[] previousPosition = new Point[] {null};
         getDriver().waitUntilCondition(driver -> {
             Point position = sideMenu.getLocation();

@@ -220,8 +220,8 @@ type BlockNoteViewWrapperProps = {
 };
 
 /**
- * Replaces the fixed, per-block-type vertical offset BlockNote positions the side menu with, which only matches its
- * own styling.
+ * Replaces the middleware BlockNote uses to center the side menu vertically on the hovered block, which offsets the
+ * menu by a fixed amount per block type that only matches BlockNote's own styling. 
  */
 const SIDE_MENU_FLOATING_OPTIONS = {
   useFloatingOptions: {
@@ -368,6 +368,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           sideMenu={false}
           onChange={(editor) => onChange?.(editor)}
         >
+          {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
           <SideMenuController floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS} />
 
           <SuggestionMenuController

@@ -36,11 +36,10 @@ import org.xwiki.test.ui.TestUtils;
  * Verify that the block side menu is properly aligned on the block you hover, no matter the type of that block.
  * <p>
  * The alignment is checked by comparing a screenshot of the content area, taken while hovering each block, with a
- * reference screenshot committed in the test resources (see {@link ScreenshotComparator}). The side menu is displayed
- * on the left of the rich text area, flush against the left edge of the content area, which is why the screenshot is
- * taken on the whole content area. When a change in the way the content is rendered makes this test fail, check the
- * screenshots this test saves and, if the side menu is still properly aligned, use them as the new reference
- * screenshots.
+ * reference screenshot committed in the test resources (see {@link ScreenshotComparator}).
+ * <p>
+ * When a change in the way the content is rendered makes this test fail, check the screenshots this test saves and, if
+ * the side menu is still properly aligned, use them as the new reference screenshots.
  *
  * @version $Id$
  * @since 18.9.0RC1
@@ -48,17 +47,8 @@ import org.xwiki.test.ui.TestUtils;
 @UITest(
     extraJARs = {
         // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
-        "org.xwiki.platform:xwiki-platform-websocket",
-
-        // The macro service uses the extension index script service to get the list of uninstalled macros (from
-        // extensions) which expects an implementation of the extension index. The extension index script service is a
-        // core extension so we need to make the extension index also core.
-        "org.xwiki.platform:xwiki-platform-extension-index",
-
-        // Solr search is used to get suggestions for the link quick action.
-        "org.xwiki.platform:xwiki-platform-search-solr-query"
-    },
-    servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS
+        "org.xwiki.platform:xwiki-platform-websocket"
+    }
 )
 class SideMenuAlignmentIT extends AbstractBlockNoteIT
 {
@@ -67,14 +57,8 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
      */
     private static final String IMAGE_NAME = "image.gif";
 
-    // The blocks are split between two tests, i.e. two pages, so that each page fits in the browser window: taking the
-    // screenshot of an element scrolls the page (when it can be scrolled) and BlockNote hides the side menu when the
-    // page is scrolled.
+    // We split the blocks into two groups to avoid issues when scrolling the page.
 
-    /**
-     * The headings the side menu is checked on, in the order they appear in {@link #HEADINGS_CONTENT}. The name of each
-     * block is also the name of its reference screenshot.
-     */
     private static final String[] HEADINGS = {"heading1", "heading2", "heading3", "heading4", "heading5", "heading6"};
 
     private static final String HEADINGS_CONTENT = """
@@ -90,10 +74,6 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
 
         ====== Heading 6 ======""";
 
-    /**
-     * The other blocks the side menu is checked on, in the order they appear in {@link #OTHER_BLOCKS_CONTENT}. The
-     * name of each block is also the name of its reference screenshot.
-     */
     private static final String[] OTHER_BLOCKS = {"paragraph", "wrappingParagraph", "bulletItem", "quote", "divider",
         "image"};
 
@@ -116,7 +96,6 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
     void sideMenuIsAlignedOnHeadings(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
-        // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference, HEADINGS_CONTENT);
 
@@ -124,10 +103,9 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
     }
 
     @Test
-    void sideMenuIsAlignedOnOtherBlocks(TestUtils setup, TestReference testReference,
+    void sideMenuIsAlignedOnOtherBlockTypes(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
-        // Start fresh.
         setup.deletePage(testReference);
         setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
         setup.createPage(testReference, OTHER_BLOCKS_CONTENT);

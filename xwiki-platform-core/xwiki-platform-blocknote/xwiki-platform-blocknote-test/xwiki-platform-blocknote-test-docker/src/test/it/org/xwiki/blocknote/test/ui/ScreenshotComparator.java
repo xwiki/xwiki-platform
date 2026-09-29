@@ -42,12 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Compares screenshots of page elements with reference screenshots committed in the test resources, under
- * {@code screenshots/<TestClassName>/}. All the comparisons are made before failing, so that a single run produces the
- * screenshots needed to review all the failures (and to create all the missing reference screenshots). The screenshots
- * are saved in the {@code screenshots} folder of the build directory, along with an image highlighting the differences
- * for each screenshot that doesn't match its reference.
- * <p>
- * This is not specific to BlockNote and is meant to be moved to the Docker-based test framework.
+ * {@code screenshots/<TestClassName>/}. The screenshots are saved in the {@code screenshots} folder of the build
+ * directory, along with an image highlighting the differences for each screenshot that doesn't match its reference.
  *
  * @version $Id$
  * @since 18.9.0RC1
@@ -55,10 +51,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ScreenshotComparator
 {
     /**
-     * How much the color of a pixel is allowed to differ before that pixel is counted as different, as a ratio of the
-     * largest possible difference between two colors. This absorbs the small differences in the way text and icons
-     * are anti-aliased. No pixel is allowed to differ beyond that, so that small user interface elements (e.g. an
-     * icon that moves by a few pixels) are still caught.
+     * How much the color of a pixel is allowed to differ before that pixel is counted as different.
+     * This absorbs the small differences in the way text and icons are anti-aliased.
      */
     private static final double PIXEL_TOLERANCE_LEVEL = 0.1;
 

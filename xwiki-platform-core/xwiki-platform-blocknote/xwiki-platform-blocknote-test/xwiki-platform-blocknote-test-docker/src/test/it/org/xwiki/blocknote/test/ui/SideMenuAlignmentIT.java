@@ -46,7 +46,6 @@ import org.xwiki.test.ui.TestUtils;
  */
 @UITest(
     extraJARs = {
-        // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
         "org.xwiki.platform:xwiki-platform-websocket"
     }
 )

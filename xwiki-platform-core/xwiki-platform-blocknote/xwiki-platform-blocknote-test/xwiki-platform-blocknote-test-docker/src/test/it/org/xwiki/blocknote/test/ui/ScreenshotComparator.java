@@ -1,0 +1,164 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.blocknote.test.ui;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebElement;
+import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.ui.XWikiWebDriver;
+
+import com.github.romankh3.image.comparison.ImageComparison;
+import com.github.romankh3.image.comparison.ImageComparisonUtil;
+import com.github.romankh3.image.comparison.model.ImageComparisonResult;
+import com.github.romankh3.image.comparison.model.ImageComparisonState;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Compares screenshots of page elements with reference screenshots committed in the test resources, under
+ * {@code screenshots/<TestClassName>/}. All the comparisons are made before failing, so that a single run produces the
+ * screenshots needed to review all the failures (and to create all the missing reference screenshots). The screenshots
+ * are saved in the {@code screenshots} folder of the build directory, along with an image highlighting the differences
+ * for each screenshot that doesn't match its reference.
+ * <p>
+ * This is not specific to BlockNote and is meant to be moved to the Docker-based test framework.
+ *
+ * @version $Id$
+ * @since 18.9.0RC1
+ */
+public class ScreenshotComparator
+{
+    /**
+     * How much the color of a pixel is allowed to differ before that pixel is counted as different, as a ratio of the
+     * largest possible difference between two colors. This absorbs the small differences in the way text and icons
+     * are anti-aliased. No pixel is allowed to differ beyond that, so that small user interface elements (e.g. an
+     * icon that moves by a few pixels) are still caught.
+     */
+    private static final double PIXEL_TOLERANCE_LEVEL = 0.1;
+
+    private final XWikiWebDriver driver;
+
+    private final Class<?> testClass;
+
+    private final File outputFolder;
+
+    private final List<String> failures = new ArrayList<>();
+
+    /**
+     * @param driver the driver used to take the screenshots
+     * @param testConfiguration the test configuration, used to find the build directory
+     * @param testClass the test class, used to find the reference screenshots and to name the saved screenshots
+     */
+    public ScreenshotComparator(XWikiWebDriver driver, TestConfiguration testConfiguration, Class<?> testClass)
+    {
+        this.driver = driver;
+        this.testClass = testClass;
+        this.outputFolder = new File(testConfiguration.getMavenBuildDirectory(), "screenshots");
+    }
+
+    /**
+     * Takes a screenshot of the specified element and compares it with the reference screenshot with the specified
+     * name. A mismatch is recorded rather than thrown, see {@link #assertAllMatch()}.
+     *
+     * @param name the name of the reference screenshot, without the extension
+     * @param element the element to take the screenshot of, which must be entirely visible in the viewport
+     * @return this instance
+     * @throws IOException if the screenshot can't be taken or the reference screenshot can't be read
+     */
+    public ScreenshotComparator compare(String name, WebElement element) throws IOException
+    {
+        // The test class name is part of the file names because the screenshots folder is shared by all the tests
+        // (and flattened when archived by the CI).
+        String prefix = this.testClass.getSimpleName() + '-' + name;
+        File actualFile = new File(this.outputFolder, prefix + ".png");
+        BufferedImage actual = takeScreenshot(element);
+        ImageComparisonUtil.saveImage(actualFile, actual);
+
+        String referencePath = "src/test/resources/" + getReferencePath(name);
+        BufferedImage reference = readReference(name);
+        if (reference == null) {
+            this.failures.add(("There is no reference screenshot for [%s]. Check the screenshot taken by the test, at "
+                + "[%s], and copy it to [%s] if it is correct.").formatted(name, actualFile, referencePath));
+            return this;
+        }
+
+        File differenceFile = new File(this.outputFolder, prefix + "-diff.png");
+        ImageComparisonResult result = new ImageComparison(reference, actual, differenceFile)
+            .setPixelToleranceLevel(PIXEL_TOLERANCE_LEVEL).compareImages();
+        if (result.getImageComparisonState() != ImageComparisonState.MATCH) {
+            this.failures.add(("The screenshot [%s] doesn't match its reference (%s, %s%% of the pixels are "
+                + "different). Compare the screenshot taken by the test, at [%s], with the reference screenshot, at "
+                + "[%s]. The differences are highlighted at [%s].").formatted(name, result.getImageComparisonState(),
+                    result.getDifferencePercent(), actualFile, referencePath, differenceFile));
+        }
+
+        return this;
+    }
+
+    /**
+     * Fails if any of the screenshots compared so far doesn't match its reference.
+     */
+    public void assertAllMatch()
+    {
+        assertTrue(this.failures.isEmpty(), String.join("\n", this.failures));
+    }
+
+    /**
+     * Takes a screenshot of the viewport and crops it to the specified element. We don't take the screenshot of the
+     * element directly because the browser may scroll the page in order to do so, which can change what is displayed
+     * (e.g. floating user interface elements that are hidden or moved, asynchronously, when the page is scrolled).
+     */
+    private BufferedImage takeScreenshot(WebElement element) throws IOException
+    {
+        BufferedImage screenshot =
+            ImageIO.read(new ByteArrayInputStream(this.driver.getScreenshotAs(OutputType.BYTES)));
+
+        @SuppressWarnings("unchecked")
+        List<Number> rect = (List<Number>) this.driver.executeScript("""
+            const rect = arguments[0].getBoundingClientRect();
+            const left = Math.floor(rect.left), top = Math.floor(rect.top);
+            return [left, top, Math.ceil(rect.right) - left, Math.ceil(rect.bottom) - top];
+            """, element);
+        return screenshot.getSubimage(rect.get(0).intValue(), rect.get(1).intValue(), rect.get(2).intValue(),
+            rect.get(3).intValue());
+    }
+
+    private String getReferencePath(String name)
+    {
+        return "screenshots/%s/%s.png".formatted(this.testClass.getSimpleName(), name);
+    }
+
+    private BufferedImage readReference(String name) throws IOException
+    {
+        try (InputStream reference = this.testClass.getResourceAsStream('/' + getReferencePath(name))) {
+            return reference == null ? null : ImageIO.read(reference);
+        }
+    }
+}

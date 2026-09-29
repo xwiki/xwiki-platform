@@ -22,7 +22,6 @@ package org.xwiki.blocknote.test.po;
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -42,6 +41,8 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNest
  */
 public class BlockNoteRichTextArea extends BaseElement
 {
+    private static final By SIDE_MENU = By.className("bn-side-menu");
+
     @NonNull
     private WebElement container;
 
@@ -421,12 +422,10 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea hoverBlock(int index)
     {
-        WebElement block = this.container.findElements(By.className("bn-block-content")).get(index);
-        getDriver().createActions().moveToElement(block).perform();
+        getDriver().createActions().moveToElement(getBlockContent(index)).perform();
 
-        By sideMenuLocator = By.className("bn-side-menu");
-        getDriver().waitUntilElementIsVisible(sideMenuLocator);
-        WebElement sideMenu = getDriver().findElement(sideMenuLocator);
+        getDriver().waitUntilElementIsVisible(SIDE_MENU);
+        WebElement sideMenu = getDriver().findElement(SIDE_MENU);
 
         // The side menu keeps its place in the DOM while moving from one block to another, so waiting for it to be
         // displayed is not enough: we also have to wait for it to stop moving, i.e. to report the same position twice
@@ -443,8 +442,8 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Hides the caret (text cursor), which blinks and would thus make the screenshots taken with
-     * {@link #getContentScreenshot()} unstable.
+     * Hides the caret (text cursor), which blinks and would thus make the screenshots of the rich text area
+     * unstable.
      *
      * @return this rich text area instance
      * @since 18.9.0RC1
@@ -459,18 +458,8 @@ public class BlockNoteRichTextArea extends BaseElement
         return this;
     }
 
-    /**
-     * Takes a screenshot of the document content area, which includes both the rich text area and the floating user
-     * interface displayed next to it, such as the block side menu. Note that we can't take a screenshot of the rich
-     * text area itself because the side menu is displayed outside of it, on its left, and would thus be cropped.
-     * <p>
-     * This works only when editing the document content in-place, since the content area is part of the view mode.
-     *
-     * @return the screenshot of the document content area, in PNG format
-     * @since 18.9.0RC1
-     */
-    public byte[] getContentScreenshot()
+    private WebElement getBlockContent(int index)
     {
-        return getDriver().findElement(By.id("xwikicontent")).getScreenshotAs(OutputType.BYTES);
+        return this.container.findElements(By.className("bn-block-content")).get(index);
     }
 }

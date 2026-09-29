@@ -45,8 +45,6 @@ import org.xwiki.test.ui.TestUtils;
  * @version $Id$
  * @since 18.9.0RC1
  */
-// The reference screenshots are taken on x86_64, which is what the CI runs on. On ARM, Chrome is replaced by Chromium
-// and the rendering may differ, so the screenshots can't be compared reliably.
 @DisabledOnOs(architectures = "aarch64")
 @UITest(
     extraJARs = {

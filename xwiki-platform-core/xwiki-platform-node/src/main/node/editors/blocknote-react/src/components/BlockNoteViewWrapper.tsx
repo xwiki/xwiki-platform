@@ -221,8 +221,7 @@ type BlockNoteViewWrapperProps = {
 
 /**
  * Replaces the fixed, per-block-type vertical offset BlockNote positions the side menu with, which only matches its
- * own styling. Defined once, outside the component, since it depends on nothing: the middleware measures the block it
- * is positioning against every time the menu is placed.
+ * own styling.
  */
 const SIDE_MENU_FLOATING_OPTIONS = {
   useFloatingOptions: {

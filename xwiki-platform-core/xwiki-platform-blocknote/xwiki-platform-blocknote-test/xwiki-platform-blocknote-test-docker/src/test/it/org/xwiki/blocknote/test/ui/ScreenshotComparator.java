@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.imageio.ImageIO;
 
@@ -42,7 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Compares screenshots of page elements with reference screenshots committed in the test resources, under
- * {@code screenshots/<TestClassName>/}. The screenshots are saved in the {@code screenshots} folder of the build
+ * {@code screenshots/<TestClassName>/<browser>/}, since each browser renders the page slightly differently (e.g. the
+ * text anti-aliasing). The screenshots are saved in the {@code screenshots} folder of the build
  * directory, along with an image highlighting the differences for each screenshot that doesn't match its reference.
  *
  * @version $Id$
@@ -58,17 +60,21 @@ public class ScreenshotComparator
 
     private final Class<?> testClass;
 
+    private final String browser;
+
     private final File outputFolder;
 
     private final List<String> failures = new ArrayList<>();
 
     /**
-     * @param testConfiguration the test configuration, used to find the build directory
+     * @param testConfiguration the test configuration, used to find the build directory and the browser the
+     *         screenshots are taken with
      * @param testClass the test class, used to find the reference screenshots and to name the saved screenshots
      */
     public ScreenshotComparator(TestConfiguration testConfiguration, Class<?> testClass)
     {
         this.testClass = testClass;
+        this.browser = testConfiguration.getBrowser().name().toLowerCase(Locale.ROOT);
         this.outputFolder = new File(testConfiguration.getMavenBuildDirectory(), "screenshots");
     }
 
@@ -83,8 +89,9 @@ public class ScreenshotComparator
      */
     public ScreenshotComparator compare(String name, WebElement element) throws IOException
     {
-        // The test class name is part of the file names because the screenshots folder is shared by all the tests.
-        String prefix = this.testClass.getSimpleName() + '-' + name;
+        // The test class name and the browser are part of the file names because the screenshots folder is shared by
+        // all the tests.
+        String prefix = "%s-%s-%s".formatted(this.testClass.getSimpleName(), this.browser, name);
         File actualFile = new File(this.outputFolder, prefix + ".png");
         BufferedImage actual = takeScreenshot(element);
         ImageComparisonUtil.saveImage(actualFile, actual);
@@ -125,7 +132,7 @@ public class ScreenshotComparator
 
     private String getReferencePath(String name)
     {
-        return "screenshots/%s/%s.png".formatted(this.testClass.getSimpleName(), name);
+        return "screenshots/%s/%s/%s.png".formatted(this.testClass.getSimpleName(), this.browser, name);
     }
 
     private BufferedImage readReference(String name) throws IOException

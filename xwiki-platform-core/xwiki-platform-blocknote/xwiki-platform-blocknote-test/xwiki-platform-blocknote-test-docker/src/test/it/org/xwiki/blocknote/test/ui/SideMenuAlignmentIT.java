@@ -22,6 +22,7 @@ package org.xwiki.blocknote.test.ui;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
@@ -44,6 +45,9 @@ import org.xwiki.test.ui.TestUtils;
  * @version $Id$
  * @since 18.9.0RC1
  */
+// The reference screenshots are taken on x86_64, which is what the CI runs on. On ARM, Chrome is replaced by Chromium
+// and the rendering may differ, so the screenshots can't be compared reliably.
+@DisabledOnOs(architectures = "aarch64")
 @UITest(
     extraJARs = {
         "org.xwiki.platform:xwiki-platform-websocket"

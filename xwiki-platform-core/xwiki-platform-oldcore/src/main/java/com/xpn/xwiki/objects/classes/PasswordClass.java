@@ -215,6 +215,11 @@ public class PasswordClass extends StringClass
     @Override
     public BaseProperty fromString(String value) throws XWikiException
     {
+        // This needs to be kept: we don't want a password to be replaced
+        // by its placeholder coming from the form
+        if (FORM_PASSWORD_PLACEHODLER.equals(value)) {
+            return null;
+        }
         BaseProperty property = newProperty();
         if (value.isEmpty() || isPasswordHashed(value)) {
             property.setValue(value);

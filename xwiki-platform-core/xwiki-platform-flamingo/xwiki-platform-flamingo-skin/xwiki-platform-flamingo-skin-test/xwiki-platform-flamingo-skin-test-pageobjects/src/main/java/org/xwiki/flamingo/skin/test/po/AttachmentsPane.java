@@ -133,6 +133,13 @@ public class AttachmentsPane extends BaseElement
      */
     public void setFileToUpload(final String filePath, final boolean local)
     {
+        // The upload is started by the change listener that the HTML5 uploader attaches to the file input, and that
+        // uploader is initialized asynchronously, once attachments.js has resolved the 'xwiki-upload' module through
+        // RequireJS. Wait for the marker that the uploader sets on the form when it is initialized, otherwise the
+        // change event triggered below can be fired before the listener exists, in which case it is lost and no upload
+        // happens at all.
+        getDriver().waitUntilElementIsVisible(this.pane, By.cssSelector("form.html5upload-initialized #attachform"));
+
         final List<WebElement> inputs = this.pane.findElements(By.className("uploadFileInput"));
         WebElement input = inputs.get(inputs.size() - 1);
         if (local) {
@@ -178,7 +185,24 @@ public class AttachmentsPane extends BaseElement
      */
     public void waitForUploadToFinish(String fileName)
     {
-        waitForNotificationSuccessMessage("Attachment uploaded: " + fileName);
+        waitForUploadToFinish(fileName, null);
+    }
+
+    /**
+     * Wait for the upload of a specific file to be finished, also asserting the localized size displayed next to the
+     * file name.
+     *
+     * @param fileName the name of the attachment
+     * @param expectedSize the expected localized size displayed in the upload notification (e.g. {@code "27B"}), or
+     *     {@code null} to not check the size
+     * @since 18.9.0RC1
+     */
+    public void waitForUploadToFinish(String fileName, String expectedSize)
+    {
+        String message = expectedSize != null
+            ? String.format("Attachment uploaded: %s (%s)", fileName, expectedSize)
+            : "Attachment uploaded: " + fileName;
+        waitForNotificationSuccessMessage(message);
     }
 
     /**

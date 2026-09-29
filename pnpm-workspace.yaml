@@ -85,17 +85,17 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - nx
 catalog:
-  "@blocknote/core": 0.54.2
-  "@blocknote/mantine": 0.54.2
-  "@blocknote/react": 0.54.2
+  "@blocknote/core": 0.55.0
+  "@blocknote/mantine": 0.55.0
+  "@blocknote/react": 0.55.0
   "@eslint/config-helpers": 0.7.0
   "@eslint/js": 10.0.1
   "@floating-ui/react": 0.27.20
   "@jridgewell/remapping": 2.3.5
-  "@mantine/core": 9.6.1
-  "@mantine/hooks": 9.6.1
+  "@mantine/core": 9.6.3
+  "@mantine/hooks": 9.6.3
   "@microsoft/api-extractor": 7.59.1
-  "@oxc-project/runtime": 0.150.0
+  "@oxc-project/runtime": 0.151.0
   "@playwright/experimental-ct-react": 1.62.1
   "@playwright/experimental-ct-vue": 1.62.1
   "@playwright/test": 1.63.0
@@ -136,8 +136,8 @@ catalog:
   inversify: 8.2.3
   jiti: 2.7.0
   jquery: 4.0.0
-  jsdom: 30.1.0
-  lib0: 0.2.117
+  jsdom: 30.1.1
+  lib0: 0.2.118
   lodash-es: 4.18.1
   lz-string: 1.5.0
   mdast-util-gfm-strikethrough: 2.0.0
@@ -158,7 +158,7 @@ catalog:
   qunit: 2.26.0
   react: 19.3.0
   react-dom: 19.3.0
-  react-i18next: 17.0.14
+  react-i18next: 17.0.15
   react-icons: 5.7.0
   reflect-metadata: 0.2.2
   remark-parse: 11.0.0
@@ -166,27 +166,27 @@ catalog:
   sinon: 22.1.0
   tippy.js: 6.3.7
   typescript: 5.9.3
-  typescript-eslint: 8.70.0
+  typescript-eslint: 8.70.1
   u-node: 0.0.8
   unified: 11.0.5
   utility-types: 3.11.0
-  vite: 8.3.0
+  vite: 8.3.1
   vite-plugin-css-injected-by-js: 5.0.2
   vite-plugin-dts: 4.5.4
-  vitest: 5.0.1
+  vitest: 5.0.2
   vitest-mock-extended: 5.1.1
   vue: 3.5.43
   vue-eslint-parser: 10.4.1
   vue-i18n: 11.4.12
   vue-router: 5.3.1
-  vue-tippy: 6.7.1
+  vue-tippy: 6.8.0
   vue-tsc: 3.3.11
   vue3-touch-events: 5.0.15
   vuedraggable: 4.1.0
   y-prosemirror: 1.3.7
   y-protocols: 1.0.7
   y-websocket: 3.1.0
-  yjs: 13.6.32
+  yjs: 13.6.33
 allowBuilds:
   esbuild: true
   nx: true

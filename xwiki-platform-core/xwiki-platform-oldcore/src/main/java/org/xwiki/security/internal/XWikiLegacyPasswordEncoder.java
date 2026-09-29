@@ -193,6 +193,6 @@ public class XWikiLegacyPasswordEncoder extends AbstractValidatingPasswordEncode
     @Override
     protected boolean upgradeEncodingNonNull(String encodedPassword)
     {
-        return true;
+        return false;
     }
 }

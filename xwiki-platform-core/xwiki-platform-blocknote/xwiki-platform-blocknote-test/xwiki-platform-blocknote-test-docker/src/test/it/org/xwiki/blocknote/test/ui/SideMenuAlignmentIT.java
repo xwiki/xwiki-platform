@@ -19,6 +19,8 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -65,14 +67,17 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
      */
     private static final String IMAGE_NAME = "image.gif";
 
+    // The blocks are split between two tests, i.e. two pages, so that each page fits in the browser window: taking the
+    // screenshot of an element scrolls the page (when it can be scrolled) and BlockNote hides the side menu when the
+    // page is scrolled.
+
     /**
-     * The blocks the side menu is checked on, in the order they appear in the test content below. The name of each
+     * The headings the side menu is checked on, in the order they appear in {@link #HEADINGS_CONTENT}. The name of each
      * block is also the name of its reference screenshot.
      */
-    private static final String[] BLOCKS = {"heading1", "heading2", "heading3", "heading4", "heading5", "heading6",
-        "paragraph", "wrappingParagraph", "bulletItem", "quote", "divider", "image"};
+    private static final String[] HEADINGS = {"heading1", "heading2", "heading3", "heading4", "heading5", "heading6"};
 
-    private static final String CONTENT = """
+    private static final String HEADINGS_CONTENT = """
         = Heading 1 =
 
         == Heading 2 ==
@@ -83,8 +88,16 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
 
         ===== Heading 5 =====
 
-        ====== Heading 6 ======
+        ====== Heading 6 ======""";
 
+    /**
+     * The other blocks the side menu is checked on, in the order they appear in {@link #OTHER_BLOCKS_CONTENT}. The
+     * name of each block is also the name of its reference screenshot.
+     */
+    private static final String[] OTHER_BLOCKS = {"paragraph", "wrappingParagraph", "bulletItem", "quote", "divider",
+        "image"};
+
+    private static final String OTHER_BLOCKS_CONTENT = """
         A short paragraph.
 
         A much longer paragraph that is going to wrap on multiple lines so that we can check that the side menu stays \
@@ -100,25 +113,57 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
         [[image:%s]]""".formatted(IMAGE_NAME);
 
     @Test
-    void sideMenuIsAlignedOnTheHoveredBlock(TestUtils setup, TestReference testReference,
+    void sideMenuIsAlignedOnHeadings(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, HEADINGS_CONTENT);
+
+        assertSideMenuIsAligned(editInplace(), setup, testConfiguration, HEADINGS);
+    }
+
+    @Test
+    void sideMenuIsAlignedOnOtherBlocks(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
         // Start fresh.
         setup.deletePage(testReference);
         setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
-        setup.createPage(testReference, CONTENT);
+        setup.createPage(testReference, OTHER_BLOCKS_CONTENT);
 
+        BlockNoteRichTextArea textArea = editInplace();
+        // An image that is still loading would make the screenshots unstable.
+        textArea.waitUntilImageIsLoaded(0);
+        assertSideMenuIsAligned(textArea, setup, testConfiguration, OTHER_BLOCKS);
+    }
+
+    /**
+     * Edits the current page in-place.
+     *
+     * @return the rich text area, with its caret hidden since its blinking would make the screenshots unstable
+     */
+    private BlockNoteRichTextArea editInplace()
+    {
         new InplaceEditablePage().editInplace();
+        return new BlockNoteEditor("content").getRichTextArea().hideCaret();
+    }
 
-        BlockNoteRichTextArea textArea = new BlockNoteEditor("content").getRichTextArea();
-        // Both the blinking caret and an image that is still loading would make the screenshots unstable.
-        textArea.hideCaret().waitUntilImageIsLoaded(0);
-
+    /**
+     * Compares a screenshot of the content area, taken while hovering each block, with the reference screenshot of
+     * that block.
+     *
+     * @param textArea the rich text area holding the blocks
+     * @param blocks the names of the blocks, in the order they appear in the rich text area
+     */
+    private void assertSideMenuIsAligned(BlockNoteRichTextArea textArea, TestUtils setup,
+        TestConfiguration testConfiguration, String[] blocks) throws IOException
+    {
         WebElement content = setup.getDriver().findElement(By.id("xwikicontent"));
-        ScreenshotComparator screenshots = new ScreenshotComparator(setup.getDriver(), testConfiguration, getClass());
-        for (int i = 0; i < BLOCKS.length; i++) {
+        ScreenshotComparator screenshots = new ScreenshotComparator(testConfiguration, getClass());
+        for (int i = 0; i < blocks.length; i++) {
             textArea.hoverBlock(i);
-            screenshots.compare(BLOCKS[i], content);
+            screenshots.compare(blocks[i], content);
         }
         screenshots.assertAllMatch();
     }

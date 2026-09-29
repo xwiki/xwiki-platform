@@ -32,7 +32,6 @@ import javax.imageio.ImageIO;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.test.ui.XWikiWebDriver;
 
 import com.github.romankh3.image.comparison.ImageComparison;
 import com.github.romankh3.image.comparison.ImageComparisonUtil;
@@ -63,8 +62,6 @@ public class ScreenshotComparator
      */
     private static final double PIXEL_TOLERANCE_LEVEL = 0.1;
 
-    private final XWikiWebDriver driver;
-
     private final Class<?> testClass;
 
     private final File outputFolder;
@@ -72,13 +69,11 @@ public class ScreenshotComparator
     private final List<String> failures = new ArrayList<>();
 
     /**
-     * @param driver the driver used to take the screenshots
      * @param testConfiguration the test configuration, used to find the build directory
      * @param testClass the test class, used to find the reference screenshots and to name the saved screenshots
      */
-    public ScreenshotComparator(XWikiWebDriver driver, TestConfiguration testConfiguration, Class<?> testClass)
+    public ScreenshotComparator(TestConfiguration testConfiguration, Class<?> testClass)
     {
-        this.driver = driver;
         this.testClass = testClass;
         this.outputFolder = new File(testConfiguration.getMavenBuildDirectory(), "screenshots");
     }
@@ -88,14 +83,13 @@ public class ScreenshotComparator
      * name. A mismatch is recorded rather than thrown, see {@link #assertAllMatch()}.
      *
      * @param name the name of the reference screenshot, without the extension
-     * @param element the element to take the screenshot of, which must be entirely visible in the viewport
+     * @param element the element to take the screenshot of
      * @return this instance
      * @throws IOException if the screenshot can't be taken or the reference screenshot can't be read
      */
     public ScreenshotComparator compare(String name, WebElement element) throws IOException
     {
-        // The test class name is part of the file names because the screenshots folder is shared by all the tests
-        // (and flattened when archived by the CI).
+        // The test class name is part of the file names because the screenshots folder is shared by all the tests.
         String prefix = this.testClass.getSimpleName() + '-' + name;
         File actualFile = new File(this.outputFolder, prefix + ".png");
         BufferedImage actual = takeScreenshot(element);
@@ -130,24 +124,9 @@ public class ScreenshotComparator
         assertTrue(this.failures.isEmpty(), String.join("\n", this.failures));
     }
 
-    /**
-     * Takes a screenshot of the viewport and crops it to the specified element. We don't take the screenshot of the
-     * element directly because the browser may scroll the page in order to do so, which can change what is displayed
-     * (e.g. floating user interface elements that are hidden or moved, asynchronously, when the page is scrolled).
-     */
     private BufferedImage takeScreenshot(WebElement element) throws IOException
     {
-        BufferedImage screenshot =
-            ImageIO.read(new ByteArrayInputStream(this.driver.getScreenshotAs(OutputType.BYTES)));
-
-        @SuppressWarnings("unchecked")
-        List<Number> rect = (List<Number>) this.driver.executeScript("""
-            const rect = arguments[0].getBoundingClientRect();
-            const left = Math.floor(rect.left), top = Math.floor(rect.top);
-            return [left, top, Math.ceil(rect.right) - left, Math.ceil(rect.bottom) - top];
-            """, element);
-        return screenshot.getSubimage(rect.get(0).intValue(), rect.get(1).intValue(), rect.get(2).intValue(),
-            rect.get(3).intValue());
+        return ImageIO.read(new ByteArrayInputStream(element.getScreenshotAs(OutputType.BYTES)));
     }
 
     private String getReferencePath(String name)

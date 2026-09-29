@@ -93,11 +93,9 @@ function measureFirstLineCenter(element: Element): number {
 }
 
 /**
- * A floating-ui middleware that keeps the block side menu vertically centered on the block's first line, however tall
- * that line renders: its own font size, and whatever margin or padding a skin puts around it. BlockNote's own
- * middleware instead offsets the menu by a fixed amount per block type, which only matches its own styling. Both the
- * first line's position and the menu's own height are measured from the actual render, so this stays correct across
- * skins, themes and block content without replicating anything about how either is styled.
+ * Actually measure the bounding box of the first line of text, and use this to offset the menu so that it is vertically
+ * centered on that line. We must do this because blocknote's default way of positioning the menu is to offset it by a
+ * fixed amount per block type, which only matches its own styling.
  *
  * @returns the middleware to pass to floating-ui, through the side menu's `useFloatingOptions`
  */
@@ -110,7 +108,6 @@ export function centerOnFirstLine(): Middleware {
 
     const blockTop = blockElement.getBoundingClientRect().top;
     const lineCenter = measureFirstLineCenter(blockElement);
-    // The menu is placed with the "left-start" placement, on which the cross axis is the vertical one.
     return {
       crossAxis: lineCenter - blockTop - state.rects.floating.height / 2,
     };

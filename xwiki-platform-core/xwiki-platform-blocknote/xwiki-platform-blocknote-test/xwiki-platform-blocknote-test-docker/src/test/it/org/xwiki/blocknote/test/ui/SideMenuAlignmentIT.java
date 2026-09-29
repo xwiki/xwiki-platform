@@ -54,11 +54,12 @@ import org.xwiki.test.ui.TestUtils;
 class SideMenuAlignmentIT extends AbstractBlockNoteIT
 {
     /**
-     * The name of the image attached to the test page, taken from the test resources.
+     * The name of the image attached to the test page, taken from the test resources. It is tall enough to make it
+     * obvious whether the side menu is centered on it.
      */
-    private static final String IMAGE_NAME = "image.gif";
+    private static final String IMAGE_NAME = "picture.png";
 
-    // We split the blocks into two groups to avoid issues when scrolling the page.
+    // We split the blocks into groups to avoid issues when scrolling the page.
 
     private static final String[] HEADINGS = {"heading1", "heading2", "heading3", "heading4", "heading5", "heading6"};
 
@@ -75,8 +76,7 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
 
         ====== Heading 6 ======""";
 
-    private static final String[] OTHER_BLOCKS = {"paragraph", "wrappingParagraph", "bulletItem", "quote", "divider",
-        "image"};
+    private static final String[] OTHER_BLOCKS = {"paragraph", "wrappingParagraph", "bulletItem", "quote", "divider"};
 
     private static final String OTHER_BLOCKS_CONTENT = """
         A short paragraph.
@@ -89,9 +89,9 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
 
         > A quote
 
-        ----
+        ----""";
 
-        [[image:%s]]""".formatted(IMAGE_NAME);
+    private static final String IMAGE_CONTENT = "[[image:%s]]".formatted(IMAGE_NAME);
 
     @Test
     void sideMenuIsAlignedOnHeadings(TestUtils setup, TestReference testReference,
@@ -108,13 +108,23 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
         TestConfiguration testConfiguration) throws Exception
     {
         setup.deletePage(testReference);
-        setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
         setup.createPage(testReference, OTHER_BLOCKS_CONTENT);
 
+        assertSideMenuIsAligned(editInplace(), setup, testConfiguration, OTHER_BLOCKS);
+    }
+
+    @Test
+    void sideMenuIsAlignedOnImage(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
+        setup.createPage(testReference, IMAGE_CONTENT);
+
         BlockNoteRichTextArea textArea = editInplace();
-        // An image that is still loading would make the screenshots unstable.
+        // An image that is still loading would make the screenshot unstable.
         textArea.waitUntilImageIsLoaded(0);
-        assertSideMenuIsAligned(textArea, setup, testConfiguration, OTHER_BLOCKS);
+        assertSideMenuIsAligned(textArea, setup, testConfiguration, new String[] {"image"});
     }
 
     /**

@@ -34,6 +34,17 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
   // The prefix used by the document tree for the id of the nodes backing a page.
   var documentNodePrefix = 'document:';
 
+  var getLabels = function(tree, node) {
+    var labels = [node.text];
+    // The parents are listed from the closest one to the root of the tree.
+    node.parents.forEach(function(parentId) {
+      if (parentId.indexOf(documentNodePrefix) === 0) {
+        labels.unshift(tree.get_node(parentId).text);
+      }
+    });
+    return labels;
+  };
+
   var enhance = function(element) {
     var picker = $(element);
     if (picker.data('locationPickerMulti')) {
@@ -51,7 +62,7 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     var updatingTree = false;
 
     var getSuggestInput = function() {
-      return select[0] && select[0].selectize;
+      return select[0]?.selectize;
     };
 
     var toLocation = function(tree, node) {
@@ -70,17 +81,6 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
         // The tree already knows the pretty name of each ancestor, so we get a proper hierarchy hint for free.
         labels: getLabels(tree, node)
       };
-    };
-
-    var getLabels = function(tree, node) {
-      var labels = [node.text];
-      // The parents are listed from the closest one to the root of the tree.
-      node.parents.forEach(function(parentId) {
-        if (parentId.indexOf(documentNodePrefix) === 0) {
-          labels.unshift(tree.get_node(parentId).text);
-        }
-      });
-      return labels;
     };
 
     /**
@@ -132,10 +132,10 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
           var node = tree.get_node(flatNode.id);
           var suggestion = toSuggestion(suggestInput, tree, node);
           if (suggestion) {
-            if (suggestInput.items.indexOf(suggestion.value) < 0) {
-              tree.uncheck_node(node);
-            } else {
+            if (suggestInput.items.includes(suggestion.value)) {
               tree.check_node(node);
+            } else {
+              tree.uncheck_node(node);
             }
           }
         });
@@ -221,7 +221,7 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
 
 require(['jquery', 'xwiki-multiLocationPicker', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
-    var elements = $((data && data.elements) || document);
+    var elements = $(data?.elements || document);
     elements.filter('.location-picker-multi').add(elements.find('.location-picker-multi')).multiLocationPicker();
   };
 

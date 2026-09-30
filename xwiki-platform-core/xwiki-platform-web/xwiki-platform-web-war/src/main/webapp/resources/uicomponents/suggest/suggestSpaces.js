@@ -25,6 +25,47 @@
 (function(spaceIcon, webHome) {
   "use strict";
 
+/**
+ * Resolves an entity reference from a string representation of the form "entityType:entityReference".
+ */
+var resolveEntityReference = function(typeAndReference) {
+  if (typeof typeAndReference === 'string') {
+    try {
+      return XWiki.Model.resolve(typeAndReference, null, XWiki.currentDocument.documentReference);
+    } catch (e) {
+      // TODO: Log a warning naming the search scope that couldn't be resolved, together with the other suggest
+      // pickers. See https://jira.xwiki.org/browse/XWIKI-25062
+      return null;
+    }
+  }
+  return typeAndReference;
+};
+
+var getRestSearchURL = function(searchScope) {
+  var spaces = searchScope.getReversedReferenceChain().filter(function(component) {
+    return component.type === XWiki.EntityType.SPACE;
+  }).map(function(component) {
+    return component.name;
+  });
+  var wiki = searchScope.extractReferenceValue(XWiki.EntityType.WIKI);
+  return XWiki.Document.getRestSearchURL('', spaces, wiki);
+};
+
+var resolveSpaceReference = function(localSpaceReference, wiki) {
+  return XWiki.Model.resolve(localSpaceReference, XWiki.EntityType.SPACE, [wiki]);
+};
+
+var removeDuplicates = function(suggestions) {
+  var seen = {};
+  return suggestions.filter(function(suggestion) {
+    if (Object.hasOwn(seen, suggestion.value)) {
+      return false;
+    }
+    seen[suggestion.value] = true;
+    return true;
+  });
+};
+
 define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
   webHome = webHome || 'WebHome';
 
@@ -63,20 +104,6 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
     options.searchScope = resolveEntityReference(options.searchScope || 'wiki:' + XWiki.currentWiki) ||
       resolveEntityReference('wiki:' + XWiki.currentWiki);
     return options;
-  };
-
-  /**
-   * Resolves an entity reference from a string representation of the form "entityType:entityReference".
-   */
-  var resolveEntityReference = function(typeAndReference) {
-    if (typeof typeAndReference === 'string') {
-      try {
-        return XWiki.Model.resolve(typeAndReference, null, XWiki.currentDocument.documentReference);
-      } catch (e) {
-        return null;
-      }
-    }
-    return typeAndReference;
   };
 
   /**
@@ -142,27 +169,13 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
     });
   };
 
-  var getRestSearchURL = function(searchScope) {
-    var spaces = searchScope.getReversedReferenceChain().filter(function(component) {
-      return component.type === XWiki.EntityType.SPACE;
-    }).map(function(component) {
-      return component.name;
-    });
-    var wiki = searchScope.extractReferenceValue(XWiki.EntityType.WIKI);
-    return XWiki.Document.getRestSearchURL('', spaces, wiki);
-  };
-
-  var resolveSpaceReference = function(localSpaceReference, wiki) {
-    return XWiki.Model.resolve(localSpaceReference, XWiki.EntityType.SPACE, [wiki]);
-  };
-
   /**
    * Adapts a page returned by the REST search or by the page resource to the format expected by the Selectize widget.
    * The page is expected to be the home page of a space.
    */
   var processPage = function(options, page) {
     var spaceReference = resolveSpaceReference(page.space, page.wiki);
-    var hierarchy = (page.hierarchy && page.hierarchy.items) || [];
+    var hierarchy = page.hierarchy?.items || [];
     var labels = hierarchy.filter(function(item) {
       return item.type === 'space';
     }).map(function(item) {
@@ -182,7 +195,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
    *   specified the names from the space reference are used instead
    */
   var createSuggestion = function(options, spaceReference, labels) {
-    if (!labels || !labels.length) {
+    if (!labels?.length) {
       labels = spaceReference.getReversedReferenceChain().filter(function(component) {
         return component.type === XWiki.EntityType.SPACE;
       }).map(function(component) {
@@ -201,17 +214,6 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
     };
   };
 
-  var removeDuplicates = function(suggestions) {
-    var seen = {};
-    return suggestions.filter(function(suggestion) {
-      if (Object.hasOwn(seen, suggestion.value)) {
-        return false;
-      }
-      seen[suggestion.value] = true;
-      return true;
-    });
-  };
-
   $.fn.suggestSpaces = function(options) {
     return this.each(function() {
       var actualOptions = $.extend(getSelectizeOptions($(this)), options);
@@ -226,7 +228,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
 
 require(['jquery', 'xwiki-suggestSpaces', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    var container = $(data?.elements || document);
     container.find('.suggest-spaces').suggestSpaces();
   };
 

@@ -168,9 +168,6 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
               isEditable() {
                 return true;
               },
-              hasPendingSave: () => false,
-              requestEdit: () => {},
-              enablePendingEdit: () => false,
               onAnyEvent: () => {},
               ...editBus,
             };

@@ -45,6 +45,8 @@
     </td>
 
     <td v-if="logic.isEditMode()" class="actions-column">
+      <!-- Footnote for frozen entries. -->
+      <sup v-if="isEntryFrozen">2</sup>
       <template v-if="entry._new">
         <button
           type="button"
@@ -107,6 +109,14 @@ export default {
     },
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
+    },
+    // The entries are frozen when the live data is in edit mode.
+    isEntryFrozen() {
+      const frozen = this.logic.isViewFrozen() && !this.entry._new;
+      if (frozen) {
+        this.logic.footnotes.put("2", "livedata.footnotes.frozenEntries");
+      }
+      return frozen;
     },
   },
 

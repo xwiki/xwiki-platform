@@ -50,8 +50,9 @@ export interface LayoutDescriptor {
 
 // @beta
 export interface LiveDataSource {
-    addEntry(source: Source, values: unknown): Promise<void>;
+    addEntry(source: Source, values: unknown): Promise<Values | undefined>;
     getEntries(query: Query): Promise<Data>;
+    getEntry(source: Source, entryId: string, properties: string[]): Promise<Values | undefined>;
     updateEntry(source: Source, entryId: string, values: unknown): Promise<void>;
     updateEntryProperty(source: Source, entryId: string, propertyId: string, value: unknown): Promise<void>;
 }

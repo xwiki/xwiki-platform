@@ -67,6 +67,9 @@ export class LiveDataLogic implements Logic {
 
   private editMode: Ref<boolean> = ref(false);
 
+  // The view should be frozen in edit mode, this stores the current query and the order of the entries.
+  private frozenView?: { query: string; entryIds: string[] };
+
   constructor(
     private readonly liveDataSource: LiveDataSource,
     data: string,
@@ -431,6 +434,9 @@ export class LiveDataLogic implements Logic {
         .then(async (data) => {
           // We need to keep drafts to insert them back in the entries.
           const drafts = this.data.data.entries.filter((entry) => entry._new);
+          data.entries = await this.restoreFrozenView(data.entries);
+          // Refreeze the values (the restore operation might have unfrozen them).
+          this.freezeView(data.entries);
           data.entries.push(...drafts);
 
           this.data.data = data;
@@ -475,6 +481,104 @@ export class LiveDataLogic implements Logic {
           }
         })
     );
+  }
+
+  /**
+   * Freeze the view.
+   * @param entries - the displayed entries to freeze
+   */
+  private freezeView(entries: Values[]) {
+    if (!this.editMode.value) {
+      this.frozenView = undefined;
+      return;
+    }
+    this.frozenView = {
+      query: this.getQuerySerialized(),
+      entryIds: entries
+        .map((entry) => this.getEntryId(entry))
+        .filter((entryId): entryId is string => entryId !== undefined),
+    };
+  }
+
+  /**
+   * Restore the frozen view.
+   * Newly fetched values are passed as parameter and will be used as-is if they are part of the frozen set.
+   * Missing values will be fetched manually.
+   * @param entries - the newly fetched entries
+   * @returns the entries to display
+   */
+  private async restoreFrozenView(entries: Values[]): Promise<Values[]> {
+    if (this.frozenView?.query !== this.getQuerySerialized()) {
+      // If the query changed, the view needs to be unfrozen.
+      return entries;
+    }
+    const fetchedEntries = new Map(
+      entries.map((entry): [string | undefined, Values] => [
+        this.getEntryId(entry),
+        entry,
+      ]),
+    );
+    // The missing entries changed page, we didn't fetch their new state and need to do it manually.
+    const movedEntries = await this.fetchEntriesById(
+      this.frozenView.entryIds.filter(
+        (entryId) => !fetchedEntries.has(entryId),
+      ),
+    );
+    return this.frozenView.entryIds
+      .map(
+        (entryId) => fetchedEntries.get(entryId) ?? movedEntries.get(entryId),
+      )
+      .filter((entry): entry is Values => entry !== undefined);
+  }
+
+  /**
+   * Indicate whether the view is frozen, meaning the entries should keep their position.
+   * @returns true if the view is frozen, false otherwise
+   * @since 18.9.0RC1
+   */
+  isViewFrozen(): boolean {
+    return this.editMode.value && this.frozenView !== undefined;
+  }
+
+  /**
+   * Fetch the entries having the given ids, one by one and independently of the current query, since
+   * they are precisely the entries that the query does not select anymore.
+   * @param entryIds - the ids of the entries to fetch
+   * @returns the fetched entries, by id, without the ones that could not be fetched
+   */
+  private async fetchEntriesById(entryIds: string[]) {
+    const source = this.data.query.source;
+    const idProperty = this.data.meta.entryDescriptor.idProperty || "id";
+    const fetchedEntries = await Promise.all(
+      entryIds.map(
+        async (entryId): Promise<[string, Values | undefined]> => [
+          entryId,
+          // An entry that can't be fetched anymore does not exist anymore.
+          await this.liveDataSource
+            .getEntry(source, entryId, this.data.query.properties)
+            .catch(() => undefined),
+        ],
+      ),
+    );
+    const entries = new Map<string, Values>();
+    fetchedEntries.forEach(([entryId, entry]) => {
+      if (entry) {
+        // The entry is identified by the id it was fetched with, which its values do not necessarily
+        // hold.
+        entries.set(entryId, { ...entry, [idProperty]: entryId });
+      }
+    });
+    return entries;
+  }
+
+  private getQuerySerialized() {
+    const query = this.data.query;
+    return JSON.stringify({
+      filters: query.filters,
+      sort: query.sort,
+      offset: query.offset,
+      limit: query.limit,
+    });
   }
 
   /**
@@ -1537,10 +1641,12 @@ export class LiveDataLogic implements Logic {
 
   enableEditMode() {
     this.editMode.value = true;
+    this.freezeView(this.data.data.entries);
   }
 
   disableEditMode() {
     this.editMode.value = false;
+    this.frozenView = undefined;
   }
 
   isEditMode(): boolean {
@@ -1558,7 +1664,7 @@ export class LiveDataLogic implements Logic {
       const entryActionKeys = this.getEntryActionKeys();
       try {
         // Submit only data properties, filtering out internal flags and action keys.
-        await this.liveDataSource.addEntry(
+        const newEntry = await this.liveDataSource.addEntry(
           this.data.query.source,
           Object.fromEntries(
             Object.entries(this.data.data.entries[newEntryIndex]).filter(
@@ -1568,6 +1674,11 @@ export class LiveDataLogic implements Logic {
         );
         // We remove the draft once it's successfully saved.
         this.data.data.entries.splice(newEntryIndex, 1);
+        // The created entry is added to the frozen view.
+        const newEntryId = newEntry && this.getEntryId(newEntry);
+        if (newEntryId) {
+          this.frozenView?.entryIds.push(newEntryId);
+        }
         await this.updateEntries();
       } catch (e) {
         console.error("Failed to create entry", e);

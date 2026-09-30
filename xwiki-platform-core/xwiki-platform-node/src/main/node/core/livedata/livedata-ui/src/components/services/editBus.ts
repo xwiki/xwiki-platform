@@ -37,8 +37,6 @@ export class EditBusService {
       [key: string]: { editing: boolean; tosave: boolean; content: unknown };
     };
   }>;
-  // This variable stores an edit request made while an edition is in progress.
-  private pendingEdit?: { entryId: string; propertyId: string };
 
   /**
    * Default constructor.
@@ -149,54 +147,6 @@ export class EditBusService {
       }
     }
     return true;
-  }
-
-  /**
-   * Indicates whether a cell has been edited and is in the middle of the save
-   * process. In that state, opening a new cell for edition should be deferred
-   * (see {@link requestEdit}), since a refresh will happen and re-render the
-   * cells.
-   *
-   * @returns true if a save is in progress, false otherwise
-   */
-  public hasPendingSave() {
-    for (const propertyStates of Object.values(this.editStates)) {
-      for (const propertyState of Object.values(propertyStates)) {
-        if (propertyState.tosave) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Stores a request for edition, to perform it later (once all save processes
-   * have completed). See {@link enablePendingEdit} to apply it.
-   *
-   * @param entryId - the entry id of the cell to edit
-   * @param propertyId - the property id of the cell to edit
-   */
-  public requestEdit(entryId: string, propertyId: string) {
-    this.pendingEdit = { entryId, propertyId };
-  }
-
-  /**
-   * Enables a pending edit request if it targets the given cell.
-   *
-   * @param entryId - the entry id of the cell
-   * @param propertyId - the property id of the cell
-   * @returns true if the given cell had a pending edit request, false otherwise
-   */
-  public enablePendingEdit(entryId: string, propertyId: string) {
-    if (
-      this.pendingEdit?.entryId === entryId &&
-      this.pendingEdit?.propertyId === propertyId
-    ) {
-      this.pendingEdit = undefined;
-      return true;
-    }
-    return false;
   }
 
   onAnyEvent(callback: () => unknown) {

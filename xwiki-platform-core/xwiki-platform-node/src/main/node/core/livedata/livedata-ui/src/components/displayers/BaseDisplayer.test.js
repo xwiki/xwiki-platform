@@ -259,55 +259,6 @@ describe("BaseDisplayer.vue", () => {
 
       expect(wrapper.emitted()["update:isView"]).toBeUndefined();
     });
-
-    it("Requests an edit instead of editing when a save is pending", async () => {
-      const requestEdit = fake();
-      const start = fake();
-      const wrapper = initEditModeWrapper({
-        editBus: { hasPendingSave: () => true, requestEdit, start },
-      });
-
-      await cell(wrapper).trigger("focusin");
-
-      // The pending save is going to refresh the table and re-render this cell, so the edit is
-      // only requested and must be resumed by the re-rendered cell.
-      expect(requestEdit.calledOnceWith("entry-1", "color")).toBe(true);
-      expect(start.called).toBe(false);
-      expect(wrapper.emitted()["update:isView"]).toBeUndefined();
-    });
-
-    it("Resumes a requested edit when the cell is re-created", () => {
-      const enablePendingEdit = fake.returns(true);
-      const wrapper = initEditModeWrapper({ editBus: { enablePendingEdit } });
-
-      expect(enablePendingEdit.calledOnceWith("entry-1", "color")).toBe(true);
-      expect(wrapper.emitted()["update:isView"]).toEqual([[false]]);
-    });
-
-    it("Resumes a requested edit when the entry is refreshed", async () => {
-      let pendingEdit = false;
-      const wrapper = initEditModeWrapper({
-        editBus: { enablePendingEdit: () => pendingEdit },
-      });
-
-      expect(wrapper.emitted()["update:isView"]).toBeUndefined();
-
-      // The refresh following a save re-uses the cell as-is and only updates its entry.
-      pendingEdit = true;
-      await wrapper.setProps({ entry: { color: "blue", age: "13" } });
-
-      expect(wrapper.emitted()["update:isView"]).toEqual([[false]]);
-    });
-
-    it("Does not resume an edit outside of edit mode", () => {
-      const enablePendingEdit = fake.returns(true);
-      initWrapper(BaseDisplayer, {
-        logic: { isEditMode: () => false },
-        editBus: { enablePendingEdit },
-      });
-
-      expect(enablePendingEdit.called).toBe(false);
-    });
   });
 
   describe("Ending an edit", () => {

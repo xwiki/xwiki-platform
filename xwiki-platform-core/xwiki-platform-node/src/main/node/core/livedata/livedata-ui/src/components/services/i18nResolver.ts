@@ -93,6 +93,7 @@ export async function i18nResolver(
       "filter.text.label",
       "footnotes.computedTitle",
       "footnotes.propertyNotViewable",
+      "footnotes.frozenEntries",
       "bottombar.noEntries",
       "error.updateEntriesFailed",
       "error.addEntryFailed",

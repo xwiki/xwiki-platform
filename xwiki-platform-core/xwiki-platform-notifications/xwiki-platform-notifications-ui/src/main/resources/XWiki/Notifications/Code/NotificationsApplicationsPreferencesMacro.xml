@@ -1049,15 +1049,19 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
         $type.applicationIcon $escapetool.xml($type.applicationName)
       &lt;/th&gt;
       ## Alert switch
+      #set ($alertToggleLabel = $services.localization.render(
+        'notifications.settings.applications.table.toggle.app.alert.label', [$type.applicationName]))
       &lt;td class="notificationAppCell loading" data-format="alert"&gt;
         &lt;input type="checkbox" class="notificationAppCheckbox hidden"
-          aria-label="$escapetool.xml($services.localization.render('notifications.settings.applications.table.toggle.app.alert.label', [$type.applicationName]))"/&gt;
+          aria-label="$escapetool.xml($alertToggleLabel)"/&gt;
       &lt;/td&gt;
       ## Email switch
       #if ($services.notification.areEmailsEnabled())
+        #set ($emailToggleLabel = $services.localization.render(
+          'notifications.settings.applications.table.toggle.app.email.label', [$type.applicationName]))
         &lt;td class="notificationAppCell loading" data-format="email"&gt;
           &lt;input type="checkbox" class="notificationAppCheckbox hidden"
-            aria-label="$escapetool.xml($services.localization.render('notifications.settings.applications.table.toggle.app.email.label', [$type.applicationName]))"/&gt;
+            aria-label="$escapetool.xml($emailToggleLabel)"/&gt;
         &lt;/td&gt;
       #end
       ## Collapse button

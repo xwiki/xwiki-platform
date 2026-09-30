@@ -35,5 +35,6 @@
     <!-- Sorted alphabetically -->
     <module>xwiki-platform-web-templates</module>
     <module>xwiki-platform-web-war</module>
+    <module>xwiki-platform-web-webjar</module>
   </modules>
 </project>

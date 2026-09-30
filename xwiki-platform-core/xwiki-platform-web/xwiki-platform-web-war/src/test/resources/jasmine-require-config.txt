@@ -12,7 +12,7 @@ paths: {
   'xwiki-tree-finder': '/webjars/finder.min',
   'xwiki-tree': '/webjars/tree.min',
 
-  'xwiki-entityReference': 'uicomponents/model/entityReference.min'
+  'xwiki-entityReference': '/webjars/xwiki-platform-web-webjar/entityReference.min'
 },
 map: {
   // '*' means all modules will get 'jQueryNoConflict' for their 'jquery' dependency.
@@ -29,8 +29,5 @@ shim: {
   'prototype': {
     exports: '$'
   },
-  'bootstrap': ['jquery'],
-  'xwiki-entityReference': {
-    exports: 'XWiki'
-  }
+  'bootstrap': ['jquery']
 }

@@ -31,6 +31,7 @@ getContent: () => BlockType[];
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "instant-change": () => any;
 "debounced-change": (content: BlockType[]) => any;
+"local-instant-change": () => any;
 }, string, PublicProps, Readonly<{
 editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
@@ -43,6 +44,7 @@ depsContainer: Container;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
 "onDebounced-change"?: ((content: BlockType[]) => any) | undefined;
+"onLocal-instant-change"?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
 'link-modal-container': HTMLDivElement;

@@ -43,6 +43,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * Migration in charge of re-encoding legacy passwords to enhance their security.
  *
  * @version $Id$
+ * @since 18.8.0RC1
  */
 @Component
 @Singleton

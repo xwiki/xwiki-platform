@@ -8053,19 +8053,26 @@ public class XWiki implements EventListener
             // A new mandatory document initializer has been installed
             case ComponentDescriptorAddedEvent componentDescriptorAddedEvent ->
                 onMandatoryDocumentInitializerAdded(componentDescriptorAddedEvent, (ComponentManager) source);
-            // Document modifications
+            // A property of the wiki preferences has been added, updated or deleted
+            case XObjectPropertyEvent xObjectPropertyEvent ->
+                onPreferencePropertyModified(xObjectPropertyEvent, (XWikiDocument) source);
             case null, default -> {
-                XWikiDocument doc = (XWikiDocument) source;
-
-                if (event instanceof XObjectPropertyEvent xObjectPropertyEvent) {
-                    EntityReference reference = xObjectPropertyEvent.getReference();
-                    String modifiedProperty = reference.getName();
-                    if (BACKLINKS.equals(modifiedProperty)) {
-                        this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent())
-                            .getIntValue(BACKLINKS, getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
-                    }
-                }
+                // Nothing to do: getEvents() registers no other event, and a null one carries nothing to handle.
             }
+        }
+    }
+
+    /**
+     * @param event the event describing the modified wiki preference property
+     * @param document the document holding the modified object
+     */
+    private void onPreferencePropertyModified(XObjectPropertyEvent event, XWikiDocument document)
+    {
+        EntityReference reference = event.getReference();
+
+        if (BACKLINKS.equals(reference.getName())) {
+            this.hasBacklinks = document.getXObject((ObjectReference) reference.getParent()).getIntValue(BACKLINKS,
+                getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
         }
     }
 

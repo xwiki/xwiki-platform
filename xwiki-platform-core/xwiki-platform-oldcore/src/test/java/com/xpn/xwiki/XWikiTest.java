@@ -691,6 +691,43 @@ class XWikiTest
     }
 
     /**
+     * Check that a user cannot be validated with an empty validation key, since validating a user empties the stored
+     * validation key.
+     *
+     * @throws Exception when any exception occurs inside XWiki
+     */
+    @Test
+    void validateUserWithEmptyValidationKey() throws Exception
+    {
+        XWikiContext context = this.oldcore.getXWikiContext();
+        context.setLanguage("en");
+
+        // Prepare the request
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(request.getParameter("xwikiname")).thenReturn("TestUser");
+        when(request.getParameter("validkey")).thenReturn("plaintextkey");
+        context.setRequest(request);
+
+        // Prepare the user profile
+        XWikiDocument testUser =
+            new XWikiDocument(new DocumentReference(context.getWikiId(), "XWiki", "TestUser"));
+        BaseObject userObject = (BaseObject) this.xwiki.getUserClass(context).newObject(context);
+        userObject.setPasswordValue("validkey", "plaintextkey");
+        testUser.addObject("XWiki.XWikiUsers", userObject);
+        this.xwiki.saveDocument(testUser, context);
+
+        // The first validation succeeds and empties the stored validation key.
+        assertEquals(0, this.xwiki.validateUser(false, context));
+        assertEquals("",
+            this.xwiki.getDocument(testUser, context).getObject("XWiki.XWikiUsers").getStringValue("validkey"));
+
+        // An empty validation key must not match the emptied stored one.
+        when(request.getParameter("validkey")).thenReturn("");
+
+        assertEquals(-1, this.xwiki.validateUser(false, context));
+    }
+
+    /**
      * Tests that XWiki.XWikiPreferences page is not saved each time XWiki is initialized.
      *
      * @throws Exception when any exception occurs inside XWiki

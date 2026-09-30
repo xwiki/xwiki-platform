@@ -58,6 +58,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.xar.XarEntry;
@@ -129,6 +130,10 @@ public class Packager
     @Inject
     @Named(XarExtensionHandler.TYPE)
     private InstalledExtensionRepository installedXARs;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userResolver;
 
     private XarInstalledExtensionRepository getXarInstalledExtensionRepository()
     {
@@ -402,9 +407,20 @@ public class Packager
     }
 
     /**
-     * @since 9.3RC1
+     * Reset the passed document, which belongs to an extension, to its standard version. The new version of the
+     * document is authored by the context user.
+     *
+     * @param reference the reference of the document to reset
+     * @throws IOException when failing to read the standard version of the document
+     * @throws XarException when failing to parse the XAR of the extension
+     * @throws XWikiException when failing to load or save the document
+     * @throws XarExtensionException when the document cannot be found in any installed extension
+     * @since 16.10.19
+     * @since 17.10.14
+     * @since 18.4.6
+     * @since 18.9.0RC1
      */
-    public void reset(DocumentReference reference, DocumentReference authorReference)
+    public void resetWithContextUser(DocumentReference reference)
         throws IOException, XarException, XWikiException, XarExtensionException
     {
         Collection<XarInstalledExtension> installedExtensions =
@@ -424,17 +440,16 @@ public class Packager
                 XWikiDocument databaseDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
 
                 // Override data of database document with extension document
-                databaseDocument.apply(document, true);
+                databaseDocument.apply(document);
                 // Make sure new version will have the right author
-                databaseDocument.setAuthorReference(authorReference);
-                databaseDocument.setContentAuthorReference(authorReference);
-                // Force generating new version
+                databaseDocument.setAuthor(this.userResolver.resolve(xcontext.getUserReference()));
+                // Force generating a new version, even if there is no change
                 databaseDocument.setMetaDataDirty(true);
                 databaseDocument.setContentDirty(true);
 
                 // Save
                 xcontext.getWiki().saveDocument(databaseDocument, "Reset document from extension [" + extension + "]",
-                    xcontext);
+                    false, true, xcontext);
             } else {
                 throw new XarExtensionException("Can't find any document with reference [" + documentReference
                     + "] in extension [" + extension.getId() + "]");

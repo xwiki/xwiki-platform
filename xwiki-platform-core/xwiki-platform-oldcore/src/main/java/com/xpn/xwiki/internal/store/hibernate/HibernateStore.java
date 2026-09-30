@@ -125,6 +125,15 @@ public class HibernateStore implements Disposable, Initializable
      */
     private static final String PROPERTY_TIMEZONE_VARIABLE = "${timezone}";
 
+    /**
+     * The transaction isolation level to use when the Hibernate configuration doesn't set one. Loading a document
+     * resolves the XClass of each of its objects in a nested read executed inside the transaction opened for that
+     * load. At {@code REPEATABLE READ} (the InnoDB default, so MySQL and MariaDB) such a read is answered from the
+     * snapshot taken when the load started, which makes an XClass committed by another thread in the meantime
+     * invisible, and the document cache then keeps that "does not exist" verdict with no expiry.
+     */
+    private static final String DEFAULT_ISOLATION = String.valueOf(Connection.TRANSACTION_READ_COMMITTED);
+
     @Inject
     private Logger logger;
 
@@ -236,6 +245,7 @@ public class HibernateStore implements Disposable, Initializable
         // For retro compatibility reasons we have to create an old Configuration object since it's exposed in the API
         this.configuration = new HibernateStoreConfiguration(this.configurationURL);
         replaceVariables(this.configuration);
+        setDefaultIsolation(this.configuration);
     }
 
     private void disposeSessionFactory()
@@ -265,6 +275,8 @@ public class HibernateStore implements Disposable, Initializable
         LoadedConfig baseConfiguration = configLoader.loadConfigXmlUrl(this.configurationURL);
         // Resolve some variables
         replaceVariables(baseConfiguration);
+        // Make sure a transaction isolation level is set, whatever the database defaults to
+        setDefaultIsolation(baseConfiguration);
 
         StandardServiceRegistryBuilder standardRegistryBuilder =
             new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);
@@ -345,6 +357,36 @@ public class HibernateStore implements Disposable, Initializable
             // Set the new URL
             values.put(org.hibernate.cfg.AvailableSettings.URL, newURL);
             this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
+        }
+    }
+
+    /**
+     * Set the transaction isolation level to {@link #DEFAULT_ISOLATION} unless the configuration already contains one,
+     * so that the store doesn't silently inherit the isolation level the database happens to default to.
+     *
+     * @param hibernateConfiguration the Hibernate configuration to complete
+     */
+    private void setDefaultIsolation(Configuration hibernateConfiguration)
+    {
+        if (StringUtils.isBlank(hibernateConfiguration.getProperty(org.hibernate.cfg.AvailableSettings.ISOLATION))) {
+            hibernateConfiguration.setProperty(org.hibernate.cfg.AvailableSettings.ISOLATION, DEFAULT_ISOLATION);
+        }
+    }
+
+    /**
+     * Set the transaction isolation level to {@link #DEFAULT_ISOLATION} unless the configuration already contains one,
+     * so that the store doesn't silently inherit the isolation level the database happens to default to.
+     *
+     * @param hibernateConfiguration the Hibernate configuration to complete
+     */
+    private void setDefaultIsolation(LoadedConfig hibernateConfiguration)
+    {
+        Map values = hibernateConfiguration.getConfigurationValues();
+        Object isolation = values.get(org.hibernate.cfg.AvailableSettings.ISOLATION);
+        if (isolation == null || StringUtils.isBlank(isolation.toString())) {
+            values.put(org.hibernate.cfg.AvailableSettings.ISOLATION, DEFAULT_ISOLATION);
+            this.logger.debug("No Hibernate transaction isolation level configured, defaulting to [{}]",
+                DEFAULT_ISOLATION);
         }
     }
 

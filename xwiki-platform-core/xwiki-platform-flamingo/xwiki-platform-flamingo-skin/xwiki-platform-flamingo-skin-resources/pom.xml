@@ -130,6 +130,12 @@
       <artifactId>xwiki-platform-bootstrap</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Provides the entity reference JavaScript API loaded by javascript.vm. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web-webjar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>Keypress</artifactId>

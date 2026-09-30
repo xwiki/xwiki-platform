@@ -40,9 +40,11 @@
   "dependencies": {
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-autosave-api": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
+    "y-protocols": "catalog:",
     "yjs": "catalog:"
   },
   "peerDependencies": {

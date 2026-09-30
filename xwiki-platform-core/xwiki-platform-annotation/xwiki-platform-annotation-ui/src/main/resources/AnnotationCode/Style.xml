@@ -39,42 +39,6 @@
   <enforceRequiredRights>true</enforceRequiredRights>
   <content>
 </content>
-  <attachment>
-    <filename>notesmall.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABmJLR0QA/wD/AP+gvaeTAAAApklEQVR4Xn3MMQrCMBTG8XfNnEBv4KKXEC/gIigiDoo4aKGgBIeCQ0UoVMRSKB1EEboUPvMloEMgw58XXn48qbSK6qSLZzrAOx/iU4wZ33bHPxopDwpAFYxGHrGBbRaMRm57A5tjMBrJtga+FsFo5LI2sB4FoxE9Uai067pRQNn3Oi8NnPXEYjQadt47XsncQMBFxJD7naY/+MdF7Mp3CulK8RoPRF+Jn0pthmUzfAAAAABJRU5ErkJggg==</content>
-    <filesize>241</filesize>
-  </attachment>
-  <attachment>
-    <filename>notesmallblue.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAAUVBMVEX///9Bhr+qdwAuYItnnswuYIs9f7g2cKGVu9xzpdBMjMM7erBBhr84dak/hL4xZ5RYlMejxOB0ptBtoc5/rdSdwN4za5o3cqUvYo46ea+LtdgK7jyvAAAABHRSTlMAvwC/Jk9xqgAAAAFiS0dEAIgFHUgAAABDSURBVAgdLcEHEoAgDATAQ1PoYC//f6gyk1242CkE6tGhLqZCDiNI3iSU1xTobhSc87UOJyb2vA0NADMNN34s8mibPzGkBTZkbmtqAAAAAElFTkSuQmCC</content>
-    <filesize>246</filesize>
-  </attachment>
-  <attachment>
-    <filename>notesmallorange.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABmJLR0QA/wD/AP+gvaeTAAAAo0lEQVR4Xn3PoQoCQRRG4R+bzSo+wTaDz+BL+BDKlglbDKJF26JYjYpZQWTRpsliFMuCbavxyL3FsDDhY4aZw3BHrHsFmz7sB3BM4TIxtvczu7NGrLrweURZI/IEyluUNWLRgdcpyhoxa8FzF2WNGDfgvoyyRu+h7FeOSROu05pvJrQNsthn8fWc1VRBCJzHhsOopkw9/PMwTxzzts9WBX+g+AES6zbKoIphxwAAAABJRU5ErkJggg==</content>
-    <filesize>238</filesize>
-  </attachment>
-  <attachment>
-    <filename>notesmallred.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABmJLR0QA/wD/AP+gvaeTAAAAnUlEQVQYV2O4x8qw/xsTx/8/Sm7//3j0/P+TtAmCQWygGEgOpIbhFgPD/49fn+PFIDUMV4DE79Pv8GKQGoZzQOLPmvt4MUgNwwmQie378GKQGoYDIIXx3XgxSA3DKiAB9BUYHwFpsvTGwLvACssZwIr/rHv4H0T/UpPBwFtACv//h2CQIhD+r8qIgdchK4QpvgbFZ4AY5DaQaUDx/QA3/AflhUcmKgAAAABJRU5ErkJggg==</content>
-    <filesize>232</filesize>
-  </attachment>
   <object>
     <name>AnnotationCode.Style</name>
     <number>0</number>
@@ -311,6 +275,24 @@ mark.annotation:not(.annotation-highlight) {
   color: unset;
 }
 
+.annotation .annotation-bubble-tools .btn, .annotation .annotation-bubble-close .btn {
+  background: transparent;
+  border: none;
+  /* Align first button with the annotation text. */
+  margin-left: calc(-1 * var(--padding-base-horizontal));
+
+  /* No background to cast a shadow on, drop it (like .btn-link). */
+  &amp;:active, &amp;.active {
+    box-shadow: none;
+  }
+}
+
+/* The Delete action is a form (so it submits as a real POST, not a link), but it should still sit inline with
+   its sibling buttons rather than starting a new line, like a form's default block display would. */
+.annotation .annotation-bubble-tools .delete-form {
+  display: inline-block;
+}
+
 /* Annotation boxes */
 .annotation-bubble {
   background: $theme.backgroundSecondaryColor;
@@ -371,25 +353,6 @@ mark.annotation:not(.annotation-highlight) {
   grid-template-columns: min-content auto min-content;
   width: 100%;
 
-  .annotation-bubble-tools .btn, .annotation-bubble-close .btn {
-    --padding-base-horizontal: 12px;
-    background: transparent;
-    border: none;
-    /* Align first button with the annotation text. */
-    margin-left: calc(-1 * var(--padding-base-horizontal));
-
-    /* No background to cast a shadow on, drop it (like .btn-link). */
-    &amp;:active, &amp;.active {
-      box-shadow: none;
-    }
-  }
-
-  /* The Delete action is a form (so it submits as a real POST, not a link), but it should still sit inline with
-     its sibling buttons rather than starting a new line, like a form's default block display would. */
-  .annotation-bubble-tools .delete-form {
-    display: inline-block;
-  }
-
   .annotation-bubble-avatar {
     grid-area: 1 / 1 / 3 / 2;
   }
@@ -422,27 +385,6 @@ mark.annotation:not(.annotation-highlight) {
   width: 99%;
 }
 
-.annotationAvatar {
-  float: left;
-  width: 55px;
-  text-align: left;
-}
-.annotationAvatar img {
-  max-width: 50px;
-  max-height: 50px;
-}
-
-#allAnnotations .annotationAvatar  {
-  padding-top: 5px;
-}
-
-#allAnnotations .annotationHeader, #allAnnotations .annotationContent {
-  margin-left: 60px;
-}
-#allAnnotations .annotationTitle * {
-  line-height: 1.4em;
-}
-
 .annotation-bubble-header {
   display: flex;
   gap: .5em;
@@ -452,9 +394,6 @@ mark.annotation:not(.annotation-highlight) {
   padding-top: 3px;
   margin-right: 51px;
   display: block;
-}
-.annotation-bubble .annotationContent {
-  clear: both;
 }
 
 .annotation-box .links {
@@ -470,23 +409,26 @@ mark.annotation:not(.annotation-highlight) {
 /* Annotations list (extra-tab) */
 #allAnnotations .annotation {
   margin: 0 0 8px;
+  /* The gutter a comment reserves for its avatar, see .reply in comments.css. */
+  padding-left: 60px;
+  /* Keep the floated avatar inside its own annotation. */
+  display: flow-root;
+
+  /* Same values as .commentavatar in comments.css: a 50px avatar pulled into the 60px gutter, centered in it, and
+     nudged down to sit level with the author name. */
+  .annotation-bubble-avatar {
+    float: left;
+    margin-left: -60px;
+    padding-top: 5px;
+    text-align: center;
+    width: 50px;
+  }
 }
+
 .annotationText {
   padding: 0 36px 0 0;
   text-align: justify;
 }
-#allAnnotations .UPDATED .annotationText {
-  background-image: #attImgURL('notesmallorange');
-}
-#allAnnotations .ALTERED annotationText {
-  background-image: #attImgURL('notesmallred');
-}
-
-/* General display of an annotation */
-.annotationHeader{
-  padding: 2px 0px 6px;
-}
-
 .annotatedText {
   font-style: italic;
   font-size: 1.2em;
@@ -508,25 +450,9 @@ mark.annotation:not(.annotation-highlight) {
   }
 }
 
-#allAnnotations .annotationHeader:hover {
-  background-color: $theme.highlightColor;
-}
 .annotationDate {
   color: $theme.textSecondaryColor;
   font-size: 80%;
-}
-.annotationTools {
-  display: block;
-  float: right;
-  margin-top: -1.2em;
-}
-
-.annotationTools .reply {
-  padding: 1px 3px;
-}
-
-.annotationComment {
-  padding: 4px 0;
 }
 
 dt.annotationLabel label {
@@ -534,18 +460,26 @@ dt.annotationLabel label {
   font-variant: small-caps;
 }
 
-.annotationOriginalSelection {
-  color: $theme.textPrimaryColor;
-  font-size: 80%;
+/* Quieter than the selection the annotation points at now, without the decorative quote of the live one. */
+.originalAnnotatedText {
+  color: var(--text-muted);
+  /* Barely smaller, enough to rank it below the live selection without making it hard to read. */
+  font-size: .95em;
+  /* Separate it from the message introducing it. */
+  padding-top: .3em;
+
+  &amp;:before {
+    content: none;
+  }
 }
 
-.annotationContent dt {
+.annotation-bubble-content dt {
   margin: 0;
 }
-.annotationContent dd, .annotationContent blockquote {
+.annotation-bubble-content dd, .annotation-bubble-content blockquote {
   margin-bottom: 10px;
 }
-.annotationContent blockquote {
+.annotation-bubble-content blockquote {
   padding-left: 12px;
 }</code>
     </property>

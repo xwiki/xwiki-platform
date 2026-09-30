@@ -82,6 +82,26 @@ public class BlockNoteEditor extends BaseElement
     }
 
     /**
+     * Overwrite the interval between two consecutive auto-saves, so that the tests don't have to wait for the default
+     * one (a minute). The value is read from the edit form each time a save is scheduled, so this can be called after
+     * the editor has loaded.
+     *
+     * @param seconds the number of seconds between two consecutive auto-saves
+     * @return this editor instance
+     * @since 18.8.0RC1
+     */
+    public BlockNoteEditor setAutoSaveInterval(int seconds)
+    {
+        // The editor is inside the edit form in standalone edit mode, but only associated with it, through the HTML
+        // form attribute, when editing in-place. Let the browser resolve the form the editor submits to, rather than
+        // looking for an ancestor form, which exists only in standalone edit mode.
+        WebElement valueInput = this.container.findElement(By.cssSelector("input[name='" + this.name + "']"));
+        getDriver().executeScript("arguments[0].form.dataset.autoSaveInterval = arguments[1];", valueInput,
+            String.valueOf(seconds));
+        return this;
+    }
+
+    /**
      * @return the rich text area of this editor
      */
     public BlockNoteRichTextArea getRichTextArea()

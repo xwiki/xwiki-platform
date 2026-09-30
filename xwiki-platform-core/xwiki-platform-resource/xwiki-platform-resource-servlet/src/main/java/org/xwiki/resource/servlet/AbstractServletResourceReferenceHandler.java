@@ -169,14 +169,12 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
     private void serveResource(R resourceReference, InputStream rawResourceStream)
         throws ResourceReferenceHandlerException
     {
-        InputStream resourceStream = rawResourceStream;
-
-        // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
-        // content type without affecting the stream (Tika may need to read a few bytes from the start of the
-        // stream, in which case it will mark & reset the stream).
-        if (!resourceStream.markSupported()) {
-            resourceStream = new BufferedInputStream(resourceStream);
-        }
+        // Detecting the content type consumes the beginning of the resource: Tika reads ahead into a buffer of its
+        // own and restores only the position of the stream it buffered, leaving the stream it was given advanced. A
+        // BufferedInputStream keeps those bytes in its own buffer and replays them, so read the resource through one
+        // and serve that same wrapper, otherwise the client gets the resource without its first bytes (and an empty
+        // response for a resource smaller than Tika's read-ahead).
+        InputStream resourceStream = new BufferedInputStream(rawResourceStream);
 
         try {
             Response response = this.container.getResponse();

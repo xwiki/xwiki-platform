@@ -106,7 +106,6 @@
     "figure-caption-font-size": "90%",
     "figure-caption-color": {"css": "var(--text-muted)", "less": "@text-muted"},
     "login-form-max-width": "450px",
-    "figure-caption-margin-bottom": "10px",
     "target-size-minimum": "24px",
     "target-size-recommended": "44px",
     "breadcrumb-link-color": {"css": "var(--link-color)", "less": "@link-color"},

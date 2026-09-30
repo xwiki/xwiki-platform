@@ -58,6 +58,10 @@
   .jstree-anchor {
     /* The node label can be split on multiple lines. */
     height: auto;
+
+    /* A page name is often a single unbroken word, which offers no place to wrap. Break inside it when it would
+      otherwise be wider than the container. */
+    overflow-wrap: break-word;
   }
 }
 

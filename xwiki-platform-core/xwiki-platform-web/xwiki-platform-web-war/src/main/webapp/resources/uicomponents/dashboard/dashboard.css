@@ -36,7 +36,8 @@
 }
 
 .gadget .gadget-content {
-  overflow: hidden;
+  /* Keep the content within the gadget, while leaving a way to reach whatever still does not fit. */
+  overflow: auto;
 }
 
 .panels .gadget .gadget-content, .dashboard-edit .gadget .gadget-content {

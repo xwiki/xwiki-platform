@@ -72,6 +72,9 @@ public class XWikiActionRule implements XWikiNotificationRule
         // Nothing to do, this rule only reacts to actions.
     }
 
+    // Catching Throwable is deliberate here: the notification target is third-party code and a broken one must not
+    // prevent the action from completing.
+    @SuppressWarnings("java:S1181")
     public void verify(XWikiDocument doc, String action, XWikiContext context)
     {
         if (!isPostverify())
@@ -85,6 +88,9 @@ public class XWikiActionRule implements XWikiNotificationRule
         }
     }
 
+    // Catching Throwable is deliberate here: the notification target is third-party code and a broken one must not
+    // prevent the action from completing.
+    @SuppressWarnings("java:S1181")
     public void preverify(XWikiDocument doc, String action, XWikiContext context)
     {
         if (!isPreverify())

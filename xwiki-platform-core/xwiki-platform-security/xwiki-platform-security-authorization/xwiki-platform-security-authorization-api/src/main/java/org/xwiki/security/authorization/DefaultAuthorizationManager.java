@@ -218,6 +218,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     }
 
     @Override
+    // Catching Throwable is deliberate here: the registration falls back to an equivalent right already registered and
+    // rethrows otherwise, so nothing is silently recovered from.
+    @SuppressWarnings("java:S1181")
     public Right register(RightDescription rightDescription, Set<Right> impliedByRights)
         throws UnableToRegisterRightException
     {

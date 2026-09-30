@@ -34,6 +34,9 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiPageNotification.class);
 
     @Override
+    // Catching Throwable is deliberate here: the notification is a wiki page executed as Groovy, i.e. user-provided
+    // code, and it must not be able to break the action it is notified about.
+    @SuppressWarnings("java:S1181")
     public void notify(XWikiNotificationRule rule, XWikiDocument doc, String action, XWikiContext context)
     {
         try {
@@ -58,6 +61,9 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface
         }
     }
 
+    // Catching Throwable is deliberate here: the notification is a wiki page executed as Groovy, i.e. user-provided
+    // code, and it must not be able to break the action it is notified about.
+    @SuppressWarnings("java:S1181")
     protected void notifyPage(String page, XWikiNotificationRule rule, XWikiDocument doc, String action,
         XWikiContext context)
     {

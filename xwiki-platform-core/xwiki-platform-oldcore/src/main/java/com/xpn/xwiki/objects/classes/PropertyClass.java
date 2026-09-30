@@ -1056,6 +1056,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      *         main wiki, or {@code template:displayer_boolean.vm} if a template on the filesystem or in the current
      *         skin exists.
      */
+    // Catching Throwable is deliberate here: a broken custom displayer must not break the display of the property, the
+    // code falls back to having no custom displayer.
+    @SuppressWarnings("java:S1181")
     protected String getDefaultCustomDisplayer(String propertyClassName, XWikiContext context)
     {
         LOGGER.debug("Looking up default custom displayer for property class name [{}]", propertyClassName);

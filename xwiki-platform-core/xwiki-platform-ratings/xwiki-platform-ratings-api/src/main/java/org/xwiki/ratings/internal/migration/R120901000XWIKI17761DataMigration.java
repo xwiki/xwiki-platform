@@ -282,6 +282,9 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
         }
     }
 
+    // Catching Throwable is deliberate here, as the comment in the catch block states: the Solr client raises runtime
+    // errors for client-side issues and this code only wants to know whether the core is reachable.
+    @SuppressWarnings("java:S1181")
     private void handleLikeMigration() throws SolrException
     {
         // We only migrate like once, if we are performing the migration on main wiki.

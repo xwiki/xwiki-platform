@@ -17,31 +17,19 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-## Automatically backport merged pull requests that are labelled with a label containing "backport"
-## using https://github.com/tibdex/backport.
-name: Backport
+## Automatically backport merged pull requests that are labelled with a label containing "backport".
+## Everything but the trigger lives in the shared workflow, which every XWiki repository calls, so
+## that a change to how backporting works is made once. See https://github.com/xwiki/.github
+name: Automatic backport action
+
 on:
   pull_request_target:
-    types:
-      - closed
-      - labeled
+    types: ["labeled", "closed"]
 
 jobs:
   backport:
-    name: Backport
-    runs-on: ubuntu-latest
-    # Only react to merged PRs for security reasons.
-    # See https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_target.
-    if: >
-      github.event.pull_request.merged
-      && (
-        github.event.action == 'closed'
-        || (
-          github.event.action == 'labeled'
-          && contains(github.event.label.name, 'backport')
-        )
-      )
-    steps:
-      - uses: tibdex/backport@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+    ## Referenced by branch and not by commit hash, on purpose: pinning would mean a pull request in
+    ## every repository for every change to the shared workflow, which is the duplication this
+    ## indirection removes. What pinning protects against, a third party repointing the ref under
+    ## us, does not apply to a repository the XWiki committers own themselves.
+    uses: xwiki/.github/.github/workflows/backport.yml@master

@@ -92,6 +92,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -293,33 +294,63 @@ class DefaultReferenceUpdaterTest
 
     private DBListClass newDBListClass(String name, String idField, boolean multiSelect)
     {
+        return newDBListClass(name, null, null, idField, null, multiSelect);
+    }
+
+    private DBListClass newDBListClass(String name, String sql, String classname, String idField, String valueField,
+        boolean multiSelect)
+    {
         DBListClass dbListClass = new DBListClass();
         dbListClass.setName(name);
-        dbListClass.setIdField(idField);
+        if (sql != null) {
+            dbListClass.setSql(sql);
+        }
+        if (classname != null) {
+            dbListClass.setClassname(classname);
+        }
+        if (idField != null) {
+            dbListClass.setIdField(idField);
+        }
+        if (valueField != null) {
+            dbListClass.setValueField(valueField);
+        }
         dbListClass.setMultiSelect(multiSelect);
 
         return dbListClass;
     }
 
-    /**
-     * Add to the passed document an xobject with a single select and a multi select database list properties holding
-     * document full names, and a single select database list property holding identifiers.
-     */
     private void setDBLists(XWikiDocument document, StringProperty singleProperty,
         StringListProperty multiProperty, StringProperty idProperty)
+    {
+        setDBLists(document, Map.of("single", singleProperty, "multi", multiProperty, "id", idProperty));
+    }
+
+    /**
+     * Add to the passed document an xobject with database list properties of every configuration, holding the passed
+     * fields. The properties holding document full names are:
+     * <ul>
+     * <li>{@code single} and {@code multi}, with {@code doc.fullName} as id field;</li>
+     * <li>{@code value}, with {@code doc.fullName} as value field and no id field;</li>
+     * <li>{@code classname}, with only a class name.</li>
+     * </ul>
+     * The properties not holding document full names are {@code id}, with {@code id} as id field, and {@code sql},
+     * with a custom query.
+     */
+    private void setDBLists(XWikiDocument document, Map<String, ? extends PropertyInterface> fields)
     {
         BaseClass baseClass = mock(BaseClass.class);
         when(baseClass.getProperties()).thenReturn(new Object[] {
             newDBListClass("single", "doc.fullName", false),
             newDBListClass("multi", "doc.fullName", true),
-            newDBListClass("id", "id", false)
+            newDBListClass("id", "id", false),
+            newDBListClass("value", null, null, null, "doc.fullName", false),
+            newDBListClass("classname", null, "Space.SomeClass", null, null, false),
+            newDBListClass("sql", "select doc.fullName from XWikiDocument doc", null, null, null, false)
         });
 
         BaseObject baseObject = mock(BaseObject.class);
         when(baseObject.getXClass(any())).thenReturn(baseClass);
-        when(baseObject.getField("single")).thenReturn(singleProperty);
-        when(baseObject.getField("multi")).thenReturn(multiProperty);
-        when(baseObject.getField("id")).thenReturn(idProperty);
+        fields.forEach((name, field) -> when(baseObject.getField(name)).thenReturn(field));
 
         DocumentReference documentReference = document.getDocumentReference();
         when(document.getXObjects()).thenReturn(Map.of(documentReference, List.of(baseObject)));
@@ -350,7 +381,11 @@ class DefaultReferenceUpdaterTest
         StringProperty singleProperty = newStringProperty("A.B");
         StringListProperty multiProperty = newStringListProperty("C.D", "A.B", "wiki:A.B", "otherwiki:A.B");
         StringProperty idProperty = newStringProperty("A.B");
-        setDBLists(document, singleProperty, multiProperty, idProperty);
+        StringProperty valueProperty = newStringProperty("A.B");
+        StringProperty classnameProperty = newStringProperty("A.B");
+        StringProperty sqlProperty = newStringProperty("A.B");
+        setDBLists(document, Map.of("single", singleProperty, "multi", multiProperty, "id", idProperty, "value",
+            valueProperty, "classname", classnameProperty, "sql", sqlProperty));
 
         this.updater.update(documentReference, new DocumentReference("wiki", "A", "B"),
             new DocumentReference("wiki", "X", "Y"));
@@ -358,6 +393,9 @@ class DefaultReferenceUpdaterTest
         assertEquals("X.Y", singleProperty.getValue());
         assertEquals(List.of("C.D", "X.Y", "X.Y", "otherwiki:A.B"), multiProperty.getList());
         assertEquals("A.B", idProperty.getValue());
+        assertEquals("X.Y", valueProperty.getValue());
+        assertEquals("X.Y", classnameProperty.getValue());
+        assertEquals("A.B", sqlProperty.getValue());
         verifyDocumentSave(document, false);
     }
 
@@ -384,7 +422,7 @@ class DefaultReferenceUpdaterTest
     @Test
     void updateDBListValuesInRelativeMode() throws Exception
     {
-        DocumentReference newReference = new DocumentReference("otherwiki", "X", "Y");
+        DocumentReference newReference = new DocumentReference("wiki", "X", "Y");
         XWikiDocument document = mockDocument(newReference);
 
         StringProperty singleProperty = newStringProperty("A.B");
@@ -397,7 +435,7 @@ class DefaultReferenceUpdaterTest
         assertEquals("A.B", singleProperty.getValue());
         assertEquals(List.of("A.B", "C.D"), multiProperty.getList());
         verify(this.xcontext.getWiki(), never()).saveDocument(any(), any(), anyBoolean(), any());
-        assertEquals("No relative links to update in [otherwiki:X.Y].", this.logCapture.getMessage(0));
+        assertEquals("No relative links to update in [wiki:X.Y].", this.logCapture.getMessage(0));
     }
 
     @Test

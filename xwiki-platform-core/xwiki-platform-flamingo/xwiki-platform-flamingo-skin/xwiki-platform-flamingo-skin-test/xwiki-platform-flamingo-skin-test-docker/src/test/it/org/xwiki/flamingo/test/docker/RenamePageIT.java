@@ -804,13 +804,16 @@ class RenamePageIT
         String p2Reference = testUtils.serializeReference(p2);
         testUtils.createPage(p2, "Some P2 content", "titleP2");
 
-        // Add to P2 an object holding the reference of P1 in a database list property.
+        // Add to P4 an object holding the reference of P1 in a database list property. The content of P4 doesn't link
+        // to P1, so the object is the only reason for P4 to be a backlink of P1.
         DocumentReference dbListClassReference = new DocumentReference("DBListClass", testSpaceReference);
         testUtils.createPage(dbListClassReference, "", "DBListClass");
         testUtils.addClassProperty(dbListClassReference, "page", "DBList");
         testUtils.updateClassProperty(dbListClassReference, "page_idField", "doc.fullName");
         String dbListClassName = testUtils.serializeLocalReference(dbListClassReference);
-        Object dbListObject = testUtils.rest().object(p2, dbListClassName);
+        DocumentReference p4 = new DocumentReference("P4", testSpaceReference);
+        testUtils.rest().savePage(p4, "Some P4 content", "titleP4");
+        Object dbListObject = testUtils.rest().object(p4, dbListClassName);
         dbListObject.getProperties().add(testUtils.rest().property("page", testUtils.serializeLocalReference(p1)));
         testUtils.rest().add(dbListObject);
 
@@ -851,9 +854,9 @@ class RenamePageIT
         WikiEditPage wikiEditPage = new WikiEditPage();
         assertEquals(String.format("[[P1 link>>doc:%s]]", p1Reference.replace("P1", "P43")), wikiEditPage.getContent());
 
-        // The database list property of P2 now holds the reference of the renamed page.
+        // The database list property of P4 now holds the reference of the renamed page.
         Property dbListProperty = testUtils.rest()
-            .get(new ObjectPropertyReference("page", new ObjectReference(dbListClassName + "[0]", p2)));
+            .get(new ObjectPropertyReference("page", new ObjectReference(dbListClassName + "[0]", p4)));
         assertEquals(testUtils.serializeLocalReference(new DocumentReference("P43", testSpaceReference)),
             dbListProperty.getValue());
 

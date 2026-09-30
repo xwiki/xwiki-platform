@@ -138,7 +138,7 @@ class SharePagePageTest extends PageTest
         assertEquals(TITLE, document.selectFirst("h1").text());
         assertTrue(document.selectFirst("p").text().contains(RECIPIENT_NAME), html);
         assertEquals(MESSAGE, document.selectFirst("pre").text());
-        assertNotNull(document.selectFirst("a[href$=/xwiki/bin/view/Space/Page]"), html);
+        assertEquals(TITLE, document.selectFirst("a[href$=/xwiki/bin/view/Space/Page]").text());
         assertTrue(document.text().contains("Shared content"), html);
         String footer = document.select("p").last().text();
         assertTrue(footer.contains(SERVER_NAME) && footer.contains("Alice"), footer);
@@ -153,7 +153,10 @@ class SharePagePageTest extends PageTest
         assertEvaluated(text);
 
         List<String> lines = text.lines().toList();
+        // A plain text mail displays the values as they are, without any HTML escaping.
         assertTrue(lines.get(0).endsWith(' ' + RECIPIENT_NAME + ','), text);
+        assertTrue(text.contains('"' + TITLE + '"'), text);
+        assertTrue(lines.contains(MESSAGE), text);
         assertTrue(text.contains("http://" + SERVER_NAME + "/xwiki/bin/view/Space/Page"), text);
         assertTrue(text.contains("Shared content"), text);
         String footer = lines.get(lines.size() - 1);

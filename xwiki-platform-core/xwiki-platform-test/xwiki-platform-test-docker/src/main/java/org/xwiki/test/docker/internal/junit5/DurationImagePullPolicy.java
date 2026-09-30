@@ -105,6 +105,9 @@ public class DurationImagePullPolicy implements ImagePullPolicy
      *
      * @param dockerImageName the image whose last pull date should be forgotten
      * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     * @since 16.10.19
      */
     public void clearPullDate(DockerImageName dockerImageName)
     {

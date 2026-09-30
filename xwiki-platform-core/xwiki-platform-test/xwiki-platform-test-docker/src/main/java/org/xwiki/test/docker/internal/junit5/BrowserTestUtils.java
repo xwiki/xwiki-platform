@@ -36,9 +36,10 @@ import org.xwiki.test.docker.junit5.browser.Browser;
 import static org.xwiki.test.docker.junit5.browser.Browser.CHROME;
 
 /**
- * Force pulling the selenium FF and Chrome docker images. Workaround for
- * <a href="https://github.com/testcontainers/testcontainers-java/issues/4608">4608</a>. Remove this class once it's
- * fixed.
+ * Pull the selenium FF and Chrome docker images at most once a day so that we test with a recent browser version,
+ * retrying on transient registry errors and falling back to the locally-available image if the pull fails. Workaround
+ * for <a href="https://github.com/testcontainers/testcontainers-java/issues/4608">4608</a>. Remove this class once
+ * it's fixed.
  *
  * @version $Id$
  */
@@ -55,8 +56,6 @@ public final class BrowserTestUtils
     private static final String SELENIUM_CHROMIUM_DOCKER_IMAGE_NAME = "selenium/standalone-chromium:%s";
 
     private static final boolean IS_ARM64 = "aarch64".equals(System.getProperty("os.arch"));
-
-    private static final long DAY = 1000L * 60L * 60L * 24L;
 
     private static List<String> pulledImages = new ArrayList<>();
 
@@ -98,7 +97,7 @@ public final class BrowserTestUtils
 
     private static void pullImage(DockerImageName imageName)
     {
-        DurationImagePullPolicy pullPolicy = new DurationImagePullPolicy(DAY);
+        DurationImagePullPolicy pullPolicy = new DurationImagePullPolicy(DockerTestUtils.PULL_INTERVAL);
         try {
             // Delegate the pull to TestContainers so that we benefit from its retry logic on transient registry
             // errors, from its image name substitution and from its local image cache handling.

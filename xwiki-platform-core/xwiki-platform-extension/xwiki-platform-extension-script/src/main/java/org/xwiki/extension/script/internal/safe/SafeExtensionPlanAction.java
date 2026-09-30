@@ -57,6 +57,9 @@ public class SafeExtensionPlanAction extends AbstractWrappingObject<ExtensionPla
         return this.safeProvider.get(getWrapped().getExtension());
     }
 
+    /**
+     * @deprecated use {@link #getPreviousExtensions()} instead
+     */
     @Override
     @Deprecated
     public InstalledExtension getPreviousExtension()

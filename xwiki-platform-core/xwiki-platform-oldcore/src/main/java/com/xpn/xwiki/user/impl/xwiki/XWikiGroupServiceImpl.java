@@ -177,6 +177,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         return context.getWiki().isAllGroupImplicit();
     }
 
+    /**
+     * @deprecated use {@link #getAllGroupsNamesForMember(String, int, int, XWikiContext)} instead
+     */
     @Override
     @Deprecated
     public Collection<String> listGroupsForUser(String member, XWikiContext context) throws XWikiException
@@ -184,6 +187,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         return getAllGroupsNamesForMember(member, -1, 0, context);
     }
 
+    /**
+     * @deprecated should never be used ! There is a listener taking care of that automatically
+     */
     @Override
     @Deprecated
     public void addUserToGroup(String username, String database, String group, XWikiContext context)
@@ -342,6 +348,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         }
     }
 
+    /**
+     * @deprecated use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)} instead
+     */
     @Override
     @Deprecated
     public List<String> listMemberForGroup(String group, XWikiContext context) throws XWikiException
@@ -380,6 +389,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         return null;
     }
 
+    /**
+     * @deprecated use {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)} instead
+     */
     @Override
     @Deprecated
     public List<String> listAllGroups(XWikiContext context) throws XWikiException

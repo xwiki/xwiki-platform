@@ -76,6 +76,9 @@ public abstract class AbstractActionExecutionEvent implements Serializable, Acti
         return getActionName().hashCode();
     }
 
+    // The getClass().isAssignableFrom() check below is the type test this rule asks for: it guarantees that the
+    // compared object is an instance of this event's class and thus an ActionExecutionEvent.
+    @SuppressWarnings("java:S2097")
     @Override
     public boolean equals(Object object)
     {

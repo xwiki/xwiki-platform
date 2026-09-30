@@ -225,6 +225,7 @@
     "font-family-monospace": 'Georgia, "Times New Roman", Times, serif',
     "font-size-base": "1rem",
     "font-size-small": ".85rem",
+    "line-height-base": "1.428571429",
     "grid-gutter-width": "30px",
     "input-bg" : "#fff",
     "input-border-focus": "#66afe9",

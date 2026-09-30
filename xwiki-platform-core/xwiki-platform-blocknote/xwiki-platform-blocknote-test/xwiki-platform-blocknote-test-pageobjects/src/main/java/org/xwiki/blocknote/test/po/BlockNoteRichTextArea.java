@@ -317,6 +317,33 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
+     * Returns the content element ({@code .bn-block-content}) of the top-level block with the specified index.
+     *
+     * @param index the index of the block to return, starting from 0
+     * @return the block content element
+     * @since 18.9.0RC1
+     */
+    public WebElement getBlockContent(int index)
+    {
+        return this.container.findElements(By.className("bn-block-content")).get(index);
+    }
+
+    /**
+     * Hovers over the specified block to reveal its side menu (drag handle) and returns the drag handle element.
+     *
+     * @param blockContent the content element of the block to hover, as returned by {@link #getBlockContent(int)}
+     * @return the drag handle element of the block's side menu
+     * @since 18.9.0RC1
+     */
+    public WebElement hoverAndGetBlockHandle(WebElement blockContent)
+    {
+        getDriver().createActions().moveToElement(blockContent).perform();
+        By handle = By.cssSelector(".bn-side-menu [data-test='dragHandle']");
+        getDriver().waitUntilElementIsVisible(handle);
+        return getDriver().findElement(handle);
+    }
+
+    /**
      * Waits until the rich text area is focused. This is especially needed when switching between browser tabs because:
      * <ul>
      * <li>when a browser tab becomes inactive its active element gets blurred (loses the focus)</li>

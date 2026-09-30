@@ -50,6 +50,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the mail templates of the {@code XWiki.SharePage} page.
@@ -111,6 +114,8 @@ class SharePagePageTest extends PageTest
     {
         this.sharePage = loadPage(SHARE_PAGE);
         this.componentManager.registerComponent(ScriptService.class, "watchlist", this.watchListScriptService);
+        // The HTML mails link to the wiki home page, which $xwiki.getDocument only returns when it's viewable.
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), any(), any(), any())).thenReturn(true);
 
         XWikiDocument sharedPage = this.xwiki.getDocument(SHARED_PAGE, this.context);
         sharedPage.setTitle(TITLE);

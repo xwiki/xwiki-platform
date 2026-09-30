@@ -21,7 +21,12 @@ package com.xpn.xwiki.web;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
 @Named("objectremove")
@@ -30,9 +35,18 @@ public class ObjectRemoveAction extends AbstractObjectRemoveAction
 {
     public ObjectRemoveAction()
     {
-        noClassNameKey = "platform.core.action.objectRemove.noClassnameSpecified";
         noIdKey = "platform.core.action.objectRemove.noObjectSpecified";
         invalidKey = "platform.core.action.objectRemove.invalidObject";
         this.deleteSuccessfulKey = "core.comment.deleteObject";
+    }
+
+    @Override
+    protected DocumentReference getClassReference(XWikiDocument doc, String className)
+    {
+        if (StringUtils.isBlank(className)) {
+            setErrorMessage("platform.core.action.objectRemove.noClassnameSpecified");
+            return null;
+        }
+        return doc.resolveClassReference(className);
     }
 }

@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.container.Response;
 import org.xwiki.model.reference.DocumentReference;
@@ -42,8 +41,9 @@ import com.xpn.xwiki.objects.BaseObject;
 public abstract class AbstractObjectRemoveAction extends XWikiAction
 {
     private static final String FAIL_MESSAGE = "failed";
-    
-    protected String noClassNameKey;
+
+    private static final String MESSAGE = "message";
+
     protected String noIdKey;
     protected String invalidKey;
     protected String deleteSuccessfulKey;
@@ -76,32 +76,44 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
         }
     }
 
+    /**
+     * Resolves the class of the object to remove from the class name provided in the request.
+     *
+     * @param doc the document holding the object to remove
+     * @param className the class name provided in the request, possibly blank
+     * @return the reference of the class of the object to remove, or {@code null} if the request is not valid, in
+     *     which case an error message has been set with {@link #setErrorMessage(String)}
+     */
+    protected abstract DocumentReference getClassReference(XWikiDocument doc, String className);
+
+    /**
+     * Exposes a localized error message to the script context.
+     *
+     * @param key the translation key of the error message
+     */
+    protected void setErrorMessage(String key)
+    {
+        getCurrentScriptContext().setAttribute(MESSAGE, localizePlainOrReturnKey(key), ScriptContext.ENGINE_SCOPE);
+    }
+
     protected BaseObject getObject(XWikiDocument doc, XWikiContext context)
     {
         ObjectRemoveForm form = (ObjectRemoveForm) context.getForm();
-        BaseObject obj = null;
 
-        String className = form.getClassName();
+        DocumentReference classReference = getClassReference(doc, form.getClassName());
+        if (classReference == null) {
+            return null;
+        }
+
         int classId = form.getClassId();
-        String attributeName = "message";
-        if (StringUtils.isBlank(className)) {
-            getCurrentScriptContext().setAttribute(attributeName,
-                localizePlainOrReturnKey(this.noClassNameKey),
-                ScriptContext.ENGINE_SCOPE);
-        } else if (classId < 0) {
-            getCurrentScriptContext().setAttribute(attributeName,
-                localizePlainOrReturnKey(this.noIdKey),
-                ScriptContext.ENGINE_SCOPE);
-        } else {
-            // Object class reference
-            DocumentReference objectClass = new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE,
-                XWikiDocument.COMMENTSCLASS_REFERENCE.getName());
-            obj = doc.getXObject(objectClass, classId);
-            if (obj == null) {
-                getCurrentScriptContext().setAttribute(attributeName,
-                    localizePlainOrReturnKey(this.invalidKey),
-                    ScriptContext.ENGINE_SCOPE);
-            }
+        if (classId < 0) {
+            setErrorMessage(this.noIdKey);
+            return null;
+        }
+
+        BaseObject obj = doc.getXObject(classReference, classId);
+        if (obj == null) {
+            setErrorMessage(this.invalidKey);
         }
         return obj;
     }

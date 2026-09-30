@@ -22,7 +22,12 @@ package com.xpn.xwiki.web;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Action used to remove a comment from a page, requires comment right but not edit right. Note that this class is
@@ -41,9 +46,22 @@ public class CommentDeleteAction extends AbstractObjectRemoveAction
      */
     public CommentDeleteAction()
     {
-        noClassNameKey = "platform.core.action.commentRemove.noClassnameSpecified";
         noIdKey = "platform.core.action.commentRemove.noCommentSpecified";
         invalidKey = "platform.core.action.commentRemove.invalidComment";
         this.deleteSuccessfulKey = "core.comment.deleteComment";
+    }
+
+    @Override
+    protected DocumentReference getClassReference(XWikiDocument doc, String className)
+    {
+        DocumentReference commentClassReference =
+            new DocumentReference(doc.getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
+                XWikiDocument.COMMENTSCLASS_REFERENCE.getName());
+        // Reject any other class so that this action cannot remove other objects with only the comment right.
+        if (StringUtils.isNotBlank(className) && !commentClassReference.equals(doc.resolveClassReference(className))) {
+            setErrorMessage("platform.core.action.commentRemove.invalidClass");
+            return null;
+        }
+        return commentClassReference;
     }
 }

@@ -34,6 +34,10 @@ import org.apache.commons.lang3.StringUtils;
  * @version $Id$
  * @since 5.1RC1
  */
+// The shadowing is deliberate: this is a drop-in extension of the Commons Lang class, and the statics that hide
+// their inherited counterpart do so to change their behaviour (see their own Javadoc). Keeping both names means
+// that moving to this class is an import change and nothing else.
+@SuppressWarnings({"java:S2176", "java:S9149"})
 public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
 {
     // class to avoid synchronization (Init on demand)

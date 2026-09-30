@@ -27,6 +27,9 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  */
 @Role
+// The shadowing is deliberate: this interface adds no method, it only tags the WYSIWYG-specific filters among
+// the HTML filters it extends, so it is the same role under the same name.
+@SuppressWarnings("java:S2176")
 public interface HTMLFilter extends org.xwiki.xml.html.filter.HTMLFilter
 {
     /**

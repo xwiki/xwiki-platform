@@ -36,6 +36,9 @@ import org.apache.solr.core.SolrXmlConfig;
  * @version $Id$
  * @since 13.1RC1
  */
+// The hiding is deliberate: these factories exist so that XWikiCoreContainer.createAndLoad(...) builds this
+// subclass rather than the Solr one, which is the whole point of the class.
+@SuppressWarnings("java:S9149")
 public class XWikiCoreContainer extends CoreContainer
 {
     /**

@@ -42,19 +42,13 @@
 @import "jstree/main.less";
 
 /**
- * Narrow Tree (no icons and no edges)
+ * Narrow Tree
  */
 @narrow-icon-width: 12px;
-.jstree-xwiki > .jstree-no-dots.jstree-no-icons {
-  /* Reduce a bit the font size. */
-  font-size: 95%;
 
-  .jstree-node {
-    /* Leave some space for the open/close icon. */
-    margin-left: 0;
-    padding-left: @narrow-icon-width;
-  }
-
+/* The part of the narrow tree styles that depends only on the width available to the tree: the node labels are split
+  on multiple lines instead of being cut, so that the full label remains readable. */
+.narrowTreeLabels() {
   .jstree-node,
   .jstree-anchor {
     /* Allow the label to be split on multiple lines. */
@@ -65,6 +59,28 @@
     /* The node label can be split on multiple lines. */
     height: auto;
   }
+}
+
+/* Any container that is too narrow to display long labels on a single line, such as a dashboard gadget or a panel, can
+  mark itself with this class in order for the trees it holds to wrap their node labels. */
+.xwiki-narrow-container .jstree-xwiki {
+  .narrowTreeLabels();
+}
+
+/**
+ * Narrow Tree (no icons and no edges)
+ */
+.jstree-xwiki > .jstree-no-dots.jstree-no-icons {
+  /* Reduce a bit the font size. */
+  font-size: 95%;
+
+  .jstree-node {
+    /* Leave some space for the open/close icon. */
+    margin-left: 0;
+    padding-left: @narrow-icon-width;
+  }
+
+  .narrowTreeLabels();
 
   .jstree-ocl {
     // Use FontAwesome for the open/close/leaf icons.

@@ -393,11 +393,13 @@ public class DBListClass extends ListClass
     }
 
     /**
-     * Check if the values stored by this property are document full names. That is the case only when no custom query
-     * is used and the generated query selects {@code doc.fullName} as the stored value. The values are then local to
-     * the wiki where the query runs.
+     * Check if the values stored by this property are known to be document full names. A custom query can select
+     * document full names too, but that cannot be detected, so it can only be guaranteed when no custom query is used
+     * and the generated query selects {@code doc.fullName} as the stored value. The values are then local to the wiki
+     * where the query runs.
      *
-     * @return {@code true} if the values stored by this property are document full names
+     * @return {@code true} if the values stored by this property are known to be document full names, {@code false}
+     *     otherwise
      * @since 18.9.0RC1
      */
     @Unstable

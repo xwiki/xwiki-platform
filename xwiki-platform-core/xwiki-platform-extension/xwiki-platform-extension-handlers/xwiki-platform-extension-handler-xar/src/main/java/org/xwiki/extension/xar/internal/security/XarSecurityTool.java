@@ -34,11 +34,10 @@ import org.xwiki.extension.xar.security.ProtectionLevel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserType;
-
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Various internal tools to deal with XAR extensions documents security.
@@ -92,7 +91,8 @@ public class XarSecurityTool
 
         if (protection != DocumentProtection.NONE
             && !((XarInstalledExtensionRepository) this.installedXARs).isAllowed(documentReference, right)) {
-            if (protection.isDeny() && !XWikiRightService.isSuperAdmin(userReference)) {
+            if (protection.isDeny()
+                && !SuperAdminUserReference.isSuperAdmin(this.userReferenceResolver.resolve(userReference))) {
                 // Check access
                 if (!getAuthorization().hasAccess(right, userReference, documentReference)) {
                     return ProtectionLevel.DENY;

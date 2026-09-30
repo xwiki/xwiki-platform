@@ -47,6 +47,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.user.SuperAdminUserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -916,7 +917,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         if (!XWikiRightService.isGuest(userReference)) {
             advanced = true;
 
-            if (!XWikiRightService.isSuperAdmin(userReference)) {
+            if (!SuperAdminUserReference.isSuperAdminReference(userReference)) {
                 XWikiContext xcontext = getContext();
 
                 try {

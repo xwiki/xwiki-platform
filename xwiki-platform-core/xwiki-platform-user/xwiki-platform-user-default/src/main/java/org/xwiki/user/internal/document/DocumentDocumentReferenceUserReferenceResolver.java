@@ -57,7 +57,7 @@ public class DocumentDocumentReferenceUserReferenceResolver extends AbstractUser
         } else {
             // small perf improvement to avoid keep duplicated references in memory.
             DocumentReference documentReference = this.entityReferenceFactory.getReference(rawReference);
-            reference = resolveName(documentReference.getName());
+            reference = resolveVirtualUser(documentReference);
             if (reference == null) {
                 boolean isGlobal = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)
                     .equals(documentReference.getWikiReference());

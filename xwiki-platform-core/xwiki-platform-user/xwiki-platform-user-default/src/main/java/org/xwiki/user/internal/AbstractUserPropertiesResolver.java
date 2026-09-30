@@ -59,7 +59,7 @@ public abstract class AbstractUserPropertiesResolver implements UserPropertiesRe
         if (normalizedUserReference == null || CurrentUserReference.INSTANCE == normalizedUserReference) {
             normalizedUserReference = this.currentUserReferenceUserReferenceResolver.resolve(null, parameters);
         }
-        if (SuperAdminUserReference.INSTANCE == normalizedUserReference) {
+        if (SuperAdminUserReference.isSuperAdmin(normalizedUserReference)) {
             userProperties = new DefaultUserProperties(getSuperAdminConfigurationSource());
         } else if (GuestUserReference.INSTANCE == normalizedUserReference) {
             userProperties = new DefaultUserProperties(getGuestConfigurationSource());

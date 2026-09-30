@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
@@ -45,8 +46,6 @@ import org.xwiki.user.UserReferenceSerializer;
 @Singleton
 public class DocumentDocumentReferenceUserReferenceSerializer implements UserReferenceSerializer<DocumentReference>
 {
-    private static final String XWIKI_SPACE = "XWiki";
-
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
 
@@ -62,9 +61,9 @@ public class DocumentDocumentReferenceUserReferenceSerializer implements UserRef
             normalizedUserReference = this.currentUserReferenceUserReferenceResolver.resolve(null);
         }
 
-        if (SuperAdminUserReference.INSTANCE == normalizedUserReference) {
-            result = new DocumentReference(
-                this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).getName(), XWIKI_SPACE, "superadmin");
+        if (SuperAdminUserReference.isSuperAdmin(normalizedUserReference)) {
+            result = new DocumentReference(SuperAdminUserReference.SUPERADMIN_LOCAL_REFERENCE, new WikiReference(
+                this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).getName()));
         } else if (GuestUserReference.INSTANCE == normalizedUserReference) {
             result = null;
         } else {

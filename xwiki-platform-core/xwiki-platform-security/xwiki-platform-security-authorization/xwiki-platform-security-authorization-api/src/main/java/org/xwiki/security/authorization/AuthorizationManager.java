@@ -21,11 +21,12 @@ package org.xwiki.security.authorization;
 
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserReference;
 
 /**
  * This API is for checking the access rights of any users on any XWiki entities. It replaces
@@ -48,7 +49,7 @@ public interface AuthorizationManager
     /**
      * The Superadmin username.
      */
-    String SUPERADMIN_USER = "superadmin";
+    String SUPERADMIN_USER = SuperAdminUserReference.SUPERADMIN_USER_NAME;
 
     /**
      * Check if the user is the super admin.
@@ -57,7 +58,8 @@ public interface AuthorizationManager
      * case-insensitive match, and will ignore any user profile's that may be matching the superadmin's user name.
      *
      * @param user a document reference representing a user identity
-     * @return {@code true} if and only if the user is determined to be the superuser
+     * @return {@code true} if and only if the user is determined to be the superuser, i.e. if and only if the passed
+     *         reference is {@code XWiki.superadmin} in some wiki
      * @since 17.2.0RC1
      * @since 16.10.5
      * @since 16.4.7
@@ -65,7 +67,22 @@ public interface AuthorizationManager
     @Unstable
     default boolean isSuperAdmin(DocumentReference user)
     {
-        return user != null && StringUtils.equalsIgnoreCase(user.getName(), SUPERADMIN_USER);
+        return SuperAdminUserReference.isSuperAdminReference(user);
+    }
+
+    /**
+     * Check if the user is the super admin.
+     *
+     * @param user the reference of the user identity to check, as resolved by a {@code UserReferenceResolver}
+     * @return {@code true} if and only if the user is determined to be the superuser
+     * @since 18.9.0RC1
+     * @since 18.4.6
+     * @since 17.10.14
+     * @since 16.10.19
+     */
+    default boolean isSuperAdmin(UserReference user)
+    {
+        return SuperAdminUserReference.isSuperAdmin(user);
     }
 
     /**

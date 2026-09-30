@@ -44,6 +44,10 @@
 .xGallery .maximize, .xGallery .minimize {
   background-color: transparent;
   border-color: transparent;
+
+  &:hover, &:focus {
+    filter: contrast(2);
+  }
 }
 
 /* We want to hide the icons in the maximization/minimization button that does not fit the current action. 
@@ -52,22 +56,10 @@
   display: none;
 }
 
-.xGallery {
-  & .maximize, & .minimize, & .previous, & .next {
-    &:hover, &:focus {
-      filter: contrast(2);
-    }
-  }
-}
-
 .xGallery .previous, .xGallery .next {
   font-family: courier,monospace;
   font-size: 32px;
   text-align: center;
-}
-
-.xGallery .previous:hover, .xGallery .next:hover {
-  filter: contrast(2);
 }
 
 .xGallery .previous {
@@ -76,6 +68,8 @@
 
 .xGallery .next {
   grid-area: 2 / 3 / 3 / 4;
+  /* Elements on the right of the grid are right aligned */
+  text-align: end;
 }
 
 .xGallery .index {
@@ -97,18 +91,9 @@
   justify-self: end;
 }
 
-.xGallery .maximize:hover, .xGallery .minimize:hover {
-  filter: contrast(2);
-}
-
 /* Elements on the left of the grid are left aligned */
 .xGallery .index, .xGallery .previous {
   text-align: start;
-}
-
-/* Elements on the right of the grid are right aligned */
-.xGallery .next {
-  text-align: end;
 }
 
 html.maximized, html.maximized body {

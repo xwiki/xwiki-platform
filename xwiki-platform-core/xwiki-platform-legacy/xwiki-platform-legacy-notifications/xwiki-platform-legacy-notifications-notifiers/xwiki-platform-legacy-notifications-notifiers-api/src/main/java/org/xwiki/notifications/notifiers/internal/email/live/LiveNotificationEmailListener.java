@@ -97,6 +97,7 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                         Thread.sleep(nextWakeUpTime.getMillis() - DateTime.now().getMillis());
                     } catch (IllegalArgumentException | InterruptedException e) {
                         if (e instanceof InterruptedException) {
+                            Thread.currentThread().interrupt();
                             return;
                         }
                     }

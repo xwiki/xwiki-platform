@@ -120,6 +120,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
             status = this.executor.getAsyncStatus(reference.getId(), clientId, reference.getTimeout(),
                 TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new ResourceReferenceHandlerException("Failed to get content", e);
         }
 

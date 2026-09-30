@@ -170,6 +170,7 @@ public class UndeleteAction extends XWikiAction
         try {
             restoreJob.join();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new XWikiException(String.format("Failed to restore [%s] from batch [%s]",
                 deletedDocument.getFullName(), deletedDocument.getBatchId()), e);
         }

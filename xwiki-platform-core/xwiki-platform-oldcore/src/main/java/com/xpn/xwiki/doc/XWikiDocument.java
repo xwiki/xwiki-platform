@@ -7215,7 +7215,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             list.add(new MetaDataDiff("syntax", fromDoc.getSyntax(), toDoc.getSyntax()));
         }
 
-        if (fromDoc.isHidden() != toDoc.isHidden()) {
+        if (ObjectUtils.notEqual(fromDoc.isHidden(), toDoc.isHidden())) {
             list.add(new MetaDataDiff(HIDDEN_PROPERTY, fromDoc.isHidden(), toDoc.isHidden()));
         }
 

@@ -51,7 +51,7 @@ class HTMLDisplayerScriptServiceTest
     private HTMLDisplayerScriptService htmlDisplayerScriptService;
 
     @Test
-    void HTMLDisplayerScriptServiceTest() throws Exception
+    void display() throws Exception
     {
         Answer answer = i -> {
             String attributes = "";

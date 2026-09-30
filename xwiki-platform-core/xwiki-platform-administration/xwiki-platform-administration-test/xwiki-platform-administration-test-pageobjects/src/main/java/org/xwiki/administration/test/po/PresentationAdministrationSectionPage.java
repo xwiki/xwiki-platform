@@ -19,6 +19,9 @@
  */
 package org.xwiki.administration.test.po;
 
+import java.util.List;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.Select;
@@ -86,6 +89,9 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
             throw new IllegalArgumentException("No ShowTabValue found for value: " + value);
         }
     }
+
+    @FindBy(id = "XWiki.XWikiPreferences_0_showdocumenttabs")
+    private WebElement showDocumentTabs;
 
     @FindBy(id = "XWiki.XWikiPreferences_0_showannotations")
     private WebElement showAnnotations;
@@ -194,6 +200,98 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     public void setShowInformation(ShowTabValue value)
     {
         new Select(this.showInformation).selectByValue(value.getValue());
+    }
+
+    /**
+     * @return the value of the "Show page tabs" option, which hides the whole tab area when set to
+     *         {@link ShowTabValue#NO}
+     * @since 18.9.0RC1
+     */
+    public ShowTabValue getShowDocumentTabs()
+    {
+        return ShowTabValue.fromString(new Select(this.showDocumentTabs).getFirstSelectedOption().getAttribute(VALUE));
+    }
+
+    /**
+     * @param value the value to set for the "Show page tabs" option
+     * @since 18.9.0RC1
+     */
+    public void setShowDocumentTabs(ShowTabValue value)
+    {
+        new Select(this.showDocumentTabs).selectByValue(value.getValue());
+    }
+
+    /**
+     * @param tabId the identifier of a tab contributed to the {@code org.xwiki.plaftorm.template.docextra} extension
+     *            point
+     * @return the value of the field displayed for that tab
+     * @since 18.9.0RC1
+     */
+    public ShowTabValue getCustomTabVisibility(String tabId)
+    {
+        String value = new Select(getCustomTabField(tabId)).getFirstSelectedOption().getAttribute(VALUE);
+        if (value.isEmpty()) {
+            return ShowTabValue.DEFAULT;
+        }
+
+        return value.startsWith("+") ? ShowTabValue.YES : ShowTabValue.NO;
+    }
+
+    /**
+     * @param tabId the identifier of a tab contributed to the {@code org.xwiki.plaftorm.template.docextra} extension
+     *            point
+     * @param value the visibility to set for that tab
+     * @since 18.9.0RC1
+     */
+    public void setCustomTabVisibility(String tabId, ShowTabValue value)
+    {
+        Select select = new Select(getCustomTabField(tabId));
+        switch (value) {
+            case YES -> select.selectByValue('+' + tabId);
+            case NO -> select.selectByValue('-' + tabId);
+            default -> select.selectByValue("");
+        }
+    }
+
+    /**
+     * Click the "Show all tabs" button, which sets every tab field of the section to "Yes".
+     *
+     * @since 18.9.0RC1
+     */
+    public void showAllTabs()
+    {
+        getDriver().findElement(By.cssSelector("[data-documenttabs-bulk='show']")).click();
+    }
+
+    /**
+     * Click the "Hide all tabs" button, which sets every tab field of the section to "No".
+     *
+     * @since 18.9.0RC1
+     */
+    public void hideAllTabs()
+    {
+        getDriver().findElement(By.cssSelector("[data-documenttabs-bulk='hide']")).click();
+    }
+
+    /**
+     * @return {@code true} when the section warns that the per tab settings are not applied
+     * @since 18.9.0RC1
+     */
+    public boolean isHiddenNoticeDisplayed()
+    {
+        return getDriver().findElement(By.cssSelector(".documentTabsHiddenNotice")).isDisplayed();
+    }
+
+    private WebElement getCustomTabField(String tabId)
+    {
+        List<WebElement> fields = getDriver().findElements(By.cssSelector("select.documentTabVisibility"));
+        for (WebElement field : fields) {
+            if (!field.findElements(By.cssSelector(String.format("option[value='+%s']", tabId))).isEmpty()) {
+                return field;
+            }
+        }
+
+        throw new IllegalArgumentException("No document tab field found for tab: " + tabId);
     }
 
     /**

@@ -38,26 +38,29 @@
   #if($xcontext.action == 'view' && $viewer != 'content' && !$doc.isNew())
     #set ($discard = $docextralinks.add(['content', $services.localization.render('core.links.content'), -1, 'file']))
   #end
-  #if($viewer != 'comments' && $showcomments && !$doc.isNew())
-    #set ($discard = $docextralinks.add(['comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'comment', '', 'tmComment']))
-  #end
-  #if($showannotations && !$doc.isNew())
-    #if(!$annotationCount)
-      ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
-      ## defined at this point, we tap into the standard annotation class, and do not load again the 
-      ## config document. This however should not happen.
-      #set ($annotationCount = $services.annotations.getAnnotations($doc).size())
+  ## The entries below link to the tabs displayed by docextra.vm, so they must follow the same visibility.
+  #if ($displayDocExtra)
+    #if($viewer != 'comments' && $showcomments && !$doc.isNew())
+      #set ($discard = $docextralinks.add(['comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'comment', '', 'tmComment']))
     #end
-    #set ($discard = $docextralinks.add(['annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'note', '', 'tmAnnotation']))
-  #end
-  #if($viewer != 'attachments' && $showattachments && !$doc.isNew())
-    #set ($discard = $docextralinks.add(['attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), 'attach', '', 'tmAttachments']))
-  #end
-  #if($viewer != 'history' && $showhistory && !$doc.isNew())
-    #set ($discard = $docextralinks.add(['history', $services.localization.render('docextra.history'), -1, 'time', '', 'tmHistory']))
-  #end
-  #if($viewer != 'information' && $showinformation && !$doc.isNew())
-    #set ($discard = $docextralinks.add(['information', $services.localization.render('docextra.information'), -1, 'information', '', 'tmInformation']))
+    #if($showannotations && !$doc.isNew())
+      #if(!$annotationCount)
+        ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
+        ## defined at this point, we tap into the standard annotation class, and do not load again the 
+        ## config document. This however should not happen.
+        #set ($annotationCount = $services.annotations.getAnnotations($doc).size())
+      #end
+      #set ($discard = $docextralinks.add(['annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'note', '', 'tmAnnotation']))
+    #end
+    #if($viewer != 'attachments' && $showattachments && !$doc.isNew())
+      #set ($discard = $docextralinks.add(['attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), 'attach', '', 'tmAttachments']))
+    #end
+    #if($viewer != 'history' && $showhistory && !$doc.isNew())
+      #set ($discard = $docextralinks.add(['history', $services.localization.render('docextra.history'), -1, 'time', '', 'tmHistory']))
+    #end
+    #if($viewer != 'information' && $showinformation && !$doc.isNew())
+      #set ($discard = $docextralinks.add(['information', $services.localization.render('docextra.information'), -1, 'information', '', 'tmInformation']))
+    #end
   #end
 #end
 

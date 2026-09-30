@@ -216,6 +216,14 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "always|create");
         xclass.addBooleanField("ldap_trylocal", "Try local login", YESNO);
 
+        xclass.addBooleanField("showdocumenttabs", "Show document tabs", YESNO);
+        // The identifiers of the tabs whose visibility is set at this level, each prefixed by '+' when the tab is
+        // shown and by '-' when it is hidden. A tab that is not listed inherits the value of the next level up, which
+        // is why a single list property can hold a per tab setting. Only the tabs contributed to the
+        // org.xwiki.plaftorm.template.docextra UI extension point are stored here: the tabs built in the skin keep
+        // their own showattachments, showcomments, showhistory and showinformation properties below.
+        xclass.addStaticListField("documentTabsVisibility", "Document tabs visibility", 1, true, true, "", null, "|",
+            null, ListClass.FREE_TEXT_ALLOWED, false);
         xclass.addBooleanField("showannotations", "Show document annotations", YESNO);
         xclass.addBooleanField("showcomments", "Show document comments", YESNO);
         xclass.addBooleanField("showattachments", "Show document attachments", YESNO);

@@ -1,0 +1,2 @@
+org.xwiki.documenttabs.internal.DefaultDocumentTabsConfiguration
+org.xwiki.documenttabs.script.DocumentTabsScriptService

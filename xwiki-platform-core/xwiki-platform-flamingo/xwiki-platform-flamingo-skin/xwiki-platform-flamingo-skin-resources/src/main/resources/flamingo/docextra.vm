@@ -65,8 +65,9 @@
   #foreach($docExtraExtension in $docExtraExtensions)
     #set ($params = $docExtraExtension.parameters)
     #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
-    ## Params are evaluated as string
-    #if ($params.show && $params.show == 'true')
+    ## The tab asks to be displayed through its 'show' parameter, which is evaluated as a string, but the
+    ## administration has the last word (Look & Feel > Presentation).
+    #if ($services.documenttabs.isTabVisible($docExtraExtension.id, $params.show == 'true'))
       #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
       #set ($discard = $docextras.add($newDocExtra))
     #end

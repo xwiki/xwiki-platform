@@ -129,7 +129,9 @@
 #set($displayAdminMenu = true) ## the admin menu, related to the page
 #set($displayMoreActionsMenu = true) ## more actions menu
 #set($displayMainMenu = true)
-#set($displayDocExtra = true)
+## The administration can hide the whole tab area (Look & Feel > Presentation); a page can still hide it on its
+## own through layoutExtraVars.vm, which is executed after this file.
+#set($displayDocExtra = $services.documenttabs.areTabsDisplayed())
 #set($displayContentFooter = true) ## tags and document creation information, after the document content area
 #set($displayShortcuts = true)
 #set($displayPageHeader = false) ## page header containing the logo and the banner taken from ColorTheme

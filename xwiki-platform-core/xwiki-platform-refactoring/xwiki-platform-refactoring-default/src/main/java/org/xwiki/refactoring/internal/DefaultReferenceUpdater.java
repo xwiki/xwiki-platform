@@ -193,27 +193,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         for (Object fieldClass : xclass.getProperties()) {
             // Wiki content stored in xobjects
             if (fieldClass instanceof TextAreaClass textAreaClass && textAreaClass.isWikiContent()) {
-                PropertyInterface field = xobject.getField(textAreaClass.getName());
-
-                // Make sure the field is the right type (might happen while a document is being migrated)
-                if (field instanceof LargeStringProperty largeField) {
-                    try {
-                        // Parse property content
-                        XDOM xdom = this.contentParser.parse(largeField.getValue(), document.getSyntax(),
-                            document.getDocumentReference());
-
-                        // Rename references
-                        if (renameLambda.call(xdom, document.getDocumentReference(), relative)) {
-                            // Serialize property content
-                            largeField.setValue(renderXDOM(xdom, renderer));
-
-                            modified = true;
-                        }
-                    } catch (Exception e) {
-                        this.logger.warn("Failed to rename links from xobject property [{}], skipping it. Error: [{}]",
-                            largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
-                    }
-                }
+                modified |= renameLinks(xobject, textAreaClass, document, renderer, relative, renameLambda);
             } else if (fieldClass instanceof DBListClass dbListClass && !relative) {
                 // Document references stored in database list xobject properties. Nothing is done in relative mode,
                 // which is used when the updated document is the moved one. The values of a database list are document
@@ -227,6 +207,34 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         }
 
         return modified;
+    }
+
+    private boolean renameLinks(BaseObject xobject, TextAreaClass textAreaClass, XWikiDocument document,
+        BlockRenderer renderer, boolean relative, RenameLambda renameLambda)
+    {
+        PropertyInterface field = xobject.getField(textAreaClass.getName());
+
+        // Make sure the field is the right type (might happen while a document is being migrated)
+        if (field instanceof LargeStringProperty largeField) {
+            try {
+                // Parse property content
+                XDOM xdom = this.contentParser.parse(largeField.getValue(), document.getSyntax(),
+                    document.getDocumentReference());
+
+                // Rename references
+                if (renameLambda.call(xdom, document.getDocumentReference(), relative)) {
+                    // Serialize property content
+                    largeField.setValue(renderXDOM(xdom, renderer));
+
+                    return true;
+                }
+            } catch (Exception e) {
+                this.logger.warn("Failed to rename links from xobject property [{}], skipping it. Error: [{}]",
+                    largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
+        return false;
     }
 
     private boolean renameLinks(BaseObject xobject, DBListClass dbListClass, XWikiDocument document,

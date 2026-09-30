@@ -81,14 +81,14 @@ require(['jquery', 'xwiki-l10n!link-protection-translations', 'xwiki-events-brid
     if (isAnchorCurrentDomain(anchor)) {
       return true;
     } else {
-      if (allowedUrls.indexOf(anchor.href) > -1) {
+      if (allowedUrls.includes(anchor.href)) {
         return true;
       }
       let host = anchor.hostname;
       do {
-        if (trustedDomains.indexOf(host) > -1) {
+        if (trustedDomains.includes(host)) {
           return true;
-        } else if (host.indexOf(".") > -1) {
+        } else if (host.includes(".")) {
           host = host.substring(host.indexOf(".") + 1);
         } else {
           host = "";

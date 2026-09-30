@@ -253,7 +253,7 @@ define('editableProperty', ['jquery', 'xwiki-meta', 'xwiki-edit-confirmation'], 
 
 require(['jquery', 'editableProperty', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    var container = $(data?.elements || document);
     container.find('dt.editableProperty').editableProperty();
   };
 

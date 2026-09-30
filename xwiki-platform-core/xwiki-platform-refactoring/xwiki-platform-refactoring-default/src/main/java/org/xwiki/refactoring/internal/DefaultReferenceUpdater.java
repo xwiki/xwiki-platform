@@ -235,7 +235,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         // Only document targets are supported.
         if (!(oldTarget instanceof DocumentReference oldDocumentReference)
             || !(newTarget instanceof DocumentReference newDocumentReference)
-            || !isDocumentReferenceDBList(dbListClass)) {
+            || !dbListClass.isDocumentReferenceList()) {
             return false;
         }
 
@@ -279,34 +279,6 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         }
 
         return null;
-    }
-
-    /**
-     * Check if the values of the passed database list property are document full names. That is the case only when no
-     * custom query is used and the generated query selects {@code doc.fullName} as the stored value. The same rule is
-     * duplicated in {@code XWikiDocument#isDocumentReferenceDBList} and both copies must be kept in sync.
-     *
-     * @param dbListClass the database list property to check
-     * @return {@code true} if the values of the property are document full names
-     */
-    private static boolean isDocumentReferenceDBList(DBListClass dbListClass)
-    {
-        if (StringUtils.isNotBlank(dbListClass.getSql())) {
-            return false;
-        }
-
-        String idField = dbListClass.getIdField();
-        String valueField = dbListClass.getValueField();
-
-        if (StringUtils.isBlank(idField) && StringUtils.isBlank(valueField)) {
-            // The generated query selects the full name of the documents holding an object of the class.
-            return StringUtils.isNotBlank(dbListClass.getClassname());
-        }
-
-        // The generated query uses the value field as stored value when the id field is blank.
-        String effectiveIdField = StringUtils.isBlank(idField) ? valueField : idField;
-
-        return "doc.fullName".equals(effectiveIdField);
     }
 
     private void info(String format, Object... arguments)

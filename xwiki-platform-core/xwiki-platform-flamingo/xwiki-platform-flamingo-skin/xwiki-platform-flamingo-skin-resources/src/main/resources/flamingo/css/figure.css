@@ -6,5 +6,5 @@ figure img {
 figcaption {
   font-size: var(--figure-caption-font-size);
   color: var(--figure-caption-color);
-  margin-bottom: var(--figure-caption-margin-bottom);
+  margin-bottom: .625rem;
 }

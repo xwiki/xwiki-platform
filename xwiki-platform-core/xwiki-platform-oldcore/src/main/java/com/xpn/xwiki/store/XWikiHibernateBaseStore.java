@@ -24,10 +24,12 @@ import java.nio.charset.StandardCharsets;
 import java.sql.DatabaseMetaData;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -35,6 +37,7 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.exception.LockAcquisitionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
@@ -64,6 +67,17 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     public static final String HINT = "hibernate";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateBaseStore.class);
+
+    /**
+     * How many times {@link #executeWriteWithRetry(XWikiContext, HibernateCallback)} runs a callback before giving up.
+     */
+    private static final int WRITE_ATTEMPTS = 3;
+
+    /**
+     * The exclusive upper bound, in milliseconds, of the random delay before the first retry of
+     * {@link #executeWriteWithRetry(XWikiContext, HibernateCallback)}; it grows with each attempt.
+     */
+    private static final long WRITE_RETRY_DELAY_MILLIS = 50;
 
     /** LoggerManager to suspend logging during normal faulty SQL operation. */
     @Inject
@@ -942,6 +956,77 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     public <T> T executeWrite(XWikiContext context, HibernateCallback<T> cb) throws XWikiException
     {
         return execute(context, true, cb);
+    }
+
+    /**
+     * Execute method for read-write operations in Hibernate, retrying the transaction when the database fails to
+     * acquire the locks the callback needs. A database can refuse to grant a lock in order to break a deadlock, and
+     * then expects the client to run the rolled back transaction again, which is what this method does.
+     * <p>
+     * The callback is flushed before its transaction is committed, so that a lock acquisition failure is reported to
+     * this method, which can still retry, rather than while closing the transaction, where
+     * {@link #execute(XWikiContext, boolean, HibernateCallback)} only logs it.
+     * <p>
+     * Use it only for a callback that is idempotent, since it may be executed several times, and that is not called
+     * from within an outer transaction, since only a transaction opened by this call is rolled back and retried. Note
+     * that inserting a row that another transaction inserted in the mean time fails as a constraint violation rather
+     * than as a lock acquisition failure, and is thus not retried.
+     *
+     * @param context the current XWikiContext
+     * @param cb the callback to execute
+     * @param <T> the type of the value returned by the callback
+     * @return {@link HibernateCallback#doInHibernate(Session)}
+     * @throws XWikiException if the callback fails for any other reason than a lock acquisition failure, or if it
+     *             still fails to acquire the locks it needs after {@value #WRITE_ATTEMPTS} attempts
+     * @see #executeWrite(XWikiContext, HibernateCallback)
+     * @since 18.8.0
+     */
+    public <T> T executeWriteWithRetry(XWikiContext context, HibernateCallback<T> cb) throws XWikiException
+    {
+        for (int attempt = 1;; attempt++) {
+            try {
+                return executeWrite(context, session -> {
+                    T result = cb.doInHibernate(session);
+                    // Flush here rather than leaving it to the commit, because a statement that fails while the
+                    // transaction is being closed doesn't reach the catch below.
+                    session.flush();
+                    return result;
+                });
+            } catch (XWikiException e) {
+                if (attempt >= WRITE_ATTEMPTS || !isLockAcquisitionFailure(e) || !waitBeforeRetry(attempt)) {
+                    throw e;
+                }
+                LOGGER.warn("The database refused the locks needed by attempt [{}] out of [{}], retrying. Cause: [{}]",
+                    attempt, WRITE_ATTEMPTS, ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+    }
+
+    /**
+     * @param failure the failure to inspect
+     * @return whether the given failure was caused by the database refusing to grant a lock
+     */
+    private boolean isLockAcquisitionFailure(Throwable failure)
+    {
+        return ExceptionUtils.getThrowableList(failure).stream().anyMatch(LockAcquisitionException.class::isInstance);
+    }
+
+    /**
+     * Wait a random amount of time, growing with the number of attempts already made, so that two transactions that
+     * deadlocked with each other don't retry at the same time and deadlock again.
+     *
+     * @param attempt the number of attempts made so far
+     * @return {@code false} if the wait was interrupted, in which case the caller must give up
+     */
+    private boolean waitBeforeRetry(int attempt)
+    {
+        try {
+            Thread.sleep(ThreadLocalRandom.current().nextLong(1, WRITE_RETRY_DELAY_MILLIS * attempt));
+            return true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
     }
 
     /**

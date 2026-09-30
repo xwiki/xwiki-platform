@@ -2046,7 +2046,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public void saveLock(XWikiLock lock, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        executeWrite(inputxcontext, session -> {
+        // Retry on failure: a page is locked and unlocked by several concurrent requests (e.g. leaving an
+        // administration section unlocks its configurable page while the section being opened locks its own), and the
+        // resulting concurrent writes on this single small table can deadlock, which the database breaks by rolling
+        // one of them back.
+        executeWriteWithRetry(inputxcontext, session -> {
             try {
                 // Remove the previous lock, if any, before inserting the new one, rather than updating it in place.
                 // An update would fail if the previous lock was removed concurrently, in the mean time (Hibernate
@@ -2066,7 +2070,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public void deleteLock(XWikiLock lock, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
-        executeWrite(inputxcontext, session -> {
+        // Retry on failure, for the same reason as in #saveLock(XWikiLock, XWikiContext, boolean).
+        executeWriteWithRetry(inputxcontext, session -> {
             try {
                 deleteLock(session, lock.getDocId());
             } catch (Exception e) {

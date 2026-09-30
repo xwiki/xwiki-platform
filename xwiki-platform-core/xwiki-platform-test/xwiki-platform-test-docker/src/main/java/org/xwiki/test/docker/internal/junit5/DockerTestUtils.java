@@ -77,7 +77,11 @@ public final class DockerTestUtils
 
     private static final Pattern REPETITION_PATTERN = Pattern.compile("\\[test-template-invocation:#(.*)\\]");
 
-    private static final long DAY = 1000L * 60L * 60L * 24L;
+    /**
+     * How often to pull the images that we don't build ourselves, in milliseconds (once a day, to avoid the pull rate
+     * limit of dockerhub).
+     */
+    static final long PULL_INTERVAL = 1000L * 60L * 60L * 24L;
 
     private static List<String> pulledImages = new ArrayList<>();
 
@@ -150,8 +154,8 @@ public final class DockerTestUtils
         // Get the latest image in case the tag has been updated on dockerhub.
         String dockerImageName = container.getDockerImageName();
 
-        // TODO: Force pulling the selenium FF and Chrome docker images.
-        // Remove once https://github.com/testcontainers/testcontainers-java/issues/4608 is fixed
+        // Pull the selenium FF and Chrome docker images at most once a day, since the pull policy set below doesn't
+        // apply to them. Remove once https://github.com/testcontainers/testcontainers-java/issues/4608 is fixed
         BrowserTestUtils.pullBrowserImages(container, testConfiguration);
 
         // Don't pull if:
@@ -162,7 +166,7 @@ public final class DockerTestUtils
         if (!testConfiguration.isOffline() && !pulledImages.contains(dockerImageName)
             && !(container instanceof XWikiLocalGenericContainer)) {
             // Pull images once every day (to avoid the 200 pull rate limit of dockerhub when authenticated).
-            container.withImagePullPolicy(new DurationImagePullPolicy(DAY));
+            container.withImagePullPolicy(new DurationImagePullPolicy(PULL_INTERVAL));
             pulledImages.add(dockerImageName);
         }
 

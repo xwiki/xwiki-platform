@@ -229,6 +229,9 @@ public class LogCaptureValidator
      * @since 17.4.9
      * @since 16.10.17
      */
+    // warn/error are always enabled in XWiki's default logging configuration, so guarding this call
+    // could never skip the evaluation of its arguments.
+    @SuppressWarnings("java:S2629")
     public void validate(Stream<String> logContent, LogCaptureConfiguration configuration, boolean displayMissing,
         boolean jobLog)
     {

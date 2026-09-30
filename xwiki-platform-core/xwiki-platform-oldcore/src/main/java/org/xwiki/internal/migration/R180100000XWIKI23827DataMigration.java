@@ -101,6 +101,15 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
     {
         return new XWikiDBVersion(180100000);
     }
+
+    @Override
+    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    {
+        int version = startupVersion.getVersion();
+        // The migration is backported in 17.10.14 so any DB between 17.10.14 and 18.0.0 don't need to execute it
+        // again.
+        return super.shouldExecute(startupVersion) && !(version >= 171014000 && version < 180000000);
+    }
     
     private static class XClassWithPasswordProperties
     {

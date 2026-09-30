@@ -73,9 +73,19 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     implements Initializable
 {
     @Inject
+    // 'transient' is deliberate here: AbstractExtension keeps a non-transient reference to its
+    // repository and extensions are serialized with XStream inside job statuses. XStream honours
+    // 'transient' independently of java.io.Serializable, so removing it would pull the injected
+    // components and caches into that graph.
+    @SuppressWarnings("java:S2065")
     private transient InstalledExtensionRepository installedRepository;
 
     @Inject
+    // 'transient' is deliberate here: AbstractExtension keeps a non-transient reference to its
+    // repository and extensions are serialized with XStream inside job statuses. XStream honours
+    // 'transient' independently of java.io.Serializable, so removing it would pull the injected
+    // components and caches into that graph.
+    @SuppressWarnings("java:S2065")
     private transient XarEntryTypeResolver typeResolver;
 
     @Inject

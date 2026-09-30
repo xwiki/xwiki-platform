@@ -19,15 +19,21 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Action used to remove a comment from a page, requires comment right but not edit right. Note that this class is
@@ -41,6 +47,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class CommentDeleteAction extends AbstractObjectRemoveAction
 {
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
+
     /**
      * Set up the few keys used by this component.
      */
@@ -63,5 +76,15 @@ public class CommentDeleteAction extends AbstractObjectRemoveAction
             return null;
         }
         return commentClassReference;
+    }
+
+    @Override
+    protected boolean canRemoveObject(BaseObject obj, XWikiContext context)
+    {
+        // Only the author of the comment or an administrator can remove it.
+        DocumentReference authorReference = this.documentReferenceResolver.resolve(obj.getStringValue("author"));
+        DocumentReference userReference = context.getUserReference();
+        return authorReference.equals(userReference)
+            || this.authorizationManager.hasAccess(Right.ADMIN, userReference, context.getDoc().getDocumentReference());
     }
 }

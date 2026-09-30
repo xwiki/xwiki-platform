@@ -29,6 +29,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.CurrentUserReference;
@@ -50,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,7 +65,14 @@ import static org.mockito.Mockito.when;
 @ReferenceComponentList
 @OldcoreTest()
 class CommentDeleteActionTest
-{   
+{
+    private static final String COMMENT_AUTHOR = "XWiki.Author";
+
+    private static final DocumentReference COMMENT_AUTHOR_REFERENCE =
+        new DocumentReference("xwiki", "XWiki", "Author");
+
+    private static final DocumentReference OTHER_USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "Other");
+
     /**
      * The object being tested.
      */
@@ -129,6 +138,7 @@ class CommentDeleteActionTest
         DocumentReference commentClassReference = new DocumentReference("XWiki", "XWiki", "XWikiComments");
         when(this.mockClonedDocument.resolveClassReference("XWikiComments")).thenReturn(commentClassReference);
         when(this.mockClonedDocument.getXObject(commentClassReference, 0)).thenReturn(this.mockComment);
+        when(this.mockComment.getStringValue("author")).thenReturn(COMMENT_AUTHOR);
         when(this.mockClonedDocument.getAuthors()).thenReturn(mockAuthors);
         // Those are necessary for the call to checkSavingDocument made while deleting the comment.
         DocumentReference documentReference = new DocumentReference("XWiki", "Foo", "Bar",
@@ -150,6 +160,8 @@ class CommentDeleteActionTest
     @Test
     void deleteComment() throws Exception
     {
+        this.context.setUserReference(COMMENT_AUTHOR_REFERENCE);
+
         // First, we check that the request has returned the right result.
         assertFalse(this.commentDeleteAction.action(this.context));
         // Then, we check that we did take CSRF validation into consideration
@@ -175,5 +187,18 @@ class CommentDeleteActionTest
         verify(this.mockClonedDocument, never()).removeXObject(any(BaseObject.class));
         verify(this.context.getWiki(), never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),
             anyBoolean(), any(XWikiContext.class));
+    }
+
+    @Test
+    void deleteCommentOfAnotherUserWithoutAdminRight() throws Exception
+    {
+        this.context.setUserReference(OTHER_USER_REFERENCE);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(eq(Right.ADMIN), eq(OTHER_USER_REFERENCE), any()))
+            .thenReturn(false);
+
+        // The action returns true so that the error template is rendered.
+        assertTrue(this.commentDeleteAction.action(this.context));
+        verify(this.mockClonedDocument, never()).removeXObject(any());
+        verify(this.context.getWiki(), never()).saveDocument(any(), any(), eq(true), eq(true), any());
     }
 }

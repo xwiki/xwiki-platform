@@ -118,6 +118,19 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
         return obj;
     }
 
+    /**
+     * Checks whether the current user is allowed to remove the given object, on top of the right associated with the
+     * action.
+     *
+     * @param obj the object to remove
+     * @param context the current context
+     * @return {@code true} if the object can be removed, {@code false} otherwise
+     */
+    protected boolean canRemoveObject(BaseObject obj, XWikiContext context)
+    {
+        return true;
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -136,7 +149,7 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
         doc = doc.clone();
 
         BaseObject obj = getObject(doc, context);
-        if (obj == null) {
+        if (obj == null || !canRemoveObject(obj, context)) {
             return true;
         }
 

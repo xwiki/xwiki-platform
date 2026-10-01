@@ -21,4 +21,5 @@
 #set ($parameters = {})
 #set ($discard = $parameters.putAll($displayer.parameters))
 #set ($parameters.value = $displayer.value)
-#multiLocationPicker($parameters)
+#set ($parameters.multiple = true)
+#compactLocationPicker($parameters)

@@ -122,7 +122,8 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
       q: text,
       scope: ['name', 'title'],
       // The search doesn't know about spaces so we have to filter out the terminal pages ourselves, which means we need
-      // to ask for more results than we display.
+      // to ask for more results than we display. This still doesn't guarantee that we get any space home page, because
+      // the terminal pages can be more numerous, which is one reason why we also search the spaces directly.
       number: limit * 4,
       localeAware: true,
       prettyNames: true
@@ -141,6 +142,8 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
     return $.getJSON(getRestSearchURL(options.searchScope), $.param({
       q: text,
       scope: 'spaces',
+      // Both search sources often return the same spaces, which are removed when the results are merged, so we ask for
+      // more results than we display in order to still have enough suggestions afterwards.
       number: limit * 2
     })).then(function(response) {
       const spaces = Array.isArray(response.searchResults) ? response.searchResults : [];

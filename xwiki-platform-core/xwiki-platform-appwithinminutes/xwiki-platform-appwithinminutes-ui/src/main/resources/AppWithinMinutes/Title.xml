@@ -53,7 +53,10 @@
     #end
   #end
   {{html clean="false"}}
+  ## Prevent entering a title that the store would fail to save.
+  #set ($titleMaxLength = $doc.titleMaxLength)
   &lt;input id="$id" type="text" name="$name" value="$!escapetool.xml($value)"
+    #if ($titleMaxLength &gt; 0)maxlength="$titleMaxLength" #end
     ## The default value for an AppWithinMinutes field should be optional so we make only the actual page title
     ## mandatory and not the template title, which holds the default title value.
     #if ($name == 'title' &amp;&amp; $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)required #end

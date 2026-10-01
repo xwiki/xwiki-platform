@@ -9662,6 +9662,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");
     }
 
+    /**
+     * Compute and return the maximum authorized length for the title of the document based on the current store
+     * limitation.
+     *
+     * @return the maximum authorized length for a document title, or {@code -1} if it cannot be determined because
+     *         there is no XWiki context
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public int getTitleMaxLength()
+    {
+        XWikiContext xcontext = getXWikiContext();
+        if (xcontext == null) {
+            return -1;
+        }
+
+        // Use the wiki store since the document store is only set once the document has been loaded or saved.
+        return getStore(xcontext).getLimitSize(xcontext, XWikiDocument.class, "title");
+    }
+
     @Override
     public DocumentAuthors getAuthors()
     {

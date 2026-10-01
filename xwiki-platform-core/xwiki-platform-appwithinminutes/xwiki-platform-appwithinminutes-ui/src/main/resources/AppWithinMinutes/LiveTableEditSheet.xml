@@ -156,7 +156,10 @@
       &lt;label for="xwikidoctitleinput"&gt;$services.localization.render('core.editors.content.titleField.label')&lt;/label&gt;
       &lt;span class="xHint"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorTitleHint')&lt;/span&gt;
     &lt;/dt&gt;
-    &lt;dd&gt;&lt;input id="xwikidoctitleinput" type="text" name="title" value="$escapetool.xml($doc.title)"/&gt;&lt;/dd&gt;
+    ## Prevent entering a title that the store would fail to save.
+    #set ($titleMaxLength = $doc.titleMaxLength)
+    &lt;dd&gt;&lt;input id="xwikidoctitleinput" type="text" name="title" value="$escapetool.xml($doc.title)"
+      #if ($titleMaxLength &gt; 0)maxlength="$titleMaxLength" #end/&gt;&lt;/dd&gt;
     &lt;dt&gt;
       &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;
         $doc.displayPrettyName('description', false, false)

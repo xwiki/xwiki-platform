@@ -781,4 +781,15 @@ class DocumentTest
                   </object>
                 </xwikidoc>""".formatted(object.getGuid()), document.getXMLContent());
     }
+
+    @Test
+    void getTitleMaxLength()
+    {
+        XWikiContext context = this.oldcore.getXWikiContext();
+        when(this.oldcore.getMockStore().getLimitSize(context, XWikiDocument.class, "title")).thenReturn(768);
+
+        Document document = new Document(new XWikiDocument(new DocumentReference("wiki", "Space", "Page")), context);
+
+        assertEquals(768, document.getTitleMaxLength());
+    }
 }

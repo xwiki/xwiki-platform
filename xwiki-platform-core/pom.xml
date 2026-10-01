@@ -153,6 +153,19 @@
             
             
             
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.web.ObjectRemoveAction</old>
+                  <new>class com.xpn.xwiki.web.ObjectRemoveAction</new>
+                  <superClass>com.xpn.xwiki.web.AbstractObjectRemoveAction</superClass>
+                  <justification>Not a breakage in our case (no final methods), the new superclass only holds the code previously in ObjectRemoveAction.</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

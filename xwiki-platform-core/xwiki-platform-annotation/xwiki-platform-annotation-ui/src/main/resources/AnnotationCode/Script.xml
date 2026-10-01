@@ -1270,7 +1270,7 @@ XWiki.Annotation = Class.create({
   },
 
   addDeleteListener : function(item, inBubble, container) {
-    // A form posts to objectremove, a link goes through the annotation REST API; both are sent as a confirmed
+    // A form posts to commentremove, a link goes through the annotation REST API; both are sent as a confirmed
     // AJAX request so the list updates in place. Never match an enclosing form: it would be submitted with its
     // own action, saving the annotation instead of deleting it.
     const form = item.closest('form.delete-form');
@@ -1291,7 +1291,7 @@ XWiki.Annotation = Class.create({
             item.disabled = true;
           },
           onSuccess : function(response) {
-            // objectremove (form branch) doesn't return the annotation REST API's JSON payload, so it can't be
+            // commentremove (form branch) doesn't return the annotation REST API's JSON payload, so it can't be
             // checked/reused the same way.
             if (!form &amp;&amp; this.checkResponseCodeAndFail(response)) {
               return;

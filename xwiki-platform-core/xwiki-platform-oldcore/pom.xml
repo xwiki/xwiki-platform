@@ -879,7 +879,6 @@
                 **/web/LockAction.java,
                 **/web/ObjectAddAction.java,
                 **/web/ObjectAddForm.java,
-                **/web/ObjectRemoveAction.java,
                 **/web/ObjectRemoveForm.java,
                 **/web/PreviewAction.java,
                 **/web/PreviewForm.java,

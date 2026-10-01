@@ -151,6 +151,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             actionMap.put("reset", DELETE);
             actionMap.put("commentadd", COMMENT);
             actionMap.put("commentsave", COMMENT);
+            actionMap.put("commentremove", COMMENT);
             actionMap.put(REGISTER, REGISTER);
             actionMap.put("redirect", "view");
             actionMap.put(ADMIN, ADMIN);

@@ -116,6 +116,7 @@ public class StaticListClass extends ListClass
             input.setName(prefix + name);
             input.setID(prefix + name);
             input.setDisabled(isDisabled());
+            setAriaLabelFallback(input, context);
 
             if (isPicker()) {
                 input.setClass("suggested");

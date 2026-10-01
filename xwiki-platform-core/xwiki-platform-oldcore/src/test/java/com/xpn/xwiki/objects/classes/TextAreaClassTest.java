@@ -19,15 +19,22 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.Map;
+
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.xwiki.edit.Editor;
+import org.xwiki.edit.EditorManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxContent;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -50,6 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -78,8 +86,37 @@ class TextAreaClassTest
     @MockComponent
     private VelocityEvaluator velocityEvaluator;
 
+    @MockComponent
+    private EditorManager editorManager;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
+
     @RegisterExtension
     private final LogCaptureExtension logCaptureExtension = new LogCaptureExtension();
+
+    @Test
+    void displayEditSetsAriaLabel() throws Exception
+    {
+        XWikiDocument spyDocument = getSpyDocument();
+
+        TextAreaClass textAreaClass = new TextAreaClass();
+        textAreaClass.setPrettyName("Description");
+        // Avoid falling back to XWiki#getEditorPreference(), which needs an EditConfiguration component.
+        textAreaClass.setEditor("text");
+        BaseObject object = new BaseObject();
+        object.setOwnerDocument(spyDocument);
+
+        Editor<SyntaxContent> editor = mock(Editor.class);
+        when(this.editorManager.<SyntaxContent>getDefaultEditor(eq(SyntaxContent.class), any())).thenReturn(editor);
+
+        textAreaClass.displayEdit(new StringBuffer(), PROPERTY_NAME, "", object, this.oldcore.getXWikiContext());
+
+        ArgumentCaptor<Map<String, Object>> parametersCaptor = ArgumentCaptor.captor();
+        verify(editor).render(any(), parametersCaptor.capture());
+        // This is the parameter actually consumed by xdom_macros.vm, on the text/puretext editors' path.
+        assertEquals("Description", parametersCaptor.getValue().get("aria-label"));
+    }
 
     @Test
     void viewWikiText()

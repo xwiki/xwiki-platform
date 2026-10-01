@@ -139,7 +139,7 @@ catalog:
   lib0: 0.2.118
   lodash-es: 4.18.1
   lz-string: 1.5.0
-  mdast-util-gfm-strikethrough: 2.0.0
+  mdast-util-gfm-strikethrough: 2.0.1
   mdast-util-gfm-table: 2.0.0
   mdast-util-gfm-task-list-item: 2.0.0
   micromark-extension-gfm-strikethrough: 2.1.0

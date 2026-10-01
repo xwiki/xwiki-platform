@@ -741,7 +741,11 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTemplateField(String fieldName, String fieldPrettyName)
     {
-        return addTextAreaField(fieldName, fieldPrettyName, 80, 15, EditorType.PURE_TEXT);
+        // A template is not wiki content in the syntax of the document holding it: the template manager evaluates it
+        // as Velocity, or parses it in the syntax declared by its "##!source.syntax" header. Set the content type
+        // explicitly since an empty one means wiki content, which would get the template parsed and re-rendered in the
+        // document syntax (e.g. when updating links after a rename).
+        return addTextAreaField(fieldName, fieldPrettyName, 80, 15, EditorType.PURE_TEXT, ContentType.PURE_TEXT);
     }
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows)

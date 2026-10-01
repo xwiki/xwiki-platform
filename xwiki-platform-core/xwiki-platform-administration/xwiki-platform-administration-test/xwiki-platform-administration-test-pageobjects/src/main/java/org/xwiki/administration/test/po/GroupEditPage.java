@@ -76,6 +76,23 @@ public class GroupEditPage extends InlinePage
         return addMembersToGroup(this.groupInput, groups);
     }
 
+    /**
+     * Types the given text in the user picker and collects the suggested users, then clears the picker.
+     *
+     * @param text the text to type in the user picker
+     * @return the values (user references) of the suggested users
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public List<String> getUserSuggestions(String text)
+    {
+        SuggestInputElement picker = new SuggestInputElement(this.userInput);
+        List<String> suggestions = picker.clear().sendKeys(text).waitForNonTypedSuggestions().getSuggestedValues();
+        picker.clear().hideSuggestions();
+        return suggestions;
+    }
+
     private GroupEditPage addMembersToGroup(WebElement input, String... members)
     {
         SuggestInputElement picker = new SuggestInputElement(input);

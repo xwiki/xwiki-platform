@@ -216,10 +216,14 @@ class SaveActionTest
     {
         when(mockForm.getLanguage()).thenReturn("fr");
         when(mockClonedDocument.getTranslatedDocument("fr", this.context)).thenReturn(mockClonedDocument);
-        when(mockClonedDocument.getDocumentReference()).thenReturn(new DocumentReference("xwiki", "My", "Page"));
+        DocumentReference documentReference = new DocumentReference("xwiki", "My", "Page");
+        when(mockClonedDocument.getDocumentReference()).thenReturn(documentReference);
         when(mockClonedDocument.getStore()).thenReturn(this.oldcore.getMockStore());
-        // The form doesn't submit the syntax, as with in-place editing.
-        when(mockClonedDocument.getSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
+        // The form doesn't submit the syntax, as with in-place editing: the new translation gets the syntax of the
+        // original document.
+        XWikiDocument originalDocument = mock(XWikiDocument.class);
+        when(originalDocument.getSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
+        when(xWiki.getDocument(documentReference, this.context)).thenReturn(originalDocument);
         when(xWiki.getStore()).thenReturn(this.oldcore.getMockStore());
         context.put("ajax", true);
         when(xWiki.isMultiLingual(this.context)).thenReturn(true);

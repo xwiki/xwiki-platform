@@ -22,6 +22,7 @@ package org.xwiki.lesscss.internal.resources;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.Template;
@@ -30,6 +31,8 @@ import org.xwiki.template.TemplateManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -71,6 +74,42 @@ public class LESSSkinFileResourceReferenceTest
 
         // Test
         assertEquals("// My LESS file", lessSkinFileResourceReference.getContent("skin"));
+    }
+
+    @Test
+    public void getTemplateContent() throws Exception
+    {
+        LESSSkinFileResourceReference lessSkinFileResourceReference
+                = new LESSSkinFileResourceReference("style.less", templateManager, skinManager);
+
+        // Mocks
+        Template template = mock(Template.class);
+        when(templateManager.getTemplate("less/style.less", skin)).thenReturn(template);
+        TemplateContent templateContent = mock(TemplateContent.class);
+        when(template.getContent()).thenReturn(templateContent);
+        DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Author");
+        DocumentReference documentReference = new DocumentReference("xwiki", "Sandbox", "StdSkin");
+        when(templateContent.getAuthorReference()).thenReturn(authorReference);
+        when(templateContent.getDocumentReference()).thenReturn(documentReference);
+
+        // Test
+        TemplateContent result = lessSkinFileResourceReference.getTemplateContent("skin");
+
+        // Verify
+        assertSame(templateContent, result);
+        assertEquals(authorReference, result.getAuthorReference());
+        assertEquals(documentReference, result.getDocumentReference());
+    }
+
+    @Test
+    public void getTemplateContentWhenFileDoesNotExist()
+    {
+        LESSSkinFileResourceReference lessSkinFileResourceReference
+                = new LESSSkinFileResourceReference("not-existing-file.less", templateManager, skinManager);
+
+        LESSCompilerException exception = assertThrows(LESSCompilerException.class,
+            () -> lessSkinFileResourceReference.getTemplateContent("skin"));
+        assertEquals("The template [not-existing-file.less] does not exist.", exception.getMessage());
     }
 
     @Test

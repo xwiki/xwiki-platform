@@ -28,7 +28,7 @@
 /**
  * Resolves an entity reference from a string representation of the form "entityType:entityReference".
  */
-var resolveEntityReference = function(typeAndReference) {
+const resolveEntityReference = function(typeAndReference) {
   if (typeof typeAndReference === 'string') {
     try {
       return XWiki.Model.resolve(typeAndReference, null, XWiki.currentDocument.documentReference);
@@ -41,22 +41,22 @@ var resolveEntityReference = function(typeAndReference) {
   return typeAndReference;
 };
 
-var getRestSearchURL = function(searchScope) {
-  var spaces = searchScope.getReversedReferenceChain().filter(function(component) {
+const getRestSearchURL = function(searchScope) {
+  const spaces = searchScope.getReversedReferenceChain().filter(function(component) {
     return component.type === XWiki.EntityType.SPACE;
   }).map(function(component) {
     return component.name;
   });
-  var wiki = searchScope.extractReferenceValue(XWiki.EntityType.WIKI);
+  const wiki = searchScope.extractReferenceValue(XWiki.EntityType.WIKI);
   return XWiki.Document.getRestSearchURL('', spaces, wiki);
 };
 
-var resolveSpaceReference = function(localSpaceReference, wiki) {
+const resolveSpaceReference = function(localSpaceReference, wiki) {
   return XWiki.Model.resolve(localSpaceReference, XWiki.EntityType.SPACE, [wiki]);
 };
 
-var removeDuplicates = function(suggestions) {
-  var seen = {};
+const removeDuplicates = function(suggestions) {
+  const seen = {};
   return suggestions.filter(function(suggestion) {
     if (Object.hasOwn(seen, suggestion.value)) {
       return false;
@@ -70,9 +70,9 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
   webHome = webHome || 'WebHome';
 
   // How many suggestions we show at most.
-  var limit = 10;
+  const limit = 10;
 
-  var getSelectizeOptions = function(select) {
+  const getSelectizeOptions = function(select) {
     return {
       create: true,
       // The document where the selected values are saved. Stored space references will be relative to the wiki of this
@@ -94,7 +94,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
     };
   };
 
-  var processOptions = function(options) {
+  const processOptions = function(options) {
     // Resolve the document reference relative to the current document reference.
     if (!options.documentReference || typeof options.documentReference === 'string') {
       options.documentReference = XWiki.Model.resolve(options.documentReference, XWiki.EntityType.DOCUMENT,
@@ -110,14 +110,14 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
    * Looks for spaces matching the given text using two complementary search sources, because neither of them is enough
    * on its own.
    */
-  var loadSpaces = function(text, options) {
+  const loadSpaces = function(text, options) {
     return $.when(loadSpacesFromPages(text, options), loadSpacesFromSpaces(text, options))
       .then(function(spacesFromPages, spacesFromSpaces) {
         return removeDuplicates(spacesFromPages.concat(spacesFromSpaces)).slice(0, limit);
       });
   };
 
-  var loadSpacesFromPages = function(text, options) {
+  const loadSpacesFromPages = function(text, options) {
     return $.getJSON(getRestSearchURL(options.searchScope), $.param({
       q: text,
       scope: ['name', 'title'],
@@ -127,7 +127,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
       localeAware: true,
       prettyNames: true
     }, true)).then(function(response) {
-      var pages = Array.isArray(response.searchResults) ? response.searchResults : [];
+      const pages = Array.isArray(response.searchResults) ? response.searchResults : [];
       // Only the non-terminal pages, i.e. the pages backing a space, are of interest here.
       return pages.filter(function(page) {
         return page.pageName === webHome;
@@ -137,13 +137,13 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
     });
   };
 
-  var loadSpacesFromSpaces = function(text, options) {
+  const loadSpacesFromSpaces = function(text, options) {
     return $.getJSON(getRestSearchURL(options.searchScope), $.param({
       q: text,
       scope: 'spaces',
       number: limit * 2
     })).then(function(response) {
-      var spaces = Array.isArray(response.searchResults) ? response.searchResults : [];
+      const spaces = Array.isArray(response.searchResults) ? response.searchResults : [];
       return spaces.map(function(space) {
         return createSuggestion(options, resolveSpaceReference(space.space, space.wiki));
       });
@@ -155,9 +155,9 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
   /**
    * Loads a space that is already selected, in order to display it with its pretty name and hierarchy.
    */
-  var loadSpace = function(value, options) {
-    var spaceReference = XWiki.Model.resolve(value, XWiki.EntityType.SPACE, options.documentReference);
-    var homeReference = new XWiki.EntityReference(webHome, XWiki.EntityType.DOCUMENT, spaceReference);
+  const loadSpace = function(value, options) {
+    const spaceReference = XWiki.Model.resolve(value, XWiki.EntityType.SPACE, options.documentReference);
+    const homeReference = new XWiki.EntityReference(webHome, XWiki.EntityType.DOCUMENT, spaceReference);
     return $.getJSON(new XWiki.Document(homeReference).getRestURL(), $.param({
       prettyNames: true
     })).then(function(page) {
@@ -173,10 +173,10 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
    * Adapts a page returned by the REST search or by the page resource to the format expected by the Selectize widget.
    * The page is expected to be the home page of a space.
    */
-  var processPage = function(options, page) {
-    var spaceReference = resolveSpaceReference(page.space, page.wiki);
-    var hierarchy = page.hierarchy?.items || [];
-    var labels = hierarchy.filter(function(item) {
+  const processPage = function(options, page) {
+    const spaceReference = resolveSpaceReference(page.space, page.wiki);
+    const hierarchy = page.hierarchy?.items || [];
+    const labels = hierarchy.filter(function(item) {
       return item.type === 'space';
     }).map(function(item) {
       return item.label;
@@ -194,7 +194,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
    * @param labels the labels of the spaces in the hierarchy, the last one being the label of the given space; when not
    *   specified the names from the space reference are used instead
    */
-  var createSuggestion = function(options, spaceReference, labels) {
+  const createSuggestion = function(options, spaceReference, labels) {
     if (!labels?.length) {
       labels = spaceReference.getReversedReferenceChain().filter(function(component) {
         return component.type === XWiki.EntityType.SPACE;
@@ -202,8 +202,8 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
         return component.name;
       });
     }
-    var relativeReference = spaceReference.relativeTo(options.documentReference.getRoot());
-    var homeReference = new XWiki.EntityReference(webHome, XWiki.EntityType.DOCUMENT, spaceReference);
+    const relativeReference = spaceReference.relativeTo(options.documentReference.getRoot());
+    const homeReference = new XWiki.EntityReference(webHome, XWiki.EntityType.DOCUMENT, spaceReference);
     return {
       value: XWiki.Model.serialize(relativeReference),
       label: labels[labels.length - 1],
@@ -216,7 +216,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
 
   $.fn.suggestSpaces = function(options) {
     return this.each(function() {
-      var actualOptions = $.extend(getSelectizeOptions($(this)), options);
+      const actualOptions = $.extend(getSelectizeOptions($(this)), options);
       $(this).xwikiSelectize(processOptions(actualOptions));
     });
   };
@@ -227,8 +227,8 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
 });
 
 require(['jquery', 'xwiki-suggestSpaces', 'xwiki-events-bridge'], function($) {
-  var init = function(event, data) {
-    var container = $(data?.elements || document);
+  const init = function(event, data) {
+    const container = $(data?.elements || document);
     container.find('.suggest-spaces').suggestSpaces();
   };
 

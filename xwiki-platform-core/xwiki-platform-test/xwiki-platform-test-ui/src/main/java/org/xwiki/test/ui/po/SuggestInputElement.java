@@ -361,6 +361,17 @@ public class SuggestInputElement extends BaseElement
     }
 
     /**
+     * @return the values of all the suggestions
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public List<String> getSuggestedValues()
+    {
+        return getSuggestions().stream().map(SuggestionElement::getValue).toList();
+    }
+
+    /**
      * Selects an element by clicking on the suggestion with the given position.
      *
      * @return the current suggest input element

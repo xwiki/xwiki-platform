@@ -94,6 +94,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -1256,6 +1257,61 @@ class XWikiDocumentTest
         assertTrue(targetDocument.apply(otherDocument));
 
         assertEquals("text/html", targetDocument.getAttachment("file.txt").getMimeType());
+    }
+
+    @Test
+    void getSyntaxOfNewTranslation()
+    {
+        this.document.setSyntax(Syntax.MARKDOWN_1_1);
+
+        XWikiDocument newTranslation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+
+        assertEquals(Syntax.MARKDOWN_1_1, newTranslation.getSyntax());
+    }
+
+    @Test
+    void getSyntaxOfNewTranslationWithExplicitSyntax()
+    {
+        this.document.setSyntax(Syntax.MARKDOWN_1_1);
+
+        XWikiDocument newTranslation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+        newTranslation.setSyntax(Syntax.PLAIN_1_0);
+
+        assertEquals(Syntax.PLAIN_1_0, newTranslation.getSyntax());
+    }
+
+    @Test
+    void getSyntaxOfNewTranslationOfNewDocument()
+    {
+        this.document.setSyntax(Syntax.MARKDOWN_1_1);
+        this.document.setNew(true);
+
+        XWikiDocument newTranslation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+
+        assertEquals(Syntax.XWIKI_2_1, newTranslation.getSyntax());
+    }
+
+    @Test
+    void getSyntaxOfNewTranslationWhenOriginalDocumentFailsToLoad() throws Exception
+    {
+        when(this.xWiki.getDocument(any(DocumentReference.class), any()))
+            .thenThrow(new XWikiException(0, 0, "load error"));
+
+        XWikiDocument newTranslation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+
+        assertEquals(Syntax.XWIKI_2_1, newTranslation.getSyntax());
+        assertEquals("Failed to load the original document of the new translation [Wiki:Space.Page(fr)] to get its"
+            + " syntax, using the default syntax instead. Root cause is [XWikiException: Error number 0 in 0:"
+            + " load error].", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void getSyntaxOfNewDocument() throws Exception
+    {
+        XWikiDocument newDocument = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, "NewPage"));
+
+        assertEquals(Syntax.XWIKI_2_1, newDocument.getSyntax());
+        verify(this.xWiki, never()).getDocument(any(DocumentReference.class), any());
     }
 
     /**

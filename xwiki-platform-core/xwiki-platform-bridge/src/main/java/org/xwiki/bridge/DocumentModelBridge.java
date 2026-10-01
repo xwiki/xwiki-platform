@@ -71,9 +71,7 @@ public interface DocumentModelBridge
      * translate.
      * 
      * @return the locale of this translation, {@link Locale#ROOT} for the original document
-     * @since 17.10.14
-     * @since 18.4.6
-     * @since 18.8.0
+     * @since 18.9.0RC1
      */
     default Locale getLocale()
     {

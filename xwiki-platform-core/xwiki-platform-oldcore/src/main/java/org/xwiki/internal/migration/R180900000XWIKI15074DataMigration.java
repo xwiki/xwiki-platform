@@ -58,8 +58,8 @@ public class R180900000XWIKI15074DataMigration extends AbstractHibernateDataMigr
     private static final int BATCH_SIZE = 100;
 
     // Empty values are stored either as empty strings or as null (Oracle stores empty strings as null), so
-    // "length(...) > 0" is the portable way of selecting the non-empty ones. A translation with an empty syntax is loaded
-    // with the xwiki/1.0 syntax, so it's selected too when the original document has a syntax.
+    // "length(...) > 0" is the portable way of selecting the non-empty ones. A translation with an empty syntax is
+    // loaded with the xwiki/1.0 syntax, so it's selected too when the original document has a syntax.
     private static final String MISMATCHED_TRANSLATIONS_QUERY = "select translation.id, original.syntaxId "
         + "from XWikiDocument translation, XWikiDocument original "
         + "where translation.fullName = original.fullName and length(translation.language) > 0 "
@@ -109,7 +109,7 @@ public class R180900000XWIKI15074DataMigration extends AbstractHibernateDataMigr
                     // Nothing could be updated, so the next query would return the same translations.
                     throw new DataMigrationException(String.format(
                         "Failed to update the syntax of the [%s] translations with id [%s] and the following ones.",
-                        results.size(), results.get(0)[0]));
+                        results.size(), results.getFirst()[0]));
                 }
                 total += updated;
             }

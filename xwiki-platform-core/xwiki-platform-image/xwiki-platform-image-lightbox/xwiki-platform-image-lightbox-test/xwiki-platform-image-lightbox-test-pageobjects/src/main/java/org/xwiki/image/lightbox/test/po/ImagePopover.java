@@ -20,6 +20,8 @@
 package org.xwiki.image.lightbox.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
@@ -32,6 +34,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class ImagePopover extends BaseElement
 {
+    private static final int MAX_CLICK_ATTEMPTS = 3;
+
     /**
      * Click on the open lightbox action of the image popover.
      *
@@ -39,12 +43,25 @@ public class ImagePopover extends BaseElement
      */
     public Lightbox openLightbox()
     {
-        // Locate without scrolling: the popover is already visible (placed at the cursor over an in-viewport image),
-        // so scrolling is unnecessary, and the scroll would move the image out from under the stationary pointer,
-        // firing a mouseleave that arms the popover's auto-hide timer and racing the click into a stale element.
-        getDriver().findElementWithoutScrolling(By.cssSelector(".popover .openLightbox")).click();
-
-        return new Lightbox();
+        By openLightboxButton = By.cssSelector(".popover .openLightbox");
+        for (int attempt = 1;; attempt++) {
+            try {
+                // Locate without scrolling: the popover is already visible (placed at the cursor over an in-viewport
+                // image), so scrolling is unnecessary, and the scroll would move the image out from under the
+                // stationary pointer, firing a mouseleave that arms the popover's auto-hide timer.
+                getDriver().findElementWithoutScrolling(openLightboxButton).click();
+                return new Lightbox();
+            } catch (StaleElementReferenceException | NoSuchElementException e) {
+                // Every time the popover is shown its content is rebuilt from the toolbar template, so a mousemove
+                // reaching the image after the popover became visible (e.g. one synthesized by the browser after the
+                // popover insertion changed the layout under the stationary pointer) re-shows it and detaches the
+                // button we just found. Wait for the popover to be (re)displayed and click the new button.
+                if (attempt >= MAX_CLICK_ATTEMPTS) {
+                    throw e;
+                }
+                waitUntilReady();
+            }
+        }
     }
 
     public String getImageId()

@@ -30,10 +30,8 @@
   border: 1px solid $theme.borderColor;
   background-color: $theme.panelBackgroundColor;
   border-radius: 10px;
-}
-.xdialog-box {
   max-height: 100%; /* Needed because of position: fixed */
-  overflow: auto; 
+  overflow: auto;
   width: auto;
 }
 @media (min-width: 768px) { /* Should be: @screen-sm-min */

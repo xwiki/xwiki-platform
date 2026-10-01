@@ -48,10 +48,7 @@
   padding: 0 !important;
   margin: 0 !important;
   background-color: $theme.pageContentBackgroundColor;
-}
-
-/* This overrides the pre behavior when the buttons end up as children of such a field */
-#body .fullScreenWrapper {
+  /* This overrides the pre behavior when the buttons end up as children of such a field */
   white-space: normal;
 }
 /* This overrides a rule for the Object Editor that is supposed to resize text inputs. */

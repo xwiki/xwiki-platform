@@ -94,11 +94,8 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
 
   var onMutations = function(mutations)
   {
-    for (var i = 0; i < mutations.length; i++) {
-      var mutation = mutations[i];
-
-      for (var j = 0; j < mutation.addedNodes.length; j++) {
-        var element = mutation.addedNodes[j];
+    for (const mutation of mutations) {
+      for (const element of mutation.addedNodes) {
         // we activate placeholder because they contain class xwiki-async and they are visible
         var selector = ".xwiki-async:visible";
 

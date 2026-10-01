@@ -18,11 +18,8 @@
 
 .container-columns .column {
   float: left;
-}
-
-/* Make sure that the columns take space when they're empty: if height is auto, and they are floated, they will collapse
-   as if they didn't exist, which breaks the layout */
-.container-columns .column {
+  /* Make sure that the columns take space when they're empty: if height is auto, and they are floated, they will
+     collapse as if they didn't exist, which breaks the layout */
   min-height: 10px;
 }
 

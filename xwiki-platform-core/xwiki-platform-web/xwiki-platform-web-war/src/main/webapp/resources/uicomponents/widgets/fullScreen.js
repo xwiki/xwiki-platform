@@ -222,10 +222,11 @@ widgets.FullScreen = Class.create({
     // Remember the maximized element
     this.maximized = targetElement;
     // Remember the cursor position and scroll offset (needed for circumventing https://bugzilla.mozilla.org/show_bug.cgi?id=633789 )
+    var selectionStart, selectionEnd, scrollTop;
     if (typeof targetElement.setSelectionRange == 'function') {
-      var selectionStart = targetElement.selectionStart;
-      var selectionEnd = targetElement.selectionEnd;
-      var scrollTop = targetElement.scrollTop;
+      selectionStart = targetElement.selectionStart;
+      selectionEnd = targetElement.selectionEnd;
+      scrollTop = targetElement.scrollTop;
     }
     // Remember the original dimensions of the maximized element
     targetElement._originalStyle = {
@@ -310,10 +311,11 @@ widgets.FullScreen = Class.create({
     var targetElement = this.maximized;
     document.fire("xwiki:fullscreen:exit", { "target" : targetElement });
     // Remember the cursor position and scroll offset (needed for circumventing https://bugzilla.mozilla.org/show_bug.cgi?id=633789 )
+    var selectionStart, selectionEnd, scrollTop;
     if (typeof targetElement.setSelectionRange == 'function') {
-      var selectionStart = targetElement.selectionStart;
-      var selectionEnd = targetElement.selectionEnd;
-      var scrollTop = targetElement.scrollTop;
+      selectionStart = targetElement.selectionStart;
+      selectionEnd = targetElement.selectionEnd;
+      scrollTop = targetElement.scrollTop;
     }
     // Hide the exit buttons
     this.closeButton.hide();

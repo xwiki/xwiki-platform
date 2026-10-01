@@ -79,7 +79,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   font-weight: 100;
   margin: 0;
   padding: 4px 4px 4px 10px;
-  border: none;
   color: $theme.textColor;
 }
 
@@ -121,6 +120,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 
 .xproperty-content {
   padding: 1em 0 1em 1em;
+  clear: both;
 }
 
 .xproperty-title {
@@ -152,10 +152,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .xproperty-title label {
   font-size: 60%;
   line-height: 1em;
-}
-
-.xproperty-content {
-  clear: both;
 }
 
 .xproperty-title .xproperty-prettyName {

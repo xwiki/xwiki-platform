@@ -48,8 +48,9 @@ public class ObjectRemoveAction extends AbstractObjectRemoveAction
     }
 
     @Override
-    protected DocumentReference getClassReference(XWikiDocument doc, String className)
+    protected DocumentReference getClassReference(XWikiDocument doc, ObjectRemoveForm form)
     {
+        String className = form.getClassName();
         if (StringUtils.isBlank(className)) {
             setErrorMessage("platform.core.action.objectRemove.noClassnameSpecified");
             return null;

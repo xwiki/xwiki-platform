@@ -206,7 +206,6 @@ $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.rend
 ## By providing an anchor this behavior is stopped, without altering the URL functionality.
 #set ($queryString = $escapetool.url({
   'form_token': $services.csrf.token,
-  'classname': $xCommentClass,
   'classid': $comment.number,
   'xredirect': $doc.getURL('view')
 }))

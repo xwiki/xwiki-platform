@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -63,16 +62,11 @@ public class CommentDeleteAction extends AbstractObjectRemoveAction
     }
 
     @Override
-    protected DocumentReference getClassReference(XWikiDocument doc, String className)
+    protected DocumentReference getClassReference(XWikiDocument doc, ObjectRemoveForm form)
     {
-        DocumentReference commentClassReference = new DocumentReference(
+        // This action only removes comments.
+        return new DocumentReference(
             XWikiDocument.COMMENTSCLASS_REFERENCE.appendParent(doc.getDocumentReference().getWikiReference()));
-        // Reject any other class so that this action cannot remove other objects with only the comment right.
-        if (StringUtils.isNotBlank(className) && !commentClassReference.equals(doc.resolveClassReference(className))) {
-            setErrorMessage("platform.core.action.commentRemove.invalidClass");
-            return null;
-        }
-        return commentClassReference;
     }
 
     @Override

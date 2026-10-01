@@ -45,8 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -105,6 +103,9 @@ class CommentDeleteActionTest
     @Mock
     private BaseObject mockComment;
 
+    @Mock
+    private BaseObject mockUserObject;
+
     XWikiContext context;
 
     @BeforeEach
@@ -119,11 +120,9 @@ class CommentDeleteActionTest
         when(this.mockClonedDocument.getOriginalDocument()).thenReturn(this.mockDocument);
 
         this.context.setForm(this.mockForm);
-        when(this.mockForm.getClassName()).thenReturn("XWikiComments");
         when(this.mockForm.getClassId()).thenReturn(0);
 
         DocumentReference commentClassReference = new DocumentReference("XWiki", "XWiki", "XWikiComments");
-        when(this.mockClonedDocument.resolveClassReference("XWikiComments")).thenReturn(commentClassReference);
         when(this.mockClonedDocument.getXObject(commentClassReference, 0)).thenReturn(this.mockComment);
         when(this.mockComment.getStringValue("author")).thenReturn(COMMENT_AUTHOR);
         // Those are necessary for the call to checkSavingDocument made while deleting the comment.
@@ -159,20 +158,19 @@ class CommentDeleteActionTest
     }
 
     @Test
-    void rejectNonCommentClass() throws Exception
+    void deleteCommentIgnoresRequestedClass() throws Exception
     {
+        this.context.setUserReference(COMMENT_AUTHOR_REFERENCE);
         when(this.mockForm.getClassName()).thenReturn("XWiki.XWikiUsers");
-        when(this.mockClonedDocument.resolveClassReference("XWiki.XWikiUsers"))
-            .thenReturn(new DocumentReference("XWiki", "XWiki", "XWikiUsers"));
+        DocumentReference userClassReference = new DocumentReference("XWiki", "XWiki", "XWikiUsers");
+        when(this.mockClonedDocument.resolveClassReference("XWiki.XWikiUsers")).thenReturn(userClassReference);
+        when(this.mockClonedDocument.getXObject(userClassReference, 0)).thenReturn(this.mockUserObject);
 
-        assertTrue(this.commentDeleteAction.action(this.context));
+        assertFalse(this.commentDeleteAction.action(this.context));
 
-        assertEquals("platform.core.action.commentRemove.invalidClass",
-            this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class)
-                .getCurrentScriptContext().getAttribute("message"));
-        verify(this.mockClonedDocument, never()).removeXObject(any(BaseObject.class));
-        verify(this.context.getWiki(), never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),
-            anyBoolean(), any(XWikiContext.class));
+        verify(this.mockClonedDocument).removeXObject(this.mockComment);
+        verify(this.mockClonedDocument, never()).removeXObject(this.mockUserObject);
+        verify(this.context.getWiki()).saveDocument(this.mockClonedDocument, "changeComment", true, true, this.context);
     }
 
     @Test

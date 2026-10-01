@@ -93,14 +93,14 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
     }
 
     /**
-     * Resolves the class of the object to remove from the class name provided in the request.
+     * Resolves the class of the object to remove.
      *
      * @param doc the document holding the object to remove
-     * @param className the class name provided in the request, possibly blank
+     * @param form the form holding the request parameters
      * @return the reference of the class of the object to remove, or {@code null} if the request is not valid, in
      *     which case an error message has been set with {@link #setErrorMessage(String)}
      */
-    protected abstract DocumentReference getClassReference(XWikiDocument doc, String className);
+    protected abstract DocumentReference getClassReference(XWikiDocument doc, ObjectRemoveForm form);
 
     /**
      * Exposes a localized error message to the script context.
@@ -113,7 +113,8 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
     }
 
     /**
-     * Finds the object to remove, based on the class and object number provided in the request.
+     * Finds the object to remove, based on the class resolved by {@link #getClassReference} and the object number
+     * provided in the request.
      *
      * @param doc the document holding the object to remove
      * @param context the current context
@@ -124,7 +125,7 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
     {
         ObjectRemoveForm form = (ObjectRemoveForm) context.getForm();
 
-        DocumentReference classReference = getClassReference(doc, form.getClassName());
+        DocumentReference classReference = getClassReference(doc, form);
         if (classReference == null) {
             return null;
         }

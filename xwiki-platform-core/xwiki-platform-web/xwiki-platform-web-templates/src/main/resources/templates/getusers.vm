@@ -17,16 +17,6 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#macro (displayUserAliasWithAvatar $userReference $disabled)
-  <div class="user#if ($disabled) disabled#end" data-reference="$escapetool.xml($userReference)">
-    <span class="user-avatar-wrapper">
-      #getUserAvatarURL($userReference $avatarURL 120)
-      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="" />
-    </span>
-    <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
-  </div>
-#end
-
 #set ($userClassName = 'XWiki.XWikiUsers')
 #set ($userClass = $xwiki.getDocument($userClassName).xWikiClass)
 #set ($docProps = ['fullName', 'name'])
@@ -141,7 +131,7 @@
         'userId': $user.documentReference,
         'csrf': $services.csrf.token
       })),
-      'name': "#displayUserAliasWithAvatar($user.documentReference $disabled)",
+      'name': "#_displayUserAliasWithAvatar($user.documentReference $disabled)",
       'first_name': $userObject.getValue('first_name'),
       'last_name': $userObject.getValue('last_name'),
       'scope': $services.localization.render("xe.admin.groups.$scope")

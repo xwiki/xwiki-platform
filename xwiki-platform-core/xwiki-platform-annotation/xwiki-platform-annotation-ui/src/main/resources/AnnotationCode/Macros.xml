@@ -295,7 +295,6 @@
   ## relying on the caller or on $xcontext.doc. Keep the $ann prefix: a #set in a macro body writes to the
   ## shared Velocity context and would otherwise clobber the calling template's values.
   #set($annHasAdmin = $services.security.authorization.hasAccess('admin', $docRef))
-  #set($annHasEdit = $services.security.authorization.hasAccess('edit', $docRef))
   #set($annHasComment = $services.security.authorization.hasAccess('comment', $docRef))
   ## Validating accepts the new position of an annotation that was moved after a page edit. It only resets the
   ## annotation state, so it goes through the annotation REST API whatever the annotation class is.
@@ -344,13 +343,12 @@
       $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
       &lt;/a&gt;##
     #end
-    #if ($annHasAdmin || ($annHasEdit &amp;&amp; $isUserComment))
+    #if($annHasComment &amp;&amp; ($annHasAdmin || $isUserComment))
       ## Delete mutates state, so it's a real POST form (not a link) - a link's href can be followed by a
       ## crawler, prefetched, opened in a new tab, or navigated to directly if JavaScript never attaches.
-      #set ($deleteActionURL = $xwiki.getURL($annoDoc.fullName, 'objectremove'))
+      #set ($deleteActionURL = $xwiki.getURL($annoDoc.fullName, 'commentremove'))
       &lt;form class="delete-form" method="post" action="$escapetool.xml($deleteActionURL)"&gt;
         &lt;input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)"/&gt;
-        &lt;input type="hidden" name="classname" value="$escapetool.xml($annotationClassDocName)"/&gt;
         &lt;input type="hidden" name="classid" value="$escapetool.xml($ann.id)"/&gt;
         &lt;input type="hidden" name="xredirect" value="$escapetool.xml($annoDoc.getURL('view'))"/&gt;
         &lt;button type="submit" class="delete btn btn-default errormessage"

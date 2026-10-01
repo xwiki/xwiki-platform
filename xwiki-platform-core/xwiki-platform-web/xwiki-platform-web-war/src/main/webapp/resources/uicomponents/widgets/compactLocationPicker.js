@@ -17,13 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($webHome = $services.model.getEntityReference('DOCUMENT', 'default').name)
-#[[*/
-// Start JavaScript-only code.
-(function(webHome) {
-  "use strict";
-
 /**
  * Lets the user browse a document tree in order to feed the space suggestion input it is attached to. The tree follows
  * the selection mode of the input: with multiple selection the locations are checked and unchecked, with single
@@ -31,7 +24,9 @@
  * state itself.
  */
 define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tree'], function($, suggestSpaces) {
-  webHome = webHome || 'WebHome';
+  "use strict";
+
+  const webHome = 'WebHome';
 
   // The prefix used by the document tree for the id of the nodes backing a page.
   const documentNodePrefix = 'document:';
@@ -269,6 +264,3 @@ require(['jquery', 'xwiki-compactLocationPicker', 'xwiki-events-bridge'], functi
   $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
   $(init);
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$webHome]));

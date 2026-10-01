@@ -97,7 +97,7 @@
  *   + the options accepted by #documentTree for the tree used to browse the locations.
  *#
 #macro (compactLocationPicker $options)
-  #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/compactLocationPicker.js', true))
+  #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/compactLocationPicker.js'))
   #set ($discard = $xwiki.get('ssfx').use('uicomponents/widgets/compactLocationPicker.css', true))
   #set ($macro.parameters = {})
   #set ($discard = $macro.parameters.putAll($options))

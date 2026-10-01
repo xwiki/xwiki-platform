@@ -2719,8 +2719,7 @@ $string##
 *#
 #macro (spacePicker_import)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestSpaces.js',
-    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestSpaces.js'))
 #end
 
 #macro (spacePicker $parameters)

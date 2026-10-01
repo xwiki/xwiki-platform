@@ -78,7 +78,10 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
     {
         if (Boolean.TRUE.equals(Utils.isAjaxRequest(context))) {
             XWikiResponse response = context.getResponse();
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            // Keep the forbidden status set when the removal was refused, like for any request lacking a right.
+            if (response.getStatus() != HttpServletResponse.SC_FORBIDDEN) {
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+            }
             response.setContentType("text/plain");
             try {
                 response.getWriter().write(FAIL_MESSAGE);
@@ -145,7 +148,7 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
 
     /**
      * Checks whether the current user is allowed to remove the given object, on top of the right associated with the
-     * action.
+     * action. A refused removal is answered with a forbidden status.
      *
      * @param obj the object to remove
      * @param context the current context
@@ -174,7 +177,11 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
         doc = doc.clone();
 
         BaseObject obj = getObject(doc, context);
-        if (obj == null || !canRemoveObject(obj, context)) {
+        if (obj == null) {
+            return true;
+        }
+        if (!canRemoveObject(obj, context)) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return true;
         }
 

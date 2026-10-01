@@ -21,6 +21,8 @@ package com.xpn.xwiki.web;
 
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -89,6 +91,9 @@ class CommentDeleteActionTest
     private XWikiRequest request;
 
     @Mock
+    private XWikiResponse response;
+
+    @Mock
     private XWikiDocument mockDocument;
 
     @Mock
@@ -135,6 +140,7 @@ class CommentDeleteActionTest
             .thenReturn("changeComment");
 
         this.context.setRequest(this.request);
+        this.context.setResponse(this.response);
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
     }
 
@@ -182,6 +188,7 @@ class CommentDeleteActionTest
 
         // The action returns true so that the error template is rendered.
         assertTrue(this.commentDeleteAction.action(this.context));
+        verify(this.response).setStatus(HttpServletResponse.SC_FORBIDDEN);
         assertEquals("platform.core.action.commentRemove.notAllowed",
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class)
                 .getCurrentScriptContext().getAttribute("message"));

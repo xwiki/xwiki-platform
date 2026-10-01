@@ -43,37 +43,58 @@ function resolveBlockElement(reference: ReferenceElement): Element | undefined {
 }
 
 /**
- * Returns the first non-empty text node inside `element`, in document order. The element floating-ui positions the
- * menu against is the block's outer wrapper, so the text that makes up the block's first line is several levels down
- * from it.
+ * The elements that render content of their own rather than through the text they contain.
+ */
+const REPLACED_ELEMENTS = "img, svg, video, canvas, iframe";
+
+/**
+ * Returns the first node that renders something inside `element`, in document order: a non-empty text node or a
+ * replaced element. Text alone is not enough, because an image that starts the block has none of its own: a captioned
+ * image would then be measured on its caption, which is below it.
  *
  * @param element - the element to search
- * @returns the first non-empty text node, or `undefined` if the block has no text at all
+ * @returns the first node that renders something, or `undefined` if the block renders nothing on its own
  */
-function findFirstNonEmptyTextNode(element: Element): Text | undefined {
-  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-  let textNode = walker.nextNode() as Text | null;
-  while (textNode && !textNode.textContent?.trim()) {
-    textNode = walker.nextNode() as Text | null;
-  }
-  return textNode ?? undefined;
+function findFirstVisibleNode(element: Element): Node | undefined {
+  const walker = document.createTreeWalker(
+    element,
+    NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+    {
+      acceptNode: (node) => {
+        const rendersSomething =
+          node instanceof Element
+            ? node.matches(REPLACED_ELEMENTS)
+            : !!node.textContent?.trim();
+        // Skipping an element still walks its children, which is how the text several levels down is reached.
+        return rendersSomething
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_SKIP;
+      },
+    },
+  );
+  return walker.nextNode() ?? undefined;
 }
 
 /**
- * Returns the rectangle of the block's first line of text. A range over a text node reports one rectangle per line
- * box, so the first one is the first line, no matter how many lines the block wraps on.
+ * Returns the rectangle of the block's first line. A range over a text node reports one rectangle per line box, so the
+ * first one is the first line, no matter how many lines the block wraps on. A replaced element is measured whole,
+ * since it makes up a line on its own.
  *
  * @param element - the block's DOM element to measure
- * @returns the first line's rectangle, or `undefined` if the block has no text to measure
+ * @returns the first line's rectangle, or `undefined` if the block has nothing to measure
  */
 function measureFirstLineRect(element: Element): DOMRect | undefined {
-  const textNode = findFirstNonEmptyTextNode(element);
-  if (!textNode) {
+  const node = findFirstVisibleNode(element);
+  if (!node) {
     return undefined;
   }
 
+  if (node instanceof Element) {
+    return node.getBoundingClientRect();
+  }
+
   const range = document.createRange();
-  range.selectNodeContents(textNode);
+  range.selectNodeContents(node);
   return range.getClientRects()[0];
 }
 

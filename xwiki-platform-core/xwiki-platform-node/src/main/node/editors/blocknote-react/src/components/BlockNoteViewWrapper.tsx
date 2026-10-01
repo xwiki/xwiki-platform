@@ -221,7 +221,7 @@ type BlockNoteViewWrapperProps = {
 
 /**
  * Replaces the middleware BlockNote uses to center the side menu vertically on the hovered block, which offsets the
- * menu by a fixed amount per block type that only matches BlockNote's own styling. 
+ * menu by a fixed amount per block type that only matches BlockNote's own styling.
  */
 const SIDE_MENU_FLOATING_OPTIONS = {
   useFloatingOptions: {

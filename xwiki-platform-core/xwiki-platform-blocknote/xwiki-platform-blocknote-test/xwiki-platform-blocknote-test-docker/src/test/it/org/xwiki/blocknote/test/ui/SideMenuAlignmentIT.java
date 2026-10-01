@@ -91,6 +91,19 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
 
     private static final String IMAGE_CONTENT = "[[image:%s]]".formatted(IMAGE_NAME);
 
+    // Blocks whose first line isn't text, so the side menu must not align on the text that comes after it.
+
+    private static final String[] BLOCKS_NOT_STARTING_WITH_TEXT = {"captionedImage", "infoBox", "imageBeforeText"};
+
+    private static final String BLOCKS_NOT_STARTING_WITH_TEXT_CONTENT = """
+        [[A caption, which is the only text of the block>>image:%1$s]]
+
+        {{info}}An info box, whose icon is rendered before its text.{{/info}}
+
+        {{info}}
+        [[image:%1$s||width="32"]] Some text after a small image.
+        {{/info}}""".formatted(IMAGE_NAME);
+
     @Test
     void sideMenuIsAlignedOnHeadings(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
@@ -123,6 +136,21 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
         // An image that is still loading would make the screenshot unstable.
         textArea.waitUntilImageIsLoaded(0);
         assertSideMenuIsAligned(textArea, setup, testConfiguration, new String[] {"image"});
+    }
+
+    @Test
+    void sideMenuIsAlignedOnBlocksNotStartingWithText(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
+        setup.createPage(testReference, BLOCKS_NOT_STARTING_WITH_TEXT_CONTENT);
+
+        BlockNoteRichTextArea textArea = editInplace();
+        // An image that is still loading would make the screenshot unstable.
+        textArea.waitUntilImageIsLoaded(0);
+        textArea.waitUntilImageIsLoaded(1);
+        assertSideMenuIsAligned(textArea, setup, testConfiguration, BLOCKS_NOT_STARTING_WITH_TEXT);
     }
 
     /**

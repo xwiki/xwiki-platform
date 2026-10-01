@@ -19,6 +19,8 @@
  */
 package org.xwiki.administration.test.ui;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -140,6 +142,7 @@ class UsersGroupsRightsManagementIT
      * <li>Validate removing user members.</li>
      * <li>Validate removing sub-groups.</li>
      * <li>Validate that the alias of a member is displayed as text.</li>
+     * <li>Validate that the user picker doesn't suggest disabled users.</li>
      * </ul>
      */
     @Test
@@ -256,11 +259,25 @@ class UsersGroupsRightsManagementIT
         setup.rest().deletePage("XWiki", carol);
         setup.createUser(carol, carol, "", "first_name", "Carol", "last_name", "Smith");
 
+        // Both users match the text typed later in the user picker, but only the enabled one should be suggested.
+        String erin = String.format("%s_%s", testName, "Erin");
+        String erik = String.format("%s_%s", testName, "Erik");
+        setup.rest().deletePage("XWiki", erin);
+        setup.rest().deletePage("XWiki", erik);
+        setup.createUser(erin, erin, "", "first_name", "", "last_name", "");
+        setup.createUser(erik, erik, "", "first_name", "", "last_name", "", "active", "0");
+
         // Verify that the alias is part of the text of the member cell, separator space and parentheses included.
         groupsPage = GroupsPage.gotoPage();
         devsGroupModal = groupsPage.clickEditGroup(devs);
         devsGroupModal.addUsers(carol);
         devsGroupModal.getMembersTable().assertRow("Member", String.format("Carol Smith (%s)", carol));
+
+        //
+        // Check that the user picker doesn't suggest disabled users.
+        //
+
+        assertEquals(List.of("XWiki." + erin), devsGroupModal.getUserSuggestions(testName + "_Eri"));
         devsGroupModal.close();
     }
 

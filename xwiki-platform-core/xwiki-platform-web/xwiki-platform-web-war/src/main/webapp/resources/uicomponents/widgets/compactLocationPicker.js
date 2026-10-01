@@ -22,6 +22,11 @@
  * the selection mode of the input: with multiple selection the locations are checked and unchecked, with single
  * selection the selected node replaces the current location. The tree only adds and removes items, it does not hold a
  * state itself.
+ *
+ * The tree is displayed in a drop down so that the picker can be used inside a modal. The downside is that there is no
+ * submit button: picking a node updates the input right away, which is why the tree has to be kept in sync with the
+ * input. The tree is also not the best place to look at the selection, because a selected location can be hidden
+ * under a collapsed node, so the suggestion input remains the reference for it.
  */
 define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tree'], function($, suggestSpaces) {
   "use strict";

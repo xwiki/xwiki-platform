@@ -74,7 +74,7 @@
 ## Display the Tabs
 ##===========
 {{html}}
-&lt;div class="floatcontainer"&gt;
+&lt;div&gt;
   &lt;ul class="xwikitabbar"&gt;
 #foreach ($tab in $tabs)
   &lt;li id="xwiki$tab['idSuffix']"#if($view == $tab['tabName']) class="active"#end&gt;&lt;a href="$doc.getURL('view', "view=$tab['tabName']&amp;amp;$!param")"&gt;$services.localization.render($tab['translationKey'])&lt;/a&gt;&lt;/li&gt;

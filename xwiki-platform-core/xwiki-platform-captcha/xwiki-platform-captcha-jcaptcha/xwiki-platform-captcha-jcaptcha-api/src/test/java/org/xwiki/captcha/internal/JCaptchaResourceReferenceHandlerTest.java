@@ -19,15 +19,17 @@
  */
 package org.xwiki.captcha.internal;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,7 +69,7 @@ class JCaptchaResourceReferenceHandlerTest
 {
     private static final String SESSION_ID = "customSessionId";
 
-    private static final Locale LOCALE = new Locale("customLocale");
+    private static final Locale LOCALE = Locale.of("customLocale");
 
     @InjectMockComponents
     private JCaptchaResourceReferenceHandler jCaptchaResourceReferenceHandler;
@@ -95,11 +98,11 @@ class JCaptchaResourceReferenceHandlerTest
 
         ServletResponse servletResponse = mock(ServletResponse.class);
         when(container.getResponse()).thenReturn(servletResponse);
-        when(servletResponse.getHttpServletResponse()).thenReturn(this.response);
+        when(servletResponse.getResponse()).thenReturn(this.response);
         when(this.response.getOutputStream()).thenReturn(this.outputStream);
 
         HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
-        when(request.getHttpServletRequest()).thenReturn(httpServletRequest);
+        when(request.getRequest()).thenReturn(httpServletRequest);
         when(httpServletRequest.getLocale()).thenReturn(LOCALE);
 
         when(httpServletRequest.getSession()).thenReturn(this.httpSession);
@@ -111,6 +114,8 @@ class JCaptchaResourceReferenceHandlerTest
     {
         ImageCaptchaService imageCaptchaService = mock(ImageCaptchaService.class);
         when(this.captchaServiceManager.getCaptchaService()).thenReturn(imageCaptchaService);
+        when(imageCaptchaService.getImageChallengeForID(SESSION_ID, LOCALE))
+            .thenReturn(new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB));
 
         JCaptchaResourceReference jCaptchaResourceReference =
             new JCaptchaResourceReference("image", "customImageEngine");
@@ -121,7 +126,7 @@ class JCaptchaResourceReferenceHandlerTest
         verify(imageCaptchaService).getImageChallengeForID(SESSION_ID, LOCALE);
         verify(this.response).setContentType("image/jpeg");
         verify(this.response).getOutputStream();
-        verify(this.outputStream).write(any());
+        verify(this.outputStream, atLeastOnce()).write(anyInt());
         verify(this.resourceReferenceHandlerChain).handleNext(jCaptchaResourceReference);
     }
 
@@ -147,7 +152,7 @@ class JCaptchaResourceReferenceHandlerTest
         verify(soundCaptchaService).getSoundChallengeForID(SESSION_ID, LOCALE);
         verify(this.response).setContentType("audio/x-wav");
         verify(this.response).getOutputStream();
-        verify(this.outputStream).write(any());
+        verify(this.outputStream, atLeastOnce()).write(anyInt());
         verify(this.resourceReferenceHandlerChain).handleNext(jCaptchaResourceReference);
     }
 

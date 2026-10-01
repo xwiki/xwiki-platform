@@ -44,6 +44,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter;
@@ -72,6 +74,9 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     @Inject
     private List<CookieFilter> cookieFilters;
+
+    @Inject
+    private Container container;
 
     @Override
     public InputStream print(URL printPreviewURL) throws IOException
@@ -340,10 +345,17 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      * @deprecated
      */
     @Deprecated(since = "17.4.0RC1")
-    protected abstract javax.servlet.http.HttpServletRequest getRequest();
+    protected javax.servlet.http.HttpServletRequest getRequest()
+    {
+        return JakartaServletBridge.toJavax(getJakartaRequest());
+    }
 
     protected HttpServletRequest getJakartaRequest()
     {
-        return JakartaServletBridge.toJakarta(getRequest());
+        if (this.container.getRequest() instanceof ServletRequest servletRequest) {
+            return servletRequest.getRequest();
+        }
+
+        return null;
     }
 }

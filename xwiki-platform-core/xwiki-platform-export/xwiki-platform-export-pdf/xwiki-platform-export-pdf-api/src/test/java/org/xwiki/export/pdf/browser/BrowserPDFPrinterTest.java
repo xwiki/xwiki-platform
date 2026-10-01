@@ -34,25 +34,33 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.internal.browser.CookieFilter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter.CookieFilterContext;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -84,6 +92,9 @@ class BrowserPDFPrinterTest
     private HttpServletRequest request;
 
     @Mock
+    private Container container;
+
+    @Mock
     private BrowserManager browserManager;
 
     @Mock(answer = Answers.CALLS_REAL_METHODS)
@@ -98,11 +109,15 @@ class BrowserPDFPrinterTest
         ReflectionUtils.setFieldValue(this.printer, "logger", this.logger);
         ReflectionUtils.setFieldValue(this.printer, "configuration", this.configuration);
         ReflectionUtils.setFieldValue(this.printer, "cookieFilters", List.of(this.cookieFilter));
+        ReflectionUtils.setFieldValue(this.printer, "container", this.container);
 
         when(this.cookieFilter.isFilterRequired()).thenReturn(true);
 
         when(this.printer.getBrowserManager()).thenReturn(this.browserManager);
-        when(this.printer.getJakartaRequest()).thenReturn(this.request);
+        // The two 4-arguments navigate methods are default methods calling each other, so one of them needs to be
+        // stubbed to avoid an infinite recursion.
+        doReturn(false).when(this.browserTab).navigate(any(), ArgumentMatchers.<Cookie[]>any(), anyBoolean(), anyInt());
+        when(this.container.getRequest()).thenReturn(new ServletRequest(this.request));
 
         when(this.request.getContextPath()).thenReturn("/xwiki");
         when(this.configuration.getXWikiURI()).thenReturn(new URI("//xwiki-host"));
@@ -274,5 +289,28 @@ class BrowserPDFPrinterTest
         when(this.browserTab.navigate(toStrEq(url), eq((jakarta.servlet.http.Cookie[]) null), eq(false), eq(60)))
             .thenReturn(true);
         assertTrue(this.browserTab.navigate(url));
+    }
+
+    @Test
+    void navigateWithJavaxCookies() throws Exception
+    {
+        URL url = new URL("http://xwiki.org");
+        Cookie cookie = new Cookie("name", "value");
+        when(this.browserTab.navigate(toStrEq(url), any(Cookie[].class), eq(true), eq(60))).thenReturn(true);
+
+        assertTrue(this.browserTab.navigate(url, JakartaServletBridge.toJavax(new Cookie[] {cookie}), true));
+        assertFalse(this.browserTab.navigate(url, (javax.servlet.http.Cookie[]) null, true, 30));
+    }
+
+    @Test
+    void getRequest()
+    {
+        assertSame(this.request, this.printer.getJakartaRequest());
+        assertSame(this.request, JakartaServletBridge.toJakarta(this.printer.getRequest()));
+
+        when(this.container.getRequest()).thenReturn(null);
+
+        assertNull(this.printer.getJakartaRequest());
+        assertNull(this.printer.getRequest());
     }
 }

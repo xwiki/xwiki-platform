@@ -36,4 +36,9 @@ class AllIT
     class NestedTagIT extends TagIT
     {
     }
+
+    @Nested
+    class NestedUnsafeTagsSelectorIT extends UnsafeTagsSelectorIT
+    {
+    }
 }

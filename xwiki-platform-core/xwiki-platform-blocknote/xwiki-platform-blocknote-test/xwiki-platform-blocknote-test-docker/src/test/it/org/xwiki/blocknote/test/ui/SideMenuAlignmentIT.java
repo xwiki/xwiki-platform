@@ -22,7 +22,6 @@ package org.xwiki.blocknote.test.ui;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
@@ -45,7 +44,6 @@ import org.xwiki.test.ui.TestUtils;
  * @version $Id$
  * @since 18.9.0RC1
  */
-@DisabledOnOs(architectures = "aarch64")
 @UITest(
     extraJARs = {
         "org.xwiki.platform:xwiki-platform-websocket"
@@ -152,8 +150,7 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
         ScreenshotComparator screenshots = new ScreenshotComparator(testConfiguration, getClass());
         for (int i = 0; i < blocks.length; i++) {
             textArea.hoverBlock(i);
-            screenshots.compare(blocks[i], content);
+            screenshots.assertScreenshotMatches(blocks[i], content);
         }
-        screenshots.assertAllMatch();
     }
 }

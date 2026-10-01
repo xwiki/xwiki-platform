@@ -24,8 +24,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import javax.imageio.ImageIO;
@@ -39,7 +37,8 @@ import com.github.romankh3.image.comparison.ImageComparisonUtil;
 import com.github.romankh3.image.comparison.model.ImageComparisonResult;
 import com.github.romankh3.image.comparison.model.ImageComparisonState;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Compares screenshots of page elements with reference screenshots committed in the test resources, under
@@ -64,8 +63,6 @@ public class ScreenshotComparator
 
     private final File outputFolder;
 
-    private final List<String> failures = new ArrayList<>();
-
     /**
      * @param testConfiguration the test configuration, used to find the build directory and the browser the
      *         screenshots are taken with
@@ -79,15 +76,13 @@ public class ScreenshotComparator
     }
 
     /**
-     * Takes a screenshot of the specified element and compares it with the reference screenshot with the specified
-     * name. A mismatch is recorded rather than thrown, see {@link #assertAllMatch()}.
-     *
+     * Takes a screenshot of the specified element and fails if it doesn't match the reference screenshot with the
+     * specified name.
      * @param name the name of the reference screenshot, without the extension
      * @param element the element to take the screenshot of
-     * @return this instance
      * @throws IOException if the screenshot can't be taken or the reference screenshot can't be read
      */
-    public ScreenshotComparator compare(String name, WebElement element) throws IOException
+    public void assertScreenshotMatches(String name, WebElement element) throws IOException
     {
         // The test class name and the browser are part of the file names because the screenshots folder is shared by
         // all the tests.
@@ -98,31 +93,17 @@ public class ScreenshotComparator
 
         String referencePath = "src/test/resources/" + getReferencePath(name);
         BufferedImage reference = readReference(name);
-        if (reference == null) {
-            this.failures.add(("There is no reference screenshot for [%s]. Check the screenshot taken by the test, at "
-                + "[%s], and copy it to [%s] if it is correct.").formatted(name, actualFile, referencePath));
-            return this;
-        }
+        assertNotNull(reference, () -> ("There is no reference screenshot for [%s]. Check the screenshot taken by the "
+            + "test, at [%s], and copy it to [%s] if it is correct.").formatted(name, actualFile, referencePath));
 
         File differenceFile = new File(this.outputFolder, prefix + "-diff.png");
         ImageComparisonResult result = new ImageComparison(reference, actual, differenceFile)
             .setPixelToleranceLevel(PIXEL_TOLERANCE_LEVEL).compareImages();
-        if (result.getImageComparisonState() != ImageComparisonState.MATCH) {
-            this.failures.add(("The screenshot [%s] doesn't match its reference (%s, %s%% of the pixels are "
-                + "different). Compare the screenshot taken by the test, at [%s], with the reference screenshot, at "
-                + "[%s]. The differences are highlighted at [%s].").formatted(name, result.getImageComparisonState(),
-                    result.getDifferencePercent(), actualFile, referencePath, differenceFile));
-        }
-
-        return this;
-    }
-
-    /**
-     * Fails if any of the screenshots compared so far doesn't match its reference.
-     */
-    public void assertAllMatch()
-    {
-        assertTrue(this.failures.isEmpty(), String.join("\n", this.failures));
+        assertEquals(ImageComparisonState.MATCH, result.getImageComparisonState(),
+            () -> ("The screenshot [%s] doesn't match its reference (%s%% of the pixels are different). Compare the "
+                + "screenshot taken by the test, at [%s], with the reference screenshot, at [%s]. The differences are "
+                + "highlighted at [%s].").formatted(name, result.getDifferencePercent(), actualFile, referencePath,
+                    differenceFile));
     }
 
     private BufferedImage takeScreenshot(WebElement element) throws IOException

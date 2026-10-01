@@ -11,7 +11,7 @@
     "deploy": "node scripts/deploy.js",
     "lint": "npmPkgJsonLint \"./*/**\" && nx run-many -t lint --parallel=2 -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
     "publint": "pnpm --filter \"./**\" -r exec publint --pack pnpm --strict ",
-    "test:unit": "nx run-many -t test --parallel=2 -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\""
+    "test:unit": "vitest --run && nx run-many -t test --parallel=2 -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\""
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",

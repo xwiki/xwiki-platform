@@ -699,10 +699,15 @@ class RenamePageIT
         SpaceReference rootSpaceReference = testReference.getLastSpaceReference();
         DocumentReference externalLinkPage = new DocumentReference("xwiki", "RenamePageIT", "ExternalPage");
         testUtils.rest().savePage(externalLinkPage);
-        testUtils.rest().savePage(testReference, 
+        // The absolute references to the renamed page itself (link and image) must follow the rename, while the
+        // relative one must be kept as is.
+        String selfReferencesFormat =
+            "%n[[Self link>>doc:%1$s]]%n[[image:%1$s@image.png]]%n[[Relative self link>>doc:]]";
+        testUtils.rest().savePage(testReference,
             String.format("[[Alice]]%n[[page:../%s/Alice]]%n[[Bob]]%n[[Eve]]"
                     + "%n[[Other link>>RenamePageIT.ExternalPage]]",
-                rootSpaceReference.getName()),
+                rootSpaceReference.getName())
+                + String.format(selfReferencesFormat, testUtils.serializeLocalReference(testReference)),
             "Test relative links");
         
         SpaceReference aliceSpace = new SpaceReference("Alice", rootSpaceReference);
@@ -724,8 +729,10 @@ class RenamePageIT
             new SpaceReference(rootSpaceReference.getName() + "Foo", rootSpaceReference.getParent());
         WikiEditPage wikiEditPage = statusPage.gotoNewPage().editWiki();
         String newRootSpaceSerialized = testUtils.serializeLocalReference(newRootSpace).replaceAll("\\.", "/");
+        String newSelfReferences = String.format(selfReferencesFormat,
+            testUtils.serializeLocalReference(new DocumentReference("WebHome", newRootSpace)));
         assertEquals(String.format("[[Alice]]%n[[page:%s/Alice]]%n[[Bob]]%n[[Eve]]"
-                + "%n[[Other link>>RenamePageIT.ExternalPage]]", newRootSpaceSerialized),
+                + "%n[[Other link>>RenamePageIT.ExternalPage]]", newRootSpaceSerialized) + newSelfReferences,
             wikiEditPage.getContent());
 
         SpaceReference newBobSpace = new SpaceReference("Bob", newRootSpace);
@@ -746,7 +753,7 @@ class RenamePageIT
         String serializedAlice2Reference = testUtils.serializeLocalReference(alice2Reference);
         assertEquals(String.format("[[%s]]%n[[page:%s/Alice2]]%n[[Bob]]%n[[Eve]]"
                 + "%n[[Other link>>RenamePageIT.ExternalPage]]",
-            serializedAlice2Reference, newRootSpaceSerialized), wikiEditPage.getContent());
+            serializedAlice2Reference, newRootSpaceSerialized) + newSelfReferences, wikiEditPage.getContent());
 
         // FIXME: ideally this one should be refactored too, however it's not a regression.
         //wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newBobSpace));

@@ -172,22 +172,31 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      */
     private Cookie[] getCookies(CookieFilterContext cookieFilterContext)
     {
-        Cookie[] cookiesArray = getJakartaRequest().getCookies();
-        List<Cookie> cookies = new LinkedList<>();
-        if (cookiesArray != null) {
-            Stream.of(cookiesArray).forEach(cookies::add);
-        }
-        this.cookieFilters.forEach(cookieFilter -> {
-            try {
-                if (cookieFilter.isFilterRequired()) {
-                    cookieFilter.filter(cookies, cookieFilterContext);
-                }
-            } catch (Exception e) {
-                this.logger.warn("Failed to apply cookie filter [{}]. Root cause is: [{}].", cookieFilter,
-                    ExceptionUtils.getRootCauseMessage(e));
+        HttpServletRequest request = getJakartaRequest();
+
+        if (request != null) {
+            Cookie[] cookiesArray = request.getCookies();
+            List<Cookie> cookies = new LinkedList<>();
+            if (cookiesArray != null) {
+                Stream.of(cookiesArray).forEach(cookies::add);
             }
-        });
-        return cookies.isEmpty() ? null : cookies.toArray(new Cookie[cookies.size()]);
+            this.cookieFilters.forEach(cookieFilter -> {
+                try {
+                    if (cookieFilter.isFilterRequired()) {
+                        cookieFilter.filter(cookies, cookieFilterContext);
+                    }
+                } catch (Exception e) {
+                    this.logger.warn("Failed to apply cookie filter [{}]. Root cause is: [{}].", cookieFilter,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            });
+
+            if (!cookies.isEmpty()) {
+                return cookies.toArray(new Cookie[cookies.size()]);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -270,17 +279,21 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     private Optional<String> getClientIPAddress(URL targetURL, BrowserTab browserTab)
     {
-        try {
-            URL restURL = new URL(targetURL, getJakartaRequest().getContextPath() + "/rest/client?media=json");
-            if (browserTab.navigate(restURL)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String clientIPAddress = objectMapper.readTree(browserTab.getSource()).path("ip").asText();
-                if (!StringUtils.isEmpty(clientIPAddress)) {
-                    return Optional.of(InetAddress.getByName(clientIPAddress).getHostAddress());
+        HttpServletRequest request = getJakartaRequest();
+
+        if (request != null) {
+            try {
+                URL restURL = new URL(targetURL, request.getContextPath() + "/rest/client?media=json");
+                if (browserTab.navigate(restURL)) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String clientIPAddress = objectMapper.readTree(browserTab.getSource()).path("ip").asText();
+                    if (!StringUtils.isEmpty(clientIPAddress)) {
+                        return Optional.of(InetAddress.getByName(clientIPAddress).getHostAddress());
+                    }
                 }
+            } catch (IOException e) {
+                // Pass through.
             }
-        } catch (IOException e) {
-            // Pass through.
         }
 
         return Optional.empty();
@@ -341,8 +354,8 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
     protected abstract BrowserManager getBrowserManager();
 
     /**
-     * @return the current HTTP servlet request, used to take the cookies from
-     * @deprecated
+     * @return the current HTTP servlet request, used to access the cookies
+     * @deprecated not taken into account anymore
      */
     @Deprecated(since = "17.4.0RC1")
     protected javax.servlet.http.HttpServletRequest getRequest()
@@ -350,6 +363,9 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         return JakartaServletBridge.toJavax(getJakartaRequest());
     }
 
+    /**
+     * @return the current HTTP servlet request, used to access the cookies
+     */
     protected HttpServletRequest getJakartaRequest()
     {
         if (this.container.getRequest() instanceof ServletRequest servletRequest) {

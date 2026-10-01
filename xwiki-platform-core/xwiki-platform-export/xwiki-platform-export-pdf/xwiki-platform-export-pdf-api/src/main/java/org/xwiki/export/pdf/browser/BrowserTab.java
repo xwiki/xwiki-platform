@@ -87,6 +87,9 @@ public interface BrowserTab extends AutoCloseable
      * @deprecated use {@link #navigate(URL, Cookie[], boolean, int)} instead
      */
     @Deprecated(since = "17.0.0RC1")
+    // BrowserTab implementations are support to implement
+    // #navigate(URL url, Cookie[] cookies, boolean wait, int timeout)
+    @SuppressWarnings("javabugs:S2190")
     default boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait, int timeout) throws IOException
     {
         return navigate(url, JakartaServletBridge.toJakarta(cookies), wait, timeout);

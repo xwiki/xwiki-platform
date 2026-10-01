@@ -103,6 +103,9 @@ public interface TemporaryAttachmentSessionsManager
      * @deprecated use {@link #uploadAttachment(DocumentReference, Part, String)} instead
      */
     @Deprecated(since = "17.0.0RC1")
+    // BrowserTab implementations are support to implement
+    // #uploadAttachment(DocumentReference documentReference, Part part, String filename)
+    @SuppressWarnings("javabugs:S2190")
     default XWikiAttachment uploadAttachment(DocumentReference documentReference, javax.servlet.http.Part part,
         String filename) throws TemporaryAttachmentException, AttachmentValidationException
     {

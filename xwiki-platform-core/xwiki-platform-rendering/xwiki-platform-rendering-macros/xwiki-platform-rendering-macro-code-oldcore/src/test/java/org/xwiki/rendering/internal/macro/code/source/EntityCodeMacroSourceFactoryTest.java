@@ -306,7 +306,7 @@ class EntityCodeMacroSourceFactoryTest
             "velocity code content", "velocity");
         // password
         assertFailCodeMacroSource(this.documentObjectPropertyFactory,
-            new MacroContentSourceReference("object_property", "wiki:Space.Document^Space.Class.passwords"));
+            new MacroContentSourceReference("object_property", "wiki:Space.Document^Space.Class.password"));
 
         document.setSyntax(Syntax.HTML_5_0);
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
@@ -325,5 +325,40 @@ class EntityCodeMacroSourceFactoryTest
         // email
         assertFailCodeMacroSource(this.documentObjectPropertyFactory,
             new MacroContentSourceReference("object_property", "wiki:Space.Document^Space.Class.email"));
+    }
+
+    @Test
+    void getContentPasswordObjectPropertyRemovedFromClass() throws XWikiException
+    {
+        LocalDocumentReference classLocalReference = new LocalDocumentReference("Space", "Class");
+        DocumentReference classDocumentReference =
+            new DocumentReference(classLocalReference, new WikiReference("wiki"));
+        XWikiDocument classDocument =
+            this.oldcore.getSpyXWiki().getDocument(classDocumentReference, this.oldcore.getXWikiContext());
+        classDocument.getXClass().addPasswordField("password", "Password", 30);
+        this.oldcore.getSpyXWiki().saveDocument(classDocument, this.oldcore.getXWikiContext());
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Document");
+        XWikiDocument document =
+            this.oldcore.getSpyXWiki().getDocument(documentReference, this.oldcore.getXWikiContext());
+        BaseObject object = document.newXObject(classLocalReference, this.oldcore.getXWikiContext());
+        // Going through the XClass creates a PasswordProperty, as when the object is loaded from the store.
+        object.set("password", "hash:SHA-512:salt:hashedpassword", this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+
+        when(this.authorization.hasAccess(Right.VIEW, CURRENT_USER, documentReference)).thenReturn(true);
+
+        MacroContentSourceReference passwordReference =
+            new MacroContentSourceReference("object_property", "wiki:Space.Document^Space.Class.password");
+
+        assertFailCodeMacroSource(this.documentObjectPropertyFactory, passwordReference);
+
+        // The value stays in the object when its field is removed from the XClass.
+        classDocument =
+            this.oldcore.getSpyXWiki().getDocument(classDocumentReference, this.oldcore.getXWikiContext());
+        classDocument.getXClass().removeField("password");
+        this.oldcore.getSpyXWiki().saveDocument(classDocument, this.oldcore.getXWikiContext());
+
+        assertFailCodeMacroSource(this.documentObjectPropertyFactory, passwordReference);
     }
 }

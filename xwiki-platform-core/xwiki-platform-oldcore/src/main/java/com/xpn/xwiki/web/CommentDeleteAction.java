@@ -36,8 +36,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Action used to remove a comment from a page, requires comment right but not edit right. Note that this class is
- * largely inspired by ObjectRemoveAction and Comment
+ * Action used to remove a comment from a page. It requires the comment right instead of the edit right, and only the
+ * author of the comment or an administrator can remove it.
  *
  * @version $Id$
  * @since 18.9.0RC1
@@ -55,13 +55,12 @@ public class CommentDeleteAction extends AbstractObjectRemoveAction
     private AuthorizationManager authorizationManager;
 
     /**
-     * Set up the few keys used by this component.
+     * Sets up the translation keys used by this action.
      */
     public CommentDeleteAction()
     {
-        noIdKey = "platform.core.action.commentRemove.noCommentSpecified";
-        invalidKey = "platform.core.action.commentRemove.invalidComment";
-        this.deleteSuccessfulKey = "core.comment.deleteComment";
+        super("platform.core.action.commentRemove.noCommentSpecified",
+            "platform.core.action.commentRemove.invalidComment", "core.comment.deleteComment");
     }
 
     @Override
@@ -84,7 +83,11 @@ public class CommentDeleteAction extends AbstractObjectRemoveAction
         // Only the author of the comment or an administrator can remove it.
         DocumentReference authorReference = this.documentReferenceResolver.resolve(obj.getStringValue("author"));
         DocumentReference userReference = context.getUserReference();
-        return authorReference.equals(userReference)
+        boolean allowed = authorReference.equals(userReference)
             || this.authorizationManager.hasAccess(Right.ADMIN, userReference, context.getDoc().getDocumentReference());
+        if (!allowed) {
+            setErrorMessage("platform.core.action.commentRemove.notAllowed");
+        }
+        return allowed;
     }
 }

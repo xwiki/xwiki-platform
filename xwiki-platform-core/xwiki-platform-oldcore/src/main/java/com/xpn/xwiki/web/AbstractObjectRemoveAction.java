@@ -26,11 +26,7 @@ import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
-import org.xwiki.container.Response;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -38,37 +34,57 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * Base class for the actions removing an object from the current document.
+ *
+ * @version $Id$
+ * @since 18.9.0RC1
+ */
 public abstract class AbstractObjectRemoveAction extends XWikiAction
 {
     private static final String FAIL_MESSAGE = "failed";
 
     private static final String MESSAGE = "message";
 
-    protected String noIdKey;
-    protected String invalidKey;
-    protected String deleteSuccessfulKey;
     @Inject
     private Logger logger;
-    @Inject
-    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
+
+    private final String noIdKey;
+
+    private final String invalidKey;
+
+    private final String deleteSuccessfulKey;
+
+    /**
+     * @param noIdKey the translation key of the error displayed when the request does not specify the object number
+     * @param invalidKey the translation key of the error displayed when the requested object does not exist
+     * @param deleteSuccessfulKey the translation key of the version comment of the saved document
+     */
+    protected AbstractObjectRemoveAction(String noIdKey, String invalidKey, String deleteSuccessfulKey)
+    {
+        this.noIdKey = noIdKey;
+        this.invalidKey = invalidKey;
+        this.deleteSuccessfulKey = deleteSuccessfulKey;
+    }
 
     @Override
     protected Class<? extends XWikiForm> getFormClass()
     {
         return ObjectRemoveForm.class;
     }
-    
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
         if (Boolean.TRUE.equals(Utils.isAjaxRequest(context))) {
-            Response response = this.container.getResponse();
+            XWikiResponse response = context.getResponse();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.setContentType("text/plain");
             try {
-                response.getOutputStream().write(FAIL_MESSAGE.getBytes());
+                response.getWriter().write(FAIL_MESSAGE);
+                response.setContentLength(FAIL_MESSAGE.length());
             } catch (IOException e) {
-                logger.error("Failed to send error response to AJAX comment delete request.", e);
+                this.logger.error("Failed to send the error response to the AJAX object removal request.", e);
             }
             return null;
         } else {
@@ -96,6 +112,14 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
         getCurrentScriptContext().setAttribute(MESSAGE, localizePlainOrReturnKey(key), ScriptContext.ENGINE_SCOPE);
     }
 
+    /**
+     * Finds the object to remove, based on the class and object number provided in the request.
+     *
+     * @param doc the document holding the object to remove
+     * @param context the current context
+     * @return the object to remove, or {@code null} if the request is not valid, in which case an error message has
+     *     been set with {@link #setErrorMessage(String)}
+     */
     protected BaseObject getObject(XWikiDocument doc, XWikiContext context)
     {
         ObjectRemoveForm form = (ObjectRemoveForm) context.getForm();
@@ -154,10 +178,9 @@ public abstract class AbstractObjectRemoveAction extends XWikiAction
         }
 
         doc.removeXObject(obj);
-        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
-        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
+        doc.setAuthorReference(context.getUserReference());
 
-        String comment = localizePlainOrReturnKey(deleteSuccessfulKey);
+        String comment = localizePlainOrReturnKey(this.deleteSuccessfulKey);
 
         xwiki.saveDocument(doc, comment, true, true, context);
 

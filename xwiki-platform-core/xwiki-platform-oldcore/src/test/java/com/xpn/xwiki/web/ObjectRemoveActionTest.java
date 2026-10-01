@@ -26,13 +26,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -71,9 +67,6 @@ class ObjectRemoveActionTest
     private CSRFToken csrfToken;
 
     @MockComponent
-    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
-
-    @MockComponent
     private StoreConfiguration storeConfiguration;
 
     @Mock
@@ -91,12 +84,6 @@ class ObjectRemoveActionTest
     @Mock
     private BaseObject object;
 
-    @Mock
-    private DocumentAuthors authors;
-
-    @Mock
-    private UserReference currentUserReference;
-
     private XWikiContext context;
 
     @BeforeEach
@@ -109,12 +96,10 @@ class ObjectRemoveActionTest
 
         when(this.document.clone()).thenReturn(this.clonedDocument);
         when(this.clonedDocument.getOriginalDocument()).thenReturn(this.document);
-        when(this.clonedDocument.getAuthors()).thenReturn(this.authors);
         DocumentReference documentReference = new DocumentReference("xwiki", "Foo", "Bar", Locale.ENGLISH);
         when(this.clonedDocument.getDocumentReference()).thenReturn(documentReference);
         when(this.clonedDocument.getDocumentReferenceWithLocale()).thenReturn(documentReference);
 
-        when(this.currentUserResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(this.currentUserReference);
         when(this.csrfToken.isTokenValid(null)).thenReturn(true);
     }
 
@@ -130,6 +115,7 @@ class ObjectRemoveActionTest
         assertFalse(this.objectRemoveAction.action(this.context));
 
         verify(this.clonedDocument).removeXObject(this.object);
+        verify(this.clonedDocument).setAuthorReference(this.context.getUserReference());
         verify(this.context.getWiki()).saveDocument(this.clonedDocument, "core.comment.deleteObject", true, true,
             this.context);
     }

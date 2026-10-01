@@ -28,16 +28,23 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * Action used to remove an object of any class from a page, requires edit right.
+ *
+ * @version $Id$
+ */
 @Component
 @Named("objectremove")
 @Singleton
 public class ObjectRemoveAction extends AbstractObjectRemoveAction
 {
+    /**
+     * Sets up the translation keys used by this action.
+     */
     public ObjectRemoveAction()
     {
-        noIdKey = "platform.core.action.objectRemove.noObjectSpecified";
-        invalidKey = "platform.core.action.objectRemove.invalidObject";
-        this.deleteSuccessfulKey = "core.comment.deleteObject";
+        super("platform.core.action.objectRemove.noObjectSpecified", "platform.core.action.objectRemove.invalidObject",
+            "core.comment.deleteObject");
     }
 
     @Override

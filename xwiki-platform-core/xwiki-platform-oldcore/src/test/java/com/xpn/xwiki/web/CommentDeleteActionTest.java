@@ -26,15 +26,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -89,9 +85,6 @@ class CommentDeleteActionTest
     private CSRFToken csrfToken;
 
     @MockComponent
-    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
-
-    @MockComponent
     private StoreConfiguration storeConfiguration;
 
     @Mock
@@ -111,12 +104,6 @@ class CommentDeleteActionTest
 
     @Mock
     private BaseObject mockComment;
-
-    @Mock
-    private DocumentAuthors mockAuthors;
-
-    @Mock
-    private UserReference currentUserReference;
 
     XWikiContext context;
 
@@ -139,14 +126,12 @@ class CommentDeleteActionTest
         when(this.mockClonedDocument.resolveClassReference("XWikiComments")).thenReturn(commentClassReference);
         when(this.mockClonedDocument.getXObject(commentClassReference, 0)).thenReturn(this.mockComment);
         when(this.mockComment.getStringValue("author")).thenReturn(COMMENT_AUTHOR);
-        when(this.mockClonedDocument.getAuthors()).thenReturn(mockAuthors);
         // Those are necessary for the call to checkSavingDocument made while deleting the comment.
         DocumentReference documentReference = new DocumentReference("XWiki", "Foo", "Bar",
             Locale.ENGLISH);
         when(mockClonedDocument.getDocumentReference()).thenReturn(documentReference);
         when(mockClonedDocument.getDocumentReferenceWithLocale()).thenReturn(documentReference);
 
-        when(this.currentUserResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(this.currentUserReference);
         when(commentDeleteAction.localizePlainOrReturnKey("core.comment.deleteComment"))
             .thenReturn("changeComment");
 
@@ -168,6 +153,7 @@ class CommentDeleteActionTest
         verify(this.csrfToken).isTokenValid(null);
         // Then, we make sure that the comment provided was actually removed
         verify(this.mockClonedDocument).removeXObject(this.mockComment);
+        verify(this.mockClonedDocument).setAuthorReference(COMMENT_AUTHOR_REFERENCE);
         // And that the document where it stood was saved.
         verify(context.getWiki()).saveDocument(this.mockClonedDocument, "changeComment", true, true, this.context);
     }
@@ -198,6 +184,9 @@ class CommentDeleteActionTest
 
         // The action returns true so that the error template is rendered.
         assertTrue(this.commentDeleteAction.action(this.context));
+        assertEquals("platform.core.action.commentRemove.notAllowed",
+            this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class)
+                .getCurrentScriptContext().getAttribute("message"));
         verify(this.mockClonedDocument, never()).removeXObject(any());
         verify(this.context.getWiki(), never()).saveDocument(any(), any(), eq(true), eq(true), any());
     }

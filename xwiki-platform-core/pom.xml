@@ -149,10 +149,41 @@
               </differences>
             </revapi.differences>
             -->
-            
-            
-            
-            
+            <revapi.differences>
+              <justification>
+                Deprecated oldcore methods moved to xwiki-platform-legacy-oldcore, which still provides them (and is
+                installed by default). Only reported by modules whose API reaches these classes while depending on the
+                non-woven xwiki-platform-oldcore jar.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.XWikiContext::setOriginalDatabase(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method int com.xpn.xwiki.doc.XWikiAttachment::getContentSize(com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method com.xpn.xwiki.objects.BaseObject com.xpn.xwiki.doc.XWikiDocument::getxWikiObject()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.doc.XWikiDocument::mergexWikiClass(com.xpn.xwiki.doc.XWikiDocument)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.doc.XWikiDocument::mergexWikiObjects(com.xpn.xwiki.doc.XWikiDocument)</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

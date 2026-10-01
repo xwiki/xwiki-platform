@@ -44,6 +44,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
+import org.xwiki.logging.internal.tail.InputStreamDataInput;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -272,7 +273,7 @@ public class DownloadAction extends XWikiAction
     {
         if (start >= 0 && start < attachment.getContentLongSize(context)) {
             try (InputStream data = attachment.getContentInputStream(context)) {
-                InputStream boundedData = new BoundedInputStream(data, end + 1);
+                InputStream boundedData = BoundedInputStream.builder().setInputStream(data).setMaxCount(end + 1).get();
                 long skip = boundedData.skip(start);
                 if (skip != start) {
                     throw new IOException(

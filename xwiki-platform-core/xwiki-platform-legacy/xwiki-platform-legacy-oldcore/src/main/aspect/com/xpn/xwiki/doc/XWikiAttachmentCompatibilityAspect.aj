@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,18 +16,32 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package com.xpn.xwiki.doc;
 
-<extensions xmlns="http://maven.apache.org/EXTENSIONS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/EXTENSIONS/1.1.0 https://maven.apache.org/xsd/core-extensions-1.0.0.xsd">
-  <extension>
-    <groupId>com.gradle</groupId>
-    <artifactId>develocity-maven-extension</artifactId>
-    <version>2.6.0</version>
-  </extension>
-  <extension>
-    <groupId>com.gradle</groupId>
-    <artifactId>common-custom-user-data-maven-extension</artifactId>
-    <version>2.4.0</version>
-  </extension>
-</extensions>
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+
+/**
+ * Add a backward compatibility layer to the {@link com.xpn.xwiki.doc.XWikiAttachment} class.
+ *
+ * @version $Id$
+ * @since 18.9.0RC1
+ */
+public aspect XWikiAttachmentCompatibilityAspect
+{
+    /**
+     * @param context current XWikiContext
+     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
+     * @throws XWikiException
+     * @since 2.3M2
+     * @deprecated use {@link #getContentLongSize(XWikiContext)} instead
+     */
+    @Deprecated(since = "9.0RC1")
+    public int XWikiAttachment.getContentSize(XWikiContext context) throws XWikiException
+    {
+        long longSize = getContentLongSize(context);
+
+        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+    }
+}

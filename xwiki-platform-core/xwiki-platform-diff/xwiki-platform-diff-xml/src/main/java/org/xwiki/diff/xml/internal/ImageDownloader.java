@@ -148,9 +148,8 @@ public class ImageDownloader
             if (maximumSize > 0) {
                 // The content length is not always available (then it is negative), so we need to use a bounded
                 // input stream to make sure we don't read more than the maximum size.
-                try (BoundedInputStream boundedInputStream = new BoundedInputStream(entity.getContent(),
-                    maximumSize))
-                {
+                try (BoundedInputStream boundedInputStream =
+                    BoundedInputStream.builder().setInputStream(entity.getContent()).setMaxCount(maximumSize).get()) {
                     content = IOUtils.toByteArray(boundedInputStream);
                 }
 

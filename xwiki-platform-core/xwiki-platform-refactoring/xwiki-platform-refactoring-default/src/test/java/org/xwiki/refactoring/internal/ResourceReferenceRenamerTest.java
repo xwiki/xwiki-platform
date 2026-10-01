@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -46,6 +47,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -171,5 +173,73 @@ class ResourceReferenceRenamerTest
             currentDocumentReference,
             false, Map.of()));
         assertEquals(new AttachmentResourceReference("xwiki:Space.Page.file2.txt"), resourceReference);
+    }
+
+    @Test
+    void updateResourceReferenceRelativeWithAbsoluteLinkToMovedDocument()
+    {
+        DocumentResourceReference resourceReference = new DocumentResourceReference("Space.Old.WebHome");
+        DocumentReference oldReference = new DocumentReference("wiki", List.of("Space", "Old"), "WebHome");
+        DocumentReference newReference = new DocumentReference("wiki", List.of("Space", "New"), "WebHome");
+
+        when(this.entityReferenceResolver.resolve(resourceReference, null, newReference)).thenReturn(oldReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, oldReference)).thenReturn(oldReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldReference)).thenReturn(oldReference);
+        when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
+            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT,
+                new EntityReference("Old", EntityType.SPACE, new EntityReference("Space", EntityType.SPACE))));
+        when(this.compactEntityReferenceSerializer.serialize(newReference, newReference.getWikiReference()))
+            .thenReturn("Space.New.WebHome");
+
+        assertTrue(this.renamer.updateResourceReference(resourceReference, oldReference, newReference, newReference,
+            true, Map.of(oldReference, newReference)));
+        assertEquals(new DocumentResourceReference("Space.New.WebHome"), resourceReference);
+    }
+
+    @Test
+    void updateResourceReferenceRelativeWithAbsoluteImageOfMovedDocument()
+    {
+        AttachmentResourceReference resourceReference =
+            new AttachmentResourceReference("Space.Old.WebHome@image.jpg");
+        DocumentReference oldReference = new DocumentReference("wiki", List.of("Space", "Old"), "WebHome");
+        DocumentReference newReference = new DocumentReference("wiki", List.of("Space", "New"), "WebHome");
+        AttachmentReference oldAttachmentReference = new AttachmentReference("image.jpg", oldReference);
+        AttachmentReference newAttachmentReference = new AttachmentReference("image.jpg", newReference);
+
+        when(this.entityReferenceResolver.resolve(resourceReference, null, newReference))
+            .thenReturn(oldAttachmentReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, oldReference))
+            .thenReturn(oldAttachmentReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldAttachmentReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldAttachmentReference)).thenReturn(oldReference);
+        when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
+            .thenReturn(new EntityReference("image.jpg", EntityType.ATTACHMENT,
+                new EntityReference("WebHome", EntityType.DOCUMENT, new EntityReference("Old", EntityType.SPACE,
+                    new EntityReference("Space", EntityType.SPACE)))));
+        when(this.compactEntityReferenceSerializer.serialize(newAttachmentReference, newReference.getWikiReference()))
+            .thenReturn("Space.New.WebHome@image.jpg");
+
+        assertTrue(this.renamer.updateResourceReference(resourceReference, oldReference, newReference, newReference,
+            true, Map.of(oldReference, newReference)));
+        assertEquals(new AttachmentResourceReference("Space.New.WebHome@image.jpg"), resourceReference);
+    }
+
+    @Test
+    void updateResourceReferenceRelativeWithRelativeLinkToMovedDocument()
+    {
+        DocumentResourceReference resourceReference = new DocumentResourceReference("");
+        DocumentReference oldReference = new DocumentReference("wiki", List.of("Space", "Old"), "WebHome");
+        DocumentReference newReference = new DocumentReference("wiki", List.of("Space", "New"), "WebHome");
+
+        when(this.entityReferenceResolver.resolve(resourceReference, null, newReference)).thenReturn(newReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, oldReference)).thenReturn(oldReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null))
+            .thenReturn(new DocumentReference("wiki", "Main", "WebHome"));
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldReference)).thenReturn(oldReference);
+
+        assertFalse(this.renamer.updateResourceReference(resourceReference, oldReference, newReference, newReference,
+            true, Map.of(oldReference, newReference)));
+        assertEquals(new DocumentResourceReference(""), resourceReference);
     }
 }

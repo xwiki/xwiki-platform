@@ -65,6 +65,15 @@ public class ResetPasswordPage extends ViewPage
         return userNameInput.getAttribute("value");
     }
 
+    /**
+     * @return the value of the {@code autocomplete} attribute of the user name field
+     * @since 18.9.0RC1
+     */
+    public String getUserNameAutocomplete()
+    {
+        return this.userNameInput.getAttribute("autocomplete");
+    }
+
     public void setUserName(String userName)
     {
         this.userNameInput.sendKeys(userName);

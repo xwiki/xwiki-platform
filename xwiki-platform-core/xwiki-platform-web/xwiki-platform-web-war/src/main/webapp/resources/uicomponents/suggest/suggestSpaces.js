@@ -17,60 +17,59 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($spaceIcon = $services.icon.getMetaData('folder'))
-#set ($webHome = $services.model.getEntityReference('DOCUMENT', 'default').name)
-#[[*/
-// Start JavaScript-only code.
-(function(spaceIcon, webHome) {
+define('xwiki-suggestSpaces-icons', {
+  icons: ['folder']
+});
+
+define('xwiki-suggestSpaces', ['jquery', 'xwiki-icon!xwiki-suggestSpaces-icons', 'xwiki-selectize'],
+    function($, icons) {
   "use strict";
 
-/**
- * Resolves an entity reference from a string representation of the form "entityType:entityReference".
- */
-const resolveEntityReference = function(typeAndReference) {
-  if (typeof typeAndReference === 'string') {
-    try {
-      return XWiki.Model.resolve(typeAndReference, null, XWiki.currentDocument.documentReference);
-    } catch (e) {
-      // TODO: Log a warning naming the search scope that couldn't be resolved, together with the other suggest
-      // pickers. See https://jira.xwiki.org/browse/XWIKI-25062
-      return null;
-    }
-  }
-  return typeAndReference;
-};
-
-const getRestSearchURL = function(searchScope) {
-  const spaces = searchScope.getReversedReferenceChain().filter(function(component) {
-    return component.type === XWiki.EntityType.SPACE;
-  }).map(function(component) {
-    return component.name;
-  });
-  const wiki = searchScope.extractReferenceValue(XWiki.EntityType.WIKI);
-  return XWiki.Document.getRestSearchURL('', spaces, wiki);
-};
-
-const resolveSpaceReference = function(localSpaceReference, wiki) {
-  return XWiki.Model.resolve(localSpaceReference, XWiki.EntityType.SPACE, [wiki]);
-};
-
-const removeDuplicates = function(suggestions) {
-  const seen = {};
-  return suggestions.filter(function(suggestion) {
-    if (Object.hasOwn(seen, suggestion.value)) {
-      return false;
-    }
-    seen[suggestion.value] = true;
-    return true;
-  });
-};
-
-define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
-  webHome = webHome || 'WebHome';
+  const webHome = 'WebHome';
 
   // How many suggestions we show at most.
   const limit = 10;
+
+  /**
+   * Resolves an entity reference from a string representation of the form "entityType:entityReference".
+   */
+  const resolveEntityReference = function(typeAndReference) {
+    if (typeof typeAndReference === 'string') {
+      try {
+        return XWiki.Model.resolve(typeAndReference, null, XWiki.currentDocument.documentReference);
+      } catch (e) {
+        // TODO: Log a warning naming the search scope that couldn't be resolved, together with the other suggest
+        // pickers. See https://jira.xwiki.org/browse/XWIKI-25062
+        return null;
+      }
+    }
+    return typeAndReference;
+  };
+
+  const getRestSearchURL = function(searchScope) {
+    const spaces = searchScope.getReversedReferenceChain().filter(function(component) {
+      return component.type === XWiki.EntityType.SPACE;
+    }).map(function(component) {
+      return component.name;
+    });
+    const wiki = searchScope.extractReferenceValue(XWiki.EntityType.WIKI);
+    return XWiki.Document.getRestSearchURL('', spaces, wiki);
+  };
+
+  const resolveSpaceReference = function(localSpaceReference, wiki) {
+    return XWiki.Model.resolve(localSpaceReference, XWiki.EntityType.SPACE, [wiki]);
+  };
+
+  const removeDuplicates = function(suggestions) {
+    const seen = {};
+    return suggestions.filter(function(suggestion) {
+      if (Object.hasOwn(seen, suggestion.value)) {
+        return false;
+      }
+      seen[suggestion.value] = true;
+      return true;
+    });
+  };
 
   const getSelectizeOptions = function(select) {
     return {
@@ -212,7 +211,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
       label: labels[labels.length - 1],
       // The hierarchy of the space, without the space itself.
       hint: labels.slice(0, -1).join(' / '),
-      icon: spaceIcon,
+      icon: icons.folder,
       url: new XWiki.Document(homeReference).getURL()
     };
   };
@@ -238,6 +237,3 @@ require(['jquery', 'xwiki-suggestSpaces', 'xwiki-events-bridge'], function($) {
   $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
   $(init);
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$spaceIcon, $webHome]));

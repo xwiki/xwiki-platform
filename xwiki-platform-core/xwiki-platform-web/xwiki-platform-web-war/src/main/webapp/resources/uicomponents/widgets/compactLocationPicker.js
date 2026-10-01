@@ -25,17 +25,19 @@
   "use strict";
 
 /**
- * Lets the user browse a document tree in order to feed the space suggestion input it is attached to.
- * The tree only adds and removes items, it does not hold a state itself.
+ * Lets the user browse a document tree in order to feed the space suggestion input it is attached to. The tree follows
+ * the selection mode of the input: with multiple selection the locations are checked and unchecked, with single
+ * selection the selected node replaces the current location. The tree only adds and removes items, it does not hold a
+ * state itself.
  */
-define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tree'], function($, suggestSpaces) {
+define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tree'], function($, suggestSpaces) {
   webHome = webHome || 'WebHome';
 
   // The prefix used by the document tree for the id of the nodes backing a page.
-  var documentNodePrefix = 'document:';
+  const documentNodePrefix = 'document:';
 
-  var getLabels = function(tree, node) {
-    var labels = [node.text];
+  const getLabels = function(tree, node) {
+    const labels = [node.text];
     // The parents are listed from the closest one to the root of the tree.
     node.parents.forEach(function(parentId) {
       if (parentId.indexOf(documentNodePrefix) === 0) {
@@ -45,31 +47,32 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     return labels;
   };
 
-  var enhance = function(element) {
-    var picker = $(element);
-    if (picker.data('locationPickerMulti')) {
+  const enhance = function(element) {
+    const picker = $(element);
+    if (picker.data('compactLocationPicker')) {
       // Already enhanced.
       return;
     }
-    picker.data('locationPickerMulti', true);
+    picker.data('compactLocationPicker', true);
 
-    var select = picker.find('select.suggest-spaces');
-    var browser = picker.children('.location-picker-browse');
-    var toggle = browser.children('.dropdown-toggle');
-    var menu = browser.children('.dropdown-menu');
-    var treeElement = menu.find('.location-tree');
+    const select = picker.find('select.suggest-spaces');
+    const multiple = select.prop('multiple');
+    const browser = picker.children('.location-picker-browse');
+    const toggle = browser.children('.dropdown-toggle');
+    const menu = browser.children('.dropdown-menu');
+    const treeElement = menu.find('.location-tree');
     // Set while we update the tree to match the input, so that we don't then update the input back.
-    var updatingTree = false;
+    let updatingTree = false;
 
-    var getSuggestInput = function() {
+    const getSuggestInput = function() {
       return select[0]?.selectize;
     };
 
-    var toLocation = function(tree, node) {
+    const toLocation = function(tree, node) {
       if (node.id.indexOf(documentNodePrefix) !== 0) {
         return null;
       }
-      var documentReference = XWiki.Model.resolve(node.id.substring(documentNodePrefix.length),
+      const documentReference = XWiki.Model.resolve(node.id.substring(documentNodePrefix.length),
         XWiki.EntityType.DOCUMENT);
       if (documentReference.name !== webHome) {
         // Only the pages backing a space can be picked as a location. The tree is configured to hide the terminal pages
@@ -87,56 +90,77 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
      * @return the suggestion matching the given tree node, in the format of the suggestion input,
      *   or null if the node is not a location
      */
-    var toSuggestion = function(suggestInput, tree, node) {
-      var location = toLocation(tree, node);
+    const toSuggestion = function(suggestInput, tree, node) {
+      const location = toLocation(tree, node);
       return location && suggestSpaces.createSuggestion(suggestInput.settings, location.reference, location.labels);
     };
 
-    var addLocation = function(tree, node) {
-      var suggestInput = getSuggestInput();
+    const addLocation = function(tree, node) {
+      const suggestInput = getSuggestInput();
       if (updatingTree || !suggestInput) {
         return;
       }
-      var suggestion = toSuggestion(suggestInput, tree, node);
+      const suggestion = toSuggestion(suggestInput, tree, node);
       if (suggestion) {
         suggestInput.addOption(suggestion);
         suggestInput.addItem(suggestion.value);
       }
     };
 
-    var removeLocation = function(tree, node) {
-      var suggestInput = getSuggestInput();
+    const removeLocation = function(tree, node) {
+      const suggestInput = getSuggestInput();
       if (updatingTree || !suggestInput) {
         return;
       }
-      var suggestion = toSuggestion(suggestInput, tree, node);
+      const suggestion = toSuggestion(suggestInput, tree, node);
       if (suggestion) {
         suggestInput.removeItem(suggestion.value);
       }
     };
 
+    const setLocation = function(tree, node) {
+      const suggestInput = getSuggestInput();
+      if (updatingTree || !suggestInput) {
+        return;
+      }
+      const suggestion = toSuggestion(suggestInput, tree, node);
+      if (suggestion) {
+        suggestInput.addOption(suggestion);
+        suggestInput.setValue(suggestion.value);
+        // There's nothing more to pick, so we give the room back to the form.
+        toggle.dropdown('toggle');
+      }
+    };
+
     /**
-     * Checks the nodes matching the selected locations and unchecks the others, so that the tree reflects the value of
-     * the suggestion input, which can also be changed without the tree.
+     * Marks the nodes matching the selected locations and unmarks the others, so that the tree reflects the value of
+     * the suggestion input, which can also be changed without the tree. The nodes are marked by checking them with
+     * multiple selection and by selecting them with single selection.
      */
-    var updateTree = function(tree) {
-      var suggestInput = getSuggestInput();
+    const updateTree = function(tree) {
+      const suggestInput = getSuggestInput();
       if (!suggestInput) {
         return;
       }
       updatingTree = true;
       try {
+        if (!multiple) {
+          tree.deselect_all(true);
+        }
         // Only the nodes that have been loaded so far can be updated, which is enough: the others get their state from
         // the value of the suggestion input when they are loaded.
         tree.get_json('#', {'flat': true}).forEach(function(flatNode) {
-          var node = tree.get_node(flatNode.id);
-          var suggestion = toSuggestion(suggestInput, tree, node);
-          if (suggestion) {
-            if (suggestInput.items.includes(suggestion.value)) {
-              tree.check_node(node);
-            } else {
-              tree.uncheck_node(node);
+          const node = tree.get_node(flatNode.id);
+          const suggestion = toSuggestion(suggestInput, tree, node);
+          const isSelected = suggestion && suggestInput.items.includes(suggestion.value);
+          if (!multiple) {
+            if (isSelected) {
+              tree.select_node(node, true);
             }
+          } else if (isSelected) {
+            tree.check_node(node);
+          } else if (suggestion) {
+            tree.uncheck_node(node);
           }
         });
       } finally {
@@ -148,9 +172,9 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
      * Hides the checkbox of the nodes that are not locations (e.g. the wiki nodes), so that it's clear what can be
      * picked.
      */
-    var hideCheckboxOfNonLocations = function(tree) {
+    const hideCheckboxOfNonLocations = function(tree) {
       tree.get_json('#', {'flat': true}).forEach(function(flatNode) {
-        var node = tree.get_node(flatNode.id);
+        const node = tree.get_node(flatNode.id);
         if (!toLocation(tree, node)) {
           tree.hide_checkbox(node);
         }
@@ -162,32 +186,49 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
      * positioned relative to the button. We only flip it above the button when there isn't enough room below, which
      * easily happens when the picker is displayed near the bottom of a dialog.
      */
-    var flipIfNeeded = function() {
+    const flipIfNeeded = function() {
       browser.removeClass('dropup');
-      var button = toggle[0].getBoundingClientRect();
-      var roomBelow = document.documentElement.clientHeight - button.bottom;
-      var roomAbove = button.top;
+      const button = toggle[0].getBoundingClientRect();
+      const roomBelow = document.documentElement.clientHeight - button.bottom;
+      const roomAbove = button.top;
       if (roomBelow < menu[0].offsetHeight && roomAbove > roomBelow) {
         browser.addClass('dropup');
       }
     };
 
-    browser.on('shown.bs.dropdown', function() {
-      var tree = $.jstree.reference(treeElement);
-      if (tree) {
-        updateTree(tree);
-      } else {
-        // The tree can only be initialized once its element is visible, otherwise it can't measure itself.
-        treeElement.xtree().on('ready.jstree refresh.jstree load_node.jstree', function(event, data) {
+    const initTree = function() {
+      // The tree can only be initialized once its element is visible, otherwise it can't measure itself.
+      const treeEvents = treeElement.xtree({
+        core: {
+          multiple: multiple
+        }
+      }).on('ready.jstree refresh.jstree load_node.jstree', function(event, data) {
+        if (multiple) {
           hideCheckboxOfNonLocations(data.instance);
-          updateTree(data.instance);
-          // Loading nodes changes the height of the drop down, so it may not fit below the button any more.
-          flipIfNeeded();
-        }).on('check_node.jstree', function(event, data) {
+        }
+        updateTree(data.instance);
+        // Loading nodes changes the height of the drop down, so it may not fit below the button any more.
+        flipIfNeeded();
+      });
+      if (multiple) {
+        treeEvents.on('check_node.jstree', function(event, data) {
           addLocation(data.instance, data.node);
         }).on('uncheck_node.jstree', function(event, data) {
           removeLocation(data.instance, data.node);
         });
+      } else {
+        treeEvents.on('select_node.jstree', function(event, data) {
+          setLocation(data.instance, data.node);
+        });
+      }
+    };
+
+    browser.on('shown.bs.dropdown', function() {
+      const tree = $.jstree.reference(treeElement);
+      if (tree) {
+        updateTree(tree);
+      } else {
+        initTree();
       }
       flipIfNeeded();
     });
@@ -212,17 +253,17 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     });
   };
 
-  $.fn.multiLocationPicker = function() {
+  $.fn.compactLocationPicker = function() {
     return this.each(function() {
       enhance(this);
     });
   };
 });
 
-require(['jquery', 'xwiki-multiLocationPicker', 'xwiki-events-bridge'], function($) {
-  var init = function(event, data) {
-    var elements = $(data?.elements || document);
-    elements.filter('.location-picker-multi').add(elements.find('.location-picker-multi')).multiLocationPicker();
+require(['jquery', 'xwiki-compactLocationPicker', 'xwiki-events-bridge'], function($) {
+  const init = function(event, data) {
+    const elements = $(data?.elements || document);
+    elements.filter('.location-picker-compact').add(elements.find('.location-picker-compact')).compactLocationPicker();
   };
 
   $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);

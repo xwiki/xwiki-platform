@@ -49,7 +49,7 @@ import org.xwiki.test.ui.TestUtils;
         "org.xwiki.platform:xwiki-platform-websocket"
     }
 )
-class SideMenuAlignmentIT extends AbstractBlockNoteIT
+class SideMenuIT extends AbstractBlockNoteIT
 {
     /**
      * The name of the image attached to the test page, taken from the test resources. It is tall enough to make it
@@ -111,7 +111,7 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, HEADINGS_CONTENT);
 
-        assertSideMenuIsAligned(editInplace(), setup, testConfiguration, HEADINGS);
+        assertSideMenuIsAligned(editInplace(), setup, testConfiguration, testReference, HEADINGS);
     }
 
     @Test
@@ -121,7 +121,7 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, OTHER_BLOCKS_CONTENT);
 
-        assertSideMenuIsAligned(editInplace(), setup, testConfiguration, OTHER_BLOCKS);
+        assertSideMenuIsAligned(editInplace(), setup, testConfiguration, testReference, OTHER_BLOCKS);
     }
 
     @Test
@@ -135,7 +135,7 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editInplace();
         // An image that is still loading would make the screenshot unstable.
         textArea.waitUntilImageIsLoaded(0);
-        assertSideMenuIsAligned(textArea, setup, testConfiguration, new String[] {"image"});
+        assertSideMenuIsAligned(textArea, setup, testConfiguration, testReference, new String[] {"image"});
     }
 
     @Test
@@ -150,7 +150,7 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
         // An image that is still loading would make the screenshot unstable.
         textArea.waitUntilImageIsLoaded(0);
         textArea.waitUntilImageIsLoaded(1);
-        assertSideMenuIsAligned(textArea, setup, testConfiguration, BLOCKS_NOT_STARTING_WITH_TEXT);
+        assertSideMenuIsAligned(textArea, setup, testConfiguration, testReference, BLOCKS_NOT_STARTING_WITH_TEXT);
     }
 
     /**
@@ -172,10 +172,10 @@ class SideMenuAlignmentIT extends AbstractBlockNoteIT
      * @param blocks the names of the blocks, in the order they appear in the rich text area
      */
     private void assertSideMenuIsAligned(BlockNoteRichTextArea textArea, TestUtils setup,
-        TestConfiguration testConfiguration, String[] blocks) throws IOException
+        TestConfiguration testConfiguration, TestReference testReference, String[] blocks) throws IOException
     {
         WebElement content = setup.getDriver().findElement(By.id("xwikicontent"));
-        ScreenshotComparator screenshots = new ScreenshotComparator(testConfiguration, getClass());
+        ScreenshotComparator screenshots = new ScreenshotComparator(testConfiguration, testReference);
         for (int i = 0; i < blocks.length; i++) {
             textArea.hoverBlock(i);
             screenshots.assertScreenshotMatches(blocks[i], content);

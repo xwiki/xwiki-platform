@@ -31,6 +31,7 @@ import javax.imageio.ImageIO;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.TestReference;
 
 import com.github.romankh3.image.comparison.ImageComparison;
 import com.github.romankh3.image.comparison.ImageComparisonUtil;
@@ -57,7 +58,7 @@ public class ScreenshotComparator
      */
     private static final double PIXEL_TOLERANCE_LEVEL = 0.1;
 
-    private final Class<?> testClass;
+    private final String testClassName;
 
     private final String browser;
 
@@ -66,11 +67,11 @@ public class ScreenshotComparator
     /**
      * @param testConfiguration the test configuration, used to find the build directory and the browser the
      *         screenshots are taken with
-     * @param testClass the test class, used to find the reference screenshots and to name the saved screenshots
+     * @param testReference the test reference, used to find the reference screenshots and to name the saved screenshots
      */
-    public ScreenshotComparator(TestConfiguration testConfiguration, Class<?> testClass)
+    public ScreenshotComparator(TestConfiguration testConfiguration, TestReference testReference)
     {
-        this.testClass = testClass;
+        this.testClassName = testReference.getLastSpaceReference().getParent().getName();
         this.browser = testConfiguration.getBrowser().name().toLowerCase(Locale.ROOT);
         this.outputFolder = new File(testConfiguration.getMavenBuildDirectory(), "screenshots");
     }
@@ -86,7 +87,7 @@ public class ScreenshotComparator
     {
         // The test class name and the browser are part of the file names because the screenshots folder is shared by
         // all the tests.
-        String prefix = "%s-%s-%s".formatted(this.testClass.getSimpleName(), this.browser, name);
+        String prefix = "%s-%s-%s".formatted(this.testClassName, this.browser, name);
         File actualFile = new File(this.outputFolder, prefix + ".png");
         BufferedImage actual = takeScreenshot(element);
         ImageComparisonUtil.saveImage(actualFile, actual);
@@ -113,12 +114,12 @@ public class ScreenshotComparator
 
     private String getReferencePath(String name)
     {
-        return "screenshots/%s/%s/%s.png".formatted(this.testClass.getSimpleName(), this.browser, name);
+        return "screenshots/%s/%s/%s.png".formatted(this.testClassName, this.browser, name);
     }
 
     private BufferedImage readReference(String name) throws IOException
     {
-        try (InputStream reference = this.testClass.getResourceAsStream('/' + getReferencePath(name))) {
+        try (InputStream reference = ScreenshotComparator.class.getResourceAsStream('/' + getReferencePath(name))) {
             return reference == null ? null : ImageIO.read(reference);
         }
     }

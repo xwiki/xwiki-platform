@@ -30,7 +30,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -66,9 +65,8 @@ public class CommentDeleteAction extends AbstractObjectRemoveAction
     @Override
     protected DocumentReference getClassReference(XWikiDocument doc, String className)
     {
-        DocumentReference commentClassReference =
-            new DocumentReference(doc.getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
-                XWikiDocument.COMMENTSCLASS_REFERENCE.getName());
+        DocumentReference commentClassReference = new DocumentReference(
+            XWikiDocument.COMMENTSCLASS_REFERENCE.appendParent(doc.getDocumentReference().getWikiReference()));
         // Reject any other class so that this action cannot remove other objects with only the comment right.
         if (StringUtils.isNotBlank(className) && !commentClassReference.equals(doc.resolveClassReference(className))) {
             setErrorMessage("platform.core.action.commentRemove.invalidClass");

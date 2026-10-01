@@ -35,6 +35,7 @@ import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.WikiLESSResourceReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.template.Template;
+import org.xwiki.template.TemplateContent;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -49,6 +50,8 @@ import com.xpn.xwiki.web.XWikiEngineContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -114,7 +117,13 @@ class CachedLESSCompilerTest
 
     void mockTemplateExecution(LESSResourceReference resource, String input, String result) throws Exception
     {
-        when(this.templateManager.createStringTemplate(resource.toString(), input, InternalTemplateManager.SUPERADMIN_REFERENCE, null))
+        mockTemplateExecution(resource, input, result, InternalTemplateManager.SUPERADMIN_REFERENCE, null);
+    }
+
+    void mockTemplateExecution(LESSResourceReference resource, String input, String result, DocumentReference author,
+        DocumentReference document) throws Exception
+    {
+        when(this.templateManager.createStringTemplate(resource.toString(), input, author, document))
             .thenReturn(this.template);
 
         doAnswer(new Answer<Void>()
@@ -133,8 +142,7 @@ class CachedLESSCompilerTest
     void computeSkinFile() throws Exception
     {
         // Mocks
-        LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent("skin2")).thenReturn("Some LESS content");
+        LESSResourceReference resource = mockSkinFile("skin2", "Some LESS content");
         mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content");
         when(less4jCompiler.compile("Some Velocity-rendered LESS content", "skin2", false)).thenReturn("output");
 
@@ -150,8 +158,7 @@ class CachedLESSCompilerTest
     void computeSkinFileWithoutVelocity() throws Exception
     {
         // Mocks
-        LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent("skin2")).thenReturn("Some LESS content");
+        LESSResourceReference resource = mockSkinFile("skin2", "Some LESS content");
         when(less4jCompiler.compile("Some LESS content", "skin2", false)).thenReturn("output");
 
         // Tests
@@ -165,8 +172,7 @@ class CachedLESSCompilerTest
     void computeSkinFileWithoutLESS() throws Exception
     {
         // Mocks
-        LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent("skin2")).thenReturn("Some LESS content");
+        LESSResourceReference resource = mockSkinFile("skin2", "Some LESS content");
         mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content");
 
         // Tests
@@ -181,8 +187,7 @@ class CachedLESSCompilerTest
     void computeSkinFileWithMainStyleIncluded() throws Exception
     {
         // Mocks
-        LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent("skin")).thenReturn("Some LESS content");
+        LESSResourceReference resource = mockSkinFile("skin", "Some LESS content");
         mockTemplateExecution(resource, "@import (reference) \"style.less.vm\";\nSome LESS content",
             "@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content");
         when(less4jCompiler.compile("@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content",
@@ -196,8 +201,7 @@ class CachedLESSCompilerTest
     void computeSkinFileWhenException() throws Exception
     {
         // Mocks
-        LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent("skin")).thenReturn("Some LESS content");
+        LESSResourceReference resource = mockSkinFile("skin", "Some LESS content");
         mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content");
         Less4jException lessCompilerException = mock(Less4jException.class);
         when(less4jCompiler.compile("Some Velocity-rendered LESS content", "skin", false))
@@ -230,12 +234,108 @@ class CachedLESSCompilerTest
             .thenReturn(authorReference);
         when(mockWikiLESSResourceReference.getDocumentReference())
             .thenReturn(documentReference);
+        mockStringTemplate(mockWikiLESSResourceReference, "", authorReference, documentReference);
 
         this.cachedCompiler.compute(mockWikiLESSResourceReference, false, true, false, "skin");
 
         verify(mockWikiLESSResourceReference).getAuthorReference();
         verify(mockWikiLESSResourceReference).getDocumentReference();
-        verify(this.templateManager).createStringTemplate(mockWikiLESSResourceReference.toString(), "", authorReference,
+        verify(mockWikiLESSResourceReference, never()).getContent(any());
+        // One template holds the content of the resource and the other one evaluates it.
+        verify(this.templateManager, times(2)).createStringTemplate(mockWikiLESSResourceReference.toString(), "",
+            authorReference, documentReference);
+    }
+
+    @Test
+    void computeWikiSkinFileUsesTemplateAuthor() throws Exception
+    {
+        DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Author");
+        DocumentReference documentReference = new DocumentReference("xwiki", "Sandbox", "StdSkin");
+        LESSResourceReference resource =
+            mockSkinFile("Sandbox.StdSkin", "Some LESS content", authorReference, documentReference);
+        mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content", authorReference,
             documentReference);
+
+        assertEquals("Some Velocity-rendered LESS content",
+            this.cachedCompiler.compute(resource, false, true, false, "Sandbox.StdSkin"));
+
+        verify(this.templateManager).createStringTemplate(resource.toString(), "Some LESS content", authorReference,
+            documentReference);
+        verify(this.templateManager, never()).createStringTemplate(any(), any(),
+            eq(InternalTemplateManager.SUPERADMIN_REFERENCE), any());
+    }
+
+    @Test
+    void computeSkinFileResolvesTemplateOnce() throws Exception
+    {
+        LESSSkinFileResourceReference resource = mockSkinFile("skin", "Some LESS content");
+        mockTemplateExecution(resource, "@import (reference) \"style.less.vm\";" + System.lineSeparator()
+            + "Some LESS content", "rendered");
+
+        assertEquals("rendered", this.cachedCompiler.compute(resource, true, true, false, "skin"));
+
+        verify(resource).getTemplateContent("skin");
+        verify(resource, never()).getContent(any());
+    }
+
+    @Test
+    void computeSkinFileWhenTemplateCannotBeResolved() throws Exception
+    {
+        LESSSkinFileResourceReference resource = mock(LESSSkinFileResourceReference.class);
+        LESSCompilerException resolutionException = new LESSCompilerException("error");
+        when(resource.getTemplateContent("skin")).thenThrow(resolutionException);
+
+        LESSCompilerException exception =
+            assertThrows(LESSCompilerException.class, () -> this.cachedCompiler.compute(resource, false, true, true,
+                "skin"));
+
+        assertSame(resolutionException, exception.getCause());
+        assertEquals("Failed to compile the resource [" + resource + "] with LESS.", exception.getMessage());
+        verify(this.templateManager, never()).createStringTemplate(any(), any(), any(), any());
+    }
+
+    @Test
+    void computeUnknownResourceWithoutAuthor() throws Exception
+    {
+        LESSResourceReference resource = mock(LESSResourceReference.class);
+        when(resource.getContent("skin")).thenReturn("Some LESS content");
+        mockStringTemplate(resource, "Some LESS content", null, null);
+        mockTemplateExecution(resource, "@import (reference) \"style.less.vm\";" + System.lineSeparator()
+            + "Some LESS content", "rendered", null, null);
+
+        assertEquals("rendered", this.cachedCompiler.compute(resource, true, true, false, "skin"));
+    }
+
+    private LESSSkinFileResourceReference mockSkinFile(String skin, String content) throws Exception
+    {
+        return mockSkinFile(skin, content, InternalTemplateManager.SUPERADMIN_REFERENCE, null);
+    }
+
+    private LESSSkinFileResourceReference mockSkinFile(String skin, String content, DocumentReference author,
+        DocumentReference document) throws Exception
+    {
+        LESSSkinFileResourceReference resource = mock(LESSSkinFileResourceReference.class);
+        TemplateContent templateContent = mockTemplateContent(content, author, document);
+        when(resource.getTemplateContent(skin)).thenReturn(templateContent);
+        return resource;
+    }
+
+    private void mockStringTemplate(LESSResourceReference resource, String content, DocumentReference author,
+        DocumentReference document) throws Exception
+    {
+        Template stringTemplate = mock(Template.class);
+        TemplateContent templateContent = mockTemplateContent(content, author, document);
+        when(stringTemplate.getContent()).thenReturn(templateContent);
+        when(this.templateManager.createStringTemplate(resource.toString(), content, author, document))
+            .thenReturn(stringTemplate);
+    }
+
+    private TemplateContent mockTemplateContent(String content, DocumentReference author, DocumentReference document)
+    {
+        TemplateContent templateContent = mock(TemplateContent.class);
+        when(templateContent.getContent()).thenReturn(content);
+        when(templateContent.getAuthorReference()).thenReturn(author);
+        when(templateContent.getDocumentReference()).thenReturn(document);
+        return templateContent;
     }
 }

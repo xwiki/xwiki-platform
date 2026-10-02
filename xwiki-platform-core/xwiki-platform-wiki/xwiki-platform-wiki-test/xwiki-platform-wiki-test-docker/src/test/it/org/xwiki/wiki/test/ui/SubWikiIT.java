@@ -19,29 +19,35 @@
  */
 package org.xwiki.wiki.test.ui;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.repository.test.SolrTestUtils;
-import org.xwiki.test.docker.junit5.ExtensionOverride;
+import org.xwiki.test.docker.junit5.SubWikiTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
+import org.xwiki.test.ui.po.LoginPage;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
-import org.xwiki.wiki.test.po.CreateWikiPage;
 import org.xwiki.wiki.test.po.DeleteWikiPage;
-import org.xwiki.wiki.test.po.WikiCreationPage;
+import org.xwiki.wiki.test.po.JoinWikiPage;
 import org.xwiki.wiki.test.po.WikiIndexPage;
-import org.xwiki.wiki.test.po.WikiLink;
+import org.xwiki.wiki.test.po.WikiUsersAdministrationSectionPage;
+import org.xwiki.wiki.user.MembershipType;
+import org.xwiki.wiki.user.UserScope;
 
-import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -56,6 +62,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(
     properties = {
+        // The RightsManagerPlugin is needed to list the members in the wiki members table
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin",
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
         // Creating and Deleting a wiki through a script service currently requires that the document hold the script
@@ -74,37 +82,46 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-wiki-script",
         "org.xwiki.platform:xwiki-platform-wiki-user-default",
         "org.xwiki.platform:xwiki-platform-wiki-user-script"
-    },
-    extensionOverrides = {
-        @ExtensionOverride(
-            extensionId = "org.xwiki.platform:xwiki-platform-web-war",
-            overrides = {
-                // We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension
-                // to install on a subwiki by default (which is something we test)
-                // Otherwise the wiki creation form will display the flavor picker and the functional tests do not
-                // handle it.
-                "properties=xwiki.extension.distribution.wikiui=org.xwiki.platform:xwiki-platform-wiki-ui-wiki"
-            }
-        )
     }
 )
 class SubWikiIT
 {
     private static final String SUBWIKI_NAME = "subwiki";
 
+    private static final String MAIN_WIKI_NAME = "xwiki";
+
+    @BeforeAll
+    void createSubWiki(TestUtils setup, SubWikiTestUtils subWikiSetup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        // Install the default subwiki flavor, as the wiki creation wizard does, which brings in particular the wiki
+        // members administration.
+        subWikiSetup.createWiki(SUBWIKI_NAME, "org.xwiki.platform:xwiki-platform-wiki-ui-wiki");
+        subWikiSetup.setMembershipType(SUBWIKI_NAME, MembershipType.OPEN);
+        subWikiSetup.setUserScope(SUBWIKI_NAME, UserScope.LOCAL_AND_GLOBAL);
+        setup.forceGuestUser();
+    }
+
+    @AfterAll
+    void deleteSubWiki(TestUtils setup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
+        if (wikiIndexPage.getWikiLink(SUBWIKI_NAME) == null) {
+            throw new Exception(String.format("The wiki [%s] is not in the wiki index.", SUBWIKI_NAME));
+        }
+        DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki(SUBWIKI_NAME).confirm(SUBWIKI_NAME);
+        assertTrue(deleteWikiPage.hasSuccessMessage());
+        // Verify the wiki has been deleted
+        wikiIndexPage = WikiIndexPage.gotoPage();
+        assertNull(wikiIndexPage.getWikiLink(SUBWIKI_NAME, false));
+        setup.forceGuestUser();
+    }
+
     @Test
     @Order(1)
     void movePageToSubwiki(TestUtils setup, TestReference testReference) throws Exception
     {
-        createSubWiki(setup);
-
-        // Checks that a non-admin user has the Join action proposed for the new sub-wiki.
-        setup.createUserAndLogin("U1", "U1");
-        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
-        TableLayoutElement tableLayout = wikiIndexPage.getLiveData().getTableLayout();
-        tableLayout.assertRow("Actions", hasItem(tableLayout.getWebElementCellWithLinkMatcher("Join",
-            setup.getURL(new DocumentReference("xwiki", "WikiManager", "JoinWiki"), "view", "wikiId=subwiki"))));
-
         setup.loginAsSuperAdmin();
         DocumentReference mainWikiLinkPage = new DocumentReference("xwiki", "Test", "Link");
         DocumentReference externalLinkPageMainWiki = new DocumentReference("xwiki", "SubWikiIT", "ExternalPage");
@@ -223,57 +240,90 @@ class SubWikiIT
                 setup.serializeReference(movedPageReference),
                 setup.serializeReference(Alice2Reference),
                 setup.serializeReference(newBobPage)), wikiEditPage.getContent());
-
-        deleteSubWiki(setup);
     }
 
     /**
-     * We create the subwiki as first action before running the test.
+     * Join an open wiki from the Wiki Index, as a user who is not a member of that wiki.
      */
-    private void createSubWiki(TestUtils setup)
+    @Test
+    @Order(2)
+    void joinOpenWiki(TestUtils setup)
     {
-        setup.loginAsSuperAdmin();
+        String userName = "JoinWikiUser";
+        setup.createUserAndLogin(userName, "JoinWikiUserPassword");
+
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
-        CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
-        createWikiPage.setPrettyName(SUBWIKI_NAME);
-        String wikiName = createWikiPage.getComputedName();
-        assertEquals(SUBWIKI_NAME, wikiName);
-        createWikiPage.setIsTemplate(false);
+        assertFalse(wikiIndexPage.canLeaveWiki(SUBWIKI_NAME));
+        JoinWikiPage joinWikiPage = wikiIndexPage.joinWiki(SUBWIKI_NAME);
+        assertThat(joinWikiPage.getConfirmationMessage(),
+            containsString(String.format("Are you sure you want to join the wiki %s?", SUBWIKI_NAME)));
+        joinWikiPage = joinWikiPage.confirm();
+        assertThat(joinWikiPage.getSuccessMessage(), containsString(
+            String.format("The user xwiki:XWiki.%s successfully joined wiki %s.", userName, SUBWIKI_NAME)));
 
-        // Code taken from WikiTemplateIT.
-        WikiCreationPage wikiCreationPage = createWikiPage.goUserStep().create();
-        assertEquals("Wiki creation", wikiCreationPage.getStepTitle());
+        // The user is now a member: Join is replaced by Leave in the Wiki Index, and the wiki administration lists
+        // the user among the members.
+        wikiIndexPage = WikiIndexPage.gotoPage();
+        assertFalse(wikiIndexPage.canJoinWiki(SUBWIKI_NAME));
+        assertTrue(wikiIndexPage.canLeaveWiki(SUBWIKI_NAME));
 
-        // Wait for the finalize button to be displayed.
-        // Note that the whole flavor defined in the pom.xml (i.e. org.xwiki.platform:xwiki-platform-wiki-ui-wiki) will
-        // be copied and that's a lot of pages (over 800+), and this takes time. If the CI agent is busy with other
-        // jobs running in parallel it'll take even more time. Thus we put a large value to be safe.
-        wikiCreationPage.waitForFinalizeButton(60 * 5);
-        // Ensure there is no error in the log.
-        assertFalse(wikiCreationPage.hasLogError());
-
-        // Finalization.
-        wikiCreationPage.finalizeCreation();
+        setup.loginAsSuperAdmin();
+        assertThat(WikiUsersAdministrationSectionPage.gotoPage(SUBWIKI_NAME).getMembers(), hasItem(userName));
         setup.forceGuestUser();
     }
 
     /**
-     * We delete the subwiki at the end of the tests.
+     * Add a global user as member of the wiki from the wiki administration, then remove it.
      */
-    private void deleteSubWiki(TestUtils setup) throws Exception
+    @Test
+    @Order(3)
+    void addAndRemoveWikiMembers(TestUtils setup)
     {
+        String userName = "WikiMemberUser";
         setup.loginAsSuperAdmin();
-        // Go to the template wiki
-        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
-        WikiLink templateWikiLink = wikiIndexPage.getWikiLink(SUBWIKI_NAME);
-        if (templateWikiLink == null) {
-            throw new Exception("The wiki [My new template] is not in the wiki index.");
+        setup.createUser(userName, "WikiMemberUserPassword", null);
+
+        WikiUsersAdministrationSectionPage usersSection = WikiUsersAdministrationSectionPage.gotoPage(SUBWIKI_NAME);
+        assertThat(usersSection.getMembers(), not(hasItem(userName)));
+        usersSection.addMembers(userName);
+        assertThat(usersSection.getMembers(), hasItem(userName));
+
+        usersSection.removeMember(userName);
+        assertThat(usersSection.getMembers(), not(hasItem(userName)));
+        // Check that the removal has been saved.
+        assertThat(WikiUsersAdministrationSectionPage.gotoPage(SUBWIKI_NAME).getMembers(), not(hasItem(userName)));
+        setup.forceGuestUser();
+    }
+
+    /**
+     * A user local to a subwiki can log in on that subwiki but not on the main wiki.
+     */
+    @Test
+    @Order(4)
+    void localSubwikiUserCannotLogInOnMainWiki(TestUtils setup)
+    {
+        String userName = "LocalSubWikiUser";
+        String password = "LocalSubWikiUserPassword";
+        setup.loginAsSuperAdmin();
+        setup.setCurrentWiki(SUBWIKI_NAME);
+        try {
+            setup.createUser(userName, password, null);
+        } finally {
+            setup.setCurrentWiki(MAIN_WIKI_NAME);
         }
-        DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki(SUBWIKI_NAME).confirm(SUBWIKI_NAME);
-        assertTrue(deleteWikiPage.hasSuccessMessage());
-        // Verify the wiki has been deleted
-        wikiIndexPage = WikiIndexPage.gotoPage();
-        assertNull(wikiIndexPage.getWikiLink(SUBWIKI_NAME, false));
+        setup.forceGuestUser();
+
+        LoginPage loginPage = LoginPage.gotoPage();
+        loginPage.loginAs(userName, password);
+        loginPage = new LoginPage();
+        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        assertFalse(loginPage.isAuthenticated());
+
+        // The same credentials are accepted on the subwiki, which proves the refusal comes from the user being local.
+        setup.gotoPage(new DocumentReference(SUBWIKI_NAME, "XWiki", "XWikiLogin"), "login");
+        loginPage = new LoginPage();
+        loginPage.loginAs(userName, password);
+        assertTrue(new ViewPage().isAuthenticated());
         setup.forceGuestUser();
     }
 }

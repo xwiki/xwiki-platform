@@ -66,6 +66,8 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     private static final String HTTP_HEADER_FORWARDED_FOR = "X-Forwarded-For";
 
+    private static final Cookie[] EMPTY_COOKIES = new Cookie[0];
+
     @Inject
     protected Logger logger;
 
@@ -109,8 +111,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
             // Indicate that the browser used to generate the PDF acts as a proxy that forwards the PDF export request
             // to the XWiki backend and "modifies" the HTML response, replacing it with the PDF document, before sending
             // it back to the original client (users's browser) that triggered the PDF export.
-            browserTab.setExtraHTTPHeaders(
-                Map.of(HTTP_HEADER_FORWARDED, getForwardedHTTPHeader(cookieFilterContext.getClientIPAddress())));
+            addForwardedHTTPHeader(browserTab, cookieFilterContext.getClientIPAddress());
 
             continueIfNotCanceled(isCanceled);
 
@@ -196,7 +197,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
             }
         }
 
-        return null;
+        return EMPTY_COOKIES;
     }
 
     /**
@@ -302,39 +303,42 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
     /**
      * Computes the values of the "Forwarded" HTTP header as if the request was forwarded by the specified proxy.
      *
+     * @param browserTab the browser tab that should be able to access the print preview URL
      * @param proxyIPAddress the IP address of the proxy that forwards the request to XWiki
      * @return the values of the "Forwarded" HTTP header
      */
-    private List<String> getForwardedHTTPHeader(String proxyIPAddress)
+    private void addForwardedHTTPHeader(BrowserTab browserTab, String proxyIPAddress)
     {
         HttpServletRequest request = getJakartaRequest();
 
-        List<String> forwarded = new LinkedList<>();
-        Enumeration<String> forwardedValues = request.getHeaders(HTTP_HEADER_FORWARDED);
-        if (forwardedValues != null) {
-            forwardedValues.asIterator().forEachRemaining(forwarded::add);
+        if (request != null) {
+            List<String> forwarded = new LinkedList<>();
+            Enumeration<String> forwardedValues = request.getHeaders(HTTP_HEADER_FORWARDED);
+            if (forwardedValues != null) {
+                forwardedValues.asIterator().forEachRemaining(forwarded::add);
+            }
+
+            String forwardedFor = request.getHeader(HTTP_HEADER_FORWARDED_FOR);
+            if (StringUtils.isBlank(forwardedFor)) {
+                forwardedFor = request.getRemoteAddr();
+            }
+
+            String host = request.getHeader("X-Forwarded-Host");
+            if (StringUtils.isBlank(host)) {
+                host = request.getHeader("Host");
+            }
+
+            String protocol = request.getHeader("X-Forwarded-Proto");
+            if (StringUtils.isBlank(protocol)) {
+                protocol = request.getScheme();
+            }
+
+            String lastForwarded =
+                String.format("by=%s;for=%s;host=%s;proto=%s", proxyIPAddress, forwardedFor, host, protocol);
+            forwarded.add(lastForwarded);
+
+            browserTab.setExtraHTTPHeaders(Map.of(HTTP_HEADER_FORWARDED, forwarded));
         }
-
-        String forwardedFor = request.getHeader(HTTP_HEADER_FORWARDED_FOR);
-        if (StringUtils.isBlank(forwardedFor)) {
-            forwardedFor = request.getRemoteAddr();
-        }
-
-        String host = request.getHeader("X-Forwarded-Host");
-        if (StringUtils.isBlank(host)) {
-            host = request.getHeader("Host");
-        }
-
-        String protocol = request.getHeader("X-Forwarded-Proto");
-        if (StringUtils.isBlank(protocol)) {
-            protocol = request.getScheme();
-        }
-
-        String lastForwarded =
-            String.format("by=%s;for=%s;host=%s;proto=%s", proxyIPAddress, forwardedFor, host, protocol);
-        forwarded.add(lastForwarded);
-
-        return forwarded;
     }
 
     @Override

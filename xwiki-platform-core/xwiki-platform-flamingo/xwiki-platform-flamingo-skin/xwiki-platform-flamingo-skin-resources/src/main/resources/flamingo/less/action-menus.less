@@ -322,6 +322,9 @@ li:has(+ li #tmRegister) #tmLogin {
 #contentmenu {
   .text-right();
   .flat-buttons();
+  // Remove default list style so that the menu box fits its buttons.
+  list-style: none;
+  padding-left: 0;
 
   .dropdown {
     display: inline-block;

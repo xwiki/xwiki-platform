@@ -449,6 +449,7 @@ public class BlockNoteRichTextArea extends BaseElement
     public SideMenu hoverBlock(int index)
     {
         WebElement block = getBlockContent(index);
+        getDriver().createActions().moveToElement(block).perform();
         return new SideMenu(block);
     }
 

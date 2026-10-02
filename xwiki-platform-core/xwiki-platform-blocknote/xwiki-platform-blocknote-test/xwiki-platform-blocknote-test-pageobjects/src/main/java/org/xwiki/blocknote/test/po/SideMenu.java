@@ -36,8 +36,6 @@ public class SideMenu extends BaseElement
 {
     private static final By SIDE_MENU = By.className("bn-side-menu");
 
-    private final WebElement container;
-
     /**
      * Waits for the side menu of the specified block to be displayed at its final position.
      *
@@ -46,15 +44,6 @@ public class SideMenu extends BaseElement
     public SideMenu(WebElement hoveredBlock)
     {
         waitUntilStable(hoveredBlock);
-        this.container = getDriver().findElement(SIDE_MENU);
-    }
-
-    /**
-     * @return the side menu container element
-     */
-    public WebElement getContainer()
-    {
-        return this.container;
     }
 
     private void waitUntilStable(WebElement hoveredBlock)

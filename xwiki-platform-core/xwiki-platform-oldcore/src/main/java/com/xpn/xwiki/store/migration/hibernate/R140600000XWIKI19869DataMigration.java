@@ -133,13 +133,13 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
     {
         // The bug we discovered only impact the main wiki users thanks to another bug (XWIKI-19591),
         // so we can safely ignore subwikis
-        if (getXWikiContext().isMainWiki()) {
-            int version = startupVersion.getVersion();
-            // The migration has been cherry-picked in 13.10.8 and 14.4.3
-            return !((version >= 131008000 && version < 140000000) || (version >= 140403000 && version < 140500000));
-        } else {
-            return false;
-        }
+        return getXWikiContext().isMainWiki() && super.shouldExecute(startupVersion);
+    }
+
+    @Override
+    protected List<XWikiDBVersion> getBackportVersions()
+    {
+        return List.of(new XWikiDBVersion(131008000), new XWikiDBVersion(140403000));
     }
 
     @Override

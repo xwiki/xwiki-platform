@@ -20,6 +20,8 @@
 
 package com.xpn.xwiki.store.migration.hibernate;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -47,6 +49,21 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 public abstract class AbstractHibernateDataMigration implements HibernateDataMigration
 {
+    /**
+     * Size of a major version in the {@code MMmmppNNN} DB version format (e.g. {@code 171014000} for 17.10.14).
+     */
+    private static final int MAJOR_VERSION_SIZE = 10000000;
+
+    /**
+     * Size of a minor version in the {@code MMmmppNNN} DB version format.
+     */
+    private static final int MINOR_VERSION_SIZE = 100000;
+
+    /**
+     * The last minor version of a major cycle (e.g. 17.10), after which the next branch is the next major version.
+     */
+    private static final int LAST_MINOR_VERSION = 10;
+
     /**
      * Component manager used to access stores.
      */
@@ -96,10 +113,45 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
         return componentDescriptor.getRoleHint();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * By default, the migration is executed unless the database already contains one of its backported copies (see
+     * {@link #getBackportVersions()}). Subclasses overriding this method should call it to keep that check.
+     */
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        return true;
+        return getBackportVersions().stream().noneMatch(backportVersion -> isInBackportBranch(startupVersion,
+            backportVersion));
+    }
+
+    /**
+     * Declare the versions of the copies of this migration that were backported to older branches, so that
+     * {@link #shouldExecute(XWikiDBVersion)} doesn't execute it again on a database that already contains one of them.
+     * A database is considered to contain a backported copy when its version is between the backported version
+     * (included) and the first version of the next branch (excluded): for example, a backport version of
+     * {@code 171014000} (17.10.14) skips databases from 17.10.14 to 18.0.0 (excluded), and a backport version of
+     * {@code 160401000} (16.4.1) skips databases from 16.4.1 to 16.5.0 (excluded).
+     *
+     * @return the DB versions (in the {@code MMmmppNNN} format) of the backported copies of this migration, empty by
+     *         default
+     * @since 18.9.0RC1
+     */
+    protected List<XWikiDBVersion> getBackportVersions()
+    {
+        return List.of();
+    }
+
+    private boolean isInBackportBranch(XWikiDBVersion startupVersion, XWikiDBVersion backportVersion)
+    {
+        int version = backportVersion.getVersion();
+        int major = version / MAJOR_VERSION_SIZE;
+        int minor = (version / MINOR_VERSION_SIZE) % (MAJOR_VERSION_SIZE / MINOR_VERSION_SIZE);
+        int nextBranchVersion = minor >= LAST_MINOR_VERSION ? (major + 1) * MAJOR_VERSION_SIZE
+            : major * MAJOR_VERSION_SIZE + (minor + 1) * MINOR_VERSION_SIZE;
+
+        return startupVersion.getVersion() >= version && startupVersion.getVersion() < nextBranchVersion;
     }
 
     /**

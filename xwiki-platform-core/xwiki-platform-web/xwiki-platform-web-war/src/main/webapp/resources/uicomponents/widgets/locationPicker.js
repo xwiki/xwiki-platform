@@ -204,7 +204,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
         }
       }).catch(() => {
         if (titleInputVal === titleInput.val()) {
-          new XWiki.widgets.Notification(l10n['entitynamevalidation.nametransformation.error'], 'error');
+          XWiki.widgets.Notification.show(l10n['entitynamevalidation.nametransformation.error'], 'error');
           // Re-enable the page name input and trigger a change event to execute the client-side validations.
           nameInput.prop('disabled', false).val(titleInputVal).trigger('change');
           // Update the location preview.

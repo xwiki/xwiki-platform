@@ -515,7 +515,7 @@ require([
         if (lastError) {
           // The PDF export job log contains some error messages that might explain why the PDF file doesn't have the
           // expected content.
-          new XWiki.widgets.Notification(l10n.get('export.pdf.lastError', lastError), 'warning',
+          XWiki.widgets.Notification.show(l10n.get('export.pdf.lastError', lastError), 'warning',
             // Increase a bit the timeout so that the user has the time to read the warning message.
             {timeout : 10});
         }

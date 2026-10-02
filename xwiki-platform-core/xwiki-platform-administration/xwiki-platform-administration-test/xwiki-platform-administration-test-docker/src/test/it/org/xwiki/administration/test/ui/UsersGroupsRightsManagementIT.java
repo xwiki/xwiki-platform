@@ -35,6 +35,7 @@ import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.administration.test.po.UsersAdministrationSectionPage;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -476,6 +477,10 @@ class UsersGroupsRightsManagementIT
      * or more pages, the delete confirmation modal warns about it, states that the user is the last author of the
      * affected pages and links to them. This automates the "Delete user with Script or Programming Rights" manual
      * test for the Script Rights case.
+     * <p>
+     * Also verify that the modal lets the administrator choose another user with Script Rights to replace the deleted
+     * user as author of those pages, rejects a user without Script Rights, and that the page is then last modified by
+     * the chosen user. This automates the "Replace Author when Deleting Users" manual test.
      */
     @Test
     @Order(8)
@@ -486,6 +491,14 @@ class UsersGroupsRightsManagementIT
         String scriptUserPassword = "password";
         setup.createUser(scriptUserName, scriptUserPassword, "");
         String userFullName = "XWiki.%s".formatted(scriptUserName);
+
+        // The candidates to replace the deleted user as author: only the first one has Script Right. Their names don't
+        // contain the name of the deleted user, so that filtering the users live data on it matches only that user.
+        String newAuthorUserName = "ReplacementAuthor";
+        setup.createUser(newAuthorUserName, "password", "", "first_name", "New", "last_name", "Author");
+        setup.setGlobalRights("", "XWiki." + newAuthorUserName, "script", true);
+        String noScriptUserName = "ReplacementAuthorWithoutScript";
+        setup.createUser(noScriptUserName, "password", "");
 
         // Grant Script Right to the user and make them the last author of a page.
         setup.setGlobalRights("", userFullName, "script", true);
@@ -505,8 +518,21 @@ class UsersGroupsRightsManagementIT
         assertEquals("/xwiki/bin/view/Main/AllDocs?doc.author=%s".formatted(userFullName),
             deleteUserConfirmationModal.getScriptRightUserErrorMessageHrefValue());
 
+        // A user without Script Right can't replace the deleted user as author.
+        deleteUserConfirmationModal.setNewAuthor(noScriptUserName);
+        assertTrue(deleteUserConfirmationModal.isNewAuthorErrorDisplayed());
+
+        // Replace the deleted user with a user who has Script Right, as author of the page they last modified.
+        deleteUserConfirmationModal.setNewAuthor(newAuthorUserName);
+        assertFalse(deleteUserConfirmationModal.isNewAuthorErrorDisplayed());
+
         deleteUserConfirmationModal.clickOk();
         assertEquals(0, usersPage.getUsersLiveData().getTableLayout().countRows());
+
+        // The page is now last modified by the selected user.
+        String lastModifiedText = setup.gotoPage(testReference).getLastModifiedText();
+        assertTrue(lastModifiedText.contains("Last modified by New Author"),
+            "Unexpected last modified text: " + lastModifiedText);
     }
 
     @Test
@@ -988,6 +1014,59 @@ class UsersGroupsRightsManagementIT
         assertEquals("No right set content", viewPage.getContent());
         assertTrue(viewPage.isEditAvailable(),
             "The Edit option should be available on a page on which \"edit\" is not denied to the user");
+    }
+
+    /**
+     * Verify that a right granted on a terminal page overrides the same right restricted on its nested parent page:
+     * when only the XWikiAdminGroup can view the nested page {@code a/b/c/d} and its children, a user can still view
+     * the terminal child page {@code a/b/c/d/test} on which "view" is granted to the XWikiAllGroup, but not the parent
+     * page nor its other children.
+     */
+    @Test
+    @Order(17)
+    void overrideRightAtPageLevel(TestUtils setup, TestReference testReference)
+    {
+        String userName = testReference.getLastSpaceReference().getName();
+        SpaceReference parentSpace = new SpaceReference("d", new SpaceReference("c",
+            new SpaceReference("b", new SpaceReference("a", testReference.getLastSpaceReference()))));
+        DocumentReference parentPage = new DocumentReference("WebHome", parentSpace);
+        DocumentReference overridingPage = new DocumentReference("test", parentSpace);
+        DocumentReference otherPage = new DocumentReference("other", parentSpace);
+
+        setup.createPage(parentPage, "Parent content", "d");
+        setup.createPage(overridingPage, "Overriding content", "test");
+        setup.createPage(otherPage, "Other content", "other");
+        setup.createUser(userName, userName, "");
+
+        // Give the "view" right only to the XWikiAdminGroup on the nested page and its children, from Administer Page >
+        // Users & Rights > Rights: Page & Children.
+        AdministrationPage.gotoSpaceAdministrationPage(parentSpace).clickSection("Users & Rights",
+            "Rights: Page & Children");
+        EditRightsPane parentRightsPane = new EditRightsPane();
+        parentRightsPane.switchToGroups();
+        parentRightsPane.getRightsTable().filterColumn("name", "XWikiAdminGroup");
+        parentRightsPane.setRight("XWikiAdminGroup", EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+
+        // Give the "view" right to the XWikiAllGroup on the terminal child page, from Edit > Access Rights.
+        setup.gotoPage(overridingPage, "edit", "editor=rights");
+        RightsEditPage overridingRightsPage = new RightsEditPage();
+        overridingRightsPage.switchToGroups();
+        overridingRightsPage.getRightsTable().filterColumn("name", "XWikiAllGroup");
+        overridingRightsPage.setRight("XWikiAllGroup", EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+
+        setup.login(userName, userName);
+
+        // The restriction set on the nested page applies to the page and to its children.
+        assertTrue(setup.gotoPage(parentPage).isForbidden(),
+            "The nested page should not be viewable since \"view\" is granted only to the XWikiAdminGroup");
+        assertTrue(setup.gotoPage(otherPage).isForbidden(),
+            "A child page without rights of its own should inherit the restriction of its parent");
+
+        // The right granted on the terminal child page overrides the restriction inherited from its parent.
+        ViewPage viewPage = setup.gotoPage(overridingPage);
+        assertFalse(viewPage.isForbidden(),
+            "The terminal page should be viewable since \"view\" is granted to the XWikiAllGroup on it");
+        assertEquals("Overriding content", viewPage.getContent());
     }
 
     private void assertRightsTableShowsUsersAndGroups(EditRightsPane editRightsPane)

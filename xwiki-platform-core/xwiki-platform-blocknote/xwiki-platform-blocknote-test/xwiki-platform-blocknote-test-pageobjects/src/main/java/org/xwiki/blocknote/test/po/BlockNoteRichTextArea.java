@@ -22,7 +22,6 @@ package org.xwiki.blocknote.test.po;
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -41,8 +40,6 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNest
  */
 public class BlockNoteRichTextArea extends BaseElement
 {
-    private static final By SIDE_MENU = By.className("bn-side-menu");
-
     @NonNull
     private WebElement container;
 
@@ -221,6 +218,36 @@ public class BlockNoteRichTextArea extends BaseElement
             }
         });
         return getImage(index);
+    }
+
+    /**
+     * Waits until all the images in the rich text area have been loaded successfully, including the ones that are part
+     * of a macro output, such as the icon of an info box. Don't call this when an image is expected to fail to load.
+     *
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilImagesAreLoaded()
+    {
+        int imageCount = this.container.findElements(By.tagName("img")).size();
+        for (int i = 0; i < imageCount; i++) {
+            waitUntilImageIsLoaded(i);
+        }
+        return this;
+    }
+
+    /**
+     * Waits until all the macros in the rich text area have been replaced by their output, which is rendered on the
+     * server and thus displayed only after the editor has loaded.
+     *
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilMacrosAreRendered()
+    {
+        getDriver().waitUntilCondition(
+            driver -> this.container.findElements(By.className("xwiki-macro-placeholder")).isEmpty());
+        return this;
     }
 
     /**
@@ -413,49 +440,16 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Hovers the block with the specified index, in order to show its side menu, and waits for the side menu to be
-     * displayed at its final position (it is positioned asynchronously, relative to the hovered block).
+     * Hovers the block with the specified index, in order to show its side menu.
      *
      * @param index the index of the block to hover, starting from 0
-     * @return this rich text area instance
+     * @return the side menu of the hovered block
      * @since 18.9.0RC1
      */
-    public BlockNoteRichTextArea hoverBlock(int index)
+    public SideMenu hoverBlock(int index)
     {
-        getDriver().createActions().moveToElement(getBlockContent(index)).perform();
-
-        getDriver().waitUntilElementIsVisible(SIDE_MENU);
-        WebElement sideMenu = getDriver().findElement(SIDE_MENU);
-
-        // Waiting for the side menu to be visible is not enough to avoid flaky screenshots, as there is a fade in
-        // animation. To be sure, we wait for the side menu to be stable, i.e. to be at the same position for two
-        // consecutive ticks.
-        Point[] previousPosition = new Point[] {null};
-        getDriver().waitUntilCondition(driver -> {
-            Point position = sideMenu.getLocation();
-            boolean stable = position.equals(previousPosition[0]);
-            previousPosition[0] = position;
-            return stable;
-        });
-
-        return this;
-    }
-
-    /**
-     * Hides the caret (text cursor), which blinks and would thus make the screenshots of the rich text area
-     * unstable.
-     *
-     * @return this rich text area instance
-     * @since 18.9.0RC1
-     */
-    public BlockNoteRichTextArea hideCaret()
-    {
-        getDriver().executeScript("""
-            const style = document.createElement('style');
-            style.textContent = '.bn-editor { caret-color: transparent; }';
-            document.head.appendChild(style);
-            """);
-        return this;
+        WebElement block = getBlockContent(index);
+        return new SideMenu(block);
     }
 
     private WebElement getBlockContent(int index)

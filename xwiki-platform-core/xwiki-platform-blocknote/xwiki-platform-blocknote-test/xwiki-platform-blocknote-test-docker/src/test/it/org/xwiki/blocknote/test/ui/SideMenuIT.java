@@ -22,7 +22,6 @@ package org.xwiki.blocknote.test.ui;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
@@ -111,7 +110,7 @@ class SideMenuIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, HEADINGS_CONTENT);
 
-        assertSideMenuIsAligned(editInplace(), setup, testConfiguration, testReference, HEADINGS);
+        assertSideMenuIsAligned(editInplace(), testConfiguration, testReference, HEADINGS);
     }
 
     @Test
@@ -121,7 +120,7 @@ class SideMenuIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, OTHER_BLOCKS_CONTENT);
 
-        assertSideMenuIsAligned(editInplace(), setup, testConfiguration, testReference, OTHER_BLOCKS);
+        assertSideMenuIsAligned(editInplace(), testConfiguration, testReference, OTHER_BLOCKS);
     }
 
     @Test
@@ -135,7 +134,7 @@ class SideMenuIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editInplace();
         // An image that is still loading would make the screenshot unstable.
         textArea.waitUntilImageIsLoaded(0);
-        assertSideMenuIsAligned(textArea, setup, testConfiguration, testReference, new String[] {"image"});
+        assertSideMenuIsAligned(textArea, testConfiguration, testReference, new String[] {"image"});
     }
 
     @Test
@@ -147,21 +146,24 @@ class SideMenuIT extends AbstractBlockNoteIT
         setup.createPage(testReference, BLOCKS_NOT_STARTING_WITH_TEXT_CONTENT);
 
         BlockNoteRichTextArea textArea = editInplace();
-        // An image that is still loading would make the screenshot unstable.
-        textArea.waitUntilImageIsLoaded(0);
-        textArea.waitUntilImageIsLoaded(1);
-        assertSideMenuIsAligned(textArea, setup, testConfiguration, testReference, BLOCKS_NOT_STARTING_WITH_TEXT);
+        // A macro whose output is not rendered yet, or an image that is still loading, would move the blocks around
+        // and thus make the screenshots unstable.
+        textArea.waitUntilMacrosAreRendered().waitUntilImagesAreLoaded();
+        assertSideMenuIsAligned(textArea, testConfiguration, testReference, BLOCKS_NOT_STARTING_WITH_TEXT);
     }
 
     /**
-     * Edits the current page in-place.
+     * Edits the current page in-place and moves the focus to the page title.
      *
-     * @return the rich text area, with its caret hidden since its blinking would make the screenshots unstable
+     * @return the rich text area, which is left unfocused so that its blinking caret doesn't make the screenshots
+     *         unstable
      */
     private BlockNoteRichTextArea editInplace()
     {
-        new InplaceEditablePage().editInplace();
-        return new BlockNoteEditor("content").getRichTextArea().hideCaret();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteRichTextArea textArea = new BlockNoteEditor("content").getRichTextArea();
+        page.focusDocumentTitle();
+        return textArea;
     }
 
     /**
@@ -171,10 +173,10 @@ class SideMenuIT extends AbstractBlockNoteIT
      * @param textArea the rich text area holding the blocks
      * @param blocks the names of the blocks, in the order they appear in the rich text area
      */
-    private void assertSideMenuIsAligned(BlockNoteRichTextArea textArea, TestUtils setup,
-        TestConfiguration testConfiguration, TestReference testReference, String[] blocks) throws IOException
+    private void assertSideMenuIsAligned(BlockNoteRichTextArea textArea, TestConfiguration testConfiguration,
+        TestReference testReference, String[] blocks) throws IOException
     {
-        WebElement content = setup.getDriver().findElement(By.id("xwikicontent"));
+        WebElement content = new InplaceEditablePage().getContentContainer();
         ScreenshotComparator screenshots = new ScreenshotComparator(testConfiguration, testReference);
         for (int i = 0; i < blocks.length; i++) {
             textArea.hoverBlock(i);

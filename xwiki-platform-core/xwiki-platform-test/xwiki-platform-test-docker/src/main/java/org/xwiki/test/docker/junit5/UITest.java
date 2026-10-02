@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.test.docker.internal.junit5.MultiUserTestUtilsParameterResolver;
+import org.xwiki.test.docker.internal.junit5.SubWikiTestUtilsParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestLocalReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
@@ -57,6 +58,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(TestReferenceParameterResolver.class)
 @ExtendWith(TestLocalReferenceParameterResolver.class)
 @ExtendWith(MultiUserTestUtilsParameterResolver.class)
+@ExtendWith(SubWikiTestUtilsParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public @interface UITest

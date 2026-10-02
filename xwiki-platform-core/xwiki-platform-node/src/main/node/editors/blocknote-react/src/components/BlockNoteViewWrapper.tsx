@@ -19,6 +19,7 @@
  */
 
 import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
+import { centerOnFirstLine } from "./SideMenu/centerOnFirstLine";
 import { FilePanel } from "./files/FilePanel";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import {
@@ -37,6 +38,7 @@ import {
   FormattingToolbar,
   FormattingToolbarController,
   LinkToolbarController,
+  SideMenuController,
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
@@ -218,6 +220,16 @@ type BlockNoteViewWrapperProps = {
 };
 
 /**
+ * Replaces the middleware BlockNote uses to center the side menu vertically on the hovered block, which offsets the
+ * menu by a fixed amount per block type that only matches BlockNote's own styling.
+ */
+const SIDE_MENU_FLOATING_OPTIONS = {
+  useFloatingOptions: {
+    middleware: [centerOnFirstLine()],
+  },
+};
+
+/**
  * BlockNote editor wrapper
  */
 
@@ -353,8 +365,12 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           linkToolbar={false}
           filePanel={false}
           slashMenu={false}
+          sideMenu={false}
           onChange={(editor) => onChange?.(editor)}
         >
+          {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
+          <SideMenuController floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS} />
+
           <SuggestionMenuController
             triggerCharacter={"/"}
             getItems={async (query) =>

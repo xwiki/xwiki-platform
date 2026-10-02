@@ -235,6 +235,15 @@ public class ViewPage extends BasePage
         return this.content.getText();
     }
 
+    /**
+     * @return the element wrapping the page's main content, e.g. to take a screenshot of it
+     * @since 18.9.0RC1
+     */
+    public WebElement getContentContainer()
+    {
+        return this.content;
+    }
+
     public WYSIWYGEditPage editSection(int sectionNumber)
     {
         By sectionBy = By.cssSelector("a.edit_section[href*=\"section=" + sectionNumber + "\"]");

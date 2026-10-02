@@ -221,6 +221,36 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
+     * Waits until all the images in the rich text area have been loaded successfully, including the ones that are part
+     * of a macro output, such as the icon of an info box. Don't call this when an image is expected to fail to load.
+     *
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilImagesAreLoaded()
+    {
+        int imageCount = this.container.findElements(By.tagName("img")).size();
+        for (int i = 0; i < imageCount; i++) {
+            waitUntilImageIsLoaded(i);
+        }
+        return this;
+    }
+
+    /**
+     * Waits until all the macros in the rich text area have been replaced by their output, which is rendered on the
+     * server and thus displayed only after the editor has loaded.
+     *
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilMacrosAreRendered()
+    {
+        getDriver().waitUntilCondition(
+            driver -> this.container.findElements(By.className("xwiki-macro-placeholder")).isEmpty());
+        return this;
+    }
+
+    /**
      * Double clicks on the macro with the specified index in the rich text area to open the macro edit modal.
      * 
      * @param index the index of the macro to double click, starting from 0
@@ -407,5 +437,26 @@ public class BlockNoteRichTextArea extends BaseElement
         String script = "return arguments[0].editor.view.state.selection.$from.parentOffset";
         getDriver().waitUntilCondition(
             driver -> ((Number) getDriver().executeScript(script, this.container)).intValue() == offset);
+    }
+
+    /**
+     * Hovers the block with the specified index, in order to show its side menu.
+     *
+     * @param index the index of the block to hover, starting from 0
+     * @return the side menu of the hovered block
+     * @since 18.9.0RC1
+     */
+    public SideMenu hoverBlock(int index)
+    {
+        WebElement block = getBlockContent(index);
+        // We move in two steps because the editor hides the side menu when the page scrolls, which the first move can
+        // trigger, and shows it again only on the next mouse move.
+        getDriver().createActions().moveToElement(block, 1, 1).moveToElement(block).perform();
+        return new SideMenu();
+    }
+
+    private WebElement getBlockContent(int index)
+    {
+        return this.container.findElements(By.className("bn-block-content")).get(index);
     }
 }

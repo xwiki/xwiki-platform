@@ -254,6 +254,11 @@ class PDFExportIT
             // For the second image we force the server-side resize.
             assertEquals(100, contentPageImages.get(1).getRawWidth());
             assertEquals(100, contentPageImages.get(1).getRawHeight());
+
+            // The images should keep their alternative text: the one specified in the wiki syntax, the default one
+            // generated from the image reference and the one specified in the HTML.
+            assertEquals(List.of("XWiki logo resized client-side", "xwiki-logo.png", "XWiki Logo"),
+                pdf.getImageAlternativeTextsFromPage(3));
         }
     }
 

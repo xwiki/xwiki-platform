@@ -141,4 +141,18 @@ public class LoginPage extends ViewPage
     {
         return getDriver().hasElementWithoutWaiting(By.className("captcha-challenge"));
     }
+
+    /**
+     * Fill the answer to the CAPTCHA challenge displayed in the login form, to be submitted with the next
+     * {@link #loginAs(String, String)}.
+     *
+     * @param answer the answer to the CAPTCHA challenge
+     * @since 18.9.0RC1
+     */
+    public void setCaptchaAnswer(String answer)
+    {
+        WebElement answerInput = getDriver().findElement(By.name("captchaAnswer"));
+        answerInput.clear();
+        answerInput.sendKeys(answer);
+    }
 }

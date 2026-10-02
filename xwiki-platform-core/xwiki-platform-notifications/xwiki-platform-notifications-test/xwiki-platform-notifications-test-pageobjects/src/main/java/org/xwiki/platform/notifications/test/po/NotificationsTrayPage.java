@@ -211,6 +211,20 @@ public class NotificationsTrayPage extends ViewPage
     }
 
     /**
+     * @return {@code true} if the badge holding the number of unread notifications is displayed on the bell, without
+     *     opening the notification tray
+     * @since 18.9.0RC1
+     */
+    public boolean isCountBadgeDisplayed()
+    {
+        // The badge is added asynchronously, once the number of unread notifications is known, and removed when there
+        // is no unread notification.
+        List<WebElement> badges = getDriver().findElementsWithoutWaiting(
+            By.cssSelector(NOTIFICATION_BUTTON_CSS_SELECTOR + " .notifications-count"));
+        return !badges.isEmpty() && badges.getFirst().isDisplayed();
+    }
+
+    /**
      * Click the button «Clear All» in the notification tray.
      */
     public void clearAllNotifications()

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -61,6 +62,8 @@ class WikiEditorIT
     private static final String EDITOR_START = "EDITOR_START";
 
     private static final String WIKI = "wiki";
+
+    private static final String FIRST_EDITOR = "FIRST_EDITOR";
 
     private static final DocumentReference RENDERER_REFERENCE =
         new DocumentReference("xwiki", "WikiEditorIT", "Renderer");
@@ -144,5 +147,29 @@ class WikiEditorIT
         String content = renderEditor(testUtils, hint);
         assertTrue(content.contains(EDITOR_START), content);
         assertFalse(content.contains(EXECUTED), content);
+    }
+
+    @Test
+    @Order(3)
+    void removeOverridingEditor(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        String hint = "wikiEditorITOverride";
+        SpaceReference spaceReference = testReference.getLastSpaceReference();
+        DocumentReference firstEditor = new DocumentReference("FirstEditor", spaceReference);
+        DocumentReference secondEditor = new DocumentReference("SecondEditor", spaceReference);
+        testUtils.loginAsSuperAdmin();
+        testUtils.rest().delete(firstEditor);
+        testUtils.rest().delete(secondEditor);
+
+        testUtils.rest().addObject(firstEditor, EDITOR_CLASS, editorProperties(hint, WIKI, FIRST_EDITOR));
+        assertEquals(FIRST_EDITOR, renderEditor(testUtils, hint));
+
+        // A second editor with the same hint replaces the first one.
+        testUtils.rest().addObject(secondEditor, EDITOR_CLASS, editorProperties(hint, WIKI, "SECOND_EDITOR"));
+        assertEquals("SECOND_EDITOR", renderEditor(testUtils, hint));
+
+        // Deleting the second editor brings back the first one.
+        testUtils.rest().delete(secondEditor);
+        assertEquals(FIRST_EDITOR, renderEditor(testUtils, hint));
     }
 }

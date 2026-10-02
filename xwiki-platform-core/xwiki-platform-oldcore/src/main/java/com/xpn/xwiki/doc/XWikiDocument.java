@@ -5934,17 +5934,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                             largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
-            } else if (fieldClass instanceof DBListClass dbListClass && entityTypes.containsKey(EntityType.DOCUMENT)
-                && dbListClass.isDocumentReferenceList()) {
+            } else if (fieldClass instanceof DBListClass dbListClass) {
                 // Document references stored in database list xobject properties
-                getUniqueLinkedDocumentReferences(xobject, dbListClass, references);
+                getUniqueLinkedDocumentReferences(xobject, dbListClass, entityTypes, references);
             }
         }
     }
 
     private void getUniqueLinkedDocumentReferences(BaseObject xobject, DBListClass dbListClass,
-        Set<EntityReference> references)
+        Map<EntityType, Set<ResourceType>> entityTypes, Set<EntityReference> references)
     {
+        // Only document references can be stored in a database list.
+        if (!entityTypes.containsKey(EntityType.DOCUMENT) || !dbListClass.isDocumentReferenceList()) {
+            return;
+        }
+
         PropertyInterface field = xobject.getField(dbListClass.getName());
 
         if (field instanceof BaseProperty<?> property && property.getValue() != null) {

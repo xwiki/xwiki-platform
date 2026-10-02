@@ -203,7 +203,9 @@ class NotificationsIT
                 // notifications strictly older than the last displayed one. A page date has no milliseconds, so a
                 // notification in the same second as the last one of a batch would not be in the next batch. The
                 // last notifications of the first two batches are those of Page12 and Page2: wait for the next
-                // second, which is the granularity of the event dates and not an asynchronous operation.
+                // second, which is the granularity of the event dates and not an asynchronous operation. See
+                // XWIKI-25165: "Load older notifications" skips the notifications that are in the same second as the
+                // last displayed one.
                 Thread.sleep(1000);
             }
             setup.deletePage(space, "Page" + i);

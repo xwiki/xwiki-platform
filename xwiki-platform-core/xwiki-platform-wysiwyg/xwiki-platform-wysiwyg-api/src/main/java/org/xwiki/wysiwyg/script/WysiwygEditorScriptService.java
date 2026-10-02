@@ -52,7 +52,9 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
@@ -131,6 +133,9 @@ public class WysiwygEditorScriptService implements ScriptService
     @Inject
     @Named("document")
     private UserReferenceSerializer<DocumentReference> userDocumentReferenceSerializer;
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
 
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
@@ -452,7 +457,10 @@ public class WysiwygEditorScriptService implements ScriptService
         XWikiContext xwikiContext = this.xcontextProvider.get();
         // We clone the document in order to not impact the environment (the document cache for example).
         XWikiDocument clonedDocument = xwikiContext.getDoc().clone();
-        xwikiContext.getRequest().getEffectiveAuthor().ifPresent(clonedDocument.getAuthors()::setContentAuthor);
+        // In cases where there is no effective author (e.g., a REST request), fallback to the current user
+        UserReference contentAuthor = xwikiContext.getRequest().getEffectiveAuthor()
+            .orElseGet(() -> this.currentUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
+        clonedDocument.getAuthors().setContentAuthor(contentAuthor);
         this.injectTemoraryAttachments(clonedDocument);
         return clonedDocument;
     }

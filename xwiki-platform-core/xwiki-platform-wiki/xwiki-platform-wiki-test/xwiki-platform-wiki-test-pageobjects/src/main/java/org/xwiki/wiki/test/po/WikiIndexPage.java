@@ -120,6 +120,43 @@ public class WikiIndexPage extends ExtendedViewPage
     }
 
     /**
+     * @return {@code true} if the current user is offered the Create Wiki action, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean canCreateWiki()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("tmCreateWiki"));
+    }
+
+    /**
+     * Click on the Join action of a wiki.
+     *
+     * @param wikiName the name of the wiki to join
+     * @return the page asking to confirm the join
+     * @since 18.9.0RC1
+     */
+    public JoinWikiPage joinWiki(String wikiName)
+    {
+        TableLayoutElement tableLayout = this.liveData.getTableLayout();
+        tableLayout.filterColumn(WIKI_NAME_COLUMN_LABEL, wikiName);
+        tableLayout.clickAction(1, "join");
+        return new JoinWikiPage();
+    }
+
+    /**
+     * @param wikiName the name of the wiki
+     * @param actionName the identifier of the action (e.g. {@code join}, {@code leave}, {@code delete})
+     * @return {@code true} if the given action is offered for the given wiki, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean hasAction(String wikiName, String actionName)
+    {
+        TableLayoutElement tableLayout = this.liveData.getTableLayout();
+        tableLayout.filterColumn(WIKI_NAME_COLUMN_LABEL, wikiName);
+        return tableLayout.hasAction(1, actionName);
+    }
+
+    /**
      * @return the Wiki Index Live Data page object
      * @since 13.5RC1
      */

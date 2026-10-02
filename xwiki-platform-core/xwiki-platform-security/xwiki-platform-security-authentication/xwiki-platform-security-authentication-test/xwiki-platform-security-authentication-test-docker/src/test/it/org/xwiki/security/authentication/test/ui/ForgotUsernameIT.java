@@ -175,6 +175,10 @@ class ForgotUsernameIT
         // check that when asking to retrieve username with a wrong email we don't get any information
         // if an user exists or not and no email is sent.
         ForgotUsernamePage forgotUsernamePage = ForgotUsernamePage.gotoPage();
+
+        // The email field must expose its purpose to browsers and password managers.
+        assertEquals("email", forgotUsernamePage.getEmailAutocomplete());
+
         forgotUsernamePage.setEmail("notexistant@xwiki.com");
         ForgotUsernameCompletePage forgotUsernameCompletePage = forgotUsernamePage.clickRetrieveUsername();
         assertTrue(forgotUsernameCompletePage.isForgotUsernameQuerySent());

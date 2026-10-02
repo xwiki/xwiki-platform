@@ -377,18 +377,19 @@ class XWikiDocumentRenderingTest
         assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
 
         // Create a translation and set the current language to be that of the translation to verify that the rendered
-        // content is that of the translated document
-        // Note that this also verifies that the translation can have a different syntax than the default doc.
+        // content is that of the translated document.
+        // Note that the translation has a syntax of its own, to verify that its content is rendered with that syntax
+        // and not with the one of the default document: "**bold**" is bold in xwiki/2.0 but plain text in plain/1.0.
         XWikiDocument translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
-        translatedDocument.setContent("//italic//");
-        translatedDocument.setSyntax(Syntax.XWIKI_1_0);
+        translatedDocument.setContent("**bold**");
+        translatedDocument.setSyntax(Syntax.PLAIN_1_0);
         translatedDocument.setNew(false);
 
         doReturn(Locale.FRENCH.toString()).when(this.xwiki).getLanguagePreference(any());
         doReturn(translatedDocument).when(this.xwiki).getDocument(
             eq(new DocumentReference(translatedDocument.getDocumentReference(), translatedDocument.getLocale())),
             any());
-        assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
+        assertEquals("<p>**bold**</p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
 
         assertEquals("<p><strong>bold</strong></p>", this.document.displayDocument(this.oldcore.getXWikiContext()));
     }

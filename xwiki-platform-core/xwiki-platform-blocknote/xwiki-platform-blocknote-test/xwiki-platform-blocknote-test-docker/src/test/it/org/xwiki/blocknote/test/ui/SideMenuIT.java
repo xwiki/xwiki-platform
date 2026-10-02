@@ -57,11 +57,6 @@ class SideMenuIT extends AbstractBlockNoteIT
      */
     private static final String IMAGE_NAME = "picture.png";
 
-    /**
-     * The name of the small image attached to the test page, taken from the test resources.
-     */
-    private static final String SMALL_IMAGE_NAME = "image.gif";
-
     // We split the blocks into groups so that no test page is taller than the viewport, because taking a
     // screenshot of a taller page scrolls it, which makes the editor hide the side menu.
 
@@ -106,9 +101,9 @@ class SideMenuIT extends AbstractBlockNoteIT
         "{{info}}An info box, whose icon is rendered before its text.{{/info}}";
 
     private static final String IMAGE_BEFORE_TEXT_CONTENT = """
-        {{info}}
-        [[image:%s]] Some text after a small image.
-        {{/info}}""".formatted(SMALL_IMAGE_NAME);
+        {{html wiki="true"}}
+        [[image:%s]]<br/>Some text after an image.
+        {{/html}}""".formatted(IMAGE_NAME);
 
     @Test
     void sideMenuIsAlignedOnHeadings(TestUtils setup, TestReference testReference,
@@ -177,8 +172,7 @@ class SideMenuIT extends AbstractBlockNoteIT
     {
         setup.deletePage(testReference);
         setup.createPage(testReference, IMAGE_BEFORE_TEXT_CONTENT);
-        setup.attachFile(testReference, SMALL_IMAGE_NAME, getClass().getResourceAsStream('/' + SMALL_IMAGE_NAME),
-            false);
+        setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
 
         BlockNoteRichTextArea textArea = editInplace();
         // A macro whose output is not rendered yet, or an image that is still loading, would move the blocks around

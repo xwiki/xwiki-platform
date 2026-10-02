@@ -17,411 +17,490 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-var XWiki = (function(XWiki) {
-// Start XWiki augmentation.
-var widgets = XWiki.widgets = XWiki.widgets || {};
-/**
- * Full screen editing for textareas or maximizable elements.
- */
-widgets.FullScreen = Class.create({
-  // Some layout settings, to be customized for other skins
-  /** Maximized element margins */
-  margin : 0,
-  /** Full screen activator / deactivator button size */
-  buttonSize : 16,
-  editFullScreenLabel: $jsontool.serialize($services.localization.render('core.editors.fullscreen.editFullScreen')),
-  exitFullScreenLabel: $jsontool.serialize($services.localization.render('core.editors.fullscreen.exitFullScreen')),
-  domInitialized: false,
+require(['jquery', 'xwiki-events-bridge'], function($) {
+  const XWiki = window.XWiki = window.XWiki || {};
+  const widgets = XWiki.widgets = XWiki.widgets || {};
+
+  function createElement(tagName, className) {
+    const element = document.createElement(tagName);
+    if (className) {
+      element.className = className;
+    }
+    return element;
+  }
+
+  function show(element) {
+    element.style.display = '';
+  }
+
+  function hide(element) {
+    element.style.display = 'none';
+  }
+
+  function isVisible(element) {
+    return window.getComputedStyle(element).display !== 'none';
+  }
+
   /**
-   * Full screen control initialization
-   * Identifies the elements that must be visible in full screen: the textarea or the rich text editor, along with their
-   * toolbar and the form buttons.
-   * Creates two buttons for closing the fullscreen: one (image) to insert in the toolbar, and one (plain form button)
-   * to add next to the form's action buttons.
-   * Finally, the textareas and rich text editors in the form are equipped with their own fullscreen activators,
-   * inserted in the corresponding toolbar, if there is any, or simply next to the textarea in the document
-   * (see the {@link #addBehavior} function),
+   * @return the closest previous sibling element that matches the given selector, or undefined if there's none
    */
-  initDom : function () {
-    if (!this.domInitialized) {
-      // The action buttons need to be visible in full screen
-      this.buttons = $(document.body).down(".bottombuttons");
-      // If there are no buttons, at least the Exit FS button should be visible, so create an empty button container
-      if (!this.buttons) {
-        this.buttons = new Element("div", {"class" : "bottombuttons"}).update(new Element("div", {"class" : "buttons"}));
-        this.buttons._x_isCustom = true;
-        // It doesn't matter where the container is, it will only be needed in fullScreen.
-        document.body.appendChild(this.buttons.hide());
-      }
-      // When the full screen is activated, the buttons will be brought in the fullscreen, thus removed from their parent
-      // element, where they are replaced by a placeholder, so that we know exactly where to put them back.
-      this.buttonsPlaceholder = new Element("span");
-      // Placeholder for the toolbar, see above.
-      this.toolbarPlaceholder = new Element("span");
-      // The controls that will close the fullscreen
-      this.createCloseButtons();
-      this.maximizedReference = $(document.body).down("input[name='x-maximized']");
-      // Cleanup before the window unloads.
-      this.unloadHandler = this.cleanup.bind(this);
-      Event.observe(window, 'unload', this.unloadHandler);
-      this.domInitialized = true;
+  function getPreviousSibling(element, selector) {
+    let sibling = element.previousElementSibling;
+    while (sibling && !sibling.matches(selector)) {
+      sibling = sibling.previousElementSibling;
     }
-  },
-  /** According to the type of each element being maximized, a button in created and attached to it. */
-  addBehavior : function (item) {
-    if (!this.isNotMaximizable(item) && !this.isAlreadyAugmented(item)) {
-      if (this.isWikiContent(item)) {
-        this.addWikiContentButton(item);
-      } else if (this.isWikiField(item)) {
-        this.addWikiFieldButton(item);
-      } else {
-        // a div element with class maximazable
-        this.addElementButton(item);
-      }
-    }
-  },
-  restoreFullscreenFromPreview : function () {
-    // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
-    // that full screen
-    if (this.maximizedReference && this.maximizedReference.value != "") {
-      var matches = $$(this.maximizedReference.value);
-      if (matches && matches.length > 0) {
-        this.makeFullScreen(matches[0]);
-      }
-    }
-  },
-  isAlreadyAugmented: function(item) {
-    return typeof item._x_fullScreenActivator !== 'undefined';
-  },
-  isNotMaximizable: function (item) {
-    return item.hasClassName('not-maximizable');
-  },
-  // Some simple functions that help deciding what kind of editor is the target element
-  isWikiContent : function (textarea) {
-    // If there's a toolbar and the textarea is visible
-    return textarea.previous('.leftmenu2') !== undefined && textarea.visible();
-  },
-  isWikiField : function (textarea) {
-    return textarea.visible();
-  },
-  /** Adds the fullscreen button in the Wiki editor toolbar. */
-  addWikiContentButton : function (textarea) {
-    textarea._toolbar = textarea.previous('.leftmenu2');
-    // Normally there should be a simple toolbar with basic actions
-    if (textarea._toolbar) {
-      if (textarea.previous('.fullScreenEditLinkContainer')) {
-        textarea.previous('.fullScreenEditLinkContainer').remove();
-      }
-      textarea._toolbar.insert({top: this.createOpenButton(textarea)});
-    } else {
-      this.addWikiFieldButton(textarea);
-    }
-  },
-  addElementButton: function(element) {
-    Element.insert(element, {before: this.createOpenLink(element)});
-  },
-  addWikiFieldButton : function (textarea) {
-    Element.insert(textarea, {before: this.createOpenLink(textarea)});
-  },
-  /** Creates a full screen activator button for the given element. */
-  createOpenButton : function (targetElement) {
-    // Create HTML element
-    var fullScreenActivator = new Element('img', {
-      'class': 'fullScreenEditButton',
-      title: this.editFullScreenLabel,
-      alt: this.editFullScreenLabel,
-      src: $jsontool.serialize($xwiki.getSkinFile('icons/silk/arrow_out.png'))
-    });
-    // Add functionality
-    fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
-    fullScreenActivator.observe('mousedown', this.preventDrag.bindAsEventListener(this));
-    // Remember the button associated with each maximizable element
-    targetElement._x_fullScreenActivator = fullScreenActivator;
-    fullScreenActivator._x_maximizedElement = targetElement;
-    return fullScreenActivator;
-  },
-  createOpenLink : function (targetElement) {
-    // Create HTML element
-    var fullScreenActivatorContainer = new Element('div', {
-      'class': 'fullScreenEditLinkContainer'
-    });
-    var fullScreenActivator = new Element('a', {
-      'class': 'fullScreenEditLink',
-      title: this.editFullScreenLabel
-    }).update(this.editFullScreenLabel + ' &raquo;');
-    // Add functionality
-    fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
-    // Add it to the container
-    fullScreenActivatorContainer.update(fullScreenActivator);
-    // Remember the button associated with each maximizable element
-    targetElement._x_fullScreenActivator = fullScreenActivator;
-    fullScreenActivator._x_maximizedElement = targetElement;
-    return fullScreenActivatorContainer;
-  },
+    return sibling || undefined;
+  }
+
+  function getSiblings(element) {
+    return Array.from(element.parentElement.children).filter(child => child !== element);
+  }
+
   /**
-   * Creates the full screen close buttons (which are generic, not attached to the maximized elements like the activators)
+   * @return the top offset of the given element relative to its closest positioned ancestor (excluding the element's
+   *   top margin)
    */
-  createCloseButtons : function () {
-    // Toolbar image button
-    // Create HTML element
-    this.closeButton = new Element('img', {
-      'class': 'fullScreenCloseButton',
-      title: this.exitFullScreenLabel,
-      alt: this.exitFullScreenLabel,
-      src: $jsontool.serialize($xwiki.getSkinFile('icons/silk/arrow_in.png'))
-    });
-    // Add functionality
-    this.closeButton.observe('click', this.closeFullScreen.bind(this));
-    this.closeButton.observe('mousedown', this.preventDrag.bindAsEventListener(this));
-    // Hide by default
-    this.closeButton.hide();
+  function getPositionedOffsetTop(element) {
+    let top = 0;
+    let current = element;
+    do {
+      top += current.offsetTop || 0;
+      current = current.offsetParent;
+    } while (current && current !== document.body && window.getComputedStyle(current).position === 'static');
+    return top - (parseFloat(window.getComputedStyle(element).marginTop) || 0);
+  }
 
-    // Edit actions button
-    // Create HTML element
-    this.actionCloseButton = new Element('input', {
-      type: 'button',
-      'class': 'button',
-      value: this.exitFullScreenLabel
-    });
-    this.actionCloseButtonWrapper = new Element('span', {
-      'class': 'buttonwrapper'
-    });
-    this.actionCloseButtonWrapper.update(this.actionCloseButton);
-    // Add functionality
-    this.actionCloseButton.observe('click', this.closeFullScreen.bind(this));
-    // Hide by default
-    this.actionCloseButtonWrapper.hide();
-    // Add it in the action bar
-    this.buttons.down(".buttons").insert({top: this.actionCloseButtonWrapper});
-  },
+  function stopEvent(event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
 
   /**
-    * How this works:
-    * - All the elements between the targetElement and the root element are maximized, and all the other nodes are hidden
-    * - The parent element becomes a wrapper around the targetElement
-    * - Move the toolbar (if it exists) and the action buttons in the wrapper
-    * - Hide the overflows of the body element, so that a scrollbar doesn't appear
-    * - All the initial styles of the altered elements are remembered, so that they can be restored when exiting fullscreen
-    */
-  makeFullScreen : function (targetElement) {
-    document.fire("xwiki:fullscreen:enter", { "target" : targetElement });
-    // Store the selector of the target element in the form, in the hidden input called 'x-maximized'.
-    // This is needed so that the full screen can be reactivated when coming back from preview, if it was activate before
-    // the user hit the preview button.
-    if (this.maximizedReference) {
-      if (targetElement.id) {
-        // Using #ID fails since the IDs for the textareas in inline editing contain the '.' character, which marks a classname
-        this.maximizedReference.value = targetElement.tagName + "[id='" + targetElement.id + "']";
-      } else if (targetElement.name) {
-        this.maximizedReference.value = targetElement.tagName + "[name='" + targetElement.name + "']" ;
-      } else if (targetElement.className) {
-        // No id, no name. This must be the WYSIWYG editor...
-        this.maximizedReference.value = targetElement.tagName + "." + targetElement.className ;
-      }
+   * Full screen editing for textareas or maximizable elements.
+   *
+   * Note that this class can be extended using Prototype.js' Class.create(XWiki.widgets.FullScreen, {...}). This is
+   * why the constructor only delegates to the initialize method (Prototype.js calls only the initialize method when
+   * creating an instance of a subclass).
+   */
+  class FullScreen {
+    constructor(...args) {
+      this.initialize(...args);
     }
-    // Remember the maximized element
-    this.maximized = targetElement;
-    // Remember the cursor position and scroll offset (needed for circumventing https://bugzilla.mozilla.org/show_bug.cgi?id=633789 )
-    if (typeof targetElement.setSelectionRange == 'function') {
-      var selectionStart = targetElement.selectionStart;
-      var selectionEnd = targetElement.selectionEnd;
-      var scrollTop = targetElement.scrollTop;
-    }
-    // Remember the original dimensions of the maximized element
-    targetElement._originalStyle = {
-      'width' : targetElement.style['width'],
-      'height' : targetElement.style['height']
-    };
-    // All the elements between the targetElement and the root element are set to position: static, so that the offset
-    // parent of the targetElement will be the window. Remember the previous settings in order to be able to restore the
-    // layout when exiting fullscreen.
-    var wrapper = targetElement.up();
-    wrapper.addClassName("fullScreenWrapper");
-    if(targetElement._toolbar) {
-      // The wiki editor has the toolbar outside the textarea element, unlike the other editors, which have it as a descendant
-      if (targetElement._toolbar.hasClassName("leftmenu2")) {
-        wrapper.insert({"top" : targetElement._toolbar.replace(this.toolbarPlaceholder)});
-      }
-      // Replace the Maximize button in the toolbar with the Restore one
-      targetElement._x_fullScreenActivator.replace(this.closeButton);
-    }
-    wrapper.insert(this.buttons.replace(this.buttonsPlaceholder).show());
-    var parent = targetElement.up();
-    targetElement._x_fullScreenActivator.hide();
-    while (parent != document.body) {
-      parent._originalStyle = {
-        'overflow' : parent.style['overflow'],
-        'position' : parent.style['position'],
-        'width' : parent.style['width'],
-        'height' : parent.style['height'],
-        'left' : parent.style['left'],
-        'right' : parent.style['right'],
-        'top' : parent.style['top'],
-        'bottom' : parent.style['bottom'],
-        'padding' : parent.style['padding'],
-        'margin' : parent.style['margin']
-      };
-      parent.setStyle({'overflow': "visible", 'position': "absolute", width: "100%", height: "100%", left: 0, top:0, right:0, bottom: 0, padding: 0, margin: 0});
-      parent.siblings().each(function(item) {
-        item._originalDisplay = item.style['display'];
-        item.setStyle({display: "none"});
-        // We tag this element to know that we have hidden it, and that we should rollback the original style when we
-        // close the fullscreen mode.
-        // We have introduced this variable because _originalDisplay can be null so we cannot rely on this variable
-        // to know if either or not we have hidden the element.
-        item._fullscreenHidden = true;
-      });
-      parent = parent.up();
-    }
-    document.body._originalStyle = {
-      'overflow' : parent.style['overflow'],
-      'width' : parent.style['width'],
-      'height' : parent.style['height']
-    };
-    var root = $(document.body).up();
-    root._originalStyle = {
-      'overflow' : root.style['overflow'],
-      'width' : root.style['width'],
-      'height' : root.style['height']
-    };
-    $(document.body).setStyle({'overflow': 'hidden', 'width': '100%', 'height': '100%'});
-    root.setStyle({'overflow': "hidden", 'width': "100%", 'height': "100%"});
 
-    // Make sure to resize the targetElement when the window dimensions are changed. Both document and window are monitored,
-    // since different browsers send events to different elements.
-    this.resizeListener = this.resizeTextArea.bind(this, targetElement);
-    Event.observe(window, 'resize', this.resizeListener);
-    // Show the exit buttons
-    this.closeButton.show();
-    this.actionCloseButtonWrapper.show();
-    // Maximize the targetElement
-    this.resizeTextArea(targetElement);
-    // Reset the cursor and scroll offset
-    if (typeof targetElement.setSelectionRange == 'function') {
-      // This is approximate, since the textarea width changes, and more lines can fit in the same vertical space
-      targetElement.scrollTop = scrollTop;
-      targetElement.selectionStart = selectionStart;
-      targetElement.selectionEnd = selectionEnd;
+    initialize() {
+      // Nothing to initialize. The DOM is initialized lazily, see initDom.
     }
-    document.fire("xwiki:fullscreen:entered", { "target" : targetElement });
-  },
-  /** Restore the layout. */
-  closeFullScreen : function() {
-    var targetElement = this.maximized;
-    document.fire("xwiki:fullscreen:exit", { "target" : targetElement });
-    // Remember the cursor position and scroll offset (needed for circumventing https://bugzilla.mozilla.org/show_bug.cgi?id=633789 )
-    if (typeof targetElement.setSelectionRange == 'function') {
-      var selectionStart = targetElement.selectionStart;
-      var selectionEnd = targetElement.selectionEnd;
-      var scrollTop = targetElement.scrollTop;
-    }
-    // Hide the exit buttons
-    this.closeButton.hide();
-    this.actionCloseButtonWrapper.hide();
-    // We're no longer interested in resize events
-    Event.stopObserving(window, 'resize', this.resizeListener);
-    // Restore the parent element (the wrapper)
-    targetElement.up().removeClassName("fullScreenWrapper");
 
-    // Restore the previous layout
-    // NOTE: We restore the previous layout in reverse order (from the document body down to the target element) to
-    // overcome a IE7 bug (see http://jira.xwiki.org/jira/browse/XWIKI-4346 ).
-    var parent = targetElement.up();
-    var parents = [];
-    while (parent != document.body) {
-      parents.push(parent);
-      parent = parent.up();
-    }
-    var i = parents.length;
-    while (i--) {
-      parent = parents[i];
-      parent.setStyle(parent._originalStyle);
-      parent.siblings().each(function(item) {
-        // if the element has been hidden by us, we should rollback its style
-        if (item._fullscreenHidden) {
-          item.style['display'] = item._originalDisplay;
+    /**
+     * Full screen control initialization
+     * Identifies the elements that must be visible in full screen: the textarea or the rich text editor, along with
+     * their toolbar and the form buttons.
+     * Creates two buttons for closing the fullscreen: one (image) to insert in the toolbar, and one (plain form button)
+     * to add next to the form's action buttons.
+     * Finally, the textareas and rich text editors in the form are equipped with their own fullscreen activators,
+     * inserted in the corresponding toolbar, if there is any, or simply next to the textarea in the document
+     * (see the {@link #addBehavior} function),
+     */
+    initDom() {
+      if (!this.domInitialized) {
+        // The action buttons need to be visible in full screen
+        this.buttons = document.body.querySelector(".bottombuttons");
+        // If there are no buttons, at least the Exit FS button should be visible, so create an empty button container
+        if (!this.buttons) {
+          this.buttons = createElement("div", "bottombuttons");
+          this.buttons.append(createElement("div", "buttons"));
+          this.buttons._x_isCustom = true;
+          // It doesn't matter where the container is, it will only be needed in fullScreen.
+          hide(this.buttons);
+          document.body.appendChild(this.buttons);
         }
-      });
-    }
-    document.body.setStyle(document.body._originalStyle);
-    $(document.body).up().setStyle($(document.body).up()._originalStyle);
-    // Restore the toolbar and action buttons to their initial position
-    this.buttonsPlaceholder.replace(this.buttons);
-    if (this.buttons._x_isCustom) {
-      this.buttons.hide();
-    }
-    if (targetElement._toolbar) {
-      if (targetElement._toolbar.hasClassName("leftmenu2")) {
-        this.toolbarPlaceholder.replace(targetElement._toolbar);
+        // When the full screen is activated, the buttons will be brought in the fullscreen, thus removed from their
+        // parent element, where they are replaced by a placeholder, so that we know exactly where to put them back.
+        this.buttonsPlaceholder = createElement("span");
+        // Placeholder for the toolbar, see above.
+        this.toolbarPlaceholder = createElement("span");
+        // The controls that will close the fullscreen
+        this.createCloseButtons();
+        this.maximizedReference = document.body.querySelector("input[name='x-maximized']");
+        // Cleanup before the window unloads.
+        this.unloadHandler = () => this.cleanup();
+        window.addEventListener('unload', this.unloadHandler);
+        this.domInitialized = true;
       }
-      // Replace the Restore button in the toolbar with the Maximize one
-      this.closeButton.replace(targetElement._x_fullScreenActivator);
     }
-    targetElement._x_fullScreenActivator.show();
-    targetElement.setStyle(targetElement._originalStyle);
-    // No element is maximized anymore
-    delete this.maximized;
-    if (this.maximizedReference) {
-      this.maximizedReference.value = '';
+
+    /** According to the type of each element being maximized, a button in created and attached to it. */
+    addBehavior(item) {
+      if (!this.isNotMaximizable(item) && !this.isAlreadyAugmented(item)) {
+        if (this.isWikiContent(item)) {
+          this.addWikiContentButton(item);
+        } else if (this.isWikiField(item)) {
+          this.addWikiFieldButton(item);
+        } else {
+          // a div element with class maximazable
+          this.addElementButton(item);
+        }
+      }
     }
-    // Reset the cursor and scroll offset
-    if (typeof targetElement.setSelectionRange == 'function') {
-      // This is approximate, since the textarea width changes, and more lines can fit in the same vertical space
-      targetElement.scrollTop = scrollTop;
-      targetElement.selectionStart = selectionStart;
-      targetElement.selectionEnd = selectionEnd;
+
+    restoreFullscreenFromPreview() {
+      // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
+      // that full screen
+      if (this.maximizedReference && this.maximizedReference.value != "") {
+        const matches = document.querySelectorAll(this.maximizedReference.value);
+        if (matches.length > 0) {
+          this.makeFullScreen(matches[0]);
+        }
+      }
     }
-    document.fire("xwiki:fullscreen:exited", { "target" : targetElement });
-  },
-  /** In full screen, when the containers's dimensions change, the maximized element must be resized accordingly. */
-  resizeTextArea : function(targetElement) {
-    if (!this.maximized) {
-      return;
+
+    isAlreadyAugmented(item) {
+      return typeof item._x_fullScreenActivator !== 'undefined';
     }
-    // Compute the maximum space available for the textarea:
-    var newHeight = document.viewport.getHeight();
-    var newWidth = document.viewport.getWidth();
-    // Window width - styling padding
-    newWidth = newWidth - this.margin;
-    // Window height - margin (for the toolbar) - styling padding - buttons
-    newHeight = newHeight - targetElement.positionedOffset().top - this.margin - this.buttons.getHeight();
-    targetElement.setStyle({'width' :  newWidth + 'px', 'height' :  newHeight + 'px'});
-    document.fire("xwiki:fullscreen:resized", { "target" : targetElement });
-  },
-  /** onMouseDown handler that prevents dragging the button. */
-  preventDrag : function(event) {
-    event.stop();
-  },
-  /** Cleans up the DOM tree when the user leaves the current page. */
-  cleanup : function() {
-    Event.stopObserving(window, 'unload', this.unloadHandler);
-    // Remove the "Exit full screen" action button because it can interfere with the browser's back-forward cache.
-    // This can throw an exception in certain browsers (IE9 for one), since the DOM may be already cleaned
-    try {
+
+    isNotMaximizable(item) {
+      return item.classList.contains('not-maximizable');
+    }
+
+    // Some simple functions that help deciding what kind of editor is the target element
+    isWikiContent(textarea) {
+      // If there's a toolbar and the textarea is visible
+      return getPreviousSibling(textarea, '.leftmenu2') !== undefined && isVisible(textarea);
+    }
+
+    isWikiField(textarea) {
+      return isVisible(textarea);
+    }
+
+    /** Adds the fullscreen button in the Wiki editor toolbar. */
+    addWikiContentButton(textarea) {
+      textarea._toolbar = getPreviousSibling(textarea, '.leftmenu2');
+      // Normally there should be a simple toolbar with basic actions
+      if (textarea._toolbar) {
+        getPreviousSibling(textarea, '.fullScreenEditLinkContainer')?.remove();
+        textarea._toolbar.prepend(this.createOpenButton(textarea));
+      } else {
+        this.addWikiFieldButton(textarea);
+      }
+    }
+
+    addElementButton(element) {
+      element.before(this.createOpenLink(element));
+    }
+
+    addWikiFieldButton(textarea) {
+      textarea.before(this.createOpenLink(textarea));
+    }
+
+    /** Creates a full screen activator button for the given element. */
+    createOpenButton(targetElement) {
+      // Create HTML element
+      const fullScreenActivator = createElement('img', 'fullScreenEditButton');
+      fullScreenActivator.title = this.editFullScreenLabel;
+      fullScreenActivator.alt = this.editFullScreenLabel;
+      fullScreenActivator.src = $jsontool.serialize($xwiki.getSkinFile('icons/silk/arrow_out.png'));
+      // Add functionality
+      fullScreenActivator.addEventListener('click', () => this.makeFullScreen(targetElement));
+      fullScreenActivator.addEventListener('mousedown', event => this.preventDrag(event));
+      // Remember the button associated with each maximizable element
+      targetElement._x_fullScreenActivator = fullScreenActivator;
+      fullScreenActivator._x_maximizedElement = targetElement;
+      return fullScreenActivator;
+    }
+
+    createOpenLink(targetElement) {
+      // Create HTML element
+      const fullScreenActivatorContainer = createElement('div', 'fullScreenEditLinkContainer');
+      const fullScreenActivator = createElement('a', 'fullScreenEditLink');
+      fullScreenActivator.title = this.editFullScreenLabel;
+      fullScreenActivator.textContent = this.editFullScreenLabel + ' »';
+      // Add functionality
+      fullScreenActivator.addEventListener('click', () => this.makeFullScreen(targetElement));
+      // Add it to the container
+      fullScreenActivatorContainer.replaceChildren(fullScreenActivator);
+      // Remember the button associated with each maximizable element
+      targetElement._x_fullScreenActivator = fullScreenActivator;
+      fullScreenActivator._x_maximizedElement = targetElement;
+      return fullScreenActivatorContainer;
+    }
+
+    /**
+     * Creates the full screen close buttons (which are generic, not attached to the maximized elements like the
+     * activators)
+     */
+    createCloseButtons() {
+      // Toolbar image button
+      // Create HTML element
+      this.closeButton = createElement('img', 'fullScreenCloseButton');
+      this.closeButton.title = this.exitFullScreenLabel;
+      this.closeButton.alt = this.exitFullScreenLabel;
+      this.closeButton.src = $jsontool.serialize($xwiki.getSkinFile('icons/silk/arrow_in.png'));
+      // Add functionality
+      this.closeButton.addEventListener('click', () => this.closeFullScreen());
+      this.closeButton.addEventListener('mousedown', event => this.preventDrag(event));
+      // Hide by default
+      hide(this.closeButton);
+
+      // Edit actions button
+      // Create HTML element
+      this.actionCloseButton = createElement('input', 'button');
+      this.actionCloseButton.type = 'button';
+      this.actionCloseButton.value = this.exitFullScreenLabel;
+      this.actionCloseButtonWrapper = createElement('span', 'buttonwrapper');
+      this.actionCloseButtonWrapper.replaceChildren(this.actionCloseButton);
+      // Add functionality
+      this.actionCloseButton.addEventListener('click', () => this.closeFullScreen());
+      // Hide by default
+      hide(this.actionCloseButtonWrapper);
+      // Add it in the action bar
+      this.buttons.querySelector(".buttons").prepend(this.actionCloseButtonWrapper);
+    }
+
+    /**
+      * How this works:
+      * - All the elements between the targetElement and the root element are maximized, and all the other nodes are
+      *   hidden
+      * - The parent element becomes a wrapper around the targetElement
+      * - Move the toolbar (if it exists) and the action buttons in the wrapper
+      * - Hide the overflows of the body element, so that a scrollbar doesn't appear
+      * - All the initial styles of the altered elements are remembered, so that they can be restored when exiting
+      *   fullscreen
+      */
+    makeFullScreen(targetElement) {
+      $(document).trigger("xwiki:fullscreen:enter", [{ "target" : targetElement }]);
+      // Store the selector of the target element in the form, in the hidden input called 'x-maximized'.
+      // This is needed so that the full screen can be reactivated when coming back from preview, if it was activate
+      // before the user hit the preview button.
+      if (this.maximizedReference) {
+        if (targetElement.id) {
+          // Using #ID fails since the IDs for the textareas in inline editing contain the '.' character, which marks a
+          // classname
+          this.maximizedReference.value = targetElement.tagName + "[id='" + targetElement.id + "']";
+        } else if (targetElement.name) {
+          this.maximizedReference.value = targetElement.tagName + "[name='" + targetElement.name + "']" ;
+        } else if (targetElement.className) {
+          // No id, no name. This must be the WYSIWYG editor...
+          this.maximizedReference.value = targetElement.tagName + "." + targetElement.className ;
+        }
+      }
+      // Remember the maximized element
+      this.maximized = targetElement;
+      // Remember the cursor position and scroll offset (needed for circumventing
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=633789 )
+      let selectionStart, selectionEnd, scrollTop;
+      if (typeof targetElement.setSelectionRange == 'function') {
+        selectionStart = targetElement.selectionStart;
+        selectionEnd = targetElement.selectionEnd;
+        scrollTop = targetElement.scrollTop;
+      }
+      // Remember the original dimensions of the maximized element
+      targetElement._originalStyle = {
+        'width' : targetElement.style['width'],
+        'height' : targetElement.style['height']
+      };
+      // All the elements between the targetElement and the root element are set to position: static, so that the
+      // offset parent of the targetElement will be the window. Remember the previous settings in order to be able to
+      // restore the layout when exiting fullscreen.
+      const wrapper = targetElement.parentElement;
+      wrapper.classList.add("fullScreenWrapper");
+      if (targetElement._toolbar) {
+        // The wiki editor has the toolbar outside the textarea element, unlike the other editors, which have it as a
+        // descendant
+        if (targetElement._toolbar.classList.contains("leftmenu2")) {
+          targetElement._toolbar.replaceWith(this.toolbarPlaceholder);
+          wrapper.prepend(targetElement._toolbar);
+        }
+        // Replace the Maximize button in the toolbar with the Restore one
+        targetElement._x_fullScreenActivator.replaceWith(this.closeButton);
+      }
+      this.buttons.replaceWith(this.buttonsPlaceholder);
+      show(this.buttons);
+      wrapper.append(this.buttons);
+      let parent = targetElement.parentElement;
+      hide(targetElement._x_fullScreenActivator);
+      while (parent != document.body) {
+        parent._originalStyle = {
+          'overflow' : parent.style['overflow'],
+          'position' : parent.style['position'],
+          'width' : parent.style['width'],
+          'height' : parent.style['height'],
+          'left' : parent.style['left'],
+          'right' : parent.style['right'],
+          'top' : parent.style['top'],
+          'bottom' : parent.style['bottom'],
+          'padding' : parent.style['padding'],
+          'margin' : parent.style['margin']
+        };
+        Object.assign(parent.style, {'overflow': "visible", 'position': "absolute", width: "100%", height: "100%",
+          left: 0, top:0, right:0, bottom: 0, padding: 0, margin: 0});
+        getSiblings(parent).forEach(function(item) {
+          item._originalDisplay = item.style['display'];
+          hide(item);
+          // We tag this element to know that we have hidden it, and that we should rollback the original style when
+          // we close the fullscreen mode.
+          // We have introduced this variable because _originalDisplay can be null so we cannot rely on this variable
+          // to know if either or not we have hidden the element.
+          item._fullscreenHidden = true;
+        });
+        parent = parent.parentElement;
+      }
+      document.body._originalStyle = {
+        'overflow' : parent.style['overflow'],
+        'width' : parent.style['width'],
+        'height' : parent.style['height']
+      };
+      const root = document.documentElement;
+      root._originalStyle = {
+        'overflow' : root.style['overflow'],
+        'width' : root.style['width'],
+        'height' : root.style['height']
+      };
+      Object.assign(document.body.style, {'overflow': 'hidden', 'width': '100%', 'height': '100%'});
+      Object.assign(root.style, {'overflow': "hidden", 'width': "100%", 'height': "100%"});
+
+      // Make sure to resize the targetElement when the window dimensions are changed.
+      this.resizeListener = () => this.resizeTextArea(targetElement);
+      window.addEventListener('resize', this.resizeListener);
+      // Show the exit buttons
+      show(this.closeButton);
+      show(this.actionCloseButtonWrapper);
+      // Maximize the targetElement
+      this.resizeTextArea(targetElement);
+      // Reset the cursor and scroll offset
+      if (typeof targetElement.setSelectionRange == 'function') {
+        // This is approximate, since the textarea width changes, and more lines can fit in the same vertical space
+        targetElement.scrollTop = scrollTop;
+        targetElement.selectionStart = selectionStart;
+        targetElement.selectionEnd = selectionEnd;
+      }
+      $(document).trigger("xwiki:fullscreen:entered", [{ "target" : targetElement }]);
+    }
+
+    /** Restore the layout. */
+    closeFullScreen() {
+      const targetElement = this.maximized;
+      $(document).trigger("xwiki:fullscreen:exit", [{ "target" : targetElement }]);
+      // Remember the cursor position and scroll offset (needed for circumventing
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=633789 )
+      let selectionStart, selectionEnd, scrollTop;
+      if (typeof targetElement.setSelectionRange == 'function') {
+        selectionStart = targetElement.selectionStart;
+        selectionEnd = targetElement.selectionEnd;
+        scrollTop = targetElement.scrollTop;
+      }
+      // Hide the exit buttons
+      hide(this.closeButton);
+      hide(this.actionCloseButtonWrapper);
+      // We're no longer interested in resize events
+      window.removeEventListener('resize', this.resizeListener);
+      // Restore the parent element (the wrapper)
+      targetElement.parentElement.classList.remove("fullScreenWrapper");
+
+      // Restore the previous layout
+      // NOTE: We restore the previous layout in reverse order (from the document body down to the target element) to
+      // overcome a IE7 bug (see http://jira.xwiki.org/jira/browse/XWIKI-4346 ).
+      let parent = targetElement.parentElement;
+      const parents = [];
+      while (parent != document.body) {
+        parents.push(parent);
+        parent = parent.parentElement;
+      }
+      let i = parents.length;
+      while (i--) {
+        parent = parents[i];
+        Object.assign(parent.style, parent._originalStyle);
+        getSiblings(parent).forEach(function(item) {
+          // if the element has been hidden by us, we should rollback its style
+          if (item._fullscreenHidden) {
+            item.style['display'] = item._originalDisplay;
+          }
+        });
+      }
+      Object.assign(document.body.style, document.body._originalStyle);
+      Object.assign(document.documentElement.style, document.documentElement._originalStyle);
+      // Restore the toolbar and action buttons to their initial position
+      this.buttonsPlaceholder.replaceWith(this.buttons);
+      if (this.buttons._x_isCustom) {
+        hide(this.buttons);
+      }
+      if (targetElement._toolbar) {
+        if (targetElement._toolbar.classList.contains("leftmenu2")) {
+          this.toolbarPlaceholder.replaceWith(targetElement._toolbar);
+        }
+        // Replace the Restore button in the toolbar with the Maximize one
+        this.closeButton.replaceWith(targetElement._x_fullScreenActivator);
+      }
+      show(targetElement._x_fullScreenActivator);
+      Object.assign(targetElement.style, targetElement._originalStyle);
+      // No element is maximized anymore
+      delete this.maximized;
+      if (this.maximizedReference) {
+        this.maximizedReference.value = '';
+      }
+      // Reset the cursor and scroll offset
+      if (typeof targetElement.setSelectionRange == 'function') {
+        // This is approximate, since the textarea width changes, and more lines can fit in the same vertical space
+        targetElement.scrollTop = scrollTop;
+        targetElement.selectionStart = selectionStart;
+        targetElement.selectionEnd = selectionEnd;
+      }
+      $(document).trigger("xwiki:fullscreen:exited", [{ "target" : targetElement }]);
+    }
+
+    /** In full screen, when the containers's dimensions change, the maximized element must be resized accordingly. */
+    resizeTextArea(targetElement) {
+      if (!this.maximized) {
+        return;
+      }
+      // Compute the maximum space available for the textarea:
+      let newHeight = document.documentElement.clientHeight;
+      let newWidth = document.documentElement.clientWidth;
+      // Window width - styling padding
+      newWidth = newWidth - this.margin;
+      // Window height - margin (for the toolbar) - styling padding - buttons
+      newHeight = newHeight - getPositionedOffsetTop(targetElement) - this.margin - this.buttons.offsetHeight;
+      Object.assign(targetElement.style, {'width' :  newWidth + 'px', 'height' :  newHeight + 'px'});
+      $(document).trigger("xwiki:fullscreen:resized", [{ "target" : targetElement }]);
+    }
+
+    /** onMouseDown handler that prevents dragging the button. */
+    preventDrag(event) {
+      stopEvent(event);
+    }
+
+    /** Cleans up the DOM tree when the user leaves the current page. */
+    cleanup() {
+      window.removeEventListener('unload', this.unloadHandler);
+      // Remove the "Exit full screen" action button because it can interfere with the browser's back-forward cache.
       this.actionCloseButtonWrapper.remove();
-    } catch (ex) {
-      // Not important, just ignore
     }
   }
-});
-XWiki.widgets.__fullscreenInstance = new XWiki.widgets.FullScreen();
-// End XWiki augmentation.
-return XWiki;
-}(XWiki || {}));
-require(['jquery', 'xwiki-events-bridge'], function ($) {
-  $(document).on('xwiki:dom:updated', function (event, data) {
-    $(data.elements).find('textarea,.maximizable').each(function () {
-      XWiki.widgets.__fullscreenInstance.initDom();
-      XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
-    });
-    XWiki.widgets.__fullscreenInstance.restoreFullscreenFromPreview();
+
+  // Some layout settings, to be customized for other skins
+  Object.assign(FullScreen.prototype, {
+    /** Maximized element margins */
+    margin : 0,
+    /** Full screen activator / deactivator button size */
+    buttonSize : 16,
+    editFullScreenLabel: $jsontool.serialize($services.localization.render('core.editors.fullscreen.editFullScreen')),
+    exitFullScreenLabel: $jsontool.serialize($services.localization.render('core.editors.fullscreen.exitFullScreen')),
+    domInitialized: false
   });
-  let init = function () {
-    XWiki.widgets.__fullscreenInstance.initDom();
-    $(document).find('textarea,.maximizable').each(function () {
-      XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
-    });
-    XWiki.widgets.__fullscreenInstance.restoreFullscreenFromPreview();
-  }
-  XWiki.domIsLoaded && init() || document.observe('xwiki:dom:loaded', init);
+
+  /** Required by Prototype.js' Class.create(), which registers each new subclass on its parent class. */
+  FullScreen.subclasses = [];
+
+  widgets.FullScreen = FullScreen;
+  const fullScreen = widgets.__fullscreenInstance = new FullScreen();
+
+  const init = function(event, data) {
+    fullScreen.initDom();
+    for (const container of (data?.elements || [document])) {
+      container.querySelectorAll('textarea, .maximizable').forEach(item => fullScreen.addBehavior(item));
+    }
+    fullScreen.restoreFullscreenFromPreview();
+  };
+
+  $(document).on('xwiki:dom:updated', init);
+  $(init);
 });

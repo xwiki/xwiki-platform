@@ -129,8 +129,8 @@ class SideMenuIT extends AbstractBlockNoteIT
         throws Exception
     {
         setup.deletePage(testReference);
-        setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
         setup.createPage(testReference, IMAGE_CONTENT);
+        setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
 
         BlockNoteRichTextArea textArea = editInplace();
         // An image that is still loading would make the screenshot unstable.
@@ -143,8 +143,8 @@ class SideMenuIT extends AbstractBlockNoteIT
         ScreenshotComparator screenshots) throws Exception
     {
         setup.deletePage(testReference);
-        setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
         setup.createPage(testReference, BLOCKS_NOT_STARTING_WITH_TEXT_CONTENT);
+        setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
 
         BlockNoteRichTextArea textArea = editInplace();
         // A macro whose output is not rendered yet, or an image that is still loading, would move the blocks around

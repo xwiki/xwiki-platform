@@ -51,4 +51,9 @@ class AllIT
     class NestedTextAreaImageUploadIT extends TextAreaImageUploadIT
     {
     }
+
+    @Nested
+    class NestedWikiEditorIT extends WikiEditorIT
+    {
+    }
 }

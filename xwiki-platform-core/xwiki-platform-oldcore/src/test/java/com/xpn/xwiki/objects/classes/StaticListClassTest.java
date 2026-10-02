@@ -193,6 +193,7 @@ class StaticListClassTest
     void testDisplayEditRadio()
     {
         StringBuilder expectedHTML = new StringBuilder();
+        expectedHTML.append("<div role='group' aria-label='Static List'>");
         expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-0\">");
         expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-0' value='a&#60;b&#62;c'");
         expectedHTML.append(" name='w&#62;vb&#38;a&#60;r' type='radio'/>c&#62;b&#60;a</label>");
@@ -203,6 +204,7 @@ class StaticListClassTest
         expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-2' value='x&#123;y&#38;z'");
         expectedHTML.append(" name='w&#62;vb&#38;a&#60;r' type='radio'/>z&#38;y&#123;x</label>");
         expectedHTML.append("<input name='w&#62;vb&#38;a&#60;r' type='hidden' value=''/>");
+        expectedHTML.append("</div>");
         testDisplayEdit("radio", Arrays.asList(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)), expectedHTML.toString());
     }
 
@@ -213,6 +215,7 @@ class StaticListClassTest
     void testDisplayEditCheckbox()
     {
         StringBuilder expectedHTML = new StringBuilder();
+        expectedHTML.append("<div role='group' aria-label='Static List'>");
         expectedHTML.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-b&#38;a&#60;r-0-0\">");
         expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-0' value='a&#60;b&#62;c'");
         expectedHTML.append(" name='w&#62;vb&#38;a&#60;r' type='checkbox'/>c&#62;b&#60;a</label>");
@@ -223,6 +226,7 @@ class StaticListClassTest
         expectedHTML.append("<input id='xwiki-form-b&#38;a&#60;r-0-2' value='x&#123;y&#38;z'");
         expectedHTML.append(" name='w&#62;vb&#38;a&#60;r' type='checkbox'/>z&#38;y&#123;x</label>");
         expectedHTML.append("<input name='w&#62;vb&#38;a&#60;r' type='hidden' value=''/>");
+        expectedHTML.append("</div>");
         testDisplayEdit("checkbox", Arrays.asList(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)), expectedHTML.toString());
     }
 

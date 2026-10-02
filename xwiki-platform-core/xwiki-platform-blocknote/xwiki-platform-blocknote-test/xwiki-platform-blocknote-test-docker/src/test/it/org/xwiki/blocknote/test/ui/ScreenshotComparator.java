@@ -31,7 +31,6 @@ import javax.imageio.ImageIO;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.test.docker.junit5.TestReference;
 
 import com.github.romankh3.image.comparison.ImageComparison;
 import com.github.romankh3.image.comparison.ImageComparisonUtil;
@@ -43,8 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Compares screenshots of page elements with reference screenshots committed in the test resources, under
- * {@code screenshots/<TestClassName>/<browser>/}, since each browser renders the page slightly differently (e.g. the
- * text anti-aliasing). The screenshots are saved in the {@code screenshots} folder of the build
+ * {@code screenshots/<TestClassName>/<testMethodName>/<browser>/}, since each browser renders the page slightly
+ * differently (e.g. the text anti-aliasing). The screenshots are saved in the {@code screenshots} folder of the build
  * directory, along with an image highlighting the differences for each screenshot that doesn't match its reference.
  *
  * @version $Id$
@@ -60,6 +59,8 @@ public class ScreenshotComparator
 
     private final String testClassName;
 
+    private final String testMethodName;
+
     private final String browser;
 
     private final File outputFolder;
@@ -67,11 +68,13 @@ public class ScreenshotComparator
     /**
      * @param testConfiguration the test configuration, used to find the build directory and the browser the
      *         screenshots are taken with
-     * @param testReference the test reference, used to find the reference screenshots and to name the saved screenshots
+     * @param testClassName the name of the class declaring the test, used to find the reference screenshots
+     * @param testMethodName the name of the test method, used to find the reference screenshots
      */
-    public ScreenshotComparator(TestConfiguration testConfiguration, TestReference testReference)
+    public ScreenshotComparator(TestConfiguration testConfiguration, String testClassName, String testMethodName)
     {
-        this.testClassName = testReference.getLastSpaceReference().getParent().getName();
+        this.testClassName = testClassName;
+        this.testMethodName = testMethodName;
         this.browser = testConfiguration.getBrowser().name().toLowerCase(Locale.ROOT);
         this.outputFolder = new File(testConfiguration.getMavenBuildDirectory(), "screenshots");
     }
@@ -85,9 +88,9 @@ public class ScreenshotComparator
      */
     public void assertScreenshotMatches(String name, WebElement element) throws IOException
     {
-        // The test class name and the browser are part of the file names because the screenshots folder is shared by
-        // all the tests.
-        String prefix = "%s-%s-%s".formatted(this.testClassName, this.browser, name);
+        // The test name and the browser are part of the file names because the screenshots folder is shared by all
+        // the tests.
+        String prefix = "%s-%s-%s-%s".formatted(this.testClassName, this.testMethodName, this.browser, name);
         File actualFile = new File(this.outputFolder, prefix + ".png");
         BufferedImage actual = takeScreenshot(element);
         ImageComparisonUtil.saveImage(actualFile, actual);
@@ -114,7 +117,7 @@ public class ScreenshotComparator
 
     private String getReferencePath(String name)
     {
-        return "screenshots/%s/%s/%s.png".formatted(this.testClassName, this.browser, name);
+        return "screenshots/%s/%s/%s/%s.png".formatted(this.testClassName, this.testMethodName, this.browser, name);
     }
 
     private BufferedImage readReference(String name) throws IOException

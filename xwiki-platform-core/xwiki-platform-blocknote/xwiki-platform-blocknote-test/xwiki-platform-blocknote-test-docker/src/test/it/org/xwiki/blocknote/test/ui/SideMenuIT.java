@@ -22,11 +22,11 @@ package org.xwiki.blocknote.test.ui;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebElement;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -48,6 +48,7 @@ import org.xwiki.test.ui.TestUtils;
         "org.xwiki.platform:xwiki-platform-websocket"
     }
 )
+@ExtendWith(ScreenshotComparatorParameterResolver.class)
 class SideMenuIT extends AbstractBlockNoteIT
 {
     /**
@@ -105,26 +106,26 @@ class SideMenuIT extends AbstractBlockNoteIT
 
     @Test
     void sideMenuIsAlignedOnHeadings(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+        ScreenshotComparator screenshots) throws Exception
     {
         setup.deletePage(testReference);
         setup.createPage(testReference, HEADINGS_CONTENT);
 
-        assertSideMenuIsAligned(editInplace(), testConfiguration, testReference, HEADINGS);
+        assertSideMenuIsAligned(editInplace(), screenshots, HEADINGS);
     }
 
     @Test
     void sideMenuIsAlignedOnOtherBlockTypes(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+        ScreenshotComparator screenshots) throws Exception
     {
         setup.deletePage(testReference);
         setup.createPage(testReference, OTHER_BLOCKS_CONTENT);
 
-        assertSideMenuIsAligned(editInplace(), testConfiguration, testReference, OTHER_BLOCKS);
+        assertSideMenuIsAligned(editInplace(), screenshots, OTHER_BLOCKS);
     }
 
     @Test
-    void sideMenuIsAlignedOnImage(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    void sideMenuIsAlignedOnImage(TestUtils setup, TestReference testReference, ScreenshotComparator screenshots)
         throws Exception
     {
         setup.deletePage(testReference);
@@ -134,12 +135,12 @@ class SideMenuIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editInplace();
         // An image that is still loading would make the screenshot unstable.
         textArea.waitUntilImageIsLoaded(0);
-        assertSideMenuIsAligned(textArea, testConfiguration, testReference, new String[] {"image"});
+        assertSideMenuIsAligned(textArea, screenshots, new String[] {"image"});
     }
 
     @Test
     void sideMenuIsAlignedOnBlocksNotStartingWithText(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+        ScreenshotComparator screenshots) throws Exception
     {
         setup.deletePage(testReference);
         setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
@@ -149,7 +150,7 @@ class SideMenuIT extends AbstractBlockNoteIT
         // A macro whose output is not rendered yet, or an image that is still loading, would move the blocks around
         // and thus make the screenshots unstable.
         textArea.waitUntilMacrosAreRendered().waitUntilImagesAreLoaded();
-        assertSideMenuIsAligned(textArea, testConfiguration, testReference, BLOCKS_NOT_STARTING_WITH_TEXT);
+        assertSideMenuIsAligned(textArea, screenshots, BLOCKS_NOT_STARTING_WITH_TEXT);
     }
 
     /**
@@ -171,13 +172,13 @@ class SideMenuIT extends AbstractBlockNoteIT
      * that block.
      *
      * @param textArea the rich text area holding the blocks
+     * @param screenshots the comparator to check the screenshots with
      * @param blocks the names of the blocks, in the order they appear in the rich text area
      */
-    private void assertSideMenuIsAligned(BlockNoteRichTextArea textArea, TestConfiguration testConfiguration,
-        TestReference testReference, String[] blocks) throws IOException
+    private void assertSideMenuIsAligned(BlockNoteRichTextArea textArea, ScreenshotComparator screenshots,
+        String[] blocks) throws IOException
     {
         WebElement content = new InplaceEditablePage().getContentContainer();
-        ScreenshotComparator screenshots = new ScreenshotComparator(testConfiguration, testReference);
         for (int i = 0; i < blocks.length; i++) {
             textArea.hoverBlock(i);
             screenshots.assertScreenshotMatches(blocks[i], content);

@@ -31,8 +31,8 @@ catalogs:
       specifier: 9.6.3
       version: 9.6.3
     '@microsoft/api-extractor':
-      specifier: 7.59.1
-      version: 7.59.1
+      specifier: 7.59.3
+      version: 7.59.3
     '@oxc-project/runtime':
       specifier: 0.151.0
       version: 0.151.0
@@ -574,7 +574,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@types/jquery':
         specifier: 'catalog:'
         version: 4.0.1
@@ -797,7 +797,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-tool-eslintconfig':
         specifier: workspace:*
         version: link:tools/tool-eslintconfig
@@ -831,7 +831,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../dev/config
@@ -889,7 +889,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -941,7 +941,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
@@ -992,7 +992,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1032,7 +1032,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1081,7 +1081,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1124,7 +1124,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1173,7 +1173,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@types/jquery':
         specifier: 'catalog:'
         version: 4.0.1
@@ -1222,7 +1222,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1274,7 +1274,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1338,7 +1338,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1414,7 +1414,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1460,7 +1460,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1500,7 +1500,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1536,7 +1536,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-apiextractorconfig
@@ -1576,7 +1576,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1619,7 +1619,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1659,7 +1659,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1699,7 +1699,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1757,7 +1757,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1806,7 +1806,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1845,7 +1845,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -1888,7 +1888,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1946,7 +1946,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1992,7 +1992,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.43)(@vue/server-renderer@3.5.43)(vue@3.5.43(typescript@5.9.3))
@@ -2074,7 +2074,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
@@ -2135,7 +2135,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2190,7 +2190,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2229,7 +2229,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2265,7 +2265,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.43)(@vue/server-renderer@3.5.43)(vue@3.5.43(typescript@5.9.3))
@@ -2338,7 +2338,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@types/jquery':
         specifier: 'catalog:'
         version: 4.0.1
@@ -2417,7 +2417,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@types/jquery':
         specifier: 'catalog:'
         version: 4.0.1
@@ -2469,7 +2469,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.43)(@vue/server-renderer@3.5.43)(vue@3.5.43(typescript@5.9.3))
@@ -2514,7 +2514,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2548,7 +2548,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2591,7 +2591,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -2630,7 +2630,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2676,7 +2676,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -2728,7 +2728,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2770,7 +2770,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2813,7 +2813,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -2874,7 +2874,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -2920,7 +2920,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -2978,7 +2978,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -3024,7 +3024,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -3067,7 +3067,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -3100,7 +3100,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -3158,7 +3158,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
@@ -3198,7 +3198,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
@@ -3229,7 +3229,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-apiextractorconfig
@@ -3272,7 +3272,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
@@ -3309,7 +3309,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -3339,7 +3339,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -3379,7 +3379,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-apiextractorconfig
@@ -3446,7 +3446,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@types/mdast':
         specifier: 'catalog:'
         version: 4.0.4
@@ -3537,7 +3537,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -3577,7 +3577,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -3616,7 +3616,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tool-tsconfig
@@ -3674,7 +3674,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@playwright/experimental-ct-vue':
         specifier: 'catalog:'
         version: 1.62.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))(vue@3.5.43(typescript@5.9.3))(yaml@2.9.0)
@@ -3825,7 +3825,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.59.1(@types/node@24.13.6)
+        version: 7.59.3(@types/node@24.13.6)
       '@playwright/experimental-ct-react':
         specifier: 'catalog:'
         version: 1.62.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))(yaml@2.9.0)
@@ -4564,26 +4564,17 @@ packages:
     peerDependencies:
       react: ^19.2.0
 
-  '@microsoft/api-extractor-model@7.33.12':
-    resolution: {integrity: sha512-TdKOYgwf98xLjNW+y3iXIiCf4ZLQbilGAlqkMTTAqqAWfgRXAn9YCSGMsaiB1U7OPRvslUWg6n08EqQPbP93tA==}
+  '@microsoft/api-extractor-model@7.33.14':
+    resolution: {integrity: sha512-HdFzU14NGrm04SxA8CfEByX4R1S06o08qVCrGgIepb4miUgky771TwiDi2b3/ZJSQ1QKEJzq452MW09zenL19w==}
     engines: {node: '>=20.9.0'}
 
-  '@microsoft/api-extractor@7.59.1':
-    resolution: {integrity: sha512-GjRUqx1MTY7xuH36urwASkfBPzrdxYG+irVeV7C9JEdRtn509AgMmwit/BhvztQzIoFk9vhFDTVYOp2cjw+9Uw==}
+  '@microsoft/api-extractor@7.59.3':
+    resolution: {integrity: sha512-L1w0pe8/Af3PhjT7JDSsYZAtwFQ3l5pw7QjiNiNFpHA32nvvwYpvHWPedu8ulaJYiNWdKKq7We0FLSfZt0mbFA==}
     engines: {node: '>=20.9.0'}
     hasBin: true
 
-  '@microsoft/tsdoc-config@0.18.2':
-    resolution: {integrity: sha512-4ymuLTQ9lFwJXK15f41iPcNHflymjk02Ltq5f5wo3fA02O1nHIGSc1TIZwzTSQZep+jXHM644jobt4Q8O3vtqg==}
-
   '@microsoft/tsdoc-config@0.18.3':
     resolution: {integrity: sha512-0I0rGXo1eJziw3EEErkDS9p/0RzBcyOiV+zbSDqOZTeURmhtut+WIvpih0LM5g+ZpZ9SyFxDfkhAcl/r8e2zGw==}
-
-  '@microsoft/tsdoc@0.16.0':
-    resolution: {integrity: sha512-xgAyonlVVS+q7Vc7qLW0UrJU7rSFcETRWsqdXZtjzRU8dF+6CkozTK4V4y1LwOX7j8r/vHphjDeMeGI4tNGeGA==}
-
-  '@microsoft/tsdoc@0.17.0':
-    resolution: {integrity: sha512-p68VexhnH7ojf3U27RdryUDqnKJgKaWUbCL96vJR7N0mqDuhKG5OIECk3sCPPdynxjk+yoVhRkScqtv5KQjzsw==}
 
   '@microsoft/tsdoc@0.17.1':
     resolution: {integrity: sha512-VHyYyyoH63jFoO3shpw9Zfijk5v/9p/VrClW35z0/q6ooK7sSmxpzOkS4iZPxs3vO4XtBW4H38HRAKkAMIK7DA==}
@@ -4946,8 +4937,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@rushstack/node-core-library@5.24.1':
-    resolution: {integrity: sha512-ZlOrzv92MwnsCXA45qWfDj4L/kTasKghXezu+M2WmdtkbnXyPnZSCovfeBZx1Yc5qm+LkElbLw6IeSSWZDhZUg==}
+  '@rushstack/node-core-library@5.25.0':
+    resolution: {integrity: sha512-JWd5MVInIQqTlujjqV2gO4aJi/QZvBdGCD5jQ4tF0Swcz1Ba80fP0dvxIYTaHawUujyQaCixtzzz9LM8bM26hQ==}
     engines: {node: '>=20.9.0'}
     peerDependencies:
       '@types/node': '*'
@@ -4966,8 +4957,8 @@ packages:
   '@rushstack/rig-package@0.7.3':
     resolution: {integrity: sha512-aAA518n6wxxjCfnTAOjQnm7ngNE0FVHxHAw2pxKlIhxrMn0XQjGcXKF0oKWpjBgJOmsaJpVob/v+zr3zxgPWuA==}
 
-  '@rushstack/terminal@0.24.4':
-    resolution: {integrity: sha512-3fRBWK0IMY293lBx5ycgit1DTMUi+nhOjALHlrIad9hQsqzM9Ak+XdBI1gJ/tZPxW+LraeAc4SsmMdcOflBmAQ==}
+  '@rushstack/terminal@0.24.6':
+    resolution: {integrity: sha512-MuSbKmMnP8CVEEBZ2kJpE22farLfxrScOrJ3pN3PoCOSaxemEhD/0H1lXZYj2PmKJxQMHb5pib5rVfIlOX/DlA==}
     engines: {node: '>=20.9.0'}
     peerDependencies:
       '@types/node': '*'
@@ -4975,8 +4966,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@rushstack/ts-command-line@5.3.14':
-    resolution: {integrity: sha512-lT2JKZk2dukBMp4GFOh4RaDfVzpZehGgQOGpzpSliUn317NgEmOOCXyd7/d0eU46HHsbRxizP83GAm39s0lAlg==}
+  '@rushstack/ts-command-line@5.3.16':
+    resolution: {integrity: sha512-k1L7MQQEuQ1v0rsQ8pRzoZ3NRsrvSifBguWlLnl2a5iWGTTW9E0/G/B39291eAf3zF45wheybuJ2onwB/PPsfA==}
     engines: {node: '>=20.9.0'}
 
   '@shikijs/types@4.4.3':
@@ -8900,23 +8891,23 @@ snapshots:
     dependencies:
       react: 19.3.0
 
-  '@microsoft/api-extractor-model@7.33.12(@types/node@24.13.6)':
+  '@microsoft/api-extractor-model@7.33.14(@types/node@24.13.6)':
     dependencies:
-      '@microsoft/tsdoc': 0.16.0
-      '@microsoft/tsdoc-config': 0.18.2
-      '@rushstack/node-core-library': 5.24.1(@types/node@24.13.6)
+      '@microsoft/tsdoc': 0.17.1
+      '@microsoft/tsdoc-config': 0.18.3
+      '@rushstack/node-core-library': 5.25.0(@types/node@24.13.6)
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/api-extractor@7.59.1(@types/node@24.13.6)':
+  '@microsoft/api-extractor@7.59.3(@types/node@24.13.6)':
     dependencies:
-      '@microsoft/api-extractor-model': 7.33.12(@types/node@24.13.6)
-      '@microsoft/tsdoc': 0.16.0
-      '@microsoft/tsdoc-config': 0.18.2
-      '@rushstack/node-core-library': 5.24.1(@types/node@24.13.6)
+      '@microsoft/api-extractor-model': 7.33.14(@types/node@24.13.6)
+      '@microsoft/tsdoc': 0.17.1
+      '@microsoft/tsdoc-config': 0.18.3
+      '@rushstack/node-core-library': 5.25.0(@types/node@24.13.6)
       '@rushstack/rig-package': 0.7.3
-      '@rushstack/terminal': 0.24.4(@types/node@24.13.6)
-      '@rushstack/ts-command-line': 5.3.14(@types/node@24.13.6)
+      '@rushstack/terminal': 0.24.6(@types/node@24.13.6)
+      '@rushstack/ts-command-line': 5.3.16(@types/node@24.13.6)
       diff: 8.0.4
       minimatch: 10.2.3
       resolve: 1.22.11
@@ -8926,23 +8917,12 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/tsdoc-config@0.18.2':
-    dependencies:
-      '@microsoft/tsdoc': 0.17.0
-      ajv: 8.18.0
-      jju: 1.4.0
-      resolve: 1.22.11
-
   '@microsoft/tsdoc-config@0.18.3':
     dependencies:
       '@microsoft/tsdoc': 0.17.1
       ajv: 8.18.0
       jju: 1.4.0
       resolve: 1.22.11
-
-  '@microsoft/tsdoc@0.16.0': {}
-
-  '@microsoft/tsdoc@0.17.0': {}
 
   '@microsoft/tsdoc@0.17.1': {}
 
@@ -9210,7 +9190,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.55.1':
     optional: true
 
-  '@rushstack/node-core-library@5.24.1(@types/node@24.13.6)':
+  '@rushstack/node-core-library@5.25.0(@types/node@24.13.6)':
     dependencies:
       ajv: 8.20.0
       ajv-draft-04: 1.0.0(ajv@8.20.0)
@@ -9232,17 +9212,17 @@ snapshots:
       jju: 1.4.0
       resolve: 1.22.11
 
-  '@rushstack/terminal@0.24.4(@types/node@24.13.6)':
+  '@rushstack/terminal@0.24.6(@types/node@24.13.6)':
     dependencies:
-      '@rushstack/node-core-library': 5.24.1(@types/node@24.13.6)
+      '@rushstack/node-core-library': 5.25.0(@types/node@24.13.6)
       '@rushstack/problem-matcher': 0.2.1(@types/node@24.13.6)
       supports-color: 8.1.1
     optionalDependencies:
       '@types/node': 24.13.6
 
-  '@rushstack/ts-command-line@5.3.14(@types/node@24.13.6)':
+  '@rushstack/ts-command-line@5.3.16(@types/node@24.13.6)':
     dependencies:
-      '@rushstack/terminal': 0.24.4(@types/node@24.13.6)
+      '@rushstack/terminal': 0.24.6(@types/node@24.13.6)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -12773,7 +12753,7 @@ snapshots:
 
   vite-plugin-dts@4.5.4(@types/node@24.13.6)(rollup@4.55.1)(supports-color@8.1.1)(typescript@5.9.3)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)):
     dependencies:
-      '@microsoft/api-extractor': 7.59.1(@types/node@24.13.6)
+      '@microsoft/api-extractor': 7.59.3(@types/node@24.13.6)
       '@rollup/pluginutils': 5.3.0(rollup@4.55.1)
       '@volar/typescript': 2.4.28(typescript@5.9.3)
       '@vue/language-core': 2.2.0(typescript@5.9.3)

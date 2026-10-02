@@ -42,6 +42,8 @@ import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -84,6 +86,9 @@ public class LiveTableRequestHandler
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     /**
      * Converts the given live data query into a fake live table request and executes the given live table results
@@ -132,12 +137,19 @@ public class LiveTableRequestHandler
         String contextDocRefString = (String) (source != null ? source : new Source()).getParameters().get(CONTEXT_DOC);
         if (contextDocRefString != null) {
             DocumentReference contextDocRef = this.currentDocumentReferenceResolver.resolve(contextDocRefString);
-            try {
-                XWikiDocument contextDoc = xcontext.getWiki().getDocument(contextDocRef, xcontext);
-                xcontext.setDoc(contextDoc);
-            } catch (XWikiException e) {
-                this.logger.debug("Failed to set context document [{}] for live table results.", contextDocRefString,
-                    e);
+            // Only honor the requested context document if the current user is allowed to view it, so that a caller
+            // cannot have the live table results rendered in the context of a document they are not allowed to access.
+            if (this.authorization.hasAccess(Right.VIEW, contextDocRef)) {
+                try {
+                    XWikiDocument contextDoc = xcontext.getWiki().getDocument(contextDocRef, xcontext);
+                    xcontext.setDoc(contextDoc);
+                } catch (XWikiException e) {
+                    this.logger.debug("Failed to set context document [{}] for live table results.",
+                        contextDocRefString, e);
+                }
+            } else {
+                this.logger.debug("Denied setting context document [{}] for live table results: the current user is "
+                    + "not allowed to view it.", contextDocRefString);
             }
         }
 

@@ -19,7 +19,9 @@
  */
 package org.xwiki.wysiwyg.script;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Named;
 
@@ -32,7 +34,9 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 
@@ -43,6 +47,7 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,6 +55,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -88,6 +94,9 @@ class WysiwygEditorScriptServiceTest
 
     @MockComponent
     private HTMLConverter htmlConverter;
+
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
 
     @BeforeEach
     void setup() throws Exception
@@ -172,6 +181,81 @@ class WysiwygEditorScriptServiceTest
             .toAnnotatedXHTML(source, SYNTAX, sourceReference, false));
         verify(this.authorExecutor)
             .call(any(), eq(currentUser), eq(DOCUMENT_REFERENCE));
+    }
+
+    @Test
+    void parseAndRenderDoesNotInheritContextDocumentAuthorWithoutEffectiveAuthor() throws Exception
+    {
+        String html = "<p>some html</p>";
+
+        XWikiContext context = this.oldcore.getXWikiContext();
+
+        // The context document is a shipped page whose content author has programming right (e.g. Main.WebHome).
+        XWikiDocument contextDocument = new XWikiDocument(new DocumentReference("xwiki", "Main", "WebHome"));
+        contextDocument.getAuthors().setContentAuthor(mock());
+        context.setDoc(contextDocument);
+
+        // The request doesn't carry an effective author, as is the case for a REST request.
+        XWikiRequest request = mock();
+        when(request.getEffectiveAuthor()).thenReturn(Optional.empty());
+        context.setRequest(request);
+
+        // The current user is an unprivileged user (e.g. a guest).
+        UserReference currentUser = mock();
+        when(this.currentUserReferenceResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(currentUser);
+
+        AtomicReference<UserReference> renderingContentAuthor = captureRenderingContentAuthor(context, html);
+
+        assertEquals(EXPECTED_HTML, this.editorScriptService.parseAndRender(html, SYNTAX, DOCUMENT_REFERENCE, false));
+        // The content submitted by the caller must be executed with the caller's rights, not with the privileged
+        // content author inherited from the context document.
+        assertEquals(currentUser, renderingContentAuthor.get());
+    }
+
+    @Test
+    void parseAndRenderUsesRequestEffectiveAuthorWhenPresent() throws Exception
+    {
+        String html = "<p>some html</p>";
+
+        XWikiContext context = this.oldcore.getXWikiContext();
+
+        XWikiDocument contextDocument = new XWikiDocument(new DocumentReference("xwiki", "Main", "WebHome"));
+        contextDocument.getAuthors().setContentAuthor(mock());
+        context.setDoc(contextDocument);
+
+        // The request carries an effective author (e.g. set by EffectiveAuthorSetterListener on a /bin/* action).
+        UserReference effectiveAuthor = mock();
+        XWikiRequest request = mock();
+        when(request.getEffectiveAuthor()).thenReturn(Optional.of(effectiveAuthor));
+        context.setRequest(request);
+
+        AtomicReference<UserReference> renderingContentAuthor = captureRenderingContentAuthor(context, html);
+
+        assertEquals(EXPECTED_HTML, this.editorScriptService.parseAndRender(html, SYNTAX, DOCUMENT_REFERENCE, false));
+        assertEquals(effectiveAuthor, renderingContentAuthor.get());
+        // The current user resolver is not consulted when the request already provides an effective author.
+        verifyNoInteractions(this.currentUserReferenceResolver);
+    }
+
+    /**
+     * Stubs the HTML converter so that it captures, while rendering, the content author of the security document that
+     * is used to check rights.
+     *
+     * @param context the current context, holding the security document during the render
+     * @param html the HTML fragment that will be passed to {@code parseAndRender}
+     * @return a holder that will contain the captured content author once {@code parseAndRender} has been called
+     */
+    private AtomicReference<UserReference> captureRenderingContentAuthor(XWikiContext context, String html)
+        throws Exception
+    {
+        AtomicReference<UserReference> renderingContentAuthor = new AtomicReference<>();
+        when(this.htmlConverter.parseAndRender(eq(html), eq(SYNTAX), eq(DOCUMENT_REFERENCE), eq(false)))
+            .then(invocation -> {
+                XWikiDocument securityDocument = (XWikiDocument) context.get(XWikiDocument.CKEY_SDOC);
+                renderingContentAuthor.set(securityDocument.getAuthors().getContentAuthor());
+                return EXPECTED_HTML;
+            });
+        return renderingContentAuthor;
     }
 
     /**

@@ -450,7 +450,7 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         WebElement block = getBlockContent(index);
         getDriver().createActions().moveToElement(block).perform();
-        return new SideMenu(block);
+        return new SideMenu();
     }
 
     private WebElement getBlockContent(int index)

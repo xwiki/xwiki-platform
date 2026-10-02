@@ -57,7 +57,13 @@ class SideMenuIT extends AbstractBlockNoteIT
      */
     private static final String IMAGE_NAME = "picture.png";
 
-    // We split the blocks into groups to avoid issues when scrolling the page.
+    /**
+     * The name of the small image attached to the test page, taken from the test resources.
+     */
+    private static final String SMALL_IMAGE_NAME = "image.gif";
+
+    // We split the blocks into groups so that no test page is taller than the viewport, because taking a
+    // screenshot of a taller page scrolls it, which makes the editor hide the side menu.
 
     private static final String[] HEADINGS = {"heading1", "heading2", "heading3", "heading4", "heading5", "heading6"};
 
@@ -93,16 +99,16 @@ class SideMenuIT extends AbstractBlockNoteIT
 
     // Blocks whose first line isn't text, so the side menu must not align on the text that comes after it.
 
-    private static final String[] BLOCKS_NOT_STARTING_WITH_TEXT = {"captionedImage", "infoBox", "imageBeforeText"};
+    private static final String CAPTIONED_IMAGE_CONTENT =
+        "[[A caption, which is the only text of the block>>image:%s||width=\"150\"]]".formatted(IMAGE_NAME);
 
-    private static final String BLOCKS_NOT_STARTING_WITH_TEXT_CONTENT = """
-        [[A caption, which is the only text of the block>>image:%1$s]]
+    private static final String INFO_BOX_CONTENT =
+        "{{info}}An info box, whose icon is rendered before its text.{{/info}}";
 
-        {{info}}An info box, whose icon is rendered before its text.{{/info}}
-
+    private static final String IMAGE_BEFORE_TEXT_CONTENT = """
         {{info}}
-        [[image:%1$s||width="32"]] Some text after a small image.
-        {{/info}}""".formatted(IMAGE_NAME);
+        [[image:%s]] Some text after a small image.
+        {{/info}}""".formatted(SMALL_IMAGE_NAME);
 
     @Test
     void sideMenuIsAlignedOnHeadings(TestUtils setup, TestReference testReference,
@@ -111,7 +117,7 @@ class SideMenuIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, HEADINGS_CONTENT);
 
-        assertSideMenuIsAligned(editInplace(), screenshots, HEADINGS);
+        assertSideMenuIsAligned(setup, editInplace(), screenshots, HEADINGS);
     }
 
     @Test
@@ -121,7 +127,7 @@ class SideMenuIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, OTHER_BLOCKS_CONTENT);
 
-        assertSideMenuIsAligned(editInplace(), screenshots, OTHER_BLOCKS);
+        assertSideMenuIsAligned(setup, editInplace(), screenshots, OTHER_BLOCKS);
     }
 
     @Test
@@ -135,22 +141,50 @@ class SideMenuIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editInplace();
         // An image that is still loading would make the screenshot unstable.
         textArea.waitUntilImageIsLoaded(0);
-        assertSideMenuIsAligned(textArea, screenshots, new String[] {"image"});
+        assertSideMenuIsAligned(setup, textArea, screenshots, new String[] {"image"});
     }
 
     @Test
-    void sideMenuIsAlignedOnBlocksNotStartingWithText(TestUtils setup, TestReference testReference,
+    void sideMenuIsAlignedOnCaptionedImage(TestUtils setup, TestReference testReference,
         ScreenshotComparator screenshots) throws Exception
     {
         setup.deletePage(testReference);
-        setup.createPage(testReference, BLOCKS_NOT_STARTING_WITH_TEXT_CONTENT);
+        setup.createPage(testReference, CAPTIONED_IMAGE_CONTENT);
         setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
 
         BlockNoteRichTextArea textArea = editInplace();
+        // An image that is still loading would make the screenshot unstable.
+        textArea.waitUntilImagesAreLoaded();
+        assertSideMenuIsAligned(setup, textArea, screenshots, new String[] {"captionedImage"});
+    }
+
+    @Test
+    void sideMenuIsAlignedOnInfoBox(TestUtils setup, TestReference testReference, ScreenshotComparator screenshots)
+        throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, INFO_BOX_CONTENT);
+
+        BlockNoteRichTextArea textArea = editInplace();
+        // A macro whose output is not rendered yet would make the screenshot unstable.
+        textArea.waitUntilMacrosAreRendered();
+        assertSideMenuIsAligned(setup, textArea, screenshots, new String[] {"infoBox"});
+    }
+
+    @Test
+    void sideMenuIsAlignedOnImageBeforeText(TestUtils setup, TestReference testReference,
+        ScreenshotComparator screenshots) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, IMAGE_BEFORE_TEXT_CONTENT);
+        setup.attachFile(testReference, SMALL_IMAGE_NAME, getClass().getResourceAsStream('/' + SMALL_IMAGE_NAME),
+            false);
+
+        BlockNoteRichTextArea textArea = editInplace();
         // A macro whose output is not rendered yet, or an image that is still loading, would move the blocks around
-        // and thus make the screenshots unstable.
+        // and thus make the screenshot unstable.
         textArea.waitUntilMacrosAreRendered().waitUntilImagesAreLoaded();
-        assertSideMenuIsAligned(textArea, screenshots, BLOCKS_NOT_STARTING_WITH_TEXT);
+        assertSideMenuIsAligned(setup, textArea, screenshots, new String[] {"imageBeforeText"});
     }
 
     /**
@@ -171,14 +205,18 @@ class SideMenuIT extends AbstractBlockNoteIT
      * Compares a screenshot of the content area, taken while hovering each block, with the reference screenshot of
      * that block.
      *
+     * @param setup the test setup, used to scroll the page
      * @param textArea the rich text area holding the blocks
      * @param screenshots the comparator to check the screenshots with
      * @param blocks the names of the blocks, in the order they appear in the rich text area
      */
-    private void assertSideMenuIsAligned(BlockNoteRichTextArea textArea, ScreenshotComparator screenshots,
-        String[] blocks) throws IOException
+    private void assertSideMenuIsAligned(TestUtils setup, BlockNoteRichTextArea textArea,
+        ScreenshotComparator screenshots, String[] blocks) throws IOException
     {
         WebElement content = new InplaceEditablePage().getContentContainer();
+        // Taking a screenshot scrolls the page down to bring the content into view, which would leave the mouse over
+        // another block and make the editor hide the side menu, so we scroll to the bottom before hovering.
+        setup.getDriver().scrollTo(0, Integer.MAX_VALUE);
         for (int i = 0; i < blocks.length; i++) {
             textArea.hoverBlock(i);
             screenshots.assertScreenshotMatches(blocks[i], content);

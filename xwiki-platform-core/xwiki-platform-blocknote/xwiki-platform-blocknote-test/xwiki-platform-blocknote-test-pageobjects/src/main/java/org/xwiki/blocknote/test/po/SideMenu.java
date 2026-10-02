@@ -19,11 +19,6 @@
  */
 package org.xwiki.blocknote.test.po;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -34,46 +29,13 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class SideMenu extends BaseElement
 {
-    private static final By SIDE_MENU = By.className("bn-side-menu");
-
     /**
-     * Waits for the side menu of the specified block to be displayed at its final position.
-     *
-     * @param hoveredBlock the block the side menu belongs to, which is hovered again while waiting
+     * Waits for the side menu of the hovered block to be fully displayed.
      */
-    public SideMenu(WebElement hoveredBlock)
+    public SideMenu()
     {
-        waitUntilStable(hoveredBlock);
-    }
-
-    private void waitUntilStable(WebElement hoveredBlock)
-    {
-        // The side menu is faded in and positioned asynchronously, so waiting for it to be visible is not enough to
-        // avoid flaky screenshots: we wait for it to be at the same position for two consecutive ticks. We hover the
-        // block again on each tick because the editor removes the side menu as soon as it considers that the mouse
-        // left the block, which happens on its own when the block is re-rendered. We move in two steps so that a
-        // mouse move event is fired even when the mouse is already at the target point.
-        Point[] previousPosition = new Point[] {null};
-        getDriver().waitUntilCondition(driver -> {
-            getDriver().createActions().moveToElement(hoveredBlock, 1, 1).moveToElement(hoveredBlock).perform();
-            Point position = getPosition();
-            boolean stable = position != null && position.equals(previousPosition[0]);
-            previousPosition[0] = position;
-            return stable;
-        });
-    }
-
-    /**
-     * @return the position of the side menu, or {@code null} if it is not displayed (anymore)
-     */
-    private Point getPosition()
-    {
-        try {
-            WebElement sideMenu = getDriver().findElementWithoutWaiting(SIDE_MENU);
-            return sideMenu.isDisplayed() ? sideMenu.getLocation() : null;
-        } catch (NoSuchElementException | StaleElementReferenceException e) {
-            // The editor has just removed or re-created the side menu, so it's not stable yet.
-            return null;
-        }
+        // The editor fades the side menu in, so it is already displayed while still half transparent.
+        getDriver().waitUntilJavascriptCondition("const sideMenu = document.querySelector('.bn-side-menu');"
+            + "return !!sideMenu && getComputedStyle(sideMenu.parentElement).opacity === '1'");
     }
 }

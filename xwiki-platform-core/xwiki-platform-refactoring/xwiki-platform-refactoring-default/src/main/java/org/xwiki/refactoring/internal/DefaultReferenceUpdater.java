@@ -194,15 +194,9 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
             // Wiki content stored in xobjects
             if (fieldClass instanceof TextAreaClass textAreaClass && textAreaClass.isWikiContent()) {
                 modified |= renameLinks(xobject, textAreaClass, document, renderer, relative, renameLambda);
-            } else if (fieldClass instanceof DBListClass dbListClass && !relative) {
-                // Document references stored in database list xobject properties. Nothing is done in relative mode,
-                // which is used when the updated document is the moved one. The values of a database list are document
-                // full names local to the wiki of the document, and not relative to its space, so after a move inside
-                // the same wiki they keep pointing to the same pages. After a move to another wiki the values are kept
-                // as they are on purpose: a value is the key of an option returned by a query that runs in the wiki the
-                // document is in, so rewriting it to a reference to the previous wiki would store a value the list can
-                // neither display nor select.
-                modified |= renameLinks(xobject, dbListClass, document, oldTarget, newTarget);
+            } else if (fieldClass instanceof DBListClass dbListClass) {
+                // Document references stored in database list xobject properties
+                modified |= renameLinks(xobject, dbListClass, document, relative, oldTarget, newTarget);
             }
         }
 
@@ -237,11 +231,16 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         return false;
     }
 
-    private boolean renameLinks(BaseObject xobject, DBListClass dbListClass, XWikiDocument document,
+    private boolean renameLinks(BaseObject xobject, DBListClass dbListClass, XWikiDocument document, boolean relative,
         EntityReference oldTarget, EntityReference newTarget)
     {
-        // Only document targets are supported.
-        if (!(oldTarget instanceof DocumentReference oldDocumentReference)
+        // Nothing is done in relative mode, which is used when the updated document is the moved one. The values of a
+        // database list are document full names local to the wiki of the document, and not relative to its space, so
+        // after a move inside the same wiki they keep pointing to the same pages. After a move to another wiki the
+        // values are kept as they are on purpose: a value is the key of an option returned by a query that runs in the
+        // wiki the document is in, so rewriting it to a reference to the previous wiki would store a value the list can
+        // neither display nor select. Only document targets are supported.
+        if (relative || !(oldTarget instanceof DocumentReference oldDocumentReference)
             || !(newTarget instanceof DocumentReference newDocumentReference)
             || !dbListClass.isDocumentReferenceList()) {
             return false;

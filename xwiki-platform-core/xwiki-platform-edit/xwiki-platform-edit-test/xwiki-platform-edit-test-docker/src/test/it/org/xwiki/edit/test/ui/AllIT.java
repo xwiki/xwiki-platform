@@ -56,4 +56,9 @@ class AllIT
     class NestedDocumentLockIT extends DocumentLockIT
     {
     }
+
+    @Nested
+    class NestedWikiEditorIT extends WikiEditorIT
+    {
+    }
 }

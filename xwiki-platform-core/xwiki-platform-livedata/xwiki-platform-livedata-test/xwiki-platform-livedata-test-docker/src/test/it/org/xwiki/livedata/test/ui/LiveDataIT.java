@@ -941,21 +941,30 @@ class LiveDataIT
         assertTrue(tableLayout.hasEditModeActionsColumn());
         assertTrue(tableLayout.canAddEntry());
 
-        // Add a new entry from the layout and save it. It is persisted, so we now have two entries.
+        // Adding a row does not create anything by itself: the entry is only created once a first value is set.
         tableLayout.startNewEntry();
-        tableLayout.setNewEntryCell(NAME_COLUMN, NAME_COLUMN, NAME_ESTHER);
-        tableLayout.saveNewEntry();
+        assertEquals(1, tableLayout.getTotalEntries());
+        tableLayout.cancelNewEntry();
+        assertEquals(1, tableLayout.getTotalEntries());
+        // The "Add entry" row is available again once the new row is dropped.
+        assertTrue(tableLayout.canAddEntry());
+
+        // Setting a first value on the new row creates the entry, so we now have two entries.
+        tableLayout.startNewEntry();
+        tableLayout.createNewEntry(NAME_COLUMN, NAME_COLUMN, NAME_ESTHER);
         assertEquals(2, tableLayout.getTotalEntries());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
         tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
 
-        // Start a new entry but cancel it: the draft entry is discarded and no new entry is persisted.
+        // Deleting the entry from the actions column removes it for good.
         tableLayout.startNewEntry();
-        tableLayout.setNewEntryCell(NAME_COLUMN, NAME_COLUMN, NAME_CHARLY);
-        tableLayout.cancelNewEntry();
+        tableLayout.createNewEntry(NAME_COLUMN, NAME_COLUMN, NAME_CHARLY);
+        assertEquals(3, tableLayout.getTotalEntries());
+        tableLayout.assertRow(NAME_COLUMN, NAME_CHARLY);
+        tableLayout.deleteEntry(NAME_COLUMN, NAME_CHARLY);
         assertEquals(2, tableLayout.getTotalEntries());
-        // The "Add entry" row is available again once the draft is discarded.
-        assertTrue(tableLayout.canAddEntry());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
 
         // Disable edit mode: the actions column and the "Add entry" row are hidden again.
         liveData.toggleEditMode();

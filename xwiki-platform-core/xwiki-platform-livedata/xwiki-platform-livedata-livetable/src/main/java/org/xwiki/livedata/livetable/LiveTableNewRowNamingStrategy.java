@@ -20,10 +20,12 @@
 package org.xwiki.livedata.livetable;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiException;
@@ -55,4 +57,17 @@ public interface LiveTableNewRowNamingStrategy
      * @return whether the current user is allowed to create a new entry with this strategy
      */
     boolean isCreationAllowed(Map<String, Object> parameters);
+
+    /**
+     * Returns where this strategy puts new entries.
+     *
+     * @param parameters the live data source parameters
+     * @return the space new entries are created in, or {@link Optional#empty()} when this strategy has no single
+     *         location
+     * @since 18.9.0RC1
+     */
+    default Optional<SpaceReference> getNewEntryLocation(Map<String, Object> parameters)
+    {
+        return Optional.empty();
+    }
 }

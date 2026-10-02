@@ -42,6 +42,8 @@
       <h2 v-if="!!titlePropertyId && logic.isPropertyVisible(titlePropertyId)">
         <LivedataDisplayer :property-id="titlePropertyId" :entry="entry" />
       </h2>
+      <!-- Footnote for frozen entries. -->
+      <sup v-if="isEntryFrozen">2</sup>
     </div>
 
     <!--
@@ -85,23 +87,23 @@
       </template>
     </draggable>
 
-    <!-- Save/cancel actions for a draft entry being created in edit mode. -->
-    <div v-if="logic.isEditMode() && entry._new" class="card-actions">
+    <!-- Entry actions, only available in edit mode. -->
+    <div v-if="logic.isEditMode()" class="card-actions">
       <button
         type="button"
         class="btn btn-default"
-        :title="$t('livedata.table.action.save')"
-        @click="logic.saveNewEntry()"
+        :title="
+          $t(
+            isEntrySaved
+              ? 'livedata.table.action.delete'
+              : 'livedata.table.action.cancel',
+          )
+        "
+        @click="logic.deleteEntry(entry)"
       >
-        <XWikiIcon :icon-descriptor="{ name: 'check' }" />
-      </button>
-      <button
-        type="button"
-        class="btn btn-default"
-        :title="$t('livedata.table.action.cancel')"
-        @click="logic.cancelNewEntry()"
-      >
-        <XWikiIcon :icon-descriptor="{ name: 'cross' }" />
+        <XWikiIcon
+          :icon-descriptor="{ name: isEntrySaved ? 'trash' : 'cross' }"
+        />
       </button>
     </div>
   </div>
@@ -162,6 +164,18 @@ export default {
 
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
+    },
+
+    // The entries are frozen when the live data is in edit mode.
+    isEntrySaved() {
+      return this.logic.getEntryId(this.entry) !== undefined;
+    },
+    isEntryFrozen() {
+      const frozen = this.logic.isViewFrozen() && !this.entry._new;
+      if (frozen) {
+        this.logic.footnotes.put("2", "livedata.footnotes.frozenEntries");
+      }
+      return frozen;
     },
   },
 

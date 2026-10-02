@@ -259,83 +259,32 @@ describe("BaseDisplayer.vue", () => {
 
       expect(wrapper.emitted()["update:isView"]).toBeUndefined();
     });
-
-    it("Requests an edit instead of editing when a save is pending", async () => {
-      const requestEdit = fake();
-      const start = fake();
-      const wrapper = initEditModeWrapper({
-        editBus: { hasPendingSave: () => true, requestEdit, start },
-      });
-
-      await cell(wrapper).trigger("focusin");
-
-      // The pending save is going to refresh the table and re-render this cell, so the edit is
-      // only requested and must be resumed by the re-rendered cell.
-      expect(requestEdit.calledOnceWith("entry-1", "color")).toBe(true);
-      expect(start.called).toBe(false);
-      expect(wrapper.emitted()["update:isView"]).toBeUndefined();
-    });
-
-    it("Resumes a requested edit when the cell is re-created", () => {
-      const enablePendingEdit = fake.returns(true);
-      const wrapper = initEditModeWrapper({ editBus: { enablePendingEdit } });
-
-      expect(enablePendingEdit.calledOnceWith("entry-1", "color")).toBe(true);
-      expect(wrapper.emitted()["update:isView"]).toEqual([[false]]);
-    });
-
-    it("Resumes a requested edit when the entry is refreshed", async () => {
-      let pendingEdit = false;
-      const wrapper = initEditModeWrapper({
-        editBus: { enablePendingEdit: () => pendingEdit },
-      });
-
-      expect(wrapper.emitted()["update:isView"]).toBeUndefined();
-
-      // The refresh following a save re-uses the cell as-is and only updates its entry.
-      pendingEdit = true;
-      await wrapper.setProps({ entry: { color: "blue", age: "13" } });
-
-      expect(wrapper.emitted()["update:isView"]).toEqual([[false]]);
-    });
-
-    it("Does not resume an edit outside of edit mode", () => {
-      const enablePendingEdit = fake.returns(true);
-      initWrapper(BaseDisplayer, {
-        logic: { isEditMode: () => false },
-        editBus: { enablePendingEdit },
-      });
-
-      expect(enablePendingEdit.called).toBe(false);
-    });
   });
 
   describe("Ending an edit", () => {
     it("Saves a new entry on enter", async () => {
-      const saveNewEntry = fake.resolves(undefined);
-      const addEntry = fake();
+      const addEntry = fake.resolves(undefined);
       const wrapper = initEditModeWrapper({
         props: { isView: false, entry: { color: "red", _new: true } },
-        logic: { saveNewEntry, addEntry },
+        logic: { addEntry },
       });
 
       await wrapper.find("input").setValue("test-value");
       await wrapper.find(".edit > div").trigger("keydown.enter");
       await flushPromises();
 
+      // Applying the edit is what creates the entry, there is nothing else to commit.
       expect(wrapper.emitted().saveEdit[0]).toEqual(["test-value"]);
       expect(wrapper.emitted()["update:isView"][0]).toEqual([true]);
-      expect(saveNewEntry.calledOnce).toBe(true);
       // A plain enter only saves the new entry, it does not start another one.
       expect(addEntry.called).toBe(false);
     });
 
     it("Saves a new entry and starts another one on ctrl+enter", async () => {
-      const saveNewEntry = fake.resolves(undefined);
-      const addEntry = fake();
+      const addEntry = fake.resolves(undefined);
       const wrapper = initEditModeWrapper({
         props: { isView: false, entry: { color: "red", _new: true } },
-        logic: { saveNewEntry, addEntry },
+        logic: { addEntry },
       });
 
       await wrapper
@@ -343,15 +292,39 @@ describe("BaseDisplayer.vue", () => {
         .trigger("keydown.enter", { ctrlKey: true });
       await flushPromises();
 
-      expect(saveNewEntry.calledOnce).toBe(true);
+      expect(wrapper.emitted().saveEdit).toHaveLength(1);
       expect(addEntry.calledOnce).toBe(true);
     });
 
-    it("Does not save the entry on enter when it is not new", async () => {
-      const saveNewEntry = fake.resolves(undefined);
+    it("Waits for the entry to be created before starting another one", async () => {
+      let resolveSave;
+      const whenSaved = () => new Promise((resolve) => (resolveSave = resolve));
+      const addEntry = fake.resolves(undefined);
+      const wrapper = initEditModeWrapper({
+        props: { isView: false, entry: { color: "red", _new: true } },
+        logic: { addEntry },
+        editBus: { whenSaved },
+      });
+
+      await wrapper
+        .find(".edit > div")
+        .trigger("keydown.enter", { ctrlKey: true });
+      await flushPromises();
+
+      // The creation of the entry is still running, so no other row is started yet.
+      expect(addEntry.called).toBe(false);
+
+      resolveSave();
+      await flushPromises();
+
+      expect(addEntry.calledOnce).toBe(true);
+    });
+
+    it("Does not start another entry on enter when the row is not new", async () => {
+      const addEntry = fake.resolves(undefined);
       const wrapper = initEditModeWrapper({
         props: { isView: false },
-        logic: { saveNewEntry },
+        logic: { addEntry },
       });
 
       await wrapper.find("input").setValue("test-value");
@@ -360,7 +333,7 @@ describe("BaseDisplayer.vue", () => {
 
       // Existing entries are only saved once the whole entry is done editing.
       expect(wrapper.emitted().saveEdit[0]).toEqual(["test-value"]);
-      expect(saveNewEntry.called).toBe(false);
+      expect(addEntry.called).toBe(false);
     });
 
     it("Keeps editing when the focus moves inside the cell", async () => {

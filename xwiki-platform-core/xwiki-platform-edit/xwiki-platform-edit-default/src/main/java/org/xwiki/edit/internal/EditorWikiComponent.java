@@ -22,6 +22,7 @@ package org.xwiki.edit.internal;
 import java.lang.reflect.Type;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -40,10 +41,11 @@ import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorDescriptor;
 import org.xwiki.edit.EditorDescriptorBuilder;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -60,8 +62,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiComponent
 {
-    private static final LocalDocumentReference EDITOR_CLASS_REFERENCE =
-        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "EditorClass");
+    private static final String MISSING_EDITOR_OBJECT = "The document [%s] is missing the XWiki.EditorClass object.";
 
     @Inject
     private Logger logger;
@@ -69,7 +70,7 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
-    private DocumentReference authorReference;
+    private UserReference authorReference;
 
     private DocumentReference editorReference;
 
@@ -80,10 +81,24 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
     @Inject
     private EditorDescriptorBuilder descriptorBuilder;
 
+    @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceDocumentReferenceSerializer;
+
     @Override
     public DocumentReference getAuthorReference()
     {
-        return this.authorReference;
+        return serializeAuthorReference(this.authorReference);
+    }
+
+    private DocumentReference serializeAuthorReference(UserReference userReference)
+    {
+        // The serializer resolves a null user reference to the current user, while the guest user is serialized to
+        // null.
+        return userReference != null ? this.userReferenceDocumentReferenceSerializer.serialize(userReference) : null;
     }
 
     @Override
@@ -118,12 +133,12 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
             XWikiDocument editorDocument = xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext);
             XWikiDocument translatedEditorDocument = editorDocument.getTranslatedDocument(xcontext);
             this.descriptorBuilder.setName(translatedEditorDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext));
-            this.descriptorBuilder.setDescription(translatedEditorDocument.getRenderedContent(Syntax.PLAIN_1_0,
-                xcontext));
+            this.descriptorBuilder
+                .setDescription(translatedEditorDocument.getRenderedContent(Syntax.PLAIN_1_0, xcontext));
 
         } catch (XWikiException e) {
-            this.logger.warn("Failed to read the editor name and description. Root cause: "
-                + ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to read the editor name and description. Root cause: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return this.descriptorBuilder.build();
     }
@@ -135,14 +150,25 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
             XWikiContext xcontext = this.xcontextProvider.get();
 
             XWikiDocument editorDocument = xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext);
-            BaseObject editorObject = editorDocument.getXObject(EDITOR_CLASS_REFERENCE);
+            BaseObject editorObject = editorDocument.getXObject(EditorClassDocumentInitializer.REFERENCE);
+            if (editorObject == null) {
+                throw new EditException(String.format(MISSING_EDITOR_OBJECT,
+                    editorDocument.getDocumentReference()));
+            }
             String editorCode = editorObject.getStringValue("code");
-            // Make sure the editor code is executed with the rights of the editor document author.
-            XWikiDocument sdoc = editorDocument;
+            // Execute the editor code with the rights of the author of the editor definition, i.e., the effective
+            // metadata author of the editor document, which is also the author whose rights allowed registering the
+            // editor. Take it from the same document instance as the code so that both always match.
+            DocumentReference editorAuthorReference =
+                serializeAuthorReference(editorDocument.getAuthors().getEffectiveMetadataAuthor());
             // Execute the editor code in the context of the current document (because the editor code needs to access
-            // the data that has been put on the script context).
-            return xcontext.getDoc().getRenderedContent(editorCode, editorDocument.getSyntax().toIdString(), false,
-                sdoc, xcontext);
+            // the data that has been put on the script context). The secure document is set by the author executor.
+            return this.authorExecutor.call(
+                () -> xcontext.getDoc().getRenderedContent(editorCode, editorDocument.getSyntax().toIdString(), false,
+                    null, xcontext),
+                editorAuthorReference, editorDocument.getDocumentReference());
+        } catch (EditException e) {
+            throw e;
         } catch (Exception e) {
             throw new EditException("Failed to render the editor code.", e);
         }
@@ -173,13 +199,13 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
 
     private void initialize(XWikiDocument editorDocument) throws WikiComponentException
     {
-        this.authorReference = editorDocument.getAuthorReference();
-        BaseObject editorObject = editorDocument.getXObject(EDITOR_CLASS_REFERENCE);
+        this.authorReference = editorDocument.getAuthors().getEffectiveMetadataAuthor();
+        BaseObject editorObject = editorDocument.getXObject(EditorClassDocumentInitializer.REFERENCE);
         if (editorObject != null) {
             initialize(editorObject);
         } else {
-            throw new WikiComponentException(String.format(
-                "The document [%s] is missing the XWiki.EditorClass object.", editorDocument.getDocumentReference()));
+            throw new WikiComponentException(String.format(MISSING_EDITOR_OBJECT,
+                editorDocument.getDocumentReference()));
         }
     }
 

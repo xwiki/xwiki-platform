@@ -19,10 +19,15 @@
  */
 package org.xwiki.rest.internal.resources.pages;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.inject.Named;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
@@ -43,6 +48,22 @@ import com.xpn.xwiki.api.Document;
 @Named("org.xwiki.rest.internal.resources.pages.PagesResourceImpl")
 public class PagesResourceImpl extends XWikiResource implements PagesResource
 {
+    /**
+     * The maximum time spent evaluating the parent filter, for all the pages of a request together.
+     */
+    private static final Duration PARENT_FILTER_TIMEOUT = Duration.ofSeconds(1);
+
+    /**
+     * The number of characters read between two checks of the deadline of the parent filter. Reading the clock takes
+     * tens of nanoseconds while reading a character takes about one, so checking the clock at each read makes matching
+     * an order of magnitude slower. With one check every 1024 reads, the overhead of the check is negligible, and a
+     * timeout is still detected at most 1024 matching steps late, which is a few microseconds, far below the
+     * {@link #PARENT_FILTER_TIMEOUT}.
+     * This constant is preferably a power of two as it can be optimized into a mask when combined with a modulo `%`
+     * operation in {@link ParentFilter#checkDeadline()}.
+     */
+    private static final int DEADLINE_CHECK_INTERVAL = 1024;
+
     @Override
     public Pages getPages(String wikiName, String spaceName, Integer start, Integer number,
             String parentFilterExpression, String order, Boolean withPrettyNames)
@@ -54,6 +75,7 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
 
         Pages pages = objectFactory.createPages();
         int limit = validateAndGetLimit(number);
+        ParentFilter parentFilter = compileParentFilter(parentFilterExpression);
 
         try {
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
@@ -78,15 +100,6 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
                     .setLimit(limit)
                     .execute();
 
-            Pattern parentFilter = null;
-            if (parentFilterExpression != null) {
-                if (parentFilterExpression.equals("null")) {
-                    parentFilter = Pattern.compile("");
-                } else {
-                    parentFilter = Pattern.compile(parentFilterExpression);
-                }
-            }
-
             for (String pageName : pageNames) {
                 String pageFullName = Utils.getPageId(wikiName, spaces, pageName);
 
@@ -107,7 +120,7 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
                             if (parent != null && !parent.isNew()) {
                                 parentId = parent.getPrefixedFullName();
                             }
-                            add = parentFilter.matcher(parentId).matches();
+                            add = parentFilter.matches(parentId);
                         }
 
                         if (add) {
@@ -117,6 +130,9 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
                     }
                 }
             }
+        } catch (ParentFilterTimeoutException | StackOverflowError e) {
+            // Reject the whole request so that the client never receives a silently partial result.
+            throw createInvalidParentFilterException("The parentId filter is too expensive to evaluate.");
         } catch (Exception e) {
             throw new XWikiRestException(e);
         } finally {
@@ -124,5 +140,128 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
         }
 
         return pages;
+    }
+
+    private ParentFilter compileParentFilter(String parentFilterExpression)
+    {
+        ParentFilter parentFilter = null;
+        if (parentFilterExpression != null) {
+            if ("null".equals(parentFilterExpression)) {
+                parentFilter = new ParentFilter(Pattern.compile(""));
+            } else {
+                try {
+                    parentFilter = new ParentFilter(Pattern.compile(parentFilterExpression));
+                } catch (PatternSyntaxException | StackOverflowError e) {
+                    throw createInvalidParentFilterException("Invalid parentId filter.");
+                }
+            }
+        }
+        return parentFilter;
+    }
+
+    private WebApplicationException createInvalidParentFilterException(String message)
+    {
+        return new WebApplicationException(
+            Response.status(Status.BAD_REQUEST).entity(message).type("text/plain").build());
+    }
+
+    /**
+     * Thrown when the evaluation of the parent filter exceeds its deadline.
+     */
+    private static final class ParentFilterTimeoutException extends RuntimeException
+    {
+        private static final long serialVersionUID = 1L;
+
+        ParentFilterTimeoutException()
+        {
+            // The stack trace is never used, so there's no need to fill it.
+            super(null, null, false, false);
+        }
+    }
+
+    /**
+     * Matches the parent of each page against the parent filter, within a time budget shared by all the pages of a
+     * request. Only the time spent matching is counted, so that loading the documents never consumes the budget.
+     */
+    private static final class ParentFilter
+    {
+        private final Pattern pattern;
+
+        private long remainingTime = PARENT_FILTER_TIMEOUT.toNanos();
+
+        private long deadline;
+
+        private int reads;
+
+        ParentFilter(Pattern pattern)
+        {
+            this.pattern = pattern;
+        }
+
+        boolean matches(String parentId)
+        {
+            long start = System.nanoTime();
+            // Compute the deadline based on the remaining time budget.
+            this.deadline = start + this.remainingTime;
+            try {
+                return this.pattern.matcher(new DeadlineCharSequence(parentId, this)).matches();
+            } finally {
+                // Decreases the remaining time budget by what was spent running the matching this time.
+                this.remainingTime -= System.nanoTime() - start;
+            }
+        }
+
+        void checkDeadline()
+        {
+            // Reading the clock costs much more than reading a character, so it's done only once every
+            // DEADLINE_CHECK_INTERVAL reads, which delays the detection of a timeout by a few microseconds at most.
+            if (this.reads++ % DEADLINE_CHECK_INTERVAL == 0 && System.nanoTime() - this.deadline > 0) {
+                throw new ParentFilterTimeoutException();
+            }
+        }
+    }
+
+    /**
+     * A {@link CharSequence} that fails once the deadline of its {@link ParentFilter} is passed.
+     * {@link java.util.regex} has no timeout, but it reads its input through {@link #charAt(int)} at each matching
+     * step, so checking the deadline there bounds the time spent matching a regular expression, whatever its
+     * complexity.
+     */
+    private static final class DeadlineCharSequence implements CharSequence
+    {
+        private final CharSequence wrapped;
+
+        private final ParentFilter filter;
+
+        DeadlineCharSequence(CharSequence wrapped, ParentFilter filter)
+        {
+            this.wrapped = wrapped;
+            this.filter = filter;
+        }
+
+        @Override
+        public char charAt(int index)
+        {
+            this.filter.checkDeadline();
+            return this.wrapped.charAt(index);
+        }
+
+        @Override
+        public int length()
+        {
+            return this.wrapped.length();
+        }
+
+        @Override
+        public CharSequence subSequence(int start, int end)
+        {
+            return this.wrapped.subSequence(start, end);
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.wrapped.toString();
+        }
     }
 }

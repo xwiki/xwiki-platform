@@ -24,6 +24,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditorConfigurationPane;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -31,6 +32,7 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
@@ -39,6 +41,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests how rendering macros are integrated in CKEditor.
@@ -214,5 +217,89 @@ class MacroIT extends AbstractCKEditorIT
             {{/info}}
 
             after""");
+    }
+
+    @Test
+    @Order(5)
+    void insertInfoBoxFromInsertMenu(TestUtils setup, TestReference testReference)
+    {
+        WYSIWYGEditPage editPage = edit(setup, testReference, true);
+
+        // The Info Box is inserted directly, with a default message, and the caret is placed at the start of it.
+        this.editor.getToolBar().insertInfoBox();
+        this.textArea.waitUntilTextContains("Type your information message here.");
+        this.textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        this.textArea.sendKeys("This is an info macro!");
+        assertThat(this.textArea.getText(), containsString("This is an info macro!"));
+
+        // The editor keeps an empty paragraph after the inserted macro, so that the user can type after it.
+        assertSourceEquals("{{info}}\nThis is an info macro!\n{{/info}}\n\n ", true);
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertTrue(viewPage.contentContainsElement(By.cssSelector(".box.infomessage")));
+        assertThat(viewPage.getContent(), containsString("This is an info macro!"));
+    }
+
+    @Test
+    @Order(6)
+    void inlineEditMacroInsertedFromOtherMacros(TestUtils setup, TestReference testReference)
+    {
+        WYSIWYGEditPage editPage = edit(setup, testReference, true);
+        this.textArea.sendKeys("before", Keys.ENTER);
+
+        MacroDialogEditModal macroEditModal =
+            this.editor.getToolBar().insertOtherMacro().filterByText("Info Message", 1).clickSelect();
+        macroEditModal.setMacroParameter("title", "This is a title!");
+        macroEditModal.setMacroContent("This is an info macro!");
+        macroEditModal.clickSubmit();
+        this.textArea.waitForContentRefresh();
+        this.textArea.waitUntilTextContains("This is an info macro!");
+
+        // Edit the title parameter and then the macro content in-line, moving the caret from the paragraph placed
+        // before the macro.
+        this.textArea.sendKeys(Keys.PAGE_UP, Keys.UP, Keys.DOWN, Keys.END, " More title.", Keys.DOWN, Keys.END,
+            " More content.");
+
+        // Format the last word of the macro content.
+        this.textArea.sendKeys(Keys.LEFT, Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.LEFT));
+        this.editor.getToolBar().bold().italic().underline();
+
+        assertSourceEquals("""
+            before
+
+            {{info title="This is a title! More title."}}
+            This is an info macro! More __//**content**//__.
+            {{/info}}""");
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertThat(viewPage.getContent(),
+            containsString("This is a title! More title.\nThis is an info macro! More content."));
+        assertTrue(viewPage.contentContainsElement(By.cssSelector(".box.infomessage ins em strong")));
+    }
+
+    @Test
+    @Order(7)
+    void insertDisplayMacroFromOtherMacros(TestUtils setup, TestReference testReference) throws Exception
+    {
+        LocalDocumentReference displayedReference =
+            new LocalDocumentReference("Displayed", testReference.getLastSpaceReference());
+        setup.createPage(displayedReference, "Displayed page content", "Displayed page title");
+        // The page picker of the macro reference parameter uses the search to get its suggestions.
+        waitForSolrIndexing(setup);
+
+        WYSIWYGEditPage editPage = edit(setup, testReference, true);
+
+        MacroDialogEditModal macroEditModal =
+            this.editor.getToolBar().insertOtherMacro().filterByText("Display other pages", 1).clickSelect();
+        new SuggestInputElement(macroEditModal.getMacroParameterInput("reference")).sendKeys("Displayed")
+            .waitForNonTypedSuggestions().selectByIndex(0);
+        macroEditModal.clickSubmit();
+        this.textArea.waitUntilTextContains("Displayed page content");
+
+        assertSourceEquals(
+            String.format("{{display reference=\"%s\"/}}", setup.serializeLocalReference(displayedReference)));
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertEquals("Displayed page content", viewPage.getContent());
     }
 }

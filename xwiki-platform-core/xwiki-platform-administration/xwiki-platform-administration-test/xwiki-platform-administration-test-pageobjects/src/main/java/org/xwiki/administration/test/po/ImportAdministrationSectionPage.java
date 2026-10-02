@@ -101,6 +101,31 @@ public class ImportAdministrationSectionPage extends ViewPage
         getDriver().waitUntilElementIsVisible(By.id("packageDescription"));
     }
 
+    /**
+     * Click the "none" link of the package explorer, which unselects all the documents of the package.
+     *
+     * @since 18.9.0RC1
+     */
+    public void selectNoDocuments()
+    {
+        getSelectLinks().get(0).click();
+    }
+
+    /**
+     * Click the "all" link of the package explorer, which selects all the documents of the package.
+     *
+     * @since 18.9.0RC1
+     */
+    public void selectAllDocuments()
+    {
+        getSelectLinks().get(1).click();
+    }
+
+    private List<WebElement> getSelectLinks()
+    {
+        return getDriver().findElements(By.cssSelector("#packageDescription .selectLinks span"));
+    }
+
     public void deletePackage(String packageName)
     {
         String xpath = "//ul[@class='xlist']//a[@class='package' and contains(.,'%s')]/..//a[@class='deletelink']";
@@ -243,12 +268,12 @@ public class ImportAdministrationSectionPage extends ViewPage
     }
 
     /**
-     * @return the tree listing the documents contained in the selected package
+     * @return the tree listing the documents contained in the selected package, once loaded
      * @since 18.2.0RC1
      * @since 17.10.5
      */
     public TreeElement getPackageTree()
     {
-        return new TreeElement(getDriver().findElement(By.id("package")));
+        return new TreeElement(getDriver().findElement(By.id("package"))).waitForIt();
     }
 }

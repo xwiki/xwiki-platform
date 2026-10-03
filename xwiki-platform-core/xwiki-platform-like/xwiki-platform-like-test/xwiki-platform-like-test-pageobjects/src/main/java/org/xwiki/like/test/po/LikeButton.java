@@ -95,4 +95,20 @@ public class LikeButton extends BaseElement
         waitForNotificationSuccessMessage("The page has been unliked.");
     }
 
+    /**
+     * Click on the number of likes displayed next to the Like button, which leads to the list of likers.
+     *
+     * @return the likers page
+     * @since 18.9.0RC1
+     */
+    public LikersPage clickLikersLink()
+    {
+        WebElement numberElement =
+            getDriver().findElementWithoutWaiting(getContainer(), By.className(LIKE_NUMBER_CLASS));
+        getDriver().addPageNotYetReloadedMarker();
+        numberElement.findElement(By.tagName("a")).click();
+        getDriver().waitUntilPageIsReloaded();
+        return new LikersPage();
+    }
+
 }

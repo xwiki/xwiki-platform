@@ -234,6 +234,9 @@ public class CustomNotificationFilterModal extends BaseModal
         int rowCount = tableLayout.countRows();
         getSubmitButton().click();
         waitForClosed();
+        // Wait for the save to be done, which also closes the success message so that it doesn't hide the Submit
+        // button of the next filter added.
+        waitForNotificationSuccessMessage("Saved!");
 
         tableLayout.waitUntilRowCountEqualsTo(rowCount + offset);
     }

@@ -369,8 +369,11 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      */
     public void setNotificationEmailInterval(EmailInterval value)
     {
-        new Select(this.notificationEmailIntervalSelect).selectByValue(value.name());
-        waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        // Selecting the current value doesn't save anything, so there would be no success message to wait for.
+        if (getNotificationEmailInterval() != value) {
+            new Select(this.notificationEmailIntervalSelect).selectByValue(value.name());
+            waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+        }
     }
 
     /**

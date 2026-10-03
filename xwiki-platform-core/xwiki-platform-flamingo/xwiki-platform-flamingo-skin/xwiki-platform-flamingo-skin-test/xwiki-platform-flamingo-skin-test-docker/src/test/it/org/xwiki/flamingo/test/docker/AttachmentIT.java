@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,6 +44,7 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.AttachmentHistoryPage;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ComparePage;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
@@ -52,6 +54,9 @@ import org.xwiki.test.ui.po.diff.DocumentDiffSummary;
 import org.xwiki.test.ui.po.diff.EntityDiff;
 import org.xwiki.test.ui.po.diff.RawChanges;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -77,6 +82,11 @@ class AttachmentIT
     private static final String SMALL_SIZE_ATTACHMENT = "SmallSizeAttachment.png";
 
     private static final String CHOICE_EMPTY = "(empty)";
+
+    /**
+     * The default date format of the wiki ({@code yyyy/MM/dd HH:mm}).
+     */
+    private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}");
 
     @BeforeAll
     public void setup(TestUtils setup)
@@ -162,6 +172,19 @@ class AttachmentIT
         viewPage.waitForDocExtraPaneActive("Attachments");
         attachmentsPane.waitForAttachmentsLiveData();
 
+        // The history of the attachment lists both versions, oldest first.
+        AttachmentHistoryPage historyPage = attachmentsPane.goToAttachmentHistory(FIRST_ATTACHMENT);
+        assertEquals("1.1", historyPage.getVersion(1));
+        assertEquals("1.2", historyPage.getVersion(2));
+        assertEquals(27, historyPage.getSize(1));
+        assertEquals(30, historyPage.getSize(2));
+        assertEquals("User1", historyPage.getAuthor(1));
+        assertEquals("User1", historyPage.getAuthor(2));
+        assertThat(historyPage.getDate(1), matchesPattern(DATE_PATTERN));
+        assertThat(historyPage.getDate(2), matchesPattern(DATE_PATTERN));
+        setup.gotoPage(testReference);
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+
         attachmentsPane.deleteAttachmentByFileByName(FIRST_ATTACHMENT);
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertTrue(attachmentsPane.attachmentExistsByFileName(SECOND_ATTACHMENT));
@@ -172,6 +195,29 @@ class AttachmentIT
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertEquals(String.format(attachmentURLScheme, SECOND_ATTACHMENT),
             attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).getAttribute("href"));
+
+        // Delete the remaining attachment from the attachments viewer, opened through the "More actions" menu.
+        AttachmentsViewPage attachmentsViewPage = new AttachmentsViewPage();
+        attachmentsPane = attachmentsViewPage.openAttachmentsViewerFromMoreActions();
+        assertThat(attachmentsViewPage.getPageURL(), containsString("viewer=attachments"));
+        attachmentsPane.deleteAttachmentByFileByName(SECOND_ATTACHMENT);
+        setup.gotoPage(testReference);
+        assertEquals(0, new AttachmentsViewPage().openAttachmentsDocExtraPane().getNumberOfAttachments());
+
+        // Same on a terminal page.
+        DocumentReference terminalReference =
+            new DocumentReference("Terminal", testReference.getLastSpaceReference());
+        setup.rest().delete(terminalReference);
+        setup.rest().savePage(terminalReference, "", "");
+        setup.attachFile(terminalReference, FIRST_ATTACHMENT,
+            getClass().getResourceAsStream("/AttachmentIT/" + FIRST_ATTACHMENT), true);
+        setup.gotoPage(terminalReference);
+        attachmentsViewPage = new AttachmentsViewPage();
+        attachmentsPane = attachmentsViewPage.openAttachmentsViewerFromMoreActions();
+        assertThat(attachmentsViewPage.getPageURL(), containsString("viewer=attachments"));
+        attachmentsPane.deleteAttachmentByFileByName(FIRST_ATTACHMENT);
+        setup.gotoPage(terminalReference);
+        assertEquals(0, new AttachmentsViewPage().openAttachmentsDocExtraPane().getNumberOfAttachments());
     }
 
     @Test

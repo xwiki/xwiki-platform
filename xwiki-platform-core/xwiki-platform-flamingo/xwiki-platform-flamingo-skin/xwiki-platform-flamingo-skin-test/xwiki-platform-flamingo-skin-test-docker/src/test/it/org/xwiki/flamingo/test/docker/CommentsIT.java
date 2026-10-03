@@ -168,6 +168,19 @@ class CommentsIT
         commentsTab.cancelCommentForm();
         commentsTab.clickOnReplyToCommentByID(commentIndex);
         commentsTab.cancelCommentForm();
+
+        // Comment from the comments viewer, opened through the "More actions" menu.
+        ViewPage viewPage = new ViewPage();
+        CommentsTab commentsViewer = viewPage.openCommentsViewerFromMoreActions();
+        assertTrue(viewPage.getPageURL().contains("viewer=comments"));
+        String viewerComment = "Comment from the comments viewer";
+        commentIndex = commentsViewer.postComment(viewerComment, true);
+        assertEquals(USER_NAME, commentsViewer.getCommentAuthorByID(commentIndex));
+
+        // The comment is listed in the comments of the page.
+        CommentsTab pageCommentsTab = setup.gotoPage(reference).openCommentsDocExtraPane();
+        commentIndex = pageCommentsTab.getCommentID(viewerComment);
+        assertEquals(USER_NAME, pageCommentsTab.getCommentAuthorByID(commentIndex));
     }
 
     @Test

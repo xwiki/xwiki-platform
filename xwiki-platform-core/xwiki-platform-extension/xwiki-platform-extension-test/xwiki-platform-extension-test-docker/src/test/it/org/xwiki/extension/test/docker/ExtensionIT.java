@@ -52,8 +52,11 @@ import org.xwiki.extension.test.po.DependencyPane;
 import org.xwiki.extension.test.po.ExtensionAdministrationPage;
 import org.xwiki.extension.test.po.ExtensionDependenciesPane;
 import org.xwiki.extension.test.po.ExtensionDescriptionPane;
+import org.xwiki.extension.test.po.ExtensionHistoryPage;
+import org.xwiki.extension.test.po.ExtensionHistoryRecordPane;
 import org.xwiki.extension.test.po.ExtensionPane;
 import org.xwiki.extension.test.po.ExtensionProgressPane;
+import org.xwiki.extension.test.po.ExtensionUpdaterPage;
 import org.xwiki.extension.test.po.LogItemPane;
 import org.xwiki.extension.test.po.MergeConflictPane;
 import org.xwiki.extension.test.po.PaginationFilterPane;
@@ -649,6 +652,13 @@ class ExtensionIT
         assertEquals(extensionId, dependencies.get(0).getId());
         assertEquals("installed", dependencies.get(0).getStatus());
         assertEquals("Installed", dependencies.get(0).getStatusMessage());
+
+        // Check that the install is listed in the Extension History. The dependency isn't listed separately since it
+        // was installed by the same job.
+        ExtensionHistoryRecordPane installRecord = ExtensionHistoryPage.gotoPage().getRecords().getFirst();
+        assertHistoryRecord("install", extensionId, installRecord);
+        assertTrue(installRecord.getUserAndDate().startsWith("Installed by superadmin on "),
+            installRecord.getUserAndDate());
     }
 
     /**
@@ -693,14 +703,17 @@ class ExtensionIT
         assertEquals("installed-dependency", uninstallPlan.get(1).getStatus());
         assertEquals("Installed as dependency", uninstallPlan.get(1).getStatusMessage());
 
-        // Check the confirmation to delete the unused wiki pages.
+        // Check the confirmation to delete the unused wiki pages. The uninstall job waits for it, so the progress bar
+        // is displayed.
         extensionPane = extensionPane.confirm();
+        assertNotNull(extensionPane.getProgressBar());
         UnusedPagesPane unusedPages = extensionPane.openProgressSection().getUnusedPages();
         assertTrue(unusedPages.contains("ExtensionTest", "Alice"));
         assertTrue(unusedPages.contains("ExtensionTest", "Bob"));
 
         // Finish the uninstall and check the log.
         extensionPane = extensionPane.confirm();
+        assertNull(extensionPane.getProgressBar());
         List<LogItemPane> log = extensionPane.openProgressSection().getJobLog();
         assertTrue(log.size() > 2);
         assertEquals("info", log.get(2).getLevel());
@@ -757,6 +770,17 @@ class ExtensionIT
         extensionPane = searchResults.getExtension(0);
         assertEquals("installed-dependency", extensionPane.getStatus());
         assertEquals(dependencyId, extensionPane.getId());
+
+        // Check that both uninstalls are listed in the Extension History, the most recent first, each after the
+        // install that preceded it.
+        List<ExtensionHistoryRecordPane> records = ExtensionHistoryPage.gotoPage().getRecords();
+        assertTrue(records.size() >= 4);
+        assertHistoryRecord("uninstall", new ExtensionId(extensionId.getId()), records.get(0));
+        assertTrue(records.get(0).getUserAndDate().startsWith("Uninstalled by superadmin on "),
+            records.get(0).getUserAndDate());
+        assertHistoryRecord("install", extensionId, records.get(1));
+        assertHistoryRecord("uninstall", new ExtensionId(dependencyId.getId()), records.get(2));
+        assertHistoryRecord("install", extensionId, records.get(3));
     }
 
     /**
@@ -803,14 +827,20 @@ class ExtensionIT
         // Make sure the old version is installed.
         extensionTestUtils.install(new ExtensionId(extensionId, oldVersion));
 
-        // Upgrade the extension.
+        // The new version is found by the search.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
         ExtensionPane extensionPane =
             adminPage.getSearchBar().clickAdvancedSearch().search(extensionId, newVersion).getExtension(0);
         assertEquals("remote-installed", extensionPane.getStatus());
         assertEquals("Version 1.3 is installed", extensionPane.getStatusMessage());
-        // Using 20s for the timeout since the default 10s seems to not always be enough for computing the
-        // upgrade plan.
+
+        // Upgrade the extension from the Extension Updater. Using 20s for the timeouts since the default 10s seems to
+        // not always be enough for computing the upgrade plan.
+        ExtensionUpdaterPage updaterPage = ExtensionUpdaterPage.gotoPage().checkForUpdates(20);
+        extensionPane = updaterPage.getOutdatedExtension(new ExtensionId(extensionId, newVersion));
+        assertNotNull(extensionPane);
+        assertEquals("remote-installed", extensionPane.getStatus());
+        assertEquals("Version 1.3 is installed", extensionPane.getStatusMessage());
         extensionPane = extensionPane.upgrade(20);
 
         // Check the upgrade plan.
@@ -1153,5 +1183,16 @@ class ExtensionIT
 
         // Don't leave the rights of the ExtensionTest space behind for the other tests.
         setup.rest().deletePage("ExtensionTest", "WebPreferences");
+    }
+
+    private void assertHistoryRecord(String expectedJobType, ExtensionId expectedExtensionId,
+        ExtensionHistoryRecordPane record)
+    {
+        assertEquals(expectedJobType, record.getJobType());
+        assertEquals(List.of(expectedExtensionId.getId()), record.getExtensionNames());
+        // The uninstall job request doesn't specify the version.
+        List<String> expectedVersions = expectedExtensionId.getVersion() != null
+            ? List.of(expectedExtensionId.getVersion().getValue()) : List.of();
+        assertEquals(expectedVersions, record.getExtensionVersions());
     }
 }

@@ -944,6 +944,115 @@ class RenamePageIT
         assertEquals(1, rightObjects.size(), "The refused move must have left the source page's right in place.");
     }
 
+    /**
+     * Move a page that has children without preserving them: only the page itself is moved, its children stay at
+     * their old location.
+     */
+    @Order(14)
+    @Test
+    void moveParentWithoutChildren(TestUtils setup, TestReference testReference) throws Exception
+    {
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        SpaceReference space1 = new SpaceReference("1", testSpace);
+        SpaceReference space2 = new SpaceReference("2", space1);
+        SpaceReference space3 = new SpaceReference("3", space2);
+        SpaceReference space4 = new SpaceReference("4", space3);
+        SpaceReference spaceA = new SpaceReference("A", testSpace);
+        SpaceReference spaceB = new SpaceReference("B", spaceA);
+        DocumentReference page2 = new DocumentReference("WebHome", space2);
+        DocumentReference page3 = new DocumentReference("WebHome", space3);
+        DocumentReference page4 = new DocumentReference("WebHome", space4);
+        SpaceReference movedSpace2 = new SpaceReference("2", spaceB);
+        DocumentReference movedPage2 = new DocumentReference("WebHome", movedSpace2);
+
+        // Clean-up and create 1/2/3/4 and A/B, every page existing.
+        setup.rest().delete(movedPage2);
+        setup.rest().delete(new DocumentReference("WebHome", new SpaceReference("3", movedSpace2)));
+        for (SpaceReference space : List.of(space1, space2, space3, space4, spaceA, spaceB)) {
+            DocumentReference page = new DocumentReference("WebHome", space);
+            setup.rest().delete(page);
+            setup.rest().savePage(page, "", space.getName());
+        }
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        // Move 2 under A/B without its children.
+        RenamePage renamePage = setup.gotoPage(page2).rename();
+        renamePage.setPreserveChildren(false);
+        renamePage.getDocumentPicker().setParent(setup.serializeLocalReference(spaceB));
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+
+        // Only 2 has been moved.
+        assertTrue(setup.rest().exists(movedPage2), "Page A/B/2 doesn't exist!");
+        assertFalse(setup.rest().exists(new DocumentReference("WebHome", new SpaceReference("3", movedSpace2))),
+            "Page A/B/2/3 exists!");
+        // The children are still at their old location, reachable at their old URLs.
+        assertTrue(setup.gotoPage(page3).exists(), "Page 1/2/3 doesn't exist anymore!");
+        assertTrue(setup.gotoPage(page4).exists(), "Page 1/2/3/4 doesn't exist anymore!");
+    }
+
+    /**
+     * Renaming a page that belongs to an installed extension asks the user to confirm, page by page.
+     */
+    @Order(15)
+    @Test
+    void renameExtensionPage(TestUtils setup) throws Exception
+    {
+        // Macros.WebHome is a page of the installed Rendering UI extension that is not used by the other tests. The
+        // question is only asked for pages that the extension doesn't allow to delete, i.e. not for demo pages (such
+        // as the Sandbox ones).
+        DocumentReference extensionPage = new DocumentReference("xwiki", "Macros", "WebHome");
+        String renamedPageName = "MacrosRenamed";
+        DocumentReference renamedPage = new DocumentReference("xwiki", renamedPageName, "WebHome");
+        setup.rest().delete(renamedPage);
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        // Cancelling the question leaves the page in place.
+        JobQuestionPane jobQuestionPane = startRename(setup, extensionPage, renamedPageName);
+        assertEquals("You are about to rename pages that belong to extensions.", jobQuestionPane.getQuestionTitle());
+        jobQuestionPane.cancelQuestion();
+        assertTrue(jobQuestionPane.isCanceled());
+        assertTrue(setup.rest().exists(extensionPage), "The extension page has been renamed!");
+        assertFalse(setup.rest().exists(renamedPage), "The renamed page exists!");
+
+        // Confirming the question with the page selected renames it.
+        jobQuestionPane = startRename(setup, extensionPage, renamedPageName);
+        assertEquals("You are about to rename pages that belong to extensions.", jobQuestionPane.getQuestionTitle());
+        TreeElement treeElement = jobQuestionPane.getQuestionTree();
+        TreeNodeElement extensionNode = treeElement.getTopLevelNodes().get(0);
+        assertEquals("org.xwiki.platform:xwiki-platform-rendering-ui", extensionNode.getId());
+        List<TreeNodeElement> extensionPages = extensionNode.open().waitForIt().getChildren();
+        assertEquals(1, extensionPages.size());
+        TreeNodeElement pageNode = extensionPages.get(0);
+        assertEquals("xwiki:Macros.WebHome", pageNode.getId());
+        pageNode.select();
+        jobQuestionPane.confirmQuestion().waitUntilFinished();
+        assertFalse(setup.rest().exists(extensionPage), "The extension page has not been renamed!");
+        assertTrue(setup.rest().exists(renamedPage), "The renamed page doesn't exist!");
+
+        // Restore the extension page. The renamed page doesn't belong to the extension, so no question is asked.
+        RenamePage renamePage = setup.gotoPage(renamedPage).rename();
+        renamePage.getDocumentPicker().setName(extensionPage.getLastSpaceReference().getName());
+        renamePage.setPreserveChildren(false);
+        renamePage.setAutoRedirect(false);
+        renamePage.clickRenameButton().waitUntilFinished();
+        assertTrue(setup.rest().exists(extensionPage), "The extension page has not been restored!");
+    }
+
+    private JobQuestionPane startRename(TestUtils setup, DocumentReference page, String newName)
+    {
+        RenamePage renamePage = setup.gotoPage(page).rename();
+        renamePage.getDocumentPicker().setName(newName);
+        renamePage.setPreserveChildren(false);
+        renamePage.setAutoRedirect(false);
+        renamePage.clickRenameButton();
+        return new JobQuestionPane().waitForQuestionPane();
+    }
+
     private static List<String> newSpaces(List<String> parentSpaces, String lastSpace)
     {
         List<String> spaces = new ArrayList<>(parentSpaces);

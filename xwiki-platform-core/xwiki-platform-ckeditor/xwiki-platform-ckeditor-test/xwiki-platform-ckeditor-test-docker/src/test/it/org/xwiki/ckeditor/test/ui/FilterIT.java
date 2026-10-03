@@ -28,10 +28,13 @@ import org.openqa.selenium.Keys;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.text.StringUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests how CKEditor filters the content.
@@ -141,5 +144,26 @@ class FilterIT extends AbstractCKEditorIT
         this.textArea.sendKeys(Keys.ARROW_RIGHT, Keys.ARROW_RIGHT, Keys.BACK_SPACE);
 
         this.assertSourceEquals("1. (tes) test");
+    }
+
+    @Test
+    @Order(3)
+    void copyPasteText()
+    {
+        this.textArea.sendKeys("alpha beta gamma", Keys.ENTER, "delta");
+
+        // Copy the last two words of the first paragraph.
+        this.textArea.sendKeys(Keys.UP, Keys.END, Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.LEFT, Keys.LEFT));
+        assertEquals("beta gamma", this.textArea.getSelectedText());
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "c"));
+
+        // Paste them at the end of the second paragraph. The pasted content goes through the paste filter.
+        this.textArea.sendKeys(Keys.DOWN, Keys.END, " ", Keys.chord(Keys.CONTROL, "v"));
+
+        // The copied text is kept in place. The space typed at the end of the paragraph is a non-breaking space.
+        assertSourceEquals("alpha beta gamma\n\ndelta beta gamma", true);
+
+        ViewPage viewPage = new WYSIWYGEditPage().clickSaveAndView();
+        assertEquals("alpha beta gamma\ndelta beta gamma", viewPage.getContent());
     }
 }

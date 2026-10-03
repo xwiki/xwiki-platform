@@ -1234,6 +1234,30 @@ class ImageIT extends AbstractCKEditorIT
         }
     }
 
+    @Test
+    @Order(27)
+    void imageWithLinkInCaption(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        loginStandardUser(setup);
+        uploadAttachment(setup, testReference, "image.gif");
+
+        // Write the captioned image in Source mode, with a link inside the caption.
+        WYSIWYGEditPage editPage = edit(setup, testReference, false);
+        setSource("[[Powered by ~[~[XWiki~>~>https://www.xwiki.org~]~]>>image:image.gif]]");
+        this.textArea.waitUntilTextContains("Powered by XWiki");
+
+        // Modify the caption in-line, below the image.
+        this.textArea.click(By.cssSelector("figcaption"));
+        this.textArea.sendKeys(Keys.HOME, "Proudly ");
+        assertSourceEquals("[[Proudly Powered by ~[~[XWiki~>~>https://www.xwiki.org~]~]>>image:image.gif]]");
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertTrue(viewPage.contentContainsElement(By.cssSelector("figure img[src*='image.gif']")));
+        assertTrue(viewPage.contentContainsElement(By.cssSelector("figure figcaption a[href='https://www.xwiki.org']")));
+        assertEquals("Proudly Powered by XWiki", viewPage.getContent());
+    }
+
     /**
      * Initialize a page with some HTML content and then, copy its displayed content to the clipboard.
      *

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -32,6 +33,9 @@ import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -559,5 +563,107 @@ class InplaceEditIT
         // We should have an error message that the Velocity macro failed to execute.
         assertThat(inplaceEditablePage.getContent(), containsString(
             "Failed to execute the [velocity] macro."));
+    }
+
+    @Test
+    @Order(10)
+    void dropNonImageFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        RichTextAreaElement richTextArea = new CKEditor("content").getRichTextArea();
+        richTextArea.clear();
+        richTextArea.sendKeys("Attachment: ");
+
+        // Dropping a file that is not an image uploads it as an attachment and inserts a link to it.
+        richTextArea.dropFile("/notes.txt");
+        assertEquals("Attachment: notes.txt", richTextArea.getText());
+        // Move the caret out of the inserted link to hide its balloon tool bar, which can cover the action buttons.
+        richTextArea.sendKeys(Keys.HOME);
+        viewPage.saveAndView();
+
+        assertEquals("Attachment: notes.txt", viewPage.getContent());
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("notes.txt"));
+
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
+        assertEquals("Attachment: [[attach:notes.txt||target=\"_blank\"]]", wikiEditPage.getContent());
+        wikiEditPage.clickCancel();
+    }
+
+    @Test
+    @Order(11)
+    void liveMacroRendering(TestUtils setup, TestReference testReference)
+    {
+        // A child page, so that the Children macro has something to display.
+        setup.createPage(new DocumentReference("Child", testReference.getLastSpaceReference()), "", "Child Title");
+        setup.gotoPage(testReference);
+
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.clear();
+        richTextArea.sendKeys("children:");
+
+        // Insert the macro from the Insert menu. Its output is rendered as soon as the macro is inserted.
+        MacroDialogEditModal macroEditModal =
+            ckeditor.getToolBar().insertOtherMacro().filterByText("Children", 1).clickSelect();
+        macroEditModal.clickSubmit();
+        richTextArea.waitForContentRefresh();
+        richTextArea.waitUntilTextContains("Child Title");
+        assertEquals("children:\nChild Title", richTextArea.getText());
+
+        viewPage.cancel();
+    }
+
+    @Test
+    @Order(12)
+    void switchToSourcePreservesSelection(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String source = "first paragraph\n\n= The Heading Title =\n\n|=Name|=Value\n|alpha|beta gamma";
+        setup.createPage(testReference, source, "");
+
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+
+        // Collapsed selection (caret) inside a paragraph word.
+        richTextArea.click(By.tagName("p"));
+        richTextArea.sendKeys(Keys.HOME, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT);
+        ckeditor.getToolBar().toggleSourceMode();
+        WebElement sourceTextArea = ckeditor.getSourceTextArea();
+        assertEquals(source, sourceTextArea.getDomProperty("value"));
+        assertEquals("3", sourceTextArea.getDomProperty("selectionStart"));
+        assertEquals("3", sourceTextArea.getDomProperty("selectionEnd"));
+        ckeditor.getToolBar().toggleSourceMode();
+
+        // A word selected in a heading.
+        richTextArea.click(By.tagName("h1"));
+        richTextArea.sendKeys(Keys.HOME, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.chord(Keys.SHIFT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT,
+            Keys.RIGHT, Keys.RIGHT, Keys.RIGHT));
+        assertEquals("Heading", richTextArea.getSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("Heading", getSelectedSource(ckeditor.getSourceTextArea()));
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("Heading", richTextArea.getSelectedText());
+
+        // A word selected at the end of a table cell. We don't select the whole cell value because the selection is
+        // then moved to the previous cell when switching back from Source (XWIKI-23209: Switching to Source multiple
+        // times after selecting a cell value expands the selection to other cells).
+        richTextArea.click(By.cssSelector("tr:last-child > td:last-child"));
+        richTextArea.sendKeys(Keys.END, Keys.chord(Keys.SHIFT, Keys.LEFT, Keys.LEFT, Keys.LEFT, Keys.LEFT, Keys.LEFT));
+        assertEquals("gamma", richTextArea.getSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("gamma", getSelectedSource(ckeditor.getSourceTextArea()));
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("gamma", richTextArea.getSelectedText());
+
+        viewPage.cancel();
+    }
+
+    private String getSelectedSource(WebElement sourceTextArea)
+    {
+        int selectionStart = Integer.parseInt(sourceTextArea.getDomProperty("selectionStart"));
+        int selectionEnd = Integer.parseInt(sourceTextArea.getDomProperty("selectionEnd"));
+        return sourceTextArea.getDomProperty("value").substring(selectionStart, selectionEnd);
     }
 }

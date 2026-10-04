@@ -22,14 +22,18 @@ package org.xwiki.edit.test.ui;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -255,6 +259,92 @@ class InplaceTranslateIT
         alicePage.translateInplace().waitForEditedLocale("fr");
 
         assertOnlyTranslationToCreateIsLocked(setup, testReference, multiUserSetup, bobTab);
+    }
+
+    @Test
+    @Order(3)
+    void translateFromInformationTab(TestUtils setup, TestReference testReference)
+    {
+        // Translate both a non-terminal page and a terminal page.
+        updateAndTranslateFromInformationTab(setup, testReference);
+        DocumentReference terminalPageReference =
+            new DocumentReference("Terminal", testReference.getLastSpaceReference(), Locale.ENGLISH);
+        setup.createPage(terminalPageReference, "content EN", "title EN");
+        updateAndTranslateFromInformationTab(setup, terminalPageReference);
+    }
+
+    private void updateAndTranslateFromInformationTab(TestUtils setup, DocumentReference reference)
+    {
+        // Update the original translation (English).
+        setup.gotoPage(reference, "view", "language=en");
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        viewPage.setDocumentTitle("English title");
+        setContent("English content");
+        viewPage.saveAndView();
+        assertEquals("English title", viewPage.getDocumentTitle());
+        assertEquals("English content", viewPage.getContent());
+
+        // Create the French translation from the Information tab.
+        viewPage.openInformationDocExtraPane().clickTranslationLink("French");
+        viewPage = new InplaceEditablePage().waitForInplaceEditor();
+        viewPage.setDocumentTitle("Titre français");
+        setContent("Contenu français");
+        viewPage.saveAndView("Enregistré");
+        assertEquals("Titre français", viewPage.getDocumentTitle());
+        assertEquals("Contenu français", viewPage.getContent());
+
+        assertLanguageSwitch(viewPage, "English title", "English content");
+    }
+
+    @Test
+    @Order(4)
+    void translateWithFrenchUI(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The French translations of these hints may be missing, in which case the English ones are used.
+        Map<String, String> frenchUI = Map.of("outputSyntax", "plain", "language", "fr");
+        String expectedTranslateHint = setup.executeWiki("{{velocity}}$services.localization.render("
+            + "'core.menu.translate.hint', [$xcontext.locale.getDisplayName($xcontext.locale)]){{/velocity}}",
+            Syntax.XWIKI_2_1, frenchUI);
+        String expectedTitleHint = setup.executeWiki("{{velocity}}$services.localization.render("
+            + "'edit.inplace.page.translate.messageAfter', [$xcontext.locale.getDisplayName($xcontext.locale)])"
+            + "{{/velocity}}", Syntax.XWIKI_2_1, frenchUI);
+
+        // The page has no French translation yet, so the French user interface offers to translate it.
+        setup.gotoPage(testReference, "view", "language=fr");
+        InplaceEditablePage viewPage = new InplaceEditablePage();
+        assertEquals(expectedTranslateHint, viewPage.getTranslateButtonHint());
+
+        viewPage.translateInplace();
+        assertEquals(expectedTitleHint, viewPage.getDocumentTitleHint());
+        viewPage.setDocumentTitle("Titre français");
+        setContent("Contenu français");
+        viewPage.saveAndView("Enregistré");
+        assertEquals("Titre français", viewPage.getDocumentTitle());
+        assertEquals("Contenu français", viewPage.getContent());
+
+        assertLanguageSwitch(viewPage, "title EN", "content EN");
+    }
+
+    private void setContent(String content)
+    {
+        RichTextAreaElement richTextArea = new CKEditor("content").getRichTextArea();
+        richTextArea.clear();
+        richTextArea.sendKeys(content);
+    }
+
+    /**
+     * Switches between the original (English) and the French translations of the current page using the Languages
+     * menu of the drawer, and checks that each translation shows its own title and content.
+     */
+    private void assertLanguageSwitch(InplaceEditablePage frenchPage, String englishTitle, String englishContent)
+    {
+        InplaceEditablePage englishPage = frenchPage.switchToLocale(Locale.ENGLISH);
+        assertEquals(englishTitle, englishPage.getDocumentTitle());
+        assertEquals(englishContent, englishPage.getContent());
+
+        frenchPage = englishPage.switchToLocale(Locale.FRENCH);
+        assertEquals("Titre français", frenchPage.getDocumentTitle());
+        assertEquals("Contenu français", frenchPage.getContent());
     }
 
     /**

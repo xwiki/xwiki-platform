@@ -136,6 +136,19 @@ public class CKEditorToolBar extends BaseElement
     }
 
     /**
+     * Open the office importer modal using the Insert menu. The office server must be connected, otherwise the menu
+     * entry is disabled.
+     *
+     * @return the page object for the office importer modal
+     * @since 18.9.0RC1
+     */
+    public OfficeImporterDialog importOfficeFile()
+    {
+        clickInsertMenuItem("officeImporter");
+        return new OfficeImporterDialog();
+    }
+
+    /**
      * Open the special character dialog using the Insert menu.
      *
      * @return the page object for the special character dialog

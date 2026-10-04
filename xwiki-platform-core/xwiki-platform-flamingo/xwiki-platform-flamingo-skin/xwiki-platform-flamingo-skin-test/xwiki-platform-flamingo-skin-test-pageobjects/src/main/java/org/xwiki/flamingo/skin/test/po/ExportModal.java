@@ -19,6 +19,8 @@
  */
 package org.xwiki.flamingo.skin.test.po;
 
+import java.net.URI;
+
 import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.BaseModal;
 import org.xwiki.test.ui.po.ViewPage;
@@ -80,5 +82,22 @@ public class ExportModal extends BaseModal
     public void exportAs(String format)
     {
         getExportFormatSelect().selectByLabel(format);
+    }
+
+    /**
+     * Selecting a single page export format (e.g. ODT) makes the browser download the export, which tests can't read.
+     * This method returns the URL that the browser would be sent to, so that tests can fetch the export themselves.
+     *
+     * @param format the label of the export format (e.g. "ODT"), which must be listed (i.e. enabled)
+     * @return the absolute URL of the export of the current page in the given format
+     * @since 18.9.0RC1
+     */
+    public String getExportURL(String format)
+    {
+        String exportURL = this.container
+            .findElement(By.xpath(".//li[contains(@class, 'xwiki-select-option')][.//label[. = '" + format
+                + "']]//input[@name = 'exportFormat']"))
+            .getAttribute("data-url");
+        return URI.create(getDriver().getCurrentUrl()).resolve(exportURL).toString();
     }
 }

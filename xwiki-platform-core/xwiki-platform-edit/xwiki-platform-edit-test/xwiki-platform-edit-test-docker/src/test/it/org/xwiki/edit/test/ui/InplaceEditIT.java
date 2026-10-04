@@ -31,6 +31,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -534,5 +537,102 @@ class InplaceEditIT
         // We should have an error message that the Velocity macro failed to execute.
         assertThat(inplaceEditablePage.getContent(), containsString(
             "Failed to execute the [velocity] macro."));
+    }
+
+    @Test
+    @Order(10)
+    void dropNonImageFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        RichTextAreaElement richTextArea = new CKEditor("content").getRichTextArea();
+        richTextArea.clear();
+        richTextArea.sendKeys("Attachment: ");
+
+        // Dropping a file that is not an image uploads it as an attachment and inserts a link to it.
+        richTextArea.dropFile("/notes.txt");
+        assertEquals("Attachment: notes.txt", richTextArea.getText());
+        // Move the caret out of the inserted link to hide its balloon tool bar, which can cover the action buttons.
+        richTextArea.sendKeys(Keys.HOME);
+        viewPage.saveAndView();
+
+        assertEquals("Attachment: notes.txt", viewPage.getContent());
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("notes.txt"));
+
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
+        assertEquals("Attachment: [[attach:notes.txt||target=\"_blank\"]]", wikiEditPage.getContent());
+        wikiEditPage.clickCancel();
+    }
+
+    @Test
+    @Order(11)
+    void liveMacroRendering(TestUtils setup, TestReference testReference)
+    {
+        // A child page, so that the Children macro has something to display.
+        setup.createPage(new DocumentReference("Child", testReference.getLastSpaceReference()), "", "Child Title");
+        setup.gotoPage(testReference);
+
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.clear();
+        richTextArea.sendKeys("children:");
+
+        // Insert the macro from the Insert menu. Its output is rendered as soon as the macro is inserted.
+        MacroDialogEditModal macroEditModal =
+            ckeditor.getToolBar().insertOtherMacro().filterByText("Children", 1).clickSelect();
+        macroEditModal.clickSubmit();
+        richTextArea.waitUntilTextContains("Child Title");
+        assertEquals("children:\nChild Title", richTextArea.getText());
+
+        viewPage.cancel();
+    }
+
+    @Test
+    @Order(12)
+    void switchToSourcePreservesSelection(TestUtils setup, TestReference testReference)
+    {
+        String source = "first paragraph\n\n= The Heading Title =\n\n|=Name|=Value\n|alpha|beta gamma";
+        setup.createPage(testReference, source, "");
+
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+
+        // Collapsed selection (caret) inside a paragraph word, at the start of the content.
+        // Firefox keeps the Control key pressed until the end of the sendKeys call, so we send the shortcut alone.
+        richTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.HOME));
+        richTextArea.sendKeys(Keys.RIGHT, Keys.RIGHT, Keys.RIGHT);
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals(source, ckeditor.getSource());
+        assertEquals(3, ckeditor.getSourceSelectionStart());
+        assertEquals(3, ckeditor.getSourceSelectionEnd());
+        ckeditor.getToolBar().toggleSourceMode();
+
+        // A word selected in the heading, on the line below the paragraph.
+        richTextArea.sendKeys(Keys.DOWN, Keys.HOME, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT,
+            Keys.chord(Keys.SHIFT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT));
+        assertEquals("Heading", richTextArea.getSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("Heading", ckeditor.getSourceSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("Heading", richTextArea.getSelectedText());
+
+        // A word selected at the end of the last table cell, i.e. at the end of the content. We don't select the whole
+        // cell value because the selection is then moved to the previous cell when switching back from Source
+        // (XWIKI-23209: Switching to Source multiple times after selecting a cell value expands the selection to other
+        // cells).
+        // Control+End moves the caret after the table. Left moves it inside the last table cell but also before its
+        // last character, so we move it back to the end of the cell value before selecting.
+        richTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.END));
+        richTextArea.sendKeys(Keys.LEFT, Keys.RIGHT,
+            Keys.chord(Keys.SHIFT, Keys.LEFT, Keys.LEFT, Keys.LEFT, Keys.LEFT, Keys.LEFT));
+        assertEquals("gamma", richTextArea.getSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("gamma", ckeditor.getSourceSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("gamma", richTextArea.getSelectedText());
+
+        viewPage.cancel();
     }
 }

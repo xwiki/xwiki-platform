@@ -19,6 +19,7 @@
  */
 package org.xwiki.panels.test.po;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.openqa.selenium.By;
@@ -94,7 +95,21 @@ public class PageWithPanels extends BasePage
             By.xpath("//div[@id = 'leftPanels']/div[contains(@class, '"+panelName+"')]"));
     }
     
-    public boolean panelIsToggled(Column panelSide) 
+    /**
+     * @param panelSide the column to look into
+     * @return the titles of the panels displayed in the given column, in the order in which they are displayed
+     * @since 18.9.0RC1
+     */
+    public List<String> getPanelTitles(Column panelSide)
+    {
+        String columnId = Objects.equals(panelSide, Column.RIGHT) ? "rightPanels" : "leftPanels";
+        // Use the text content because the title of some panels (e.g. Navigation) can be hidden.
+        return getDriver()
+            .findElementsWithoutWaiting(By.cssSelector(String.format("#%s > .panel .xwikipaneltitle", columnId)))
+            .stream().map(title -> title.getDomProperty("textContent").trim()).toList();
+    }
+
+    public boolean panelIsToggled(Column panelSide)
     {
         WebElement panelToggle = (Objects.equals(panelSide, Column.RIGHT)) ? rightPanelsToggle : leftPanelsToggle;
         return Objects.equals(panelToggle.getDomAttribute("aria-expanded"), "true") 

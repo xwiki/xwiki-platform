@@ -69,7 +69,7 @@ public class NavigationPanel extends ViewPage
 
     public NavigationTreeElement getNavigationTree()
     {
-        String panelContainer = "Panels.Navigation".equals(getMetaDataValue("data-xwiki-document")) ? "#xwikicontent"
+        String panelContainer = "Panels.Navigation".equals(getMetaDataValue("document")) ? "#xwikicontent"
             : this.columnSelector;
         return (NavigationTreeElement) new NavigationTreeElement(
             getDriver().findElementWithoutWaiting(By.cssSelector(panelContainer + " .panel.Navigation .xtree")))

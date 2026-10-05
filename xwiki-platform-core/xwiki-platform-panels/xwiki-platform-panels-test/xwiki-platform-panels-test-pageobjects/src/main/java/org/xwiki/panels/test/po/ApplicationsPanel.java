@@ -73,4 +73,31 @@ public class ApplicationsPanel extends ViewPage
 
         return applications;
     }
+
+    /**
+     * Expands the "More applications" list of the panel, so that its entries (e.g. the AppWithinMinutes "Create your
+     * own!" entry) can be clicked.
+     *
+     * @return this panel
+     * @since 18.9.0RC1
+     */
+    public ApplicationsPanel clickMoreApplications()
+    {
+        WebElement moreButton = getDriver().findElementWithoutWaiting(By.className("applicationPanelMoreButton"));
+        moreButton.click();
+        getDriver().waitUntilCondition(driver -> "true".equals(moreButton.getDomAttribute("aria-expanded")));
+        return this;
+    }
+
+    /**
+     * @param applicationName the label of the application entry
+     * @return the HTML of the icon displayed for the specified application entry
+     * @since 18.9.0RC1
+     */
+    public String getApplicationIcon(String applicationName)
+    {
+        return getDriver().findElementWithoutWaiting(By.xpath("//a[span[@class=\"application-label\" and "
+            + "contains(text(), '" + applicationName + "')]]/span[@class=\"application-img\"]"))
+            .getDomProperty("innerHTML").trim();
+    }
 }

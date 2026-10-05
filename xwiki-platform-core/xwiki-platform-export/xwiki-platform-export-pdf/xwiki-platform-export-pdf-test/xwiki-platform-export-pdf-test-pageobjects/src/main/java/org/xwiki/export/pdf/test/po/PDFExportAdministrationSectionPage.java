@@ -67,6 +67,9 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_pageReadyTimeout")
     private WebElement pageReadyTimeoutInput;
 
+    @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_replaceFOP")
+    private WebElement replaceFOPSelect;
+
     @FindBy(linkText = "Reset")
     private WebElement resetButton;
 
@@ -237,6 +240,18 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     {
         this.pageReadyTimeoutInput.clear();
         this.pageReadyTimeoutInput.sendKeys(value);
+    }
+
+    /**
+     * Sets whether the new PDF export replaces the old PDF export based on Apache Formatting Objects Processor (FOP).
+     *
+     * @param replaceFOP {@code true} to hide the old (FOP) PDF export, {@code false} to make it available next to the
+     *            new PDF export
+     * @since 18.9.0RC1
+     */
+    public void setReplaceFOP(boolean replaceFOP)
+    {
+        new Select(this.replaceFOPSelect).selectByValue(replaceFOP ? "1" : "0");
     }
 
     /**

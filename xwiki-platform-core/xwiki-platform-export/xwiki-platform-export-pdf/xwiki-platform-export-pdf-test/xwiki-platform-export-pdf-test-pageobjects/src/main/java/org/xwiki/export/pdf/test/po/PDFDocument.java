@@ -119,7 +119,23 @@ public class PDFDocument implements AutoCloseable
      */
     public static PDFDocument post(URL url) throws IOException
     {
-        return new PDFDocument(openConnection(url, "POST"), null, null);
+        return post(url, null, null);
+    }
+
+    /**
+     * Fetches and parses a PDF document by submitting a POST request to the given URL, as the given user. Some
+     * actions, such as the export action, perform their job only on POST requests.
+     *
+     * @param url where to fetch the PDF document from
+     * @param userName the user name used to access the PDF document
+     * @param password the password used to access the PDF document
+     * @return the fetched PDF document
+     * @throws IOException if fetching and parsing the PDF document fails
+     * @since 18.9.0RC1
+     */
+    public static PDFDocument post(URL url, String userName, String password) throws IOException
+    {
+        return new PDFDocument(openConnection(url, "POST"), userName, password);
     }
 
     private static URLConnection openConnection(URL url, String httpMethod) throws IOException

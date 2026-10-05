@@ -19,6 +19,11 @@
  */
 package org.xwiki.export.pdf.test.ui;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import javax.imageio.ImageIO;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -38,11 +45,14 @@ import org.testcontainers.containers.Network;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
+import org.xwiki.export.pdf.test.po.FOPExportOptionsPage;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportAdministrationSectionPage;
 import org.xwiki.export.pdf.test.po.PDFExportOptionsModal;
 import org.xwiki.export.pdf.test.po.PDFImage;
+import org.xwiki.export.pdf.test.po.PDFPrintPreview;
 import org.xwiki.export.pdf.test.po.PDFTemplateEditPage;
+import org.xwiki.flamingo.skin.test.po.ExportModal;
 import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
@@ -55,10 +65,12 @@ import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.XWikiSelectWidget;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -1303,15 +1315,8 @@ class PDFExportIT
     @Order(24)
     void officeMacro(TestUtils setup) throws Exception
     {
-        // Connect the wiki to the office server if it is not already done.
         setup.loginAsSuperAdmin();
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
-        administrationPage.clickSection("Content", "Office Server");
-        OfficeServerAdministrationSectionPage officeServerAdministrationSectionPage =
-            new OfficeServerAdministrationSectionPage();
-        if (!"Connected".equals(officeServerAdministrationSectionPage.getServerState())) {
-            officeServerAdministrationSectionPage.startServer();
-        }
+        connectToOfficeServer();
 
         setup.login("John", "pass");
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "OfficeMacro"));
@@ -1804,6 +1809,154 @@ class PDFExportIT
             assertTrue(contentWithoutWhitespace.contains(/* Title */ "Child" + /* Location */ childLocation),
                 "Unexpected content: " + content);
         }
+    }
+
+    /**
+     * Verify the old PDF export, based on Apache Formatting Objects Processor (FOP), when the new PDF export is
+     * configured to not replace it: first with all its options enabled, then with all of them disabled.
+     */
+    @Test
+    @Order(38)
+    void oldFOPExportWithOptions(TestUtils setup, TestReference testReference,
+        LogCaptureConfiguration logCaptureConfiguration) throws Exception
+    {
+        setup.login("John", "pass");
+        setup.createPage(testReference, "= Introduction =\n\nContent exported with the old PDF export.",
+            "Old PDF Export");
+        setup.addObject(testReference, "XWiki.XWikiComments", "author", "XWiki.John", "comment",
+            "A comment to export.");
+        // The image is attached but not displayed by the page content, so it's in the PDF only when the attached
+        // images are included.
+        setup.attachFile(testReference, "image.png", createImage(80, 40), true);
+
+        // The old PDF export is not available by default, because the new PDF export replaces it.
+        ViewPage viewPage = setup.gotoPage(testReference);
+        XWikiSelectWidget exportFormats = ExportModal.open(viewPage).getExportFormatSelect();
+        assertTrue(exportFormats.hasOptionWithLabel("PDF"));
+        assertFalse(exportFormats.hasOptionWithLabel("PDF (FOP)"));
+
+        setup.loginAsSuperAdmin();
+        PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
+        adminSection.setReplaceFOP(false);
+        adminSection.clickSave();
+
+        try {
+            setup.login("John", "pass");
+            viewPage = setup.gotoPage(testReference);
+            ExportModal.open(viewPage).exportAs("PDF (FOP)");
+            FOPExportOptionsPage exportOptions = new FOPExportOptionsPage().setCover(true).setTableOfContents(true)
+                .setHeader(true).setFooter(true).setComments(true).setAttachments(true);
+
+            try (PDFDocument pdf = exportOptions.export("John", "pass")) {
+                // We should have 3 pages: cover page, table of contents and one content page.
+                assertEquals(3, pdf.getNumberOfPages(), "Unexpected PDF text: " + pdf.getText());
+
+                String coverPageText = pdf.getTextFromPage(0);
+                assertTrue(coverPageText.contains("Old PDF Export"), "Unexpected cover page: " + coverPageText);
+                assertTrue(coverPageText.contains("last modified by John"), "Unexpected cover page: " + coverPageText);
+
+                String tocPageText = pdf.getTextFromPage(1);
+                assertTrue(tocPageText.contains("Table of Contents"), "Unexpected table of contents: " + tocPageText);
+                assertTrue(tocPageText.contains("Introduction"), "Unexpected table of contents: " + tocPageText);
+
+                String contentPageText = pdf.getTextFromPage(2);
+                // Header.
+                assertTrue(contentPageText.contains("Old PDF Export"), "Unexpected content page: " + contentPageText);
+                // Footer.
+                assertTrue(contentPageText.contains("Page 3 / 3 - last modified by John"),
+                    "Unexpected content page: " + contentPageText);
+                assertTrue(contentPageText.contains("Content exported with the old PDF export."),
+                    "Unexpected content page: " + contentPageText);
+                // Comments: the comments template shows their number and first author, while their content is in
+                // a collapsed section (only expanded when the showcomments preference is "open").
+                assertTrue(contentPageText.contains("Comments: 1 Comments by John"),
+                    "Unexpected content page: " + contentPageText);
+                // Attached images.
+                List<PDFImage> images = pdf.getImagesFromPage(2);
+                assertEquals(1, images.size());
+                assertEquals(80, images.get(0).getRawWidth());
+                assertEquals(40, images.get(0).getRawHeight());
+            }
+
+            exportOptions.setCover(false).setTableOfContents(false).setHeader(false).setFooter(false)
+                .setComments(false).setAttachments(false);
+
+            try (PDFDocument pdf = exportOptions.export("John", "pass")) {
+                // Only the content page is left.
+                assertEquals(1, pdf.getNumberOfPages(), "Unexpected PDF text: " + pdf.getText());
+                String text = pdf.getText();
+                assertTrue(text.contains("Content exported with the old PDF export."), "Unexpected text: " + text);
+                assertFalse(text.contains("Table of Contents"), "Unexpected text: " + text);
+                assertFalse(text.contains("last modified by"), "Unexpected text: " + text);
+                assertFalse(text.contains("Comments:"), "Unexpected text: " + text);
+                assertEquals(0, pdf.getImages().size());
+            }
+            // The comments template, used when the comments are included, calls a deprecated method.
+            logCaptureConfiguration.registerExpected("Deprecated usage of method "
+                + "[com.xpn.xwiki.api.Document.getRenderedContent] in environment:/templates/comments2.vm");
+        } finally {
+            setup.loginAsSuperAdmin();
+            adminSection = PDFExportAdministrationSectionPage.gotoPage();
+            adminSection.setReplaceFOP(true);
+            adminSection.clickSave();
+        }
+    }
+
+    /**
+     * Verify the PDF export when the PDF is generated client-side, by the user's web browser, for a page displaying
+     * office content.
+     */
+    @Test
+    @Order(39)
+    void exportInUserBrowser(TestUtils setup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        connectToOfficeServer();
+        PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
+        adminSection.getGeneratorSelect().selectByVisibleText("User Browser");
+        adminSection.clickSave();
+
+        try {
+            setup.login("John", "pass");
+            ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "OfficeMacro"));
+            PDFPrintPreview printPreview = PDFExportOptionsModal.open(viewPage).exportInUserBrowser();
+
+            // We should have 3 print pages: cover page, table of contents and one content page.
+            assertEquals(3, printPreview.getNumberOfPages());
+            String coverPageText = printPreview.getTextFromPage(0);
+            assertTrue(coverPageText.startsWith("OfficeMacro"), "Unexpected cover page: " + coverPageText);
+            String tocPageText = printPreview.getTextFromPage(1);
+            assertTrue(tocPageText.startsWith("Table of Contents"), "Unexpected table of contents: " + tocPageText);
+            String contentPageText = printPreview.getTextFromPage(2);
+            assertTrue(contentPageText.contains("This is a word with image"),
+                "Unexpected content page: " + contentPageText);
+            // The presentation slide and the image from the word document.
+            assertEquals(2, printPreview.getImageCountFromPage(2));
+        } finally {
+            setup.loginAsSuperAdmin();
+            adminSection = PDFExportAdministrationSectionPage.gotoPage();
+            adminSection.getGeneratorSelect().selectByVisibleText("Chrome Docker Container");
+            adminSection.clickSave();
+        }
+    }
+
+    private void connectToOfficeServer()
+    {
+        // Connect the wiki to the office server if it is not already done.
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        administrationPage.clickSection("Content", "Office Server");
+        OfficeServerAdministrationSectionPage officeServerAdministrationSectionPage =
+            new OfficeServerAdministrationSectionPage();
+        if (!"Connected".equals(officeServerAdministrationSectionPage.getServerState())) {
+            officeServerAdministrationSectionPage.startServer();
+        }
+    }
+
+    private InputStream createImage(int width, int height) throws IOException
+    {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ImageIO.write(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB), "png", output);
+        return new ByteArrayInputStream(output.toByteArray());
     }
 
     private void markPageReady(TestUtils setup)

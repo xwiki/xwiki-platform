@@ -70,6 +70,15 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class ExportAction extends XWikiAction
 {
+    private static final String EXCEPTION = "exception";
+
+    private static final String HTTP_METHOD_POST = "POST";
+
+    /**
+     * Not taken from a servlet API constant, so that this stays identical on the branches where oldcore has only the
+     * javax namespace and on those where it has only the jakarta one.
+     */
+    private static final int STATUS_METHOD_NOT_ALLOWED = 405;
     /**
      * Template listing the parameters of an export that was requested with a method the action doesn't export on, and
      * offering to submit that same export again with a POST request.
@@ -86,6 +95,7 @@ public class ExportAction extends XWikiAction
             String format = request.get("format");
 
             if (!validateExportRequest(request)) {
+                refuseExportRequest(context);
                 return RESUBMIT_TEMPLATE;
             } else if (format == null || "xar".equals(format)) {
                 defaultPage = exportXAR(context);
@@ -117,7 +127,24 @@ public class ExportAction extends XWikiAction
         // export print preview), and an unintended backup XAR export is very expensive. Requiring POST means an export
         // can only be started by submitting one of the export forms. Requests that are refused here get the
         // RESUBMIT_TEMPLATE, from which the user can start the same export again with a POST request.
-        return "POST".equalsIgnoreCase(request.getMethod());
+        return HTTP_METHOD_POST.equalsIgnoreCase(request.getMethod());
+    }
+
+    /**
+     * Describes on the response why the export was not performed. These headers belong to the refused export request
+     * rather than to {@link #RESUBMIT_TEMPLATE}, which is plain markup and is also rendered on its own, through
+     * actions for which they would be wrong.
+     *
+     * @param context the context carrying the response to describe the refusal on
+     */
+    private void refuseExportRequest(XWikiContext context)
+    {
+        XWikiResponse response = context.getResponse();
+        response.setStatus(STATUS_METHOD_NOT_ALLOWED);
+        response.addHeader("Allow", HTTP_METHOD_POST);
+        // Submitting the resubmission form starts an operation that can consume a lot of resources, so the page must
+        // not be displayed in an IFRAME, where the user could be tricked into submitting it.
+        response.addHeader("X-FRAME-OPTIONS", "DENY");
     }
 
     /**

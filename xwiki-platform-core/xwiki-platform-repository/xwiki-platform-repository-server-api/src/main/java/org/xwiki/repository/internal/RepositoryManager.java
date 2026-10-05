@@ -1044,9 +1044,7 @@ public class RepositoryManager
             extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
         if (versionObjects != null) {
             for (BaseObject versionObject : versionObjects) {
-                if (versionObject != null) {
-                    moveLegacyVersion(extensionDocument, versionObject);
-
+                if (versionObject != null && moveLegacyVersion(extensionDocument, versionObject)) {
                     migratedVersions
                         .add(this.extensionStore.getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_VERSION));
                 }
@@ -2020,21 +2018,27 @@ public class RepositoryManager
             .anyMatch(version -> version.getValue().equals(extensionVersion));
     }
 
-    private void moveLegacyVersion(XWikiDocument extensionDocument, BaseObject versionObject) throws XWikiException
+    private boolean moveLegacyVersion(XWikiDocument extensionDocument, BaseObject versionObject) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
         // Resolve the version
         String version = versionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
 
-        // Resolve the version document
-        XWikiDocument extensionVersionDocument = this.extensionStore
-            .getExtensionVersionDocument(extensionDocument, new DefaultVersion(version), xcontext).clone();
+        if (StringUtils.isNotBlank(version)) {
+            // Resolve the version document
+            XWikiDocument extensionVersionDocument = this.extensionStore
+                .getExtensionVersionDocument(extensionDocument, new DefaultVersion(version), xcontext).clone();
 
-        extensionVersionDocument.addXObject(versionObject.clone());
+            extensionVersionDocument.addXObject(versionObject.clone());
 
-        // Save if dedicated version page
-        saveDocument(extensionVersionDocument, "Migrate the extension version", xcontext);
+            // Save if dedicated version page
+            saveDocument(extensionVersionDocument, "Migrate the extension version", xcontext);
+
+            return true;
+        }
+
+        return false;
     }
 
     private boolean updateExtensionVersion(Extension extensionVersion, XWikiDocument projectVersionDocument, long index,

@@ -38,7 +38,7 @@
     <xwiki.extension.name>Extension Repository Server</xwiki.extension.name>
     <!-- Needs to be installed on root to be available via REST -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
-    <xwiki.jacoco.instructionRatio>0.06</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.10</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

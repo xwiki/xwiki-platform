@@ -20,26 +20,33 @@
 package org.xwiki.user.test.ui;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
 import org.xwiki.user.test.po.GroupsUserProfilePage;
 import org.xwiki.user.test.po.PreferencesEditPage;
 import org.xwiki.user.test.po.PreferencesUserProfilePage;
 import org.xwiki.user.test.po.ProfileEditPage;
 import org.xwiki.user.test.po.ProfileUserProfilePage;
+import org.xwiki.user.test.po.UserInactivePage;
 import org.xwiki.user.test.po.UserProfileAdministrationSectionPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -78,6 +85,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UserProfileIT
 {
     private static final String IMAGE_NAME = "avatar.png";
+
+    /**
+     * The name sorts before {@link #IMAGE_NAME} on purpose: after an upload, the attachment picker selects the most
+     * recent attachment rather than the uploaded one, and attachment dates have a precision of one second. When both
+     * images are uploaded within the same second the tie is resolved by file name, so this name makes the second
+     * upload the selected one. See XWIKI-25240: Uploading a file in the attachment picker can select another
+     * attachment when both have the same upload second.
+     */
+    private static final String OTHER_IMAGE_NAME = "another-avatar.png";
 
     private static final String USER_FIRST_NAME = "User";
 
@@ -118,6 +134,21 @@ class UserProfileIT
     private static final String CUSTOM_PROPERTY_PRETTY_NAME = "Facebook";
 
     private static final String CUSTOM_PROPERTY_VALUE = "MyFacebookProfile";
+
+    private static final String ACCOUNT_DISABLED_MESSAGE =
+        "Your account has been disabled. Please contact the administrator if you think this is a mistake.";
+
+    private static final String GROUPS_CLASS = "XWiki.XWikiGroups";
+
+    private static final String GROUP_COLUMN = "Group";
+
+    /**
+     * The Page Index, the User Index and the Application Index, which are listed in the drawer, with their titles.
+     */
+    private static final Map<DocumentReference, String> INDEX_PAGES = Map.of(
+        new DocumentReference("xwiki", "Main", "AllDocs"), "Pages on this Wiki",
+        new DocumentReference("xwiki", "Main", "UserDirectory"), "User Index",
+        new DocumentReference("xwiki", "Applications", "WebHome"), "Application Index");
 
     private String userName;
 
@@ -193,6 +224,15 @@ class UserProfileIT
         // before reading it, to avoid a stale element reference while the page is still reloading.
         userProfilePage.waitUntilAvatarImageName(IMAGE_NAME);
         assertEquals(IMAGE_NAME, userProfilePage.getAvatarImageName());
+
+        // Select another image: it replaces the first one as the avatar.
+        userProfilePage = new ProfileUserProfilePage(this.userName);
+        changeAvatarImage = userProfilePage.changeAvatarImage();
+        imageFile = new File(testConfiguration.getBrowser().getTestResourcesPath(), OTHER_IMAGE_NAME);
+        changeAvatarImage.setAvatarImage(imageFile.getAbsolutePath());
+        changeAvatarImage.submit();
+        userProfilePage.waitUntilAvatarImageName(OTHER_IMAGE_NAME);
+        assertEquals(OTHER_IMAGE_NAME, ProfileUserProfilePage.gotoPage(this.userName).getAvatarImageName());
     }
 
     /** Functionality check: changing the user type. */
@@ -298,20 +338,6 @@ class UserProfileIT
 
     @Test
     @Order(7)
-    void verifyGroupTab(TestUtils setup)
-    {
-        GroupsUserProfilePage preferencesPage = GroupsUserProfilePage.gotoPage(this.userName);
-
-        assertEquals("Groups", preferencesPage.getPreferencesTitle());
-        TableLayoutElement tableLayout = preferencesPage.getGroupsPaneLiveData().getTableLayout();
-
-        assertEquals(1, tableLayout.countRows());
-        tableLayout.assertCellWithLink("Group", "XWikiAllGroup",
-            setup.getURL(new DocumentReference("xwiki", "XWiki", "XWikiAllGroup")));
-    }
-
-    @Test
-    @Order(8)
     void toggleEnableDisable(TestUtils setup)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
@@ -346,7 +372,7 @@ class UserProfileIT
     }
 
     @Test
-    @Order(9)
+    @Order(8)
     void disabledUserTest(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
@@ -362,10 +388,31 @@ class UserProfileIT
             assertEquals("Unexpected code [401], was expecting one of [[201, 202]]", e.getMessage());
             gotException = true;
         }
+        // The disabled user gets a notice instead of the content of the pages listed in the drawer.
+        for (DocumentReference indexPage : INDEX_PAGES.keySet()) {
+            setup.gotoPage(indexPage);
+            assertEquals(ACCOUNT_DISABLED_MESSAGE, new UserInactivePage().getMessage());
+        }
+
         setup.loginAsSuperAdmin();
         ViewPage viewPage = setup.gotoPage(testReference);
         assertFalse(viewPage.exists());
         assertTrue(gotException);
+
+        // Once enabled again, the user is logged in and sees the content of these pages instead of the notice, and
+        // can edit a page.
+        ProfileUserProfilePage.gotoPage(this.userName).clickEnable();
+        setup.login(this.userName, DEFAULT_PASSWORD);
+        for (Map.Entry<DocumentReference, String> indexPage : INDEX_PAGES.entrySet()) {
+            viewPage = setup.gotoPage(indexPage.getKey());
+            assertEquals(indexPage.getValue(), viewPage.getDocumentTitle());
+            assertFalse(UserInactivePage.isDisplayed(),
+                indexPage.getKey() + " still shows the account disabled notice");
+            assertEquals(this.userName, viewPage.getCurrentUser());
+        }
+        WikiEditPage editPage = WikiEditPage.gotoPage(testReference);
+        editPage.setContent("Edited after the account was enabled again");
+        assertEquals("Edited after the account was enabled again", editPage.clickSaveAndView().getContent());
     }
 
     /**
@@ -373,7 +420,7 @@ class UserProfileIT
      * when viewing a user's profile.
      */
     @Test
-    @Order(10)
+    @Order(9)
     void extendUserProfile(TestUtils setup)
     {
         // Admin rights are required both to extend the XWikiUsers class and to configure the profile section.
@@ -403,5 +450,45 @@ class UserProfileIT
         // Step 4 (expected result): the new field is displayed when viewing the user's profile.
         userProfilePage = new ProfileUserProfilePage(this.userName);
         assertEquals(CUSTOM_PROPERTY_VALUE, userProfilePage.getUserCustomProperty(CUSTOM_PROPERTY_PRETTY_NAME));
+    }
+
+    /**
+     * The Groups tab of the profile of a global user lists the groups of the main wiki and of the subwikis that the
+     * user belongs to, directly or through another group.
+     */
+    @ParameterizedTest
+    @WikisSource(mainWiki = false)
+    @Order(10)
+    void groupMembershipIncludesSubwikiGroups(WikiReference subwiki, TestUtils setup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        String userReference = "XWiki." + this.userName;
+        DocumentReference firstGroup = new DocumentReference("xwiki", "XWiki", this.userName + "FirstGroup");
+        DocumentReference secondGroup = new DocumentReference("xwiki", "XWiki", this.userName + "SecondGroup");
+        DocumentReference parentGroup = new DocumentReference("xwiki", "XWiki", this.userName + "ParentGroup");
+        DocumentReference subwikiGroup =
+            new DocumentReference(subwiki.getName(), "XWiki", this.userName + "SubwikiGroup");
+        setup.rest().addObject(firstGroup, GROUPS_CLASS, "member", userReference);
+        setup.rest().addObject(secondGroup, GROUPS_CLASS, "member", userReference);
+        setup.rest().addObject(parentGroup, GROUPS_CLASS, "member", "XWiki." + firstGroup.getName());
+        setup.rest().addObject(subwikiGroup, GROUPS_CLASS, "member", "xwiki:" + userReference);
+
+        List<DocumentReference> expectedGroups = List.of(new DocumentReference("xwiki", "XWiki", "XWikiAllGroup"),
+            firstGroup, secondGroup, parentGroup, subwikiGroup);
+        // Both an administrator and the user see all the groups of the user.
+        assertGroups(expectedGroups, setup);
+        setup.login(this.userName, DEFAULT_PASSWORD);
+        assertGroups(expectedGroups, setup);
+    }
+
+    private void assertGroups(List<DocumentReference> expectedGroups, TestUtils setup)
+    {
+        GroupsUserProfilePage groupsPage = GroupsUserProfilePage.gotoPage(this.userName);
+        assertEquals("Groups", groupsPage.getPreferencesTitle());
+        TableLayoutElement tableLayout = groupsPage.getGroupsPaneLiveData().getTableLayout();
+        assertEquals(expectedGroups.size(), tableLayout.countRows());
+        for (DocumentReference group : expectedGroups) {
+            tableLayout.assertCellWithLink(GROUP_COLUMN, group.getName(), setup.getURL(group));
+        }
     }
 }

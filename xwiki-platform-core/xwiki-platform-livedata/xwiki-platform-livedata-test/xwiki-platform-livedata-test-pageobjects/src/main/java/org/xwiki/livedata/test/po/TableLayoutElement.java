@@ -723,6 +723,18 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Return the text of the cells of a column, in the order of the displayed rows.
+     *
+     * @param columnLabel the label of the column to get, for instance {@code "Title"}
+     * @return the text of each cell of the requested column
+     * @since 18.9.0RC1
+     */
+    public List<String> getColumnValues(String columnLabel)
+    {
+        return getAllCells(columnLabel).stream().map(WebElement::getText).toList();
+    }
+
+    /**
      * Get the 1-based row index of an element, relative to the number of currently displayed rows.
      *
      * @param by the selector of the searched element

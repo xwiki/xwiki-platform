@@ -1,4 +1,4 @@
 .modal-title {
-  /* Using the font-size of H4, but using normal divs because of WCAG headings hierarchy rule */
+  /* Bootstrap doesn't size modal titles, whether they are divs or headings. */
   font-size: 1.43rem;
 }

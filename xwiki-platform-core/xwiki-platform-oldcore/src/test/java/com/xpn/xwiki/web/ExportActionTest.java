@@ -125,6 +125,11 @@ class ExportActionTest
         when(this.request.getMethod()).thenReturn("GET");
         assertEquals("exportresubmit", this.action.render(this.oldcore.getXWikiContext()));
         verify(this.oldcore.getMockRightService(), never()).hasWikiAdminRights(any(XWikiContext.class));
+        // The refusal is described on the response by the action, not by the template, which is also rendered on its
+        // own through actions these headers would be wrong for.
+        verify(this.response).setStatus(405);
+        verify(this.response).addHeader("Allow", "POST");
+        verify(this.response).addHeader("X-FRAME-OPTIONS", "DENY");
     }
 
     @Test

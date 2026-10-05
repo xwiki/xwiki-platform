@@ -23,11 +23,6 @@
 ### Displayed when the export action is reached with a method it doesn't export on. It lists the requested export
 ### parameters and lets the user start that same export again with a POST request carrying a CSRF token.
 ###
-#set ($discard = $response.setStatus(405))
-#set ($discard = $response.addHeader('Allow', 'POST'))
-## Submitting the form starts an operation that can consume a lot of resources, so the page must not be displayed in
-## an IFRAME, where the user could be tricked into submitting it.
-#set ($discard = $response.addHeader('X-FRAME-OPTIONS', 'DENY'))
 #template("startpage.vm")
 <div class="main layoutsubsection">
 ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.

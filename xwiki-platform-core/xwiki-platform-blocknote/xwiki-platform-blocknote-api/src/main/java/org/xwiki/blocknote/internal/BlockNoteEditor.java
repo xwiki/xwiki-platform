@@ -19,11 +19,13 @@
  */
 package org.xwiki.blocknote.internal;
 
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.edit.AbstractTemplateEditor;
@@ -40,6 +42,8 @@ import org.xwiki.rendering.syntax.SyntaxContent;
 @Component
 @Singleton
 @Named(BlockNoteEditor.ROLE_HINT)
+// Lower priority than CKEditor, so that CKEditor stays the default WYSIWYG editor when none is configured.
+@Priority(ComponentDescriptor.DEFAULT_PRIORITY + 100)
 public class BlockNoteEditor extends AbstractTemplateEditor<SyntaxContent> implements Initializable
 {
     /**

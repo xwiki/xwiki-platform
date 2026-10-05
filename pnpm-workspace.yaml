@@ -153,7 +153,7 @@ catalog:
   postcss: 8.5.28
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
-  publint: 0.3.24
+  publint: 0.3.25
   qunit: 2.26.0
   react: 19.3.0
   react-dom: 19.3.0

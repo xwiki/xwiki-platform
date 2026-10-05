@@ -104,15 +104,14 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
     {
         // We only execute the migration on main wiki: we cannot have filters related to another subwiki in a subwiki
         // DB.
-        boolean shouldExecute = super.shouldExecute(startupVersion)
+        return super.shouldExecute(startupVersion)
             && this.wikiDescriptorManager.isMainWiki(this.wikiDescriptorManager.getCurrentWikiId());
+    }
 
-        if (shouldExecute) {
-            int version = startupVersion.getVersion();
-            // The migration is backported in 16.4.1 so any DB between 16.4.1 and 16.5.0 don't need to execute it again.
-            shouldExecute = !(version >= 160401000 && version < 160500000);
-        }
-        return shouldExecute;
+    @Override
+    protected List<XWikiDBVersion> getBackportVersions()
+    {
+        return List.of(new XWikiDBVersion(160401000));
     }
 
     @Override

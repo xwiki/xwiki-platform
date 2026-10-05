@@ -121,15 +121,9 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     }
 
     @Override
-    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    protected List<XWikiDBVersion> getBackportVersions()
     {
-        boolean shouldExecute = super.shouldExecute(startupVersion);
-
-        if (shouldExecute) {
-            int version = startupVersion.getVersion();
-            shouldExecute = !(version >= 131007000 && version < 140000000);
-        }
-        return shouldExecute;
+        return List.of(new XWikiDBVersion(131007000));
     }
 
     @Override

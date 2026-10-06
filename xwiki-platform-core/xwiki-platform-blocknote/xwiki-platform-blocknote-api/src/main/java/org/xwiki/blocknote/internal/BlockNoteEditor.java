@@ -42,7 +42,7 @@ import org.xwiki.rendering.syntax.SyntaxContent;
 @Component
 @Singleton
 @Named(BlockNoteEditor.ROLE_HINT)
-// Lower priority than CKEditor, so that CKEditor stays the default WYSIWYG editor when none is configured.
+// BlockNote is still experimental, so we lower its priority compared to other editors that might be installed.
 @Priority(ComponentDescriptor.DEFAULT_PRIORITY + 100)
 public class BlockNoteEditor extends AbstractTemplateEditor<SyntaxContent> implements Initializable
 {

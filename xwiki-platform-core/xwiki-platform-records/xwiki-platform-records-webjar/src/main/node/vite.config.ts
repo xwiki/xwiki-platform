@@ -19,5 +19,19 @@
  */
 
 import { generateWebjarNodeConfig } from "@xwiki/platform-tool-viteconfig";
+import type { LibraryOptions } from "vite";
 
-export default generateWebjarNodeConfig(import.meta.url);
+const config = generateWebjarNodeConfig(import.meta.url);
+
+// The displayer templates load the bundle as a classic script (see src/index.ts for why), and the top-level names of
+// a classic script are globals. Emitted as an ES module, the minified functions would land on window under names
+// such as `$`, overwriting the page's own. The "iife" format wraps them in a function scope instead.
+config.build!.lib = {
+  ...(config.build!.lib as LibraryOptions),
+  // Unused, since the entry point exports nothing, but required by the "iife" format.
+  name: "xwikiRecords",
+  formats: ["iife"],
+  fileName: () => "index.js",
+};
+
+export default config;

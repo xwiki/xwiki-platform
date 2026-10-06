@@ -19,7 +19,9 @@
  */
 package org.xwiki.records.internal.macro;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Named;
@@ -28,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
@@ -36,11 +39,13 @@ import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.records.macro.RecordsMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -58,6 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
@@ -97,6 +103,12 @@ class RecordsMacroTest
     private LiveDataPropertyDescriptorStore propertyStore;
 
     @MockComponent
+    private ContextualLocalizationManager localization;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
     @Named("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
@@ -111,6 +123,11 @@ class RecordsMacroTest
         // The document's generator: shared by every id the page builds, headings included.
         this.context.setXDOM(new XDOM(List.of(), new IdGenerator()));
         when(this.entityReferenceSerializer.serialize(DATA_TYPE)).thenReturn(SERIALIZED_DATA_TYPE);
+        when(this.documentAccessBridge.exists(DATA_TYPE)).thenReturn(true);
+        // Echoes the key and the arguments, which is what the tests assert on.
+        when(this.localization.getTranslationPlain(any(String.class), any(Object[].class)))
+            .thenAnswer(invocation -> invocation.getArgument(0) + Arrays.toString(
+                Arrays.copyOfRange(invocation.getArguments(), 1, invocation.getArguments().length)));
         when(this.liveDataSourceManager.get(any(Source.class))).thenReturn(Optional.of(this.liveDataSource));
         when(this.liveDataSource.getProperties()).thenReturn(this.propertyStore);
         // What the liveTable property store reports: the entry metadata, the data type's fields, and the Live Data
@@ -136,9 +153,9 @@ class RecordsMacroTest
     void executeMapsEveryParameterOntoLiveData() throws Exception
     {
         RecordsMacroParameters parameters = newParameters();
-        parameters.setProperties("doc.title,status,budget");
-        parameters.setFilters("status=Active&client=Acme");
-        parameters.setSort("budget:desc");
+        parameters.setProperties("doc.title,first_name,email");
+        parameters.setFilters("first_name=Ann&email=ann%40acme.com");
+        parameters.setSort("last_name:desc");
         parameters.setLayouts("cards");
         parameters.setDescription("Acme projects, most recent first");
         parameters.setId("projects");
@@ -146,9 +163,9 @@ class RecordsMacroTest
         LiveDataRendererParameters liveDataParameters = execute(parameters);
 
         assertEquals("liveTable", liveDataParameters.getSource());
-        assertEquals("doc.title,status,budget", liveDataParameters.getProperties());
-        assertEquals("status=Active&client=Acme", liveDataParameters.getFilters());
-        assertEquals("budget:desc", liveDataParameters.getSort());
+        assertEquals("doc.title,first_name,email", liveDataParameters.getProperties());
+        assertEquals("first_name=Ann&email=ann%40acme.com", liveDataParameters.getFilters());
+        assertEquals("last_name:desc", liveDataParameters.getSort());
         assertEquals("cards", liveDataParameters.getLayouts());
         assertEquals("Acme projects, most recent first", liveDataParameters.getDescription());
         assertEquals("projects", liveDataParameters.getId());
@@ -215,13 +232,111 @@ class RecordsMacroTest
     }
 
     @Test
-    void executeKeepsTheAuthoredColumnsAndDoesNotQueryTheDataType() throws Exception
+    void executeKeepsTheAuthoredColumns() throws Exception
     {
         RecordsMacroParameters parameters = newParameters();
         parameters.setProperties("doc.title,email");
 
         assertEquals("doc.title,email", execute(parameters).getProperties());
-        verify(this.propertyStore, never()).get();
+    }
+
+    @Test
+    void executeKeepsTheLiveDataPseudoColumnsTheAuthorNamed() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setProperties("doc.title,_actions");
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title")));
+
+        assertEquals("doc.title,_actions", execute(parameters).getProperties());
+    }
+
+    @Test
+    void executeSkipsAColumnTheDataTypeNoLongerHasAndSaysSo() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setProperties("doc.title, budget ,email,,status");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("doc.title,email", capture().getProperties());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.columnSkipped[budget, Clients.Code.ProjectClass]"),
+            warning("rendering.macro.records.warning.columnSkipped[status, Clients.Code.ProjectClass]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeFallsBackToTheDefaultColumnsWhenNoneOfTheAuthoredOnesIsLeft() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setProperties("budget");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("doc.title,first_name,last_name,email", capture().getProperties());
+        assertEquals(2, blocks.size());
+    }
+
+    @Test
+    void executeDropsASortCriterionOnAFieldTheDataTypeNoLongerHas() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setSort("budget:desc,email,last_name:asc,status");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("email,last_name:asc", capture().getSort());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.sortSkipped[budget, Clients.Code.ProjectClass]"),
+            warning("rendering.macro.records.warning.sortSkipped[status, Clients.Code.ProjectClass]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeLeavesNoSortWhenEveryCriterionIsDropped() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setSort("budget:desc");
+
+        assertNull(execute(parameters).getSort());
+    }
+
+    @Test
+    void executeDropsAFilterOnAFieldTheDataTypeNoLongerHas() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setFilters("budget=1%262&email=a&first_name=b&%62udget=3");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("email=a&first_name=b", capture().getFilters());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.filterSkipped[budget, Clients.Code.ProjectClass]"),
+            warning("rendering.macro.records.warning.filterSkipped[budget, Clients.Code.ProjectClass]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeLeavesNoFilterWhenEveryConstraintIsDropped() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setFilters("budget=1");
+
+        assertNull(execute(parameters).getFilters());
+    }
+
+    @Test
+    void executeReplacesTheTableWithAMessageWhenTheDataTypeNoLongerExists() throws Exception
+    {
+        when(this.documentAccessBridge.exists(DATA_TYPE)).thenReturn(false);
+
+        List<Block> blocks = this.macro.execute(newParameters(), null, this.context);
+
+        assertEquals(List.of(new GroupBlock(
+            List.of(new WordBlock("rendering.macro.records.error.dataTypeMissing[Clients.Code.ProjectClass]")),
+            Map.of("class", "box errormessage"))), blocks);
+        verify(this.liveDataRenderer, never()).execute(any(LiveDataRendererParameters.class), anyString(),
+            anyBoolean());
     }
 
     @Test
@@ -232,7 +347,20 @@ class RecordsMacroTest
         MacroExecutionException exception = assertThrows(MacroExecutionException.class,
             () -> this.macro.execute(newParameters(), null, this.context));
 
-        assertEquals("Failed to read the fields of [Clients.Code.ProjectClass].", exception.getMessage());
+        assertEquals("rendering.macro.records.error.fieldsUnreadable[Clients.Code.ProjectClass]",
+            exception.getMessage());
+    }
+
+    @Test
+    void executeReportsADataTypeWhoseExistenceCannotBeChecked() throws Exception
+    {
+        when(this.documentAccessBridge.exists(DATA_TYPE)).thenThrow(new Exception("no store"));
+
+        MacroExecutionException exception = assertThrows(MacroExecutionException.class,
+            () -> this.macro.execute(newParameters(), null, this.context));
+
+        assertEquals("rendering.macro.records.error.fieldsUnreadable[Clients.Code.ProjectClass]",
+            exception.getMessage());
     }
 
     @Test
@@ -243,7 +371,7 @@ class RecordsMacroTest
         MacroExecutionException exception = assertThrows(MacroExecutionException.class,
             () -> this.macro.execute(newParameters(), null, this.context));
 
-        assertEquals("The [liveTable] Live Data source is not available.", exception.getMessage());
+        assertEquals("rendering.macro.records.error.renderFailed[]", exception.getMessage());
     }
 
     @Test
@@ -365,7 +493,7 @@ class RecordsMacroTest
             assertThrows(MacroExecutionException.class,
                 () -> this.macro.execute(new RecordsMacroParameters(), null, this.context));
 
-        assertEquals("The [class] parameter is mandatory.", exception.getMessage());
+        assertEquals("rendering.macro.records.error.noDataType[]", exception.getMessage());
     }
 
     @Test
@@ -378,7 +506,7 @@ class RecordsMacroTest
         MacroExecutionException exception = assertThrows(MacroExecutionException.class,
             () -> this.macro.execute(newParameters(), null, this.context));
 
-        assertEquals("Failed to render the Records macro.", exception.getMessage());
+        assertEquals("rendering.macro.records.error.renderFailed[]", exception.getMessage());
         assertSame(cause, exception.getCause());
     }
 
@@ -389,6 +517,11 @@ class RecordsMacroTest
         // into the surrounding transformation.
         assertFalse(this.macro.supportsInlineMode());
         assertTrue(this.macro.isExecutionIsolated(newParameters(), null));
+    }
+
+    private static Block warning(String message)
+    {
+        return new GroupBlock(List.of(new WordBlock(message)), Map.of("class", "box warningmessage"));
     }
 
     /**
@@ -437,7 +570,14 @@ class RecordsMacroTest
         RecordsMacroParameters parameters) throws Exception
     {
         this.macro.execute(parameters, null, context);
+        return capture();
+    }
 
+    /**
+     * @return the Live Data parameters the macro handed to the renderer last
+     */
+    private LiveDataRendererParameters capture() throws Exception
+    {
         ArgumentCaptor<LiveDataRendererParameters> captor =
             ArgumentCaptor.forClass(LiveDataRendererParameters.class);
         verify(this.liveDataRenderer, atLeastOnce()).execute(captor.capture(), eq((String) null), anyBoolean());

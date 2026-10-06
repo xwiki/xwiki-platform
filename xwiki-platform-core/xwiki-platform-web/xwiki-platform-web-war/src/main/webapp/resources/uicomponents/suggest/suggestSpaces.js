@@ -46,12 +46,17 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-icon!xwiki-suggestSpaces-icons',
     return typeAndReference;
   };
 
+  /**
+   * @return the names of the spaces from the given reference, from the top level space to the most nested one
+   */
+  const getSpaceNames = function(reference) {
+    return reference.getReversedReferenceChain()
+      .filter(component => component.type === XWiki.EntityType.SPACE)
+      .map(component => component.name);
+  };
+
   const getRestSearchURL = function(searchScope) {
-    const spaces = searchScope.getReversedReferenceChain().filter(function(component) {
-      return component.type === XWiki.EntityType.SPACE;
-    }).map(function(component) {
-      return component.name;
-    });
+    const spaces = getSpaceNames(searchScope);
     const wiki = searchScope.extractReferenceValue(XWiki.EntityType.WIKI);
     return XWiki.Document.getRestSearchURL('', spaces, wiki);
   };
@@ -62,7 +67,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-icon!xwiki-suggestSpaces-icons',
 
   const removeDuplicates = function(suggestions) {
     const seen = {};
-    return suggestions.filter(function(suggestion) {
+    return suggestions.filter(suggestion => {
       if (Object.hasOwn(seen, suggestion.value)) {
         return false;
       }
@@ -109,66 +114,69 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-icon!xwiki-suggestSpaces-icons',
    * Looks for spaces matching the given text using two complementary search sources, because neither of them is enough
    * on its own.
    */
-  const loadSpaces = function(text, options) {
-    return $.when(loadSpacesFromPages(text, options), loadSpacesFromSpaces(text, options))
-      .then(function(spacesFromPages, spacesFromSpaces) {
-        return removeDuplicates(spacesFromPages.concat(spacesFromSpaces)).slice(0, limit);
-      });
+  const loadSpaces = async function(text, options) {
+    const [spacesFromPages, spacesFromSpaces] = await Promise.all([
+      loadSpacesFromPages(text, options),
+      loadSpacesFromSpaces(text, options)
+    ]);
+    return removeDuplicates(spacesFromPages.concat(spacesFromSpaces)).slice(0, limit);
   };
 
-  const loadSpacesFromPages = function(text, options) {
-    return $.getJSON(getRestSearchURL(options.searchScope), $.param({
-      q: text,
-      scope: ['name', 'title'],
-      // The search doesn't know about spaces so we have to filter out the terminal pages ourselves, which means we need
-      // to ask for more results than we display. This still doesn't guarantee that we get any space home page, because
-      // the terminal pages can be more numerous, which is one reason why we also search the spaces directly.
-      number: limit * 4,
-      localeAware: true,
-      prettyNames: true
-    }, true)).then(function(response) {
-      const pages = Array.isArray(response.searchResults) ? response.searchResults : [];
-      // Only the non-terminal pages, i.e. the pages backing a space, are of interest here.
-      return pages.filter(function(page) {
-        return page.pageName === webHome;
-      }).map(processPage.bind(null, options));
-    }, function() {
+  const loadSpacesFromPages = async function(text, options) {
+    let response;
+    try {
+      response = await $.getJSON(getRestSearchURL(options.searchScope), $.param({
+        q: text,
+        scope: ['name', 'title'],
+        // The search doesn't know about spaces so we have to filter out the terminal pages ourselves, which means we
+        // need to ask for more results than we display. This still doesn't guarantee that we get any space home page,
+        // because the terminal pages can be more numerous, which is one reason why we also search the spaces directly.
+        number: limit * 4,
+        localeAware: true,
+        prettyNames: true
+      }, true));
+    } catch {
       return [];
-    });
+    }
+    const pages = Array.isArray(response.searchResults) ? response.searchResults : [];
+    // Only the non-terminal pages, i.e. the pages backing a space, are of interest here.
+    return pages.filter(page => page.pageName === webHome).map(page => processPage(options, page));
   };
 
-  const loadSpacesFromSpaces = function(text, options) {
-    return $.getJSON(getRestSearchURL(options.searchScope), $.param({
-      q: text,
-      scope: 'spaces',
-      // Both search sources often return the same spaces, which are removed when the results are merged, so we ask for
-      // more results than we display in order to still have enough suggestions afterwards.
-      number: limit * 2
-    })).then(function(response) {
-      const spaces = Array.isArray(response.searchResults) ? response.searchResults : [];
-      return spaces.map(function(space) {
-        return createSuggestion(options, resolveSpaceReference(space.space, space.wiki));
-      });
-    }, function() {
+  const loadSpacesFromSpaces = async function(text, options) {
+    let response;
+    try {
+      response = await $.getJSON(getRestSearchURL(options.searchScope), $.param({
+        q: text,
+        scope: 'spaces',
+        // Both search sources often return the same spaces, which are removed when the results are merged, so we ask
+        // for more results than we display in order to still have enough suggestions afterwards.
+        number: limit * 2
+      }));
+    } catch {
       return [];
-    });
+    }
+    const spaces = Array.isArray(response.searchResults) ? response.searchResults : [];
+    return spaces.map(space => createSuggestion(options, resolveSpaceReference(space.space, space.wiki)));
   };
 
   /**
    * Loads a space that is already selected, in order to display it with its pretty name and hierarchy.
    */
-  const loadSpace = function(value, options) {
+  const loadSpace = async function(value, options) {
     const spaceReference = XWiki.Model.resolve(value, XWiki.EntityType.SPACE, options.documentReference);
     const homeReference = new XWiki.EntityReference(webHome, XWiki.EntityType.DOCUMENT, spaceReference);
-    return $.getJSON(new XWiki.Document(homeReference).getRestURL(), $.param({
-      prettyNames: true
-    })).then(function(page) {
-      // An array is expected in xwiki.selectize.js
-      return [processPage(options, page)];
-    }, function() {
+    let page;
+    try {
+      page = await $.getJSON(new XWiki.Document(homeReference).getRestURL(), $.param({
+        prettyNames: true
+      }));
+    } catch {
       // The home page of the space may not exist, or may not be viewable. Fall back on the reference itself.
       return [createSuggestion(options, spaceReference)];
-    });
+    }
+    // An array is expected in xwiki.selectize.js
+    return [processPage(options, page)];
   };
 
   /**
@@ -178,11 +186,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-icon!xwiki-suggestSpaces-icons',
   const processPage = function(options, page) {
     const spaceReference = resolveSpaceReference(page.space, page.wiki);
     const hierarchy = page.hierarchy?.items || [];
-    const labels = hierarchy.filter(function(item) {
-      return item.type === 'space';
-    }).map(function(item) {
-      return item.label;
-    });
+    const labels = hierarchy.filter(item => item.type === 'space').map(item => item.label);
     return createSuggestion(options, spaceReference, labels);
   };
 
@@ -198,11 +202,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-icon!xwiki-suggestSpaces-icons',
    */
   const createSuggestion = function(options, spaceReference, labels) {
     if (!labels?.length) {
-      labels = spaceReference.getReversedReferenceChain().filter(function(component) {
-        return component.type === XWiki.EntityType.SPACE;
-      }).map(function(component) {
-        return component.name;
-      });
+      labels = getSpaceNames(spaceReference);
     }
     const relativeReference = spaceReference.relativeTo(options.documentReference.getRoot());
     const homeReference = new XWiki.EntityReference(webHome, XWiki.EntityType.DOCUMENT, spaceReference);

@@ -24,6 +24,7 @@ import java.util.function.Predicate;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
 import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
 
@@ -73,6 +74,133 @@ public class CKEditorToolBar extends BaseElement
         } finally {
             getDriver().switchTo().parentFrame();
         }
+    }
+
+    /**
+     * Click the bold button.
+     *
+     * @return this tool bar instance
+     * @since 18.9.0RC1
+     */
+    public CKEditorToolBar bold()
+    {
+        clickButton("bold");
+        return this;
+    }
+
+    /**
+     * Click the italic button.
+     *
+     * @return this tool bar instance
+     * @since 18.9.0RC1
+     */
+    public CKEditorToolBar italic()
+    {
+        clickButton("italic");
+        return this;
+    }
+
+    /**
+     * Click the underline entry of the basic styles menu (the underline action has no dedicated tool bar button).
+     *
+     * @return this tool bar instance
+     * @since 18.9.0RC1
+     */
+    public CKEditorToolBar underline()
+    {
+        clickMenuItem("basicstyles", "underline");
+        return this;
+    }
+
+    /**
+     * Insert an Info Box using the Insert menu. The info macro is inserted with a default content, and the caret is
+     * placed at the start of this content.
+     *
+     * @since 18.9.0RC1
+     */
+    public void insertInfoBox()
+    {
+        clickInsertMenuItem("infoBox");
+    }
+
+    /**
+     * Open the macro selection modal using the Other Macros entry of the Insert menu.
+     *
+     * @return the page object for the macro selection modal
+     * @since 18.9.0RC1
+     */
+    public MacroDialogSelectModal insertOtherMacro()
+    {
+        clickInsertMenuItem("xwiki-macro");
+        return new MacroDialogSelectModal().waitUntilReady();
+    }
+
+    /**
+     * Open the office importer modal using the Insert menu. The office server must be connected, otherwise the menu
+     * entry is disabled.
+     *
+     * @return the page object for the office importer modal
+     * @since 18.9.0RC1
+     */
+    public OfficeImporterDialog importOfficeFile()
+    {
+        clickInsertMenuItem("officeImporter");
+        return new OfficeImporterDialog();
+    }
+
+    /**
+     * Open the special character dialog using the Insert menu.
+     *
+     * @return the page object for the special character dialog
+     * @since 18.9.0RC1
+     */
+    public SpecialCharacterDialog insertSpecialCharacter()
+    {
+        clickInsertMenuItem("specialchar");
+        return new SpecialCharacterDialog();
+    }
+
+    /**
+     * Open the emoji panel using the dedicated tool bar button.
+     *
+     * @return the page object for the emoji panel
+     * @since 18.9.0RC1
+     */
+    public EmojiPanel openEmojiPanel()
+    {
+        clickButton("emojipanel");
+        return new EmojiPanel(waitForOpenedPanelFrame());
+    }
+
+    private void clickInsertMenuItem(String item)
+    {
+        clickMenuItem("insert", item);
+    }
+
+    private void clickMenuItem(String menu, String item)
+    {
+        clickButton(menu);
+        WebElement menuFrame = waitForOpenedPanelFrame();
+        try {
+            getDriver().switchTo().frame(menuFrame);
+            // The tool bar menu items are prefixed in order to prevent conflicts with the context menu items.
+            getDriver().findElement(By.className("cke_menubutton__toolbar_" + item)).click();
+        } finally {
+            getDriver().switchTo().parentFrame();
+        }
+    }
+
+    /**
+     * CKEditor keeps the panels (menus, drop downs) it has already opened in the DOM, hidden, so we need to look for
+     * the one that is currently displayed.
+     *
+     * @return the frame of the currently opened panel
+     */
+    private WebElement waitForOpenedPanelFrame()
+    {
+        return getDriver().waitUntilCondition(driver -> getDriver()
+            .findElementsWithoutWaiting(By.cssSelector("iframe.cke_panel_frame")).stream()
+            .filter(WebElement::isDisplayed).findFirst().orElse(null));
     }
 
     protected WebElement findContainer(CKEditor editor)

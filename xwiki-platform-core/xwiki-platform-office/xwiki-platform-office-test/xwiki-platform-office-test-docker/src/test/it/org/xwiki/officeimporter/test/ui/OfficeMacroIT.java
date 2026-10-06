@@ -24,13 +24,17 @@ import java.io.InputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -83,17 +87,36 @@ class OfficeMacroIT
     }
 
     /**
-     * The office macro displays the content of the office attachment to a user allowed to view it.
+     * The office macro, inserted with CKEditor, displays the content of the office attachment to a user allowed to view
+     * it.
      */
     @Test
     void viewAttachment(TestUtils setup, TestReference testReference) throws Exception
     {
         DocumentReference sourceReference = getSourceReference(testReference);
-        createFixture(setup, testReference, sourceReference);
+        attachOfficeFile(setup, testReference, sourceReference);
+        setup.rest().savePage(testReference, "", "Viewer");
+
+        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
+        CKEditor editor = new CKEditor("content").waitToLoad();
+        MacroDialogEditModal macroEditModal =
+            editor.getToolBar().insertOtherMacro().filterByText("Office Document Viewer", 1).clickSelect();
+        // Pick the office attachment of the source page among the attachments with the same name. The picker values are
+        // attachment references relative to the wiki, the "attach:" prefix being added on submit.
+        new SuggestInputElement(macroEditModal.getMacroParameterInput("reference")).sendKeys(ATTACHMENT_NAME)
+            .waitForNonTypedSuggestions()
+            .selectByValue(String.format("%s@%s", setup.serializeLocalReference(sourceReference), ATTACHMENT_NAME));
+        macroEditModal.clickSubmit();
+        // The macro is rendered by the server once inserted.
+        editor.getRichTextArea().waitUntilTextContains(DOCUMENT_CONTENT);
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertThat("The office macro should display the document content.", viewPage.getContent(),
+            containsString(DOCUMENT_CONTENT));
 
         setup.createUserAndLogin(getUserName(testReference), PASSWORD);
 
-        ViewPage viewPage = setup.gotoPage(testReference);
+        viewPage = setup.gotoPage(testReference);
         assertThat("The office macro should display the document content to a user allowed to view the attachment.",
             viewPage.getContent(), containsString(DOCUMENT_CONTENT));
     }
@@ -148,6 +171,19 @@ class OfficeMacroIT
     private void createFixture(TestUtils setup, TestReference testReference, DocumentReference sourceReference)
         throws Exception
     {
+        attachOfficeFile(setup, testReference, sourceReference);
+
+        setup.rest().savePage(testReference,
+            String.format("{{office reference=\"%s\"/}}", getOfficeResourceReference(setup, sourceReference)),
+            "Viewer");
+    }
+
+    /**
+     * Delete the test and source pages, then attach the office file to a new source page.
+     */
+    private void attachOfficeFile(TestUtils setup, TestReference testReference, DocumentReference sourceReference)
+        throws Exception
+    {
         setup.rest().delete(sourceReference);
         setup.rest().delete(testReference);
 
@@ -155,10 +191,13 @@ class OfficeMacroIT
         try (InputStream officeFile = getClass().getResourceAsStream("/ooffice.3.0/" + ATTACHMENT_NAME)) {
             setup.attachFile(sourceReference, ATTACHMENT_NAME, officeFile, true);
         }
+    }
 
-        setup.rest().savePage(testReference,
-            String.format("{{office reference=\"attach:%s@%s\"/}}", setup.serializeReference(sourceReference),
-                ATTACHMENT_NAME),
-            "Viewer");
+    /**
+     * @return the value of the office macro {@code reference} parameter pointing to the office attachment
+     */
+    private String getOfficeResourceReference(TestUtils setup, DocumentReference sourceReference)
+    {
+        return String.format("attach:%s@%s", setup.serializeReference(sourceReference), ATTACHMENT_NAME);
     }
 }

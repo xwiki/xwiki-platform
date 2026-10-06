@@ -83,6 +83,13 @@
       <type>xar</type>
     </dependency>
     <dependency>
+      <!-- We need this to test the insertion of the Display Macro. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <!-- We need this to test how the Children Macro is displayed in edit mode. -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-index-tree-macro</artifactId>

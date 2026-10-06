@@ -29,12 +29,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeImporterPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
@@ -42,6 +44,7 @@ import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DeletePageConfirmationPage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,6 +73,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 )
 class OfficeImporterIT
 {
+    private static final String COLOR_STYLE = "color:";
+
     private TestUtils setup;
 
     private TestConfiguration testConfiguration;
@@ -97,6 +102,33 @@ class OfficeImporterIT
         verifyImports(info);
         verifySplitByHeadings(info);
         verifyChildNamingMethodInputVisibility(info);
+    }
+
+    /**
+     * Import an office file in the content of a page edited with CKEditor, using Insert &gt; Import Office File.
+     */
+    @Test
+    void importOfficeFileFromCKEditor(TestReference testReference) throws Exception
+    {
+        this.setup.rest().delete(testReference);
+        this.setup.rest().savePage(testReference, "", "Imported from CKEditor");
+
+        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
+        CKEditor editor = new CKEditor("content").waitToLoad();
+        editor.getToolBar().importOfficeFile().setFile(getResourceFile("ooffice.3.0/Test.odt")).clickImport();
+        // The office file is uploaded and converted asynchronously.
+        editor.getRichTextArea().waitUntilTextContains("This is a test document.");
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertTrue(Strings.CS.contains(viewPage.getContent(), "This is a test document."));
+        // The images of the office file are imported too, as attachments of the page.
+        WikiEditPage wikiEditPage = viewPage.editWiki();
+        String wikiContent = wikiEditPage.getContent();
+        Matcher matcher = Pattern.compile("image:(?<imageName>Test_\\w+\\.(png|gif))").matcher(wikiContent);
+        assertTrue(matcher.find(), wikiContent);
+        wikiEditPage.clickCancel();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName(matcher.group("imageName")));
     }
 
     /**
@@ -133,13 +165,26 @@ class OfficeImporterIT
         WikiEditPage wikiEditPage = resultPage.editWiki();
         String regex = "(?<imageName>Test_[\\w]+\\.png)";
         Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        Matcher matcher = pattern.matcher(wikiEditPage.getContent());
+        String filteredContent = wikiEditPage.getContent();
+        Matcher matcher = pattern.matcher(filteredContent);
         assertTrue(matcher.find());
         String imageName = matcher.group("imageName");
+        // The document has colored text, whose color is dropped when filtering styles.
+        assertFalse(filteredContent.contains(COLOR_STYLE), filteredContent);
         resultPage = wikiEditPage.clickCancel();
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
         assertTrue(attachmentsPane.attachmentExistsByFileName(imageName));
+        deletePage(testName);
+
+        // Test ODT file without filtering styles: the same content is imported, with its styles.
+        resultPage = importFile(testName, "ooffice.3.0/Test.odt", false, false);
+        assertTrue(Strings.CS.contains(resultPage.getContent(), "This is a test document."));
+        wikiEditPage = resultPage.editWiki();
+        String unfilteredContent = wikiEditPage.getContent();
+        assertTrue(unfilteredContent.contains(COLOR_STYLE), unfilteredContent);
+        assertTrue(pattern.matcher(unfilteredContent).find(), unfilteredContent);
+        wikiEditPage.clickCancel();
         deletePage(testName);
 
         // Test ODP file
@@ -271,6 +316,19 @@ class OfficeImporterIT
      */
     private ViewPage importFile(String testName, String fileName, boolean splitByHeadings)
     {
+        return importFile(testName, fileName, splitByHeadings, true);
+    }
+
+    /**
+     * Import an office file in the wiki.
+     *
+     * @param fileName name of the file to import (the file should be located in test /resources/ folder)
+     * @param splitByHeadings either the option splitByHeadings should be use or not
+     * @param filterStyles whether the styles of the office file should be filtered
+     * @return the result page
+     */
+    private ViewPage importFile(String testName, String fileName, boolean splitByHeadings, boolean filterStyles)
+    {
         ViewPage page = this.setup.gotoPage(
             new DocumentReference("xwiki", Arrays.asList(getClass().getSimpleName(), testName), "WebHome"));
         CreatePagePage createPage = page.createPage();
@@ -280,7 +338,7 @@ class OfficeImporterIT
         OfficeImporterPage officeImporterPage = new OfficeImporterPage();
         File resourceFile = this.getResourceFile(fileName);
         officeImporterPage.setFile(resourceFile);
-        officeImporterPage.setFilterStyle(true);
+        officeImporterPage.setFilterStyle(filterStyles);
         officeImporterPage.setSplitDocument(splitByHeadings);
 
         return officeImporterPage.submit();

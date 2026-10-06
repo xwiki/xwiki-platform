@@ -104,11 +104,17 @@ public class MacroDialogEditModal extends BaseElement
         return getMacroParameterInput(name).getDomProperty("value");
     }
 
+    /**
+     * @param name the name of a macro parameter
+     * @return the element holding the value of the parameter: an {@code input}, or the {@code select} behind a picker
+     *     (e.g. an attachment picker), which can be driven with {@code SuggestInputElement}
+     */
     public WebElement getMacroParameterInput(String name)
     {
-        return getDriver().findElementWithoutWaitingWithoutScrolling(
-            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
-            By.cssSelector("[class*=-editor-modal] .macro-parameter-field input[name='" + name + "']"));
+        // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+        String fieldSelector = "[class*=-editor-modal] .macro-parameter-field ";
+        return getDriver().findElementWithoutWaitingWithoutScrolling(By.cssSelector(
+            String.format("%1$sinput[name='%2$s'], %1$sselect[name='%2$s']", fieldSelector, name)));
     }
 
     /**

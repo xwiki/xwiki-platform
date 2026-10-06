@@ -19,24 +19,37 @@
  */
 package org.xwiki.officeimporter.test.ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.flamingo.skin.test.po.ExportModal;
+import org.xwiki.officeimporter.test.po.OfficeImporterPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.CreatePagePage;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tika.internal.TikaUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the office exporter.
@@ -52,6 +65,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
     })
 class OfficeExporterIT
 {
+    private static final String DOCUMENT_CONTENT = "This is a test document.";
+
     @BeforeEach
     public void setUp(TestUtils setup)
     {
@@ -66,10 +81,46 @@ class OfficeExporterIT
         }
     }
 
+    /**
+     * Export to ODT, from the Export modal, a page created by importing an office document.
+     */
     @Test
     void exportODT(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference) throws Exception
     {
-        export(setup, testConfiguration, testReference, "odt", "application/vnd.oasis.opendocument.text");
+        setup.rest().delete(testReference);
+        CreatePagePage createPage = setup.gotoPage(testReference).createPage();
+        createPage.setType("office");
+        createPage.clickCreate();
+        OfficeImporterPage officeImporterPage = new OfficeImporterPage();
+        officeImporterPage
+            .setFile(new File(testConfiguration.getBrowser().getTestResourcesPath(), "ooffice.3.0/Test.odt"));
+        ViewPage viewPage = officeImporterPage.submit();
+        assertTrue(viewPage.getContent().contains(DOCUMENT_CONTENT));
+
+        // Selecting ODT in the Export modal makes the browser download the file, so we fetch it ourselves.
+        ExportModal exportModal = ExportModal.open(viewPage);
+        String exportURL = exportModal.getExportURL("ODT");
+        exportModal.close();
+
+        String mimeType = null;
+        String content = null;
+        List<String> pictures = new ArrayList<>();
+        try (ZipInputStream odt = new ZipInputStream(new URL(setup.toHttpClientUri(exportURL)).openStream())) {
+            for (ZipEntry entry = odt.getNextEntry(); entry != null; entry = odt.getNextEntry()) {
+                if ("mimetype".equals(entry.getName())) {
+                    mimeType = new String(odt.readAllBytes(), StandardCharsets.UTF_8);
+                } else if ("content.xml".equals(entry.getName())) {
+                    content = new String(odt.readAllBytes(), StandardCharsets.UTF_8);
+                } else if (entry.getName().startsWith("Pictures/")) {
+                    pictures.add(entry.getName());
+                }
+            }
+        }
+        assertEquals("application/vnd.oasis.opendocument.text", mimeType);
+        assertNotNull(content, "The exported file has no content.xml");
+        assertTrue(content.contains(DOCUMENT_CONTENT), content);
+        // The image of the imported office document is embedded in the export.
+        assertFalse(pictures.isEmpty(), "The exported file has no picture");
     }
 
     @Test

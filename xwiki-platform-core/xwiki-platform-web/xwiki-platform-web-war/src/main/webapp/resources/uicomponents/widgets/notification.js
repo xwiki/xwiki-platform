@@ -189,7 +189,7 @@ widgets.Notification.container = null;
 widgets.Notification.textFormat = () => "plain"
 
 /**
- * Displays a notification. Equivalent to creating a Notification object, which displays itself, but makes that side
+ * Displays a notification (unless `options.inactive is set`). Equivalent to creating a Notification object, which displays itself, but makes that side
  * effect explicit at the call site.
  *
  * @param {string} text the notification text, interpreted as described on the constructor

@@ -95,6 +95,7 @@
  *   'value' the initially selected locations, either a serialized list or a collection of references;
  *   'multiple' whether more than one location can be selected, single selection is used if missing or false;
  *   + the options accepted by #documentTree for the tree used to browse the locations.
+ * @since 18.9.0RC1
  *#
 #macro (compactLocationPicker $options)
   #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/compactLocationPicker.js'))

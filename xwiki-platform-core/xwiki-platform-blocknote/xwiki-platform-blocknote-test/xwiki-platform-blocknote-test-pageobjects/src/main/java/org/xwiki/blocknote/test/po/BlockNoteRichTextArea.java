@@ -448,10 +448,7 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public SideMenu hoverBlock(int index)
     {
-        WebElement block = getBlockContent(index);
-        // We move in two steps because the editor hides the side menu when the page scrolls, which the first move can
-        // trigger, and shows it again only on the next mouse move.
-        getDriver().createActions().moveToElement(block, 1, 1).moveToElement(block).perform();
+        getDriver().createActions().moveToElement(getBlockContent(index)).perform();
         return new SideMenu();
     }
 

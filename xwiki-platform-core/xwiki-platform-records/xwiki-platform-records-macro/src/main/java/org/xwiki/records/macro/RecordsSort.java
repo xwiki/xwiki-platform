@@ -41,7 +41,7 @@ import org.xwiki.stability.Unstable;
  * is read from the browser at query time for the reasons given there.
  *
  * @version $Id$
- * @since 18.8.0RC1
+ * @since 18.9.0RC1
  */
 @Unstable
 public interface RecordsSort

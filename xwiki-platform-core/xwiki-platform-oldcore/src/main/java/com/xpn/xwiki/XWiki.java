@@ -2774,12 +2774,12 @@ public class XWiki implements EventListener
                 }
             }
 
-            // Look for a resource file.
-            String resourceFilePath = "/resources/" + fileName;
-            XWikiURLFactory urlFactory = context.getURLFactory();
-            if (resourceExists(resourceFilePath)) {
+            // Look for a resource file (the prefix makes sure the file name cannot escape the resources folder).
+            URL resourceURL = getEnvironment().getResource("/resources/", fileName);
+            if (resourceURL != null) {
+                XWikiURLFactory urlFactory = context.getURLFactory();
                 URL url = urlFactory.createResourceURL(fileName, forceSkinAction, context,
-                    getResourceURLCacheParameters(resourceFilePath));
+                    getResourceURLCacheParameters(resourceURL));
                 return urlFactory.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2787,17 +2787,6 @@ public class XWiki implements EventListener
         }
 
         return null;
-    }
-
-    private Map<String, Object> getResourceURLCacheParameters(String resourceFilePath)
-    {
-        URL resourceUrl = getEnvironment().getResource(resourceFilePath);
-
-        if (resourceUrl != null) {
-            return getResourceURLCacheParameters(resourceUrl);
-        }
-
-        return Collections.singletonMap(CACHE_VERSION, getVersion());
     }
 
     private Map<String, Object> getResourceURLCacheParameters(URL resourceUrl)

@@ -173,10 +173,7 @@ class SideMenuIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, INFO_BOX_CONTENT);
 
-        BlockNoteRichTextArea textArea = editInplace();
-        // A macro whose output is not rendered yet would make the screenshot unstable.
-        textArea.waitUntilMacrosAreRendered();
-        assertSideMenuIsAligned(textArea, screenshots, new String[] {"infoBox"});
+        assertSideMenuIsAligned(editInplace(), screenshots, new String[] {"infoBox"});
     }
 
     @Test
@@ -188,9 +185,8 @@ class SideMenuIT extends AbstractBlockNoteIT
         setup.attachFile(testReference, IMAGE_NAME, getClass().getResourceAsStream('/' + IMAGE_NAME), false);
 
         BlockNoteRichTextArea textArea = editInplace();
-        // A macro whose output is not rendered yet, or an image that is still loading, would move the blocks around
-        // and thus make the screenshot unstable.
-        textArea.waitUntilMacrosAreRendered().waitUntilImagesAreLoaded();
+        // An image that is still loading would move the blocks around and thus make the screenshot unstable.
+        textArea.waitUntilImagesAreLoaded();
         assertSideMenuIsAligned(textArea, screenshots, new String[] {"imageBeforeText"});
     }
 

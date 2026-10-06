@@ -237,20 +237,6 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Waits until all the macros in the rich text area have been replaced by their output, which is rendered on the
-     * server and thus displayed only after the editor has loaded.
-     *
-     * @return this rich text area instance
-     * @since 18.9.0RC1
-     */
-    public BlockNoteRichTextArea waitUntilMacrosAreRendered()
-    {
-        getDriver().waitUntilCondition(
-            driver -> this.container.findElements(By.className("xwiki-macro-placeholder")).isEmpty());
-        return this;
-    }
-
-    /**
      * Double clicks on the macro with the specified index in the rich text area to open the macro edit modal.
      * 
      * @param index the index of the macro to double click, starting from 0

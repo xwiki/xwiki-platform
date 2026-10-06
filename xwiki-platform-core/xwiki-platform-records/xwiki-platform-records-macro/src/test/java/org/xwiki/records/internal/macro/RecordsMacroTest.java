@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,8 +35,11 @@ import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.LiveDataSource;
@@ -135,6 +139,10 @@ class RecordsMacroTest
     private LiveDataPropertyDescriptorStore propertyStore;
 
     @MockComponent
+    @Named("liveTable")
+    private Provider<LiveDataConfiguration> sourceDefaults;
+
+    @MockComponent
     private ContextualLocalizationManager localization;
 
     @MockComponent
@@ -179,6 +187,16 @@ class RecordsMacroTest
             descriptor("first_name"), descriptor("last_name"), descriptor("email")));
         when(this.liveDataRenderer.execute(any(LiveDataRendererParameters.class), eq((String) null), anyBoolean()))
             .thenReturn(this.renderedBlock);
+        // The defaults of the liveTable source for the types the tests use, as its configuration declares them.
+        LiveDataMeta meta = new LiveDataMeta();
+        meta.setPropertyTypes(List.of(
+            propertyType("String", true, "text"),
+            propertyType("Number", true, "number"),
+            propertyType("Boolean", true, "boolean"),
+            propertyType("Password", false, null)));
+        LiveDataConfiguration defaults = new LiveDataConfiguration();
+        defaults.setMeta(meta);
+        when(this.sourceDefaults.get()).thenReturn(defaults);
     }
 
     @Test
@@ -426,6 +444,180 @@ class RecordsMacroTest
     }
 
     @Test
+    void executeDropsAFilterOnAFieldThatCannotBeFilteredOnAndSaysSo() throws Exception
+    {
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor("first_name"),
+            descriptor("secret", "Password"), descriptor("_actions", null)));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setFilters("secret=a&first_name=b&_actions=c");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("first_name=b", capture().getFilters());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.filterUnsupported[secret]"),
+            warning("rendering.macro.records.warning.filterUnsupported[_actions]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeDropsAFilterValueTheTypeOfItsFieldNoLongerAllowsAndSaysSo() throws Exception
+    {
+        // price used to be a String and active a String, and the filters were authored then.
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor("first_name"),
+            descriptor("price", "Number"), descriptor("active", "Boolean")));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setFilters(
+            "price=cheap&price=%2012.5%20&price=&active=yes&active=1&active=0&active=&first_name=12");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("price=%2012.5%20&price=&active=1&active=0&active=&first_name=12", capture().getFilters());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.filterTypeChanged[price]"),
+            warning("rendering.macro.records.warning.filterTypeChanged[active]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeMatchesABooleanFilterAgainstTheValuesOfItsOwnFilter() throws Exception
+    {
+        // The page metadata booleans are matched with true and false, not with 1 and 0.
+        LiveDataPropertyDescriptor hidden = descriptor("doc.hidden", "Boolean");
+        hidden.setFilter(new FilterDescriptor("boolean"));
+        hidden.getFilter().setParameter("trueValue", true);
+        hidden.getFilter().setParameter("falseValue", false);
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), hidden));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setFilters("doc.hidden=true&doc.hidden=1");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("doc.hidden=true", capture().getFilters());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.filterTypeChanged[doc.hidden]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeLetsTheDescriptorOfAFieldOverrideTheDefaultsOfItsType() throws Exception
+    {
+        LiveDataPropertyDescriptor tags = descriptor("tags");
+        // What the source says of a multiple selection list.
+        tags.setSortable(false);
+        LiveDataPropertyDescriptor code = descriptor("code", "Password");
+        code.setFilterable(true);
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), tags, code));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setFilters("tags=a&code=b");
+        parameters.setSort("tags,doc.title:desc");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        LiveDataRendererParameters liveDataParameters = capture();
+        assertEquals("tags=a&code=b", liveDataParameters.getFilters());
+        assertEquals("doc.title:desc", liveDataParameters.getSort());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.sortUnsupported[tags, doc.title]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeDropsASortCriterionOnAFieldThatCannotBeSortedOnAndNamesTheNextOne() throws Exception
+    {
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor("first_name"),
+            descriptor("secret", "Password"), descriptor("hint", "ComputedField")));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setSort("secret:desc,first_name:asc,hint");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("first_name:asc", capture().getSort());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.sortUnsupported[secret, first_name]"),
+            warning("rendering.macro.records.warning.sortUnsupported[hint, first_name]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeNamesTheFirstColumnWhenNoSortCriterionIsLeft() throws Exception
+    {
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor("first_name"),
+            descriptor("secret", "Password")));
+        RecordsMacroParameters parameters = newParameters();
+        // Live Data sorts on the first column that is not a pseudo-column when it is given no sort.
+        parameters.setProperties("_actions,first_name,secret");
+        parameters.setSort("secret");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertNull(capture().getSort());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.sortUnsupported[secret, first_name]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeSaysTheTableIsNotSortedWhenTheFirstColumnCannotBeSortedOnEither() throws Exception
+    {
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor("first_name"),
+            descriptor("secret", "Password")));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setProperties("secret,first_name");
+        parameters.setSort("secret");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertNull(capture().getSort());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.sortUnsupportedUnsorted[secret]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeLeavesNoFilterWhenEveryConstraintIsOnAFieldThatCannotBeFilteredOn() throws Exception
+    {
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor("secret", "Password")));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setFilters("secret=a");
+
+        assertNull(execute(parameters).getFilters());
+    }
+
+    @Test
+    void executeSaysTheTableIsNotSortedWhenTheSourceDoesNotDescribeTheFirstColumn() throws Exception
+    {
+        // Live Data does not sort on a column it has no descriptor for.
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("first_name"), descriptor("secret", "Password")));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setSort("secret");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("doc.title,first_name,secret", capture().getProperties());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.sortUnsupportedUnsorted[secret]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeIgnoresAFieldWithoutIdentifierAndTheRepeatsOfAField() throws Exception
+    {
+        LiveDataPropertyDescriptor repeat = descriptor("first_name", "Password");
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor(null),
+            descriptor("first_name"), repeat));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setSort("first_name");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        LiveDataRendererParameters liveDataParameters = capture();
+        assertEquals("doc.title,first_name", liveDataParameters.getProperties());
+        assertEquals("first_name", liveDataParameters.getSort());
+        assertEquals(List.of(this.renderedBlock), blocks);
+    }
+
+    @Test
     void executeKeepsTheAuthoredParametersOfAReaderWhoCannotViewTheDataType() throws Exception
     {
         // The source reports the fields of a data type only to a reader who can view it.
@@ -658,9 +850,42 @@ class RecordsMacroTest
      */
     private static LiveDataPropertyDescriptor descriptor(String id)
     {
+        return descriptor(id, "String");
+    }
+
+    /**
+     * @param id the property identifier
+     * @param type the property type
+     * @return a property descriptor carrying just that identifier and type, leaving the rest to the type's defaults
+     */
+    private static LiveDataPropertyDescriptor descriptor(String id, String type)
+    {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         descriptor.setId(id);
+        descriptor.setType(type);
         return descriptor;
+    }
+
+    /**
+     * @param id the type identifier
+     * @param enabled whether the fields of the type can be sorted and filtered on
+     * @param filter the filter of the type, {@code null} for none
+     * @return the defaults of the type
+     */
+    private static LiveDataPropertyDescriptor propertyType(String id, boolean enabled, String filter)
+    {
+        LiveDataPropertyDescriptor type = new LiveDataPropertyDescriptor();
+        type.setId(id);
+        type.setSortable(enabled);
+        type.setFilterable(enabled);
+        if (filter != null) {
+            type.setFilter(new FilterDescriptor(filter));
+            if ("boolean".equals(filter)) {
+                type.getFilter().setParameter("trueValue", 1);
+                type.getFilter().setParameter("falseValue", 0);
+            }
+        }
+        return type;
     }
 
     /**

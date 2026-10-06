@@ -64,22 +64,22 @@ class CompactLocationPickerIT
         CompactLocationPickerElement picker = displayPicker(setup, reference, alice, false);
         assertEquals("Browse for a location", picker.getBrowseLabel());
 
-        picker.openBrowser();
+        picker.openDropDown();
         assertFalse(picker.hasCheckbox(getNodeId(setup, alice)));
         // The tree reflects the value of the picker.
         assertTrue(picker.isSelected(getNodeId(setup, alice)));
 
         picker.pick(getNodeId(setup, bob));
-        assertFalse(picker.isBrowserOpen());
+        assertFalse(picker.isDropDownOpen());
         assertEquals(List.of(setup.serializeLocalReference(bob)), picker.getSuggestInput().getValues());
 
-        picker.openBrowser();
+        picker.openDropDown();
         assertTrue(picker.isSelected(getNodeId(setup, bob)));
         assertFalse(picker.isSelected(getNodeId(setup, alice)));
 
         // Moving to the suggestion input closes the tree, without taking the focus away from the input.
         picker.clickSuggestInput();
-        assertFalse(picker.isBrowserOpen());
+        assertFalse(picker.isDropDownOpen());
         assertTrue(picker.isSuggestInputFocused());
     }
 
@@ -98,13 +98,13 @@ class CompactLocationPickerIT
         CompactLocationPickerElement picker = displayPicker(setup, reference, alice, true);
         assertEquals("Browse for locations", picker.getBrowseLabel());
 
-        picker.openBrowser();
+        picker.openDropDown();
         assertTrue(picker.hasCheckbox(getNodeId(setup, alice)));
         // The tree reflects the value of the picker.
         assertTrue(picker.isChecked(getNodeId(setup, alice)));
 
         picker.setChecked(getNodeId(setup, bob), true);
-        assertTrue(picker.isBrowserOpen());
+        assertTrue(picker.isDropDownOpen());
         assertEquals(List.of(setup.serializeLocalReference(alice), setup.serializeLocalReference(bob)),
             picker.getSuggestInput().getValues());
 
@@ -112,8 +112,8 @@ class CompactLocationPickerIT
         assertEquals(List.of(setup.serializeLocalReference(bob)), picker.getSuggestInput().getValues());
 
         // The value can also be changed without the tree, which must then follow.
-        picker.closeBrowser().getSuggestInput().clearSelectedSuggestions();
-        picker.openBrowser();
+        picker.closeDropDown().getSuggestInput().clearSelectedSuggestions();
+        picker.openDropDown();
         assertFalse(picker.isChecked(getNodeId(setup, bob)));
     }
 

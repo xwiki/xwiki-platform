@@ -57,9 +57,9 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
 
     const select = picker.find('select.suggest-spaces');
     const multiple = select.prop('multiple');
-    const browser = picker.children('.location-picker-browse');
-    const toggle = browser.children('.dropdown-toggle');
-    const menu = browser.children('.dropdown-menu');
+    const dropDown = picker.children('.location-picker-browse');
+    const toggle = dropDown.children('.dropdown-toggle');
+    const menu = dropDown.children('.dropdown-menu');
     const treeElement = menu.find('.location-tree');
     // Set while we update the tree to match the input, so that we don't then update the input back.
     let updatingTree = false;
@@ -187,12 +187,12 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
      * easily happens when the picker is displayed near the bottom of a dialog.
      */
     const flipIfNeeded = function() {
-      browser.removeClass('dropup');
+      dropDown.removeClass('dropup');
       const button = toggle[0].getBoundingClientRect();
       const roomBelow = document.documentElement.clientHeight - button.bottom;
       const roomAbove = button.top;
       if (roomBelow < menu[0].offsetHeight && roomAbove > roomBelow) {
-        browser.addClass('dropup');
+        dropDown.addClass('dropup');
       }
     };
 
@@ -223,7 +223,7 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
       }
     };
 
-    browser.on('shown.bs.dropdown', function() {
+    dropDown.on('shown.bs.dropdown', function() {
       const tree = $.jstree.reference(treeElement);
       if (tree) {
         updateTree(tree);
@@ -236,11 +236,11 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
     // Set while we close the drop down because the focus moved to another element, which must keep the focus.
     let closingOnFocusOut = false;
 
-    browser.on('focusout', function(event) {
+    dropDown.on('focusout', function(event) {
       // Bootstrap closes the drop down when the user clicks outside of it, but some widgets, like the suggestion
       // inputs, stop the propagation of their click events. So we also close the drop down as soon as the focus moves
       // to an element outside of it. Clicks on elements that can't be focused are still handled by Bootstrap.
-      if (browser.hasClass('open') && event.relatedTarget && !browser[0].contains(event.relatedTarget)) {
+      if (dropDown.hasClass('open') && event.relatedTarget && !dropDown[0].contains(event.relatedTarget)) {
         closingOnFocusOut = true;
         try {
           toggle.dropdown('toggle');
@@ -250,7 +250,7 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
       }
     });
 
-    browser.on('hide.bs.dropdown', function() {
+    dropDown.on('hide.bs.dropdown', function() {
       // The drop down can be closed without the toggle button getting focus back which would otherwise drop
       // the focus to the body.
       if (!closingOnFocusOut) {

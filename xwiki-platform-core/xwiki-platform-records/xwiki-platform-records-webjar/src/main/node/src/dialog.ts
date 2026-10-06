@@ -39,16 +39,6 @@ import { DATA_TYPE_PARAMETER } from "./fieldPicker";
 const DERIVED_PARAMETERS: readonly string[] = ["properties", "filters", "sort"];
 
 /**
- * A Tom Select instance, as the suggest widget exposes it on the enhanced element.
- */
-interface Enhanced {
-  selectize?: {
-    clear: (silent?: boolean) => void;
-    clearOptions: () => void;
-  };
-}
-
-/**
  * Returns the form the dialog's fields live in, which scopes every lookup to one dialog.
  *
  * @param element - any element inside the dialog
@@ -120,7 +110,7 @@ function resetDerivedParameters(scope: ParentNode): string[] {
  */
 function resetField(element: Element): boolean {
   const held = hasValue(element);
-  const enhanced = (element as unknown as Enhanced).selectize;
+  const enhanced = element.selectize;
   if (enhanced) {
     enhanced.clear(true);
     enhanced.clearOptions();

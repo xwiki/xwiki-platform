@@ -24,6 +24,8 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +39,17 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
@@ -157,6 +163,11 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private static final String FILTER_SEPARATOR = "&";
 
     /**
+     * What separates the field of a filter constraint from its value.
+     */
+    private static final String FILTER_VALUE_SEPARATOR = "=";
+
+    /**
      * What separates the items of a columns or sort value.
      */
     private static final String LIST_SEPARATOR = ",";
@@ -167,6 +178,18 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private static final List<String> SORT_DIRECTIONS = List.of(":asc", ":desc");
 
     /**
+     * The filter the {@code liveTable} source matches as a number, which it cannot do with a value that is not one.
+     */
+    private static final String NUMBER_FILTER = "number";
+
+    /**
+     * The filter the {@code liveTable} source matches against its two parameters below.
+     */
+    private static final String BOOLEAN_FILTER = "boolean";
+
+    private static final List<String> BOOLEAN_VALUES = List.of("trueValue", "falseValue");
+
+    /**
      * Builds the warning for a field the data type no longer has. Not a {@link Function} because building a message
      * can fail.
      */
@@ -174,6 +197,17 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private interface WarningBuilder
     {
         Block build(String field) throws MacroExecutionException;
+    }
+
+    /**
+     * What the table can do with a field of the data type.
+     *
+     * @param sortable whether the table can be sorted on the field
+     * @param filterable whether the table can be filtered on the field
+     * @param values whether a filter value fits the field's type
+     */
+    private record Field(boolean sortable, boolean filterable, Predicate<String> values)
+    {
     }
 
     private static final String DESCRIPTION =
@@ -199,6 +233,14 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      */
     @Inject
     private LiveDataSourceManager liveDataSourceManager;
+
+    /**
+     * The defaults of the {@code liveTable} source, which say whether a field can be sorted and filtered, and with
+     * which filter, whenever the field's own descriptor leaves that to its type.
+     */
+    @Inject
+    @Named(SOURCE)
+    private Provider<LiveDataConfiguration> sourceDefaults;
 
     /**
      * Tells whether the reader can view the data type, without which its fields cannot be checked.
@@ -291,14 +333,15 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * @param context the transformation context, which carries the document's identifier generator
      * @param dataTypeReference the reference of the data type
      * @param dataType the serialized reference of the data type
-     * @param warnings receives a warning for every field the data type no longer has
+     * @param warnings receives a warning for every field the data type no longer has, and for every filter and sort
+     *     criterion the field's type does not allow
      * @return the equivalent Live Data renderer parameters
      */
     private LiveDataRendererParameters toLiveDataParameters(RecordsMacroParameters parameters,
         MacroTransformationContext context, DocumentReference dataTypeReference, String dataType,
         List<Block> warnings) throws MacroExecutionException
     {
-        List<String> fields = getFields(dataType);
+        Map<String, Field> fields = getFields(dataType);
         Predicate<String> known = getKnownFields(dataTypeReference, fields);
         WarningBuilder unknownColumn = field -> warning("warning.columnSkipped", field, dataType);
         WarningBuilder unknownSort = field -> warning("warning.sortSkipped", field, dataType);
@@ -308,12 +351,14 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         liveDataParameters.setId(getId(parameters, context));
         liveDataParameters.setSource(SOURCE);
         liveDataParameters.setSourceParameters(getSourceParameters(parameters, dataType));
-        liveDataParameters.setProperties(getProperties(parameters, fields, known, unknownColumn, warnings));
-        liveDataParameters.setFilters(
-            keepKnown(keepReadable(parameters.getFilters(), warnings), FILTER_SEPARATOR, this::getFilterField, known,
-                unknownFilter, warnings));
-        liveDataParameters.setSort(
-            keepKnown(parameters.getSort(), LIST_SEPARATOR, this::getSortField, known, unknownSort, warnings));
+        String properties = getProperties(parameters, fields, known, unknownColumn, warnings);
+        liveDataParameters.setProperties(properties);
+        String filters = keepKnown(keepReadable(parameters.getFilters(), warnings), FILTER_SEPARATOR,
+            this::getFilterField, known, unknownFilter, warnings);
+        liveDataParameters.setFilters(keepApplicable(filters, fields, warnings));
+        String sort =
+            keepKnown(parameters.getSort(), LIST_SEPARATOR, this::getSortField, known, unknownSort, warnings);
+        liveDataParameters.setSort(keepSortable(sort, properties, fields, warnings));
         liveDataParameters.setLayouts(parameters.getLayouts());
         liveDataParameters.setDescription(parameters.getDescription());
         return liveDataParameters;
@@ -330,13 +375,13 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * the entry title alone, which is also all that Live Data would describe to them.
      *
      * @param dataType the reference of the data type
-     * @param fields the identifiers the data type's source offers to the current user
+     * @param fields the fields the data type's source offers to the current user
      * @return whether a field counts as one the data type has
      */
-    private Predicate<String> getKnownFields(DocumentReference dataType, List<String> fields)
+    private Predicate<String> getKnownFields(DocumentReference dataType, Map<String, Field> fields)
     {
         if (this.authorization.hasAccess(Right.VIEW, dataType)) {
-            return fields::contains;
+            return fields::containsKey;
         }
         return field -> true;
     }
@@ -393,22 +438,21 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * is left the default applies, since a table with no column at all would say nothing.
      *
      * @param parameters the macro parameters
-     * @param fields the identifiers of everything the data type's source offers
+     * @param fields everything the data type's source offers, by identifier
      * @param known whether a field counts as one the data type has
      * @param unknown builds the warning for a column that is gone
      * @param warnings receives the warnings
      * @return the columns the author chose, or the entry title followed by every field of the data type
      */
-    private String getProperties(RecordsMacroParameters parameters, List<String> fields, Predicate<String> known,
-        WarningBuilder unknown, List<Block> warnings)
-        throws MacroExecutionException
+    private String getProperties(RecordsMacroParameters parameters, Map<String, Field> fields,
+        Predicate<String> known, WarningBuilder unknown, List<Block> warnings) throws MacroExecutionException
     {
         String kept = keepKnown(parameters.getProperties(), LIST_SEPARATOR, String::trim, known, unknown, warnings);
         if (kept != null) {
             return kept;
         }
         return Stream.concat(Stream.of(TITLE_PROPERTY),
-            fields.stream().filter(id -> !id.startsWith(METADATA_PREFIX) && !id.startsWith(INTERNAL_PREFIX)))
+            fields.keySet().stream().filter(id -> !id.startsWith(METADATA_PREFIX) && !id.startsWith(INTERNAL_PREFIX)))
             .collect(Collectors.joining(LIST_SEPARATOR));
     }
 
@@ -474,6 +518,92 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         return String.join(FILTER_SEPARATOR, kept);
     }
 
+    /**
+     * Keeps the constraints of a filters value that the type of their field still allows.
+     * <p>
+     * A constraint the type does not allow does not make Live Data ignore it: the {@code liveTable} source matches no
+     * entry at all for a number field filtered on {@code cheap}, which is what is left of a filter authored before
+     * the field became a number. The constraint is dropped with a warning instead, and the table shows the others.
+     * The fields the reader is not told about are left alone, since nothing is known of their type.
+     *
+     * @param filters the filters value, which may be blank
+     * @param fields the fields of the data type, by identifier
+     * @param warnings receives a warning for every constraint the type of its field does not allow
+     * @return the constraints kept, or {@code null} when there is none
+     */
+    private String keepApplicable(String filters, Map<String, Field> fields, List<Block> warnings)
+        throws MacroExecutionException
+    {
+        if (StringUtils.isBlank(filters)) {
+            return null;
+        }
+        List<String> kept = new ArrayList<>();
+        for (String constraint : filters.split(Pattern.quote(FILTER_SEPARATOR))) {
+            String fieldId = getFilterField(constraint);
+            Field field = fields.get(fieldId);
+            if (field == null) {
+                kept.add(constraint);
+            } else if (!field.filterable()) {
+                warnings.add(warning("warning.filterUnsupported", fieldId));
+            } else if (!field.values().test(getFilterValue(constraint))) {
+                warnings.add(warning("warning.filterTypeChanged", fieldId));
+            } else {
+                kept.add(constraint);
+            }
+        }
+        return kept.isEmpty() ? null : String.join(FILTER_SEPARATOR, kept);
+    }
+
+    /**
+     * Keeps the criteria of a sort value whose field can be sorted on.
+     * <p>
+     * The warning names what the table is sorted on instead: the first criterion left, or else the column Live Data
+     * falls back to when given no sort, which is the first one when it can be sorted on.
+     *
+     * @param sort the sort value, which may be {@code null}
+     * @param properties the columns displayed
+     * @param fields the fields of the data type, by identifier
+     * @param warnings receives a warning for every criterion whose field cannot be sorted on
+     * @return the criteria kept, or {@code null} when there is none
+     */
+    private String keepSortable(String sort, String properties, Map<String, Field> fields, List<Block> warnings)
+        throws MacroExecutionException
+    {
+        if (sort == null) {
+            return null;
+        }
+        List<String> kept = new ArrayList<>();
+        List<String> dropped = new ArrayList<>();
+        for (String criterion : sort.split(Pattern.quote(LIST_SEPARATOR))) {
+            String fieldId = getSortField(criterion);
+            Field field = fields.get(fieldId);
+            if (field == null || field.sortable()) {
+                kept.add(criterion);
+            } else {
+                dropped.add(fieldId);
+            }
+        }
+        String fallback = kept.isEmpty() ? getDefaultSort(properties, fields) : getSortField(kept.get(0));
+        for (String fieldId : dropped) {
+            warnings.add(fallback == null ? warning("warning.sortUnsupportedUnsorted", fieldId)
+                : warning("warning.sortUnsupported", fieldId, fallback));
+        }
+        return kept.isEmpty() ? null : String.join(LIST_SEPARATOR, kept);
+    }
+
+    /**
+     * @param properties the columns displayed
+     * @param fields the fields of the data type, by identifier
+     * @return the column Live Data sorts on when given no sort, or {@code null} when it leaves the table unsorted
+     */
+    private String getDefaultSort(String properties, Map<String, Field> fields)
+    {
+        return Stream.of(properties.split(LIST_SEPARATOR)).map(String::trim)
+            .filter(property -> !property.startsWith(INTERNAL_PREFIX)).findFirst()
+            .filter(property -> fields.containsKey(property) && fields.get(property).sortable())
+            .orElse(null);
+    }
+
     private boolean exists(DocumentReference dataType) throws MacroExecutionException
     {
         try {
@@ -493,31 +623,89 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
 
     private String getFilterField(String item)
     {
-        return URLDecoder.decode(StringUtils.substringBefore(item, "="), StandardCharsets.UTF_8).trim();
+        return URLDecoder.decode(StringUtils.substringBefore(item, FILTER_VALUE_SEPARATOR), StandardCharsets.UTF_8)
+            .trim();
+    }
+
+    private String getFilterValue(String item)
+    {
+        return URLDecoder.decode(StringUtils.substringAfter(item, FILTER_VALUE_SEPARATOR), StandardCharsets.UTF_8)
+            .trim();
     }
 
     /**
-     * Reads the identifiers the data type's source offers: the page metadata, the data type's fields and the Live
-     * Data pseudo-columns, in the order the source reports them.
+     * Reads the fields the data type's source offers: the page metadata, the data type's fields and the Live Data
+     * pseudo-columns, in the order the source reports them.
      *
      * @param dataType the serialized reference of the data type
-     * @return the identifiers
+     * @return the fields, by identifier
      * @throws MacroExecutionException when the source cannot be reached or its properties cannot be read
      */
-    private List<String> getFields(String dataType) throws MacroExecutionException
+    private Map<String, Field> getFields(String dataType) throws MacroExecutionException
     {
         Source source = new Source(SOURCE);
         source.setParameter(CLASS_NAME_PARAMETER, dataType);
+        Collection<LiveDataPropertyDescriptor> descriptors;
         try {
-            return this.liveDataSourceManager.get(source)
+            descriptors = this.liveDataSourceManager.get(source)
                 .orElseThrow(() -> new MacroExecutionException(translate(RENDER_FAILED)))
-                .getProperties().get().stream()
-                .map(LiveDataPropertyDescriptor::getId)
-                .filter(Objects::nonNull)
-                .toList();
+                .getProperties().get();
         } catch (LiveDataException e) {
             throw new MacroExecutionException(translate(FIELDS_UNREADABLE, dataType), e);
         }
+        Map<String, LiveDataPropertyDescriptor> types = new HashMap<>();
+        this.sourceDefaults.get().getMeta().getPropertyTypes().forEach(type -> types.putIfAbsent(type.getId(), type));
+        Map<String, Field> fields = new LinkedHashMap<>();
+        for (LiveDataPropertyDescriptor descriptor : descriptors) {
+            if (descriptor.getId() != null) {
+                fields.putIfAbsent(descriptor.getId(), getField(descriptor, types.get(descriptor.getType())));
+            }
+        }
+        return fields;
+    }
+
+    /**
+     * Resolves what the table can do with a field the way Live Data does: from the field's own descriptor, and from
+     * the defaults of its type for whatever the descriptor leaves unset. A field of a type with no defaults can be
+     * neither sorted nor filtered on.
+     *
+     * @param descriptor the descriptor of the field
+     * @param type the defaults of the field's type, {@code null} when there are none
+     * @return what the table can do with the field
+     */
+    private Field getField(LiveDataPropertyDescriptor descriptor, LiveDataPropertyDescriptor type)
+    {
+        boolean sortable = isEnabled(descriptor.isSortable(), type == null ? null : type.isSortable());
+        boolean filterable = isEnabled(descriptor.isFilterable(), type == null ? null : type.isFilterable());
+        FilterDescriptor filter = descriptor.getFilter() != null || type == null ? descriptor.getFilter()
+            : type.getFilter();
+        return new Field(sortable, filterable, getAcceptedValues(filter));
+    }
+
+    private static boolean isEnabled(Boolean own, Boolean typeDefault)
+    {
+        return own != null ? own : Boolean.TRUE.equals(typeDefault);
+    }
+
+    /**
+     * Tells which values the {@code liveTable} source can match a field with. It matches a number filter by parsing
+     * the value, and a boolean one by comparing it with the filter's own true and false values, so anything else
+     * matches no entry. An empty value is always accepted, since it filters nothing.
+     *
+     * @param filter the filter of the field, {@code null} when it has none
+     * @return whether a decoded filter value fits the field
+     */
+    private static Predicate<String> getAcceptedValues(FilterDescriptor filter)
+    {
+        String filterId = filter == null ? null : filter.getId();
+        if (NUMBER_FILTER.equals(filterId)) {
+            return value -> value.isEmpty() || NumberUtils.isCreatable(value);
+        } else if (BOOLEAN_FILTER.equals(filterId)) {
+            List<String> accepted = BOOLEAN_VALUES.stream().map(filter.getParameters()::get).filter(Objects::nonNull)
+                .map(String::valueOf).toList();
+            return value -> value.isEmpty() || accepted.contains(value);
+        }
+        return value -> true;
     }
 
     /**

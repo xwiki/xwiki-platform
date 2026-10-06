@@ -40,6 +40,8 @@ public abstract class AbstractCopyOrMoveRequest extends EntityRequest
      */
     private static final String PROPERTY_UPDATE_LINKS = "updateLinks";
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor.
      */
@@ -94,33 +96,5 @@ public abstract class AbstractCopyOrMoveRequest extends EntityRequest
     public void setUpdateLinks(boolean updateLinks)
     {
         setProperty(PROPERTY_UPDATE_LINKS, updateLinks);
-    }
-
-    /**
-     * @return {@code true} if the job should update the links that target the old entity reference (before the move)
-     *         from anywhere on the farm, {@code false} if the job should update only the links from the wiki where the
-     *         entity was located before the move
-     * @deprecated not taken into account anymore
-     */
-    @Deprecated(since = "14.8RC1")
-    public boolean isUpdateLinksOnFarm()
-    {
-        return true;
-    }
-
-    /**
-     * Sets whether the job should update the links that target the old entity reference (before the move) from anywhere
-     * on the farm, or only from the wiki where the entity was located before the mode.
-     * <p>
-     * Note that this parameter has no effect if {@link #isUpdateLinks()} is {@code false}.
-     *
-     * @param updateLinksOnFarm {@code true} to update the links from anywhere on the farm, {@code false} to update only
-     *            the links from the wiki where the entity is located
-     * @deprecated not taken into account anymore
-     */
-    @Deprecated(since = "14.8RC1")
-    public void setUpdateLinksOnFarm(boolean updateLinksOnFarm)
-    {
-        // Ignored
     }
 }

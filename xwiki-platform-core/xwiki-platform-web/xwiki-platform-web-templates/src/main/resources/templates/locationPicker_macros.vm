@@ -116,7 +116,7 @@
   #if ($isDocumentTreeAvailable)
     <div class="location-picker-compact">
       #spacePicker($macro.parameters)
-      #_compactLocationPickerBrowser($options $macro.multiple)
+      #_compactLocationPickerDropDown($options $macro.multiple)
     </div>
   #else
     #spacePicker($macro.parameters)
@@ -152,7 +152,7 @@
   #setVariable("$return" $macro.serializedLocations)
 #end
 
-#macro (_compactLocationPickerBrowser $options $multiple)
+#macro (_compactLocationPickerDropDown $options $multiple)
   #if ($multiple)
     #set ($macro.browseLabelKey = 'core.widgets.compactLocationPicker.multi.browse')
   #else

@@ -91,15 +91,15 @@ public class CompactLocationPickerElement extends BaseElement
      */
     public String getBrowseLabel()
     {
-        return getBrowseToggle().getAttribute("aria-label");
+        return getDropDownToggle().getAttribute("aria-label");
     }
 
     /**
      * @return {@code true} if the drop down holding the document tree is open, {@code false} otherwise
      */
-    public boolean isBrowserOpen()
+    public boolean isDropDownOpen()
     {
-        return hasClass(getBrowser(), "open");
+        return hasClass(getDropDown(), "open");
     }
 
     /**
@@ -107,11 +107,11 @@ public class CompactLocationPickerElement extends BaseElement
      *
      * @return the document tree used to browse for locations
      */
-    public TreeElement openBrowser()
+    public TreeElement openDropDown()
     {
-        if (!isBrowserOpen()) {
-            getBrowseToggle().click();
-            getDriver().waitUntilCondition(driver -> isBrowserOpen());
+        if (!isDropDownOpen()) {
+            getDropDownToggle().click();
+            getDriver().waitUntilCondition(driver -> isDropDownOpen());
         }
         return getTree().waitForIt();
     }
@@ -121,11 +121,11 @@ public class CompactLocationPickerElement extends BaseElement
      *
      * @return this picker
      */
-    public CompactLocationPickerElement closeBrowser()
+    public CompactLocationPickerElement closeDropDown()
     {
-        if (isBrowserOpen()) {
-            getBrowseToggle().click();
-            getDriver().waitUntilCondition(driver -> !isBrowserOpen());
+        if (isDropDownOpen()) {
+            getDropDownToggle().click();
+            getDriver().waitUntilCondition(driver -> !isDropDownOpen());
         }
         return this;
     }
@@ -139,8 +139,8 @@ public class CompactLocationPickerElement extends BaseElement
      */
     public CompactLocationPickerElement pick(String nodeId)
     {
-        openBrowser().getNode(nodeId).select();
-        getDriver().waitUntilCondition(driver -> !isBrowserOpen());
+        openDropDown().getNode(nodeId).select();
+        getDriver().waitUntilCondition(driver -> !isDropDownOpen());
         return this;
     }
 
@@ -153,7 +153,7 @@ public class CompactLocationPickerElement extends BaseElement
      */
     public CompactLocationPickerElement setChecked(String nodeId, boolean checked)
     {
-        openBrowser();
+        openDropDown();
         if (isChecked(nodeId) != checked) {
             getCheckbox(nodeId).click();
             getDriver().waitUntilCondition(driver -> isChecked(nodeId) == checked);
@@ -202,7 +202,7 @@ public class CompactLocationPickerElement extends BaseElement
 
     private TreeElement getTree()
     {
-        return new TreeElement(getBrowser().findElement(By.className("location-tree")));
+        return new TreeElement(getDropDown().findElement(By.className("location-tree")));
     }
 
     private WebElement getSuggestInputControl()
@@ -212,7 +212,7 @@ public class CompactLocationPickerElement extends BaseElement
         return this.container.findElement(By.cssSelector(".ts-wrapper > .ts-control"));
     }
 
-    private WebElement getBrowser()
+    private WebElement getDropDown()
     {
         return this.container.findElement(By.className("location-picker-browse"));
     }
@@ -222,8 +222,8 @@ public class CompactLocationPickerElement extends BaseElement
         return Arrays.asList(element.getAttribute("class").split("\\s+")).contains(className);
     }
 
-    private WebElement getBrowseToggle()
+    private WebElement getDropDownToggle()
     {
-        return getBrowser().findElement(By.className("dropdown-toggle"));
+        return getDropDown().findElement(By.className("dropdown-toggle"));
     }
 }

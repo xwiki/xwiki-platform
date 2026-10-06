@@ -19,6 +19,7 @@
  */
 package org.xwiki.records.internal.macro;
 
+import java.io.StringReader;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -51,10 +52,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.records.macro.RecordsMacroParameters;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
 
@@ -78,6 +83,9 @@ import org.xwiki.rendering.util.IdGenerator;
  */
 @Component
 @Named(RecordsMacro.ID)
+// The macro is the one place that maps its parameters onto Live Data and builds the messages, which is why it
+// depends on that many types.
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @Singleton
 public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
 {
@@ -155,6 +163,16 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      */
     private static final List<String> SORT_DIRECTIONS = List.of(":asc", ":desc");
 
+    /**
+     * Builds the warning for a field the data type no longer has. Not a {@link Function} because building a message
+     * can fail.
+     */
+    @FunctionalInterface
+    private interface WarningBuilder
+    {
+        Block build(String field) throws MacroExecutionException;
+    }
+
     private static final String DESCRIPTION =
         "Displays a collection of entries of the same object type, as a table readers can sort and filter.";
 
@@ -188,6 +206,22 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
+     * Parses a translated message as plain text, so that nothing in it, such as a field name taken from the wiki, is
+     * read as wiki syntax.
+     */
+    @Inject
+    @Named("plain/1.0")
+    private Parser plainParser;
+
+    /**
+     * Renders the plain text blocks back to XWiki syntax, which escapes whatever the message macros would otherwise
+     * interpret when they parse their content.
+     */
+    @Inject
+    @Named("xwiki/2.1")
+    private BlockRenderer xwikiRenderer;
+
+    /**
      * Default constructor.
      */
     public RecordsMacro()
@@ -207,7 +241,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         String serializedDataType = this.entityReferenceSerializer.serialize(dataType);
         if (!exists(dataType)) {
             // The macro call is left untouched, so that restoring the data type restores the table.
-            return List.of(message("errormessage", "error.dataTypeMissing", serializedDataType));
+            return List.of(message("error", "error.dataTypeMissing", serializedDataType));
         }
 
         List<Block> blocks = new ArrayList<>();
@@ -254,9 +288,9 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         MacroTransformationContext context, String dataType, List<Block> warnings) throws MacroExecutionException
     {
         List<String> fields = getFields(dataType);
-        Function<String, Block> unknownColumn = field -> warning("warning.columnSkipped", field, dataType);
-        Function<String, Block> unknownSort = field -> warning("warning.sortSkipped", field, dataType);
-        Function<String, Block> unknownFilter = field -> warning("warning.filterSkipped", field, dataType);
+        WarningBuilder unknownColumn = field -> warning("warning.columnSkipped", field, dataType);
+        WarningBuilder unknownSort = field -> warning("warning.sortSkipped", field, dataType);
+        WarningBuilder unknownFilter = field -> warning("warning.filterSkipped", field, dataType);
 
         LiveDataRendererParameters liveDataParameters = new LiveDataRendererParameters();
         liveDataParameters.setId(getId(parameters, context));
@@ -331,7 +365,8 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * @return the columns the author chose, or the entry title followed by every field of the data type
      */
     private String getProperties(RecordsMacroParameters parameters, List<String> fields,
-        Function<String, Block> unknown, List<Block> warnings)
+        WarningBuilder unknown, List<Block> warnings)
+        throws MacroExecutionException
     {
         String kept = keepKnown(parameters.getProperties(), LIST_SEPARATOR, String::trim, fields, unknown, warnings);
         if (kept != null) {
@@ -354,7 +389,8 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * @return the items kept, in their original text, or {@code null} when there is none
      */
     private String keepKnown(String value, String separator, Function<String, String> fieldOf, List<String> fields,
-        Function<String, Block> unknown, List<Block> warnings)
+        WarningBuilder unknown, List<Block> warnings)
+        throws MacroExecutionException
     {
         if (StringUtils.isBlank(value)) {
             return null;
@@ -368,7 +404,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
             if (field.startsWith(INTERNAL_PREFIX) || fields.contains(field)) {
                 kept.add(item);
             } else {
-                warnings.add(unknown.apply(field));
+                warnings.add(unknown.build(field));
             }
         }
         return kept.isEmpty() ? null : String.join(separator, kept);
@@ -441,15 +477,44 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         return this.localization.getTranslationPlain(MESSAGE_PREFIX + key, arguments);
     }
 
-    private Block warning(String key, Object... arguments)
+    private Block warning(String key, Object... arguments) throws MacroExecutionException
     {
-        return message("warningmessage", key, arguments);
+        return message("warning", key, arguments);
     }
 
-    private Block message(String cssClass, String key, Object... arguments)
+    /**
+     * Builds a call to a message macro, so that the message looks and is announced like a {@code {{warning}}} or an
+     * {@code {{error}}}, icon and accessible name included. The call is left for the macro transformation to execute,
+     * which it does for the blocks a macro returns.
+     *
+     * @param macroId the identifier of the message macro, {@code warning} or {@code error}
+     * @param key the translation key of the message
+     * @param arguments the arguments of the message
+     * @return the macro call
+     * @throws MacroExecutionException when the message cannot be escaped
+     */
+    private Block message(String macroId, String key, Object... arguments) throws MacroExecutionException
     {
-        return new GroupBlock(List.of(new WordBlock(translate(key, arguments))),
-            Map.of("class", "box " + cssClass));
+        return new MacroBlock(macroId, Map.of(), escape(translate(key, arguments)), false);
+    }
+
+    /**
+     * The message macros parse their content as wiki syntax, while the messages embed names that come from the wiki,
+     * so the text goes through a plain text parser and back out as XWiki syntax, which escapes it.
+     *
+     * @param text the plain text to escape
+     * @return the text as XWiki syntax content that renders as the text itself
+     * @throws MacroExecutionException when the text cannot be parsed
+     */
+    private String escape(String text) throws MacroExecutionException
+    {
+        try {
+            WikiPrinter printer = new DefaultWikiPrinter();
+            this.xwikiRenderer.render(this.plainParser.parse(new StringReader(text)), printer);
+            return printer.toString();
+        } catch (ParseException e) {
+            throw new MacroExecutionException(translate(RENDER_FAILED), e);
+        }
     }
 
     /**

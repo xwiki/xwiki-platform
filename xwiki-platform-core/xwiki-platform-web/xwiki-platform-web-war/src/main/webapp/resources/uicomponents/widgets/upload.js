@@ -49,11 +49,34 @@ define('upload-translations', {
     'status.finished'
   ]
 });
-define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
+define('xwiki-upload', ['jquery', 'xwiki-l10n!upload-translations', 'xwiki-events-bridge'], function($, l10n) {
   /**
    * Internal small utility functions.
    */
   const UploadUtils = class {
+    /**
+     * Prevents the default behavior of the given event and stops its propagation.
+     *
+     * @param event the event to stop, can be undefined
+     */
+    static stopEvent(event)
+    {
+      event?.preventDefault();
+      event?.stopPropagation();
+    }
+
+    /**
+     * Replaces the #{name} placeholders from the given message template with the corresponding parameter values.
+     *
+     * @param template the message template
+     * @param parameters the values to use for the placeholders
+     * @return the formatted message
+     */
+    static formatMessage(template, parameters)
+    {
+      return template.replace(/#\{(\w+)\}/g, (match, key) => parameters[key] ?? '');
+    }
+
     /**
      * Convert seconds to human readable time format.
      *
@@ -188,15 +211,16 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
 
       if (this.options.enableFileInfo) {
         statusUI.FILE_INFO = UploadUtils.createDiv('file-info');
-        statusUI.FILE_NAME = UploadUtils.createSpan('file-name', this.file.name.escapeHTML());
+        statusUI.FILE_NAME = UploadUtils.createSpan('file-name');
+        statusUI.FILE_NAME.textContent = this.file.name;
         statusUI.FILE_NAME.title = this.file.type;
         statusUI.FILE_SIZE_CONTAINER = UploadUtils.createSpan('progress-info');
         statusUI.FILE_SIZE = UploadUtils.createSpan('file-size', UploadUtils.bytesToSize(this.file.size));
         statusUI.FILE_SIZE_CONTAINER.append(statusUI.FILE_SIZE);
         statusUI.FILE_SIZE_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['status.fileSize']);
         statusUI.FILE_SIZE.append(statusUI.FILE_SIZE_ALTERNATIVE);
-        statusUI.FILE_CANCEL = UploadUtils.createButton(icons['cross'], this.cancelUpload.bindAsEventListener(this));
-        statusUI.FILE_CANCEL.addClassName('upload-cancel');
+        statusUI.FILE_CANCEL = UploadUtils.createButton(icons['cross'], event => this.cancelUpload(event));
+        statusUI.FILE_CANCEL.classList.add('upload-cancel');
         statusUI.FILE_CANCEL_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['item.cancel']);
         statusUI.FILE_CANCEL.append(statusUI.FILE_CANCEL_ALTERNATIVE);
         // We want to put the button next to everything else.
@@ -289,14 +313,12 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
         return;
       }
 
-      if (event) {
-        event.stop();
-      }
+      UploadUtils.stopEvent(event);
 
       let formData = new FormData();
       formData.append(this.formData.input.name, this.file);
       let fields = this.formData.additionalFields;
-      Object.keys(fields).each(function (key) {
+      Object.keys(fields).forEach(function (key) {
         fields[key] && formData.append(key, fields[key]);
       });
 
@@ -311,14 +333,14 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       this.statusUI.UPLOAD_STATUS.classList.remove('upload-waiting');
       if (this.options.enableProgressInfo) {
         // Progress listener
-        request.upload.addEventListener('progress', this.onUploadProgress.bindAsEventListener(this), false);
+        request.upload.addEventListener('progress', event => this.onUploadProgress(event), false);
         // Set inner timer
         this.timer = setInterval(this.doInnerUpdates.bind(this), Math.round(1000 / this.progressData.updatesPerSecond));
       }
-      request.upload.addEventListener('load', this.onUploadFinish.bindAsEventListener(this), false);
-      request.addEventListener('load', this.onRequestDone.bindAsEventListener(this), false);
-      request.addEventListener('error', this.onUploadError.bindAsEventListener(this), false);
-      request.addEventListener('abort', this.onUploadAbort.bindAsEventListener(this), false);
+      request.upload.addEventListener('load', () => this.onUploadFinish(), false);
+      request.addEventListener('load', event => this.onRequestDone(event), false);
+      request.addEventListener('error', () => this.onUploadError(), false);
+      request.addEventListener('abort', () => this.onUploadAbort(), false);
       request.open('POST', this.formData.action);
       request.send(formData);
     }
@@ -330,14 +352,15 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
      */
     cancelUpload(event)
     {
-      event?.stop();
+      UploadUtils.stopEvent(event);
       if (this.completed) {
         return;
       }
       this.request?.abort();
       this.canceled = true;
       clearInterval(this.timer);
-      this.statusUI.UPLOAD_STATUS.removeClassName('upload-inprogress').addClassName('upload-canceled');
+      this.statusUI.UPLOAD_STATUS.classList.remove('upload-inprogress');
+      this.statusUI.UPLOAD_STATUS.classList.add('upload-canceled');
     }
 
     /**
@@ -365,8 +388,8 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       // update speed info
       let speed = UploadUtils.bytesToSize(crtBytesPerSecond, true);
       this.progressData.latestSpeed = speed;
-      this.statusUI.PROGRESS_SPEED.update(`(${speed})`);
-      this.statusUI.PROGRESS_REMAINING.update(UploadUtils.secondsToTime(secondsRemaining));
+      this.statusUI.PROGRESS_SPEED.textContent = `(${speed})`;
+      this.statusUI.PROGRESS_REMAINING.textContent = UploadUtils.secondsToTime(secondsRemaining);
     }
 
     /**
@@ -382,11 +405,11 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
         const percentageCompleted = Math.round(event.loaded * 100 / event.total);
         const bytesTransfered = UploadUtils.bytesToSize(this.progressData.bytesUploaded);
 
-        this.statusUI.PROGRESS_PERCENTAGE.update(percentageCompleted + '%');
+        this.statusUI.PROGRESS_PERCENTAGE.textContent = percentageCompleted + '%';
         this.statusUI.PROGRESS.setAttribute('value', percentageCompleted / 100);
-        this.statusUI.PROGRESS_TRANSFERED.update('(' + bytesTransfered + ')');
+        this.statusUI.PROGRESS_TRANSFERED.textContent = '(' + bytesTransfered + ')';
       } else {
-        this.statusUI.PROGRESS.update('n/a'); //Unable to compute
+        this.statusUI.PROGRESS.textContent = 'n/a'; //Unable to compute
       }
     }
 
@@ -397,10 +420,10 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     {
       this.completed = true;
       clearInterval(this.timer);
-      this.formData.input.fire('xwiki:html5upload:message', {
+      $(this.formData.input).trigger('xwiki:html5upload:message', [{
         content: 'UPLOAD_FINISHING', type: 'inprogress', source: this,
         parameters: {name: this.file.name}
-      });
+      }]);
     }
 
     /**
@@ -418,24 +441,25 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       }
 
       if (event?.target?.responseText) {
-        this.statusUI.UPLOAD_RESPONSE.update(event.target.responseText);
+        this.statusUI.UPLOAD_RESPONSE.innerHTML = event.target.responseText;
       }
 
       if (this.options.enableProgressInfo) {
-        this.statusUI.PROGRESS_PERCENTAGE.update('100%');
-        this.statusUI.PROGRESS_REMAINING.update('00:00:00');
-        this.statusUI.PROGRESS_TRANSFERED.update(UploadUtils.bytesToSize(this.file.size));
+        this.statusUI.PROGRESS_PERCENTAGE.textContent = '100%';
+        this.statusUI.PROGRESS_REMAINING.textContent = '00:00:00';
+        this.statusUI.PROGRESS_TRANSFERED.textContent = UploadUtils.bytesToSize(this.file.size);
         if (this.progressData.latestSpeed === 0) {
-          this.statusUI.PROGRESS_SPEED.update('(' + UploadUtils.bytesToSize(this.file.size, true) + ')');
+          this.statusUI.PROGRESS_SPEED.textContent = '(' + UploadUtils.bytesToSize(this.file.size, true) + ')';
         }
       }
-      this.formData.input.fire('xwiki:html5upload:message', {
+      $(this.formData.input).trigger('xwiki:html5upload:message', [{
         content: 'UPLOAD_FINISHED', type: 'done', source: this,
         parameters: {name: this.file.name, size: UploadUtils.bytesToSize(this.file.size)}
-      });
-      this.formData.input.fire('xwiki:html5upload:fileFinished', {source: this});
+      }]);
+      $(this.formData.input).trigger('xwiki:html5upload:fileFinished', [{source: this}]);
       clearInterval(this.timer);
-      this.statusUI.UPLOAD_STATUS.removeClassName('upload-inprogress').addClassName('upload-done');
+      this.statusUI.UPLOAD_STATUS.classList.remove('upload-inprogress');
+      this.statusUI.UPLOAD_STATUS.classList.add('upload-done');
     }
 
     /**
@@ -443,7 +467,8 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
      */
     onUploadError()
     {
-      this.statusUI.UPLOAD_STATUS.removeClassName('upload-inprogress').addClassName('upload-error');
+      this.statusUI.UPLOAD_STATUS.classList.remove('upload-inprogress');
+      this.statusUI.UPLOAD_STATUS.classList.add('upload-error');
       this.abnormalUploadFinish('UNKNOWN_ERROR');
     }
 
@@ -463,11 +488,11 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     abnormalUploadFinish(message)
     {
       clearInterval(this.timer);
-      this.formData.input.fire('xwiki:html5upload:message', {
+      $(this.formData.input).trigger('xwiki:html5upload:message', [{
         content: message, type: 'error', source: this, parameters:
             {name: this.file.name}
-      });
-      this.formData.input.fire('xwiki:html5upload:fileFinished', {source: this});
+      }]);
+      $(this.formData.input).trigger('xwiki:html5upload:fileFinished', [{source: this}]);
     }
   }
 
@@ -505,12 +530,12 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
 
     /** Templates for feedback messages displayed to the user. */
     messages = {
-      UNKNOWN_ERROR: new Template(l10n.get('error.unknown', '#{name}')),
-      INVALID_FILE_TYPE: new Template(l10n.get('error.invalidType', '#{name}')),
-      UPLOAD_LIMIT_EXCEEDED: new Template(l10n.get('error.invalidSize', '#{name}', '#{size}')),
-      UPLOAD_ABORTED: new Template(l10n.get('error.aborted', '#{name}')),
-      UPLOAD_FINISHING: new Template(l10n.get('status.finishing', '#{name}')),
-      UPLOAD_FINISHED: new Template(l10n.get('status.finished', '#{name}', '#{size}'))
+      UNKNOWN_ERROR: l10n.get('error.unknown', '#{name}'),
+      INVALID_FILE_TYPE: l10n.get('error.invalidType', '#{name}'),
+      UPLOAD_LIMIT_EXCEEDED: l10n.get('error.invalidSize', '#{name}', '#{size}'),
+      UPLOAD_ABORTED: l10n.get('error.aborted', '#{name}'),
+      UPLOAD_FINISHING: l10n.get('status.finishing', '#{name}'),
+      UPLOAD_FINISHED: l10n.get('status.finished', '#{name}', '#{size}')
     }
 
     /**
@@ -522,7 +547,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     constructor(input, options)
     {
       // Update the options
-      this.options = Object.extend(Object.clone(this.options), options || {});
+      this.options = {...this.options, ...options};
 
       if (input.__x_html5uploader) {
         return;
@@ -533,14 +558,14 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       // Make sure the input for which the uploader is being generated is of type file, and it belongs to a form
       if (input.type !== 'file') return;
       this.input = input;
-      this.inputContainer = this.input.up('.fileupload-field') || this.input;
+      this.inputContainer = this.input.parentElement?.closest('.fileupload-field') || this.input;
       this.form = input.form;
       if (!this.form) {
         return;
       }
 
       // Any mentions of a filename filter present in the form?
-      const customFilter = this.form.down('input[type=hidden][name=' + input.name + '__filter]');
+      const customFilter = this.form.querySelector('input[type=hidden][name=' + input.name + '__filter]');
       if (!this.options.fileFilter && customFilter && customFilter.value !== '') {
         this.options.fileFilter = new RegExp(customFilter.value, "i");
       }
@@ -549,7 +574,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       this.options.targetURL = this.options.targetURL || this.form.action;
 
       // Get the input that contains the comment
-      let comment = this.form.down('input[name=comment]');
+      let comment = this.form.querySelector('input[name=comment]');
 
       // Prepare common form data to send with each uploaded file
       this.formData = {
@@ -558,19 +583,19 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
         comment: comment,
         additionalFields: {}
       };
-      let redirect = this.form.down('input[name=xredirect]');
+      let redirect = this.form.querySelector('input[name=xredirect]');
       this.formData.additionalFields.xredirect = this.options.responseURL || redirect?.value;
-      let form_token = this.form.down('input[name=form_token]');
+      let form_token = this.form.querySelector('input[name=form_token]');
       form_token && (this.formData.additionalFields.form_token = form_token.value);
 
       // Attach event listeners to the target file input
-      this.onUploadNextFile = this.onUploadNextFile.bindAsEventListener(this);
-      this.input.observe('change', this.onFilesSelected.bindAsEventListener(this));
-      this.input.observe('xwiki:html5upload:start', this.showUploadStatus.bindAsEventListener(this));
-      this.input.observe('xwiki:html5upload:start', this.onUploadNextFile);
-      this.input.observe('xwiki:html5upload:fileFinished', this.onUploadNextFile);
-      this.input.observe('xwiki:html5upload:message', this.onMessage.bindAsEventListener(this));
-      this.input.observe('xwiki:html5upload:done', this.onUploadDone.bindAsEventListener(this));
+      this.onUploadNextFile = this.onUploadNextFile.bind(this);
+      this.input.addEventListener('change', () => this.onFilesSelected());
+      $(this.input).on('xwiki:html5upload:start', () => this.showUploadStatus())
+        .on('xwiki:html5upload:start', this.onUploadNextFile)
+        .on('xwiki:html5upload:fileFinished', this.onUploadNextFile)
+        .on('xwiki:html5upload:message', (event, data) => this.onMessage(event, data))
+        .on('xwiki:html5upload:done', () => this.onUploadDone());
 
       // Generate the upload status UI (initially hidden)
       this.generateStatusUI();
@@ -586,13 +611,13 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       statusUI.LIST = UploadUtils.createDiv('upload-status-list');
       statusUI.CANCEL = UploadUtils.createButton(
           l10n['cancelAll'],
-          this.cancelUpload.bindAsEventListener(this)
+          event => this.cancelUpload(event)
       );
       statusUI.HIDE = UploadUtils.createButton(
           l10n['hideStatus'],
-          this.hideUploadStatus.bindAsEventListener(this)
+          event => this.hideUploadStatus(event)
       );
-      statusUI.HIDE.hide();
+      statusUI.HIDE.style.display = 'none';
       statusUI.CONTAINER.append(statusUI.LIST, statusUI.CANCEL, statusUI.HIDE);
     }
 
@@ -602,8 +627,8 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     showUploadStatus()
     {
       this.inputContainer.parentNode.append(this.statusUI.CONTAINER);
-      this.statusUI.HIDE.hide();
-      this.statusUI.CANCEL.show();
+      this.statusUI.HIDE.style.display = 'none';
+      this.statusUI.CANCEL.style.display = '';
     }
 
     /**
@@ -611,10 +636,10 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
      */
     hideUploadStatus(event)
     {
-      if(event) event.stop();
+      UploadUtils.stopEvent(event);
       this.input.value = '';
       this.statusUI.CONTAINER.remove();
-      this.statusUI.LIST.update('');
+      this.statusUI.LIST.replaceChildren();
     }
 
     /**
@@ -627,22 +652,23 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       for (let i = 0; i < total; ++i) {
         let file = this.input.files[i];
         try {
-          const event = Event.fire(this.input, 'xwiki:actions:beforeUpload', {
+          const event = $.Event('xwiki:actions:beforeUpload');
+          $(this.input).trigger(event, [{
             file: file
-          });
+          }]);
           // Queue the file only if no listener cancelled the event.
-          if (!event.defaultPrevented) {
+          if (!event.isDefaultPrevented()) {
             this.fileUploadItems.push(new FileUploadItem(file, this.statusUI.LIST, this.formData, this.options));
           }
         } catch (ex) {
           console.error(ex);
           this.showMessage(ex, 'error', {
             size: UploadUtils.bytesToSize(this.options?.maxFilesize),
-            name: file.name.escapeHTML(), type: file.type
+            name: file.name, type: file.type
           });
         }
       }
-      Event.fire(this.input, 'xwiki:html5upload:start');
+      $(this.input).trigger('xwiki:html5upload:start');
     }
 
     /**
@@ -654,7 +680,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       if (next) {
         next.startUploading();
       } else {
-        Event.fire(this.input, 'xwiki:html5upload:done');
+        $(this.input).trigger('xwiki:html5upload:done');
       }
     }
 
@@ -665,10 +691,10 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
      */
     cancelUpload(event)
     {
-      event?.stop();
-      this.fileUploadItems.invoke('cancelUpload');
+      UploadUtils.stopEvent(event);
+      this.fileUploadItems.forEach(fileUploadItem => fileUploadItem.cancelUpload());
       this.currentUpload?.cancelUpload();
-      this.input.fire('xwiki:html5upload:done');
+      $(this.input).trigger('xwiki:html5upload:done');
     }
 
     /**
@@ -678,29 +704,30 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
      */
     onUploadDone()
     {
-      this.statusUI.CANCEL.hide();
+      this.statusUI.CANCEL.style.display = 'none';
       if (this.options.progressAutohide) {
-        setTimeout(this.hideUploadStatus.bind(this), 2000);
+        setTimeout(() => this.hideUploadStatus(), 2000);
       } else {
-        this.statusUI.HIDE.show();
+        this.statusUI.HIDE.style.display = '';
       }
     }
 
     /**
      * Event handler called when a message is received from a FileUploadItem object.
      *
-     * @param event the event, which must hold in its memo the <tt>source</tt> object,
-     * the <tt>content</tt> of the message, and, optionally, a message <tt>type</tt> and a <tt>parameters</tt> map
+     * @param event the event
+     * @param data the event data, which must hold the <tt>source</tt> object, the <tt>content</tt> of the message, and,
+     * optionally, a message <tt>type</tt> and a <tt>parameters</tt> map
      */
-    onMessage(event)
+    onMessage(event, data)
     {
-      if (!(event.memo?.source && event.memo?.content)) {
+      if (!(data?.source && data?.content)) {
         return;
       }
-      if (event.memo.source._currentMessage) {
-        event.memo.source._currentMessage.hide();
+      if (data.source._currentMessage) {
+        data.source._currentMessage.hide();
       }
-      event.memo.source._currentMessage = this.showMessage(event.memo.content, event.memo.type, event.memo.parameters);
+      data.source._currentMessage = this.showMessage(data.content, data.type, data.parameters);
     }
 
     /**
@@ -708,14 +735,18 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
      *
      * @param message the identifier of the message to display, a key in the messages object
      * @param type the type of the notification message, see types supported by XWiki.widgets.Notification
-     * @param parameters optional Template parameters
+     * @param parameters optional message template parameters
      * @return an XWiki.widgets.Notification object displaying the requested message
      */
     showMessage(message, type, parameters)
     {
-      let formattedMessage = this.messages[message] || message;
-      if (formattedMessage instanceof Template) {
-        formattedMessage = formattedMessage.evaluate(parameters || {});
+      const template = this.messages[message];
+      let formattedMessage = message;
+      if (typeof template === 'string') {
+        formattedMessage = UploadUtils.formatMessage(template, parameters || {});
+      } else if (typeof template?.evaluate === 'function') {
+        // Support message templates created with Prototype.js' Template (backwards compatibility).
+        formattedMessage = template.evaluate(parameters || {});
       }
       return new XWiki.widgets.Notification(formattedMessage, type || "plain");
     }
@@ -726,15 +757,17 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
      */
     hideFormButtons()
     {
-      if (!this.form.hasClassName('html5upload-initialized')) {
-        this.form.addClassName('html5upload-initialized');
+      if (!this.form.classList.contains('html5upload-initialized')) {
+        this.form.classList.add('html5upload-initialized');
         if (this.options.autoUpload) {
           // Hide submit buttons
-          this.form.select('input[type=submit]').invoke('hide');
+          this.form.querySelectorAll('input[type=submit]').forEach(submitButton => {
+            submitButton.style.display = 'none';
+          });
         }
-        const cancelButton = this.form.down('.cancel');
+        const cancelButton = this.form.querySelector('.cancel');
         if (cancelButton) {
-          cancelButton.hide();
+          cancelButton.style.display = 'none';
         }
       }
     }

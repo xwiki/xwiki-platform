@@ -26,9 +26,15 @@
   #end
   #if ($request.uorg == 'user')
     #set ($statement = "from doc.object(XWiki.XWikiUsers) as user " +
-      "where lower(doc.name) like :input or " +
-        "concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input " +
-      "order by lower(user.first_name), user.first_name, lower(user.last_name), user.last_name")
+      "where (lower(doc.name) like :input or " +
+        "concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input) ")
+    #if ($request.includeInactiveUsers != 'true')
+      ## Suggest only the enabled users, unless the caller explicitly asks for the disabled users too. An enabled user
+      ## always has its "active" property set to 1.
+      #set ($statement = "${statement}and user.active = 1 ")
+    #end
+    #set ($statement = "${statement}order by lower(user.first_name), user.first_name, lower(user.last_name), " +
+      "user.last_name")
   #else
     #set ($statement = 'from doc.object(XWiki.XWikiGroups) as groups ' +
       'where lower(doc.name) like :input and doc.fullName <> ''XWiki.XWikiGroupTemplate'' ' +

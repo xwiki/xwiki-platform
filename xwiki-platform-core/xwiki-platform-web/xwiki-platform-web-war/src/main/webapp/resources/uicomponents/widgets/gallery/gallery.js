@@ -32,6 +32,10 @@
 #end
 #[[*/
 // Start JavaScript-only code.
+define('xwiki-gallery-icons', {
+  icons: ['arrow-expand', 'arrow-compress']
+});
+
 (function(l10n) {
   "use strict";
 globalThis.XWiki = (function (XWiki) {
@@ -42,6 +46,11 @@ XWiki.Gallery = Class.create({
     // Generate the different parts of the gallery
     let maximizeButton = new Element('button', {
       'class': 'maximize', 'title': l10n['core.widgets.gallery.maximize']});
+    require(['xwiki-icon!xwiki-gallery-icons'], function(icons) {
+      // The CSS expects the expand icon to come first, in order to show only the icon matching the current action.
+      maximizeButton.insert(icons['arrow-expand']?.render());
+      maximizeButton.insert(icons['arrow-compress']?.render());
+    });
     let previousButton = new Element('button', {
       'class': 'previous', 'title': l10n['core.widgets.gallery.previousImage']});
     previousButton.insert("&lt;");

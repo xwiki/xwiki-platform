@@ -153,8 +153,6 @@ public class ResourceReferenceRenamer
 
         DocumentReference linkTargetDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
-        EntityReference newTargetReference = newReference;
-        ResourceType newResourceType = resourceReference.getType();
         EntityReference absoluteResolvedEntityReference = this.entityReferenceResolver.resolve(resourceReference, null);
         DocumentReference absoluteResolvedDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(absoluteResolvedEntityReference);
@@ -172,39 +170,56 @@ public class ResourceReferenceRenamer
             || isPageReferenceOutOfParent(resourceReference, linkTargetDocumentReference, updatedEntities));
 
         if (shouldBeUpdated) {
-            // If the link was resolved to a space...
-            if (EntityType.SPACE.equals(linkEntityReference.getType())) {
-                if (DEFAULT_SPACE_HOMEPAGE.equals(newReference.getName())) {
-                    // If the new document reference is also a space (non-terminal doc), be careful to keep it
-                    // serialized as a space still (i.e. without ".WebHome") and not serialize it as a doc by mistake
-                    // (i.e. with ".WebHome").
-                    newTargetReference = newReference.getLastSpaceReference();
-                } else {
-                    // If the new target is a non-terminal document, we can not use a "space:" resource type to access
-                    // it anymore. To fix it, we need to change the resource type of the link reference "doc:".
-                    newResourceType = ResourceType.DOCUMENT;
-                }
-            }
-
-            // If the link was resolved to a page...
-            if (EntityType.PAGE.equals(linkEntityReference.getType())) {
-                // Be careful to keep it serialized as a page still and not serialize it as a doc by mistake
-                newTargetReference = this.defaultReferencePageReferenceResolver.resolve(newReference);
-            }
-
-            // If the link was resolved as an attachment
-            if (EntityType.ATTACHMENT.equals(linkEntityReference.getType())) {
-                // Make sure to serialize an attachment reference and not just the document
-                newTargetReference = new AttachmentReference(linkEntityReference.getName(), newReference);
-            }
-
-            String newReferenceString = getNewTargetReference(resourceReference, newTargetReference,
-                currentDocumentReference);
-            resourceReference.setReference(newReferenceString);
-            resourceReference.setType(newResourceType);
+            setNewTarget(resourceReference, linkEntityReference, newReference, currentDocumentReference);
             result = true;
         }
         return result;
+    }
+
+    /**
+     * Make the given resource reference target the new document, keeping the kind of entity it was resolved to
+     * (space, page, attachment or document).
+     *
+     * @param resourceReference the resource reference to update
+     * @param linkEntityReference the entity the resource reference was resolved to before the update
+     * @param newReference the new document reference target
+     * @param baseReference the reference relative to which the new target is serialized
+     */
+    private void setNewTarget(ResourceReference resourceReference, EntityReference linkEntityReference,
+        DocumentReference newReference, EntityReference baseReference)
+    {
+        EntityReference newTargetReference = newReference;
+        ResourceType newResourceType = resourceReference.getType();
+
+        // If the link was resolved to a space...
+        if (EntityType.SPACE.equals(linkEntityReference.getType())) {
+            if (DEFAULT_SPACE_HOMEPAGE.equals(newReference.getName())) {
+                // If the new document reference is also a space (non-terminal doc), be careful to keep it
+                // serialized as a space still (i.e. without ".WebHome") and not serialize it as a doc by mistake
+                // (i.e. with ".WebHome").
+                newTargetReference = newReference.getLastSpaceReference();
+            } else {
+                // If the new target is a non-terminal document, we can not use a "space:" resource type to access
+                // it anymore. To fix it, we need to change the resource type of the link reference "doc:".
+                newResourceType = ResourceType.DOCUMENT;
+            }
+        }
+
+        // If the link was resolved to a page...
+        if (EntityType.PAGE.equals(linkEntityReference.getType())) {
+            // Be careful to keep it serialized as a page still and not serialize it as a doc by mistake
+            newTargetReference = this.defaultReferencePageReferenceResolver.resolve(newReference);
+        }
+
+        // If the link was resolved as an attachment
+        if (EntityType.ATTACHMENT.equals(linkEntityReference.getType())) {
+            // Make sure to serialize an attachment reference and not just the document
+            newTargetReference = new AttachmentReference(linkEntityReference.getName(), newReference);
+        }
+
+        String newReferenceString = getNewTargetReference(resourceReference, newTargetReference, baseReference);
+        resourceReference.setReference(newReferenceString);
+        resourceReference.setType(newResourceType);
     }
 
     private String getNewTargetReference(ResourceReference resourceReference, EntityReference newTargetReference,
@@ -239,6 +254,20 @@ public class ResourceReferenceRenamer
         return result;
     }
 
+    /**
+     * @param resourceReference the resource reference to check
+     * @param linkReference the entity the resource reference resolves to, relative to the document holding it
+     * @param documentReference the document reference to compare with
+     * @return {@code true} if the resource reference targets the given document (or an entity it holds, such as an
+     *     attachment) and is absolute, i.e. its resolution doesn't depend on the document holding it
+     */
+    private boolean isAbsoluteReferenceToDocument(ResourceReference resourceReference, EntityReference linkReference,
+        DocumentReference documentReference)
+    {
+        return documentReference.equals(this.defaultReferenceDocumentReferenceResolver.resolve(linkReference))
+            && linkReference.equals(this.entityReferenceResolver.resolve(resourceReference, null));
+    }
+
     private <T extends EntityReference> boolean updateRelativeResourceReference(ResourceReference resourceReference,
         T oldReference, T newReference, Map<EntityReference, EntityReference> updatedEntities)
     {
@@ -249,6 +278,17 @@ public class ResourceReferenceRenamer
         // current link, use the old document's reference to fill in blanks.
         EntityReference oldLinkReference =
             this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
+
+        if (oldReference instanceof DocumentReference oldDocumentReference
+            && isAbsoluteReferenceToDocument(resourceReference, oldLinkReference, oldDocumentReference)) {
+            // An absolute reference to the moved document itself (or to one of its attachments) is not affected by
+            // the change of location of the document holding it, so it needs to be explicitly redirected to the new
+            // location. It's serialized relative to the wiki only, to keep it absolute as it was written.
+            DocumentReference newDocumentReference = (DocumentReference) newReference;
+            setNewTarget(resourceReference, oldLinkReference, newDocumentReference,
+                newDocumentReference.getWikiReference());
+            return true;
+        }
 
         boolean docExists = false;
         EntityType entityType = linkEntityReference.getType();

@@ -19,24 +19,29 @@
 ## ---------------------------------------------------------------------------
 ## Displays the filter picker of a Records table: one item per field=value constraint.
 ##
-## Everything this template does mirrors the columns picker, and for the same reasons: the candidates depend on the
-## sibling class parameter, which no displayer can be told about, so they are loaded by the browser; the element is
-## marked with a class of ours rather than xwiki-selectize, so that this module owns the enhancement; and the
-## bundle is loaded as a classic script, since the macro editor injects this template with jQuery. See
-## templates/html_displayer/recordscolumns/edit.vm for the long form of each.
+## Like the columns and sort pickers, this one gets its candidates from the browser, because they depend on the
+## sibling class parameter and no displayer can be told about it. The element carries a class of ours rather than
+## xwiki-selectize, so that this module owns the enhancement, and the bundle is loaded as a classic script, because
+## the macro editor injects this template with jQuery. templates/html_displayer/recordscolumns/edit.vm explains each
+## of these in full.
 ##
-## Unlike the other two pickers, this one separates its items with & rather than with a comma, since that is how
-## the parameter separates its constraints. The widget is told so in JavaScript, along with everything else that
-## is behaviour rather than markup.
+## Unlike those two pickers, this one is a text input rather than a multiple select. The parameter separates its
+## constraints with &, but when the macro editor finds a field holding several values it joins them with a comma.
+## With a single text input, the suggest widget writes the &-separated string itself, so the editor reads one
+## value back and stores it unchanged. Reopening works the same way in reverse: the editor sets the stored string
+## as the input value and the widget splits it on &. The widget learns its delimiter in JavaScript.
+##
+## An empty input submits an empty value, so removing every filter clears the parameter. That is why the hidden
+## input #suggestInput adds after a multiple select is not needed here.
 #set ($parameters = {})
 #set ($discard = $parameters.putAll($displayer.parameters))
 #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-records-filters"))
-#set ($discard = $parameters.put('multiple', 'multiple'))
-#if ("$!displayer.value" != '')
-  #set ($discard = $parameters.put('value', "$displayer.value"))
-#end
 #set ($discard = $parameters.putIfAbsent('placeholder',
   $services.localization.render('rendering.macro.records.parameter.filters.placeholder')))
 <script src="$escapetool.xml($services.webjars.url(
   'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
-#suggestInput($parameters)
+<input type="text" value="$!escapetool.xml($displayer.value)"
+  #foreach ($parameter in $parameters.entrySet())
+    $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+  #end
+/>

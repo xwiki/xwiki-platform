@@ -19,6 +19,7 @@
  */
 package org.xwiki.records.internal.macro;
 
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
@@ -45,12 +48,29 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.records.macro.RecordsMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.listener.ListenerRegistry;
+import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
+import org.xwiki.rendering.internal.parser.plain.PlainTextStreamParser;
+import org.xwiki.rendering.internal.plain.Plain10SyntaxProvider;
+import org.xwiki.rendering.internal.renderer.xwiki20.reference.XWiki20ResourceReferenceTypeSerializer;
+import org.xwiki.rendering.internal.renderer.xwiki21.XWikiSyntaxBlockRenderer;
+import org.xwiki.rendering.internal.renderer.xwiki21.XWikiSyntaxRenderer;
+import org.xwiki.rendering.internal.renderer.xwiki21.XWikiSyntaxRendererFactory;
+import org.xwiki.rendering.internal.renderer.xwiki21.reference.InterWikiReferenceTypeSerializer;
+import org.xwiki.rendering.internal.renderer.xwiki21.reference.XWiki21ResourceReferenceTypeSerializer;
+import org.xwiki.rendering.internal.renderer.xwiki21.reference.XWikiSyntaxImageReferenceSerializer;
+import org.xwiki.rendering.internal.renderer.xwiki21.reference.XWikiSyntaxLinkReferenceSerializer;
+import org.xwiki.rendering.internal.syntax.DefaultSyntaxRegistry;
+import org.xwiki.rendering.internal.xwiki21.XWiki21SyntaxProvider;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -66,6 +86,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -79,6 +100,15 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+// The real plain text parser and XWiki syntax renderer, since what is under test is the escaping they perform.
+@ComponentList({
+    PlainTextBlockParser.class, PlainTextStreamParser.class,
+    XWikiSyntaxBlockRenderer.class, XWikiSyntaxRenderer.class, XWikiSyntaxRendererFactory.class,
+    XWikiSyntaxLinkReferenceSerializer.class, XWikiSyntaxImageReferenceSerializer.class,
+    XWiki21ResourceReferenceTypeSerializer.class, InterWikiReferenceTypeSerializer.class,
+    XWiki20ResourceReferenceTypeSerializer.class, ListenerRegistry.class,
+    DefaultSyntaxRegistry.class, Plain10SyntaxProvider.class, XWiki21SyntaxProvider.class
+})
 @ComponentTest
 class RecordsMacroTest
 {
@@ -111,6 +141,11 @@ class RecordsMacroTest
     @MockComponent
     @Named("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    // Needed by the syntax registry that the XWiki syntax renderer looks the syntaxes up in.
+    @MockComponent
+    @Named("context")
+    private ComponentManager contextComponentManager;
 
     private final Block renderedBlock = new GroupBlock(List.of());
 
@@ -266,6 +301,36 @@ class RecordsMacroTest
     }
 
     @Test
+    void executeEscapesTheWikiSyntaxOfAFieldNameInAWarning() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setProperties("**x**,email");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        // The name comes from the wiki and the message macro parses its content, so the name must not be read as
+        // syntax.
+        assertEquals("rendering.macro.records.warning.columnSkipped[~*~*x~*~*, Clients.Code.ProjectClass]",
+            ((MacroBlock) blocks.get(0)).getContent());
+    }
+
+    @Test
+    void executeFailsWhenAMessageCannotBeEscaped() throws Exception
+    {
+        ParseException cause = new ParseException("parse failure");
+        Parser failingParser = mock(Parser.class);
+        when(failingParser.parse(any(Reader.class))).thenThrow(cause);
+        // The real plain text parser never fails, so this is the only way to reach the failure.
+        ReflectionUtils.setFieldValue(this.macro, "plainParser", failingParser);
+        when(this.documentAccessBridge.exists(DATA_TYPE)).thenReturn(false);
+
+        MacroExecutionException exception = assertThrows(MacroExecutionException.class,
+            () -> this.macro.execute(newParameters(), null, this.context));
+
+        assertSame(cause, exception.getCause());
+    }
+
+    @Test
     void executeFallsBackToTheDefaultColumnsWhenNoneOfTheAuthoredOnesIsLeft() throws Exception
     {
         RecordsMacroParameters parameters = newParameters();
@@ -332,9 +397,8 @@ class RecordsMacroTest
 
         List<Block> blocks = this.macro.execute(newParameters(), null, this.context);
 
-        assertEquals(List.of(new GroupBlock(
-            List.of(new WordBlock("rendering.macro.records.error.dataTypeMissing[Clients.Code.ProjectClass]")),
-            Map.of("class", "box errormessage"))), blocks);
+        assertEquals(List.of(new MacroBlock("error", Map.of(),
+            "rendering.macro.records.error.dataTypeMissing[Clients.Code.ProjectClass]", false)), blocks);
         verify(this.liveDataRenderer, never()).execute(any(LiveDataRendererParameters.class), anyString(),
             anyBoolean());
     }
@@ -521,7 +585,7 @@ class RecordsMacroTest
 
     private static Block warning(String message)
     {
-        return new GroupBlock(List.of(new WordBlock(message)), Map.of("class", "box warningmessage"));
+        return new MacroBlock("warning", Map.of(), message, false);
     }
 
     /**

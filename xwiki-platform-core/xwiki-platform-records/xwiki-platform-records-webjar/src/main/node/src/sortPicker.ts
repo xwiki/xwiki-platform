@@ -42,20 +42,35 @@ import type { FieldOption, PropertyDescriptor } from "./fieldPicker";
 const DIRECTION_SEPARATOR = ":";
 
 /**
- * The directions Live Data understands, with the label each is offered under.
- *
- * English rather than translated for the same reason as the rest of this webjar: a webjar has no access to a
- * translation bundle, and these belong in the macro's bundle once the dialog has a way to reach one.
+ * The words a sort criterion is labelled with, already translated.
  */
-const DIRECTIONS: readonly { value: string; label: string }[] = [
-  { value: "asc", label: "ascending" },
-  { value: "desc", label: "descending" },
-];
+interface DirectionLabels {
+  /**
+   * The label of the ascending direction.
+   */
+  ascending: string;
+  /**
+   * The label of the descending direction.
+   */
+  descending: string;
+  /**
+   * The label of a criterion that names no direction, since Live Data then applies the source's own order.
+   */
+  defaultOrder: string;
+}
 
 /**
- * How a criterion that names no direction is labelled, since Live Data then applies the source's own order.
+ * @param labels - the translated direction labels
+ * @returns the directions Live Data understands, with the label each is offered under
  */
-const DEFAULT_DIRECTION_LABEL = "default order";
+function directionsOf(
+  labels: DirectionLabels,
+): readonly { value: string; label: string }[] {
+  return [
+    { value: "asc", label: labels.ascending },
+    { value: "desc", label: labels.descending },
+  ];
+}
 
 /**
  * @param criterion - one criterion, with or without a direction
@@ -72,19 +87,21 @@ function fieldOf(criterion: string): string {
  * @param descriptors - the property descriptors of the data type
  * @param query - the text the author typed, matched against both the label and the stored value
  * @param selected - the criteria already picked, whose fields are not offered again
+ * @param labels - the translated direction labels
  * @returns two options per candidate field still available, ascending first
  */
 function toSortOptions(
   descriptors: PropertyDescriptor[],
-  query = "",
-  selected: readonly string[] = [],
+  query: string,
+  selected: readonly string[],
+  labels: DirectionLabels,
 ): FieldOption[] {
   const used = new Set(selected.map(fieldOf));
   return descriptors
     .filter(isCandidate)
     .filter((descriptor) => !used.has(descriptor.id))
     .flatMap((descriptor) =>
-      DIRECTIONS.map((direction) => ({
+      directionsOf(labels).map((direction) => ({
         value: `${descriptor.id}${DIRECTION_SEPARATOR}${direction.value}`,
         label: `${descriptor.name ?? descriptor.id} (${direction.label})`,
         hint: descriptor.type,
@@ -104,11 +121,13 @@ function toSortOptions(
  *
  * @param descriptors - the property descriptors of the data type
  * @param value - one criterion, as stored in the parameter
+ * @param labels - the translated direction labels
  * @returns the option showing that criterion
  */
 function resolveSortOption(
   descriptors: PropertyDescriptor[],
   value: string,
+  labels: DirectionLabels,
 ): FieldOption {
   const separator = value.indexOf(DIRECTION_SEPARATOR);
   const field = fieldOf(value);
@@ -117,8 +136,8 @@ function resolveSortOption(
     .filter(isCandidate)
     .find((candidate) => candidate.id === field);
   const directionLabel =
-    DIRECTIONS.find((candidate) => candidate.value === direction)?.label ??
-    DEFAULT_DIRECTION_LABEL;
+    directionsOf(labels).find((candidate) => candidate.value === direction)
+      ?.label ?? labels.defaultOrder;
   return {
     value,
     // A field the data type does not have is shown as it was authored: the dialog is not the place to decide that
@@ -131,10 +150,5 @@ function resolveSortOption(
   };
 }
 
-export {
-  DEFAULT_DIRECTION_LABEL,
-  DIRECTIONS,
-  fieldOf,
-  resolveSortOption,
-  toSortOptions,
-};
+export type { DirectionLabels };
+export { fieldOf, resolveSortOption, toSortOptions };

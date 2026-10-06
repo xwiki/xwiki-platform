@@ -37,6 +37,7 @@ import {
 } from "./filterPicker";
 import { resolveSortOption, toSortOptions } from "./sortPicker";
 import type { FieldOption, JsonFetcher } from "./fieldPicker";
+import type { DirectionLabels } from "./sortPicker";
 
 /**
  * Wires the Records macro dialog: the field picker, and the two behaviours that depend on the data type.
@@ -73,14 +74,47 @@ const FILTERS_SELECTOR = ".suggest-records-filters";
 const WIRED_FLAG = "recordsDialogWired";
 
 /**
- * What the author is warned with before a change of data type discards their configuration.
- *
- * Kept in English here rather than read from a translation bundle because a webjar has no access to one; the
- * message belongs in the macro's bundle once the picker gets a proper in-dialog error channel.
+ * The module holding the translation keys the dialog needs, which the `xwiki-l10n` loader plugin resolves into the
+ * translated messages. The keys are the ones of the macro's translation bundle, without the prefix.
  */
-const RESET_WARNING =
-  "Changing the object type resets the columns, the filters and the sort, " +
-  "because they name fields of the object type you are leaving.\n\nChange it anyway?";
+const TRANSLATION_KEYS_MODULE = "xwiki-records-translation-keys";
+
+/**
+ * The prefix the translation keys of the macro's bundle share.
+ */
+const TRANSLATION_PREFIX = "rendering.macro.records.";
+
+/**
+ * The translated messages, as the `xwiki-l10n` loader plugin hands them over.
+ */
+interface Messages {
+  get: (key: string, ...args: string[]) => string | null;
+}
+
+/**
+ * The messages the dialog displays. Set when the module is initialized, which is before anything reads it.
+ */
+let messages: Messages = { get: () => null };
+
+/**
+ * @param key - a translation key, without the prefix
+ * @returns the translated message, or the key when the bundle does not have it, so that a missing translation shows
+ *   up as an identifier rather than as an empty label
+ */
+function translate(key: string): string {
+  return messages.get(key) ?? key;
+}
+
+/**
+ * @returns the translated labels a sort criterion is offered under
+ */
+function directionLabels(): DirectionLabels {
+  return {
+    ascending: translate("picker.sort.ascending"),
+    descending: translate("picker.sort.descending"),
+    defaultOrder: translate("picker.sort.default"),
+  };
+}
 
 /**
  * The suggest widget settings this picker needs.
@@ -169,8 +203,8 @@ function createSettings(
     ),
     loadSelected: guard((value) => offer.resolve(element, value, fetchJson)),
     optgroups: [
-      { value: "fields", label: "Fields" },
-      { value: "metadata", label: "Entry metadata" },
+      { value: "fields", label: translate("picker.group.fields") },
+      { value: "metadata", label: translate("picker.group.metadata") },
     ],
     optgroupField: "optgroup",
     labelField: "label",
@@ -233,11 +267,13 @@ const sortOffer: Offer = {
       await loadDescriptors(element, XWiki.contextPath, fetchJson),
       query,
       selected,
+      directionLabels(),
     ),
   resolve: async (element, value, fetchJson) => [
     resolveSortOption(
       await loadDescriptors(element, XWiki.contextPath, fetchJson),
       value,
+      directionLabels(),
     ),
   ],
   settings: {
@@ -383,7 +419,7 @@ function wire($: JQueryStatic, picker: Element): void {
       return;
     }
     // Only warn when there is something to lose: the first choice discards nothing.
-    if (previous !== "" && !window.confirm(RESET_WARNING)) {
+    if (previous !== "" && !window.confirm(translate("picker.resetWarning"))) {
       revert(dataTypeInput, previous);
       return;
     }
@@ -415,9 +451,28 @@ function revert(
   enhanced?.setValue(value, true);
 }
 
-define("xwiki-records-fields", ["jquery", "xwiki-selectize"], function (
-  $: JQueryStatic,
-) {
+// The RequireJS typings only know how to define a module with a factory, not with a plain value.
+(define as unknown as (name: string, value: unknown) => void)(
+  TRANSLATION_KEYS_MODULE,
+  {
+    prefix: TRANSLATION_PREFIX,
+    keys: [
+      "picker.group.fields",
+      "picker.group.metadata",
+      "picker.sort.ascending",
+      "picker.sort.descending",
+      "picker.sort.default",
+      "picker.resetWarning",
+    ],
+  },
+);
+
+define("xwiki-records-fields", [
+  "jquery",
+  "xwiki-selectize",
+  `xwiki-l10n!${TRANSLATION_KEYS_MODULE}`,
+], function ($: JQueryStatic, _selectize: unknown, translations: Messages) {
+  messages = translations;
   const initialize = (event?: unknown, data?: { elements?: Element[] }) => {
     const roots: ParentNode[] = data?.elements ?? [document];
     roots.forEach((root) => {

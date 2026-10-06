@@ -29,6 +29,7 @@ import {
   resetDerivedParameters,
   setTabsVisible,
   showMessage,
+  showProblems,
 } from "../dialog";
 import { describe, expect, it, vi } from "vitest";
 
@@ -238,6 +239,106 @@ describe("clearMessage", () => {
     document.body.innerHTML = `<form><input name="properties" /><span id="next"></span></form>`;
     clearMessage(document.querySelector("input")!);
     expect(document.querySelector("#next")).not.toBeNull();
+  });
+
+  it("removes only a message of the given kind when told one", () => {
+    document.body.innerHTML = `<form><input name="properties" /></form>`;
+    const field = document.querySelector("input")!;
+    showMessage(field, "warning", "stale");
+    clearMessage(field, "error");
+    expect(document.querySelector(".warningmessage")).not.toBeNull();
+    clearMessage(field, "warning");
+    expect(document.querySelector(".box")).toBeNull();
+  });
+});
+
+describe("showMessage with several messages", () => {
+  it("lists them, as text", () => {
+    document.body.innerHTML = `<form><input name="properties" /></form>`;
+    const field = document.querySelector("input")!;
+    showMessage(field, "warning", ["<i>first</i>", "second"]);
+    const items = document.querySelectorAll(".box li");
+    expect([...items].map((item) => item.textContent)).toEqual([
+      "<i>first</i>",
+      "second",
+    ]);
+    expect(document.querySelector(".box i")).toBeNull();
+  });
+});
+
+describe("showProblems", () => {
+  /**
+   * @returns the wrapper of a widget holding three items, the way the suggest widget renders them
+   */
+  function givenItems(): HTMLElement {
+    document.body.innerHTML = `
+      <form>
+        <div class="ts-wrapper"><div class="ts-control">
+          <div class="item" data-value="code"><span class="xwiki-selectize-option-label">code</span><a class="remove">x</a></div>
+          <div class="item" data-value="count=cheap">count = cheap</div>
+          <div class="item" data-value="name=Alpha">name = Alpha</div>
+        </div></div>
+      </form>`;
+    return document.querySelector(".ts-wrapper")!;
+  }
+
+  const PROBLEMS: Record<string, string> = {
+    code: "code cannot be used.",
+    "count=cheap": "cheap does not fit.",
+  };
+
+  it("strikes through the items the table ignores, says why, and leaves the others alone", () => {
+    const wrapper = givenItems();
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    const items = [...wrapper.querySelectorAll<HTMLElement>(".item")];
+    // The label is struck through rather than the whole item, which also holds the remove button.
+    expect(
+      wrapper.querySelector<HTMLElement>(".xwiki-selectize-option-label")!.style
+        .textDecoration,
+    ).toBe("line-through");
+    expect(items[0].style.textDecoration).toBe("");
+    expect(items.slice(1).map((item) => item.style.textDecoration)).toEqual([
+      "line-through",
+      "",
+    ]);
+    expect(items[0].title).toBe("code cannot be used.");
+    const box = wrapper.nextElementSibling!;
+    expect(box.classList).toContain("warningmessage");
+    expect([...box.querySelectorAll("li")].map((li) => li.textContent)).toEqual(
+      ["code cannot be used.", "cheap does not fit."],
+    );
+  });
+
+  it("says the same thing once, for two items with the same problem", () => {
+    const wrapper = givenItems();
+    showProblems(wrapper, () => "ignored");
+    expect(wrapper.nextElementSibling!.querySelectorAll("li")).toHaveLength(1);
+  });
+
+  it("keeps the box it already shows when nothing changed, so that it is not announced again", () => {
+    const wrapper = givenItems();
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    const box = wrapper.nextElementSibling;
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    expect(wrapper.nextElementSibling).toBe(box);
+  });
+
+  it("removes the box and the marks once no item is ignored", () => {
+    const wrapper = givenItems();
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    showProblems(wrapper, () => undefined);
+    expect(wrapper.nextElementSibling).toBeNull();
+    expect(
+      wrapper.querySelector<HTMLElement>(".xwiki-selectize-option-label")!.style
+        .textDecoration,
+    ).toBe("");
+  });
+
+  it("leaves an error alone, since the items could not be checked", () => {
+    const wrapper = givenItems();
+    showMessage(wrapper, "error", "could not be loaded");
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    expect(wrapper.nextElementSibling!.classList).toContain("errormessage");
   });
 });
 

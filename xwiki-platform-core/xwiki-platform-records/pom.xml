@@ -35,4 +35,12 @@
     <module>xwiki-platform-records-webjar</module>
     <module>xwiki-platform-records-macro</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-records-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

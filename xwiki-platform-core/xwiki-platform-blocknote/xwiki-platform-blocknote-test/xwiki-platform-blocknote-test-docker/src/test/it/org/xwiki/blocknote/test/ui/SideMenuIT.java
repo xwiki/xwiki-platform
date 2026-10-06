@@ -191,7 +191,8 @@ class SideMenuIT extends AbstractBlockNoteIT
     }
 
     /**
-     * Edits the current page in-place and moves the focus to the page title.
+     * Edits the current page in-place and moves the focus to the page title. This is done in order to move the
+     * caret out of the screenshotted area, preventing flakiness.
      *
      * @return the rich text area, which is left unfocused so that its blinking caret doesn't make the screenshots
      *         unstable

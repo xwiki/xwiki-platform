@@ -329,7 +329,9 @@ const filtersOffer: Offer = {
     ),
   ],
   settings: {
-    // One item is one constraint, and the parameter separates them the way a query string does.
+    // One item is one constraint, and the parameter separates them the way a query string does. The displayer
+    // renders a text input rather than a multiple select so that this delimiter is what builds the stored value:
+    // the macro editor would join the options of a select with a comma.
     delimiter: FILTER_SEPARATOR,
     // Most properties have no value suggester, so a value has to be typeable.
     create: true,

@@ -54,7 +54,7 @@ describe("toSortOptions", () => {
     ]);
   });
 
-  it("groups the entry metadata apart from the fields", () => {
+  it("groups the page metadata apart from the fields", () => {
     expect(
       toSortOptions(DESCRIPTORS, "title", [], LABELS).map(
         (option) => option.optgroup,

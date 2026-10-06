@@ -111,7 +111,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     static final String DOC_TRANSLATION_PREFIX = "platform.index.";
 
     /**
-     * The identifier prefix of the entry metadata properties, which the default column list leaves out.
+     * The identifier prefix of the page metadata properties, which the default column list leaves out.
      */
     private static final String METADATA_PREFIX = "doc.";
 
@@ -397,7 +397,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     }
 
     /**
-     * Reads the identifiers the data type's source offers: the entry metadata, the data type's fields and the Live
+     * Reads the identifiers the data type's source offers: the page metadata, the data type's fields and the Live
      * Data pseudo-columns, in the order the source reports them.
      *
      * @param dataType the serialized reference of the data type

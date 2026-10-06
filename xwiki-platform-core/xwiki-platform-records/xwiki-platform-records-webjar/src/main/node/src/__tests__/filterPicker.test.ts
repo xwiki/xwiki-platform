@@ -100,7 +100,7 @@ describe("toFieldOptions", () => {
     ]);
   });
 
-  it("groups the entry metadata apart", () => {
+  it("groups the page metadata apart", () => {
     expect(toFieldOptions(DESCRIPTORS, "title")[0].optgroup).toBe(
       METADATA_GROUP,
     );

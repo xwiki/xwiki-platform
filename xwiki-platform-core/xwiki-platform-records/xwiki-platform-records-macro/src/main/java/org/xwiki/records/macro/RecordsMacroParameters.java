@@ -124,7 +124,7 @@ public class RecordsMacroParameters
      */
     @PropertyDisplayType(RecordsColumns.class)
     @PropertyName("Columns")
-    @PropertyDescription("The columns to display, separated by commas, in the order given. Entry metadata such as "
+    @PropertyDescription("The columns to display, separated by commas, in the order given. Page metadata such as "
         + "doc.title and the fields of the object type can be mixed. Leave empty to display the entry title followed "
         + "by every field.")
     @PropertyGroup("columns")

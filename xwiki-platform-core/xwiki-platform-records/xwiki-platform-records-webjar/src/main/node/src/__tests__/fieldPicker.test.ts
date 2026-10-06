@@ -103,7 +103,7 @@ describe("propertiesUrl", () => {
 });
 
 describe("toOptions", () => {
-  it("separates the entry metadata from the data type's own fields", () => {
+  it("separates the page metadata from the data type's own fields", () => {
     const options = toOptions(DESCRIPTORS);
     expect(options).toEqual([
       {

@@ -27,8 +27,17 @@ import {
   resetDerivedParameters,
   setTabsVisible,
   showMessage,
+  showProblems,
 } from "./dialog";
 import { hasDataTypeFields, loadDescriptors, loadOptions } from "./fieldPicker";
+import {
+  asTypes,
+  canFilter,
+  canSort,
+  filterProblem,
+  sortProblem,
+  typesUrl,
+} from "./fieldUse";
 import {
   FILTER_SEPARATOR,
   asValues,
@@ -40,8 +49,13 @@ import {
   toValueOptions,
   valuesUrl,
 } from "./filterPicker";
-import { resolveSortOption, toSortOptions } from "./sortPicker";
-import type { FieldOption, JsonFetcher } from "./fieldPicker";
+import { fieldOf, resolveSortOption, toSortOptions } from "./sortPicker";
+import type {
+  FieldOption,
+  JsonFetcher,
+  PropertyDescriptor,
+} from "./fieldPicker";
+import type { Problem, PropertyType } from "./fieldUse";
 import type { DirectionLabels } from "./sortPicker";
 
 /**
@@ -218,7 +232,10 @@ function createSettings(
       void (async () => {
         try {
           callback(await produce(query, selected));
-          clearMessage(this?.wrapper ?? element);
+          clearMessage(this?.wrapper ?? element, "error");
+          if (this) {
+            refreshProblems(this);
+          }
         } catch {
           callback([]);
           reportLoadFailure(element, this);
@@ -287,18 +304,95 @@ function reportLoadFailure(
  */
 function retry(suggester: Suggester): void {
   suggester.clearOptions();
-  suggester.items.forEach((value) => {
-    suggester.settings.loadSelected.call(suggester, value, (options) => {
-      options.forEach((option) => {
-        if (Object.hasOwn(suggester.options, option.value)) {
-          suggester.updateOption(option.value, option);
-        } else {
-          suggester.addOption(option);
-        }
-      });
+  suggester.items.forEach((value) => resolveAgain(suggester, value));
+  suggester.load(suggester.inputValue());
+}
+
+/**
+ * Resolves one selected value again, replacing the option it is shown with.
+ *
+ * @param suggester - the widget holding the value
+ * @param value - the selected value
+ */
+function resolveAgain(suggester: Suggester, value: string): void {
+  suggester.settings.loadSelected.call(suggester, value, (options) => {
+    options.forEach((option) => {
+      if (Object.hasOwn(suggester.options, option.value)) {
+        suggester.updateOption(option.value, option);
+      } else {
+        suggester.addOption(option);
+      }
     });
   });
-  suggester.load(suggester.inputValue());
+}
+
+/**
+ * Points at the selected items of a picker that the table ignores, from the problem their options carry.
+ *
+ * @param suggester - the widget whose items to check
+ */
+function refreshProblems(suggester: Suggester): void {
+  showProblems(suggester.wrapper, (value) => suggester.options[value]?.problem);
+}
+
+/**
+ * Keeps the problems of a picker's items shown as the items change: when the stored ones are resolved, and when
+ * the author adds or removes one.
+ *
+ * @param suggester - the widget to watch
+ */
+function watchProblems(suggester: Suggester): void {
+  const control = suggester.wrapper.querySelector(".ts-control");
+  if (control === null) {
+    return;
+  }
+  // Only the list of items is watched: marking an item changes its attributes, which must not trigger it again.
+  new MutationObserver(() => refreshProblems(suggester)).observe(control, {
+    childList: true,
+  });
+}
+
+/**
+ * The property types of the source, loaded once per page since they do not depend on the data type.
+ */
+let types: Promise<PropertyType[]> | null = null;
+
+/**
+ * @param fetchJson - fetches and parses the types resource
+ * @returns the property types of the source, which say what a field of each type can be used for
+ */
+function loadTypes(fetchJson: JsonFetcher): Promise<PropertyType[]> {
+  if (types === null) {
+    types = fetchJson(typesUrl(XWiki.contextPath)).then(asTypes);
+    // A failure is reported by the picker that asked, and the next load tries again.
+    types.catch(() => {
+      types = null;
+    });
+  }
+  return types;
+}
+
+/**
+ * @param element - a picker element
+ * @returns the name the author knows the selected data type under
+ */
+function dataTypeName(element: Element): string {
+  const dataTypeInput = findDataTypeInput(findScope(element));
+  return dataTypeInput ? findDataTypeLabel(dataTypeInput) : "";
+}
+
+/**
+ * @param option - the option showing a stored value back
+ * @param problem - why the table ignores that value, if it does
+ * @returns the option, carrying the translated problem
+ */
+function withProblem(
+  option: FieldOption,
+  problem: Problem | null,
+): FieldOption {
+  return problem === null
+    ? option
+    : { ...option, problem: translate(problem.key, ...problem.args) };
 }
 
 /**
@@ -370,20 +464,35 @@ const columnsOffer: Offer = {
  * {@link resolveSortOption}.
  */
 const sortOffer: Offer = {
-  load: async (element, query, fetchJson, selected) =>
-    toSortOptions(
+  load: async (element, query, fetchJson, selected) => {
+    const sourceTypes = await loadTypes(fetchJson);
+    return toSortOptions(
       await loadDescriptors(element, XWiki.contextPath, fetchJson),
       query,
       selected,
       directionLabels(),
-    ),
-  resolve: async (element, value, fetchJson) => [
-    resolveSortOption(
-      await loadDescriptors(element, XWiki.contextPath, fetchJson),
-      value,
-      directionLabels(),
-    ),
-  ],
+      (descriptor) => canSort(descriptor, sourceTypes),
+    );
+  },
+  resolve: async (element, value, fetchJson) => {
+    const sourceTypes = await loadTypes(fetchJson);
+    const descriptors = await loadDescriptors(
+      element,
+      XWiki.contextPath,
+      fetchJson,
+    );
+    return [
+      withProblem(
+        resolveSortOption(descriptors, value, directionLabels()),
+        sortProblem(
+          descriptors,
+          sourceTypes,
+          fieldOf(value),
+          dataTypeName(element),
+        ),
+      ),
+    ];
+  },
   settings: {
     // A field that has just been used, or has just been freed, changes what should be offered. The widget caches
     // what it has loaded per query and keeps the options it has already seen, so both are dropped here: what
@@ -407,34 +516,34 @@ const sortOffer: Offer = {
  */
 const filtersOffer: Offer = {
   load: async (element, query, fetchJson) => {
+    const sourceTypes = await loadTypes(fetchJson);
     const descriptors = await loadDescriptors(
       element,
       XWiki.contextPath,
       fetchJson,
     );
+    const filterable = descriptors.filter((descriptor) =>
+      canFilter(descriptor, sourceTypes),
+    );
     const constraint = splitTyped(query);
-    if (constraint === null) {
-      return toFieldOptions(descriptors, query);
-    }
-    const descriptor = descriptors.find(
-      (candidate) => candidate.id === constraint.field,
-    );
-    const searchURL = descriptor?.filter?.searchURL;
-    if (descriptor === undefined || searchURL === undefined) {
-      return [];
-    }
-    return toValueOptions(
-      await loadValues(searchURL, constraint.value, fetchJson),
-      descriptor,
-      constraint.value,
-    );
+    return constraint === null
+      ? toFieldOptions(filterable, query)
+      : loadValueOptions(filterable, constraint, fetchJson);
   },
-  resolve: async (element, value, fetchJson) => [
-    resolveFilterOption(
-      await loadDescriptors(element, XWiki.contextPath, fetchJson),
-      value,
-    ),
-  ],
+  resolve: async (element, value, fetchJson) => {
+    const sourceTypes = await loadTypes(fetchJson);
+    const descriptors = await loadDescriptors(
+      element,
+      XWiki.contextPath,
+      fetchJson,
+    );
+    return [
+      withProblem(
+        resolveFilterOption(descriptors, value),
+        filterProblem(descriptors, sourceTypes, value, dataTypeName(element)),
+      ),
+    ];
+  },
   settings: {
     // One item is one constraint, and the parameter separates them the way a query string does. The displayer
     // renders a text input rather than a multiple select so that this delimiter is what builds the stored value:
@@ -451,17 +560,48 @@ const filtersOffer: Offer = {
     // A complete constraint, on the other hand, must leave an empty text box behind. Tom Select only clears what
     // was typed when a typed value is created, not when a suggested one is picked, and the text left over from
     // picking `status=published` would be read as the start of the next constraint.
+    //
+    // A typed constraint is resolved like a stored one, so that a value its field cannot take, or a field that cannot
+    // be filtered on, is pointed at as soon as it is added.
     onItemAdd(value) {
       if (isIncomplete(value)) {
         this.removeItem(value, true);
         this.setTextboxValue(value);
       } else {
         this.setTextboxValue("");
+        resolveAgain(this, value);
       }
       this.refreshOptions(true);
     },
   },
 };
+
+/**
+ * Offers the values of the field a typed constraint names, when the field suggests any.
+ *
+ * @param descriptors - the fields that can be filtered on
+ * @param constraint - what the author typed, split into a field and a value
+ * @param fetchJson - fetches and parses the suggestions
+ * @returns the constraints to offer, empty when the field suggests no value
+ */
+async function loadValueOptions(
+  descriptors: PropertyDescriptor[],
+  constraint: { field: string; value: string },
+  fetchJson: JsonFetcher,
+): Promise<FieldOption[]> {
+  const descriptor = descriptors.find(
+    (candidate) => candidate.id === constraint.field,
+  );
+  const searchURL = descriptor?.filter?.searchURL;
+  if (descriptor === undefined || searchURL === undefined) {
+    return [];
+  }
+  return toValueOptions(
+    await loadValues(searchURL, constraint.value, fetchJson),
+    descriptor,
+    constraint.value,
+  );
+}
 
 /**
  * Loads the values a field suggests for what the author typed after the value separator.
@@ -527,6 +667,10 @@ function enhancePickers(
   others.forEach(([selector, offer]) => {
     scope.querySelectorAll(selector).forEach((element) => {
       $(element).xwikiSelectize(createSettings(element, fetchJson, offer));
+      const suggester = element.selectize as Suggester | undefined;
+      if (suggester) {
+        watchProblems(suggester);
+      }
     });
   });
 }
@@ -604,6 +748,11 @@ define(TRANSLATION_KEYS_MODULE, [], () => ({
     "picker.loadFailed",
     "picker.retry",
     "picker.dataTypeMissing",
+    "picker.problem.fieldMissing",
+    "picker.problem.notSortable",
+    "picker.problem.notFilterable",
+    "picker.problem.valueDoesNotFit",
+    "picker.problem.unreadable",
   ],
 }));
 

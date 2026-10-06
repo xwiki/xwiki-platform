@@ -150,6 +150,11 @@ function hasValue(element: Element): boolean {
 const MESSAGE_CLASS = "records-picker-message";
 
 /**
+ * The style of a message box: `error` for something that failed, `warning` for something the author should fix.
+ */
+type MessageKind = "error" | "warning";
+
+/**
  * A button offered in a message box.
  */
 interface MessageAction {
@@ -185,26 +190,49 @@ function findDataTypeLabel(
  *
  * @param anchor - the element to show the message after: the enhanced widget, or the field itself
  * @param kind - the box style, `error` for something that failed and `warning` for something the author should fix
- * @param text - the message
+ * @param text - the message, or several, shown as a list
  * @param action - the button to offer next to the message, if any
  */
 function showMessage(
   anchor: Element,
-  kind: "error" | "warning",
-  text: string,
+  kind: MessageKind,
+  text: string | string[],
   action?: MessageAction,
 ): void {
   clearMessage(anchor);
   const box = anchor.ownerDocument.createElement("div");
   box.className = `box ${kind}message ${MESSAGE_CLASS}`;
   box.setAttribute("role", "alert");
-  const message = anchor.ownerDocument.createElement("span");
-  message.textContent = text;
-  box.append(message);
+  box.append(createMessageText(anchor.ownerDocument, text));
   if (action) {
     box.append(" ", createActionButton(anchor, action));
   }
   anchor.after(box);
+}
+
+/**
+ * @param document - the document the message is shown in
+ * @param text - the message, or several
+ * @returns the message as text, or the messages as a list
+ */
+function createMessageText(
+  document: Document,
+  text: string | string[],
+): Element {
+  if (!Array.isArray(text)) {
+    const message = document.createElement("span");
+    message.textContent = text;
+    return message;
+  }
+  const list = document.createElement("ul");
+  list.append(
+    ...text.map((line) => {
+      const item = document.createElement("li");
+      item.textContent = line;
+      return item;
+    }),
+  );
+  return list;
 }
 
 /**
@@ -232,11 +260,63 @@ function createActionButton(
  * Removes the message shown after a field, if any.
  *
  * @param anchor - the element the message was shown after
+ * @param kind - the only style of message to remove, when not any
  */
-function clearMessage(anchor: Element): void {
+function clearMessage(anchor: Element, kind?: MessageKind): void {
+  const next = findMessage(anchor, kind);
+  next?.remove();
+}
+
+/**
+ * @param anchor - the element a message is shown after
+ * @param kind - the only style of message to find, when not any
+ * @returns the message shown after the element, if any
+ */
+function findMessage(anchor: Element, kind?: MessageKind): Element | null {
   const next = anchor.nextElementSibling;
-  if (next?.classList.contains(MESSAGE_CLASS)) {
-    next.remove();
+  return next?.classList.contains(MESSAGE_CLASS) &&
+    (kind === undefined || next.classList.contains(`${kind}message`))
+    ? next
+    : null;
+}
+
+/**
+ * Points at the selected items of a picker that the table ignores, and says why under the picker.
+ *
+ * An item is struck through, with the reason as its tooltip, and the reasons are listed in a warning box, which is
+ * what a screen reader announces. The box is left as it is when it already says the same thing, so that it is not
+ * announced again on every keystroke, and an error box is left alone, since it says the items could not be checked.
+ *
+ * @param wrapper - the element the widget is rendered in
+ * @param problemOf - why the table ignores the item holding a value, if it does
+ */
+function showProblems(
+  wrapper: Element,
+  problemOf: (value: string) => string | undefined,
+): void {
+  const problems = new Set<string>();
+  wrapper.querySelectorAll(".item[data-value]").forEach((item) => {
+    if (!(item instanceof HTMLElement)) {
+      return;
+    }
+    const problem = problemOf(item.dataset.value ?? "");
+    // The label only: the item also holds its remove button.
+    const label =
+      item.querySelector<HTMLElement>(".xwiki-selectize-option-label") ?? item;
+    label.style.textDecoration = problem === undefined ? "" : "line-through";
+    if (problem !== undefined) {
+      item.title = problem;
+      problems.add(problem);
+    }
+  });
+  if (findMessage(wrapper, "error") !== null) {
+    return;
+  }
+  const lines = [...problems];
+  if (lines.length === 0) {
+    clearMessage(wrapper, "warning");
+  } else if (findMessage(wrapper, "warning")?.textContent !== lines.join("")) {
+    showMessage(wrapper, "warning", lines);
   }
 }
 
@@ -260,5 +340,6 @@ export {
   resetDerivedParameters,
   setTabsVisible,
   showMessage,
+  showProblems,
 };
-export type { MessageAction };
+export type { MessageAction, MessageKind };

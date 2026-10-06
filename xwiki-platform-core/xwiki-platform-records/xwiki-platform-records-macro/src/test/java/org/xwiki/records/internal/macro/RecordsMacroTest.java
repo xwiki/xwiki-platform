@@ -70,6 +70,8 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -139,6 +141,9 @@ class RecordsMacroTest
     private DocumentAccessBridge documentAccessBridge;
 
     @MockComponent
+    private ContextualAuthorizationManager authorization;
+
+    @MockComponent
     @Named("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
@@ -159,6 +164,7 @@ class RecordsMacroTest
         this.context.setXDOM(new XDOM(List.of(), new IdGenerator()));
         when(this.entityReferenceSerializer.serialize(DATA_TYPE)).thenReturn(SERIALIZED_DATA_TYPE);
         when(this.documentAccessBridge.exists(DATA_TYPE)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, DATA_TYPE)).thenReturn(true);
         // Echoes the key and the arguments, which is what the tests assert on.
         when(this.localization.getTranslationPlain(any(String.class), any(Object[].class)))
             .thenAnswer(invocation -> invocation.getArgument(0) + Arrays.toString(
@@ -388,6 +394,35 @@ class RecordsMacroTest
         parameters.setFilters("budget=1");
 
         assertNull(execute(parameters).getFilters());
+    }
+
+    @Test
+    void executeKeepsTheAuthoredParametersOfAReaderWhoCannotViewTheDataType() throws Exception
+    {
+        // The source reports the fields of a data type only to a reader who can view it.
+        when(this.authorization.hasAccess(Right.VIEW, DATA_TYPE)).thenReturn(false);
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor("doc.location")));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setProperties("doc.title,first_name,email");
+        parameters.setFilters("first_name=Ann");
+        parameters.setSort("last_name:desc");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        LiveDataRendererParameters liveDataParameters = capture();
+        assertEquals("doc.title,first_name,email", liveDataParameters.getProperties());
+        assertEquals("first_name=Ann", liveDataParameters.getFilters());
+        assertEquals("last_name:desc", liveDataParameters.getSort());
+        assertEquals(List.of(this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeShowsTheTitleAloneByDefaultToAReaderWhoCannotViewTheDataType() throws Exception
+    {
+        when(this.authorization.hasAccess(Right.VIEW, DATA_TYPE)).thenReturn(false);
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor("doc.location")));
+
+        assertEquals("doc.title", execute(newParameters()).getProperties());
     }
 
     @Test

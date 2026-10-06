@@ -320,7 +320,16 @@
              *   widget
              */
             upcast: function(element) {
-              return element.hasClass?.('xwiki-widget-placeholder-' + this.name);
+              const placeholderClass = 'xwiki-widget-placeholder-' + this.name;
+              if (element.hasClass?.(placeholderClass)) {
+                // Remove the placeholder class, otherwise CKEditor stores it in the widget data (as widget classes),
+                // making the placeholder widget data different from the data of the upload widget it stands for. The
+                // realtime editor would then see a widget data change whenever it compares the local content, where
+                // the user has an upload in progress, with the remote content, where the upload is represented by a
+                // placeholder. Applying this change invalidates the local selection and modifies the upload widget.
+                element.removeClass(placeholderClass);
+                return true;
+              }
             },
 
             init: function(...args) {

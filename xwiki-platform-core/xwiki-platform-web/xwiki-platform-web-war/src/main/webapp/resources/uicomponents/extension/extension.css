@@ -48,10 +48,7 @@
 .supported-by h3,
 .supported-by h4{
   color: var(--text-muted);
-  /*TODO: Change font-size to use CSS variables in future work.
-  For XWIKI-24855, the 0.9em values was used since it's used in other places of this CSS file,
-  making it 'locally' consistent. But they too should be updated to font variables */
-  font-size: .9em;
+  font-size: var(--font-size-small);
 }
 
 .supporter-listing {
@@ -67,7 +64,7 @@
 .supporter-name {
   border: none;
   background: transparent;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   padding: 0px 6px;
 }
 
@@ -76,14 +73,14 @@
 }
 
 .support-multi-name:hover {
-  background-color: rgba(0,0,0,0.1);
+  background-color: var(--nav-link-hover-bg);
   border-radius: 56px;
 }
 
 .plan-name.infomessage {
   border-radius: 96px;
   white-space: nowrap;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   padding: 4px 12px;
 }
 
@@ -96,8 +93,8 @@
 }
 
 .support-dialog {
-  border: 1px solid rgba(0,0,0,0.05);
-  border-radius: 8px;
+  border: var(--border-width) solid var(--dropdown-border);
+  border-radius: var(--border-radius-base);
   padding: 12px 16px;
   position: absolute;
   display: none;

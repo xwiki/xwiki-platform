@@ -46,5 +46,5 @@
 ## reason, and it declares jquery and xwiki-selectize as RequireJS dependencies so that it shares the page's
 ## instances rather than bundling its own.
 <script src="$escapetool.xml($services.webjars.url(
-  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.js'))"></script>
 #suggestInput($parameters)

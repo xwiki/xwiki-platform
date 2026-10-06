@@ -34,5 +34,5 @@
 #set ($discard = $parameters.putIfAbsent('placeholder',
   $services.localization.render('rendering.macro.records.parameter.sort.placeholder')))
 <script src="$escapetool.xml($services.webjars.url(
-  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.js'))"></script>
 #suggestInput($parameters)

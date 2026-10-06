@@ -139,7 +139,7 @@ define('xwiki-wysiwyg-image-selector', [
           modal.data('initialized', true);
         }).fail(function (error) {
           console.log('Failed to retrieve the image selection form.', error);
-          new XWiki.widgets.Notification(translations.get('initialization.fail'), 'error');
+          XWiki.widgets.Notification.show(translations.get('initialization.fail'), 'error');
           modal.data('initialized', true);
         });
       }

@@ -22,6 +22,7 @@ package org.xwiki.export.pdf.test.po;
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -91,7 +92,11 @@ public class PDFDocument implements AutoCloseable
      */
     public PDFDocument(URL url, String userName, String password) throws IOException
     {
-        URLConnection connection = url.openConnection();
+        this(openConnection(url, null), userName, password);
+    }
+
+    private PDFDocument(URLConnection connection, String userName, String password) throws IOException
+    {
         if (!StringUtils.isEmpty(userName)) {
             String auth = userName + ":" + password;
             byte[] encodedAuth = Base64.getEncoder().encode((auth.getBytes(StandardCharsets.UTF_8)));
@@ -101,6 +106,29 @@ public class PDFDocument implements AutoCloseable
         this.document = Loader.loadPDF(IOUtils.toByteArray(connection));
         this.imageExtractor = new PDFImageExtractor();
         save();
+    }
+
+    /**
+     * Fetches and parses a PDF document by submitting a POST request to the given URL. Some actions, such as the
+     * export action, perform their job only on POST requests.
+     *
+     * @param url where to fetch the PDF document from
+     * @return the fetched PDF document
+     * @throws IOException if fetching and parsing the PDF document fails
+     * @since 18.8.0RC1
+     */
+    public static PDFDocument post(URL url) throws IOException
+    {
+        return new PDFDocument(openConnection(url, "POST"), null, null);
+    }
+
+    private static URLConnection openConnection(URL url, String httpMethod) throws IOException
+    {
+        URLConnection connection = url.openConnection();
+        if (httpMethod != null && connection instanceof HttpURLConnection httpConnection) {
+            httpConnection.setRequestMethod(httpMethod);
+        }
+        return connection;
     }
 
     private void save() throws IOException

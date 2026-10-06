@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.FailableRunnable;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -114,49 +115,8 @@ public class EditAction extends XWikiAction
         // Determine the edited document (translation).
         XWikiDocument editedDocument = getEditedDocument(editForm, context);
 
-        // Remember dirty status
-        boolean metadataDirty = editedDocument.isMetaDataDirty();
-        boolean contentDirty = editedDocument.isContentDirty();
-
-        // Reset the dirty status to find out if the document was modified by inputs
-        editedDocument.setMetaDataDirty(false);
-        editedDocument.setContentDirty(false);
-
         // Update the edited document based on form inputs
-        editedDocument.readDocMetaFromForm(editForm, context);
-        // Update the edited document based on the template specified on the request.
-        readFromTemplate(editedDocument, editForm.getTemplate(), context);
-        // The default values from the template can be overwritten by additional request parameters.
-        updateDocumentTitleAndContentFromRequest(editedDocument, editForm, context);
-        editedDocument.readAddedUpdatedAndRemovedObjectsFromForm(editForm, context);
-
-        // Check if the document in modified
-        if (editedDocument.isMetaDataDirty() || editedDocument.isContentDirty()) {
-            // If the document is modified make sure a valid CSRF is provided
-            String token = context.getRequest().getParameter("form_token");
-            if (!this.csrf.isTokenValid(token)) {
-                // or make the document restricted
-                editedDocument.setRestricted(true);
-            }
-        }
-
-        // Restore dirty status
-        editedDocument.setMetaDataDirty(editedDocument.isMetaDataDirty() || metadataDirty);
-        editedDocument.setContentDirty(editedDocument.isContentDirty() || contentDirty);
-
-        // If the metadata is modified, modify the effective metadata author
-        if (editedDocument.isMetaDataDirty()) {
-            UserReference userReference =
-                this.documentReferenceUserReferenceResolver.resolve(context.getUserReference());
-            editedDocument.setAuthor(userReference);
-        }
-
-        // If the content is modified, modify the content author
-        if (editedDocument.isContentDirty()) {
-            UserReference userReference =
-                this.documentReferenceUserReferenceResolver.resolve(context.getUserReference());
-            editedDocument.getAuthors().setContentAuthor(userReference);
-        }
+        int sectionNumber = updateDocumentFromRequest(editedDocument, editForm, context);
 
         // Set the current user as creator, author and contentAuthor when the edited document is newly created to avoid
         // using XWikiGuest instead (because those fields were not previously initialized).
@@ -165,6 +125,14 @@ public class EditAction extends XWikiAction
             editedDocument.setAuthorReference(context.getUserReference());
             editedDocument.setContentAuthorReference(context.getUserReference());
         }
+
+        // The section title is extracted from the edited content, which can be provided on the request, so it has to be
+        // rendered only once the restricted flag and the authors of the edited document take the request into account.
+        String sectionEditingTitle = getSectionEditingTitle(editedDocument, editForm, sectionNumber, context);
+        if (sectionEditingTitle != null) {
+            updateDocument(editedDocument, () -> editedDocument.setTitle(sectionEditingTitle), context);
+        }
+
         editedDocument.readTemporaryUploadedFiles(editForm);
 
         // Expose the edited document on the XWiki context and the Velocity context.
@@ -252,22 +220,97 @@ public class EditAction extends XWikiAction
     }
 
     /**
-     * Updates the title and content of the given document with values taken from the 'title' and 'content' request
-     * parameters or based on the document section specified on the request.
+     * Updates the given document based on the form inputs, the template and the title and content request parameters.
      *
-     * @param document the document whose title and content should be updated
+     * @param document the document to update
      * @param editForm the form inputs
      * @param context the XWiki context
+     * @return the number of the edited section, {@code 0} if no section is edited
      * @throws XWikiException if something goes wrong
      */
-    private void updateDocumentTitleAndContentFromRequest(XWikiDocument document, EditForm editForm,
-        XWikiContext context) throws XWikiException
+    private int updateDocumentFromRequest(XWikiDocument document, EditForm editForm, XWikiContext context)
+        throws XWikiException
     {
         // Check if section editing is enabled and if a section is specified.
         boolean sectionEditingEnabled = context.getWiki().hasSectionEdit(context);
         int sectionNumber = sectionEditingEnabled ? NumberUtils.toInt(context.getRequest().getParameter("section")) : 0;
         getCurrentScriptContext().setAttribute("sectionNumber", sectionNumber, ScriptContext.ENGINE_SCOPE);
 
+        updateDocument(document, () -> {
+            document.readDocMetaFromForm(editForm, context);
+            // Update the edited document based on the template specified on the request.
+            readFromTemplate(document, editForm.getTemplate(), context);
+            // The default values from the template can be overwritten by additional request parameters.
+            updateDocumentTitleAndContentFromRequest(document, editForm, sectionNumber);
+            document.readAddedUpdatedAndRemovedObjectsFromForm(editForm, context);
+        }, context);
+
+        return sectionNumber;
+    }
+
+    /**
+     * Applies the given modifications to the document and, if they modify it, makes the document restricted when the
+     * request doesn't provide a valid CSRF token and makes the current user its author.
+     *
+     * @param document the document to update
+     * @param modifications the modifications to apply
+     * @param context the XWiki context
+     * @throws XWikiException if something goes wrong
+     */
+    private void updateDocument(XWikiDocument document, FailableRunnable<XWikiException> modifications,
+        XWikiContext context) throws XWikiException
+    {
+        // Remember dirty status
+        boolean metadataDirty = document.isMetaDataDirty();
+        boolean contentDirty = document.isContentDirty();
+
+        // Reset the dirty status to find out if the document was modified by the given modifications
+        document.setMetaDataDirty(false);
+        document.setContentDirty(false);
+
+        modifications.run();
+
+        // Check if the document in modified
+        if (document.isMetaDataDirty() || document.isContentDirty()) {
+            // If the document is modified make sure a valid CSRF is provided
+            String token = context.getRequest().getParameter("form_token");
+            if (!this.csrf.isTokenValid(token)) {
+                // or make the document restricted
+                document.setRestricted(true);
+            }
+        }
+
+        // Restore dirty status
+        document.setMetaDataDirty(document.isMetaDataDirty() || metadataDirty);
+        document.setContentDirty(document.isContentDirty() || contentDirty);
+
+        // If the metadata is modified, modify the effective metadata author
+        if (document.isMetaDataDirty()) {
+            UserReference userReference =
+                this.documentReferenceUserReferenceResolver.resolve(context.getUserReference());
+            document.setAuthor(userReference);
+        }
+
+        // If the content is modified, modify the content author
+        if (document.isContentDirty()) {
+            UserReference userReference =
+                this.documentReferenceUserReferenceResolver.resolve(context.getUserReference());
+            document.getAuthors().setContentAuthor(userReference);
+        }
+    }
+
+    /**
+     * Updates the title and content of the given document with values taken from the 'title' and 'content' request
+     * parameters or based on the document section specified on the request.
+     *
+     * @param document the document whose title and content should be updated
+     * @param editForm the form inputs
+     * @param sectionNumber the number of the edited section, {@code 0} if no section is edited
+     * @throws XWikiException if something goes wrong
+     */
+    private void updateDocumentTitleAndContentFromRequest(XWikiDocument document, EditForm editForm,
+        int sectionNumber) throws XWikiException
+    {
         // Update the edited content.
         if (editForm.getContent() != null) {
             document.setContent(editForm.getContent());
@@ -278,19 +321,40 @@ public class EditAction extends XWikiAction
         // Update the edited title.
         if (editForm.getTitle() != null) {
             document.setTitle(editForm.getTitle());
-        } else if (sectionNumber > 0 && !document.getSections().isEmpty()) {
+        }
+    }
+
+    /**
+     * Computes the title to display while editing a document section. The title of the section is rendered with the
+     * rights of the content author of the given document, and in restricted mode if the document is restricted.
+     *
+     * @param document the edited document
+     * @param editForm the form inputs
+     * @param sectionNumber the number of the edited section, {@code 0} if no section is edited
+     * @param context the XWiki context
+     * @return the title to display while editing the section, or {@code null} if the title should not be modified
+     * @throws XWikiException if something goes wrong
+     */
+    private String getSectionEditingTitle(XWikiDocument document, EditForm editForm, int sectionNumber,
+        XWikiContext context) throws XWikiException
+    {
+        if (editForm.getTitle() == null && sectionNumber > 0 && !document.getSections().isEmpty()) {
             // The edited content is either the content of the specified section or the content provided on the
             // request. We assume the content provided on the request is meant to overwrite the specified section.
             // In both cases the document content is currently having one section, so we can take its title.
             String sectionTitle = document.getDocumentSection(1).getSectionTitle();
             if (StringUtils.isNotBlank(sectionTitle)) {
                 // We cannot edit the page title while editing a page section so this title is for display only.
+                // Use the edited document as secure document so that the section title is rendered with the rights of
+                // its content author and not the rights of the content author of the saved document.
                 String sectionPlainTitle = document.getRenderedContent(sectionTitle, document.getSyntax().toIdString(),
-                    Syntax.PLAIN_1_0.toIdString(), context);
-                document.setTitle(localizePlainOrKey("core.editors.content.titleField.sectionEditingFormat",
-                    document.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionPlainTitle));
+                    Syntax.PLAIN_1_0.toIdString(), false, document, context);
+                return localizePlainOrKey("core.editors.content.titleField.sectionEditingFormat",
+                    document.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionPlainTitle);
             }
         }
+
+        return null;
     }
 
     /**

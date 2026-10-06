@@ -517,7 +517,7 @@ public class RichTextAreaElement extends BaseElement
     {
         dropFile(loadFile(filePath));
         // Wait for the upload widget to be inserted and selected.
-        waitUntilWidgetSelected();
+        waitUntilUploadWidgetSelected();
         if (wait) {
             // Wait for the upload to finish.
             waitForOwnNotificationSuccessMessage("File successfully uploaded.");
@@ -583,6 +583,23 @@ public class RichTextAreaElement extends BaseElement
         script.append("});\n");
 
         script.append("const editor = CKEDITOR.instances[editorName];\n");
+
+        // Remember, on the editor instance, that the upload widget created by this drop has been selected. We can't
+        // simply wait for the "cke_widget_selected" CSS class to show up in the edited content because the upload
+        // widget is replaced by the uploaded content as soon as the upload finishes, and this can happen before we
+        // manage to look at the content (we've seen uploads finish in less than 300ms, while we look at the content
+        // every 500ms), leaving us waiting for a state that is gone for good.
+        script.append("editor._testUploadWidgetSelected = false;\n");
+        script.append("const widgetListener = editor.widgets.on('instanceCreated', function(event) {\n");
+        script.append("  const widget = event.data;\n");
+        script.append("  if (widget.name === 'uploadfile' || widget.name === 'uploadimage') {\n");
+        script.append("    widgetListener.removeListener();\n");
+        script.append("    widget.once('select', function() {\n");
+        script.append("      editor._testUploadWidgetSelected = true;\n");
+        script.append("    });\n");
+        script.append("  }\n");
+        script.append("});\n");
+
         script.append("const dropTarget = CKEDITOR.plugins.clipboard.getDropTarget(editor);\n");
         // Register a drop event listener on the drop target with high priority in order to intercept the event data and
         // set the test range. The CKEditor drop handler will then use this test range to insert the dropped content.
@@ -696,6 +713,19 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilWidgetSelected()
     {
         waitUntilContentContains("cke_widget_selected");
+    }
+
+    /**
+     * Waits until the upload widget created by the last dropped file has been selected. Unlike
+     * {@link #waitUntilWidgetSelected()} this doesn't look for the "selected" marker in the edited content, because
+     * that marker is dropped again as soon as the upload finishes and the upload widget is replaced by the uploaded
+     * content. It relies instead on the flag that the drop script sets when the upload widget gets selected, which
+     * remains set afterwards.
+     */
+    private void waitUntilUploadWidgetSelected()
+    {
+        getDriver().waitUntilCondition(driver -> (Boolean) getDriver().executeScript(
+            "return CKEDITOR.instances[arguments[0]]?._testUploadWidgetSelected === true", this.editor.getName()));
     }
 
     /**

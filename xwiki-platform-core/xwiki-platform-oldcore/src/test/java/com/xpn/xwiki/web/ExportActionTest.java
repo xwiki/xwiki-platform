@@ -53,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -91,6 +92,8 @@ class ExportActionTest
     void configure() throws Exception
     {
         this.oldcore.getXWikiContext().setRequest(this.request);
+        // The export action only performs an export on POST requests.
+        when(this.request.getMethod()).thenReturn("POST");
 
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(this.response.getOutputStream()).thenReturn(outputStream);
@@ -114,11 +117,19 @@ class ExportActionTest
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     void exportXARInvalid() throws Exception
     {
-        // A request originating from a script tag in an HTML page.
-        when(this.request.getHeader("Sec-Fetch-Dest")).thenReturn("script");
-        assertEquals("docdoesnotexist", this.action.render(this.oldcore.getXWikiContext()));
+        // A request that doesn't express a clear intent to export, e.g. a resource loaded with a relative URL from a
+        // page served by the export action.
+        when(this.request.getMethod()).thenReturn("GET");
+        assertEquals("exportresubmit", this.action.render(this.oldcore.getXWikiContext()));
+        verify(this.oldcore.getMockRightService(), never()).hasWikiAdminRights(any(XWikiContext.class));
+        // The refusal is described on the response by the action, not by the template, which is also rendered on its
+        // own through actions these headers would be wrong for.
+        verify(this.response).setStatus(405);
+        verify(this.response).addHeader("Allow", "POST");
+        verify(this.response).addHeader("X-FRAME-OPTIONS", "DENY");
     }
 
     @Test

@@ -688,10 +688,10 @@ require(['jquery'], function($) {
     const button = this;
     const permalinkField = $('#permalinkModal').find('.form-control');
     function notifyCopied() {
-      new XWiki.widgets.Notification($(button).data('copiedMessage'), 'info');
+      XWiki.widgets.Notification.show($(button).data('copiedMessage'), 'info');
     }
     function notifyFailed() {
-      new XWiki.widgets.Notification($(button).data('copyFailedMessage'), 'error');
+      XWiki.widgets.Notification.show($(button).data('copyFailedMessage'), 'error');
     }
     function copyWithExecCommand() {
       permalinkField.select();

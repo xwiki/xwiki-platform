@@ -44,7 +44,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
-import org.xwiki.logging.internal.tail.InputStreamDataInput;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;

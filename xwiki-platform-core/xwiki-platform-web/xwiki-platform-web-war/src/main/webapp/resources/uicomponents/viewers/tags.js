@@ -59,7 +59,7 @@ viewers.Tags = Class.create({
               item.up('.tag-wrapper').remove();
             },
             onFailure : function (response) {
-               new XWiki.widgets.Notification(response.responseText || 'Server not responding', "error");
+               XWiki.widgets.Notification.show(response.responseText || 'Server not responding', "error");
             },
             // 0 is returned for network failures.
             on0 : function(response) {
@@ -99,7 +99,7 @@ viewers.Tags = Class.create({
                 this.ajaxifyForm(item._x_form);
               }.bind(this),
               onFailure : function (response) {
-                new XWiki.widgets.Notification(response.responseText || 'Server not responding', "error");
+                XWiki.widgets.Notification.show(response.responseText || 'Server not responding', "error");
               },
               // 0 is returned for network failures.
               on0 : function(response) {
@@ -146,7 +146,7 @@ viewers.Tags = Class.create({
               form.reset();
             }.bind(this),
             onFailure : function (response) {
-              new XWiki.widgets.Notification(response.responseText || 'Server not responding', "error");
+              XWiki.widgets.Notification.show(response.responseText || 'Server not responding', "error");
             },
             onComplete : function () {
               form.enable();

@@ -23,6 +23,7 @@ import {
   METADATA_GROUP,
   asDescriptors,
   findDataType,
+  hasDataTypeFields,
   loadOptions,
   propertiesUrl,
   toOptions,
@@ -218,6 +219,25 @@ describe("asDescriptors", () => {
     expect(asDescriptors({ properties: "not an array" })).toEqual([]);
     expect(asDescriptors(null)).toEqual([]);
     expect(asDescriptors(undefined)).toEqual([]);
+  });
+});
+
+describe("hasDataTypeFields", () => {
+  it("sees a field of the data type", () => {
+    expect(hasDataTypeFields([{ id: "doc.title" }, { id: "first_name" }])).toBe(
+      true,
+    );
+  });
+
+  it("does not count the page metadata nor the pseudo-columns, which the resource reports for any class", () => {
+    // What the resource answers for a class that was deleted or that the user may not view.
+    expect(
+      hasDataTypeFields([
+        { id: "doc.title" },
+        { id: "doc.author" },
+        { id: "_actions" },
+      ]),
+    ).toBe(false);
   });
 });
 

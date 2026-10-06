@@ -20,13 +20,17 @@
 
 import {
   DERIVED_PARAMETERS,
+  clearMessage,
+  clearMessages,
   findDataTypeInput,
+  findDataTypeLabel,
   findScope,
   hasValue,
   resetDerivedParameters,
   setTabsVisible,
+  showMessage,
 } from "../dialog";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 /**
  * Builds the shape the macro editor produces: the mandatory field, then the tab strip and its panes holding the
@@ -171,5 +175,82 @@ describe("hasValue", () => {
         <option value="" >Every field</option><option value="doc.title" selected>Title</option>
       </select>`;
     expect(hasValue(document.querySelector("select")!)).toBe(true);
+  });
+});
+
+describe("findDataTypeLabel", () => {
+  it("names the data type as the class picker shows it", () => {
+    document.body.innerHTML = `
+      <select name="class"><option value="Acme.ClientClass" selected> Client project </option></select>`;
+    expect(findDataTypeLabel(document.querySelector("select")!)).toBe(
+      "Client project",
+    );
+  });
+
+  it("falls back to the reference when there is no label", () => {
+    document.body.innerHTML = `<input name="class" value="Acme.ClientClass" />`;
+    expect(findDataTypeLabel(document.querySelector("input")!)).toBe(
+      "Acme.ClientClass",
+    );
+  });
+});
+
+describe("showMessage", () => {
+  it("shows the message as text right after the field", () => {
+    document.body.innerHTML = `<form><input name="properties" /><span id="next"></span></form>`;
+    const field = document.querySelector("input")!;
+    showMessage(field, "error", "The fields of <b>X</b> could not be loaded.");
+    const box = field.nextElementSibling!;
+    expect(box.classList).toContain("errormessage");
+    expect(box.getAttribute("role")).toBe("alert");
+    // Names chosen in the wiki are never read as markup.
+    expect(box.textContent).toBe("The fields of <b>X</b> could not be loaded.");
+    expect(box.querySelector("b")).toBeNull();
+  });
+
+  it("replaces the message already shown rather than stacking a second one", () => {
+    document.body.innerHTML = `<form><input name="properties" /></form>`;
+    const field = document.querySelector("input")!;
+    showMessage(field, "error", "first");
+    showMessage(field, "warning", "second");
+    const boxes = document.querySelectorAll(".box");
+    expect(boxes).toHaveLength(1);
+    expect(boxes[0].classList).toContain("warningmessage");
+    expect(boxes[0].textContent).toBe("second");
+  });
+
+  it("offers an action that removes the message and runs, without submitting the dialog", () => {
+    document.body.innerHTML = `<form><input name="properties" /></form>`;
+    const field = document.querySelector("input")!;
+    const run = vi.fn();
+    showMessage(field, "error", "failed", { label: "Try again", run });
+    const button = document.querySelector("button")!;
+    expect(button.type).toBe("button");
+    expect(button.textContent).toBe("Try again");
+    button.click();
+    expect(run).toHaveBeenCalledOnce();
+    expect(document.querySelector(".box")).toBeNull();
+  });
+});
+
+describe("clearMessage", () => {
+  it("leaves alone an element after the field that is not a message", () => {
+    document.body.innerHTML = `<form><input name="properties" /><span id="next"></span></form>`;
+    clearMessage(document.querySelector("input")!);
+    expect(document.querySelector("#next")).not.toBeNull();
+  });
+});
+
+describe("clearMessages", () => {
+  it("removes every message of the dialog, and only of that dialog", () => {
+    document.body.innerHTML = `
+      <form id="a"><input name="class" /><input name="properties" /></form>
+      <form id="b"><input name="properties" /></form>`;
+    document
+      .querySelectorAll("input")
+      .forEach((field) => showMessage(field, "error", "failed"));
+    clearMessages(document.querySelector("#a")!);
+    expect(document.querySelectorAll("#a .box")).toHaveLength(0);
+    expect(document.querySelectorAll("#b .box")).toHaveLength(1);
   });
 });

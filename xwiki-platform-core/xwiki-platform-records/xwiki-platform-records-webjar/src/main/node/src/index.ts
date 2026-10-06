@@ -19,12 +19,16 @@
  */
 
 import {
+  clearMessage,
+  clearMessages,
   findDataTypeInput,
+  findDataTypeLabel,
   findScope,
   resetDerivedParameters,
   setTabsVisible,
+  showMessage,
 } from "./dialog";
-import { loadDescriptors, loadOptions } from "./fieldPicker";
+import { hasDataTypeFields, loadDescriptors, loadOptions } from "./fieldPicker";
 import {
   FILTER_SEPARATOR,
   asValues,
@@ -99,11 +103,12 @@ let messages: Messages = { get: () => null };
 
 /**
  * @param key - a translation key, without the prefix
+ * @param args - the values of the message parameters
  * @returns the translated message, or the key when the bundle does not have it, so that a missing translation shows
  *   up as an identifier rather than as an empty label
  */
-function translate(key: string): string {
-  return messages.get(key) ?? key;
+function translate(key: string, ...args: string[]): string {
+  return messages.get(key, ...args) ?? key;
 }
 
 /**
@@ -148,6 +153,25 @@ interface Suggester {
    * The values currently selected.
    */
   items: string[];
+  /**
+   * The options the widget knows, by value.
+   */
+  options: Record<string, FieldOption>;
+  settings: PickerSettings;
+  /**
+   * The element the widget is rendered in, which replaces the enhanced field on screen.
+   */
+  wrapper: HTMLElement;
+  addOption: (option: FieldOption) => void;
+  updateOption: (value: string, option: FieldOption) => void;
+  /**
+   * Asks the `load` setting for the options matching a query, unless that query has already been loaded.
+   */
+  load: (query: string) => void;
+  /**
+   * @returns the text the author has typed in the widget
+   */
+  inputValue: () => string;
   removeItem: (value: string, silent?: boolean) => void;
   setTextboxValue: (value: string) => void;
   refreshOptions: (triggerDropdown?: boolean) => void;
@@ -177,8 +201,9 @@ function createSettings(
   fetchJson: JsonFetcher,
   offer: Offer = columnsOffer,
 ): PickerSettings {
-  // A failure to reach the properties resource must not break the keystroke handler: the dropdown simply has
-  // nothing to offer, which is the same state as "no data type picked yet".
+  // A failure to reach the properties resource must not break the keystroke handler, and must not pass for "this
+  // object type has no fields" either: the dropdown has nothing to offer, and a message under the widget says why
+  // and offers to try again. What the author already chose stays selected, and is saved as it is.
   const guard = (
     produce: (query: string, selected: string[]) => Promise<FieldOption[]>,
   ) =>
@@ -193,8 +218,10 @@ function createSettings(
       void (async () => {
         try {
           callback(await produce(query, selected));
+          clearMessage(this?.wrapper ?? element);
         } catch {
           callback([]);
+          reportLoadFailure(element, this);
         }
       })();
     };
@@ -224,6 +251,87 @@ function createSettings(
     hidePlaceholder: true,
     ...offer.settings,
   };
+}
+
+/**
+ * Tells the author, under the picker, that the fields of the data type could not be loaded, and offers to try again.
+ *
+ * @param element - the field input of the picker
+ * @param suggester - the widget enhancing it, when the failure happened in one
+ */
+function reportLoadFailure(
+  element: Element,
+  suggester: Suggester | undefined,
+): void {
+  const dataTypeInput = findDataTypeInput(findScope(element));
+  const dataType = dataTypeInput ? findDataTypeLabel(dataTypeInput) : "";
+  showMessage(
+    suggester?.wrapper ?? element,
+    "error",
+    translate("picker.loadFailed", dataType),
+    suggester && {
+      label: translate("picker.retry"),
+      run: () => retry(suggester),
+    },
+  );
+}
+
+/**
+ * Loads a picker's options again after a failure.
+ *
+ * The widget remembers every query it has asked for, failed or not, so that memory is dropped first. The selected
+ * values are resolved again too: when the failure happened as the dialog opened, they are still shown as raw
+ * identifiers rather than under their labels.
+ *
+ * @param suggester - the widget to load again
+ */
+function retry(suggester: Suggester): void {
+  suggester.clearOptions();
+  suggester.items.forEach((value) => {
+    suggester.settings.loadSelected.call(suggester, value, (options) => {
+      options.forEach((option) => {
+        if (Object.hasOwn(suggester.options, option.value)) {
+          suggester.updateOption(option.value, option);
+        } else {
+          suggester.addOption(option);
+        }
+      });
+    });
+  });
+  suggester.load(suggester.inputValue());
+}
+
+/**
+ * Warns, on the data type picker, when the data type a dialog was reopened on no longer exists.
+ *
+ * The saved configuration is left alone until the author picks a replacement, so that reopening a page does not
+ * silently wipe it. The data type picker gets the focus, since picking another data type is the way forward.
+ *
+ * @param picker - the columns picker element, through which the data type is read
+ * @param dataTypeInput - the data type field
+ */
+async function warnIfDataTypeMissing(
+  picker: Element,
+  dataTypeInput: HTMLInputElement | HTMLSelectElement,
+): Promise<void> {
+  const dataType = dataTypeInput.value;
+  let descriptors;
+  try {
+    descriptors = await loadDescriptors(picker, XWiki.contextPath, fetchJson);
+  } catch {
+    // The pickers make the same request and report its failure themselves.
+    return;
+  }
+  // The author may have picked another data type while the request was running.
+  if (hasDataTypeFields(descriptors) || dataTypeInput.value !== dataType) {
+    return;
+  }
+  showMessage(
+    dataTypeInput.selectize?.wrapper ?? dataTypeInput,
+    "warning",
+    translate("picker.dataTypeMissing", findDataTypeLabel(dataTypeInput)),
+  );
+  dataTypeInput.selectize?.focus();
 }
 
 /**
@@ -316,12 +424,11 @@ const filtersOffer: Offer = {
     if (descriptor === undefined || searchURL === undefined) {
       return [];
     }
-    const values = asValues(
-      await fetchJson(
-        valuesUrl(searchURL, constraint.value, window.location.href),
-      ),
+    return toValueOptions(
+      await loadValues(searchURL, constraint.value, fetchJson),
+      descriptor,
+      constraint.value,
     );
-    return toValueOptions(values, descriptor, constraint.value);
   },
   resolve: async (element, value, fetchJson) => [
     resolveFilterOption(
@@ -356,6 +463,31 @@ const filtersOffer: Offer = {
     },
   },
 };
+
+/**
+ * Loads the values a field suggests for what the author typed after the value separator.
+ *
+ * A failure yields no suggestion rather than an error: the fields did load, and a value can always be typed, so the
+ * author is left as with a field that has no suggester rather than told that the fields could not be loaded.
+ *
+ * @param searchURL - the field's value suggestion URL, as its descriptor reports it
+ * @param query - the typed value
+ * @param fetchJson - fetches and parses the suggestions
+ * @returns the suggested values, empty when they could not be loaded
+ */
+async function loadValues(
+  searchURL: string,
+  query: string,
+  fetchJson: JsonFetcher,
+): Promise<ReturnType<typeof asValues>> {
+  try {
+    return asValues(
+      await fetchJson(valuesUrl(searchURL, query, window.location.href)),
+    );
+  } catch {
+    return [];
+  }
+}
 
 /**
  * Fetches and parses a JSON document.
@@ -421,6 +553,10 @@ function wire($: JQueryStatic, picker: Element): void {
     return;
   }
 
+  if (dataTypeInput.value !== "") {
+    void warnIfDataTypeMissing(picker, dataTypeInput);
+  }
+
   let previous = dataTypeInput.value;
   $(dataTypeInput).on("change", () => {
     const current = dataTypeInput.value;
@@ -433,6 +569,7 @@ function wire($: JQueryStatic, picker: Element): void {
       return;
     }
     resetDerivedParameters(scope);
+    clearMessages(scope);
     setTabsVisible(scope, current !== "");
     previous = current;
   });
@@ -465,6 +602,9 @@ define(TRANSLATION_KEYS_MODULE, [], () => ({
     "picker.sort.descending",
     "picker.sort.default",
     "picker.resetWarning",
+    "picker.loadFailed",
+    "picker.retry",
+    "picker.dataTypeMissing",
   ],
 }));
 

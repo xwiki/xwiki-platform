@@ -41,6 +41,11 @@ declare global {
       clear: (silent?: boolean) => void;
       clearOptions: () => void;
       setValue: (value: string, silent?: boolean) => void;
+      focus: () => void;
+      /**
+       * The element the widget is rendered in, which replaces the enhanced field on screen.
+       */
+      wrapper: HTMLElement;
     };
   }
 }

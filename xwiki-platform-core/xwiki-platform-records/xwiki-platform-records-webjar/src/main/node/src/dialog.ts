@@ -144,11 +144,121 @@ function hasValue(element: Element): boolean {
   return false;
 }
 
+/**
+ * The CSS class marking the message box this module puts under a field, so that it is replaced rather than stacked.
+ */
+const MESSAGE_CLASS = "records-picker-message";
+
+/**
+ * A button offered in a message box.
+ */
+interface MessageAction {
+  label: string;
+  run: () => void;
+}
+
+/**
+ * Returns the name the author knows the selected data type under.
+ *
+ * The class picker is a select whose options are labelled with the class names, so the selected option's text is
+ * that name; a plain input only has the reference.
+ *
+ * @param dataTypeInput - the data type field
+ * @returns the label of the selected data type, or its reference when there is no label
+ */
+function findDataTypeLabel(
+  dataTypeInput: HTMLInputElement | HTMLSelectElement,
+): string {
+  const label =
+    dataTypeInput instanceof HTMLSelectElement
+      ? dataTypeInput.selectedOptions[0]?.text.trim()
+      : undefined;
+  return label || dataTypeInput.value;
+}
+
+/**
+ * Shows a message right after a field, replacing the one already there.
+ *
+ * The message is plain text, since it carries names the author or the wiki chose. The box is an alert so that a
+ * screen reader announces a failure the author did not trigger directly, such as one of the loads a dialog makes
+ * when it opens.
+ *
+ * @param anchor - the element to show the message after: the enhanced widget, or the field itself
+ * @param kind - the box style, `error` for something that failed and `warning` for something the author should fix
+ * @param text - the message
+ * @param action - the button to offer next to the message, if any
+ */
+function showMessage(
+  anchor: Element,
+  kind: "error" | "warning",
+  text: string,
+  action?: MessageAction,
+): void {
+  clearMessage(anchor);
+  const box = anchor.ownerDocument.createElement("div");
+  box.className = `box ${kind}message ${MESSAGE_CLASS}`;
+  box.setAttribute("role", "alert");
+  const message = anchor.ownerDocument.createElement("span");
+  message.textContent = text;
+  box.append(message);
+  if (action) {
+    box.append(" ", createActionButton(anchor, action));
+  }
+  anchor.after(box);
+}
+
+/**
+ * @param anchor - the element the message is shown after
+ * @param action - the button to create
+ * @returns a button that removes the message, then runs the action
+ */
+function createActionButton(
+  anchor: Element,
+  action: MessageAction,
+): HTMLButtonElement {
+  const button = anchor.ownerDocument.createElement("button");
+  // Not a submit button: the box sits inside the dialog's form.
+  button.type = "button";
+  button.className = "btn btn-default btn-xs";
+  button.textContent = action.label;
+  button.addEventListener("click", () => {
+    clearMessage(anchor);
+    action.run();
+  });
+  return button;
+}
+
+/**
+ * Removes the message shown after a field, if any.
+ *
+ * @param anchor - the element the message was shown after
+ */
+function clearMessage(anchor: Element): void {
+  const next = anchor.nextElementSibling;
+  if (next?.classList.contains(MESSAGE_CLASS)) {
+    next.remove();
+  }
+}
+
+/**
+ * Removes every message shown in a dialog, which all concern the data type that was selected when they appeared.
+ *
+ * @param scope - the dialog's form
+ */
+function clearMessages(scope: ParentNode): void {
+  scope.querySelectorAll(`.${MESSAGE_CLASS}`).forEach((box) => box.remove());
+}
+
 export {
   DERIVED_PARAMETERS,
+  clearMessage,
+  clearMessages,
   findDataTypeInput,
+  findDataTypeLabel,
   findScope,
   hasValue,
   resetDerivedParameters,
   setTabsVisible,
+  showMessage,
 };
+export type { MessageAction };

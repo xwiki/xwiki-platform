@@ -24,23 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-records-test</artifactId>
     <version>18.9.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-records</artifactId>
-  <name>XWiki Platform - Records - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Records - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-records-webjar</module>
-    <module>xwiki-platform-records-macro</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-records-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-records-test-pageobjects</artifactId>
+  <name>XWiki Platform - Records - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Records - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

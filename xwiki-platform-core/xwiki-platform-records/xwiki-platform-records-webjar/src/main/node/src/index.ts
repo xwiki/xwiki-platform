@@ -305,7 +305,7 @@ function retry(suggester: Suggester): void {
  * Warns, on the data type picker, when the data type a dialog was reopened on no longer exists.
  *
  * The saved configuration is left alone until the author picks a replacement, so that reopening a page does not
- * silently wipe it. The data type picker gets the focus, since picking another data type is the way forward.
+ * silently wipe it. The data type picker is not given the focus: that would open its dropdown over the message.
  *
  * @param picker - the columns picker element, through which the data type is read
  * @param dataTypeInput - the data type field
@@ -331,7 +331,6 @@ async function warnIfDataTypeMissing(
     "warning",
     translate("picker.dataTypeMissing", findDataTypeLabel(dataTypeInput)),
   );
-  dataTypeInput.selectize?.focus();
 }
 
 /**

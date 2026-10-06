@@ -67,6 +67,26 @@ public class CompactLocationPickerElement extends BaseElement
     }
 
     /**
+     * Clicks on the suggestion input, like a user who wants to type a location.
+     *
+     * @return this picker
+     */
+    public CompactLocationPickerElement clickSuggestInput()
+    {
+        getSuggestInputControl().click();
+        return this;
+    }
+
+    /**
+     * @return {@code true} if the text input of the suggestion input has the focus, {@code false} otherwise
+     */
+    public boolean isSuggestInputFocused()
+    {
+        return getSuggestInputControl().findElement(By.tagName("input"))
+            .equals(getDriver().switchTo().activeElement());
+    }
+
+    /**
      * @return the accessible label of the button opening the document tree
      */
     public String getBrowseLabel()
@@ -183,6 +203,13 @@ public class CompactLocationPickerElement extends BaseElement
     private TreeElement getTree()
     {
         return new TreeElement(getBrowser().findElement(By.className("location-tree")));
+    }
+
+    private WebElement getSuggestInputControl()
+    {
+        // Wait for the suggestion input to be ready before looking for the element it generates.
+        getSuggestInput();
+        return this.container.findElement(By.cssSelector(".ts-wrapper > .ts-control"));
     }
 
     private WebElement getBrowser()

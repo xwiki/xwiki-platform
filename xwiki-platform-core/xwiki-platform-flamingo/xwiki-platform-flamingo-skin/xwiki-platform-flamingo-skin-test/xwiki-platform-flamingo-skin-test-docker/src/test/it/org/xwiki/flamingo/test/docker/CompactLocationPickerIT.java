@@ -51,7 +51,7 @@ class CompactLocationPickerIT
 
     /**
      * With single selection, picking a location in the tree replaces the current one and closes the tree, since
-     * there's nothing more to pick.
+     * there's nothing more to pick. The tree also closes when the user moves to the suggestion input.
      */
     @Test
     @Order(1)
@@ -76,6 +76,11 @@ class CompactLocationPickerIT
         picker.openBrowser();
         assertTrue(picker.isSelected(getNodeId(setup, bob)));
         assertFalse(picker.isSelected(getNodeId(setup, alice)));
+
+        // Moving to the suggestion input closes the tree, without taking the focus away from the input.
+        picker.clickSuggestInput();
+        assertFalse(picker.isBrowserOpen());
+        assertTrue(picker.isSuggestInputFocused());
     }
 
     /**

@@ -122,7 +122,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private static final String ID_PREFIX = ID;
 
     private static final String DESCRIPTION =
-        "Displays a collection of entries of the same data type, as a table readers can sort and filter.";
+        "Displays a collection of entries of the same object type, as a table readers can sort and filter.";
 
     @Inject
     private LiveDataRenderer liveDataRenderer;

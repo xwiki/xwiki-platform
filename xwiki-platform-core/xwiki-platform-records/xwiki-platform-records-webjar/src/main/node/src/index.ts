@@ -79,8 +79,8 @@ const WIRED_FLAG = "recordsDialogWired";
  * message belongs in the macro's bundle once the picker gets a proper in-dialog error channel.
  */
 const RESET_WARNING =
-  "Changing the data type resets the columns, the filters and the sort, " +
-  "because they name fields of the data type you are leaving.\n\nChange it anyway?";
+  "Changing the object type resets the columns, the filters and the sort, " +
+  "because they name fields of the object type you are leaving.\n\nChange it anyway?";
 
 /**
  * The suggest widget settings this picker needs.

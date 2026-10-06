@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,6 +63,8 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Lists the entries of a data type as a table readers can sort and filter.
@@ -198,6 +201,12 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private LiveDataSourceManager liveDataSourceManager;
 
     /**
+     * Tells whether the reader can view the data type, without which its fields cannot be checked.
+     */
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
+    /**
      * Serializes the picked data type for the source. The compact form keeps the wiki only when it is not the
      * current one, which is what a class reference looks like in a Live Data source parameter.
      */
@@ -249,7 +258,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
             boolean restricted = context.getTransformationContext().isRestricted();
             // The advanced configuration is left blank on purpose, see the class javadoc.
             LiveDataRendererParameters liveDataParameters =
-                toLiveDataParameters(parameters, context, serializedDataType, blocks);
+                toLiveDataParameters(parameters, context, dataType, serializedDataType, blocks);
             blocks.add(this.liveDataRenderer.execute(liveDataParameters, (String) null, restricted));
         } catch (LiveDataException e) {
             throw new MacroExecutionException(translate(RENDER_FAILED), e);
@@ -280,14 +289,17 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      *
      * @param parameters the macro parameters
      * @param context the transformation context, which carries the document's identifier generator
+     * @param dataTypeReference the reference of the data type
      * @param dataType the serialized reference of the data type
      * @param warnings receives a warning for every field the data type no longer has
      * @return the equivalent Live Data renderer parameters
      */
     private LiveDataRendererParameters toLiveDataParameters(RecordsMacroParameters parameters,
-        MacroTransformationContext context, String dataType, List<Block> warnings) throws MacroExecutionException
+        MacroTransformationContext context, DocumentReference dataTypeReference, String dataType,
+        List<Block> warnings) throws MacroExecutionException
     {
         List<String> fields = getFields(dataType);
+        Predicate<String> known = getKnownFields(dataTypeReference, fields);
         WarningBuilder unknownColumn = field -> warning("warning.columnSkipped", field, dataType);
         WarningBuilder unknownSort = field -> warning("warning.sortSkipped", field, dataType);
         WarningBuilder unknownFilter = field -> warning("warning.filterSkipped", field, dataType);
@@ -296,15 +308,37 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         liveDataParameters.setId(getId(parameters, context));
         liveDataParameters.setSource(SOURCE);
         liveDataParameters.setSourceParameters(getSourceParameters(parameters, dataType));
-        liveDataParameters.setProperties(getProperties(parameters, fields, unknownColumn, warnings));
+        liveDataParameters.setProperties(getProperties(parameters, fields, known, unknownColumn, warnings));
         liveDataParameters.setFilters(
-            keepKnown(parameters.getFilters(), FILTER_SEPARATOR, this::getFilterField, fields, unknownFilter,
+            keepKnown(parameters.getFilters(), FILTER_SEPARATOR, this::getFilterField, known, unknownFilter,
                 warnings));
         liveDataParameters.setSort(
-            keepKnown(parameters.getSort(), LIST_SEPARATOR, this::getSortField, fields, unknownSort, warnings));
+            keepKnown(parameters.getSort(), LIST_SEPARATOR, this::getSortField, known, unknownSort, warnings));
         liveDataParameters.setLayouts(parameters.getLayouts());
         liveDataParameters.setDescription(parameters.getDescription());
         return liveDataParameters;
+    }
+
+    /**
+     * Tells which fields the data type has, for the purpose of dropping the authored ones it no longer has.
+     * <p>
+     * The source only reports the fields of a data type to a reader who can view it, and reports none to anyone
+     * else. For such a reader the field list says nothing about the data type, so every field is taken as known and
+     * the authored columns, filters and sort are passed through unchanged. Dropping them would show that reader
+     * every entry the author filtered out, and warn them about fields that do exist, in a message they cannot act on.
+     * The default column list is still built from the fields they are offered, so with no column authored they see
+     * the entry title alone, which is also all that Live Data would describe to them.
+     *
+     * @param dataType the reference of the data type
+     * @param fields the identifiers the data type's source offers to the current user
+     * @return whether a field counts as one the data type has
+     */
+    private Predicate<String> getKnownFields(DocumentReference dataType, List<String> fields)
+    {
+        if (this.authorization.hasAccess(Right.VIEW, dataType)) {
+            return fields::contains;
+        }
+        return field -> true;
     }
 
     /**
@@ -360,15 +394,16 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      *
      * @param parameters the macro parameters
      * @param fields the identifiers of everything the data type's source offers
+     * @param known whether a field counts as one the data type has
      * @param unknown builds the warning for a column that is gone
      * @param warnings receives the warnings
      * @return the columns the author chose, or the entry title followed by every field of the data type
      */
-    private String getProperties(RecordsMacroParameters parameters, List<String> fields,
+    private String getProperties(RecordsMacroParameters parameters, List<String> fields, Predicate<String> known,
         WarningBuilder unknown, List<Block> warnings)
         throws MacroExecutionException
     {
-        String kept = keepKnown(parameters.getProperties(), LIST_SEPARATOR, String::trim, fields, unknown, warnings);
+        String kept = keepKnown(parameters.getProperties(), LIST_SEPARATOR, String::trim, known, unknown, warnings);
         if (kept != null) {
             return kept;
         }
@@ -383,13 +418,13 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * @param value the parameter value, which may be blank
      * @param separator what separates the items
      * @param fieldOf extracts the field an item is about
-     * @param fields the identifiers the data type's source offers
+     * @param known whether a field counts as one the data type has
      * @param unknown builds the warning for a field that is gone
      * @param warnings receives the warnings
      * @return the items kept, in their original text, or {@code null} when there is none
      */
-    private String keepKnown(String value, String separator, Function<String, String> fieldOf, List<String> fields,
-        WarningBuilder unknown, List<Block> warnings)
+    private String keepKnown(String value, String separator, Function<String, String> fieldOf,
+        Predicate<String> known, WarningBuilder unknown, List<Block> warnings)
         throws MacroExecutionException
     {
         if (StringUtils.isBlank(value)) {
@@ -401,7 +436,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
             if (field.isEmpty()) {
                 continue;
             }
-            if (field.startsWith(INTERNAL_PREFIX) || fields.contains(field)) {
+            if (field.startsWith(INTERNAL_PREFIX) || known.test(field)) {
                 kept.add(item);
             } else {
                 warnings.add(unknown.build(field));

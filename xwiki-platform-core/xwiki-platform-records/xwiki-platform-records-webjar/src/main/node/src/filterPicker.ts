@@ -26,8 +26,9 @@
  * field. So one filter is one `field=value` pair, which is what makes a multiple-value suggester with `&` as its
  * delimiter the natural widget: each selected item is one constraint.
  *
- * Two consequences of that encoding drive this module. A suggested value is percent-encoded, because the renderer
- * decodes it and a value holding `&` or `=` would otherwise be read as another constraint. And the same field may
+ * Two consequences of that encoding drive this module. Every value is percent-encoded, whether suggested or typed,
+ * because the renderer decodes it: a value holding `&` or `=` would otherwise be read as another constraint, a `%`
+ * would make the whole table fail to load, and a `+` would turn into a space. And the same field may
  * legitimately appear more than once, which works because an item's value is the whole pair rather than the field.
  *
  * The candidate values come from the property descriptor itself: the Live Data properties resource reports a
@@ -36,7 +37,7 @@
  * in the rendered table.
  */
 
-import { groupOf, isCandidate, matches } from "./fieldPicker";
+import { FIELDS_GROUP, groupOf, isCandidate, matches } from "./fieldPicker";
 import type { FieldOption, PropertyDescriptor } from "./fieldPicker";
 
 /**
@@ -69,36 +70,55 @@ interface Constraint {
 }
 
 /**
- * Splits a constraint into its field and its value.
+ * Splits what the author typed into a field and a value, taken literally.
  *
- * @param text - one constraint, or the text the author is typing
+ * Typed text is not encoded: `completion=100%` means a value of `100%`, and `language=C++` a value of `C++`.
+ *
+ * @param text - the text the author is typing
  * @returns the two halves, or null when no value separator has been typed yet
  */
-function splitConstraint(text: string): Constraint | null {
+function splitTyped(text: string): Constraint | null {
   const separator = text.indexOf(VALUE_SEPARATOR);
   if (separator === -1) {
     return null;
   }
   return {
     field: text.slice(0, separator),
-    value: decode(text.slice(separator + 1)),
+    value: text.slice(separator + 1),
   };
 }
 
 /**
- * Decodes the value half of a constraint, tolerating one that is not valid percent-encoding.
+ * Splits a stored constraint into its field and its decoded value.
  *
- * An author may type a bare `%` in a value, which {@link decodeURIComponent} refuses. Showing what they typed is
- * better than failing inside a keystroke handler.
+ * @param text - one constraint, as stored in the parameter
+ * @returns the two halves, or null when the constraint has no value separator
+ */
+function splitConstraint(text: string): Constraint | null {
+  const constraint = splitTyped(text);
+  return constraint === null
+    ? null
+    : { field: constraint.field, value: decode(constraint.value) };
+}
+
+/**
+ * Decodes the value half of a stored constraint the way the renderer does, tolerating one that is not valid
+ * percent-encoding.
+ *
+ * The renderer decodes the parameter as form data, where `+` stands for a space, so it is read as one here too:
+ * otherwise the dialog would show a hand-written `a+b` as something other than what the table filters on. A value
+ * holding a bare `%`, which {@link decodeURIComponent} refuses, is shown as it is rather than failing inside a
+ * keystroke handler; the macro reports it when the table is rendered.
  *
  * @param value - the value as it appears in the parameter
  * @returns the decoded value, or the value unchanged when it cannot be decoded
  */
 function decode(value: string): string {
+  const spaced = value.replaceAll("+", " ");
   try {
-    return decodeURIComponent(value);
+    return decodeURIComponent(spaced);
   } catch {
-    return value;
+    return spaced;
   }
 }
 
@@ -111,6 +131,29 @@ function decode(value: string): string {
  */
 function encodeConstraint(field: string, value: string): string {
   return `${field}${VALUE_SEPARATOR}${encodeURIComponent(value)}`;
+}
+
+/**
+ * Turns what the author typed into a constraint, which is how a value no resource suggests gets in.
+ *
+ * The value is encoded exactly as a suggested one is, since the renderer decodes every constraint: left as typed, a
+ * `%` would make the whole table fail to load and a `+` would turn into a space. The label shows the text as typed.
+ *
+ * @param input - the text the author typed
+ * @returns the option to create, or null when the text names no field and value, since it would not be a
+ *   constraint
+ */
+function createFilterOption(input: string): FieldOption | null {
+  const constraint = splitTyped(input);
+  if (constraint === null || constraint.field.trim() === "") {
+    return null;
+  }
+  const field = constraint.field.trim();
+  return {
+    value: encodeConstraint(field, constraint.value),
+    label: `${field} ${VALUE_SEPARATOR} ${constraint.value}`,
+    optgroup: FIELDS_GROUP,
+  };
 }
 
 /**
@@ -259,10 +302,12 @@ export {
   QUERY_PLACEHOLDER,
   VALUE_SEPARATOR,
   asValues,
+  createFilterOption,
   encodeConstraint,
   isIncomplete,
   resolveFilterOption,
   splitConstraint,
+  splitTyped,
   toFieldOptions,
   toValueOptions,
   valuesUrl,

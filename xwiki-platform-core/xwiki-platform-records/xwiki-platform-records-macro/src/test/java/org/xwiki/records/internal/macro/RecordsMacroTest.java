@@ -388,6 +388,35 @@ class RecordsMacroTest
     }
 
     @Test
+    void executePassesEncodedFreeTextValuesThrough() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        // What the dialog saves for the typed values 100% and C++.
+        parameters.setFilters("first_name=100%25&last_name=C%2B%2B");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("first_name=100%25&last_name=C%2B%2B", capture().getFilters());
+        assertEquals(List.of(this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeDropsAFilterTheRendererCannotDecodeAndSaysSo() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        // A bare % in a value, then in a field: both make the renderer fail on the whole table.
+        parameters.setFilters("first_name=100%&email=a&b%=c");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals("email=a", capture().getFilters());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.filterUnreadable[first_name=100%]"),
+            warning("rendering.macro.records.warning.filterUnreadable[b%=c]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
     void executeLeavesNoFilterWhenEveryConstraintIsDropped() throws Exception
     {
         RecordsMacroParameters parameters = newParameters();

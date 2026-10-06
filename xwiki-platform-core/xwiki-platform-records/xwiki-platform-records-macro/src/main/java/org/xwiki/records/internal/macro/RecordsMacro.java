@@ -310,8 +310,8 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         liveDataParameters.setSourceParameters(getSourceParameters(parameters, dataType));
         liveDataParameters.setProperties(getProperties(parameters, fields, known, unknownColumn, warnings));
         liveDataParameters.setFilters(
-            keepKnown(parameters.getFilters(), FILTER_SEPARATOR, this::getFilterField, known, unknownFilter,
-                warnings));
+            keepKnown(keepReadable(parameters.getFilters(), warnings), FILTER_SEPARATOR, this::getFilterField, known,
+                unknownFilter, warnings));
         liveDataParameters.setSort(
             keepKnown(parameters.getSort(), LIST_SEPARATOR, this::getSortField, known, unknownSort, warnings));
         liveDataParameters.setLayouts(parameters.getLayouts());
@@ -443,6 +443,35 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
             }
         }
         return kept.isEmpty() ? null : String.join(separator, kept);
+    }
+
+    /**
+     * Keeps the constraints of a filters value that the renderer can decode.
+     * <p>
+     * The renderer reads the value as form data, and fails on a {@code %} that is not followed by two hexadecimal
+     * digits. It fails as a whole, so one such constraint, which only a hand-written value can hold since the dialog
+     * encodes what it saves, would otherwise replace the table with an error. The constraint is dropped with a warning
+     * instead, and the table shows the others.
+     *
+     * @param filters the filters value, which may be blank
+     * @param warnings receives a warning for every constraint that cannot be decoded
+     * @return the constraints kept, possibly none
+     */
+    private String keepReadable(String filters, List<Block> warnings) throws MacroExecutionException
+    {
+        if (StringUtils.isBlank(filters)) {
+            return filters;
+        }
+        List<String> kept = new ArrayList<>();
+        for (String constraint : filters.split(Pattern.quote(FILTER_SEPARATOR))) {
+            try {
+                URLDecoder.decode(constraint, StandardCharsets.UTF_8);
+                kept.add(constraint);
+            } catch (IllegalArgumentException e) {
+                warnings.add(warning("warning.filterUnreadable", constraint));
+            }
+        }
+        return String.join(FILTER_SEPARATOR, kept);
     }
 
     private boolean exists(DocumentReference dataType) throws MacroExecutionException

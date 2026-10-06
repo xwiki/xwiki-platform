@@ -236,12 +236,12 @@
       $("#groupusers").data('liveData').updateEntries();
       // Show notification message.
       if(response.hasIgnored) {
-        new XWiki.widgets.Notification(response.ignoredMessage, 'warning', {timeout: 5});
+        XWiki.widgets.Notification.show(response.ignoredMessage, 'warning', {timeout: 5});
       } else {
-        new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
+        XWiki.widgets.Notification.show("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
       }
     }).catch(function(response) {
-      new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" +
+      XWiki.widgets.Notification.show("$services.localization.render('xe.admin.groups.addFailure')" +
         response.statusText, 'error', {timeout: 5});
     }).finally(function() {
       addMembersButton.prop('disabled', false);

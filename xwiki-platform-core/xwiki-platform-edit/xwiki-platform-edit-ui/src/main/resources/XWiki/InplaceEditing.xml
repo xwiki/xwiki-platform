@@ -278,7 +278,7 @@ define('xwiki-document-api', [
           renderedContent: isContentRenderedToHTML ? contentWrapper.html() : contentWrapper.text()
         });
       }).catch(() =&gt; {
-        new XWiki.widgets.Notification(l10n['edit.inplace.page.renderFailed'], 'error');
+        XWiki.widgets.Notification.show(l10n['edit.inplace.page.renderFailed'], 'error');
         return Promise.reject(this);
       });
     }
@@ -567,7 +567,7 @@ define('editInPlace', [
             return Promise.reject(xwikiDocument);
           });
       } else {
-        new XWiki.widgets.Notification(l10n['edit.inplace.page.lockFailed'], 'error');
+        XWiki.widgets.Notification.show(l10n['edit.inplace.page.lockFailed'], 'error');
         return Promise.reject(xwikiDocument);
       }
     });
@@ -579,7 +579,7 @@ define('editInPlace', [
       xwikiDocument.backup();
       return xwikiDocument;
     }).catch(xwikiDocument =&gt; {
-      new XWiki.widgets.Notification(l10n['edit.inplace.page.loadFailed'], 'error');
+      XWiki.widgets.Notification.show(l10n['edit.inplace.page.loadFailed'], 'error');
       return Promise.reject(xwikiDocument);
     // Render the document for edit, using the provided rendering configuration, which may depend on the editor used to
     // edit the content.
@@ -914,7 +914,7 @@ define('editInPlace', [
         });
       });
     }).catch(() =&gt; {
-      new XWiki.widgets.Notification(l10n['edit.inplace.actionButtons.loadFailed'], 'error');
+      XWiki.widgets.Notification.show(l10n['edit.inplace.actionButtons.loadFailed'], 'error');
     });
   };
 

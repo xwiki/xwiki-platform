@@ -454,7 +454,7 @@ define('xwiki-wysiwyg-image-editor', [
             addToggleImageWidthLock(modal);
             addToggleAlignmentTextWrap(modal);
           }).fail(function(error) {
-            new XWiki.widgets.Notification(translations.get('initialization.fail'), 'error');
+            XWiki.widgets.Notification.show(translations.get('initialization.fail'), 'error');
             console.log('Failed to retrieve the image edition form.', error);
         });
       }

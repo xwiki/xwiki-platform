@@ -443,29 +443,21 @@ function revert(
   value: string,
 ): void {
   dataTypeInput.value = value;
-  const enhanced = (
-    dataTypeInput as unknown as {
-      selectize?: { setValue: (value: string, silent?: boolean) => void };
-    }
-  ).selectize;
-  enhanced?.setValue(value, true);
+  dataTypeInput.selectize?.setValue(value, true);
 }
 
-// The RequireJS typings only know how to define a module with a factory, not with a plain value.
-(define as unknown as (name: string, value: unknown) => void)(
-  TRANSLATION_KEYS_MODULE,
-  {
-    prefix: TRANSLATION_PREFIX,
-    keys: [
-      "picker.group.fields",
-      "picker.group.metadata",
-      "picker.sort.ascending",
-      "picker.sort.descending",
-      "picker.sort.default",
-      "picker.resetWarning",
-    ],
-  },
-);
+// An empty dependency list and a factory returning the value is the typed form of a plain value module.
+define(TRANSLATION_KEYS_MODULE, [], () => ({
+  prefix: TRANSLATION_PREFIX,
+  keys: [
+    "picker.group.fields",
+    "picker.group.metadata",
+    "picker.sort.ascending",
+    "picker.sort.descending",
+    "picker.sort.default",
+    "picker.resetWarning",
+  ],
+}));
 
 define("xwiki-records-fields", [
   "jquery",

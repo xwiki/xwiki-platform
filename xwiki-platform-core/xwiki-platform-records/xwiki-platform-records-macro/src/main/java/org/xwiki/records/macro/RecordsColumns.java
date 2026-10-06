@@ -38,7 +38,7 @@ import org.xwiki.stability.Unstable;
  * contract the macro editor itself relies on to assemble a macro call.
  *
  * @version $Id$
- * @since 18.8.0RC1
+ * @since 18.9.0RC1
  */
 @Unstable
 public interface RecordsColumns

@@ -35,7 +35,7 @@ import org.xwiki.stability.Unstable;
  * name, showing the entry count and hiding technical classes are the subject of a separate proposal.
  *
  * @version $Id$
- * @since 18.8.0RC1
+ * @since 18.9.0RC1
  */
 @Unstable
 public interface RecordsDataType

@@ -64,7 +64,7 @@ import org.xwiki.rendering.util.IdGenerator;
  * mapping below therefore sticks to what the parameters can express.
  *
  * @version $Id$
- * @since 18.8.0RC1
+ * @since 18.9.0RC1
  */
 @Component
 @Named(RecordsMacro.ID)

@@ -70,7 +70,7 @@ import org.xwiki.stability.Unstable;
  * Java type already has: a {@link String} renders a text input.
  *
  * @version $Id$
- * @since 18.8.0RC1
+ * @since 18.9.0RC1
  */
 @Unstable
 public class RecordsMacroParameters

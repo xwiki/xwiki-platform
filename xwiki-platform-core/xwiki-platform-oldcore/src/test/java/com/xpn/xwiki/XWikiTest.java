@@ -35,6 +35,8 @@ import javax.servlet.http.Cookie;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
@@ -1380,6 +1382,45 @@ class XWikiTest
             this.xwiki.getDocument(reference4, this.oldcore.getXWikiContext()).getParent());
         assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"),
             this.xwiki.getDocument(reference5, this.oldcore.getXWikiContext()).getParentReference());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "superadmin", "SuperAdmin", "XWikiGuest", "xwikiguest", "XWIKIGUEST" })
+    void createUserWithReservedName(String userName) throws Exception
+    {
+        setRegistrationRequest(userName);
+
+        assertEquals(-8, this.xwiki.createUser(false, "edit", this.oldcore.getXWikiContext()));
+        assertTrue(this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", userName),
+            this.oldcore.getXWikiContext()).isNew());
+    }
+
+    @Test
+    void createUser() throws Exception
+    {
+        setRegistrationRequest("Alice");
+
+        assertEquals(1, this.xwiki.createUser(false, "edit", this.oldcore.getXWikiContext()));
+
+        XWikiDocument userDocument = this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Alice"),
+            this.oldcore.getXWikiContext());
+        assertFalse(userDocument.isNew());
+        BaseObject rightObject =
+            userDocument.getXObject(new LocalDocumentReference("XWiki", "XWikiRights"), 0);
+        assertEquals("XWiki.Alice", rightObject.getLargeStringValue("users"));
+        assertEquals("edit", rightObject.getStringValue("levels"));
+        assertEquals(1, rightObject.getIntValue("allow"));
+    }
+
+    private void setRegistrationRequest(String userName)
+    {
+        String password = "password";
+        Map<String, String[]> parameters = Map.of(
+            "xwikiname", new String[] { userName },
+            "register_password", new String[] { password },
+            "register2_password", new String[] { password },
+            "register_email", new String[] { "user@example.org" });
+        this.oldcore.getXWikiContext().setRequest(new XWikiServletRequestStub(null, parameters));
     }
 
     @Test

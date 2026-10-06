@@ -3928,8 +3928,10 @@ public class XWiki implements EventListener
             String parent = request.getParameter("parent");
             String validkey = null;
 
-            // Validate the values.
-            if (XWikiRightService.SUPERADMIN_USER.equalsIgnoreCase(xwikiname)) {
+            // Reject the names of the reserved users.
+            if (XWikiRightService.SUPERADMIN_USER.equalsIgnoreCase(xwikiname)
+                || XWikiRightService.GUEST_USER.equalsIgnoreCase(xwikiname))
+            {
                 return -8;
             }
             try {

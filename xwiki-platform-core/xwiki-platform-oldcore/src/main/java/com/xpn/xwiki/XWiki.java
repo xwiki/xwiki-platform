@@ -1666,7 +1666,7 @@ public class XWiki implements EventListener
     public String getVersion()
     {
         if (this.version == null) {
-            try (InputStream is = getResourceAsStream(VERSION_FILE)) {
+            try (InputStream is = getEnvironment().getResourceAsStream(VERSION_FILE)) {
                 if (is != null) {
                     XWikiConfig properties = new XWikiConfig(is);
                     this.version = properties.getProperty(VERSION_FILE_PROPERTY);
@@ -1690,11 +1690,19 @@ public class XWiki implements EventListener
         return this.version;
     }
 
+    /**
+     * @deprecated use {@link Environment#getResource(String)} instead
+     */
+    @Deprecated(since = "18.9.0RC1, 18.4.7, 17.10.14")
     public URL getResource(String s) throws MalformedURLException
     {
         return getEnvironment().getResource(s);
     }
 
+    /**
+     * @deprecated use {@link Environment#getResourceAsStream(String)} instead
+     */
+    @Deprecated(since = "18.9.0RC1, 18.4.7, 17.10.14")
     public InputStream getResourceAsStream(String s) throws MalformedURLException
     {
         return getEnvironment().getResourceAsStream(s);
@@ -1702,13 +1710,12 @@ public class XWiki implements EventListener
 
     public String getResourceContent(String name) throws IOException
     {
-        if (getEnvironment() != null) {
-            try (InputStream is = getResourceAsStream(name)) {
-                if (is != null) {
-                    return IOUtils.toString(is, StandardCharsets.UTF_8);
-                }
+        try (InputStream is = getEnvironment().getResourceAsStream(name)) {
+            if (is != null) {
+                return IOUtils.toString(is, StandardCharsets.UTF_8);
             }
         }
+
         // Resources should always be encoded as UTF-8, to reduce the dependency on the system encoding
         return FileUtils.readFileToString(new File(name), StandardCharsets.UTF_8);
     }
@@ -1716,50 +1723,43 @@ public class XWiki implements EventListener
     public Date getResourceLastModificationDate(String name)
     {
         try {
-            if (getEnvironment() != null) {
-                return getEnvironment().getResourceLastModified(name);
-            }
+            return getEnvironment().getResourceLastModified(name);
         } catch (Exception ex) {
             // Probably a SecurityException or the file is not accessible (inside a war)
             LOGGER.info("Failed to get the modification date of resource [{}]. Root cause is [{}]", name,
                 ExceptionUtils.getRootCauseMessage(ex));
         }
+
         return new Date();
     }
 
     public byte[] getResourceContentAsBytes(String name) throws IOException
     {
-        if (getEnvironment() != null) {
-            try (InputStream is = getResourceAsStream(name)) {
-                if (is != null) {
-                    return IOUtils.toByteArray(is);
-                }
-            } catch (Exception e) {
-                // TODO: log a warning instead of ignoring this exception.
-                // The resource is then read from the file system below.
+        try (InputStream is = getEnvironment().getResourceAsStream(name)) {
+            if (is != null) {
+                return IOUtils.toByteArray(is);
             }
+        } catch (Exception e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The resource is then read from the file system below.
         }
+
         return FileUtils.readFileToByteArray(new File(name));
     }
 
     public boolean resourceExists(String name)
     {
-        if (getEngineContext() != null) {
-            try {
-                if (getResource(name) != null) {
-                    return true;
-                }
-            } catch (IOException e) {
-                // TODO: log a warning instead of ignoring this exception.
-                // The resource is then looked for on the file system below.
-            }
+        if (getEnvironment().getResource(name) != null) {
+            return true;
         }
+
         try {
             File file = new File(name);
             return file.exists();
         } catch (Exception e) {
             // Could be running under -security, which prevents calling file.exists().
         }
+
         return false;
     }
 
@@ -2791,13 +2791,13 @@ public class XWiki implements EventListener
 
     private Map<String, Object> getResourceURLCacheParameters(String resourceFilePath)
     {
-        try {
-            URL resourceUrl = getResource(resourceFilePath);
+        URL resourceUrl = getEnvironment().getResource(resourceFilePath);
+
+        if (resourceUrl != null) {
             return getResourceURLCacheParameters(resourceUrl);
-        } catch (MalformedURLException e) {
-            LOGGER.debug("Error while getting URL for resource path [{}]", resourceFilePath, e);
-            return Collections.singletonMap(CACHE_VERSION, getVersion());
         }
+
+        return Collections.singletonMap(CACHE_VERSION, getVersion());
     }
 
     private Map<String, Object> getResourceURLCacheParameters(URL resourceUrl)

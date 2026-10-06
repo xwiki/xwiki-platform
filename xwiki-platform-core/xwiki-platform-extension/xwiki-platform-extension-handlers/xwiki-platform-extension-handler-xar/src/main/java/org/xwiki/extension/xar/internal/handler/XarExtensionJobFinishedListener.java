@@ -260,6 +260,7 @@ public class XarExtensionJobFinishedListener implements EventListener
                 try {
                     job.getStatus().ask(question);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     this.logger.warn("The thread has been interrupted", e);
 
                     // The thread has been interrupted, do nothing

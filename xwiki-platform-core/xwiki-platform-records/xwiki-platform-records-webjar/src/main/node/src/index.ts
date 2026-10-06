@@ -340,12 +340,18 @@ const filtersOffer: Offer = {
     // Picking a field is picking half a constraint. Rather than leaving `status=` behind as an item that filters
     // on the empty value, put it back in the text box: the author carries on with the value, and typing the
     // separator is what brings up that field's values.
+    //
+    // A complete constraint, on the other hand, must leave an empty text box behind. Tom Select only clears what
+    // was typed when a typed value is created, not when a suggested one is picked, and the text left over from
+    // picking `status=published` would be read as the start of the next constraint.
     onItemAdd(value) {
       if (isIncomplete(value)) {
         this.removeItem(value, true);
         this.setTextboxValue(value);
-        this.refreshOptions(true);
+      } else {
+        this.setTextboxValue("");
       }
+      this.refreshOptions(true);
     },
   },
 };

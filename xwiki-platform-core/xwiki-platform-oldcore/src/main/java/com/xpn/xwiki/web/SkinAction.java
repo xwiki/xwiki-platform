@@ -38,11 +38,15 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -92,6 +96,19 @@ public class SkinAction extends XWikiAction
 
     @Inject
     private XWikiAttachmentSecurityManager attachmentSecurityManager;
+
+    @Inject
+    private DocumentAuthorizationManager documentAuthorizationManager;
+
+    @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserSerializer;
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -414,9 +431,16 @@ public class SkinAction extends XWikiAction
                 final ObjectPropertyReference propertyReference =
                     new ObjectPropertyReference(filename, object.getReference());
 
-                // Evaluate the content with the rights of the document's author.
-                content = evaluateVelocity(content, propertyReference, doc.getAuthorReference(),
-                    doc.getDocumentReference(), context);
+                // The object properties are written by the effective metadata author of the document, so the content
+                // is evaluated with the rights of that author, provided the author is allowed to write scripts.
+                DocumentReference author = getEffectiveMetadataAuthor(doc);
+                if (isVelocityAllowed(author, doc)) {
+                    content = evaluateVelocity(content, propertyReference, author, doc.getDocumentReference(),
+                        context);
+                } else {
+                    LOGGER.warn("The Velocity code of [{}] is not evaluated because its author [{}] doesn't have "
+                        + "script right on the document.", propertyReference, author);
+                }
             }
 
             // Prepare the response.
@@ -438,11 +462,29 @@ public class SkinAction extends XWikiAction
         return false;
     }
 
+    private DocumentReference getEffectiveMetadataAuthor(XWikiDocument doc)
+    {
+        return this.documentUserSerializer.serialize(doc.getAuthors().getEffectiveMetadataAuthor());
+    }
+
+    /**
+     * Velocity code is evaluated with the rights of its author, so that author must be allowed to write scripts on the
+     * document holding the code, and the document must not be restricted (i.e. its scripts must not be disabled).
+     *
+     * @param author the author of the Velocity code
+     * @param doc the document holding the Velocity code
+     * @return {@code true} if the Velocity code can be evaluated
+     */
+    private boolean isVelocityAllowed(DocumentReference author, XWikiDocument doc)
+    {
+        return !doc.isRestricted() && this.documentAuthorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            author, doc.getDocumentReference());
+    }
+
     private String evaluateVelocity(String content, EntityReference reference, DocumentReference author,
         final DocumentReference sourceDocument, XWikiContext context)
     {
-        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
-        String namespace = serializer.serialize(reference);
+        String namespace = this.entityReferenceSerializer.serialize(reference);
 
         return evaluateVelocity(content, namespace, author, sourceDocument, context);
     }
@@ -453,8 +495,8 @@ public class SkinAction extends XWikiAction
         String result = content;
 
         try {
-            result = Utils.getComponent(AuthorExecutor.class)
-                .call(() -> context.getWiki().evaluateVelocity(content, namespace), author, sourceDocument);
+            result = this.authorExecutor.call(() -> context.getWiki().evaluateVelocity(content, namespace), author,
+                sourceDocument);
         } catch (Exception e) {
             // Should not happen since there is nothing in the call() method throwing an exception.
             LOGGER.error("Failed to evaluate velocity content for namespace {} with the rights of the user {}",
@@ -491,10 +533,23 @@ public class SkinAction extends XWikiAction
                 // Always force UTF-8, as this is the assumed encoding for text files.
                 String velocityCode = new String(data, StandardCharsets.UTF_8);
 
-                // Evaluate the content with the rights of the document's author.
-                String evaluatedContent =
-                    evaluateVelocity(velocityCode, attachment.getReference(), doc.getAuthorReference(),
+                // The content of the attachment is written by the author of the attachment, not by the author of
+                // the document, so the content is evaluated with the rights of the attachment's author. The effective
+                // metadata author of the document must also be allowed to write scripts, since that author is the one
+                // who put the attachment on this document when it is copied, renamed or restored.
+                // FIXME: This should be changed when XWIKI-25193 is properly implemented.
+                DocumentReference attachmentAuthor = attachment.getAuthorReference();
+                DocumentReference documentAuthor = getEffectiveMetadataAuthor(doc);
+                String evaluatedContent;
+                if (isVelocityAllowed(attachmentAuthor, doc) && isVelocityAllowed(documentAuthor, doc)) {
+                    evaluatedContent = evaluateVelocity(velocityCode, attachment.getReference(), attachmentAuthor,
                         doc.getDocumentReference(), context);
+                } else {
+                    LOGGER.warn("The Velocity code of [{}] is not evaluated because either its author [{}] or "
+                        + "the author [{}] of the document doesn't have script right on the document.",
+                        attachment.getReference(), attachmentAuthor, documentAuthor);
+                    evaluatedContent = velocityCode;
+                }
 
                 // Prepare the response.
                 response.setCharacterEncoding(StandardCharsets.UTF_8.name());

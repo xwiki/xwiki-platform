@@ -130,7 +130,7 @@ class RecordsMacroTest
                 Arrays.copyOfRange(invocation.getArguments(), 1, invocation.getArguments().length)));
         when(this.liveDataSourceManager.get(any(Source.class))).thenReturn(Optional.of(this.liveDataSource));
         when(this.liveDataSource.getProperties()).thenReturn(this.propertyStore);
-        // What the liveTable property store reports: the entry metadata, the data type's fields, and the Live Data
+        // What the liveTable property store reports: the page metadata, the data type's fields, and the Live Data
         // pseudo-columns, all in one list.
         when(this.propertyStore.get()).thenReturn(List.of(
             descriptor("doc.title"), descriptor("doc.location"),
@@ -213,7 +213,7 @@ class RecordsMacroTest
     @Test
     void executeLeavesTheOtherMetadataAndThePseudoColumnsOutOfTheDefault() throws Exception
     {
-        // The title is the only piece of entry metadata the default wants; the rest is the author's to add. The
+        // The title is the only piece of page metadata the default wants; the rest is the author's to add. The
         // pseudo-columns are affordances rather than data.
         String properties = execute(newParameters()).getProperties();
 

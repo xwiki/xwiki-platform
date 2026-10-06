@@ -22,7 +22,7 @@
  * The field picker of the Records macro dialog.
  *
  * The candidate columns of a Records table are the fields of the data type the author picked in the sibling
- * `class` parameter, plus the entry metadata. The macro editor has no declarative way to express that dependency:
+ * `class` parameter, plus the page metadata. The macro editor has no declarative way to express that dependency:
  * it builds every parameter widget by handing a displayer its own type, default value and attributes, and nothing
  * else, and it caches the resulting templates per macro id, so a template can never be rendered against the
  * current values.
@@ -91,7 +91,7 @@ interface FieldOption {
 }
 
 /**
- * The identifier prefix of the entry metadata properties, as opposed to the data type's own fields.
+ * The identifier prefix of the page metadata properties, as opposed to the data type's own fields.
  */
 const METADATA_PREFIX = "doc.";
 
@@ -105,7 +105,7 @@ const METADATA_PREFIX = "doc.";
 const INTERNAL_PREFIX = "_";
 
 /**
- * The group the entry metadata properties are listed under.
+ * The group the page metadata properties are listed under.
  */
 const METADATA_GROUP = "metadata";
 
@@ -162,7 +162,7 @@ function propertiesUrl(contextPath: string, dataType: string): string {
 /**
  * Turns property descriptors into dropdown options.
  *
- * The two groups matter: the entry metadata and the data type's own fields are different things, and authors look
+ * The two groups matter: the page metadata and the data type's own fields are different things, and authors look
  * for them separately.
  *
  * @param descriptors - the property descriptors reported by the Live Data properties resource

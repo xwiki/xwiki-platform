@@ -21,10 +21,12 @@
 import { FIELDS_GROUP, METADATA_GROUP } from "../fieldPicker";
 import {
   asValues,
+  createFilterOption,
   encodeConstraint,
   isIncomplete,
   resolveFilterOption,
   splitConstraint,
+  splitTyped,
   toFieldOptions,
   toValueOptions,
   valuesUrl,
@@ -74,6 +76,47 @@ describe("splitConstraint", () => {
 
   it("reads an empty value as empty rather than as no constraint", () => {
     expect(splitConstraint("status=")).toEqual({ field: "status", value: "" });
+  });
+
+  it("reads a + as a space, as the renderer does", () => {
+    expect(splitConstraint("language=C+%2B")).toEqual({
+      field: "language",
+      value: "C +",
+    });
+  });
+});
+
+describe("splitTyped", () => {
+  it("takes the typed value literally", () => {
+    expect(splitTyped("completion=100%25 C++")).toEqual({
+      field: "completion",
+      value: "100%25 C++",
+    });
+  });
+
+  it("returns null while no value separator has been typed", () => {
+    expect(splitTyped("stat")).toBeNull();
+  });
+});
+
+describe("createFilterOption", () => {
+  it("encodes a typed value so that the renderer reads it back as typed", () => {
+    expect(createFilterOption("completion=100%")).toEqual({
+      value: "completion=100%25",
+      label: "completion = 100%",
+      optgroup: FIELDS_GROUP,
+    });
+    expect(createFilterOption("language=C++")?.value).toBe("language=C%2B%2B");
+    expect(createFilterOption("formula=a=b")?.value).toBe("formula=a%3Db");
+  });
+
+  it("leaves a field waiting for its value", () => {
+    expect(createFilterOption("status=")?.value).toBe("status=");
+  });
+
+  it("creates nothing from text that names no field and value", () => {
+    expect(createFilterOption("status")).toBeNull();
+    expect(createFilterOption("=Active")).toBeNull();
   });
 });
 

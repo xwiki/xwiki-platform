@@ -28,9 +28,10 @@ import { loadDescriptors, loadOptions } from "./fieldPicker";
 import {
   FILTER_SEPARATOR,
   asValues,
+  createFilterOption,
   isIncomplete,
   resolveFilterOption,
-  splitConstraint,
+  splitTyped,
   toFieldOptions,
   toValueOptions,
   valuesUrl,
@@ -132,7 +133,7 @@ interface PickerSettings {
   searchField: string[];
   plugins: string[];
   persist: boolean;
-  create: boolean;
+  create: boolean | ((input: string) => FieldOption | null);
   hidePlaceholder: boolean;
   delimiter?: string;
   onItemAdd?: (this: Suggester, value: string) => void;
@@ -304,7 +305,7 @@ const filtersOffer: Offer = {
       XWiki.contextPath,
       fetchJson,
     );
-    const constraint = splitConstraint(query);
+    const constraint = splitTyped(query);
     if (constraint === null) {
       return toFieldOptions(descriptors, query);
     }
@@ -333,8 +334,8 @@ const filtersOffer: Offer = {
     // renders a text input rather than a multiple select so that this delimiter is what builds the stored value:
     // the macro editor would join the options of a select with a comma.
     delimiter: FILTER_SEPARATOR,
-    // Most properties have no value suggester, so a value has to be typeable.
-    create: true,
+    // Most properties have no value suggester, so a value has to be typeable, and it is encoded like a suggested one.
+    create: createFilterOption,
     // Filters apply together, so unlike columns and sort criteria their order carries no meaning.
     plugins: ["remove_button"],
     // Picking a field is picking half a constraint. Rather than leaving `status=` behind as an item that filters

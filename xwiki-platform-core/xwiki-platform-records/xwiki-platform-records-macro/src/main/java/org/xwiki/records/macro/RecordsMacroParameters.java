@@ -102,8 +102,8 @@ public class RecordsMacroParameters
      */
     @PropertyId("class")
     @PropertyDisplayType(RecordsDataType.class)
-    @PropertyName("Data type")
-    @PropertyDescription("The data type whose entries are listed.")
+    @PropertyName("Object type")
+    @PropertyDescription("The object type whose entries are listed.")
     @PropertyMandatory
     @PropertyOrder(1)
     public void setDataType(DocumentReference dataType)
@@ -125,7 +125,7 @@ public class RecordsMacroParameters
     @PropertyDisplayType(RecordsColumns.class)
     @PropertyName("Columns")
     @PropertyDescription("The columns to display, separated by commas, in the order given. Entry metadata such as "
-        + "doc.title and the fields of the data type can be mixed. Leave empty to display the entry title followed "
+        + "doc.title and the fields of the object type can be mixed. Leave empty to display the entry title followed "
         + "by every field.")
     @PropertyGroup("columns")
     @PropertyOrder(2)

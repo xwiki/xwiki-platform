@@ -30,7 +30,7 @@
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-records-macro</artifactId>
   <name>XWiki Platform - Records - Macro</name>
-  <description>Lists the entries of a data type as a table, configurable from the WYSIWYG macro dialog.</description>
+  <description>Lists the entries of an object type as a table, configurable from the WYSIWYG macro dialog.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Records Macro</xwiki.extension.name>

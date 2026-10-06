@@ -37,6 +37,18 @@ const LABELS: DirectionLabels = {
 };
 
 describe("toSortOptions", () => {
+  it("offers only the fields the table can be sorted on", () => {
+    expect(
+      toSortOptions(
+        DESCRIPTORS,
+        "",
+        [],
+        LABELS,
+        (descriptor) => descriptor.id !== "budget",
+      ).map((option) => option.value),
+    ).toEqual(["doc.title:asc", "doc.title:desc"]);
+  });
+
   it("offers each field ascending and descending", () => {
     expect(toSortOptions(DESCRIPTORS, "budget", [], LABELS)).toEqual([
       {

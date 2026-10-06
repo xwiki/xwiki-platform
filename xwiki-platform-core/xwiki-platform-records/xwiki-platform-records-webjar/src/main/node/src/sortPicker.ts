@@ -88,6 +88,7 @@ function fieldOf(criterion: string): string {
  * @param query - the text the author typed, matched against both the label and the stored value
  * @param selected - the criteria already picked, whose fields are not offered again
  * @param labels - the translated direction labels
+ * @param sortable - whether the table can be sorted on a field, since the table ignores a criterion on one it cannot
  * @returns two options per candidate field still available, ascending first
  */
 function toSortOptions(
@@ -95,10 +96,12 @@ function toSortOptions(
   query: string,
   selected: readonly string[],
   labels: DirectionLabels,
+  sortable: (descriptor: PropertyDescriptor) => boolean = () => true,
 ): FieldOption[] {
   const used = new Set(selected.map(fieldOf));
   return descriptors
     .filter(isCandidate)
+    .filter(sortable)
     .filter((descriptor) => !used.has(descriptor.id))
     .flatMap((descriptor) =>
       directionsOf(labels).map((direction) => ({

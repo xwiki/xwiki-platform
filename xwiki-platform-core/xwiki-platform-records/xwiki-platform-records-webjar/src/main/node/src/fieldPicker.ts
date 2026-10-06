@@ -59,13 +59,30 @@ interface PropertyDescriptor {
   /**
    * How the property is filtered, when the source says so.
    */
-  filter?: {
-    /**
-     * The URL suggesting the property's values, with an `{encodedQuery}` placeholder. Reported for the properties
-     * whose values are enumerable, and used by the filter picker exactly as the Live Data filter row uses it.
-     */
-    searchURL?: string;
-  };
+  filter?: FilterDescriptor;
+}
+
+/**
+ * How a property is filtered.
+ */
+interface FilterDescriptor {
+  /**
+   * The filter, such as `text`, `number` or `boolean`. Absent when the property leaves it to its type.
+   */
+  id?: string;
+  /**
+   * The URL suggesting the property's values, with an `{encodedQuery}` placeholder. Reported for the properties
+   * whose values are enumerable, and used by the filter picker exactly as the Live Data filter row uses it.
+   */
+  searchURL?: string;
+  /**
+   * The value a `boolean` filter matches true with.
+   */
+  trueValue?: unknown;
+  /**
+   * The value a `boolean` filter matches false with.
+   */
+  falseValue?: unknown;
 }
 
 /**
@@ -88,6 +105,10 @@ interface FieldOption {
    * The group this option is listed under.
    */
   optgroup: string;
+  /**
+   * Why the stored value this option shows back is ignored when the table is displayed, already translated.
+   */
+  problem?: string;
 }
 
 /**
@@ -342,4 +363,4 @@ export {
   propertiesUrl,
   toOptions,
 };
-export type { FieldOption, JsonFetcher, PropertyDescriptor };
+export type { FieldOption, FilterDescriptor, JsonFetcher, PropertyDescriptor };

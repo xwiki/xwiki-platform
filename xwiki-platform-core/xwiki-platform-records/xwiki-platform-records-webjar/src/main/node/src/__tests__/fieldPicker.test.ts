@@ -173,9 +173,10 @@ describe("toOptions", () => {
 
   it("falls back to the identifier when the resource sends a null name", () => {
     // doc.* descriptors really do come back with name: null.
-    const descriptors = [
+    const descriptors: PropertyDescriptor[] = [
+      // @ts-expect-error the typings say name is a string, which is what the resource does not honour here.
       { id: "doc.title", name: null, type: "String" },
-    ] as unknown as PropertyDescriptor[];
+    ];
     expect(toOptions(descriptors)[0]).toMatchObject({
       value: "doc.title",
       label: "doc.title",

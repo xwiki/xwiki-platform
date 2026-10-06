@@ -5,6 +5,6 @@
     "isolatedDeclarations": false,
     "types": ["requirejs", "jquery", "node", "jsdom"]
   },
-  "include": ["src/**/__tests__/*"],
+  "include": ["src/**/__tests__/*", "src/xwiki.d.ts"],
   "exclude": []
 }

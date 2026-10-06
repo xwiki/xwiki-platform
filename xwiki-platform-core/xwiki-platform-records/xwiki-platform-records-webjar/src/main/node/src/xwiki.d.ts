@@ -32,4 +32,15 @@ declare global {
   interface JQuery {
     xwikiSelectize(settings: unknown): JQuery;
   }
+
+  /**
+   * The Tom Select instance the suggest widget stores on the element it enhances; absent on a plain field.
+   */
+  interface Element {
+    selectize?: {
+      clear: (silent?: boolean) => void;
+      clearOptions: () => void;
+      setValue: (value: string, silent?: boolean) => void;
+    };
+  }
 }

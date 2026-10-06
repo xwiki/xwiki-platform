@@ -130,7 +130,7 @@ XWiki.ExtensionBehaviour = Class.create({
       return false;
     } else {
       var failureReason = response.statusText || 'Server not responding';
-      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('extensions.info.fetch.failed'))" + failureReason, "error");
+      XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('extensions.info.fetch.failed'))" + failureReason, "error");
       return true;
     }
   },

@@ -19,11 +19,17 @@
  */
 package org.xwiki.annotation;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.function.Consumer;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.annotation.internal.AnnotationClassDocumentInitializer;
 import org.xwiki.annotation.internal.AnnotationConfigurationSource;
 import org.xwiki.annotation.internal.DefaultAnnotationConfiguration;
@@ -56,10 +62,12 @@ import org.xwiki.xml.html.script.HTMLScriptService;
 
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -69,7 +77,7 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 import static org.xwiki.test.LogLevel.INFO;
 
 /**
- * Test of the annotation reply button rendered by {@code AnnotationCode.Macros}.
+ * Test of the annotation markup rendered by {@code AnnotationCode.Macros}.
  *
  * @version $Id$
  */
@@ -108,6 +116,8 @@ class AnnotationCodeMacrosPageTest extends PageTest
 
     private static final DocumentReference TARGET = new DocumentReference("xwiki", "Space", "Target");
 
+    private static final DocumentReference AUTHOR = new DocumentReference("xwiki", "XWiki", "Author");
+
     // Required by DefaultIOService, but not exercised since the tested annotations carry no uploaded files.
     @MockComponent
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
@@ -141,9 +151,16 @@ class AnnotationCodeMacrosPageTest extends PageTest
         this.xwiki.saveDocument(target, this.context);
 
         // The rights service backing the toolbox goes through the real AuthorizationManager, which PageTest only
-        // provides as an unstubbed mock: grant view/edit on the annotated document so the toolbox is displayed.
+        // provides as an unstubbed mock: grant view/edit/comment on the annotated document so the toolbox
+        // (including the reply button, gated on the comment right) is displayed. The toolbox macro checks the
+        // current user's rights through ContextualAuthorizationManager rather than AuthorizationManager, so both
+        // need stubbing.
         when(this.oldcore.getMockAuthorizationManager().hasAccess(eq(Right.VIEW), any(), any())).thenReturn(true);
         when(this.oldcore.getMockAuthorizationManager().hasAccess(eq(Right.EDIT), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(eq(Right.COMMENT), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(eq(Right.VIEW), any())).thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(eq(Right.EDIT), any())).thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(eq(Right.COMMENT), any())).thenReturn(true);
 
         // The annotation displayed in the toolbox, stored the same way the annotation service stores it, so that it
         // can be read back by AnnotationScriptService#getAnnotation.
@@ -172,7 +189,7 @@ class AnnotationCodeMacrosPageTest extends PageTest
             String.format("The xredirect payload was injected as a javascript: href: [%s]", href));
         assertEquals("The URI [javascript:alert(1)//] is considered not safe: "
             + "[The given URI [javascript:alert(1)//] is not safe on this server.]", this.logCapture.getMessage(0));
-        assertEquals("/xwiki/bin/view/Space/Target#xwikicomment_0", href);
+        assertEquals("/xwiki/bin/view/Space/Target&replyto=0#xwikicomment_0", href);
     }
 
     @Test
@@ -182,7 +199,7 @@ class AnnotationCodeMacrosPageTest extends PageTest
 
         // Without an xredirect parameter (the common case, e.g. when the toolbox is fetched by the annotations UI),
         // the reply button targets the annotated document view URL.
-        assertEquals("/xwiki/bin/view/Space/Target#xwikicomment_0", replyButton.attr("href"));
+        assertEquals("/xwiki/bin/view/Space/Target&replyto=0#xwikicomment_0", replyButton.attr("href"));
     }
 
     @Test
@@ -192,7 +209,151 @@ class AnnotationCodeMacrosPageTest extends PageTest
 
         Element replyButton = renderReplyButton();
 
-        assertEquals("/xwiki/bin/view/Sandbox/WebHome#xwikicomment_0", replyButton.attr("href"));
+        assertEquals("/xwiki/bin/view/Sandbox/WebHome&replyto=0#xwikicomment_0", replyButton.attr("href"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "edit", "create" })
+    void annotationIsDisplayedForTheBubble(String mode) throws Exception
+    {
+        Element annotation = renderAnnotation(mode);
+
+        assertNotNull(annotation.selectFirst(".annotation-bubble-close button"),
+            String.format("The close button was not rendered in the [%s] mode", mode));
+        assertNotNull(annotation.selectFirst(".annotation-bubble-avatar img.avatar_30"),
+            String.format("The [%s] mode did not keep the compact avatar", mode));
+    }
+
+    @Test
+    void annotationIsDisplayedForTheAnnotationsTab() throws Exception
+    {
+        updateStoredAnnotation(object -> object.setDateValue("date",
+            new GregorianCalendar(2026, Calendar.SEPTEMBER, 17, 15, 43).getTime()));
+
+        Element annotation = renderAnnotation("list");
+
+        // The tab displays the annotation inside the Annotations tab, where there is nothing to close and where the
+        // author line is the one of a comment: a 50px avatar, which has to be asked for since a CSS cap cannot
+        // enlarge the 30px image the bubble requests.
+        assertNull(annotation.selectFirst(".annotation-bubble-close"),
+            "The close button was rendered in the list mode");
+        assertNotNull(annotation.selectFirst(".annotation-bubble-avatar img.avatar_50"),
+            "The Annotations tab did not request the avatar size of a comment");
+        // Without a dateformat preference, an afternoon time must not be displayed as the matching morning one.
+        assertEquals("17/09/2026 15:43", annotation.selectFirst("time.annotationDate").text());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "list", "edit", "create" })
+    void toolboxMatchesTheMode(String mode) throws Exception
+    {
+        this.context.setUserReference(AUTHOR);
+
+        Element tools = renderAnnotation(mode).selectFirst(".annotation-bubble-tools");
+
+        if ("edit".equals(mode) || "create".equals(mode)) {
+            // The edit and create forms have nothing to act on.
+            assertNull(tools, String.format("The toolbox was rendered in the [%s] mode", mode));
+            return;
+        }
+        assertNotNull(tools, String.format("The toolbox was not rendered in the [%s] mode", mode));
+        assertNotNull(tools.selectFirst("a.edit"),
+            String.format("The edit button was not rendered in the [%s] mode", mode));
+        assertNotNull(tools.selectFirst("form.delete-form button.delete"),
+            String.format("The delete form was not rendered in the [%s] mode", mode));
+        assertNull(tools.selectFirst("a.validate"),
+            String.format("The validate button was rendered in the [%s] mode for an annotation that didn't move",
+                mode));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "list", "edit" })
+    void toolboxOfAnotherAnnotationClassMatchesTheMode(String mode) throws Exception
+    {
+        this.context.setUserReference(AUTHOR);
+
+        Element tools = renderOtherClassToolbox(mode);
+
+        if ("edit".equals(mode)) {
+            assertNull(tools.selectFirst("a.edit"), "The edit button was rendered in the edit form");
+            assertNull(tools.selectFirst("a.delete"), "The delete button was rendered in the edit form");
+        } else {
+            assertNotNull(tools.selectFirst("a.edit"),
+                String.format("The edit button was not rendered in the [%s] mode", mode));
+            assertNotNull(tools.selectFirst("a.delete"),
+                String.format("The delete button was not rendered in the [%s] mode", mode));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "view", "list", "edit" })
+    void validateMatchesTheModeForAnAnnotationMovedByAPageEdit(String mode) throws Exception
+    {
+        updateStoredAnnotation(object -> object.setStringValue("state", "UPDATED"));
+
+        Element validate = renderAnnotation(mode).selectFirst("a.validate");
+
+        if ("edit".equals(mode)) {
+            // Validating reloads the annotation and would discard the text being edited.
+            assertNull(validate, "The validate button was rendered in the edit form");
+        } else {
+            assertNotNull(validate,
+                String.format("The validate button was not rendered in the [%s] mode for a moved annotation", mode));
+        }
+    }
+
+    private void updateStoredAnnotation(Consumer<BaseObject> update) throws Exception
+    {
+        XWikiDocument target = this.xwiki.getDocument(TARGET, this.context);
+        update.accept(target.getXObject(COMMENTS_CLASS, 0));
+        this.xwiki.saveDocument(target, this.context);
+    }
+
+    private Element renderAnnotation(String mode) throws Exception
+    {
+        XWikiDocument testPage = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "TestPage"),
+            this.context);
+        testPage.setSyntax(XWIKI_2_0);
+        testPage.setContent(String.format(
+            """
+                {{include reference="AnnotationCode.Macros" /}}
+
+                {{velocity}}
+                {{html clean="false" wiki="false"}}
+                #set($docRef = $services.model.createDocumentReference('xwiki', 'Space', 'Target'))
+                #set($ann = $services.annotations.getAnnotation('Space.Target', '0'))
+                #displayAnnotationFromReference($ann, '%s', $docRef)
+                {{/html}}
+                {{/velocity}}""", mode));
+
+        Element annotation = renderHTMLPage(testPage).selectFirst(".annotation");
+        assertNotNull(annotation, String.format("The annotation was not rendered in the [%s] mode", mode));
+        return annotation;
+    }
+
+    private Element renderOtherClassToolbox(String mode) throws Exception
+    {
+        XWikiDocument testPage = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "TestPage"),
+            this.context);
+        testPage.setSyntax(XWIKI_2_0);
+        // Overriding the configured class after the include is enough for the toolbox, which only compares the class
+        // name to pick the actions to render.
+        testPage.setContent(String.format(
+            """
+                {{include reference="AnnotationCode.Macros" /}}
+
+                {{velocity}}
+                {{html clean="false" wiki="false"}}
+                #set($annotationClassDocName = 'Space.CustomAnnotationClass')
+                #set($docRef = $services.model.createDocumentReference('xwiki', 'Space', 'Target'))
+                #set($ann = $services.annotations.getAnnotation('Space.Target', '0'))
+                <div class="tools">#displayAnnotationToolboxFromReference($ann, '%s', $docRef)</div>
+                {{/html}}
+                {{/velocity}}""", mode));
+
+        Element tools = renderHTMLPage(testPage).selectFirst("div.tools");
+        assertNotNull(tools, String.format("The toolbox was not rendered in the [%s] mode", mode));
+        return tools;
     }
 
     private Element renderReplyButton() throws Exception
@@ -213,7 +374,7 @@ class AnnotationCodeMacrosPageTest extends PageTest
                 {{/velocity}}""");
 
         Document document = renderHTMLPage(testPage);
-        Element replyButton = document.selectFirst("a.reply");
+        Element replyButton = document.selectFirst("a.commentreply");
         assertNotNull(replyButton, "The annotation reply button was not rendered");
         return replyButton;
     }

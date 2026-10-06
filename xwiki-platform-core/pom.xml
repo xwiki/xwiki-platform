@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -151,102 +151,36 @@
             -->
             <revapi.differences>
               <justification>
-                We changed the default algorithm for PasswordClass hash computation for something more robust and we
-                also changed the format of the hash for better handling in the future.
-              </justification>
-              <criticality>highlight</criticality>
-                <differences>
-                  <item>
-                    <ignore>true</ignore>
-                    <code>java.field.constantValueChanged</code>
-                    <old>field com.xpn.xwiki.objects.classes.PasswordClass.DEFAULT_HASH_ALGORITHM</old>
-                    <new>field com.xpn.xwiki.objects.classes.PasswordClass.DEFAULT_HASH_ALGORITHM</new>
-                  </item>
-                  <item>
-                    <ignore>true</ignore>
-                    <code>java.method.removed</code>
-                    <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::getPasswordHash(java.lang.String, java.lang.String, java.lang.String)</old>
-                  </item>
-                  <item>
-                    <ignore>true</ignore>
-                    <code>java.method.removed</code>
-                    <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::getSaltFromPassword(java.lang.String)</old>
-                  </item>
-                  <item>
-                    <ignore>true</ignore>
-                    <code>java.method.removed</code>
-                    <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::randomSalt()</old>
-                  </item>
-                </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>
-                ResourceReferenceHandler was declared as Comparable over the raw ResourceReferenceHandler type. It is
-                now Comparable over ResourceReferenceHandler&lt;?&gt;, which removes the raw type without changing the
-                erasure: the compiled compareTo() descriptor and the Comparable bridge method are identical, so
-                existing compiled Handlers keep working, and Handlers declaring the former raw parameter still
-                override it (with an unchecked warning).
+                Deprecated oldcore methods moved to xwiki-platform-legacy-oldcore, which still provides them (and is
+                installed by default). Only reported by modules whose API reaches these classes while depending on the
+                non-woven xwiki-platform-oldcore jar.
               </justification>
               <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.superTypeTypeParametersChanged</code>
-                  <old>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</old>
-                  <new>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.noLongerImplementsInterface</code>
-                  <old>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</old>
-                  <new>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <regex>true</regex>
-                  <code>java\.class\.noLongerImplementsInterface</code>
-                  <interface>java\.lang\.Comparable&lt;org\.xwiki\.resource\.ResourceReferenceHandler&gt;</interface>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>
-                UserManager#hasAccess() is an unstable API. Checking any right on a user through the user API was too
-                broad, checking view access makes sense but others are out of scope.
-                It is now replaced by UserManager#hasViewAccess().
-              </justification>
-              <criticality>documented</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.removed</code>
-                  <old>method boolean org.xwiki.user.UserManager::hasAccess(org.xwiki.security.authorization.Right, org.xwiki.user.UserReference, org.xwiki.user.UserReference)</old>
+                  <old>method void com.xpn.xwiki.XWikiContext::setOriginalDatabase(java.lang.String)</old>
                 </item>
                 <item>
                   <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method boolean org.xwiki.user.UserManager::hasViewAccess(org.xwiki.user.UserReference, org.xwiki.user.UserReference)</new>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>
-                No real breakage: the API return type changed, but it's the REST API and the actual return type
-                didn't change, we only encapsulate it in a Response to also allow setting a header.
-              </justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method org.xwiki.icon.rest.model.jaxb.Icons org.xwiki.icon.rest.IconThemesResource::getIcons(java.lang.String, java.util.List&lt;java.lang.String&gt;)</old>
-                  <new>method javax.ws.rs.core.Response org.xwiki.icon.rest.IconThemesResource::getIcons(java.lang.String, java.util.List&lt;java.lang.String&gt;)</new>
+                  <code>java.method.removed</code>
+                  <old>method int com.xpn.xwiki.doc.XWikiAttachment::getContentSize(com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
                 </item>
                 <item>
                   <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method org.xwiki.icon.rest.model.jaxb.Icons org.xwiki.icon.rest.IconThemesResource::getIconsByTheme(java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;)</old>
-                  <new>method javax.ws.rs.core.Response org.xwiki.icon.rest.IconThemesResource::getIconsByTheme(java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;)</new>
+                  <code>java.method.removed</code>
+                  <old>method com.xpn.xwiki.objects.BaseObject com.xpn.xwiki.doc.XWikiDocument::getxWikiObject()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.doc.XWikiDocument::mergexWikiClass(com.xpn.xwiki.doc.XWikiDocument)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.doc.XWikiDocument::mergexWikiObjects(com.xpn.xwiki.doc.XWikiDocument)</old>
                 </item>
               </differences>
             </revapi.differences>
@@ -256,7 +190,7 @@
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-importmap-plugin</artifactId>
-        <version>18.8.0-SNAPSHOT</version>
+        <version>18.9.0-SNAPSHOT</version>
         <executions>
           <!-- Make sure declared importmap are valid. -->
           <execution>

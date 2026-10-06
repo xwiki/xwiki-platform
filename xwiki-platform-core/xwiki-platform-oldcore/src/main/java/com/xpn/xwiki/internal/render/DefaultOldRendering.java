@@ -101,7 +101,7 @@ public class DefaultOldRendering implements OldRendering
 
         if (this.contextComponentManagerProvider.get().hasComponent(BlockRenderer.class,
             backlinkDocument.getSyntax().toIdString())) {
-            refactorDocumentLinks(backlinkDocument, oldReference, newReference, context);
+            refactorDocumentLinks(backlinkDocument, oldReference, newReference);
         }
     }
 
@@ -115,7 +115,7 @@ public class DefaultOldRendering implements OldRendering
      * @since 2.2M1
      */
     private void refactorDocumentLinks(XWikiDocument document, DocumentReference oldDocumentReference,
-        DocumentReference newDocumentReference, XWikiContext context)
+        DocumentReference newDocumentReference)
     {
         this.referenceRenamer.renameReferences(document.getXDOM(), document.getDocumentReference(),
             oldDocumentReference, newDocumentReference, false,

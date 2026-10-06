@@ -50,6 +50,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class EditPage extends BasePage
 {
+    /**
+     * The default language field is rendered as a text input that the locale picker replaces asynchronously with a
+     * {@code select} having the same id, enhanced with the bootstrap-select widget. The select is wrapped by the
+     * widget only once the replacement is complete, so matching the wrapper avoids getting the replaced input.
+     */
+    private static final By DEFAULT_LANGUAGE_SELECT =
+        By.cssSelector(".bootstrap-select > select#xwikidoclanguageinput2");
+
     @FindBy(name = "action_saveandcontinue")
     protected WebElement saveandcontinue;
 
@@ -73,9 +81,6 @@ public class EditPage extends BasePage
 
     @FindBy(id = "xwikidoctitleinput")
     private WebElement titleField;
-
-    @FindBy(id = "xwikidoclanguageinput2")
-    private WebElement defaultLanguageField;
 
     /**
      * The top floating edit menu bar.
@@ -449,14 +454,20 @@ public class EditPage extends BasePage
     public void setDefaultLanguage(String defaultLanguage)
     {
         // Select the parent of the default language field because we're using the Bootstrap select widget.
-        WebElement parent = this.defaultLanguageField.findElement(By.xpath("./.."));
+        WebElement parent = getDefaultLanguageSelect().findElement(By.xpath("./.."));
         BootstrapSelect select = new BootstrapSelect(parent, getDriver());
         select.selectByValue(defaultLanguage);
     }
 
     public String getDefaultLanguage()
     {
-        return new Select(this.defaultLanguageField).getFirstSelectedOption().getAttribute("value");
+        return new Select(getDefaultLanguageSelect()).getFirstSelectedOption().getAttribute("value");
+    }
+
+    private WebElement getDefaultLanguageSelect()
+    {
+        // Rely on the implicit wait of findElement to wait for the locale picker to be initialized.
+        return getDriver().findElement(DEFAULT_LANGUAGE_SELECT);
     }
 
     public boolean isCSRFWarningDisplayed()

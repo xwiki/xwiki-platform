@@ -44,7 +44,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 17.4.6
  * @since 16.10.13
  */
-@UITest
+@UITest(properties = {
+    // The slow document extra tab of openDocExtraTabWhileAnotherOneIsStillLoading uses the Groovy macro, which needs
+    // Programming Rights, and functional tests deny that right to wiki content unless the page is excluded here. The
+    // pattern matches the name of this class prefixed with "Nested" too, since the pages are named after the test
+    // class and this test also runs nested inside AllIT.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*DocExtraTabsIT\\..*"
+})
 class DocExtraTabsIT
 {
     @Test
@@ -67,6 +73,38 @@ class DocExtraTabsIT
 
         docExtraPane = viewPage.useShortcutForDocExtraPane(tabId, Keys.chord(Keys.ALT, Keys.SHIFT, "t"));
         assertEquals("Content of test tab.", docExtraPane.getText());
+    }
+
+    @Test
+    @Order(2)
+    void openDocExtraTabWhileAnotherOneIsStillLoading(TestUtils setup, TestReference reference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        // This tab takes several seconds to load, which leaves us the time to open another tab before its response
+        // arrives.
+        createCustomDocExtraTab(setup, reference,
+            "{{groovy}}Thread.sleep(5000); println 'Slow tab content.'{{/groovy}}",
+            Map.of("show", "true", "title", "Slow", "name", "slow"));
+        String slowTabId = reference.toString();
+
+        ViewPage viewPage = setup.gotoPage(reference);
+        viewPage.waitForDocExtraPaneActive("Comments");
+
+        // Start loading the slow tab and, without waiting for it, open the history tab, which loads fast. The
+        // response of the slow tab thus arrives while the history tab is displayed.
+        viewPage.startOpeningDocExtraPane(slowTabId);
+        viewPage.openHistoryDocExtraPane();
+
+        // Wait for the content of the slow tab to arrive. The pane is hidden, so we look at its text content.
+        assertEquals("Slow tab content.", viewPage.waitForDocExtraPaneContent(slowTabId));
+
+        // The slow tab must not have taken the place of the history tab.
+        assertTrue(viewPage.isDocExtraPaneActive("History"));
+        assertFalse(viewPage.isDocExtraPaneActive(slowTabId));
+
+        // The slow tab has been loaded, so opening it now displays it without loading it again (its content would be
+        // duplicated otherwise).
+        assertEquals("Slow tab content.", viewPage.openDocExtraPane(slowTabId).getText());
     }
 
     private void createCustomDocExtraTab(TestUtils setup, DocumentReference reference, String content,

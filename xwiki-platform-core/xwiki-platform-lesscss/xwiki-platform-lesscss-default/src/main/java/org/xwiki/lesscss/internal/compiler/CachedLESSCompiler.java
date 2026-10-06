@@ -38,11 +38,11 @@ import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.WikiLESSResourceReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.template.Template;
+import org.xwiki.template.TemplateContent;
 import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.internal.template.InternalTemplateManager;
 
 /**
  * Compile a LESS resource in a particular context (@see org.xwiki.lesscss.compiler.IntegratedLESSCompiler}. To be used
@@ -90,35 +90,26 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
 
         try {
             semaphore.acquire();
-            if (lessResourceReference instanceof LESSSkinFileResourceReference || includeSkinStyle) {
 
-                if (includeSkinStyle) {
-                    // Add the import line to the LESS resource.
-                    // We import this file to be able to use variables and mix-ins defined in it.
-                    // But we don't want it in the output.
-                    source.write(String.format("@import (reference) \"%s\";%s", MAIN_SKIN_STYLE_FILENAME,
-                        System.lineSeparator()));
-                }
+            // Resolve the LESS resource only once so that the evaluated content and its author always match.
+            TemplateContent templateContent = getTemplateContent(lessResourceReference, includeSkinStyle, skin);
 
-                // Get the content of the LESS resource
-                source.write(lessResourceReference.getContent(skin));
+            if (includeSkinStyle) {
+                // Add the import line to the LESS resource.
+                // We import this file to be able to use variables and mix-ins defined in it.
+                // But we don't want it in the output.
+                source.write(String.format("@import (reference) \"%s\";%s", MAIN_SKIN_STYLE_FILENAME,
+                    System.lineSeparator()));
             }
+
+            // Get the content of the LESS resource
+            source.write(templateContent.getContent());
 
             // Parse the LESS content with Velocity
             String lessCode = source.toString();
             if (useVelocity) {
-                DocumentReference authorReference;
-                DocumentReference documentReference;
-                if (lessResourceReference instanceof WikiLESSResourceReference wikiLESSResourceReference) {
-                    authorReference = wikiLESSResourceReference.getAuthorReference();
-                    documentReference = wikiLESSResourceReference.getDocumentReference();
-                } else {
-                    authorReference = InternalTemplateManager.SUPERADMIN_REFERENCE;
-                    documentReference = null;
-                }
-
-                lessCode =
-                    evaluate(lessResourceReference.toString(), lessCode, skin, authorReference, documentReference);
+                lessCode = evaluate(lessResourceReference.toString(), lessCode, skin,
+                    templateContent.getAuthorReference(), templateContent.getDocumentReference());
             }
 
             // Compile the LESS code
@@ -138,6 +129,31 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
         } finally {
             semaphore.release();
         }
+    }
+
+    private TemplateContent getTemplateContent(LESSResourceReference lessResourceReference, boolean includeSkinStyle,
+        String skin) throws Exception
+    {
+        if (lessResourceReference instanceof LESSSkinFileResourceReference skinFileResourceReference) {
+            // The resolved template carries its own author and document: for a wiki skin, the file is an attachment
+            // or an object property of the skin document, while filesystem skin templates have their own author.
+            return skinFileResourceReference.getTemplateContent(skin);
+        }
+
+        // Resources other than skin files contribute their content only when the main skin style is included.
+        String content = includeSkinStyle ? lessResourceReference.getContent(skin) : "";
+
+        // When the origin of the code is unknown, it has no author and is thus evaluated with the guest user rights.
+        DocumentReference authorReference = null;
+        DocumentReference documentReference = null;
+        if (lessResourceReference instanceof WikiLESSResourceReference wikiLESSResourceReference) {
+            authorReference = wikiLESSResourceReference.getAuthorReference();
+            documentReference = wikiLESSResourceReference.getDocumentReference();
+        }
+
+        return this.templateManager
+            .createStringTemplate(lessResourceReference.toString(), content, authorReference, documentReference)
+            .getContent();
     }
 
     private String evaluate(String id, String source, String skin, DocumentReference authorReference,

@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +46,8 @@ import org.xwiki.url.URLSecurityManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+
+import com.google.common.base.Suppliers;
 
 /**
  * Default implementation of {@link URLSecurityManager}. This implementation keeps a HashSet in memory containing the
@@ -89,15 +92,21 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     @Inject
     private Logger logger;
 
-    private Set<String> trustedDomains;
+    // The only mutation of this field is the wholesale replacement of the supplier by invalidateCache(), so volatile
+    // is exactly what is needed here: the supplier returned by Suppliers.memoize() and the set it computes (a
+    // ConcurrentHashMap key set) are both thread-safe on their own.
+    @SuppressWarnings("java:S3077")
+    private volatile Supplier<Set<String>> trustedDomains = newTrustedDomainsSupplier();
 
-    private synchronized void computeTrustedDomains()
+    private Supplier<Set<String>> newTrustedDomainsSupplier()
     {
-        // Check if another thread already computed the list of trusted domains.
-        if (this.trustedDomains != null) {
-            return;
-        }
+        // The supplier computes the trusted domains at most once, in a thread-safe way, and only when they are
+        // actually needed.
+        return Suppliers.memoize(this::computeTrustedDomains);
+    }
 
+    private Set<String> computeTrustedDomains()
+    {
         Set<String> result = ConcurrentHashMap.newKeySet();
         result.addAll(this.urlConfiguration.getTrustedDomains());
 
@@ -112,9 +121,7 @@ public class DefaultURLSecurityManager implements URLSecurityManager
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
-        // Set the list of trusted domains only at the end to avoid exposing an incomplete list of trusted domains to
-        // other threads.
-        this.trustedDomains = result;
+        return result;
     }
 
     private String getCurrentDomain()
@@ -139,11 +146,12 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     public boolean isDomainTrusted(URL urlToCheck)
     {
         if (this.urlConfiguration.isTrustedDomainsEnabled()) {
-            maybeInitializeWithDomain(this.getCurrentDomain());
+            // Keep a reference to the set of trusted domains as it can be invalidated by another thread at any time.
+            Set<String> domains = initializeWithDomain(this.getCurrentDomain());
             String host = urlToCheck.getHost();
 
             do {
-                if (trustedDomains.contains(host)) {
+                if (domains.contains(host)) {
                     return true;
                 } else if (StringUtils.contains(host, DOT)) {
                     host = host.substring(host.indexOf(DOT) + 1);
@@ -168,20 +176,19 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     }
 
     /**
-     * Initialize the trusted domains with the given domain as additional trusted domains if trusted domains are
-     * enabled.
+     * Initialize the trusted domains with the given domain as an additional trusted domain.
+     * <p>
+     * It's up to the caller to check that trusted domains are enabled before calling this method.
      *
      * @param domain the domain to add to the trusted domains
+     * @return the set of trusted domains, never {@code null}
      */
-    private void maybeInitializeWithDomain(String domain)
+    private Set<String> initializeWithDomain(String domain)
     {
-        if (this.urlConfiguration.isTrustedDomainsEnabled()) {
-            if (this.trustedDomains == null) {
-                computeTrustedDomains();
-            }
+        Set<String> domains = this.trustedDomains.get();
+        domains.add(domain);
 
-            this.trustedDomains.add(domain);
-        }
+        return domains;
     }
 
     /**
@@ -189,7 +196,9 @@ public class DefaultURLSecurityManager implements URLSecurityManager
      */
     public void invalidateCache()
     {
-        this.trustedDomains = null;
+        // Replace the supplier instead of clearing its value so that a computation that is currently running, and
+        // that is thus based on outdated descriptors, cannot be stored in the new supplier.
+        this.trustedDomains = newTrustedDomainsSupplier();
     }
 
     @Override
@@ -284,7 +293,9 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     @Override
     public URI parseToSafeURI(String serializedURI, String requestHost) throws URISyntaxException, SecurityException
     {
-        maybeInitializeWithDomain(requestHost);
+        if (this.urlConfiguration.isTrustedDomainsEnabled()) {
+            initializeWithDomain(requestHost);
+        }
 
         return parseToSafeURI(serializedURI);
     }

@@ -215,6 +215,11 @@ public class PasswordClass extends StringClass
     @Override
     public BaseProperty fromString(String value) throws XWikiException
     {
+        // This needs to be kept: we don't want a password to be replaced
+        // by its placeholder coming from the form
+        if (FORM_PASSWORD_PLACEHODLER.equals(value)) {
+            return null;
+        }
         BaseProperty property = newProperty();
         if (value.isEmpty() || isPasswordHashed(value)) {
             property.setValue(value);
@@ -394,7 +399,7 @@ public class PasswordClass extends StringClass
     public String getPasswordHash(String password, String algorithmName)
     {
         PasswordEncoder passwordEncoder = getPasswordEncoder(algorithmName);
-        String encodedPassword = this.ENCODERS_MAP.get(algorithmName).encode(password);
+        String encodedPassword = ENCODERS_MAP.get(algorithmName).encode(password);
         if (passwordEncoder.upgradeEncoding(encodedPassword)
             || isDeprecatedEncoder(passwordEncoder.getClass())) {
             warnAboutOutdatedAlgorithm(algorithmName);
@@ -404,8 +409,8 @@ public class PasswordClass extends StringClass
 
     private @NonNull PasswordEncoder getPasswordEncoder(String algorithmName)
     {
-        if (this.ENCODERS_MAP.containsKey(algorithmName)) {
-            PasswordEncoder passwordEncoder = this.ENCODERS_MAP.get(algorithmName);
+        if (ENCODERS_MAP.containsKey(algorithmName)) {
+            PasswordEncoder passwordEncoder = ENCODERS_MAP.get(algorithmName);
             if (isDeprecatedEncoder(passwordEncoder.getClass())) {
                 warnAboutOutdatedAlgorithm(algorithmName);
             }

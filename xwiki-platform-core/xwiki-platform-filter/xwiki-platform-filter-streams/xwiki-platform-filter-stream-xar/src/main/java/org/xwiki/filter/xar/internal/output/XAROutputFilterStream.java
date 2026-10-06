@@ -144,19 +144,13 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
     private String toString(Object obj)
     {
-        String result;
-        if (obj instanceof String objString) {
-            result = objString;
-        } else if (obj instanceof Date objDate) {
-            result = toString(objDate);
-        } else if (obj instanceof Syntax objSyntax) {
-            result = toString(objSyntax);
-        } else if (obj instanceof EntityReference objEntityReference) {
-            result = toString(objEntityReference);
-        } else {
-            result = Objects.toString(obj, null);
-        }
-        return result;
+        return switch (obj) {
+            case String objString -> objString;
+            case Date objDate -> toString(objDate);
+            case Syntax objSyntax -> toString(objSyntax);
+            case EntityReference objEntityReference -> toString(objEntityReference);
+            case null, default -> Objects.toString(obj, null);
+        };
     }
 
     private String toString(Date date)

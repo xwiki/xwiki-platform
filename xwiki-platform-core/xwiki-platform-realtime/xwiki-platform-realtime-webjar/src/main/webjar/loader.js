@@ -67,16 +67,15 @@ define('xwiki-realtime-loader', [
     }
 
     async updateChannels() {
-      const channels = await doc.getChannels({
-        path: [
-          `translations/${doc.realLocale}/saver`,
-          `translations/${doc.realLocale}/userData`,
-          `translations/${doc.realLocale}/fields/${this.info.field}/editors/${this.info.type}`,
-          // Check also if the field is edited in real-time with other editors at the same time.
-          `translations/${doc.realLocale}/fields/${this.info.field}/editors/`,
-        ],
-        create: true
-      });
+      // The array of key / value pairs is what allows repeating the 'path' parameter.
+      const channels = await doc.getChannels(new URLSearchParams([
+        ['path', `translations/${doc.realLocale}/saver`],
+        ['path', `translations/${doc.realLocale}/userData`],
+        ['path', `translations/${doc.realLocale}/fields/${this.info.field}/editors/${this.info.type}`],
+        // Check also if the field is edited in real-time with other editors at the same time.
+        ['path', `translations/${doc.realLocale}/fields/${this.info.field}/editors/`],
+        ['create', true]
+      ]));
       this.channels = this._parseChannels(channels);
       return this.channels;
     }
@@ -481,10 +480,10 @@ define('xwiki-realtime-loader', [
   },
 
   getAllUsersChannel = async function() {
-    const channels = await doc.getChannels({
+    const channels = await doc.getChannels(new URLSearchParams({
       path: `translations/${doc.realLocale}/loader`,
       create: true
-    });
+    }));
     if (channels.length) {
       return channels[0];
     } else {

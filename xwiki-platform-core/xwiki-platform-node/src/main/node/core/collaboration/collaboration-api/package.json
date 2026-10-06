@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-collaboration-api",
-  "version": "18.8.0-SNAPSHOT",
+  "version": "18.9.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -40,9 +40,11 @@
   "dependencies": {
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-autosave-api": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
+    "y-protocols": "catalog:",
     "yjs": "catalog:"
   },
   "peerDependencies": {

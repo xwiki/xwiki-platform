@@ -57,9 +57,12 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -98,6 +101,16 @@ class R180100000XWIKI23827DataMigrationTest
         when(executionContext.getProperty("xwikicontext")).thenReturn(this.context);
         this.wiki = mock(XWiki.class);
         when(this.context.getWiki()).thenReturn(this.wiki);
+    }
+
+    @Test
+    void shouldExecute()
+    {
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(171013000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(171014000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(171015000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180000000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180002000)));
     }
 
     @Test

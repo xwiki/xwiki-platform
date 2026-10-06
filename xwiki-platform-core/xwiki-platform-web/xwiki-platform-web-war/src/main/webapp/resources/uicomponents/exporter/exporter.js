@@ -487,6 +487,9 @@ require(['jquery'], function ($) {
           filterHiddenPages: !!exportFormat.data('filterHiddenPages'),
           excludeNestedPagesByDefault: !!exportFormat.data('excludeNestedPagesByDefault')
         });
+      } else if (exportFormat.attr('data-method') === 'post') {
+        // Export the current page through a form because the target action only accepts POST requests.
+        submitExportForm(exportURL);
       } else {
         // Export the current page.
         window.location.href = exportURL;
@@ -599,17 +602,25 @@ require(['jquery'], function ($) {
     method: 'post'
   }).appendTo("body");
 
+  // Submit the given export URL, optionally after filling the form with additional inputs.
+  function submitExportForm(exportURL, fillForm) {
+    form.empty().attr('action', exportURL);
+    if (fillForm) {
+      fillForm(form);
+    }
+    form.submit();
+  };
+
   // Export modal submit.
   exportTreeModal.find('.modal-footer .btn-primary').on('click', function (event) {
     var exportTree = exportTreeModal.find('.export-tree');
     // Make sure to remove any preselected page from the export URL since we're going to take the pages from the tree.
     const exportURL = exportTreeModal.data('config').url;
-    form.empty().attr('action', exportURL.replace(/pages=.*?(&|$)/g, ''));
-    // Fill the form and submit.
-    const filterHiddenPages = exportTreeModal.data('config').filterHiddenPages;
-    createHiddenInputsFromExportTree($.jstree.reference(exportTree), form, filterHiddenPages);
-    exportTreeModal.find('input[type="hidden"][name="filter"]').clone().appendTo(form);
-    form.submit();
+    submitExportForm(exportURL.replace(/pages=.*?(&|$)/g, ''), function(exportForm) {
+      const filterHiddenPages = exportTreeModal.data('config').filterHiddenPages;
+      createHiddenInputsFromExportTree($.jstree.reference(exportTree), exportForm, filterHiddenPages);
+      exportTreeModal.find('input[type="hidden"][name="filter"]').clone().appendTo(exportForm);
+    });
   });
 
   //

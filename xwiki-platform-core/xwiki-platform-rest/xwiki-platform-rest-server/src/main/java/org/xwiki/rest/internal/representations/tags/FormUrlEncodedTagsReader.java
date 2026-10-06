@@ -57,7 +57,7 @@ public class FormUrlEncodedTagsReader implements MessageBodyReader<Tags>, XWikiR
 
     private static final String TAG_FIELD_NAME = "tag";
 
-    private static final Pattern TAG_SEPARATORS = Pattern.compile(" |,|\\|");
+    private static final Pattern TAG_SEPARATORS = Pattern.compile("[ ,|]");
 
     @Inject
     private JAXRSUtils jaxrs;

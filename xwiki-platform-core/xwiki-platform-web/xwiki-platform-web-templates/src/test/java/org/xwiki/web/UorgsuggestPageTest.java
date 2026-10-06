@@ -46,6 +46,7 @@ import org.xwiki.user.script.UserScriptService;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -72,6 +73,13 @@ import static org.xmlunit.matchers.CompareMatcher.isIdenticalTo;
 class UorgsuggestPageTest extends PageTest
 {
     private static final String UORGSUGGEST = "uorgsuggest.vm";
+
+    private static final String USERS_STATEMENT_PREFIX = "from doc.object(XWiki.XWikiUsers) as user "
+        + "where (lower(doc.name) like :input "
+        + "or concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input) ";
+
+    private static final String USERS_ORDER_BY =
+        "order by lower(user.first_name), user.first_name, lower(user.last_name), user.last_name";
 
     private TemplateManager templateManager;
 
@@ -126,10 +134,7 @@ class UorgsuggestPageTest extends PageTest
 
         String render = this.templateManager.render(UORGSUGGEST).trim();
 
-        verify(this.queryManagerScriptService).xwql(
-            "from doc.object(XWiki.XWikiUsers) as user " + "where lower(doc.name) like :input "
-                + "or concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input "
-                + "order by lower(user.first_name), user.first_name, lower(user.last_name), user.last_name");
+        verify(this.queryManagerScriptService).xwql(USERS_STATEMENT_PREFIX + "and user.active = 1 " + USERS_ORDER_BY);
         InputStream inputStream = getClass().getResourceAsStream("/uorgsuggest/users.xml");
         assertThat(fromString(render), isIdenticalTo(fromStream(inputStream)).ignoreWhitespace());
     }
@@ -159,13 +164,24 @@ class UorgsuggestPageTest extends PageTest
 
         String render = this.templateManager.render(UORGSUGGEST).trim();
 
-        verify(this.queryManagerScriptService).xwql(
-            "from doc.object(XWiki.XWikiUsers) as user " + "where lower(doc.name) like :input "
-                + "or concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input "
-                + "order by lower(user.first_name), user.first_name, lower(user.last_name), user.last_name");
+        verify(this.queryManagerScriptService).xwql(USERS_STATEMENT_PREFIX + "and user.active = 1 " + USERS_ORDER_BY);
 
         InputStream inputStream = getClass().getResourceAsStream("/uorgsuggest/users.json");
         JSONAssert.assertEquals(IOUtils.toString(inputStream, StandardCharsets.UTF_8), render, true);
+    }
+
+    @Test
+    void usersIncludingInactiveUsers() throws Exception
+    {
+        this.request.put("uorg", "user");
+        this.request.put("media", "json");
+        this.request.put("includeInactiveUsers", "true");
+
+        String render = this.templateManager.render(UORGSUGGEST).trim();
+
+        // The disabled users are not filtered out.
+        verify(this.queryManagerScriptService).xwql(USERS_STATEMENT_PREFIX + USERS_ORDER_BY);
+        assertEquals("[]", render);
     }
 
     @Test

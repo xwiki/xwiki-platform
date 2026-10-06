@@ -1,0 +1,4 @@
+.modal-title {
+  /* Bootstrap doesn't size modal titles, whether they are divs or headings. */
+  font-size: 1.43rem;
+}

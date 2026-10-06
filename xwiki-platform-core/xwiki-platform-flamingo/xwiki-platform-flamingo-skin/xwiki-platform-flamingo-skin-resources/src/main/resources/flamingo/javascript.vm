@@ -96,8 +96,9 @@
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
     'tom-select': "#removeJsSuffix($services.webjars.url('org.webjars.npm:tom-select', ""dist/js/tom-select.complete${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
+    'xwiki-autosave': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-web-webjar', ""autosave${jsExtension}""))",
+    'xwiki-document': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-web-webjar', ""document${jsExtension}""))",
     'xwiki-document-lock': $xwiki.getSkinFile('uicomponents/lock/lock.js'),
-    'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
     'xwiki-form-validation-async': $xwiki.getSkinFile('uicomponents/tools/formAsyncValidation.js'),
     'xwiki-icon': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-icon-webjar', ""icon${jsExtension}""))",
@@ -119,9 +120,6 @@
     'scriptaculous/dragdrop': ['scriptaculous/effects'],
     'xwiki-document-lock': {
       'exports': 'XWiki.DocumentLock'
-    },
-    'xwiki-entityReference': {
-      'exports': 'XWiki'
     }
   },
   'bundles': {
@@ -281,8 +279,11 @@ window.docgeturl = "${doc.getURL('get')}";
 ##
 ## Top-level JavaScript libraries (that are loaded directly)
 ##
-## Required by xwiki.js but we have to load it ourselves because xwiki.js doesn't use Require.js
-$xwiki.jsfx.use('uicomponents/model/entityReference.js', {'defer': false})##
+## Required by xwiki.js, which doesn't use Require.js, and by inline scripts such as the ones in rightsUI.vm, so it has
+## to be a blocking script loaded before them. It also registers itself as the 'xwiki-entityReference' Require.js
+## module, which resolves to the global XWiki object.
+<script src="$escapetool.xml($services.webjars.url('org.xwiki.platform:xwiki-platform-web-webjar',
+  "entityReference$jsExtension"))"></script>##
 ## xwiki.bundle.min.js and xwiki.bundle.min.css aggregate a couple of JavaScript and CSS files that are used on each
 ## page. In order to help debugging we provide/bundle the individual files also and you can load them instead of the
 ## aggregated files by passing 'minify=false' in the request query string or setting debug.minify property in

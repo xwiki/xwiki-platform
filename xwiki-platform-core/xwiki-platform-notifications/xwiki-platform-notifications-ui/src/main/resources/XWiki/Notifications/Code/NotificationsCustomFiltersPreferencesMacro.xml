@@ -345,13 +345,13 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
         traditional: true
       }).then(data =&gt; {
         notification.hide();
-        new XWiki.widgets.Notification(l10n['settings.saved'], 'done');
+        XWiki.widgets.Notification.show(l10n['settings.saved'], 'done');
 
         // Reload the Live Data.
         self.filterPreferencesLivetable.data('liveData').updateEntries();
       }).catch(() =&gt; {
         notification.hide();
-        new XWiki.widgets.Notification(l10n['settings.savingfailed'], 'error');
+        XWiki.widgets.Notification.show(l10n['settings.savingfailed'], 'error');
       });
     };
 

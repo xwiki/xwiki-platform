@@ -246,7 +246,7 @@
       ## Icon Container
       * (% class="admin-category-icon" %)
       (((
-        [[image:${section.iconReference}]]
+        [[image:${services.rendering.escape($section.iconReference, 'xwiki/2.1')}]]
       )))
       ## NEW: Container for Title and Description
       (% class="admin-category-text-container" %)
@@ -254,13 +254,13 @@
         ## Name/Link Container
         (% class="admin-category-name" %)
         (((
-          [[${section.name}&gt;&gt;path:${section.url}]]
+          [[${services.rendering.escape($services.rendering.escape($section.name, 'xwiki/2.1'), 'xwiki/2.1')}&gt;&gt;path:${section.url}]]
         )))
         ## Description Container
         #if ("$!section.description" != "")
           (% class="admin-category-description" %)
           (((
-            $section.description
+            $services.rendering.escape($section.description, 'xwiki/2.1')
           )))
         #end
       )))
@@ -293,7 +293,7 @@
 #foreach ($category in $adminMenu)
     * (% class="admin-category-icon" %)
       (((
-        [[image:${category.iconReference}]]
+        [[image:${services.rendering.escape($category.iconReference, 'xwiki/2.1')}]]
       )))
       ## Container for Title and Description
       (% class="admin-category-text-container" %)
@@ -301,13 +301,13 @@
         ## Name/Link Container
         (% class="admin-category-name" %)
         (((
-          [[${category.name}&gt;&gt;path:${category.url}]]
+          [[${services.rendering.escape($services.rendering.escape($category.name, 'xwiki/2.1'), 'xwiki/2.1')}&gt;&gt;path:${category.url}]]
         )))
         ## Description Container
         #if ("$!category.description" != "")
           (% class="admin-category-description" %)
           (((
-            $category.description
+            $services.rendering.escape($category.description, 'xwiki/2.1')
           )))
         #end
       )))

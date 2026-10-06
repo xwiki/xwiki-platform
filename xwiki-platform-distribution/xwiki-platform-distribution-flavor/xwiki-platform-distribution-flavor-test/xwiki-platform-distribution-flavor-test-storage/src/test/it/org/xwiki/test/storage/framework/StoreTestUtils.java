@@ -100,7 +100,11 @@ public final class StoreTestUtils
 
     private static Response execute(ClassicHttpRequest request, XWikiCredentials credentials) throws IOException
     {
-        try (XWikiHTTPClient client = new XWikiHTTPClient()) {
+        // Don't follow the redirects, as Apache HttpClient 3 didn't for POST requests: the tests assert on the
+        // status code of the response and, more importantly, on the state of the wiki after the request. Following
+        // the redirect of the save action would render the saved page, and the pages these tests save contain scripts
+        // that modify the wiki when they are executed.
+        try (XWikiHTTPClient client = new XWikiHTTPClient(XWikiHTTPClient.builder().disableRedirectHandling())) {
             return client.execute(request, credentials, (response, context) -> new Response(response.getCode(),
                 response.getEntity() != null ? EntityUtils.toByteArray(response.getEntity()) : new byte[0]));
         }

@@ -199,6 +199,13 @@ Object.extend(XWiki, {
         document.fire("xwiki:docextra:activated", {"id": extraID});
      };
 
+     // Remember which pane was requested last. Since the panes are loaded asynchronously and their responses can
+     // arrive in any order, a pane must only be displayed if it's still the one requested last, otherwise a pane
+     // that is slow to load steals the display from a pane requested after it. This happens for instance when the
+     // first pane, which is loaded automatically when the page is loaded, is still loading when the user clicks on
+     // another pane.
+     window.lastRequestedDocExtra = extraID;
+
      // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
      // On complete :
      //   1. Call dhtmlSwitch()
@@ -289,22 +296,30 @@ Object.extend(XWiki, {
 
                       $("docextrapanes").className="";
 
+                      // The content is in the pane, so it must not be fetched again, even when the pane is not
+                      // displayed below because another pane has been requested in the meantime. Note that the pane
+                      // keeps its "hidden" class in that case, and that dhtmlSwitch() is what drops it.
+                      $(extraID + "pane").removeClassName("empty");
+
                       // Let other know new content has been loaded
                       document.fire("xwiki:docextra:loaded", {
                         "id" : extraID,
                         "element": $(extraID + "pane")
                       });
 
-                      // switch tab
-                      dhtmlSwitch(extraID);
+                      // Switch tab, but only if this pane is still the one requested last, so that a pane that is
+                      // slow to load doesn't replace a pane the user has requested after it.
+                      if (window.lastRequestedDocExtra === extraID) {
+                        dhtmlSwitch(extraID);
 
-                      if (scrollToAnchor) {
-                        // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
-                        // prevents the anchor 'jump' after a click event but enable it
-                        // when the user is arriving from a direct /Space/Page#Section URL
-                        $(extraID + 'anchor').id = extraID;
-                        location.href='#' + extraID;
-                        $(extraID).id = extraID + 'anchor';
+                        if (scrollToAnchor) {
+                          // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
+                          // prevents the anchor 'jump' after a click event but enable it
+                          // when the user is arriving from a direct /Space/Page#Section URL
+                          $(extraID + 'anchor').id = extraID;
+                          location.href='#' + extraID;
+                          $(extraID).id = extraID + 'anchor';
+                        }
                       }
                     }
                 });
@@ -1021,11 +1036,15 @@ window.shortcut = new Object({
             if (group === this._listeners.disabled_in_inputs) {
                 // Disable the created listener when focus goes on an input, a textarea field, an editable element or on
                 // the CodeMirror div (syntax highlighting).
+                const editableSelector = 'input, textarea, [contenteditable=true], .CodeMirror-code';
                 jQuery(document)
-                    .on('focus', 'input, textarea, [contenteditable=true], .CodeMirror-code',
-                        function() { newListener.stop_listening(); })
-                    .on('blur', 'input, textarea, [contenteditable=true], .CodeMirror-code',
-                        function() { newListener.listen(); });
+                    .on('focus', editableSelector, function() { newListener.stop_listening(); })
+                    .on('blur', editableSelector, function() { newListener.listen(); });
+                // The listener is created asynchronously, after Keypress JS is loaded, so the focus may already be in
+                // an editable element (e.g. one with the autofocus attribute) and the focus event above was missed.
+                if (document.activeElement?.matches(editableSelector)) {
+                    newListener.stop_listening();
+                }
             }
 
             group[target] = newListener;

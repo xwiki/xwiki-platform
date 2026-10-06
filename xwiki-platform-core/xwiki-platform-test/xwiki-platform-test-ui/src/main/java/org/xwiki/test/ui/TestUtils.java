@@ -30,7 +30,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,12 +67,14 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.InputStreamEntity;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Keys;
@@ -203,6 +207,11 @@ public class TestUtils
 
     private static final String USER_CLASS_NAME = "XWiki.XWikiUsers";
 
+    private static final String GROUP_CLASS_NAME = "XWiki.XWikiGroups";
+
+    private static final LocalDocumentReference ALL_GROUP_REFERENCE =
+        new LocalDocumentReference("XWiki", "XWikiAllGroup");
+
     private static final String SERVER_CLASS_NAME = "XWiki.XWikiServerClass";
 
     private static final DocumentReference MAIN_WIKI_DESCRIPTOR =
@@ -258,6 +267,14 @@ public class TestUtils
     private String currentWiki = "xwiki";
 
     private RestTestUtils rest;
+
+    /**
+     * The credentials of a user that has full rights on the wiki under test, used for the REST calls that the test
+     * framework performs on behalf of the tests. Defaults to the superadmin, but not every wiki under test has one:
+     * the distribution enables it only when {@code xwiki.superadminpassword} is set in {@code xwiki.cfg}, which the
+     * shipped configuration doesn't do.
+     */
+    private XWikiCredentials privilegedCredentials = SUPER_ADMIN_CREDENTIALS;
 
     /**
      * The host/port the main wiki descriptor currently points to, to avoid updating it when it's already the expected
@@ -389,6 +406,28 @@ public class TestUtils
     public XWikiCredentials getDefaultCredentials()
     {
         return this.httpClient.getDefaultCredentials();
+    }
+
+    /**
+     * @return the credentials of a user that has full rights on the wiki under test
+     * @since 18.8.0RC1
+     */
+    public XWikiCredentials getPrivilegedCredentials()
+    {
+        return this.privilegedCredentials;
+    }
+
+    /**
+     * Declare which user the test framework has to authenticate as for the REST calls it performs on behalf of the
+     * tests when they need full rights on the wiki, typically to save a page whose content is executed as a script.
+     * The superadmin is used by default, so this only needs to be called for a wiki that doesn't have one.
+     *
+     * @param privilegedCredentials the credentials of a user that has full rights on the wiki under test
+     * @since 18.8.0RC1
+     */
+    public void setPrivilegedCredentials(XWikiCredentials privilegedCredentials)
+    {
+        this.privilegedCredentials = privilegedCredentials;
     }
 
     public void loginAsSuperAdmin()
@@ -1499,7 +1538,8 @@ public class TestUtils
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        rest().savePageAs(SUPER_ADMIN_CREDENTIALS, reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
+        rest().savePageAs(getPrivilegedCredentials(), reference, wikiContent, wikiSyntax.toIdString(), null, null,
+            false);
 
         // Execute the content and return the result
         return executeAndGetBodyAsString(reference, queryParameters);
@@ -2463,7 +2503,7 @@ public class TestUtils
 
         // Note: the test may have logged in as another user, and thus have changed the credentials used for REST
         // calls.
-        XWikiCredentials previousCredentials = setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
+        XWikiCredentials previousCredentials = setDefaultCredentials(getPrivilegedCredentials());
         try {
             org.xwiki.rest.model.jaxb.Object descriptorObject = rest().object(MAIN_WIKI_DESCRIPTOR, SERVER_CLASS_NAME);
             descriptorObject.withProperties(RestTestUtils.property("server", host),
@@ -2575,6 +2615,25 @@ public class TestUtils
     }
 
     /**
+     * Same as {@link #getString(String, Map)} but waits for the response at most the given time instead of the default
+     * socket timeout of the HTTP client (3 minutes), for requests that take long to be processed on the server.
+     *
+     * @param path the path to request, relative to the base URL of the HTTP client
+     * @param queryParams additional query parameters added to the computed URL
+     * @param timeout how long to wait for the response
+     * @return the content of the computed URL
+     * @throws Exception in case of error when executing the request
+     * @since 18.8.0
+     */
+    public String getString(String path, Map<String, ?> queryParams, Duration timeout) throws Exception
+    {
+        String url = getURL(getCurrentExecutor().getHttpClientBaseURL(), path, queryParams);
+        try (InputStream inputStream = executeGet(url, timeout, Status.OK.getStatusCode()).getEntity().getContent()) {
+            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
      * Extended version to work in a docker context.
      *
      * @param baseURL the base url
@@ -2592,6 +2651,13 @@ public class TestUtils
 
     public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
         throws Exception
+    {
+        String url = getURL(prefix, path, queryParams, elements);
+
+        return executeGet(url, Status.OK.getStatusCode()).getEntity().getContent();
+    }
+
+    private String getURL(String prefix, String path, Map<String, ?> queryParams, Object... elements)
     {
         String cleanPrefix = Strings.CS.removeEnd(prefix, "/");
         if (path.startsWith(cleanPrefix)) {
@@ -2611,9 +2677,7 @@ public class TestUtils
             }
         }
 
-        String url = builder.build(elements).toString();
-
-        return executeGet(url, Status.OK.getStatusCode()).getEntity().getContent();
+        return builder.build(elements).toString();
     }
 
     protected CloseableHttpResponse executeGet(String uri) throws Exception
@@ -2632,6 +2696,26 @@ public class TestUtils
     protected CloseableHttpResponse executeGet(String uri, boolean release, int... expectedCodes) throws Exception
     {
         return assertStatusCodes(executeGet(uri), release, expectedCodes);
+    }
+
+    /**
+     * Execute a GET request, waiting for the response at most the given time instead of the default socket timeout of
+     * the HTTP client (3 minutes).
+     *
+     * @param uri the URI to request
+     * @param timeout how long to wait for the response
+     * @param expectedCodes the accepted status codes of the response
+     * @return the response, which the caller is responsible for closing
+     * @throws Exception when failing to execute the request or when the response has an unexpected status code
+     * @since 18.8.0
+     */
+    protected CloseableHttpResponse executeGet(String uri, Duration timeout, int... expectedCodes) throws Exception
+    {
+        HttpGet request = new HttpGet(uri);
+        // The response timeout replaces the socket timeout of the connection for this request.
+        request.setConfig(RequestConfig.custom().setResponseTimeout(Timeout.of(timeout)).build());
+
+        return assertStatusCodes(execute(request), false, expectedCodes);
     }
 
     /**
@@ -3226,7 +3310,8 @@ public class TestUtils
         /**
          * Create a user, without going through the browser as {@link TestUtils#createUser(String, String, String,
          * Object...)} does. The user is created active, and its password is hashed by the class' password property
-         * when it is set, so that the user can log in with it.
+         * when it is set, so that the user can log in with it. It is added to {@code XWiki.XWikiAllGroup}, like the
+         * registration does, so that it gets the rights that are granted to that group.
          * <p>
          * The user must not exist yet: this adds a new user object, it does not update an existing one.
          *
@@ -3239,8 +3324,34 @@ public class TestUtils
          */
         public void createUser(XWikiCredentials credentials, Object... properties) throws Exception
         {
-            addObject(new LocalDocumentReference("XWiki", credentials.getUserName()), USER_CLASS_NAME,
+            String userName = credentials.getUserName();
+
+            addObject(new LocalDocumentReference("XWiki", userName), USER_CLASS_NAME,
                 ArrayUtils.addAll(new Object[] {"password", credentials.getPassword(), "active", "1"}, properties));
+
+            // The registration adds the new user to XWikiAllGroup, see XWiki#setUserDefaultGroup(). A lot of rights
+            // are usually granted to that group, so a user created here would otherwise be less privileged than a
+            // registered one.
+            addUserToAllGroup(userName);
+        }
+
+        private void addUserToAllGroup(String userName) throws Exception
+        {
+            String member = "XWiki." + userName;
+
+            // Don't add the user twice, like XWiki#addUserToGroup() does: the group document outlives the user
+            // documents, so the membership can still be there when a user of the same name is created again.
+            org.xwiki.rest.model.jaxb.Objects objects = get(ObjectsResource.class, ALL_GROUP_REFERENCE, false);
+            // The headline of an object summary is the value of the first property of the object, which is the
+            // member for XWiki.XWikiGroups as that's the only property of that class.
+            boolean isMember = objects != null
+                && objects.getObjectSummaries().stream()
+                    .anyMatch(object -> GROUP_CLASS_NAME.equals(object.getClassName())
+                        && member.equals(object.getHeadline()));
+
+            if (!isMember) {
+                addObject(ALL_GROUP_REFERENCE, GROUP_CLASS_NAME, "member", member);
+            }
         }
 
         /**

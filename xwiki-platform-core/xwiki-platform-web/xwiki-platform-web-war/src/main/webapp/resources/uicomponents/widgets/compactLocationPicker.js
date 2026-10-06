@@ -47,229 +47,256 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
     return labels;
   };
 
-  const enhance = function(element) {
-    const picker = $(element);
-    if (picker.data('compactLocationPicker')) {
-      // Already enhanced.
+  /**
+   * @return the location backed by the given tree node, or null if the node is not a location
+   */
+  const toLocation = function(tree, node) {
+    if (node.id.indexOf(documentNodePrefix) !== 0) {
+      return null;
+    }
+    const documentReference = XWiki.Model.resolve(node.id.substring(documentNodePrefix.length),
+      XWiki.EntityType.DOCUMENT);
+    if (documentReference.name !== webHome) {
+      // Only the pages backing a space can be picked as a location. The tree is configured to hide the terminal pages
+      // but let's not rely on it.
+      return null;
+    }
+    return {
+      reference: documentReference.parent,
+      // The tree already knows the pretty name of each ancestor, so we get a proper hierarchy hint for free.
+      labels: getLabels(tree, node)
+    };
+  };
+
+  /**
+   * @return the nodes that have been loaded so far in the given tree
+   */
+  const getLoadedNodes = function(tree) {
+    return tree.get_json('#', {'flat': true}).map(flatNode => tree.get_node(flatNode.id));
+  };
+
+  const getSuggestInput = function(picker) {
+    return picker.select[0]?.selectize;
+  };
+
+  /**
+   * @return the suggestion matching the given tree node, in the format of the suggestion input,
+   *   or null if the node is not a location
+   */
+  const toSuggestion = function(suggestInput, tree, node) {
+    const location = toLocation(tree, node);
+    return location && suggestSpaces.createSuggestion(suggestInput.settings, location.reference, location.labels);
+  };
+
+  //
+  // Updating the suggestion input from the tree.
+  //
+
+  /**
+   * @return the suggestion to apply to the suggestion input after a change of the given tree node, or null when there
+   *   is nothing to apply: the node is not a location, the suggestion input is not ready, or the change comes from
+   *   updating the tree to match the suggestion input
+   */
+  const getSuggestionToApply = function(picker, tree, node) {
+    const suggestInput = getSuggestInput(picker);
+    if (picker.updatingTree || !suggestInput) {
+      return null;
+    }
+    return toSuggestion(suggestInput, tree, node);
+  };
+
+  const addLocation = function(picker, tree, node) {
+    const suggestion = getSuggestionToApply(picker, tree, node);
+    if (suggestion) {
+      const suggestInput = getSuggestInput(picker);
+      suggestInput.addOption(suggestion);
+      suggestInput.addItem(suggestion.value);
+    }
+  };
+
+  const removeLocation = function(picker, tree, node) {
+    const suggestion = getSuggestionToApply(picker, tree, node);
+    if (suggestion) {
+      getSuggestInput(picker).removeItem(suggestion.value);
+    }
+  };
+
+  const setLocation = function(picker, tree, node) {
+    const suggestion = getSuggestionToApply(picker, tree, node);
+    if (suggestion) {
+      const suggestInput = getSuggestInput(picker);
+      suggestInput.addOption(suggestion);
+      suggestInput.setValue(suggestion.value);
+      // There's nothing more to pick, so we give the room back to the form.
+      picker.toggle.dropdown('toggle');
+    }
+  };
+
+  //
+  // Updating the tree from the suggestion input.
+  //
+
+  /**
+   * Marks the given node if it matches a selected location, and unmarks it otherwise. The nodes are marked by checking
+   * them with multiple selection and by selecting them with single selection.
+   */
+  const markNode = function(picker, suggestInput, tree, node) {
+    const suggestion = toSuggestion(suggestInput, tree, node);
+    const isSelected = suggestion && suggestInput.items.includes(suggestion.value);
+    if (!picker.multiple) {
+      if (isSelected) {
+        tree.select_node(node, true);
+      }
+    } else if (isSelected) {
+      tree.check_node(node);
+    } else if (suggestion) {
+      tree.uncheck_node(node);
+    }
+  };
+
+  /**
+   * Marks the nodes matching the selected locations and unmarks the others, so that the tree reflects the value of
+   * the suggestion input, which can also be changed without the tree.
+   */
+  const updateTree = function(picker, tree) {
+    const suggestInput = getSuggestInput(picker);
+    if (!suggestInput) {
       return;
     }
-    picker.data('compactLocationPicker', true);
-
-    const select = picker.find('select.suggest-spaces');
-    const multiple = select.prop('multiple');
-    const dropDown = picker.children('.location-picker-browse');
-    const toggle = dropDown.children('.dropdown-toggle');
-    const menu = dropDown.children('.dropdown-menu');
-    const treeElement = menu.find('.location-tree');
-    // Set while we update the tree to match the input, so that we don't then update the input back.
-    let updatingTree = false;
-
-    const getSuggestInput = function() {
-      return select[0]?.selectize;
-    };
-
-    const toLocation = function(tree, node) {
-      if (node.id.indexOf(documentNodePrefix) !== 0) {
-        return null;
+    picker.updatingTree = true;
+    try {
+      if (!picker.multiple) {
+        tree.deselect_all(true);
       }
-      const documentReference = XWiki.Model.resolve(node.id.substring(documentNodePrefix.length),
-        XWiki.EntityType.DOCUMENT);
-      if (documentReference.name !== webHome) {
-        // Only the pages backing a space can be picked as a location. The tree is configured to hide the terminal pages
-        // but let's not rely on it.
-        return null;
-      }
-      return {
-        reference: documentReference.parent,
-        // The tree already knows the pretty name of each ancestor, so we get a proper hierarchy hint for free.
-        labels: getLabels(tree, node)
-      };
-    };
+      // Only the nodes that have been loaded so far can be updated, which is enough: the others get their state from
+      // the value of the suggestion input when they are loaded.
+      getLoadedNodes(tree).forEach(node => markNode(picker, suggestInput, tree, node));
+    } finally {
+      picker.updatingTree = false;
+    }
+  };
 
-    /**
-     * @return the suggestion matching the given tree node, in the format of the suggestion input,
-     *   or null if the node is not a location
-     */
-    const toSuggestion = function(suggestInput, tree, node) {
-      const location = toLocation(tree, node);
-      return location && suggestSpaces.createSuggestion(suggestInput.settings, location.reference, location.labels);
-    };
+  /**
+   * Hides the checkbox of the nodes that are not locations, like the wiki nodes, so that it's clear what can be
+   * picked.
+   */
+  const hideCheckboxOfNonLocations = function(tree) {
+    getLoadedNodes(tree).filter(node => !toLocation(tree, node)).forEach(node => tree.hide_checkbox(node));
+  };
 
-    const addLocation = function(tree, node) {
-      const suggestInput = getSuggestInput();
-      if (updatingTree || !suggestInput) {
-        return;
+  const initTree = function(picker) {
+    // The tree can only be initialized once its element is visible, otherwise it can't measure itself.
+    const treeEvents = picker.treeElement.xtree({
+      core: {
+        multiple: picker.multiple
       }
-      const suggestion = toSuggestion(suggestInput, tree, node);
-      if (suggestion) {
-        suggestInput.addOption(suggestion);
-        suggestInput.addItem(suggestion.value);
+    }).on('ready.jstree refresh.jstree load_node.jstree', (event, data) => {
+      if (picker.multiple) {
+        hideCheckboxOfNonLocations(data.instance);
       }
-    };
+      updateTree(picker, data.instance);
+      // Loading nodes changes the height of the drop down, so it may not fit below the button any more.
+      flipIfNeeded(picker);
+    });
+    if (picker.multiple) {
+      treeEvents.on('check_node.jstree', (event, data) => addLocation(picker, data.instance, data.node))
+        .on('uncheck_node.jstree', (event, data) => removeLocation(picker, data.instance, data.node));
+    } else {
+      treeEvents.on('select_node.jstree', (event, data) => setLocation(picker, data.instance, data.node));
+    }
+  };
 
-    const removeLocation = function(tree, node) {
-      const suggestInput = getSuggestInput();
-      if (updatingTree || !suggestInput) {
-        return;
-      }
-      const suggestion = toSuggestion(suggestInput, tree, node);
-      if (suggestion) {
-        suggestInput.removeItem(suggestion.value);
-      }
-    };
+  //
+  // Handling the drop down holding the tree.
+  //
 
-    const setLocation = function(tree, node) {
-      const suggestInput = getSuggestInput();
-      if (updatingTree || !suggestInput) {
-        return;
-      }
-      const suggestion = toSuggestion(suggestInput, tree, node);
-      if (suggestion) {
-        suggestInput.addOption(suggestion);
-        suggestInput.setValue(suggestion.value);
-        // There's nothing more to pick, so we give the room back to the form.
-        toggle.dropdown('toggle');
-      }
-    };
+  /**
+   * The dropdown is placed right below the button by the style sheet, which is always correct because it is
+   * positioned relative to the button. We only flip it above the button when there isn't enough room below, which
+   * easily happens when the picker is displayed near the bottom of a dialog.
+   */
+  const flipIfNeeded = function(picker) {
+    picker.dropDown.removeClass('dropup');
+    const button = picker.toggle[0].getBoundingClientRect();
+    const roomBelow = document.documentElement.clientHeight - button.bottom;
+    const roomAbove = button.top;
+    if (roomBelow < picker.menu[0].offsetHeight && roomAbove > roomBelow) {
+      picker.dropDown.addClass('dropup');
+    }
+  };
 
-    /**
-     * Marks the nodes matching the selected locations and unmarks the others, so that the tree reflects the value of
-     * the suggestion input, which can also be changed without the tree. The nodes are marked by checking them with
-     * multiple selection and by selecting them with single selection.
-     */
-    const updateTree = function(tree) {
-      const suggestInput = getSuggestInput();
-      if (!suggestInput) {
-        return;
-      }
-      updatingTree = true;
-      try {
-        if (!multiple) {
-          tree.deselect_all(true);
-        }
-        // Only the nodes that have been loaded so far can be updated, which is enough: the others get their state from
-        // the value of the suggestion input when they are loaded.
-        tree.get_json('#', {'flat': true}).forEach(function(flatNode) {
-          const node = tree.get_node(flatNode.id);
-          const suggestion = toSuggestion(suggestInput, tree, node);
-          const isSelected = suggestion && suggestInput.items.includes(suggestion.value);
-          if (!multiple) {
-            if (isSelected) {
-              tree.select_node(node, true);
-            }
-          } else if (isSelected) {
-            tree.check_node(node);
-          } else if (suggestion) {
-            tree.uncheck_node(node);
-          }
-        });
-      } finally {
-        updatingTree = false;
-      }
-    };
-
-    /**
-     * Hides the checkbox of the nodes that are not locations (e.g. the wiki nodes), so that it's clear what can be
-     * picked.
-     */
-    const hideCheckboxOfNonLocations = function(tree) {
-      tree.get_json('#', {'flat': true}).forEach(function(flatNode) {
-        const node = tree.get_node(flatNode.id);
-        if (!toLocation(tree, node)) {
-          tree.hide_checkbox(node);
-        }
-      });
-    };
-
-    /**
-     * The dropdown is placed right below the button by the style sheet, which is always correct because it is
-     * positioned relative to the button. We only flip it above the button when there isn't enough room below, which
-     * easily happens when the picker is displayed near the bottom of a dialog.
-     */
-    const flipIfNeeded = function() {
-      dropDown.removeClass('dropup');
-      const button = toggle[0].getBoundingClientRect();
-      const roomBelow = document.documentElement.clientHeight - button.bottom;
-      const roomAbove = button.top;
-      if (roomBelow < menu[0].offsetHeight && roomAbove > roomBelow) {
-        dropDown.addClass('dropup');
-      }
-    };
-
-    const initTree = function() {
-      // The tree can only be initialized once its element is visible, otherwise it can't measure itself.
-      const treeEvents = treeElement.xtree({
-        core: {
-          multiple: multiple
-        }
-      }).on('ready.jstree refresh.jstree load_node.jstree', function(event, data) {
-        if (multiple) {
-          hideCheckboxOfNonLocations(data.instance);
-        }
-        updateTree(data.instance);
-        // Loading nodes changes the height of the drop down, so it may not fit below the button any more.
-        flipIfNeeded();
-      });
-      if (multiple) {
-        treeEvents.on('check_node.jstree', function(event, data) {
-          addLocation(data.instance, data.node);
-        }).on('uncheck_node.jstree', function(event, data) {
-          removeLocation(data.instance, data.node);
-        });
-      } else {
-        treeEvents.on('select_node.jstree', function(event, data) {
-          setLocation(data.instance, data.node);
-        });
-      }
-    };
-
-    dropDown.on('shown.bs.dropdown', function() {
-      const tree = $.jstree.reference(treeElement);
+  const bindDropDownEvents = function(picker) {
+    picker.dropDown.on('shown.bs.dropdown', () => {
+      const tree = $.jstree.reference(picker.treeElement);
       if (tree) {
-        updateTree(tree);
+        updateTree(picker, tree);
       } else {
-        initTree();
+        initTree(picker);
       }
-      flipIfNeeded();
+      flipIfNeeded(picker);
     });
 
-    // Set while we close the drop down because the focus moved to another element, which must keep the focus.
-    let closingOnFocusOut = false;
-
-    dropDown.on('focusout', function(event) {
+    picker.dropDown.on('focusout', event => {
       // Bootstrap closes the drop down when the user clicks outside of it, but some widgets, like the suggestion
       // inputs, stop the propagation of their click events. So we also close the drop down as soon as the focus moves
       // to an element outside of it. Clicks on elements that can't be focused are still handled by Bootstrap.
-      if (dropDown.hasClass('open') && event.relatedTarget && !dropDown[0].contains(event.relatedTarget)) {
-        closingOnFocusOut = true;
+      if (picker.dropDown.hasClass('open') && event.relatedTarget &&
+          !picker.dropDown[0].contains(event.relatedTarget)) {
+        picker.closingOnFocusOut = true;
         try {
-          toggle.dropdown('toggle');
+          picker.toggle.dropdown('toggle');
         } finally {
-          closingOnFocusOut = false;
+          picker.closingOnFocusOut = false;
         }
       }
     });
 
-    dropDown.on('hide.bs.dropdown', function() {
+    picker.dropDown.on('hide.bs.dropdown', () => {
       // The drop down can be closed without the toggle button getting focus back which would otherwise drop
       // the focus to the body.
-      if (!closingOnFocusOut) {
-        toggle.trigger('focus');
+      if (!picker.closingOnFocusOut) {
+        picker.toggle.trigger('focus');
       }
     });
 
-    menu.on('click', function(event) {
+    picker.menu.on('click', event => {
       // Browsing the tree must not close the drop down.
       event.stopPropagation();
     });
 
-    menu.on('keydown', function(event) {
+    picker.menu.on('keydown', event => {
       // Same for typing in the tree finder, but let the Escape key through so that the drop down can still be closed
       // from the keyboard.
       if (event.key !== 'Escape') {
         event.stopPropagation();
       }
     });
+  };
+
+  const enhance = function(element) {
+    const container = $(element);
+    if (container.data('compactLocationPicker')) {
+      // Already enhanced.
+      return;
+    }
+    container.data('compactLocationPicker', true);
+
+    const select = container.find('select.suggest-spaces');
+    const dropDown = container.children('.location-picker-browse');
+    const menu = dropDown.children('.dropdown-menu');
+    const picker = {
+      select,
+      multiple: select.prop('multiple'),
+      dropDown,
+      toggle: dropDown.children('.dropdown-toggle'),
+      menu,
+      treeElement: menu.find('.location-tree'),
+      // Set while we update the tree to match the input, so that we don't then update the input back.
+      updatingTree: false,
+      // Set while we close the drop down because the focus moved to another element, which must keep the focus.
+      closingOnFocusOut: false
+    };
+    bindDropDownEvents(picker);
   };
 
   $.fn.compactLocationPicker = function() {

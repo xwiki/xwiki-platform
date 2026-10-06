@@ -39,7 +39,7 @@
 #set ($discard = $parameters.putIfAbsent('placeholder',
   $services.localization.render('rendering.macro.records.parameter.filters.placeholder')))
 <script src="$escapetool.xml($services.webjars.url(
-  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.js'))"></script>
 <input type="text" value="$!escapetool.xml($displayer.value)"
   #foreach ($parameter in $parameters.entrySet())
     $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"

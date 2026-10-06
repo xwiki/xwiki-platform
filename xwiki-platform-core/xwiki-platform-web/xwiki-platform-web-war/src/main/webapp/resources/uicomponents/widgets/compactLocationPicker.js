@@ -233,10 +233,29 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
       flipIfNeeded();
     });
 
+    // Set while we close the drop down because the focus moved to another element, which must keep the focus.
+    let closingOnFocusOut = false;
+
+    browser.on('focusout', function(event) {
+      // Bootstrap closes the drop down when the user clicks outside of it, but some widgets, like the suggestion
+      // inputs, stop the propagation of their click events. So we also close the drop down as soon as the focus moves
+      // to an element outside of it. Clicks on elements that can't be focused are still handled by Bootstrap.
+      if (browser.hasClass('open') && event.relatedTarget && !browser[0].contains(event.relatedTarget)) {
+        closingOnFocusOut = true;
+        try {
+          toggle.dropdown('toggle');
+        } finally {
+          closingOnFocusOut = false;
+        }
+      }
+    });
+
     browser.on('hide.bs.dropdown', function() {
       // The drop down can be closed without the toggle button getting focus back which would otherwise drop
       // the focus to the body.
-      toggle.trigger('focus');
+      if (!closingOnFocusOut) {
+        toggle.trigger('focus');
+      }
     });
 
     menu.on('click', function(event) {

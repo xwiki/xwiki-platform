@@ -36,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -71,6 +72,8 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
 
     private ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+
+    private Environment environment = Utils.getComponent(Environment.class);
 
     private boolean checkAccess;
 
@@ -240,7 +243,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     private boolean copyResource(String resourceName, String key, Map<String, File> usedFiles, XWikiContext context)
     {
         try {
-            try (InputStream data = context.getWiki().getResourceAsStream(resourceName)) {
+            try (InputStream data = this.environment.getResourceAsStream(resourceName)) {
                 if (data != null) {
                     // Copy the resource to a temporary file
                     File file = getTemporaryFile(key, context);

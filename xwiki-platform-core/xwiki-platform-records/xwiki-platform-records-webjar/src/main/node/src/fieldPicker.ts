@@ -252,6 +252,24 @@ function isCandidate(descriptor: PropertyDescriptor): boolean {
 }
 
 /**
+ * Whether the properties resource reported any field of the data type itself.
+ *
+ * The resource always reports the page metadata, and adds the data type's fields only when the class exists and the
+ * current user may view it. A list without any field is therefore how a deleted or unreachable data type shows, and
+ * the two cannot be told apart, which suits a picker that must not reveal that something exists but is out of reach.
+ * A class that exists with no field at all reads the same way, but it cannot fill a table either.
+ *
+ * @param descriptors - the property descriptors reported by the resource
+ * @returns whether at least one of them is a field of the data type
+ */
+function hasDataTypeFields(descriptors: PropertyDescriptor[]): boolean {
+  return descriptors.some(
+    (descriptor) =>
+      isCandidate(descriptor) && groupOf(descriptor) === FIELDS_GROUP,
+  );
+}
+
+/**
  * @param descriptor - a property descriptor
  * @returns the group it is listed under
  */
@@ -316,6 +334,7 @@ export {
   asDescriptors,
   findDataType,
   groupOf,
+  hasDataTypeFields,
   isCandidate,
   loadDescriptors,
   loadOptions,

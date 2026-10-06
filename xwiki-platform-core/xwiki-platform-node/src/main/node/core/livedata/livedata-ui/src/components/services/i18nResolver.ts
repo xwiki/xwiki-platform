@@ -94,6 +94,7 @@ export async function i18nResolver(
       "footnotes.computedTitle",
       "footnotes.propertyNotViewable",
       "footnotes.frozenEntries",
+      "footnotes.frozenEntries.hint",
       "bottombar.noEntries",
       "error.updateEntriesFailed",
       "error.addEntryFailed",

@@ -18,8 +18,11 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script>
+import XWikiIcon from "../utilities/XWikiIcon.vue";
+
 export default {
   name: "LivedataFootnotes",
+  components: { XWikiIcon },
   inject: ["logic"],
   data() {
     return {
@@ -38,6 +41,17 @@ export default {
     >
       (<small>{{ footnote.symbol }}</small
       >) {{ $t(footnote.translationKey) }}
+    </div>
+    <div v-if="logic.isViewFrozen()" class="box infomessage footnote">
+      {{ $t("livedata.footnotes.frozenEntries") }}
+      <span
+        tabindex="0"
+        role="img"
+        :title="$t('livedata.footnotes.frozenEntries.hint')"
+        :aria-label="$t('livedata.footnotes.frozenEntries.hint')"
+      >
+        <XWikiIcon :icon-descriptor="{ name: 'info' }" />
+      </span>
     </div>
   </div>
 </template>

@@ -41,7 +41,7 @@ import org.xwiki.stability.Unstable;
  * the whole group and checks the one whose value matches the current parameter value.
  *
  * @version $Id$
- * @since 18.8.0RC1
+ * @since 18.9.0RC1
  */
 @Unstable
 public interface RecordsLayouts

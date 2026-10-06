@@ -147,6 +147,18 @@ public class InplaceEditablePage extends ViewPage
         return this;
     }
 
+    /**
+     * Moves the focus to the page title input, e.g. to take the focus away from the content editor.
+     *
+     * @return this page object
+     * @since 18.9.0RC1
+     */
+    public InplaceEditablePage focusDocumentTitle()
+    {
+        getDriver().findElement(TITLE_INPUT).click();
+        return this;
+    }
+
     @Override
     public String getDocumentTitle()
     {

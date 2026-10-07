@@ -375,6 +375,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * @param value the value of the property to set
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public void setPasswordValue(String name, String value)
@@ -660,6 +661,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * returns {@code false} if the given raw password is empty without any check.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public boolean isPasswordValueMatching(String passwordFieldName, String rawPassword)

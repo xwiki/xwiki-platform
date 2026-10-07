@@ -78,6 +78,7 @@ public class PasswordClass extends StringClass
      * The key for the argon2 algorithm which is the default hashing algorithm used in the class.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public static final String ARGON2_ALGORITHM = "argon2";
@@ -86,6 +87,7 @@ public class PasswordClass extends StringClass
      * The key for the bcrypt hash algorithm.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public static final String BCRYPT_ALGORITHM = "bcrypt";
@@ -94,6 +96,7 @@ public class PasswordClass extends StringClass
      * The key for the scrypt hash algorithm.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public static final String SCRYPT_ALGORITHM = "scrypt";
@@ -102,6 +105,7 @@ public class PasswordClass extends StringClass
      * The key for the pbkdf2 hash algorithm.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public static final String PBKDF2_ALGORITHM = "pbkdf2";
@@ -111,6 +115,7 @@ public class PasswordClass extends StringClass
      * reasons.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public static final String SHA_1_ALGORITHM = "SHA-1";
@@ -120,6 +125,7 @@ public class PasswordClass extends StringClass
      * reasons.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public static final String SHA_256_ALGORITHM = "SHA-256";
@@ -129,6 +135,7 @@ public class PasswordClass extends StringClass
      * reasons.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public static final String SHA_512_ALGORITHM = "SHA-512";
@@ -137,6 +144,7 @@ public class PasswordClass extends StringClass
      * Expose the full list of supported hash algorithms.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public static final List<String> SUPPORTED_ALGORITHMS = List.of(
@@ -243,6 +251,7 @@ public class PasswordClass extends StringClass
      * @return {@code true} if it's recognized as a hash.
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public static boolean isPasswordHashed(String value)
@@ -339,7 +348,7 @@ public class PasswordClass extends StringClass
      * there's a match between both values, else it returns an empty string. It shouldn't be used at all anymore and
      * instead {@link #arePasswordsMatching(String, String)} should be used.
      */
-    @Deprecated(since = "18.8.0RC1, 18.4.5")
+    @Deprecated(since = "18.8.0RC1, 18.4.5, 17.10.14")
     public String getEquivalentPassword(String storedPassword, String plainPassword)
     {
         return (arePasswordsMatching(plainPassword, storedPassword)) ? storedPassword : "";
@@ -465,6 +474,7 @@ public class PasswordClass extends StringClass
      * @return {@code true} only if there's match between the passwords
      * @since 18.8.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     @Unstable
     public boolean arePasswordsMatching(String rawPassword, String encodedPassword)

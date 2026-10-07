@@ -74,6 +74,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
      *
      * @since 18.6.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     public static final String VALIDKEY_FIELD = "validkey";
 
@@ -82,6 +83,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
      *
      * @since 18.6.0RC1
      * @since 18.4.5
+     * @since 17.10.14
      */
     public static final String PASSWORD_FIELD = "password";
 

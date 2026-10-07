@@ -36,8 +36,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @version $Id$
  * @since 18.8.0RC1
  * @since 18.4.5
- * @since 17.10.13
- * @since 16.10.19
+ * @since 17.10.14
  */
 public class XWikiLegacyPasswordEncoder extends AbstractValidatingPasswordEncoder
 {

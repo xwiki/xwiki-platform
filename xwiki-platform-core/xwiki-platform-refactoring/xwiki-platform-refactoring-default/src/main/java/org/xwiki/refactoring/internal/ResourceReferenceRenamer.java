@@ -154,18 +154,17 @@ public class ResourceReferenceRenamer
         DocumentReference linkTargetDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
         EntityReference absoluteResolvedEntityReference = this.entityReferenceResolver.resolve(resourceReference, null);
-        DocumentReference absoluteResolvedDocumentReference =
-            this.defaultReferenceDocumentReferenceResolver.resolve(absoluteResolvedEntityReference);
 
         // If the link targets the old (renamed) document reference and it's an absolute reference
         // (i.e. its resolution without any given parameter gives same result than its resolution with the
-        // currentDocument) then we must update it
+        // currentDocument) then we must update it. The resolved entities are compared, and not the documents they
+        // belong to, so that references to an attachment or to a space of the old document are handled too.
         // We also update the link if it's not an absolute link but the current document is not part of the move job,
         // as in this case there won't be any other call to perform the link refactoring.
         // Finally, if we're in the special case of a page reference starting with ../ then we check if it doesn't
         // contain a space that we're actually moving, in which case we want to actually fix the reference.
         boolean shouldBeUpdated = linkTargetDocumentReference.equals(oldReference)
-            && (absoluteResolvedDocumentReference.equals(linkEntityReference)
+            && (absoluteResolvedEntityReference.equals(linkEntityReference)
             || !updatedEntities.containsKey(currentDocumentReference)
             || isPageReferenceOutOfParent(resourceReference, linkTargetDocumentReference, updatedEntities));
 

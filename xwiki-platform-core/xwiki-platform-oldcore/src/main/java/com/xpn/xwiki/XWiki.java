@@ -2113,7 +2113,7 @@ public class XWiki implements EventListener
                 if (!originalDocument.isNew()) {
                     // We don't want to notify about this delete since from outside world point of view it's an update
                     // and not a delete+create
-                    deleteDocument(originalDocument, true, false, context);
+                    deleteDocumentInternal(originalDocument, true, false, false, context);
                 }
             } else {
                 saveRemovedAttachmentsToRecycleBin(document, context);
@@ -4608,7 +4608,27 @@ public class XWiki implements EventListener
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
-        deleteDocument(doc, totrash, true, context);
+        deleteDocument(doc, totrash, false, context);
+    }
+
+    /**
+     * Delete the passed document.
+     *
+     * @param doc the document coming to the store to delete
+     * @param totrash true if the document should be moved to the trash bin
+     * @param deletedByContextUser true if the document is potentially deleted by a user, in which case some protection
+     *            must be applied, false if it's done by the system
+     * @param context the XWiki context
+     * @throws XWikiException when failing to delete the document
+     * @since 18.9.0RC1
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 16.10.20
+     */
+    public void deleteDocument(XWikiDocument doc, boolean totrash, boolean deletedByContextUser, XWikiContext context)
+        throws XWikiException
+    {
+        deleteDocumentInternal(doc, totrash, true, deletedByContextUser, context);
     }
 
     private XWikiDocument prepareDocumentDelete(XWikiDocument doc, XWikiContext context)
@@ -4656,8 +4676,8 @@ public class XWiki implements EventListener
         }
     }
 
-    private void deleteDocument(XWikiDocument doc, boolean totrash, boolean notify, XWikiContext context)
-        throws XWikiException
+    private void deleteDocumentInternal(XWikiDocument doc, boolean totrash, boolean notify, boolean deletedByContextUser,
+        XWikiContext context) throws XWikiException
     {
         String currentWiki = null;
 
@@ -4672,6 +4692,12 @@ public class XWiki implements EventListener
             // an XWikiDocument as source and an XWikiContext as data.
             if (notify) {
                 blankDoc = prepareDocumentDelete(doc, context);
+
+                if (deletedByContextUser) {
+                    // Make sure the user is allowed to make this delete
+                    context.getWiki().checkDeletingDocument(context.getUserReference(), doc, context);
+                }
+
                 beforeDelete(doc, blankDoc, context);
             }
 
@@ -5015,7 +5041,7 @@ public class XWiki implements EventListener
             // delete since from outside world point of view the target document is updated, and not deleted and
             // created again.
             if (!previousTargetDocument.isNew()) {
-                deleteDocument(previousTargetDocument, true, false, context);
+                deleteDocumentInternal(previousTargetDocument, true, false, false, context);
             }
 
             getStore().renameXWikiDoc(modifiedSourceDocument != null ? modifiedSourceDocument : sourceDocument,
@@ -7051,17 +7077,37 @@ public class XWiki implements EventListener
 
     public void deleteAllDocuments(XWikiDocument doc, boolean toTrash, XWikiContext context) throws XWikiException
     {
+        deleteAllDocuments(doc, toTrash, false, context);
+    }
+
+    /**
+     * Delete the passed document and all its translations.
+     *
+     * @param doc the document to delete
+     * @param toTrash true if the documents should be moved to the trash bin
+     * @param deletedByContextUser true if the documents are potentially deleted by a user, in which case some
+     *            protection must be applied, false if it's done by the system
+     * @param context the XWiki context
+     * @throws XWikiException when failing to delete the documents
+     * @since 18.9.0RC1
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 16.10.20
+     */
+    public void deleteAllDocuments(XWikiDocument doc, boolean toTrash, boolean deletedByContextUser,
+        XWikiContext context) throws XWikiException
+    {
         // Wrap the work as a batch operation.
         BatchOperationExecutor batchOperationExecutor = Utils.getComponent(BatchOperationExecutor.class);
         batchOperationExecutor.execute(() -> {
             // Delete all translation documents
             for (Locale locale : doc.getTranslationLocales(context)) {
                 XWikiDocument tdoc = doc.getTranslatedDocument(locale, context);
-                deleteDocument(tdoc, toTrash, context);
+                deleteDocument(tdoc, toTrash, deletedByContextUser, context);
             }
 
             // Delete the default document
-            deleteDocument(doc, toTrash, context);
+            deleteDocument(doc, toTrash, deletedByContextUser, context);
         });
     }
 

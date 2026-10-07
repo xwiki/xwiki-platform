@@ -100,6 +100,7 @@ public class Property extends Element
      *
      * @return the value of the property, obfuscated if it's sensitive
      * @see BaseProperty#getObfuscatedValue()
+     * @since 17.10.14
      * @since 18.4.0
      */
     @Unstable

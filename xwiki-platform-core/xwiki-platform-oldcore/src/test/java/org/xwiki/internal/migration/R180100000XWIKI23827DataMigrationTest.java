@@ -585,6 +585,8 @@ class R180100000XWIKI23827DataMigrationTest
         for (XWikiDocument xclassDoc : xclassDocs) {
             verify(storeInterface).invalidate(xclassDoc);
         }
+        // The cached documents must not be saved back with their former StringProperty password properties.
+        verify(storeInterface).flushCache();
         assertEquals(18, logCapture.size());
         assertEquals("[4] different xclass found containing password properties values to migrate found.",
             logCapture.getMessage(0));

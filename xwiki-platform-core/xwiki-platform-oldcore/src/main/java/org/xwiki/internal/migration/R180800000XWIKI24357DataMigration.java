@@ -33,6 +33,7 @@ import org.xwiki.security.internal.XWikiLegacyPasswordEncoder;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
@@ -126,6 +127,14 @@ public class R180800000XWIKI24357DataMigration extends AbstractHibernateDataMigr
             } while (!results.isEmpty());
         } catch (QueryException e) {
             throw new DataMigrationException("Error while performing query to access passwords", e);
+        }
+
+        // The values have been changed directly in the database, so the documents loaded before this migration (e.g. by
+        // a previous migration) are still cached with their former properties: saving one of them later on (e.g. when
+        // a mandatory class gets updated during the initialization) would put back the former properties in the
+        // database, overriding the migrated ones.
+        if (store instanceof XWikiCacheStoreInterface cacheStore) {
+            cacheStore.flushCache();
         }
     }
 

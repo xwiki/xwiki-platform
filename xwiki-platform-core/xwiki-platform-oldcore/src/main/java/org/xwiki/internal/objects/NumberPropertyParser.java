@@ -37,6 +37,7 @@ import jakarta.inject.Singleton;
  * Component implementation for all types of number properties.
  *
  * @version $Id$
+ * @since 17.10.14
  * @since 18.2.0RC1
  */
 @Component(hints = {

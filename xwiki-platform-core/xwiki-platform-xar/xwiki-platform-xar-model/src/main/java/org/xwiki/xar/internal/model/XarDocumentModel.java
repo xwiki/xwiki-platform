@@ -74,6 +74,7 @@ public class XarDocumentModel
     /**
      * Introduce the concept of type in object property.
      *
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     public static final String VERSION_17 = "1.7";

@@ -157,6 +157,7 @@ public class ObjectDiff
      * @param newValue the new value of the property.
      * @param sensitive {@code true} if the property is sensitive and should be obfuscated.
      *
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @Unstable
@@ -325,6 +326,7 @@ public class ObjectDiff
 
     /**
      * @return {@code true} if the property is sensitive and should be obfuscated.
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @Unstable
@@ -335,6 +337,7 @@ public class ObjectDiff
 
     /**
      * @param sensitive {@code true} if the property is sensitive and should be obfuscated.
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @Unstable

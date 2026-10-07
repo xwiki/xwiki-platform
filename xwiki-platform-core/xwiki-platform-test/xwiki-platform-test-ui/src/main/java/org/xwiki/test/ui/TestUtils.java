@@ -291,6 +291,7 @@ public class TestUtils
      * Define the base URL to use when accessing the servlet engine from outside (e.g. for using APIs such as
      * {@link #getInputStream(String, Map)} directly from the test.
      * @param dockerBaseUrl the base URL built from servlet engine information currently used by the test
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     public void setDockerBaseUrl(String dockerBaseUrl)
@@ -304,6 +305,7 @@ public class TestUtils
      * Note that the docker base URL then needs to be properly given.
      * @param useDockerBaseUrl {@code true} to compute the base URL based on servlet engine information.
      * @see #setDockerBaseUrl(String) 
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     public void setUseDockerBaseUrl(boolean useDockerBaseUrl)

@@ -39,6 +39,7 @@ public class StaticListClass extends ListClass
 {
     /**
      * The type used as a hint to find the class.
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @Unstable

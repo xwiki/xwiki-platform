@@ -269,6 +269,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     /**
      * Whether the property might contain sensitive data (e.g. a password) and should be obfuscated in some situations.
      * @return {@code false} if the property is never sensitive, {@code true} otherwise.
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @Unstable

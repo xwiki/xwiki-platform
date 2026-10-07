@@ -313,6 +313,7 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
 
     /**
      * @return {@code true} if sensitive properties of an object shouldn't generate events.
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @PropertyName("Sensitive fields excluded")
@@ -326,6 +327,7 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
 
     /**
      * @param sensitiveFieldsExcluded {@code true} if sensitive properties of an object shouldn't generate events.
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @Unstable

@@ -40,6 +40,7 @@ public interface WikiObjectPropertyFilter
 
     /**
      * Hold the object property type information, when the class type is not available. The type is given as a String.
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @Unstable

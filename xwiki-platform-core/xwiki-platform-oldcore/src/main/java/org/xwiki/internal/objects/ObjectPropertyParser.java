@@ -28,6 +28,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * Component role dedicated to instantiate a xproperty and set its value based on the given string.
  *
  * @version $Id$
+ * @since 17.10.14
  * @since 18.2.0RC1
  */
 @Role

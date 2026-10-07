@@ -564,7 +564,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * @return an identifier for the data type of the property value (e.g. 'String', 'Number', 'Date')
      * @deprecated Use {@link #getPropertyType()} instead.
      */
-    @Deprecated(since = "18.2.0RC1")
+    @Deprecated(since = "18.2.0RC1,17.10.14")
     public String getClassType()
     {
         // By default the hint is computed by removing the Class suffix, if present, from the Java simple class name
@@ -924,6 +924,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * obfuscation possible. Now inherited classes can override this to use their own obfuscation mechanism.
      * @param value the value to be obfuscated.
      * @return the obfuscated value, which can be {@code null}.
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @Unstable

@@ -154,7 +154,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      * @param type the type supposed to be set.
      * @deprecated this method does nothing.
      */
-    @Deprecated(since = "18.2.0RC1")
+    @Deprecated(since = "18.2.0RC1,17.10.14")
     public void setClassType(String type)
     {
     }
@@ -228,6 +228,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      * @see PropertyClass#getObfuscatedValue(Object)
      * @see #isSensitive(XWikiContext)
      * @see #getValue()
+     * @since 17.10.14
      * @since 18.2.0RC1
      */
     @Unstable

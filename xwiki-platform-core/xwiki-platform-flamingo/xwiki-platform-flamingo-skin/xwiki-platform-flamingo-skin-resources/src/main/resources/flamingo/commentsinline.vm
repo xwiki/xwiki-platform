@@ -337,7 +337,6 @@ $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.rend
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal"
-              title="$escapetool.xml($services.localization.render('core.modal.close'))"
               aria-label="$escapetool.xml($services.localization.render('core.modal.close'))">$services.icon.renderHTML('cross')</button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.permalink')</div>
         </div>
@@ -374,7 +373,6 @@ $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.rend
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal"
-              title="$escapetool.xml($services.localization.render('core.modal.close'))"
               aria-label="$escapetool.xml($services.localization.render('core.modal.close'))">$services.icon.renderHTML('cross')</button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.delete')</div>
         </div>

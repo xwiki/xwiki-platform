@@ -282,7 +282,7 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
     container.data('compactLocationPicker', true);
 
     const select = container.find('select.suggest-spaces');
-    const dropDown = container.children('.location-picker-browse');
+    const dropDown = container.children('.location-picker-dropdown');
     const menu = dropDown.children('.dropdown-menu');
     const picker = {
       select,

@@ -21,14 +21,14 @@
   border-bottom-right-radius: 0;
 }
 
-.location-picker-compact > .location-picker-browse > .dropdown-toggle {
+.location-picker-compact > .location-picker-dropdown > .dropdown-toggle {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   border-left: none;
   border-color: var(--input-border);
 }
 
-.location-picker-compact > .location-picker-browse > .dropdown-menu {
+.location-picker-compact > .location-picker-dropdown > .dropdown-menu {
   /* Leave enough room for a deep hierarchy, but keep the drop down short enough to fit below the button in most cases. */
   min-width: 20em;
   max-width: calc(100vw - 2em);
@@ -37,6 +37,6 @@
   padding: .5em;
 }
 
-.location-picker-compact > .location-picker-browse > .dropdown-menu > .location-tree {
+.location-picker-compact > .location-picker-dropdown > .dropdown-menu > .location-tree {
   margin: 0;
 }

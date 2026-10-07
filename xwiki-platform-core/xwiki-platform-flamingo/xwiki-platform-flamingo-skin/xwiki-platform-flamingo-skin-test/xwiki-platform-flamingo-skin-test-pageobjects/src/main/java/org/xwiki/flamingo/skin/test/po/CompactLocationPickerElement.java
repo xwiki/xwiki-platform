@@ -214,7 +214,7 @@ public class CompactLocationPickerElement extends BaseElement
 
     private WebElement getDropDown()
     {
-        return this.container.findElement(By.className("location-picker-browse"));
+        return this.container.findElement(By.className("location-picker-dropdown"));
     }
 
     private boolean hasClass(WebElement element, String className)

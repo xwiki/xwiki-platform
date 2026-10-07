@@ -159,7 +159,7 @@
     #set ($macro.browseLabelKey = 'core.widgets.compactLocationPicker.single.browse')
   #end
   #set ($macro.browseLabel = $escapetool.xml($services.localization.render($macro.browseLabelKey)))
-  <div class="location-picker-browse dropdown">
+  <div class="location-picker-dropdown dropdown">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
         aria-expanded="false" title="$macro.browseLabel" aria-label="$macro.browseLabel">
       $services.icon.renderHTML('chart-organisation')

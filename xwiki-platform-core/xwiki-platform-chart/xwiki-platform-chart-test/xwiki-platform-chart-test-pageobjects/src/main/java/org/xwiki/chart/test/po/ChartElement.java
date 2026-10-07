@@ -32,7 +32,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * @since 18.9.0RC1
  * @since 18.4.7
  * @since 17.10.14
- * @since 16.10.19
+ * @since 16.10.20
  */
 public class ChartElement extends BaseElement
 {

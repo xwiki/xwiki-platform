@@ -24,17 +24,23 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -56,6 +62,19 @@ class R140100000XRENDERING375DataMigrationTest
 
     @InjectMockComponents(role = HibernateDataMigration.class)
     private R140100000XRENDERING375DataMigration r140100000XRENDERING375DataMigration;
+
+    @MockComponent
+    private Execution execution;
+
+    @BeforeEach
+    void setUp()
+    {
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(this.execution.getContext()).thenReturn(executionContext);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(xcontext);
+        when(xcontext.getWiki()).thenReturn(mock(XWiki.class));
+    }
 
     @Test
     void doNothingWhenEmpty() throws DataMigrationException

@@ -373,20 +373,23 @@ public class PDFDocument implements AutoCloseable
         List<String> alternativeTexts = new ArrayList<>();
         PDStructureTreeRoot structureTreeRoot = this.document.getDocumentCatalog().getStructureTreeRoot();
         if (structureTreeRoot != null) {
-            collectImageAlternativeTexts(structureTreeRoot, this.document.getPage(pageNumber), alternativeTexts);
+            collectImageAlternativeTexts(structureTreeRoot, null, this.document.getPage(pageNumber),
+                alternativeTexts);
         }
         return alternativeTexts;
     }
 
-    private void collectImageAlternativeTexts(PDStructureNode node, PDPage page, List<String> alternativeTexts)
+    private void collectImageAlternativeTexts(PDStructureNode node, PDPage inheritedPage, PDPage page,
+        List<String> alternativeTexts)
     {
         for (Object kid : node.getKids()) {
             if (kid instanceof PDStructureElement element) {
-                if (StandardStructureTypes.Figure.equals(element.getStructureType())
-                    && page.equals(element.getPage())) {
+                // The page can be specified on an ancestor rather than on the element itself.
+                PDPage elementPage = element.getPage() != null ? element.getPage() : inheritedPage;
+                if (StandardStructureTypes.Figure.equals(element.getStructureType()) && page.equals(elementPage)) {
                     alternativeTexts.add(element.getAlternateDescription());
                 }
-                collectImageAlternativeTexts(element, page, alternativeTexts);
+                collectImageAlternativeTexts(element, elementPage, page, alternativeTexts);
             }
         }
     }

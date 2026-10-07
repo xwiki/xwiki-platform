@@ -360,12 +360,12 @@ public class PDFDocument implements AutoCloseable
     }
 
     /**
-     * Looks for the images from the specified page in the structure tree of this tagged PDF document and returns their
-     * alternative text. Decorative images are not listed because they are not tagged as figures.
+     * Looks for the figures from the specified page in the structure tree of this tagged PDF document and returns their
+     * alternative text.
      *
      * @param pageNumber the page number
-     * @return the alternative text of each image tagged as figure on the specified page, in document order, with
-     *         {@code null} for a figure that has no alternative text
+     * @return the alternative text of each figure on the specified page, in document order, with {@code null} for a
+     *         figure that has no alternative text
      * @since 18.9.0RC1
      */
     public List<String> getImageAlternativeTextsFromPage(int pageNumber)

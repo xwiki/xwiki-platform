@@ -243,7 +243,7 @@ class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, this.xcontext);
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, true);
     }
 
@@ -257,8 +257,38 @@ class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference, true);
 
-        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, this.xcontext);
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, false);
+    }
+
+    @Test
+    void deleteByContextUser() throws Exception
+    {
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
+        when(sourceDocument.getTranslation()).thenReturn(1);
+
+        assertTrue(this.modelBridge.delete(sourceReference, false, true));
+
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, true);
+    }
+
+    @Test
+    void deleteAllTranslationsByContextUser() throws Exception
+    {
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
+
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
+        when(sourceDocument.getTranslation()).thenReturn(0);
+
+        assertTrue(this.modelBridge.delete(sourceReference, true, true));
+
+        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, false, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
+            sourceReference, false);
     }
 
     @Test
@@ -286,7 +316,7 @@ class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, true, this.xcontext);
+        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, true, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
             sourceReference, true);
     }

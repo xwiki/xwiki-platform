@@ -24,24 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-chart-test</artifactId>
     <version>16.10.20-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-chart</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Chart - Parent POM</name>
-  <description>Support for generating charts inside XWiki</description>
-  <modules>
-    <!-- Sorted alphabetically -->
-    <module>xwiki-platform-chart-macro</module>
-    <module>xwiki-platform-chart-renderer</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-chart-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-chart-test-pageobjects</artifactId>
+  <name>XWiki Platform - Chart - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Chart - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -24,23 +24,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-chart</artifactId>
     <version>16.10.20-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-chart</artifactId>
+  <artifactId>xwiki-platform-chart-test</artifactId>
+  <name>XWiki Platform - Chart - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Chart - Parent POM</name>
-  <description>Support for generating charts inside XWiki</description>
+  <description>Tests for the Chart module</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
-    <!-- Sorted alphabetically -->
-    <module>xwiki-platform-chart-macro</module>
-    <module>xwiki-platform-chart-renderer</module>
+    <module>xwiki-platform-chart-test-pageobjects</module>
   </modules>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>docker</id>
       <modules>
-        <module>xwiki-platform-chart-test</module>
+        <module>xwiki-platform-chart-test-docker</module>
       </modules>
     </profile>
   </profiles>

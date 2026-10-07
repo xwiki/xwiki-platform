@@ -168,7 +168,7 @@
   &lt;li class="navbar-avatar"&gt;
     #displayUser($xcontext.user {
       'useInlineHTML': true,
-      'avatarCssClass': 'medium-avatar',
+      'avatarClass': 'medium-avatar',
       'displayName': false
     })
   &lt;/li&gt;

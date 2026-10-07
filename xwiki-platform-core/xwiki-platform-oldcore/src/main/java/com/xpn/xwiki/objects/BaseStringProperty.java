@@ -40,10 +40,26 @@ public class BaseStringProperty extends BaseProperty
     @Override
     public String getValue()
     {
+        return sanitizeValue(this.value);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return an empty string instead of {@code null} when the data is sensitive.
+     * @see BaseProperty#getObfuscatedValue()
+     */
+    @Override
+    public Object getObfuscatedValue()
+    {
+        return sanitizeValue((String) super.getObfuscatedValue());
+    }
+
+    private String sanitizeValue(String value)
+    {
         // A null String does not make much sense (the whole property would not be in the xobject in that case) and we
         // have to make sure something saved as empty string will come back as such in Oracle (which has a very
         // annoying "empty string is stored as null" behavior)
-        return this.value != null ? this.value : "";
+        return value != null ? value : "";
     }
 
     @Override

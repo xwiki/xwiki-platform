@@ -63,4 +63,15 @@ public interface PropertyInterface extends ElementInterface
     {
         return false;
     }
+
+    /**
+     * @return the name of the type defined by the property.
+     * @since 17.10.14
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    default String getPropertyType()
+    {
+        return "";
+    }
 }

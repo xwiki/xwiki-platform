@@ -19,12 +19,26 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
+/**
+ * Property defining a string stored in a text field to override the limitation of 255 characters.
+ *
+ * @version $Id$
+ */
 public class LargeStringProperty extends BaseStringProperty
 {
+    /**
+     * The type used as a hint to find the property.
+     * @since 17.10.14
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "LargeString";
+
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -40,5 +54,11 @@ public class LargeStringProperty extends BaseStringProperty
         // We cannot convert a Conflict<String> to Conflict<Object> right now, so we're loosing conflicts info here...
         result.setModified(valueMergeManagerResult.isModified());
         return result;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

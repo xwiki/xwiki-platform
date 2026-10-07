@@ -1490,7 +1490,7 @@ public class Document extends Api
         documentProperties.setWithWikiAttachmentsContent(false);
         documentProperties.setWithJRCSRevisions(false);
         documentProperties.setWithRevisions(false);
-        documentProperties.setExcludedPropertyTypes(Set.of("Email", "Password"));
+        documentProperties.setSensitiveFieldsExcluded(true);
 
         // Output
         XAROutputProperties xarProperties = new XAROutputProperties();

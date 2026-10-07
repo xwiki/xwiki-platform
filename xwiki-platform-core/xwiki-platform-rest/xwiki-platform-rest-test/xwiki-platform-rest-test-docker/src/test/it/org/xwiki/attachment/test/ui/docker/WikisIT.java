@@ -71,6 +71,7 @@ class WikisIT
     @Test
     void testImportXAR(TestUtils setup) throws Exception
     {
+        // FIXME: check if that works....
         // Try as guest
         setup.setDefaultCredentials(null);
 

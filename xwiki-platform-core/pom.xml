@@ -151,8 +151,37 @@
             -->
             
             
-
-
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.nowFinal</code>
+                  <old>field com.xpn.xwiki.objects.classes.PasswordClass.LOGGER</old>
+                  <new>field com.xpn.xwiki.objects.classes.PasswordClass.LOGGER</new>
+                  <justification>The field value should never be replaced and should have been final
+                    from sthe start.</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>The removed methods were not implemented nor used. As for setxWikiClass the
+                implementation was expecting already a PropertyMetaClass and not using it would cause
+                errors.</justification>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.objects.classes.PropertyClass::initLazyCollections()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean com.xpn.xwiki.objects.classes.PropertyClass::isValidColumnTypes(org.hibernate.mapping.Property)</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

@@ -256,6 +256,9 @@ public class TestUtils
      */
     private String currentWiki = "xwiki";
 
+    private String dockerBaseUrl;
+    private boolean useDockerBaseUrl;
+
     private RestTestUtils rest;
 
     public TestUtils()
@@ -282,6 +285,32 @@ public class TestUtils
     public void switchExecutor(int index)
     {
         this.currentExecutorIndex = index;
+    }
+
+    /**
+     * Define the base URL to use when accessing the servlet engine from outside (e.g. for using APIs such as
+     * {@link #getInputStream(String, Map)} directly from the test.
+     * @param dockerBaseUrl the base URL built from servlet engine information currently used by the test
+     * @since 17.10.14
+     * @since 18.2.0RC1
+     */
+    public void setDockerBaseUrl(String dockerBaseUrl)
+    {
+        this.dockerBaseUrl = dockerBaseUrl;
+    }
+
+    /**
+     * Use this when needing to rely on a specific URL for accessing a resource when using docker tests and not
+     * relying on selenium API. e.g. when using {@link #getInputStream(String, Map)} APIs directly in tests.
+     * Note that the docker base URL then needs to be properly given.
+     * @param useDockerBaseUrl {@code true} to compute the base URL based on servlet engine information.
+     * @see #setDockerBaseUrl(String) 
+     * @since 17.10.14
+     * @since 18.2.0RC1
+     */
+    public void setUseDockerBaseUrl(boolean useDockerBaseUrl)
+    {
+        this.useDockerBaseUrl = useDockerBaseUrl;
     }
 
     /**
@@ -1465,9 +1494,11 @@ public class TestUtils
     {
         String baseURL;
 
+        if (this.useDockerBaseUrl && !StringUtils.isEmpty(this.dockerBaseUrl)) {
+            baseURL = this.dockerBaseUrl;
         // If the URL has the port specified then consider it's a full URL and use it, otherwise add the port and the
         // webapp context
-        if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
+        } else if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
             baseURL = TestUtils.urlPrefix;
         } else {
             baseURL = TestUtils.urlPrefix + ":"

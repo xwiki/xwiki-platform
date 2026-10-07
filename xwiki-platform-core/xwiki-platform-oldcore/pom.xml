@@ -804,7 +804,6 @@
                 **/objects/classes/LevelsClass.java,
                 **/objects/classes/ListClass.java,
                 **/objects/classes/ListItem.java,
-                **/objects/classes/PasswordClass.java,
                 **/objects/classes/StaticListClass.java,
                 **/objects/classes/StringClass.java,
                 **/objects/ElementComparator.java,

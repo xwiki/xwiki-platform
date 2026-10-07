@@ -269,11 +269,13 @@ public class PasswordClass extends StringClass
         return result;
     }
 
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     public String getPasswordCrypt(String password)
     {
         return getPasswordCrypt(password, getCryptAlgorithm());
     }
 
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     public String getPasswordCrypt(String password, String algorithmName)
     {
         // TODO Write me!

@@ -200,24 +200,28 @@ public class DefaultModelBridge implements ModelBridge
     @Override
     public boolean delete(DocumentReference reference, boolean skipRecycleBin)
     {
+        return delete(reference, skipRecycleBin, false);
+    }
+
+    @Override
+    public boolean delete(DocumentReference reference, boolean skipRecycleBin, boolean deletedByContextUser)
+    {
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
             if (document.getTranslation() == 1) {
-                xcontext.getWiki().deleteDocument(document, !skipRecycleBin, xcontext);
-                this.logger
-                    .info("Document [{}] has been deleted (to the recycle bin: [{}]).", reference, !skipRecycleBin);
+                xcontext.getWiki().deleteDocument(document, !skipRecycleBin, deletedByContextUser, xcontext);
+                this.logger.info("Document [{}] has been deleted (to the recycle bin: [{}]).", reference,
+                    !skipRecycleBin);
             } else {
-                xcontext.getWiki().deleteAllDocuments(document, !skipRecycleBin, xcontext);
-                this.logger
-                    .info("Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
-                        reference,
-                        !skipRecycleBin);
+                xcontext.getWiki().deleteAllDocuments(document, !skipRecycleBin, deletedByContextUser, xcontext);
+                this.logger.info("Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
+                    reference, !skipRecycleBin);
             }
             return true;
         } catch (Exception e) {
-            this.logger
-                .error("Failed to delete document [{}] (to the recycle bin: [{}]).", reference, !skipRecycleBin, e);
+            this.logger.error("Failed to delete document [{}] (to the recycle bin: [{}]).", reference, !skipRecycleBin,
+                e);
             return false;
         }
     }

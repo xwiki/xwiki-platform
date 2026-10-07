@@ -69,9 +69,12 @@ public class R180800000XWIKI24357DataMigration extends AbstractHibernateDataMigr
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
         int version = startupVersion.getVersion();
-        // The migration is backported in 17.10.14 (as R171014001XWIKI24357DataMigration) so any DB between 17.10.14
-        // and 18.0.0 don't need to execute it again.
-        return super.shouldExecute(startupVersion) && !(version >= 171014001 && version < 180000000);
+        // The migration is backported in 17.10.14 (as R171014001XWIKI24357DataMigration) and in 18.4.5 (as
+        // R180405000XWIKI24357DataMigration) so any DB between 17.10.14 and 18.0.0 or between 18.4.5 and 18.5.0 don't
+        // need to execute it again.
+        boolean alreadyExecuted = (version >= 171014001 && version < 180000000)
+            || (version >= 180405000 && version < 180500000);
+        return super.shouldExecute(startupVersion) && !alreadyExecuted;
     }
 
     @Override

@@ -48,6 +48,10 @@ class R180800000XWIKI24357DataMigrationTest
         assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(171014001)));
         assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(171015000)));
         assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180000000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180404000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(180405000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(180407000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180500000)));
         assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180700000)));
     }
 }

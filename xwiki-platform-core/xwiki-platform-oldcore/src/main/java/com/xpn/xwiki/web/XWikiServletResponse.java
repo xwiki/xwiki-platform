@@ -23,6 +23,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.jakartabridge.JavaxToJakartaWrapper;
 
 @Deprecated(since = "17.0.0RC1")
@@ -32,6 +33,25 @@ public class XWikiServletResponse extends HttpServletResponseWrapper
     public XWikiServletResponse(HttpServletResponse response)
     {
         super(response);
+    }
+
+    @Override
+    public void setHeader(String name, String value)
+    {
+        super.setHeader(name, cleanHeaderValue(value));
+    }
+
+    @Override
+    public void addHeader(String name, String value)
+    {
+        super.addHeader(name, cleanHeaderValue(value));
+    }
+
+    private static String cleanHeaderValue(String value)
+    {
+        // Line breaks are forbidden in HTTP header values: browsers reject the whole response over HTTP/2, while
+        // servlet containers replace them by spaces over HTTP/1.1. Do the same for all protocols.
+        return StringUtils.replaceChars(value, "\r\n", "  ");
     }
 
     // JavaxToJakartaWrapper

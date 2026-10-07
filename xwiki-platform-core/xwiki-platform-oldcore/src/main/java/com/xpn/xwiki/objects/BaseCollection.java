@@ -673,8 +673,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     propertyClass = new PasswordClass();
                 }
                 if (propertyClass instanceof PasswordClass passwordClass) {
-                    result = passwordClass.arePasswordsMatching(rawPassword, passwordProperty.getValue(),
-                        passwordProperty.getReference());
+                    result = passwordClass.arePasswordsMatching(rawPassword, passwordProperty.getValue());
                 }
             } else if (property instanceof StringProperty stringProperty) {
                 // Legacy fallback if the property is a StringProperty,
@@ -682,8 +681,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 // in clear or not and how we should compare it.
                 String passwordValue = stringProperty.getValue();
                 if (PasswordClass.isPasswordHashed(passwordValue)) {
-                    result = new PasswordClass().arePasswordsMatching(rawPassword, passwordValue,
-                        stringProperty.getReference());
+                    result = new PasswordClass().arePasswordsMatching(rawPassword, passwordValue);
                 } else {
                     result = Strings.CS.equals(passwordValue, rawPassword);
                 }

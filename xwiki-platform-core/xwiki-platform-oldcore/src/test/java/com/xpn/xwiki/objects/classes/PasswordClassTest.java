@@ -21,9 +21,6 @@ package com.xpn.xwiki.objects.classes;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 
@@ -105,19 +102,16 @@ class PasswordClassTest
     }
 
     @Test
-    void arePasswordsMatchingWithDeprecatedAlgorithmAndLocation()
+    void getPasswordHashWithDeprecatedAlgorithm()
     {
-        String hash = "{SHA-256}" + new org.springframework.security.crypto.password.MessageDigestPasswordEncoder(
-            PasswordClass.SHA_256_ALGORITHM).encode(PLAIN_PASSWORD);
-        ObjectPropertyReference location = new ObjectPropertyReference("password",
-            new ObjectReference("XWiki.XWikiUsers[0]", new DocumentReference("xwiki", "XWiki", "Admin")));
+        String hash = this.passwordClass.getPasswordHash(PLAIN_PASSWORD, PasswordClass.SHA_256_ALGORITHM);
 
-        assertTrue(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, hash, location));
+        assertTrue(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, hash));
 
-        // A single warning, pointing to the given location even though the class is not attached to any object.
-        assertEquals(1, this.logCapture.size());
-        assertEquals("The password located in [Object_property xwiki:XWiki.Admin^XWiki.XWikiUsers[0].password] uses"
-            + " an outdated algorithm [SHA-256] (or an outdated version of it) and should be re-encoded.",
-            this.logCapture.getMessage(0));
+        // The usage of the deprecated algorithm is logged once for computing the hash, and once for checking it.
+        assertEquals(2, this.logCapture.size());
+        assertEquals("An outdated algorithm [SHA-256] (or an outdated version of it) is used in a PasswordClass "
+            + "property not yet attached to an object", this.logCapture.getMessage(0));
+        assertEquals(this.logCapture.getMessage(0), this.logCapture.getMessage(1));
     }
 }

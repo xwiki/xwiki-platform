@@ -159,12 +159,11 @@ class BaseCollectionTest
 
         assertTrue(userObject.isPasswordValueMatching(FIELD, PASSWORD));
 
-        // The warning must point to the user profile holding the password, and name the algorithm it relies on.
+        // The log must name the legacy algorithm the password relies on, not the one used for re-encoded passwords.
         assertEquals(1, this.logCapture.size());
-        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("The password located in [Object_property xwiki:XWiki.Admin^XWiki.XWikiUsers[0].myField] uses an"
-            + " outdated algorithm [SHA-512] (or an outdated version of it) and should be re-encoded.",
-            this.logCapture.getMessage(0));
+        assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("An outdated algorithm [SHA-512] (or an outdated version of it) is used in a PasswordClass "
+            + "property not yet attached to an object", this.logCapture.getMessage(0));
     }
 
     @Test

@@ -35,7 +35,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.internal.XWikiLegacyPasswordEncoder;
 import org.xwiki.stability.Unstable;
 
@@ -435,35 +434,12 @@ public class PasswordClass extends StringClass
     @Unstable
     public boolean arePasswordsMatching(String rawPassword, String encodedPassword)
     {
-        return arePasswordsMatching(rawPassword, encodedPassword, getPasswordLocation());
-    }
-
-    /**
-     * Same as {@link #arePasswordsMatching(String, String)}, but with the reference of the property holding the
-     * encoded password. That reference is the one given in the warning issued when the encoded password relies on an
-     * outdated algorithm, so that administrators know which password needs to be re-encoded: the reference of this
-     * class can't be used for that, since the class is shared by all the objects holding such a password, and it's
-     * not even available when the class is not attached to any {@link BaseClass} (e.g. when the password is stored
-     * in a property whose type doesn't match the class definition).
-     *
-     * @param rawPassword the raw password to test for a match
-     * @param encodedPassword the encoded (or not if the storage type is clear) password to match with
-     * @param passwordLocation the reference of the property holding the encoded password, or {@code null} if it's
-     *     unknown
-     * @return {@code true} only if there's match between the passwords
-     * @since 18.9.0RC1
-     * @since 18.4.7
-     */
-    @Unstable
-    public boolean arePasswordsMatching(String rawPassword, String encodedPassword, EntityReference passwordLocation)
-    {
         if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
             return Strings.CS.equals(rawPassword, encodedPassword);
         } else if (encodedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
             // The password has not been re-encoded with XWikiLegacyPasswordEncoder: it's only protected by the
             // legacy message digest algorithm it contains, which is the one to report.
-            warnAboutOutdatedAlgorithm(LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(encodedPassword),
-                passwordLocation);
+            warnAboutOutdatedAlgorithm(LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(encodedPassword));
             return LEGACY_PASSWORD_ENCODER.matchesLegacy(rawPassword, encodedPassword);
         } else {
             Matcher hashMatcher = HASH_PATTERN.matcher(encodedPassword);
@@ -472,7 +448,7 @@ public class PasswordClass extends StringClass
                 String passwordHash = hashMatcher.group(PASSWORD_HASH_PATTERN_GROUP);
                 PasswordEncoder passwordEncoder = getPasswordEncoder(algorithmId);
                 if (passwordEncoder.upgradeEncoding(passwordHash) || isDeprecatedEncoder(passwordEncoder.getClass())) {
-                    warnAboutOutdatedAlgorithm(algorithmId, passwordLocation);
+                    warnAboutOutdatedAlgorithm(algorithmId);
                 }
                 return passwordEncoder.matches(rawPassword, passwordHash);
             } else {
@@ -486,22 +462,12 @@ public class PasswordClass extends StringClass
         return encoderClass.getAnnotation(Deprecated.class) != null;
     }
 
-    private EntityReference getPasswordLocation()
-    {
-        return (getObject() != null) ? getReference() : null;
-    }
-
     private void warnAboutOutdatedAlgorithm(String algorithmName)
     {
-        warnAboutOutdatedAlgorithm(algorithmName, getPasswordLocation());
-    }
-
-    private void warnAboutOutdatedAlgorithm(String algorithmName, EntityReference passwordLocation)
-    {
-        if (passwordLocation != null) {
+        if (getObject() != null) {
             LOGGER.warn("The password located in [{}] uses an outdated algorithm [{}] (or an outdated version of it) "
                     + "and should be re-encoded.",
-                passwordLocation, algorithmName);
+                getReference(), algorithmName);
         } else {
             LOGGER.error("An outdated algorithm [{}] (or an outdated version of it) is used in a PasswordClass "
                     + "property not yet attached to an object",

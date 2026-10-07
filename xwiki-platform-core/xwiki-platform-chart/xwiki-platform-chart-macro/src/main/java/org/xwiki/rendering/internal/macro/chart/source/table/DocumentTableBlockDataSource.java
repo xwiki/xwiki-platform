@@ -159,10 +159,15 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         } else {
             try {
                 DocumentModelBridge document = this.docBridge.getDocumentInstance(this.documentReference);
+                // Display the content of the charted document in an isolated execution and transformation context,
+                // like the display macro does, so that it is executed with the rights of its own content author and
+                // in its own Velocity macro name-space instead of those of the document holding the chart macro.
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+                parameters.setContentTransformed(true);
+                parameters.setExecutionContextIsolated(true);
+                parameters.setTransformationContextIsolated(true);
                 parameters.setContentTranslated(true);
                 parameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
-                parameters.setContentTranslated(true);
 
                 xdom = this.documentDisplayer.display(document, parameters);
             } catch (Exception e) {

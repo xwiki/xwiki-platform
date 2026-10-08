@@ -125,13 +125,21 @@ class UserDirectoryIT
         testUtils.createUser("UserDirectoryITUser", "foobar", null, "email", "foo@xwiki.com");
         testUtils.forceGuestUser();
 
-        String jsonResult = testUtils.getString("/bin/get/XWiki/UserDirectoryLivetableResults", Map.of(
-            "outputSyntax", "plain",
-            "transprefix", "xe.userdirectory.",
-            "classname", "XWiki.XWikiUsers",
-            "collist", "doc.name,first_name,last_name,email,password",
-            "sort", "doc.creationDate"
-        ));
+        // The request is sent from the test JVM and not from the browser container, so it needs the base URL that
+        // reaches the servlet engine from outside the docker network.
+        testUtils.setUseDockerBaseUrl(true);
+        String jsonResult;
+        try {
+            jsonResult = testUtils.getString("/bin/get/XWiki/UserDirectoryLivetableResults", Map.of(
+                "outputSyntax", "plain",
+                "transprefix", "xe.userdirectory.",
+                "classname", "XWiki.XWikiUsers",
+                "collist", "doc.name,first_name,last_name,email,password",
+                "sort", "doc.creationDate"
+            ));
+        } finally {
+            testUtils.setUseDockerBaseUrl(false);
+        }
         JsonNode jsonNode = new ObjectMapper().readTree(jsonResult);
         assertInstanceOf(ObjectNode.class, jsonNode);
         ObjectNode objectNode = (ObjectNode) jsonNode;

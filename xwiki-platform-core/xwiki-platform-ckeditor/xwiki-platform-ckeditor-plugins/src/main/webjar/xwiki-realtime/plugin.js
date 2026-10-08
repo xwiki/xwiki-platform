@@ -325,6 +325,30 @@
     };
   }
 
+  /**
+   * Logs the progress of a local upload. An upload widget is replaced when its upload completes, but a remote change
+   * can modify the content around it in the meantime, so the log tells whether the upload finished, failed or was
+   * abandoned because its widget was no longer in the edited content.
+   *
+   * @param {CKEDITOR.plugins.widget} widget the upload widget
+   * @param {Number} uploadId the identifier of the file loader that performs the upload
+   */
+  function logUploadProgress(widget, uploadId) {
+    const loader = widget.editor.uploadRepository.loaders[uploadId];
+    let lastStatus;
+    loader?.on('update', () => {
+      if (loader.status !== lastStatus) {
+        lastStatus = loader.status;
+        console.debug(`Upload of [${loader.fileName}] (${uploadId}): ${loader.status}, widget attached: ` +
+          !!widget.wrapper?.$.isConnected);
+      }
+    });
+    widget.once('destroy', () => {
+      console.debug(`Upload widget of [${loader?.fileName}] (${uploadId}) destroyed, upload status: ` +
+        loader?.status);
+    });
+  }
+
   // Add support for synchronizing the upload widgets when realtime editing is enabled.
   const originalAddUploadWidget = CKEDITOR.fileTools.addUploadWidget;
   CKEDITOR.fileTools.addUploadWidget = function(editor, widgetName, ...args) {
@@ -359,7 +383,11 @@
             init: function(...args) {
               const widget = this;
               // Call the original init method only if this is a real upload widget and not a placeholder.
-              if (widget.wrapper.findOne('[data-cke-upload-id]')) {
+              const uploadMarker = widget.wrapper.findOne('[data-cke-upload-id]');
+              if (uploadMarker) {
+                // Log before calling the original init method so that our listener runs before the one that replaces
+                // or removes the widget.
+                logUploadProgress(widget, uploadMarker.data('cke-upload-id'));
                 originalInit.call(widget, ...args);
               }
             },

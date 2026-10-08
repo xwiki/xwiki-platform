@@ -225,6 +225,9 @@
     "&lt;a href='$xwiki.getURL($userReference, 'view', 'category=groups')'&gt;",
     '&lt;/a&gt;'
   ])&lt;/p&gt;
+  ## Warn when the user belongs to an installed extension, like the standard delete UI does.
+  #set ($deletedDocumentReference = $userReference)
+  #template('extension/handler/xar/deleteWarning.vm')
   ## Check if the user we're about to delete has programming or script rights because in this case deleting the user may
   ## break the pages where this user was the last (content) author.
   ##
@@ -696,6 +699,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
       xpage: 'deleteuorg',
       docname: userReference,
       newAuthor: deleteUserModal.find('#newAuthor').val(),
+      // Confirm the deletion of a user belonging to an installed extension once the user has been warned about it.
+      force: deleteUserModalBody.find('.deleteWarningExtensions').length &gt; 0,
       form_token: xm.form_token
     }).then(() =&gt; {
       deleteUserModal.data('liveDataElement').data('liveData').updateEntries();

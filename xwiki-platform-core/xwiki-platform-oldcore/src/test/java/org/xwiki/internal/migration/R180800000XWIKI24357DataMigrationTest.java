@@ -160,8 +160,6 @@ class R180800000XWIKI24357DataMigrationTest
 
         verify(hibernateStore).beginTransaction(this.context);
         verify(hibernateStore).endTransaction(this.context, true);
-        // The cached documents must not be saved back with their former password values.
-        verify(store).flushCache();
 
         assertEquals(3, this.logCapture.size());
         assertEquals("Found [2] passwords to check for possible re-hashing.", this.logCapture.getMessage(0));

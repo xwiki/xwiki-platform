@@ -21,16 +21,23 @@ package org.xwiki.internal.migration;
 
 import jakarta.inject.Named;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link R180900000XWIKI25199DataMigration}.
@@ -50,6 +57,19 @@ class R180900000XWIKI25199DataMigrationTest
     @MockComponent
     @Named("180800000XWIKI24357")
     private HibernateDataMigration passwordHashMigration;
+
+    @MockComponent
+    private Execution execution;
+
+    @BeforeEach
+    void setUp()
+    {
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(this.execution.getContext()).thenReturn(executionContext);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(xcontext);
+        when(xcontext.getWiki()).thenReturn(mock(XWiki.class));
+    }
 
     @Test
     void getVersion()

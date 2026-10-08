@@ -42,7 +42,6 @@ import com.xpn.xwiki.objects.PasswordProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
@@ -168,14 +167,6 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
             }
             // unbound the lists to allow GC free the memory
             xclass.emptyLists();
-        }
-
-        // The values have been changed directly in the database, so the documents loaded before this migration (e.g. by
-        // a previous migration) are still cached with their former properties: saving one of them later on (e.g. when
-        // a mandatory class gets updated during the initialization) would put back the former properties in the
-        // database, overriding the migrated ones.
-        if (getXWikiContext().getWiki().getStore() instanceof XWikiCacheStoreInterface cacheStore) {
-            cacheStore.flushCache();
         }
     }
 

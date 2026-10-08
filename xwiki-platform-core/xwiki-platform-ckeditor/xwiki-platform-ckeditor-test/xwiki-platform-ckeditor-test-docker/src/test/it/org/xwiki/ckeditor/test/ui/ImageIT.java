@@ -645,10 +645,7 @@ class ImageIT extends AbstractCKEditorIT
         edit(setup, testReference, false);
         
         // Run the image quick action.
-        textArea.sendKeys("/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        textArea.executeQuickAction("/image", "Image");
         
         // Select the newly uploaded image.
         textArea.sendKeys("image");
@@ -683,10 +680,7 @@ class ImageIT extends AbstractCKEditorIT
         edit(setup, testReference, false);
         
         // Run the image quick action.
-        textArea.sendKeys("/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        textArea.executeQuickAction("/image", "Image");
         
         // With the query "image", the image from the current page should be first.
         textArea.sendKeys("image");
@@ -728,10 +722,7 @@ class ImageIT extends AbstractCKEditorIT
         edit(setup, testReference, false);
         
         // Run the image quick action.
-        textArea.sendKeys("/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        textArea.executeQuickAction("/image", "Image");
         
         // Since there is no image on the current page, the image from the subwiki should be first.
         textArea.sendKeys("image");
@@ -1121,10 +1112,8 @@ class ImageIT extends AbstractCKEditorIT
         this.textArea.sendKeys("12 3");
 
         // Insert the image.
-        this.textArea.sendKeys(Keys.LEFT, "/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        this.textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        this.textArea.sendKeys(Keys.LEFT);
+        this.textArea.executeQuickAction("/image", "Image");
         this.textArea.sendKeys("other");
         AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
         this.textArea.sendKeys(Keys.ENTER);
@@ -1166,10 +1155,7 @@ class ImageIT extends AbstractCKEditorIT
         WYSIWYGEditPage editPage = edit(setup, testReference);
 
         // Insert the image.
-        this.textArea.sendKeys("/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        this.textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        this.textArea.executeQuickAction("/image", "Image");
         this.textArea.sendKeys("other");
         AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
         this.textArea.sendKeys(Keys.ENTER);

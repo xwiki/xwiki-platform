@@ -131,7 +131,6 @@ class UserProfileIT
         this.userName = testReference.getLastSpaceReference().getName();
         setup.loginAsSuperAdmin();
         setup.rest().deletePage("XWiki", this.userName);
-        // We make sure the user is in advanced mode so that they can use view mode shortcuts
         setup.createUserAndLogin(this.userName, DEFAULT_PASSWORD);
 
         // At first edition the Dashboard is saving the doc to insert a new object, so we need to be sure
@@ -273,11 +272,10 @@ class UserProfileIT
     /** Functionality check: changing the shortcut for the default edit mode. */
     @Test
     @Order(5)
-    void changeShortcutViewEdit(TestUtils setup)
+    void changeShortcutViewEdit()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
-
 
         // Setting to Advanced user, so that the view shortcuts are enabled
         PreferencesEditPage preferencesEditPage = preferencesPage.editPreferences();
@@ -295,21 +293,11 @@ class UserProfileIT
         preferencesPage = userProfilePage.switchToPreferences();
         assertEquals(NEW_SHORTCUT_VALUE, preferencesPage.getViewEditShortcut());
 
-        // Testing that the updated shortcut preference works as intended
-        setup.getDriver().addPageNotYetReloadedMarker();
-        setup.getDriver().createActions().sendKeys(NEW_SHORTCUT_VALUE).perform();
-        setup.getDriver().waitUntilPageIsReloaded();
+        // Testing that the updated shortcut preference works as intended.
         // The edit shortcut sends us to the profile section, whatever the section we were in was.
-        ProfileEditPage profileEditPage = new ProfileEditPage();
+        ProfileEditPage profileEditPage = preferencesPage.useShortcutKeyForProfileEditing(NEW_SHORTCUT_VALUE);
         // We make sure we can find a field on this page (aka we didn't cast this erroneously)
         assertEquals("", profileEditPage.getUserFirstName());
-
-        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
-        preferencesPage = userProfilePage.switchToPreferences();
-        preferencesEditPage = preferencesPage.editPreferences();
-        // Reset the preference
-        preferencesEditPage.setShortcutViewEdit("");
-        preferencesEditPage.clickSaveAndView();
     }
 
     /**
@@ -440,25 +428,17 @@ class UserProfileIT
         assertTrue(commentsPane.isOpened());
         assertFalse(infoPane.isOpened());
         // We try using the default shortcut. We expect it to not work, that is, to still have the commentsTab opened.
-        setup.getDriver().createActions().sendKeys("i").perform();
+        viewPage.useShortcutKey("i");
         assertTrue(commentsPane.isOpened());
         assertFalse(infoPane.isOpened());
         // We now use the user preference defined shortcut to open it instead.
-        setup.getDriver().createActions().sendKeys(NEW_SHORTCUT_VALUE).perform();
-        viewPage.waitForDocExtraPaneActive("information");
+        viewPage.useShortcutForDocExtraPane("Information", NEW_SHORTCUT_VALUE);
         assertFalse(commentsPane.isOpened());
         assertTrue(infoPane.isOpened());
         // We try using the default shortcut to get back to the comments tab. We expect this one to work without change.
         viewPage.useShortcutKeyForCommentPane();
         assertTrue(commentsPane.isOpened());
         assertFalse(infoPane.isOpened());
-
-        // Reset the preference
-        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
-        preferencesPage = userProfilePage.switchToPreferences();
-        preferencesEditPage = preferencesPage.editPreferences();
-        preferencesEditPage.setShortcutInformation("");
-        preferencesEditPage.clickSaveAndView();
     }
 
     /**

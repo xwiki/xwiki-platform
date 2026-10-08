@@ -28,6 +28,8 @@ import org.xwiki.test.ui.po.editor.EditPage;
 /** User profile, the preferences pane, edit mode. */
 public class PreferencesEditPage extends EditPage
 {
+    private static final String SHORTCUT_SAVED_MESSAGE = "Updated shortcut preference";
+
     @FindBy(id = "XWiki.XWikiUsers_0_editor")
     private WebElement defaultEditor;
 
@@ -36,12 +38,6 @@ public class PreferencesEditPage extends EditPage
 
     @FindBy(id = "XWiki.XWikiUsers_0_timezone")
     private WebElement timezone;
-
-    @FindBy(id = "XWiki.XWikiUsers_0_shortcut_view_edit")
-    private WebElement shortcutViewEdit;
-
-    @FindBy(id = "XWiki.XWikiUsers_0_shortcut_view_information")
-    private WebElement shortcutInformation;
 
     public void setSimpleUserType()
     {
@@ -89,25 +85,34 @@ public class PreferencesEditPage extends EditPage
         this.timezone.sendKeys(value);
     }
 
+    /**
+     * Sets the shortcut used to edit the current page with the default editor, and waits for it to be saved.
+     *
+     * @param shortcutValue the new shortcut, must be different from the current one
+     */
     public void setShortcutViewEdit(String shortcutValue)
     {
-        getDriver().scrollTo(this.shortcutViewEdit);
-        this.shortcutViewEdit.clear();
-        this.shortcutViewEdit.sendKeys(shortcutValue);
-        if (!shortcutValue.equals("")) {
-            getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_edit"),
-                "value");
-        }
+        setShortcut("core.shortcuts.view.edit", shortcutValue);
     }
 
+    /**
+     * Sets the shortcut used to open the information tab of the current page, and waits for it to be saved.
+     *
+     * @param shortcutValue the new shortcut, must be different from the current one
+     */
     public void setShortcutInformation(String shortcutValue)
     {
-        getDriver().scrollTo(this.shortcutInformation);
-        this.shortcutInformation.clear();
-        this.shortcutInformation.sendKeys(shortcutValue);
-        if (!shortcutValue.equals("")) {
-            getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_information"),
-                "value");
-        }
+        setShortcut("core.shortcuts.view.information", shortcutValue);
+    }
+
+    private void setShortcut(String translationKey, String shortcutValue)
+    {
+        WebElement shortcutInput = getDriver().findElement(
+            By.cssSelector(String.format("input.shortcutPreference[data-translate-key='%s']", translationKey)));
+        getDriver().scrollTo(shortcutInput);
+        shortcutInput.clear();
+        shortcutInput.sendKeys(shortcutValue);
+        // The shortcut preference is saved in the background as soon as it's typed.
+        waitForNotificationSuccessMessage(SHORTCUT_SAVED_MESSAGE);
     }
 }

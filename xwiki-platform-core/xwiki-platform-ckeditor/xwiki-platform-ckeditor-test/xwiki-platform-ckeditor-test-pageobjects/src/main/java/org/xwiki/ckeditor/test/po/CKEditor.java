@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.po;
 
 import java.time.Duration;
+import java.util.Objects;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -41,6 +42,12 @@ public class CKEditor extends BaseElement
      * The editor field name.
      */
     private final String name;
+
+    /**
+     * The value of the refresh counter after the last content refresh waited for by a page object action, shared by
+     * all the rich text area page objects of this editor so that none of them waits again for that refresh.
+     */
+    private String awaitedRefreshCounter;
 
     /**
      * Create a new instance that can be used to interact with the specified CKEditor instance.
@@ -126,6 +133,30 @@ public class CKEditor extends BaseElement
     public RichTextAreaElement getRichTextArea(boolean wait)
     {
         return new RichTextAreaElement(this, wait);
+    }
+
+    /**
+     * @return the value of the refresh counter after the last content refresh waited for by a page object action, or
+     *         {@code null} if there was none
+     */
+    String getAwaitedRefreshCounter()
+    {
+        return this.awaitedRefreshCounter;
+    }
+
+    /**
+     * Run an action that refreshes the edited content, such as inserting or updating a macro (macros are rendered
+     * server-side), and wait for that refresh.
+     *
+     * @param action the action to run
+     */
+    void runAndWaitForContentRefresh(Runnable action)
+    {
+        RichTextAreaElement textArea = getRichTextArea(false);
+        String refreshCounter = textArea.getRefreshCounter();
+        action.run();
+        getDriver().waitUntilCondition(driver -> !Objects.equals(refreshCounter, textArea.getRefreshCounter()));
+        this.awaitedRefreshCounter = textArea.getRefreshCounter();
     }
 
     /**

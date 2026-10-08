@@ -32,14 +32,17 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
  */
 public class CKEditorBalloonToolBar extends CKEditorToolBar
 {
+    private final CKEditor editor;
+
     /**
      * Create a new balloon tool bar instance for the given editor.
-     * 
+     *
      * @param editor the editor that owns the balloon tool bar
      */
     public CKEditorBalloonToolBar(CKEditor editor)
     {
         super(editor);
+        this.editor = editor;
     }
 
     @Override
@@ -52,13 +55,13 @@ public class CKEditorBalloonToolBar extends CKEditorToolBar
     }
 
     /**
-     * Edit the currently focused macro.
-     * 
+     * Edit the currently focused macro. Submitting the returned modal waits for the updated macro to be rendered.
+     *
      * @return the macro edit modal
      */
     public MacroDialogEditModal editMacro()
     {
         clickButton("xwiki-macro-edit");
-        return new MacroDialogEditModal().waitUntilReady();
+        return new MacroDialogEditModal(this.editor::runAndWaitForContentRefresh).waitUntilReady();
     }
 }

@@ -138,46 +138,98 @@ describe("LiveDataLogic", () => {
     expect(displayedIds(logic)).toStrictEqual(["1", "2", "3"]);
   });
 
-  it("fetches the frozen entries that are not returned by the query anymore", async () => {
-    logic.enableEditMode();
-    // The second entry does not match the query anymore, it is not part of the returned entries.
-    liveDataSource.getEntries.mockResolvedValue({
-      count: 2,
-      entries: [
+  describe("with frozen entries that are not returned by the query anymore", () => {
+    it("fetches the frozen entries that are not returned by the query anymore", async () => {
+      logic.enableEditMode();
+      // The second entry does not match the query anymore, it is not part of the returned entries.
+      liveDataSource.getEntries.mockResolvedValue({
+        count: 2,
+        entries: [
+          { id: "1", name: "one" },
+          { id: "3", name: "three" },
+        ],
+      });
+      liveDataSource.getEntry.mockResolvedValue({ name: "two (updated)" });
+
+      await logic.updateEntries();
+
+      expect(liveDataSource.getEntry).toHaveBeenCalledWith(SOURCE, "2", [
+        "name",
+        "status",
+      ]);
+      expect(displayedIds(logic)).toStrictEqual(["1", "2", "3"]);
+      expect(logic.data.data.entries[1]).toStrictEqual({
+        id: "2",
+        name: "two (updated)",
+      });
+    });
+
+    it("drops the frozen entries that do not exist anymore", async () => {
+      logic.enableEditMode();
+      liveDataSource.getEntries.mockResolvedValue({
+        count: 2,
+        entries: [
+          { id: "1", name: "one" },
+          { id: "3", name: "three" },
+        ],
+      });
+      // The entry has been deleted in the meantime.
+      liveDataSource.getEntry.mockResolvedValue(undefined);
+
+      await logic.updateEntries();
+
+      expect(displayedIds(logic)).toStrictEqual(["1", "3"]);
+    });
+
+    it("keeps the displayed values of the frozen entries that fail to be fetched", async () => {
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      logic.enableEditMode();
+      liveDataSource.getEntries.mockResolvedValue({
+        count: 2,
+        entries: [
+          { id: "1", name: "one" },
+          { id: "3", name: "three" },
+        ],
+      });
+      const error = new Error("Server error");
+      liveDataSource.getEntry.mockRejectedValue(error);
+
+      await logic.updateEntries();
+
+      expect(displayedIds(logic)).toStrictEqual(["1", "2", "3"]);
+      expect(logic.data.data.entries[1]).toStrictEqual({
+        id: "2",
+        name: "two",
+      });
+      expect(consoleError).toHaveBeenCalledWith(
+        "Failed to fetch the entry [2]",
+        error,
+      );
+      consoleError.mockRestore();
+    });
+
+    it("drops the update when fetching a frozen entry is aborted", async () => {
+      logic.enableEditMode();
+      liveDataSource.getEntries.mockResolvedValue({
+        count: 2,
+        entries: [
+          { id: "1", name: "one (updated)" },
+          { id: "3", name: "three" },
+        ],
+      });
+      // A newer update aborted the request.
+      liveDataSource.getEntry.mockRejectedValue({ statusText: "abort" });
+
+      await logic.updateEntries();
+
+      expect(logic.data.data.entries).toStrictEqual([
         { id: "1", name: "one" },
+        { id: "2", name: "two" },
         { id: "3", name: "three" },
-      ],
+      ]);
     });
-    liveDataSource.getEntry.mockResolvedValue({ name: "two (updated)" });
-
-    await logic.updateEntries();
-
-    expect(liveDataSource.getEntry).toHaveBeenCalledWith(SOURCE, "2", [
-      "name",
-      "status",
-    ]);
-    expect(displayedIds(logic)).toStrictEqual(["1", "2", "3"]);
-    expect(logic.data.data.entries[1]).toStrictEqual({
-      id: "2",
-      name: "two (updated)",
-    });
-  });
-
-  it("drops the frozen entries that cannot be fetched anymore", async () => {
-    logic.enableEditMode();
-    liveDataSource.getEntries.mockResolvedValue({
-      count: 2,
-      entries: [
-        { id: "1", name: "one" },
-        { id: "3", name: "three" },
-      ],
-    });
-    // The entry has been deleted in the meantime.
-    liveDataSource.getEntry.mockRejectedValue(new Error("Entry not found"));
-
-    await logic.updateEntries();
-
-    expect(displayedIds(logic)).toStrictEqual(["1", "3"]);
   });
 
   it("unfreezes the view when the query changes", async () => {

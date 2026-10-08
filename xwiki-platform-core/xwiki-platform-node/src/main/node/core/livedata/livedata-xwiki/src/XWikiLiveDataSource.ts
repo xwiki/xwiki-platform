@@ -31,6 +31,7 @@ import type {
 export class XWikiLiveDataSource implements LiveDataSource {
   private readonly baseURL = `${XWiki.contextPath}/rest/liveData/sources/`;
   private entriesRequest?: JQuery.jqXHR | null;
+  private readonly entryRequests = new Set<JQuery.jqXHR>();
 
   constructor(private readonly $: JQueryStatic) {}
 
@@ -73,6 +74,7 @@ export class XWikiLiveDataSource implements LiveDataSource {
     // quickly changing sorting, or just if the network  is slow) and that the first request
     // succeeds after the second request, and its results would replace the "fresher" state.
     this.entriesRequest?.abort();
+    this.entryRequests.forEach((request) => request.abort());
     this.entriesRequest = this.$.getJSON(
       entriesURL,
       this.$.param(parameters, true),
@@ -96,7 +98,19 @@ export class XWikiLiveDataSource implements LiveDataSource {
       { properties },
       true,
     )}`;
-    return (await this.$.getJSON(entryURL))?.values;
+    const request = this.$.getJSON(entryURL);
+    this.entryRequests.add(request);
+    try {
+      return (await request)?.values;
+    } catch (err) {
+      // A missing entry is not an error, it is just not returned.
+      if ((err as JQuery.jqXHR).status === 404) {
+        return undefined;
+      }
+      throw err;
+    } finally {
+      this.entryRequests.delete(request);
+    }
   }
 
   updateEntry(source: Source, entryId: string, values: unknown): Promise<void> {

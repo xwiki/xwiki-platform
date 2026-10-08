@@ -131,5 +131,61 @@ describe("liveDataSource.js", () => {
         await liveDataSource.getEntry({ id: "test" }, "MySpace.MyEntry", []),
       ).toBeUndefined();
     });
+
+    it("returns undefined when the entry does not exist", async () => {
+      global.XWiki = { contextPath: "http://localhost", currentWiki: "xwiki" };
+      getJSONStub.resetBehavior();
+      // @ts-expect-error leftover from initial javascript implementation
+      getJSONStub.returns(Promise.reject({ status: 404 }));
+
+      const liveDataSource = new XWikiLiveDataSource($);
+
+      expect(
+        await liveDataSource.getEntry({ id: "test" }, "MySpace.MyEntry", []),
+      ).toBeUndefined();
+    });
+
+    it("fails when the entry cannot be fetched", async () => {
+      global.XWiki = { contextPath: "http://localhost", currentWiki: "xwiki" };
+      getJSONStub.resetBehavior();
+      const error = { status: 500 };
+      // @ts-expect-error leftover from initial javascript implementation
+      getJSONStub.returns(Promise.reject(error));
+
+      const liveDataSource = new XWikiLiveDataSource($);
+
+      await expect(
+        liveDataSource.getEntry({ id: "test" }, "MySpace.MyEntry", []),
+      ).rejects.toBe(error);
+    });
+
+    it("aborts the pending entry requests when the entries are fetched again", async () => {
+      global.XWiki = { contextPath: "http://localhost", currentWiki: "xwiki" };
+      getJSONStub.resetBehavior();
+      const entryRequest = Object.assign(new Promise(() => {}), {
+        abort: stub(),
+      });
+      getJSONStub.callsFake(
+        // @ts-expect-error leftover from initial javascript implementation
+        (url: string) =>
+          url.includes("/entries/")
+            ? entryRequest
+            : Promise.resolve({ count: 0, entries: [] }),
+      );
+
+      const liveDataSource = new XWikiLiveDataSource($);
+      // The entry request never completes, it is not awaited.
+      liveDataSource.getEntry({ id: "test" }, "MySpace.MyEntry", []);
+      await liveDataSource.getEntries({
+        source: { id: "test" },
+        properties: [],
+        offset: 0,
+        limit: 15,
+        filters: [],
+        sort: [],
+      });
+
+      expect(entryRequest.abort.calledOnce).toBe(true);
+    });
   });
 });

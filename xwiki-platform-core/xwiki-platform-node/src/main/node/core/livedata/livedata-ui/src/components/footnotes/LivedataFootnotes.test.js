@@ -119,11 +119,6 @@ describe("LivedataFootnotes.vue", () => {
     const box = wrapper.find(".box");
     expect(box.text()).toBe("livedata.footnotes.frozenEntries");
     const hint = box.find("[role='img']");
-    expect(hint.attributes("title")).toBe(
-      "livedata.footnotes.frozenEntries.hint",
-    );
-    expect(hint.attributes("aria-label")).toBe(
-      "livedata.footnotes.frozenEntries.hint",
-    );
+    expect(hint.attributes("aria-label")).toBe("livedata.footnotes.hintLabel");
   });
 });

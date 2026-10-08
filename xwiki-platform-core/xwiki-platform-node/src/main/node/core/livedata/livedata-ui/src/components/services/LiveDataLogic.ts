@@ -413,7 +413,7 @@ export class LiveDataLogic implements Logic {
    */
 
   /**
-   * Fetch the entries of the current page according to the query configuration.
+   * Fetch the entries of the current page according to the query configuration, keeping the frozen view if any.
    * @returns the fetched entries
    */
   async fetchEntries(): Promise<{ count: number; entries: Values[] }> {
@@ -421,7 +421,9 @@ export class LiveDataLogic implements Logic {
     this.triggerEvent("beforeEntryFetch");
     // Fetch entries from data source
     try {
-      return await this.liveDataSource.getEntries(this.data.query!);
+      const data = await this.liveDataSource.getEntries(this.data.query!);
+      data.entries = await this.restoreFrozenView(data.entries);
+      return data;
     } finally {
       this.triggerEvent("afterEntryFetch");
     }
@@ -434,7 +436,6 @@ export class LiveDataLogic implements Logic {
         .then(async (data) => {
           // We need to keep drafts to insert them back in the entries.
           const drafts = this.data.data.entries.filter((entry) => entry._new);
-          data.entries = await this.restoreFrozenView(data.entries);
           // Refreeze the values (the restore operation might have unfrozen them).
           this.freezeView(data.entries);
           data.entries.push(...drafts);
@@ -544,19 +545,33 @@ export class LiveDataLogic implements Logic {
    * Fetch the entries having the given ids, one by one and independently of the current query, since
    * they are precisely the entries that the query does not select anymore.
    * @param entryIds - the ids of the entries to fetch
-   * @returns the fetched entries, by id, without the ones that could not be fetched
+   * @returns the fetched entries, by id, without the ones that do not exist anymore
    */
   private async fetchEntriesById(entryIds: string[]) {
     const source = this.data.query.source;
     const idProperty = this.data.meta.entryDescriptor.idProperty || "id";
+    const displayedEntries = new Map(
+      this.data.data.entries.map((entry): [string | undefined, Values] => [
+        this.getEntryId(entry),
+        entry,
+      ]),
+    );
     const fetchedEntries = await Promise.all(
       entryIds.map(
         async (entryId): Promise<[string, Values | undefined]> => [
           entryId,
-          // An entry that can't be fetched anymore does not exist anymore.
+          // An entry that the source does not return anymore does not exist anymore.
           await this.liveDataSource
             .getEntry(source, entryId, this.data.query.properties)
-            .catch(() => undefined),
+            .catch((err) => {
+              // An aborted request means a newer update is in progress, this one must be dropped.
+              if (err.statusText === "abort") {
+                throw err;
+              }
+              // The entry might still exist, so its displayed values are kept.
+              console.error(`Failed to fetch the entry [${entryId}]`, err);
+              return displayedEntries.get(entryId);
+            }),
         ],
       ),
     );

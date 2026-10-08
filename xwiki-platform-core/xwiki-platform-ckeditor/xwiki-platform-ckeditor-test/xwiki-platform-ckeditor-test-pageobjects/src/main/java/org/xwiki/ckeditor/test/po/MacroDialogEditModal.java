@@ -22,6 +22,7 @@ package org.xwiki.ckeditor.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Page Object for the macro edition modal.
@@ -96,6 +97,20 @@ public class MacroDialogEditModal extends BaseElement
         return getDriver().findElementWithoutWaitingWithoutScrolling(
             // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
             By.cssSelector("[class*=-editor-modal] .macro-parameter-field input[name='" + name + "']"));
+    }
+
+    /**
+     * Use this for a macro parameter whose value is picked from a list of suggestions, such as a page reference.
+     *
+     * @param name the macro parameter name
+     * @return the suggest input used to edit the value of the specified macro parameter
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public SuggestInputElement getMacroParameterSuggestInput(String name)
+    {
+        return new SuggestInputElement(getMacroParameterInput(name));
     }
 
     /**

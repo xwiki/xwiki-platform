@@ -80,6 +80,8 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
     // (prop.id.id = :objectId_0 and prop.id.name = :property_0)
     private static final int BATCH_SIZE = 100;
 
+    private static final String PROPERTY_NAMES_PARAMETER = "propNames";
+
     private static final String SELECT_PROPERTIES_STATEMENT = "select prop from StringProperty as prop "
         + "where prop.id.name in :propNames and prop.id.id in :objectIds";
 
@@ -225,15 +227,18 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
     {
         XWiki wiki = getXWikiContext().getWiki();
         String className = xClassWithPasswordProperties.getClassName();
-        String objectIdsQuery =  "select obj.id "
-            + "from BaseObject as obj "
-            + "where obj.className = :className "
+        // Only the objects still holding a StringProperty for one of the password fields need to be migrated: the
+        // others (e.g. already migrated, since the migration can be executed again) can be skipped.
+        String objectIdsQuery = "select distinct obj.id "
+            + "from BaseObject as obj, StringProperty as prop "
+            + "where obj.className = :className and prop.id.id = obj.id and prop.id.name in (:propNames) "
             + "order by obj.id";
         List<Long> results;
         try {
             results = wiki.getStore().getQueryManager()
                 .createQuery(objectIdsQuery, Query.HQL)
                 .bindValue("className", className)
+                .bindValue(PROPERTY_NAMES_PARAMETER, xClassWithPasswordProperties.getProperties())
                 .execute();
         } catch (QueryException e) {
             throw new DataMigrationException(
@@ -283,7 +288,7 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
 
         org.hibernate.query.Query<StringProperty> query =
             session.createQuery(SELECT_PROPERTIES_STATEMENT, StringProperty.class);
-        query.setParameter("propNames", xclassWithPasswordProperties.getProperties());
+        query.setParameter(PROPERTY_NAMES_PARAMETER, xclassWithPasswordProperties.getProperties());
         query.setParameter("objectIds", objectsIdsToMigrate);
 
         for (StringProperty stringProperty : query.getResultList()) {

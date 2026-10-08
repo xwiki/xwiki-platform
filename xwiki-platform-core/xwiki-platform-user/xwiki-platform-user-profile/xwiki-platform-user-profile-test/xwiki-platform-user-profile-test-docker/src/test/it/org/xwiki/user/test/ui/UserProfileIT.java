@@ -68,7 +68,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
         // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
         // manually. See https://jira.xwiki.org/browse/XWIKI-21594
-        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index"
     }
 )
 class UserProfileIT

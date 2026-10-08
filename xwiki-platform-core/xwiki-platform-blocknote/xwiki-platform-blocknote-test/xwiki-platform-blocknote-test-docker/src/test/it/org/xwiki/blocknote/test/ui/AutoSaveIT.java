@@ -26,20 +26,17 @@ import org.openqa.selenium.TimeoutException;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Verify that the content edited in a realtime collaboration session is saved without the user asking for it.
@@ -62,12 +59,6 @@ class AutoSaveIT extends AbstractBlockNoteIT
     private static final String AUTO_SAVE_SUMMARY = "Auto-saved during real-time collaboration";
 
     /**
-     * The notification the edit form displays after it saved, see the
-     * {@code core.editors.saveandcontinue.notification.done} translation key.
-     */
-    private static final String SAVED_NOTIFICATION = "Saved";
-
-    /**
      * The initial version of a freshly created page.
      */
     private static final String INITIAL_VERSION = "1.1";
@@ -79,18 +70,19 @@ class AutoSaveIT extends AbstractBlockNoteIT
     private static final int AUTO_SAVE_INTERVAL = 5;
 
     /**
-     * How long to wait for the auto-save, in seconds. A save lands a bit later than the interval above: the saver adds
-     * a random amount to it, holds the save election for a moment and then waits for the server. Waiting costs nothing
-     * when the save does happen, so leave a wide margin rather than risk a flickering test on a loaded machine.
+     * How long to wait for the auto-save to create a new version of the edited document, in seconds. A save lands a
+     * bit later than the interval above: the saver adds a random amount to it, holds the save election for a moment
+     * and then waits for the server. Waiting costs nothing when the save does happen, so leave a wide margin rather
+     * than risk a flickering test on a loaded machine.
      */
-    private static final int AUTO_SAVE_TIMEOUT = 4 * AUTO_SAVE_INTERVAL;
+    private static final int NEW_VERSION_TIMEOUT = 4 * AUTO_SAVE_INTERVAL;
 
     /**
-     * How long to watch an editing session in which nothing must be saved, in seconds. It has to outlast the save
-     * interval, otherwise the absence of a save proves nothing. Unlike the timeout above this one is always waited out
-     * in full, so it's the one that costs test time: keep it just above the point where a save would have happened.
+     * How long to watch the edited document for a version that must not be created, in seconds. It has to outlast the
+     * save interval, otherwise the absence of a save proves nothing. Unlike the timeout above this one is always
+     * waited out in full, so keep it just above the point where a save would have happened.
      */
-    private static final int NO_AUTO_SAVE_TIMEOUT = 2 * AUTO_SAVE_INTERVAL;
+    private static final int NO_NEW_VERSION_TIMEOUT = 2 * AUTO_SAVE_INTERVAL;
 
     @Test
     @Order(1)
@@ -100,14 +92,14 @@ class AutoSaveIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "one", "");
 
-        WYSIWYGEditPage editPage = new ViewPage().editWYSIWYG();
-        BlockNoteRichTextArea textArea =
-            new BlockNoteEditor("content").setAutoSaveInterval(AUTO_SAVE_INTERVAL).getRichTextArea();
+        new ViewPage().editWYSIWYG();
+        BlockNoteEditor editor = new BlockNoteEditor("content").setAutoSaveInterval(AUTO_SAVE_INTERVAL);
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
         textArea.click();
         textArea.sendKeys(Keys.END, " two");
 
         // Nobody clicks any save button: the edit form must be submitted on its own.
-        waitForAutoSave(setup, editPage);
+        editor.waitForAutoSave();
 
         setup.leaveEditMode();
         ViewPage viewPage = new ViewPage();
@@ -122,7 +114,7 @@ class AutoSaveIT extends AbstractBlockNoteIT
     @Test
     @Order(2)
     void autoSavesOnlyOnceWhenTwoClientsEdit(TestReference testReference, TestUtils setup,
-        MultiUserTestUtils multiUserSetup)
+        MultiUserTestUtils multiUserSetup) throws Exception
     {
         //
         // First Tab
@@ -180,12 +172,14 @@ class AutoSaveIT extends AbstractBlockNoteIT
         // Both clients have changes to save, and only the one that wins the save election must save them. We watch
         // the document rather than the save notification because that notification is displayed only in the tab that
         // actually saved, and we cannot tell in advance which client the election picks.
-        String savedVersion = waitForNewVersion(setup, testReference);
+        String savedVersion = setup.rest().waitForVersionChange(testReference, INITIAL_VERSION, NEW_VERSION_TIMEOUT);
 
         // Stay in the editing session well past another save interval: had the election let both clients through,
         // the second one would save here. We watch the document rather than the save notification because the
         // notification of the save above is still displayed in the tab that performed it.
-        assertNoNewVersion(setup, testReference, savedVersion, "A second client saved the same changes.");
+        assertThrows(TimeoutException.class,
+            () -> setup.rest().waitForVersionChange(testReference, savedVersion, NO_NEW_VERSION_TIMEOUT),
+            "A second client saved the same changes.");
 
         multiUserSetup.switchToBrowserTab(secondTabHandle);
         setup.leaveEditMode();
@@ -194,7 +188,7 @@ class AutoSaveIT extends AbstractBlockNoteIT
 
         ViewPage viewPage = setup.gotoPage(testReference);
         assertEquals("one two three", viewPage.getContent());
-        assertEquals(savedVersion, getPage(setup, testReference).getVersion(),
+        assertEquals(savedVersion, setup.rest().<Page>get(testReference).getVersion(),
             "A second client saved the same changes.");
 
         HistoryPane historyPane = viewPage.openHistoryDocExtraPane().showMinorEdits();
@@ -217,110 +211,16 @@ class AutoSaveIT extends AbstractBlockNoteIT
         setup.createPage(testReference, "one", "");
 
         // Open the editor, which joins the realtime session, and then leave it alone.
-        WYSIWYGEditPage editPage = new ViewPage().editWYSIWYG();
-        new BlockNoteEditor("content").setAutoSaveInterval(AUTO_SAVE_INTERVAL).getRichTextArea();
+        new ViewPage().editWYSIWYG();
+        BlockNoteEditor editor = new BlockNoteEditor("content").setAutoSaveInterval(AUTO_SAVE_INTERVAL);
+        editor.getRichTextArea();
 
-        assertNoAutoSave(setup, editPage, "The content was saved even though nobody edited it.");
+        assertFalse(editor.isAutoSavedWithinNextInterval(), "The content was saved even though nobody edited it.");
 
         setup.leaveEditMode();
         HistoryPane historyPane = new ViewPage().openHistoryDocExtraPane().showMinorEdits();
         // Note that we don't count the versions here: the history pagination, which is where that count is read
         // from, is not displayed when there is a single version.
         assertEquals(INITIAL_VERSION, historyPane.getCurrentVersion());
-    }
-
-    /**
-     * Wait for the edit form to report that it saved.
-     *
-     * @param setup the test setup
-     * @param page the page displaying the notification
-     */
-    private void waitForAutoSave(TestUtils setup, BaseElement page)
-    {
-        withTimeout(setup, AUTO_SAVE_TIMEOUT, () -> page.waitForNotificationSuccessMessage(SAVED_NOTIFICATION));
-    }
-
-    /**
-     * Watch an editing session for longer than the save interval and fail if it saves.
-     *
-     * @param setup the test setup
-     * @param page the page that would display the notification
-     * @param message the failure message
-     */
-    private void assertNoAutoSave(TestUtils setup, BaseElement page, String message)
-    {
-        withTimeout(setup, NO_AUTO_SAVE_TIMEOUT, () -> assertThrows(TimeoutException.class,
-            () -> page.waitForNotificationSuccessMessage(SAVED_NOTIFICATION), message));
-    }
-
-    /**
-     * Watch the edited document for longer than the save interval and fail if a new version shows up.
-     *
-     * @param setup the test setup
-     * @param reference the reference of the edited document
-     * @param expectedVersion the version the document must stay at
-     * @param message the failure message
-     */
-    private void assertNoNewVersion(TestUtils setup, DocumentReference reference, String expectedVersion,
-        String message)
-    {
-        try {
-            // Stop waiting as soon as another version shows up, which is the failure we're looking for.
-            setup.getDriver().waitUntilCondition(
-                driver -> expectedVersion.equals(getPage(setup, reference).getVersion()) ? null : true,
-                NO_AUTO_SAVE_TIMEOUT);
-        } catch (TimeoutException expected) {
-            // No new version was created, which is what we want.
-            return;
-        }
-        fail(message);
-    }
-
-    /**
-     * Run the given code with a longer wait timeout, because the auto-save is scheduled a while after the content
-     * became dirty, which is above the default.
-     *
-     * @param setup the test setup
-     * @param timeout the timeout to use, in seconds
-     * @param action the code to run
-     */
-    private void withTimeout(TestUtils setup, int timeout, Runnable action)
-    {
-        int originalTimeout = setup.getDriver().getTimeout();
-        setup.getDriver().setTimeout(timeout);
-        try {
-            action.run();
-        } finally {
-            setup.getDriver().setTimeout(originalTimeout);
-        }
-    }
-
-    /**
-     * Wait for the auto-save to create a new version of the edited document.
-     *
-     * @param setup the test setup
-     * @param reference the reference of the edited document
-     * @return the version the auto-save created
-     */
-    private String waitForNewVersion(TestUtils setup, DocumentReference reference)
-    {
-        return setup.getDriver().waitUntilCondition(driver -> {
-            String version = getPage(setup, reference).getVersion();
-            return INITIAL_VERSION.equals(version) ? null : version;
-        }, AUTO_SAVE_TIMEOUT);
-    }
-
-    /**
-     * @param setup the test setup
-     * @param reference the reference of the document to fetch
-     * @return the document, as the server knows it
-     */
-    private Page getPage(TestUtils setup, DocumentReference reference)
-    {
-        try {
-            return setup.rest().get(reference);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch the edited document.", e);
-        }
     }
 }

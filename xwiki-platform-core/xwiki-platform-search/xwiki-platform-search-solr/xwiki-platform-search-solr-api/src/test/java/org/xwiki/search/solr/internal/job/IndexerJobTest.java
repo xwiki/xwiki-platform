@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.job;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Named;
 
@@ -35,9 +36,12 @@ import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.search.solr.internal.SolrIndexerStoppedException;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
+import org.xwiki.store.ReadyIndicator;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -45,6 +49,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -203,6 +210,46 @@ class IndexerJobTest
         verify(this.mockIndexer).index(DOCUMENT_TWO, true);
         verifyNoMoreInteractions(this.mockIndexer);
         assertLog(0, 0, 1);
+    }
+
+    @Test
+    void runInternalUpdateSolrIndexWhenIndexerStopped() throws Exception
+    {
+        this.request.setCleanInvalid(true);
+        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
+        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
+        mockWaitReady(new SolrIndexerStoppedException("Indexing stopped."));
+
+        this.indexerJob.runInternal();
+
+        // The invalid entries are not cleaned since the indexer stopped before applying the indexing.
+        verifyNoInteractions(this.mockSolrInstance);
+        assertLog(0, 0, 0);
+        assertEquals("The synchronization of the Solr index was interrupted because the indexer stopped.",
+            this.logCapture.getMessage(1));
+    }
+
+    @Test
+    void runInternalUpdateSolrIndexWhenWaitingForTheIndexingFails() throws Exception
+    {
+        this.request.setCleanInvalid(true);
+        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
+        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
+        SolrIndexerException cause = new SolrIndexerException("Failed to index");
+        mockWaitReady(cause);
+
+        ExecutionException exception = assertThrows(ExecutionException.class, () -> this.indexerJob.runInternal());
+
+        assertSame(cause, exception.getCause());
+        verifyNoInteractions(this.mockSolrInstance);
+        assertLog(0, 0, 0);
+    }
+
+    private void mockWaitReady(Exception cause) throws Exception
+    {
+        ReadyIndicator readyIndicator = mock(ReadyIndicator.class);
+        when(readyIndicator.get()).thenThrow(new ExecutionException(cause));
+        when(this.mockIndexer.waitReady()).thenReturn(readyIndicator);
     }
 
     private void assertLog(int added, int deleted, int updated)

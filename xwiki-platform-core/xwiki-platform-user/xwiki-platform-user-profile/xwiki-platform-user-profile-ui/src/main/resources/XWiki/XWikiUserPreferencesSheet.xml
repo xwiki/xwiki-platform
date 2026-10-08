@@ -497,7 +497,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-profile-preferences'], functi
       &lt;/button&gt;
     #else
       &lt;span&gt;
-        #if("$!shortcutPreference" != '') $!value##
+        #if("$!shortcutPreference" != '') $!escapetool.xml($value)##
         #if("$!value" == '')&lt;small&gt;($escapetool.xml($services.localization.render('platform.core.profile.shortcut.hint.unbound')))&lt;/small&gt;#end
         #else $defaultValue ##
           &lt;small&gt;($escapetool.xml($services.localization.render('userprofile.default')))&lt;/small&gt;##

@@ -60,24 +60,23 @@
  * @param name The value of the <tt>name</tt> attribute
  * @param shortcut The keyboard shortcut for this button. The value will be displayed
  *        as the title of the element. The actual shortcut is attached elsewhere, in
- *        the javascript code.
+ *        the javascript code, from the data-shortcut attribute.
  * @param value The value of the <tt>value</tt> attribute, i.e. the text displayed on
  *        the button.
  * @param class The class to use.
  *#
 #macro(submitButton $name $shortcut $value $class)
-<input class="btn $!class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$escapetool.xml($shortcut)"#end value="$value"/>
+<input class="btn $!class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$escapetool.xml($shortcut)"#end data-shortcut="$!escapetool.xml($shortcut)" value="$value"/>
 #end
 #**
  * Returns the value of the shortcut as a String. This value can be set in two ways: via user preferences and wiki level translation
  * keys. If there are both, the user preference will take priority.
  * @param translationKey  The key of the translation containing the wiki level defined shortcut.
  *        e.g. `core.shortcuts.developer.user.type`
- * @param escapeJavaScript Optional, whether to escape the value for a JavaScript string. The value is unescaped by default.
  * @since 18.9.0RC1
  *#
-#macro(getShortcutValue $translationKey $escapeJavaScript)
-## The current user document isn't defined when evaluating a skin resource, like a JavaScript file.
+#macro(getShortcutValue $translationKey)
+## The current user document isn't defined in every rendering context.
 #set ($shortcutUserDoc = $crtUserDoc)
 #if (!$shortcutUserDoc)
 #set ($shortcutUserDoc = $xwiki.getDocument($xcontext.user))
@@ -89,7 +88,7 @@
 #else
 #set ($shortcutValue = $services.localization.render($translationKey))
 #end
-#if ($escapeJavaScript)$escapetool.javascript($shortcutValue)#else$shortcutValue#end##
+$shortcutValue##
 #end
 #**
  * Displays a submit button for the editor. This macro calls submitButton,

@@ -76,6 +76,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.function.FailablePredicate;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -176,6 +177,8 @@ import org.xwiki.security.authservice.internal.AuthServiceManager;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
@@ -303,6 +306,12 @@ public class XWiki implements EventListener
 
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
+
+    /**
+     * The number of times {@link #updateDocument} applies the modification before giving up when the document keeps
+     * being saved concurrently.
+     */
+    private static final int UPDATE_DOCUMENT_ATTEMPTS = 5;
 
     /** Frequently used Document reference, the class which holds virtual wiki definitions. */
     private static final DocumentReference VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE =
@@ -1993,6 +2002,13 @@ public class XWiki implements EventListener
         // Also for document indicated as new make sure the previous document is accurate.
         if (originalDocument == null || document.isNew()) {
             XWikiDocument existing = getDocument(document.getDocumentReferenceWithLocale(), context);
+            if (originalDocument != null && originalDocument.isNew() && !existing.isNew()
+                && getStoreConfiguration().isRevisionCheckEnabled()) {
+                // The document didn't exist when it was loaded, and was created by another request since then. Saving
+                // it would replace the created document, so let the caller load it again and re-apply its changes.
+                throw new DocumentRevisionConflictException(document.getDocumentReferenceWithLocale(), null,
+                    existing.getVersion());
+            }
             // Switch the original document only if we actually find an existing document or if there is no original
             // document in the first place
             if (originalDocument == null || !existing.isNew()) {
@@ -2078,6 +2094,50 @@ public class XWiki implements EventListener
         throws XWikiException
     {
         saveDocument(document, comment, isMinorEdit, false, context);
+    }
+
+    /**
+     * Loads the stored document, modifies it and saves it. When the document is saved concurrently by another request
+     * (see {@link DocumentRevisionConflictException}), the modification is applied again to the newly stored document,
+     * so that neither modification is lost. Use this instead of loading, modifying and saving a document yourself
+     * whenever the modification can be applied again to a newer version of the document, e.g. adding an attachment or
+     * a group member.
+     *
+     * @param documentReference the reference of the document to update, with the locale of the translation to update
+     * @param update modifies the given copy of the stored document (a new document if it doesn't exist) and returns
+     *     {@code true} if the document needs to be saved, {@code false} to leave it unchanged; it may be called several
+     *     times, with a newer copy each time
+     * @param comment the comment of the saved version
+     * @param isMinorEdit {@code true} if the saved version is a minor edit
+     * @param context the XWiki context
+     * @return the saved document, or a copy of the stored document if {@code update} returned {@code false}
+     * @throws DocumentRevisionConflictException if the document was still saved concurrently after several attempts
+     * @throws XWikiException if loading, modifying or saving the document failed
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public XWikiDocument updateDocument(DocumentReference documentReference,
+        FailablePredicate<XWikiDocument, XWikiException> update, String comment, boolean isMinorEdit,
+        XWikiContext context) throws XWikiException
+    {
+        for (int attempt = 1;; attempt++) {
+            // Copy the document because the stored one can be shared through the document cache.
+            XWikiDocument document = getDocument(documentReference, context).clone();
+            if (!update.test(document)) {
+                return document;
+            }
+
+            try {
+                saveDocument(document, comment, isMinorEdit, context);
+                return document;
+            } catch (DocumentRevisionConflictException e) {
+                if (attempt >= UPDATE_DOCUMENT_ATTEMPTS) {
+                    throw e;
+                }
+                LOGGER.debug("Document [{}] was saved concurrently, updating the stored document again.",
+                    documentReference);
+            }
+        }
     }
 
     /**
@@ -4377,21 +4437,21 @@ public class XWiki implements EventListener
 
     protected void addUserToGroup(String userName, String groupName, XWikiContext context) throws XWikiException
     {
-        XWikiDocument groupDoc = getDocument(groupName, context);
-
+        DocumentReference groupReference = getDocument(groupName, context).getDocumentReference();
         DocumentReference groupClassReference = getGroupClass(context).getDocumentReference();
 
-        // Make sure the user is not already part of the group
-        if (groupDoc.getXObject(groupClassReference, "member", userName, false) == null) {
-            XWikiDocument modifiedDocument = groupDoc.clone();
-            BaseObject memberObject =
-                modifiedDocument.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()),
-                    context);
+        // Users can be added concurrently to the same group, e.g. when they register at the same time.
+        updateDocument(groupReference, groupDoc -> {
+            // Make sure the user is not already part of the group
+            if (groupDoc.getXObject(groupClassReference, "member", userName, false) != null) {
+                return false;
+            }
 
+            BaseObject memberObject = groupDoc
+                .newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
             memberObject.setStringValue("member", userName);
-
-            saveDocument(modifiedDocument, localizePlainOrKey("core.comment.addedUserToGroup"), context);
-        }
+            return true;
+        }, localizePlainOrKey("core.comment.addedUserToGroup"), false, context);
     }
 
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)

@@ -19,9 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,10 +32,15 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.container.Container;
+import org.xwiki.container.Request;
 import org.xwiki.context.Execution;
+import org.xwiki.diff.Conflict;
+import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -45,6 +53,10 @@ import org.xwiki.refactoring.script.RequestFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.store.DocumentRevisionConflictException;
+import org.xwiki.store.merge.MergeConflictDecisionsManager;
+import org.xwiki.store.merge.MergeDocumentResult;
+import org.xwiki.store.merge.MergeManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -68,11 +80,18 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -87,6 +106,9 @@ import static org.mockito.Mockito.when;
 class SaveActionTest
 {
     private static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "FooBar");
+
+    private static final DocumentReference DOCUMENT_REFERENCE =
+        new DocumentReference(new DocumentReference("xwiki", "Space", "Page"), Locale.ROOT);
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -115,6 +137,15 @@ class SaveActionTest
 
     @MockComponent
     private UserReferenceResolver<CurrentUserReference> currentUserResolver;
+
+    @MockComponent
+    private MergeManager mergeManager;
+
+    @MockComponent
+    private MergeConflictDecisionsManager conflictDecisionsManager;
+
+    @MockComponent
+    private Container container;
 
     private XWikiContext context;
 
@@ -152,6 +183,10 @@ class SaveActionTest
         this.mockRequest = mock(XWikiRequest.class);
         when(this.mockRequest.getEffectiveAuthor()).thenReturn(Optional.of(this.effectiveAuthor));
         this.context.setRequest(this.mockRequest);
+        Request containerRequest = mock();
+        when(this.container.getRequest()).thenReturn(containerRequest);
+        when(containerRequest.getParameter(any())).then(
+            invocation -> this.mockRequest.getParameter(invocation.getArgument(0)));
 
         this.mockResponse = mock(XWikiResponse.class);
         this.context.setResponse(this.mockResponse);
@@ -344,5 +379,236 @@ class SaveActionTest
         verify(mockClonedDocument).setComment(comment);
         verify(mockClonedDocument).setMinorEdit(true);
         verify(mockClonedDocument, never()).readFromForm(any(), any());
+    }
+
+    @Test
+    void saveAgainAfterConcurrentSave() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        when(mockDocument.getDocumentReference()).thenReturn(documentReference);
+        when(mockClonedDocument.getComment()).thenReturn("My Changes");
+        when(mockForm.getTemplate()).thenReturn("");
+        // Another request saves the document after this request loaded it.
+        doThrow(new DocumentRevisionConflictException(documentReference, "1.2", "1.3")).when(this.xWiki)
+            .saveDocument(mockClonedDocument, "My Changes", false, this.context);
+        XWikiDocument latestDocument = mock();
+        XWikiDocument latestClonedDocument = mock();
+        when(this.xWiki.getDocument(documentReference, this.context)).thenReturn(latestDocument);
+        when(latestDocument.clone()).thenReturn(latestClonedDocument);
+        when(latestClonedDocument.getAuthors()).thenReturn(this.mockAuthors);
+        when(latestClonedDocument.getComment()).thenReturn("My Changes");
+        when(latestClonedDocument.getRCSVersion()).thenReturn(new Version("1.4"));
+        XWikiLock lock = mock();
+        when(latestClonedDocument.getLock(this.context)).thenReturn(lock);
+
+        assertFalse(saveAction.save(this.context));
+
+        assertEquals(Map.of("newVersion", "1.4"), saveAction.getJSONAnswer(context));
+        // The request is applied again on the latest version of the document.
+        verify(latestClonedDocument).readFromForm(this.mockForm, this.context);
+        verify(this.xWiki).saveDocument(latestClonedDocument, "My Changes", false, this.context);
+        verify(latestClonedDocument).removeLock(this.context);
+    }
+
+    @Test
+    void saveConflictingWithConcurrentSave() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        DocumentReference documentReferenceWithLocale = new DocumentReference(documentReference, Locale.ROOT);
+        when(mockDocument.getDocumentReference()).thenReturn(documentReference);
+        when(this.xWiki.getDocument(documentReference, this.context)).thenReturn(mockDocument);
+        when(mockClonedDocument.getDocumentReferenceWithLocale()).thenReturn(documentReferenceWithLocale);
+        when(mockClonedDocument.getComment()).thenReturn("My Changes");
+        when(mockForm.getTemplate()).thenReturn("");
+        context.put("ajax", true);
+        when(mockRequest.getParameter("previousVersion")).thenReturn("1.2");
+        when(mockRequest.getParameter("editingVersionDate")).thenReturn("1000");
+        // The document loaded by this request is the one the user edited, so the conflict check before saving passes.
+        when(mockDocument.getRCSVersion()).thenReturn(new Version("1.2"));
+        when(mockDocument.getDate()).thenReturn(new Date(500));
+        // Other requests save the document each time after this request loaded it.
+        doThrow(new DocumentRevisionConflictException(documentReference, "1.2", "1.3")).when(this.xWiki)
+            .saveDocument(mockClonedDocument, "My Changes", false, this.context);
+        XWikiDocument latestDocument = mock();
+        when(latestDocument.getRCSVersion()).thenReturn(new Version("1.3"));
+        when(latestDocument.getDate()).thenReturn(new Date(2000));
+        when(this.xWiki.getDocument(documentReferenceWithLocale, this.context)).thenReturn(latestDocument);
+        StringWriter responseContent = mockResponseContent();
+
+        assertTrue(saveAction.save(this.context));
+
+        verify(this.xWiki, times(5)).saveDocument(mockClonedDocument, "My Changes", false, this.context);
+        verify(this.mockResponse).setStatus(409);
+        assertEquals(String.format("{\"previousVersion\":\"1.2\",\"previousVersionDate\":\"%s\","
+            + "\"latestVersion\":\"1.3\",\"latestVersionDate\":\"%s\"}", new Date(1000), new Date(2000)),
+            responseContent.toString());
+        verify(mockClonedDocument, never()).removeLock(this.context);
+    }
+
+    @Test
+    void saveConflictingWithConcurrentSaveWithoutAjax() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        when(mockDocument.getDocumentReference()).thenReturn(documentReference);
+        when(this.xWiki.getDocument(documentReference, this.context)).thenReturn(mockDocument);
+        when(mockClonedDocument.getComment()).thenReturn("My Changes");
+        when(mockForm.getTemplate()).thenReturn("");
+        DocumentRevisionConflictException conflict =
+            new DocumentRevisionConflictException(documentReference, "1.2", "1.3");
+        doThrow(conflict).when(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
+
+        assertSame(conflict, assertThrows(DocumentRevisionConflictException.class,
+            () -> saveAction.save(this.context)));
+        verify(this.xWiki, times(5)).saveDocument(mockClonedDocument, "My Changes", false, this.context);
+    }
+
+    @Test
+    void overrideWithLatestConflictVersion() throws Exception
+    {
+        mockConflictDecision("override", "1.3");
+
+        assertFalse(saveAction.save(this.context));
+
+        assertEquals(Map.of("newVersion", "1.4"), saveAction.getJSONAnswer(context));
+        verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
+        verify(this.mergeManager, never()).mergeDocument(any(), any(), any(), any());
+    }
+
+    @Test
+    void overrideWithOutdatedConflictVersion() throws Exception
+    {
+        mockConflictDecision("override", "1.2");
+        XWikiDocument conflictDocument = mockRevision("1.2");
+        MergeDocumentResult mergeResult = mock();
+        when(this.mergeManager.mergeDocument(same(conflictDocument), same(mockDocument), same(mockClonedDocument),
+            any())).thenReturn(mergeResult);
+
+        assertFalse(saveAction.save(this.context));
+
+        // The changes saved after the version the user overrides are merged.
+        assertEquals(Map.of("mergedDocument", "true", "newVersion", "1.4"), saveAction.getJSONAnswer(context));
+        verify(this.mergeManager).mergeDocument(any(), any(), any(), any());
+        verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
+    }
+
+    @Test
+    void mergeWithOutdatedConflictVersion() throws Exception
+    {
+        mockConflictDecision("merge", "1.2");
+        when(mockRequest.getParameterValues("mergeChoices")).thenReturn(new String[] {"42=current"});
+        XWikiDocument previousDocument = mockRevision("1.1");
+        XWikiDocument conflictDocument = mockRevision("1.2");
+        // The decisions solve the conflicts with the version the user saw.
+        MergeDocumentResult decisionsResult = mock();
+        when(decisionsResult.hasConflicts()).thenReturn(true);
+        when(this.mergeManager.mergeDocument(same(previousDocument), same(conflictDocument),
+            same(mockClonedDocument), any())).thenReturn(decisionsResult);
+        MergeDocumentResult mergeResult = mock();
+        when(this.mergeManager.mergeDocument(same(conflictDocument), same(mockDocument), same(mockClonedDocument),
+            any())).thenReturn(mergeResult);
+
+        assertFalse(saveAction.save(this.context));
+
+        assertEquals(Map.of("mergedDocument", "true", "newVersion", "1.4"), saveAction.getJSONAnswer(context));
+        InOrder inOrder = inOrder(this.conflictDecisionsManager, this.mergeManager);
+        inOrder.verify(this.conflictDecisionsManager).recordDecision(DOCUMENT_REFERENCE, USER_REFERENCE, "42",
+            ConflictDecision.DecisionType.CURRENT, null);
+        inOrder.verify(this.mergeManager).mergeDocument(same(previousDocument), same(conflictDocument),
+            same(mockClonedDocument), any());
+        inOrder.verify(this.conflictDecisionsManager).removeConflictDecisionList(DOCUMENT_REFERENCE,
+            USER_REFERENCE);
+        inOrder.verify(this.mergeManager).mergeDocument(same(conflictDocument), same(mockDocument),
+            same(mockClonedDocument), any());
+        verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
+    }
+
+    @Test
+    void mergeConflictingWithChangesAfterConflictVersion() throws Exception
+    {
+        mockConflictDecision("merge", "1.2");
+        XWikiDocument previousDocument = mockRevision("1.1");
+        XWikiDocument conflictDocument = mockRevision("1.2");
+        XWikiDocument unmergedDocument = mock();
+        when(mockClonedDocument.clone()).thenReturn(unmergedDocument);
+        MergeDocumentResult decisionsResult = mock();
+        when(this.mergeManager.mergeDocument(same(previousDocument), same(conflictDocument),
+            same(mockClonedDocument), any())).thenReturn(decisionsResult);
+        MergeDocumentResult conflictingResult = mock();
+        when(conflictingResult.hasConflicts()).thenReturn(true);
+        when(this.mergeManager.mergeDocument(same(conflictDocument), same(mockDocument), same(mockClonedDocument),
+            any())).thenReturn(conflictingResult);
+        // The conflicts the user has to solve now, between the version the user started from and the latest one.
+        MergeDocumentResult newConflictsResult = mock();
+        Conflict<String> newConflict = mock();
+        List<Conflict<?>> newConflicts = List.of(newConflict);
+        when(newConflictsResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT)).thenReturn(newConflicts);
+        when(this.mergeManager.mergeDocument(same(previousDocument), same(mockDocument), same(unmergedDocument),
+            any())).thenReturn(newConflictsResult);
+        StringWriter responseContent = mockResponseContent();
+
+        assertTrue(saveAction.save(this.context));
+
+        verify(this.conflictDecisionsManager).recordConflicts(DOCUMENT_REFERENCE, USER_REFERENCE,
+            newConflicts);
+        verify(this.mockResponse).setStatus(409);
+        assertEquals(String.format("{\"previousVersion\":\"1.1\",\"previousVersionDate\":\"%s\","
+            + "\"latestVersion\":\"1.3\",\"latestVersionDate\":\"%s\"}", new Date(1000), new Date(2000)),
+            responseContent.toString());
+        verify(this.xWiki, never()).saveDocument(any(), any(), anyBoolean(), any());
+    }
+
+    @Test
+    void mergeWithDeletedConflictVersion() throws Exception
+    {
+        mockConflictDecision("merge", "1.2");
+        XWikiDocument previousDocument = mockRevision("1.1");
+        XWikiDocument unmergedDocument = mock();
+        when(mockClonedDocument.clone()).thenReturn(unmergedDocument);
+        MergeDocumentResult newConflictsResult = mock();
+        when(this.mergeManager.mergeDocument(same(previousDocument), same(mockDocument), same(unmergedDocument),
+            any())).thenReturn(newConflictsResult);
+        StringWriter responseContent = mockResponseContent();
+
+        assertTrue(saveAction.save(this.context));
+
+        verify(this.mockResponse).setStatus(409);
+        assertTrue(responseContent.toString().contains("\"latestVersion\":\"1.3\""));
+        verify(this.xWiki, never()).saveDocument(any(), any(), anyBoolean(), any());
+    }
+
+    /**
+     * Mocks a request saving the user changes after the user decided how to solve the merge conflicts with the given
+     * version, while the latest version of the document is 1.3 and the user started editing version 1.1.
+     */
+    private void mockConflictDecision(String forceSave, String conflictVersion)
+    {
+        when(mockClonedDocument.getDocumentReferenceWithLocale()).thenReturn(DOCUMENT_REFERENCE);
+        when(mockClonedDocument.getComment()).thenReturn("My Changes");
+        when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.4"));
+        when(mockForm.getTemplate()).thenReturn("");
+        context.put("ajax", true);
+        when(this.propertiesConf.getProperty("edit.conflictChecking.enabled", true)).thenReturn(true);
+        when(mockRequest.getParameter("previousVersion")).thenReturn("1.1");
+        when(mockRequest.getParameter("editingVersionDate")).thenReturn("1000");
+        when(mockRequest.getParameter("forceSave")).thenReturn(forceSave);
+        when(mockRequest.getParameter("conflictVersion")).thenReturn(conflictVersion);
+        when(mockDocument.getVersion()).thenReturn("1.3");
+        when(mockDocument.getRCSVersion()).thenReturn(new Version("1.3"));
+        when(mockDocument.getDate()).thenReturn(new Date(2000));
+    }
+
+    private XWikiDocument mockRevision(String version) throws Exception
+    {
+        XWikiDocument revision = mock();
+        when(this.documentRevisionProvider.getRevision(mockDocument, version)).thenReturn(revision);
+        return revision;
+    }
+
+    private StringWriter mockResponseContent() throws Exception
+    {
+        when(this.xWiki.getEncoding()).thenReturn("UTF-8");
+        StringWriter responseContent = new StringWriter();
+        when(this.mockResponse.getWriter()).thenReturn(new PrintWriter(responseContent));
+        return responseContent;
     }
 }

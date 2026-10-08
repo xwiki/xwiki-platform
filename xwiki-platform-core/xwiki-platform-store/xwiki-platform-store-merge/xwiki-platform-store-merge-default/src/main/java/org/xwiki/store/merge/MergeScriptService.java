@@ -28,6 +28,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.diff.Conflict;
 import org.xwiki.diff.ConflictDecision;
@@ -35,6 +36,8 @@ import org.xwiki.diff.internal.DefaultConflictDecision;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.DocumentRevisionConflictException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -127,5 +130,35 @@ public class MergeScriptService implements ScriptService
         XWikiContext context = contextProvider.get();
         conflictDecisionsManager.setConflictDecisionList(decisionList,
             context.getDoc().getDocumentReferenceWithLocale(), context.getUserReference());
+    }
+
+    /**
+     * Indicates if a document couldn't be saved because it was saved or deleted concurrently by another request after
+     * it was loaded. The document should then be loaded again and the modifications applied again (or merged with the
+     * stored document) before saving it again, e.g.:
+     *
+     * <pre>{@code
+     * #foreach ($attempt in [1..5])
+     *   #set ($document = $xwiki.getDocument($reference))
+     *   ## Modify the document.
+     *   #set ($saveException = $NULL)
+     *   #try('saveException')
+     *     $document.save()
+     *   #end
+     *   #if ("$!saveException" == '' || !$services.merge.isDocumentRevisionConflict($saveException))
+     *     #break
+     *   #end
+     * #end
+     * }</pre>
+     *
+     * @param exception the exception thrown when saving a document, possibly wrapped in other exceptions (e.g. the
+     *     exception caught by the Velocity {@code #try} directive)
+     * @return {@code true} if the exception (or one of its causes) is a revision conflict, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public boolean isDocumentRevisionConflict(Throwable exception)
+    {
+        return ExceptionUtils.indexOfType(exception, DocumentRevisionConflictException.class) >= 0;
     }
 }

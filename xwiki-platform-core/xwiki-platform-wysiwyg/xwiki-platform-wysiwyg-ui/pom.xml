@@ -49,6 +49,13 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <!-- XWiki.WYSIWYG.FileUploader uses $services.merge to detect documents saved concurrently -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-merge-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <!-- The administration section is defined using ConfigurableClass -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>

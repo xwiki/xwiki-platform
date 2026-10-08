@@ -60,6 +60,10 @@ public class StoreConfiguration
     private ConfigurationSource configuration;
 
     @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesConfiguration;
+
+    @Inject
     private Logger logger;
 
     private <S> S getStore(Class<S> storeClass, String property, String defaultHint) throws ComponentLookupException
@@ -207,6 +211,16 @@ public class StoreConfiguration
     public boolean isAttachmentRecycleBinEnabled()
     {
         return !"0".equals(this.configuration.getProperty("storage.attachment.recyclebin", "1"));
+    }
+
+    /**
+     * @return {@code true} if saving a document checks that it is based on the revision currently stored, and refuses
+     *         to save it otherwise, {@code false} to let the last save overwrite the concurrent ones
+     * @since 18.9.0RC1
+     */
+    public boolean isRevisionCheckEnabled()
+    {
+        return this.xwikiPropertiesConfiguration.getProperty("store.revisionCheck.enabled", true);
     }
 
     /**

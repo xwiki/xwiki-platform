@@ -1205,6 +1205,16 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# primarily a safeguard for rare cases where this automatic cleanup fails.
 # store.fsattach.cleanOnStartup=true
 
+#-# [Since 18.9.0RC1]
+#-# Check, when saving a document, that it is based on the revision currently stored, and refuse to save it otherwise.
+#-# Without this check, when two requests (possibly on different cluster nodes) save the same document at the same
+#-# time, the last save silently overwrites the changes of the other one. The code saving a document can then load the
+#-# document again and re-apply its changes. Disable this check only if an extension relies on overwriting documents
+#-# saved concurrently and fails because of the refused saves.
+#-#
+#-# The default is:
+# store.revisionCheck.enabled = true
+
 #-# [Since 11.4RC1]
 #-# The root directory used by the various "file" stores implementation (attachment, deleted document, etc.).
 #-# 

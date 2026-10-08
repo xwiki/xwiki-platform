@@ -676,6 +676,17 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * Use the following keyboard shortcut without waiting for anything, for instance to check that it has no effect.
+     *
+     * @param shortcut the keyboard key combination to perform
+     * @since 18.9.0RC1
+     */
+    public void useShortcutKey(CharSequence... shortcut)
+    {
+        getDriver().createActions().sendKeys(shortcut).perform();
+    }
+
+    /**
      * Use the following keyboard shortcut and wait for a new page to load. This should be only used for shortcuts that
      * indeed loads a new page.
      * 

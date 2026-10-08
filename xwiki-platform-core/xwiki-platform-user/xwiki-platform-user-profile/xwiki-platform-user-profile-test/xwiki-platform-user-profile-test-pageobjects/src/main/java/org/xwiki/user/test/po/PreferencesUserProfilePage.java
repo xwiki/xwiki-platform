@@ -42,9 +42,6 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
     @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div//dd[@data-user-property = 'editor']")
     private WebElement defaultEditorToUse;
 
-    @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[5]/dd[1]")
-    private WebElement viewEditShortcut;
-
     @FindBy(xpath = "//a[@id='changePassword']")
     private WebElement changePassword;
 
@@ -69,9 +66,13 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
         return this.timezone.getText();
     }
 
+    /**
+     * @return the shortcut used to edit the current page with the default editor
+     */
     public String getViewEditShortcut()
     {
-        return this.viewEditShortcut.getText();
+        return getDriver().findElement(By.cssSelector("li[data-translate-key='core.shortcuts.view.edit'] > span"))
+            .getText();
     }
 
     public PreferencesEditPage editPreferences()

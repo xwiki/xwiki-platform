@@ -92,21 +92,28 @@ var XWiki = (function(XWiki) {
 
     addShortcuts: function() {
       var shortcuts = {
-        'action_cancel' : "#getShortcutValue('core.shortcuts.edit.cancel' true)",
-        'action_preview' : "#getShortcutValue('core.shortcuts.edit.preview' true)",
+        'action_cancel' : "$services.localization.render('core.shortcuts.edit.cancel')",
+        'action_preview' : "$services.localization.render('core.shortcuts.edit.preview')",
         // The following 2 are both "Back to edit" in the preview mode, depending on the used editor
-        'action_edit' : "#getShortcutValue('core.shortcuts.edit.backtoedit' true)",
-        'action_inline' : "#getShortcutValue('core.shortcuts.edit.backtoedit' true)",
-        'action_save' : "#getShortcutValue('core.shortcuts.edit.save' true)",
-        'action_propupdate' : "#getShortcutValue('core.shortcuts.edit.saveandview' true)",
-        'action_saveandcontinue' : "#getShortcutValue('core.shortcuts.edit.saveandcontinue' true)"
-      };
+        'action_edit' : "$services.localization.render('core.shortcuts.edit.backtoedit')",
+        'action_inline' : "$services.localization.render('core.shortcuts.edit.backtoedit')",
+        'action_save' : "$services.localization.render('core.shortcuts.edit.saveandview')",
+        'action_propupdate' : "$services.localization.render('core.shortcuts.edit.saveandview')",
+        'action_saveandcontinue' : "$services.localization.render('core.shortcuts.edit.saveandcontinue')"
+      }
       for (var key in shortcuts) {
         var targetButtons = $$("input[name=" + key + "]");
         if (targetButtons.length) {
-          shortcut.add(shortcuts[key], function() {
-            this.click();
-          }.bind(targetButtons.first()));
+          var targetButton = targetButtons.first();
+          // The buttons displayed by the edit actions hold the shortcut defined in the user preferences, which is empty
+          // when the user unbinds it.
+          var buttonShortcut = targetButton.hasAttribute('data-shortcut') ? targetButton.dataset.shortcut
+            : shortcuts[key];
+          if (buttonShortcut) {
+            shortcut.add(buttonShortcut, function() {
+              this.click();
+            }.bind(targetButton));
+          }
         }
       }
     },
@@ -274,6 +281,7 @@ var XWiki = (function(XWiki) {
 
       this.savedBox.hide();
       this.failedBox.hide();
+      
       var isContinue = event.memo["continue"];
       this.form = $(event.memo.form);
 

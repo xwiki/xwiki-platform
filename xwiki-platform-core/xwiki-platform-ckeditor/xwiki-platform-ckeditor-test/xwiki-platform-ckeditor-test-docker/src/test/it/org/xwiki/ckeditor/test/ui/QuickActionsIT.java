@@ -504,12 +504,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(22)
     void toc()
     {
-        textArea.sendKeys("/toc");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/toc", "Table of Contents");
-        textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        textArea.waitForContentRefresh();
+        textArea.insertMacro("/toc", "Table of Contents");
 
         assertSourceEquals("{{toc/}}\n\n ");
     }

@@ -121,8 +121,6 @@ class MacroIT extends AbstractCKEditorIT
             Inline {{box}}<param></param>{{/box}}.
             {{/box}}""");
 
-        this.textArea.waitUntilContentContains("Inline");
-
         ViewPage viewPage = editPage.clickSaveAndView();
         assertThat(viewPage.getContent(), containsString("<param></param>"));
     }
@@ -136,12 +134,9 @@ class MacroIT extends AbstractCKEditorIT
         assertEquals("before\nmacro:id\nafter", this.textArea.getText());
 
         this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
-        this.textArea.waitUntilWidgetSelected();
-        this.textArea.sendKeys(Keys.ENTER);
-        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
+        MacroDialogEditModal macroEditModal = this.textArea.editSelectedMacro();
         assertEquals("test", macroEditModal.getMacroParameter("name"));
         macroEditModal.setMacroParameter("name", "foo").clickSubmit();
-        this.textArea.waitForContentRefresh();
 
         assertEquals("before\nmacro:id\nafter", this.textArea.getText());
         assertSourceEquals("before\n\n{{id name=\"foo\"/}}\n\nafter");
@@ -191,8 +186,6 @@ class MacroIT extends AbstractCKEditorIT
             {{/success}}
 
             //three//""").clickSubmit();
-
-        this.textArea.waitForContentRefresh();
 
         // Modify again the tile parameter and the macro content inline.
         this.textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.RIGHT));
@@ -251,8 +244,7 @@ class MacroIT extends AbstractCKEditorIT
         macroEditModal.setMacroParameter("title", "This is a title!");
         macroEditModal.setMacroContent("This is an info macro!");
         macroEditModal.clickSubmit();
-        this.textArea.waitForContentRefresh();
-        this.textArea.waitUntilTextContains("This is an info macro!");
+        assertThat(this.textArea.getText(), containsString("This is an info macro!"));
 
         // Edit the title parameter and then the macro content in-line, moving the caret from the paragraph placed
         // before the macro.
@@ -299,7 +291,7 @@ class MacroIT extends AbstractCKEditorIT
         macroEditModal.getMacroParameterSuggestInput("reference").sendKeys("Displayed").waitForNonTypedSuggestions()
             .selectByIndex(0);
         macroEditModal.clickSubmit();
-        this.textArea.waitUntilTextContains("Displayed page content");
+        assertThat(this.textArea.getText(), containsString("Displayed page content"));
 
         assertSourceEquals(
             String.format("{{display reference=\"%s\"/}}", setup.serializeLocalReference(displayedReference)));

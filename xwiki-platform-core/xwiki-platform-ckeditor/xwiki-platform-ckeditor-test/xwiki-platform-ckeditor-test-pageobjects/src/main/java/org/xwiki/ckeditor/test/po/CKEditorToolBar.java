@@ -19,7 +19,6 @@
  */
 package org.xwiki.ckeditor.test.po;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.openqa.selenium.By;
@@ -129,15 +128,12 @@ public class CKEditorToolBar extends BaseElement
      */
     public void insertInfoBox()
     {
-        RichTextAreaElement textArea = this.editor.getRichTextArea(false);
-        String refreshCounter = textArea.getRefreshCounter();
-        clickInsertMenuItem("infoBox");
-        // The inserted macro is rendered server-side, which reloads the edited content.
-        getDriver().waitUntilCondition(driver -> !Objects.equals(refreshCounter, textArea.getRefreshCounter()));
+        this.editor.runAndWaitForContentRefresh(() -> clickInsertMenuItem("infoBox"));
     }
 
     /**
-     * Open the macro selection modal using the Other Macros entry of the Insert menu.
+     * Open the macro selection modal using the Other Macros entry of the Insert menu. Submitting the macro edit modal
+     * that follows waits for the inserted macro to be rendered.
      *
      * @return the page object for the macro selection modal
      * @since 17.10.14
@@ -147,7 +143,7 @@ public class CKEditorToolBar extends BaseElement
     public MacroDialogSelectModal insertOtherMacro()
     {
         clickInsertMenuItem("xwiki-macro");
-        return new MacroDialogSelectModal().waitUntilReady();
+        return new MacroDialogSelectModal(this.editor::runAndWaitForContentRefresh).waitUntilReady();
     }
 
     /**

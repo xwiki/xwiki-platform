@@ -132,7 +132,8 @@ class AbstractHibernateDataMigrationTest
     @Test
     void migrateWithoutCacheStore() throws Exception
     {
-        when(this.wiki.getStore()).thenReturn(mock(XWikiStoreInterface.class));
+        XWikiStoreInterface store = mock(XWikiStoreInterface.class);
+        when(this.wiki.getStore()).thenReturn(store);
 
         this.dataMigration.migrate();
 

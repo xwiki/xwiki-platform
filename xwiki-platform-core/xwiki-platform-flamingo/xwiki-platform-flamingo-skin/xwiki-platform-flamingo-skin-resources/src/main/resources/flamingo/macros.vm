@@ -69,17 +69,27 @@
 <input class="btn $!class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$escapetool.xml($shortcut)"#end value="$value"/>
 #end
 #**
- * Returns the unescaped value of the shortcut as a String. This value can be set in two ways: via user preferences and wiki level translation
+ * Returns the value of the shortcut as a String. This value can be set in two ways: via user preferences and wiki level translation
  * keys. If there are both, the user preference will take priority.
  * @param translationKey  The key of the translation containing the wiki level defined shortcut.
  *        e.g. `core.shortcuts.developer.user.type`
+ * @param escapeJavaScript Optional, whether to escape the value for a JavaScript string. The value is unescaped by default.
  * @since 18.9.0RC1
  *#
-#macro(getShortcutValue $translationKey)
-#set ($shortcutPreferenceObject = $crtUserDoc.getObject('XWiki.UserPreferenceShortcutsClass', 'translationKey', $translationKey))
-#if("$!shortcutPreferenceObject"!='')$shortcutPreferenceObject.value##
-#{else}$services.localization.render($translationKey)##
+#macro(getShortcutValue $translationKey $escapeJavaScript)
+## The current user document isn't defined when evaluating a skin resource, like a JavaScript file.
+#set ($shortcutUserDoc = $crtUserDoc)
+#if (!$shortcutUserDoc)
+#set ($shortcutUserDoc = $xwiki.getDocument($xcontext.user))
 #end
+#set ($shortcutPreferenceObject = '')
+#set ($shortcutPreferenceObject = $shortcutUserDoc.getObject('XWiki.UserPreferenceShortcutsClass', 'translationKey', $translationKey))
+#if("$!shortcutPreferenceObject"!='')
+#set ($shortcutValue = "$!shortcutUserDoc.getValue('value', $shortcutPreferenceObject)")
+#else
+#set ($shortcutValue = $services.localization.render($translationKey))
+#end
+#if ($escapeJavaScript)$escapetool.javascript($shortcutValue)#else$shortcutValue#end##
 #end
 #**
  * Displays a submit button for the editor. This macro calls submitButton,

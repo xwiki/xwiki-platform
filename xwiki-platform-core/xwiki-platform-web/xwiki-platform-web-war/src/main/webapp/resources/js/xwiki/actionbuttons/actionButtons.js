@@ -91,18 +91,16 @@ var XWiki = (function(XWiki) {
     },
 
     addShortcuts: function() {
-      ## Somehow the crtUserDoc variable is not properly set when evaluating this file with VTL. We set it again
-      #set($crtUserDoc = $!xwiki.getDocument($xcontext.user))
-      #set ($shortcutMap = {})
-      #set ($discard = $shortcutMap.put("action_cancel", "#getShortcutValue('core.shortcuts.edit.cancel')"))
-      #set ($discard = $shortcutMap.put("action_preview", "#getShortcutValue('core.shortcuts.edit.preview')"))
-      ## The following two entries are both "Back to edit" in the preview mode, depending on the used editor
-      #set ($discard = $shortcutMap.put("action_edit", "#getShortcutValue('core.shortcuts.edit.backtoedit')"))
-      #set ($discard = $shortcutMap.put("action_inline", "#getShortcutValue('core.shortcuts.edit.backtoedit')"))
-      #set ($discard = $shortcutMap.put("action_save", "#getShortcutValue('core.shortcuts.edit.save')"))
-      #set ($discard = $shortcutMap.put("action_propupdate", "#getShortcutValue('core.shortcuts.edit.saveandview')"))
-      #set ($discard = $shortcutMap.put("action_saveandcontinue", "#getShortcutValue('core.shortcuts.edit.saveandcontinue')"))
-      var shortcuts = $jsontool.serialize($shortcutMap);
+      var shortcuts = {
+        'action_cancel' : "#getShortcutValue('core.shortcuts.edit.cancel' true)",
+        'action_preview' : "#getShortcutValue('core.shortcuts.edit.preview' true)",
+        // The following 2 are both "Back to edit" in the preview mode, depending on the used editor
+        'action_edit' : "#getShortcutValue('core.shortcuts.edit.backtoedit' true)",
+        'action_inline' : "#getShortcutValue('core.shortcuts.edit.backtoedit' true)",
+        'action_save' : "#getShortcutValue('core.shortcuts.edit.save' true)",
+        'action_propupdate' : "#getShortcutValue('core.shortcuts.edit.saveandview' true)",
+        'action_saveandcontinue' : "#getShortcutValue('core.shortcuts.edit.saveandcontinue' true)"
+      };
       for (var key in shortcuts) {
         var targetButtons = $$("input[name=" + key + "]");
         if (targetButtons.length) {

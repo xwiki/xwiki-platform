@@ -184,6 +184,13 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-profile-preferences'], functi
       defaultValue, url));
     shortcutPreference.data('pendingRequest', request.catch(() => {}));
   };
+  let notifyResult = function (request, action) {
+    return request.then(() => {
+      new XWiki.widgets.Notification(l10n[`shortcut.notifications.${action}.successful`], 'done');
+    }).catch(() => {
+      new XWiki.widgets.Notification(l10n[`shortcut.notifications.${action}.failed`], 'error');
+    });
+  };
   let saveShortcut = function (shortcutPreference, translateKey, newValue, defaultValue, url) {
     const oldItemNumber = shortcutPreference.attr("data-shortcut-pref-number");
     if (oldItemNumber == null) {
@@ -195,31 +202,27 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-profile-preferences'], functi
           'property#translationKey': translateKey,
           'property#value': newValue
         };
-        return Promise.resolve($.post(creationUrl, data)).then(newObject => {
+        return notifyResult(Promise.resolve($.post(creationUrl, data)).then(newObject => {
           shortcutPreference.attr("data-shortcut-pref-number", newObject.firstChild.getElementsByTagName("number")[0].textContent);
-        });
+        }), 'update');
       }
     } else if (newValue === defaultValue) {
       // Remove the existing preference, we don't want to keep it if the user is back to normal.
       const destructionUrl = url + "/objects/XWiki.UserPreferenceShortcutsClass/" + oldItemNumber;
       shortcutPreference.removeAttr("data-shortcut-pref-number");
-      return Promise.resolve($.ajax({url: destructionUrl,
+      return notifyResult(Promise.resolve($.ajax({url: destructionUrl,
         type: "DELETE"
-      }));
+      })), 'reset');
     } else {
       // Update the existing preference
       const updateUrl = url + "/objects/XWiki.UserPreferenceShortcutsClass/" + oldItemNumber +"/properties/value";
       const data = {
         'property#value': newValue
       };
-      return Promise.resolve($.ajax({url: updateUrl,
+      return notifyResult(Promise.resolve($.ajax({url: updateUrl,
         type: "PUT",
         data: data
-      })).then(() => {
-        new XWiki.widgets.Notification(l10n['shortcut.notifications.update.successful'], 'done');
-      }).catch(() => {
-        new XWiki.widgets.Notification(l10n['shortcut.notifications.update.failed'], 'error');
-      });
+      })), 'update');
     }
   };
   /**
@@ -465,7 +468,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-profile-preferences'], functi
   #set ($escapedSelectId = $escapetool.xml("XWiki.UserPreferenceShortcutsClass_${fieldNumber}"))
   #set ($escapedHintId = $escapedSelectId + "_hint")
   #set ($defaultValue = $escapetool.xml($services.localization.render($translationKey)))
-  &lt;li&gt;
+  &lt;li data-translate-key="$escapetool.xml($translationKey)"&gt;
     &lt;label #if($isEdit)for="$escapedSelectId"#end&gt;$!escapetool.xml($services.localization.render($label))
       &lt;span id="$escapedHintId" class='xHint'&gt;##
       $escapetool.xml($services.localization.render('userprofile.default')): $defaultValue##

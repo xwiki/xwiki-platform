@@ -108,7 +108,7 @@ class SearchSuggestIT
 
         // Configure search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();
-        searchAdminPage.getSearchExclusionsField().sendKeys("Banana").waitForSuggestions().selectByVisibleText("Banana")
+        searchAdminPage.getSearchExclusionsField().sendKeys("Banana").selectByVisibleText("Banana")
             .hideSuggestions();
         searchAdminPage.clickSave();
 

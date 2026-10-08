@@ -408,7 +408,6 @@ class QuickActionsIT extends AbstractCKEditorIT
         SuggestInputElement reference =
             new SuggestInputElement(macroDialogEditModal.getMacroParameterInput("reference"));
         reference.sendKeys("TestInclude")
-            .waitForNonTypedSuggestions()
             .selectByIndex(0);
         macroDialogEditModal.clickSubmit();
 

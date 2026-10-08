@@ -64,7 +64,7 @@ class PagePickerIT
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
 
-        pagePicker.sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions().selectByVisibleText(pageName);
+        pagePicker.sendKeys(pageName.substring(0, 3)).selectByVisibleText(pageName);
         // Clear and perform the same query again. We don't wait for remote suggestions this time because the query
         // results have been cached.
         pagePicker.clearSelectedSuggestions().sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions(false)
@@ -102,8 +102,7 @@ class PagePickerIT
         assertEquals(1, suggestions.size());
         assertEquals(pageTitle, suggestions.get(0).getLabel());
         // Just to be sure that searching for the children also works, search and select the first child.
-        pagePicker.clear().sendKeys(childName + "0").waitForNonTypedSuggestions()
-            .selectByVisibleText("Child page 0");
+        pagePicker.clear().sendKeys(childName + "0").selectByVisibleText("Child page 0");
     }
 
     @ParameterizedTest

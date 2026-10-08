@@ -290,8 +290,7 @@ class MacroIT extends AbstractCKEditorIT
 
         MacroDialogEditModal macroEditModal =
             this.editor.getToolBar().insertOtherMacro().filterByText("Display other pages", 1).clickSelect();
-        macroEditModal.getMacroParameterSuggestInput("reference").sendKeys("Displayed").waitForNonTypedSuggestions()
-            .selectByIndex(0);
+        macroEditModal.getMacroParameterSuggestInput("reference").sendKeys("Displayed").selectByIndex(0);
         macroEditModal.clickSubmit();
         assertThat(this.textArea.getText(), containsString("Displayed page content"));
 

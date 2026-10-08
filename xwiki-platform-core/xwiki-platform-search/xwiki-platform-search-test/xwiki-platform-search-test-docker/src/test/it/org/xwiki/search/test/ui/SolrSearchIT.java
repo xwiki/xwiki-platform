@@ -306,8 +306,8 @@ class SolrSearchIT
 
         // Configure search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();
-        searchAdminPage.getSearchExclusionsField().sendKeys("Two").waitForSuggestions().selectByVisibleText("Two")
-            .clear().sendKeys("Three").waitForSuggestions().selectByVisibleText("Three").hideSuggestions();
+        searchAdminPage.getSearchExclusionsField().sendKeys("Two").selectByVisibleText("Two")
+            .clear().sendKeys("Three").selectByVisibleText("Three").hideSuggestions();
         searchAdminPage.clickSave();
 
         // Check the search results after configuring search exclusions.

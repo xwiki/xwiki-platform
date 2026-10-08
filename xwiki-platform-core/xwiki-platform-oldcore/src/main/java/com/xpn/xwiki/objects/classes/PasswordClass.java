@@ -410,8 +410,8 @@ public class PasswordClass extends StringClass
 
     private @NonNull PasswordEncoder getPasswordEncoder(String algorithmName)
     {
-        if (this.ENCODERS_MAP.containsKey(algorithmName)) {
-            return this.ENCODERS_MAP.get(algorithmName);
+        if (ENCODERS_MAP.containsKey(algorithmName)) {
+            return ENCODERS_MAP.get(algorithmName);
         } else {
             throw new IllegalArgumentException(String.format("The algorithm [%s] is not supported for password hash.",
                 algorithmName));

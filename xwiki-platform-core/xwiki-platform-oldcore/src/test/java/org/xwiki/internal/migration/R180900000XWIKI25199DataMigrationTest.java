@@ -68,7 +68,8 @@ class R180900000XWIKI25199DataMigrationTest
         when(this.execution.getContext()).thenReturn(executionContext);
         XWikiContext xcontext = mock(XWikiContext.class);
         when(executionContext.getProperty("xwikicontext")).thenReturn(xcontext);
-        when(xcontext.getWiki()).thenReturn(mock(XWiki.class));
+        XWiki xwiki = mock(XWiki.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
     }
 
     @Test

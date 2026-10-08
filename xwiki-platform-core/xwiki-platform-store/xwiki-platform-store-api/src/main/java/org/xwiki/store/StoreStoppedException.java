@@ -17,25 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.store;
 
-import org.xwiki.index.IndexException;
+import org.xwiki.stability.Unstable;
 
 /**
- * Indicate that a pending operation of the Solr indexer could not be completed because the indexer was stopped (e.g.
- * when XWiki is stopping). It's not an error: the operation was interrupted on purpose.
+ * Indicate that a pending operation of a store could not be completed because the store was stopped (e.g. when XWiki
+ * is stopping). It's not an error: the operation was interrupted on purpose. In particular, a {@link ReadyIndicator}
+ * whose store is stopped before becoming ready is completed with this exception.
  *
  * @version $Id$
  * @since 18.9.0RC1
  */
-public class SolrIndexerStoppedException extends IndexException
+@Unstable
+public class StoreStoppedException extends Exception
 {
     private static final long serialVersionUID = 1L;
 
     /**
      * @param message the detail message
      */
-    public SolrIndexerStoppedException(String message)
+    public StoreStoppedException(String message)
     {
         super(message);
     }

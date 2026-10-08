@@ -39,7 +39,6 @@ import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.search.solr.internal.SolrIndexerStoppedException;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
@@ -47,6 +46,7 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
+import org.xwiki.store.StoreStoppedException;
 
 /**
  * Provide progress information and store logging of an advanced indexing.
@@ -214,7 +214,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
 
             return true;
         } catch (ExecutionException e) {
-            if (e.getCause() instanceof SolrIndexerStoppedException) {
+            if (e.getCause() instanceof StoreStoppedException) {
                 // The indexer is stopped (e.g. XWiki is stopping): there's nothing to clean since the synchronization
                 // will be executed again at the next start.
                 this.logger.info("The synchronization of the Solr index was interrupted because the indexer stopped.");

@@ -27,6 +27,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.store.ReadyIndicator;
+import org.xwiki.store.StoreStoppedException;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -84,7 +85,7 @@ class DefaultSolrIndexerTest
         // The indexer won't become ready again, which is reported as a stop and not as a failure.
         ExecutionException exception =
             assertThrows(ExecutionException.class, () -> readyIndicator.get(10, TimeUnit.SECONDS));
-        SolrIndexerStoppedException cause = assertInstanceOf(SolrIndexerStoppedException.class, exception.getCause());
+        StoreStoppedException cause = assertInstanceOf(StoreStoppedException.class, exception.getCause());
         assertEquals("The indexer has been disposed", cause.getMessage());
     }
 }

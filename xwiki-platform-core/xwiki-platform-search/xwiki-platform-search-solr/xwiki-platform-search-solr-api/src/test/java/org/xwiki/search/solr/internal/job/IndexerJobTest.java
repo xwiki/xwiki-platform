@@ -36,12 +36,12 @@ import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.search.solr.internal.SolrIndexerStoppedException;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.store.ReadyIndicator;
+import org.xwiki.store.StoreStoppedException;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -218,7 +218,7 @@ class IndexerJobTest
         this.request.setCleanInvalid(true);
         mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
         mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
-        mockWaitReady(new SolrIndexerStoppedException("Indexing stopped."));
+        mockWaitReady(new StoreStoppedException("Indexing stopped."));
 
         this.indexerJob.runInternal();
 

@@ -19,28 +19,28 @@
  */
 package org.xwiki.store;
 
-import java.util.concurrent.Future;
-
 import org.xwiki.stability.Unstable;
 
 /**
- * An indicator if a store is ready, i.e., has completed all writes/indexing tasks that have been submitted before
- * the indicator was requested. If the indexing tasks cannot be completed, e.g., because the indexer has been
- * stopped, the {@link Future} is completed with an exception. When it's because the store was stopped (e.g., when
- * XWiki is stopping), that exception is a {@link StoreStoppedException} (since 17.10.14, 18.4.7 and 18.9.0RC1), so
- * {@link #get()} throws an {@link java.util.concurrent.ExecutionException} whose cause is a
- * {@link StoreStoppedException}.
+ * Indicate that a pending operation of a store could not be completed because the store was stopped (e.g. when XWiki
+ * is stopping). It's not an error: the operation was interrupted on purpose. In particular, a {@link ReadyIndicator}
+ * whose store is stopped before becoming ready is completed with this exception.
  *
- * @since 16.9.0RC1
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
+ * @since 18.9.0RC1
  */
 @Unstable
-public interface ReadyIndicator extends Future<Void>
+public class StoreStoppedException extends Exception
 {
+    private static final long serialVersionUID = 1L;
+
     /**
-     *
-     * @return a value between 0 and 100 that expresses the progress towards being ready. Values might jump
-     * non-linearly and might not be fully accurate.
+     * @param message the detail message
      */
-    int getProgressPercentage();
+    public StoreStoppedException(String message)
+    {
+        super(message);
+    }
 }

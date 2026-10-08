@@ -511,6 +511,14 @@ class UserProfileIT
         preferencesPage = userProfilePage.switchToPreferences();
         assertEquals(UNBOUND_SHORTCUT, preferencesPage.getInformationShortcut());
 
+        // Cancelling the edition doesn't save the shortcut preferences, like the other preferences.
+        preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.setShortcutInformation(NEW_SHORTCUT_VALUE);
+        preferencesEditPage.clickCancel();
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        assertEquals(UNBOUND_SHORTCUT, preferencesPage.getInformationShortcut());
+
         viewPage = setup.gotoPage(testReference);
         infoPane = viewPage.openInformationDocExtraPane();
         commentsPane = viewPage.openCommentsDocExtraPane();

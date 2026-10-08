@@ -30,10 +30,6 @@ import org.xwiki.test.ui.po.editor.EditPage;
 /** User profile, the preferences pane, edit mode. */
 public class PreferencesEditPage extends EditPage
 {
-    private static final String SHORTCUT_SAVED_MESSAGE = "Updated shortcut preference";
-
-    private static final String SHORTCUT_RESET_MESSAGE = "Reset shortcut preference";
-
     private static final String INFORMATION_SHORTCUT = "core.shortcuts.view.information";
 
     @FindBy(id = "XWiki.XWikiUsers_0_editor")
@@ -92,9 +88,9 @@ public class PreferencesEditPage extends EditPage
     }
 
     /**
-     * Sets the shortcut used to edit the current page with the default editor, and waits for it to be saved.
+     * Sets the shortcut used to edit the current page with the default editor. It's saved with the form.
      *
-     * @param shortcutValue the new shortcut, must be different from the current one
+     * @param shortcutValue the new shortcut
      */
     public void setShortcutViewEdit(String shortcutValue)
     {
@@ -102,9 +98,9 @@ public class PreferencesEditPage extends EditPage
     }
 
     /**
-     * Sets the shortcut used to open the information tab of the current page, and waits for it to be saved.
+     * Sets the shortcut used to open the information tab of the current page. It's saved with the form.
      *
-     * @param shortcutValue the new shortcut, must be different from the current one, empty to unbind the shortcut
+     * @param shortcutValue the new shortcut, empty to unbind the shortcut
      */
     public void setShortcutInformation(String shortcutValue)
     {
@@ -112,8 +108,8 @@ public class PreferencesEditPage extends EditPage
     }
 
     /**
-     * Resets the shortcut used to open the information tab of the current page to its default value, and waits for
-     * the shortcut preference to be removed.
+     * Resets the shortcut used to open the information tab of the current page to its default value. The shortcut
+     * preference is removed when the form is saved.
      */
     public void resetShortcutInformation()
     {
@@ -121,13 +117,12 @@ public class PreferencesEditPage extends EditPage
             .findElement(By.xpath("following-sibling::button[contains(@class, 'reset-shortcut-preference')]"));
         getDriver().scrollTo(resetButton);
         resetButton.click();
-        waitForNotificationSuccessMessage(SHORTCUT_RESET_MESSAGE);
     }
 
     /**
-     * Sets the shortcut used to cancel the edition, and waits for it to be saved.
+     * Sets the shortcut used to cancel the edition. It's saved with the form.
      *
-     * @param shortcutValue the new shortcut, must be different from the current one
+     * @param shortcutValue the new shortcut
      */
     public void setShortcutEditCancel(String shortcutValue)
     {
@@ -152,11 +147,9 @@ public class PreferencesEditPage extends EditPage
     {
         WebElement shortcutInput = getShortcutInput(translationKey);
         getDriver().scrollTo(shortcutInput);
-        // Clear the input with key presses, so that the shortcut preference is saved even when it's unbound.
+        // Clear the input with key presses, so that the form knows about the change even when the shortcut is unbound.
         shortcutInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
         shortcutInput.sendKeys(shortcutValue);
-        // The shortcut preference is saved in the background as soon as it's typed.
-        waitForNotificationSuccessMessage(SHORTCUT_SAVED_MESSAGE);
     }
 
     private WebElement getShortcutInput(String translationKey)

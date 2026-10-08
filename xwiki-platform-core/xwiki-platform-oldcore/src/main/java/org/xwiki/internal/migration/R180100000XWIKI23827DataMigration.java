@@ -225,15 +225,18 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
     {
         XWiki wiki = getXWikiContext().getWiki();
         String className = xClassWithPasswordProperties.getClassName();
-        String objectIdsQuery =  "select obj.id "
-            + "from BaseObject as obj "
-            + "where obj.className = :className "
+        // Only the objects still holding a StringProperty for one of the password fields need to be migrated: the
+        // others (e.g. already migrated, since the migration can be executed again) can be skipped.
+        String objectIdsQuery = "select distinct obj.id "
+            + "from BaseObject as obj, StringProperty as prop "
+            + "where obj.className = :className and prop.id.id = obj.id and prop.id.name in (:propNames) "
             + "order by obj.id";
         List<Long> results;
         try {
             results = wiki.getStore().getQueryManager()
                 .createQuery(objectIdsQuery, Query.HQL)
                 .bindValue("className", className)
+                .bindValue("propNames", xClassWithPasswordProperties.getProperties())
                 .execute();
         } catch (QueryException e) {
             throw new DataMigrationException(

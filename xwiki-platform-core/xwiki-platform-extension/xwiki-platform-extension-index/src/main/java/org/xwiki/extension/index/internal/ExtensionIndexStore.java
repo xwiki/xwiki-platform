@@ -462,10 +462,17 @@ public class ExtensionIndexStore implements Initializable, Disposable
     public void updateInstalled(ExtensionId extensionId, String namespace, boolean installed)
         throws SolrServerException, IOException
     {
+        String id = this.extensionIndexSolrUtil.toSolrId(extensionId);
+
+        // An installed extension is not necessarily indexed (for example an extension coming from a non searchable
+        // repository like Maven Central). The installed state is set when an extension is added to the index.
+        if (!isIndexed(id)) {
+            return;
+        }
+
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
-            this.extensionIndexSolrUtil.toSolrId(extensionId), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, id, document);
 
         // Update installed
         this.utils.setAtomic(
@@ -498,14 +505,35 @@ public class ExtensionIndexStore implements Initializable, Disposable
     public void updateCompatible(ExtensionId extensionId, String namespace, Boolean compatible, Boolean incompatible)
         throws SolrServerException, IOException
     {
+        String id = this.extensionIndexSolrUtil.toSolrId(extensionId);
+
+        if (!isIndexed(id)) {
+            return;
+        }
+
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
-            this.extensionIndexSolrUtil.toSolrId(extensionId), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, id, document);
 
         updateCompatible(document, namespace, compatible, incompatible);
 
         add(document);
+    }
+
+    /**
+     * Solr creates the document when an atomic update targets a document which does not exist, and such a document
+     * would only contain the updated fields (no extension id, version, repository, etc.).
+     * <p>
+     * The document is looked up with a real-time get, so that a document added but not yet committed is found.
+     *
+     * @param id the Solr identifier of the document
+     * @return true if a document with the passed identifier exists in the index
+     * @throws IOException if there is a communication error with the server
+     * @throws SolrServerException if there is an error on the server
+     */
+    private boolean isIndexed(String id) throws SolrServerException, IOException
+    {
+        return this.client.getById(id, new SolrQuery().setFields(AbstractSolrCoreInitializer.SOLR_FIELD_ID)) != null;
     }
 
     private void updateCompatible(SolrInputDocument document, String namespace, Boolean compatible,

@@ -20,6 +20,9 @@
 package com.xpn.xwiki.objects.classes;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
@@ -39,6 +42,9 @@ class PasswordClassTest
     private static final String PLAIN_PASSWORD = "secret";
 
     private final PasswordClass passwordClass = new PasswordClass();
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void fromStringWithFormPlaceholder() throws Exception
@@ -93,5 +99,35 @@ class PasswordClassTest
         BaseProperty property = this.passwordClass.fromString(PLAIN_PASSWORD);
 
         assertEquals(PLAIN_PASSWORD, property.getValue());
+    }
+
+    @Test
+    void getPasswordHashWithDeprecatedAlgorithm()
+    {
+        String hash = this.passwordClass.getPasswordHash(PLAIN_PASSWORD, PasswordClass.SHA_256_ALGORITHM);
+
+        assertTrue(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, hash));
+
+        // The usage of the deprecated algorithm is logged once for computing the hash, and once for checking it.
+        assertEquals(2, this.logCapture.size());
+        assertEquals("An outdated algorithm [SHA-256] (or an outdated version of it) is used in a PasswordClass "
+            + "property not yet attached to an object", this.logCapture.getMessage(0));
+        assertEquals(this.logCapture.getMessage(0), this.logCapture.getMessage(1));
+    }
+
+    @Test
+    void arePasswordsMatchingWithLegacyHash()
+    {
+        // Legacy hash of PLAIN_PASSWORD, using SHA-512 and the salt "abcd", not re-encoded by
+        // XWikiLegacyPasswordEncoder yet.
+        String legacyHash = "hash:SHA-512:abcd:b352183394a5006c92614d401e22ef6ace71a3c46b3ef4109508fb59711282cd011d7735"
+            + "da75dc6672ba8e413887d30a89e33aa30e2fdec1a562128425408981";
+
+        assertTrue(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, legacyHash));
+
+        // The log must name the legacy algorithm the password relies on, not the one used for re-encoded passwords.
+        assertEquals(1, this.logCapture.size());
+        assertEquals("An outdated algorithm [SHA-512] (or an outdated version of it) is used in a PasswordClass "
+            + "property not yet attached to an object", this.logCapture.getMessage(0));
     }
 }

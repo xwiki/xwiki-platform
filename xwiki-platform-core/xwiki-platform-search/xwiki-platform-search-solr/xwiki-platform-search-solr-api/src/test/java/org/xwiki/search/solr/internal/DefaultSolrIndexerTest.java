@@ -23,12 +23,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.store.ReadyIndicator;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -43,8 +49,18 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultSolrIndexerTest
 {
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
     @MockComponent
     private SolrConfiguration configuration;
+
+    // Needed by the resolve and index threads to initialize their execution context.
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    private ExecutionContextManager executionContextManager;
 
     @InjectMockComponents
     private DefaultSolrIndexer indexer;
@@ -53,6 +69,9 @@ class DefaultSolrIndexerTest
     void beforeComponent()
     {
         when(this.configuration.getIndexerQueueCapacity()).thenReturn(10);
+
+        // The resolve and index threads get their execution context components through the static component manager.
+        Utils.setComponentManager(this.componentManager);
     }
 
     @Test

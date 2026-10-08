@@ -20,6 +20,8 @@
 package org.xwiki.administration.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.ConfirmationModal;
 
 /**
@@ -33,6 +35,9 @@ public class DeleteGroupConfirmationModal extends ConfirmationModal
     public DeleteGroupConfirmationModal()
     {
         super(By.id("deleteGroupModal"));
+
+        // Wait for the modal content to be loaded.
+        waitUntilReady();
     }
 
     @Override
@@ -40,5 +45,25 @@ public class DeleteGroupConfirmationModal extends ConfirmationModal
     {
         super.clickOk();
         waitForNotificationSuccessMessage("Group deleted");
+    }
+
+    /**
+     * The modal content is loaded asynchronously so we must wait for it.
+     *
+     * @return this modal
+     */
+    private DeleteGroupConfirmationModal waitUntilReady()
+    {
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                // The delete group button is enabled as soon as the modal content is loaded.
+                return getDriver().findElementWithoutWaiting(DeleteGroupConfirmationModal.this.container,
+                    By.cssSelector(".modal-footer .btn-danger")).isEnabled();
+            }
+        });
+        return this;
     }
 }

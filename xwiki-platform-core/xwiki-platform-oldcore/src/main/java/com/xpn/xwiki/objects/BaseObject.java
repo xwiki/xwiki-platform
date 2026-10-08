@@ -501,7 +501,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     /**
      * Set the defined property with the given value in the current object.
      * The given value might be a {@link String} or a type supported by the property. If a {@link String} is given
-     * then {@link com.xpn.xwiki.objects.classes.PropertyClassInterface#fromString(String)} will be used.
+     * then {@link com.xpn.xwiki.objects.classes.PropertyClassInterface#fromString(String)} will be used: if it
+     * returns {@code null}, the property is left unchanged.
      * @param fieldname the name of the property to set
      * @param value the value to set
      * @param context the context to use for setting the value
@@ -518,9 +519,11 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             if (prop == null) {
                 prop = newProp;
                 createProp = true;
-            } else {
+            } else if (newProp != null) {
                 prop.setValue(newProp.getValue());
             }
+            // When fromString returns null (e.g. PasswordClass for the password placeholder sent back by a form),
+            // the existing property keeps its current value.
         } else {
             if ((prop == null) && (pclass != null)) {
                 prop = pclass.newProperty();

@@ -344,4 +344,30 @@ class MacroIT extends AbstractBlockNoteIT
             foo
             {{/success}}""", wikiEditor.getContent());
     }
+
+    @Test
+    @Order(4)
+    void editCodeMacro(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, """
+            {{code language="java" layout="linenumbers"}}
+            int count = 0;
+            {{/code}}""", "");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // The code macro is edited as a code block, so its content can be modified directly.
+        textArea.clickBlock(0).moveCaretTo(0).sendKeys("final ").waitUntilTextContains("final int count = 0;");
+
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            {{code language="java" layout="linenumbers"}}
+            final int count = 0;
+            {{/code}}""", wikiEditor.getContent());
+    }
 }

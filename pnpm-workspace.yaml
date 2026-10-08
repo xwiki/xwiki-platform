@@ -85,6 +85,7 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - nx
 catalog:
+  "@blocknote/code-block": 0.55.0
   "@blocknote/core": 0.55.0
   "@blocknote/mantine": 0.55.0
   "@blocknote/react": 0.55.0

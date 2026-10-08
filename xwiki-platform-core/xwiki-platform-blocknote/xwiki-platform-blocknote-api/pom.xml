@@ -32,7 +32,7 @@
   <name>XWiki Platform - BlockNote Integration - API</name>
   <description>Integrates BlockNote as a WYSIWYG editor in XWiki. The integration is in early stages of development so please use with care.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.14</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>BlockNote Integration (Experimental)</xwiki.extension.name>
   </properties>

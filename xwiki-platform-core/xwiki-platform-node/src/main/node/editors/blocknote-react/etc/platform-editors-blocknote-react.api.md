@@ -60,6 +60,7 @@ export type BlockNoteViewWrapperProps = {
         linkEdition?: LinkEditionHooks;
     };
     syntax: SyntaxConfig;
+    codeBlockClassName?: string;
     refs?: {
         setEditor?: (editor: EditorType) => void;
     };

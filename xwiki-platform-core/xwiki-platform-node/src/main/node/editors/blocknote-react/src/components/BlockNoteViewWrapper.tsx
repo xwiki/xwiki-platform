@@ -30,6 +30,7 @@ import {
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import { DepsContainerContext, MacrosContext } from "../contexts";
+import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -212,6 +213,15 @@ type BlockNoteViewWrapperProps = {
   syntax: SyntaxConfig;
 
   /**
+   * The CSS classes (space separated) to add to the code blocks, e.g. to style them like the code snippets displayed in
+   * view mode.
+   *
+   * @since 18.9.0RC1
+   * @beta
+   */
+  codeBlockClassName?: string;
+
+  /**
    * Make the wrapper forward some data through references
    */
   refs?: {
@@ -247,6 +257,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   overrides,
   label,
   syntax,
+  codeBlockClassName,
   refs: { setEditor } = {},
   // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
@@ -272,7 +283,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     }
   }
 
-  const schema = createBlockNoteSchema(builtMacros);
+  const schema = createBlockNoteSchema(builtMacros, { codeBlockClassName });
 
   // When realtime collaboration is enabled, the initial content is set through the shared document. Moreover, BlockNote
   // doesn't support empty content, as in an empty array of blocks, so instead of passing an empty array we don't pass
@@ -301,6 +312,8 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     initialContent,
     // Editor's schema, with custom blocks definition
     schema,
+    // Highlight the code blocks based on their language.
+    extensions: [...(blockNoteOptions?.extensions ?? []), syntaxHighlighter],
     // Use the provided language for the dictionary
     dictionary: createDictionary(lang),
     // The default drop cursor only shows up above and below blocks - we replace

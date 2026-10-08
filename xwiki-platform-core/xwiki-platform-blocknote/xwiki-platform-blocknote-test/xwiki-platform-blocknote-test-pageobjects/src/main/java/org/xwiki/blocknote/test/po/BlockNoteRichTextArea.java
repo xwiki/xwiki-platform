@@ -107,6 +107,20 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
+     * Clicks in the middle of the specified block, e.g. to place the caret inside its text.
+     *
+     * @param index the index of the block to click, starting from 0
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea clickBlock(int index)
+    {
+        getBlockContent(index).click();
+        waitUntilFocused();
+        return this;
+    }
+
+    /**
      * Simulate typing in the rich text area.
      * 
      * @param keysToSend the sequence of keys to by typed

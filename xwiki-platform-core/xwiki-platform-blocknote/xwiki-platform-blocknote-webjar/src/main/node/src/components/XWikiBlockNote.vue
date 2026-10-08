@@ -327,6 +327,8 @@ const editorProps = shallowRef<
   },
   theme: "light",
   lang: (actualLocale || "en") as EditorLanguage,
+  // Style the code blocks like the code macro output in view mode.
+  codeBlockClassName: "box code",
   label: defaultLabel,
   overrides: {
     imageEdition,
@@ -554,6 +556,40 @@ defineExpose({
     [data-content-type="bulletListItem"] > p.bn-inline-content,
     [data-content-type="numberedListItem"] > p.bn-inline-content {
       margin: 0;
+    }
+
+    .bn-block-content[data-content-type="codeBlock"] {
+      /* The code block is styled by the XWiki skin, like the code macro output in view mode, through the CSS classes
+        added to its pre element (see codeBlockClassName). */
+      background: transparent;
+      border-radius: 0;
+
+      /* Use the same spacing as the code macro output in view mode. */
+      > pre {
+        padding: 19px; /* .well */
+        margin: 0 0 20px; /* @line-height-computed */
+      }
+
+      /* The XWiki skin styles select elements as form fields, but the language selector should look like plain
+        text. */
+      > div > select {
+        width: auto;
+        height: auto;
+        padding: 0;
+        border: 0 none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        font-size: 0.8em;
+        /* Display the language selector in the top padding of the code block, aligned with the code. */
+        line-height: 1;
+        top: 4px;
+        left: 20px; /* border width + padding */
+
+        &:focus {
+          box-shadow: none;
+        }
+      }
     }
 
     [data-content-type="table"] {

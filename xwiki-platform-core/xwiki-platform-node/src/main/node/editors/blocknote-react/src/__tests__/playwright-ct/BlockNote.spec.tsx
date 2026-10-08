@@ -218,6 +218,59 @@ test("Macros can be inserted", async ({ mount, page }) => {
   expect(macroInsertionModalTriggered).toBe(true);
 });
 
+test("Code blocks with supported and unsupported languages", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  // Unsupported languages used to make the editor fail with an uncaught error, or log a syntax highlighting error.
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      errors.push(message.text());
+    }
+  });
+
+  // The code block with the unsupported language comes first because it used to prevent the next code blocks from
+  // being highlighted.
+  const languages = ["velocity", "java", "js"];
+  const component = await mount(
+    <BlockNoteForTest
+      content={languages.map((language) =>
+        buildCodeBlock(language, "if (true) { return 'foo'; }"),
+      )}
+      macros={false}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  const codeBlocks = component.locator(
+    '.bn-block-content[data-content-type="codeBlock"]',
+  );
+  await expect(codeBlocks).toHaveCount(languages.length);
+  for (const [index, language] of languages.entries()) {
+    const codeBlock = codeBlocks.nth(index);
+    await expect(codeBlock).toHaveAttribute("data-language", language);
+    await expect(codeBlock.locator("code")).toHaveText(
+      "if (true) { return 'foo'; }",
+    );
+    await expect(codeBlock.locator("select")).toHaveValue(language);
+  }
+
+  // Supported languages (including aliases) are highlighted, unsupported ones are displayed as plain text.
+  const highlightedTokens = 'code span[style*="--shiki-light"]';
+  await expect(
+    codeBlocks.nth(1).locator(highlightedTokens).first(),
+  ).toBeAttached();
+  await expect(
+    codeBlocks.nth(2).locator(highlightedTokens).first(),
+  ).toBeAttached();
+  await expect(codeBlocks.nth(0).locator(highlightedTokens)).toHaveCount(0);
+
+  expect(errors).toEqual([]);
+});
+
 function buildParagraphs(blocks: string[]): BlockType[] {
   return blocks.map((blockText) => ({
     id: Math.random().toString(),
@@ -236,6 +289,19 @@ function buildParagraphs(blocks: string[]): BlockType[] {
     ],
     children: [],
   }));
+}
+
+function buildCodeBlock(
+  language: string,
+  code: string,
+): BlockOfType<"codeBlock"> {
+  return {
+    id: Math.random().toString(),
+    type: "codeBlock",
+    props: { language },
+    content: [{ type: "text", text: code, styles: {} }],
+    children: [],
+  };
 }
 
 function buildImage(url: string): BlockOfType<"image"> {

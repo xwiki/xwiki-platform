@@ -82,6 +82,10 @@ public class WebJarsTest extends AbstractTest
     @Test
     public void pathTraversal() throws Exception
     {
+        // The resource requested outside of the WebJars is refused and the refusal is logged.
+        validateConsole.getLogCaptureConfiguration().registerExpected("The provided resource name "
+            + "[../../../../../WEB-INF/xwiki.cfg] is trying to navigate out of the mandatory prefix");
+
         URI uri = new URI(Strings.CS.removeEnd(getUtil().rest().getBaseURL(), "rest")
             + "webjars/wiki%3Axwiki/..%2F..%2F..%2F..%2F..%2FWEB-INF%2Fxwiki.cfg");
 

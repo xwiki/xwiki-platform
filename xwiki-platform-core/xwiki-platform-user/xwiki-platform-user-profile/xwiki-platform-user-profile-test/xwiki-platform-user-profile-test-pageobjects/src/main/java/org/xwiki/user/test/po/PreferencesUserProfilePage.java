@@ -66,6 +66,29 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
         return this.timezone.getText();
     }
 
+    /**
+     * @return the shortcut used to edit the current page with the default editor
+     */
+    public String getViewEditShortcut()
+    {
+        return getShortcut("core.shortcuts.view.edit");
+    }
+
+    /**
+     * @return the shortcut used to open the information tab of the current page
+     */
+    public String getInformationShortcut()
+    {
+        return getShortcut("core.shortcuts.view.information");
+    }
+
+    private String getShortcut(String translationKey)
+    {
+        return getDriver()
+            .findElement(By.cssSelector(String.format("li[data-translate-key='%s'] > span", translationKey)))
+            .getText();
+    }
+
     public PreferencesEditPage editPreferences()
     {
         getDriver().addPageNotYetReloadedMarker();

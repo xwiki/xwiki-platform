@@ -166,4 +166,39 @@ public class PageWithTour extends ViewPage
         getDriver().findElement(By.id("tourResume")).click();
         getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(By.className("tour")));
     }
+
+    /**
+     * Forgets the state of all the tours (current step, ended), which the tours keep in the local storage of the
+     * browser, so that the tours start again from their first step, as for a new visitor. Reload the page afterwards
+     * for the tours of the current page to be started again.
+     *
+     * @since 18.9.0RC1
+     */
+    public void clearToursState()
+    {
+        getDriver().executeJavascript("Object.keys(window.localStorage).filter(key => key.startsWith('tour_'))"
+            + ".forEach(key => window.localStorage.removeItem(key));");
+    }
+
+    /**
+     * @param linkLabel the label of a link in the description of the displayed step
+     * @return the URL targeted by that link
+     * @since 18.9.0RC1
+     */
+    public String getStepDescriptionLinkURL(String linkLabel)
+    {
+        getDriver().waitUntilElementIsVisible(By.className("popover-content"));
+        return getDriver().findElementWithoutWaiting(By.cssSelector(".tour .popover-content"))
+            .findElement(By.linkText(linkLabel)).getDomAttribute("href");
+    }
+
+    /**
+     * @return the hint displayed next to the resume button when a tour ends, even once it has been hidden
+     * @since 18.9.0RC1
+     */
+    public String getResumeHint()
+    {
+        return getDriver().findElement(By.cssSelector("#tourResumeContainer .popover-content"))
+            .getDomProperty("textContent").trim();
+    }
 }

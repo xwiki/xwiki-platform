@@ -28,7 +28,6 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
@@ -166,14 +165,7 @@ class InplaceEditIT
         richTextArea.clear();
 
         // Insert a macro that is editable in-line.
-        richTextArea.sendKeys("/inf");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/inf", "Info Box");
-        richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-
-        // The content is reloaded after the macro is inserted.
-        ckeditor.getRichTextArea();
+        richTextArea.insertMacro("/inf", "Info Box");
 
         // Switch to Source mode and save without making any change.
         ckeditor.getToolBar().toggleSourceMode();

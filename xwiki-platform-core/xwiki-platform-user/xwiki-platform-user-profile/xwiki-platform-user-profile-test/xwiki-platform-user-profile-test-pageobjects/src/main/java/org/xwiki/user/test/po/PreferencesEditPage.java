@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -35,6 +36,12 @@ public class PreferencesEditPage extends EditPage
 
     @FindBy(id = "XWiki.XWikiUsers_0_timezone")
     private WebElement timezone;
+
+    @FindBy(id = "XWiki.XWikiUsers_0_shortcut_view_edit")
+    private WebElement shortcutViewEdit;
+
+    @FindBy(id = "XWiki.XWikiUsers_0_shortcut_view_information")
+    private WebElement shortcutInformation;
 
     public void setSimpleUserType()
     {
@@ -80,5 +87,27 @@ public class PreferencesEditPage extends EditPage
         getDriver().scrollTo(this.timezone);
         this.timezone.clear();
         this.timezone.sendKeys(value);
+    }
+
+    public void setShortcutViewEdit(String shortcutValue)
+    {
+        getDriver().scrollTo(this.shortcutViewEdit);
+        this.shortcutViewEdit.clear();
+        this.shortcutViewEdit.sendKeys(shortcutValue);
+        if (!shortcutValue.equals("")) {
+            getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_edit"),
+                "value");
+        }
+    }
+
+    public void setShortcutInformation(String shortcutValue)
+    {
+        getDriver().scrollTo(this.shortcutInformation);
+        this.shortcutInformation.clear();
+        this.shortcutInformation.sendKeys(shortcutValue);
+        if (!shortcutValue.equals("")) {
+            getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_information"),
+                "value");
+        }
     }
 }

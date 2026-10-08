@@ -62,6 +62,54 @@ user.profile.status.done=Done
 user.profile.status.saving=Saving...
 user.profile.status.error=Error saving the user status
 
+platform.core.profile.section.shortcutPreferences=Keyboard Shortcut Preferences
+platform.core.profile.section.shortcutPreferences.hint=These are the shortcut keys associated with each command. When setting the value of this preference empty, the shortcut will be unbound completely. Only simple keyboard shortcuts (one key) are supported right now.
+platform.core.profile.section.shortcutPreferences.editModes=Edit modes
+platform.core.profile.section.shortcutPreferences.editModes.hint=Shortcuts to edit the current page with a specific editor. Only available as an advanced user.
+platform.core.profile.section.shortcutPreferences.viewInfos=View page informations
+platform.core.profile.section.shortcutPreferences.viewInfos.hint=Shortcuts to access additional page information or alternative view modes. Only available as an advanced user.
+platform.core.profile.section.shortcutPreferences.pageActions=Page actions
+platform.core.profile.section.shortcutPreferences.pageActions.hint=Shortcuts to start an action on the current page. Only available as an advanced user.
+platform.core.profile.section.shortcutPreferences.editorActions=Editor actions
+platform.core.profile.section.shortcutPreferences.editorActions.hint=Shortcuts accessible when editing a page. It's highly recommended to use composite shortcuts like Alt+C to avoid triggering the shortcut while typing in a field.
+platform.core.profile.section.shortcutPreferences.developerShortcuts=Developer shortcuts
+platform.core.profile.section.shortcutPreferences.developerShortcuts.hint=Shortcuts for advanced actions included for developer convenience. Only simple key shortcuts are supported in this parameter, no sequence.
+
+platform.core.profile.shortcut.button.reset=Reset
+platform.core.profile.shortcut.hint.unbound=Unbound
+
+platform.core.profile.shortcut.view.edit=Default edit mode
+platform.core.profile.shortcut.view.wiki=Wiki edit mode
+platform.core.profile.shortcut.view.wysiwyg=Wysiwyg edit mode
+platform.core.profile.shortcut.view.inline=Inline edit mode
+platform.core.profile.shortcut.view.rights=Rights edit mode
+platform.core.profile.shortcut.view.objects=Objects edit mode
+platform.core.profile.shortcut.view.class=Class edit mode
+
+platform.core.profile.shortcut.view.comments=View page comments
+platform.core.profile.shortcut.view.annotations=View page annotations
+platform.core.profile.shortcut.view.attachments=View page attachments
+platform.core.profile.shortcut.view.history=View page history
+platform.core.profile.shortcut.view.information=View page information
+platform.core.profile.shortcut.view.code=View page code
+
+platform.core.profile.shortcut.view.delete=Delete the page
+platform.core.profile.shortcut.view.rename=Rename the page
+
+platform.core.profile.shortcut.edit.preview=See preview from the editor
+platform.core.profile.shortcut.edit.backtoedit=Go back to the editor from preview
+platform.core.profile.shortcut.edit.cancel=Cancel edition
+platform.core.profile.shortcut.edit.save=Save
+platform.core.profile.shortcut.edit.saveandview=Save and view
+
+platform.core.profile.shortcut.dev.usertype=Switch the current user type
+platform.core.profile.shortcut.dev.hiddendocs=Toggle hidden documents
+
+platform.core.profile.shortcut.notifications.update.successful=Updated shortcut preference
+platform.core.profile.shortcut.notifications.update.failed=Failed to save shortcut preference
+platform.core.profile.shortcut.notifications.reset.successful=Reset shortcut preference
+platform.core.profile.shortcut.notifications.reset.failed=Failed to reset shortcut preference
+
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 

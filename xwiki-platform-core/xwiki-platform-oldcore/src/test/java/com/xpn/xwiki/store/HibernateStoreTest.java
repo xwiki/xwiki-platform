@@ -116,7 +116,7 @@ class HibernateStoreTest
     }
 
     @Test
-    void getConfiguredColumnNameUsesTheCaseOfTheDatabase() throws Exception
+    void getConfiguredColumnNameUsesTheCaseOfTheDatabase()
     {
         HibernateAdapter adapter = mock(HibernateAdapter.class);
         when(adapter.getColumnName("ase_page")).thenReturn("ASE_PAGE");

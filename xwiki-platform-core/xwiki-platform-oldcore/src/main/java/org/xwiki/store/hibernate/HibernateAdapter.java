@@ -106,6 +106,7 @@ public interface HibernateAdapter
      * @return the name of the column in the right case/format
      * @since 18.9.0RC1
      */
+    @Unstable
     default String getColumnName(String columnName)
     {
         return columnName;

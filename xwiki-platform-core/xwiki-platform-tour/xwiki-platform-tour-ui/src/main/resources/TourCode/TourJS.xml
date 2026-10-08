@@ -211,11 +211,11 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
    */
   var getTemplate = function (index, step) {
     var idPrefix = 'bootstrap_tour';
-    var template = '&lt;div class="popover tour" style="min-width: 300px;" role="dialog" aria-labelledby="'+idPrefix+'_title" aria-describedby="'+idPrefix+'_content"&gt;\n'
+    var template = '&lt;div class="popover tour" style="min-width: 300px;" role="dialog" aria-labelledby="'+idPrefix+'_title"&gt;\n'
                  + ' &lt;a class="btn btn-xs btn-default" href="#" id="'+idPrefix+'_close" aria-label="#tr("tour.popover.quit")" title="#tr("tour.popover.quit")"&gt;$escapetool.javascript($services.icon.renderHTML("cross"))&lt;/a&gt;\n'
                  + '  &lt;div class="arrow"&gt;&lt;/div&gt;\n'
                  + '  &lt;h2 class="popover-title" id="'+idPrefix+'_title"&gt;&lt;/h2&gt;\n'
-                 + '  &lt;div class="popover-content" id="'+idPrefix+'_content"&gt;&lt;/div&gt;\n'
+                 + '  &lt;div class="popover-content"&gt;&lt;/div&gt;\n'
                  + '  &lt;div class="popover-navigation"&gt;\n'
                  + '    &lt;div class="col-xs-6 text-left"&gt;\n';
     if (step.prev &gt; -1) {

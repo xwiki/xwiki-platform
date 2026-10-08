@@ -38,6 +38,7 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
@@ -52,6 +53,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
@@ -112,6 +114,22 @@ public class SaveAction extends EditAction
 
     private static final String PREVIOUS_VERSION = "previousVersion";
 
+    private static final String EDITING_VERSION_DATE = "editingVersionDate";
+
+    private static final String FORCE_SAVE = "forceSave";
+
+    /**
+     * The request parameter holding the latest version of the document when the user decided how to solve the merge
+     * conflicts, i.e. the version the decisions (sent with {@value #FORCE_SAVE}) were taken against.
+     */
+    private static final String CONFLICT_VERSION = "conflictVersion";
+
+    /**
+     * The number of times the request is applied on the latest version of the document and saved, when the document is
+     * saved concurrently by other requests.
+     */
+    private static final int SAVE_ATTEMPTS = 5;
+
     @Inject
     private DocumentRevisionProvider documentRevisionProvider;
 
@@ -145,7 +163,8 @@ public class SaveAction extends EditAction
     {
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
-        XWikiDocument doc = context.getDoc();
+        // The document is set on the context before the action is executed.
+        XWikiDocument doc = Objects.requireNonNull(context.getDoc());
         EditForm form = (EditForm) context.getForm();
 
         // Check save session
@@ -160,6 +179,91 @@ public class SaveAction extends EditAction
                 new Object[] { getLocalSerializer().serialize(doc.getDocumentReference())});
             return true;
         }
+
+        // Another request can save the document after this request loaded it, in which case the store refuses to save
+        // it. The request is then applied again on the latest version of the document, which gives the same result as
+        // if this request was received after the other one: the changes are merged again before saving.
+        XWikiDocument tdoc = null;
+        for (int attempt = 1; tdoc == null; attempt++) {
+            try {
+                tdoc = updateAndSaveDocument(doc, sectionNumber, attempt == SAVE_ATTEMPTS, context);
+                if (tdoc == null) {
+                    // The response is already handled, e.g. a merge conflict or a validation error.
+                    return true;
+                }
+            } catch (DocumentRevisionConflictException e) {
+                if (attempt == SAVE_ATTEMPTS) {
+                    throw e;
+                }
+                doc = xwiki.getDocument(doc.getDocumentReference(), context);
+            }
+        }
+
+        // Return the latest version number to the editor that triggered the save. We do this even if we didn't create a
+        // new revision because the editor may have an outdated version number. This can happen for instance if two
+        // users save the same document state one after the other (either because both didn't make any changes, or
+        // because both made the same changes). Having an up-to-date version number is important for properly detecting
+        // and handling merge conflicts on save.
+        getJSONAnswer(context).put("newVersion", tdoc.getRCSVersion().toString());
+
+        // Cleanup temporary attachments that were uploaded while editing the document. We do this even if we didn't
+        // create a new revision (e.g. if there were no changes) because those attachments are not needed anymore (e.g.
+        // the user may have discarded the changes that lead to the upload of those attachments).
+        this.temporaryAttachmentSessionsManager.removeUploadedAttachments(tdoc.getDocumentReference());
+
+        // If a template hierarchy is specified we start a job to copy the child pages. Even if we didn't create a new
+        // revision for the root document (because there were no changes) the child pages may still need to be created
+        // or updated, because the template can be applied on existing documents, even on documents where the template
+        // was previously applied.
+        Job createJob = startCreateJob(tdoc.getDocumentReference(), form);
+        if (createJob != null) {
+            if (isAsync(request)) {
+                if (Utils.isAjaxRequest(context)) {
+                    // Redirect to the job status URL of the job we have just launched.
+                    sendRedirect(context.getResponse(), String.format("%s/rest/jobstatus/%s?media=json",
+                        context.getRequest().getContextPath(), serializeJobId(createJob.getRequest().getId())));
+                }
+
+                // else redirect normally and the operation will eventually finish in the background.
+                // Note: It is preferred that async mode is called in an AJAX request that can display the progress.
+            } else {
+                // Sync mode, default, wait for the work to finish.
+                try {
+                    createJob.join();
+                } catch (InterruptedException e) {
+                    throw new XWikiException(String.format(
+                        "Interrupted while waiting for template [%s] to be processed when creating the document [%s]",
+                        form.getTemplate(), tdoc.getDocumentReference()), e);
+                }
+            }
+        } else {
+            // Nothing more to do, just unlock the document.
+            XWikiLock lock = tdoc.getLock(context);
+            if (lock != null) {
+                tdoc.removeLock(context);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Applies the request on the given version of the edited document and saves it.
+     *
+     * @param doc the edited document, as loaded from the store
+     * @param sectionNumber the number of the edited section, 0 if the whole document is edited
+     * @param lastAttempt {@code false} if the save can be attempted again when the document is saved concurrently
+     * @param context the current context of the request
+     * @return the saved document translation, or {@code null} if the response is already handled
+     * @throws DocumentRevisionConflictException if the document was saved concurrently by another request after it was
+     *             loaded, and it is not the last attempt
+     */
+    private XWikiDocument updateAndSaveDocument(XWikiDocument doc, int sectionNumber, boolean lastAttempt,
+        XWikiContext context) throws XWikiException
+    {
+        XWiki xwiki = context.getWiki();
+        XWikiRequest request = context.getRequest();
+        EditForm form = (EditForm) context.getForm();
 
         XWikiDocument originalDoc = doc;
 
@@ -209,7 +313,7 @@ public class SaveAction extends EditAction
         } catch (XWikiException e) {
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                 context.put(EXCEPTION, e);
-                return true;
+                return null;
             }
         }
 
@@ -273,7 +377,7 @@ public class SaveAction extends EditAction
             context.put("tdoc", tdoc);
             // Force the "Inline form" edit mode.
             getCurrentScriptContext().setAttribute("editor", "inline", ScriptContext.ENGINE_SCOPE);
-            return true;
+            return null;
         }
 
         // Prepare the JSON answer that will be sent to the editor in case of an async request. We put it on the XWiki
@@ -286,7 +390,7 @@ public class SaveAction extends EditAction
         // a merge conflict is detected the editor will display the merge conflict modal.
         if (isConflictCheckEnabled() && Utils.isAjaxRequest(context) && request.getParameter(PREVIOUS_VERSION) != null
             && isConflictingWithVersion(context, originalDoc, tdoc)) {
-            return true;
+            return null;
         }
 
         // Make sure the user is allowed to save the document. This triggers an event whose listeners can block (cancel)
@@ -310,58 +414,23 @@ public class SaveAction extends EditAction
 
             // We take the version summary comment from the document being saved because it may have been modified by an
             // event listener after it was copied from the EditForm by the call to readFromForm.
-            xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
+            try {
+                xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
+            } catch (DocumentRevisionConflictException e) {
+                // The document was saved by another request after this request loaded it, again and again. The editor
+                // waiting for the result of an asynchronous save can let the user resolve the conflict.
+                if (lastAttempt && Boolean.TRUE.equals(Utils.isAjaxRequest(context))) {
+                    answerConcurrentSaveConflict(context, originalDoc, tdoc);
+                    return null;
+                }
+                throw e;
+            }
         } else {
             // Let the editor know that the document was not saved because there were no changes.
             jsonAnswer.put("noChanges", "true");
         }
 
-        // Return the latest version number to the editor that triggered the save. We do this even if we didn't create a
-        // new revision because the editor may have an outdated version number. This can happen for instance if two
-        // users save the same document state one after the other (either because both didn't make any changes, or
-        // because both made the same changes). Having an up-to-date version number is important for properly detecting
-        // and handling merge conflicts on save.
-        jsonAnswer.put("newVersion", tdoc.getRCSVersion().toString());
-
-        // Cleanup temporary attachments that were uploaded while editing the document. We do this even if we didn't
-        // create a new revision (e.g. if there were no changes) because those attachments are not needed anymore (e.g.
-        // the user may have discarded the changes that lead to the upload of those attachments).
-        this.temporaryAttachmentSessionsManager.removeUploadedAttachments(tdoc.getDocumentReference());
-
-        // If a template hierarchy is specified we start a job to copy the child pages. Even if we didn't create a new
-        // revision for the root document (because there were no changes) the child pages may still need to be created
-        // or updated, because the template can be applied on existing documents, even on documents where the template
-        // was previously applied.
-        Job createJob = startCreateJob(tdoc.getDocumentReference(), form);
-        if (createJob != null) {
-            if (isAsync(request)) {
-                if (Utils.isAjaxRequest(context)) {
-                    // Redirect to the job status URL of the job we have just launched.
-                    sendRedirect(context.getResponse(), String.format("%s/rest/jobstatus/%s?media=json",
-                        context.getRequest().getContextPath(), serializeJobId(createJob.getRequest().getId())));
-                }
-
-                // else redirect normally and the operation will eventually finish in the background.
-                // Note: It is preferred that async mode is called in an AJAX request that can display the progress.
-            } else {
-                // Sync mode, default, wait for the work to finish.
-                try {
-                    createJob.join();
-                } catch (InterruptedException e) {
-                    throw new XWikiException(String.format(
-                        "Interrupted while waiting for template [%s] to be processed when creating the document [%s]",
-                        form.getTemplate(), tdoc.getDocumentReference()), e);
-                }
-            }
-        } else {
-            // Nothing more to do, just unlock the document.
-            XWikiLock lock = tdoc.getLock(context);
-            if (lock != null) {
-                tdoc.removeLock(context);
-            }
-        }
-
-        return false;
+        return tdoc;
     }
 
     private boolean isConflictCheckEnabled()
@@ -432,9 +501,15 @@ public class SaveAction extends EditAction
         throws XWikiException
     {
         XWikiRequest request = context.getRequest();
+        String forceSave = request.getParameter(FORCE_SAVE);
+
+        // The user decided how to solve the merge conflicts with a version that isn't the latest anymore.
+        if (forceSave != null && isConflictVersionOutdated(originalDoc)) {
+            return isConflictingWithNewerVersion(context, originalDoc, modifiedDoc, forceSave);
+        }
 
         // in case of force save we skip the check.
-        if (FORCE_SAVE_OVERRIDE.equals(request.getParameter("forceSave"))) {
+        if (FORCE_SAVE_OVERRIDE.equals(forceSave)) {
             return false;
         }
 
@@ -448,7 +523,7 @@ public class SaveAction extends EditAction
         Version previousVersion = new Version(request.getParameter(PREVIOUS_VERSION));
         Version latestVersion = originalDoc.getRCSVersion();
 
-        Date editingVersionDate = new Date(Long.parseLong(request.getParameter("editingVersionDate")));
+        Date editingVersionDate = new Date(Long.parseLong(request.getParameter(EDITING_VERSION_DATE)));
         Date latestVersionDate = originalDoc.getDate();
 
         // we ensure that nobody edited the document between the moment the user started to edit and now
@@ -489,22 +564,11 @@ public class SaveAction extends EditAction
                     if (contentDiff.isEmpty() && objectDiff.isEmpty() && filteredMetaDataDiff.isEmpty()) {
                         return false;
                     } else {
-                        MergeConfiguration mergeConfiguration = new MergeConfiguration();
-
-                        // We need the reference of the user and the document in the config to retrieve
-                        // the conflict decision in the MergeManager.
-                        mergeConfiguration.setUserReference(context.getUserReference());
-                        mergeConfiguration.setConcernedDocument(modifiedDoc.getDocumentReferenceWithLocale());
-
-                        // The modified doc is actually the one we should save, so it's ok to modify it directly
-                        // and better for performance.
-                        mergeConfiguration.setProvidedVersionsModifiables(true);
-
                         // We need to retrieve the conflict decisions that might have occurred from the request.
                         recordConflictDecisions(context, modifiedDoc.getDocumentReferenceWithLocale());
 
                         MergeDocumentResult mergeDocumentResult =
-                            this.mergeManager.mergeDocument(previousDoc, originalDoc, modifiedDoc, mergeConfiguration);
+                            mergeDocument(previousDoc, originalDoc, modifiedDoc, context);
 
                         // Be sure to not keep the conflict decisions we might have made if new conflicts occurred
                         // we don't want to pollute the list of decisions.
@@ -513,8 +577,7 @@ public class SaveAction extends EditAction
 
                         // If we don't get any conflict, or if we want to force the merge even with conflicts,
                         // then we pursue to save the document.
-                        if (FORCE_SAVE_MERGE.equals(request.getParameter("forceSave"))
-                            || !mergeDocumentResult.hasConflicts()) {
+                        if (FORCE_SAVE_MERGE.equals(forceSave) || !mergeDocumentResult.hasConflicts()) {
                             getJSONAnswer(context).put("mergedDocument", "true");
                             return false;
 
@@ -531,18 +594,141 @@ public class SaveAction extends EditAction
                 // if the revision has been deleted or if the content/object diff is not empty
                 // we have a conflict.
                 // TODO: Improve it to return the diff between the current version and the latest recorder
-                Map<String, String> jsonObject = new LinkedHashMap<>();
-                jsonObject.put(PREVIOUS_VERSION, previousVersion.toString());
-                jsonObject.put("previousVersionDate", editingVersionDate.toString());
-                jsonObject.put("latestVersion", latestVersion.toString());
-                jsonObject.put("latestVersionDate", latestVersionDate.toString());
-                this.answerJSON(context, HttpStatus.SC_CONFLICT, jsonObject);
+                answerConflict(context, previousVersion.toString(), editingVersionDate, latestVersion.toString(),
+                    latestVersionDate);
                 return true;
             } catch (DifferentiationFailedException e) {
                 throw new XWikiException("Error while loading the diff", e);
             }
         }
         return false;
+    }
+
+    private boolean isConflictVersionOutdated(XWikiDocument latestDoc)
+    {
+        String conflictVersion = getParameter(CONFLICT_VERSION);
+        return StringUtils.isNotEmpty(conflictVersion) && !latestDoc.isNew()
+            && !conflictVersion.equals(latestDoc.getVersion());
+    }
+
+    /**
+     * Applies the merge conflict decisions taken by the user against a version of the document that isn't the latest
+     * anymore, because the document was saved again while the user was solving the conflicts. The decisions are
+     * applied on the version the user saw when taking them, then the changes saved since then are merged. The user
+     * has to solve the conflicts again if this second merge has conflicts, because the decisions don't cover them.
+     *
+     * @param context the current context of the request
+     * @param latestDoc the latest version of the document being modified, before applying the user changes
+     * @param modifiedDoc the document to save, with the user changes, that is merged with the other changes
+     * @param forceSave how the user decided to solve the conflicts
+     * @return true in case of conflict, in which case the answer is immediately sent to the client
+     */
+    private boolean isConflictingWithNewerVersion(XWikiContext context, XWikiDocument latestDoc,
+        XWikiDocument modifiedDoc, String forceSave) throws XWikiException
+    {
+        DocumentReference documentReference = modifiedDoc.getDocumentReferenceWithLocale();
+        String previousVersion = getParameter(PREVIOUS_VERSION);
+        // Keep the user changes, to compute the conflicts again if the decisions can't be applied.
+        XWikiDocument unmergedDoc = modifiedDoc.clone();
+
+        XWikiDocument previousDoc = this.documentRevisionProvider.getRevision(latestDoc, previousVersion);
+        XWikiDocument conflictDoc =
+            this.documentRevisionProvider.getRevision(latestDoc, getParameter(CONFLICT_VERSION));
+
+        boolean conflicting;
+        if (FORCE_SAVE_OVERRIDE.equals(forceSave)) {
+            // The user changes override the version the user saw, so there is nothing to merge with it.
+            conflicting = conflictDoc == null;
+        } else if (previousDoc != null && conflictDoc != null) {
+            // Apply the decisions on the version the user saw when taking them, which has the conflicts they solve.
+            recordConflictDecisions(context, documentReference);
+            MergeDocumentResult mergeDocumentResult = mergeDocument(previousDoc, conflictDoc, modifiedDoc, context);
+            this.conflictDecisionsManager.removeConflictDecisionList(documentReference, context.getUserReference());
+            conflicting = mergeDocumentResult.hasConflicts() && !FORCE_SAVE_MERGE.equals(forceSave);
+        } else {
+            conflicting = true;
+        }
+
+        // Merge the changes saved since the user took the decisions, which the decisions don't cover.
+        if (conflicting || mergeDocument(conflictDoc, latestDoc, modifiedDoc, context).hasConflicts()) {
+            if (previousDoc != null) {
+                // Record the new conflicts so that the user can solve them.
+                MergeDocumentResult mergeDocumentResult = mergeDocument(previousDoc, latestDoc, unmergedDoc, context);
+                this.conflictDecisionsManager.recordConflicts(documentReference, context.getUserReference(),
+                    mergeDocumentResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT));
+            }
+            answerConflict(context, previousVersion, getEditingVersionDate(latestDoc), latestDoc.getVersion(),
+                latestDoc.getDate());
+            return true;
+        }
+
+        getJSONAnswer(context).put("mergedDocument", "true");
+        return false;
+    }
+
+    /**
+     * Merges the changes from the previous to the next document into the current document.
+     */
+    private MergeDocumentResult mergeDocument(XWikiDocument previousDoc, XWikiDocument nextDoc,
+        XWikiDocument currentDoc, XWikiContext context)
+    {
+        MergeConfiguration mergeConfiguration = new MergeConfiguration();
+
+        // We need the reference of the user and the document in the config to retrieve the conflict decision in the
+        // MergeManager.
+        mergeConfiguration.setUserReference(context.getUserReference());
+        mergeConfiguration.setConcernedDocument(currentDoc.getDocumentReferenceWithLocale());
+
+        // The current doc is actually the one we should save, so it's ok to modify it directly and better for
+        // performance.
+        mergeConfiguration.setProvidedVersionsModifiables(true);
+
+        return this.mergeManager.mergeDocument(previousDoc, nextDoc, currentDoc, mergeConfiguration);
+    }
+
+    private String getParameter(String name)
+    {
+        return Objects.toString(this.container.getRequest().getParameter(name), null);
+    }
+
+    private Date getEditingVersionDate(XWikiDocument loadedDoc)
+    {
+        String editingVersionDate = getParameter(EDITING_VERSION_DATE);
+        return NumberUtils.isCreatable(editingVersionDate) ? new Date(Long.parseLong(editingVersionDate))
+            : loadedDoc.getDate();
+    }
+
+    private void answerConflict(XWikiContext context, String previousVersion, Date previousVersionDate,
+        String latestVersion, Date latestVersionDate) throws XWikiException
+    {
+        Map<String, String> jsonObject = new LinkedHashMap<>();
+        jsonObject.put(PREVIOUS_VERSION, previousVersion);
+        jsonObject.put("previousVersionDate", previousVersionDate.toString());
+        jsonObject.put("latestVersion", latestVersion);
+        jsonObject.put("latestVersionDate", latestVersionDate.toString());
+        this.answerJSON(context, HttpStatus.SC_CONFLICT, jsonObject);
+    }
+
+    /**
+     * Answers with the conflict response when the document was saved concurrently by another request after it was
+     * loaded by this one, so that the editor lets the user merge the changes, override or reload, the same way as for
+     * a conflict detected before saving.
+     *
+     * @param context the current context of the request
+     * @param originalDoc the document loaded by this request, before applying the user changes
+     * @param modifiedDoc the document that couldn't be saved
+     */
+    private void answerConcurrentSaveConflict(XWikiContext context, XWikiDocument originalDoc,
+        XWikiDocument modifiedDoc) throws XWikiException
+    {
+        String previousVersion = StringUtils.defaultIfEmpty(
+            getParameter(PREVIOUS_VERSION), originalDoc.getRCSVersion().toString());
+        Date previousVersionDate = getEditingVersionDate(originalDoc);
+
+        XWikiDocument latestDoc =
+            context.getWiki().getDocument(modifiedDoc.getDocumentReferenceWithLocale(), context);
+        answerConflict(context, previousVersion, previousVersionDate, latestDoc.getRCSVersion().toString(),
+            latestDoc.getDate());
     }
 
     @SuppressWarnings("unchecked")

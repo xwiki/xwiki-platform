@@ -175,6 +175,15 @@ public class XWikiException extends Exception
 
     public static final int ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DOC = 3236;
 
+    /**
+     * The document to save is not based on the revision currently stored, because it was saved or deleted
+     * concurrently.
+     *
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC_REVISION_CONFLICT = 3237;
+
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE = 3301;
 
     public static final int ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE = 3401;

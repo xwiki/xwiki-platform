@@ -51,13 +51,18 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.ReferenceMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
+import org.hibernate.LockMode;
 import org.hibernate.ObjectNotFoundException;
+import org.hibernate.PessimisticLockException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.query.NativeQuery;
@@ -86,6 +91,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.store.UnexpectedException;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -98,6 +104,7 @@ import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.XWikiSpace;
+import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
@@ -132,6 +139,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private static final String DROP_SCHEMA = "DROP SCHEMA ";
     private static final String DOC_ID = "docId";
     private static final String SELECT_DISTINCT_DOC_FULLNAME = "select distinct doc.fullName";
+    private static final String DOCUMENT_ALIAS = "xwikidoc";
+    private static final String SELECT_STORED_VERSION = "select " + DOCUMENT_ALIAS + ".version from XWikiDocument as "
+        + DOCUMENT_ALIAS + " where " + DOCUMENT_ALIAS + ".id = :id";
 
     @Inject
     private Logger logger;
@@ -141,6 +151,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     @Inject
     private QueryManager queryManager;
+
+    @Inject
+    private StoreConfiguration storeConfiguration;
 
     /** Needed so we can register an event to trap logout and delete held locks. */
     @Inject
@@ -528,6 +541,99 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             || this.optimizedObjectClasses.get().contains(classReference.getLocalDocumentReference());
     }
 
+    /**
+     * Checks that the document to save is based on the revision currently stored, and locks the stored document until
+     * the end of the current transaction. Without this check, a document loaded before a concurrent save (from another
+     * request or another cluster node) would overwrite the changes of that save.
+     *
+     * @param doc the document to save
+     * @param session the session of the current transaction
+     * @throws DocumentRevisionConflictException if the document is not based on the stored revision
+     */
+    private void checkStoredRevision(XWikiDocument doc, Session session) throws DocumentRevisionConflictException
+    {
+        if (!this.storeConfiguration.isRevisionCheckEnabled()) {
+            return;
+        }
+
+        String expectedRevision;
+        if (doc.isNew()) {
+            // The document is created, or replaces a document that has been deleted before (e.g. when renaming or
+            // importing a document), so nothing must be stored.
+            expectedRevision = null;
+        } else {
+            XWikiDocument originalDocument = doc.getOriginalDocument();
+            if (originalDocument == null || originalDocument.isNew() || !originalDocument
+                .getDocumentReferenceWithLocale().equals(doc.getDocumentReferenceWithLocale())) {
+                // We don't know which stored revision the document is based on: e.g. when renaming a document, the
+                // original document is the one of the source document.
+                return;
+            }
+            // Compare with the original document and not with the document itself, because some code sets the version
+            // of the saved document explicitly (e.g. when importing a document while preserving its history).
+            expectedRevision = originalDocument.getVersion();
+        }
+
+        Query<String> query = session.createQuery(SELECT_STORED_VERSION, String.class);
+        query.setParameter("id", doc.getId());
+        // Lock the stored document until the end of the transaction. The lock is taken in the database so that it also
+        // works across cluster nodes. A document that isn't stored can't be locked: a concurrent creation is detected
+        // when inserting it, see #getConcurrentCreationConflict().
+        query.setLockMode(DOCUMENT_ALIAS, LockMode.PESSIMISTIC_WRITE);
+        String storedRevision = query.uniqueResult();
+
+        if (!Objects.equals(expectedRevision, storedRevision)) {
+            throw new DocumentRevisionConflictException(doc.getDocumentReferenceWithLocale(), expectedRevision,
+                storedRevision);
+        }
+    }
+
+    /**
+     * Two requests creating the same document at the same time both find that it isn't stored, because there is no
+     * row to lock yet. The second one then fails to insert it, either because of the primary key or, on databases
+     * that lock the gap where the row would be (MySQL and MariaDB), because of a deadlock between the two inserts.
+     * This method converts these failures into the same revision conflict as a concurrent modification, so that the
+     * caller can load the stored document and retry.
+     *
+     * @param doc the document that couldn't be saved
+     * @param saveException the exception thrown while saving the document
+     * @param context the XWiki context
+     * @return the revision conflict, or {@code null} if the failure wasn't caused by a concurrent creation
+     */
+    private DocumentRevisionConflictException getConcurrentCreationConflict(XWikiDocument doc,
+        Exception saveException, XWikiContext context)
+    {
+        if (!doc.isNew() || !this.storeConfiguration.isRevisionCheckEnabled()) {
+            return null;
+        }
+
+        boolean lockFailure = ExceptionUtils.indexOfType(saveException, LockAcquisitionException.class) >= 0
+            || ExceptionUtils.indexOfType(saveException, PessimisticLockException.class) >= 0;
+        if (!lockFailure && ExceptionUtils.indexOfType(saveException, ConstraintViolationException.class) < 0) {
+            return null;
+        }
+
+        String storedRevision = null;
+        try {
+            storedRevision = executeRead(context,
+                session -> session.createQuery(SELECT_STORED_VERSION, String.class).setParameter("id", doc.getId())
+                    .uniqueResult());
+        } catch (XWikiException e) {
+            this.logger.warn("Failed to check if document [{}] was created concurrently. Root cause: [{}]",
+                doc.getDocumentReferenceWithLocale(), ExceptionUtils.getRootCauseMessage(e));
+        }
+
+        // Another constraint than the primary key can be violated, so the document has to be stored for this to be a
+        // concurrent creation. After a lock failure, the other creation can still be in progress, so the document
+        // might not be stored yet.
+        if (storedRevision != null || lockFailure) {
+            return new DocumentRevisionConflictException(doc.getDocumentReferenceWithLocale(), null, storedRevision,
+                saveException);
+        }
+
+        return null;
+    }
+
     @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
@@ -567,6 +673,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 try {
                     Session session = getSession(context);
                     session.setHibernateFlushMode(FlushMode.COMMIT);
+
+                    // Before writing anything, make sure the document is based on the stored revision, and lock the
+                    // stored document so that it can't be saved concurrently until this transaction ends.
+                    checkStoredRevision(doc, session);
 
                     // This information will allow to not look for attachments and objects on loading
                     doc.setElement(XWikiDocument.HAS_ATTACHMENTS, !doc.getAttachmentList().isEmpty());
@@ -773,7 +883,17 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
                     }
                 }
+            } catch (DocumentRevisionConflictException e) {
+                throw e;
             } catch (Exception e) {
+                // The stored document can only be read again when the failed transaction was ours: an outer
+                // transaction can't be used anymore.
+                DocumentRevisionConflictException conflict =
+                    bTransaction ? getConcurrentCreationConflict(doc, e, context) : null;
+                if (conflict != null) {
+                    throw conflict;
+                }
+
                 Object[] args = {this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference())};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC, "Exception while saving document {0}", e,

@@ -35,8 +35,6 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.46</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
     <!-- The Solr framework is designed to be shared for the whole farm -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>

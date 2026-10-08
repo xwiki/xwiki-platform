@@ -33,7 +33,12 @@ public class Upgrade1510Test extends UpgradeTest
             // We don't ignore anymore property values related to missing xclass fields when reading a XAR file,
             // so when reading the XAR file of AdminSection we find configureGlobally property which is not present
             // in DB since when we imported the file back then we were ignoring those values, hence the warning.
-            "Object property [Home » CKEditor » AdminSection] already removed"
+            "Object property [Home » CKEditor » AdminSection] already removed",
+            // The PDF export extensions installed by the previous version depend on the ScriptSafeProvider class
+            // which is not internal anymore since 16.2, so they cannot be initialized until the flavor is upgraded
+            // (see https://jira.xwiki.org/browse/XWIKI-22043). The error about xwiki-platform-export-pdf-default is
+            // already globally excluded, but not the one about the UI extension depending on it.
+            "Failed to initialize local extension [org.xwiki.platform:xwiki-platform-export-pdf-ui/"
         );
     }
 }

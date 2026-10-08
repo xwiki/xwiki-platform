@@ -81,6 +81,8 @@ public class R171014000XWIKI23827DataMigration extends AbstractHibernateDataMigr
     // (prop.id.id = :objectId_0 and prop.id.name = :property_0)
     private static final int BATCH_SIZE = 100;
 
+    private static final String PROPERTY_NAMES_PARAMETER = "propNames";
+
     private static final String SELECT_PROPERTIES_STATEMENT = "select prop from StringProperty as prop "
         + "where prop.id.name in :propNames and prop.id.id in :objectIds";
 
@@ -228,7 +230,7 @@ public class R171014000XWIKI23827DataMigration extends AbstractHibernateDataMigr
             results = wiki.getStore().getQueryManager()
                 .createQuery(objectIdsQuery, Query.HQL)
                 .bindValue("className", className)
-                .bindValue("propNames", xClassWithPasswordProperties.getProperties())
+                .bindValue(PROPERTY_NAMES_PARAMETER, xClassWithPasswordProperties.getProperties())
                 .execute();
         } catch (QueryException e) {
             throw new DataMigrationException(
@@ -278,7 +280,7 @@ public class R171014000XWIKI23827DataMigration extends AbstractHibernateDataMigr
 
         org.hibernate.query.Query<StringProperty> query =
             session.createQuery(SELECT_PROPERTIES_STATEMENT, StringProperty.class);
-        query.setParameter("propNames", xclassWithPasswordProperties.getProperties());
+        query.setParameter(PROPERTY_NAMES_PARAMETER, xclassWithPasswordProperties.getProperties());
         query.setParameter("objectIds", objectsIdsToMigrate);
 
         for (StringProperty stringProperty : query.getResultList()) {

@@ -71,7 +71,21 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
      */
     public String getViewEditShortcut()
     {
-        return getDriver().findElement(By.cssSelector("li[data-translate-key='core.shortcuts.view.edit'] > span"))
+        return getShortcut("core.shortcuts.view.edit");
+    }
+
+    /**
+     * @return the shortcut used to open the information tab of the current page
+     */
+    public String getInformationShortcut()
+    {
+        return getShortcut("core.shortcuts.view.information");
+    }
+
+    private String getShortcut(String translationKey)
+    {
+        return getDriver()
+            .findElement(By.cssSelector(String.format("li[data-translate-key='%s'] > span", translationKey)))
             .getText();
     }
 

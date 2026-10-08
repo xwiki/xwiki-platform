@@ -107,6 +107,12 @@ class UserProfileIT
 
     private static final String NEW_SHORTCUT_VALUE = "B";
 
+    private static final String NEW_CANCEL_SHORTCUT_VALUE = "Alt+Q";
+
+    private static final String NEW_CANCEL_SHORTCUT_KEY = "q";
+
+    private static final String UNBOUND_SHORTCUT = "(Unbound)";
+
     private static final String DEFAULT_EDITOR = "Text (Default)";
 
     private static final String SIMPLE_USER = "Simple";
@@ -287,11 +293,19 @@ class UserProfileIT
         preferencesPage = userProfilePage.switchToPreferences();
         preferencesEditPage = preferencesPage.editPreferences();
         preferencesEditPage.setShortcutViewEdit(NEW_SHORTCUT_VALUE);
+        // Overriding the default cancel shortcut value (Alt+C)
+        preferencesEditPage.setShortcutEditCancel(NEW_CANCEL_SHORTCUT_VALUE);
         preferencesEditPage.clickSaveAndView();
 
         userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         preferencesPage = userProfilePage.switchToPreferences();
         assertEquals(NEW_SHORTCUT_VALUE, preferencesPage.getViewEditShortcut());
+
+        // The editor actions use the updated shortcut preference.
+        preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.useShortcutKeyForCancellingEdition(NEW_CANCEL_SHORTCUT_KEY);
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
 
         // Testing that the updated shortcut preference works as intended.
         // The edit shortcut sends us to the profile section, whatever the section we were in was.
@@ -439,6 +453,36 @@ class UserProfileIT
         viewPage.useShortcutKeyForCommentPane();
         assertTrue(commentsPane.isOpened());
         assertFalse(infoPane.isOpened());
+
+        // Unbinding the shortcut disables both the user preference defined shortcut and the default one.
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.setShortcutInformation("");
+        preferencesEditPage.clickSaveAndView();
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        assertEquals(UNBOUND_SHORTCUT, preferencesPage.getInformationShortcut());
+
+        viewPage = setup.gotoPage(testReference);
+        infoPane = viewPage.openInformationDocExtraPane();
+        commentsPane = viewPage.openCommentsDocExtraPane();
+        viewPage.useShortcutKey(NEW_SHORTCUT_VALUE);
+        viewPage.useShortcutKey("i");
+        assertTrue(commentsPane.isOpened());
+        assertFalse(infoPane.isOpened());
+
+        // Resetting the shortcut brings the default one back.
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.resetShortcutInformation();
+        preferencesEditPage.clickSaveAndView();
+
+        viewPage = setup.gotoPage(testReference);
+        viewPage.openCommentsDocExtraPane();
+        infoPane = viewPage.useShortcutKeyForInformationPane();
+        assertTrue(infoPane.isOpened());
     }
 
     /**

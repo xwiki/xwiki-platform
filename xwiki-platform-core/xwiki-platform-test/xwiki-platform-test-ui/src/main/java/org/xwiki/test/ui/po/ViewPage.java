@@ -395,6 +395,17 @@ public class ViewPage extends BasePage
     }
 
     /**
+     * @return the message boxes displayed in the content of the page (such as the ones rendered by the {@code info}
+     *         or {@code warning} macros), in the order in which they are displayed
+     * @since 18.9.0RC1
+     */
+    public List<MessageBoxElement> getMessageBoxes()
+    {
+        return getDriver().findElementsWithoutWaiting(this.content, MessageBoxElement.LOCATOR).stream()
+            .map(MessageBoxElement::new).toList();
+    }
+
+    /**
      * Instantaneously scrolls to the top of the screen.
      *
      * @since 13.3RC1

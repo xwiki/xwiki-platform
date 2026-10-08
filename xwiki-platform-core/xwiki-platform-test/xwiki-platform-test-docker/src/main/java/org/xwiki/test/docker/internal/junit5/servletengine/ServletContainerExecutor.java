@@ -75,6 +75,17 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String OFFICE_IMAGE_VERSION_LABEL = "image-version";
 
+    /**
+     * Revision of the image embedding LibreOffice, to increment whenever a change is brought to it so that it's rebuilt
+     * on all the machines having it already.
+     */
+    private static final int OFFICE_IMAGE_REVISION = 2;
+
+    /**
+     * Stable path to the Python home bundled with LibreOffice, whose directory name contains the Python version.
+     */
+    private static final String OFFICE_PYTHON_HOME = "/opt/libreoffice-python";
+
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
 
     private static final String ROOT_USER = "root";
@@ -417,8 +428,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             // Resolve the version of LibreOffice to install in the image
             String officeVersion = 
                 LibreOfficeResolver.resolve(this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version"));
-            // We rebuild every time the LibreOffice version changes
-            String imageVersion = String.format("LO-%S", officeVersion);
+            // We rebuild every time the LibreOffice version or the image revision changes
+            String imageVersion = String.format("LO-%S-%d", officeVersion, OFFICE_IMAGE_REVISION);
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
                 .withReferenceFilter(imageName)
                 .withLabelFilter(Collections.singletonMap(OFFICE_IMAGE_VERSION_LABEL, imageVersion))
@@ -468,9 +479,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             // the LibreOffice installation directory
                             .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
                                 + "apt-get install --no-install-recommends ./*.deb &&"
-                                + " ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
-                            // Increment the image version whenever a change is brought to the image so that it can
-                            // reconstructed on all machines needing it.
+                                + " ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice &&"
+                                + " ln -fs `ls -d /opt/libreoffice/program/python-core-*` " + OFFICE_PYTHON_HOME)
+                            // The Python bundled with LibreOffice cannot find its home by itself when it's loaded by
+                            // LibreOffice (e.g. when importing HTML), and complains about it on the error output,
+                            // which JODConverter logs as errors.
+                            .env("PYTHONHOME", OFFICE_PYTHON_HOME)
+                            // Increment OFFICE_IMAGE_REVISION whenever a change is brought to the image so that it's
+                            // rebuilt on all machines needing it.
                             .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);
                         if (this.testConfiguration.getServletEngine() == ServletEngine.JETTY) {
                             // Create the right jetty user directory since it doesn't exist

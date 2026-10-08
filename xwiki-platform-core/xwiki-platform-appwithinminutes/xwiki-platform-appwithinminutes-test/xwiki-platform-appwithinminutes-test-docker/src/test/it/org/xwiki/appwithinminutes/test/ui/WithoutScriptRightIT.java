@@ -32,6 +32,7 @@ import org.xwiki.appwithinminutes.test.po.EntryEditPage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -71,8 +72,12 @@ class WithoutScriptRightIT
 
     @Order(1)
     @Test
-    void createApplicationWithoutScriptRight(TestReference testReference)
+    void createApplicationWithoutScriptRight(TestReference testReference,
+        LogCaptureConfiguration logCaptureConfiguration)
     {
+        // The translations of the application can't be registered since they were saved without script right.
+        logCaptureConfiguration.registerExpected("Failed to register translation bundle from document");
+
         ApplicationCreatePage appCreatePage = AppWithinMinutesHomePage.gotoPage().clickCreateApplication();
         String appName = testReference.getLastSpaceReference().getName();
         appCreatePage.setApplicationName(appName);

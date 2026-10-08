@@ -20,15 +20,21 @@
 package org.xwiki.user.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 
 /** User profile, the preferences pane, edit mode. */
 public class PreferencesEditPage extends EditPage
 {
     private static final String SHORTCUT_SAVED_MESSAGE = "Updated shortcut preference";
+
+    private static final String SHORTCUT_RESET_MESSAGE = "Reset shortcut preference";
+
+    private static final String INFORMATION_SHORTCUT = "core.shortcuts.view.information";
 
     @FindBy(id = "XWiki.XWikiUsers_0_editor")
     private WebElement defaultEditor;
@@ -98,21 +104,64 @@ public class PreferencesEditPage extends EditPage
     /**
      * Sets the shortcut used to open the information tab of the current page, and waits for it to be saved.
      *
-     * @param shortcutValue the new shortcut, must be different from the current one
+     * @param shortcutValue the new shortcut, must be different from the current one, empty to unbind the shortcut
      */
     public void setShortcutInformation(String shortcutValue)
     {
-        setShortcut("core.shortcuts.view.information", shortcutValue);
+        setShortcut(INFORMATION_SHORTCUT, shortcutValue);
+    }
+
+    /**
+     * Resets the shortcut used to open the information tab of the current page to its default value, and waits for
+     * the shortcut preference to be removed.
+     */
+    public void resetShortcutInformation()
+    {
+        WebElement resetButton = getShortcutInput(INFORMATION_SHORTCUT)
+            .findElement(By.xpath("following-sibling::button[contains(@class, 'reset-shortcut-preference')]"));
+        getDriver().scrollTo(resetButton);
+        resetButton.click();
+        waitForNotificationSuccessMessage(SHORTCUT_RESET_MESSAGE);
+    }
+
+    /**
+     * Sets the shortcut used to cancel the edition, and waits for it to be saved.
+     *
+     * @param shortcutValue the new shortcut, must be different from the current one
+     */
+    public void setShortcutEditCancel(String shortcutValue)
+    {
+        setShortcut("core.shortcuts.edit.cancel", shortcutValue);
+    }
+
+    /**
+     * Cancel the edition by using a keyboard shortcut made of the Alt key and the given key.
+     *
+     * @param key the key to press along with the Alt key
+     * @return the page that was being edited
+     */
+    public ViewPage useShortcutKeyForCancellingEdition(String key)
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().createActions().keyDown(Keys.ALT).sendKeys(key).keyUp(Keys.ALT).perform();
+        getDriver().waitUntilPageIsReloaded();
+        return new ViewPage();
     }
 
     private void setShortcut(String translationKey, String shortcutValue)
     {
-        WebElement shortcutInput = getDriver().findElement(
-            By.cssSelector(String.format("input.shortcutPreference[data-translate-key='%s']", translationKey)));
+        WebElement shortcutInput = getShortcutInput(translationKey);
         getDriver().scrollTo(shortcutInput);
-        shortcutInput.clear();
+        // Clear the input with key presses, so that the shortcut preference is saved even when it's unbound.
+        shortcutInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
         shortcutInput.sendKeys(shortcutValue);
         // The shortcut preference is saved in the background as soon as it's typed.
         waitForNotificationSuccessMessage(SHORTCUT_SAVED_MESSAGE);
+    }
+
+    private WebElement getShortcutInput(String translationKey)
+    {
+        return getDriver().findElement(
+            By.cssSelector(String.format("input.shortcutPreference[data-translate-key='%s']", translationKey)));
     }
 }

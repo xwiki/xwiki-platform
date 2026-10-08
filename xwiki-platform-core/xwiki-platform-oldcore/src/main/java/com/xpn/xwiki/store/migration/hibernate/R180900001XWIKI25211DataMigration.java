@@ -17,55 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store.hibernate.internal;
+package com.xpn.xwiki.store.migration.hibernate;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.store.hibernate.AbstractHibernateAdapter;
-import org.xwiki.store.hibernate.HibernateAdapter;
+
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * The {@link HibernateAdapter} for PostgreSQL.
- * 
+ * Increase again the maximum size of the columns to the maximum index supported by MySQL: 768. On databases storing
+ * the unquoted column names in upper case (e.g. HSQLDB, Oracle), {@link R140200010XWIKI19207DataMigration} could not
+ * find the columns declared in lower case in the Hibernate mapping (e.g. the legacy activity stream ones) and thus
+ * kept them at their previous size.
+ *
  * @version $Id$
- * @since 17.1.0RC1
+ * @since 18.9.0RC1
  */
 @Component
-@Named(PostgreSQLHibernateAdapter.HINT)
+@Named("R180900001XWIKI25211")
 @Singleton
-public class PostgreSQLHibernateAdapter extends AbstractHibernateAdapter
+public class R180900001XWIKI25211DataMigration extends AbstractResizeMigration
 {
-    /**
-     * The role hint of the component.
-     */
-    public static final String HINT = "postgresql";
-
     @Override
-    protected String getDefaultMainWikiDatabase(String wikiId)
+    public String getDescription()
     {
-        if (isConfiguredInSchemaMode()) {
-            return "public";
-        }
-
-        return super.getDefaultMainWikiDatabase(wikiId);
+        return "Increase the maximum size of the columns which were not found by the previous resize migration";
     }
 
     @Override
-    public boolean isCatalog()
+    public XWikiDBVersion getVersion()
     {
-        if (isConfiguredInSchemaMode()) {
-            return false;
-        }
-
-        return super.isCatalog();
-    }
-
-    @Override
-    public String getColumnName(String columnName)
-    {
-        // PostgreSQL stores the unquoted column names in lower case
-        return columnName != null ? columnName.toLowerCase() : null;
+        return new XWikiDBVersion(180900001);
     }
 }

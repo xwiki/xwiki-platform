@@ -38,7 +38,6 @@ import org.openqa.selenium.WindowType;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
-import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.CKEditorToolBar;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
@@ -1316,13 +1315,10 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // * different channels are used to synchronize the content of different translations
         // * each translation has its own script author
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        secondTextArea.sendKeys("French content", Keys.ENTER, "/velo");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
-        secondTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
-        secondTextArea.waitUntilTextContains("superadmin");
+        secondTextArea.sendKeys("French content", Keys.ENTER);
+        secondTextArea.insertMacroWithRequiredParameters("/velo", "Velocity")
+            .setMacroContent("$xcontext.userReference.name").clickSubmit();
+        assertTrue(secondTextArea.getText().contains("superadmin"));
 
         //
         // First Tab
@@ -1331,13 +1327,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
 
         // Try to insert a script macro. The current user doesn't have script right.
-        firstTextArea.sendKeys(Keys.ENTER, "/velo");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
         firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent(" ").clickSubmit();
-        firstTextArea.waitUntilTextContains("default content\nFailed to execute the [velocity] macro.");
+        firstTextArea.insertMacroWithRequiredParameters("/velo", "Velocity").setMacroContent(" ").clickSubmit();
+        assertTrue(firstTextArea.getText().contains("default content\nFailed to execute the [velocity] macro."));
 
         // Verify that we're editing alone.
         assertTrue(firstEditPage.getToolbar().isEditingAlone());

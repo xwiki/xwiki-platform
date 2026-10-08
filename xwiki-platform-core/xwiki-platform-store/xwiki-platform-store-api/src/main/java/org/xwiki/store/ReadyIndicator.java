@@ -25,8 +25,9 @@ import java.util.concurrent.Future;
  * An indicator if a store is ready, i.e., has completed all writes/indexing tasks that have been submitted before
  * the indicator was requested. If the indexing tasks cannot be completed, e.g., because the indexer has been
  * stopped, the {@link Future} is completed with an exception. When it's because the store was stopped (e.g., when
- * XWiki is stopping), that exception is a {@link StoreStoppedException} (since 18.9.0RC1), so {@link #get()} throws
- * an {@link java.util.concurrent.ExecutionException} whose cause is a {@link StoreStoppedException}.
+ * XWiki is stopping), that exception is a {@link StoreStoppedException} (since 17.10.14, 18.4.7 and 18.9.0RC1), so
+ * {@link #get()} throws an {@link java.util.concurrent.ExecutionException} whose cause is a
+ * {@link StoreStoppedException}.
  *
  * @since 16.9.0RC1
  * @version $Id$

@@ -23,12 +23,12 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WindowType;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -121,7 +121,8 @@ class AutoSaveIT extends AbstractBlockNoteIT
 
     @Test
     @Order(2)
-    void autoSavesOnlyOnceWhenTwoClientsEdit(TestReference testReference, TestUtils setup) throws Exception
+    void autoSavesOnlyOnceWhenTwoClientsEdit(TestReference testReference, TestUtils setup,
+        MultiUserTestUtils multiUserSetup)
     {
         //
         // First Tab
@@ -131,10 +132,32 @@ class AutoSaveIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "one", "");
 
-        String firstTabHandle = setup.getDriver().getWindowHandle();
         new ViewPage().editWYSIWYG();
         BlockNoteRichTextArea firstTextArea =
             new BlockNoteEditor("content").setAutoSaveInterval(AUTO_SAVE_INTERVAL).getRichTextArea();
+
+        //
+        // Second Tab
+        //
+
+        // The same user joins the session from another tab, in-place this time. The tab uses another host so that it
+        // gets its own session, hence the login.
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsJohn(setup);
+        setup.gotoPage(testReference);
+        new InplaceEditablePage().editInplace();
+        // Each tab has its own auto-saver, so the interval has to be set again here.
+        BlockNoteRichTextArea secondTextArea =
+            new BlockNoteEditor("content").setAutoSaveInterval(AUTO_SAVE_INTERVAL).getRichTextArea();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Typing starts the auto-save countdown, so both editors are loaded before anyone types: otherwise a slow
+        // second load could let the first client save before the second one types, and the second client would
+        // rightfully save its own later changes as another version.
         firstTextArea.click();
         firstTextArea.sendKeys(Keys.END, " two");
 
@@ -142,13 +165,7 @@ class AutoSaveIT extends AbstractBlockNoteIT
         // Second Tab
         //
 
-        // The same user joins the session from another tab, in-place this time.
-        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
-        setup.gotoPage(testReference);
-        new InplaceEditablePage().editInplace();
-        // Each tab has its own auto-saver, so the interval has to be set again here.
-        BlockNoteRichTextArea secondTextArea =
-            new BlockNoteEditor("content").setAutoSaveInterval(AUTO_SAVE_INTERVAL).getRichTextArea();
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
         secondTextArea.waitUntilTextContains("one two");
         secondTextArea.click();
         secondTextArea.sendKeys(Keys.END, " three");
@@ -157,7 +174,7 @@ class AutoSaveIT extends AbstractBlockNoteIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("three");
 
         // Both clients have changes to save, and only the one that wins the save election must save them. We watch
@@ -170,9 +187,9 @@ class AutoSaveIT extends AbstractBlockNoteIT
         // notification of the save above is still displayed in the tab that performed it.
         assertNoNewVersion(setup, testReference, savedVersion, "A second client saved the same changes.");
 
-        setup.getDriver().switchTo().window(secondTabHandle);
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
         setup.leaveEditMode();
-        setup.getDriver().switchTo().window(firstTabHandle);
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         setup.leaveEditMode();
 
         ViewPage viewPage = setup.gotoPage(testReference);

@@ -261,91 +261,21 @@ public class SaveAction extends EditAction
     private XWikiDocument updateAndSaveDocument(XWikiDocument doc, int sectionNumber, boolean lastAttempt,
         XWikiContext context) throws XWikiException
     {
-        XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         EditForm form = (EditForm) context.getForm();
-
-        XWikiDocument originalDoc = doc;
 
         // We need to clone this document first, since a cached storage would return the same object for the
         // following requests, so concurrent request might get a partially modified object, or worse, if an error
         // occurs during the save, the cached object will not reflect the actual document at all.
-        doc = doc.clone();
+        XWikiDocument clonedDoc = doc.clone();
+        EditedTranslation translation = getEditedTranslation(doc, clonedDoc, form.getLanguage(), context);
+        XWikiDocument originalDoc = translation.original();
+        XWikiDocument tdoc = translation.edited();
 
-        String language = form.getLanguage();
-        // FIXME Which one should be used: doc.getDefaultLanguage or
-        // form.getDefaultLanguage()?
-        // String defaultLanguage = ((EditForm) form).getDefaultLanguage();
-        XWikiDocument tdoc;
+        initializeNewDocumentLocale(clonedDoc, context);
 
-        if (doc.isNew() || (language == null) || (language.isEmpty()) || ("default".equals(language))
-            || (language.equals(doc.getDefaultLanguage()))) {
-            // Saving the default document translation.
-            // Need to save parent and defaultLanguage if they have changed
-            tdoc = doc;
-        } else {
-            tdoc = doc.getTranslatedDocument(language, context);
-            if ((tdoc == doc) && xwiki.isMultiLingual(context)) {
-                // Saving a new document translation.
-                tdoc = new XWikiDocument(doc.getDocumentReference());
-                tdoc.setLanguage(language);
-                tdoc.setStore(doc.getStore());
-                // In that specific case, we want the original doc to be the translation document so that we
-                // never raised a conflict.
-                originalDoc = tdoc;
-            } else if (tdoc != doc) {
-                // Saving an existing document translation (but not the default one).
-                // Same as above, clone the object retrieved from the store cache.
-                originalDoc = tdoc;
-                tdoc = tdoc.clone();
-            }
-        }
-
-        if (doc.isNew()) {
-            doc.setLocale(Locale.ROOT);
-            if (doc.getDefaultLocale() == Locale.ROOT) {
-                doc.setDefaultLocale(xwiki.getLocalePreference(context));
-            }
-        }
-
-        try {
-            readFromTemplate(tdoc, form.getTemplate(), context);
-        } catch (XWikiException e) {
-            if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
-                context.put(EXCEPTION, e);
-                return null;
-            }
-        }
-
-        // Convert the content and the meta data of the edited document and its translations if the syntax has changed
-        // and the request is asking for a syntax conversion. We do this after applying the template because the
-        // template may have content in the previous syntax that needs to be converted. We do this before applying the
-        // changes from the submitted form because it may contain content that was already converted.
-        if (form.isConvertSyntax() && !tdoc.getSyntax().toIdString().equals(form.getSyntaxId())) {
-            convertSyntax(tdoc, form.getSyntaxId(), context);
-        }
-
-        if (sectionNumber != 0) {
-            XWikiDocument sectionDoc = tdoc.clone();
-            sectionDoc.readFromForm(form, context);
-            String sectionContent = sectionDoc.getContent() + "\n";
-            String content = tdoc.updateDocumentSection(sectionNumber, sectionContent);
-
-            // The list of attachments might have been modified by a new upload that is read in sectionDoc.readFromForm
-            // so we ensure to keep the updated list of attachments.
-            tdoc.setAttachmentList(sectionDoc.getAttachmentList());
-            tdoc.setContent(content);
-            tdoc.setComment(sectionDoc.getComment());
-            tdoc.setMinorEdit(sectionDoc.isMinorEdit());
-        } else {
-            tdoc.readFromForm(form, context);
-        }
-
-        // Remove the redirect object if the save request doesn't update it. This allows users to easily overwrite
-        // redirect place-holders that are created when we move pages around.
-        if (tdoc.getXObject(RedirectClassDocumentInitializer.REFERENCE) != null
-            && request.getParameter("XWiki.RedirectClass_0_location") == null) {
-            tdoc.removeXObjects(RedirectClassDocumentInitializer.REFERENCE);
+        if (!applyRequest(tdoc, sectionNumber, form, context)) {
+            return null;
         }
 
         // There are cases (e.g. when leaving a realtime collaboration session) when we don't want to create a new
@@ -356,27 +286,9 @@ public class SaveAction extends EditAction
         // a version summary comment if they want to force the save even when preventEmptyRevision is true.
         boolean dirtyBeforeSettingAuthors = tdoc.isContentDirty() || tdoc.isMetaDataDirty();
 
-        // Update the document authors.
-        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
-        tdoc.getAuthors().setOriginalMetadataAuthor(currentUserReference);
-        request.getEffectiveAuthor().ifPresent(tdoc.getAuthors()::setEffectiveMetadataAuthor);
-        if (tdoc.isNew()) {
-            tdoc.getAuthors().setCreator(currentUserReference);
-        }
+        updateAuthors(tdoc, request);
 
-        // Validate the document if we have xvalidate=1 in the request.
-        if ("1".equals(request.getParameter("xvalidate")) && !tdoc.validate(context)) {
-            // Validation failed. Redirect to "Inline form" edit mode.
-            // Set display context to "edit".
-            context.put("display", "edit");
-            // Set the action used by the "Inline form" edit mode as the context action. See #render(XWikiContext).
-            context.setAction(tdoc.getDefaultEditMode(context));
-            // Set the document in the context.
-            context.put("doc", doc);
-            context.put("cdoc", tdoc);
-            context.put("tdoc", tdoc);
-            // Force the "Inline form" edit mode.
-            getCurrentScriptContext().setAttribute("editor", "inline", ScriptContext.ENGINE_SCOPE);
+        if (redirectToInlineFormIfInvalid(clonedDoc, tdoc, context)) {
             return null;
         }
 
@@ -400,30 +312,12 @@ public class SaveAction extends EditAction
         //   after the event listeners are called)
         // * the listeners may want to block a hierarchy template from being applied, even if the root document is not
         //   itself affected.
-        xwiki.checkSavingDocument(context.getUserReference(), tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
+        context.getWiki().checkSavingDocument(context.getUserReference(), tdoc, tdoc.getComment(), tdoc.isMinorEdit(),
+            context);
 
-        // Note that users may save an existing document without making any changes just to update the author, e.g. to
-        // change access rights. In this or other similar cases the version summary comment can be used to justify the
-        // action, which is why we force the save if a comment is provided. We consider preventEmptyRevision to be false
-        // by default for backward compatibility. This is currently used by realtime collaboration to avoid creating
-        // empty revisions when leaving the editing session.
-        if (tdoc.isNew() || dirtyBeforeSettingAuthors || StringUtils.isNotEmpty(tdoc.getComment())
-            || !"true".equals(request.getParameter("preventEmptyRevision"))) {
-            // Make sure we have at least the meta data dirty otherwise the version is not incremented.
-            tdoc.setMetaDataDirty(true);
-
-            // We take the version summary comment from the document being saved because it may have been modified by an
-            // event listener after it was copied from the EditForm by the call to readFromForm.
-            try {
-                xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
-            } catch (DocumentRevisionConflictException e) {
-                // The document was saved by another request after this request loaded it, again and again. The editor
-                // waiting for the result of an asynchronous save can let the user resolve the conflict.
-                if (lastAttempt && Boolean.TRUE.equals(Utils.isAjaxRequest(context))) {
-                    answerConcurrentSaveConflict(context, originalDoc, tdoc);
-                    return null;
-                }
-                throw e;
+        if (isSaveNeeded(tdoc, dirtyBeforeSettingAuthors, request)) {
+            if (!saveDocument(originalDoc, tdoc, lastAttempt, context)) {
+                return null;
             }
         } else {
             // Let the editor know that the document was not saved because there were no changes.
@@ -431,6 +325,191 @@ public class SaveAction extends EditAction
         }
 
         return tdoc;
+    }
+
+    /**
+     * The document translation that is edited, and the stored version it is based on.
+     *
+     * @param original the stored version of the edited translation, before the changes from the request
+     * @param edited the edited translation, that is saved
+     */
+    private record EditedTranslation(XWikiDocument original, XWikiDocument edited)
+    {
+    }
+
+    private EditedTranslation getEditedTranslation(XWikiDocument originalDoc, XWikiDocument doc, String language,
+        XWikiContext context) throws XWikiException
+    {
+        // FIXME Which one should be used: doc.getDefaultLanguage or
+        // form.getDefaultLanguage()?
+        // String defaultLanguage = ((EditForm) form).getDefaultLanguage();
+        if (doc.isNew() || StringUtils.isEmpty(language) || "default".equals(language)
+            || language.equals(doc.getDefaultLanguage())) {
+            // Saving the default document translation.
+            // Need to save parent and defaultLanguage if they have changed
+            return new EditedTranslation(originalDoc, doc);
+        }
+
+        XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
+        if ((tdoc == doc) && context.getWiki().isMultiLingual(context)) {
+            // Saving a new document translation.
+            tdoc = new XWikiDocument(doc.getDocumentReference());
+            tdoc.setLanguage(language);
+            tdoc.setStore(doc.getStore());
+            // In that specific case, we want the original doc to be the translation document so that we
+            // never raised a conflict.
+            return new EditedTranslation(tdoc, tdoc);
+        } else if (tdoc != doc) {
+            // Saving an existing document translation (but not the default one).
+            // Same as above, clone the object retrieved from the store cache.
+            return new EditedTranslation(tdoc, tdoc.clone());
+        }
+
+        return new EditedTranslation(originalDoc, doc);
+    }
+
+    private void initializeNewDocumentLocale(XWikiDocument doc, XWikiContext context)
+    {
+        if (doc.isNew()) {
+            doc.setLocale(Locale.ROOT);
+            if (doc.getDefaultLocale() == Locale.ROOT) {
+                doc.setDefaultLocale(context.getWiki().getLocalePreference(context));
+            }
+        }
+    }
+
+    /**
+     * Applies the template, the syntax conversion and the submitted form on the edited document.
+     *
+     * @return {@code false} if the request can't be applied and the response is already handled
+     */
+    private boolean applyRequest(XWikiDocument tdoc, int sectionNumber, EditForm form, XWikiContext context)
+        throws XWikiException
+    {
+        try {
+            readFromTemplate(tdoc, form.getTemplate(), context);
+        } catch (XWikiException e) {
+            if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
+                context.put(EXCEPTION, e);
+                return false;
+            }
+        }
+
+        // Convert the content and the meta data of the edited document and its translations if the syntax has changed
+        // and the request is asking for a syntax conversion. We do this after applying the template because the
+        // template may have content in the previous syntax that needs to be converted. We do this before applying the
+        // changes from the submitted form because it may contain content that was already converted.
+        if (form.isConvertSyntax() && !tdoc.getSyntax().toIdString().equals(form.getSyntaxId())) {
+            convertSyntax(tdoc, form.getSyntaxId(), context);
+        }
+
+        readFromForm(tdoc, sectionNumber, form, context);
+
+        // Remove the redirect object if the save request doesn't update it. This allows users to easily overwrite
+        // redirect place-holders that are created when we move pages around.
+        if (tdoc.getXObject(RedirectClassDocumentInitializer.REFERENCE) != null
+            && context.getRequest().getParameter("XWiki.RedirectClass_0_location") == null) {
+            tdoc.removeXObjects(RedirectClassDocumentInitializer.REFERENCE);
+        }
+
+        return true;
+    }
+
+    private void readFromForm(XWikiDocument tdoc, int sectionNumber, EditForm form, XWikiContext context)
+        throws XWikiException
+    {
+        if (sectionNumber != 0) {
+            XWikiDocument sectionDoc = tdoc.clone();
+            sectionDoc.readFromForm(form, context);
+            String sectionContent = sectionDoc.getContent() + "\n";
+            String content = tdoc.updateDocumentSection(sectionNumber, sectionContent);
+
+            // The list of attachments might have been modified by a new upload that is read in sectionDoc.readFromForm
+            // so we ensure to keep the updated list of attachments.
+            tdoc.setAttachmentList(sectionDoc.getAttachmentList());
+            tdoc.setContent(content);
+            tdoc.setComment(sectionDoc.getComment());
+            tdoc.setMinorEdit(sectionDoc.isMinorEdit());
+        } else {
+            tdoc.readFromForm(form, context);
+        }
+    }
+
+    private void updateAuthors(XWikiDocument tdoc, XWikiRequest request)
+    {
+        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
+        tdoc.getAuthors().setOriginalMetadataAuthor(currentUserReference);
+        request.getEffectiveAuthor().ifPresent(tdoc.getAuthors()::setEffectiveMetadataAuthor);
+        if (tdoc.isNew()) {
+            tdoc.getAuthors().setCreator(currentUserReference);
+        }
+    }
+
+    /**
+     * Validates the document if we have xvalidate=1 in the request.
+     *
+     * @return {@code true} if the validation failed, in which case the "Inline form" edit mode is displayed
+     */
+    private boolean redirectToInlineFormIfInvalid(XWikiDocument doc, XWikiDocument tdoc, XWikiContext context)
+        throws XWikiException
+    {
+        if ("1".equals(context.getRequest().getParameter("xvalidate")) && !tdoc.validate(context)) {
+            // Validation failed. Redirect to "Inline form" edit mode.
+            // Set display context to "edit".
+            context.put("display", "edit");
+            // Set the action used by the "Inline form" edit mode as the context action. See #render(XWikiContext).
+            context.setAction(tdoc.getDefaultEditMode(context));
+            // Set the document in the context.
+            context.put("doc", doc);
+            context.put("cdoc", tdoc);
+            context.put("tdoc", tdoc);
+            // Force the "Inline form" edit mode.
+            getCurrentScriptContext().setAttribute("editor", "inline", ScriptContext.ENGINE_SCOPE);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isSaveNeeded(XWikiDocument tdoc, boolean dirtyBeforeSettingAuthors, XWikiRequest request)
+    {
+        // Note that users may save an existing document without making any changes just to update the author, e.g. to
+        // change access rights. In this or other similar cases the version summary comment can be used to justify the
+        // action, which is why we force the save if a comment is provided. We consider preventEmptyRevision to be false
+        // by default for backward compatibility. This is currently used by realtime collaboration to avoid creating
+        // empty revisions when leaving the editing session.
+        return tdoc.isNew() || dirtyBeforeSettingAuthors || StringUtils.isNotEmpty(tdoc.getComment())
+            || !"true".equals(request.getParameter("preventEmptyRevision"));
+    }
+
+    /**
+     * Saves the edited document.
+     *
+     * @return {@code false} if the document couldn't be saved and the response is already handled
+     * @throws DocumentRevisionConflictException if the document was saved concurrently by another request after it was
+     *             loaded, and it is not the last attempt
+     */
+    private boolean saveDocument(XWikiDocument originalDoc, XWikiDocument tdoc, boolean lastAttempt,
+        XWikiContext context) throws XWikiException
+    {
+        // Make sure we have at least the meta data dirty otherwise the version is not incremented.
+        tdoc.setMetaDataDirty(true);
+
+        // We take the version summary comment from the document being saved because it may have been modified by an
+        // event listener after it was copied from the EditForm by the call to readFromForm.
+        try {
+            context.getWiki().saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
+        } catch (DocumentRevisionConflictException e) {
+            // The document was saved by another request after this request loaded it, again and again. The editor
+            // waiting for the result of an asynchronous save can let the user resolve the conflict.
+            if (lastAttempt && Boolean.TRUE.equals(Utils.isAjaxRequest(context))) {
+                answerConcurrentSaveConflict(context, originalDoc, tdoc);
+                return false;
+            }
+            throw e;
+        }
+
+        return true;
     }
 
     private boolean isConflictCheckEnabled()

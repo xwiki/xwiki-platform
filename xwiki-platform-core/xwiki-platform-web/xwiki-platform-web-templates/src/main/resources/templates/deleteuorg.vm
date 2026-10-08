@@ -17,18 +17,25 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+#set ($documentReference = $services.model.resolveDocument($request.docname))
+## Deleting a page that belongs to an installed extension is either denied, or allowed only after the user has been
+## warned about it, in which case the delete UI confirms it with the force parameter.
+#set ($deleteProtection = $services.extension.xar.getDeleteSecurityLevel($xcontext.userReference,
+  $documentReference))
 ## CSRF check
-#if ($services.csrf.isTokenValid($request.form_token))
+#if (!$services.csrf.isTokenValid($request.form_token))
+FAIL
+#elseif ("$!deleteProtection" == 'DENY' || ("$!deleteProtection" == 'WARNING' && "$!request.force" != 'true'))
+#set ($discard = $response.setStatus(403))
+FAIL
+#else
 #if ("$!request.newAuthor" != '')
-#set ($oldAuthorReference = $services.model.resolveDocument($request.docname))
 #set ($newAuthorReference = $services.model.resolveDocument($request.newAuthor))
-#if (!$newAuthorReference.equals($oldAuthorReference))
-$!services.refactoring.changeDocumentAuthor($oldAuthorReference, $newAuthorReference).join()
+#if (!$newAuthorReference.equals($documentReference))
+$!services.refactoring.changeDocumentAuthor($documentReference, $newAuthorReference).join()
 #end
 #end
-$!xwiki.getDocument($request.docname).delete()
+$!xwiki.getDocument($documentReference).delete()
 ## delete() doesn't return anything, so we need to print some text in order to avoid a "This template does not exist" response.
 OK
-#else
-FAIL
 #end

@@ -191,5 +191,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- XAR extension script service, used to check the protection of the pages coming from extensions -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

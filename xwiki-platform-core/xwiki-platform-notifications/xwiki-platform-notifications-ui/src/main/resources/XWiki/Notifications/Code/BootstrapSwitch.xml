@@ -344,12 +344,11 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
 /* Bootstrap Switch fades the indeterminate state to half opacity, like the disabled and read-only states, which makes
   the ON / OFF texts fall under the WCAG 1.4.3 contrast requirement and suggests that the switch can't be used. An
   indeterminate switch is still enabled and already stands out by showing its handle halfway between ON and OFF, so
-  keep it fully opaque. The original cursor rules are marked important, hence the important flags here. */
+  keep it fully opaque. */
 .bootstrap-switch.bootstrap-switch-indeterminate .bootstrap-switch-handle-on,
 .bootstrap-switch.bootstrap-switch-indeterminate .bootstrap-switch-handle-off,
 .bootstrap-switch.bootstrap-switch-indeterminate .bootstrap-switch-label {
   opacity: 1;
-  cursor: pointer !important;
 }</code>
     </property>
     <property>

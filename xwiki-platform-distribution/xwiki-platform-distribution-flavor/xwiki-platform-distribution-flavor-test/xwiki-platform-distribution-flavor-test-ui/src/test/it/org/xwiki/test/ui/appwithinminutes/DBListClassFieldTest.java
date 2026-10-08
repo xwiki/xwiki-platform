@@ -50,7 +50,7 @@ public class DBListClassFieldTest extends AbstractClassEditorTest
         DBListClassFieldEditPane dbListField = new DBListClassFieldEditPane(editor.addField(this.fieldName).getName());
 
         // Check that the input suggest picker is working.
-        dbListField.getPicker().sendKeys("db").waitForSuggestions().selectByVisibleText("DBList");
+        dbListField.getPicker().sendKeys("db").selectByVisibleText("DBList");
 
         // Enable multiple selection.
         dbListField.openConfigPanel();

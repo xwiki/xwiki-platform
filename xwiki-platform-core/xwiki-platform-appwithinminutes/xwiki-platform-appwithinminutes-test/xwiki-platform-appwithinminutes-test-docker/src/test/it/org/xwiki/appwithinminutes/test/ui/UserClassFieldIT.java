@@ -128,7 +128,7 @@ class UserClassFieldIT
         assertUserSuggestion(suggestions.get(0), "Eduard Moraru", "Enygma2002");
 
         // The guest user shouldn't be suggested.
-        suggestions = userPicker.clear().sendKeys("guest").waitForSuggestions().getSuggestions();
+        suggestions = userPicker.clear().sendKeys("guest").getSuggestions();
         assertTrue(suggestions.isEmpty());
 
         // Default administrator user should be suggested.
@@ -200,7 +200,7 @@ class UserClassFieldIT
 
         // Select 2 users.
         userPicker.sendKeys("tmortagne").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
-        userPicker.sendKeys("2002").waitForNonTypedSuggestions().selectByValue("XWiki.Enygma2002");
+        userPicker.sendKeys("2002").selectByValue("XWiki.Enygma2002");
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");

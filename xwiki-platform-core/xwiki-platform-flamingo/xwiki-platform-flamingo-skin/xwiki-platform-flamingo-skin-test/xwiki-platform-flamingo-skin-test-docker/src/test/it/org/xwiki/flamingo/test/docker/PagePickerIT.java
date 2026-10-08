@@ -67,7 +67,7 @@ class PagePickerIT
         // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
         pagePicker.click().waitForSuggestions();
 
-        pagePicker.sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions().selectByVisibleText(pageName);
+        pagePicker.sendKeys(pageName.substring(0, 3)).selectByVisibleText(pageName);
         pagePicker.clearSelectedSuggestions().sendKeys(pageName.substring(0, 3)).waitForNonTypedSuggestions()
             .selectByVisibleText(pageName);
     }
@@ -103,8 +103,7 @@ class PagePickerIT
         assertEquals(1, suggestions.size());
         assertEquals(pageTitle, suggestions.get(0).getLabel());
         // Just to be sure that searching for the children also works, search and select the first child.
-        pagePicker.clear().sendKeys(childName + "0").waitForNonTypedSuggestions()
-            .selectByVisibleText("Child page 0");
+        pagePicker.clear().sendKeys(childName + "0").selectByVisibleText("Child page 0");
     }
 
     @ParameterizedTest

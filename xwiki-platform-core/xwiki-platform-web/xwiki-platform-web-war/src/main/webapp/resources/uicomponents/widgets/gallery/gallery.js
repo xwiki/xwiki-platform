@@ -38,113 +38,125 @@ define('xwiki-gallery-icons', {
 
 (function(l10n) {
   "use strict";
-globalThis.XWiki = (function (XWiki) {
-// Start XWiki augmentation.
-XWiki.Gallery = Class.create({
-  initialize : function(container) {
+require(['jquery', 'xwiki-icon!xwiki-gallery-icons', 'xwiki-events-bridge'], function($, icons) {
+const XWiki = window.XWiki = window.XWiki || {};
+
+function createButton(className, title, text) {
+  const button = document.createElement('button');
+  Object.assign(button, {className, title, textContent: text || ''});
+  return button;
+}
+
+/**
+ * Note that this class can be extended using Prototype.js' Class.create(XWiki.Gallery, {...}). This is why the
+ * constructor only delegates to the initialize method (Prototype.js calls only the initialize method when creating an
+ * instance of a subclass).
+ */
+class Gallery {
+  constructor(...args) {
+    this.initialize(...args);
+  }
+
+  initialize(container) {
     this.images = this._collectImages(container);
     // Generate the different parts of the gallery
-    let maximizeButton = new Element('button', {
-      'class': 'maximize', 'title': l10n['core.widgets.gallery.maximize']});
-    require(['xwiki-icon!xwiki-gallery-icons'], function(icons) {
-      // The CSS expects the expand icon to come first, in order to show only the icon matching the current action.
-      maximizeButton.insert(icons['maximize']?.render());
-      maximizeButton.insert(icons['minimize']?.render());
+    const maximizeButton = createButton('maximize', l10n['core.widgets.gallery.maximize']);
+    // The CSS expects the expand icon to come first, in order to show only the icon matching the current action.
+    maximizeButton.append(...[icons['maximize']?.render(), icons['minimize']?.render()].filter(icon => icon));
+    const previousButton = createButton('previous', l10n['core.widgets.gallery.previousImage'], '<');
+    const currentImage = document.createElement('img');
+    Object.assign(currentImage, {className: 'currentImage', title: l10n['core.widgets.gallery.currentImage']});
+    const nextButton = createButton('next', l10n['core.widgets.gallery.nextImage'], '>');
+    const imageIndex = document.createElement('div');
+    Object.assign(imageIndex, {
+      className: 'index',
+      tabIndex: 0,
+      title: l10n['core.widgets.gallery.index.description'],
+      textContent: '0 / 0'
     });
-    let previousButton = new Element('button', {
-      'class': 'previous', 'title': l10n['core.widgets.gallery.previousImage']});
-    previousButton.insert("&lt;");
-    let currentImage = new Element('img',
-      {'class': 'currentImage', 'title': l10n['core.widgets.gallery.currentImage']});
-    let nextButton = new Element('button',
-      {'class': 'next', 'title': l10n['core.widgets.gallery.nextImage']});
-    nextButton.insert("&gt;");
-    let imageIndex = new Element('div', {
-      'class': 'index', 'tabindex': 0, 'title': l10n['core.widgets.gallery.index.description'],
-      'aria-description': l10n['core.widgets.gallery.index.description']});
-    imageIndex.insert("0 / 0");
-    // Remove the content that's left in the container
-    container.update("");
-    // Add the gallery parts in the container, in the correct order.
-    container.insert(maximizeButton);
-    container.insert(previousButton);
-    container.insert(currentImage);
-    container.insert(nextButton);
-    container.insert(imageIndex);
+    imageIndex.setAttribute('aria-description', l10n['core.widgets.gallery.index.description']);
+    // Replace the content that's left in the container with the gallery parts, in the correct order.
+    container.replaceChildren(maximizeButton, previousButton, currentImage, nextButton, imageIndex);
     this.container = container;
-    this.container.addClassName('xGallery');    
-    
+    this.container.classList.add('xGallery');
+
     // Instead of an arbitrary element to catch focus, we use the index.
     // This index already stores the current image state, might as well be responsible for providing quick controls and
     // explanations about these quick controls.
     // Note that wrapping the image in an interactive container to handle this would have been a good solution too.
     // However, this wrapping caused the image to overflow the CSS grid vertically when in maximized mode. 
     // Technically I couldn't find a CSS solution to prevent this, so I decided to make do without wrapping.
-    this.focusCatcher = this.container.down('.index');
-    this.focusCatcher.observe('keydown', this._onKeyDown.bindAsEventListener(this));
+    this.focusCatcher = imageIndex;
+    this.focusCatcher.addEventListener('keydown', event => this._onKeyDown(event));
 
-    this.container.down('.previous').observe('click', this._onPreviousImage.bind(this));
-    this.container.down('.next').observe('click', this._onNextImage.bind(this));
-    this.container.observe('click', function() {
-      this.focusCatcher.focus();
-    }.bind(this));
+    previousButton.addEventListener('click', () => this._onPreviousImage());
+    nextButton.addEventListener('click', () => this._onNextImage());
+    this.container.addEventListener('click', () => this.focusCatcher.focus());
 
-    this.currentImage = this.container.down('.currentImage');
-    this.currentImage.observe('load', this._onLoadImage.bind(this));
-    this.currentImage.observe('error', this._onErrorImage.bind(this));
-    this.currentImage.observe('abort', this._onAbortImage.bind(this));
+    this.currentImage = currentImage;
+    this.currentImage.addEventListener('load', () => this._onLoadImage());
+    this.currentImage.addEventListener('error', () => this._onErrorImage());
+    this.currentImage.addEventListener('abort', () => this._onAbortImage());
 
-    this.indexDisplay = this.container.down('.index');
+    this.indexDisplay = imageIndex;
 
-    this.maximizeToggle = this.container.down('.maximize');
-    this.maximizeToggle.observe('click', this._onToggleMaximize.bind(this));
+    this.maximizeToggle = maximizeButton;
+    this.maximizeToggle.addEventListener('click', () => this._onToggleMaximize());
 
     this.show(0);
-  },
-  _collectImages : function(container) {
+  }
+
+  _collectImages(container) {
     const images = [];
-    const imageElements = container.select('img');
+    const imageElements = container.querySelectorAll('img');
     for (const imageElement of imageElements) {
       images.push({url: imageElement.getAttribute('src'), title: imageElement.title, alt: imageElement.alt});
       imageElement.removeAttribute('src');
     }
     return images;
-  },
-  _onPreviousImage : function() {
+  }
+
+  _onPreviousImage() {
     this.show(this.index > 0 ? this.index - 1 : this.images.length - 1);
-  },
-  _onNextImage : function() {
+  }
+
+  _onNextImage() {
     this.show(this.index < this.images.length - 1 ? this.index + 1 : 0);
-  },
-  _onLoadImage : function() {
-    Element.removeClassName(this.currentImage.parentNode, 'loading');
+  }
+
+  _onLoadImage() {
+    this.currentImage.parentNode.classList.remove('loading');
     this.currentImage.style.visibility = 'visible';
-  },
-  _onErrorImage: function() {
-  },
-  _onAbortImage: function() {
-  },
-  _onKeyDown : function(event) {
+  }
+
+  _onErrorImage() {
+  }
+
+  _onAbortImage() {
+  }
+
+  _onKeyDown(event) {
     let stop = true;
-    switch(event.keyCode) {
-      case Event.KEY_LEFT:
+    switch(event.key) {
+      case 'ArrowLeft':
         this._onPreviousImage();
         break;
-      case Event.KEY_RIGHT:
+      case 'ArrowRight':
         this._onNextImage();
         break;
-      case Event.KEY_HOME:
+      case 'Home':
         this.show(0);
         break;
-      case Event.KEY_END:
+      case 'End':
         this.show(this.images.length - 1);
         break;
-      case Event.KEY_ESC:
-        if (this.container.hasClassName('maximized')) {
+      case 'Escape':
+        if (this.container.classList.contains('maximized')) {
           this._onToggleMaximize();
         }
         break;
-      case 70: /* F */
+      case 'f':
+      case 'F':
         this._onToggleMaximize();
         break;
       default:
@@ -152,23 +164,26 @@ XWiki.Gallery = Class.create({
         break;
     }
     if (stop) {
-      Event.stop(event);
+      event.preventDefault();
+      event.stopPropagation();
     }
-  },
-  _onToggleMaximize : function() {
-    this.maximizeToggle.toggleClassName('maximize');
-    this.maximizeToggle.toggleClassName('minimize');
-    this.maximizeToggle.title = this.maximizeToggle.hasClassName('maximize') ?
+  }
+
+  _onToggleMaximize() {
+    this.maximizeToggle.classList.toggle('maximize');
+    this.maximizeToggle.classList.toggle('minimize');
+    this.maximizeToggle.title = this.maximizeToggle.classList.contains('maximize') ?
       l10n['core.widgets.gallery.maximize'] : l10n['core.widgets.gallery.minimize'];
-    this.container.toggleClassName('maximized');
-    $(document.documentElement).toggleClassName('maximized');
+    this.container.classList.toggle('maximized');
+    document.documentElement.classList.toggle('maximized');
     // When a keyboard shortcut is used, the gallery is not focused by default. In order to keep the screen at the
     // level of the gallery even when minimizing, we need to make sure it's always focused.
     // Without this forced focus, minimizing the gallery by pressing the `Escape` key will
     // unexpectedly send the user to the top of the page.
     this.maximizeToggle.focus();
-  },
-  show : function(index) {
+  }
+
+  show(index) {
     if (index < 0 || index >= this.images.length || index == this.index) {
       return;
     }
@@ -177,7 +192,7 @@ XWiki.Gallery = Class.create({
     const imageData = this.images[index];
     if (this.currentImage.src !== imageData.url) {
       this.currentImage.style.visibility = 'hidden';
-      Element.addClassName(this.currentImage.parentNode, 'loading');
+      this.currentImage.parentNode.classList.add('loading');
       this.currentImage.title = imageData.title;
       const filename = decodeURI(imageData.url.split('/').pop().split('?')[0]);
       // If the alt is just the name of the file, we instead fall back on the human-readable currentImage translation.
@@ -189,32 +204,30 @@ XWiki.Gallery = Class.create({
       this.currentImage.src = imageData.url;
     }
     this.index = index;
-    this.indexDisplay.update((index + 1) + ' / ' + this.images.length);
+    this.indexDisplay.textContent = (index + 1) + ' / ' + this.images.length;
   }
-});
+}
 
-function init(event) {
-  const elements = event?.memo.elements || [$('body')];
-  elements.forEach(function(element) {
-    const galleries = element.hasClassName('gallery') ? [element] : element.select('.gallery');
-    galleries.forEach(function (gallery) {
-      new XWiki.Gallery(gallery);
-    });
-  });
+/** Required by Prototype.js' Class.create(), which registers each new subclass on its parent class. */
+Gallery.subclasses = [];
+
+XWiki.Gallery = Gallery;
+
+function init(event, data) {
+  for (const element of (data?.elements || [document.body])) {
+    const galleries = element.matches('.gallery') ? [element] : element.querySelectorAll('.gallery');
+    galleries.forEach(gallery => new XWiki.Gallery(gallery));
+  }
 }
 
 // Don't initialize the galleries when exporting to PDF because we want to include all the images.
 if (XWiki.contextaction !== 'export') {
   // When the document is loaded, install galleries
-  (XWiki.isInitialized && init())
-  || document.observe('xwiki:dom:loading', init);
+  $(init);
 
   // Initialize the gallery when it is added after the page is loaded.
-  document.observe('xwiki:dom:updated', init);
+  $(document).on('xwiki:dom:updated', init);
 }
-
-// End XWiki augmentation.
-return XWiki;
-}(XWiki || {}));
+});
 // End JavaScript-only code.
 }).apply(']]#', $jsontool.serialize([$l10n]));

@@ -25,166 +25,178 @@ var XWiki = (function (XWiki) {
 var viewers = XWiki.viewers = XWiki.viewers || {};
 
 /**
- * Tag editing.
+ * Sends a POST request to the given URL, showing an in-progress notification while the request is pending and an error
+ * notification if the request fails.
+ *
+ * @param url the URL to send the request to
+ * @param inProgressMessage the message to show while the request is pending
+ * @return a promise that resolves with the response text when the request succeeds, and with undefined otherwise
  */
-viewers.Tags = Class.create({
+async function post(url, inProgressMessage) {
+  const notification = XWiki.widgets.Notification.show(inProgressMessage, "inprogress");
+  let errorMessage;
+  try {
+    const response = await fetch(url, {method: 'POST'});
+    const responseText = await response.text();
+    if (response.ok) {
+      notification.hide();
+      return responseText;
+    }
+    errorMessage = responseText;
+  } catch {
+    // Network failure, handled below.
+  }
+  notification.replace(XWiki.widgets.Notification.show(errorMessage || 'Server not responding', "error"));
+}
+
+function stopEvent(event) {
+  event?.preventDefault();
+  event?.stopPropagation();
+}
+
+function setFormDisabled(form, disabled) {
+  for (const element of form.elements) {
+    element.disabled = disabled;
+  }
+}
+
+/**
+ * Tag editing.
+ *
+ * Note that this class can be extended using Prototype.js' Class.create(XWiki.viewers.Tags, {...}). This is why the
+ * constructor only delegates to the initialize method (Prototype.js calls only the initialize method when creating an
+ * instance of a subclass).
+ */
+class Tags {
+  constructor(...args) {
+    this.initialize(...args);
+  }
+
   /**
    * Initialization: add listeners for all tag actions, to perform them via AJAX
    */
-  initialize : function() {
+  initialize() {
     // delete tags
-    $$('.doc-tags .tag-delete').each(this.ajaxTagDelete);
-    $$('.doc-tags .tag-add a').each(this.createTagAddForm.bind(this));
-    if ($$('.doc-tags .tag-add-form').length > 0) {
-      this.ajaxifyForm($$('.doc-tags .tag-add-form')[0]);
+    document.querySelectorAll('.doc-tags .tag-delete').forEach(item => this.ajaxTagDelete(item));
+    document.querySelectorAll('.doc-tags .tag-add a').forEach(item => this.createTagAddForm(item));
+    const tagAddForm = document.querySelector('.doc-tags .tag-add-form');
+    if (tagAddForm) {
+      this.ajaxifyForm(tagAddForm);
     }
-  },
-  /** AJAX tag removal */
-  ajaxTagDelete : function (item) {
-    item.observe('click', function(event) {
-      if (event) {
-        event.stop();
-      }
-      if (!item.disabled) {
-        new Ajax.Request(
-          item.readAttribute('href').replace(/&xredirect=.+$/, "&ajax=1"),
-          {
-            onCreate : function () {
-              // ignore "cascade" clicks
-              item.disabled = true;
-              item.notification = new XWiki.widgets.Notification("$services.localization.render('core.tags.deleting')", "inprogress");
-            },
-            onSuccess : function () {
-              // delete the corresponding element
-              item.up('.tag-wrapper').remove();
-            },
-            onFailure : function (response) {
-               XWiki.widgets.Notification.show(response.responseText || 'Server not responding', "error");
-            },
-            // 0 is returned for network failures.
-            on0 : function(response) {
-              response.request.options.onFailure(response);
-            },
-            onComplete : function () {
-              item.disabled = false;
-              item.notification.hide();
-            }
-          }
-        );
-      }
-    }.bindAsEventListener());
-  },
-  createTagAddForm : function (item) {
-    item.observe('click', function(event) {
-      if (event) {
-        event.stop();
-      }
-      if (!item._x_form) {
-        if (!item.disabled) {
-          new Ajax.Request(
-            item.readAttribute('href').replace(/#.+$/, "&ajax=1&xpage=documentTags"),
-            {
-              onCreate : function () {
-                // ignore "cascade" clicks
-                item.disabled = true;
-                item.notification = new XWiki.widgets.Notification("$services.localization.render('core.tags.fetchform')", "inprogress");
-              },
-              onSuccess : function (response) {
-                var iParent = item.up();
-                item.remove();
-                iParent.update(response.responseText);
-                item._x_form = iParent.firstDescendant();
-                item._x_form._x_activator = item;
-                item._x_form.down('input[type=text]').focus();
-                this.ajaxifyForm(item._x_form);
-              }.bind(this),
-              onFailure : function (response) {
-                XWiki.widgets.Notification.show(response.responseText || 'Server not responding', "error");
-              },
-              // 0 is returned for network failures.
-              on0 : function(response) {
-                response.request.options.onFailure(response);
-              },
-              onComplete : function () {
-                item.disabled = false;
-                item.notification.hide();
-              }
-            }
-          );
-        }
-      } else {
-        Element.replace(item, item._x_form);
-        item._x_form.down('input[type=text]').focus();
-      }
-    }.bindAsEventListener(this));
-  },
-  ajaxifyForm : function(form) {
-    form.setAttribute('autocomplete', 'off');
-    form.down('input[type=text]').setAttribute('autocomplete', 'off');
-    form.down('input[type=text]').setAttribute('autocomplete', 'off');
-    form.observe('submit', function(event) {
-      event.stop();
-      form.down('input[type=text]').focus();
-      if (form.tag.value != '') {
-        new Ajax.Request(
-          form.action.replace(/&xredirect=.+$/, '&ajax=1&tag=') + encodeURIComponent(form.tag.value),
-          {
-            onCreate : function () {
-              // ignore "cascade" clicks
-              form.disable();
-              form.notification = new XWiki.widgets.Notification("$services.localization.render('core.tags.adding')", "inprogress");
-            },
-            onSuccess : function (response) {
-              var wrapper = new Element('span');
-              wrapper.insert(response.responseText + ' ');
-              wrapper.select('.tag-delete').each(this.ajaxTagDelete);
-              while (wrapper.childNodes.length > 0) {
-                form.up('.tag-add').insert({before : wrapper.firstChild});
-                form.up('.tag-add').insert({before : ' '});
-                wrapper.firstChild.remove();
-              }
-              form.reset();
-            }.bind(this),
-            onFailure : function (response) {
-              XWiki.widgets.Notification.show(response.responseText || 'Server not responding', "error");
-            },
-            onComplete : function () {
-              form.enable();
-              form.notification.hide();
-            },
-            // 0 is returned for network failures.
-            on0 : function(response) {
-              response.request.options.onFailure(response);
-            }
-          }
-        );
-      }
-    }.bindAsEventListener(this));
-    form.observe('reset', function(event) {
-      Element.replace(form, form._x_activator);
-    }.bindAsEventListener(this));
-    // Replace the Cancel link (which is supposed to 
-    var cancel = new Element("input", {type: "reset", value : form.down('.button-add-tag-cancel').innerHTML, "class" : "button secondary"});
-    form.down('.button-add-tag-cancel').replace(cancel);
+  }
 
-    new XWiki.widgets.Suggest(form.down('input[type=text]'), {
-      script: "${xwiki.getURL('Main.WebHome', 'view', 'xpage=suggest&classname=XWiki.TagClass&fieldname=tags&firCol=-&secCol=-')}&",
-      parentContainer: 'tag-add-form-suggest', // Generate the suggest drop-down at a correct place in the DOM for easy keyboard access.
-      varname: 'input',
-      seps: "${xwiki.getDocument('XWiki.TagClass').xWikiClass.tags.getProperty('separators').value}",
-      shownoresults : false,
-      icon: "${xwiki.getSkinFile('icons/silk/tag_yellow.png')}"
+  /** AJAX tag removal */
+  ajaxTagDelete(item) {
+    item.addEventListener('click', async event => {
+      stopEvent(event);
+      if (!item.disabled) {
+        // ignore "cascade" clicks
+        item.disabled = true;
+        const responseText = await post(item.getAttribute('href').replace(/&xredirect=.+$/, "&ajax=1"),
+          $jsontool.serialize($services.localization.render('core.tags.deleting')));
+        if (responseText !== undefined) {
+          // delete the corresponding element
+          item.closest('.tag-wrapper').remove();
+        }
+        item.disabled = false;
+      }
     });
   }
-});
+
+  createTagAddForm(item) {
+    item.addEventListener('click', async event => {
+      stopEvent(event);
+      if (!item._x_form) {
+        if (!item.disabled) {
+          // ignore "cascade" clicks
+          item.disabled = true;
+          const responseText = await post(item.getAttribute('href').replace(/#.+$/, "&ajax=1&xpage=documentTags"),
+            $jsontool.serialize($services.localization.render('core.tags.fetchform')));
+          if (responseText !== undefined) {
+            const iParent = item.parentElement;
+            item.remove();
+            iParent.innerHTML = responseText;
+            item._x_form = iParent.firstElementChild;
+            item._x_form._x_activator = item;
+            item._x_form.querySelector('input[type=text]').focus();
+            this.ajaxifyForm(item._x_form);
+          }
+          item.disabled = false;
+        }
+      } else {
+        item.replaceWith(item._x_form);
+        item._x_form.querySelector('input[type=text]').focus();
+      }
+    });
+  }
+
+  ajaxifyForm(form) {
+    const tagInput = form.querySelector('input[type=text]');
+    form.setAttribute('autocomplete', 'off');
+    tagInput.setAttribute('autocomplete', 'off');
+    form.addEventListener('submit', async event => {
+      stopEvent(event);
+      tagInput.focus();
+      if (form.tag.value != '') {
+        const url = form.action.replace(/&xredirect=.+$/, '&ajax=1&tag=') + encodeURIComponent(form.tag.value);
+        // ignore "cascade" clicks
+        setFormDisabled(form, true);
+        const responseText = await post(url, $jsontool.serialize($services.localization.render('core.tags.adding')));
+        setFormDisabled(form, false);
+        if (responseText !== undefined) {
+          const wrapper = document.createElement('span');
+          wrapper.innerHTML = responseText;
+          wrapper.querySelectorAll('.tag-delete').forEach(item => this.ajaxTagDelete(item));
+          // Insert the added tags before the "add" button, separated by a space.
+          const tagAdd = form.closest('.tag-add');
+          for (const tag of Array.from(wrapper.children)) {
+            tagAdd.before(tag, ' ');
+          }
+          form.reset();
+        }
+      }
+    });
+    form.addEventListener('reset', () => {
+      // The form is displayed without an activator when the page is loaded with the add form already shown.
+      if (form._x_activator) {
+        form.replaceWith(form._x_activator);
+      } else {
+        form.remove();
+      }
+    });
+    // Replace the Cancel link (which is supposed to 
+    const cancelLink = form.querySelector('.button-add-tag-cancel');
+    const cancel = document.createElement("input");
+    Object.assign(cancel, {type: "reset", value: cancelLink.innerHTML, className: "button secondary"});
+    cancelLink.replaceWith(cancel);
+
+    new XWiki.widgets.Suggest(tagInput, {
+      script: new XWiki.Document('WebHome', 'Main').getURL('view',
+        'xpage=suggest&classname=XWiki.TagClass&fieldname=tags&firCol=-&secCol=-') + '&',
+      parentContainer: 'tag-add-form-suggest', // Generate the suggest drop-down at a correct place in the DOM for easy keyboard access.
+      varname: 'input',
+      seps: $jsontool.serialize($xwiki.getDocument('XWiki.TagClass').xWikiClass.tags.getProperty('separators').value),
+      shownoresults : false,
+      icon: $jsontool.serialize($xwiki.getSkinFile('icons/silk/tag_yellow.png'))
+    });
+  }
+}
+
+/** Required by Prototype.js' Class.create(), which registers each new subclass on its parent class. */
+Tags.subclasses = [];
+
+viewers.Tags = Tags;
 
 function init() {
   return new viewers.Tags();
 }
 
 // When the document is loaded, trigger the Tags enhancements.
-(XWiki.domIsLoaded && init())
-|| document.observe("xwiki:dom:loaded", init);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 // End XWiki augmentation.
 return XWiki;

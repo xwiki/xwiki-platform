@@ -39,14 +39,23 @@ const getRealLocale = () => document.documentElement.dataset.xwikiRealLocale ?? 
 // a page named "Page". We favored consistency here, but we may have to deal with this edge case later.
 const getKey = (document, locale) => `${XWiki.Model.serialize(document.documentReference)}(${locale})`;
 
-XWiki.DocumentLock = Class.create({
+/**
+ * Note that this class can be extended using Prototype.js' Class.create(XWiki.DocumentLock, {...}). This is why the
+ * constructor only delegates to the initialize method (Prototype.js calls only the initialize method when creating an
+ * instance of a subclass).
+ */
+class DocumentLock {
+  constructor(...args) {
+    this.initialize(...args);
+  }
+
   /**
    * @param document the document to lock, defaulting to the current document; can be either an XWiki.Document instance
    *          or a serialized document reference
    * @param locale the locale of the document translation to lock, defaulting to the locale of the current document
    *          translation; the empty string targets the default translation
    */
-  initialize: function(document, locale) {
+  initialize(document, locale) {
     this._document = getDocument(document);
     this._locale = locale ?? getRealLocale();
     this._options = {};
@@ -58,63 +67,63 @@ XWiki.DocumentLock = Class.create({
     XWiki.DocumentLock.get(this._document, this._locale)?.destroy();
 
     // Unlock when we leave the page.
-    const unlock = this.unlock.bind(this);
+    const unlock = () => this.unlock();
     // We may need to look into 'visibilitychange' event in the future, as per
     // https://www.igvita.com/2015/11/20/dont-lose-user-and-app-state-use-page-visibility/
     // in order to cover the mobile usage, but then we need to decide what to do when the user switches browser tabs.
-    Event.observe(window, 'unload', unlock);
-    Event.observe(window, 'pagehide', unlock);
+    window.addEventListener('unload', unlock);
+    window.addEventListener('pagehide', unlock);
     this._cleanupCallbacks.push(() => {
-      Event.stopObserving(window, 'unload', unlock);
-      Event.stopObserving(window, 'pagehide', unlock);
+      window.removeEventListener('unload', unlock);
+      window.removeEventListener('pagehide', unlock);
     });
 
     // Unlock before logging out because afterwards we don't have rights.
     // Note that the logout action doesn't target the current document so it can't remove its lock.
-    const logoutLink = $('tmLogout')?.down('a');
-    logoutLink?.observe('click', unlock);
-    this._cleanupCallbacks.push(() => logoutLink?.stopObserving('click', unlock));
+    const logoutLink = window.document.querySelector('#tmLogout a');
+    logoutLink?.addEventListener('click', unlock);
+    this._cleanupCallbacks.push(() => logoutLink?.removeEventListener('click', unlock));
 
-    // The page is automatically unlocked when the form is submitted. We pin the lock options, otherwise the submit
-    // event would be passed as options by the event listener.
-    const markUnlocked = this.setLocked.bind(this, false, undefined);
-    $$('form.withLock').forEach(form => {
-      form.observe('submit', markUnlocked);
-      this._cleanupCallbacks.push(() => form.stopObserving('submit', markUnlocked));
+    // The page is automatically unlocked when the form is submitted. We ignore the listener argument, otherwise the
+    // submit event would be passed as lock options.
+    const markUnlocked = () => this.setLocked(false);
+    window.document.querySelectorAll('form.withLock').forEach(form => {
+      form.addEventListener('submit', markUnlocked);
+      this._cleanupCallbacks.push(() => form.removeEventListener('submit', markUnlocked));
     });
 
     const key = getKey(this._document, this._locale);
     XWiki.DocumentLock._instances[key] = this;
     this._cleanupCallbacks.push(() => delete XWiki.DocumentLock._instances[key]);
-  },
+  }
 
   /**
    * Stops listening to the events that trigger the unlock and forgets this instance. Note that this doesn't remove the
    * lock, it only stops this instance from removing it.
    */
-  destroy: function() {
+  destroy() {
     this._cleanupCallbacks.forEach(cleanup => cleanup());
     this._cleanupCallbacks = [];
-  },
+  }
 
   /**
    * Locks the document, unless we already hold the lock.
    *
    * @param options the lock options, see {@link #setLocked}
    */
-  lock: function(options) {
+  lock(options) {
     if (!this._locked) {
       this.setLocked(true, options);
-      new Ajax.Request(this._getURL('lock'), {method: 'get'});
+      fetch(this._getURL('lock'));
     }
-  },
+  }
 
-  unlock: function() {
+  unlock() {
     if (this._locked) {
       this._locked = false;
       navigator.sendBeacon(this._getURL('cancel'));
     }
-  },
+  }
 
   /**
    * Marks this document as locked or unlocked, without sending any request. Use this when the lock is acquired or
@@ -126,22 +135,22 @@ XWiki.DocumentLock = Class.create({
    * @param options the lock options, holding the edit action the lock is taken for ({@code action}); they are left
    *          unchanged when not specified
    */
-  setLocked: function(locked, options) {
+  setLocked(locked, options) {
     this._locked = !!locked;
     if (options) {
       this._options = options;
     }
-  },
+  }
 
-  isLocked: function() {
+  isLocked() {
     return this._locked;
-  },
+  }
 
   /**
    * @param action the action to build the URL for (e.g. 'lock' or 'cancel')
    * @return the URL to call in order to perform the given action on the locked document translation
    */
-  _getURL: function(action) {
+  _getURL(action) {
     const parameters = new URLSearchParams({
       ajax: 1,
       // The edit action the lock is taken for, which is not the action from the URL we build here.
@@ -152,7 +161,12 @@ XWiki.DocumentLock = Class.create({
     }
     return this._document.getURL(action, parameters.toString());
   }
-});
+}
+
+/** Required by Prototype.js' Class.create(), which registers each new subclass on its parent class. */
+DocumentLock.subclasses = [];
+
+XWiki.DocumentLock = DocumentLock;
 
 XWiki.DocumentLock._instances = {};
 
@@ -188,7 +202,13 @@ const init = function() {
   return true;
 };
 
-(XWiki.domIsLoaded && init()) || document.observe('xwiki:dom:loaded', init);
+// When the document is loaded, lock the current document if needed.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));

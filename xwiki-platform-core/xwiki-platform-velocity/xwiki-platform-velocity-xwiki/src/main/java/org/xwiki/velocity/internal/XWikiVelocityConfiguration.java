@@ -63,7 +63,9 @@ public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
         // Override some tools
         this.defaultTools.put("numbertool", this.numberTool);
         this.defaultTools.put("datetool", this.dateTool);
+        // We use to wrongly declare the tool with that typo, we cannot really get rid of it now so keeping both.
         this.defaultTools.put("mathttool", this.mathTool);
+        this.defaultTools.put("mathtool", this.mathTool);
 
         if (this.componentManager.hasComponent(ResourceLoaderInitializer.class)) {
             try {

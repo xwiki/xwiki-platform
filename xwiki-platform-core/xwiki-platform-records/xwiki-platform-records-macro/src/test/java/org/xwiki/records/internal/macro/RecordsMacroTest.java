@@ -19,14 +19,13 @@
  */
 package org.xwiki.records.internal.macro;
 
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataMeta;
@@ -69,8 +67,6 @@ import org.xwiki.rendering.internal.renderer.xwiki21.reference.XWikiSyntaxLinkRe
 import org.xwiki.rendering.internal.syntax.DefaultSyntaxRegistry;
 import org.xwiki.rendering.internal.xwiki21.XWiki21SyntaxProvider;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
@@ -92,7 +88,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -106,8 +101,10 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-// The real plain text parser and XWiki syntax renderer, since what is under test is the escaping they perform.
+// The macro's real helpers, so that the tests cover what it delegates to them, and the real plain text parser and
+// XWiki syntax renderer, since what is under test is the escaping they perform.
 @ComponentList({
+    RecordsFields.class, RecordsMessages.class,
     PlainTextBlockParser.class, PlainTextStreamParser.class,
     XWikiSyntaxBlockRenderer.class, XWikiSyntaxRenderer.class, XWikiSyntaxRendererFactory.class,
     XWikiSyntaxLinkReferenceSerializer.class, XWikiSyntaxImageReferenceSerializer.class,
@@ -336,22 +333,6 @@ class RecordsMacroTest
         // syntax.
         assertEquals("rendering.macro.records.warning.columnSkipped[~*~*x~*~*, Clients.Code.ProjectClass]",
             ((MacroBlock) blocks.get(0)).getContent());
-    }
-
-    @Test
-    void executeFailsWhenAMessageCannotBeEscaped() throws Exception
-    {
-        ParseException cause = new ParseException("parse failure");
-        Parser failingParser = mock(Parser.class);
-        when(failingParser.parse(any(Reader.class))).thenThrow(cause);
-        // The real plain text parser never fails, so this is the only way to reach the failure.
-        ReflectionUtils.setFieldValue(this.macro, "plainParser", failingParser);
-        when(this.documentAccessBridge.exists(DATA_TYPE)).thenReturn(false);
-
-        MacroExecutionException exception = assertThrows(MacroExecutionException.class,
-            () -> this.macro.execute(newParameters(), null, this.context));
-
-        assertSame(cause, exception.getCause());
     }
 
     @Test

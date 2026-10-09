@@ -160,7 +160,7 @@ public class LiveDataElement extends BaseElement
      *
      * @return {@code true} if edit mode is enabled, {@code false} otherwise
      * @throws NoSuchElementException if the Live Data does not offer the edit mode
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public boolean isEditMode()
     {
@@ -173,7 +173,7 @@ public class LiveDataElement extends BaseElement
      * Toggle the maximized view from the actions menu. The maximized view displays the Live Data over the rest of the
      * page.
      *
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void toggleMaximized()
     {
@@ -183,7 +183,7 @@ public class LiveDataElement extends BaseElement
     /**
      * @return the label of the action toggling the maximized view, which describes the view the user switches to
      *     (e.g., "Maximize" or "Minimize")
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public String getMaximizedActionLabel()
     {
@@ -199,7 +199,7 @@ public class LiveDataElement extends BaseElement
      * that the theme does not map is displayed as an empty placeholder.
      *
      * @return {@code true} if the action displays an actual icon, {@code false} otherwise
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public boolean hasMaximizedActionIcon()
     {
@@ -214,7 +214,7 @@ public class LiveDataElement extends BaseElement
 
     /**
      * @return {@code true} if the Live Data is displayed over the rest of the page, {@code false} otherwise
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public boolean isMaximized()
     {
@@ -226,7 +226,7 @@ public class LiveDataElement extends BaseElement
      * Wait until the Live Data enters or leaves the maximized view.
      *
      * @param maximized {@code true} to wait for the maximized view, {@code false} to wait for the normal view
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void waitUntilMaximized(boolean maximized)
     {
@@ -236,7 +236,7 @@ public class LiveDataElement extends BaseElement
     /**
      * Press the escape key, which exits the maximized view when no other component consumes it.
      *
-     * @since 18.8.0RC1
+     * @since 18.9.0RC1
      */
     public void pressEscape()
     {

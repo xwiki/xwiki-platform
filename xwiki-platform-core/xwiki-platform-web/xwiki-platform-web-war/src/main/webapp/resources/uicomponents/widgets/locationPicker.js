@@ -267,9 +267,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
       // We need to pass a document reference to the hierarchy_reference template and we cannot create a document
       // reference without the space reference. If the space reference is empty we use the current space reference and
       // we remove the extra path elements afterwards from the breadcrumb HTML.
-      var spaceReference = XWiki.Model.resolve(localSpaceReference || xm.space, XWiki.EntityType.SPACE);
+      // The space reference may already specify the wiki, in which case it takes precedence over the selected wiki.
+      var spaceReference = XWiki.Model.resolve(localSpaceReference || xm.space, XWiki.EntityType.SPACE,
+        wiki ? [wiki] : undefined);
       var documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, spaceReference);
-      wiki && spaceReference.appendParent(new XWiki.WikiReference(wiki));
 
       return $.post(getCurrentPageURL(), {
         'xpage': 'hierarchy_reference',

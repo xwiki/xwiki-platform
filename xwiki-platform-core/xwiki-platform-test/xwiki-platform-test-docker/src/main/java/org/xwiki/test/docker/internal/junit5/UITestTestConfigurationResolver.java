@@ -94,6 +94,8 @@ public class UITestTestConfigurationResolver
 
     private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
+    private static final String TESTEXTENSIONREPOSITORY_PROPERTY = "xwiki.test.ui.testExtensionRepository";
+
     private static final String SAVEPERMANENTDIRECTORY_PROPERTY = "xwiki.test.ui.savePermanentDirectoryData";
 
     private static final String SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY = "xwiki.test.ui.servletEngineNetworkAliases";
@@ -133,6 +135,8 @@ public class UITestTestConfigurationResolver
         configuration.setForbiddenServletEngines(resolveForbiddenServletEngines(uiTestAnnotation.forbiddenEngines()));
         configuration.setDatabaseCommands(resolveDatabaseCommands(uiTestAnnotation.databaseCommands()));
         configuration.setSaveDatabaseData(resolveSaveDatabaseData(uiTestAnnotation.saveDatabaseData()));
+        configuration.setTestExtensionRepository(
+            resolve(uiTestAnnotation.testExtensionRepository(), TESTEXTENSIONREPOSITORY_PROPERTY));
         configuration.setSavePermanentDirectoryData(
             resolveSavePermanentDirectoryData(uiTestAnnotation.savePermanentDirectoryData()));
         configuration.setServletEngineNetworkAliases(resolveCommaSeparatedValues(

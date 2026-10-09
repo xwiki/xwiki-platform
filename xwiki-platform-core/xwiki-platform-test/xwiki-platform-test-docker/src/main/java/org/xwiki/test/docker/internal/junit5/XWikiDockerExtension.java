@@ -175,6 +175,9 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
                     startBlobStore(testConfiguration);
                 }
 
+                // Generate the extension repository of the test (if needed)
+                generateTestExtensionRepository(testConfiguration);
+
                 // Build the XWiki WAR
                 LOGGER.info("(*) Building custom XWiki WAR...");
                 ServletContainerExecutor containerExecutor = getServletContainerExecutor(index, testConfiguration,
@@ -461,6 +464,14 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         testContext.getUtil().recacheSecretToken();
 
         return webDriverContainer;
+    }
+
+    private void generateTestExtensionRepository(TestConfiguration testConfiguration) throws Exception
+    {
+        if (testConfiguration.isTestExtensionRepository()) {
+            LOGGER.info("(*) Generating the extension repository of the test...");
+            TestExtensionRepository.generate(testConfiguration);
+        }
     }
 
     private void startDatabase(TestConfiguration testConfiguration) throws Exception

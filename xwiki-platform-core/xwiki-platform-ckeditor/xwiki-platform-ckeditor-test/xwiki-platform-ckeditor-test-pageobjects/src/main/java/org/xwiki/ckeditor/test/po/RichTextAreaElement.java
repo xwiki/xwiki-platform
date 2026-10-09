@@ -486,6 +486,8 @@ public class RichTextAreaElement extends BaseElement
      * Submitting the modal waits for the updated macro to be rendered.
      *
      * @return the macro edit modal
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public MacroDialogEditModal editSelectedMacro()
@@ -501,6 +503,8 @@ public class RichTextAreaElement extends BaseElement
      *
      * @param query the quick action query, starting with {@code /}
      * @param label the label of the quick action to submit
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void executeQuickAction(String query, String label)
@@ -518,6 +522,8 @@ public class RichTextAreaElement extends BaseElement
      *
      * @param query the quick action query, starting with {@code /}
      * @param label the label of the quick action that inserts the macro
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void insertMacro(String query, String label)
@@ -533,6 +539,8 @@ public class RichTextAreaElement extends BaseElement
      * @param query the quick action query, starting with {@code /}
      * @param label the label of the quick action that inserts the macro
      * @return the macro edit modal used to set the required macro parameters
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public MacroDialogEditModal insertMacroWithRequiredParameters(String query, String label)

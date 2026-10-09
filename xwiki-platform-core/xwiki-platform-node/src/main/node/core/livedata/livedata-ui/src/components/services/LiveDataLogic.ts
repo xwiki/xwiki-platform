@@ -472,7 +472,6 @@ export class LiveDataLogic implements Logic {
           if (err.readyState === 4) {
             // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
             this.translate("livedata.error.updateEntriesFailed").then(
-              // @ts-expect-error XWiki.widget is excepted to be globally accessible
               (value) => new XWiki.widgets.Notification(value, "error"),
             );
           }
@@ -1715,7 +1714,6 @@ export class LiveDataLogic implements Logic {
         console.error("Failed to create entry", e);
         try {
           const message = await this.translate("livedata.error.addEntryFailed");
-          // @ts-expect-error XWiki.widgets is expected to be globally accessible
           new XWiki.widgets.Notification(message, "error");
         } catch {
           /* ignore translation failure */

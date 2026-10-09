@@ -17,4 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export const XWiki = window.XWiki || {};
+
+// The type is imported through the package name rather than a relative path so that it is the very interface that
+// extensions augment with "declare module".
+declare global {
+  const XWiki: import("@xwiki/platform-xwiki-utils").XWikiGlobal;
+}
+
+export {};

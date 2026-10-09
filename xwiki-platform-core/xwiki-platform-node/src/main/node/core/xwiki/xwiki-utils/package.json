@@ -17,11 +17,15 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./src/index.ts"
+    },
+    "./global": {
+      "types": "./global.d.ts"
     }
   },
   "main": "./src/index.ts",
   "files": [
     "dist",
+    "global.d.ts",
     "src",
     "!src/**/*.spec.*",
     "!src/**/*.test.*",
@@ -66,6 +70,9 @@
           "types": "./dist/index.d.cts",
           "default": "./dist/index.umd.js"
         }
+      },
+      "./global": {
+        "types": "./global.d.ts"
       }
     },
     "main": "./dist/index.es.js",

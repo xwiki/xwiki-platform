@@ -121,7 +121,6 @@ export class EditBusService {
           delete this.editStates[entryId][keyEntry];
         })
         .catch(() => {
-          // @ts-expect-error leftover from initial javascript implementation
           new XWiki.widgets.Notification(
             `The row save action failed.`,
             "error",

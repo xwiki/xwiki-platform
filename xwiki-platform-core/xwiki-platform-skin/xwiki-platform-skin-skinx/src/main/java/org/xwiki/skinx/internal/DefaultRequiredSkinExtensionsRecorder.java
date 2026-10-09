@@ -85,7 +85,9 @@ public class DefaultRequiredSkinExtensionsRecorder implements RequiredSkinExtens
             }
             requiredSkinExtensions.addAll(allAfterSet);
         }
-        return String.join("\n", requiredSkinExtensions);
+        // Join with a space rather than a line break because the result is typically sent as a response header and
+        // line breaks are forbidden in header values (browsers reject the whole response over HTTP/2).
+        return String.join(" ", requiredSkinExtensions);
     }
 
     @SuppressWarnings("deprecation")

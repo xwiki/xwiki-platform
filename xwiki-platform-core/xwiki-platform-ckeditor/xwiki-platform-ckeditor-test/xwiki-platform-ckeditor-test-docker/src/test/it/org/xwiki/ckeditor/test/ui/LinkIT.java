@@ -96,7 +96,7 @@ class LinkIT extends AbstractCKEditorIT
         edit(setup, testReference, false);
 
         LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
-        linkDialog.getResourceSuggestInput().click().waitForSuggestions().sendKeys("subPage").waitForSuggestions()
+        linkDialog.getResourceSuggestInput().click().waitForSuggestions().sendKeys("subPage")
             .selectByVisibleText("subPage");
         linkDialog.submit();
 
@@ -109,7 +109,7 @@ class LinkIT extends AbstractCKEditorIT
         assertTrue(linkDialog.isResourceReferenceInputNextInTabOrder());
         assertTrue(linkDialog.isLabelBoundToResourceReferenceInput());
 
-        linkDialog.getResourceSuggestInput().sendKeys("text").waitForSuggestions().selectByVisibleText(attachmentName);
+        linkDialog.getResourceSuggestInput().sendKeys("text").selectByVisibleText(attachmentName);
         linkDialog.submit();
 
         // Verify that the content matches what we did using CKEditor.

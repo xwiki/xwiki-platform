@@ -118,7 +118,7 @@ class PDFExportIT
 
         // Make sure we start with the default settings.
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage().reset();
-        adminSection.getTemplatesInput().sendKeys("custom").waitForSuggestions().selectByVisibleText("CustomTemplate");
+        adminSection.getTemplatesInput().sendKeys("custom").selectByVisibleText("CustomTemplate");
         adminSection.getGeneratorSelect().selectByVisibleText("Chrome Docker Container");
 
         if (!testConfiguration.getServletEngine().isOutsideDocker()) {
@@ -324,7 +324,7 @@ class PDFExportIT
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
         SuggestInputElement templatesInput = adminSection.getTemplatesInput();
         if (!StringUtils.join(templatesInput.getValues(), ",").contains("My cool template")) {
-            templatesInput.sendKeys("my cool").waitForSuggestions().selectByVisibleText("My cool template");
+            templatesInput.sendKeys("my cool").selectByVisibleText("My cool template");
             adminSection.clickSave();
         }
 

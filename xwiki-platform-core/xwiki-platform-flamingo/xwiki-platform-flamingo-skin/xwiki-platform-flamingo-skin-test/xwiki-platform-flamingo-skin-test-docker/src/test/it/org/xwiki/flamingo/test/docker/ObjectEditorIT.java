@@ -596,7 +596,7 @@ class ObjectEditorIT
         ObjectEditPage objectEditor = ObjectEditPage.gotoPage(testReference);
         ObjectEditPane object = objectEditor.addObject(testClass);
         object.openDatePicker("date").selectDay("15").close();
-        object.getSuggestInput("author").sendKeys("ad").waitForSuggestions().selectByVisibleText("Admin");
+        object.getSuggestInput("author").sendKeys("ad").selectByVisibleText("Admin");
 
         // Save, edit again and check the values.
         object = objectEditor.clickSaveAndView().editObjects().getObjectsOfClass(testClass).get(0);

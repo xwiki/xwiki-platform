@@ -443,7 +443,7 @@ class ImageIT extends AbstractCKEditorIT
         // currently have to select a link target. See XWIKI-24860: Preselect the image resource reference as link
         // target when creating a link from an image selection
         linkDialog.getResourceSuggestInput().waitForSuggestions()
-            .sendKeys(testReference.getLastSpaceReference().getName()).waitForSuggestions().selectByIndex(0);
+            .sendKeys(testReference.getLastSpaceReference().getName()).selectByIndex(0);
         linkDialog.submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();

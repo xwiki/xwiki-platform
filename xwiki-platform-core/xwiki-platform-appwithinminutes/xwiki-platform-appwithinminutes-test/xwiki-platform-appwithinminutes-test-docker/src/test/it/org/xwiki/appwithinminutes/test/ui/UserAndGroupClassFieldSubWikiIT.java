@@ -182,11 +182,10 @@ class UserAndGroupClassFieldSubWikiIT
         String className = setup.serializeReference(classReference.getLocalDocumentReference());
         SuggestInputElement entryUserPicker =
             new SuggestInputElement(setup.getDriver().findElement(By.id(className + "_0_" + userProperty)));
-        entryUserPicker.sendKeys(pickedUser).waitForNonTypedSuggestions().selectByValue(USERS_SPACE + '.' + pickedUser);
+        entryUserPicker.sendKeys(pickedUser).selectByValue(USERS_SPACE + '.' + pickedUser);
         SuggestInputElement entryGroupPicker =
             new SuggestInputElement(setup.getDriver().findElement(By.id(className + "_0_" + groupProperty)));
-        entryGroupPicker.sendKeys(pickedGroup).waitForNonTypedSuggestions()
-            .selectByValue(USERS_SPACE + '.' + pickedGroup);
+        entryGroupPicker.sendKeys(pickedGroup).selectByValue(USERS_SPACE + '.' + pickedGroup);
         entryEditPage.clickSaveAndView();
 
         List<WebElement> users = setup.getDriver().findElements(By.className("user"));

@@ -34,40 +34,39 @@ import org.xwiki.stability.Unstable;
  * Parameters of the {@code records} macro.
  * <p>
  * The annotations are what the WYSIWYG macro dialog is built from, and the layout they produce is not a free choice.
- * {@code MacroDescriptorUIFactory} renders the mandatory nodes flat, above the tab strip, and turns the optional
- * groups into the tabs. {@code class} is mandatory and carries no group, so it is that flat field; the
- * {@code columns}, {@code filterSort}, {@code display} and {@code advanced} groups become the tabs, in that order.
+ * {@code MacroDescriptorUIFactory} renders the mandatory nodes flat, above the tab strip, and turns the optional groups
+ * into the tabs. {@code class} is mandatory and carries no group, so it is that flat field; the {@code columns},
+ * {@code filterSort}, {@code display} and {@code advanced} groups become the tabs, in that order.
  * <p>
  * Leaving {@code class} ungrouped is a choice rather than a requirement: a group holding a mandatory parameter is
- * itself mandatory and would be rendered in the same place, as a titled panel. It is ungrouped because it is
- * currently alone there, and a panel headed <em>Data</em> wrapping a single field labelled <em>Data type</em> is
- * redundant. It belongs in a group again once {@code location} joins it, since the two parameters that decide which
- * rows the table has do belong together.
+ * itself mandatory and would be rendered in the same place, as a titled panel. It is ungrouped because it is currently
+ * alone there, and a panel headed <em>Data</em> wrapping a single field labelled <em>Data type</em> is redundant. It
+ * belongs in a group again once {@code location} joins it, since the two parameters that decide which rows the table
+ * has do belong together.
  * <p>
  * Every <em>optional</em> parameter, by contrast, must carry an explicit group. An ungrouped optional parameter is
  * added to the framework's own {@code defaultOptionalGroup}, and because {@code MacroDescriptorUIFactory} pins that
  * group at order {@code 0} while {@code DefaultBeanDescriptor} keeps an {@link PropertyOrder} value only when it is
- * strictly positive, no Java macro can move it: it would show up as the <em>first</em> tab, ahead of
- * {@code Columns}. Leaving it childless is the only way to get the intended order. A mandatory parameter never
- * reaches that branch, which is why {@code class} is exempt.
+ * strictly positive, no Java macro can move it: it would show up as the <em>first</em> tab, ahead of {@code Columns}.
+ * Leaving it childless is the only way to get the intended order. A mandatory parameter never reaches that branch,
+ * which is why {@code class} is exempt.
  * <p>
- * Three parameters the design calls for are deliberately absent from this first increment. {@code limit}, which
- * decides how many entries a page holds, is left out until there is a reason to override Live Data's own default of
- * fifteen: the reader can already change the page size from the pagination controls, so the parameter would only
- * pick the starting point. {@code location}, which scopes the table to one part of the page tree, needs an exact
- * prefix predicate that the {@code liveTable} source cannot express, so it waits on the results page this module
- * will ship. {@code editable} cannot be honoured
- * without harm: it maps onto the per-property {@code editable} flag of the Live Data <em>configuration</em> rather
- * than onto a macro parameter, and {@code LiveDataRenderer} treats a configuration as trusted only when it is blank
- * or the author holds script right. Since the {@code liveTable} property types already allow editing, suppressing
- * it is the default path, so honouring the parameter would silently downgrade the content trust of every table
- * authored by someone without script right and get the link displayers sanitized away.
+ * Three parameters the design calls for are deliberately absent from this first increment. {@code limit}, which decides
+ * how many entries a page holds, is left out until there is a reason to override Live Data's own default of fifteen:
+ * the reader can already change the page size from the pagination controls, so the parameter would only pick the
+ * starting point. {@code location}, which scopes the table to one part of the page tree, needs an exact prefix
+ * predicate that the {@code liveTable} source cannot express, so it waits on the results page this module will ship.
+ * {@code editable} cannot be honoured without harm: it maps onto the per-property {@code editable} flag of the Live
+ * Data <em>configuration</em> rather than onto a macro parameter, and {@code LiveDataRenderer} treats a configuration
+ * as trusted only when it is blank or the author holds script right. Since the {@code liveTable} property types already
+ * allow editing, suppressing it is the default path, so honouring the parameter would silently downgrade the content
+ * trust of every table authored by someone without script right and get the link displayers sanitized away.
  * <p>
  * The display types are what select the parameter widgets. {@link RecordsDataType} names the XClass picker of the
- * object and class editors, {@link RecordsColumns} names this module's own field picker, {@link RecordsFilters}
- * its filter picker, {@link RecordsSort} its sort picker and {@link RecordsLayouts} its layout radio group; all
- * five resolve to a template under {@code templates/html_displayer}. Everything else relies on the displayer the
- * Java type already has: a {@link String} renders a text input.
+ * object and class editors, {@link RecordsColumns} names this module's own field picker, {@link RecordsFilters} its
+ * filter picker, {@link RecordsSort} its sort picker and {@link RecordsLayouts} its layout radio group; all five
+ * resolve to a template under {@code templates/html_displayer}. Everything else relies on the displayer the Java type
+ * already has: a {@link String} renders a text input.
  *
  * @version $Id$
  * @since 18.9.0RC1

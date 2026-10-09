@@ -95,22 +95,31 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for {@link RecordsMacro}.
  * <p>
- * The macro is a translation layer onto Live Data, so these tests are about the translation: they assert what the
- * macro hands to {@link LiveDataRenderer} rather than what the rendered table looks like, which is Live Data's own
- * concern and is covered by its own tests.
+ * The macro is a translation layer onto Live Data, so these tests are about the translation: they assert what the macro
+ * hands to {@link LiveDataRenderer} rather than what the rendered table looks like, which is Live Data's own concern
+ * and is covered by its own tests.
  *
  * @version $Id$
  */
 // The macro's real helpers, so that the tests cover what it delegates to them, and the real plain text parser and
 // XWiki syntax renderer, since what is under test is the escaping they perform.
 @ComponentList({
-    RecordsFields.class, RecordsMessages.class,
-    PlainTextBlockParser.class, PlainTextStreamParser.class,
-    XWikiSyntaxBlockRenderer.class, XWikiSyntaxRenderer.class, XWikiSyntaxRendererFactory.class,
-    XWikiSyntaxLinkReferenceSerializer.class, XWikiSyntaxImageReferenceSerializer.class,
-    XWiki21ResourceReferenceTypeSerializer.class, InterWikiReferenceTypeSerializer.class,
-    XWiki20ResourceReferenceTypeSerializer.class, ListenerRegistry.class,
-    DefaultSyntaxRegistry.class, Plain10SyntaxProvider.class, XWiki21SyntaxProvider.class
+    RecordsFields.class,
+    RecordsMessages.class,
+    PlainTextBlockParser.class,
+    PlainTextStreamParser.class,
+    XWikiSyntaxBlockRenderer.class,
+    XWikiSyntaxRenderer.class,
+    XWikiSyntaxRendererFactory.class,
+    XWikiSyntaxLinkReferenceSerializer.class,
+    XWikiSyntaxImageReferenceSerializer.class,
+    XWiki21ResourceReferenceTypeSerializer.class,
+    InterWikiReferenceTypeSerializer.class,
+    XWiki20ResourceReferenceTypeSerializer.class,
+    ListenerRegistry.class,
+    DefaultSyntaxRegistry.class,
+    Plain10SyntaxProvider.class,
+    XWiki21SyntaxProvider.class
 })
 @ComponentTest
 class RecordsMacroTest
@@ -202,7 +211,7 @@ class RecordsMacroTest
         List<Block> blocks = this.macro.execute(newParameters(), null, this.context);
 
         assertEquals(1, blocks.size());
-        assertSame(this.renderedBlock, blocks.get(0));
+        assertSame(this.renderedBlock, blocks.getFirst());
     }
 
     @Test
@@ -332,7 +341,7 @@ class RecordsMacroTest
         // The name comes from the wiki and the message macro parses its content, so the name must not be read as
         // syntax.
         assertEquals("rendering.macro.records.warning.columnSkipped[~*~*x~*~*, Clients.Code.ProjectClass]",
-            ((MacroBlock) blocks.get(0)).getContent());
+            ((MacroBlock) blocks.getFirst()).getContent());
     }
 
     @Test
@@ -892,9 +901,9 @@ class RecordsMacroTest
 
     /**
      * Executes the macro in a given context and captures what it handed to the renderer.
-     *
-     * Several tests execute the macro more than once in the same context, to exercise what a page holding more than
-     * one table produces, so the captured value is the last one.
+     * <p>
+     * Several tests execute the macro more than once in the same context, to exercise what a page holding more than one
+     * table produces, so the captured value is the last one.
      *
      * @param context the transformation context to execute in
      * @param parameters the macro parameters

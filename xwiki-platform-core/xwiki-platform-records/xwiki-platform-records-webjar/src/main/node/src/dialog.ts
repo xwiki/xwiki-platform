@@ -203,6 +203,8 @@ function showMessage(
   const box = anchor.ownerDocument.createElement("div");
   box.className = `box ${kind}message ${MESSAGE_CLASS}`;
   box.setAttribute("role", "alert");
+  // Keep the box apart from the field it follows.
+  box.style.marginTop = "0.75em";
   box.append(createMessageText(anchor.ownerDocument, text));
   if (action) {
     box.append(" ", createActionButton(anchor, action));

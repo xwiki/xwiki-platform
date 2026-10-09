@@ -21,6 +21,7 @@
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "@xwiki/platform-xwiki-utils": "workspace:*",
     "eslint": "catalog:",
     "jsdom": "catalog:",
     "npm-run-all": "catalog:",

@@ -4082,6 +4082,9 @@ importers:
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-viteconfig
+      '@xwiki/platform-xwiki-utils':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils
       eslint:
         specifier: 'catalog:'
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)

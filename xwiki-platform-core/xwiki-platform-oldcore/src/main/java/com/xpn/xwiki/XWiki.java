@@ -106,6 +106,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
+import org.xwiki.environment.Environment;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
@@ -349,6 +350,8 @@ public class XWiki implements EventListener
     private XWikiURLFactoryService urlFactoryService;
 
     private XWikiCriteriaService criteriaService;
+
+    private Environment environment;
 
     /** Lock object used for the lazy initialization of the authentication service. */
     private final Object AUTH_SERVICE_LOCK = new Object();
@@ -1653,6 +1656,15 @@ public class XWiki implements EventListener
         return this.version;
     }
 
+    private Environment getEnvironment()
+    {
+        if (this.environment == null) {
+            this.environment = Utils.getComponent(Environment.class);
+        }
+
+        return this.environment;
+    }
+
     public URL getResource(String s) throws MalformedURLException
     {
         return getEngineContext().getResource(s);
@@ -2717,12 +2729,12 @@ public class XWiki implements EventListener
                 }
             }
 
-            // Look for a resource file.
-            String resourceFilePath = "/resources/" + fileName;
-            XWikiURLFactory urlFactory = context.getURLFactory();
-            if (resourceExists(resourceFilePath)) {
+            // Look for a resource file (the prefix makes sure the file name cannot escape the resources folder).
+            URL resourceURL = getEnvironment().getResource("/resources/", fileName);
+            if (resourceURL != null) {
+                XWikiURLFactory urlFactory = context.getURLFactory();
                 URL url = urlFactory.createResourceURL(fileName, forceSkinAction, context,
-                    getResourceURLCacheParameters(resourceFilePath));
+                    getResourceURLCacheParameters(resourceURL));
                 return urlFactory.getURL(url, context);
             }
         } catch (Exception e) {
@@ -2732,17 +2744,6 @@ public class XWiki implements EventListener
         }
 
         return null;
-    }
-
-    private Map<String, Object> getResourceURLCacheParameters(String resourceFilePath)
-    {
-        try {
-            URL resourceUrl = getResource(resourceFilePath);
-            return getResourceURLCacheParameters(resourceUrl);
-        } catch (MalformedURLException e) {
-            LOGGER.debug("Error while getting URL for resource path [{}]", resourceFilePath, e);
-            return Collections.singletonMap(CACHE_VERSION, getVersion());
-        }
     }
 
     private Map<String, Object> getResourceURLCacheParameters(URL resourceUrl)

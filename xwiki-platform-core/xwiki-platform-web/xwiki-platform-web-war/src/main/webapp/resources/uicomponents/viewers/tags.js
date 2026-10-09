@@ -110,7 +110,7 @@ class Tags {
         if (!item.disabled) {
           // ignore "cascade" clicks
           item.disabled = true;
-          const responseText = await post(item.getAttribute('href').replace(/#.+$/, "&ajax=1&xpage=documentTags"),
+          const responseText = await post(item.getAttribute('href').replace(/#.*/, "&ajax=1&xpage=documentTags"),
             $jsontool.serialize($services.localization.render('core.tags.fetchform')));
           if (responseText !== undefined) {
             const iParent = item.parentElement;

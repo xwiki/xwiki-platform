@@ -35,6 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Validate the Homepage tour shipped with the standard flavor.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 // standardFlavor = true because the Homepage tour is defined by xwiki-platform-distribution-flavor-tour, which reaches

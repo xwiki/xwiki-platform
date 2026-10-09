@@ -224,6 +224,7 @@ public class NumberClass extends PropertyClass
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setDisabled(isDisabled());
+        setAriaLabelFallback(input, context);
 
         String ntype = getNumberType();
         input.addAttribute(DATA_VALIDATION_BAD_INPUT,

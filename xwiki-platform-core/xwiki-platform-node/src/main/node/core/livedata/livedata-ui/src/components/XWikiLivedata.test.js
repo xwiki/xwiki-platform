@@ -336,10 +336,8 @@ describe("XWikiLivedata.vue", () => {
 
     it("Leaves the rest of the page inert as it found it", async () => {
       const logic = mockLogic();
-      const sibling = document.createElement("div");
+      const { sibling } = await mountWithSibling(logic);
       sibling.setAttribute("inert", "");
-      document.body.appendChild(sibling);
-      await mount(logic, document.body);
 
       logic.toggleMaximized();
       await nextTick();

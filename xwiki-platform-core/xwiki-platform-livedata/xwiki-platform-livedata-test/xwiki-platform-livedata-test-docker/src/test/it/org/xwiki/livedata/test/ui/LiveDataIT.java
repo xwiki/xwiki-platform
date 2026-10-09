@@ -901,7 +901,7 @@ class LiveDataIT
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
 
-        createEditableLiveDataPage(testUtils, testReference);
+        createEditableLiveDataPage(testUtils, testReference, "", NAME_LYNDA);
 
         testUtils.createUser("creator", "creator", null);
         testUtils.setRightsOnSpace(testReference.getLastSpaceReference(), null, "XWiki.creator", "edit", true);
@@ -914,12 +914,14 @@ class LiveDataIT
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
 
         assertTrue(liveData.hasEditModeAction());
+        assertFalse(liveData.isEditMode());
         assertFalse(tableLayout.hasEditModeActionsColumn());
         assertFalse(tableLayout.canAddEntry());
 
-        // Enable edit mode: the actions column and the "Add entry" row appear.
+        // Enable edit mode: the actions column and the "Add entry" row appear, and the button stays pressed.
         liveData.toggleEditMode();
         tableLayout.waitUntilReady();
+        assertTrue(liveData.isEditMode());
         assertTrue(tableLayout.hasEditModeActionsColumn());
         assertTrue(tableLayout.canAddEntry());
 
@@ -942,6 +944,7 @@ class LiveDataIT
         // Disable edit mode: the actions column and the "Add entry" row are hidden again.
         liveData.toggleEditMode();
         tableLayout.waitUntilReady();
+        assertFalse(liveData.isEditMode());
         assertFalse(tableLayout.hasEditModeActionsColumn());
         assertFalse(tableLayout.canAddEntry());
         assertEquals(2, tableLayout.getTotalEntries());
@@ -956,25 +959,9 @@ class LiveDataIT
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
 
-        // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
-        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
         // The limit is lower than the number of entries, so that edited entries can be moved to another page.
-        String content = """
-            {{liveData
-              id="test"
-              properties="%s"
-              limit="2"
-              sort="%s:asc"
-              source="liveTable"
-              sourceParameters="translationPrefix=&className=%s&hasEditMode=true"
-            /}}
-            """.formatted(NAME_COLUMN, NAME_COLUMN, className);
-        testUtils.createPage(testReference, content, "Frozen rows in edit mode");
-        testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
-        for (String name : List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA)) {
-            testUtils.addObject(new DocumentReference(name, testReference.getLastSpaceReference()), className,
-                singletonMap(NAME_COLUMN, name));
-        }
+        createEditableLiveDataPage(testUtils, testReference, "limit=\"2\" sort=\"%s:asc\"".formatted(NAME_COLUMN),
+            NAME_CHARLY, NAME_ESTHER, NAME_LYNDA);
 
         testUtils.gotoPage(testReference);
         LiveDataElement liveData = new LiveDataElement("test");
@@ -1011,31 +998,17 @@ class LiveDataIT
 
     @Test
     @Order(13)
-    void editModeAndMaximizedView(TestUtils testUtils, TestReference testReference) throws Exception
+    void maximizedView(TestUtils testUtils, TestReference testReference) throws Exception
     {
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
 
-        createEditableLiveDataPage(testUtils, testReference);
+        createEditableLiveDataPage(testUtils, testReference, "", NAME_LYNDA);
 
         testUtils.gotoPage(testReference);
         LiveDataElement liveData = new LiveDataElement("test");
         TableLayoutElement tableLayout = liveData.getTableLayout();
         tableLayout.waitUntilRowCountEqualsTo(1);
-
-        assertTrue(liveData.hasEditModeAction());
-        assertFalse(liveData.isEditMode());
-
-        // The button stays pressed while the user is in edit mode.
-        liveData.toggleEditMode();
-        tableLayout.waitUntilReady();
-        assertTrue(liveData.isEditMode());
-        assertTrue(tableLayout.hasEditModeActionsColumn());
-
-        liveData.toggleEditMode();
-        tableLayout.waitUntilReady();
-        assertFalse(liveData.isEditMode());
-        assertFalse(tableLayout.hasEditModeActionsColumn());
 
         assertFalse(liveData.isMaximized());
         assertEquals("Maximize", liveData.getMaximizedActionLabel());
@@ -1082,9 +1055,13 @@ class LiveDataIT
     }
 
     /**
-     * Creates a Live Data page on an XClass holding a single entry, with a source supporting the edit mode.
+     * Creates a Live Data page on an XClass, with a source supporting the edit mode.
+     *
+     * @param macroParameters additional parameters of the Live Data macro, for instance its limit or its sort
+     * @param names the names of the entries to create, each entry being saved in a page of the same name
      */
-    private void createEditableLiveDataPage(TestUtils testUtils, DocumentReference testReference)
+    private void createEditableLiveDataPage(TestUtils testUtils, DocumentReference testReference,
+        String macroParameters, String... names)
     {
         // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
         String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
@@ -1099,16 +1076,19 @@ class LiveDataIT
             {{liveData
               id="test"
               properties="%s"
+              %s
               source="liveTable"
               sourceParameters="%s"
             /}}
-            """.formatted(NAME_COLUMN, sourceParameters);
+            """.formatted(NAME_COLUMN, macroParameters, sourceParameters);
         testUtils.createPage(testReference, content, "Live Data with an edit mode");
 
-        // Define the XClass on the test page, and add a single entry.
+        // Define the XClass on the test page, and add the entries.
         testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
-        DocumentReference initialEntry = new DocumentReference("InitialEntry", testReference.getLastSpaceReference());
-        testUtils.addObject(initialEntry, className, singletonMap(NAME_COLUMN, NAME_LYNDA));
+        for (String name : names) {
+            testUtils.addObject(new DocumentReference(name, testReference.getLastSpaceReference()), className,
+                singletonMap(NAME_COLUMN, name));
+        }
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

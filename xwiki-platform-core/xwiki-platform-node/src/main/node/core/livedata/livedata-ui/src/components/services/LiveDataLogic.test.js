@@ -119,12 +119,15 @@ describe("LiveDataLogic", () => {
   });
 
   it("freezes the view when the edit mode is enabled, and unfreezes it when it is disabled", () => {
+    expect(logic.isEditMode()).toBe(false);
     expect(logic.isViewFrozen()).toBe(false);
 
     logic.enableEditMode();
+    expect(logic.isEditMode()).toBe(true);
     expect(logic.isViewFrozen()).toBe(true);
 
     logic.disableEditMode();
+    expect(logic.isEditMode()).toBe(false);
     expect(logic.isViewFrozen()).toBe(false);
   });
 
@@ -320,22 +323,6 @@ describe("LiveDataLogic edit mode", () => {
     expect(initLogic([], { hasEditMode: "true" }).logic.hasEditMode()).toBe(
       true,
     );
-  });
-
-  it("is not in edit mode by default", () => {
-    expect(initLogic([], { hasEditMode: "true" }).logic.isEditMode()).toBe(
-      false,
-    );
-  });
-
-  it("enables and disables the edit mode", () => {
-    const { logic } = initLogic([], { hasEditMode: "true" });
-
-    logic.enableEditMode();
-    expect(logic.isEditMode()).toBe(true);
-
-    logic.disableEditMode();
-    expect(logic.isEditMode()).toBe(false);
   });
 
   it("exposes the edit mode state reactively", () => {

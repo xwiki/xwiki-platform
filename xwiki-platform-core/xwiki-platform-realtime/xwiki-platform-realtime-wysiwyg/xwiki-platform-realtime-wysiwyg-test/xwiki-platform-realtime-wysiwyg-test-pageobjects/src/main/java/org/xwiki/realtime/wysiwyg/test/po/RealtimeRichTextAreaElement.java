@@ -168,6 +168,13 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
         repeatedWait(timeout -> waitUntilContentContains(html, timeout));
     }
 
+    @Override
+    public void waitForUploadsToFinish()
+    {
+        // The uploads can be done by other users, in inactive browser tabs.
+        repeatedWait(this::waitForUploadsToFinish);
+    }
+
     /**
      * Wait for local changes to be pushed to the server. This only guarantees that the server has acknowledged
      * receiving the changes, not that other users have received them. Use this in tests when you need to force a

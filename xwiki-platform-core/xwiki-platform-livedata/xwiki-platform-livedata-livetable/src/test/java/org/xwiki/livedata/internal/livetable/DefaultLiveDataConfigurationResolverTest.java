@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -38,6 +39,8 @@ import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -78,6 +81,10 @@ class DefaultLiveDataConfigurationResolverTest
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
     @MockComponent
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
+
+    @MockComponent
     @Named("uuid")
     private LiveTableNewRowNamingStrategy namingStrategy;
 
@@ -109,6 +116,37 @@ class DefaultLiveDataConfigurationResolverTest
 
         assertTrue(actualConfig.getMeta().getActions().stream()
             .anyMatch(action -> "addEntry".equals(action.getId())));
+    }
+
+    @Test
+    void addEntryExposesTheLocationOfTheNewEntries() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        when(this.namingStrategy.isCreationAllowed(any())).thenReturn(true);
+        SpaceReference location = new SpaceReference("xwiki", "NewRows");
+        when(this.namingStrategy.getNewEntryLocation(any())).thenReturn(Optional.of(location));
+        when(this.stringEntityReferenceSerializer.serialize(location)).thenReturn("NewRows");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        // The client displays a row that has no entry yet in the context of the location it will end up in.
+        LiveDataActionDescriptor addEntry = actualConfig.getMeta().getActions().stream()
+            .filter(action -> "addEntry".equals(action.getId())).findFirst().orElseThrow();
+        assertEquals("NewRows", addEntry.getParameters().get("location"));
+    }
+
+    @Test
+    void addEntryWithoutLocation() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        when(this.namingStrategy.isCreationAllowed(any())).thenReturn(true);
+        when(this.namingStrategy.getNewEntryLocation(any())).thenReturn(Optional.empty());
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        LiveDataActionDescriptor addEntry = actualConfig.getMeta().getActions().stream()
+            .filter(action -> "addEntry".equals(action.getId())).findFirst().orElseThrow();
+        assertFalse(addEntry.getParameters().containsKey("location"));
     }
 
     @Test

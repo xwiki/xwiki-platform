@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.LongPredicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -51,6 +52,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.ConfirmationBox;
 import org.xwiki.test.ui.po.DateRangePicker;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
@@ -654,12 +656,15 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * @return the number of rows currently displayed in the live data
+     * @return the number of entry rows currently displayed in the live data, without the "Add entry" row of the edit
+     *     mode
      * @since 12.10.9
      */
     public int countRows()
     {
-        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody tr td:first-child")).size();
+        // The "Add entry" row displayed in edit mode is not an entry.
+        return getDriver().findElementsWithoutWaiting(getRoot(),
+            By.cssSelector("tbody tr:not(.layout-table-new-row) td:first-child")).size();
     }
 
     /**
@@ -873,17 +878,16 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Create a new draft entry without saving it.
+     * Add a row to the table. The entry itself is only created once a first value is set on that row, see
+     * {@link #createNewEntry(String, String, String)}.
      *
      * @since 18.7.0RC1
      */
     public void startNewEntry()
     {
         getRoot().findElement(By.cssSelector("tr.layout-table-new-row a")).click();
-        // Wait for the draft row to be ready (by checking there is a save button).
-        getDriver().waitUntilElementIsVisible(getRoot(), getNewEntrySaveButtonSelector());
-        // The first editable cell is automatically focused, we blur it to keep a consistent state for the other
-        // helpers.
+        // The first editable cell of the new row is automatically focused. We blur it to keep a consistent state for
+        // the other helpers.
         By editorInput = By.cssSelector("tbody tr td.cell input");
         getDriver().waitUntilElementIsVisible(getRoot(), editorInput);
         getRoot().findElement(editorInput).sendKeys(Keys.ESCAPE);
@@ -892,42 +896,96 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Fill a field of the current draft entry without saving it.
+     * Fill a field of the new row and validate it, which creates the entry, then wait for the Live Data to be
+     * reloaded.
      *
      * @param columnLabel the label of the column to fill
      * @param fieldName the name of the field to fill (i.e., the corresponding XClass property)
      * @param value the value to set
-     * @since 18.7.0RC1
+     * @since 18.9.0RC1
      */
-    public void setNewEntryCell(String columnLabel, String fieldName, String value)
+    public void createNewEntry(String columnLabel, String fieldName, String value)
     {
-        setNewEntryCell(countRows(), columnLabel, fieldName, value);
+        long entriesBeforeCreation = getTotalEntries();
+        WebElement input = setNewEntryCell(countRows(), columnLabel, fieldName, value);
+        input.sendKeys(Keys.ENTER);
+        // Validating the cell closes the editor right away, while the entry is created and the Live Data refreshed
+        // asynchronously. So we wait for the new entry to be counted rather than for the editor to be gone.
+        waitUntilTotalEntries(totalEntries -> totalEntries > entriesBeforeCreation);
     }
 
     /**
-     * Save the current draft entry, then wait for the Live Data to be reloaded.
+     * Delete, from the actions column, the entry displaying the given value in the given column, then confirm the
+     * deletion and wait for the Live Data to be reloaded.
      *
-     * @since 18.7.0RC1
+     * @param columnLabel the label of the column holding the value identifying the entry
+     * @param value the value identifying the entry to delete
+     * @since 18.9.0RC1
      */
-    public void saveNewEntry()
+    public void deleteEntry(String columnLabel, String value)
     {
-        WebElement saveButton = getRoot().findElement(getNewEntrySaveButtonSelector());
-        saveButton.click();
-        getDriver().waitUntilCondition(ExpectedConditions.stalenessOf(saveButton));
+        long entriesBeforeDeletion = getTotalEntries();
+        WebElement deleteButton = getActionButton(findRow(columnLabel, value), "Delete");
+        deleteButton.click();
+        new ConfirmationBox().clickYes();
+        // The entry is deleted and the Live Data refreshed asynchronously, so we wait for the entry to be gone from
+        // the count rather than for the button to be detached.
+        waitUntilTotalEntries(totalEntries -> totalEntries < entriesBeforeDeletion);
+    }
+
+    /**
+     * Wait until the total number of entries matches the given condition, then until the Live Data is ready.
+     *
+     * @param condition the condition the total number of entries must match
+     */
+    private void waitUntilTotalEntries(LongPredicate condition)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return condition.test(getTotalEntries());
+            } catch (IllegalStateException | StaleElementReferenceException e) {
+                // The pagination is being re-rendered by the refresh.
+                return false;
+            }
+        });
         waitUntilReady();
     }
 
     /**
-     * Cancel the current draft entry.
+     * Drop the new row. It has no entry behind it yet, so it is discarded without confirmation.
      *
      * @since 18.7.0RC1
      */
     public void cancelNewEntry()
     {
-        // Only the draft row holds action buttons, so the cancel button uniquely identifies it.
-        WebElement cancelButton = getRoot().findElement(getNewEntryCancelButtonSelector());
+        // The new row is appended after the entries, and the "Add entry" row is hidden while it is displayed.
+        List<WebElement> rows = getRows();
+        WebElement cancelButton = getActionButton(rows.get(rows.size() - 1), "Cancel");
         cancelButton.click();
         getDriver().waitUntilCondition(ExpectedConditions.stalenessOf(cancelButton));
+    }
+
+    /**
+     * @return the row displaying the given value in the given column
+     */
+    private WebElement findRow(String columnLabel, String value)
+    {
+        return getAllCells(columnLabel).stream()
+            .filter(cell -> value.equals(cell.getText().trim()))
+            .findFirst()
+            .map(cell -> cell.findElement(By.xpath("./parent::tr")))
+            .orElseThrow(() -> new NoSuchElementException(
+                String.format("No entry with the value [%s] in the column [%s].", value, columnLabel)));
+    }
+
+    /**
+     * @param row the row holding the button
+     * @param title the title of the button
+     * @return the button of the actions column of the given row
+     */
+    private WebElement getActionButton(WebElement row, String title)
+    {
+        return row.findElement(By.cssSelector(String.format("td.actions-column button[title='%s']", title)));
     }
 
     private WebElement setNewEntryCell(int rowNumber, String columnLabel, String fieldName, String value)
@@ -940,18 +998,6 @@ public class TableLayoutElement extends BaseElement
         WebElement input = cell.findElement(selector);
         new FormContainerElement(By.cssSelector(".livedata-displayer .edit")).setFieldValue(input, value);
         return input;
-    }
-
-    private By getNewEntrySaveButtonSelector()
-    {
-        // Only the draft row holds action buttons, so the save button uniquely identifies it.
-        return By.cssSelector("tbody tr td button[title='Save']");
-    }
-
-    private By getNewEntryCancelButtonSelector()
-    {
-        // Only the draft row holds action buttons, so the cancel button uniquely identifies it.
-        return By.cssSelector("tbody tr td button[title='Cancel']");
     }
 
     /**

@@ -262,6 +262,21 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         return Optional.of(this.stringEntityReferenceSerializer.serialize(documentReference));
     }
 
+    @Override
+    public Optional<Map<String, Object>> remove(Object entryId) throws LiveDataException
+    {
+        Optional<Map<String, Object>> entry = get(entryId);
+        if (entry.isPresent()) {
+            try {
+                this.modelBridge.delete(this.currentDocumentReferenceResolver.resolve((String) entryId));
+            } catch (AccessDeniedException | XWikiException e) {
+                throw new LiveDataException(e);
+            }
+        }
+
+        return entry;
+    }
+
     private void checkAllXObjectPropertiesHaveXClass(Map<String, Object> entry,
         Map<String, DocumentReference> propertyClassReferences) throws LiveDataException
     {

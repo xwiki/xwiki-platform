@@ -188,4 +188,52 @@ describe("liveDataSource.js", () => {
       expect(entryRequest.abort.calledOnce).toBe(true);
     });
   });
+
+  describe("removeEntry", () => {
+    const ajaxStub = stub($, "ajax");
+
+    afterEach(() => {
+      ajaxStub.reset();
+    });
+
+    it("sends a delete request for the entry", async () => {
+      global.XWiki = { contextPath: "http://localhost", currentWiki: "xwiki" };
+      // @ts-expect-error the stub doesn't return a full jqXHR
+      ajaxStub.returns(Promise.resolve());
+
+      const liveDataSource = new XWikiLiveDataSource($);
+
+      await liveDataSource.removeEntry({ id: "test" }, "MySpace.MyEntry");
+
+      const settings = ajaxStub.lastCall.args[0] as JQuery.AjaxSettings;
+      expect(settings.type).toBe("DELETE");
+      expect(settings.url).toContain(
+        "/rest/liveData/sources/test/entries/MySpace.MyEntry?",
+      );
+    });
+
+    it("completes when the entry does not exist", async () => {
+      global.XWiki = { contextPath: "http://localhost", currentWiki: "xwiki" };
+      // @ts-expect-error the stub doesn't return a full jqXHR
+      ajaxStub.returns(Promise.reject({ status: 404 }));
+
+      const liveDataSource = new XWikiLiveDataSource($);
+
+      await expect(
+        liveDataSource.removeEntry({ id: "test" }, "MySpace.MyEntry"),
+      ).resolves.toBeUndefined();
+    });
+
+    it("fails when the deletion fails", async () => {
+      global.XWiki = { contextPath: "http://localhost", currentWiki: "xwiki" };
+      // @ts-expect-error the stub doesn't return a full jqXHR
+      ajaxStub.returns(Promise.reject({ status: 403 }));
+
+      const liveDataSource = new XWikiLiveDataSource($);
+
+      await expect(
+        liveDataSource.removeEntry({ id: "test" }, "MySpace.MyEntry"),
+      ).rejects.toEqual({ status: 403 });
+    });
+  });
 });

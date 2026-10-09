@@ -56,12 +56,12 @@
         Implement property reorder
       -->
       <!--
-        We include the entry index in the key in case of inconsistent data, in this case duplicated entry IDs.
-        That way even if two entries have the same id, the keys will not be equals.
+        The keys stay the same when the entries are refreshed or reordered, and when the entry of a new row is created.
+        They are made unique in case of inconsistent data, in this case duplicated entry IDs.
       -->
       <LayoutCardsCard
         v-for="(entry, idx) in entries"
-        :key="`card-${logic.getEntryId(entry)}-${idx}`"
+        :key="entryKeys[idx]"
         :entry="entry"
         :entry-idx="idx"
       />
@@ -116,6 +116,9 @@ export default {
     },
     entries() {
       return this.logic.data.data.entries;
+    },
+    entryKeys() {
+      return this.logic.getEntryKeys(this.entries);
     },
     isSelectionEnabled() {
       return this.logic.isSelectionEnabled();

@@ -123,11 +123,12 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         // correctly with a Servlet Context.
         ServletEnvironment environment = getComponentManager().getInstance(Environment.class);
         Mock mockServletContext = mock(ServletContext.class);
-        environment.setServletContext((ServletContext) mockServletContext.proxy());
         mockServletContext.stubs().method("getResourceAsStream").will(returnValue(null));
         mockServletContext.stubs().method("getResource").will(returnValue(null));
+        mockServletContext.stubs().method("getRealPath").will(returnValue(null));
         mockServletContext.stubs().method("getAttribute").with(eq("javax.servlet.context.tempdir"))
             .will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
+        environment.setServletContext((ServletContext) mockServletContext.proxy());
 
         File testDirectory = new File("target/test-" + new Date().getTime());
         this.temporaryDirectory = new File(testDirectory, "temporary-dir");

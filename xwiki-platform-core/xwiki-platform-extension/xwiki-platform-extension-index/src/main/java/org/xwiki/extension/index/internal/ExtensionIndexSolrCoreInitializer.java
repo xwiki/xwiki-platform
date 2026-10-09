@@ -160,10 +160,12 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final Pattern COMPONENT_SPECIAL_CHARS = Pattern.compile("[<>,]+");
 
+    private static final long SCHEMA_VERSION_17_10_14 = 171014000;
+
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_16_7;
+        return SCHEMA_VERSION_17_10_14;
     }
 
     @Override
@@ -228,6 +230,19 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             setStringField(InstalledExtension.FIELD_INSTALLED_NAMESPACES, true, false);
         }
 
+        migrateSecuritySchema(cversion);
+
+        if (cversion < SCHEMA_VERSION_16_7) {
+            setStringField(RemoteExtension.FIELD_SUPPORT_PLANS, true, false);
+        }
+
+        if (cversion < SCHEMA_VERSION_17_10_14) {
+            deleteIncompleteDocuments();
+        }
+    }
+
+    private void migrateSecuritySchema(long cversion) throws SolrException
+    {
         if (cversion < SCHEMA_VERSION_15_5) {
             setPDoubleField(SECURITY_MAX_CVSS, false, false);
             setStringField(SECURITY_CVE_ID, true, false);
@@ -256,9 +271,18 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
                 deleteField("is_from_environment", false);
             }
         }
+    }
 
-        if (cversion < SCHEMA_VERSION_16_7) {
-            setStringField(RemoteExtension.FIELD_SUPPORT_PLANS, true, false);
+    /**
+     * Remove the incomplete documents (without extension version, repository, etc.) created when updating the installed
+     * or compatible state of an extension which was not indexed.
+     */
+    private void deleteIncompleteDocuments() throws SolrException
+    {
+        try {
+            this.core.getClient().deleteByQuery("*:* -" + Extension.FIELD_VERSION + ":[* TO *]");
+        } catch (SolrServerException | IOException e) {
+            throw new SolrException("Failed to cleanup the documents without version", e);
         }
     }
 

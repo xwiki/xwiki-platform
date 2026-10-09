@@ -50,6 +50,7 @@ import {
   valuesUrl,
 } from "./filterPicker";
 import { fieldOf, resolveSortOption, toSortOptions } from "./sortPicker";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 import type {
   FieldOption,
   JsonFetcher,
@@ -61,15 +62,12 @@ import type { DirectionLabels } from "./sortPicker";
 /**
  * Wires the Records macro dialog: the field picker, and the two behaviours that depend on the data type.
  *
- * jQuery and the suggest widget are taken as RequireJS dependencies rather than imported, so that they stay the
- * single instances the rest of the page already uses and nothing is bundled twice. That is also why this module
- * registers itself with `define` and then requires itself.
+ * jQuery and the suggest widget are loaded through RequireJS rather than imported, so that they stay the single
+ * instances the rest of the page already uses and nothing is bundled twice.
  *
- * The bundle deliberately exports nothing. The macro editor builds each parameter field in a detached element and
- * only then appends it to the dialog, and jQuery evaluates a field's scripts at that append: a classic script runs,
- * a `type="module"` one is skipped outright, and ES syntax in a classic one fails to parse. Keeping this module
- * free of imports and exports leaves the emitted bundle valid as a classic script, which is what the displayer
- * template loads it as.
+ * The displayer templates load this bundle as a `type="module"` script. The macro editor injects them with jQuery,
+ * which hands such a script to the browser, so the bundle is only fetched once the Records dialog is displayed, and
+ * runs once however many of its displayers the dialog holds.
  */
 
 /**
@@ -775,29 +773,24 @@ define(TRANSLATION_KEYS_MODULE, [], () => ({
   ],
 }));
 
-define("xwiki-records-fields", [
+const [$, , translations] = await loadById<[JQueryStatic, unknown, Messages]>(
   "jquery",
   "xwiki-selectize",
   `xwiki-l10n!${TRANSLATION_KEYS_MODULE}`,
-], function ($: JQueryStatic, _selectize: unknown, translations: Messages) {
-  messages = translations;
-  const initialize = (event?: unknown, data?: { elements?: Element[] }) => {
-    const roots: ParentNode[] = data?.elements ?? [document];
-    roots.forEach((root) => {
-      root.querySelectorAll(PICKER_SELECTOR).forEach((picker) => {
-        const $picker = $(picker);
-        if ($picker.data(WIRED_FLAG) === true) {
-          return;
-        }
-        $picker.data(WIRED_FLAG, true);
-        wire($, picker);
-      });
+);
+messages = translations;
+const initialize = (event?: unknown, data?: { elements?: Element[] }) => {
+  const roots: ParentNode[] = data?.elements ?? [document];
+  roots.forEach((root) => {
+    root.querySelectorAll(PICKER_SELECTOR).forEach((picker) => {
+      const $picker = $(picker);
+      if ($picker.data(WIRED_FLAG) === true) {
+        return;
+      }
+      $picker.data(WIRED_FLAG, true);
+      wire($, picker);
     });
-  };
-  $(document).on("xwiki:dom:loaded xwiki:dom:updated", initialize);
-  initialize();
-});
-
-// Kick the module off, since `define` on its own only registers it. The `requirejs` alias is used rather than
-// `require` so that this reads as the AMD loader it is rather than as a CommonJS import.
-requirejs(["xwiki-records-fields"], () => {});
+  });
+};
+$(document).on("xwiki:dom:loaded xwiki:dom:updated", initialize);
+initialize();

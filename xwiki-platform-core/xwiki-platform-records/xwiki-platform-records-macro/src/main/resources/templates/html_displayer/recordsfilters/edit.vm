@@ -21,8 +21,8 @@
 ##
 ## Like the columns and sort pickers, this one gets its candidates from the browser, because they depend on the
 ## sibling class parameter and no displayer can be told about it. The element carries a class of ours rather than
-## xwiki-selectize, so that this module owns the enhancement, and the bundle is loaded as a classic script, because
-## the macro editor injects this template with jQuery. templates/html_displayer/recordscolumns/edit.vm explains each
+## xwiki-selectize, so that this module owns the enhancement, and the bundle is loaded as a module script, which
+## runs once however many displayers load it. templates/html_displayer/recordscolumns/edit.vm explains each
 ## of these in full.
 ##
 ## Unlike those two pickers, this one is a text input rather than a multiple select. The parameter separates its
@@ -38,8 +38,8 @@
 #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-records-filters"))
 #set ($discard = $parameters.putIfAbsent('placeholder',
   $services.localization.render('rendering.macro.records.parameter.filters.placeholder')))
-<script src="$escapetool.xml($services.webjars.url(
-  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.js'))"></script>
+<script type="module" src="$escapetool.xml($services.webjars.url(
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
 <input type="text" value="$!escapetool.xml($displayer.value)"
   #foreach ($parameter in $parameters.entrySet())
     $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"

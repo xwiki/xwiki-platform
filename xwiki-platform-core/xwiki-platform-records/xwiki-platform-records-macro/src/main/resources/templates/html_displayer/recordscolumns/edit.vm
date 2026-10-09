@@ -40,11 +40,10 @@
 #end
 #set ($discard = $parameters.putIfAbsent('placeholder',
   $services.localization.render('rendering.macro.records.parameter.properties.placeholder')))
-## Loads the picker. This is deliberately a classic script rather than a module one: the macro editor injects this
-## template with jQuery, which refuses to fetch a type="module" script by src and evaluates every other script as a
-## classic one, so a module script here would never run. The bundle is built free of imports and exports for that
-## reason, and it declares jquery and xwiki-selectize as RequireJS dependencies so that it shares the page's
-## instances rather than bundling its own.
-<script src="$escapetool.xml($services.webjars.url(
-  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.js'))"></script>
+## Loads the picker. The macro editor injects this template with jQuery, which hands a type="module" script to the
+## browser, so the bundle is only fetched once the dialog is displayed. The browser runs a module once, however many
+## of the Records displayers load it. The bundle loads jquery and xwiki-selectize through RequireJS, so that it
+## shares the page's instances rather than bundling its own.
+<script type="module" src="$escapetool.xml($services.webjars.url(
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
 #suggestInput($parameters)

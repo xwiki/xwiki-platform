@@ -47,7 +47,7 @@ public class CKEditorToolBar extends BaseElement
 
     protected final WebElement container;
 
-    private final CKEditor editor;
+    protected final CKEditor editor;
 
     /**
      * Create a new tool bar instance for the given editor.

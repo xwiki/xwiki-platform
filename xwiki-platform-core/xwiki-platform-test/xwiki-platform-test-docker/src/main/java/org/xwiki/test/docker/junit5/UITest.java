@@ -232,6 +232,16 @@ public @interface UITest
     boolean saveDatabaseData() default false;
 
     /**
+     * @return true if the extensions declared in the resources of the module executing the test must be made available
+     *     to the XWiki instances as an extension repository, so that the test can ask XWiki to install them (see
+     *     {@code src/test/resources/packagefile} and {@code src/test/resources/repository})
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    boolean testExtensionRepository() default false;
+
+    /**
      * @return true if the XWiki permanent directory should be preserved after the test is finished and the XWiki
      *         container stopped (doesn't make sense for Servlet containers running outside of Docker). Can be useful
      *         for debugging purposes

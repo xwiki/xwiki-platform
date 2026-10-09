@@ -109,8 +109,8 @@ catalogs:
       specifier: 4.13.0
       version: 4.13.0
     bootstrap-icons:
-      specifier: 1.13.1
-      version: 1.13.1
+      specifier: 1.13.2
+      version: 1.13.2
     cross-env:
       specifier: 10.1.0
       version: 10.1.0
@@ -1994,7 +1994,7 @@ importers:
     dependencies:
       bootstrap-icons:
         specifier: 'catalog:'
-        version: 1.13.1
+        version: 1.13.2
       reflect-metadata:
         specifier: 0.x
         version: 0.2.2
@@ -5712,8 +5712,8 @@ packages:
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
-  bootstrap-icons@1.13.1:
-    resolution: {integrity: sha512-ijombt4v6bv5CLeXvRWKy7CuM3TRTuPEuGaGKvTV5cz65rQSY8RQ2JcHt6b90cBBAC7s8fsf2EkQDldzCoXUjw==}
+  bootstrap-icons@1.13.2:
+    resolution: {integrity: sha512-fAU1Ly3dH7hwRg+CB8EZ0Vl0fF80zgXHeUVJyfUOKzoURr+TbwISbCW5tKUoQLERaWYG2emTCybcPbD96hdD1A==}
 
   brace-expansion@1.1.12:
     resolution: {integrity: sha512-9T9UjW3r0UW5c1Q7GTwllptXwhvYmEzFhzMfZ9H7FQWt+uZePjZPjBP/W1ZEyZ1twGWom5/56TF4lPcqjnDHcg==}
@@ -10114,7 +10114,7 @@ snapshots:
 
   boolbase@1.0.0: {}
 
-  bootstrap-icons@1.13.1: {}
+  bootstrap-icons@1.13.2: {}
 
   brace-expansion@1.1.12:
     dependencies:

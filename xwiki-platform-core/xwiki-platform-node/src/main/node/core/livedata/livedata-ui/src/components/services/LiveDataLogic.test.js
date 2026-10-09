@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { LiveDataLogic } from "./LiveDataLogic";
+import flushPromises from "flush-promises";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { computed } from "vue";
 
@@ -426,6 +427,39 @@ describe("Creating the entry of a new row", () => {
     );
   });
 
+  // eslint-disable-next-line max-statements
+  it("creates the entry once when the next cell is saved while it is being created", async () => {
+    const { logic, liveDataSource } = await initLogicWithNewRow();
+    let resolveCreation;
+    liveDataSource.addEntry.mockReturnValue(
+      new Promise((resolve) => {
+        resolveCreation = resolve;
+      }),
+    );
+    liveDataSource.updateEntry.mockResolvedValue(undefined);
+    const editBus = logic.getEditBus();
+    const row = logic.data.data.entries.find((entry) => entry._new);
+
+    editBus.start(row, "name");
+    const creation = editBus.save(row, "name", { name: "Esther" });
+    // The next cell is saved before the entry is created.
+    editBus.start(row, "status");
+    const update = editBus.save(row, "status", { status: "done" });
+    resolveCreation({ id: "4", name: "Esther" });
+    await creation;
+    await update;
+    await flushPromises();
+
+    // A single entry is created, and the value of the next cell reaches it.
+    expect(liveDataSource.addEntry).toHaveBeenCalledOnce();
+    expect(liveDataSource.updateEntry).toHaveBeenCalledOnce();
+    expect(liveDataSource.updateEntry).toHaveBeenCalledWith(
+      expect.anything(),
+      "4",
+      { status: "done" },
+    );
+  });
+
   it("does not create the entry when the value is left empty", async () => {
     const { logic, liveDataSource } = await initLogicWithNewRow();
 
@@ -582,5 +616,50 @@ describe("Entry keys", () => {
       secondKey,
       firstKey,
     ]);
+  });
+});
+
+describe("Saving the cells of an entry", () => {
+  // eslint-disable-next-line max-statements
+  it("saves the next cell saved while the previous one is still being saved", async () => {
+    const { logic, liveDataSource } = initLogic([
+      { id: "1", name: "one", status: "todo" },
+    ]);
+    logic.updateEntries = vi.fn().mockResolvedValue(undefined);
+    let resolveFirstSave;
+    liveDataSource.updateEntry
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveFirstSave = resolve;
+        }),
+      )
+      .mockResolvedValue(undefined);
+    const editBus = logic.getEditBus();
+    const entry = logic.data.data.entries[0];
+
+    editBus.start(entry, "name");
+    const firstSave = editBus.save(entry, "name", { name: "two" });
+    // The next cell is saved before the previous one is.
+    editBus.start(entry, "status");
+    const secondSave = editBus.save(entry, "status", { status: "done" });
+    resolveFirstSave();
+    await firstSave;
+    await secondSave;
+    await flushPromises();
+
+    // Each cell is saved once, with its own value.
+    expect(liveDataSource.updateEntry).toHaveBeenCalledTimes(2);
+    expect(liveDataSource.updateEntry).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      "1",
+      { name: "two" },
+    );
+    expect(liveDataSource.updateEntry).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      "1",
+      { status: "done" },
+    );
   });
 });

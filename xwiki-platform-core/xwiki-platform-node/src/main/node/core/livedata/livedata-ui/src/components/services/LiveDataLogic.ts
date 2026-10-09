@@ -539,7 +539,6 @@ export class LiveDataLogic implements Logic {
           if (err.readyState === 4) {
             // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
             this.translate("livedata.error.updateEntriesFailed").then(
-              // @ts-expect-error XWiki.widget is excepted to be globally accessible
               (value) => new XWiki.widgets.Notification(value, "error"),
             );
           }
@@ -1950,7 +1949,6 @@ export class LiveDataLogic implements Logic {
   private async confirm(translationKey: string): Promise<boolean> {
     const confirmationText = await this.translate(translationKey);
     return new Promise((resolve) => {
-      // @ts-expect-error XWiki.widgets is expected to be globally accessible
       new XWiki.widgets.ConfirmationBox(
         {
           onYes: () => resolve(true),
@@ -1969,7 +1967,6 @@ export class LiveDataLogic implements Logic {
   private async notifyError(translationKey: string) {
     try {
       const message = await this.translate(translationKey);
-      // @ts-expect-error XWiki.widgets is expected to be globally accessible
       new XWiki.widgets.Notification(message, "error");
     } catch {
       /* ignore translation failure */

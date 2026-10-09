@@ -50,7 +50,8 @@ public interface PagesResource
      * @param parentFilterExpression filters the returned pages by their parent; when absent ({@code null}) no parent
      *  filtering is applied; the literal string {@code null} keeps only pages that have no parent; any other value is
      *  treated as a regular expression that must fully match the parent's prefixed full name (for example
-     *  {@code xwiki:Main.WebHome})
+     *  {@code xwiki:Main.WebHome}); a regular expression that is invalid or too expensive to evaluate against the
+     *  returned pages is rejected with a {@code 400} response
      * @param order the ordering of the returned pages; the only recognized value is {@code date}, which sorts them by
      *  descending modification date; any other value (including absent) uses the default document-name ordering
      * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's

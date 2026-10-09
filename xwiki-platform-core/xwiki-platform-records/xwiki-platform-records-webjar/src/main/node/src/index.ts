@@ -157,6 +157,7 @@ interface PickerSettings {
   delimiter?: string;
   onItemAdd?: (this: Suggester, value: string) => void;
   onItemRemove?: (this: Suggester, value: string) => void;
+  onFocus?: (this: Suggester) => void;
 }
 
 /**
@@ -266,8 +267,26 @@ function createSettings(
     // placeholder names the default column list, so leaving it visible would tell the author the table
     // shows the title and every field while they are looking at the columns they just picked.
     hidePlaceholder: true,
+    // The widget asks for the options of the empty query once, when it is created, and afterwards only as the author
+    // types. A picker created before the data type was picked, or whose options were dropped since, would otherwise
+    // open empty until something is typed. Asking costs nothing when the query is already loaded: the widget
+    // remembers what it has asked for.
+    onFocus() {
+      this.load(this.inputValue());
+    },
     ...offer.settings,
   };
+}
+
+/**
+ * Drops the options a picker has loaded, except those backing its selected items, and asks for the ones matching
+ * what is typed again.
+ *
+ * @param suggester - the widget to load again
+ */
+function reload(suggester: Suggester): void {
+  suggester.clearOptions();
+  suggester.load(suggester.inputValue());
 }
 
 /**
@@ -495,13 +514,13 @@ const sortOffer: Offer = {
   },
   settings: {
     // A field that has just been used, or has just been freed, changes what should be offered. The widget caches
-    // what it has loaded per query and keeps the options it has already seen, so both are dropped here: what
-    // survives is the options backing the selected criteria, and the next dropdown loads the rest afresh.
+    // what it has loaded per query and keeps the options it has already seen, so both are dropped here, and loaded
+    // again right away since the dropdown stays open for the next criterion.
     onItemAdd() {
-      this.clearOptions();
+      reload(this);
     },
     onItemRemove() {
-      this.clearOptions();
+      reload(this);
     },
   },
 };

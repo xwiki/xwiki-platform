@@ -22,6 +22,7 @@ package org.xwiki.records.test.ui;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditor;
@@ -65,10 +66,11 @@ class RecordsMacroIT extends AbstractCKEditorIT
     }
 
     /**
-     * The filters picked in the dialog are saved as one {@code &}-separated value, so that they all apply, and a
-     * stored value is shown back as one item per constraint.
+     * The filters picked in the dialog are saved as one {@code &}-separated value, so that they all apply, and a stored
+     * value is shown back as one item per constraint.
      */
     @Test
+    @Order(1)
     void filters(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -84,7 +86,9 @@ class RecordsMacroIT extends AbstractCKEditorIT
         createEntry(setup, testReference, className, "Published essay", "published", "essay");
         createEntry(setup, testReference, className, "Draft fiction", "draft", "fiction");
 
-        edit(setup, testReference, "{{records class=\"%s\" id=\"%s\"/}}".formatted(className, LIVE_DATA_ID));
+        edit(setup, testReference, """
+            {{records class="%s" id="%s"/}}
+            """.formatted(className, LIVE_DATA_ID));
         RecordsMacroEditModal macroEditModal = editMacro();
         SuggestInputElement filtersPicker = macroEditModal.getFiltersPicker();
         filtersPicker.sendKeys("status=published").selectTypedText();
@@ -108,7 +112,12 @@ class RecordsMacroIT extends AbstractCKEditorIT
         macroEditModal.clickCancel();
 
         // A field named twice is two constraints on that field, and removing one keeps the other alone.
-        setSource("before\n\n{{records class=\"%s\" filters=\"status=published&status=draft\" id=\"%s\"/}}\n\nafter"
+        setSource("""
+            before
+            
+            {{records class="%s" filters="status=published&status=draft" id="%s"/}}
+            
+            after"""
             .formatted(className, LIVE_DATA_ID));
         macroEditModal = editMacro();
         filtersPicker = macroEditModal.getFiltersPicker();
@@ -124,16 +133,15 @@ class RecordsMacroIT extends AbstractCKEditorIT
     private void createEntry(TestUtils setup, TestReference testReference, String className, String title,
         String status, String genre) throws Exception
     {
-        DocumentReference entryReference =
-            new DocumentReference(title.replace(" ", ""), testReference.getLastSpaceReference());
+        DocumentReference entryReference = new DocumentReference(title, testReference.getLastSpaceReference());
         setup.rest().delete(entryReference);
         setup.createPage(entryReference, "", title);
         setup.addObject(entryReference, className, STATUS, status, GENRE, genre);
     }
 
     /**
-     * Opens the test page in the WYSIWYG editor with the given macro call between two paragraphs, which give the
-     * editor somewhere to put the caret that is not the macro itself.
+     * Opens the test page in the WYSIWYG editor with the given macro call between two paragraphs, which give the editor
+     * somewhere to put the caret that is not the macro itself.
      */
     private void edit(TestUtils setup, TestReference testReference, String macroCall)
     {

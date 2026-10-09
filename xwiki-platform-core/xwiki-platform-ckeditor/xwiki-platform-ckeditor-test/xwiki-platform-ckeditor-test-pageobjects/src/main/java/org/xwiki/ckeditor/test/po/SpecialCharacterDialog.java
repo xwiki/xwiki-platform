@@ -26,6 +26,8 @@ import org.xwiki.stability.Unstable;
  * Models the CKEditor dialog used to insert special characters.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 @Unstable

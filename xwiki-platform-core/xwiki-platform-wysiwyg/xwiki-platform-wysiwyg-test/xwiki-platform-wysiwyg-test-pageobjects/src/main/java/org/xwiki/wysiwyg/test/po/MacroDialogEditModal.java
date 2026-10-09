@@ -141,6 +141,8 @@ public class MacroDialogEditModal extends BaseElement
      *
      * @param name the macro parameter name
      * @return the suggest input used to edit the value of the specified macro parameter
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public SuggestInputElement getMacroParameterSuggestInput(String name)

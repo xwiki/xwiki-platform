@@ -83,6 +83,8 @@ public class CKEditorToolBar extends BaseElement
      * Click the bold button and wait for its state to be toggled.
      *
      * @return this tool bar instance
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public CKEditorToolBar bold()
@@ -94,6 +96,8 @@ public class CKEditorToolBar extends BaseElement
      * Click the italic button and wait for its state to be toggled.
      *
      * @return this tool bar instance
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public CKEditorToolBar italic()
@@ -105,6 +109,8 @@ public class CKEditorToolBar extends BaseElement
      * Click the underline entry of the basic styles menu (the underline action has no dedicated tool bar button).
      *
      * @return this tool bar instance
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public CKEditorToolBar underline()
@@ -117,6 +123,8 @@ public class CKEditorToolBar extends BaseElement
      * Insert an Info Box using the Insert menu, and wait for the inserted info macro to be rendered. The info macro
      * is inserted with a default content, and the caret is placed at the start of this content.
      *
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void insertInfoBox()
@@ -129,6 +137,8 @@ public class CKEditorToolBar extends BaseElement
      * that follows waits for the inserted macro to be rendered.
      *
      * @return the page object for the macro selection modal
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public MacroDialogSelectModal insertOtherMacro()
@@ -141,6 +151,8 @@ public class CKEditorToolBar extends BaseElement
      * Open the special character dialog using the Insert menu.
      *
      * @return the page object for the special character dialog
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public SpecialCharacterDialog insertSpecialCharacter()
@@ -153,6 +165,8 @@ public class CKEditorToolBar extends BaseElement
      * Open the emoji panel using the dedicated tool bar button.
      *
      * @return the page object for the emoji panel
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public EmojiPanel openEmojiPanel()

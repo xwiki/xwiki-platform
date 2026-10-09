@@ -19,17 +19,13 @@
  */
 package org.xwiki.records.internal.macro;
 
-import java.io.StringReader;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -37,36 +33,21 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataException;
-import org.xwiki.livedata.LiveDataPropertyDescriptor;
-import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
-import org.xwiki.livedata.LiveDataQuery.Source;
-import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.records.macro.RecordsMacroParameters;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -92,9 +73,6 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(RecordsMacro.ID)
-// The macro is the one place that maps its parameters onto Live Data and builds the messages, which is why it
-// depends on that many types.
-@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @Singleton
 public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
 {
@@ -149,15 +127,6 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private static final String ID_PREFIX = ID;
 
     /**
-     * The prefix of the translation keys of the messages this macro displays.
-     */
-    private static final String MESSAGE_PREFIX = "rendering.macro.records.";
-
-    private static final String RENDER_FAILED = "error.renderFailed";
-
-    private static final String FIELDS_UNREADABLE = "error.fieldsUnreadable";
-
-    /**
      * What separates the constraints of a filters value.
      */
     private static final String FILTER_SEPARATOR = "&";
@@ -178,18 +147,6 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private static final List<String> SORT_DIRECTIONS = List.of(":asc", ":desc");
 
     /**
-     * The filter the {@code liveTable} source matches as a number, which it cannot do with a value that is not one.
-     */
-    private static final String NUMBER_FILTER = "number";
-
-    /**
-     * The filter the {@code liveTable} source matches against its two parameters below.
-     */
-    private static final String BOOLEAN_FILTER = "boolean";
-
-    private static final List<String> BOOLEAN_VALUES = List.of("trueValue", "falseValue");
-
-    /**
      * Builds the warning for a field the data type no longer has. Not a {@link Function} because building a message
      * can fail.
      */
@@ -199,17 +156,6 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         Block build(String field) throws MacroExecutionException;
     }
 
-    /**
-     * What the table can do with a field of the data type.
-     *
-     * @param sortable whether the table can be sorted on the field
-     * @param filterable whether the table can be filtered on the field
-     * @param values whether a filter value fits the field's type
-     */
-    private record Field(boolean sortable, boolean filterable, Predicate<String> values)
-    {
-    }
-
     private static final String DESCRIPTION =
         "Displays a collection of entries of the same object type, as a table readers can sort and filter.";
 
@@ -217,30 +163,16 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private LiveDataRenderer liveDataRenderer;
 
     /**
-     * Translates the messages shown to authors and readers.
+     * Builds the messages shown to authors and readers.
      */
     @Inject
-    private ContextualLocalizationManager localization;
+    private RecordsMessages messages;
 
     /**
-     * Tells whether the chosen data type still exists.
+     * Tells whether the chosen data type exists and what the table can do with its fields.
      */
     @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    /**
-     * Reads the fields of the chosen data type, to fill in the default column list.
-     */
-    @Inject
-    private LiveDataSourceManager liveDataSourceManager;
-
-    /**
-     * The defaults of the {@code liveTable} source, which say whether a field can be sorted and filtered, and with
-     * which filter, whenever the field's own descriptor leaves that to its type.
-     */
-    @Inject
-    @Named(SOURCE)
-    private Provider<LiveDataConfiguration> sourceDefaults;
+    private RecordsFields recordsFields;
 
     /**
      * Tells whether the reader can view the data type, without which its fields cannot be checked.
@@ -257,22 +189,6 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * Parses a translated message as plain text, so that nothing in it, such as a field name taken from the wiki, is
-     * read as wiki syntax.
-     */
-    @Inject
-    @Named("plain/1.0")
-    private Parser plainParser;
-
-    /**
-     * Renders the plain text blocks back to XWiki syntax, which escapes whatever the message macros would otherwise
-     * interpret when they parse their content.
-     */
-    @Inject
-    @Named("xwiki/2.1")
-    private BlockRenderer xwikiRenderer;
-
-    /**
      * Default constructor.
      */
     public RecordsMacro()
@@ -287,12 +203,12 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     {
         DocumentReference dataType = parameters.getDataType();
         if (dataType == null) {
-            throw new MacroExecutionException(translate("error.noDataType"));
+            throw new MacroExecutionException(this.messages.translate("error.noDataType"));
         }
         String serializedDataType = this.entityReferenceSerializer.serialize(dataType);
-        if (!exists(dataType)) {
+        if (!this.recordsFields.exists(dataType, serializedDataType)) {
             // The macro call is left untouched, so that restoring the data type restores the table.
-            return List.of(message("error", "error.dataTypeMissing", serializedDataType));
+            return List.of(this.messages.error("error.dataTypeMissing", serializedDataType));
         }
 
         List<Block> blocks = new ArrayList<>();
@@ -303,7 +219,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
                 toLiveDataParameters(parameters, context, dataType, serializedDataType, blocks);
             blocks.add(this.liveDataRenderer.execute(liveDataParameters, (String) null, restricted));
         } catch (LiveDataException e) {
-            throw new MacroExecutionException(translate(RENDER_FAILED), e);
+            throw new MacroExecutionException(this.messages.translate(RecordsMessages.RENDER_FAILED), e);
         }
         return blocks;
     }
@@ -341,16 +257,16 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         MacroTransformationContext context, DocumentReference dataTypeReference, String dataType,
         List<Block> warnings) throws MacroExecutionException
     {
-        Map<String, Field> fields = getFields(dataType);
+        Map<String, RecordField> fields = this.recordsFields.get(dataType);
         Predicate<String> known = getKnownFields(dataTypeReference, fields);
-        WarningBuilder unknownColumn = field -> warning("warning.columnSkipped", field, dataType);
-        WarningBuilder unknownSort = field -> warning("warning.sortSkipped", field, dataType);
-        WarningBuilder unknownFilter = field -> warning("warning.filterSkipped", field, dataType);
+        WarningBuilder unknownColumn = field -> this.messages.warning("warning.columnSkipped", field, dataType);
+        WarningBuilder unknownSort = field -> this.messages.warning("warning.sortSkipped", field, dataType);
+        WarningBuilder unknownFilter = field -> this.messages.warning("warning.filterSkipped", field, dataType);
 
         LiveDataRendererParameters liveDataParameters = new LiveDataRendererParameters();
         liveDataParameters.setId(getId(parameters, context));
         liveDataParameters.setSource(SOURCE);
-        liveDataParameters.setSourceParameters(getSourceParameters(parameters, dataType));
+        liveDataParameters.setSourceParameters(getSourceParameters(dataType));
         String properties = getProperties(parameters, fields, known, unknownColumn, warnings);
         liveDataParameters.setProperties(properties);
         String filters = keepKnown(keepReadable(parameters.getFilters(), warnings), FILTER_SEPARATOR,
@@ -378,7 +294,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * @param fields the fields the data type's source offers to the current user
      * @return whether a field counts as one the data type has
      */
-    private Predicate<String> getKnownFields(DocumentReference dataType, Map<String, Field> fields)
+    private Predicate<String> getKnownFields(DocumentReference dataType, Map<String, RecordField> fields)
     {
         if (this.authorization.hasAccess(Right.VIEW, dataType)) {
             return fields::containsKey;
@@ -444,7 +360,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * @param warnings receives the warnings
      * @return the columns the author chose, or the entry title followed by every field of the data type
      */
-    private String getProperties(RecordsMacroParameters parameters, Map<String, Field> fields,
+    private String getProperties(RecordsMacroParameters parameters, Map<String, RecordField> fields,
         Predicate<String> known, WarningBuilder unknown, List<Block> warnings) throws MacroExecutionException
     {
         String kept = keepKnown(parameters.getProperties(), LIST_SEPARATOR, String::trim, known, unknown, warnings);
@@ -512,7 +428,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
                 URLDecoder.decode(constraint, StandardCharsets.UTF_8);
                 kept.add(constraint);
             } catch (IllegalArgumentException e) {
-                warnings.add(warning("warning.filterUnreadable", constraint));
+                warnings.add(this.messages.warning("warning.filterUnreadable", constraint));
             }
         }
         return String.join(FILTER_SEPARATOR, kept);
@@ -531,7 +447,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * @param warnings receives a warning for every constraint the type of its field does not allow
      * @return the constraints kept, or {@code null} when there is none
      */
-    private String keepApplicable(String filters, Map<String, Field> fields, List<Block> warnings)
+    private String keepApplicable(String filters, Map<String, RecordField> fields, List<Block> warnings)
         throws MacroExecutionException
     {
         if (StringUtils.isBlank(filters)) {
@@ -540,13 +456,13 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         List<String> kept = new ArrayList<>();
         for (String constraint : filters.split(Pattern.quote(FILTER_SEPARATOR))) {
             String fieldId = getFilterField(constraint);
-            Field field = fields.get(fieldId);
+            RecordField field = fields.get(fieldId);
             if (field == null) {
                 kept.add(constraint);
             } else if (!field.filterable()) {
-                warnings.add(warning("warning.filterUnsupported", fieldId));
+                warnings.add(this.messages.warning("warning.filterUnsupported", fieldId));
             } else if (!field.values().test(getFilterValue(constraint))) {
-                warnings.add(warning("warning.filterTypeChanged", fieldId));
+                warnings.add(this.messages.warning("warning.filterTypeChanged", fieldId));
             } else {
                 kept.add(constraint);
             }
@@ -566,7 +482,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * @param warnings receives a warning for every criterion whose field cannot be sorted on
      * @return the criteria kept, or {@code null} when there is none
      */
-    private String keepSortable(String sort, String properties, Map<String, Field> fields, List<Block> warnings)
+    private String keepSortable(String sort, String properties, Map<String, RecordField> fields, List<Block> warnings)
         throws MacroExecutionException
     {
         if (sort == null) {
@@ -576,17 +492,17 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         List<String> dropped = new ArrayList<>();
         for (String criterion : sort.split(Pattern.quote(LIST_SEPARATOR))) {
             String fieldId = getSortField(criterion);
-            Field field = fields.get(fieldId);
+            RecordField field = fields.get(fieldId);
             if (field == null || field.sortable()) {
                 kept.add(criterion);
             } else {
                 dropped.add(fieldId);
             }
         }
-        String fallback = kept.isEmpty() ? getDefaultSort(properties, fields) : getSortField(kept.get(0));
+        String fallback = kept.isEmpty() ? getDefaultSort(properties, fields) : getSortField(kept.getFirst());
         for (String fieldId : dropped) {
-            warnings.add(fallback == null ? warning("warning.sortUnsupportedUnsorted", fieldId)
-                : warning("warning.sortUnsupported", fieldId, fallback));
+            warnings.add(fallback == null ? this.messages.warning("warning.sortUnsupportedUnsorted", fieldId)
+                : this.messages.warning("warning.sortUnsupported", fieldId, fallback));
         }
         return kept.isEmpty() ? null : String.join(LIST_SEPARATOR, kept);
     }
@@ -596,22 +512,12 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * @param fields the fields of the data type, by identifier
      * @return the column Live Data sorts on when given no sort, or {@code null} when it leaves the table unsorted
      */
-    private String getDefaultSort(String properties, Map<String, Field> fields)
+    private String getDefaultSort(String properties, Map<String, RecordField> fields)
     {
         return Stream.of(properties.split(LIST_SEPARATOR)).map(String::trim)
             .filter(property -> !property.startsWith(INTERNAL_PREFIX)).findFirst()
             .filter(property -> fields.containsKey(property) && fields.get(property).sortable())
             .orElse(null);
-    }
-
-    private boolean exists(DocumentReference dataType) throws MacroExecutionException
-    {
-        try {
-            return this.documentAccessBridge.exists(dataType);
-        } catch (Exception e) {
-            throw new MacroExecutionException(
-                translate(FIELDS_UNREADABLE, this.entityReferenceSerializer.serialize(dataType)), e);
-        }
     }
 
     private String getSortField(String item)
@@ -634,86 +540,10 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     }
 
     /**
-     * Reads the fields the data type's source offers: the page metadata, the data type's fields and the Live Data
-     * pseudo-columns, in the order the source reports them.
-     *
-     * @param dataType the serialized reference of the data type
-     * @return the fields, by identifier
-     * @throws MacroExecutionException when the source cannot be reached or its properties cannot be read
-     */
-    private Map<String, Field> getFields(String dataType) throws MacroExecutionException
-    {
-        Source source = new Source(SOURCE);
-        source.setParameter(CLASS_NAME_PARAMETER, dataType);
-        Collection<LiveDataPropertyDescriptor> descriptors;
-        try {
-            descriptors = this.liveDataSourceManager.get(source)
-                .orElseThrow(() -> new MacroExecutionException(translate(RENDER_FAILED)))
-                .getProperties().get();
-        } catch (LiveDataException e) {
-            throw new MacroExecutionException(translate(FIELDS_UNREADABLE, dataType), e);
-        }
-        Map<String, LiveDataPropertyDescriptor> types = new HashMap<>();
-        this.sourceDefaults.get().getMeta().getPropertyTypes().forEach(type -> types.putIfAbsent(type.getId(), type));
-        Map<String, Field> fields = new LinkedHashMap<>();
-        for (LiveDataPropertyDescriptor descriptor : descriptors) {
-            if (descriptor.getId() != null) {
-                fields.putIfAbsent(descriptor.getId(), getField(descriptor, types.get(descriptor.getType())));
-            }
-        }
-        return fields;
-    }
-
-    /**
-     * Resolves what the table can do with a field the way Live Data does: from the field's own descriptor, and from
-     * the defaults of its type for whatever the descriptor leaves unset. A field of a type with no defaults can be
-     * neither sorted nor filtered on.
-     *
-     * @param descriptor the descriptor of the field
-     * @param type the defaults of the field's type, {@code null} when there are none
-     * @return what the table can do with the field
-     */
-    private Field getField(LiveDataPropertyDescriptor descriptor, LiveDataPropertyDescriptor type)
-    {
-        boolean sortable = isEnabled(descriptor.isSortable(), type == null ? null : type.isSortable());
-        boolean filterable = isEnabled(descriptor.isFilterable(), type == null ? null : type.isFilterable());
-        FilterDescriptor filter = descriptor.getFilter() != null || type == null ? descriptor.getFilter()
-            : type.getFilter();
-        return new Field(sortable, filterable, getAcceptedValues(filter));
-    }
-
-    private static boolean isEnabled(Boolean own, Boolean typeDefault)
-    {
-        return own != null ? own : Boolean.TRUE.equals(typeDefault);
-    }
-
-    /**
-     * Tells which values the {@code liveTable} source can match a field with. It matches a number filter by parsing
-     * the value, and a boolean one by comparing it with the filter's own true and false values, so anything else
-     * matches no entry. An empty value is always accepted, since it filters nothing.
-     *
-     * @param filter the filter of the field, {@code null} when it has none
-     * @return whether a decoded filter value fits the field
-     */
-    private static Predicate<String> getAcceptedValues(FilterDescriptor filter)
-    {
-        String filterId = filter == null ? null : filter.getId();
-        if (NUMBER_FILTER.equals(filterId)) {
-            return value -> value.isEmpty() || NumberUtils.isCreatable(value);
-        } else if (BOOLEAN_FILTER.equals(filterId)) {
-            List<String> accepted = BOOLEAN_VALUES.stream().map(filter.getParameters()::get).filter(Objects::nonNull)
-                .map(String::valueOf).toList();
-            return value -> value.isEmpty() || accepted.contains(value);
-        }
-        return value -> true;
-    }
-
-    /**
-     * @param parameters the macro parameters
      * @param dataType the serialized reference of the data type
      * @return the source parameters, as the query string {@link LiveDataRendererParameters} expects
      */
-    private String getSourceParameters(RecordsMacroParameters parameters, String dataType)
+    private String getSourceParameters(String dataType)
     {
         Map<String, String> sourceParameters = new LinkedHashMap<>();
         sourceParameters.put(CLASS_NAME_PARAMETER, dataType);
@@ -722,51 +552,6 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         return sourceParameters.entrySet().stream()
             .map(entry -> encode(entry.getKey()) + '=' + encode(entry.getValue()))
             .collect(Collectors.joining(FILTER_SEPARATOR));
-    }
-
-    private String translate(String key, Object... arguments)
-    {
-        return this.localization.getTranslationPlain(MESSAGE_PREFIX + key, arguments);
-    }
-
-    private Block warning(String key, Object... arguments) throws MacroExecutionException
-    {
-        return message("warning", key, arguments);
-    }
-
-    /**
-     * Builds a call to a message macro, so that the message looks and is announced like a {@code {{warning}}} or an
-     * {@code {{error}}}, icon and accessible name included. The call is left for the macro transformation to execute,
-     * which it does for the blocks a macro returns.
-     *
-     * @param macroId the identifier of the message macro, {@code warning} or {@code error}
-     * @param key the translation key of the message
-     * @param arguments the arguments of the message
-     * @return the macro call
-     * @throws MacroExecutionException when the message cannot be escaped
-     */
-    private Block message(String macroId, String key, Object... arguments) throws MacroExecutionException
-    {
-        return new MacroBlock(macroId, Map.of(), escape(translate(key, arguments)), false);
-    }
-
-    /**
-     * The message macros parse their content as wiki syntax, while the messages embed names that come from the wiki,
-     * so the text goes through a plain text parser and back out as XWiki syntax, which escapes it.
-     *
-     * @param text the plain text to escape
-     * @return the text as XWiki syntax content that renders as the text itself
-     * @throws MacroExecutionException when the text cannot be parsed
-     */
-    private String escape(String text) throws MacroExecutionException
-    {
-        try {
-            WikiPrinter printer = new DefaultWikiPrinter();
-            this.xwikiRenderer.render(this.plainParser.parse(new StringReader(text)), printer);
-            return printer.toString();
-        } catch (ParseException e) {
-            throw new MacroExecutionException(translate(RENDER_FAILED), e);
-        }
     }
 
     /**

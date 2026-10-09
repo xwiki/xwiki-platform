@@ -26,10 +26,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrInputDocument;
 import org.junit.jupiter.api.Test;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.internal.MapCache;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.environment.Environment;
 import org.xwiki.extension.AbstractRemoteExtension;
 import org.xwiki.extension.DefaultExtensionAuthor;
@@ -54,6 +57,9 @@ import org.xwiki.extension.repository.search.ExtensionQuery.COMPARISON;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.rendering.macro.Macro;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
+import org.xwiki.search.solr.Solr;
+import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -67,8 +73,12 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -134,6 +144,10 @@ class ExtensionIndexStoreTest
             .thenReturn(this.testRepository);
         when(this.extensionIndexSolrUtil.toSolrId(any()))
             .thenAnswer(invocation -> ExtensionIdConverter.toString(invocation.getArgument(0)));
+        when(this.extensionIndexSolrUtil.toStoredNamespace(anyString()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(this.extensionIndexSolrUtil.toStoredNamespace(any(Namespace.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0).toString());
     }
 
     private void assertSimpleSearch(String query, ExtensionId... expected) throws SearchException
@@ -294,5 +308,73 @@ class ExtensionIndexStoreTest
             extensionId);
 
         assertSimpleSearch("Name1", extensionId);
+    }
+
+    @Test
+    void updateCompatible() throws SolrServerException, IOException
+    {
+        ExtensionId extensionId = new ExtensionId("id", "version");
+
+        // Update the extension before committing it
+        this.indexStore.add(new TestExtension(this.testRepository, extensionId, "type"), true);
+        assertTrue(this.indexStore.exists(extensionId));
+        this.indexStore.updateCompatible(extensionId, "namespace", true, null);
+        this.indexStore.updateCompatible(extensionId, "othernamespace", null, true);
+        this.indexStore.commit();
+
+        assertTrue(this.indexStore.isCompatible(extensionId, "namespace"));
+        assertFalse(this.indexStore.isCompatible(extensionId, "othernamespace"));
+        assertNull(this.indexStore.isCompatible(extensionId, "unknownnamespace"));
+
+        this.indexStore.updateInstalled(extensionId, "namespace", true);
+        this.indexStore.commit();
+
+        assertNull(this.indexStore.isCompatible(extensionId, "namespace"));
+    }
+
+    @Test
+    void updateNotIndexedExtension() throws SolrServerException, IOException, SearchException
+    {
+        ExtensionId extensionId = new ExtensionId("id", "version");
+
+        this.indexStore.updateInstalled(extensionId, "wiki:wiki1", true);
+        this.indexStore.updateInstalled(extensionId, "wiki:wiki2", false);
+        this.indexStore.updateCompatible(extensionId, "wiki:wiki3", true, null);
+        this.indexStore.updateCompatible(extensionId, "wiki:wiki4", null, true);
+        this.indexStore.commit();
+
+        assertFalse(this.indexStore.exists(extensionId));
+        assertNull(this.indexStore.isCompatible(extensionId, "wiki:wiki2"));
+        assertNull(this.indexStore.isCompatible(extensionId, "wiki:wiki3"));
+
+        IndexedExtensionQuery query = new IndexedExtensionQuery("");
+        query.setCompatible(true, new Namespace("wiki", "wiki2"), new Namespace("wiki", "wiki3"));
+        assertEquals(0, this.indexStore.search(query).getTotalHits());
+        assertSimpleSearch("");
+    }
+
+    @Test
+    void deleteIncompleteDocumentsOnMigration() throws Exception
+    {
+        ExtensionId extensionId = new ExtensionId("id", "version");
+        this.indexStore.add(new TestExtension(this.testRepository, extensionId, "type"), true);
+
+        // Simulate a document created by an atomic update of a document which did not exist
+        SolrClient client =
+            this.componentManager.<Solr>getInstance(Solr.class).getCore(ExtensionIndexSolrCoreInitializer.NAME)
+                .getClient();
+        SolrInputDocument document = new SolrInputDocument();
+        document.setField(AbstractSolrCoreInitializer.SOLR_FIELD_ID, "incomplete/version");
+        document.setField(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES, "wiki:wiki");
+        client.add(document);
+        client.commit();
+
+        ExtensionIndexSolrCoreInitializer initializer =
+            this.componentManager.getInstance(SolrCoreInitializer.class, ExtensionIndexSolrCoreInitializer.NAME);
+        initializer.migrateSchema(AbstractSolrCoreInitializer.SCHEMA_VERSION_16_7);
+        client.commit();
+
+        assertTrue(this.indexStore.exists(extensionId));
+        assertFalse(this.indexStore.exists(new ExtensionId("incomplete", "version")));
     }
 }

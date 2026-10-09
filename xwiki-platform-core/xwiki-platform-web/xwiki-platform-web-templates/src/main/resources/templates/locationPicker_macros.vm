@@ -84,6 +84,108 @@
   </dl>
 #end
 
+#**
+ * Compact picker for one or more locations (i.e. spaces). The locations are selected as you type, in a suggestion
+ * input, and can also be browsed for in a document tree, displayed in a drop down next to the input. The value of the
+ * picker is the serialized space reference, or the list of serialized space references separated by a comma when
+ * multiple selection is enabled.
+ *
+ * @param $options the picker options:
+ *   'name' the name of the form field holding the value;
+ *   'value' the initially selected locations, either a serialized list or a collection of references;
+ *   'multiple' whether more than one location can be selected, single selection is used if missing or false;
+ *   + the options accepted by #documentTree for the tree used to browse the locations.
+ * @since 18.9.0RC1
+ *#
+#macro (compactLocationPicker $options)
+  #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/compactLocationPicker.js'))
+  #set ($discard = $xwiki.get('ssfx').use('uicomponents/widgets/compactLocationPicker.css', true))
+  #set ($macro.parameters = {})
+  #set ($discard = $macro.parameters.putAll($options))
+  #_serializeLocations($options.value $macro.serializedValue)
+  #set ($macro.parameters.value = $macro.serializedValue)
+  ## The suggestion input expects the HTML attribute value, and any other value would still turn the select multiple.
+  #set ($macro.multiple = "$!options.multiple" != '' && "$!options.multiple" != 'false')
+  #if ($macro.multiple)
+    #set ($discard = $macro.parameters.put('multiple', 'multiple'))
+  #else
+    #set ($discard = $macro.parameters.remove('multiple'))
+  #end
+  ## The tree is only an alternative way of feeding the suggestion input: the input remains the single source of truth
+  ## for the value, which is why it doesn't need to know anything about the tree.
+  #if ($isDocumentTreeAvailable)
+    <div class="location-picker-compact">
+      #spacePicker($macro.parameters)
+      #_compactLocationPickerDropDown($options $macro.multiple)
+    </div>
+  #else
+    #spacePicker($macro.parameters)
+  #end
+#end
+
+#**
+ * Serializes the given locations so that the suggestion input can output them. Space references are serialized
+ * relative to the current wiki, while strings are kept as they are since they are already serialized.
+ *
+ * @param $locations a serialized list of locations, a space reference, or a collection of space references or strings
+ * @param $return the variable to set with the given string or with the list of serialized locations
+ *#
+#macro (_serializeLocations $locations $return)
+  #set ($return = $NULL)
+  #if ("$!locations" == '' || $locations.equals($locations.toString()))
+    #set ($macro.serializedLocations = $locations)
+  #else
+    #if ($locations.type)
+      #set ($macro.locations = [$locations])
+    #else
+      #set ($macro.locations = $locations)
+    #end
+    #set ($macro.serializedLocations = [])
+    #foreach ($location in $macro.locations)
+      #if ($location.type)
+        #set ($discard = $macro.serializedLocations.add($services.model.serialize($location, 'compactwiki')))
+      #else
+        #set ($discard = $macro.serializedLocations.add($location))
+      #end
+    #end
+  #end
+  #setVariable("$return" $macro.serializedLocations)
+#end
+
+#macro (_compactLocationPickerDropDown $options $multiple)
+  #if ($multiple)
+    #set ($macro.browseLabelKey = 'core.widgets.compactLocationPicker.multi.browse')
+  #else
+    #set ($macro.browseLabelKey = 'core.widgets.compactLocationPicker.single.browse')
+  #end
+  #set ($macro.browseLabel = $escapetool.xml($services.localization.render($macro.browseLabelKey)))
+  <div class="location-picker-dropdown dropdown">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false" title="$macro.browseLabel" aria-label="$macro.browseLabel">
+      $services.icon.renderHTML('chart-organisation')
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+      #set ($macro.showWikis = $displayWikiFields)
+      #set ($macro.filterHiddenDocuments = $options.filterHiddenDocuments != false)
+      #documentTree({
+        'class': 'location-tree',
+        'checkboxes': $multiple,
+        'finder': true,
+        'showAttachments': false,
+        'showRoot': false,
+        'showTerminalDocuments': false,
+        'showTranslations': false,
+        'showWikis': $macro.showWikis,
+        'exclusions': "$!options.exclusions",
+        'root': "$!options.root",
+        'filterHiddenDocuments': $macro.filterHiddenDocuments,
+        'sortDocumentsBy': "$!options.sortDocumentsBy",
+        'config': {'checkbox': {'tie_selection': false, 'three_state': false, 'cascade': ''}}
+      })
+    </div>
+  </div>
+#end
+
 #macro (locationPickerActions $options)
   #set ($isTreePickerAvailable = $isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
   <div class="location-actions btn-group">

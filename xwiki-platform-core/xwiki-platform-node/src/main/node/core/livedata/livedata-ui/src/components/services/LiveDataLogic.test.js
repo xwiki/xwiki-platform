@@ -19,6 +19,7 @@
  */
 import { LiveDataLogic } from "./LiveDataLogic";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { computed } from "vue";
 
 vi.mock("vue-i18n", () => ({
   useI18n: () => ({ t: (key) => key }),
@@ -32,13 +33,14 @@ const SOURCE = { id: "liveTable" };
 
 /**
  * @param entries - the entries initially displayed
+ * @param sourceParameters - the parameters to set on the source of the query
  * @returns the serialized live data configuration
  */
-function initData(entries) {
+function initData(entries, sourceParameters = {}) {
   return JSON.stringify({
     query: {
       properties: ["name", "status"],
-      source: SOURCE,
+      source: { ...SOURCE, ...sourceParameters },
       sort: [],
       filters: [],
       offset: 0,
@@ -64,9 +66,10 @@ function initData(entries) {
 
 /**
  * @param entries - the entries initially displayed
+ * @param sourceParameters - the parameters to set on the source of the query
  * @returns the live data logic and the mocked live data source
  */
-function initLogic(entries) {
+function initLogic(entries, sourceParameters = {}) {
   const liveDataSource = {
     getEntries: vi.fn(),
     getEntry: vi.fn(),
@@ -74,8 +77,11 @@ function initLogic(entries) {
     updateEntry: vi.fn(),
     updateEntryProperty: vi.fn(),
   };
-  const logic = new LiveDataLogic(liveDataSource, initData(entries), true, () =>
-    Promise.resolve({}),
+  const logic = new LiveDataLogic(
+    liveDataSource,
+    initData(entries, sourceParameters),
+    true,
+    () => Promise.resolve({}),
   );
   return { logic, liveDataSource };
 }
@@ -113,12 +119,15 @@ describe("LiveDataLogic", () => {
   });
 
   it("freezes the view when the edit mode is enabled, and unfreezes it when it is disabled", () => {
+    expect(logic.isEditMode()).toBe(false);
     expect(logic.isViewFrozen()).toBe(false);
 
     logic.enableEditMode();
+    expect(logic.isEditMode()).toBe(true);
     expect(logic.isViewFrozen()).toBe(true);
 
     logic.disableEditMode();
+    expect(logic.isEditMode()).toBe(false);
     expect(logic.isViewFrozen()).toBe(false);
   });
 
@@ -269,5 +278,61 @@ describe("LiveDataLogic", () => {
 
     expect(displayedIds(logic)).toStrictEqual(["1", "2", "3", undefined]);
     expect(logic.data.data.entries[3]._new).toBe(true);
+  });
+});
+
+describe("LiveDataLogic maximized state", () => {
+  let logic;
+
+  beforeEach(() => {
+    ({ logic } = initLogic([]));
+  });
+
+  it("is not maximized by default", () => {
+    expect(logic.isMaximized()).toBe(false);
+  });
+
+  it("switches back and forth between maximized and normal", () => {
+    logic.toggleMaximized();
+    expect(logic.isMaximized()).toBe(true);
+
+    logic.toggleMaximized();
+    expect(logic.isMaximized()).toBe(false);
+  });
+
+  it("exposes the maximized state reactively", () => {
+    const maximized = computed(() => logic.isMaximized());
+
+    expect(maximized.value).toBe(false);
+
+    logic.toggleMaximized();
+
+    expect(maximized.value).toBe(true);
+  });
+});
+
+describe("LiveDataLogic edit mode", () => {
+  it("has no edit mode when the source does not declare one", () => {
+    expect(initLogic([]).logic.hasEditMode()).toBe(false);
+    expect(initLogic([], { hasEditMode: "false" }).logic.hasEditMode()).toBe(
+      false,
+    );
+  });
+
+  it("has an edit mode when the source declares one", () => {
+    expect(initLogic([], { hasEditMode: "true" }).logic.hasEditMode()).toBe(
+      true,
+    );
+  });
+
+  it("exposes the edit mode state reactively", () => {
+    const { logic } = initLogic([], { hasEditMode: "true" });
+    const editMode = computed(() => logic.isEditMode());
+
+    expect(editMode.value).toBe(false);
+
+    logic.enableEditMode();
+
+    expect(editMode.value).toBe(true);
   });
 });

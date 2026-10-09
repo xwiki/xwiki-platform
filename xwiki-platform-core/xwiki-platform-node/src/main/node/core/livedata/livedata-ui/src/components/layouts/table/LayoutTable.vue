@@ -41,7 +41,7 @@
       </template>
       <template #right>
         <LivedataPagination side="right" />
-        <LivedataDropdownMenu />
+        <LivedataActions />
       </template>
     </LivedataTopbar>
 
@@ -103,8 +103,8 @@ import LayoutTableHeaderFilters from "./LayoutTableHeaderFilters.vue";
 import LayoutTableHeaderNames from "./LayoutTableHeaderNames.vue";
 import LayoutTableNewRow from "./LayoutTableNewRow.vue";
 import LayoutTableRow from "./LayoutTableRow.vue";
+import LivedataActions from "../../LivedataActions.vue";
 import LivedataBottombar from "../../LivedataBottombar.vue";
-import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
 import LivedataTopbar from "../../LivedataTopbar.vue";
@@ -114,9 +114,9 @@ export default {
   name: "layout-table",
 
   components: {
+    LivedataActions,
     LivedataBottombar,
     LivedataTopbar,
-    LivedataDropdownMenu,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
     LayoutTableHeaderNames,

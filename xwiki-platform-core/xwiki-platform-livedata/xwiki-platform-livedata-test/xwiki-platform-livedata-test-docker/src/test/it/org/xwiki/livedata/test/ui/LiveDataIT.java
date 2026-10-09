@@ -93,6 +93,10 @@ class LiveDataIT
 
     private static final String NAME_NIKOLAY = "Nikolay";
 
+    private static final String NAME_ZOE = "Zoe";
+
+    private static final String NAME_ABBY = "Abby";
+
     private static final String CHOICE_A = "value1";
 
     private static final String CHOICE_B = "value2";
@@ -129,6 +133,8 @@ class LiveDataIT
     private static final String FOOTNOTE_COMPUTED_TITLE =
         "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
             + "pages.";
+
+    private static final String FOOTNOTE_FROZEN_ENTRIES = "The positions of the entries are currently fixed.";
 
     public static final String ACTIONS_COLUMN = "_actions";
 
@@ -965,6 +971,66 @@ class LiveDataIT
         assertEquals(2, tableLayout.getTotalEntries());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
         tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
+    }
+
+    @Test
+    @Order(12)
+    void frozenRowsInEditMode(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
+        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
+        // The limit is lower than the number of entries, so that edited entries can be moved to another page.
+        String content = """
+            {{liveData
+              id="test"
+              properties="%s"
+              limit="2"
+              sort="%s:asc"
+              source="liveTable"
+              sourceParameters="translationPrefix=&className=%s&hasEditMode=true"
+            /}}
+            """.formatted(NAME_COLUMN, NAME_COLUMN, className);
+        testUtils.createPage(testReference, content, "Frozen rows in edit mode");
+        testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
+        for (String name : List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA)) {
+            testUtils.addObject(new DocumentReference(name, testReference.getLastSpaceReference()), className,
+                singletonMap(NAME_COLUMN, name));
+        }
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        assertEquals(0, liveData.countFootnotes());
+
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertEquals(NAME_CHARLY, tableLayout.getCellText(NAME_COLUMN, 1));
+        assertEquals(NAME_ESTHER, tableLayout.getCellText(NAME_COLUMN, 2));
+        assertEquals(List.of(FOOTNOTE_FROZEN_ENTRIES), liveData.getFootnotesText());
+
+        // The edited entry keeps its position, even though it is now sorted on the next page.
+        tableLayout.editCell(NAME_COLUMN, 1, NAME_COLUMN, NAME_ZOE);
+        tableLayout.waitUntilCellText(NAME_COLUMN, 1, NAME_ZOE);
+        assertEquals(2, tableLayout.countRows());
+        assertEquals(NAME_ESTHER, tableLayout.getCellText(NAME_COLUMN, 2));
+
+        // The entry moved to the next page keeps its position on the following updates too.
+        tableLayout.editCell(NAME_COLUMN, 2, NAME_COLUMN, NAME_ABBY);
+        tableLayout.waitUntilCellText(NAME_COLUMN, 2, NAME_ABBY);
+        assertEquals(2, tableLayout.countRows());
+        assertEquals(NAME_ZOE, tableLayout.getCellText(NAME_COLUMN, 1));
+
+        // Leaving the edit mode sorts the entries again.
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertEquals(NAME_ABBY, tableLayout.getCellText(NAME_COLUMN, 1));
+        assertEquals(NAME_LYNDA, tableLayout.getCellText(NAME_COLUMN, 2));
+        assertEquals(3, tableLayout.getTotalEntries());
+        assertEquals(0, liveData.countFootnotes());
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

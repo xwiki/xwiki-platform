@@ -35,9 +35,11 @@ import { describe, expect, it } from "vitest";
  *         list() {
  *           return [];
  *         }
- *       }
+ *       },
+ *       isViewFrozen: () => false
  *     }
  *   },
+ *   stubs: { XWikiIcon: true },
  *   mocks: {
  *     $t: (key) => key
  *   }
@@ -60,8 +62,10 @@ function initWrapper(mountConfiguration = {}) {
                   return [];
                 },
               },
+              isViewFrozen: () => false,
             },
           },
+          stubs: { XWikiIcon: true },
           mocks: {
             $t: (key) => key,
           },
@@ -100,5 +104,21 @@ describe("LivedataFootnotes.vue", () => {
       "footnote",
     ]);
     expect(wrapper.find(".box").text()).toBe("(1) a.b.c");
+  });
+
+  it("Render the frozen entries notice when the view is frozen", () => {
+    const wrapper = initWrapper({
+      global: {
+        provide: {
+          logic: {
+            isViewFrozen: () => true,
+          },
+        },
+      },
+    });
+    const box = wrapper.find(".box");
+    expect(box.text()).toBe("livedata.footnotes.frozenEntries");
+    const hint = box.find("[role='img']");
+    expect(hint.attributes("aria-label")).toBe("livedata.footnotes.hintLabel");
   });
 });

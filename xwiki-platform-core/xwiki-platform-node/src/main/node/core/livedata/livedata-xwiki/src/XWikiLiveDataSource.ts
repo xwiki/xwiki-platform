@@ -31,6 +31,7 @@ import type {
 export class XWikiLiveDataSource implements LiveDataSource {
   private readonly baseURL = `${XWiki.contextPath}/rest/liveData/sources/`;
   private entriesRequest?: JQuery.jqXHR | null;
+  private readonly entryRequests = new Set<JQuery.jqXHR>();
 
   constructor(private readonly $: JQueryStatic) {}
 
@@ -73,6 +74,7 @@ export class XWikiLiveDataSource implements LiveDataSource {
     // quickly changing sorting, or just if the network  is slow) and that the first request
     // succeeds after the second request, and its results would replace the "fresher" state.
     this.entriesRequest?.abort();
+    this.entryRequests.forEach((request) => request.abort());
     this.entriesRequest = this.$.getJSON(
       entriesURL,
       this.$.param(parameters, true),
@@ -83,6 +85,31 @@ export class XWikiLiveDataSource implements LiveDataSource {
       return this.toLiveData(resolved);
     } finally {
       this.cleanupRequest(this.entriesRequest);
+    }
+  }
+
+  async getEntry(
+    source: Source,
+    entryId: string,
+    properties: string[],
+  ): Promise<Values | undefined> {
+    // The entry URL already holds parameters (e.g. the namespace), so the properties are appended to it.
+    const entryURL = `${this.getEntryURL(source, entryId)}&${this.$.param(
+      { properties },
+      true,
+    )}`;
+    const request = this.$.getJSON(entryURL);
+    this.entryRequests.add(request);
+    try {
+      return (await request)?.values;
+    } catch (err) {
+      // A missing entry is not an error, it is just not returned.
+      if ((err as JQuery.jqXHR).status === 404) {
+        return undefined;
+      }
+      throw err;
+    } finally {
+      this.entryRequests.delete(request);
     }
   }
 
@@ -113,15 +140,16 @@ export class XWikiLiveDataSource implements LiveDataSource {
     );
   }
 
-  addEntry(source: Source, values: unknown): Promise<void> {
+  addEntry(source: Source, values: unknown): Promise<Values | undefined> {
     return Promise.resolve(
       this.$.ajax({
         type: "POST",
         url: this.getEntriesURL(source),
         contentType: "application/json",
+        dataType: "json",
         data: JSON.stringify({ values }),
       }),
-    );
+    ).then((newEntry) => newEntry?.values);
   }
 
   private getEntriesURL(source: Source) {

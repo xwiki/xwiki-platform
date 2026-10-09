@@ -126,7 +126,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             Map<String, File> usedFiles = getFileMapping(context);
             String key = getSkinfileKey(filename, skin);
             if (!usedFiles.containsKey(key)) {
-                if (!copyResource("/skins/" + skin + '/' + filename, key, usedFiles, context)) {
+                if (!copyResource("/skins/", skin + '/' + filename, key, usedFiles, context)) {
                     // The resource does not exist, just return a http:// URL
                     return super.createSkinURL(filename, skin, context);
                 }
@@ -145,7 +145,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             Map<String, File> usedFiles = getFileMapping(context);
             String key = getResourceKey(filename);
             if (!usedFiles.containsKey(key)) {
-                if (!copyResource("/resources/" + filename, key, usedFiles, context)) {
+                if (!copyResource("/resources/", filename, key, usedFiles, context)) {
                     return super.createResourceURL(filename, forceSkinAction, context);
                 }
             }
@@ -232,18 +232,20 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
      * Copy a resource from the filesystem into a temporary file and map this resulting file to the requested resource
      * location.
      *
-     * @param resourceName the name of the file to copy, possibly including a path to it, for example
-     *            {@code icons/silk/add.png}
+     * @param prefix the folder containing the resource, outside of which the resource name is not allowed to point
+     * @param resourceName the name of the file to copy relative to the prefix, possibly including a path to it, for
+     *            example {@code icons/silk/add.png}
      * @param key the collision-free identifier of the resource
      * @param usedFiles the mapping of resource keys to temporary files where to put the resulting temporary file
      * @param context the current request context
      * @return {@code true} if copying the resource succeeded and the new temporary file was mapped to the resource key,
      *         {@code false} otherwise
      */
-    private boolean copyResource(String resourceName, String key, Map<String, File> usedFiles, XWikiContext context)
+    private boolean copyResource(String prefix, String resourceName, String key, Map<String, File> usedFiles,
+        XWikiContext context)
     {
         try {
-            try (InputStream data = this.environment.getResourceAsStream(resourceName)) {
+            try (InputStream data = this.environment.getResourceAsStream(prefix, resourceName)) {
                 if (data != null) {
                     // Copy the resource to a temporary file
                     File file = getTemporaryFile(key, context);

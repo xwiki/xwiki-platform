@@ -22,7 +22,7 @@
 ## Everything this template does mirrors the columns picker, and for the same reasons: the candidates depend on the
 ## sibling class parameter, which no displayer can be told about, so they are loaded by the browser; the element is
 ## marked with a class of ours rather than xwiki-selectize, so that this module owns the enhancement; and the
-## bundle is loaded as a classic script, since the macro editor injects this template with jQuery. See
+## bundle is loaded as a module script, which runs once however many displayers load it. See
 ## templates/html_displayer/recordscolumns/edit.vm for the long form of each.
 #set ($parameters = {})
 #set ($discard = $parameters.putAll($displayer.parameters))
@@ -33,6 +33,6 @@
 #end
 #set ($discard = $parameters.putIfAbsent('placeholder',
   $services.localization.render('rendering.macro.records.parameter.sort.placeholder')))
-<script src="$escapetool.xml($services.webjars.url(
-  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.js'))"></script>
+<script type="module" src="$escapetool.xml($services.webjars.url(
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
 #suggestInput($parameters)

@@ -950,6 +950,8 @@ public class TestConfiguration
     /**
      * @return true if the extensions declared in the resources of the module executing the test are made available to
      *     the XWiki instances as an extension repository
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.7.0RC1
      */
     public boolean isTestExtensionRepository()
@@ -959,6 +961,8 @@ public class TestConfiguration
 
     /**
      * @param testExtensionRepository see {@link #isTestExtensionRepository()}
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.7.0RC1
      */
     public void setTestExtensionRepository(boolean testExtensionRepository)

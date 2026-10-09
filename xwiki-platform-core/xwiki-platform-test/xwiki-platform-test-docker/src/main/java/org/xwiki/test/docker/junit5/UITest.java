@@ -234,6 +234,8 @@ public @interface UITest
      * @return true if the extensions declared in the resources of the module executing the test must be made available
      *     to the XWiki instances as an extension repository, so that the test can ask XWiki to install them (see
      *     {@code src/test/resources/packagefile} and {@code src/test/resources/repository})
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.7.0RC1
      */
     boolean testExtensionRepository() default false;

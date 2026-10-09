@@ -567,6 +567,12 @@
       <artifactId>xwiki-platform-security-authentication-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used to check the user references handled by oldcore against the Super Admin user reference. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-merge-api</artifactId>

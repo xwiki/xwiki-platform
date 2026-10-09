@@ -32,6 +32,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -253,7 +254,7 @@ public class XWikiUser
 
     private boolean isSuperAdmin()
     {
-        return XWikiRightService.isSuperAdmin(getUserReference());
+        return SuperAdminUserReference.isSuperAdminReference(getUserReference());
     }
 
     private XWikiDocument getUserDocument(XWikiContext context) throws XWikiException

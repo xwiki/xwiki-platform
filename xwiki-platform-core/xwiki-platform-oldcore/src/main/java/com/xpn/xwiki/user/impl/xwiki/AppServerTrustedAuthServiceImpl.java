@@ -21,6 +21,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.user.SuperAdminUserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -40,7 +41,9 @@ public class AppServerTrustedAuthServiceImpl extends XWikiAuthServiceImpl
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         String user = context.getRequest().getRemoteUser();
-        if ((user == null) || user.isEmpty()) {
+        if ((user == null) || user.isEmpty() || SuperAdminUserReference.isSuperAdminName(user)) {
+            // The superadmin user is virtual, it has no user document and is only ever authenticated against the
+            // password from the configuration, so it is never taken from the application server.
             return super.checkAuth(context);
         } else {
             LOGGER.debug("Launching create user for [{}]", user);
@@ -61,7 +64,8 @@ public class AppServerTrustedAuthServiceImpl extends XWikiAuthServiceImpl
         throws XWikiException
     {
         String user = context.getRequest().getRemoteUser();
-        if ((user == null) || user.isEmpty()) {
+        if ((user == null) || user.isEmpty() || SuperAdminUserReference.isSuperAdminName(user)) {
+            // See the comment in checkAuth(XWikiContext).
             return super.checkAuth(username, password, rememberme, context);
         } else {
             createUser(user, context);

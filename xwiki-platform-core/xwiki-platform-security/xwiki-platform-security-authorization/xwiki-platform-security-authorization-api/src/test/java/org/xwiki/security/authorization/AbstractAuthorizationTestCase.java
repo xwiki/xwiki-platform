@@ -68,8 +68,8 @@ import static org.xwiki.security.authorization.Right.SCRIPT;
     DefaultEntityReferenceProvider.class, DefaultModelConfiguration.class})
 public abstract class AbstractAuthorizationTestCase
 {
-    /** SuperAdmin user. */
-    protected static final DocumentReference SUPERADMIN = new DocumentReference("anyWiki", "anySpace", "SuperAdmin");
+    /** SuperAdmin user. It is always in the XWiki space, which is what makes it the SuperAdmin user. */
+    protected static final DocumentReference SUPERADMIN = new DocumentReference("anyWiki", "XWiki", "SuperAdmin");
 
     /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, SCRIPT, ADMIN, PROGRAM, CREATE_WIKI. */
     protected static final RightSet ALL_RIGHTS = new RightSet();

@@ -19,10 +19,10 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import java.awt.Insets;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebElement;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
@@ -34,8 +34,8 @@ import org.xwiki.test.ui.TestUtils;
 /**
  * Verify that the block side menu is properly aligned on the block you hover, no matter the type of that block.
  * <p>
- * The alignment is checked by comparing a screenshot of the content area, taken while hovering each block, with a
- * reference screenshot committed in the test resources (see {@link ScreenshotComparator}).
+ * The alignment is checked by comparing a screenshot of the hovered block and of its side menu with a reference
+ * screenshot committed in the test resources (see {@link ScreenshotComparator}).
  * <p>
  * When a change in the way the content is rendered makes this test fail, check the screenshots this test saves and, if
  * the side menu is still properly aligned, use them as the new reference screenshots.
@@ -55,6 +55,12 @@ class SideMenuIT extends AbstractBlockNoteIT
      * obvious whether the side menu is centered on it.
      */
     private static final String IMAGE_NAME = "picture.png";
+
+    /**
+     * The side menu is displayed on the left of the hovered block, outside of it, so the screenshot has to extend
+     * past the left side of the block in order to include it.
+     */
+    private static final Insets SIDE_MENU_MARGIN = new Insets(2, 60, 2, 2);
 
     // We split the blocks into groups so that no test page is taller than the viewport, because taking a
     // screenshot of a taller page scrolls it, which makes the editor hide the side menu.
@@ -205,8 +211,8 @@ class SideMenuIT extends AbstractBlockNoteIT
     }
 
     /**
-     * Compares a screenshot of the content area, taken while hovering each block, with the reference screenshot of
-     * that block.
+     * Compares a screenshot of each block and of its side menu, taken while hovering that block, with the reference
+     * screenshot of that block.
      *
      * @param textArea the rich text area holding the blocks
      * @param screenshots the comparator to check the screenshots with
@@ -215,10 +221,9 @@ class SideMenuIT extends AbstractBlockNoteIT
     private void assertSideMenuIsAligned(BlockNoteRichTextArea textArea, ScreenshotComparator screenshots,
         String[] blocks) throws IOException
     {
-        WebElement content = new InplaceEditablePage().getContentContainer();
         for (int i = 0; i < blocks.length; i++) {
             textArea.hoverBlock(i);
-            screenshots.assertScreenshotMatches(blocks[i], content);
+            screenshots.assertMatches(blocks[i], textArea.getBlockContent(i), SIDE_MENU_MARGIN);
         }
     }
 }

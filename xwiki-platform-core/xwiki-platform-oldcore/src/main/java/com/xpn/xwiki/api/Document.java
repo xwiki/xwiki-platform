@@ -3099,7 +3099,12 @@ public class Document extends Api
      */
     protected void deleteDocument() throws XWikiException
     {
-        getXWikiContext().getWiki().deleteDocument(this.doc, getXWikiContext());
+        deleteDocument(true);
+    }
+
+    private void deleteDocument(boolean checkDeleting) throws XWikiException
+    {
+        getXWikiContext().getWiki().deleteDocument(this.doc, true, checkDeleting, getXWikiContext());
         this.initialDoc = this.doc;
     }
 
@@ -3146,7 +3151,8 @@ public class Document extends Api
     public void deleteWithProgrammingRights() throws XWikiException
     {
         if (hasProgrammingRights()) {
-            deleteDocument();
+            // Programming right allows bypassing the protections applied to a delete done by the context user
+            deleteDocument(false);
         } else {
             java.lang.Object[] args = { this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,

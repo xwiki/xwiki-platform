@@ -68,6 +68,7 @@ import org.xwiki.user.UserProperties;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.internal.event.UserDeletingDocumentEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
@@ -543,6 +544,85 @@ class XWikiTest
             same(this.oldcore.getXWikiContext()));
         verify(mockListener).onEvent(any(DocumentDeletedEvent.class), any(XWikiDocument.class),
             same(this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void deleteDocumentByContextUserSendsUserDeletingDocumentEvent() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Alice");
+        xcontext.setUserReference(userReference);
+
+        EventListener mockListener = addUserDeletingDocumentListener();
+
+        this.xwiki.deleteDocument(this.document, false, true, xcontext);
+
+        ArgumentCaptor<UserDeletingDocumentEvent> eventCaptor =
+            ArgumentCaptor.forClass(UserDeletingDocumentEvent.class);
+        verify(mockListener).onEvent(eventCaptor.capture(), any(XWikiDocument.class), same(xcontext));
+        assertEquals(userReference, eventCaptor.getValue().getUserReference());
+        verify(this.oldcore.getMockStore()).deleteXWikiDoc(this.document, xcontext);
+    }
+
+    @Test
+    void deleteDocumentByContextUserWhenCanceled() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
+        EventListener mockListener = addUserDeletingDocumentListener();
+        doAnswer(invocation -> {
+            invocation.<CancelableEvent>getArgument(0).cancel("denied");
+            return null;
+        }).when(mockListener).onEvent(any(), any(), any());
+
+        XWikiException exception = assertThrows(XWikiException.class,
+            () -> this.xwiki.deleteDocument(this.document, false, true, xcontext));
+        assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, exception.getCode());
+
+        verify(this.oldcore.getMockStore(), never()).deleteXWikiDoc(any(), any());
+        assertTrue(this.xwiki.exists(this.document.getDocumentReference(), xcontext));
+    }
+
+    @Test
+    void deleteDocumentBySystemDoesNotSendUserDeletingDocumentEvent() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
+        EventListener mockListener = addUserDeletingDocumentListener();
+
+        this.xwiki.deleteDocument(this.document, false, xcontext);
+
+        verify(mockListener, never()).onEvent(any(), any(), any());
+        verify(this.oldcore.getMockStore()).deleteXWikiDoc(this.document, xcontext);
+    }
+
+    @Test
+    void deleteAllDocumentsByContextUser() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
+        XWikiDocument translation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+        this.xwiki.saveDocument(translation, xcontext);
+
+        EventListener mockListener = addUserDeletingDocumentListener();
+
+        this.xwiki.deleteAllDocuments(this.document, false, true, xcontext);
+
+        // One event for the translation and one for the default document
+        verify(mockListener, times(2)).onEvent(any(UserDeletingDocumentEvent.class), any(XWikiDocument.class),
+            same(xcontext));
+        assertFalse(this.xwiki.exists(this.document.getDocumentReference(), xcontext));
+    }
+
+    private EventListener addUserDeletingDocumentListener() throws Exception
+    {
+        EventListener mockListener = mock(EventListener.class);
+        when(mockListener.getName()).thenReturn("userdeletinglistener");
+        when(mockListener.getEvents()).thenReturn(List.of(new UserDeletingDocumentEvent()));
+
+        this.oldcore.getMocker().<ObservationManager>getInstance(ObservationManager.class).addListener(mockListener);
+
+        return mockListener;
     }
 
     @Test

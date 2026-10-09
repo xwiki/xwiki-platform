@@ -1,0 +1,357 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+import {
+  DERIVED_PARAMETERS,
+  clearMessage,
+  clearMessages,
+  findDataTypeInput,
+  findDataTypeLabel,
+  findScope,
+  hasValue,
+  resetDerivedParameters,
+  setTabsVisible,
+  showMessage,
+  showProblems,
+} from "../dialog";
+import { describe, expect, it, vi } from "vitest";
+
+/**
+ * Builds the shape the macro editor produces: the mandatory field, then the tab strip and its panes holding the
+ * parameters derived from it.
+ *
+ * @param dataType - the value of the data type input
+ * @param derived - the values of the derived parameters
+ * @returns the dialog's form
+ */
+function givenDialog(
+  dataType: string,
+  derived: Partial<Record<string, string>> = {},
+): HTMLFormElement {
+  document.body.innerHTML = `
+    <form>
+      <div class="macro-parameter-field">
+        <select name="class"><option value="">none</option>
+          <option value="${dataType}" selected>${dataType}</option></select>
+      </div>
+      <ul class="nav nav-tabs macro-tabs"><li>Columns</li></ul>
+      <div class="tab-content">
+        <input name="properties" value="${derived.properties ?? ""}" />
+        <input name="filters" value="${derived.filters ?? ""}" />
+        <input name="sort" value="${derived.sort ?? ""}" />
+      </div>
+    </form>`;
+  return document.querySelector("form")!;
+}
+
+describe("findScope", () => {
+  it("scopes lookups to the enclosing form, so two dialogs cannot read each other", () => {
+    document.body.innerHTML = `
+      <form id="a"><input name="class" value="A.Class" /><span class="p"></span></form>
+      <form id="b"><input name="class" value="B.Class" /></form>`;
+    const marker = document.querySelector("#a .p")!;
+    const scope = findScope(marker);
+    expect(findDataTypeInput(scope)!.value).toBe("A.Class");
+  });
+
+  it("falls back to the document when the field is not in a form", () => {
+    document.body.innerHTML = `<input name="class" value="Loose" /><span class="p"></span>`;
+    const scope = findScope(document.querySelector(".p")!);
+    expect(findDataTypeInput(scope)!.value).toBe("Loose");
+  });
+});
+
+describe("findDataTypeInput", () => {
+  it("returns null when the dialog has no data type field", () => {
+    document.body.innerHTML = `<form><input name="properties" /></form>`;
+    expect(findDataTypeInput(document.querySelector("form")!)).toBeNull();
+  });
+});
+
+describe("setTabsVisible", () => {
+  it("hides the tab strip and its panes together", () => {
+    const form = givenDialog("Some.Class");
+    setTabsVisible(form, false);
+    expect(form.querySelector<HTMLElement>(".macro-tabs")!.hidden).toBe(true);
+    expect(form.querySelector<HTMLElement>(".tab-content")!.hidden).toBe(true);
+  });
+
+  it("shows them again", () => {
+    const form = givenDialog("Some.Class");
+    setTabsVisible(form, false);
+    setTabsVisible(form, true);
+    expect(form.querySelector<HTMLElement>(".macro-tabs")!.hidden).toBe(false);
+    expect(form.querySelector<HTMLElement>(".tab-content")!.hidden).toBe(false);
+  });
+
+  it("does not touch another dialog's tabs", () => {
+    document.body.innerHTML = `
+      <form id="a"><ul class="macro-tabs"></ul></form>
+      <form id="b"><ul class="macro-tabs"></ul></form>`;
+    setTabsVisible(document.querySelector("#a")!, false);
+    expect(document.querySelector<HTMLElement>("#a .macro-tabs")!.hidden).toBe(
+      true,
+    );
+    expect(document.querySelector<HTMLElement>("#b .macro-tabs")!.hidden).toBe(
+      false,
+    );
+  });
+});
+
+describe("resetDerivedParameters", () => {
+  it("clears every parameter derived from the data type", () => {
+    const form = givenDialog("Some.Class", {
+      properties: "doc.title,status",
+      filters: "status=Active",
+      sort: "doc.title:asc",
+    });
+    resetDerivedParameters(form);
+    DERIVED_PARAMETERS.forEach((name) => {
+      expect(
+        form.querySelector<HTMLInputElement>(`[name="${name}"]`)!.value,
+      ).toBe("");
+    });
+  });
+
+  it("reports which parameters actually held a value", () => {
+    const form = givenDialog("Some.Class", {
+      properties: "doc.title",
+      sort: "doc.title:asc",
+    });
+    expect(resetDerivedParameters(form).sort()).toEqual(["properties", "sort"]);
+  });
+
+  it("reports nothing when there was nothing to lose", () => {
+    expect(resetDerivedParameters(givenDialog("Some.Class"))).toEqual([]);
+  });
+
+  it("leaves the data type itself alone", () => {
+    const form = givenDialog("Some.Class", { properties: "doc.title" });
+    resetDerivedParameters(form);
+    expect(findDataTypeInput(form)!.value).toBe("Some.Class");
+  });
+
+  it("clears an enhanced widget through its own API rather than the element", () => {
+    const form = givenDialog("Some.Class");
+    const element = form.querySelector('[name="properties"]')!;
+    const calls: string[] = [];
+    Object.assign(element, {
+      selectize: {
+        clear: () => calls.push("clear"),
+        clearOptions: () => calls.push("clearOptions"),
+      },
+    });
+    resetDerivedParameters(form);
+    // Both matter: clear drops the selection, clearOptions drops the previous type's candidates.
+    expect(calls).toEqual(["clear", "clearOptions"]);
+  });
+});
+
+describe("hasValue", () => {
+  it("ignores a placeholder option, which is not a value", () => {
+    document.body.innerHTML = `<select name="properties"><option value="" selected>Every field</option></select>`;
+    expect(hasValue(document.querySelector("select")!)).toBe(false);
+  });
+
+  it("sees a real selection", () => {
+    document.body.innerHTML = `
+      <select name="properties" multiple>
+        <option value="" >Every field</option><option value="doc.title" selected>Title</option>
+      </select>`;
+    expect(hasValue(document.querySelector("select")!)).toBe(true);
+  });
+});
+
+describe("findDataTypeLabel", () => {
+  it("names the data type as the class picker shows it", () => {
+    document.body.innerHTML = `
+      <select name="class"><option value="Acme.ClientClass" selected> Client project </option></select>`;
+    expect(findDataTypeLabel(document.querySelector("select")!)).toBe(
+      "Client project",
+    );
+  });
+
+  it("falls back to the reference when there is no label", () => {
+    document.body.innerHTML = `<input name="class" value="Acme.ClientClass" />`;
+    expect(findDataTypeLabel(document.querySelector("input")!)).toBe(
+      "Acme.ClientClass",
+    );
+  });
+});
+
+describe("showMessage", () => {
+  it("shows the message as text right after the field", () => {
+    document.body.innerHTML = `<form><input name="properties" /><span id="next"></span></form>`;
+    const field = document.querySelector("input")!;
+    showMessage(field, "error", "The fields of <b>X</b> could not be loaded.");
+    const box = field.nextElementSibling!;
+    expect(box.classList).toContain("errormessage");
+    expect(box.getAttribute("role")).toBe("alert");
+    // Names chosen in the wiki are never read as markup.
+    expect(box.textContent).toBe("The fields of <b>X</b> could not be loaded.");
+    expect(box.querySelector("b")).toBeNull();
+  });
+
+  it("replaces the message already shown rather than stacking a second one", () => {
+    document.body.innerHTML = `<form><input name="properties" /></form>`;
+    const field = document.querySelector("input")!;
+    showMessage(field, "error", "first");
+    showMessage(field, "warning", "second");
+    const boxes = document.querySelectorAll(".box");
+    expect(boxes).toHaveLength(1);
+    expect(boxes[0].classList).toContain("warningmessage");
+    expect(boxes[0].textContent).toBe("second");
+  });
+
+  it("offers an action that removes the message and runs, without submitting the dialog", () => {
+    document.body.innerHTML = `<form><input name="properties" /></form>`;
+    const field = document.querySelector("input")!;
+    const run = vi.fn();
+    showMessage(field, "error", "failed", { label: "Try again", run });
+    const button = document.querySelector("button")!;
+    expect(button.type).toBe("button");
+    expect(button.textContent).toBe("Try again");
+    button.click();
+    expect(run).toHaveBeenCalledOnce();
+    expect(document.querySelector(".box")).toBeNull();
+  });
+});
+
+describe("clearMessage", () => {
+  it("leaves alone an element after the field that is not a message", () => {
+    document.body.innerHTML = `<form><input name="properties" /><span id="next"></span></form>`;
+    clearMessage(document.querySelector("input")!);
+    expect(document.querySelector("#next")).not.toBeNull();
+  });
+
+  it("removes only a message of the given kind when told one", () => {
+    document.body.innerHTML = `<form><input name="properties" /></form>`;
+    const field = document.querySelector("input")!;
+    showMessage(field, "warning", "stale");
+    clearMessage(field, "error");
+    expect(document.querySelector(".warningmessage")).not.toBeNull();
+    clearMessage(field, "warning");
+    expect(document.querySelector(".box")).toBeNull();
+  });
+});
+
+describe("showMessage with several messages", () => {
+  it("lists them, as text", () => {
+    document.body.innerHTML = `<form><input name="properties" /></form>`;
+    const field = document.querySelector("input")!;
+    showMessage(field, "warning", ["<i>first</i>", "second"]);
+    const items = document.querySelectorAll(".box li");
+    expect([...items].map((item) => item.textContent)).toEqual([
+      "<i>first</i>",
+      "second",
+    ]);
+    expect(document.querySelector(".box i")).toBeNull();
+  });
+});
+
+describe("showProblems", () => {
+  /**
+   * @returns the wrapper of a widget holding three items, the way the suggest widget renders them
+   */
+  function givenItems(): HTMLElement {
+    document.body.innerHTML = `
+      <form>
+        <div class="ts-wrapper"><div class="ts-control">
+          <div class="item" data-value="code"><span class="xwiki-selectize-option-label">code</span><a class="remove">x</a></div>
+          <div class="item" data-value="count=cheap">count = cheap</div>
+          <div class="item" data-value="name=Alpha">name = Alpha</div>
+        </div></div>
+      </form>`;
+    return document.querySelector(".ts-wrapper")!;
+  }
+
+  const PROBLEMS: Record<string, string> = {
+    code: "code cannot be used.",
+    "count=cheap": "cheap does not fit.",
+  };
+
+  it("strikes through the items the table ignores, says why, and leaves the others alone", () => {
+    const wrapper = givenItems();
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    const items = [...wrapper.querySelectorAll<HTMLElement>(".item")];
+    // The label is struck through rather than the whole item, which also holds the remove button.
+    expect(
+      wrapper.querySelector<HTMLElement>(".xwiki-selectize-option-label")!.style
+        .textDecoration,
+    ).toBe("line-through");
+    expect(items[0].style.textDecoration).toBe("");
+    expect(items.slice(1).map((item) => item.style.textDecoration)).toEqual([
+      "line-through",
+      "",
+    ]);
+    expect(items[0].title).toBe("code cannot be used.");
+    const box = wrapper.nextElementSibling!;
+    expect(box.classList).toContain("warningmessage");
+    expect([...box.querySelectorAll("li")].map((li) => li.textContent)).toEqual(
+      ["code cannot be used.", "cheap does not fit."],
+    );
+  });
+
+  it("says the same thing once, for two items with the same problem", () => {
+    const wrapper = givenItems();
+    showProblems(wrapper, () => "ignored");
+    expect(wrapper.nextElementSibling!.querySelectorAll("li")).toHaveLength(1);
+  });
+
+  it("keeps the box it already shows when nothing changed, so that it is not announced again", () => {
+    const wrapper = givenItems();
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    const box = wrapper.nextElementSibling;
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    expect(wrapper.nextElementSibling).toBe(box);
+  });
+
+  it("removes the box and the marks once no item is ignored", () => {
+    const wrapper = givenItems();
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    showProblems(wrapper, () => undefined);
+    expect(wrapper.nextElementSibling).toBeNull();
+    expect(
+      wrapper.querySelector<HTMLElement>(".xwiki-selectize-option-label")!.style
+        .textDecoration,
+    ).toBe("");
+  });
+
+  it("leaves an error alone, since the items could not be checked", () => {
+    const wrapper = givenItems();
+    showMessage(wrapper, "error", "could not be loaded");
+    showProblems(wrapper, (value) => PROBLEMS[value]);
+    expect(wrapper.nextElementSibling!.classList).toContain("errormessage");
+  });
+});
+
+describe("clearMessages", () => {
+  it("removes every message of the dialog, and only of that dialog", () => {
+    document.body.innerHTML = `
+      <form id="a"><input name="class" /><input name="properties" /></form>
+      <form id="b"><input name="properties" /></form>`;
+    document
+      .querySelectorAll("input")
+      .forEach((field) => showMessage(field, "error", "failed"));
+    clearMessages(document.querySelector("#a")!);
+    expect(document.querySelectorAll("#a .box")).toHaveLength(0);
+    expect(document.querySelectorAll("#b .box")).toHaveLength(1);
+  });
+});

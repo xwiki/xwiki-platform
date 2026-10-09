@@ -30,6 +30,7 @@ import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -456,12 +457,95 @@ public class RichTextAreaElement extends BaseElement
             // Either wait until the refresh counter has the expected value...
             if ((expectedRefreshCounter != null && Objects.equals(expectedRefreshCounter, refreshCounter))
                 // ...or until its value is different from the cached value.
-                || (expectedRefreshCounter == null && !Objects.equals(cachedRefreshCounter, refreshCounter))) {
+                || (expectedRefreshCounter == null && !Objects.equals(getLastKnownRefreshCounter(), refreshCounter))) {
                 cachedRefreshCounter = refreshCounter;
                 return true;
             }
             return false;
         });
+    }
+
+    /**
+     * @return the newest of the refresh counter value known by this rich text area and the one of the last content
+     *         refresh waited for by a page object action (which may have used another rich text area page object),
+     *         so that we don't wait again for a refresh that was already waited for
+     */
+    private String getLastKnownRefreshCounter()
+    {
+        String awaitedRefreshCounter = this.editor.getAwaitedRefreshCounter();
+        if (awaitedRefreshCounter != null && (this.cachedRefreshCounter == null
+            || Integer.parseInt(awaitedRefreshCounter) > Integer.parseInt(this.cachedRefreshCounter))) {
+            return awaitedRefreshCounter;
+        }
+        return this.cachedRefreshCounter;
+    }
+
+    /**
+     * Open the macro edit modal for the selected macro by pressing Enter, after waiting for the macro to be selected.
+     * Submitting the modal waits for the updated macro to be rendered.
+     *
+     * @return the macro edit modal
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public MacroDialogEditModal editSelectedMacro()
+    {
+        waitUntilWidgetSelected();
+        sendKeys(Keys.ENTER);
+        return new MacroDialogEditModal(this.editor::runAndWaitForContentRefresh).waitUntilReady();
+    }
+
+    /**
+     * Type the given quick action query (e.g. {@code /info}) and submit the quick action with the given label, waiting
+     * for the auto-complete drop-down to take it into account.
+     *
+     * @param query the quick action query, starting with {@code /}
+     * @param label the label of the quick action to submit
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void executeQuickAction(String query, String label)
+    {
+        sendKeys(query);
+        AutocompleteDropdown quickActions = new AutocompleteDropdown();
+        quickActions.waitForItemSelected(query, label);
+        sendKeys(Keys.ENTER);
+        quickActions.waitForItemSubmitted();
+    }
+
+    /**
+     * Insert a macro that has no required parameters using the quick action with the given query and label, and wait
+     * for the inserted macro to be rendered.
+     *
+     * @param query the quick action query, starting with {@code /}
+     * @param label the label of the quick action that inserts the macro
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void insertMacro(String query, String label)
+    {
+        this.editor.runAndWaitForContentRefresh(() -> executeQuickAction(query, label));
+    }
+
+    /**
+     * Insert a macro that has required parameters using the quick action with the given query and label. Such a macro
+     * is inserted through the macro edit modal, which is opened automatically, and submitting it waits for the
+     * inserted macro to be rendered.
+     *
+     * @param query the quick action query, starting with {@code /}
+     * @param label the label of the quick action that inserts the macro
+     * @return the macro edit modal used to set the required macro parameters
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public MacroDialogEditModal insertMacroWithRequiredParameters(String query, String label)
+    {
+        executeQuickAction(query, label);
+        return new MacroDialogEditModal(this.editor::runAndWaitForContentRefresh).waitUntilReady();
     }
 
     /**

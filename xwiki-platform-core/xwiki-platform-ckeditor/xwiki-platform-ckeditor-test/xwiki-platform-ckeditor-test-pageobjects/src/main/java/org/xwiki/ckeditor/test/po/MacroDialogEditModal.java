@@ -19,6 +19,8 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.util.function.Consumer;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
@@ -32,6 +34,30 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  */
 public class MacroDialogEditModal extends BaseElement
 {
+    private final Consumer<Runnable> submitHandler;
+
+    /**
+     * Creates a page object whose {@link #clickSubmit()} only clicks the submit button.
+     */
+    public MacroDialogEditModal()
+    {
+        this(Runnable::run);
+    }
+
+    /**
+     * Creates a page object whose {@link #clickSubmit()} lets the editor that opened the modal wait for the result of
+     * the submission, which only that editor knows (e.g. CKEditor refreshes its content to render the macro).
+     *
+     * @param submitHandler receives the action that clicks the submit button, runs it and waits for its result
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public MacroDialogEditModal(Consumer<Runnable> submitHandler)
+    {
+        this.submitHandler = submitHandler;
+    }
+
     /**
      * Wait until the macro selection edition is loaded.
      *
@@ -157,13 +183,14 @@ public class MacroDialogEditModal extends BaseElement
     }
 
     /**
-     * Click on the macro submission button.
+     * Click on the macro submission button, then wait for the result of the submission when the editor that opened
+     * the modal knows how to (see {@link #MacroDialogEditModal(Consumer)}).
      */
     public void clickSubmit()
     {
-        getDriver().findElement(
+        this.submitHandler.accept(() -> getDriver().findElement(
             // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
-            By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click();
+            By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click());
     }
 
     /**

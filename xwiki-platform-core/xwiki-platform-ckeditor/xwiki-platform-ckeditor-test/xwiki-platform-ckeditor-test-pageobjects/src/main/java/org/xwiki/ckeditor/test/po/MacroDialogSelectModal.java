@@ -105,7 +105,7 @@ public class MacroDialogSelectModal extends BaseElement
      */
     public MacroDialogEditModal clickSelect()
     {
-        getDriver().findElement(By.cssSelector(".gadget-selector-modal .modal-footer .btn-primary")).click();
+        getDriver().findElement(By.cssSelector("[class*=-selector-modal] .modal-footer .btn-primary")).click();
         return new MacroDialogEditModal(this.submitHandler).waitUntilReady();
     }
 

@@ -93,6 +93,8 @@ public class TestConfiguration
 
     private boolean saveDatabaseData;
 
+    private boolean testExtensionRepository;
+
     private boolean savePermanentDirectoryData;
 
     private List<String> servletEngineNetworkAliases;
@@ -139,6 +141,7 @@ public class TestConfiguration
         mergeForbiddenServletEngines(testConfiguration.getForbiddenServletEngines());
         mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
+        mergeTestExtensionRepository(testConfiguration.isTestExtensionRepository());
         mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
         mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
         mergeBlobStore(testConfiguration.blobStore);
@@ -360,6 +363,13 @@ public class TestConfiguration
             mergedForbiddenServletEngines.addAll(forbiddenServletEngines);
         }
         this.forbiddenServletEngines = mergedForbiddenServletEngines;
+    }
+
+    private void mergeTestExtensionRepository(boolean testExtensionRepository)
+    {
+        if (!isTestExtensionRepository() && testExtensionRepository) {
+            this.testExtensionRepository = true;
+        }
     }
 
     private void mergeSaveDatabaseData(boolean saveDatabaseData)
@@ -924,6 +934,29 @@ public class TestConfiguration
     public boolean isDatabaseDataSaved()
     {
         return this.saveDatabaseData;
+    }
+
+    /**
+     * @return true if the extensions declared in the resources of the module executing the test are made available to
+     *     the XWiki instances as an extension repository
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    public boolean isTestExtensionRepository()
+    {
+        return this.testExtensionRepository;
+    }
+
+    /**
+     * @param testExtensionRepository see {@link #isTestExtensionRepository()}
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    public void setTestExtensionRepository(boolean testExtensionRepository)
+    {
+        this.testExtensionRepository = testExtensionRepository;
     }
 
     /**

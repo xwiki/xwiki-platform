@@ -42,6 +42,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.TestExtensionRepository;
 import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecutor;
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -212,6 +213,13 @@ public class ConfigurationFilesGenerator
             // WARBuilder when resolving distribution artifacts.
             repositories.add(
                 "maven-xwiki-snapshot:maven:https://nexus-snapshots.xwiki.org/repository/snapshots");
+        }
+
+        // Repository containing the extensions declared in the resources of the module executing the test, so that
+        // the test can ask XWiki to install them.
+        if (this.testConfiguration.isTestExtensionRepository()) {
+            repositories.add(String.format("%s:maven:%s", TestExtensionRepository.ID,
+                TestExtensionRepository.getURL(this.testConfiguration)));
         }
 
         props.setProperty("xwikiExtensionRepositories", StringUtils.join(repositories, ','));

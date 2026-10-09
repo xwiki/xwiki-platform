@@ -38,8 +38,10 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.MountableFile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.TestExtensionRepository;
 import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -329,6 +331,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             .waitingFor(
                 Wait.forHttp("/xwiki/rest")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
+
+        // Copy the extension repository of the test inside the container since XWiki cannot access the file system of
+        // the host from there. Note that each instance gets its own copy of the same repository.
+        if (this.testConfiguration.isTestExtensionRepository()) {
+            this.servletContainer.withCopyFileToContainer(
+                MountableFile.forHostPath(TestExtensionRepository.getDirectory(this.testConfiguration).toString()),
+                TestExtensionRepository.CONTAINER_DIRECTORY);
+        }
 
         List<Integer> exposedPorts = new ArrayList<>();
         exposedPorts.add(internalPort);

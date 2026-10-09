@@ -42,19 +42,8 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- The macro renders a Live Data backed by the liveTable source. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livedata-macro</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livedata-livetable</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
+    <!-- The liveTable source falls back to the XWiki.LiveTableResults page, which xwiki-platform-livedata-livetable
+         does not depend on. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livetable-ui</artifactId>
@@ -62,14 +51,8 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <!-- The macro reports a missing object type or field through the message macros. -->
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-message</artifactId>
-      <version>${rendering.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- The macro dialog loads its translations through the localization REST resource. -->
+    <!-- The macro dialog loads its translations through the localization REST resource, which every distribution
+         ships but the test WAR does not. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-localization-rest-default</artifactId>

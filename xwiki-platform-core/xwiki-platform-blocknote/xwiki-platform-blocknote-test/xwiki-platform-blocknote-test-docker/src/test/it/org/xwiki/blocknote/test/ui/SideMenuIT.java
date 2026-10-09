@@ -22,11 +22,11 @@ package org.xwiki.blocknote.test.ui;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebElement;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
+import org.xwiki.test.docker.junit5.ScreenshotComparator;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -48,7 +48,6 @@ import org.xwiki.test.ui.TestUtils;
         "org.xwiki.platform:xwiki-platform-websocket"
     }
 )
-@ExtendWith(ScreenshotComparatorParameterResolver.class)
 class SideMenuIT extends AbstractBlockNoteIT
 {
     /**

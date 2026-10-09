@@ -113,13 +113,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Used to compare screenshots with reference screenshots. -->
-    <dependency>
-      <groupId>com.github.romankh3</groupId>
-      <artifactId>image-comparison</artifactId>
-      <version>4.4.0</version>
-      <scope>test</scope>
-    </dependency>
     <!-- Realtime synchronization is done through WebSockets. -->
     <dependency>
       <groupId>jakarta.websocket</groupId>

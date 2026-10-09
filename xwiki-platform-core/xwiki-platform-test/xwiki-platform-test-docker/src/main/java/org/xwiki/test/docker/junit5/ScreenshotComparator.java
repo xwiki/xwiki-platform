@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.blocknote.test.ui;
+package org.xwiki.test.docker.junit5;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -30,7 +30,6 @@ import javax.imageio.ImageIO;
 
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.romankh3.image.comparison.ImageComparison;
 import com.github.romankh3.image.comparison.ImageComparisonUtil;

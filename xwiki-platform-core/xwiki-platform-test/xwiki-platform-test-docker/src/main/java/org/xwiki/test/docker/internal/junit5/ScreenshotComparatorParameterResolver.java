@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.blocknote.test.ui;
+package org.xwiki.test.docker.internal.junit5;
 
 import java.lang.reflect.Method;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.junit5.ScreenshotComparator;
 
 /**
  * Add support for injecting {@link ScreenshotComparator} as a parameter in JUnit 5 tests.

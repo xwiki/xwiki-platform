@@ -114,7 +114,7 @@ class DocumentLock {
   lock(options) {
     if (!this._locked) {
       this.setLocked(true, options);
-      fetch(this._getURL('lock'));
+      void fetch(this._getURL('lock'));
     }
   }
 

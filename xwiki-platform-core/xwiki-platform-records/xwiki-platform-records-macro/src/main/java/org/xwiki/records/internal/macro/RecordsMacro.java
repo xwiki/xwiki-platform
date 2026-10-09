@@ -367,7 +367,8 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
             return kept;
         }
         return Stream.concat(Stream.of(TITLE_PROPERTY),
-                fields.keySet().stream().filter(id -> !id.startsWith(METADATA_PREFIX) && !id.startsWith(INTERNAL_PREFIX)))
+                fields.keySet().stream()
+                    .filter(id -> !id.startsWith(METADATA_PREFIX) && !id.startsWith(INTERNAL_PREFIX)))
             .collect(Collectors.joining(LIST_SEPARATOR));
     }
 

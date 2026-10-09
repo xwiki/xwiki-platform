@@ -49,6 +49,8 @@ public class MacroDialogEditModal extends BaseElement
      * the submission, which only that editor knows (e.g. CKEditor refreshes its content to render the macro).
      *
      * @param submitHandler receives the action that clicks the submit button, runs it and waits for its result
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public MacroDialogEditModal(Consumer<Runnable> submitHandler)

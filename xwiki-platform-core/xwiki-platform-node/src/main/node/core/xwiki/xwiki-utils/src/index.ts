@@ -52,6 +52,10 @@ function getRestSpacesApiUrl(
 export { getRestSpacesApiUrl, loadById };
 export type {
   LegacyAjaxSaveAndContinue,
+  LegacyConfirmationBoxBehavior,
+  LegacyConfirmationBoxParameters,
+  LegacyNotification,
+  LegacyNotificationType,
   LegacyXWikiAttachment,
   LegacyXWikiDocument,
   XWikiGlobal,

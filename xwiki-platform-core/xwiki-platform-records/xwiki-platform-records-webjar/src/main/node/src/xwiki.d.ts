@@ -17,14 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/// <reference types="@xwiki/platform-xwiki-utils/global" />
+
 export {};
 
 declare global {
-  const XWiki: {
-    contextPath: string;
-    currentWiki: string;
-  };
-
   /**
    * The suggest widget's jQuery plugin, declared by `uicomponents/suggest/xwiki.selectize.js`, which the displayer
    * template imports. It ships no type definitions of its own.

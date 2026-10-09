@@ -27,6 +27,7 @@ import {
   loadOptions,
   propertiesUrl,
   toOptions,
+  withMetadataLabels,
 } from "../fieldPicker";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { JsonFetcher, PropertyDescriptor } from "../fieldPicker";
@@ -188,6 +189,39 @@ describe("toOptions", () => {
   it("skips descriptors without a usable identifier", () => {
     const descriptors = [{ id: "" }, { id: "kept" }] as PropertyDescriptor[];
     expect(toOptions(descriptors).map((o) => o.value)).toEqual(["kept"]);
+  });
+});
+
+describe("toOptions on the page metadata", () => {
+  it("offers only the page metadata the App Within Minutes wizard offers", () => {
+    const descriptors: PropertyDescriptor[] = [
+      { id: "doc.name", type: "String" },
+      { id: "doc.fullName", type: "String" },
+      { id: "doc.enforceRequiredRights", type: "Boolean" },
+      { id: "status", name: "Status", type: "StaticList" },
+    ];
+    expect(toOptions(descriptors).map((o) => o.value)).toEqual([
+      "doc.name",
+      "status",
+    ]);
+  });
+});
+
+describe("withMetadataLabels", () => {
+  it("names the page metadata after the labels given and leaves the rest alone", () => {
+    expect(
+      withMetadataLabels(DESCRIPTORS, { "doc.title": "Page Title" }),
+    ).toEqual([
+      { id: "doc.title", name: "Page Title", type: "String" },
+      { id: "status", name: "Status", type: "StaticList" },
+      { id: "budget", name: "Budget", type: "Number" },
+    ]);
+  });
+
+  it("does not take an inherited property for a label", () => {
+    expect(withMetadataLabels([{ id: "toString" }], {})).toEqual([
+      { id: "toString" },
+    ]);
   });
 });
 

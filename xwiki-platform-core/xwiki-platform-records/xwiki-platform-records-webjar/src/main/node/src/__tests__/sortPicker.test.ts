@@ -102,6 +102,16 @@ describe("toSortOptions", () => {
     ).toEqual(["doc.title:asc", "doc.title:desc"]);
   });
 
+  it("leaves out the page metadata the column picker does not offer", () => {
+    const descriptors: PropertyDescriptor[] = [
+      { id: "doc.fullName", type: "String" },
+      { id: "budget", name: "Budget", type: "Number" },
+    ];
+    expect(
+      toSortOptions(descriptors, "", [], LABELS).map((o) => o.value),
+    ).toEqual(["budget:asc", "budget:desc"]);
+  });
+
   it("recognises a used field whose criterion names no direction", () => {
     expect(
       toSortOptions(DESCRIPTORS, "", ["budget"], LABELS).map((o) => o.value),
@@ -133,6 +143,15 @@ describe("resolveSortOption", () => {
     // author wrote the next time the dialog opens.
     expect(resolveSortOption(DESCRIPTORS, "gone:asc", LABELS)).toEqual(
       expect.objectContaining({ value: "gone:asc", label: "gone:asc" }),
+    );
+  });
+
+  it("shows a stored criterion on page metadata that is no longer offered", () => {
+    const descriptors: PropertyDescriptor[] = [
+      { id: "doc.fullName", type: "String" },
+    ];
+    expect(resolveSortOption(descriptors, "doc.fullName:asc", LABELS)).toEqual(
+      expect.objectContaining({ optgroup: METADATA_GROUP }),
     );
   });
 

@@ -172,6 +172,8 @@ public class PageWithTour extends ViewPage
      * browser, so that the tours start again from their first step, as for a new visitor. Reload the page afterwards
      * for the tours of the current page to be started again.
      *
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void clearToursState()
@@ -183,6 +185,8 @@ public class PageWithTour extends ViewPage
     /**
      * @param linkLabel the label of a link in the description of the displayed step
      * @return the URL targeted by that link
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getStepDescriptionLinkURL(String linkLabel)
@@ -194,6 +198,8 @@ public class PageWithTour extends ViewPage
 
     /**
      * @return the hint displayed next to the resume button when a tour ends, even once it has been hidden
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getResumeHint()

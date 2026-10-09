@@ -104,6 +104,9 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
         return uploadAttachment(documentReference, part, null);
     }
 
+    /**
+     * @deprecated use {@link #uploadAttachment(DocumentReference, Part, String)} instead
+     */
     @Override
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException

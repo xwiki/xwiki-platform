@@ -119,6 +119,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         }
     }
 
+    /**
+     * @deprecated use {@link #getTranslatedDocumentInstance(DocumentReference)} instead
+     */
     @Override
     @Deprecated
     public DocumentModelBridge getDocument(String documentReference) throws Exception
@@ -127,6 +130,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return xcontext.getWiki().getDocument(documentReference, xcontext).getTranslatedDocument(xcontext);
     }
 
+    /**
+     * @deprecated use {@link #getTranslatedDocumentInstance(DocumentReference)} instead
+     */
     @Override
     @Deprecated
     public DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception
@@ -186,6 +192,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return currentDocument == null ? null : currentDocument.getDocumentReference();
     }
 
+    /**
+     * @deprecated replaced by {@link #getDocument(DocumentReference)} and {@link DocumentModelBridge#getContent()}
+     */
     @Override
     @Deprecated
     public String getDocumentContent(String documentReference) throws Exception
@@ -201,6 +210,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return xcontext.getWiki().getDocument(documentReference, xcontext).getContent();
     }
 
+    /**
+     * @deprecated replaced by {@link #getDocumentContentForDefaultLanguage(DocumentReference)}
+     */
     @Override
     @Deprecated
     public String getDocumentContentForDefaultLanguage(String documentReference) throws Exception
@@ -224,6 +236,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         }
     }
 
+    /**
+     * @deprecated replaced by {@link #getDocumentContent(DocumentReference, String)}
+     */
     @Override
     @Deprecated
     public String getDocumentContent(String documentReference, String language) throws Exception
@@ -251,6 +266,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         }
     }
 
+    /**
+     * @deprecated replaced by {@link #exists(DocumentReference)}
+     */
     @Override
     @Deprecated
     public boolean exists(String documentReference) throws XWikiException
@@ -277,6 +295,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         saveDocument(doc, editComment, isMinorEdit);
     }
 
+    /**
+     * @deprecated replaced by {@link #setDocumentContent(DocumentReference, String, String, boolean)}
+     */
     @Override
     @Deprecated
     public void setDocumentContent(String documentReference, String content, String editComment, boolean isMinorEdit)
@@ -292,6 +313,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         saveDocument(doc, editComment, isMinorEdit);
     }
 
+    /**
+     * @deprecated replaced by {@link #getDocument(DocumentReference)} and {@link DocumentModelBridge#getSyntaxId()}
+     */
     @Override
     @Deprecated
     public String getDocumentSyntaxId(String documentReference) throws Exception
@@ -315,6 +339,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", doc.getSyntax(), syntaxId), true);
     }
 
+    /**
+     * @deprecated replaced by {@link #setDocumentSyntaxId(DocumentReference, String)}
+     */
     @Override
     @Deprecated
     public void setDocumentSyntaxId(String documentReference, String syntaxId) throws Exception
@@ -432,6 +459,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return value;
     }
 
+    /**
+     * @deprecated use {@link #getProperty(DocumentReference, DocumentReference, String)} instead
+     */
     @Override
     @Deprecated
     public Object getProperty(String documentReference, String className, String propertyName)
@@ -582,6 +612,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return lst != null && lst.contains(property);
     }
 
+    /**
+     * @deprecated use {@link DocumentAccessBridge#setProperty(DocumentReference, DocumentReference, String,
+     *             Object)} instead
+     */
     @Override
     @Deprecated
     public void setProperty(String documentReference, String className, String propertyName, Object propertyValue)
@@ -617,6 +651,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         }
     }
 
+    /**
+     * @deprecated use {@link #getAttachmentContent(EntityReference)} instead
+     */
     @Override
     @Deprecated
     public byte[] getAttachmentContent(String documentReference, String attachmentFilename) throws Exception
@@ -670,6 +707,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
 
+    /**
+     * @deprecated replaced by {@link #setAttachmentContent(AttachmentReference, byte[])}
+     */
     @Override
     @Deprecated
     public void setAttachmentContent(String documentReference, String attachmentFilename, byte[] attachmentData)
@@ -775,6 +815,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return getDocumentURL(documentReference, action, queryString, anchor, isFullURL);
     }
 
+    /**
+     * @deprecated replaced by {@link #getDocumentURL(DocumentReference, String, String, String)}
+     */
     @Override
     @Deprecated
     public String getURL(String documentReference, String action, String queryString, String anchor)
@@ -790,6 +833,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return xcontext.getWiki().getURL(computedDocumentName, action, queryString, anchor, xcontext);
     }
 
+    /**
+     * @deprecated use {@link #getAttachmentURL(org.xwiki.model.reference.AttachmentReference, boolean)} instead
+     */
     @Override
     @Deprecated
     public String getAttachmentURL(String documentReference, String attachmentName)
@@ -845,6 +891,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return url;
     }
 
+    /**
+     * @deprecated use {@link #getAttachmentReferences(org.xwiki.model.reference.DocumentReference)} instead
+     */
     @Override
     @Deprecated
     public List<String> getAttachmentURLs(DocumentReference documentReference, boolean isFullURL) throws Exception
@@ -862,6 +911,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return hasRight(documentReference, "view");
     }
 
+    /**
+     * @deprecated use {@link #isDocumentViewable(org.xwiki.model.reference.DocumentReference)} instead
+     */
     @Override
     @Deprecated
     public boolean isDocumentViewable(String documentReference)
@@ -869,6 +921,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return hasRight(documentReference, "view");
     }
 
+    /**
+     * @deprecated use {@link #isDocumentEditable(org.xwiki.model.reference.DocumentReference)} instead
+     */
     @Override
     @Deprecated
     public boolean isDocumentEditable(String documentReference)
@@ -882,6 +937,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return hasRight(documentReference, "edit");
     }
 
+    /**
+     * @deprecated replaced by {@link org.xwiki.bridge.DocumentAccessBridge#getCurrentUserReference()}
+     */
     @Override
     @Deprecated
     public String getCurrentUser()
@@ -950,6 +1008,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiDocument.restoreContext(backupObjects, getContext());
     }
 
+    /**
+     * @deprecated use {@link #pushDocumentInContext(Map, DocumentReference)} instead
+     */
     @Override
     @Deprecated
     public void pushDocumentInContext(Map<String, Object> backupObjects, String documentReference) throws Exception

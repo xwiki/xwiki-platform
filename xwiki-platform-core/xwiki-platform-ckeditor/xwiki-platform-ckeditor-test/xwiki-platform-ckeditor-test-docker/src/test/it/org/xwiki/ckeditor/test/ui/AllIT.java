@@ -75,4 +75,14 @@ public class AllIT
     class NestedTableIT extends TableIT
     {
     }
+
+    @Nested
+    class NestedMacroIT extends MacroIT
+    {
+    }
+
+    @Nested
+    class NestedToolBarIT extends ToolBarIT
+    {
+    }
 }

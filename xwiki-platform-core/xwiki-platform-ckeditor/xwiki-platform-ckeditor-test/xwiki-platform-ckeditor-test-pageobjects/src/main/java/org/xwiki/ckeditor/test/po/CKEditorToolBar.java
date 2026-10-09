@@ -19,11 +19,13 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
 import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
 
@@ -46,6 +48,8 @@ public class CKEditorToolBar extends BaseElement
 
     protected final WebElement container;
 
+    private final CKEditor editor;
+
     /**
      * Create a new tool bar instance for the given editor.
      * 
@@ -53,6 +57,7 @@ public class CKEditorToolBar extends BaseElement
      */
     public CKEditorToolBar(CKEditor editor)
     {
+        this.editor = editor;
         this.container = findContainer(editor);
     }
 
@@ -73,6 +78,146 @@ public class CKEditorToolBar extends BaseElement
         } finally {
             getDriver().switchTo().parentFrame();
         }
+    }
+
+    /**
+     * Click the bold button and wait for its state to be toggled.
+     *
+     * @return this tool bar instance
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public CKEditorToolBar bold()
+    {
+        return toggleButton("bold");
+    }
+
+    /**
+     * Click the italic button and wait for its state to be toggled.
+     *
+     * @return this tool bar instance
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public CKEditorToolBar italic()
+    {
+        return toggleButton("italic");
+    }
+
+    /**
+     * Click the underline entry of the basic styles menu (the underline action has no dedicated tool bar button).
+     *
+     * @return this tool bar instance
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public CKEditorToolBar underline()
+    {
+        clickMenuItem("basicstyles", "underline");
+        return this;
+    }
+
+    /**
+     * Insert an Info Box using the Insert menu, and wait for the inserted info macro to be rendered. The info macro
+     * is inserted with a default content, and the caret is placed at the start of this content.
+     *
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void insertInfoBox()
+    {
+        RichTextAreaElement textArea = this.editor.getRichTextArea(false);
+        String refreshCounter = textArea.getRefreshCounter();
+        clickInsertMenuItem("infoBox");
+        // The inserted macro is rendered server-side, which reloads the edited content.
+        getDriver().waitUntilCondition(driver -> !Objects.equals(refreshCounter, textArea.getRefreshCounter()));
+    }
+
+    /**
+     * Open the macro selection modal using the Other Macros entry of the Insert menu.
+     *
+     * @return the page object for the macro selection modal
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public MacroDialogSelectModal insertOtherMacro()
+    {
+        clickInsertMenuItem("xwiki-macro");
+        return new MacroDialogSelectModal().waitUntilReady();
+    }
+
+    /**
+     * Open the special character dialog using the Insert menu.
+     *
+     * @return the page object for the special character dialog
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public SpecialCharacterDialog insertSpecialCharacter()
+    {
+        clickInsertMenuItem("specialchar");
+        return new SpecialCharacterDialog();
+    }
+
+    /**
+     * Open the emoji panel using the dedicated tool bar button.
+     *
+     * @return the page object for the emoji panel
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public EmojiPanel openEmojiPanel()
+    {
+        clickButton("emojipanel");
+        return new EmojiPanel(waitForOpenedPanelFrame());
+    }
+
+    private void clickInsertMenuItem(String item)
+    {
+        clickMenuItem("insert", item);
+    }
+
+    private void clickMenuItem(String menu, String item)
+    {
+        clickButton(menu);
+        WebElement menuFrame = waitForOpenedPanelFrame();
+        try {
+            getDriver().switchTo().frame(menuFrame);
+            // The tool bar menu items are prefixed in order to prevent conflicts with the context menu items.
+            getDriver().findElement(By.className("cke_menubutton__toolbar_" + item)).click();
+        } finally {
+            getDriver().switchTo().parentFrame();
+        }
+        // The menu is closed after an item is clicked.
+        getDriver().waitUntilCondition(driver -> !menuFrame.isDisplayed());
+    }
+
+    private CKEditorToolBar toggleButton(String feature)
+    {
+        boolean wasToggledOn = isButtonToggledOn(feature);
+        clickButton(feature);
+        getDriver().waitUntilCondition(driver -> isButtonToggledOn(feature) != wasToggledOn);
+        return this;
+    }
+
+    /**
+     * CKEditor keeps the panels (menus, drop downs) it has already opened in the DOM, hidden, so we need to look for
+     * the one that is currently displayed.
+     *
+     * @return the frame of the currently opened panel
+     */
+    private WebElement waitForOpenedPanelFrame()
+    {
+        return getDriver().waitUntilCondition(driver -> getDriver()
+            .findElementsWithoutWaiting(By.cssSelector("iframe.cke_panel_frame")).stream()
+            .filter(WebElement::isDisplayed).findFirst().orElse(null));
     }
 
     protected WebElement findContainer(CKEditor editor)

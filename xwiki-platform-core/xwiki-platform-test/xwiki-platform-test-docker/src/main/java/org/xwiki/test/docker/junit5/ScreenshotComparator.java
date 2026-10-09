@@ -33,6 +33,7 @@ import javax.imageio.ImageIO;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 import com.github.romankh3.image.comparison.ImageComparison;
@@ -43,12 +44,16 @@ import com.github.romankh3.image.comparison.model.ImageComparisonState;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Compares screenshots of page elements with reference screenshots committed in the test resources, under
  * {@code screenshots/<TestClassName>/<testMethodName>/<browser>/}, since each browser renders the page slightly
  * differently (e.g. the text anti-aliasing). The screenshots are saved in the {@code screenshots} folder of the build
  * directory, along with an image highlighting the differences for each screenshot that doesn't match its reference.
+ * <p>
+ * A single set of reference screenshots is maintained, taken with {@link Browser#FIREFOX}, so a test that compares
+ * screenshots is skipped when it runs with another browser.
  * <p>
  * The screenshots are taken by cropping a screenshot of the page, rather than by screenshotting the element itself,
  * so that they can include the floating user interface an element shows outside of its own bounds, such as a menu.
@@ -61,6 +66,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class ScreenshotComparator
 {
+    /**
+     * The only browser the reference screenshots are taken with. Its Docker image supports all the architectures we
+     * run the tests on, so that the same references can be used on all of them.
+     */
+    private static final Browser REFERENCE_BROWSER = Browser.FIREFOX;
+
     /**
      * How much the color of a pixel is allowed to differ before that pixel is counted as different.
      * This absorbs the small differences in the way text and icons are anti-aliased.
@@ -87,7 +98,7 @@ public class ScreenshotComparator
 
     private final String testMethodName;
 
-    private final String browser;
+    private final Browser browser;
 
     private final File outputFolder;
 
@@ -106,7 +117,7 @@ public class ScreenshotComparator
         this.driver = driver;
         this.testClassName = testClassName;
         this.testMethodName = testMethodName;
-        this.browser = testConfiguration.getBrowser().name().toLowerCase(Locale.ROOT);
+        this.browser = testConfiguration.getBrowser();
         this.outputFolder = new File(testConfiguration.getMavenBuildDirectory(), "screenshots");
         this.referenceFolder = new File(testConfiguration.getMavenBuildDirectory(), "../src/test/resources");
     }
@@ -135,9 +146,13 @@ public class ScreenshotComparator
      */
     public void assertMatches(String name, WebElement element, Insets margin) throws IOException
     {
+        assumeTrue(this.browser == REFERENCE_BROWSER, () -> ("The reference screenshots are only maintained for "
+            + "[%s] and the tests run with [%s].").formatted(REFERENCE_BROWSER, this.browser));
+
         // The test name and the browser are part of the file names because the screenshots folder is shared by all
         // the tests.
-        String prefix = "%s-%s-%s-%s".formatted(this.testClassName, this.testMethodName, this.browser, name);
+        String prefix = "%s-%s-%s-%s".formatted(this.testClassName, this.testMethodName,
+            this.browser.name().toLowerCase(Locale.ROOT), name);
         File actualFile = new File(this.outputFolder, prefix + ".png");
         BufferedImage actual = takeScreenshot(element, margin);
         ImageComparisonUtil.saveImage(actualFile, actual);
@@ -192,7 +207,8 @@ public class ScreenshotComparator
 
     private String getReferencePath(String name)
     {
-        return "screenshots/%s/%s/%s/%s.png".formatted(this.testClassName, this.testMethodName, this.browser, name);
+        return "screenshots/%s/%s/%s/%s.png".formatted(this.testClassName, this.testMethodName,
+            this.browser.name().toLowerCase(Locale.ROOT), name);
     }
 
     private BufferedImage readReference(String name) throws IOException

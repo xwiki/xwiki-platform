@@ -79,6 +79,10 @@ public class UITestTestConfigurationResolver
 
     private static final String REMOTESOLRTAG_PROPERTY = "xwiki.test.ui.remoteSolrTag";
 
+    private static final String SCREEN_WIDTH_PROPERTY = "xwiki.test.ui.screenWidth";
+
+    private static final String SCREEN_HEIGHT_PROPERTY = "xwiki.test.ui.screenHeight";
+
     private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
 
     private static final String WCAG_PROPERTY = "xwiki.test.ui.wcag";
@@ -124,6 +128,8 @@ public class UITestTestConfigurationResolver
         configuration.setBrowserTag(resolveBrowserTag(uiTestAnnotation.browserTag()));
         configuration.setServletEngineTag(resolveServletEngineTag(uiTestAnnotation.servletEngineTag()));
         configuration.setJDBCDriverVersion(resolveJDBCDriverVersion(uiTestAnnotation.jdbcDriverVersion()));
+        configuration.setScreenWidth(resolveScreenWidth(uiTestAnnotation.screenWidth()));
+        configuration.setScreenHeight(resolveScreenHeight(uiTestAnnotation.screenHeight()));
         configuration.setVNC(resolveVNC(uiTestAnnotation.vnc()));
         configuration.setWCAG(resolveWCAG(uiTestAnnotation.wcag()));
         configuration.setWCAGStopOnError(resolveWCAGStopOnError(uiTestAnnotation.wcagStopOnError()));
@@ -258,6 +264,21 @@ public class UITestTestConfigurationResolver
     private String resolveBrowserTag(String browserTag)
     {
         return resolve(browserTag, BROWSERTAG_PROPERTY);
+    }
+
+    private int resolveScreenWidth(int screenWidth)
+    {
+        return resolve(screenWidth, SCREEN_WIDTH_PROPERTY);
+    }
+
+    private int resolveScreenHeight(int screenHeight)
+    {
+        return resolve(screenHeight, SCREEN_HEIGHT_PROPERTY);
+    }
+
+    private int resolve(int annotationValue, String propertyName)
+    {
+        return Integer.getInteger(propertyName, annotationValue);
     }
 
     private boolean resolveVNC(boolean vnc)

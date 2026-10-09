@@ -33,6 +33,8 @@ import javax.imageio.ImageIO;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.ui.XWikiWebDriver;
 
@@ -44,7 +46,6 @@ import com.github.romankh3.image.comparison.model.ImageComparisonState;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Compares screenshots of page elements with reference screenshots committed in the test resources, under
@@ -52,13 +53,13 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * differently (e.g. the text anti-aliasing). The screenshots are saved in the {@code screenshots} folder of the build
  * directory, along with an image highlighting the differences for each screenshot that doesn't match its reference.
  * <p>
- * A single set of reference screenshots is maintained, taken with {@link Browser#FIREFOX}, so a test that compares
- * screenshots is skipped when it runs with another browser.
+ * A single set of reference screenshots is maintained, taken with {@link Browser#FIREFOX}, so the comparison is
+ * skipped, and only the comparison, when the tests run with another browser.
  * <p>
  * The screenshots are taken by cropping a screenshot of the page, rather than by screenshotting the element itself,
  * so that they can include the floating user interface an element shows outside of its own bounds, such as a menu.
  * <p>
- * Run the tests with {@code -Dxwiki.test.screenshots.update=true} to overwrite the reference screenshots with the
+ * Run the tests with {@code -Dxwiki.test.ui.screenshots.update=true} to overwrite the reference screenshots with the
  * ones taken by the tests, e.g. after a change that is expected to modify them.
  *
  * @version $Id$
@@ -84,13 +85,15 @@ public class ScreenshotComparator
      * When this system property is set, the reference screenshots are overwritten with the screenshots taken by the
      * tests, instead of being compared with them.
      */
-    private static final boolean UPDATE_REFERENCES = Boolean.getBoolean("xwiki.test.screenshots.update");
+    private static final boolean UPDATE_REFERENCES = Boolean.getBoolean("xwiki.test.ui.screenshots.update");
 
     /**
      * Reads the scroll offset of the page, its viewport height and its pixel density, in one round trip.
      */
     private static final String PAGE_METRICS =
         "return [window.scrollX, window.scrollY, window.innerHeight, window.devicePixelRatio];";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScreenshotComparator.class);
 
     private final XWikiWebDriver driver;
 
@@ -146,8 +149,11 @@ public class ScreenshotComparator
      */
     public void assertMatches(String name, WebElement element, Insets margin) throws IOException
     {
-        assumeTrue(this.browser == REFERENCE_BROWSER, () -> ("The reference screenshots are only maintained for "
-            + "[%s] and the tests run with [%s].").formatted(REFERENCE_BROWSER, this.browser));
+        if (this.browser != REFERENCE_BROWSER) {
+            LOGGER.info("Skipping the comparison of the screenshot [{}] because the reference screenshots are only "
+                + "maintained for [{}] and the tests run with [{}].", name, REFERENCE_BROWSER, this.browser);
+            return;
+        }
 
         // The test name and the browser are part of the file names because the screenshots folder is shared by all
         // the tests.

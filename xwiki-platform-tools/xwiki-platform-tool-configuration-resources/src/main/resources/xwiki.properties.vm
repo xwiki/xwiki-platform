@@ -1907,4 +1907,29 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Define the maximum authorized width of a chart in pixels. By default the value is configured at 2048 pixels.
 # chart.width.max=2048
 
+#-------------------------------------------------------------------------------------
+# Netflux (WebSocket end-point used by realtime editing)
+#-------------------------------------------------------------------------------------
+
+#-# [Since 18.9.0RC1]
+#-# The number of milliseconds after which an inactive Netflux WebSocket session is closed. The server pings the
+#-# clients regularly (see netflux.pingInterval) so this timeout is normally reached only when the WebSocket container
+#-# doesn't count the ping and pong messages as activity. Keep it well above netflux.pingInterval. If you disable the
+#-# server pings, set it to at least 90000 (90 seconds): the client's own keep-alive messages are then the only
+#-# activity, and the browsers send them only once per minute from background tabs.
+#-# The default is 75000 (75 seconds).
+# netflux.maxIdleTimeout=75000
+
+#-# [Since 18.9.0RC1]
+#-# The number of milliseconds between two WebSocket ping messages sent by the server to each Netflux client. The
+#-# browsers answer these pings even in background tabs, where they throttle the JavaScript timers that the client
+#-# uses to send its own keep-alive messages. Set it to 0 to disable the server pings (see netflux.maxIdleTimeout).
+#-# The default is 25000 (25 seconds).
+# netflux.pingInterval=25000
+
+#-# [Since 18.9.0RC1]
+#-# The number of consecutive ping messages a Netflux client can leave unanswered before the server closes its
+#-# WebSocket session. The default is 3.
+# netflux.pingMaxMissedPongs=3
+
 $!xwikiPropertiesAdditionalProperties

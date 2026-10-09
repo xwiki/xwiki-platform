@@ -392,6 +392,39 @@ public class DBListClass extends ListClass
         setStringValue("valueField", valueField);
     }
 
+    /**
+     * Check if the values stored by this property are known to be document full names. A custom query can select
+     * document full names too, but that cannot be detected, so it can only be guaranteed when no custom query is used
+     * and the generated query selects {@code doc.fullName} as the stored value. The values are then local to the wiki
+     * where the query runs.
+     *
+     * @return {@code true} if the values stored by this property are known to be document full names, {@code false}
+     *     otherwise
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public boolean isDocumentReferenceList()
+    {
+        if (StringUtils.isNotBlank(getSql())) {
+            return false;
+        }
+
+        String idField = getIdField();
+        String valueField = getValueField();
+        boolean hasClassname = StringUtils.isNotBlank(getClassname());
+
+        if (StringUtils.isBlank(idField) && StringUtils.isBlank(valueField)) {
+            // The generated query selects the full name of the documents holding an object of the class.
+            return hasClassname;
+        }
+
+        // The generated query uses the value field as stored value when the id field is blank.
+        String effectiveIdField = StringUtils.isBlank(idField) ? valueField : idField;
+
+        // Without a class name, a field without prefix is a document field.
+        return "doc.fullName".equals(effectiveIdField) || (!hasClassname && "fullName".equals(effectiveIdField));
+    }
+
     public List<ListItem> getCachedDBList(XWikiContext context)
     {
         if (isCache()) {

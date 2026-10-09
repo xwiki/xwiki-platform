@@ -32,6 +32,8 @@ import org.xwiki.test.ui.po.BaseElement;
  * Models the CKEditor panel opened from the Emoji List tool bar button.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 @Unstable

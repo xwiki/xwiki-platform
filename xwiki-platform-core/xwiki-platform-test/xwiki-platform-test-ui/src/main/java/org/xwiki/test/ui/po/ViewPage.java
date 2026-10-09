@@ -397,6 +397,8 @@ public class ViewPage extends BasePage
     /**
      * @return the message boxes displayed in the content of the page (such as the ones rendered by the {@code info}
      *         or {@code warning} macros), in the order in which they are displayed
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public List<MessageBoxElement> getMessageBoxes()

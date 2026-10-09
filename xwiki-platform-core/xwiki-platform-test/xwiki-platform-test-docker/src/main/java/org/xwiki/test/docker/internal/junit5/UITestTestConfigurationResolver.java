@@ -89,6 +89,8 @@ public class UITestTestConfigurationResolver
 
     private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
+    private static final String TESTEXTENSIONREPOSITORY_PROPERTY = "xwiki.test.ui.testExtensionRepository";
+
     private static final String SAVEPERMANENTDIRECTORY_PROPERTY = "xwiki.test.ui.savePermanentDirectoryData";
 
     private static final String SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY = "xwiki.test.ui.servletEngineNetworkAliases";
@@ -97,6 +99,9 @@ public class UITestTestConfigurationResolver
      * @param uiTestAnnotation the annotation from which to extract the configuration
      * @return the constructed {@link TestConfiguration} object containing the full test configuration
      */
+    // It does not make much sense to split the resolution of the different properties, and it would actually hurt
+    // readability
+    @SuppressWarnings("ExecutableStatementCount")
     public TestConfiguration resolve(UITest uiTestAnnotation)
     {
         TestConfiguration configuration = new TestConfiguration();
@@ -124,6 +129,8 @@ public class UITestTestConfigurationResolver
         configuration.setForbiddenServletEngines(resolveForbiddenServletEngines(uiTestAnnotation.forbiddenEngines()));
         configuration.setDatabaseCommands(resolveDatabaseCommands(uiTestAnnotation.databaseCommands()));
         configuration.setSaveDatabaseData(resolveSaveDatabaseData(uiTestAnnotation.saveDatabaseData()));
+        configuration.setTestExtensionRepository(
+            resolve(uiTestAnnotation.testExtensionRepository(), TESTEXTENSIONREPOSITORY_PROPERTY));
         configuration.setSavePermanentDirectoryData(resolveSavePermanentDirectoryData(
             uiTestAnnotation.savePermanentDirectoryData()));
         configuration.setServletEngineNetworkAliases(resolveCommaSeparatedValues(

@@ -20,7 +20,6 @@
 package org.xwiki.records.test.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
@@ -44,15 +43,16 @@ public class RecordsMacroEditModal extends MacroDialogEditModal
     /**
      * Shows the parameters of one tab.
      *
-     * @param label the label of the tab, as displayed
+     * @param groupId the identifier of the parameter group the tab shows
      * @return the current page object
      */
-    public RecordsMacroEditModal openTab(String label)
+    public RecordsMacroEditModal openTab(String groupId)
     {
-        WebElement tab = getDriver().findElement(By.xpath("//*[contains(@class, '-editor-modal')]"
-            + "//ul[contains(@class, 'macro-tabs')]//a[normalize-space(.) = '" + label + "']"));
-        tab.click();
-        getDriver().waitUntilElementIsVisible(By.id(tab.getDomAttribute("aria-controls")));
+        String panelId = "macroParameterTreeNode-" + groupId;
+        // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+        getDriver().findElement(
+            By.cssSelector("[class*=-editor-modal] .macro-tabs a[aria-controls='" + panelId + "']")).click();
+        getDriver().waitUntilElementIsVisible(By.id(panelId));
         return this;
     }
 

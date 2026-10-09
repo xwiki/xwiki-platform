@@ -53,7 +53,7 @@ class RecordsMacroIT extends AbstractCKEditorIT
 
     private static final String GENRE = "genre";
 
-    private static final String FILTER_SORT_TAB = "Filter & sort";
+    private static final String FILTER_SORT_TAB = "filterSort";
 
     private static final String TITLE_COLUMN = "Title";
 
@@ -87,8 +87,7 @@ class RecordsMacroIT extends AbstractCKEditorIT
         createEntry(setup, testReference, className, "Draft fiction", "draft", "fiction");
 
         edit(setup, testReference, """
-            {{records class="%s" id="%s"/}}
-            """.formatted(className, LIVE_DATA_ID));
+            {{records class="%s" id="%s"/}}""".formatted(className, LIVE_DATA_ID));
         RecordsMacroEditModal macroEditModal = editMacro();
         SuggestInputElement filtersPicker = macroEditModal.getFiltersPicker();
         filtersPicker.sendKeys("status=published").selectTypedText();

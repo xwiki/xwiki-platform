@@ -27,9 +27,11 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.executor.ContentExecutorException;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -64,6 +66,9 @@ class MacroContentExecutorTest
     @Named("macro")
     private Transformation macroTransformation;
 
+    @MockComponent(classToMock = MutableRenderingContext.class)
+    private RenderingContext renderingContext;
+
     @Test
     void executeWithNoSource() throws Exception
     {
@@ -75,8 +80,9 @@ class MacroContentExecutorTest
 
         this.macroContentExecutor.execute("", Syntax.PLAIN_1_0, context);
 
-        // The test is here: Verify that the Macro Transformation has been called
-        verify(this.macroTransformation).transform(parsedBlocks, transformationContext);
+        // The test is here: Verify that the Macro Transformation has been called in its own rendering context.
+        verify((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation,
+            transformationContext, parsedBlocks);
     }
 
     @Test
@@ -90,8 +96,9 @@ class MacroContentExecutorTest
 
         this.macroContentExecutor.execute("", Syntax.PLAIN_1_0, DOCUMENT_REFERENCE, context);
 
-        // The test is here: Verify that the Macro Transformation has been called
-        verify(this.macroTransformation).transform(parsedBlocks, transformationContext);
+        // The test is here: Verify that the Macro Transformation has been called in its own rendering context.
+        verify((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation,
+            transformationContext, parsedBlocks);
     }
 
     @Test
@@ -103,8 +110,8 @@ class MacroContentExecutorTest
         TransformationContext transformationContext = new TransformationContext();
         MacroTransformationContext context = new MacroTransformationContext(transformationContext);
 
-        doThrow(new TransformationException("error"))
-            .when(this.macroTransformation).transform(parsedBlocks, transformationContext);
+        doThrow(new TransformationException("error")).when((MutableRenderingContext) this.renderingContext)
+            .transformInContext(this.macroTransformation, transformationContext, parsedBlocks);
 
         ContentExecutorException exception = assertThrows(ContentExecutorException.class,
             () -> this.macroContentExecutor.execute("", Syntax.PLAIN_1_0, context));

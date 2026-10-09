@@ -46,13 +46,17 @@ public abstract class AbstractFilesystemAttachmentStoreTest extends AbstractComp
         final ServletEnvironment environment =
             (ServletEnvironment) this.getComponentManager().getInstance(Environment.class);
         final ServletContext mockServletContext = this.getMockery().mock(ServletContext.class);
-        environment.setServletContext(mockServletContext);
 
         this.getMockery().checking(new Expectations() {{
             allowing(mockServletContext).getAttribute("javax.servlet.context.tempdir");
                 will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
             allowing(mockServletContext).getResource("/WEB-INF/xwiki.properties");
                 will(returnValue(null));
+            allowing(mockServletContext).getResourceAsStream("/WEB-INF/resourcecheck/a%61b");
+                will(returnValue(null));
+            allowing(mockServletContext).getRealPath("/");
+                will(returnValue(null));
         }});
+        environment.setServletContext(mockServletContext);
     }
 }

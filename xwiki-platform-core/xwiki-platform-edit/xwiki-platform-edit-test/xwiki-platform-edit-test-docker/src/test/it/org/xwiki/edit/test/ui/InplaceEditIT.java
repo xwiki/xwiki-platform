@@ -28,7 +28,6 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
@@ -176,14 +175,7 @@ class InplaceEditIT
         richTextArea.clear();
 
         // Insert a macro that is editable in-line.
-        richTextArea.sendKeys("/inf");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/inf", "Info Box");
-        richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-
-        // The content is reloaded after the macro is inserted.
-        ckeditor.getRichTextArea();
+        richTextArea.insertMacro("/inf", "Info Box");
 
         // Switch to Source mode and save without making any change.
         ckeditor.getToolBar().toggleSourceMode();
@@ -336,25 +328,14 @@ class InplaceEditIT
         richTextArea.sendKeys("a first line", Keys.ENTER);
 
         // Insert the Id macro. The macro placeholder should be displayed.
-        richTextArea.sendKeys(Keys.ENTER, "/id");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/id", "Id");
         richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-
         // We need to set the required name parameter through the Macro Edit dialog.
-        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
-        macroEditModal.setMacroParameter("name", "test").clickSubmit();
-        richTextArea.waitForContentRefresh();
+        richTextArea.insertMacroWithRequiredParameters("/id", "Id").setMacroParameter("name", "test").clickSubmit();
 
         // Insert the Children macro. The macro placeholder is initially displayed but then hidden, because the macro
         // output is empty until the tree is lazy loaded.
-        richTextArea.sendKeys(Keys.UP, "/chi");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/chi", "Children");
-        richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        richTextArea.waitForContentRefresh();
+        richTextArea.sendKeys(Keys.UP);
+        richTextArea.insertMacro("/chi", "Children");
 
         // Wait until the children macro has loaded the tree content.
         richTextArea.waitUntilTextContains("No pages found");
@@ -476,19 +457,13 @@ class InplaceEditIT
         richTextArea.clear();
 
         // Insert the Velocity macro. The macro placeholder should be displayed.
-        richTextArea.sendKeys("/velocity");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velocity", "Velocity");
-        richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        MacroDialogEditModal macroEditModal = richTextArea.insertMacroWithRequiredParameters("/velocity", "Velocity");
 
         // check the behaviour of boolean parameters of macro.
-        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
         assertTrue(macroEditModal.getMacroParameterInput("wiki").isSelected());
         macroEditModal.setMacroContent("#set($discard = $NULL)");
         macroEditModal.setMacroParameterCheckbox("wiki", false);
         macroEditModal.clickSubmit();
-        richTextArea.waitForContentRefresh();
 
         assertEquals("macro:velocity", richTextArea.getText());
 

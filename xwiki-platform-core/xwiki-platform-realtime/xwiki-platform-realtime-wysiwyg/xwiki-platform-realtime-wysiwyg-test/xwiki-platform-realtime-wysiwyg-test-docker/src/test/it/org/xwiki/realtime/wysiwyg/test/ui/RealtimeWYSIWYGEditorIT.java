@@ -38,7 +38,6 @@ import org.openqa.selenium.WindowType;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
-import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.CKEditorToolBar;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
@@ -384,12 +383,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         secondTextArea.waitUntilTextContains("one");
-        secondTextArea.sendKeys("/info");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/info", "Info Box");
-        secondTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        secondTextArea.waitForContentRefresh();
+        secondTextArea.insertMacro("/info", "Info Box");
 
         // Replace the default message text.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -756,12 +750,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
 
-        firstTextArea.sendKeys("/info");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/info", "Info Box");
-        firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        firstTextArea.waitForContentRefresh();
+        firstTextArea.insertMacro("/info", "Info Box");
 
         // Replace the default message text.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -800,7 +789,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilTextContains("two");
         firstMacroEditModal.setMacroContent("one two");
         firstMacroEditModal.clickSubmit();
-        firstTextArea.waitForContentRefresh();
 
         // Move to the information box title field and type something.
         firstTextArea.sendKeys(Keys.ARROW_UP, Keys.END, " title");
@@ -816,9 +804,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondMacroEditModal.getMacroParameterInput("cssClass").sendKeys("a");
         secondMacroEditModal.setMacroParameter("title", "Some title");
         secondMacroEditModal.clickSubmit();
-        // The content is refreshed 3 times: after the macro is inserted, after the macro is updated from the first tab
-        // and after the macro is updated from the second tab.
-        secondTextArea.waitForContentRefresh("3");
 
         // Move to the information box title field and type something.
         secondTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);
@@ -1033,24 +1018,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
 
         // Type some text and insert an information box.
-        firstTextArea.sendKeys("before", Keys.ENTER, "/info");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/info", "Info Box");
-        firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        firstTextArea.waitForContentRefresh();
+        firstTextArea.sendKeys("before", Keys.ENTER);
+        firstTextArea.insertMacro("/info", "Info Box");
 
         // Select the default information message and delete it.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
         firstTextArea.sendKeys(Keys.BACK_SPACE);
 
         // Insert a nested error box.
-        firstTextArea.sendKeys("inside", Keys.ENTER, "/err");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/err", "Error Box");
-        firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        firstTextArea.waitForContentRefresh();
+        firstTextArea.sendKeys("inside", Keys.ENTER);
+        firstTextArea.insertMacro("/err", "Error Box");
 
         // Replace the default error message.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -1203,13 +1180,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Insert a Velocity macro.
         secondTextArea.sendKeys("before", Keys.RETURN);
-        secondTextArea.sendKeys("/velo");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
-        secondTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
-        secondTextArea.waitForContentRefresh();
+        secondTextArea.insertMacroWithRequiredParameters("/velo", "Velocity")
+            .setMacroContent("$xcontext.userReference.name").clickSubmit();
         String text = secondTextArea.getText();
         assertTrue(text.contains("superadmin"));
         assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
@@ -1244,9 +1216,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilTextContains(" dinner");
 
         // Edit the macro again.
-        secondTextArea.sendKeys(Keys.ENTER);
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("User: $xcontext.userReference.name").clickSubmit();
-        secondTextArea.waitForContentRefresh();
+        secondTextArea.editSelectedMacro().setMacroContent("User: $xcontext.userReference.name").clickSubmit();
         text = secondTextArea.getText();
         // This time the script macro is not executed because John has been associated as script author of the realtime
         // session.
@@ -1268,13 +1238,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Try to inject a script macro.
         firstTextArea.sendKeys(Keys.HOME);
         firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.ARROW_RIGHT));
-        firstTextArea.sendKeys(Keys.ENTER, Keys.ENTER, Keys.ARROW_UP, "/velo");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
-        firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("injected").clickSubmit();
-        firstTextArea.waitForContentRefresh();
+        firstTextArea.sendKeys(Keys.ENTER, Keys.ENTER, Keys.ARROW_UP);
+        firstTextArea.insertMacroWithRequiredParameters("/velo", "Velocity").setMacroContent("injected").clickSubmit();
         text = firstTextArea.getText();
         assertFalse(text.contains("injected"), "Unexpected text content: " + text);
         String firstRefreshCounter = firstTextArea.getRefreshCounter();
@@ -1295,9 +1260,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertFalse(text.contains("injected"), "Unexpected text content: " + text);
 
         // Edit again the macro to see that the script level doesn't change.
-        secondTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("Current: $xcontext.userReference").clickSubmit();
-        secondTextArea.waitForContentRefresh();
+        secondTextArea.sendKeys(Keys.ARROW_RIGHT);
+        secondTextArea.editSelectedMacro().setMacroContent("Current: $xcontext.userReference").clickSubmit();
         text = secondTextArea.getText();
         assertFalse(text.contains("Current: superadmin"), "Unexpected text content: " + text);
         assertTrue(text.contains("Failed to execute the [velocity] macro."), "Unexpected text content: " + text);
@@ -1351,13 +1315,10 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // * different channels are used to synchronize the content of different translations
         // * each translation has its own script author
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        secondTextArea.sendKeys("French content", Keys.ENTER, "/velo");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
-        secondTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
-        secondTextArea.waitUntilTextContains("superadmin");
+        secondTextArea.sendKeys("French content", Keys.ENTER);
+        secondTextArea.insertMacroWithRequiredParameters("/velo", "Velocity")
+            .setMacroContent("$xcontext.userReference.name").clickSubmit();
+        assertTrue(secondTextArea.getText().contains("superadmin"));
 
         //
         // First Tab
@@ -1366,13 +1327,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
 
         // Try to insert a script macro. The current user doesn't have script right.
-        firstTextArea.sendKeys(Keys.ENTER, "/velo");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
         firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent(" ").clickSubmit();
-        firstTextArea.waitUntilTextContains("default content\nFailed to execute the [velocity] macro.");
+        firstTextArea.insertMacroWithRequiredParameters("/velo", "Velocity").setMacroContent(" ").clickSubmit();
+        assertTrue(firstTextArea.getText().contains("default content\nFailed to execute the [velocity] macro."));
 
         // Verify that we're editing alone.
         assertTrue(firstEditPage.getToolbar().isEditingAlone());

@@ -195,6 +195,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Edit again to verify the autosave.
         inplaceEditablePage.editInplace();
+
+        // Verify that we reconnect after a connection loss. We're editing alone, so the server removes the realtime
+        // session when we're disconnected and we have to join a new one (regression test for XWIKI-25236).
+        inplaceEditablePage.getToolbar().simulateConnectionLoss();
+
         editor = new RealtimeCKEditor();
         textArea = editor.getRichTextArea();
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));

@@ -33,6 +33,9 @@ define('xwiki-realtime-saver', [
 
   const {SaveTransport, Saver, XWikiFormSaveTarget} = AutoSave;
 
+  // How long to wait for the server to acknowledge the local saver state, in milliseconds.
+  const SETTLE_TIMEOUT = 2000;
+
   // The auto-save modules report what they do through the Logger role of the component API. This WebJar has no
   // component container to resolve the default implementation from, so it passes this console backed one.
   const logger = {
@@ -72,6 +75,8 @@ define('xwiki-realtime-saver', [
 
       this._config = config;
       this._revertList = [];
+      // The callbacks of the callers waiting for the local state to reach the server, see whenSettled.
+      this._settleWaiters = new Set();
 
       this._initializing = new Promise(resolve => {
         this._notifyReady = () => {
@@ -142,14 +147,45 @@ define('xwiki-realtime-saver', [
       return this._userList.users.includes(state.id);
     }
 
+    /**
+     * ChainPad settles when the server acknowledges our pending changes, but this acknowledgement may never come:
+     * ChainPad doesn't time out the messages that are waiting for it and Netflux drops them (without rejecting them)
+     * when the WebSocket connection is closed. So we stop waiting when the connection is lost, when the transport is
+     * disposed, or when waiting has taken too long, because the saver waits for this before leaving the realtime
+     * session and a settlement that never comes must not block the editor.
+     *
+     * @returns a promise that resolves when the local state has been received by the server, or when waiting for it
+     *   doesn't make sense anymore
+     */
     whenSettled() {
+      if (!this._chainpad) {
+        // We're not connected (yet, or anymore) so there's nothing to wait for.
+        return Promise.resolve();
+      }
+
       return new Promise(resolve => {
-        if (this._chainpad) {
-          this._chainpad.onSettle(resolve);
-        } else {
+        const settle = () => {
+          clearTimeout(timeout);
+          this._settleWaiters.delete(settle);
           resolve();
-        }
+        };
+        const timeout = setTimeout(settle, SETTLE_TIMEOUT);
+        this._settleWaiters.add(settle);
+        this._chainpad.onSettle(settle);
       });
+    }
+
+    _stopWaitingForSettlement() {
+      // Copy the set because each waiter removes itself from it.
+      [...this._settleWaiters].forEach(settle => settle());
+    }
+
+    _onConnectionLost() {
+      // Stop ChainPad from trying again and again to send our pending changes over a connection that is closed.
+      this._chainpad?.abort();
+      // We can only keep the state locally from now on (see updateLocalState).
+      delete this._chainpad;
+      this._stopWaitingForSettlement();
     }
 
     _getRealtimeConfig() {
@@ -165,7 +201,11 @@ define('xwiki-realtime-saver', [
         onRemote: this._onRemote.bind(this),
         onReady: this._onReady.bind(this),
         onLocal: this._onLocal.bind(this),
-        onAbort: () => this.saver.stop()
+        // Called when the WebSocket connection is closed.
+        onAbort: () => {
+          this._onConnectionLost();
+          this.saver.stop();
+        }
       };
     }
 
@@ -178,7 +218,7 @@ define('xwiki-realtime-saver', [
     }
 
     _onRemote() {
-      if (this._initializing) {
+      if (this._initializing || !this._chainpad) {
         return;
       }
 
@@ -197,7 +237,7 @@ define('xwiki-realtime-saver', [
     }
 
     _onLocal() {
-      if (this._initializing) {
+      if (this._initializing || !this._chainpad) {
         return;
       }
       const localStates = jsonSortify(this._states);
@@ -214,6 +254,7 @@ define('xwiki-realtime-saver', [
 
     async dispose() {
       delete this._chainpad;
+      this._stopWaitingForSettlement();
 
       // Disconnect from the realtime channel and remove the event listeners.
       this._revertList.forEach(revert => revert());

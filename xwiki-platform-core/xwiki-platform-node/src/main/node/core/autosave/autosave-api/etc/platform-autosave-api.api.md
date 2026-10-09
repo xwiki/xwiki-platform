@@ -89,7 +89,6 @@ export abstract class SaveTransport<C extends object = object> {
         push?: boolean;
         immediate?: boolean;
     }): Promise<void>;
-    // (undocumented)
     whenSettled(): Promise<void>;
 }
 

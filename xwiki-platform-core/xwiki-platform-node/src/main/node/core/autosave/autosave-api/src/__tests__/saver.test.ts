@@ -42,6 +42,11 @@ class FakeTransport extends SaveTransport<TestContext> {
 
   public pushCount: number = 0;
 
+  /**
+   * When set, waiting for the local state to reach the other clients fails with this error.
+   */
+  public settleFailure?: Error;
+
   public constructor(
     saver: Saver<TestContext>,
     private readonly clientId: string = "alice",
@@ -70,6 +75,9 @@ class FakeTransport extends SaveTransport<TestContext> {
     this.states[this.clientId] = this.state;
     if (options?.push) {
       this.pushCount++;
+    }
+    if (options?.immediate && this.settleFailure) {
+      throw this.settleFailure;
     }
   }
 
@@ -474,6 +482,17 @@ describe("Saver", () => {
       await saver.stop();
 
       expect(transport.pushCount).toBe(pushCount + 1);
+      expect(transport.disposed).toBe(true);
+      expect(target.disposed).toBe(true);
+    });
+
+    it("disposes the transport and the target even when the final push fails", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      transport.settleFailure = new Error("Connection lost");
+
+      await saver.stop();
+
       expect(transport.disposed).toBe(true);
       expect(target.disposed).toBe(true);
     });

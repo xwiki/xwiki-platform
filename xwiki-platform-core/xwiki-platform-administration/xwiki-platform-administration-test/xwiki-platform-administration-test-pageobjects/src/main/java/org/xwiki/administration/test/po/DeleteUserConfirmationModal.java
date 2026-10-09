@@ -63,6 +63,7 @@ public class DeleteUserConfirmationModal extends ConfirmationModal
     /**
      * @return the text of the warning displayed when the user being deleted has Script or Programming Rights and is
      *         the last author of one or more pages, or an empty string when no such warning is displayed
+     * @since 17.10.14
      * @since 18.4.7
      * @since 18.7.0RC1
      */

@@ -106,6 +106,13 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
     }
 
     @Override
+    public String getColumnName(String columnName)
+    {
+        // Oracle stores the unquoted column names in upper case
+        return columnName != null ? columnName.toUpperCase() : null;
+    }
+
+    @Override
     protected String cleanDatabaseName(String name)
     {
         // Oracle generally needs the schema name to be upper case

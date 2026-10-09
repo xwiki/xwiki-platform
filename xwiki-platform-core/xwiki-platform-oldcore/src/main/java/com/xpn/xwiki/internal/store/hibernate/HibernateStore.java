@@ -1174,13 +1174,8 @@ public class HibernateStore implements Disposable, Initializable
      */
     public String getConfiguredColumnName(Column column)
     {
-        String columnName = column.getName();
-
-        if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
-            columnName = columnName.toLowerCase();
-        }
-
-        return columnName;
+        // The case of the column name in the database depends on the database (whatever the case used in the mapping)
+        return getAdapter().getColumnName(column.getName());
     }
 
     /**

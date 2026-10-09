@@ -317,6 +317,7 @@ class ExtensionIndexStoreTest
 
         // Update the extension before committing it
         this.indexStore.add(new TestExtension(this.testRepository, extensionId, "type"), true);
+        assertTrue(this.indexStore.exists(extensionId));
         this.indexStore.updateCompatible(extensionId, "namespace", true, null);
         this.indexStore.updateCompatible(extensionId, "othernamespace", null, true);
         this.indexStore.commit();

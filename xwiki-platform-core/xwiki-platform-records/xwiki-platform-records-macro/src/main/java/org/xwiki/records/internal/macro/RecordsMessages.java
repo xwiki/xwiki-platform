@@ -128,8 +128,8 @@ public class RecordsMessages
     }
 
     /**
-     * The message macros parse their content as wiki syntax, while the messages embed names that come from the wiki,
-     * so the text goes through a plain text parser and back out as XWiki syntax, which escapes it.
+     * The message macros parse their content as wiki syntax, while the messages embed names that come from the wiki, so
+     * the text goes through a plain text parser and back out as XWiki syntax, which escapes it.
      *
      * @param text the plain text to escape
      * @return the text as XWiki syntax content that renders as the text itself

@@ -139,9 +139,9 @@ public class RecordsFields
     }
 
     /**
-     * Resolves what the table can do with a field the way Live Data does: from the field's own descriptor, and from
-     * the defaults of its type for whatever the descriptor leaves unset. A field of a type with no defaults can be
-     * neither sorted nor filtered on.
+     * Resolves what the table can do with a field the way Live Data does: from the field's own descriptor, and from the
+     * defaults of its type for whatever the descriptor leaves unset. A field of a type with no defaults can be neither
+     * sorted nor filtered on.
      *
      * @param descriptor the descriptor of the field
      * @param type the defaults of the field's type, {@code null} when there are none
@@ -162,9 +162,9 @@ public class RecordsFields
     }
 
     /**
-     * Tells which values the {@code liveTable} source can match a field with. It matches a number filter by parsing
-     * the value, and a boolean one by comparing it with the filter's own true and false values, so anything else
-     * matches no entry. An empty value is always accepted, since it filters nothing.
+     * Tells which values the {@code liveTable} source can match a field with. It matches a number filter by parsing the
+     * value, and a boolean one by comparing it with the filter's own true and false values, so anything else matches no
+     * entry. An empty value is always accepted, since it filters nothing.
      *
      * @param filter the filter of the field, {@code null} when it has none
      * @return whether a decoded filter value fits the field

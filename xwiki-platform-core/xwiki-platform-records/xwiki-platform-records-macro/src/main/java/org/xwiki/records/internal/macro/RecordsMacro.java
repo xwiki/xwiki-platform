@@ -64,9 +64,9 @@ import org.xwiki.security.authorization.Right;
  * The one thing worth knowing about that translation is what it deliberately does <em>not</em> do. The renderer also
  * accepts an advanced configuration, which is the only way to reach the parts of a Live Data that are not macro
  * parameters. It is not used here, and cannot be while it stays the trust switch it is today: the renderer marks the
- * content trusted only when the advanced configuration is blank or the author holds script right, so passing one
- * would downgrade every table authored by someone without that right and get its HTML displayers sanitized. The
- * mapping below therefore sticks to what the parameters can express.
+ * content trusted only when the advanced configuration is blank or the author holds script right, so passing one would
+ * downgrade every table authored by someone without that right and get its HTML displayers sanitized. The mapping below
+ * therefore sticks to what the parameters can express.
  *
  * @version $Id$
  * @since 18.9.0RC1
@@ -147,8 +147,8 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private static final List<String> SORT_DIRECTIONS = List.of(":asc", ":desc");
 
     /**
-     * Builds the warning for a field the data type no longer has. Not a {@link Function} because building a message
-     * can fail.
+     * Builds the warning for a field the data type no longer has. Not a {@link Function} because building a message can
+     * fail.
      */
     @FunctionalInterface
     private interface WarningBuilder
@@ -181,8 +181,8 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private ContextualAuthorizationManager authorization;
 
     /**
-     * Serializes the picked data type for the source. The compact form keeps the wiki only when it is not the
-     * current one, which is what a class reference looks like in a Live Data source parameter.
+     * Serializes the picked data type for the source. The compact form keeps the wiki only when it is not the current
+     * one, which is what a class reference looks like in a Live Data source parameter.
      */
     @Inject
     @Named("compactwiki")
@@ -242,8 +242,8 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * Only {@code class} needs real work, because it is the only parameter that is not already in the shape Live Data
      * expects: it becomes a source parameter of the {@code liveTable} source. The rest are passed through, since the
      * macro deliberately reuses Live Data's own encodings — a comma-separated properties list, a query-string filter
-     * and a {@code name:asc} sort list — so that a value an author writes here means the same thing it would mean in
-     * a {@code liveData} macro.
+     * and a {@code name:asc} sort list — so that a value an author writes here means the same thing it would mean in a
+     * {@code liveData} macro.
      *
      * @param parameters the macro parameters
      * @param context the transformation context, which carries the document's identifier generator
@@ -283,12 +283,12 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     /**
      * Tells which fields the data type has, for the purpose of dropping the authored ones it no longer has.
      * <p>
-     * The source only reports the fields of a data type to a reader who can view it, and reports none to anyone
-     * else. For such a reader the field list says nothing about the data type, so every field is taken as known and
-     * the authored columns, filters and sort are passed through unchanged. Dropping them would show that reader
-     * every entry the author filtered out, and warn them about fields that do exist, in a message they cannot act on.
-     * The default column list is still built from the fields they are offered, so with no column authored they see
-     * the entry title alone, which is also all that Live Data would describe to them.
+     * The source only reports the fields of a data type to a reader who can view it, and reports none to anyone else.
+     * For such a reader the field list says nothing about the data type, so every field is taken as known and the
+     * authored columns, filters and sort are passed through unchanged. Dropping them would show that reader every entry
+     * the author filtered out, and warn them about fields that do exist, in a message they cannot act on. The default
+     * column list is still built from the fields they are offered, so with no column authored they see the entry title
+     * alone, which is also all that Live Data would describe to them.
      *
      * @param dataType the reference of the data type
      * @param fields the fields the data type's source offers to the current user
@@ -304,16 +304,16 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
 
     /**
      * Returns the identifier of this table, which is always set.
-     *
+     * <p>
      * Live Data needs one whether or not the author supplied it. Its layout builds the element id of the table's
-     * description as {@code <id>-description} and points at it with {@code aria-describedby}, so a table without an
-     * id gets the literal id {@code undefined-description}: harmless alone, but two such tables on one page share
-     * that element id and the second is then described by the first one's text.
-     *
-     * The document's {@link IdGenerator} is used rather than a counter of our own, so a Records table takes its
-     * place among the ids the rest of the page generates — headings included — and cannot collide with them. It
-     * appends {@code -1}, {@code -2} and so on, which is what makes two tables on a page distinct whether the author
-     * named them the same thing or named neither.
+     * description as {@code <id>-description} and points at it with {@code aria-describedby}, so a table without an id
+     * gets the literal id {@code undefined-description}: harmless alone, but two such tables on one page share that
+     * element id and the second is then described by the first one's text.
+     * <p>
+     * The document's {@link IdGenerator} is used rather than a counter of our own, so a Records table takes its place
+     * among the ids the rest of the page generates — headings included — and cannot collide with them. It appends
+     * {@code -1}, {@code -2} and so on, which is what makes two tables on a page distinct whether the author named them
+     * the same thing or named neither.
      *
      * @param parameters the macro parameters
      * @param context the transformation context, which carries the generator
@@ -340,18 +340,17 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
 
     /**
      * Returns the columns to display.
-     *
-     * The default has to be resolved here rather than left to Live Data: the {@code liveTable} source needs an
-     * explicit column list, and an absent one yields a table with no columns at all rather than one with every
-     * column. The {@code documents} macro assembles its list for the same reason.
-     *
-     * It opens with the entry's title. A table of nothing but field values gives a reader no way to tell one entry
-     * from another, and no way to reach the page an entry lives in; the title column is what makes the rest of the
-     * row mean something. An author who wants the fields alone can say so, since naming any column replaces this
-     * list entirely.
-     *
-     * The columns the author named that the data type no longer has are skipped, with a warning. When none of them
-     * is left the default applies, since a table with no column at all would say nothing.
+     * <p>
+     * The default has to be resolved here rather than left to Live Data: the {@code liveTable} source needs an explicit
+     * column list, and an absent one yields a table with no columns at all rather than one with every column. The
+     * {@code documents} macro assembles its list for the same reason.
+     * <p>
+     * It opens with the entry's title. A table of nothing but field values gives a reader no way to tell one entry from
+     * another, and no way to reach the page an entry lives in; the title column is what makes the rest of the row mean
+     * something. An author who wants the fields alone can say so, since naming any column replaces this list entirely.
+     * <p>
+     * The columns the author named that the data type no longer has are skipped, with a warning. When none of them is
+     * left the default applies, since a table with no column at all would say nothing.
      *
      * @param parameters the macro parameters
      * @param fields everything the data type's source offers, by identifier
@@ -368,7 +367,7 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
             return kept;
         }
         return Stream.concat(Stream.of(TITLE_PROPERTY),
-            fields.keySet().stream().filter(id -> !id.startsWith(METADATA_PREFIX) && !id.startsWith(INTERNAL_PREFIX)))
+                fields.keySet().stream().filter(id -> !id.startsWith(METADATA_PREFIX) && !id.startsWith(INTERNAL_PREFIX)))
             .collect(Collectors.joining(LIST_SEPARATOR));
     }
 
@@ -438,9 +437,9 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * Keeps the constraints of a filters value that the type of their field still allows.
      * <p>
      * A constraint the type does not allow does not make Live Data ignore it: the {@code liveTable} source matches no
-     * entry at all for a number field filtered on {@code cheap}, which is what is left of a filter authored before
-     * the field became a number. The constraint is dropped with a warning instead, and the table shows the others.
-     * The fields the reader is not told about are left alone, since nothing is known of their type.
+     * entry at all for a number field filtered on {@code cheap}, which is what is left of a filter authored before the
+     * field became a number. The constraint is dropped with a warning instead, and the table shows the others. The
+     * fields the reader is not told about are left alone, since nothing is known of their type.
      *
      * @param filters the filters value, which may be blank
      * @param fields the fields of the data type, by identifier

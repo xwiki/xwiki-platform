@@ -29,16 +29,15 @@ import org.xwiki.stability.Unstable;
  * {@code templates/html_displayer/<simple type name in lower case>/edit.vm} — here
  * {@code templates/html_displayer/recordsfilters/edit.vm}.
  * <p>
- * The widget it selects holds one item per {@code field=value} constraint, which is what the renderer parses the
- * query string into. Its suggestions come in two steps, since only the author knows which field they mean: the
- * fields until a {@code =} is typed, then that field's values. Those values are not invented here — the Live Data
- * properties resource reports a {@code filter.searchURL} for every property whose values are enumerable, and that
- * is the same URL the Live Data filter row queries, so the dialog offers what a reader would be offered in the
- * rendered table. A property without one is filtered by typing, which is why this is the only picker of this
- * dialog that accepts free text.
+ * The widget it selects holds one item per {@code field=value} constraint, which is what the renderer parses the query
+ * string into. Its suggestions come in two steps, since only the author knows which field they mean: the fields until a
+ * {@code =} is typed, then that field's values. Those values are not invented here — the Live Data properties resource
+ * reports a {@code filter.searchURL} for every property whose values are enumerable, and that is the same URL the Live
+ * Data filter row queries, so the dialog offers what a reader would be offered in the rendered table. A property
+ * without one is filtered by typing, which is why this is the only picker of this dialog that accepts free text.
  * <p>
- * Like {@link RecordsColumns}, the candidate list depends on the value of the sibling {@code class} parameter, and
- * is read from the browser at query time for the reasons given there.
+ * Like {@link RecordsColumns}, the candidate list depends on the value of the sibling {@code class} parameter, and is
+ * read from the browser at query time for the reasons given there.
  *
  * @version $Id$
  * @since 18.9.0RC1

@@ -30,12 +30,12 @@ import org.xwiki.stability.Unstable;
  * {@code templates/html_displayer/recordscolumns/edit.vm}.
  * <p>
  * The widget it selects is a suggester whose candidate list depends on the value of the sibling {@code class}
- * parameter. The macro editor offers no declarative way to express that dependency: a displayer receives its own
- * type, default value and attributes and nothing else. What makes it work anyway is that the suggest widget's data
- * source is a callback invoked on each keystroke rather than a URL fixed when this template is rendered, so it can
- * read the {@code class} input at query time. See the {@code xwiki-platform-records-webjar} module for the
- * implementation, and note that the coupling is to the input <em>named after the parameter</em>, which is the same
- * contract the macro editor itself relies on to assemble a macro call.
+ * parameter. The macro editor offers no declarative way to express that dependency: a displayer receives its own type,
+ * default value and attributes and nothing else. What makes it work anyway is that the suggest widget's data source is
+ * a callback invoked on each keystroke rather than a URL fixed when this template is rendered, so it can read the
+ * {@code class} input at query time. See the {@code xwiki-platform-records-webjar} module for the implementation, and
+ * note that the coupling is to the input <em>named after the parameter</em>, which is the same contract the macro
+ * editor itself relies on to assemble a macro call.
  *
  * @version $Id$
  * @since 18.9.0RC1

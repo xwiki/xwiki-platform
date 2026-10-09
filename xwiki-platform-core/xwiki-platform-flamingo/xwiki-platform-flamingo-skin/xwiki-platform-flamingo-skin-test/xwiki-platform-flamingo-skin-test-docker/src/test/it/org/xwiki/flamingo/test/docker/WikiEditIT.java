@@ -458,12 +458,13 @@ class WikiEditIT
      *      save diffs are different, verify manipulating diffs, submit reload of the editor
      *   4. Edit different places, save&continue, ensure the automatic merge is performed and the editor is reloaded
      *      with fresh content.
-     *   5. Create another conflict, Save&Continue, fix by forcing save.
+     *   5. Create another conflict, Save&Continue, fix by forcing save. The page is saved again while choosing, so
+     *      the conflict window appears again and the save is forced again.
      *   6. Create multiple conflicts and solve them with custom fixes.
      */
     @Test
     @Order(8)
-    void editWithConflict(TestUtils setup, TestReference testReference)
+    void editWithConflict(TestUtils setup, TestReference testReference) throws Exception
     {
         // Fixture
         String title = testReference.getLastSpaceReference().getName();
@@ -662,6 +663,15 @@ class WikiEditIT
             " Yet another line with other few changes.",
             "-And again a new line"),
             editConflictModal.getDiff().getDiff("Content"));
+
+        // The page is saved again while the user decides: the decision doesn't cover these changes, so the user has
+        // to decide again.
+        setup.rest().savePage(testReference, "A sixth edit from somewhere else.\nAnother line."
+            + "\nYet another line with other few changes.\nAnd again a new line", title);
+        editConflictModal.submitCurrentChoice(false);
+        editConflictModal = new EditConflictModal();
+        assertTrue(editConflictModal.isDisplayed());
+        editConflictModal = editConflictModal.makeChoice(EditConflictModal.ConflictChoice.OVERRIDE);
         editConflictModal.submitCurrentChoice(true);
         // The content should remain the same in the editor
         assertEquals("A fifth edit from another tab.\nAnother line."

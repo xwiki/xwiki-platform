@@ -85,6 +85,7 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
@@ -196,6 +197,8 @@ public class MockitoOldcore
 
     private boolean notifyDocumentCreatedEvent;
 
+    private boolean checkDocumentRevision;
+
     private boolean notifyDocumentUpdatedEvent;
 
     private boolean notifyDocumentDeletedEvent;
@@ -270,6 +273,19 @@ public class MockitoOldcore
     public MockitoComponentManager getMocker()
     {
         return this.componentManager;
+    }
+
+    /**
+     * Makes the mock store refuse to save a document that isn't based on the stored revision, like the Hibernate store
+     * does, by throwing a {@link DocumentRevisionConflictException}. Disabled by default because many tests save
+     * documents without loading them first.
+     *
+     * @param checkDocumentRevision {@code true} to check the revision of the saved documents
+     * @since 18.9.0RC1
+     */
+    public void checkDocumentRevision(boolean checkDocumentRevision)
+    {
+        this.checkDocumentRevision = checkDocumentRevision;
     }
 
     public void notifyDocumentCreatedEvent(boolean notifyDocumentCreatedEvent)
@@ -1244,9 +1260,35 @@ public class MockitoOldcore
         }
     }
 
+    private void checkStoredRevision(XWikiDocument document) throws DocumentRevisionConflictException
+    {
+        String expectedRevision;
+        if (document.isNew()) {
+            expectedRevision = null;
+        } else {
+            XWikiDocument originalDocument = document.getOriginalDocument();
+            if (originalDocument == null || originalDocument.isNew() || !originalDocument
+                .getDocumentReferenceWithLocale().equals(document.getDocumentReferenceWithLocale())) {
+                return;
+            }
+            expectedRevision = originalDocument.getVersion();
+        }
+
+        XWikiDocument storedDocument = this.documents.get(document.getDocumentReferenceWithLocale());
+        String storedRevision = storedDocument != null ? storedDocument.getVersion() : null;
+        if (!Objects.equals(expectedRevision, storedRevision)) {
+            throw new DocumentRevisionConflictException(document.getDocumentReferenceWithLocale(), expectedRevision,
+                storedRevision);
+        }
+    }
+
     private void saveDocument(XWikiDocument document, XWikiContext xcontext)
         throws XWikiException
     {
+        if (this.checkDocumentRevision) {
+            checkStoredRevision(document);
+        }
+
         boolean supportRevisionStore = this.componentManager.hasComponent(XWikiDocumentFilterUtils.class);
 
         if (document.isContentDirty() || document.isMetaDataDirty()) {

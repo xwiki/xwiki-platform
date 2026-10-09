@@ -31,10 +31,14 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.LockMode;
+import org.hibernate.PessimisticLockException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,6 +57,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AfterComponent;
@@ -70,6 +75,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.BaseObject;
@@ -81,12 +87,16 @@ import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -147,6 +157,9 @@ class XWikiHibernateStoreTest
 
     @MockComponent
     private HibernateConfiguration hibernateConfiguration;
+
+    @MockComponent
+    private StoreConfiguration storeConfiguration;
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
@@ -617,5 +630,238 @@ class XWikiHibernateStoreTest
 
         verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
         verify(this.session, times(2)).update("com.xpn.xwiki.objects.BaseObject", object1);
+    }
+
+    private static final String SELECT_DOCUMENT_ID =
+        "select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id";
+
+    private static final String SELECT_STORED_VERSION =
+        "select xwikidoc.version from XWikiDocument as xwikidoc where xwikidoc.id = :id";
+
+    private static final DocumentReference DOCUMENT_REFERENCE =
+        new DocumentReference(WIKI_NAME, "space", "document");
+
+    private Query<String> mockStoredDocument(XWikiDocument document, String storedVersion)
+    {
+        when(this.storeConfiguration.isRevisionCheckEnabled()).thenReturn(true);
+
+        Query<String> versionQuery = mock();
+        when(this.session.createQuery(SELECT_STORED_VERSION, String.class)).thenReturn(versionQuery);
+        when(versionQuery.setParameter(anyString(), any())).thenReturn(versionQuery);
+        when(versionQuery.uniqueResult()).thenReturn(storedVersion);
+
+        Query<Long> existsQuery = mock();
+        when(this.session.createQuery(SELECT_DOCUMENT_ID)).thenReturn(existsQuery);
+        when(existsQuery.uniqueResult()).thenReturn(storedVersion != null ? document.getId() : null);
+
+        return versionQuery;
+    }
+
+    private XWikiDocument getDocumentBasedOn(String version)
+    {
+        XWikiDocument originalDocument = new XWikiDocument(DOCUMENT_REFERENCE);
+        originalDocument.setNew(false);
+        originalDocument.setVersion(version);
+
+        XWikiDocument document = originalDocument.clone();
+        document.setOriginalDocument(originalDocument);
+        document.setContent("modified");
+        return document;
+    }
+
+    @Test
+    void saveNewDocumentWhenNotStored() throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        Query<String> versionQuery = mockStoredDocument(document, null);
+
+        this.store.saveXWikiDoc(document, this.xcontext, true);
+
+        verify(versionQuery).setParameter("id", document.getId());
+        verify(versionQuery).setLockMode("xwikidoc", LockMode.PESSIMISTIC_WRITE);
+        verify(this.session).save(same(document));
+        assertFalse(document.isNew());
+    }
+
+    @Test
+    void saveNewDocumentWhenAlreadyStored()
+    {
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        mockStoredDocument(document, "1.1");
+
+        DocumentRevisionConflictException exception = assertThrows(DocumentRevisionConflictException.class,
+            () -> this.store.saveXWikiDoc(document, this.xcontext, true));
+
+        assertEquals(new DocumentReference(DOCUMENT_REFERENCE, Locale.ROOT), exception.getDocumentReference());
+        assertNull(exception.getExpectedRevision());
+        assertEquals("1.1", exception.getStoredRevision());
+        assertEquals(XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC_REVISION_CONFLICT, exception.getCode());
+        verify(this.session, never()).save(any());
+        verify(this.session, never()).update(any());
+        assertTrue(document.isNew());
+    }
+
+    @Test
+    void saveDocumentBasedOnStoredRevision() throws XWikiException
+    {
+        XWikiDocument document = getDocumentBasedOn("2.1");
+        mockStoredDocument(document, "2.1");
+
+        this.store.saveXWikiDoc(document, this.xcontext, true);
+
+        verify(this.session).update(same(document));
+        assertEquals("3.1", document.getVersion());
+        assertEquals("3.1", document.getOriginalDocument().getVersion());
+    }
+
+    @Test
+    void saveDocumentBasedOnOutdatedRevision()
+    {
+        XWikiDocument document = getDocumentBasedOn("2.1");
+        mockStoredDocument(document, "3.1");
+
+        DocumentRevisionConflictException exception = assertThrows(DocumentRevisionConflictException.class,
+            () -> this.store.saveXWikiDoc(document, this.xcontext, true));
+
+        assertEquals("2.1", exception.getExpectedRevision());
+        assertEquals("3.1", exception.getStoredRevision());
+        assertEquals("Error number 3237 in 3: Document wiki:space.document was modified concurrently: the saved"
+            + " document is based on revision [2.1] but the stored revision is [3.1]", exception.getMessage());
+        verify(this.session, never()).update(any());
+        // The version is incremented only when the document is actually saved.
+        assertEquals("2.1", document.getVersion());
+    }
+
+    @Test
+    void saveDocumentDeletedConcurrently()
+    {
+        XWikiDocument document = getDocumentBasedOn("2.1");
+        mockStoredDocument(document, null);
+
+        DocumentRevisionConflictException exception = assertThrows(DocumentRevisionConflictException.class,
+            () -> this.store.saveXWikiDoc(document, this.xcontext, true));
+
+        assertEquals("2.1", exception.getExpectedRevision());
+        assertNull(exception.getStoredRevision());
+        verify(this.session, never()).save(any());
+        verify(this.session, never()).update(any());
+    }
+
+    @Test
+    void saveDocumentWithUnknownBaseRevision() throws XWikiException
+    {
+        // The original document of a renamed document is the one of the source document.
+        XWikiDocument sourceDocument = new XWikiDocument(new DocumentReference(WIKI_NAME, "space", "source"));
+        sourceDocument.setNew(false);
+        sourceDocument.setVersion("5.1");
+        XWikiDocument document = getDocumentBasedOn("2.1");
+        document.setOriginalDocument(sourceDocument);
+        mockStoredDocument(document, "2.1");
+
+        this.store.saveXWikiDoc(document, this.xcontext, true);
+
+        verify(this.session, never()).createQuery(SELECT_STORED_VERSION, String.class);
+        verify(this.session).update(same(document));
+    }
+
+    @Test
+    void saveDocumentWithRevisionCheckDisabled() throws XWikiException
+    {
+        XWikiDocument document = getDocumentBasedOn("2.1");
+        mockStoredDocument(document, "3.1");
+        when(this.storeConfiguration.isRevisionCheckEnabled()).thenReturn(false);
+
+        this.store.saveXWikiDoc(document, this.xcontext, true);
+
+        verify(this.session, never()).createQuery(SELECT_STORED_VERSION, String.class);
+        verify(this.session).update(same(document));
+    }
+
+    @Test
+    void saveNewDocumentCreatedConcurrently() throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        Query<String> versionQuery = mockStoredDocument(document, null);
+        when(this.hibernateStore.beginTransaction(any())).thenReturn(true);
+        // The other request inserts the document between the check and the commit.
+        ConstraintViolationException constraintViolation =
+            new ConstraintViolationException("duplicate key", null, "XWIKIDOC_PK");
+        doAnswer(invocation -> {
+            when(versionQuery.uniqueResult()).thenReturn("1.1");
+            throw constraintViolation;
+        }).when(this.hibernateStore).endTransaction(true);
+
+        DocumentRevisionConflictException exception = assertThrows(DocumentRevisionConflictException.class,
+            () -> this.store.saveXWikiDoc(document, this.xcontext, true));
+
+        assertNull(exception.getExpectedRevision());
+        assertEquals("1.1", exception.getStoredRevision());
+        assertSame(constraintViolation, exception.getCause());
+    }
+
+    @Test
+    void saveNewDocumentDeadlockedWithConcurrentCreation() throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        mockStoredDocument(document, null);
+        when(this.hibernateStore.beginTransaction(any())).thenReturn(true);
+        // The other request locked the same gap and its insert isn't committed yet, so the document isn't stored.
+        LockAcquisitionException deadlock = new LockAcquisitionException("deadlock", null);
+        doThrow(deadlock).when(this.hibernateStore).endTransaction(true);
+
+        DocumentRevisionConflictException exception = assertThrows(DocumentRevisionConflictException.class,
+            () -> this.store.saveXWikiDoc(document, this.xcontext, true));
+
+        assertNull(exception.getExpectedRevision());
+        assertNull(exception.getStoredRevision());
+        assertSame(deadlock, exception.getCause());
+    }
+
+    @Test
+    void saveNewDocumentTimingOutOnConcurrentCreation() throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        Query<String> versionQuery = mockStoredDocument(document, null);
+        when(this.hibernateStore.beginTransaction(any())).thenReturn(true);
+        PessimisticLockException lockTimeout = new PessimisticLockException("lock wait timeout", null, null);
+        doAnswer(invocation -> {
+            when(versionQuery.uniqueResult()).thenReturn("1.1");
+            throw lockTimeout;
+        }).when(this.hibernateStore).endTransaction(true);
+
+        DocumentRevisionConflictException exception = assertThrows(DocumentRevisionConflictException.class,
+            () -> this.store.saveXWikiDoc(document, this.xcontext, true));
+
+        assertEquals("1.1", exception.getStoredRevision());
+        assertSame(lockTimeout, exception.getCause());
+    }
+
+    @Test
+    void saveExistingDocumentFailingOnLock() throws XWikiException
+    {
+        XWikiDocument document = getDocumentBasedOn("2.1");
+        mockStoredDocument(document, "2.1");
+        when(this.hibernateStore.beginTransaction(any())).thenReturn(true);
+        doThrow(new LockAcquisitionException("deadlock", null)).when(this.hibernateStore).endTransaction(true);
+
+        XWikiException exception =
+            assertThrows(XWikiException.class, () -> this.store.saveXWikiDoc(document, this.xcontext, true));
+
+        assertEquals(XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC, exception.getCode());
+    }
+
+    @Test
+    void saveNewDocumentFailingWithoutConcurrentCreation() throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        mockStoredDocument(document, null);
+        when(this.hibernateStore.beginTransaction(any())).thenReturn(true);
+        doThrow(new ConstraintViolationException("other constraint", null, "OTHER")).when(this.hibernateStore)
+            .endTransaction(true);
+
+        XWikiException exception =
+            assertThrows(XWikiException.class, () -> this.store.saveXWikiDoc(document, this.xcontext, true));
+
+        assertEquals(XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC, exception.getCode());
     }
 }

@@ -31,8 +31,6 @@ import org.openqa.selenium.WebElement;
  */
 public class CKEditorBalloonToolBar extends CKEditorToolBar
 {
-    private final CKEditor editor;
-
     /**
      * Create a new balloon tool bar instance for the given editor.
      *
@@ -41,7 +39,6 @@ public class CKEditorBalloonToolBar extends CKEditorToolBar
     public CKEditorBalloonToolBar(CKEditor editor)
     {
         super(editor);
-        this.editor = editor;
     }
 
     @Override

@@ -123,6 +123,31 @@
     "border-radius-large": "10px",
     "border-radius-small": "5px",
     "button-spacing": "2px",
+    "spacing-small": {
+        "css": "calc(var(--spacing-base) / 2)",
+        "less": "@spacing-base / 2"
+    },
+    "spacing-base": "4px",
+    "spacing-medium": {
+        "css": "calc(var(--spacing-base) * 2)",
+        "less": "@spacing-base * 2"
+    },
+    "spacing-large": {
+        "css": "calc(var(--spacing-base) * 3)",
+        "less": "@spacing-base * 3"
+    },
+    "spacing-xlarge": {
+        "css": "calc(var(--spacing-base) * 4)",
+        "less": "@spacing-base * 4"
+    },
+    "spacing-xxlarge": {
+        "css": "calc(var(--spacing-base) * 6)",
+        "less": "@spacing-base * 6"
+    },
+    "spacing-xxxlarge": {
+        "css": "calc(var(--spacing-base) * 8)",
+        "less": "@spacing-base * 8"
+    },
     "button-border-width": "1px",
     "edit-section-relative-height": ".7",
     "main-padding": {"css": "calc(var(--grid-gutter-width) * 2)", "less": "@grid-gutter-width * 2"},

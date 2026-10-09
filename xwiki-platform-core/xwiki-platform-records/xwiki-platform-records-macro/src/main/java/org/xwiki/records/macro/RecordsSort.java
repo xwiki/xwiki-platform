@@ -32,13 +32,13 @@ import org.xwiki.stability.Unstable;
  * The widget it selects offers each field of the data type twice, once ascending and once descending, so that a
  * criterion is picked rather than typed. It is a suggester rather than the platform's {@code sortPicker} widget
  * ({@code uicomponents/widgets/sortPicker.js}), which edits a single criterion through a field select and an order
- * select: this parameter holds an ordered <em>list</em> of criteria, and the suggester's drag-and-drop plugin is
- * what lets that order be authored. The platform widget would also need its field select filled from the sibling
- * {@code class} parameter, which is the same client-side work as this picker, so choosing it would buy the harder
- * half and still lose the list.
+ * select: this parameter holds an ordered <em>list</em> of criteria, and the suggester's drag-and-drop plugin is what
+ * lets that order be authored. The platform widget would also need its field select filled from the sibling
+ * {@code class} parameter, which is the same client-side work as this picker, so choosing it would buy the harder half
+ * and still lose the list.
  * <p>
- * Like {@link RecordsColumns}, the candidate list depends on the value of the sibling {@code class} parameter, and
- * is read from the browser at query time for the reasons given there.
+ * Like {@link RecordsColumns}, the candidate list depends on the value of the sibling {@code class} parameter, and is
+ * read from the browser at query time for the reasons given there.
  *
  * @version $Id$
  * @since 18.9.0RC1

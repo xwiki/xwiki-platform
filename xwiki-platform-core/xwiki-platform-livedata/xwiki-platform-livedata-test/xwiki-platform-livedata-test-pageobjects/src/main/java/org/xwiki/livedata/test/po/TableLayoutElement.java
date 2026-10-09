@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.LongPredicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -655,12 +656,15 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * @return the number of rows currently displayed in the live data
+     * @return the number of entry rows currently displayed in the live data, without the "Add entry" row of the edit
+     *     mode
      * @since 12.10.9
      */
     public int countRows()
     {
-        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody tr td:first-child")).size();
+        // The "Add entry" row displayed in edit mode is not an entry.
+        return getDriver().findElementsWithoutWaiting(getRoot(),
+            By.cssSelector("tbody tr:not(.layout-table-new-row) td:first-child")).size();
     }
 
     /**
@@ -907,15 +911,7 @@ public class TableLayoutElement extends BaseElement
         input.sendKeys(Keys.ENTER);
         // Validating the cell closes the editor right away, while the entry is created and the Live Data refreshed
         // asynchronously. So we wait for the new entry to be counted rather than for the editor to be gone.
-        getDriver().waitUntilCondition(driver -> {
-            try {
-                return getTotalEntries() > entriesBeforeCreation;
-            } catch (IllegalStateException | StaleElementReferenceException e) {
-                // The pagination is being re-rendered by the refresh.
-                return false;
-            }
-        });
-        waitUntilReady();
+        waitUntilTotalEntries(totalEntries -> totalEntries > entriesBeforeCreation);
     }
 
     /**
@@ -934,9 +930,19 @@ public class TableLayoutElement extends BaseElement
         new ConfirmationBox().clickYes();
         // The entry is deleted and the Live Data refreshed asynchronously, so we wait for the entry to be gone from
         // the count rather than for the button to be detached.
+        waitUntilTotalEntries(totalEntries -> totalEntries < entriesBeforeDeletion);
+    }
+
+    /**
+     * Wait until the total number of entries matches the given condition, then until the Live Data is ready.
+     *
+     * @param condition the condition the total number of entries must match
+     */
+    private void waitUntilTotalEntries(LongPredicate condition)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return getTotalEntries() < entriesBeforeDeletion;
+                return condition.test(getTotalEntries());
             } catch (IllegalStateException | StaleElementReferenceException e) {
                 // The pagination is being re-rendered by the refresh.
                 return false;
@@ -964,11 +970,10 @@ public class TableLayoutElement extends BaseElement
      */
     private WebElement findRow(String columnLabel, String value)
     {
-        By cellSelector = By.cssSelector(String.format("td:nth-child(%d)", findColumnIndex(columnLabel)));
-        return getRows().stream()
-            .filter(row -> getDriver().findElementsWithoutWaiting(row, cellSelector).stream()
-                .anyMatch(cell -> value.equals(cell.getText().trim())))
+        return getAllCells(columnLabel).stream()
+            .filter(cell -> value.equals(cell.getText().trim()))
             .findFirst()
+            .map(cell -> cell.findElement(By.xpath("./parent::tr")))
             .orElseThrow(() -> new NoSuchElementException(
                 String.format("No entry with the value [%s] in the column [%s].", value, columnLabel)));
     }

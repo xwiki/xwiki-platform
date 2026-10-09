@@ -93,6 +93,16 @@ export interface Logic {
   getEntryKey(entry: Values): string;
 
   /**
+   * Return the keys of the given entries, in the same order. Each entry gets the key returned by
+   * getEntryKey, made unique among the given entries in case of inconsistent data, for instance
+   * duplicated entry IDs.
+   * @param entries - the entries to get the keys of
+   * @returns the keys of the entries
+   * @since 18.9.0RC1
+   */
+  getEntryKeys(entries: Values[]): string[];
+
+  /**
    * Delete an entry, or drop the row when its entry does not exist yet.
    * @param entry - the entry to delete
    * @returns a promise completing when the entry is deleted

@@ -318,19 +318,25 @@ describe("LiveDataLogic maximized state", () => {
 describe("LiveDataLogic edit mode", () => {
   it("has no edit mode when the source does not declare one", () => {
     expect(initLogic([]).logic.hasEditMode()).toBe(false);
-    expect(initLogic([], { sourceParameters: { hasEditMode: "false" } }).logic.hasEditMode()).toBe(
-      false,
-    );
+    expect(
+      initLogic([], {
+        sourceParameters: { hasEditMode: "false" },
+      }).logic.hasEditMode(),
+    ).toBe(false);
   });
 
   it("has an edit mode when the source declares one", () => {
-    expect(initLogic([], { sourceParameters: { hasEditMode: "true" } }).logic.hasEditMode()).toBe(
-      true,
-    );
+    expect(
+      initLogic([], {
+        sourceParameters: { hasEditMode: "true" },
+      }).logic.hasEditMode(),
+    ).toBe(true);
   });
 
   it("exposes the edit mode state reactively", () => {
-    const { logic } = initLogic([], { sourceParameters: { hasEditMode: "true" } });
+    const { logic } = initLogic([], {
+      sourceParameters: { hasEditMode: "true" },
+    });
     const editMode = computed(() => logic.isEditMode());
 
     expect(editMode.value).toBe(false);
@@ -542,5 +548,39 @@ describe("Deleting an entry", () => {
 
     expect(liveDataSource.removeEntry).not.toHaveBeenCalled();
     expect(logic.data.data.entries).toHaveLength(1);
+  });
+});
+
+describe("Entry keys", () => {
+  let logic;
+
+  beforeEach(() => {
+    ({ logic } = initLogic([]));
+  });
+
+  it("gives distinct keys to entries sharing an id", () => {
+    const keys = logic.getEntryKeys([{ id: "1" }, { id: "1" }, { id: "2" }]);
+
+    expect(new Set(keys).size).toBe(3);
+    // The first occurrence keeps the key of the entry.
+    expect(keys[0]).toBe(logic.getEntryKey({ id: "1" }));
+  });
+
+  it("gives distinct keys to entries without an id", () => {
+    const keys = logic.getEntryKeys([{ name: "one" }, { name: "two" }]);
+
+    expect(new Set(keys).size).toBe(2);
+  });
+
+  it("keeps the key of an entry when the entries are reordered", () => {
+    const [firstKey, secondKey] = logic.getEntryKeys([
+      { id: "1" },
+      { id: "2" },
+    ]);
+
+    expect(logic.getEntryKeys([{ id: "2" }, { id: "1" }])).toStrictEqual([
+      secondKey,
+      firstKey,
+    ]);
   });
 });

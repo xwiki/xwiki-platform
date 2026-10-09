@@ -75,6 +75,7 @@ export interface Logic {
     }): Promise<void>;
     getEntryId(entry: Values): string | undefined;
     getEntryKey(entry: Values): string;
+    getEntryKeys(entries: Values[]): string[];
     getPageCount(): number;
     isContentTrusted(): boolean;
     isMaximized(): boolean;

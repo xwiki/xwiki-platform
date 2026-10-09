@@ -242,6 +242,26 @@ export class LiveDataLogic implements Logic {
   }
 
   /**
+   * Return the keys of the given entries, in the same order. Each entry gets the key returned by
+   * getEntryKey, made unique among the given entries in case of inconsistent data, for instance
+   * duplicated entry IDs.
+   * @param entries - the entries to get the keys of
+   * @returns the keys of the entries
+   * @since 18.9.0RC1
+   */
+  getEntryKeys(entries: Values[]): string[] {
+    const occurrences = new Map<string, number>();
+    return entries.map((entry) => {
+      const entryKey = this.getEntryKey(entry);
+      const occurrence = occurrences.get(entryKey) ?? 0;
+      occurrences.set(entryKey, occurrence + 1);
+      // Only the repeated keys get a suffix, so that the key of an entry does not depend on its
+      // position.
+      return occurrence ? `${entryKey}-${occurrence}` : entryKey;
+    });
+  }
+
+  /**
    * @returns a key that no other entry holds
    */
   private static newEntryKey(): string {
@@ -480,7 +500,7 @@ export class LiveDataLogic implements Logic {
   updateEntries() {
     return (
       this.fetchEntries()
-        // eslint-disable-next-line promise/always-return, max-statements
+        // eslint-disable-next-line promise/always-return
         .then(async (data) => {
           // We need to keep drafts to insert them back in the entries.
           const drafts = this.data.data.entries.filter((entry) => entry._new);

@@ -117,6 +117,24 @@ interface FieldOption {
 const METADATA_PREFIX = "doc.";
 
 /**
+ * The page metadata offered as columns.
+ *
+ * They are the page columns the App Within Minutes wizard offers for its live table, so that an author meets the same
+ * choices in both places. The `liveTable` source reports more, such as `doc.fullName` or
+ * `doc.enforceRequiredRights`, but those repeat another column or describe how the page is stored rather than the
+ * entry it holds.
+ */
+const METADATA_COLUMNS: string[] = [
+  "doc.title",
+  "doc.name",
+  "doc.location",
+  "doc.author",
+  "doc.creator",
+  "doc.date",
+  "doc.creationDate",
+];
+
+/**
  * The identifier prefix of the Live Data pseudo-columns.
  *
  * The properties resource reports `_actions`, `_avatar`, `_images` and `_attachments` alongside the real ones.
@@ -195,7 +213,7 @@ function toOptions(
   query = "",
 ): FieldOption[] {
   return descriptors
-    .filter(isCandidate)
+    .filter(isOffered)
     .map((descriptor) => ({
       value: descriptor.id,
       label: descriptor.name ?? descriptor.id,
@@ -220,6 +238,7 @@ type JsonFetcher = (url: string) => Promise<unknown>;
  * @param query - the text the author typed
  * @param contextPath - the wiki context path
  * @param fetchJson - fetches and parses the properties resource
+ * @param metadataLabels - the translated labels of the page metadata, by identifier
  * @returns the options to offer, empty when there is no data type or the resource reports none
  */
 async function loadOptions(
@@ -227,9 +246,10 @@ async function loadOptions(
   query: string,
   contextPath: string,
   fetchJson: JsonFetcher,
+  metadataLabels: Record<string, string> = {},
 ): Promise<FieldOption[]> {
   return toOptions(
-    await loadDescriptors(element, contextPath, fetchJson),
+    await loadDescriptors(element, contextPath, fetchJson, metadataLabels),
     query,
   );
 }
@@ -244,18 +264,58 @@ async function loadOptions(
  * @param element - the picker element
  * @param contextPath - the wiki context path
  * @param fetchJson - fetches and parses the properties resource
+ * @param metadataLabels - the translated labels of the page metadata, by identifier
  * @returns the descriptors of the selected data type, empty when no data type is selected
  */
 async function loadDescriptors(
   element: Element,
   contextPath: string,
   fetchJson: JsonFetcher,
+  metadataLabels: Record<string, string> = {},
 ): Promise<PropertyDescriptor[]> {
   const dataType = findDataType(element);
   if (dataType === null) {
     return [];
   }
-  return asDescriptors(await fetchJson(propertiesUrl(contextPath, dataType)));
+  return withMetadataLabels(
+    asDescriptors(await fetchJson(propertiesUrl(contextPath, dataType))),
+    metadataLabels,
+  );
+}
+
+/**
+ * Names the page metadata, which the properties resource reports without a name.
+ *
+ * @param descriptors - the property descriptors reported by the resource
+ * @param metadataLabels - the translated labels of the page metadata, by identifier
+ * @returns the descriptors, the page metadata named after the labels given
+ */
+function withMetadataLabels(
+  descriptors: PropertyDescriptor[],
+  metadataLabels: Record<string, string>,
+): PropertyDescriptor[] {
+  return descriptors.map((descriptor) =>
+    Object.hasOwn(metadataLabels, descriptor.id)
+      ? { ...descriptor, name: metadataLabels[descriptor.id] }
+      : descriptor,
+  );
+}
+
+/**
+ * Whether a property descriptor is offered to the author, in any of the pickers.
+ *
+ * Only the page metadata of {@link METADATA_COLUMNS} is offered. The other fields the resource reports stay
+ * candidates, so that a value naming one of them, stored before or typed by hand, is still shown back and checked.
+ *
+ * @param descriptor - the descriptor to check
+ * @returns whether the descriptor is a candidate the pickers offer
+ */
+function isOffered(descriptor: PropertyDescriptor): boolean {
+  return (
+    isCandidate(descriptor) &&
+    (groupOf(descriptor) !== METADATA_GROUP ||
+      METADATA_COLUMNS.includes(descriptor.id))
+  );
 }
 
 /**
@@ -350,6 +410,7 @@ export {
   DATA_TYPE_PARAMETER,
   FIELDS_GROUP,
   INTERNAL_PREFIX,
+  METADATA_COLUMNS,
   METADATA_GROUP,
   METADATA_PREFIX,
   asDescriptors,
@@ -357,10 +418,12 @@ export {
   groupOf,
   hasDataTypeFields,
   isCandidate,
+  isOffered,
   loadDescriptors,
   loadOptions,
   matches,
   propertiesUrl,
   toOptions,
+  withMetadataLabels,
 };
 export type { FieldOption, FilterDescriptor, JsonFetcher, PropertyDescriptor };

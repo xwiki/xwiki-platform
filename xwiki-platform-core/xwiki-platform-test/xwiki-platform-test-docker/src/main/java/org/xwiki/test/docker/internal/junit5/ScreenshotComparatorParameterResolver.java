@@ -17,14 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.blocknote.test.ui;
+package org.xwiki.test.docker.internal.junit5;
 
 import java.lang.reflect.Method;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.junit5.ScreenshotComparator;
+import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
  * Add support for injecting {@link ScreenshotComparator} as a parameter in JUnit 5 tests.
@@ -47,7 +48,9 @@ public class ScreenshotComparatorParameterResolver implements ParameterResolver
         // run from a test suite, which nests it in a class of its own, and the reference screenshots are committed
         // under the name of the class that declares the test.
         Method testMethod = extensionContext.getRequiredTestMethod();
-        return new ScreenshotComparator(DockerTestUtils.getTestConfiguration(extensionContext),
+        XWikiWebDriver driver = DockerTestUtils.getStore(extensionContext).get(XWikiWebDriver.class,
+            XWikiWebDriver.class);
+        return new ScreenshotComparator(driver, DockerTestUtils.getTestConfiguration(extensionContext),
             testMethod.getDeclaringClass().getSimpleName(), testMethod.getName());
     }
 }

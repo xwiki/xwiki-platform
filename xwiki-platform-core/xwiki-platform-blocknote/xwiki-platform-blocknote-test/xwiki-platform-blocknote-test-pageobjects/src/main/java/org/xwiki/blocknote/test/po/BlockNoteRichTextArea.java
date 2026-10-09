@@ -452,7 +452,12 @@ public class BlockNoteRichTextArea extends BaseElement
         return new SideMenu();
     }
 
-    private WebElement getBlockContent(int index)
+    /**
+     * @param index the index of the block, starting from 0
+     * @return the element holding the content of the specified block
+     * @since 18.9.0RC1
+     */
+    public WebElement getBlockContent(int index)
     {
         return this.container.findElements(By.className("bn-block-content")).get(index);
     }

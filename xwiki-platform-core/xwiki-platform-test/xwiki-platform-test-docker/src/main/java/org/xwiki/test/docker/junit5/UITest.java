@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.test.docker.internal.junit5.MultiUserTestUtilsParameterResolver;
+import org.xwiki.test.docker.internal.junit5.ScreenshotComparatorParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestLocalReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
@@ -57,6 +58,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(TestReferenceParameterResolver.class)
 @ExtendWith(TestLocalReferenceParameterResolver.class)
 @ExtendWith(MultiUserTestUtilsParameterResolver.class)
+@ExtendWith(ScreenshotComparatorParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public @interface UITest
@@ -122,6 +124,21 @@ public @interface UITest
      * @since 16.3.0RC1
      */
     String browserTag() default "";
+
+    /**
+     * @return the width, in pixels, of the screen of the browser container, which the browser window is sized to
+     *         (0 means the default of {@value TestConfiguration#DEFAULT_SCREEN_WIDTH})
+     * @since 18.9.0RC1
+     */
+    int screenWidth() default 0;
+
+    /**
+     * @return the height, in pixels, of the screen of the browser container, which the browser window is sized to.
+     *         A taller screen means a taller viewport, and thus fewer tests that have to scroll
+     *         (0 means the default of {@value TestConfiguration#DEFAULT_SCREEN_HEIGHT})
+     * @since 18.9.0RC1
+     */
+    int screenHeight() default 0;
 
     /**
      * @return true if VNC container is started and recording is done and saved on test exit

@@ -37,7 +37,13 @@
  * in the rendered table.
  */
 
-import { FIELDS_GROUP, groupOf, isCandidate, matches } from "./fieldPicker";
+import {
+  FIELDS_GROUP,
+  groupOf,
+  isCandidate,
+  isOffered,
+  matches,
+} from "./fieldPicker";
 import type { FieldOption, PropertyDescriptor } from "./fieldPicker";
 
 /**
@@ -171,7 +177,7 @@ function toFieldOptions(
   query = "",
 ): FieldOption[] {
   return descriptors
-    .filter(isCandidate)
+    .filter(isOffered)
     .map((descriptor) => ({
       value: `${descriptor.id}${VALUE_SEPARATOR}`,
       label: `${descriptor.name ?? descriptor.id} ${VALUE_SEPARATOR}`,

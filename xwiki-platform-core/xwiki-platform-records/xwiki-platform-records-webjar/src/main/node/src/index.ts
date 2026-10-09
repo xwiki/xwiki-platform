@@ -29,7 +29,12 @@ import {
   showMessage,
   showProblems,
 } from "./dialog";
-import { hasDataTypeFields, loadDescriptors, loadOptions } from "./fieldPicker";
+import {
+  METADATA_COLUMNS,
+  hasDataTypeFields,
+  loadDescriptors,
+  loadOptions,
+} from "./fieldPicker";
 import {
   asTypes,
   canFilter,
@@ -132,6 +137,15 @@ function directionLabels(): DirectionLabels {
     descending: translate("picker.sort.descending"),
     defaultOrder: translate("picker.sort.default"),
   };
+}
+
+/**
+ * @returns the translated labels the page metadata is offered under, by identifier
+ */
+function metadataLabels(): Record<string, string> {
+  return Object.fromEntries(
+    METADATA_COLUMNS.map((id) => [id, translate(`picker.metadata.${id}`)]),
+  );
 }
 
 /**
@@ -470,9 +484,9 @@ interface Offer {
  */
 const columnsOffer: Offer = {
   load: (element, query, fetchJson) =>
-    loadOptions(element, query, XWiki.contextPath, fetchJson),
+    loadOptions(element, query, XWiki.contextPath, fetchJson, metadataLabels()),
   resolve: (element, value, fetchJson) =>
-    loadOptions(element, value, XWiki.contextPath, fetchJson),
+    loadOptions(element, value, XWiki.contextPath, fetchJson, metadataLabels()),
 };
 
 /**
@@ -484,7 +498,12 @@ const sortOffer: Offer = {
   load: async (element, query, fetchJson, selected) => {
     const sourceTypes = await loadTypes(fetchJson);
     return toSortOptions(
-      await loadDescriptors(element, XWiki.contextPath, fetchJson),
+      await loadDescriptors(
+        element,
+        XWiki.contextPath,
+        fetchJson,
+        metadataLabels(),
+      ),
       query,
       selected,
       directionLabels(),
@@ -497,6 +516,7 @@ const sortOffer: Offer = {
       element,
       XWiki.contextPath,
       fetchJson,
+      metadataLabels(),
     );
     return [
       withProblem(
@@ -538,6 +558,7 @@ const filtersOffer: Offer = {
       element,
       XWiki.contextPath,
       fetchJson,
+      metadataLabels(),
     );
     const filterable = descriptors.filter((descriptor) =>
       canFilter(descriptor, sourceTypes),
@@ -553,6 +574,7 @@ const filtersOffer: Offer = {
       element,
       XWiki.contextPath,
       fetchJson,
+      metadataLabels(),
     );
     return [
       withProblem(
@@ -758,6 +780,7 @@ define(TRANSLATION_KEYS_MODULE, [], () => ({
   keys: [
     "picker.group.fields",
     "picker.group.metadata",
+    ...METADATA_COLUMNS.map((id) => `picker.metadata.${id}`),
     "picker.sort.ascending",
     "picker.sort.descending",
     "picker.sort.default",

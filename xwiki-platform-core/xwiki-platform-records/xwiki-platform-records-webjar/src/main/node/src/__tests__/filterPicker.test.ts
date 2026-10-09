@@ -149,6 +149,14 @@ describe("toFieldOptions", () => {
     );
   });
 
+  it("leaves out the page metadata the column picker does not offer", () => {
+    expect(
+      toFieldOptions([{ id: "doc.enforceRequiredRights" }, STATUS]).map(
+        (option) => option.value,
+      ),
+    ).toEqual(["status="]);
+  });
+
   it("leaves out the Live Data pseudo-columns", () => {
     expect(
       toFieldOptions(DESCRIPTORS).some((option) =>
@@ -247,6 +255,15 @@ describe("resolveFilterOption", () => {
     expect(resolveFilterOption(DESCRIPTORS, "gone=1")).toEqual(
       expect.objectContaining({ value: "gone=1", label: "gone=1" }),
     );
+  });
+
+  it("shows a stored constraint on page metadata that is no longer offered", () => {
+    expect(
+      resolveFilterOption(
+        [{ id: "doc.hidden", type: "Boolean" }],
+        "doc.hidden=true",
+      ),
+    ).toEqual(expect.objectContaining({ optgroup: METADATA_GROUP }));
   });
 
   it("keeps something that is not a constraint at all", () => {

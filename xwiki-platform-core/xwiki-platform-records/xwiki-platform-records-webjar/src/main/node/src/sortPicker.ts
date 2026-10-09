@@ -33,7 +33,7 @@
  * directions of a field that is already sorted invites reading the pair as a choice when it is not one.
  */
 
-import { groupOf, isCandidate, matches } from "./fieldPicker";
+import { groupOf, isCandidate, isOffered, matches } from "./fieldPicker";
 import type { FieldOption, PropertyDescriptor } from "./fieldPicker";
 
 /**
@@ -100,7 +100,7 @@ function toSortOptions(
 ): FieldOption[] {
   const used = new Set(selected.map(fieldOf));
   return descriptors
-    .filter(isCandidate)
+    .filter(isOffered)
     .filter(sortable)
     .filter((descriptor) => !used.has(descriptor.id))
     .flatMap((descriptor) =>

@@ -234,6 +234,19 @@ class WikiEditIT
         testToolBarButton(setup, reference, "Internal Link", "[[%s]]", "Link Example");
         testToolBarButton(setup, reference, "Horizontal ruler", "\n----\n", "");
         testToolBarButton(setup, reference, "Attached Image", "[[image:%s]]", "example.jpg");
+
+        // Bold applied from the toolbar is rendered in bold once saved, on a nested and on a terminal page.
+        DocumentReference terminalReference = new DocumentReference("Terminal", reference.getLastSpaceReference());
+        for (DocumentReference pageReference : List.of(reference, terminalReference)) {
+            setup.deletePage(pageReference);
+            WikiEditPage wikiEditPage = WikiEditPage.gotoPage(pageReference);
+            wikiEditPage.sendKeys("Some bold text");
+            wikiEditPage.sendKeysWithAction(Keys.SHIFT, Keys.HOME);
+            wikiEditPage.clickToolbarButton("Bold");
+            assertEquals("**Some bold text**", wikiEditPage.getExactContent());
+            ViewPage viewPage = wikiEditPage.clickSaveAndView();
+            assertEquals(List.of("Some bold text"), viewPage.getBoldTexts());
+        }
     }
 
     /**

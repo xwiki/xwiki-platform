@@ -45,6 +45,14 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Provides the Dashboard, whose activity gadget is a notifications macro -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-dashboard-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Needed to trigger the scheduler job -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

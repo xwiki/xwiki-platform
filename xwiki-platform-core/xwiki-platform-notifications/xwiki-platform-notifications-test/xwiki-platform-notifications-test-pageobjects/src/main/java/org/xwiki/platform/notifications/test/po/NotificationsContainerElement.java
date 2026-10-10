@@ -20,6 +20,7 @@
 package org.xwiki.platform.notifications.test.po;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -38,6 +39,10 @@ import org.xwiki.test.ui.po.BaseElement;
 public class NotificationsContainerElement extends BaseElement
 {
     private static final String NOTIFICATION_MACRO_CONTAINER_CLASS = "notifications-macro";
+
+    private static final String LOAD_MORE_CSS_SELECTOR = ".notifications-macro-load-more";
+
+    private static final String LOAD_MORE_BUTTON_CSS_SELECTOR = LOAD_MORE_CSS_SELECTOR + " button";
 
     /**
      * Maximum number of page reloads performed while waiting for the expected number of notifications. Events are
@@ -80,11 +85,26 @@ public class NotificationsContainerElement extends BaseElement
      */
     public static NotificationsContainerElement waitUntilNotificationCount(int expectedCount)
     {
+        return waitUntilNotifications(element -> element.getNotificationsListCount() >= expectedCount);
+    }
+
+    /**
+     * Wait for the notification macro of the current page to display notifications matching the given condition,
+     * reloading the page between attempts, for the same reasons as {@link #waitUntilNotificationCount(int)}. Use it
+     * when the number of notifications is not known in advance, for instance because some events may be grouped.
+     *
+     * @param condition the condition that the displayed notifications must match
+     * @return an instance of {@link NotificationsContainerElement} located on the up-to-date page
+     * @since 18.9.0RC1
+     */
+    public static NotificationsContainerElement waitUntilNotifications(
+        Predicate<NotificationsContainerElement> condition)
+    {
         NotificationsContainerElement element = getElementForMacroInPage();
         // Wait for the asynchronous REST request performed by the macro to complete before counting the events.
         element.waitUntilPageIsReady();
         int attempts = 0;
-        while (element.getNotificationsListCount() < expectedCount && attempts < MAX_RELOAD_ATTEMPTS) {
+        while (!condition.test(element) && attempts < MAX_RELOAD_ATTEMPTS) {
             getUtil().getDriver().navigate().refresh();
             element = getElementForMacroInPage();
             element.waitUntilPageIsReady();
@@ -224,6 +244,45 @@ public class NotificationsContainerElement extends BaseElement
         checkNotificationNumber(notificationNumber);
 
         return this.getNotifications().get(notificationNumber).getText();
+    }
+
+    /**
+     * @param notificationNumber index of the notification in the list
+     * @return {@code true} if the notification is displayed as unread
+     * @since 18.9.0RC1
+     */
+    public boolean isNotificationUnread(int notificationNumber)
+    {
+        checkNotificationNumber(notificationNumber);
+
+        return this.getNotifications().get(notificationNumber).getAttribute("class")
+            .contains("notification-event-unread");
+    }
+
+    /**
+     * @return {@code true} if the button to load older notifications is displayed, which is the case when the last
+     *     loaded batch of notifications was full
+     * @since 18.9.0RC1
+     */
+    public boolean hasLoadMoreButton()
+    {
+        return getDriver().hasElementWithoutWaiting(this.container, By.cssSelector(LOAD_MORE_BUTTON_CSS_SELECTOR));
+    }
+
+    /**
+     * Click the button to load older notifications and wait until they are displayed.
+     *
+     * @since 18.9.0RC1
+     */
+    public void loadMore()
+    {
+        int previousCount = getNotificationsListCount();
+        this.container.findElement(By.cssSelector(LOAD_MORE_BUTTON_CSS_SELECTOR)).click();
+        // The button is replaced by a loading placeholder until the next batch is displayed, after which the
+        // placeholder is removed (and a new button added if this batch is full too).
+        getDriver().waitUntilCondition(driver -> getNotificationsListCount() > previousCount
+            && !getDriver().hasElementWithoutWaiting(this.container,
+                By.cssSelector(LOAD_MORE_CSS_SELECTOR + ".loading")));
     }
 
     /**

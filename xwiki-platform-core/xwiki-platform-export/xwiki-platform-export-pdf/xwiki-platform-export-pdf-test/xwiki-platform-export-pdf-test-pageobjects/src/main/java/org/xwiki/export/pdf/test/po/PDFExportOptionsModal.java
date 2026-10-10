@@ -22,6 +22,8 @@ package org.xwiki.export.pdf.test.po;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
@@ -178,6 +180,45 @@ public class PDFExportOptionsModal extends BaseModal
         URL pdfURL = new URL(new URL(getUtil().getCurrentExecutor().getHttpClientBaseURL(false)),
             new URL(getDriver().getCurrentUrl()).getFile());
         return new PDFDocument(pdfURL, userName, password);
+    }
+
+    /**
+     * Click on the export button when the PDF is generated client-side, by the user's web browser, and wait for the
+     * browser print to be triggered.
+     * <p>
+     * The print preview is loaded in a hidden iframe whose print is triggered once the page is ready. The native print
+     * dialog can't be driven (and would block the browser), so the print function of that iframe is replaced, before
+     * it is called, by one that records the print pages.
+     *
+     * @return the print preview, as it was when the browser print was triggered
+     * @since 18.9.0RC1
+     */
+    @SuppressWarnings("unchecked")
+    public PDFPrintPreview exportInUserBrowser()
+    {
+        // Use a capture listener on the document, because the load event doesn't bubble and because it must be called
+        // before the iframe's own load listener, which triggers the print.
+        getDriver().executeScript("delete window.pdfPrintPreviewPages;"
+            + "const listener = event => {"
+            + "  const iframe = event.target;"
+            + "  if (iframe.tagName === 'IFRAME' && iframe.src.includes('XWiki.PDFExport.Sheet')) {"
+            + "    document.removeEventListener('load', listener, true);"
+            + "    iframe.contentWindow.print = () => {"
+            + "      window.pdfPrintPreviewPages = Array.from(iframe.contentDocument.querySelectorAll('.pagedjs_page'))"
+            + "        .map(page => ({text: page.textContent, imageCount: page.querySelectorAll('img').length}));"
+            + "    };"
+            + "  }"
+            + "};"
+            + "document.addEventListener('load', listener, true);");
+
+        triggerExport();
+
+        // Use a bigger timeout because the PDF export job and the print preview can take a while.
+        getDriver().waitUntilCondition(
+            driver -> (Boolean) getDriver().executeScript("return window.pdfPrintPreviewPages !== undefined;"),
+            PDFExportAdministrationSectionPage.CHROME_INIT_TIMEOUT);
+        return new PDFPrintPreview(
+            (List<Map<String, Object>>) getDriver().executeScript("return window.pdfPrintPreviewPages;"));
     }
 
     /**

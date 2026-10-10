@@ -20,7 +20,6 @@
 package org.xwiki.tree.test.po;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -168,14 +167,14 @@ public class TreeElement extends BaseElement
     /**
      * @return a list of loaded node IDs.
      */
+    @SuppressWarnings("unchecked")
     public List<String> getNodeIDs()
     {
-        String[] selectedNodeIDs = (String[]) getDriver().executeScript(
+        // The script result is converted to a List by WebDriver, not to an array.
+        return (List<String>) getDriver().executeScript(
             "return jQuery.jstree.reference(jQuery(arguments[0])).get_json('#', "
                 + "{flat:true, no_data:true, no_state:true})" + ".map(function(element) {return element.id});",
             this.element);
-
-        return Arrays.asList(selectedNodeIDs);
     }
 
     /**

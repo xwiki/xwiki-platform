@@ -67,12 +67,14 @@ public class CustomNotificationFilterModal extends BaseModal
     }
 
     /**
-     * @return the tree allowing to select the locations.
+     * @return the tree allowing to select the locations, once it is loaded
      */
     public DocumentTreeElement getLocations()
     {
+        // The tree is initialized asynchronously when the modal is opened: opening it to a node before its root nodes
+        // are loaded may have no effect.
         return new DocumentTreeElement(getDriver().findElementWithoutWaiting(this.container,
-            By.className("location-tree")));
+            By.className("location-tree"))).waitForIt();
     }
 
     /**
@@ -232,6 +234,9 @@ public class CustomNotificationFilterModal extends BaseModal
         int rowCount = tableLayout.countRows();
         getSubmitButton().click();
         waitForClosed();
+        // Wait for the save to be done, which also closes the success message so that it doesn't hide the Submit
+        // button of the next filter added.
+        waitForNotificationSuccessMessage("Saved!");
 
         tableLayout.waitUntilRowCountEqualsTo(rowCount + offset);
     }

@@ -21,6 +21,7 @@ package org.xwiki.platform.notifications.test.ui;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,11 +29,13 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
 import org.xwiki.platform.notifications.test.po.NotificationWatchButtonElement;
 import org.xwiki.platform.notifications.test.po.NotificationsAdministrationPage;
+import org.xwiki.platform.notifications.test.po.NotificationsMacroSettingsPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.platform.notifications.test.po.NotificationsWatchModal;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
@@ -118,7 +121,8 @@ class NotificationsSettingsIT
         NotificationsUserProfilePage notificationsUserProfilePage =
             NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
 
-        assertEquals(1, notificationsUserProfilePage.getApplicationPreferences().size());
+        // The System application, plus the Likes and Mentions applications installed for NotificationsEmailsIT.
+        assertEquals(3, notificationsUserProfilePage.getApplicationPreferences().size());
 
         // Open system
         ApplicationPreferences system = notificationsUserProfilePage.getApplication(SYSTEM);
@@ -872,5 +876,131 @@ class NotificationsSettingsIT
         testUtils.gotoPage(testReference);
         watchButtonElement = new NotificationWatchButtonElement();
         assertTrue(watchButtonElement.isNotSet());
+    }
+
+    /**
+     * Check that the email, system filters and custom filters preferences macros, displayed on a regular page, are
+     * in sync both ways with the user Notification settings.
+     */
+    @Test
+    @Order(7)
+    void preferencesMacrosInSyncWithNotificationSettings(TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        // Create the pages as superadmin, so that the autowatch of the user doesn't add custom filters for them.
+        testUtils.loginAsSuperAdmin();
+        testUtils.createPage(testReference, "{{notificationsEmailPreferences/}}\n\n"
+            + "{{notificationsSystemFiltersPreferences/}}\n\n{{notificationsCustomFiltersPreferences/}}", "");
+        DocumentReference childPage = new DocumentReference("Child", testReference.getLastSpaceReference());
+        testUtils.createPage(childPage, "", "");
+        String pageName = testUtils.serializeReference(testReference.removeParent(new WikiReference("xwiki")));
+        String childPageName = testUtils.serializeReference(childPage.removeParent(new WikiReference("xwiki")));
+
+        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+
+        // Email preferences: the macro shows the values of the Notification settings.
+        NotificationsUserProfilePage settingsPage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        AbstractNotificationsSettingsPage.EmailInterval interval = settingsPage.getNotificationEmailInterval();
+        assertEquals(AbstractNotificationsSettingsPage.EmailInterval.DAILY, interval);
+        // The default diff type is a global setting that globalAndOtherUserSettings changes.
+        AbstractNotificationsSettingsPage.EmailDiffType diffType = settingsPage.getNotificationEmailDiffType();
+        AbstractNotificationsSettingsPage.EmailDiffType otherDiffType =
+            diffType == AbstractNotificationsSettingsPage.EmailDiffType.STANDARD
+                ? AbstractNotificationsSettingsPage.EmailDiffType.NOTHING
+                : AbstractNotificationsSettingsPage.EmailDiffType.STANDARD;
+        NotificationsMacroSettingsPage macroPage = NotificationsMacroSettingsPage.gotoPage(testReference);
+        assertEquals(interval, macroPage.getNotificationEmailInterval());
+        assertEquals(diffType, macroPage.getNotificationEmailDiffType());
+
+        // Change them in the Notification settings: the macro shows the new values.
+        settingsPage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        settingsPage.setNotificationEmailInterval(AbstractNotificationsSettingsPage.EmailInterval.WEEKLY);
+        settingsPage.setNotificationEmailDiffType(otherDiffType);
+        macroPage = NotificationsMacroSettingsPage.gotoPage(testReference);
+        assertEquals(AbstractNotificationsSettingsPage.EmailInterval.WEEKLY, macroPage.getNotificationEmailInterval());
+        assertEquals(otherDiffType, macroPage.getNotificationEmailDiffType());
+
+        // Change them from the macro: the Notification settings show the new values.
+        macroPage.setNotificationEmailInterval(AbstractNotificationsSettingsPage.EmailInterval.HOURLY);
+        macroPage.setNotificationEmailDiffType(diffType);
+        settingsPage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        assertEquals(AbstractNotificationsSettingsPage.EmailInterval.HOURLY,
+            settingsPage.getNotificationEmailInterval());
+        assertEquals(diffType, settingsPage.getNotificationEmailDiffType());
+
+        // System filters: the macro lists the same filters, with the same states, as the Notification settings.
+        // "Read Event Filter (Alert)" is disabled and "Minor Event (Alert)" is enabled by default.
+        settingsPage.getSystemNotificationFilterPreferences().get(0).setEnabled(true);
+        macroPage = NotificationsMacroSettingsPage.gotoPage(testReference);
+        List<SystemNotificationFilterPreference> systemFilters = macroPage.getSystemNotificationFilterPreferences();
+        assertEquals(6, systemFilters.size());
+        assertEquals("Read Event Filter (Alert)", systemFilters.get(0).getName());
+        assertTrue(systemFilters.get(0).isEnabled());
+        assertEquals("Minor Event (Alert)", systemFilters.get(2).getName());
+        assertTrue(systemFilters.get(2).isEnabled());
+
+        systemFilters.get(2).setEnabled(false);
+        settingsPage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        systemFilters = settingsPage.getSystemNotificationFilterPreferences();
+        assertTrue(systemFilters.get(0).isEnabled());
+        assertFalse(systemFilters.get(2).isEnabled());
+
+        // Custom filters: a filter added in the Notification settings is listed by the macro. The user also gets the
+        // wiki filters, such as the one that customFiltersAndLiveData adds in the administration. They are listed
+        // after the new filters, which are ordered in descending order of creation.
+        int wikiFilterCount = settingsPage.getCustomNotificationFilterPreferencesLiveData()
+            .getCustomNotificationFilterPreferences().size();
+        addCustomFilter(settingsPage, testReference);
+        macroPage = NotificationsMacroSettingsPage.gotoPage(testReference);
+        List<CustomNotificationFilterPreference> customFilters =
+            macroPage.getCustomNotificationFilterPreferencesLiveData().getCustomNotificationFilterPreferences();
+        assertEquals(wikiFilterCount + 1, customFilters.size());
+        assertEquals("Page and children", customFilters.get(0).getScope());
+        assertEquals(pageName, customFilters.get(0).getLocation());
+        assertTrue(customFilters.get(0).isEnabled());
+
+        // Add a filter and disable the existing one in the Notification settings: the macro reflects both.
+        settingsPage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        addCustomFilter(settingsPage, childPage);
+        settingsPage.getCustomNotificationFilterPreferencesLiveData().getCustomNotificationFilterPreferences().get(1)
+            .setEnabled(false);
+        macroPage = NotificationsMacroSettingsPage.gotoPage(testReference);
+        customFilters =
+            macroPage.getCustomNotificationFilterPreferencesLiveData().getCustomNotificationFilterPreferences();
+        assertEquals(wikiFilterCount + 2, customFilters.size());
+        assertEquals("Page only", customFilters.get(0).getScope());
+        assertEquals(childPageName, customFilters.get(0).getLocation());
+        assertTrue(customFilters.get(0).isEnabled());
+        assertEquals(pageName, customFilters.get(1).getLocation());
+        assertFalse(customFilters.get(1).isEnabled());
+
+        // Delete a filter and enable the other one from the macro: the Notification settings reflect both.
+        customFilters.get(0).delete();
+        macroPage = NotificationsMacroSettingsPage.gotoPage(testReference);
+        customFilters =
+            macroPage.getCustomNotificationFilterPreferencesLiveData().getCustomNotificationFilterPreferences();
+        assertEquals(wikiFilterCount + 1, customFilters.size());
+        customFilters.get(0).setEnabled(true);
+        settingsPage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        customFilters =
+            settingsPage.getCustomNotificationFilterPreferencesLiveData().getCustomNotificationFilterPreferences();
+        assertEquals(wikiFilterCount + 1, customFilters.size());
+        assertEquals(pageName, customFilters.get(0).getLocation());
+        assertTrue(customFilters.get(0).isEnabled());
+
+        // The custom filters are not deleted with the user, so delete the remaining one.
+        customFilters.get(0).delete();
+        settingsPage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        assertEquals(wikiFilterCount, settingsPage.getCustomNotificationFilterPreferencesLiveData()
+            .getCustomNotificationFilterPreferences().size());
+    }
+
+    private void addCustomFilter(AbstractNotificationsSettingsPage settingsPage, DocumentReference location)
+    {
+        String[] path = Stream.concat(location.getSpaceReferences().stream().map(EntityReference::getName),
+            Stream.of(location.getName())).toArray(String[]::new);
+        CustomNotificationFilterModal modal = settingsPage.clickAddCustomFilter();
+        modal.getLocations().openToDocument(path).getDocumentNode(path).select();
+        modal.clickSubmit();
     }
 }

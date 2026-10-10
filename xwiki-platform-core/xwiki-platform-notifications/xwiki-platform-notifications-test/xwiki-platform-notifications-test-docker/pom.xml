@@ -67,6 +67,21 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed to check the mention and like events in the notification emails -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mentions-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-like-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Needed to execute tests on subwikis -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -102,6 +117,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-like-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

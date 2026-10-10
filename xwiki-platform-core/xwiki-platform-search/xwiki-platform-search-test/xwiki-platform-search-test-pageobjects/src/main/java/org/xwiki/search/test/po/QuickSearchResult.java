@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
@@ -49,5 +51,15 @@ public class QuickSearchResult extends BaseElement
     public String getTitle()
     {
         return this.container.findElement(By.cssSelector(".value")).getText();
+    }
+
+    /**
+     * @return the parts of the title of this quick search result that are highlighted because they match the search
+     *     terms
+     * @since 18.9.0RC1
+     */
+    public List<String> getHighlights()
+    {
+        return this.container.findElements(By.cssSelector(".value em")).stream().map(WebElement::getText).toList();
     }
 }

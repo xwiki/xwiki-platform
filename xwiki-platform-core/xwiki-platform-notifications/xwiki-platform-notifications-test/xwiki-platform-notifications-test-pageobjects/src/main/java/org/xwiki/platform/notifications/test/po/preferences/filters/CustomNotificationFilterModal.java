@@ -42,6 +42,9 @@ public class CustomNotificationFilterModal extends BaseModal
     private static final String INCLUSIVE = "inclusive";
     private static final String EXCLUSIVE = "exclusive";
 
+    private static final By SAVED_MESSAGE =
+        By.xpath("//div[contains(@class, 'xnotification-done') and contains(., 'Saved!')]");
+
     /**
      * Available notification formats.
      */
@@ -235,6 +238,10 @@ public class CustomNotificationFilterModal extends BaseModal
         getSubmitButton().click();
         waitForClosed();
 
+        // The Live Data is refreshed once the "Saved!" success message is displayed.
         tableLayout.waitUntilRowCountEqualsTo(rowCount + offset);
+        // Wait for the success message to disappear (it hides itself after a short delay) so that it doesn't cover the
+        // Submit button of the next filter added.
+        getDriver().waitUntilElementDisappears(SAVED_MESSAGE);
     }
 }

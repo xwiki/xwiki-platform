@@ -26,6 +26,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.ConfirmationModal;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Represents the actions possible on the delete user confirmation modal.
@@ -72,6 +73,36 @@ public class DeleteUserConfirmationModal extends ConfirmationModal
         List<WebElement> warnings =
             getDriver().findElementsWithoutWaiting(this.container, By.cssSelector(".errormessage.xform"));
         return warnings.isEmpty() ? "" : warnings.get(0).getText();
+    }
+
+    /**
+     * Selects the user that replaces the deleted user as author of the pages they last modified, using the "New
+     * Author" user picker displayed when the deleted user has Script or Programming Rights, and waits for the
+     * selected user to be validated.
+     *
+     * @param userName the name of the user to select, in the main wiki (e.g. {@code "JohnDoe"})
+     * @return this modal
+     * @since 18.9.0RC1
+     */
+    public DeleteUserConfirmationModal setNewAuthor(String userName)
+    {
+        SuggestInputElement picker = new SuggestInputElement(this.container.findElement(By.id("newAuthor")));
+        picker.clear().sendKeys(userName).waitForNonTypedSuggestions().selectByValue("XWiki." + userName);
+        picker.hideSuggestions();
+        // The delete button is disabled while the selected user is checked for the required right.
+        return waitUntilReady();
+    }
+
+    /**
+     * @return {@code true} if the error stating that the selected new author doesn't have the required right is
+     *         displayed, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean isNewAuthorErrorDisplayed()
+    {
+        List<WebElement> errors =
+            getDriver().findElementsWithoutWaiting(this.container, By.cssSelector("#newAuthor ~ .xErrorMsg"));
+        return !errors.isEmpty() && errors.get(0).isDisplayed();
     }
 
     /**

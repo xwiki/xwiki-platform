@@ -35,7 +35,7 @@
     <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JPQL Query Parser</xwiki.extension.name>
-    </properties>
+  </properties>
   <dependencies>
     <!-- Test Dependencies -->
     <dependency>
@@ -55,6 +55,41 @@
             <goals>
               <goal>generate</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <!-- Compile the SableCC-generated sources in their own execution, with the javac lint checks turned off
+               since we don't control the generated code (it uses raw collection types, for instance). The generated
+               sources don't reference the hand-written ones, so they can be compiled first, which lets the
+               hand-written sources below stay fully checked. -->
+          <execution>
+            <id>compile-generated-sources</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <compileSourceRoots>
+                <compileSourceRoot>${project.build.directory}/generated-sources/sablecc</compileSourceRoot>
+              </compileSourceRoots>
+              <compilerArgs>
+                <arg>-Xlint:none</arg>
+                <arg>-parameters</arg>
+              </compilerArgs>
+            </configuration>
+          </execution>
+          <execution>
+            <id>default-compile</id>
+            <configuration>
+              <!-- Only the hand-written sources: the generated ones are compiled by the execution above. -->
+              <compileSourceRoots>
+                <compileSourceRoot>${project.build.sourceDirectory}</compileSourceRoot>
+              </compileSourceRoots>
+            </configuration>
           </execution>
         </executions>
       </plugin>

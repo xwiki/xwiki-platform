@@ -808,6 +808,21 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Same as {@link #hasAction(int, String)} but doesn't wait for the action to appear, so that checking for the
+     * absence of an action doesn't wait for the full timeout. The rows are expected to be already loaded.
+     *
+     * @param rowNumber the row number to inspect
+     * @param actionName the expected action
+     * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean hasActionWithoutWaiting(int rowNumber, String actionName)
+    {
+        return !getDriver().findElementsWithoutWaiting(getRowElement(rowNumber), getActionSelector(actionName))
+            .isEmpty();
+    }
+
+    /**
      * Clicks on an action based on a row and the provided selector.
      *
      * @param rowNumber the row number, for instance 3 for the third row

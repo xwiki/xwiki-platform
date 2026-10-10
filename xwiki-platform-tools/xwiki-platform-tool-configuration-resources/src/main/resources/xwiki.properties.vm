@@ -1324,6 +1324,18 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #-# The default is 512 MB.
 # store.s3.multipartCopySizeMB = 512
 
+#-# [Since 18.9.0RC1]
+#-# Indicates whether the S3 service supports conditional requests on writes: the "If-None-Match: *" condition, which
+#-# XWiki uses to atomically create an object only if it does not exist yet, and the "x-amz-copy-source-if-match"
+#-# condition, which makes sure the source of a copy did not change meanwhile. AWS S3, MinIO and SILO support them,
+#-# but other S3-compatible services don't implement all of them: OVHcloud Object Storage, for example, rejects copies
+#-# with a source condition with "501 Not Implemented". When disabled, XWiki checks whether the object exists before
+#-# writing it instead, and copies without the source check. The existence check is not atomic: two nodes creating
+#-# the same blob at exactly the same time could overwrite each other, which is unlikely in practice.
+#-#
+#-# The default is true.
+# store.s3.conditionalWrites = true
+
 #-------------------------------------------------------------------------------------
 # Mail
 #-------------------------------------------------------------------------------------

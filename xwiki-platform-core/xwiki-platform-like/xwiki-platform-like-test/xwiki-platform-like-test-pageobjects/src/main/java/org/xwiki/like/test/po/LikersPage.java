@@ -33,6 +33,8 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class LikersPage extends ViewPage
 {
+    private static final String LIKERS = "likers";
+
     /**
      * Go to the likers page of a given page.
      *
@@ -41,7 +43,22 @@ public class LikersPage extends ViewPage
      */
     public static LikersPage goToLikers(DocumentReference documentReference)
     {
-        getUtil().gotoPage(documentReference, "view", Map.of("viewer", "likers"));
+        getUtil().gotoPage(documentReference, "view", Map.of("viewer", LIKERS));
+        return new LikersPage();
+    }
+
+    /**
+     * Go to the likers page of the current page through the "Likes" entry of the "More actions" menu.
+     *
+     * @return the likers page object for the current page
+     * @since 18.9.0RC1
+     */
+    public static LikersPage goToLikersFromMoreActions()
+    {
+        ViewPage viewPage = new ViewPage();
+        getUtil().getDriver().addPageNotYetReloadedMarker();
+        viewPage.clickMoreActionsSubMenuEntry(LIKERS);
+        getUtil().getDriver().waitUntilPageIsReloaded();
         return new LikersPage();
     }
 

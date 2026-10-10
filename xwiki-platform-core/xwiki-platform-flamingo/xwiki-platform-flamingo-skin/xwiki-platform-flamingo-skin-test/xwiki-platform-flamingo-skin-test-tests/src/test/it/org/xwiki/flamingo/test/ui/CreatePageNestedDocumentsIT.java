@@ -79,7 +79,7 @@ public class CreatePageNestedDocumentsIT extends AbstractTest
     }
 
     @Test
-    public void createNestedDocumentsFromURL()
+    public void createNestedDocumentsFromURL() throws Exception
     {
         // Create and assert each nested document.
         for (DocumentReference pageReference : nestedDocuments) {
@@ -97,6 +97,14 @@ public class CreatePageNestedDocumentsIT extends AbstractTest
             // Check that we created the right page
             assertCreatedNestedDocument(pageReference, viewPage);
         }
+
+        // Creating a nested document must not create its missing parents (the holes in the hierarchy).
+        DocumentReference holeAtTheEnd =
+            new DocumentReference("xwiki", List.of("A", "B", "C", "D", "E", "F"), "WebHome");
+        assertFalse(String.format("Parent [%s] was created", holeAtTheEnd), getUtil().rest().exists(holeAtTheEnd));
+        DocumentReference holeAtTheBeginning = new DocumentReference("xwiki", List.of("X"), "WebHome");
+        assertFalse(String.format("Parent [%s] was created", holeAtTheBeginning),
+            getUtil().rest().exists(holeAtTheBeginning));
     }
 
     @Test

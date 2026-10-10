@@ -39,6 +39,10 @@ public class NotificationsContainerElement extends BaseElement
 {
     private static final String NOTIFICATION_MACRO_CONTAINER_CLASS = "notifications-macro";
 
+    private static final By LOAD_OLDER_BUTTON = By.cssSelector(".notifications-macro-load-more button");
+
+    private static final By LOADING_OLDER = By.cssSelector(".notifications-macro-load-more.loading");
+
     /**
      * Maximum number of page reloads performed while waiting for the expected number of notifications. Events are
      * processed asynchronously, so the macro might not display all of them right after a page has been saved.
@@ -224,6 +228,32 @@ public class NotificationsContainerElement extends BaseElement
         checkNotificationNumber(notificationNumber);
 
         return this.getNotifications().get(notificationNumber).getText();
+    }
+
+    /**
+     * @return {@code true} if the "Load older notifications" button is displayed, i.e. if there might be older
+     *     notifications to load
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public boolean hasOlderNotifications()
+    {
+        return getDriver().hasElementWithoutWaiting(this.container, LOAD_OLDER_BUTTON);
+    }
+
+    /**
+     * Click the "Load older notifications" button and wait for the older notifications to be displayed.
+     *
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public void loadOlderNotifications()
+    {
+        getDriver().findElementWithoutWaiting(this.container, LOAD_OLDER_BUTTON).click();
+        // The button is replaced by a loading indicator until the older notifications are displayed.
+        getDriver().waitUntilCondition(driver -> !getDriver().hasElementWithoutWaiting(this.container, LOADING_OLDER));
     }
 
     /**

@@ -34,17 +34,25 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * Keep the extension page up to date.
+ * <p>
+ * Only local events are handled: the cluster member where the change happened takes care of it, while a remote
+ * member could save the extension page from an outdated cached version, losing the most recent modifications.
+ * 
+ * @version $Id$
+ */
 @Component
 @Named("ExtensionUpdaterListener")
 @Singleton
-public class ExtensionUpdaterListener extends AbstractEventListener
+public class ExtensionUpdaterListener extends AbstractLocalEventListener
 {
     private static final BeginEvent IMPORT_PROCESS = new ExtensionImportStartingEvent();
 
@@ -71,7 +79,7 @@ public class ExtensionUpdaterListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
         XWikiDocument document = (XWikiDocument) source;
 

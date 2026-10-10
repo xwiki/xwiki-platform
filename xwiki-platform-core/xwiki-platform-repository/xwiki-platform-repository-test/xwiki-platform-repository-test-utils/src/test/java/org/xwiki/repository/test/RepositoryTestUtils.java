@@ -121,6 +121,10 @@ public class RepositoryTestUtils
         org.xwiki.rest.model.jaxb.Object extensionVersionObject = extensionVersionObject(extension.getId().getVersion(),
             null, XWikiRepositoryModel.toStringList(extension.getRepositories()));
 
+        // The versions of an extension are looked up by this id (as set by the repository importer).
+        extensionVersionObject.getProperties()
+            .add(property(XWikiRepositoryModel.PROP_VERSION_ID, extension.getId().getId()));
+
         extensionVersionObject.getProperties().add(property(XWikiRepositoryModel.PROP_VERSION_FEATURES,
             ExtensionIdConverter.toStringList(extension.getExtensionFeatures())));
 
@@ -414,6 +418,8 @@ public class RepositoryTestUtils
     {
         Map<String, Object> queryParameters = new HashMap<String, Object>();
 
+        // The versions of an extension are looked up by this id (as set by the repository importer).
+        queryParameters.put(XWikiRepositoryModel.PROP_VERSION_ID, extension.getId().getId());
         if (version != null) {
             queryParameters.put(XWikiRepositoryModel.PROP_VERSION_VERSION, version);
         }

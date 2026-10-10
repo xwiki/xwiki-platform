@@ -317,8 +317,10 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         'async':               true
       };
       if (untilDate) {
+        // The bound is inclusive because the date of a document event has no milliseconds: other events of the same
+        // second as the last displayed one may not be displayed yet. The blacklist excludes the displayed ones.
         params.untilDate = untilDate;
-        params.untilDateIncluded = false;
+        params.untilDateIncluded = true;
         params.blackList = self.blackList.join(',');
       }
       var promise = $.Deferred();
@@ -355,11 +357,11 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         self.displayEntry(data.notifications[i]);
       }
       self.macro.find('.notifications-macro-load-more').remove();
-      var lastCompositeEvent = data.notifications[data.notifications.length - 1];
-      var lastEventDate = lastCompositeEvent.dates[lastCompositeEvent.dates.length - 1];
 
       // If there is other notifications to load
-      if (data.notifications.length == self.notificationsLimit) {
+      if (data.notifications.length &gt; 0 &amp;&amp; data.notifications.length == self.notificationsLimit) {
+        var lastCompositeEvent = data.notifications[data.notifications.length - 1];
+        var lastEventDate = lastCompositeEvent.dates[lastCompositeEvent.dates.length - 1];
         var loadMore = $('&lt;div&gt;').addClass('text-center').addClass('notifications-macro-load-more');
         // Prevent the new macro which listens on events on the DOM to add one more button.
         loadMore.data('augmented', true);
@@ -579,8 +581,17 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         btn.on('click', function(event) {
           loadMore.text('').addClass('loading').css('height', '50px');
           // We use the date of the last displayed event as an offset to display those that come next
-          var lastEventDate = self.macro.find('.notification-event').last().attr('data-eventdate');
-          new XWikiNotificationsMacro(self.macro).load(lastEventDate);
+          var displayedEvents = self.macro.find('.notification-event');
+          var lastEventDate = displayedEvents.last().attr('data-eventdate');
+          // Blacklist the events already displayed, since the events of the same date are loaded again.
+          var blackList = [];
+          displayedEvents.each(function() {
+            var ids = $(this).attr('data-ids');
+            if (ids) {
+              blackList.push(...ids.split(','));
+            }
+          });
+          new XWikiNotificationsMacro(self.macro, undefined, undefined, undefined, blackList).load(lastEventDate);
         });
       }
     };

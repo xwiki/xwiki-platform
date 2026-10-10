@@ -413,6 +413,30 @@ public class NotificationsTrayPage extends ViewPage
     }
 
     /**
+     * @return {@code true} if the "Load older notifications" button is displayed in the notification tray
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public boolean hasOlderNotifications()
+    {
+        return getNotificationsContainerElement().hasOlderNotifications();
+    }
+
+    /**
+     * Click the "Load older notifications" button of the notification tray and wait for the older notifications to be
+     * displayed.
+     *
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public void loadOlderNotifications()
+    {
+        getNotificationsContainerElement().loadOlderNotifications();
+    }
+
+    /**
      * Mark a notification as read.
      *
      * @param notificationNumber index of the notification in the list

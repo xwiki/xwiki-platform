@@ -21,6 +21,7 @@ package org.xwiki.flamingo.test.docker;
 
 import java.io.File;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,7 @@ import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,6 +57,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class RecycleBinIT
 {
+    /**
+     * The default date format of the wiki ({@code yyyy/MM/dd HH:mm}).
+     */
+    private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}");
+
     /**
      * @see "XWIKI-9421: Attachment version is incremented when a document is restored from recycle bin"
      */
@@ -285,6 +292,18 @@ class RecycleBinIT
 
         assertTrue(deletedPagesEntries.get(0).canBeRestored());
         assertTrue(deletedTerminalPagesEntries.get(0).canBeRestored());
+
+        // The deleter, who is not an admin, restores the deleted page.
+        testUtils.login(user1, user1);
+        testUtils.gotoPage(page1);
+        recycleBinPage1 = new DeletePageOutcomePage();
+        assertEquals("The requested page could not be found.", recycleBinPage1.getMessage());
+        DeletedPageEntry deletedPageEntry = recycleBinPage1.getDeletedPagesEntries().get(0);
+        assertEquals(user1, deletedPageEntry.getDeleter());
+        assertThat(deletedPageEntry.getDeletionDate(), matchesPattern(DATE_PATTERN));
+        viewPage = deletedPageEntry.clickRestore();
+        assertEquals("Page 1 Non Terminal", viewPage.getDocumentTitle());
+        assertEquals("Page 1 non terminal page content", viewPage.getContent());
     }
 
     @Test

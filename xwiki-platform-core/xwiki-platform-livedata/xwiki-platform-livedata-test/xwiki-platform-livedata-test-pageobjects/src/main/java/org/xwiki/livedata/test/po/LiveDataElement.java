@@ -315,8 +315,9 @@ public class LiveDataElement extends BaseElement
 
     private List<WebElement> getFootnotes()
     {
-        return getDriver().findElementWithoutWaiting(By.id(this.id))
-            .findElements(By.cssSelector(".footnotes > .footnote"));
+        // Don't wait: the footnotes are displayed along with the entries, and there are often none.
+        return getDriver().findElementsWithoutWaiting(getDriver().findElementWithoutWaiting(By.id(this.id)),
+            By.cssSelector(".footnotes > .footnote"));
     }
 
     private WebElement getRootElement()

@@ -19,6 +19,8 @@
  */
 package org.xwiki.index.test.po;
 
+import org.openqa.selenium.By;
+import org.xwiki.test.ui.po.ConfirmationBox;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -40,5 +42,45 @@ public class DeletedAttachmentsPage extends ViewPage
         LiveTableElement lt = new LiveTableElement("attachmentTrash");
         lt.waitUntilReady();
         return lt;
+    }
+
+    /**
+     * Filters the deleted attachments on the "Page" column and waits for the table to be reloaded.
+     *
+     * @param location the text to look for in the location of the page the attachments were deleted from
+     * @since 18.9.0RC1
+     */
+    public void filterByLocation(String location)
+    {
+        getDeletedAttachmentsLiveTable().filterColumn("xwiki-livetable-attachmentTrash-filter-2", location);
+    }
+
+    /**
+     * Filters the deleted attachments on the "Deleted by" column and waits for the table to be reloaded.
+     *
+     * @param deleter the text to look for in the name of the user who deleted the attachments
+     * @since 18.9.0RC1
+     */
+    public void filterByDeleter(String deleter)
+    {
+        getDeletedAttachmentsLiveTable().filterColumn("xwiki-livetable-attachmentTrash-filter-4", deleter);
+    }
+
+    /**
+     * Permanently deletes a deleted attachment, using the delete action of its row and confirming, and waits for its
+     * row to be removed from the table.
+     *
+     * @param fileName the name of the deleted attachment, as displayed in the "Attachment" column; its row must be
+     *     displayed
+     * @since 18.9.0RC1
+     */
+    public void deletePermanently(String fileName)
+    {
+        LiveTableElement liveTable = getDeletedAttachmentsLiveTable();
+        By row = By.xpath(String.format("//tbody[@id = 'attachmentTrash-display']/tr[td[1]/a[. = '%s']]", fileName));
+        getDriver().findElement(row).findElement(By.cssSelector("td.itemActions a.delete")).click();
+        new ConfirmationBox().clickYes();
+        getDriver().waitUntilElementDisappears(row);
+        liveTable.waitUntilReady();
     }
 }

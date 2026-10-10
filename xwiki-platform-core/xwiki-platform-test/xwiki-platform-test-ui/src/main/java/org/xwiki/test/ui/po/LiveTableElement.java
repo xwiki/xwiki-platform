@@ -188,6 +188,18 @@ public class LiveTableElement extends BaseElement
         return result;
     }
 
+    /**
+     * Return the text of the cells of a column, in the order of the displayed rows.
+     *
+     * @param columnTitle the title of the live table column
+     * @return the text of each cell of the specified column
+     * @since 18.9.0RC1
+     */
+    public List<String> getColumnValues(String columnTitle)
+    {
+        return getRows(columnTitle).stream().map(WebElement::getText).toList();
+    }
+
     private List<WebElement> getRows(String columnTitle)
     {
         String cellXPath = String.format(".//tr/td[position() = %s]", getColumnIndex(columnTitle) + 1);
@@ -342,7 +354,7 @@ public class LiveTableElement extends BaseElement
     public void sortAscending(String columnTitle)
     {
         WebElement element = getHeaderByColumnTitle(columnTitle);
-        List<String> strings = Arrays.asList(element.getAttribute("class").split("\\w+"));
+        List<String> strings = Arrays.asList(element.getAttribute("class").split("\\s+"));
         boolean isSelected = strings.contains("selected");
         boolean isAsc = strings.contains("asc");
 
@@ -372,7 +384,7 @@ public class LiveTableElement extends BaseElement
     public void sortDescending(String columnTitle)
     {
         WebElement element = getHeaderByColumnTitle(columnTitle);
-        List<String> strings = Arrays.asList(element.getAttribute("class").split("\\w+"));
+        List<String> strings = Arrays.asList(element.getAttribute("class").split("\\s+"));
         boolean isSelected = strings.contains("selected");
         boolean isDesc = strings.contains("desc");
 

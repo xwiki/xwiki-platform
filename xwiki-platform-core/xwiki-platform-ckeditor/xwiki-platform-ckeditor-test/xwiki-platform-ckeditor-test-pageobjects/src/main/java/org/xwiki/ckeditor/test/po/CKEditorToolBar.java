@@ -43,6 +43,8 @@ public class CKEditorToolBar extends BaseElement
 
     private static final String REDO = "redo";
 
+    private static final String MAXIMIZE = "maximize";
+
     private static final String CLASS = "class";
 
     protected final WebElement container;
@@ -311,7 +313,16 @@ public class CKEditorToolBar extends BaseElement
      */
     public void toggleFullScreenMode()
     {
-        clickButton("maximize");
+        clickButton(MAXIMIZE);
+    }
+
+    /**
+     * @return {@code true} if the editor is currently in full screen mode, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean isInFullScreenMode()
+    {
+        return isButtonToggledOn(MAXIMIZE);
     }
 
     /**

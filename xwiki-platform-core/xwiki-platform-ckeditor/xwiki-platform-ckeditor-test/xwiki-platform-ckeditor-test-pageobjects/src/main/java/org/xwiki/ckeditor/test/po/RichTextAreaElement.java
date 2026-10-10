@@ -166,6 +166,23 @@ public class RichTextAreaElement extends BaseElement
         }
     }
 
+    /**
+     * Clicks on the caption of a captioned image from the edited content, e.g. to edit the caption in-line.
+     *
+     * @param captionedImageIndex the index of the captioned image, among the captioned images from the edited content
+     * @since 18.9.0RC1
+     */
+    public void clickImageCaption(int captionedImageIndex)
+    {
+        try {
+            WebElement rootEditableElement = getRootEditableElement();
+            getDriver().findElementsWithoutWaiting(rootEditableElement, By.tagName("figcaption"))
+                .get(captionedImageIndex).click();
+        } finally {
+            maybeSwitchToDefaultContent();
+        }
+    }
+
     protected void maybeSwitchToEditedContent()
     {
         if (this.isFrame) {

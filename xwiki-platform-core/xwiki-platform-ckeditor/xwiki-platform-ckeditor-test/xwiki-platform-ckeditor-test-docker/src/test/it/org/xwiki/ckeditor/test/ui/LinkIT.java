@@ -35,6 +35,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -93,7 +95,7 @@ class LinkIT extends AbstractCKEditorIT
         setup.createPage(subPage, "", "");
         setup.attachFile(subPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
 
-        edit(setup, testReference, false);
+        WYSIWYGEditPage editPage = edit(setup, testReference, false);
 
         LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
         linkDialog.getResourceSuggestInput().click().waitForSuggestions().sendKeys("subPage")
@@ -112,18 +114,61 @@ class LinkIT extends AbstractCKEditorIT
         linkDialog.getResourceSuggestInput().sendKeys("text").selectByVisibleText(attachmentName);
         linkDialog.submit();
 
+        // Create the same links, and an external one, from selected words: the selected words become the link labels.
+        this.textArea.sendKeys(Keys.RIGHT, Keys.ENTER, "Page", Keys.chord(Keys.SHIFT, Keys.HOME));
+        linkDialog = editor.getToolBar().insertOrEditLink().setResourceReference("subPage");
+        linkDialog.getResourceSuggestInput().selectByVisibleText("subPage");
+        linkDialog.submit();
+
+        this.textArea.sendKeys(Keys.RIGHT, Keys.ENTER, "File", Keys.chord(Keys.SHIFT, Keys.HOME));
+        linkDialog = editor.getToolBar().insertOrEditLink().setResourceType("attach");
+        linkDialog.getResourceSuggestInput().sendKeys("text").waitForSuggestions().selectByVisibleText(attachmentName);
+        linkDialog.submit();
+
+        this.textArea.sendKeys(Keys.RIGHT, Keys.ENTER, "Google", Keys.chord(Keys.SHIFT, Keys.HOME));
+        editor.getToolBar().insertOrEditLink().setResourceType("url").setResourceReference("http://google.ro")
+            .submit();
+
         // Verify that the content matches what we did using CKEditor.
-        assertSourceEquals("[[subPage>>doc:subPage]]\n\n[[text.txt>>attach:subPage@text.txt]]");
+        assertSourceEquals("""
+            [[subPage>>doc:subPage]]
+
+            [[text.txt>>attach:subPage@text.txt]]
+
+            [[Page>>doc:subPage]]
+
+            [[File>>attach:subPage@text.txt]]
+
+            [[Google>>http://google.ro]]""");
+
+        // Verify the targets of the saved links.
+        ViewPage viewPage = editPage.clickSaveAndView();
+        String spacePath = "/" + testReference.getLastSpaceReference().getName() + "/";
+        String pageLinkTarget = viewPage.getContentLinkTarget("Page");
+        assertTrue(pageLinkTarget.contains("/view/") && pageLinkTarget.contains(spacePath + "subPage"),
+            pageLinkTarget);
+        String fileLinkTarget = viewPage.getContentLinkTarget("File");
+        assertTrue(fileLinkTarget.contains("/download/") && fileLinkTarget.contains(spacePath + "subPage/text.txt"),
+            fileLinkTarget);
+        assertEquals("http://google.ro", viewPage.getContentLinkTarget("Google"));
     }
 
     @Test
     @Order(2)
-    void useLinkShortcutWhenTargetPageNameHasSpecialCharacters(TestUtils setup, TestReference testReference)
+    void useLinkShortcut(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Create the link target page with special characters in its name.
+        // Create the link target page with special characters in its name. It's a terminal page.
         LocalDocumentReference childPageReference =
             new LocalDocumentReference("\"Quote\" and 'Apostrophe'", testReference.getLastSpaceReference());
         setup.createPage(childPageReference, "", "");
+        // Create a nested page, and attach a file to each of the two pages.
+        DocumentReference nestedPageReference =
+            new DocumentReference("WebHome", new SpaceReference("Wombat", testReference.getLastSpaceReference()));
+        setup.createPage(nestedPageReference, "", "Wombat");
+        setup.attachFile(nestedPageReference, "yakima.txt", getClass().getResourceAsStream("/text.txt"), false);
+        setup.attachFile(childPageReference, "jicama.txt", getClass().getResourceAsStream("/text.txt"), false);
+        // The link suggestions are based on Solr.
+        waitForSolrIndexing(setup);
 
         edit(setup, testReference);
 
@@ -134,6 +179,33 @@ class LinkIT extends AbstractCKEditorIT
         linkDropDown.waitForItemSubmitted();
 
         assertSourceEquals(String.format("[[%1$s>>%1$s]] ", childPageReference.getName()));
+
+        // Link to the nested page.
+        textArea.sendKeys(Keys.END, Keys.ENTER, "[wo");
+        linkDropDown.waitForItemSelected("[wo", "Wombat");
+        textArea.sendKeys(Keys.ENTER);
+        linkDropDown.waitForItemSubmitted();
+
+        // Link to the attachments of the nested page and of the terminal page.
+        textArea.sendKeys(Keys.END, Keys.ENTER, "[ya");
+        linkDropDown.waitForItemSelected("[ya", "yakima.txt");
+        textArea.sendKeys(Keys.ENTER);
+        linkDropDown.waitForItemSubmitted();
+
+        textArea.sendKeys(Keys.END, Keys.ENTER, "[ji");
+        linkDropDown.waitForItemSelected("[ji", "jicama.txt");
+        textArea.sendKeys(Keys.ENTER);
+        linkDropDown.waitForItemSubmitted();
+
+        assertSourceEquals(String.format("""
+            [[%1$s>>%1$s]]\040
+
+            [[Wombat>>%2$s]]\040
+
+            [[yakima.txt>>attach:%2$s@yakima.txt]]\040
+
+            [[jicama.txt>>attach:%1$s@jicama.txt]]\040""", childPageReference.getName(),
+            setup.serializeLocalReference(nestedPageReference)));
     }
 
     @Test

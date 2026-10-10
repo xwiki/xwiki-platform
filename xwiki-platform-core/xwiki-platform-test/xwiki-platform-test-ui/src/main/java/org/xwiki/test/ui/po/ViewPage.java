@@ -395,6 +395,37 @@ public class ViewPage extends BasePage
     }
 
     /**
+     * @param label the label of a link displayed in the content of the page
+     * @return the target of the first link from the content of the page that has the given label, as specified in the
+     *         HTML (i.e. not resolved against the page URL), or {@code null} if there's no such link
+     * @since 18.9.0RC1
+     */
+    public String getContentLinkTarget(String label)
+    {
+        return getDriver().findElementsWithoutWaiting(this.content, By.tagName("a")).stream()
+            .filter(link -> label.equals(link.getText())).map(link -> link.getDomAttribute("href")).findFirst()
+            .orElse(null);
+    }
+
+    /**
+     * @param imageName the name of an image displayed in the content of the page (e.g. its attachment file name)
+     * @return the caption of the first captioned image from the content of the page whose source contains the given
+     *         image name, or {@code null} if there's no such captioned image
+     * @since 18.9.0RC1
+     */
+    public String getImageCaption(String imageName)
+    {
+        return getDriver().findElementsWithoutWaiting(this.content, By.tagName("figure")).stream()
+            .filter(figure -> getDriver().findElementsWithoutWaiting(figure, By.tagName("img")).stream()
+                .anyMatch(image -> {
+                    String source = image.getDomAttribute("src");
+                    return source != null && source.contains(imageName);
+                }))
+            .flatMap(figure -> getDriver().findElementsWithoutWaiting(figure, By.tagName("figcaption")).stream())
+            .map(WebElement::getText).findFirst().orElse(null);
+    }
+
+    /**
      * @return the message boxes displayed in the content of the page (such as the ones rendered by the {@code info}
      *         or {@code warning} macros), in the order in which they are displayed
      * @since 17.10.14

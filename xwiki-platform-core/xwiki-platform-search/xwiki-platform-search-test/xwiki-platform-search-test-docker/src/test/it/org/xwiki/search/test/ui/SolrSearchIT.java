@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.test.ui;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,8 @@ import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.repository.test.SolrTestUtils;
+import org.xwiki.search.test.po.QuickSearchElement;
+import org.xwiki.search.test.po.QuickSearchResult;
 import org.xwiki.search.test.po.SearchAdministrationPage;
 import org.xwiki.search.test.po.SolrSearchPage;
 import org.xwiki.search.test.po.SolrSearchResult;
@@ -46,6 +50,8 @@ import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -329,5 +335,80 @@ class SolrSearchIT
         searchPage = searchPage.search(matchedWord);
         assertThat(searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
             containsInAnyOrder("One", "Two", "Four", "Child of Four"));
+    }
+
+    /**
+     * Searches the title, the content and the attachment names of a nested page and of a terminal page, and verifies
+     * that the searched words are highlighted, both on the Solr search page and in the quick search.
+     */
+    @Test
+    @Order(7)
+    void highlightSearchedWords(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String titleWord = "Zephyrine";
+        String contentWord = "quixotically";
+        String attachmentWord = "xylophonist";
+        DocumentReference nestedPageReference =
+            new DocumentReference("WebHome", new SpaceReference("Nested", testReference.getLastSpaceReference()));
+        DocumentReference terminalPageReference =
+            new DocumentReference("Terminal", testReference.getLastSpaceReference());
+        setup.rest().savePage(nestedPageReference, "Some content written " + contentWord + ".",
+            titleWord + " Nested");
+        setup.rest().savePage(terminalPageReference, "Other content written " + contentWord + ".",
+            titleWord + " Terminal");
+        setup.attachFile(nestedPageReference, attachmentWord + "-nested.txt",
+            new ByteArrayInputStream("nested".getBytes(StandardCharsets.UTF_8)), false);
+        setup.attachFile(terminalPageReference, attachmentWord + "-terminal.txt",
+            new ByteArrayInputStream("terminal".getBytes(StandardCharsets.UTF_8)), false);
+
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        // Search the title on the Solr search page.
+        SolrSearchPage searchPage = SolrSearchPage.gotoPage().search(titleWord);
+        List<SolrSearchResult> searchResults = searchPage.getSearchResults();
+        assertThat(searchResults.stream().map(SolrSearchResult::getTitle).toList(),
+            containsInAnyOrder(titleWord + " Nested", titleWord + " Terminal"));
+        for (SolrSearchResult searchResult : searchResults) {
+            assertEquals(List.of(titleWord), searchResult.getHighlightedWords().get("Title"));
+        }
+
+        // Search the content on the Solr search page.
+        searchPage = searchPage.search(contentWord);
+        searchResults = searchPage.getSearchResults();
+        assertThat(searchResults.stream().map(SolrSearchResult::getTitle).toList(),
+            containsInAnyOrder(titleWord + " Nested", titleWord + " Terminal"));
+        for (SolrSearchResult searchResult : searchResults) {
+            assertEquals(List.of(contentWord), searchResult.getHighlightedWords().get("Document content"));
+        }
+
+        // Search the attachment names on the Solr search page: the pages holding the attachments are found.
+        searchPage = searchPage.search(attachmentWord);
+        searchResults = searchPage.getSearchResults();
+        assertThat(searchResults.stream().map(SolrSearchResult::getTitle).toList(),
+            containsInAnyOrder(titleWord + " Nested", titleWord + " Terminal"));
+        for (SolrSearchResult searchResult : searchResults) {
+            assertEquals(List.of(attachmentWord), searchResult.getHighlightedWords().get("Attachment name"));
+        }
+
+        // Search the title and the attachment names in the quick search, from one of the pages.
+        setup.gotoPage(nestedPageReference);
+        QuickSearchElement quickSearch = new QuickSearchElement();
+        quickSearch.search(titleWord);
+        List<QuickSearchResult> quickSearchResults = quickSearch.getResults("Page titles");
+        assertThat(quickSearchResults.stream().map(QuickSearchResult::getTitle).toList(),
+            containsInAnyOrder(titleWord + " Nested", titleWord + " Terminal"));
+        assertThat(quickSearchResults.stream().map(QuickSearchResult::getHighlights).toList(),
+            everyItem(equalTo(List.of(titleWord))));
+
+        setup.gotoPage(terminalPageReference);
+        quickSearch = new QuickSearchElement();
+        quickSearch.search(attachmentWord);
+        quickSearchResults = quickSearch.getResults("Attachment names");
+        assertThat(quickSearchResults.stream().map(QuickSearchResult::getTitle).toList(),
+            containsInAnyOrder(attachmentWord + "-nested.txt", attachmentWord + "-terminal.txt"));
+        assertThat(quickSearchResults.stream().map(QuickSearchResult::getHighlights).toList(),
+            everyItem(equalTo(List.of(attachmentWord))));
     }
 }

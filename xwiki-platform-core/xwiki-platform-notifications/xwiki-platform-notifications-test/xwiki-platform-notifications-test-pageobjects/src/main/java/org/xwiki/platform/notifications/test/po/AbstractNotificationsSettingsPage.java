@@ -65,6 +65,9 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     @FindBy(className = "notificationEmailDiffType")
     private WebElement notificationEmailDiffTypeSelect;
 
+    @FindBy(className = "notificationEmailInterval")
+    private WebElement notificationEmailIntervalSelect;
+
     @FindBy(className = "btn-addfilter")
     private WebElement addFilterButton;
 
@@ -81,6 +84,25 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
 
         /** No diff. */
         NOTHING
+    }
+
+    /**
+     * Represents the available email frequency settings values.
+     * @since 18.9.0RC1
+     */
+    public enum EmailInterval
+    {
+        /** An email every hour. */
+        HOURLY,
+
+        /** An email every day. */
+        DAILY,
+
+        /** An email every week. */
+        WEEKLY,
+
+        /** An email for each event. */
+        LIVE
     }
 
     /**
@@ -272,7 +294,12 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
         }
     }
 
-    private void waitForNotificationsSettingsLiveData()
+    /**
+     * Wait until the live data of the system and custom filter preferences are loaded.
+     *
+     * @since 18.9.0RC1
+     */
+    protected void waitForNotificationsSettingsLiveData()
     {
         new LiveDataElement(SYSTEM_PREF_LIVE_DATA_ID).waitUntilReady();
         new CustomNotificationFilterPreferencesLiveDataElement(this).waitUntilReady();
@@ -321,6 +348,28 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     public void setNotificationEmailDiffType(EmailDiffType value)
     {
         new Select(this.notificationEmailDiffTypeSelect).selectByValue(value.name());
+        waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
+    }
+
+    /**
+     * @return the value of the email frequency setting
+     * @since 18.9.0RC1
+     */
+    public EmailInterval getNotificationEmailInterval()
+    {
+        return EmailInterval.valueOf(
+            new Select(this.notificationEmailIntervalSelect).getFirstSelectedOption().getAttribute(VALUE_ATTRIBUTE));
+    }
+
+    /**
+     * Set the email frequency setting.
+     *
+     * @param value the email frequency to set
+     * @since 18.9.0RC1
+     */
+    public void setNotificationEmailInterval(EmailInterval value)
+    {
+        new Select(this.notificationEmailIntervalSelect).selectByValue(value.name());
         waitForNotificationSuccessMessage(SAVED_NOTIFICATION_TEXT);
     }
 

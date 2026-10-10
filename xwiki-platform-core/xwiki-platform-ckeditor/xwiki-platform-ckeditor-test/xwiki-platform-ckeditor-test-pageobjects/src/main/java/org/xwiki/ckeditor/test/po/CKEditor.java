@@ -170,6 +170,42 @@ public class CKEditor extends BaseElement
         return sourceTextArea;
     }
 
+    /**
+     * @return the edited source, but you need to switch to Source first
+     * @since 18.9.0RC1
+     */
+    public String getSource()
+    {
+        return getSourceTextArea().getDomProperty("value");
+    }
+
+    /**
+     * @return the offset in the edited source where the selection starts, but you need to switch to Source first
+     * @since 18.9.0RC1
+     */
+    public int getSourceSelectionStart()
+    {
+        return Integer.parseInt(getSourceTextArea().getDomProperty("selectionStart"));
+    }
+
+    /**
+     * @return the offset in the edited source where the selection ends, but you need to switch to Source first
+     * @since 18.9.0RC1
+     */
+    public int getSourceSelectionEnd()
+    {
+        return Integer.parseInt(getSourceTextArea().getDomProperty("selectionEnd"));
+    }
+
+    /**
+     * @return the source text that is currently selected, but you need to switch to Source first
+     * @since 18.9.0RC1
+     */
+    public String getSourceSelectedText()
+    {
+        return getSource().substring(getSourceSelectionStart(), getSourceSelectionEnd());
+    }
+
     protected WebElement getContentContainer()
     {
         WebElement contentContainer = (WebElement) getDriver()

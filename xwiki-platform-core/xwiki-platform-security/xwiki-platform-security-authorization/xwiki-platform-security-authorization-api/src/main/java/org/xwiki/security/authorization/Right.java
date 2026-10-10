@@ -246,7 +246,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      */
     // Error because of the usage of 8 parameters in private constructor. This is not easy to improve to avoid
     // duplicated code
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     private Right(String name, RuleState defaultState, RuleState tieResolutionPolicy,
         boolean inheritanceOverridePolicy, Set<Right> impliedRights, Set<EntityType> validEntityTypes,
         boolean isReadOnly, Set<Right> impliedByRights)

@@ -21,15 +21,18 @@ package org.xwiki.platform.notifications.test.ui;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
@@ -88,6 +91,10 @@ class NotificationsIT
 
     // Number of pages that have to be created in order for the notifications badge to show «X+»
     private static final int PAGES_TOP_CREATION_COUNT = 21;
+
+    // Number of pages whose creation notifications are loaded batch after batch in the notification tray: more than
+    // two batches of 10, and not more than 21, the maximum unread count computed by the notifications REST resource.
+    private static final int OLDER_NOTIFICATIONS_PAGE_COUNT = 21;
 
     private static final String SYSTEM = "org.xwiki.platform";
 
@@ -555,6 +562,60 @@ class NotificationsIT
 
         assertTrue(notificationsContainerElement.getNotificationPage(4).startsWith("Profile of "));
         assertTrue(notificationsContainerElement.getNotificationPage(5).startsWith("Profile of "));
+    }
+
+    @Test
+    @Order(7)
+    void loadOlderNotifications(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The user 2 enables the notifications for page creations and watches the entire wiki.
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+        p.getApplication(SYSTEM).setCollapsed(false);
+        p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
+        new NotificationWatchButtonElement().openModal()
+            .selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
+
+        // The date of a creation event has no milliseconds, while the date from which the preferences saved just
+        // above apply has some: an event fired within that same second is dated before them, and the notification is
+        // then filtered out. Wait for the next second, which is the granularity of the event dates and not an
+        // asynchronous operation, so there is nothing to poll on.
+        Thread.sleep(1000);
+
+        // The user 1 creates the pages over REST, so that several of them are saved within the same second, which is
+        // the granularity of the date of their creation events: the last notification of a batch shares its date with
+        // notifications of the next batch, which must still be loaded.
+        String space = testReference.getLastSpaceReference().getName();
+        UsernamePasswordCredentials previousCredentials = setup.getDefaultCredentials();
+        setup.setDefaultCredentials(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        try {
+            for (int i = 1; i <= OLDER_NOTIFICATIONS_PAGE_COUNT; i++) {
+                setup.rest().savePage(new LocalDocumentReference(space, "Page" + i), "Content " + i, "Page " + i);
+            }
+        } finally {
+            setup.setDefaultCredentials(previousCredentials);
+        }
+
+        setup.gotoPage(space, "WebHome");
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
+            OLDER_NOTIFICATIONS_PAGE_COUNT);
+        NotificationsTrayPage tray = new NotificationsTrayPage();
+        // The tray displays 10 notifications by default.
+        assertEquals(10, tray.getNotificationsListCount());
+        while (tray.hasOlderNotifications()) {
+            tray.loadOlderNotifications();
+        }
+
+        // Every page creation is listed exactly once.
+        List<String> pages = new ArrayList<>();
+        for (int i = 0; i < tray.getNotificationsListCount(); i++) {
+            pages.add(tray.getNotificationPage(i));
+        }
+        List<String> expectedPages = new ArrayList<>();
+        for (int i = 1; i <= OLDER_NOTIFICATIONS_PAGE_COUNT; i++) {
+            expectedPages.add("Page " + i);
+        }
+        assertEquals(expectedPages.stream().sorted().toList(), pages.stream().sorted().toList());
     }
 
     private SyndEntry getEntryByTitle(NotificationsRSS rss, String title)

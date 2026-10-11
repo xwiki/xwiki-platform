@@ -1855,10 +1855,28 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 
 #-# [Since 17.5.0, 17.4.1]
 #-# "true" (the default) if the scheduler should be enabled on this instance.
-#-# Disabling the scheduler is often used as a workaround to avoid duplicates in a cluster.
+#-# In a cluster where scheduler.clusterSingleton is "false" (the default), every member with an enabled scheduler runs
+#-# all the scheduler jobs, so disabling the scheduler on all the members but one is the way to avoid running the jobs
+#-# several times (with no failover when that member is down).
+#-# When scheduler.clusterSingleton is "true", "false" excludes this member: it never runs the scheduler, even when it
+#-# is the cluster singleton node.
 #-# 
 #-# Default is "true".
 # scheduler.enabled=false
+
+#-# [Since 18.10.0RC1]
+#-# "true" to run the scheduler on a single member of the cluster, the cluster singleton node (see
+#-# observation.remote.singletonPriority), and to move it automatically to another member when that member leaves the
+#-# cluster. Only the members where scheduler.enabled is "true" run the scheduler: if the singleton node has a
+#-# disabled scheduler, no member runs the jobs (a warning is logged). The other members show the status stored in the
+#-# job pages and save the actions (schedule, pause, resume, unschedule) in the job pages, which the singleton node
+#-# applies; triggering a job is only possible on the singleton node.
+#-# Ignored when remote observation is disabled.
+#-# When enabling it on a cluster which disables the scheduler on all the members but one, either enable the scheduler
+#-# on all the members, or give that member a higher observation.remote.singletonPriority.
+#-# 
+#-# Default is "false".
+# scheduler.clusterSingleton=true
 
 #-------------------------------------------------------------------------------------
 # REST API

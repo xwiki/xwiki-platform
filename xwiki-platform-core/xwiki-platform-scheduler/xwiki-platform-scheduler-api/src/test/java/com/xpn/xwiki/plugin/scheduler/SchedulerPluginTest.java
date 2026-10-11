@@ -34,8 +34,11 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerKey;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.test.LogLevel;
@@ -45,6 +48,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.scheduler.internal.SchedulerClusterSingletonListener;
+import com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobsInitializedEvent;
 import com.xpn.xwiki.plugin.scheduler.internal.SchedulersClassLoaderManager;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
@@ -54,14 +59,23 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -320,6 +334,307 @@ class SchedulerPluginTest
         verify(this.scheduler).deleteJob(new JobKey("xwiki:Scheduler.Job_0"));
         verify(this.schedulersClassLoaderManager).removeScheduler(job.getReference());
         assertEquals("None", getJob().getStringValue("status"));
+    }
+
+    private void stopSchedulerMock() throws SchedulerException
+    {
+        // A scheduler which was never started or was stopped is in standby mode
+        when(this.scheduler.isInStandbyMode()).thenReturn(true);
+    }
+
+    private ObservationManager getObservationManager() throws Exception
+    {
+        if (this.oldcore.getMocker().hasComponent(ObservationManager.class)) {
+            return this.oldcore.getMocker().getInstance(ObservationManager.class);
+        }
+
+        return this.oldcore.getMocker().registerMockComponent(ObservationManager.class);
+    }
+
+    private void notifyJobUpdated(BaseObject previousJob) throws Exception
+    {
+        XWikiDocument document =
+            this.oldcore.getSpyXWiki().getDocument(this.jobDocumentReference, this.oldcore.getXWikiContext()).clone();
+        document.setOriginalDocument(previousJob.getOwnerDocument());
+        this.plugin.onEvent(new DocumentUpdatedEvent(this.jobDocumentReference), document,
+            this.oldcore.getXWikiContext());
+    }
+
+    @Test
+    void initWithClusterSingleton() throws Exception
+    {
+        ObservationManager observation = getObservationManager();
+        this.oldcore.getMocker().registerMockComponent(SchedulersClassLoaderManager.class);
+        SchedulerClusterSingletonListener singletonListener =
+            this.oldcore.getMocker().registerMockComponent(SchedulerClusterSingletonListener.class);
+        when(singletonListener.isSingletonNodeRequired()).thenReturn(true);
+        this.plugin.setScheduler(null);
+
+        this.plugin.init(this.oldcore.getXWikiContext());
+
+        assertTrue(this.plugin.isEnabled());
+        verify(singletonListener).setSchedulerPlugin(this.plugin);
+        verify(observation).addListener(singletonListener);
+        verify(observation).addListener(this.plugin);
+        // The listener starts the scheduler on the cluster singleton node
+        assertNull(this.plugin.getScheduler());
+    }
+
+    @Test
+    void initWithoutClusterSingleton() throws Exception
+    {
+        ObservationManager observation = getObservationManager();
+        this.oldcore.getMocker().registerMockComponent(SchedulersClassLoaderManager.class);
+        this.oldcore.getMocker().registerMockComponent(ExecutionContextManager.class);
+        SchedulerClusterSingletonListener singletonListener =
+            this.oldcore.getMocker().registerMockComponent(SchedulerClusterSingletonListener.class);
+        doReturn(List.of()).when(this.oldcore.getSpyXWiki()).getVirtualWikisDatabaseNames(any());
+
+        this.plugin.init(this.oldcore.getXWikiContext());
+
+        // Started right away, whatever the cluster singleton node (the default, and today's behaviour)
+        verify(observation, timeout(10000)).notify(any(SchedulerJobsInitializedEvent.class), isNull());
+        verify(this.scheduler).start();
+        verify(singletonListener, never()).setSchedulerPlugin(any());
+        verify(observation, never()).addListener(singletonListener);
+        verify(observation).addListener(this.plugin);
+    }
+
+    @Test
+    void initWhenDisabled() throws Exception
+    {
+        ObservationManager observation = getObservationManager();
+        this.oldcore.getMocker().registerMockComponent(SchedulersClassLoaderManager.class);
+        SchedulerClusterSingletonListener singletonListener =
+            this.oldcore.getMocker().registerMockComponent(SchedulerClusterSingletonListener.class);
+        this.oldcore.getConfigurationSource().setProperty("scheduler.enabled", false);
+
+        this.plugin.init(this.oldcore.getXWikiContext());
+
+        assertFalse(this.plugin.isEnabled());
+        verify(singletonListener, never()).setSchedulerPlugin(any());
+        verifyNoInteractions(observation);
+    }
+
+    @Test
+    void initWhenDisabledWithClusterSingleton() throws Exception
+    {
+        ObservationManager observation = getObservationManager();
+        this.oldcore.getMocker().registerMockComponent(SchedulersClassLoaderManager.class);
+        SchedulerClusterSingletonListener singletonListener =
+            this.oldcore.getMocker().registerMockComponent(SchedulerClusterSingletonListener.class);
+        when(singletonListener.isSingletonNodeRequired()).thenReturn(true);
+        this.oldcore.getConfigurationSource().setProperty("scheduler.enabled", false);
+
+        this.plugin.init(this.oldcore.getXWikiContext());
+
+        // Registered to warn if this instance becomes the cluster singleton node
+        verify(singletonListener).setSchedulerPlugin(this.plugin);
+        verify(observation).addListener(singletonListener);
+        verify(observation, never()).addListener(this.plugin);
+    }
+
+    @Test
+    void startSchedulerRestoresTheJobs() throws Exception
+    {
+        enable();
+        mockJobContextPreparation();
+        ObservationManager observation = getObservationManager();
+        this.oldcore.getMocker().registerMockComponent(ExecutionContextManager.class);
+        saveJob("Normal");
+        doReturn(List.of("xwiki")).when(this.oldcore.getSpyXWiki()).getVirtualWikisDatabaseNames(any());
+        when(this.oldcore.getMockStore().searchDocumentReferences(anyString(), any(XWikiContext.class)))
+            .thenReturn(List.of(this.jobDocumentReference));
+        when(this.scheduler.getTriggerState(any(TriggerKey.class))).thenReturn(TriggerState.NONE);
+
+        this.plugin.startScheduler();
+
+        verify(observation, timeout(10000)).notify(any(SchedulerJobsInitializedEvent.class), isNull());
+        verify(this.scheduler).start();
+        verify(this.scheduler).scheduleJob(any(Trigger.class));
+        assertEquals("XWiki Job Status: [Normal]", this.logCapture.getMessage(0));
+        // Nothing to save
+        assertEquals("1.1", getJob().getOwnerDocument().getVersion());
+    }
+
+    @Test
+    void startSchedulerWhenStopping() throws Exception
+    {
+        enable();
+        when(this.scheduler.getCurrentlyExecutingJobs()).thenReturn(List.of());
+        this.plugin.onEvent(new ApplicationStoppedEvent(), null, null);
+
+        this.plugin.startScheduler();
+        this.plugin.stopScheduler();
+
+        verify(this.scheduler, never()).start();
+        verify(this.scheduler, never()).clear();
+    }
+
+    @Test
+    void stopScheduler() throws Exception
+    {
+        enable();
+
+        this.plugin.stopScheduler();
+
+        var inOrder = inOrder(this.scheduler);
+        inOrder.verify(this.scheduler).standby();
+        inOrder.verify(this.scheduler).clear();
+    }
+
+    @Test
+    void stopSchedulerWhenNeverStarted()
+    {
+        this.plugin.setScheduler(null);
+
+        // Nothing to stop
+        this.plugin.stopScheduler();
+
+        assertNull(this.plugin.getScheduler());
+    }
+
+    @Test
+    void stopSchedulerFailure() throws Exception
+    {
+        enable();
+        doThrow(new SchedulerException("error")).when(this.scheduler).clear();
+
+        this.plugin.stopScheduler();
+
+        assertEquals("Failed to stop the scheduler: [SchedulerException: error]", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void readMethodsWhenNotRunning() throws Exception
+    {
+        enable();
+        stopSchedulerMock();
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
+        BaseObject job = saveJob("Normal");
+        assertEquals(JobState.STATE_NORMAL, this.plugin.getJobStatus(job, xcontext).getValue());
+        assertNotNull(this.plugin.getNextFireTime(job, xcontext));
+        assertNull(this.plugin.getPreviousFireTime(job, xcontext));
+
+        job.setStringValue("status", "Paused");
+        assertEquals(JobState.STATE_PAUSED, this.plugin.getJobStatus(job, xcontext).getValue());
+        assertNull(this.plugin.getNextFireTime(job, xcontext));
+
+        job.setStringValue("status", "None");
+        assertEquals(JobState.STATE_NONE, this.plugin.getJobStatus(job, xcontext).getValue());
+
+        job.setStringValue("status", "Normal");
+        job.setStringValue("cron", "invalid");
+        assertNull(this.plugin.getNextFireTime(job, xcontext));
+
+        verify(this.scheduler, never()).getTriggerState(any());
+        verify(this.scheduler, never()).getTrigger(any());
+    }
+
+    @Test
+    void readMethodsWhenDisabled() throws Exception
+    {
+        this.plugin.setScheduler(null);
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        BaseObject job = saveJob("Normal");
+
+        assertNull(this.plugin.getJobStatus(job, xcontext));
+        assertNull(this.plugin.getNextFireTime(job, xcontext));
+        assertNull(this.plugin.getPreviousFireTime(job, xcontext));
+    }
+
+    @Test
+    void actionsWhenNotRunning() throws Exception
+    {
+        enable();
+        stopSchedulerMock();
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        BaseObject job = saveJob("None", "");
+
+        // Only the job page is saved: the instance running the scheduler applies it
+        this.plugin.scheduleJob(job, xcontext);
+        BaseObject savedJob = getJob();
+        assertEquals("Normal", savedJob.getStringValue("status"));
+        assertEquals("en", savedJob.getStringValue("contextLang"));
+        assertEquals("1.2", savedJob.getOwnerDocument().getVersion());
+
+        this.plugin.pauseJob(job, xcontext);
+        assertEquals("Paused", getJob().getStringValue("status"));
+
+        this.plugin.resumeJob(job, xcontext);
+        assertEquals("Normal", getJob().getStringValue("status"));
+
+        this.plugin.unscheduleJob(job, xcontext);
+        assertEquals("None", getJob().getStringValue("status"));
+
+        // A paused job stays paused when it's scheduled again
+        job = saveJob("Paused");
+        this.plugin.scheduleJob(job, xcontext);
+        assertEquals("Paused", getJob().getStringValue("status"));
+
+        SchedulerPluginException exception =
+            assertThrows(SchedulerPluginException.class, () -> this.plugin.triggerJob(getJob(), xcontext));
+        assertTrue(exception.getMessage().contains("The scheduler is not running on this instance"));
+
+        // Nothing to reload
+        this.plugin.reloadJob(job, xcontext);
+
+        verify(this.scheduler, never()).addJob(any(), anyBoolean());
+        verify(this.scheduler, never()).pauseJob(any(JobKey.class));
+        verify(this.scheduler, never()).resumeJob(any(JobKey.class));
+        verify(this.scheduler, never()).deleteJob(any());
+        verify(this.scheduler, never()).triggerJob(any(JobKey.class));
+    }
+
+    @Test
+    void documentEventWhenNotRunning() throws Exception
+    {
+        enable();
+        stopSchedulerMock();
+        BaseObject previousJob = saveJob("Normal");
+        BaseObject job = getJob();
+        job.setStringValue("status", "Paused");
+        this.oldcore.getSpyXWiki().saveDocument(job.getOwnerDocument(), this.oldcore.getXWikiContext());
+
+        notifyJobUpdated(previousJob);
+
+        verify(this.scheduler, never()).pauseJob(any(JobKey.class));
+    }
+
+    @Test
+    void documentEventAlreadyApplied() throws Exception
+    {
+        enable();
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        // Paused on this instance: the scheduler is updated before the page is saved
+        BaseObject previousJob = saveJob("Normal");
+        when(this.scheduler.getTriggerState(any(TriggerKey.class))).thenReturn(TriggerState.PAUSED);
+        BaseObject job = getJob();
+        job.setStringValue("status", "Paused");
+        this.oldcore.getSpyXWiki().saveDocument(job.getOwnerDocument(), xcontext);
+
+        notifyJobUpdated(previousJob);
+
+        verify(this.scheduler, never()).deleteJob(any());
+        verify(this.scheduler, never()).addJob(any(), anyBoolean());
+    }
+
+    @Test
+    void documentEventWithInvalidCron() throws Exception
+    {
+        enable();
+        mockJobContextPreparation();
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        BaseObject previousJob = saveJob("Normal");
+        when(this.scheduler.getTriggerState(any(TriggerKey.class))).thenReturn(TriggerState.NORMAL);
+        BaseObject job = getJob();
+        job.setStringValue("cron", "invalid");
+        this.oldcore.getSpyXWiki().saveDocument(job.getOwnerDocument(), xcontext);
+
+        notifyJobUpdated(previousJob);
+
+        assertTrue(this.logCapture.getMessage(0).startsWith("Failed to update job in document [xwiki:Scheduler.Job]"));
     }
 
     @Test

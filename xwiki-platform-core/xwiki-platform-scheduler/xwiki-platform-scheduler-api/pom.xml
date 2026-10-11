@@ -34,12 +34,17 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Scheduler API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.31</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.57</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-observation-remote</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

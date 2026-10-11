@@ -1,2 +1,3 @@
+com.xpn.xwiki.plugin.scheduler.internal.SchedulerClusterSingletonListener
 com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitializer
 com.xpn.xwiki.plugin.scheduler.internal.SchedulersClassLoaderManager

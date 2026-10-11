@@ -1964,19 +1964,18 @@ public class XWiki implements EventListener
     private XWikiDocument prepareDocumentForSave(XWikiDocument document, String comment, boolean isMinorEdit,
         XWikiContext context) throws XWikiException
     {
-        // Set the store so we can use it for checking the max length.
-        if (document.getStore() == null) {
-            document.setStore(this.getStore());
-        }
-        String fullName = getLocalStringEntityReferenceSerializer().serialize(document.getDocumentReference());
         // If it's a new doc we check its name length to avoid a nasty SQL error.
-        if (document.isNew() && fullName.length() > document.getLocalReferenceMaxLength()) {
-            java.lang.Object[] args = { fullName, document.getLocalReferenceMaxLength(), fullName.length() };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG,
-                "Cannot create document {0} because its full path is too long: only {1} characters are allowed and "
-                    + "current length is {2}.",
-                null, args);
+        if (document.isNew()) {
+            String fullName = getLocalStringEntityReferenceSerializer().serialize(document.getDocumentReference());
+            int maxLength = getDocumentLocalReferenceMaxLength(context);
+            if (fullName.length() > maxLength) {
+                java.lang.Object[] args = { fullName, maxLength, fullName.length() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG,
+                    "Cannot create document {0} because its full path is too long: only {1} characters are allowed "
+                        + "and current length is {2}.",
+                    null, args);
+            }
         }
 
         // Setting comment & minor edit before saving
@@ -8092,6 +8091,20 @@ public class XWiki implements EventListener
     public int getDocumentTitleMaxLength(XWikiContext context)
     {
         return getStore().getLimitSize(context, XWikiDocument.class, "title");
+    }
+
+    /**
+     * Compute and return the maximum authorized length for a document local reference (i.e. the serialized local
+     * reference of the document, also called its full name), based on the current store limitation.
+     *
+     * @param context the XWiki context
+     * @return the maximum authorized length for a document local reference
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public int getDocumentLocalReferenceMaxLength(XWikiContext context)
+    {
+        return getStore().getLimitSize(context, XWikiDocument.class, "fullName");
     }
 
     @Override

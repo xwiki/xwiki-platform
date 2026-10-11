@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Provider;
 
@@ -33,6 +34,7 @@ import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -56,6 +58,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.ApplicationStoppedEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
@@ -92,6 +95,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerPlugin.class);
 
     /**
+     * Logs what happens while XWiki stops (visible with the default logging configuration).
+     */
+    private static final Logger SHUTDOWN_LOGGER = LoggerFactory.getLogger("org.xwiki.shutdown");
+
+    /**
      * Fullname of the XWiki Scheduler Job Class representing a job that can be scheduled by this plugin.
      * 
      * @deprecated use {@link #XWIKI_JOB_CLASSREFERENCE} instead
@@ -108,6 +116,16 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     private static final String NORMAL = "Normal";
 
     /**
+     * How long to wait for the running jobs to finish when XWiki stops, in seconds.
+     */
+    private static final long SHUTDOWN_TIMEOUT = 30;
+
+    /**
+     * How long to wait for the running jobs to finish when XWiki stops, in seconds (modified by the tests).
+     */
+    long shutdownTimeout = SHUTDOWN_TIMEOUT;
+
+    /**
      * Local reference of the XWiki Scheduler Job Class representing a job that can be scheduled by this plugin.
      */
     public static final EntityReference XWIKI_JOB_CLASSREFERENCE =
@@ -118,17 +136,28 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         new DocumentDeletedEvent(),
         new DocumentUpdatedEvent(),
         new WikiDeletedEvent(),
-        new ClassLoaderResetEvent()
+        new ClassLoaderResetEvent(),
+        new ApplicationStoppedEvent()
     );
 
     /**
      * Default Quartz scheduler instance.
      */
-    private Scheduler scheduler;
+    private volatile Scheduler scheduler;
 
     private boolean enabled;
 
     private SchedulersClassLoaderManager schedulersClassLoaderManager;
+
+    /**
+     * Guards the creation of the Quartz scheduler, the restoration of each job and {@link #stopped}.
+     */
+    private final Object lifecycleLock = new Object();
+
+    /**
+     * True once XWiki is stopping: the scheduler must not be started anymore.
+     */
+    private boolean stopped;
 
     /**
      * Default plugin constructor.
@@ -206,9 +235,16 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             // Also give priority below normal to scheduler threads by default
             System.setProperty("org.quartz.threadPool.threadPriority", String.valueOf(Thread.NORM_PRIORITY - 1));
 
-            setScheduler(getDefaultSchedulerInstance());
-            setStatusListener();
-            getScheduler().start();
+            synchronized (this.lifecycleLock) {
+                if (this.stopped) {
+                    // XWiki is already stopping
+                    return;
+                }
+
+                setScheduler(getDefaultSchedulerInstance());
+                setStatusListener();
+                getScheduler().start();
+            }
 
             // Restore jobs
 
@@ -228,6 +264,69 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         } finally {
             observation.notify(new SchedulerJobsInitializedEvent(), null);
         }
+    }
+
+    /**
+     * Stop the scheduler when XWiki stops: no new job is fired, the running jobs are given {@link #shutdownTimeout}
+     * seconds to finish (while the components they use are still available), then the threads of the scheduler are
+     * stopped without waiting more (a job still running is not interrupted).
+     */
+    private void shutdown()
+    {
+        Scheduler currentScheduler;
+        synchronized (this.lifecycleLock) {
+            this.stopped = true;
+            currentScheduler = getScheduler();
+        }
+
+        if (currentScheduler == null) {
+            // The scheduler was not started
+            return;
+        }
+
+        try {
+            // Don't fire new jobs
+            currentScheduler.standby();
+
+            List<JobExecutionContext> runningJobs = waitForRunningJobs(currentScheduler);
+            if (!runningJobs.isEmpty()) {
+                SHUTDOWN_LOGGER.warn("Stopping the scheduler while the following jobs are still running after waiting"
+                    + " for [{}] seconds: {}", this.shutdownTimeout, getJobNames(runningJobs));
+            }
+
+            // The wait above is the bound: shutdown(true) would wait without limit for a job fired just before the
+            // standby but not yet listed as running
+            currentScheduler.shutdown(false);
+        } catch (SchedulerException e) {
+            LOGGER.warn("Failed to stop the scheduler: [{}]", ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
+
+    private List<JobExecutionContext> waitForRunningJobs(Scheduler currentScheduler) throws SchedulerException
+    {
+        List<JobExecutionContext> runningJobs = currentScheduler.getCurrentlyExecutingJobs();
+        if (!runningJobs.isEmpty()) {
+            SHUTDOWN_LOGGER.info("Waiting up to [{}] seconds for the following scheduler jobs to finish: {}",
+                this.shutdownTimeout, getJobNames(runningJobs));
+
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(this.shutdownTimeout);
+            while (!runningJobs.isEmpty() && System.nanoTime() < deadline) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+                runningJobs = currentScheduler.getCurrentlyExecutingJobs();
+            }
+        }
+
+        return runningJobs;
+    }
+
+    private List<String> getJobNames(List<JobExecutionContext> jobs)
+    {
+        return jobs.stream().map(job -> job.getJobDetail().getKey().getName()).toList();
     }
 
     /**
@@ -342,12 +441,19 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                 context.getWiki().getStore().searchDocumentReferences(hql, context);
             for (DocumentReference docReference : jobDocReferences) {
                 try {
-                    XWikiDocument jobDoc = context.getWiki().getDocument(docReference, context);
+                    // Don't restore a job once XWiki is stopping (the scheduler is shut down)
+                    synchronized (this.lifecycleLock) {
+                        if (this.stopped) {
+                            return;
+                        }
 
-                    // Avoid modifying the cached document
-                    jobDoc = jobDoc.clone();
+                        XWikiDocument jobDoc = context.getWiki().getDocument(docReference, context);
 
-                    register(jobDoc, context);
+                        // Avoid modifying the cached document
+                        jobDoc = jobDoc.clone();
+
+                        register(jobDoc, context);
+                    }
                 } catch (Exception e) {
                     LOGGER.error("Failed to restore job with in document [{}] and wiki [{}]", docReference,
                         context.getWikiId(), e);
@@ -854,7 +960,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+        if (event instanceof ApplicationStoppedEvent) {
+            shutdown();
+        } else if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
             String wikiId = wikiDeletedEvent.getWikiId();
             try {
                 onWikiDeletedEvent(wikiId);

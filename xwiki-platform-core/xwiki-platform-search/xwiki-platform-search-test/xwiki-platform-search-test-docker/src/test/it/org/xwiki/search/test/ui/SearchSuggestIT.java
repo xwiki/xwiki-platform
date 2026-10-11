@@ -43,6 +43,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UI tests for Search Suggest features.
@@ -74,6 +75,15 @@ class SearchSuggestIT
         QuickSearchElement quickSearchElement = new QuickSearchElement();
         quickSearchElement.search(testDocumentTitle);
         assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
+
+        // Verify that "Go to search page..." is displayed last.
+        assertTrue(quickSearchElement.isShowAllResultsLast());
+
+        // Verify that closing and reopening the suggestions panel doesn't leave "Go to search page..." behind.
+        quickSearchElement.closeSuggestions();
+        quickSearchElement.reopenSuggestions(testDocumentTitle);
+        assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
+        assertTrue(quickSearchElement.isShowAllResultsLast());
 
         // A page saved from a script, without setting its locale, is found too.
         DocumentReference scriptPageReference =

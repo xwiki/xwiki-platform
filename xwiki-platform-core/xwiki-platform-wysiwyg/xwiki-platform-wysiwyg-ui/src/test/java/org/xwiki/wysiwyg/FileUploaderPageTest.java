@@ -53,6 +53,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -95,6 +96,8 @@ class FileUploaderPageTest extends PageTest
         when(this.csrfScriptService.isTokenValid(any())).thenReturn(true);
         setOutputSyntax(Syntax.PLAIN_1_0);
         setAttachmentSupportStatus(true);
+        // Allow the current user to edit the target document by default.
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), any(), any(), any())).thenReturn(true);
     }
 
     @Test
@@ -201,6 +204,21 @@ class FileUploaderPageTest extends PageTest
         assertEquals(String.format("/xwiki/bin/download/XWiki/WYSIWYG/FileUploader/%s", filename),
             json.get("url").asText());
         assertEquals(filename, json.get("fileName").asText());
+    }
+
+    @Test
+    void renderUploadWithoutEditRight() throws Exception
+    {
+        this.context.setAction("get");
+        this.request.put("filename", "test.txt");
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), any(), any(), any())).thenReturn(false);
+
+        JsonNode json = renderJSONPage(documentReference);
+
+        assertEquals(0, json.get("uploaded").asInt());
+        assertEquals(403, json.get("error").get("number").asInt());
+        assertEquals("You are not allowed to perform this action.", json.get("error").get("message").asText());
+        verifyNoInteractions(this.temporaryAttachmentsScriptService);
     }
 
     private void setAttachmentSupportStatus(boolean status)

@@ -43,6 +43,8 @@ import org.xwiki.container.Session;
 import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
@@ -70,6 +72,9 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
 
     @Inject
     private Provider<Container> container;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Inject
     private Logger logger;
@@ -108,6 +113,11 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException
     {
+        // The uploaded files are only attached by the users who can edit the document (save, comment, annotation).
+        if (!this.authorization.hasAccess(Right.EDIT, documentReference)) {
+            throw new TemporaryAttachmentException(
+                "The current user is not allowed to edit [%s].".formatted(documentReference));
+        }
         Optional<TemporaryAttachmentSession> optionalSession = getOrCreateSession();
         if (optionalSession.isEmpty()) {
             throw new TemporaryAttachmentException("Cannot find a user http session.");

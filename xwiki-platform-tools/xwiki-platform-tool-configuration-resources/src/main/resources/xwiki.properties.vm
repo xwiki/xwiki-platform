@@ -1230,6 +1230,44 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #-# The default is "filesystem".
 # store.blobMigrationStoreType = filesystem
 
+#-# [Since 18.10.0RC1]
+#-# The files uploaded in an editor before the document is saved (temporary attachments) are kept in the blob store
+#-# "store/temporary-attachments", so that any cluster member can display them and attach them when the document is
+#-# saved. They are identified by the current user and by a random identifier kept in the HTTP only cookie
+#-# "xwikiTemporaryAttachments", which lasts as long as an upload (see maxAge below) and is removed once the browser has
+#-# no pending upload. They are deleted when the document is saved, when the edit is cancelled and at logout, but not
+#-# when the HTTP session ends: an upload older than the following number of hours is deleted by a task that runs every
+#-# hour on each cluster member. A value lower than 1 is replaced by the default.
+#-#
+#-# The default is 24.
+# store.temporaryAttachments.maxAge = 24
+
+#-# [Since 18.10.0RC1]
+#-# The directory of the temporary attachments when the "filesystem" blob store is used. In a cluster it must be shared
+#-# by the members, like store.file.directory.
+#-#
+#-# The default is the directory "temporary-attachments" next to store.file.directory when that property is set (and
+#-# its parent directory is writable), ${environment.permanentDirectory}/store/temporary-attachments otherwise.
+# store.temporaryAttachments.directory = /var/lib/xwiki/data/store/temporary-attachments/
+
+#-# [Since 18.10.0RC1]
+#-# The maximum number of pending temporary attachments of a user in one browser. An upload above this limit is
+#-# rejected until some pending uploads are saved, cancelled or expired. A negative value means no limit. This limit,
+#-# like the next one, applies per user and per browser: the total size of the store is bounded only by the users
+#-# allowed to upload (the edit right on the target document) and by maxAge. With an S3 blob store, a lifecycle rule
+#-# expiring the "store/temporary-attachments/" prefix after a few days can be added as a safety net.
+#-#
+#-# The default is 100.
+# store.temporaryAttachments.maxCount = 100
+
+#-# [Since 18.10.0RC1]
+#-# The maximum total size in bytes of the pending temporary attachments of a user in one browser. An upload that would
+#-# exceed it is rejected. A negative value means no limit.
+#-#
+#-# The default is 10 times the "upload_maxsize" preference (335544320 bytes, 320 MiB, with the default upload_maxsize
+#-# of 32 MiB).
+# store.temporaryAttachments.maxTotalSize = 335544320
+
 #-------------------------------------------------------------------------------------
 # S3 Blob Store
 #-------------------------------------------------------------------------------------

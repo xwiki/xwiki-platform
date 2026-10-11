@@ -11,5 +11,10 @@ org.xwiki.store.serialization.xml.internal.AttachmentListMetadataSerializer
 org.xwiki.store.serialization.xml.internal.AttachmentMetadataSerializer
 org.xwiki.store.serialization.xml.internal.DeletedAttachmentMetadataSerializer
 org.xwiki.store.filesystem.internal.DefaultTemporaryAttachmentSessionsManager
+org.xwiki.store.filesystem.internal.TemporaryAttachmentScopeManager
+org.xwiki.store.filesystem.internal.TemporaryAttachmentStore
+org.xwiki.store.filesystem.internal.TemporaryAttachmentsCleaner
+org.xwiki.store.filesystem.internal.TemporaryAttachmentsConfiguration
+org.xwiki.store.filesystem.internal.TemporaryAttachmentsLogoutListener
 org.xwiki.store.filesystem.internal.XWikiFilesystemBlobStorePropertiesCustomizer
 org.xwiki.store.script.TemporaryAttachmentsScriptService

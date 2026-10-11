@@ -37,8 +37,8 @@ import org.xwiki.store.internal.FileSystemStoreUtils;
 
 /**
  * Customizes filesystem blob store profiles using legacy XWiki filesystem attachment config.
- * Applies only when the profile type is "filesystem" and store name equals the store/file name.
- * Cleans up empty directories on startup if configured to do so.
+ * Applies only when the profile type is "filesystem" and store name equals the store/file name, or the name of the
+ * temporary attachments store. Cleans up empty directories on startup if configured to do so.
  *
  * @version $Id$
  * @since 17.10.0RC1
@@ -48,8 +48,18 @@ import org.xwiki.store.internal.FileSystemStoreUtils;
 @Named("org.xwiki.store.filesystem.internal.XWikiFilesystemBlobStorePropertiesCustomizer")
 public class XWikiFilesystemBlobStorePropertiesCustomizer implements BlobStorePropertiesCustomizer
 {
+    /**
+     * Constant copied from FileSystemBlobStoreProperties to avoid a direct dependency.
+     */
+    private static final String ROOT_DIRECTORY = "filesystem.rootDirectory";
+
+    private static final String TEMPORARY_ATTACHMENTS_DIRECTORY = "temporary-attachments";
+
     @Inject
     private FilesystemAttachmentsConfiguration config;
+
+    @Inject
+    private TemporaryAttachmentsConfiguration temporaryAttachmentsConfiguration;
 
     @Inject
     private Environment environment;
@@ -76,14 +86,45 @@ public class XWikiFilesystemBlobStorePropertiesCustomizer implements BlobStorePr
 
             Path path = fileStorageDirectory.toPath();
             this.logger.debug("Customizing filesystem store root directory to [{}] for attachments store", path);
-            // Constant copied from FileSystemBlobStoreProperties to avoid a direct dependency.
-            propertiesBuilder.set("filesystem.rootDirectory", path);
+            propertiesBuilder.set(ROOT_DIRECTORY, path);
 
             if (this.config.cleanOnStartup()) {
                 File finalFileStorageDirectory = fileStorageDirectory;
                 new Thread(() -> deleteEmptyDirs(finalFileStorageDirectory, 0)).start();
             }
+        } else if (TemporaryAttachmentStore.STORE_NAME.equals(propertiesBuilder.getName())) {
+            File directory = getTemporaryAttachmentsDirectory();
+            if (directory != null) {
+                this.logger.debug("Customizing filesystem store root directory to [{}] for temporary attachments",
+                    directory);
+                propertiesBuilder.set(ROOT_DIRECTORY, directory.toPath());
+            }
         }
+    }
+
+    /**
+     * The temporary attachments must be visible to every cluster member, like the attachments: when the attachments
+     * directory is configured (usually on a shared volume), the temporary attachments go next to it, unless their own
+     * directory is configured.
+     */
+    private File getTemporaryAttachmentsDirectory()
+    {
+        File directory = this.temporaryAttachmentsConfiguration.getDirectory();
+        if (directory == null) {
+            File fileStorageDirectory = this.config.getDirectory();
+            if (fileStorageDirectory != null) {
+                File parent = fileStorageDirectory.getAbsoluteFile().getParentFile();
+                if (parent != null && Files.isDirectory(parent.toPath()) && Files.isWritable(parent.toPath())) {
+                    directory = new File(parent, TEMPORARY_ATTACHMENTS_DIRECTORY);
+                } else {
+                    this.logger.warn("Cannot store the temporary attachments next to [{}] (parent directory missing or"
+                        + " not writable): set store.temporaryAttachments.directory to a directory shared by the"
+                        + " cluster members.", fileStorageDirectory);
+                }
+            }
+        }
+
+        return directory;
     }
 
     private static boolean deleteEmptyDirs(final File location, int depth)

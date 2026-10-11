@@ -41,7 +41,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * The idea of this API is to allow obtaining directly a temporary {@link XWikiAttachment} from a {@link Part} and to
  * keep it in cache until it's saved.
  * <P>
- * The manager is handling a separated map of attachments for each {@link jakarta.servlet.http.HttpSession}.
+ * The temporary attachments are kept per user and per browser: the default implementation stores them in a blob store
+ * shared by the cluster members and identifies the browser with a cookie, so that any member can serve them and attach
+ * them when the document is saved, whatever member received the upload. They are deleted when the document is saved,
+ * when the edit is cancelled, at logout, and in any case after a maximum age (the
+ * {@code store.temporaryAttachments.maxAge} configuration property, 24 hours by default), but not when the HTTP session
+ * ends.
  *
  * @version $Id$
  * @since 14.3RC1
@@ -139,8 +144,9 @@ public interface TemporaryAttachmentSessionsManager
      * This can be useful if an API manipulates an {@link XWikiAttachment} without saving it, and want it to be
      * discoverable when parsing a document through the download action for example.
      * <p>
-     * Note that consumer of this API needs to be aware that the file attached to the {@link XWikiAttachment} might be
-     * deleted at the end of the session, as any temporary attachment.
+     * Note that consumer of this API needs to be aware that the content of the given {@link XWikiAttachment} is copied
+     * and that the copy is deleted after a maximum age or when the temporary attachments of the document are removed,
+     * as any temporary attachment.
      *
      * @param attachment the attachment to be temporarily attached to the document
      * @param documentReference the reference of the document to link this attachment to
@@ -151,7 +157,7 @@ public interface TemporaryAttachmentSessionsManager
         throws TemporaryAttachmentException;
 
     /**
-     * Retrieve all temporary attachments related to the given document reference in the current user session.
+     * Retrieve all temporary attachments related to the given document reference for the current user and browser.
      *
      * @param documentReference the reference for which to retrieve temporary attachments.
      * @return a collection of temporary attachments or an empty collection.
@@ -194,12 +200,12 @@ public interface TemporaryAttachmentSessionsManager
     boolean removeUploadedAttachment(DocumentReference documentReference, String filename);
 
     /**
-     * Remove all uploaded attachments from the cache related to the given document reference in the current user
-     * session.
+     * Remove all uploaded attachments from the cache related to the given document reference for the current user and
+     * browser.
      *
      * @param documentReference the reference for which to retrieve the temporary attachments.
      * @return {@code true} if there was some temporary attachments in cache for the given document reference in the
-     *         current user session, {@code false} if there was no matching temporary attachment in cache.
+     *         current user and browser, {@code false} if there was no matching temporary attachment in cache.
      */
     boolean removeUploadedAttachments(DocumentReference documentReference);
 

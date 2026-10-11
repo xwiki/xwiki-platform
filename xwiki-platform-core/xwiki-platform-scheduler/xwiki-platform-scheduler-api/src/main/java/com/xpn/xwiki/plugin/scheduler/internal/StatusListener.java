@@ -93,7 +93,7 @@ public class StatusListener implements SchedulerListener, JobListener
     @Override
     public void schedulerShutdown()
     {
-        LOGGER.warn("Scheduler is shutting down");
+        LOGGER.info("Scheduler is shutting down");
     }
 
     @Override

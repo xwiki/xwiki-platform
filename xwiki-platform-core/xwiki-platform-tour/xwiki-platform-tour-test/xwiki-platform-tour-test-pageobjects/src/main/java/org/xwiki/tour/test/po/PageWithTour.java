@@ -20,6 +20,7 @@
 package org.xwiki.tour.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -71,26 +72,35 @@ public class PageWithTour extends ViewPage
     }
 
     /**
-     * Read the text of an element of the step popover, waiting for it to be displayed first.
+     * Read the text of an element of the step popover, waiting for the popover to be displayed first.
      * <p>
-     * The step popover is shown by the tour's JavaScript right after the target page has been loaded, so a lookup for
-     * it is typically issued while that navigation is still settling. The implicit wait must not be relied on in that
-     * situation: a single {@code findElement} spanning a navigation keeps polling the document we're leaving and
-     * fails after its full timeout, even though the popover is on screen the whole time. An explicit wait issues a
-     * new lookup on every poll, so each poll runs against the current document. Waiting for the element to be
-     * <em>displayed</em> also covers the moment where the popover is already in the DOM but not shown yet, in which
-     * case {@code getText()} would return an empty string. Note that when we start a new tour from the tour home page,
-     * there are actually two page loads: one that contains startTour=true and then the tour's JavaScript code
-     * redirects to the same URL without that parameter as this is the URL recorded in the tour. It is this second page
-     * load that causes the aforementioned issues as we're not explicitly waiting for it.
+     * The text is read again on every poll until it is not empty, for two reasons:
+     * <ul>
+     * <li>The step popover is shown by the tour's JavaScript right after the target page has been loaded, so a lookup
+     * for it is typically issued while that navigation is still settling. A single {@code findElement} spanning a
+     * navigation keeps polling the document we're leaving and fails after its full timeout, whereas each poll runs a
+     * new lookup against the current document. Note that when we start a new tour from the tour home page, there are
+     * actually two page loads: one that contains startTour=true and then the tour's JavaScript code redirects to the
+     * same URL without that parameter as this is the URL recorded in the tour.</li>
+     * <li>When the tour scrolls the page to the element of a step, it shows the step popover twice: once at the end of
+     * the scroll animation and once more from its (debounced) window scroll listener. Each time, the popover is
+     * replaced by a new one that fades in, and {@code getText()} returns an empty string while it's still invisible
+     * (or fails if the element we found has just been replaced).</li>
+     * </ul>
      *
      * @param locator the locator of the popover element to read
      * @return the text of the element, once it is displayed
      */
     private String getShownStepElement(By locator)
     {
-        getDriver().waitUntilElementIsVisible(locator);
-        return getDriver().findElementWithoutWaiting(locator).getText();
+        return getDriver().waitUntilCondition(driver -> {
+            try {
+                String text = driver.findElement(locator).getText();
+                return text.isEmpty() ? null : text;
+            } catch (StaleElementReferenceException e) {
+                return null;
+            }
+        });
     }
 
     public boolean hasPreviousStep()
@@ -169,17 +179,19 @@ public class PageWithTour extends ViewPage
 
     /**
      * Forgets the state of all the tours (current step, ended), which the tours keep in the local storage of the
-     * browser, so that the tours start again from their first step, as for a new visitor. Reload the page afterwards
-     * for the tours of the current page to be started again.
+     * browser, then reloads the page so that its tours start again from their first step, as for a new visitor.
      *
+     * @return the reloaded page
      * @since 17.10.14
      * @since 18.4.7
      * @since 18.9.0RC1
      */
-    public void clearToursState()
+    public PageWithTour clearToursState()
     {
         getDriver().executeJavascript("Object.keys(window.localStorage).filter(key => key.startsWith('tour_'))"
             + ".forEach(key => window.localStorage.removeItem(key));");
+        getDriver().navigate().refresh();
+        return new PageWithTour();
     }
 
     /**
@@ -191,9 +203,16 @@ public class PageWithTour extends ViewPage
      */
     public String getStepDescriptionLinkURL(String linkLabel)
     {
-        getDriver().waitUntilElementIsVisible(By.className("popover-content"));
-        return getDriver().findElementWithoutWaiting(By.cssSelector(".tour .popover-content"))
-            .findElement(By.linkText(linkLabel)).getDomAttribute("href");
+        // Look for the link on every poll, for the same reasons as in getShownStepElement(): the link text can't be
+        // matched while the popover is invisible, and the popover can be replaced by a new one meanwhile.
+        return getDriver().waitUntilCondition(driver -> {
+            try {
+                return driver.findElement(By.cssSelector(".tour .popover-content")).findElement(By.linkText(linkLabel))
+                    .getDomAttribute("href");
+            } catch (StaleElementReferenceException e) {
+                return null;
+            }
+        });
     }
 
     /**

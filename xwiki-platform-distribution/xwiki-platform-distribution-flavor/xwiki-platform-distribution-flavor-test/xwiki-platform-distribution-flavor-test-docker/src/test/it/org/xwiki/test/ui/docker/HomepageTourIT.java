@@ -56,9 +56,7 @@ class HomepageTourIT
     {
         // Visit the home page as a new visitor would: as guest and without any tour state in the browser.
         setup.forceGuestUser();
-        PageWithTour homePage = PageWithTour.gotoPage(HOME_PAGE);
-        homePage.clearToursState();
-        homePage = PageWithTour.gotoPage(HOME_PAGE);
+        PageWithTour homePage = PageWithTour.gotoPage(HOME_PAGE).clearToursState();
 
         // The tour starts by itself.
         assertTrue(homePage.isTourDisplayed());

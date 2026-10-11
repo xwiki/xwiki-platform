@@ -20,6 +20,7 @@
 package org.xwiki.platform.notifications.test.po;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -84,11 +85,26 @@ public class NotificationsContainerElement extends BaseElement
      */
     public static NotificationsContainerElement waitUntilNotificationCount(int expectedCount)
     {
+        return waitUntilNotifications(element -> element.getNotificationsListCount() >= expectedCount);
+    }
+
+    /**
+     * Wait for the notification macro of the current page to display notifications matching the given condition,
+     * reloading the page between attempts, for the same reasons as {@link #waitUntilNotificationCount(int)}. Use it
+     * when the number of notifications is not known in advance, for instance because some events may be grouped.
+     *
+     * @param condition the condition that the displayed notifications must match
+     * @return an instance of {@link NotificationsContainerElement} located on the up-to-date page
+     * @since 18.9.0RC1
+     */
+    public static NotificationsContainerElement waitUntilNotifications(
+        Predicate<NotificationsContainerElement> condition)
+    {
         NotificationsContainerElement element = getElementForMacroInPage();
         // Wait for the asynchronous REST request performed by the macro to complete before counting the events.
         element.waitUntilPageIsReady();
         int attempts = 0;
-        while (element.getNotificationsListCount() < expectedCount && attempts < MAX_RELOAD_ATTEMPTS) {
+        while (!condition.test(element) && attempts < MAX_RELOAD_ATTEMPTS) {
             getUtil().getDriver().navigate().refresh();
             element = getElementForMacroInPage();
             element.waitUntilPageIsReady();
@@ -235,6 +251,19 @@ public class NotificationsContainerElement extends BaseElement
         getDriver().findElementWithoutWaiting(this.container, LOAD_OLDER_BUTTON).click();
         // The button is replaced by a loading indicator until the older notifications are displayed.
         getDriver().waitUntilCondition(driver -> !getDriver().hasElementWithoutWaiting(this.container, LOADING_OLDER));
+    }
+
+    /**
+     * @param notificationNumber index of the notification in the list
+     * @return {@code true} if the notification is displayed as unread
+     * @since 18.9.0RC1
+     */
+    public boolean isNotificationUnread(int notificationNumber)
+    {
+        checkNotificationNumber(notificationNumber);
+
+        return this.getNotifications().get(notificationNumber).getAttribute("class")
+            .contains("notification-event-unread");
     }
 
     /**

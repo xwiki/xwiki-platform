@@ -22,16 +22,17 @@ package org.xwiki.search.solr.internal;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.jupiter.api.Test;
-import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.XWikiSolrCore;
-import org.xwiki.search.solr.internal.search.SearchCoreInitializer;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -46,9 +47,11 @@ import static org.mockito.Mockito.when;
 class SolrClientInstanceTest
 {
     @MockComponent
-    private Solr solr;
+    private LazySolrCore searchCore;
 
     private final SolrClient client = mock();
+
+    private final XWikiSolrCore core = mock();
 
     @InjectMockComponents
     private SolrClientInstance instance;
@@ -56,9 +59,37 @@ class SolrClientInstanceTest
     @BeforeComponent
     void beforeComponent() throws Exception
     {
-        XWikiSolrCore core = mock();
-        when(core.getClient()).thenReturn(this.client);
-        when(this.solr.getCore(SearchCoreInitializer.CORE_NAME)).thenReturn(core);
+        when(this.core.getClient()).thenReturn(this.client);
+        when(this.searchCore.initialize(SolrClientInstance.CORE_NAME)).thenReturn(this.core);
+    }
+
+    @BeforeComponent("searchCoreResolvedOnFirstUse")
+    void beforeSearchCoreResolvedOnFirstUse() throws Exception
+    {
+        // The search core is not available when the instance is initialized (a remote Solr server which cannot be
+        // reached), then it is
+        when(this.searchCore.initialize(SolrClientInstance.CORE_NAME)).thenReturn(null);
+        when(this.searchCore.get()).thenReturn(this.core);
+    }
+
+    @Test
+    void searchCoreResolvedOnFirstUse() throws Exception
+    {
+        assertNull(this.instance.server);
+        assertNull(this.instance.getServer());
+
+        SolrDocument document = new SolrDocument();
+        when(this.client.getById("id")).thenReturn(document);
+
+        // Every operation resolves the search core when needed, the get by id included
+        assertSame(document, this.instance.get("id"));
+        assertSame(this.core, this.instance.server);
+        assertSame(this.client, this.instance.getServer());
+
+        // The resolved search core is kept
+        this.instance.commit();
+        verify(this.client).commit();
+        verify(this.searchCore).get();
     }
 
     @Test

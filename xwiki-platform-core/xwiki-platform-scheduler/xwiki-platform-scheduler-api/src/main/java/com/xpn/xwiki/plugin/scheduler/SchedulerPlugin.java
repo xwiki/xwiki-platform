@@ -368,8 +368,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             try {
                 context.setWikiId(cDb);
                 XWikiDocument jobHolder = job.getOwnerDocument();
-                jobHolder.setMinorEdit(true);
-                context.getWiki().saveDocument(jobHolder, context);
+                context.getWiki().saveDocument(jobHolder, "", true, context);
             } catch (XWikiException e) {
                 throw new SchedulerPluginException(
                     SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT,
@@ -923,13 +922,18 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     {
         XWikiDocument jobHolder = context.getWiki().getDocument(object.getDocumentReference(), context);
 
+        // Setting the same value still marks the document as modified, so saving it would create a new version (for
+        // example for each job restored at startup)
+        if (status.equals(jobHolder.getXObject(object.getReference()).getStringValue(STATUS))) {
+            return;
+        }
+
         // Avoid modifying the cache document
         jobHolder = jobHolder.clone();
 
-        BaseObject job = jobHolder.getXObject(XWIKI_JOB_CLASSREFERENCE);
+        BaseObject job = jobHolder.getXObject(object.getReference());
         job.setStringValue(STATUS, status);
-        jobHolder.setMinorEdit(true);
-        context.getWiki().saveDocument(jobHolder, context);
+        context.getWiki().saveDocument(jobHolder, "", true, context);
     }
 
     /**

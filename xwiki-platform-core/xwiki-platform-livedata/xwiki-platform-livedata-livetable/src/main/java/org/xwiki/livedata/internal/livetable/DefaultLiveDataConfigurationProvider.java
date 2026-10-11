@@ -120,6 +120,8 @@ public class DefaultLiveDataConfigurationProvider implements Provider<LiveDataCo
             property.setFilter(new FilterDescriptor("list"));
         }
         // TODO: Take into account the user scope. See suggestUsersAndGroups.js for an example.
-        property.getFilter().setParameter("searchURL", "?xpage=uorgsuggest&uorg=user&input={encodedQuery}&media=json");
+        // Disabled users are included because the table can hold documents authored by users disabled since then.
+        property.getFilter().setParameter("searchURL",
+            "?xpage=uorgsuggest&uorg=user&input={encodedQuery}&media=json&includeInactiveUsers=true");
     }
 }

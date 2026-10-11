@@ -506,15 +506,6 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated use {@link #setOriginalWikiId(String)} instead
-     */
-    @Deprecated(since = "6.1M1")
-    public void setOriginalDatabase(String wikiId)
-    {
-        setOriginalWikiId(wikiId);
-    }
-
-    /**
      * Set the "original" wiki id. This will be the wiki id for the wiki which the user requested. If the wiki is
      * switched to load some piece of data, this will remember what it should be switched back to.
      *

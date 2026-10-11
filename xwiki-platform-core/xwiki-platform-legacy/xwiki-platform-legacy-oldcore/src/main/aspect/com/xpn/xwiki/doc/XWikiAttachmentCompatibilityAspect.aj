@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,4 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export const XWiki = window.XWiki || {};
+package com.xpn.xwiki.doc;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+
+/**
+ * Add a backward compatibility layer to the {@link com.xpn.xwiki.doc.XWikiAttachment} class.
+ *
+ * @version $Id$
+ * @since 18.9.0RC1
+ */
+public aspect XWikiAttachmentCompatibilityAspect
+{
+    /**
+     * @param context current XWikiContext
+     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
+     * @throws XWikiException
+     * @since 2.3M2
+     * @deprecated use {@link #getContentLongSize(XWikiContext)} instead
+     */
+    @Deprecated(since = "9.0RC1")
+    public int XWikiAttachment.getContentSize(XWikiContext context) throws XWikiException
+    {
+        long longSize = getContentLongSize(context);
+
+        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+    }
+}

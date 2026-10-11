@@ -272,7 +272,7 @@ public class DownloadAction extends XWikiAction
     {
         if (start >= 0 && start < attachment.getContentLongSize(context)) {
             try (InputStream data = attachment.getContentInputStream(context)) {
-                InputStream boundedData = new BoundedInputStream(data, end + 1);
+                InputStream boundedData = BoundedInputStream.builder().setInputStream(data).setMaxCount(end + 1).get();
                 long skip = boundedData.skip(start);
                 if (skip != start) {
                     throw new IOException(

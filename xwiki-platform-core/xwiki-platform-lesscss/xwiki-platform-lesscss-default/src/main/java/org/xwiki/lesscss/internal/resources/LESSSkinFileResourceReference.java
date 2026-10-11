@@ -23,6 +23,7 @@ import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.Template;
+import org.xwiki.template.TemplateContent;
 import org.xwiki.template.TemplateManager;
 
 /**
@@ -70,13 +71,31 @@ public class LESSSkinFileResourceReference implements LESSResourceReference
 
     @Override public String getContent(String skin) throws LESSCompilerException
     {
+        return getTemplateContent(skin).getContent();
+    }
+
+    /**
+     * Resolve the template of this LESS file in the given skin. The returned content carries the author and the
+     * document of the resolved template (e.g. the attachment author when the file comes from a wiki skin), which must
+     * be used when evaluating its Velocity code.
+     *
+     * @param skin the skin in which the file is resolved
+     * @return the content of the resolved template
+     * @throws LESSCompilerException if the template does not exist or its content cannot be read
+     * @since 16.10.19
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public TemplateContent getTemplateContent(String skin) throws LESSCompilerException
+    {
         Template template = templateManager.getTemplate("less/" + fileName, skinManager.getSkin(skin));
         if (template == null) {
             throw new LESSCompilerException(String.format("The template [%s] does not exist.", fileName));
         }
 
         try {
-            return template.getContent().getContent();
+            return template.getContent();
         } catch (Exception e) {
             throw new LESSCompilerException(
                     String.format("Failed to get the content of the template [%s].", fileName), e);

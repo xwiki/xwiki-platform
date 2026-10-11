@@ -61,6 +61,23 @@ public class SolrSearchResult extends BaseElement
      */
     public Map<String, List<String>> getHighlights()
     {
+        return getHighlights(By.tagName("blockquote"));
+    }
+
+    /**
+     * Get the words that are highlighted in the displayed snippets. Highlights are automatically expanded to make
+     * them all visible.
+     *
+     * @return a map from the name of the field to the words that are highlighted in the snippets of the field
+     * @since 18.9.0RC1
+     */
+    public Map<String, List<String>> getHighlightedWords()
+    {
+        return getHighlights(By.cssSelector("blockquote .search-text-highlight"));
+    }
+
+    private Map<String, List<String>> getHighlights(By highlightSelector)
+    {
         // If there is a link to show all highlights, click it so they are visible.
         getDriver().findElementsWithoutWaiting(this.container, By.cssSelector(".search-result-highlightAll"))
             .forEach(WebElement::click);
@@ -74,7 +91,7 @@ public class SolrSearchResult extends BaseElement
                 highlightKey = highlightElement.getText();
             } else if (highlightKey != null && "dd".equals(highlightElement.getTagName())) {
                 highlights.put(highlightKey,
-                    getDriver().findElementsWithoutWaiting(highlightElement, By.tagName("blockquote"))
+                    getDriver().findElementsWithoutWaiting(highlightElement, highlightSelector)
                         .stream()
                         .map(WebElement::getText)
                         .toList()

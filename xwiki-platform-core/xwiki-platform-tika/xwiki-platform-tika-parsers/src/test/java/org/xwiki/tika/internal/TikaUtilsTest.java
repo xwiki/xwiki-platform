@@ -43,7 +43,7 @@ class TikaUtilsTest
     @Test
     void parseAutoclosable() throws IOException, TikaException
     {
-        assertEquals("\nPDF content\n\n\n",
-            TikaUtils.parseToString(new AutoCloseInputStream(getClass().getResourceAsStream("/pdf.pdf"))));
+        assertEquals("\nPDF content\n\n\n", TikaUtils.parseToString(
+            AutoCloseInputStream.builder().setInputStream(getClass().getResourceAsStream("/pdf.pdf")).get()));
     }
 }

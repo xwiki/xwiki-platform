@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.openqa.selenium.WebElement;
 import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
+import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.xpath;
@@ -44,6 +45,17 @@ public class MentionNotificationPage extends GroupedNotificationElementPage
     public MentionNotificationPage(WebElement rootElement)
     {
         super(rootElement);
+    }
+
+    /**
+     * Access the mention notifications listed in the given notification tray.
+     *
+     * @param tray the notification tray holding the mention notifications
+     * @since 18.9.0RC1
+     */
+    public MentionNotificationPage(NotificationsTrayPage tray)
+    {
+        this(tray.getNotificationsButton());
     }
 
     /**

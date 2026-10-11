@@ -24,6 +24,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
@@ -40,10 +42,18 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
@@ -55,6 +65,7 @@ import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.VelocityTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -73,6 +84,10 @@ import static org.mockito.Mockito.when;
 @ComponentList(DocumentReferenceDequeContext.class)
 class DocumentTitleDisplayerTest
 {
+    private static final String SDOC = "sdoc";
+
+    private static final String SERIALIZED_REFERENCE = "wiki:Space.Page";
+
     @InjectMockComponents
     private DocumentTitleDisplayer documentTitleDisplayer;
 
@@ -98,12 +113,31 @@ class DocumentTitleDisplayerTest
     @MockComponent
     private VelocityManager velocityManager;
 
+    @MockComponent
+    @Named("xwikicfg")
+    private ConfigurationSource xwikicfg;
+
+    @MockComponent
+    private DisplayConfiguration displayConfiguration;
+
+    @MockComponent
+    private TransformationManager transformationManager;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @MockComponent
+    private ErrorBlockGenerator errorBlockGenerator;
+
+    private Map<String, Object> xwikiContext;
+
     @BeforeEach
     void configure()
     {
         // The execution context is expected to have the "xwikicontext" property set.
         ExecutionContext executionContext = new ExecutionContext();
-        executionContext.setProperty("xwikicontext", new HashMap<String, Object>());
+        this.xwikiContext = new HashMap<>();
+        executionContext.setProperty("xwikicontext", this.xwikiContext);
         when(this.execution.getContext()).thenReturn(executionContext);
     }
 
@@ -173,5 +207,97 @@ class DocumentTitleDisplayerTest
         // Check that the context is restored.
         verify(this.dab).popDocumentFromContext(any());
         verify(this.modelContext).setCurrentEntityReference(currentWikiReference);
+    }
+
+    @Test
+    void titleExtractedFromContentIsExecutedInTheContextOfTheDocument() throws Exception
+    {
+        // Enable the title compatibility mode, in which the title is extracted from the first heading of the content.
+        when(this.xwikicfg.getProperty("xwiki.title.compatibility", "0")).thenReturn("1");
+        when(this.displayConfiguration.getTitleHeadingDepth()).thenReturn(2);
+
+        DocumentReference documentReference = new DocumentReference("wiki", List.of("Space"), "Page");
+        when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn(SERIALIZED_REFERENCE);
+
+        DocumentModelBridge document = mock();
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        WordBlock headingContent = new WordBlock("heading");
+        when(document.getPreparedXDOM()).thenReturn(
+            new XDOM(List.of(new HeaderBlock(List.of(headingContent), HeaderLevel.LEVEL1)),
+                new MetaData(Map.of(MetaData.SOURCE, SERIALIZED_REFERENCE))));
+
+        // The title is displayed while the content of another document is being executed.
+        Object otherSecureDocument = new Object();
+        this.xwikiContext.put(SDOC, otherSecureDocument);
+
+        doAnswer(invocationOnMock -> {
+            XDOM headingXDOM = invocationOnMock.getArgument(0);
+            TransformationContext transformationContext = invocationOnMock.getArgument(1);
+            // The heading is executed in the context of the document it has been extracted from.
+            assertSame(document, this.xwikiContext.get(SDOC));
+            assertEquals(SERIALIZED_REFERENCE, transformationContext.getId());
+            assertEquals(SERIALIZED_REFERENCE, headingXDOM.getMetaData().getMetaData(MetaData.SOURCE));
+            return null;
+        }).when(this.transformationManager).performTransformations(any(XDOM.class), any(TransformationContext.class));
+
+        DocumentDisplayerParameters params = new DocumentDisplayerParameters();
+        params.setTitleDisplayed(true);
+
+        assertEquals(List.of(headingContent), this.documentTitleDisplayer.display(document, params).getChildren());
+
+        verify(this.transformationManager).performTransformations(any(XDOM.class), any(TransformationContext.class));
+        // The secure document of the caller is restored.
+        assertSame(otherSecureDocument, this.xwikiContext.get(SDOC));
+    }
+
+    @Test
+    void titleExtractedFromContentRemovesTheSecureDocumentWhenThereWasNone() throws Exception
+    {
+        when(this.xwikicfg.getProperty("xwiki.title.compatibility", "0")).thenReturn("1");
+        when(this.displayConfiguration.getTitleHeadingDepth()).thenReturn(2);
+
+        DocumentModelBridge document = mock();
+        when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", List.of("Space"), "Page"));
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(document.getPreparedXDOM()).thenReturn(
+            new XDOM(List.of(new HeaderBlock(List.of(new WordBlock("heading")), HeaderLevel.LEVEL1))));
+
+        DocumentDisplayerParameters params = new DocumentDisplayerParameters();
+        params.setTitleDisplayed(true);
+
+        this.documentTitleDisplayer.display(document, params);
+
+        assertFalse(this.xwikiContext.containsKey(SDOC));
+    }
+
+    @Test
+    void titleExtractedFromContentFallsBackToDocumentNameOnRenderingError() throws Exception
+    {
+        when(this.xwikicfg.getProperty("xwiki.title.compatibility", "0")).thenReturn("1");
+        when(this.displayConfiguration.getTitleHeadingDepth()).thenReturn(2);
+        when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
+
+        DocumentModelBridge document = mock();
+        when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", List.of("Space"), "Page"));
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(document.getPreparedXDOM()).thenReturn(
+            new XDOM(List.of(new HeaderBlock(List.of(new WordBlock("heading")), HeaderLevel.LEVEL1))));
+
+        // The macro of the heading couldn't be executed, so the transformed heading contains a rendering error.
+        when(this.errorBlockGenerator.containsError(any(XDOM.class))).thenReturn(true);
+
+        XDOM staticTitle = new XDOM(List.of(new WordBlock("Page")));
+        when(this.plainTextParser.parse(any(StringReader.class))).thenReturn(staticTitle);
+
+        DocumentDisplayerParameters params = new DocumentDisplayerParameters();
+        params.setTitleDisplayed(true);
+
+        assertSame(staticTitle, this.documentTitleDisplayer.display(document, params));
+
+        ArgumentCaptor<Reader> argument = ArgumentCaptor.captor();
+        verify(this.plainTextParser).parse(argument.capture());
+        assertEquals("Page", IOUtils.toString(argument.getValue()));
     }
 }

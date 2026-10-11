@@ -45,6 +45,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.environment.Environment;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -64,6 +65,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -93,6 +95,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -677,5 +680,36 @@ class XWikiMockitoTest
         when(pngMinified.getURL(false)).thenReturn("path/to/test.min.png");
         when(currentSkin.getResource("test.min.png")).thenReturn(pngMinified);
         assertNull(this.xwiki.getSkinFile("test.png", this.context));
+    }
+
+    @Test
+    void getSkinFileFromResources() throws Exception
+    {
+        this.componentManager.registerMockComponent(InternalSkinManager.class);
+        this.componentManager.registerMockComponent(URLConfiguration.class);
+        // Needed to compute the resource URL cache version.
+        this.componentManager.registerMockComponent(CoreExtensionRepository.class);
+        Environment environment = this.componentManager.getInstance(Environment.class);
+
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        this.context.setURLFactory(urlFactory);
+
+        URL resourceURL = new URL("file:/webapp/resources/icons/test.png");
+        when(environment.getResource("/resources/", "icons/test.png")).thenReturn(resourceURL);
+        URL url = new URL("http://host/xwiki/resources/icons/test.png");
+        when(urlFactory.createResourceURL(eq("icons/test.png"), eq(false), same(this.context), any(Map.class)))
+            .thenReturn(url);
+        when(urlFactory.getURL(url, this.context)).thenReturn("/xwiki/resources/icons/test.png");
+
+        assertEquals("/xwiki/resources/icons/test.png",
+            this.xwiki.getSkinFile("icons/test.png", null, false, this.context));
+
+        // The resource lookup is restricted to the resources folder, so a path traversal attempt is not found (the
+        // environment is in charge of rejecting it) and does not fallback on the filesystem.
+        assertNull(this.xwiki.getSkinFile("../WEB-INF/xwiki.cfg", null, false, this.context));
+        assertNull(this.xwiki.getSkinFile("../../../../../../../../etc/passwd", null, false, this.context));
+
+        verify(environment, never()).getResource(anyString());
+        verify(urlFactory).createResourceURL(any(), anyBoolean(), any(), any(Map.class));
     }
 }

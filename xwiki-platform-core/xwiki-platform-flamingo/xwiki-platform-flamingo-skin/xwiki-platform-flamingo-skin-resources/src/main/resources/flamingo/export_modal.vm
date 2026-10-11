@@ -79,6 +79,9 @@
         }
       })
       #set ($exportFormat.data.multipage = $uix.parameters.multipage == 'true')
+      ## Export formats targeting an action that only accepts POST requests (e.g. the export action) have to declare
+      ## it, so that the export URL is submitted through a form instead of being navigated to.
+      #set ($exportFormat.data.method = $uix.parameters.getOrDefault('method', 'get'))
       #set ($discard = $exportFormat.data.put('filter-hidden-pages', $uix.parameters.filterHiddenPages == 'true'))
       #set ($discard = $exportFormat.data.put('exclude-nested-pages-by-default',
         $uix.parameters.excludeNestedPagesByDefault == 'true'))
@@ -134,6 +137,7 @@
         'icon': 'file-word',
         'category': 'office',
         'url': $doc.getURL('export', "format=odt&$!request.getQueryString()"),
+        'method': 'post',
         'multipage': false,
         'enabled': $services.officemanager.isConnected()
       }
@@ -145,6 +149,7 @@
         'icon': 'file-word',
         'category': 'office',
         'url': $doc.getURL('export', "format=rtf&$!request.getQueryString()"),
+        'method': 'post',
         'multipage': false,
         'enabled': $services.officemanager.isConnected()
       }
@@ -155,6 +160,7 @@
         'hint': $services.localization.render('core.exporter.formats.html.hint'),
         'icon': 'file-code',
         'url': $doc.getURL('export', "format=html&$!request.getQueryString()"),
+        'method': 'post',
         'multipage': true,
         'enabled': true
       }
@@ -165,6 +171,7 @@
         'hint': $services.localization.render('core.exporter.formats.xar.hint'),
         'icon': 'file-archive',
         'url': $doc.getURL('export', "$escapetool.url($xarExportParams)&$!docvariant"),
+        'method': 'post',
         'multipage': true,
         'enabled': $xarExportEnabled
       }

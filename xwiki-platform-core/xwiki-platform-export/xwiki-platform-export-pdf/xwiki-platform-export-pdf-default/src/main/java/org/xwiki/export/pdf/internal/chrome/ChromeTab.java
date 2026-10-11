@@ -36,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.export.pdf.browser.BrowserTab;
-import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
 import com.github.kklisura.cdt.protocol.commands.Network;
 import com.github.kklisura.cdt.protocol.commands.Page;
@@ -83,12 +82,6 @@ public class ChromeTab implements BrowserTab
         this.tabDevToolsService.close();
         LOGGER.debug("Disposing browser context [{}].", browserContextId);
         this.browserDevToolsService.getTarget().disposeBrowserContext(browserContextId);
-    }
-
-    @Override
-    public boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait, int timeout) throws IOException
-    {
-        return navigate(url, JakartaServletBridge.toJakarta(cookies), wait, timeout);
     }
 
     @Override

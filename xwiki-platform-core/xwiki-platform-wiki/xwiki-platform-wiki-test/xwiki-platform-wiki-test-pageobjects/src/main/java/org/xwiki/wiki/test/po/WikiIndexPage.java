@@ -120,6 +120,59 @@ public class WikiIndexPage extends ExtendedViewPage
     }
 
     /**
+     * @return {@code true} if the current user is offered the Create Wiki action, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean canCreateWiki()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("tmCreateWiki"));
+    }
+
+    /**
+     * Click on the Join action of a wiki.
+     *
+     * @param wikiName the name of the wiki to join
+     * @return the page asking to confirm the join
+     * @since 18.9.0RC1
+     */
+    public JoinWikiPage joinWiki(String wikiName)
+    {
+        TableLayoutElement tableLayout = this.liveData.getTableLayout();
+        tableLayout.filterColumn(WIKI_NAME_COLUMN_LABEL, wikiName);
+        tableLayout.clickAction(1, "join");
+        return new JoinWikiPage();
+    }
+
+    /**
+     * @param wikiName the name of the wiki
+     * @return {@code true} if the current user is offered to join the given wiki, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean canJoinWiki(String wikiName)
+    {
+        return hasAction(wikiName, "join");
+    }
+
+    /**
+     * @param wikiName the name of the wiki
+     * @return {@code true} if the current user is offered to leave the given wiki, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean canLeaveWiki(String wikiName)
+    {
+        return hasAction(wikiName, "leave");
+    }
+
+    private boolean hasAction(String wikiName, String actionName)
+    {
+        TableLayoutElement tableLayout = this.liveData.getTableLayout();
+        // Filtering waits for the Live Data to be reloaded, so the row can be checked without waiting, which avoids
+        // waiting for the full timeout when the action is absent.
+        tableLayout.filterColumn(WIKI_NAME_COLUMN_LABEL, wikiName);
+        return tableLayout.hasActionWithoutWaiting(1, actionName);
+    }
+
+    /**
      * @return the Wiki Index Live Data page object
      * @since 13.5RC1
      */

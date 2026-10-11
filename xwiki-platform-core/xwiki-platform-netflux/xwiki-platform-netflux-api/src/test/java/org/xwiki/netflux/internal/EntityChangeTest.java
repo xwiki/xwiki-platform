@@ -63,4 +63,15 @@ class EntityChangeTest
         EntityChange secondChange = new EntityChange(this.documentReference, this.userReference, ScriptLevel.SCRIPT);
         assertNotEquals(firstChange, secondChange);
     }
+
+    @Test
+    void verifyHashCode()
+    {
+        EntityChange firstChange =
+            new EntityChange(this.documentReference, this.userReference, ScriptLevel.SCRIPT, 1000L);
+        EntityChange sameChange =
+            new EntityChange(this.documentReference, this.userReference, ScriptLevel.SCRIPT, 1000L);
+        assertEquals(firstChange, sameChange);
+        assertEquals(firstChange.hashCode(), sameChange.hashCode());
+    }
 }

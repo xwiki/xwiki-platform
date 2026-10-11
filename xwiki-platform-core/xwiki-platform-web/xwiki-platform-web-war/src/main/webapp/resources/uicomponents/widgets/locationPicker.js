@@ -204,7 +204,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
         }
       }).catch(() => {
         if (titleInputVal === titleInput.val()) {
-          new XWiki.widgets.Notification(l10n['entitynamevalidation.nametransformation.error'], 'error');
+          XWiki.widgets.Notification.show(l10n['entitynamevalidation.nametransformation.error'], 'error');
           // Re-enable the page name input and trigger a change event to execute the client-side validations.
           nameInput.prop('disabled', false).val(titleInputVal).trigger('change');
           // Update the location preview.
@@ -369,7 +369,7 @@ require(['jquery'], function($) {
       failureMessage: l10n['core.validation.required.message'],
       against: function(value) {
         // The page name must not be blank.
-        return typeof value === 'string' && value.strip().length > 0;
+        return typeof value === 'string' && value.trim().length > 0;
       }
     });
 
@@ -407,7 +407,7 @@ require(['jquery'], function($) {
         failureMessage: l10n['core.validation.spacevalidation.message.invalidreference'],
         against: function(value) {
           if (typeof value === 'string') {
-            let separatorsOnly = value.strip().replaceAll('\\\\', 'x').replaceAll(/\\./g, 'x');
+            let separatorsOnly = value.trim().replaceAll('\\\\', 'x').replaceAll(/\\./g, 'x');
             return separatorsOnly.search(dotRegex) === -1;
           } else {
             return true;
@@ -455,7 +455,7 @@ require(['jquery'], function($) {
       against: function(value) {
         if (terminalCheckbox.prop('checked')) {
           // Space reference is required for terminal documents.
-          return typeof value === 'string' && value.strip().length > 0;
+          return typeof value === 'string' && value.trim().length > 0;
         } else {
           // Space reference can be empty for non-terminal documents.
           return true;

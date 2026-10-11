@@ -63,21 +63,24 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
             throw new MacroExecutionException("Unknown property [" + entityReference + "]");
         }
 
+        // Ask the stored property rather than the XClass field: the value stays in the object when its field is
+        // removed from the XClass, and some property types (e.g. passwords) are sensitive on their own.
+        if (xobjectProperty.isSensitive(xcontext)) {
+            throw new MacroExecutionException(String.format(
+                "Displaying content of property [%s] is not allowed because it's sensitive.", entityReference));
+        }
+
         return new CodeMacroSource(reference, xobjectProperty.toText(),
             getLanguage(xobject, document, entityReference, xcontext));
     }
 
     private String getLanguage(BaseObject xobject, XWikiDocument document, EntityReference entityReference,
-        XWikiContext xcontext) throws MacroExecutionException
+        XWikiContext xcontext)
     {
         BaseClass xclass = xobject.getXClass(xcontext);
 
         if (xclass != null) {
             PropertyInterface xclassProperty = xclass.get(entityReference.getName());
-            if (xclassProperty != null && xclassProperty.isSensitive(xcontext)) {
-                throw new MacroExecutionException(String.format(
-                    "Displaying content of property [%s] is not allowed because it's sensitive.", entityReference));
-            }
 
             String language = null;
             if (xclassProperty instanceof TextAreaClass textarea) {

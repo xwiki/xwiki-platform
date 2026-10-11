@@ -126,6 +126,18 @@ public class ApplicationHomePage extends ViewPage
     }
 
     /**
+     * Clicks the Rename page action, which the application home page replaces with its own rename modal.
+     *
+     * @return the modal used to rename the application
+     * @since 18.9.0RC1
+     */
+    public RenameApplicationModal clickRenameApplication()
+    {
+        clickMoreActionsSubMenuEntry("tmActionRename");
+        return new RenameApplicationModal();
+    }
+
+    /**
      * Returns the filter input id of a column of an AWM application livetable.
      *
      * @param columnIndex the column index

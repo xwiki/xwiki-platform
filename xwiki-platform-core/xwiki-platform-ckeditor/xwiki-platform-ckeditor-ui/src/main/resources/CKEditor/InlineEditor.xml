@@ -255,7 +255,7 @@
         createEditor(ckeditor, this, config).done(config.deferred.resolve.bind(config.deferred, config.document));
       } catch (e) {
         console.log(e);
-        new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+        XWiki.widgets.Notification.show($jsontool.serialize($services.localization.render(
           'ckeditor.inline.failedToInit')), 'error');
         config.deferred.reject();
       }

@@ -76,4 +76,14 @@ public class CommentElement extends BaseElement
     {
         return !StringUtils.isEmpty(this.container.getDomAttribute("data-replyto"));
     }
+
+    /**
+     * @return the number of the comment this comment replies to, or {@code null} if it is not a reply
+     * @since 18.9.0RC1
+     */
+    public Integer getReplyTo()
+    {
+        String replyTo = this.container.getDomAttribute("data-replyto");
+        return StringUtils.isEmpty(replyTo) ? null : Integer.valueOf(replyTo);
+    }
 }

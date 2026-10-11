@@ -498,7 +498,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     }).then(() =&gt; {
       window.location.replace(relatedTarget.attr('data-restoreurl'));
     }).catch(() =&gt; {
-      new XWiki.widgets.Notification(
+      XWiki.widgets.Notification.show(
         $jsontool.serialize($services.localization.render('platform.index.trashDocumentsReplacePageFailed')),
         'failed'
       );

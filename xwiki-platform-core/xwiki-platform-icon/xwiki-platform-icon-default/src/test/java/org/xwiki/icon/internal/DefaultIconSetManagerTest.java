@@ -22,19 +22,17 @@ package org.xwiki.icon.internal;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.environment.Environment;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetCache;
@@ -51,9 +49,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -82,9 +77,6 @@ class DefaultIconSetManagerTest
     private DefaultIconSetManager iconSetManager;
 
     @MockComponent
-    private Provider<XWikiContext> xcontextProvider;
-
-    @MockComponent
     @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
@@ -107,14 +99,11 @@ class DefaultIconSetManagerTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @MockComponent
+    private Environment environment;
+
+    @MockComponent
     @Named("all")
     private ConfigurationSource configurationSource;
-
-    @Mock
-    private XWikiContext xcontext;
-
-    @Mock
-    private XWiki xwiki;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -122,8 +111,6 @@ class DefaultIconSetManagerTest
     @BeforeEach
     void setUp()
     {
-        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
-        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWikiId");
     }
 
@@ -211,7 +198,7 @@ class DefaultIconSetManagerTest
     void getDefaultIcon() throws Exception
     {
         InputStream is = getClass().getResourceAsStream("/test.iconset");
-        when(this.xwiki.getResourceAsStream("/resources/icons/default.iconset")).thenReturn(is);
+        when(this.environment.getResourceAsStream("/resources/icons/default.iconset")).thenReturn(is);
 
         IconSet iconSet = new IconSet("default");
         when(this.iconSetLoader.loadIconSet(any(InputStreamReader.class), eq("default"))).thenReturn(iconSet);
@@ -236,27 +223,6 @@ class DefaultIconSetManagerTest
         // Verify
         assertEquals(iconSet, result);
         verify(this.iconSetLoader, never()).loadIconSet(any(InputStreamReader.class), any());
-    }
-
-    @Test
-    void getDefaultIconWithException() throws Exception
-    {
-        // Mocks
-        Exception exception = new MalformedURLException();
-        when(this.xwiki.getResourceAsStream(any())).thenThrow(exception);
-
-        // Test
-        Exception exceptionCaught = null;
-        try {
-            this.iconSetManager.getDefaultIconSet();
-        } catch (IconException e) {
-            exceptionCaught = e;
-        }
-
-        // Verify
-        assertNotNull(exceptionCaught);
-        assertEquals(exception, exceptionCaught.getCause());
-        assertEquals("Failed to load the current default icon set resource.", exceptionCaught.getMessage());
     }
 
     @Test
@@ -404,7 +370,7 @@ class DefaultIconSetManagerTest
         IconSet iconSet = new IconSet("default");
         when(this.iconSetLoader.loadIconSet(any(Reader.class), eq("default"))).thenReturn(iconSet);
         InputStream is = getClass().getResourceAsStream("/test.iconset");
-        when(this.xwiki.getResourceAsStream("/resources/icons/default.iconset")).thenReturn(is);
+        when(this.environment.getResourceAsStream("/resources/icons/default.iconset")).thenReturn(is);
 
         // Test
         assertEquals(iconSet, this.iconSetManager.getIconSet("default"));

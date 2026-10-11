@@ -18,7 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageFilePanel } from "./ImageFilePanel";
-import { useBlockNoteEditor, useComponentsContext } from "@blocknote/react";
+import {
+  useBlockNoteEditor,
+  useComponentsContext,
+  usePortalElement,
+} from "@blocknote/react";
 import { assertUnreachable } from "@xwiki/platform-fn-utils";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -56,6 +60,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   imageEditionOverrideFn,
 }) => {
   const Components = useComponentsContext()!;
+  const portalElement = usePortalElement();
   const { t } = useTranslation();
   const editor = useBlockNoteEditor();
 
@@ -90,7 +95,10 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
 
   return (
     <>
-      <Components.Generic.Popover.Root open={showImageEditor}>
+      <Components.Generic.Popover.Root
+        open={showImageEditor}
+        portalElement={portalElement}
+      >
         <Components.Generic.Popover.Trigger>
           {/* TODO: hide tooltip on click
               (note: this comment is from BlockNote's source code but may remain relevant here) */}

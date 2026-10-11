@@ -100,10 +100,19 @@ define('xwiki-ckeditor-realtime-adapter', [
       this._ckeditor.fire('lockSnapshot', {dontUpdate: true});
 
       let updatedNodes = [];
+      // CKEditor can add temporary elements directly under the editable area, such as the hidden selection container
+      // used when a widget is selected. They are not part of the edited content, so the new content doesn't have them.
+      // We remove them while the content is updated, otherwise the difference in the number of child nodes can make
+      // DiffDOM match the local paragraphs with the wrong remote paragraphs (e.g. reusing the paragraph holding the
+      // selected widget for the next paragraph). These elements are always at the start or at the end of the editable
+      // area, which is where we put them back (see #_detachTemporaryElements()).
+      const restoreTemporaryElements = this._detachTemporaryElements();
       try {
         this._protectWidgets(this._ckeditor.widgets.instances, this.getContentWrapper());
         updatedNodes = updater(this.getContentWrapper());
       } finally {
+        restoreTemporaryElements();
+        this._forgetRemovedFillingChar();
         await this._updateWidgets(updatedNodes);
 
         // Push the updated content to remote users, when saving the snapshot, if this is a local change.
@@ -205,6 +214,56 @@ define('xwiki-ckeditor-realtime-adapter', [
     /** @inheritdoc */
     setReadOnly(readOnly) {
       this._ckeditor.setReadOnly(readOnly);
+    }
+
+    /**
+     * Detaches the temporary elements (marked with the data-cke-temp attribute) that CKEditor adds directly under the
+     * editable area. CKEditor (4.22) adds all of them either at the start or at the end of the editable area:
+     * <ul>
+     *   <li>at the end: the hidden selection container used when a widget is selected (fake selection), the copy bins
+     *     used when copying or cutting a widget or a table selection, and the paste bin;</li>
+     *   <li>at the start or at the end: the fillers added by the widgetselection plugin when the user selects all the
+     *     content and the content starts or ends with a widget.</li>
+     * </ul>
+     * They stay there while they exist: CKEditor inserts the content at the selection, which is never after the
+     * temporary elements added at the end, nor before the ones added at the start, and the remote changes can't insert
+     * content around them because we detach them while applying these changes. We can't put them back next to their
+     * original siblings because these siblings may be removed or replaced by the remote changes, so we put back the
+     * temporary elements that preceded the edited content at the start, and the others at the end.
+     *
+     * @returns {Function} a function that puts back the detached temporary elements
+     */
+    _detachTemporaryElements() {
+      const contentWrapper = this.getContentWrapper();
+      const childNodes = [...contentWrapper.childNodes];
+      const isTemporary = node => node.nodeType === Node.ELEMENT_NODE && node.hasAttribute('data-cke-temp');
+      const firstContentIndex = childNodes.findIndex(node => !isTemporary(node));
+      // If there's no edited content then we put back all the temporary elements at the end.
+      const leadingElements = firstContentIndex > 0 ? childNodes.slice(0, firstContentIndex) : [];
+      const trailingElements = childNodes.slice(leadingElements.length).filter(isTemporary);
+      leadingElements.concat(trailingElements).forEach(element => element.remove());
+      return () => {
+        contentWrapper.prepend(...leadingElements);
+        contentWrapper.append(...trailingElements);
+      };
+    }
+
+    /**
+     * On WebKit-based browsers CKEditor inserts a filling character sequence in the text node where the user is typing
+     * and remembers that text node in order to remove the filling characters later, adjusting the selection offsets.
+     * The filling characters are not part of the synchronized content so applying a remote patch can remove them. When
+     * this happens CKEditor must forget the filling character node, because it removes the filling characters later
+     * (e.g. on the next selection change) assuming they are still there: if the text node has no more characters than
+     * the filling character sequence it resets the text, which moves the caret to the start of the text node, otherwise
+     * it subtracts the length of the filling character sequence from the caret offset.
+     */
+    _forgetRemovedFillingChar() {
+      const editable = this._ckeditor.editable();
+      const fillingChar = editable?.getCustomData('cke-fillingChar');
+      if (fillingChar && (!fillingChar.$.isConnected ||
+          !fillingChar.getText().startsWith(this._CKEDITOR.dom.selection.FILLING_CHAR_SEQUENCE))) {
+        editable.removeCustomData('cke-fillingChar');
+      }
     }
 
     _ensureSameContentWrapper(root) {

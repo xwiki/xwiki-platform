@@ -2919,15 +2919,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * @deprecated use {@link #getXObject()} instead
-     */
-    @Deprecated(since = "2.2M1")
-    public BaseObject getxWikiObject()
-    {
-        return getXObject(getDocumentReference());
-    }
-
-    /**
      * @since 2.2M1
      */
     public List<BaseClass> getXClasses(XWikiContext context)
@@ -3468,15 +3459,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * @deprecated use {@link #mergeXClass(XWikiDocument)} instead
-     */
-    @Deprecated(since = "2.2M1")
-    public void mergexWikiClass(XWikiDocument templatedoc)
-    {
-        mergeXClass(templatedoc);
-    }
-
-    /**
      * @since 2.2M1
      */
     public void mergeXObjects(XWikiDocument templateDoc)
@@ -3498,15 +3480,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 }
             }
         }
-    }
-
-    /**
-     * @deprecated use {@link #mergeXObjects(XWikiDocument)} instead
-     */
-    @Deprecated(since = "2.2M1")
-    public void mergexWikiObjects(XWikiDocument templatedoc)
-    {
-        mergeXObjects(templatedoc);
     }
 
     /**

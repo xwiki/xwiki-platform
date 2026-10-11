@@ -1036,11 +1036,15 @@ window.shortcut = new Object({
             if (group === this._listeners.disabled_in_inputs) {
                 // Disable the created listener when focus goes on an input, a textarea field, an editable element or on
                 // the CodeMirror div (syntax highlighting).
+                const editableSelector = 'input, textarea, [contenteditable=true], .CodeMirror-code';
                 jQuery(document)
-                    .on('focus', 'input, textarea, [contenteditable=true], .CodeMirror-code',
-                        function() { newListener.stop_listening(); })
-                    .on('blur', 'input, textarea, [contenteditable=true], .CodeMirror-code',
-                        function() { newListener.listen(); });
+                    .on('focus', editableSelector, function() { newListener.stop_listening(); })
+                    .on('blur', editableSelector, function() { newListener.listen(); });
+                // The listener is created asynchronously, after Keypress JS is loaded, so the focus may already be in
+                // an editable element (e.g. one with the autofocus attribute) and the focus event above was missed.
+                if (document.activeElement?.matches(editableSelector)) {
+                    newListener.stop_listening();
+                }
             }
 
             group[target] = newListener;

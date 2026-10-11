@@ -32,6 +32,7 @@ import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
@@ -115,6 +116,13 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
     {
         try {
             hibernateMigrate();
+
+            // Clean the document cache to make sure the operation performed during the migration won't be lost
+            // during next save before a version of the document without those properties was already in the cache
+            XWikiStoreInterface store = getXWikiContext().getWiki().getStore();
+            if (store instanceof XWikiCacheStoreInterface cacheStore) {
+                cacheStore.flushCache();
+            }
         } catch (Exception e) {
             throw new DataMigrationException(String.format("Data migration %s failed", getName()), e);
         }

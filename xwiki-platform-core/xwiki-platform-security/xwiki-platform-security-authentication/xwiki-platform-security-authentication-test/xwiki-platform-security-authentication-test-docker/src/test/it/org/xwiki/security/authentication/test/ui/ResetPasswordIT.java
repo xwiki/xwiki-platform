@@ -114,6 +114,9 @@ public class ResetPasswordIT
         setup.createUser(userName, password, null);
         ResetPasswordPage resetPasswordPage = ResetPasswordPage.gotoPage();
 
+        // The user name field must expose its purpose to browsers and password managers.
+        assertEquals("username", resetPasswordPage.getUserNameAutocomplete());
+
         // Try to reset the password of a non existent user
         resetPasswordPage.setUserName("SomeUserThatDoesNotExist");
         resetPasswordPage = resetPasswordPage.clickResetPassword();
@@ -137,8 +140,9 @@ public class ResetPasswordIT
             setup.getSecretToken());
         setup.forceGuestUser();
 
-        // Actually reset the user's password
-        resetPasswordPage = ResetPasswordPage.gotoPage();
+        // Actually reset the user's password, starting from the link of the login page, as a user would do.
+        LoginPage.gotoPage().clickForgotPassword();
+        resetPasswordPage = new ResetPasswordPage();
         resetPasswordPage.setUserName(userName);
         ResetPasswordPage newResetPasswordPage = resetPasswordPage.clickResetPassword();
         assertTrue(newResetPasswordPage.getMessage().contains("An e-mail was sent"),

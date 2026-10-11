@@ -31,7 +31,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -146,7 +147,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         response.setContentType("application/json; charset=utf-8");
 
         if (response instanceof ServletResponse servletResponse) {
-            servletResponse.getHttpServletResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
+            servletResponse.getResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
         }
 
         // TODO: Send back a REST version of the job status
@@ -196,10 +197,10 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
                 }
             }
             if (!head.isEmpty()) {
-                servletResponse.getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
+                servletResponse.getResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
             }
             if (!scripts.isEmpty()) {
-                servletResponse.getHttpServletResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
+                servletResponse.getResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
                     scripts.toString());
             }
         }

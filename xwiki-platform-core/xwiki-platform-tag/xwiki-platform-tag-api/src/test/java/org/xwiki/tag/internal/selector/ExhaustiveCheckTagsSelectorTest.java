@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -47,6 +48,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.Right.VIEW;
 
@@ -108,9 +110,9 @@ class ExhaustiveCheckTagsSelectorTest
     /**
      * The stream of arguments contains three {@link Arguments}
      * <ol>
-     *     <li>The first one is a {@link List} of {@link Object} arrays. Index 0 is a document reference, and Index 1
-     *     is a tag. This corresponds to the values returned by the database. The order is important and the entries
-     *     must be sorted by document reference
+     *     <li>The first one is a {@link List} of {@link Object} arrays. Index 0 is a tag, and Index 1 is a document
+     *     reference. This corresponds to the values returned by the database. The order is important and the entries
+     *     must be sorted by tag
      *     <li>The second one is a {@link Map} of {@link DocumentReference} and {@link Boolean}. The document reference
      *     corresponds to the serialized forms from the first argument (two document references are available
      *     {@code xwiki:Space.Page0}, and {@code xwiki:Space.Page1})
@@ -131,7 +133,7 @@ class ExhaustiveCheckTagsSelectorTest
             // A single result, the page is viewable
             Arguments.of(
                 List.<Object[]>of(
-                    new Object[] { "xwiki:Space.Page0", "Tag0" }
+                    new Object[] { "Tag0", "xwiki:Space.Page0" }
                 ),
                 Map.of(
                     PAGE0, true
@@ -141,7 +143,7 @@ class ExhaustiveCheckTagsSelectorTest
             // A single result, the page is not viewable
             Arguments.of(
                 List.<Object[]>of(
-                    new Object[] { "xwiki:Space.Page0", "Tag0" }
+                    new Object[] { "Tag0", "xwiki:Space.Page0" }
                 ),
                 Map.of(
                     PAGE0, false
@@ -151,10 +153,10 @@ class ExhaustiveCheckTagsSelectorTest
             // Two pages, Page0 is viewable, Page 1 is not
             Arguments.of(
                 List.of(
-                    new Object[] { "xwiki:Space.Page0", "Page0" },
-                    new Object[] { "xwiki:Space.Page0", "All" },
-                    new Object[] { "xwiki:Space.Page1", "Page1" },
-                    new Object[] { "xwiki:Space.Page1", "all" }
+                    new Object[] { "All", "xwiki:Space.Page0" },
+                    new Object[] { "Page0", "xwiki:Space.Page0" },
+                    new Object[] { "Page1", "xwiki:Space.Page1" },
+                    new Object[] { "all", "xwiki:Space.Page1" }
                 ),
                 Map.of(
                     PAGE0, true,
@@ -165,17 +167,29 @@ class ExhaustiveCheckTagsSelectorTest
             // Two pages, both are viewable
             Arguments.of(
                 List.of(
-                    new Object[] { "xwiki:Space.Page0", "Page0" },
-                    new Object[] { "xwiki:Space.Page0", "All" },
-                    new Object[] { "xwiki:Space.Page1", "Page1" },
-                    new Object[] { "xwiki:Space.Page1", "all" },
-                    new Object[] { "xwiki:Space.Page1", "All" }
+                    new Object[] { "All", "xwiki:Space.Page0" },
+                    new Object[] { "All", "xwiki:Space.Page1" },
+                    new Object[] { "Page0", "xwiki:Space.Page0" },
+                    new Object[] { "Page1", "xwiki:Space.Page1" },
+                    new Object[] { "all", "xwiki:Space.Page1" }
                 ),
                 Map.of(
                     PAGE0, true,
                     PAGE1, true
                 ),
                 List.of("All", "all", "Page0", "Page1")
+            ),
+            // A tag carried by a non-viewable page and by a viewable one is returned, whatever their order
+            Arguments.of(
+                List.of(
+                    new Object[] { "Shared", "xwiki:Space.Page1" },
+                    new Object[] { "Shared", "xwiki:Space.Page0" }
+                ),
+                Map.of(
+                    PAGE0, true,
+                    PAGE1, false
+                ),
+                List.of("Shared")
             )
         );
     }
@@ -190,6 +204,34 @@ class ExhaustiveCheckTagsSelectorTest
 
         when(this.query.<Object[]>execute()).thenReturn(values);
         assertEquals(expectedTags, this.tagsSelector.getAllTags());
+        // The results must be ordered by tag, otherwise the documents of an already accepted tag can't be skipped.
+        verify(this.queryManager).createQuery("select distinct item, doc.fullName "
+            + "from XWikiDocument as doc, BaseObject as obj, DBStringListProperty as prop join prop.list item "
+            + "where obj.name=doc.fullName "
+            + "and obj.className='XWiki.TagClass' "
+            + "and obj.id=prop.id.id "
+            + "and prop.id.name='tags' "
+            + "order by item", Query.HQL);
+    }
+
+    @Test
+    void getAllTagsChecksEachDocumentOnlyOnce() throws Exception
+    {
+        when(this.contextualAuthorizationManager.hasAccess(VIEW, PAGE0)).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(VIEW, PAGE1)).thenReturn(true);
+
+        // Page0 is never viewable, so it is met again for each tag, but its right must be checked only once. Page1 is
+        // viewable, so the second document of "Shared" doesn't need to be checked at all.
+        when(this.query.<Object[]>execute()).thenReturn(List.of(
+            new Object[] { "Shared", "xwiki:Space.Page1" },
+            new Object[] { "Shared", "xwiki:Space.Page0" },
+            new Object[] { "Tag0", "xwiki:Space.Page0" },
+            new Object[] { "Tag1", "xwiki:Space.Page0" }
+        ));
+
+        assertEquals(List.of("Shared"), this.tagsSelector.getAllTags());
+        verify(this.contextualAuthorizationManager).hasAccess(VIEW, PAGE0);
+        verify(this.contextualAuthorizationManager).hasAccess(VIEW, PAGE1);
     }
 
     /**

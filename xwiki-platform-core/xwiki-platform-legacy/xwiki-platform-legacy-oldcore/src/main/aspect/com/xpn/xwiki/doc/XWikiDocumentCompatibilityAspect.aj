@@ -361,7 +361,34 @@ privileged public aspect XWikiDocumentCompatibilityAspect
     {
         cloneXObjects(templatedoc);
     }
-    
+
+    /**
+     * @deprecated use {@link #getXObject()} instead
+     */
+    @Deprecated(since = "2.2M1")
+    public BaseObject XWikiDocument.getxWikiObject()
+    {
+        return getXObject();
+    }
+
+    /**
+     * @deprecated use {@link #mergeXClass(XWikiDocument)} instead
+     */
+    @Deprecated(since = "2.2M1")
+    public void XWikiDocument.mergexWikiClass(XWikiDocument templatedoc)
+    {
+        mergeXClass(templatedoc);
+    }
+
+    /**
+     * @deprecated use {@link #mergeXObjects(XWikiDocument)} instead
+     */
+    @Deprecated(since = "2.2M1")
+    public void XWikiDocument.mergexWikiObjects(XWikiDocument templatedoc)
+    {
+        mergeXObjects(templatedoc);
+    }
+
     /**
      * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
      */

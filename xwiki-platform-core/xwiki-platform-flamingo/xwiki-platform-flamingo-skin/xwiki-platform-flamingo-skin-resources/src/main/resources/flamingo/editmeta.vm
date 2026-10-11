@@ -56,7 +56,7 @@
       #set ($placeholder = $doc.documentReference.lastSpaceReference.name)
     #end
     #if ($wysiwygWithOptionalTitle)<h1 class="editable">#end
-    <input type="text" id="xwikidoctitleinput" name="title" value="$!escapetool.xml($docTitle)"
+    <input type="text" id="xwikidoctitleinput" name="title" value="$!escapetool.xml($docTitle)" autofocus
       #if ($titleIsMandatory)required #{else}placeholder="$!escapetool.xml($placeholder)" #end
       data-validation-value-missing="$escapetool.xml($services.localization.render('core.validation.required.message'))"
     />

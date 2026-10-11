@@ -58,7 +58,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         breadcrumb.replaceWith(updatedBreadcrumb);
         $(document).trigger('xwiki:dom:updated', {'elements': updatedBreadcrumb.toArray()});
       }).catch(() => {
-        new XWiki.widgets.Notification(l10n['web.hierarchy.error'], 'error');
+        XWiki.widgets.Notification.show(l10n['web.hierarchy.error'], 'error');
         ellipsis.removeClass('loading');
       });
     };

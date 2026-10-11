@@ -89,6 +89,37 @@ public class AnnotationsLabel extends BaseElement
         confirmAction();
     }
 
+    /**
+     * Clicks the Reply button of the bubble of the specified annotation. The button is only displayed when the
+     * Comments tab is loaded, since it forwards the click to the Reply button of the annotation comment in that tab.
+     *
+     * @param idText the annotation id
+     * @since 18.9.0RC1
+     */
+    public void clickReplyById(String idText)
+    {
+        this.showAnnotationById(idText);
+        getDriver().findElement(By.cssSelector(".annotation-bubble a.commentreply")).click();
+    }
+
+    /**
+     * Clicks the "View thread" button of the bubble of the specified annotation. The button is only displayed when the
+     * annotation has replies and the Comments tab is loaded, since it forwards the click to the thread toggle of the
+     * annotation comment in that tab.
+     *
+     * @param idText the annotation id
+     * @return the label of the clicked button
+     * @since 18.9.0RC1
+     */
+    public String clickViewThreadById(String idText)
+    {
+        this.showAnnotationById(idText);
+        WebElement threadToggle = getDriver().findElement(By.cssSelector(".annotation-bubble .thread-toggle"));
+        String label = threadToggle.getText();
+        threadToggle.click();
+        return label;
+    }
+
     public String getAnnotationsAuthorByText(String searchText)
     {
         this.openAnnotationViewByText(searchText);

@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -32,6 +33,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 
 /**
  * Update XWiki.XWikiSkins document with all required information.
@@ -47,6 +50,8 @@ public class XWikiSkinsDocumentInitializer extends AbstractMandatoryClassInitial
     private static final String CLASS_REFERENCE_SPACE = "SkinsCode";
 
     private static final String CLASS_REFERENCE_NAME = "XWikiSkinsSheet";
+
+    private static final String CONTENT_TYPE = "contenttype";
 
     /**
      * Used to bind a class to a document sheet.
@@ -83,6 +88,8 @@ public class XWikiSkinsDocumentInitializer extends AbstractMandatoryClassInitial
     {
         boolean needsUpdate = super.updateDocument(document);
 
+        needsUpdate |= updateSkinFileProperties(document.getXClass());
+
         String wikiName = document.getDocumentReference().getWikiReference().getName();
 
         // The skin sheet used to be located in XWiki space, removing it if it exist
@@ -93,6 +100,30 @@ public class XWikiSkinsDocumentInitializer extends AbstractMandatoryClassInitial
         if (this.classSheetBinder.getSheets(document).isEmpty()) {
             DocumentReference sheet = new DocumentReference(wikiName, CLASS_REFERENCE_SPACE, CLASS_REFERENCE_NAME);
             needsUpdate |= this.classSheetBinder.bind(document, sheet);
+        }
+
+        return needsUpdate;
+    }
+
+    /**
+     * A skin file can also be stored in any property of a skin object named after the file, e.g. an
+     * {@code htmlheader.vm} TextArea property added to the class through the class editor. Such a property gets no
+     * content type, which means wiki content, and would thus get the skin file parsed and re-rendered as wiki syntax
+     * (e.g. when updating links after a rename). A property with an explicitly chosen content type is left as is.
+     *
+     * @param xclass the skin class
+     * @return true if the class has been modified, false otherwise
+     */
+    private boolean updateSkinFileProperties(BaseClass xclass)
+    {
+        boolean needsUpdate = false;
+
+        for (Object property : xclass.getProperties()) {
+            if (property instanceof TextAreaClass textAreaClass
+                && StringUtils.isEmpty(textAreaClass.getStringValue(CONTENT_TYPE))) {
+                textAreaClass.setContentType(ContentType.PURE_TEXT);
+                needsUpdate = true;
+            }
         }
 
         return needsUpdate;

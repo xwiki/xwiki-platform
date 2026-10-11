@@ -29,23 +29,10 @@
       "registryUrls": ["https://repo1.maven.org/maven2/", "https://nexus.xwiki.org/nexus/content/repositories/public/"]
     },
 
-    // There is no point trying to find updates for rendering, platform and enterprise dependencies
+    // There is no point trying to find updates for commons, rendering and platform dependencies
     {
-      "matchPackagePrefixes": ["org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:"],
+      "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:"],
       "enabled": false
-    },
-
-    // Automatically assign npm packages to @manuelleduc
-    {
-      "matchDatasources": ["npm"],
-      "assignees": ["manuelleduc"]
-    },
-
-    // Wait for released packages to be 1 day old before proposing them. This aligns with pnpm's default while staying
-    // package manager independent. See https://docs.renovatebot.com/configuration-options/#minimumreleaseage
-    {
-      "matchDatasources": ["npm"],
-      "minimumReleaseAge": "1 day"
     },
 
     // Automatically assign webjars packages to @mflorea
@@ -60,6 +47,22 @@
       "matchDatasources": ["maven"],
       "matchPackageNames": ["!org.webjars*"],
       "assignees": ["tmortagne"]
+    },
+
+    ////////
+    // NPM
+    ////////
+
+    // Wait for released packages to be 1 day old before proposing them. This aligns with pnpm's default while staying
+    // package manager independent. See https://docs.renovatebot.com/configuration-options/#minimumreleaseage
+    {
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "1 day"
+    },
+    // Automatically assign npm packages to @manuelleduc
+    {
+      "matchDatasources": ["npm"],
+      "assignees": ["manuelleduc"]
     },
     // Group React dependencies together
     {

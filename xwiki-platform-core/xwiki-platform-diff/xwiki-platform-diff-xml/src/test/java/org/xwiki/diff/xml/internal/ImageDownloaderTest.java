@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
-import javax.inject.Provider;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -43,14 +43,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.diff.xml.XMLDiffDataURIConverterConfiguration;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,7 +75,7 @@ class ImageDownloaderTest
     private HttpClientBuilderFactory httpClientBuilderFactory;
 
     @MockComponent
-    private Provider<XWikiContext> xwikiContextProvider;
+    private Container container;
 
     @MockComponent
     private XMLDiffDataURIConverterConfiguration configuration;
@@ -97,9 +96,6 @@ class ImageDownloaderTest
     private ClassicHttpResponse httpResponse;
 
     @Mock
-    private XWikiContext xwikiContext;
-
-    @Mock
     private HttpEntity httpEntity;
 
     @BeforeEach
@@ -113,7 +109,6 @@ class ImageDownloaderTest
                 HttpClientResponseHandler<?> responseHandler = invocation.getArgument(1);
                 return responseHandler.handleResponse(this.httpResponse);
             });
-        when(this.xwikiContextProvider.get()).thenReturn(this.xwikiContext);
         when(this.httpResponse.getEntity()).thenReturn(this.httpEntity);
         when(this.httpResponse.getCode()).thenReturn(HttpStatus.SC_OK);
         when(this.httpResponse.getReasonPhrase()).thenReturn("OK");
@@ -202,12 +197,12 @@ class ImageDownloaderTest
     void passesCookiesFromRequest(String requestDomain, boolean shouldSendCookie, String cookieDomain)
         throws IOException
     {
-        // Set a mock request in the context.
-        XWikiRequest request = mock();
+        // Set a mock request in the container.
+        HttpServletRequest request = mock();
         when(request.getServerName()).thenReturn(requestDomain);
         String cookieHeader = "cookie1=value1; cookie2=value2";
         when(request.getHeader("Cookie")).thenReturn(cookieHeader);
-        when(this.xwikiContext.getRequest()).thenReturn(request);
+        when(this.container.getRequest()).thenReturn(new ServletRequest(request));
 
         if (StringUtils.isNotBlank(cookieDomain)) {
             when(this.authenticationConfiguration.getCookieDomains()).thenReturn(List.of(cookieDomain));

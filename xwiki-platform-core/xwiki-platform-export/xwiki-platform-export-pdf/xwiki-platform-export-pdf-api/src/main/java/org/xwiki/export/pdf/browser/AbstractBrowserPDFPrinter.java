@@ -44,6 +44,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter;
@@ -64,6 +66,8 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     private static final String HTTP_HEADER_FORWARDED_FOR = "X-Forwarded-For";
 
+    private static final Cookie[] EMPTY_COOKIES = new Cookie[0];
+
     @Inject
     protected Logger logger;
 
@@ -72,6 +76,9 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     @Inject
     private List<CookieFilter> cookieFilters;
+
+    @Inject
+    private Container container;
 
     @Override
     public InputStream print(URL printPreviewURL) throws IOException
@@ -104,8 +111,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
             // Indicate that the browser used to generate the PDF acts as a proxy that forwards the PDF export request
             // to the XWiki backend and "modifies" the HTML response, replacing it with the PDF document, before sending
             // it back to the original client (users's browser) that triggered the PDF export.
-            browserTab.setExtraHTTPHeaders(
-                Map.of(HTTP_HEADER_FORWARDED, getForwardedHTTPHeader(cookieFilterContext.getClientIPAddress())));
+            addForwardedHTTPHeader(browserTab, cookieFilterContext.getClientIPAddress());
 
             continueIfNotCanceled(isCanceled);
 
@@ -167,22 +173,31 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      */
     private Cookie[] getCookies(CookieFilterContext cookieFilterContext)
     {
-        Cookie[] cookiesArray = getJakartaRequest().getCookies();
-        List<Cookie> cookies = new LinkedList<>();
-        if (cookiesArray != null) {
-            Stream.of(cookiesArray).forEach(cookies::add);
-        }
-        this.cookieFilters.forEach(cookieFilter -> {
-            try {
-                if (cookieFilter.isFilterRequired()) {
-                    cookieFilter.filter(cookies, cookieFilterContext);
-                }
-            } catch (Exception e) {
-                this.logger.warn("Failed to apply cookie filter [{}]. Root cause is: [{}].", cookieFilter,
-                    ExceptionUtils.getRootCauseMessage(e));
+        HttpServletRequest request = getJakartaRequest();
+
+        if (request != null) {
+            Cookie[] cookiesArray = request.getCookies();
+            List<Cookie> cookies = new LinkedList<>();
+            if (cookiesArray != null) {
+                Stream.of(cookiesArray).forEach(cookies::add);
             }
-        });
-        return cookies.isEmpty() ? null : cookies.toArray(new Cookie[cookies.size()]);
+            this.cookieFilters.forEach(cookieFilter -> {
+                try {
+                    if (cookieFilter.isFilterRequired()) {
+                        cookieFilter.filter(cookies, cookieFilterContext);
+                    }
+                } catch (Exception e) {
+                    this.logger.warn("Failed to apply cookie filter [{}]. Root cause is: [{}].", cookieFilter,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            });
+
+            if (!cookies.isEmpty()) {
+                return cookies.toArray(new Cookie[cookies.size()]);
+            }
+        }
+
+        return EMPTY_COOKIES;
     }
 
     /**
@@ -265,17 +280,21 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     private Optional<String> getClientIPAddress(URL targetURL, BrowserTab browserTab)
     {
-        try {
-            URL restURL = new URL(targetURL, getJakartaRequest().getContextPath() + "/rest/client?media=json");
-            if (browserTab.navigate(restURL)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String clientIPAddress = objectMapper.readTree(browserTab.getSource()).path("ip").asText();
-                if (!StringUtils.isEmpty(clientIPAddress)) {
-                    return Optional.of(InetAddress.getByName(clientIPAddress).getHostAddress());
+        HttpServletRequest request = getJakartaRequest();
+
+        if (request != null) {
+            try {
+                URL restURL = new URL(targetURL, request.getContextPath() + "/rest/client?media=json");
+                if (browserTab.navigate(restURL)) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String clientIPAddress = objectMapper.readTree(browserTab.getSource()).path("ip").asText();
+                    if (!StringUtils.isEmpty(clientIPAddress)) {
+                        return Optional.of(InetAddress.getByName(clientIPAddress).getHostAddress());
+                    }
                 }
+            } catch (IOException e) {
+                // Pass through.
             }
-        } catch (IOException e) {
-            // Pass through.
         }
 
         return Optional.empty();
@@ -284,39 +303,42 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
     /**
      * Computes the values of the "Forwarded" HTTP header as if the request was forwarded by the specified proxy.
      *
+     * @param browserTab the browser tab that should be able to access the print preview URL
      * @param proxyIPAddress the IP address of the proxy that forwards the request to XWiki
      * @return the values of the "Forwarded" HTTP header
      */
-    private List<String> getForwardedHTTPHeader(String proxyIPAddress)
+    private void addForwardedHTTPHeader(BrowserTab browserTab, String proxyIPAddress)
     {
         HttpServletRequest request = getJakartaRequest();
 
-        List<String> forwarded = new LinkedList<>();
-        Enumeration<String> forwardedValues = request.getHeaders(HTTP_HEADER_FORWARDED);
-        if (forwardedValues != null) {
-            forwardedValues.asIterator().forEachRemaining(forwarded::add);
+        if (request != null) {
+            List<String> forwarded = new LinkedList<>();
+            Enumeration<String> forwardedValues = request.getHeaders(HTTP_HEADER_FORWARDED);
+            if (forwardedValues != null) {
+                forwardedValues.asIterator().forEachRemaining(forwarded::add);
+            }
+
+            String forwardedFor = request.getHeader(HTTP_HEADER_FORWARDED_FOR);
+            if (StringUtils.isBlank(forwardedFor)) {
+                forwardedFor = request.getRemoteAddr();
+            }
+
+            String host = request.getHeader("X-Forwarded-Host");
+            if (StringUtils.isBlank(host)) {
+                host = request.getHeader("Host");
+            }
+
+            String protocol = request.getHeader("X-Forwarded-Proto");
+            if (StringUtils.isBlank(protocol)) {
+                protocol = request.getScheme();
+            }
+
+            String lastForwarded =
+                String.format("by=%s;for=%s;host=%s;proto=%s", proxyIPAddress, forwardedFor, host, protocol);
+            forwarded.add(lastForwarded);
+
+            browserTab.setExtraHTTPHeaders(Map.of(HTTP_HEADER_FORWARDED, forwarded));
         }
-
-        String forwardedFor = request.getHeader(HTTP_HEADER_FORWARDED_FOR);
-        if (StringUtils.isBlank(forwardedFor)) {
-            forwardedFor = request.getRemoteAddr();
-        }
-
-        String host = request.getHeader("X-Forwarded-Host");
-        if (StringUtils.isBlank(host)) {
-            host = request.getHeader("Host");
-        }
-
-        String protocol = request.getHeader("X-Forwarded-Proto");
-        if (StringUtils.isBlank(protocol)) {
-            protocol = request.getScheme();
-        }
-
-        String lastForwarded =
-            String.format("by=%s;for=%s;host=%s;proto=%s", proxyIPAddress, forwardedFor, host, protocol);
-        forwarded.add(lastForwarded);
-
-        return forwarded;
     }
 
     @Override
@@ -336,14 +358,24 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
     protected abstract BrowserManager getBrowserManager();
 
     /**
-     * @return the current HTTP servlet request, used to take the cookies from
-     * @deprecated
+     * @return the current HTTP servlet request, used to access the cookies
+     * @deprecated not taken into account anymore
      */
     @Deprecated(since = "17.4.0RC1")
-    protected abstract javax.servlet.http.HttpServletRequest getRequest();
+    protected javax.servlet.http.HttpServletRequest getRequest()
+    {
+        return JakartaServletBridge.toJavax(getJakartaRequest());
+    }
 
+    /**
+     * @return the current HTTP servlet request, used to access the cookies
+     */
     protected HttpServletRequest getJakartaRequest()
     {
-        return JakartaServletBridge.toJakarta(getRequest());
+        if (this.container.getRequest() instanceof ServletRequest servletRequest) {
+            return servletRequest.getRequest();
+        }
+
+        return null;
     }
 }

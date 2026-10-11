@@ -178,14 +178,14 @@
           onSuccess: function (entityReference) {
             imageSelector.updateSelectedImageReferences([XWiki.Model.serialize(entityReference)], buttonElement);
             element.removeClass('loading');
-            new XWiki.widgets.Notification(translations.get('fileUpload.success'), 'done');
+            XWiki.widgets.Notification.show(translations.get('fileUpload.success'), 'done');
           },
           onError: function () {
-            new XWiki.widgets.Notification(translations.get('fileUpload.fail'), 'error');
+            XWiki.widgets.Notification.show(translations.get('fileUpload.fail'), 'error');
             element.removeClass('loading');
           },
           onAbort: function () {
-            new XWiki.widgets.Notification(translations.get('fileUpload.abort'), 'error');
+            XWiki.widgets.Notification.show(translations.get('fileUpload.abort'), 'error');
             element.removeClass('loading');
           }
         }, element);

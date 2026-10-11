@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.converter.JakartaRequestParameterConversionResult;
@@ -71,7 +72,9 @@ public class HTMLRequestParameterConverter extends AbstractRequestParameterConve
             try {
                 request.setParameter(parameterName, this.htmlConverter.fromHTML(html, syntax));
             } catch (Exception e) {
-                this.logger.error(e.getLocalizedMessage(), e);
+                this.logger.warn("Failed to convert the [{}] request parameter. Root cause is [{}].", parameterName,
+                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Full stack trace for the conversion failure:", e);
                 conversionResult.getErrors().put(parameterName, e);
             }
             // If the conversion fails the output contains the value before the conversion.

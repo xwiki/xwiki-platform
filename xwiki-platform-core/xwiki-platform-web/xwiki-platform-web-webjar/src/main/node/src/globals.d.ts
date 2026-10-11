@@ -20,6 +20,9 @@
 
 export {};
 
+// This module must not use the shared "@xwiki/platform-xwiki-utils/global" declaration of the XWiki global: that one
+// describes the object as read once the page is loaded, while this module creates or extends it, possibly before
+// xwiki.js has run, so it sees a possibly undefined object holding none of the members declared there yet.
 declare global {
   // A global "var" declaration, rather than a "const" one, is what makes globalThis.XWiki assignable.
   var XWiki: Record<string, unknown> | undefined;

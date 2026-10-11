@@ -22,31 +22,33 @@ var XWiki = (function(XWiki) {
 
 var editors = XWiki.editors = XWiki.editors || {};
 
+function createElement(tagName, properties) {
+  return Object.assign(document.createElement(tagName), properties);
+}
+
 /**
  * Autosave feature.
  * TODO Improve i18n support
+ *
+ * Note that this class can be extended using Prototype.js' Class.create(XWiki.editors.AutoSave, {...}). This is why
+ * the constructor only delegates to the initialize method (Prototype.js calls only the initialize method when creating
+ * an instance of a subclass).
  */
-editors.AutoSave = Class.create({
-  options : {
-    /** Is the autosave enabled ? */
-    enabled: false,
-    /** If enabled, how frequent are the savings */
-    frequency: 5, // minutes
-    /** Is the UI for configuring the autosave enabled or not? */
-    showConfigurationUI: true,
-    /**
-     * Form to autosave, either a DOM element or its ID.
-     * By default the form containing the element with the "xwikieditcontent" ID is used.
-     * If no valid form is specified, then the autosave won't do anything at all.
-     */
-    form: undefined
-  },
+class AutoSave {
+  constructor(...args) {
+    this.initialize(...args);
+  }
 
   /** Initialization */
-  initialize : function(options) {
-    this.options = Object.extend(Object.clone(this.options), options || { });
-    this.form = $(this.options.form) || $("xwikieditcontent")?.up('form');
-    if (!this.form || this.form.down('#autosaveControl')) {
+  initialize(options) {
+    this.options = {...this.options, ...options};
+    if (typeof this.options.form === 'string') {
+      this.form = document.getElementById(this.options.form);
+    } else {
+      this.form = this.options.form;
+    }
+    this.form = this.form || document.getElementById("xwikieditcontent")?.closest('form');
+    if (!this.form || this.form.querySelector('#autosaveControl')) {
       return;
     }
     this.initVersionMetadataElements();
@@ -55,7 +57,7 @@ editors.AutoSave = Class.create({
       this.addListeners();
     }
     this.toggleTimer();
-  },
+  }
 
   /**
    * The metadata elements are the version comment input and the minor edit checkbox in the editor form.
@@ -63,85 +65,86 @@ editors.AutoSave = Class.create({
    * If they are missing, hidden inputs are created and introduced in the form in their place.
    * By means of these, every autosaved version is marked as minor and contains the text "(Autosaved)" in the comment.
    */
-  initVersionMetadataElements : function() {
-    var container = new Element("div", {"class" : "hidden"});
+  initVersionMetadataElements() {
+    const container = createElement("div", {className: "hidden"});
     // The element containing the edit comment (summary) from the edit form.
-    this.editComment = this.form.down('input[name="comment"]');
+    this.editComment = this.form.querySelector('input[name="comment"]');
     if (!this.editComment) {
-      this.editComment = new Element('input', {type : "hidden", name: "comment"});
+      this.editComment = createElement('input', {type: "hidden", name: "comment"});
       this.customMetadataElementsContainer = container;
-      container.insert(this.editComment);
+      container.append(this.editComment);
     }
     // The minor edit checkbox from the edit form.
-    this.minorEditCheckbox = this.form.down('input[name="minorEdit"]');
+    this.minorEditCheckbox = this.form.querySelector('input[name="minorEdit"]');
     if (!this.minorEditCheckbox) {
       // Value already set, does not need to be switched on/off
-      this.minorEditCheckbox = new Element('input', {type : "checkbox", name: "minorEdit", checked: true});
+      this.minorEditCheckbox = createElement('input', {type: "checkbox", name: "minorEdit", checked: true});
       this.customMetadataElementsContainer = container;
-      container.insert(this.minorEditCheckbox);
+      container.append(this.minorEditCheckbox);
     }
-  },
+  }
 
   /**
-   * The UI of the autosave feature is created and introduced towards the end of the edit form. 
+   * The UI of the autosave feature is created and introduced towards the end of the edit form.
    * It contains a checkbox for toggling the autosave and an input that allows to set the autosave interval in minutes.
    */
-  createUIElements : function() {
+  createUIElements() {
     // Toggle for the autosave feature.
-    this.autosaveCheckbox = new Element('input', {
+    this.autosaveCheckbox = createElement('input', {
       type: "checkbox",
       checked: this.options.enabled,
       name: "doAutosave",
       id: "doAutosave"
     });
     // Input for setting the autosave frequency
-    this.autosaveInput = new Element('input', {
+    this.autosaveInput = createElement('input', {
       type: "text",
       value: this.options.frequency,
-      size: "2",
-      "class": "autosave-frequency"
+      size: 2,
+      className: "autosave-frequency"
     });
     // Labels
-    let autosaveLabel = new Element('label', {'class': 'autosave'});
+    const autosaveLabel = createElement('label', {className: 'autosave'});
     autosaveLabel.append(this.autosaveCheckbox,
       "$escapetool.javascript($services.localization.render('core.edit.autosave'))");
-    let frequencyLabel = new Element('label', {'class': 'frequency'});
+    const frequencyLabel = createElement('label', {className: 'frequency'});
     frequencyLabel.append("$escapetool.javascript($services.localization.render('core.edit.autosave.frequency.label'))",
       this.autosaveInput);
     // A paragraph containing the whole thing
-    let container = new Element('div', {"id": "autosaveControl"});
+    const container = createElement('div', {id: "autosaveControl"});
     this.classNameAutosaveDisabled = 'autosaveDisabled';
     if (!this.options.enabled) {
-      container.addClassName(this.classNameAutosaveDisabled);
+      container.classList.add(this.classNameAutosaveDisabled);
     }
     container.append(autosaveLabel, " ", frequencyLabel, " ");
     // Insert in the editing UI
-    this.form.down('.buttons').insert(container);
-  },
+    this.form.querySelector('.buttons').append(container);
+  }
 
   /**
    * Adds listeners to the elements in the autosave UI, allowing to acknowledge when the user changes the settings.
    */
-  addListeners : function() {
+  addListeners() {
     // Stop the Enter key from submitting the form
-    var preventSubmit = function(event) {
-      if (event.keyCode == Event.KEY_RETURN) {
-        event.stop();
-        event.element().blur();
+    const preventSubmit = function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        event.stopPropagation();
+        event.target.blur();
       }
     };
-    ["keydown", "keyup", "keypress"].each(function(eventName) {
-      this.autosaveInput.observe(eventName, preventSubmit);
-      this.autosaveCheckbox.observe(eventName, preventSubmit);
-    }.bind(this));
+    ["keydown", "keyup", "keypress"].forEach(eventName => {
+      this.autosaveInput.addEventListener(eventName, preventSubmit);
+      this.autosaveCheckbox.addEventListener(eventName, preventSubmit);
+    });
 
     // Enable/disable autosave
-    Event.observe(this.autosaveCheckbox, "click", function() {
+    this.autosaveCheckbox.addEventListener("click", () => {
       this.toggleTimer(this.autosaveCheckbox.checked);
-    }.bindAsEventListener(this));
+    });
 
     // Set autosave frequency
-    Event.observe(this.autosaveInput, "blur", function() {
+    this.autosaveInput.addEventListener("blur", () => {
       // is the given value valid?
       let newFrequency = Number(this.autosaveInput.value);
       if (newFrequency > 0) {
@@ -153,78 +156,76 @@ editors.AutoSave = Class.create({
         // no: restore the previous value in the input
         this.autosaveInput.value = this.options.frequency;
       }
-    }.bindAsEventListener(this));
+    });
 
     this._toggleTimerWhenSaveButtonIsEnabledOrDisabled();
-  },
+  }
 
   /**
    * Stop the timer when the save button is disabled (e.g. because there is another save in progress or because the save
    * button was hidden) and restart the timer, if needed, when the save button is enabled.
    */
-  _toggleTimerWhenSaveButtonIsEnabledOrDisabled: function() {
-    var self = this;
-    var observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
+  _toggleTimerWhenSaveButtonIsEnabledOrDisabled() {
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         if (mutation.target.disabled) {
-          self.stopTimer();
+          this.stopTimer();
         } else {
-          self.toggleTimer();
+          this.toggleTimer();
         }
       });
     });
-    var saveButton = this.form.down('input[name="action_saveandcontinue"]');
+    const saveButton = this.form.querySelector('input[name="action_saveandcontinue"]');
     observer.observe(saveButton, {
       attributes: true,
       attributeFilter: ['disabled']
     });
-  },
+  }
 
-  toggleTimer: function(enabled) {
+  toggleTimer(enabled) {
     if (typeof enabled === 'boolean') {
       this.options.enabled = enabled;
     }
     if (this.options.enabled) {
       this.startTimer();
       if (this.autosaveInput) {
-        this.autosaveInput.up(1).removeClassName(this.classNameAutosaveDisabled);
+        this.autosaveInput.closest('#autosaveControl').classList.remove(this.classNameAutosaveDisabled);
       }
     } else {
       this.stopTimer();
       if (this.autosaveInput) {
-        this.autosaveInput.up(1).addClassName(this.classNameAutosaveDisabled);
+        this.autosaveInput.closest('#autosaveControl').classList.add(this.classNameAutosaveDisabled);
       }
     }
-  },
+  }
 
   /**
    * Start autosave timer when the autosave is enabled.
    * Every (this.options.frequency * 60) seconds, the callback function doAutosave is called.
    */
-  startTimer : function() {
+  startTimer() {
     // Make sure we stop the existing timer.
     this.stopTimer();
-    this.timer = new PeriodicalExecuter(this.doAutosave.bind(this),
-      this.options.frequency * 60 /* seconds in a minute */);
-  },
+    this.timer = setInterval(() => this.doAutosave(), this.options.frequency * 60 /* seconds in a minute */ * 1000);
+  }
 
   /**
    * Stop the autosave loop when the autosave is disabled or when the autosave frequency is changed
    * and the loop needs to be restarted.
    */
-  stopTimer : function() {
+  stopTimer() {
     if (this.timer) {
-      this.timer.stop();
+      clearInterval(this.timer);
       delete this.timer;
     }
-  },
+  }
 
   /**
    * The function that performs the actual automatic save, if the content has changed. It marks the version as minor and
    * updates the version comment with "(Autosaved)". Then it clicks on the Save & Continue button. Afterwards, it resets
    * the version metadata elements to their previous state.
    */
-  doAutosave : function() {
+  doAutosave() {
     this.updateVersionMetadata();
     try {
       // Click the Save & Continue button. We don't trigger the save event ourselves because:
@@ -232,19 +233,19 @@ editors.AutoSave = Class.create({
       //   are no changes)
       // * the save button might have additional click event listeners, so custom behavior (e.g. validation) that we
       //   want to execute.
-      this.form.down('input[name="action_saveandcontinue"]').click();
+      this.form.querySelector('input[name="action_saveandcontinue"]').click();
     } finally {
       // Restore comment and minor edit to previous values.
       this.resetVersionMetadata();
     }
-  },
+  }
 
   /**
    * Marks the version as minor and updates the version comment with "(Autosaved)".
    */
-  updateVersionMetadata : function() {
+  updateVersionMetadata() {
     if (this.customMetadataElementsContainer) {
-      this.form.insert(this.customMetadataElementsContainer);
+      this.form.append(this.customMetadataElementsContainer);
     }
     this.userEditComment = this.editComment.value;
     this.userMinorEdit = this.minorEditCheckbox.checked;
@@ -252,27 +253,50 @@ editors.AutoSave = Class.create({
     this.editComment.value += " (Autosaved)";
     // Check the minor edit checkbox
     this.minorEditCheckbox.checked = true;
-  },
+  }
 
   /**
    * Resets the version metadata elements to their previous state and the contentChanged to false.
    */
-  resetVersionMetadata : function() {
+  resetVersionMetadata() {
     if (this.customMetadataElementsContainer) {
       this.customMetadataElementsContainer.remove();
     }
     this.editComment.value = this.userEditComment;
     this.minorEditCheckbox.checked = this.userMinorEdit;
   }
-});
+}
+
+AutoSave.prototype.options = {
+  /** Is the autosave enabled ? */
+  enabled: false,
+  /** If enabled, how frequent are the savings */
+  frequency: 5, // minutes
+  /** Is the UI for configuring the autosave enabled or not? */
+  showConfigurationUI: true,
+  /**
+   * Form to autosave, either a DOM element or its ID.
+   * By default the form containing the element with the "xwikieditcontent" ID is used.
+   * If no valid form is specified, then the autosave won't do anything at all.
+   */
+  form: undefined
+};
+
+/** Required by Prototype.js' Class.create(), which registers each new subclass on its parent class. */
+AutoSave.subclasses = [];
+
+editors.AutoSave = AutoSave;
 
 function init() {
   return new editors.AutoSave();
 }
 
 // When the document is loaded, create the Autosave control
-(XWiki.domIsLoaded && init())
-|| document.observe("xwiki:dom:loaded", init);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 // End XWiki augmentation.
 return XWiki;

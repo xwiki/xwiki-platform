@@ -464,9 +464,9 @@ ol.tagCloud .ultraPopular {
       <code>{{velocity}}
 ##
 ## tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
-#set ($tagCloudSpace = $xcontext.macro.params.get('space'))
-#set ($tagCloudSpaces = $xcontext.macro.params.get('spaces'))
-#set ($limit = $xcontext.macro.params.get('limit'))
+#set ($tagCloudSpace = $wikimacro.parameters.get('space'))
+#set ($tagCloudSpaces = $wikimacro.parameters.get('spaces'))
+#set ($limit = $wikimacro.parameters.get('limit'))
 #if ("$!limit" != '' &amp;&amp; $limit &lt; 0)
   #set ($limit = 0)
 #end

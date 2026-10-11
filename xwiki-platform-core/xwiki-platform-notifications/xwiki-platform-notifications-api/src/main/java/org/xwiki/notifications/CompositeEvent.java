@@ -27,12 +27,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.DocumentEventType;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.text.StringUtils;
 
 /**
  * A group of similar events that compose a "composite" event.
@@ -227,9 +227,7 @@ public class CompositeEvent
             return true;
         }
 
-        if (obj instanceof CompositeEvent) {
-            CompositeEvent compositeEvent = (CompositeEvent) obj;
-
+        if (obj instanceof CompositeEvent compositeEvent) {
             EqualsBuilder builder = new EqualsBuilder();
             builder.append(getSimilarityBetweenEvents(), compositeEvent.getSimilarityBetweenEvents());
             builder.append(getEvents(), compositeEvent.getEvents());

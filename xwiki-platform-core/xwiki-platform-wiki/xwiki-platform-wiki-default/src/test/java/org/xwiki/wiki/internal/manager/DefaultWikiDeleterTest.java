@@ -21,10 +21,11 @@ package org.xwiki.wiki.internal.manager;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
@@ -34,23 +35,26 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class DefaultWikiDeleterTest
+@ComponentTest
+class DefaultWikiDeleterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultWikiDeleter> mocker =
-            new MockitoComponentMockingRule(DefaultWikiDeleter.class);
+    @InjectMockComponents
+    private DefaultWikiDeleter defaultWikiDeleter;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private WikiDescriptorDocumentHelper descriptorDocumentHelper;
 
     private XWikiContext xcontext;
@@ -59,51 +63,40 @@ public class DefaultWikiDeleterTest
 
     private XWikiStoreInterface store;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        // Injection
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
-
         // Frequent uses
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(com.xpn.xwiki.XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
-        store = mock(XWikiStoreInterface.class);
-        when(xwiki.getStore()).thenReturn(store);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+        this.store = mock(XWikiStoreInterface.class);
+        when(this.xwiki.getStore()).thenReturn(this.store);
     }
 
     @Test
-    public void deleteTheMainWiki() throws Exception
+    void deleteTheMainWiki()
     {
-        boolean exceptionCaught = false;
-        try {
-            this.mocker.getComponentUnderTest().delete("xwiki");
-        } catch (WikiManagerException e) {
-            exceptionCaught = true;
-        }
-        assertTrue(exceptionCaught);
+        assertThrows(WikiManagerException.class, () -> this.defaultWikiDeleter.delete("xwiki"));
     }
 
     @Test
-    public void deleteWiki() throws Exception
+    void deleteWiki() throws Exception
     {
         // Mock
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias");
         descriptor.addAlias("wikialias2");
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
-        when(descriptorDocumentHelper.getDocumentFromWikiId("wikiid")).thenReturn(descriptorDocument);
+        when(this.descriptorDocumentHelper.getDocumentFromWikiId("wikiid")).thenReturn(descriptorDocument);
 
         // Delete
-        this.mocker.getComponentUnderTest().delete("wikiid");
+        this.defaultWikiDeleter.delete("wikiid");
 
         // Verify that the database has been deleted
-        verify(store).deleteWiki(eq("wikiid"), any(XWikiContext.class));
+        verify(this.store).deleteWiki(eq("wikiid"), any(XWikiContext.class));
         // Verify that the descriptor document has been deleted
-        verify(xwiki).deleteDocument(eq(descriptorDocument), any(XWikiContext.class));
+        verify(this.xwiki).deleteDocument(eq(descriptorDocument), any(XWikiContext.class));
     }
 }

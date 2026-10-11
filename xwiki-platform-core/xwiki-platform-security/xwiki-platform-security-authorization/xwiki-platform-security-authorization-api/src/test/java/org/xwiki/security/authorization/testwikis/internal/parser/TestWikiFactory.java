@@ -30,9 +30,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.testwikis.TestEntity;
 import org.xwiki.security.authorization.testwikis.TestWiki;
+import org.xwiki.security.authorization.testwikis.internal.entities.DefaultTestDefinition;
 import org.xwiki.security.authorization.testwikis.internal.entities.DefaultTestDocument;
 import org.xwiki.security.authorization.testwikis.internal.entities.DefaultTestWiki;
-import org.xwiki.security.authorization.testwikis.internal.entities.DefaultTestDefinition;
 
 /**
  * Test wiki factory.

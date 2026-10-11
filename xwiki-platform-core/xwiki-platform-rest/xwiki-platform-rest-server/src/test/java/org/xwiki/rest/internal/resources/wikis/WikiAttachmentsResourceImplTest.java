@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link WikiAttachmentsResourceImpl}.
- * 
+ *
  * @version $Id$
  */
 @OldcoreTest
@@ -62,7 +62,7 @@ class WikiAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
         setUriInfo(this.wikiAttachmentsResource);
@@ -74,7 +74,8 @@ class WikiAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         Query query = mock(Query.class);
         when(this.queryManager.createQuery("select doc.space, doc.name, doc.version, attachment"
             + " from XWikiDocument as doc, XWikiAttachment as attachment"
-            + " where attachment.docId = doc.id and upper(doc.space) like :space", Query.HQL)).thenReturn(query);
+            + " where attachment.docId = doc.id and upper(doc.space) like :space"
+            + " order by doc.fullName asc, doc.language asc, attachment.filename asc", Query.HQL)).thenReturn(query);
         mockContainsQueryParam(query, "space", "ABC");
         when(query.setOffset(0)).thenReturn(query);
         when(query.setLimit(10)).thenReturn(query);
@@ -89,8 +90,8 @@ class WikiAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         when(forbiddenAttachment.getReference()).thenReturn(forbiddenAttachmentReference);
         when(this.authorization.hasAccess(Right.VIEW, forbiddenAttachmentReference)).thenReturn(false);
 
-        List<Object> results = Arrays.asList(new Object[] {"Path.To", "Page", "1.3", xwikiAttachment},
-            new Object[] {"Path.To", "ForbiddenPage", "1.3", forbiddenAttachment});
+        List<Object> results = Arrays.asList(new Object[] { "Path.To", "Page", "1.3", xwikiAttachment },
+            new Object[] { "Path.To", "ForbiddenPage", "1.3", forbiddenAttachment });
         when(query.execute()).thenReturn(results);
 
         when(this.defaultSpaceReferenceResover.resolve(eq("Path.To"), any()))

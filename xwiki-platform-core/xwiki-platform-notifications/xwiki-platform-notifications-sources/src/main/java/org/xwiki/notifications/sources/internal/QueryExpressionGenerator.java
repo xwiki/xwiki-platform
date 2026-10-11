@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -69,8 +68,6 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Singleton
 public class QueryExpressionGenerator
 {
-    private static final LocalDocumentReference USER_CLASS = new LocalDocumentReference("XWiki", "XWikiUsers");
-
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
@@ -195,8 +192,8 @@ public class QueryExpressionGenerator
                 NotificationFilter filter = filterIterator.next();
                 ExpressionNode node =
                     filter.filterExpression(parameters.user, parameters.filterPreferences, preference);
-                if (node != null && node instanceof AbstractOperatorNode) {
-                    preferenceTypeNode = preferenceTypeNode.and((AbstractOperatorNode) node);
+                if (node != null && node instanceof AbstractOperatorNode operatorNode) {
+                    preferenceTypeNode = preferenceTypeNode.and(operatorNode);
                 }
             }
 
@@ -225,11 +222,11 @@ public class QueryExpressionGenerator
         for (NotificationFilter filter : parameters.filters) {
             ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
                 NotificationFilterType.EXCLUSIVE, parameters.format);
-            if (node instanceof AbstractOperatorNode) {
+            if (node instanceof AbstractOperatorNode operatorNode) {
                 if (globalFiltersNode == null) {
-                    globalFiltersNode = (AbstractOperatorNode) node;
+                    globalFiltersNode = operatorNode;
                 } else {
-                    globalFiltersNode = globalFiltersNode.and((AbstractOperatorNode) node);
+                    globalFiltersNode = globalFiltersNode.and(operatorNode);
                 }
             }
         }
@@ -244,11 +241,11 @@ public class QueryExpressionGenerator
         for (NotificationFilter filter : parameters.filters) {
             ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
                 NotificationFilterType.INCLUSIVE, parameters.format, parameters.preferences);
-            if (node != null && node instanceof AbstractOperatorNode) {
+            if (node != null && node instanceof AbstractOperatorNode operatorNode) {
                 if (globalFiltersNode == null) {
-                    globalFiltersNode = (AbstractOperatorNode) node;
+                    globalFiltersNode = operatorNode;
                 } else {
-                    globalFiltersNode = globalFiltersNode.or((AbstractOperatorNode) node);
+                    globalFiltersNode = globalFiltersNode.or(operatorNode);
                 }
             }
         }
@@ -318,7 +315,6 @@ public class QueryExpressionGenerator
             return excludeHiddenEvents(topNode);
         }
 
-        final DocumentReference userClass = new DocumentReference(USER_CLASS, parameters.user.getWikiReference());
         // Don't show hidden events unless the user want to display hidden pages
         boolean displayHiddenDocuments = this.userPropertiesResolver
             .resolve(this.userReferenceResolver.resolve(parameters.user)).displayHiddenDocuments();

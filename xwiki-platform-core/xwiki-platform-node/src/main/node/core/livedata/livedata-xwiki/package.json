@@ -1,7 +1,7 @@
 {
   "name": "@xwiki/platform-livedata-xwiki",
-  "version": "18.3.0-SNAPSHOT",
-  "license": "LGPL 2.1",
+  "version": "18.9.0-SNAPSHOT",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -49,8 +49,11 @@
     "@types/jquery": "catalog:",
     "@types/sinon": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "@xwiki/platform-xwiki-utils": "workspace:*",
     "eslint": "catalog:",
     "jquery": "catalog:",
     "sinon": "catalog:",

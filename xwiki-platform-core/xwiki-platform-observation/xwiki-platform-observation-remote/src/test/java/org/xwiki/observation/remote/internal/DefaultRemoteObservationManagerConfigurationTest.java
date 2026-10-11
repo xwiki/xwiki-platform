@@ -52,7 +52,7 @@ class DefaultRemoteObservationManagerConfigurationTest
     private File tmpDir;
 
     @BeforeComponent
-    public void configure() throws Exception
+    public void configure()
     {
         // getPermanentDirectory needs to be mocked before on remoteObservationManagerConfiguration during the component
         // initialization.

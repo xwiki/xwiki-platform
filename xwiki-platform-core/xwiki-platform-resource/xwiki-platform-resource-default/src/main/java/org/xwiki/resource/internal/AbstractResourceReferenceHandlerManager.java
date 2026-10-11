@@ -62,7 +62,7 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
     @Inject
     private Logger logger;
 
-    protected abstract boolean matches(ResourceReferenceHandler handler, T resourceReferenceQualifier);
+    protected abstract boolean matches(ResourceReferenceHandler<?> handler, T resourceReferenceQualifier);
 
     protected abstract T extractResourceReferenceQualifier(ResourceReference reference);
 
@@ -70,7 +70,7 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
     public void handle(ResourceReference reference) throws ResourceReferenceHandlerException
     {
         // Look for a Handler supporting the Resource Type located in the passed Resource Reference object.
-        Set<ResourceReferenceHandler> orderedHandlers =
+        Set<ResourceReferenceHandler<?>> orderedHandlers =
             getMatchingHandlers(extractResourceReferenceQualifier(reference));
 
         if (!orderedHandlers.isEmpty()) {
@@ -100,13 +100,13 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
         return result;
     }
 
-    private Set<ResourceReferenceHandler> getMatchingHandlers(T resourceReferenceQualifier)
+    private Set<ResourceReferenceHandler<?>> getMatchingHandlers(T resourceReferenceQualifier)
         throws ResourceReferenceHandlerException
     {
         // Look for a Handler supporting the Resource Type located in the passed Resource Reference object.
         // TODO: Use caching to avoid having to sort all Handlers at every call.
-        Set<ResourceReferenceHandler> orderedHandlers = new TreeSet<>();
-        for (ResourceReferenceHandler handler : getHandlers(resourceReferenceQualifier.getClass())) {
+        Set<ResourceReferenceHandler<?>> orderedHandlers = new TreeSet<>();
+        for (ResourceReferenceHandler<?> handler : getHandlers(resourceReferenceQualifier.getClass())) {
             if (matches(handler, resourceReferenceQualifier)) {
                 orderedHandlers.add(handler);
             }
@@ -115,7 +115,8 @@ public abstract class AbstractResourceReferenceHandlerManager<T> implements Reso
         return orderedHandlers;
     }
 
-    private List<ResourceReferenceHandler> getHandlers(Class typeClass) throws ResourceReferenceHandlerException
+    private List<ResourceReferenceHandler<?>> getHandlers(Class<?> typeClass)
+        throws ResourceReferenceHandlerException
     {
         try {
             return this.contextComponentManager

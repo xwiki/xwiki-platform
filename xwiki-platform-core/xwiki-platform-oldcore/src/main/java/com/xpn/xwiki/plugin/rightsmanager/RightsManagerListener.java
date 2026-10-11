@@ -117,13 +117,13 @@ public final class RightsManagerListener implements EventListener
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, true, context);
                 } catch (XWikiException e) {
-                    LOGGER.warn("Error when cleaning for deleted user", e);
+                    LOGGER.warn("Failed to clean the rights of deleted user [{}]", userOrGroupName, e);
                 }
             } else if (document.getObject("XWiki.XWikiGroups") != null) {
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, false, context);
                 } catch (XWikiException e) {
-                    LOGGER.warn("Error when cleaning for deleted group", e);
+                    LOGGER.warn("Failed to clean the rights of deleted group [{}]", userOrGroupName, e);
                 }
             }
         }

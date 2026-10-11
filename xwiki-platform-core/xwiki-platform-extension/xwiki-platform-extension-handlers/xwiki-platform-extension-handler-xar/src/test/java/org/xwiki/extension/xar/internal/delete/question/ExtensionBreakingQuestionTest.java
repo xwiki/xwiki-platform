@@ -36,10 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class ExtensionBreakingQuestionTest
+class ExtensionBreakingQuestionTest
 {
     @Test
-    public void get()
+    void get()
     {
         DocumentReference document1 = new DocumentReference("wiki1", "space1", "document1");
         DocumentReference document2 = new DocumentReference("wiki2", "space2", "document2");
@@ -57,7 +57,7 @@ public class ExtensionBreakingQuestionTest
     }
 
     @Test
-    public void selectAllFreePages()
+    void selectAllFreePages()
     {
         DocumentReference document1 = new DocumentReference("wiki1", "space1", "document1");
         DocumentReference document2 = new DocumentReference("wiki2", "space2", "document2");

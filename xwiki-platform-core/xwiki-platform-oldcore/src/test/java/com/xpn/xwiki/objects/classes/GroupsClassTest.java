@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  * @since 14.2RC1
  */
-public class GroupsClassTest
+class GroupsClassTest
 {
     @Test
     void fromList()

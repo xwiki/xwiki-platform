@@ -21,6 +21,8 @@ package com.xpn.xwiki.plugin.feed;
 
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 
@@ -31,6 +33,8 @@ import com.xpn.xwiki.web.Utils;
 
 public class UpdateThread extends AbstractXWikiRunnable
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateThread.class);
+
     protected boolean fullContent;
 
     protected String space;
@@ -80,7 +84,7 @@ public class UpdateThread extends AbstractXWikiRunnable
     public void update()
     {
         if (!stopUpdate) {
-            if (updateInProgress == false) {
+            if (!updateInProgress) {
                 updateInProgress = true;
                 nbLoadedFeeds = 0;
                 nbLoadedFeedsErrors = 0;
@@ -96,14 +100,14 @@ public class UpdateThread extends AbstractXWikiRunnable
                     nbLoadedArticles = feedPlugin.updateFeedsInSpace(space, fullContent, true, false, context);
                 } catch (XWikiException e) {
                     exception = e;
-                    e.printStackTrace();
+                    LOGGER.error("Failed to update the feeds of space [{}]", this.space, e);
                 } finally {
                     updateInProgress = false;
                     endDate = new Date();
                     context.getWiki().getStore().cleanUp(context);
                 }
                 // an update has been schedule..
-                if ((forceUpdate == true) && (stopUpdate == false)) {
+                if (forceUpdate && !stopUpdate) {
                     forceUpdate = false;
                     update();
                 }

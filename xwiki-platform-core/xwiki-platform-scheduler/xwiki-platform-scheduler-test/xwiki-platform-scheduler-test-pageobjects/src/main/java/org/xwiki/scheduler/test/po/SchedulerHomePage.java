@@ -116,8 +116,8 @@ public class SchedulerHomePage extends ViewPage
      */
     public boolean hasError()
     {
-        return getDriver().findElementsWithoutWaiting(
-            By.xpath("//div[contains(@class, 'errormessage')]")).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(
+            By.xpath("//div[contains(@class, 'errormessage')]")).isEmpty();
     }
 
     /**

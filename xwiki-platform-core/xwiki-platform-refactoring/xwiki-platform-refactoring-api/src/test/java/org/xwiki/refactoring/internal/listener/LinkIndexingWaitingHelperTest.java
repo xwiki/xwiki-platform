@@ -30,6 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.link.LinkStore;
@@ -93,9 +94,10 @@ class LinkIndexingWaitingHelperTest
     private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
-    public void configure()
+    void configure()
     {
-        when(this.jobContext.getCurrentJob()).thenReturn(mock());
+        Job jobMock = mock();
+        when(this.jobContext.getCurrentJob()).thenReturn(jobMock);
         when(this.jobContext.getCurrentJob().getStatus()).thenReturn(this.jobStatus);
         when(this.linkStore.waitReady()).thenReturn(this.readyIndicator);
     }

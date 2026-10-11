@@ -19,16 +19,17 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventGroup;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.List;
 
 /**
  * Default implementation for the {@link EventStream} that uses the old Activity Stream storage thanks to

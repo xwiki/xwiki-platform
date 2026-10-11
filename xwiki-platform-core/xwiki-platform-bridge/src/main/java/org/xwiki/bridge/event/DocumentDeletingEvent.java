@@ -51,7 +51,7 @@ public class DocumentDeletingEvent extends AbstractDocumentEvent
      */
     public DocumentDeletingEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

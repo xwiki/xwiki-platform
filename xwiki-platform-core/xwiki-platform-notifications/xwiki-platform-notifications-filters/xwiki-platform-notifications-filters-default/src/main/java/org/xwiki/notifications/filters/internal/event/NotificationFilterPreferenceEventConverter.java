@@ -69,10 +69,10 @@ public class NotificationFilterPreferenceEventConverter extends AbstractEventCon
     {
         Serializable remote = null;
 
-        if (local instanceof DefaultNotificationFilterPreference) {
+        if (local instanceof DefaultNotificationFilterPreference preference) {
             Map<String, Object> map = new HashMap<>();
 
-            map.put(PROP_OWNER, ((DefaultNotificationFilterPreference) local).getOwner());
+            map.put(PROP_OWNER, preference.getOwner());
 
             remote = (Serializable) map;
         }

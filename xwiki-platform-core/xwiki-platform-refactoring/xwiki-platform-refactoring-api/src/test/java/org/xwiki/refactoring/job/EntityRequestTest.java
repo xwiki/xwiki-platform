@@ -21,20 +21,21 @@ package org.xwiki.refactoring.job;
 
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link EntityRequest}.
- * 
+ *
  * @version $Id$
  */
-public class EntityRequestTest
+class EntityRequestTest
 {
     @Test
-    public void getSetEntityParameters()
+    void getSetEntityParameters()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         EntityRequest entityRequest = new EntityRequest();

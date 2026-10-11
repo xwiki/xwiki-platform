@@ -226,9 +226,7 @@ public class SolrIndexScriptService implements ScriptService
         EntityType type;
         try {
             type = EntityType.valueOf((String) document.get(FieldUtils.TYPE));
-        } catch (IllegalArgumentException e) {
-            return null;
-        } catch (NullPointerException e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             return null;
         }
 

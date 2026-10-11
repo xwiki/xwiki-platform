@@ -36,20 +36,6 @@ function warn(message){
 }
 
 /**
- * Deprecated since 2.6RC2
- */
-if (typeof XWiki.widgets == 'object' && typeof XWiki.widgets.FullScreen == 'function') {
-  XWiki.editors = XWiki.editors || {};
-  XWiki.editors.FullScreenEditing = Class.create(XWiki.widgets.FullScreen, {
-    initialize: function($super){
-      warn("XWiki.editors.FullScreenEditing is deprecated since XWiki 2.6RC2. Use XWiki.widgets.FullScreen instead.");
-      $super();
-    }
-  });
-}
-
-
-/**
  * _xwk is an old namespace for XWiki code that was optional
  * Deprecated since 2.6RC1
  */
@@ -512,7 +498,7 @@ Object.extend(XWiki.watchlist, {
   var html = $$('html')[0];
   var head = $$('head')[0];
 
-  // Function that creates a meta tag with the value taken from the new HTML data-* attrribute
+  // Function that creates a meta tag with the value taken from the new HTML data-* attribute
   var addMetaTag = function(name, value) {
     head.insert(new Element('meta', {'name': name, 'content': html.readAttribute('data-xwiki-'+value)}));
   };

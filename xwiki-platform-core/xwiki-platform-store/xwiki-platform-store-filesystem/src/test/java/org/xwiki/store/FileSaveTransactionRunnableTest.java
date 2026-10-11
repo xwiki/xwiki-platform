@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 3.0M2
  */
 @ExtendWith(XWikiTempDirExtension.class)
-public class FileSaveTransactionRunnableTest
+class FileSaveTransactionRunnableTest
 {
     private static final String[] FILE_PATH = { "path", "to", "file" };
 
@@ -68,7 +68,7 @@ public class FileSaveTransactionRunnableTest
     private File testDirectory;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         File storageLocation = new File(this.testDirectory, "test-storage" + System.identityHashCode(this.getClass()));
 
@@ -92,21 +92,21 @@ public class FileSaveTransactionRunnableTest
     }
 
     @Test
-    public void simpleTest() throws Exception
+    void simpleTest() throws Exception
     {
-        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
+        assertEquals(CONTENT_VERSION1, FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8));
 
         this.runnable.start();
 
         assertFalse(this.backup.exists());
         assertFalse(this.temp.exists());
-        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION2);
+        assertEquals(CONTENT_VERSION2, FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8));
     }
 
     @Test
-    public void rollbackAfterPreRunTest() throws Exception
+    void rollbackAfterPreRunTest() throws Exception
     {
-        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
+        assertEquals(CONTENT_VERSION1, FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8));
 
         // After preRun(), before run.
         final TransactionRunnable failRunnable = new TransactionRunnable()
@@ -126,13 +126,13 @@ public class FileSaveTransactionRunnableTest
         runnable.runIn(str);
         this.validateRollback(str);
 
-        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
+        assertEquals(CONTENT_VERSION1, FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8));
     }
 
     @Test
-    public void rollbackAfterRunTest() throws Exception
+    void rollbackAfterRunTest() throws Exception
     {
-        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
+        assertEquals(CONTENT_VERSION1, FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8));
 
         // After run() before onCommit()
         final TransactionRunnable failRunnable = new TransactionRunnable()
@@ -153,9 +153,9 @@ public class FileSaveTransactionRunnableTest
     }
 
     @Test
-    public void rollbackAfterFailedCommit() throws Exception
+    void rollbackAfterFailedCommit() throws Exception
     {
-        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
+        assertEquals(CONTENT_VERSION1, FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8));
 
         // Make the temp rename fail
         this.temp = new File(this.temp.getPath())
@@ -174,7 +174,7 @@ public class FileSaveTransactionRunnableTest
     }
 
     @Test
-    public void saveWithNonexistantOriginalTest() throws Exception
+    void saveWithNonexistantOriginalTest() throws Exception
     {
         this.toSave.delete();
         assertFalse(this.toSave.exists());
@@ -182,14 +182,14 @@ public class FileSaveTransactionRunnableTest
         this.runnable.start();
 
         assertTrue(this.toSave.exists());
-        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION2);
+        assertEquals(CONTENT_VERSION2, FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8));
 
         assertFalse(this.temp.exists());
         assertFalse(this.backup.exists());
     }
 
     @Test
-    public void rollbackWithNonexistantOriginalTest() throws Exception
+    void rollbackWithNonexistantOriginalTest()
     {
         this.toSave.delete();
         assertFalse(this.toSave.exists());
@@ -209,7 +209,7 @@ public class FileSaveTransactionRunnableTest
         final StartableTransactionRunnable str = new StartableTransactionRunnable();
         runnable.runIn(str);
         failRunnable.runIn(str);
-        Exception exception = assertThrows(Exception.class, () -> str.start());
+        assertThrows(Exception.class, str::start);
 
         assertFalse(this.toSave.exists());
         assertFalse(this.temp.exists());
@@ -218,11 +218,11 @@ public class FileSaveTransactionRunnableTest
 
     private void validateRollback(final StartableTransactionRunnable tr) throws Exception
     {
-        assertThrows(Exception.class, () -> tr.start(),
+        assertThrows(Exception.class, tr::start,
             "TransactionRunnable#start() did not throw the exception thrown by run.");
 
         assertTrue(this.toSave.exists());
-        assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
+        assertEquals(CONTENT_VERSION1, FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8));
         assertFalse(this.temp.exists());
         assertFalse(this.backup.exists());
     }

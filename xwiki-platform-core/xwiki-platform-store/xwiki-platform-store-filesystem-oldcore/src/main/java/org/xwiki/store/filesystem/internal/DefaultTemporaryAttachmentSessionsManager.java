@@ -20,6 +20,7 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +42,6 @@ import org.xwiki.container.Container;
 import org.xwiki.container.Session;
 import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
-import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
@@ -105,14 +105,6 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     }
 
     @Override
-    @Deprecated
-    public XWikiAttachment uploadAttachment(DocumentReference documentReference, javax.servlet.http.Part part,
-        String filename) throws TemporaryAttachmentException, AttachmentValidationException
-    {
-        return uploadAttachment(documentReference, JakartaServletBridge.toJakarta(part), filename);
-    }
-
-    @Override
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException
     {
@@ -131,7 +123,9 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
                 actualFilename = part.getSubmittedFileName();
             }
             xWikiAttachment.setFilename(actualFilename);
-            xWikiAttachment.setContent(part.getInputStream());
+            try (InputStream inputStream = part.getInputStream()) {
+                xWikiAttachment.setContent(inputStream);
+            }
             xWikiAttachment.setAuthorReference(context.getUserReference());
             // Initialize an empty document with the right document reference and locale. We don't set the actual
             // document since it's a temporary attachment, but it is still useful to have a minimal knowledge of the

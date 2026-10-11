@@ -20,6 +20,7 @@
 package org.xwiki.rest.jersey.internal;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,6 +33,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -125,6 +127,21 @@ public class JerseyServletContainer extends HttpServlet
     @Override
     public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException
     {
+        // Jersey cannot parse a form body (multipart/form-data or application/x-www-form-urlencoded) when the servlet
+        // input stream was already consumed by an upstream filter (e.g., via getParameter()). Wrap such requests so
+        // that getInputStream() re-creates the body from the servlet-cached state when the stream is found to be empty.
+        ServletRequest effectiveReq = req;
+        if (req instanceof HttpServletRequest httpReq) {
+            String contentType = httpReq.getContentType();
+            if (contentType != null) {
+                String lowerCase = contentType.toLowerCase(Locale.ROOT);
+                if (lowerCase.startsWith("multipart/form-data")
+                    || lowerCase.startsWith("application/x-www-form-urlencoded")) {
+                    effectiveReq = new ConsumedBodyRestoringRequestWrapper(httpReq);
+                }
+            }
+        }
+
         // Remember the current container used for this request
         ServletContainer requestContainer = this.container;
 
@@ -136,7 +153,7 @@ public class JerseyServletContainer extends HttpServlet
 
         try {
             // Execute the request
-            this.container.service(JakartaServletBridge.toJavax(req), JakartaServletBridge.toJavax(res));
+            this.container.service(JakartaServletBridge.toJavax(effectiveReq), JakartaServletBridge.toJavax(res));
         } catch (javax.servlet.ServletException e) {
             throw new ServletException(e);
         } finally {

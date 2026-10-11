@@ -163,9 +163,6 @@ rendering.macro.wikis.description=全てのウィキの一覧を表示
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=ワークスペース（レガシー）
 rendering.macro.workspaces.description=互換性の理由で使用すべきでない非推奨のマクロです。代わりに"wikis"マクロを使用してください。
-
-## Browse
-platform.wiki.browse=ウィキを閲覧
 platform.wiki.browse.emptyvalue=該当なし
 platform.wiki.browse.wikiprettyname=名称
 platform.wiki.browse.description=詳細
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=完了
 #######################################
 platform.wiki.delete.confirmation.yes=はい、このウィキを削除してください！
 platform.wiki.delete.confirmation.no=いいえ、戻ります！
+
+## Browse
+platform.wiki.browse=ウィキを閲覧
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

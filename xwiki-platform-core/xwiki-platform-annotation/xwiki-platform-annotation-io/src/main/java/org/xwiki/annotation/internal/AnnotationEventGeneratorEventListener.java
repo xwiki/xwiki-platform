@@ -166,7 +166,7 @@ public class AnnotationEventGeneratorEventListener implements EventListener
             if (defaultCommentsClassReference.equals(object.getXClassReference())) {
                 // A comment is considered an annotation when it has a text selection.
                 String selection = object.getStringValue(Annotation.SELECTION_FIELD);
-                if (selection == null || selection.trim().length() == 0) {
+                if (selection == null || selection.trim().isEmpty()) {
                     // This is a simple comment. Skip it.
                     return;
                 }

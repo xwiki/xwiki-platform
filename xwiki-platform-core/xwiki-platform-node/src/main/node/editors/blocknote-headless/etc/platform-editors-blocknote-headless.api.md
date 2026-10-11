@@ -5,7 +5,8 @@
 ```ts
 
 import { BlockNoteViewWrapperProps } from '@xwiki/platform-editors-blocknote-react';
-import { CollaborationInitializer } from '@xwiki/platform-collaboration-api';
+import { BlockType } from '@xwiki/platform-editors-blocknote-react';
+import { Collaboration } from '@xwiki/platform-collaboration-api';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
@@ -14,37 +15,39 @@ import { DefineComponent } from 'vue';
 import { EditorType } from '@xwiki/platform-editors-blocknote-react';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PublicProps } from 'vue';
-import { UniAst } from '@xwiki/platform-uniast-api';
 
 // @beta (undocumented)
 export const BlocknoteEditor: DefineComponent<    {
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
+editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
-list: MacroWithUnknownParamsType[];
+list?: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
-editorContent: UniAst | Error;
-collaborationProvider?: () => CollaborationInitializer;
-container: Container;
+editorContent: BlockType[];
+collaboration?: Collaboration;
+depsContainer: Container;
 }, {
-getContent: () => UniAst | Error;
+getContent: () => BlockType[];
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "instant-change": () => any;
-"debounced-change": (content: UniAst) => any;
+"debounced-change": (content: BlockType[]) => any;
+"local-instant-change": () => any;
 }, string, PublicProps, Readonly<{
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
+editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
-list: MacroWithUnknownParamsType[];
+list?: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
-editorContent: UniAst | Error;
-collaborationProvider?: () => CollaborationInitializer;
-container: Container;
+editorContent: BlockType[];
+collaboration?: Collaboration;
+depsContainer: Container;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
-"onDebounced-change"?: ((content: UniAst) => any) | undefined;
+"onDebounced-change"?: ((content: BlockType[]) => any) | undefined;
+"onLocal-instant-change"?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
+'link-modal-container': HTMLDivElement;
 }, any>;
 
 export { ContextForMacros }

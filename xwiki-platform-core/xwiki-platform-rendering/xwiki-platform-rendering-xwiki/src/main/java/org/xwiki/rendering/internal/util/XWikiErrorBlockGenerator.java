@@ -134,9 +134,10 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
             scriptContext.setAttribute(CONTEXT_ATTRIBUTE, renderingerror, ScriptContext.GLOBAL_SCOPE);
 
             // Disable restricted context if set as the error generator template generally needs scripting
-            if (this.renderingContext.isRestricted() && this.renderingContext instanceof MutableRenderingContext) {
+            if (this.renderingContext.isRestricted()
+                && this.renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
                 // Make the current velocity template id available
-                ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
+                mutableRenderingContext.push(this.renderingContext.getTransformation(),
                     this.renderingContext.getXDOM(), this.renderingContext.getDefaultSyntax(),
                     this.renderingContext.getTransformationId(), false, this.renderingContext.getTargetSyntax());
 
@@ -170,8 +171,8 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
     protected List<Block> generateErrorBlocks(boolean inline, Message message, Message description)
     {
         String messageId;
-        if (message.getMarker() instanceof TranslationMarker) {
-            messageId = ((TranslationMarker) message.getMarker()).getTranslationKey();
+        if (message.getMarker() instanceof TranslationMarker translationMarker) {
+            messageId = translationMarker.getTranslationKey();
         } else {
             messageId = null;
         }

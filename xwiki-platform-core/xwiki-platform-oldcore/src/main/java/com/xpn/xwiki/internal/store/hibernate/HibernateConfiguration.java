@@ -97,7 +97,7 @@ public class HibernateConfiguration
     }
 
     /**
-     * @return the databse/schema name for the main wiki
+     * @return the database/schema name for the main wiki
      */
     public String getDB()
     {
@@ -105,7 +105,7 @@ public class HibernateConfiguration
     }
 
     /**
-     * @return a prefix to apply to the database/shema name of each wiki
+     * @return a prefix to apply to the database/schema name of each wiki
      */
     public String getDBPrefix()
     {
@@ -114,9 +114,9 @@ public class HibernateConfiguration
 
     /**
      * @return true if the database schema should be automatically updated at startup
-     * @deprecated since 3.3M1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "3.3M1")
     public boolean isUpdateSchema()
     {
         return this.xwikiConfiguration.getProperty("xwiki.store.hibernate.updateschema", 1) != 0;

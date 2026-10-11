@@ -35,8 +35,26 @@ import org.xwiki.rest.model.jaxb.Attachments;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/attachments")
 public interface AttachmentsAtPageVersionResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns the attachments of a page as they existed at a specific version of that page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page whose attachments are listed, for example {@code WebHome}
+     * @param version the page revision to read the attachments from, for example {@code 3.1} (as listed by the page
+     *  history)
+     * @param start the 0-based index of the first attachment to return, used together with {@code number} for
+     *  pagination; defaults to {@code 0}
+     * @param number the maximum number of attachments to return, or {@code -1} to return all of them; defaults to
+     *  {@code -1}
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name and the document title) in addition to the technical references, at some extra cost; defaults to
+     *  {@code false}
+     * @return the attachments present at the specified page version, within the requested pagination window
+     * @throws XWikiRestException if the attachments cannot be retrieved, for example the page or that version does not
+     *  exist
+     */
     @GET Attachments getAttachmentsAtPageVersion(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

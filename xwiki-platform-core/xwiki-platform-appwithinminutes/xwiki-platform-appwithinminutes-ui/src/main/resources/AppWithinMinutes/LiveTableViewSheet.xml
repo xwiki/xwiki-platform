@@ -150,7 +150,7 @@
 
 #macro (renameAppModal)
   &lt;div class="modal" id="renameAppModal" tabindex="-1" role="dialog" aria-labelledby="renameAppModal-label"
-      data-backdrop="static" data-keyboard="false"&gt;
+      data-backdrop="static"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;form class="modal-content xform"&gt;
         ## The fieldset allows us to disable and enable the entire form quickly and easy.

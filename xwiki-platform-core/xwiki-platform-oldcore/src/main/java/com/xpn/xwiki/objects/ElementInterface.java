@@ -94,11 +94,11 @@ public interface ElementInterface
         MergeConfiguration configuration, XWikiContext context);
 
     /**
-     * Apply the provided element so that the current one contains the same informations and indicate if it was
+     * Apply the provided element so that the current one contains the same information and indicate if it was
      * necessary to modify it in any way.
      *
      * @param newElement the element to apply
-     * @param clean true if informations that are not in the new element should be removed (for example class properties
+     * @param clean true if information that are not in the new element should be removed (for example class properties
      *            not in the new class)
      * @return true if the element has been modified
      * @since 4.3M1

@@ -145,8 +145,8 @@ public class DefaultEmailTemplateRenderer implements EmailTemplateRenderer
             // Use the external URL factory to generate full URLs
             context.setURLFactory(new ExternalServletURLFactory(context));
             // Set the given syntax in the rendering context
-            if (renderingContext instanceof MutableRenderingContext) {
-                ((MutableRenderingContext) renderingContext).push(null, null, syntax, null, false, syntax);
+            if (renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
+                mutableRenderingContext.push(null, null, syntax, null, false, syntax);
             }
             // Render the template or fallback to the default one
             return templateManager.execute(template);
@@ -154,8 +154,8 @@ public class DefaultEmailTemplateRenderer implements EmailTemplateRenderer
             throw new NotificationException("Failed to render the notification.", e);
         } finally {
             // Cleaning the rendering context
-            if (renderingContext instanceof MutableRenderingContext) {
-                ((MutableRenderingContext) renderingContext).pop();
+            if (renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
+                mutableRenderingContext.pop();
             }
             // Cleaning the URL factory
             context.setURLFactory(originalURLFactory);

@@ -17,17 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  type PlaywrightTestConfig,
-  defineConfig,
-  devices,
-} from "@playwright/experimental-ct-react";
+import { defineConfig, devices } from "@playwright/experimental-ct-react";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-const config: PlaywrightTestConfig = defineConfig({
-  testDir: "./src/__tests__",
+export default defineConfig({
+  testDir: "./src/__tests__/playwright-ct",
   /* The base directory, relative to the config file, for snapshot files created with toMatchSnapshot and toHaveScreenshot. */
   snapshotDir: "./__snapshots__",
   /* Maximum time one test can run for. */
@@ -60,5 +56,3 @@ const config: PlaywrightTestConfig = defineConfig({
     },
   ],
 });
-
-export default config;

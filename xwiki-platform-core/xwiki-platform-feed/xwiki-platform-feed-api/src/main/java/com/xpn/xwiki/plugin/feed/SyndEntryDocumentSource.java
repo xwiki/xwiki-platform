@@ -50,6 +50,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.TidyMessageLogger;
 
 /**
@@ -140,6 +141,33 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
     public static final String CONTENT_LENGTH = "ContentLength";
 
+    /**
+     * The JTidy configuration property name holding the input encoding.
+     */
+    private static final String INPUT_ENCODING = "input-encoding";
+
+    /**
+     * The opening of the HTML macro that {@link XWikiDocument#display(String, String, BaseObject, XWikiContext)} wraps
+     * its output in when it is called from wiki content.
+     * <p>
+     * TODO: this repeats the wrapper that {@code XWikiDocument} builds, and that the
+     * {@code unwrapXPropertyDisplay} Velocity macro and its callers repeat as well. The wrapper is an implementation
+     * detail of {@code display}, so every copy of it silently breaks the day it changes. Remove these constants and
+     * the unwrapping once there is a way to ask {@code display} for a result that is not meant to be inserted in wiki
+     * content.
+     */
+    private static final String HTML_MACRO_START = "{{html clean=\"false\" wiki=\"false\"}}";
+
+    /**
+     * The closing of {@link #HTML_MACRO_START}.
+     */
+    private static final String HTML_MACRO_END = "{{/html}}";
+
+    /**
+     * The mode in which the properties are displayed.
+     */
+    private static final String VIEW_MODE = "view";
+
     public static final Properties TIDY_FEED_CONFIG;
 
     public static final Properties TIDY_XML_CONFIG;
@@ -180,7 +208,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         TIDY_XML_CONFIG.setProperty("input-xml", "yes");
         TIDY_XML_CONFIG.setProperty("output-xml", "yes");
         TIDY_XML_CONFIG.setProperty("add-xml-pi", "no");
-        TIDY_XML_CONFIG.setProperty("input-encoding", "UTF8");
+        TIDY_XML_CONFIG.setProperty(INPUT_ENCODING, "UTF8");
 
         // HTML specific configuration
         TIDY_HTML_CONFIG = new Properties(TIDY_FEED_CONFIG);
@@ -189,7 +217,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         TIDY_HTML_CONFIG.setProperty("drop-empty-paras", "yes");
         TIDY_HTML_CONFIG.setProperty("enclose-text", "yes");
         TIDY_HTML_CONFIG.setProperty("logical-emphasis", "yes");
-        TIDY_HTML_CONFIG.setProperty("input-encoding", "UTF8");
+        TIDY_HTML_CONFIG.setProperty(INPUT_ENCODING, "UTF8");
 
         // default parameters for all instances of this class
         DEFAULT_PARAMS = new HashMap<>();
@@ -352,7 +380,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         String author = xwiki.getUserName(doc.getAuthor(), null, false, context);
         // the description format should be taken from a resource bundle, and thus localized
         String descFormat = "Version %1$s edited by %2$s on %3$s";
-        return String.format(descFormat, new Object[] {doc.getVersion(), author, doc.getDate()});
+        return String.format(descFormat, doc.getVersion(), author, doc.getDate());
     }
 
     protected SyndContent getDescription(Document doc, Map<String, Object> params, XWikiContext context)
@@ -365,7 +393,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         } else if (isVelocityCode(mapping)) {
             description = parseString(mapping, doc, context);
         } else {
-            description = doc.getRenderedContent(getStringValue(mapping, doc, context), doc.getSyntaxId());
+            description = displayValue(mapping, doc);
         }
         String contentType = (String) params.get(CONTENT_TYPE);
         int contentLength = ((Number) params.get(CONTENT_LENGTH)).intValue();
@@ -403,8 +431,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
         List<SyndCategory> result = new ArrayList<>();
         for (Object category : categories) {
-            if (category instanceof SyndCategory) {
-                result.add((SyndCategory) category);
+            if (category instanceof SyndCategory syndCategory) {
+                result.add(syndCategory);
             } else if (category != null) {
                 SyndCategory scat = new SyndCategoryImpl();
                 scat.setName(category.toString());
@@ -491,8 +519,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
         List<String> contributors = new ArrayList<>();
         for (Object rawContributor : rawContributors) {
-            if (rawContributor instanceof String) {
-                contributors.add((String) rawContributor);
+            if (rawContributor instanceof String contributor) {
+                contributors.add(contributor);
             } else {
                 contributors.add(rawContributor.toString());
             }
@@ -551,13 +579,41 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         String[] array = strRep.substring(1, strRep.length() - 1).split(",");
         if (array.length > 0) {
             List<Object> list = new ArrayList<>();
-            for (int i = 0; i < array.length; i++) {
-                list.add(array[i]);
-            }
+            Collections.addAll(list, array);
             return list;
         } else {
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Displays the property targeted by the given mapping, in view mode, using the standard object property display.
+     * This is what applies the rights of the effective metadata author of the document holding the property, and what
+     * honours the restricted flag of the property and of its document, instead of executing the raw property value
+     * with the rights of whoever asks for the feed.
+     *
+     * <p>
+     * The property is displayed from the given document as it is: when that document was modified through the public
+     * API, the modification made the script author its metadata author, so their rights apply.
+     *
+     * @param mapping the property selector, see {@link PropertySelector}
+     * @param doc the document holding the property
+     * @return the displayed property, as HTML
+     */
+    protected String displayValue(String mapping, Document doc)
+    {
+        PropertySelector propertySelector = new PropertySelector(mapping);
+        String propertyName = propertySelector.getPropertyName();
+
+        String display;
+        if (propertySelector.getClassName() == null) {
+            display = doc.display(propertyName, VIEW_MODE);
+        } else {
+            display = doc.display(propertyName, VIEW_MODE,
+                doc.getObject(propertySelector.getClassName(), propertySelector.getObjectIndex()));
+        }
+
+        return unwrapPropertyDisplay(display);
     }
 
     /**
@@ -607,15 +663,15 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      */
     protected Map<String, Object> joinParams(Map<String, Object> base, Map<String, Object> extra)
     {
-        Map<String, Object> params = new HashMap<>();
-        params.putAll(base);
+        Map<String, Object> mergedParams = new HashMap<>();
+        mergedParams.putAll(base);
 
         for (Map.Entry<String, Object> entry : extra.entrySet()) {
-            if (params.get(entry.getKey()) == null) {
-                params.put(entry.getKey(), entry.getValue());
+            if (mergedParams.get(entry.getKey()) == null) {
+                mergedParams.put(entry.getKey(), entry.getValue());
             }
         }
-        return params;
+        return mergedParams;
     }
 
     /**
@@ -636,7 +692,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         // Even if we add a message listener we still have to redirect the output. Otherwise all the messages will be
         // written to the standard output (besides being logged by TIDY_LOGGER).
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ByteArrayInputStream in = new ByteArrayInputStream(xmlFragment.getBytes(Charset.forName(config.getProperty("input-encoding"))));
+        ByteArrayInputStream in = new ByteArrayInputStream(xmlFragment.getBytes(Charset.forName(config.getProperty(INPUT_ENCODING))));
         return tidy.parseDOM(in, out);
     }
 
@@ -760,14 +816,29 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      */
     protected Document castDocument(Object obj, XWikiContext context) throws XWikiException
     {
-        if (obj instanceof Document) {
-            return (Document) obj;
-        } else if (obj instanceof XWikiDocument) {
-            return ((XWikiDocument) obj).newDocument(context);
-        } else if (obj instanceof String) {
-            return context.getWiki().getDocument((String) obj, context).newDocument(context);
-        } else {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "");
+        return switch (obj) {
+            case Document document -> document;
+            case XWikiDocument xwikiDocument -> xwikiDocument.newDocument(context);
+            case String string -> context.getWiki().getDocument(string, context).newDocument(context);
+            case null, default -> throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+                XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "");
+        };
+    }
+
+    /**
+     * Removes the HTML macro that the display of an object property is wrapped in when it is asked for from wiki
+     * content, since a feed entry holds HTML and not wiki syntax. This is the counterpart of the
+     * {@code unwrapXPropertyDisplay} Velocity macro.
+     *
+     * @param display the output of a property display
+     * @return the display without its wrapping HTML macro
+     */
+    private static String unwrapPropertyDisplay(String display)
+    {
+        if (display.startsWith(HTML_MACRO_START) && display.endsWith(HTML_MACRO_END)) {
+            return display.substring(HTML_MACRO_START.length(), display.length() - HTML_MACRO_END.length());
         }
+
+        return display;
     }
 }

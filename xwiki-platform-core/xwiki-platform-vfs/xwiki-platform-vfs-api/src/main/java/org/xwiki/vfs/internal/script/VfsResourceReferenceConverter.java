@@ -20,6 +20,7 @@
 package org.xwiki.vfs.internal.script;
 
 import java.lang.reflect.Type;
+
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;

@@ -26,10 +26,11 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +76,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AttachmentsResourceImpl}.
- * 
+ *
  * @version $Id$
  */
 @OldcoreTest
@@ -115,7 +116,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
 
@@ -134,7 +135,8 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
             + "where attachment.docId = doc.id and doc.fullName = :localDocumentReference and"
             + " upper(attachment.author) like :author and upper(attachment.filename) like :name and"
             + " (attachment.mimeType is null or attachment.mimeType = '' or upper(attachment.mimeType) like :mediaType0"
-            + " or upper(attachment.filename) like :extension0)", Query.HQL)).thenReturn(query);
+            + " or upper(attachment.filename) like :extension0)"
+            + " order by doc.fullName asc, doc.language asc, attachment.filename asc", Query.HQL)).thenReturn(query);
         mockContainsQueryParam(query, "author", "MFLOREA");
         mockContainsQueryParam(query, "name", "LOGO");
         mockContainsQueryParam(query, "mediaType0", "VIDEO/");
@@ -153,9 +155,9 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         when(textAttachment.getFilename()).thenReturn("plain.txt");
         when(textAttachment.getMimeType(this.xcontext)).thenReturn("text/plain");
 
-        List<Object> results = Arrays.asList(new Object[] {"Path.To", "Page", "1.3", videoAttachment},
-            new Object[] {"Path.To", "Page", "1.3", textAttachment},
-            new Object[] {"Path.To", "Page", "1.3", imageAttachment});
+        List<Object> results = Arrays.asList(new Object[] { "Path.To", "Page", "1.3", videoAttachment },
+            new Object[] { "Path.To", "Page", "1.3", textAttachment },
+            new Object[] { "Path.To", "Page", "1.3", imageAttachment });
         when(query.execute()).thenReturn(results);
 
         when(this.authorization.hasAccess(same(Right.VIEW), any())).thenReturn(true);
@@ -196,7 +198,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         AttachmentReference attachmentReference = new AttachmentReference("myBio.txt", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
 
-        mockRequest("bio.txt", "myBio.txt", "blah", "text/plain");
+        mockRequest("bio.txt", "myBio.txt", "blah");
 
         Attachment attachment = mock(Attachment.class);
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
@@ -227,7 +229,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         AttachmentReference attachmentReference = new AttachmentReference("myBio.txt", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
 
-        mockRequest("bio.txt", "myBio.txt", "blah", "text/plain");
+        mockRequest("bio.txt", "myBio.txt", "blah");
 
         Attachment attachment = mock(Attachment.class);
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
@@ -254,7 +256,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         AttachmentReference attachmentReference = new AttachmentReference("pom.xml", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
 
-        mockRequest("pom.xml", null, "<project/>", "application/xml");
+        mockRequest("pom.xml", null, "<project/>");
 
         Attachment attachment = mock(Attachment.class);
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
@@ -272,7 +274,7 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         assertEquals("<project/>", IOUtils.toString(xwikiAttachment.getContentInputStream(this.xcontext)));
     }
 
-    private void mockRequest(String originalFileName, String overwritingFileName, String content, String mediaType)
+    private void mockRequest(String originalFileName, String overwritingFileName, String content)
         throws Exception
     {
         HttpServletRequest request = mock();

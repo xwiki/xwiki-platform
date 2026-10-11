@@ -19,8 +19,9 @@
  */
 package org.xwiki.export.pdf.test.ui;
 
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -43,7 +44,10 @@ import org.xwiki.export.pdf.test.po.PDFExportOptionsModal;
 import org.xwiki.export.pdf.test.po.PDFImage;
 import org.xwiki.export.pdf.test.po.PDFTemplateEditPage;
 import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
@@ -114,7 +118,7 @@ class PDFExportIT
 
         // Make sure we start with the default settings.
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage().reset();
-        adminSection.getTemplatesInput().sendKeys("custom").waitForSuggestions().selectByVisibleText("CustomTemplate");
+        adminSection.getTemplatesInput().sendKeys("custom").selectByVisibleText("CustomTemplate");
         adminSection.getGeneratorSelect().selectByVisibleText("Chrome Docker Container");
 
         if (!testConfiguration.getServletEngine().isOutsideDocker()) {
@@ -122,7 +126,7 @@ class PDFExportIT
             // for PDF export) to access XWiki its own Docker container has to be in the same network and we also need
             // to pass the internal host name or IP address used by XWiki.
             adminSection.setDockerNetwork(Network.SHARED.getId());
-            adminSection.setXWikiURI(testConfiguration.getServletEngine().getInternalIP());
+            adminSection.setXWikiURI(setup.getCurrentExecutor().getBrowserHost());
         }
 
         adminSection.clickSave();
@@ -131,7 +135,7 @@ class PDFExportIT
 
     @Test
     @Order(2)
-    void exportAsPDF(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void exportAsPDF(TestUtils setup) throws Exception
     {
         setup.createUserAndLogin("John", "pass");
 
@@ -152,7 +156,7 @@ class PDFExportIT
         exportTreeModal.export();
         PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
             // the child document.
             assertEquals(4, pdf.getNumberOfPages());
@@ -250,18 +254,23 @@ class PDFExportIT
             // For the second image we force the server-side resize.
             assertEquals(100, contentPageImages.get(1).getRawWidth());
             assertEquals(100, contentPageImages.get(1).getRawHeight());
+
+            // The images should keep their alternative text: the one specified in the wiki syntax, the default one
+            // generated from the image reference and the one specified in the HTML.
+            assertEquals(List.of("XWiki logo resized client-side", "xwiki-logo.png", "XWiki Logo"),
+                pdf.getImageAlternativeTextsFromPage(3));
         }
     }
 
     @Test
     @Order(3)
-    void exportSinglePageAsPDF(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void exportSinglePageAsPDF(TestUtils setup) throws Exception
     {
         ViewPage viewPage =
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 3 pages: cover page, table of contents and one page for the content.
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -320,7 +329,7 @@ class PDFExportIT
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
         SuggestInputElement templatesInput = adminSection.getTemplatesInput();
         if (!StringUtils.join(templatesInput.getValues(), ",").contains("My cool template")) {
-            templatesInput.sendKeys("my cool").waitForSuggestions().selectByVisibleText("My cool template");
+            templatesInput.sendKeys("my cool").selectByVisibleText("My cool template");
             adminSection.clickSave();
         }
 
@@ -335,7 +344,7 @@ class PDFExportIT
         exportOptions.getTemplateSelect().selectByVisibleText("My cool template");
 
         String currentURL = setup.getDriver().getCurrentUrl().replaceAll("/WebHome.*", "/");
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // Verify that the custom PDF template was used.
 
             // We should have 3 pages: cover page, table of contents and one content page.
@@ -361,7 +370,7 @@ class PDFExportIT
 
     @Test
     @Order(5)
-    void exportHiddenPageAsPDF(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void exportHiddenPageAsPDF(TestUtils setup) throws Exception
     {
         //
         // Export directly a nested hidden page.
@@ -369,7 +378,7 @@ class PDFExportIT
         ViewPage viewPage =
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Hidden"), "WebHome"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
-        try (PDFDocument pdf = exportOnlyContent(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = exportOnlyContent(exportOptions)) {
             assertEquals(1, pdf.getNumberOfPages());
             // The document title is not included when a single page is exported.
             assertEquals("Hidden content\n", pdf.getTextFromPage(0));
@@ -382,7 +391,7 @@ class PDFExportIT
             new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Hidden"), "Grandchild");
         viewPage = setup.gotoPage(grandchildReference);
         exportOptions = PDFExportOptionsModal.open(viewPage);
-        try (PDFDocument pdf = exportOnlyContent(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = exportOnlyContent(exportOptions)) {
             assertEquals(1, pdf.getNumberOfPages());
             // The document title is not included when a single page is exported.
             assertEquals("Once upon a time...\n", pdf.getTextFromPage(0));
@@ -403,13 +412,13 @@ class PDFExportIT
         exportTreeModal.export();
         exportOptions = new PDFExportOptionsModal();
 
-        try (PDFDocument pdf = exportOnlyContent(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = exportOnlyContent(exportOptions)) {
             assertEquals(3, pdf.getNumberOfPages());
             String pageText = pdf.getTextFromPage(0);
             assertTrue(pageText.startsWith("""
                 Parent
                 Chapter 1
-                """), "Unexpeced parent document content: " + pageText);
+                """), "Unexpected parent document content: " + pageText);
             assertEquals("""
                 Hidden
                 Hidden content
@@ -426,7 +435,7 @@ class PDFExportIT
 
     @Test
     @Order(6)
-    void updatePDFExportConfigurationWithValidation(TestUtils setup, TestConfiguration testConfiguration)
+    void updatePDFExportConfigurationWithValidation(TestUtils setup)
         throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -460,7 +469,7 @@ class PDFExportIT
         exportOptions.getCoverCheckbox().click();
         exportOptions.getTocCheckbox().click();
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // One content page.
             assertEquals(1, pdf.getNumberOfPages());
             String content = pdf.getTextFromPage(0);
@@ -470,12 +479,12 @@ class PDFExportIT
 
     @Test
     @Order(7)
-    void invalidTOCAnchors(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void invalidTOCAnchors(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "InvalidTOCAnchors"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 3 pages: cover page, table of contents and one page for the content.
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -516,7 +525,7 @@ class PDFExportIT
 
     @Test
     @Order(8)
-    void refactorAnchors(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void refactorAnchors(TestUtils setup) throws Exception
     {
         setup.login("John", "pass");
 
@@ -528,7 +537,7 @@ class PDFExportIT
         exportTreeModal.export();
         PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             //
             // Verify the anchors from the parent document.
             //
@@ -629,12 +638,12 @@ class PDFExportIT
 
     @Test
     @Order(9)
-    void numberedHeadings(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void numberedHeadings(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "NumberedHeadings"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 3 pages: cover page, table of contents and one page for the content.
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -724,12 +733,12 @@ class PDFExportIT
 
     @Test
     @Order(10)
-    void formFields(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void formFields(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "FormFields"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 2 pages: cover page and content page.
             assertEquals(2, pdf.getNumberOfPages());
 
@@ -757,7 +766,7 @@ class PDFExportIT
 
     @Test
     @Order(11)
-    void liveTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void liveTable(TestUtils setup) throws Exception
     {
         // Create a child page because we want to verify that the PDF export preserves the live table sort (we sort by
         // last modification date and the child page we create should be the most recent).
@@ -770,11 +779,11 @@ class PDFExportIT
         // Change the state of the Live Table in order to verify that the PDF export preserves it.
         LiveTableElement liveTable = new LiveTableElement("docs");
         liveTable.sortDescending("Date");
-        liveTable.filterColumn("xwiki-livetable-docs-filter-2", "live");
+        liveTable.filterColumn("xwiki-livetable-docs-filter-2", "livetable");
 
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 2 pages: cover page and content page.
             assertEquals(2, pdf.getNumberOfPages());
 
@@ -783,7 +792,7 @@ class PDFExportIT
             assertTrue(content.contains("""
                 Results 1 - 2 out of 2 per page of 15
                 Page Location Date Last Author Actions
-                live
+                livetable
                 """), "Unexpected content: " + content);
             // Verify the results and the order.
             // Depending on the screen width the text from the live table cells might be wrapped on multiple lines,
@@ -801,12 +810,12 @@ class PDFExportIT
 
     @Test
     @Order(12)
-    void codeMacro(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void codeMacro(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "CodeMacro"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 3 pages: cover page and two content pages (the long code macro is split in two).
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -834,12 +843,12 @@ class PDFExportIT
 
     @Test
     @Order(13)
-    void resizedTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void resizedTable(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "ResizedTable"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 2 pages: cover page and content page. If the resized table uses absolute widths then it
             // ends up with a very small column that spans lots of print pages. By checking that we have only 2 pages we
             // verify that the absolute widths have been replaced with relative widths.
@@ -886,7 +895,7 @@ class PDFExportIT
         exportTreeModal.getPageTree().getNode("document:" + setup.serializeReference(childReference)).select();
         exportTreeModal.export();
 
-        try (PDFDocument pdf = export(new PDFExportOptionsModal(), testConfiguration)) {
+        try (PDFDocument pdf = export(new PDFExportOptionsModal())) {
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
             // the child document.
             assertEquals(4, pdf.getNumberOfPages());
@@ -940,7 +949,7 @@ class PDFExportIT
                 setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
             PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-            try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            try (PDFDocument pdf = export(exportOptions)) {
                 // We should have 3 pages: cover page, table of contents and one page for the content.
                 assertEquals(3, pdf.getNumberOfPages());
 
@@ -983,7 +992,7 @@ class PDFExportIT
         exportOptions.getHeaderCheckbox().click();
         exportOptions.getFooterCheckbox().click();
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 2 pages: cover page and one page for the content.
             assertEquals(2, pdf.getNumberOfPages());
 
@@ -1003,12 +1012,12 @@ class PDFExportIT
 
     @Test
     @Order(17)
-    void floatingImage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void floatingImage(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "FloatingImage"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should normally have 5 pages (the cover page plus 4 content pages) but out workaround for
             // https://jira.xwiki.org/browse/XWIKI-21201 (Floating images and the text around them can be cut from the
             // PDF export) generates more content pages (6) because the content is split into print pages as if the
@@ -1083,13 +1092,13 @@ class PDFExportIT
 
     @Test
     @Order(18)
-    void longTableCell(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void longTableCell(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LongTableCell"));
         String expectedContent = viewPage.getContent();
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 4 pages: the cover page and 3 content pages.
             assertEquals(4, pdf.getNumberOfPages());
 
@@ -1125,12 +1134,12 @@ class PDFExportIT
 
     @Test
     @Order(19)
-    void largeTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void largeTable(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LargeTable"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // Verify the number of pages.
             assertEquals(37, pdf.getNumberOfPages());
 
@@ -1152,12 +1161,12 @@ class PDFExportIT
      */
     @Test
     @Order(20)
-    void largeExcelImport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void largeExcelImport(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LargeExcelImport"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // Verify the number of pages.
             assertEquals(110, pdf.getNumberOfPages());
 
@@ -1180,7 +1189,7 @@ class PDFExportIT
 
     @Test
     @Order(21)
-    void singlePageExportWithCustomTemplateShowingMetadata(TestUtils setup, TestConfiguration testConfiguration)
+    void singlePageExportWithCustomTemplateShowingMetadata(TestUtils setup)
         throws Exception
     {
         ViewPage viewPage =
@@ -1194,7 +1203,7 @@ class PDFExportIT
         PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
         exportOptions.getTemplateSelect().selectByVisibleText("CustomTemplate");
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 3 pages: cover page, table of contents and one content page.
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -1212,7 +1221,7 @@ class PDFExportIT
 
     @Test
     @Order(22)
-    void multiPageExportWithCustomTemplateShowingMetadata(TestUtils setup, TestConfiguration testConfiguration)
+    void multiPageExportWithCustomTemplateShowingMetadata(TestUtils setup)
         throws Exception
     {
         ViewPage viewPage =
@@ -1227,7 +1236,7 @@ class PDFExportIT
         PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
         exportOptions.getTemplateSelect().selectByVisibleText("CustomTemplate");
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
             // the child document.
             assertEquals(4, pdf.getNumberOfPages());
@@ -1253,7 +1262,7 @@ class PDFExportIT
 
     @Test
     @Order(23)
-    void exportPageWithCustomSheetApplied(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void exportPageWithCustomSheetApplied(TestUtils setup) throws Exception
     {
         setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"), "view",
             "sheet=PDFExportIT.Sheet");
@@ -1265,7 +1274,7 @@ class PDFExportIT
         exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.Child.WebHome").select();
         exportTreeModal.export();
 
-        try (PDFDocument pdf = export(new PDFExportOptionsModal(), testConfiguration)) {
+        try (PDFDocument pdf = export(new PDFExportOptionsModal())) {
             // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
             // the child document.
             assertEquals(4, pdf.getNumberOfPages());
@@ -1297,7 +1306,7 @@ class PDFExportIT
 
     @Test
     @Order(24)
-    void officeMacro(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void officeMacro(TestUtils setup) throws Exception
     {
         // Connect the wiki to the office server if it is not already done.
         setup.loginAsSuperAdmin();
@@ -1313,7 +1322,7 @@ class PDFExportIT
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "OfficeMacro"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 3 pages: cover page, table of contents and one content page.
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -1348,7 +1357,7 @@ class PDFExportIT
             setup.createPage(new LocalDocumentReference("A&B=C", testReference), "Page with & in title.", "A&B=C");
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 2 pages: cover page and one content page.
             assertEquals(2, pdf.getNumberOfPages());
 
@@ -1375,7 +1384,7 @@ class PDFExportIT
         exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.PinnedPages.WebHome").deselect().select();
         exportTreeModal.export();
 
-        try (PDFDocument pdf = export(new PDFExportOptionsModal(), testConfiguration)) {
+        try (PDFDocument pdf = export(new PDFExportOptionsModal())) {
             // We should have 10 pages: cover page, table of contents and 8 content pages, one for each wiki page
             // included in the export.
             assertEquals(10, pdf.getNumberOfPages());
@@ -1403,7 +1412,7 @@ class PDFExportIT
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "MissingStyleSheet"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 2 pages: cover page and one content page.
             assertEquals(2, pdf.getNumberOfPages());
             assertEquals("MissingStyleSheet\n2 / 2\nSome content.\n", pdf.getTextFromPage(1));
@@ -1438,7 +1447,7 @@ class PDFExportIT
             exportOptions.getLanguageSelect().getFirstSelectedOption().getText());
         exportOptions.getLanguageSelect().selectByVisibleText("French");
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 4 print pages: cover page, table of contents and two content pages (for the parent and
             // child wiki pages).
             assertEquals(4, pdf.getNumberOfPages());
@@ -1481,7 +1490,7 @@ class PDFExportIT
         exportOptions = PDFExportOptionsModal.open(viewPage);
         exportOptions.getLanguageSelect().selectByVisibleText("German");
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 3 pages: cover page, table of contents and one content page.
             assertEquals(3, pdf.getNumberOfPages());
 
@@ -1509,7 +1518,7 @@ class PDFExportIT
 
     @Test
     @Order(29)
-    void simulateLongPDFExport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void simulateLongPDFExport(TestUtils setup) throws Exception
     {
         // Disable multilingual mode from the previous test.
         setup.loginAsSuperAdmin();
@@ -1523,7 +1532,7 @@ class PDFExportIT
         // page. We want to trigger the export right away.
         markPageReady(setup);
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(new ViewPage());
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 2 pages: cover page and one content page.
             assertEquals(2, pdf.getNumberOfPages());
             assertEquals("DelayedPageReady\n2 / 2\nTest content.\n", pdf.getTextFromPage(1));
@@ -1532,7 +1541,7 @@ class PDFExportIT
 
     @Test
     @Order(30)
-    void cancelWhileWaitingForPageToBeReady(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void cancelWhileWaitingForPageToBeReady(TestUtils setup) throws Exception
     {
         setup.gotoPage(new LocalDocumentReference("PDFExportIT", "DelayedPageReady"), "view", "delay=17");
         // We delayed the page ready in order to simulate a long PDF export, but we don't want to wait when viewing the
@@ -1559,7 +1568,7 @@ class PDFExportIT
 
     @Test
     @Order(31)
-    void stopChromeWhileWaitingForPageToBeReady(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void stopChromeWhileWaitingForPageToBeReady(TestUtils setup) throws Exception
     {
         // Reduce the page ready timeout to 10 seconds in order to check that the PDF export is aborted when it takes
         // too long, even if the Chrome Docker container is stopped (or not responding).
@@ -1593,11 +1602,11 @@ class PDFExportIT
 
     @Test
     @Order(32)
-    void lazyLoadedImage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void lazyLoadedImage(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LazyLoadedImage"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // We should have 3 pages: cover page and 2 content pages.
             assertEquals(3, pdf.getNumberOfPages());
             assertEquals("LazyLoadedImage\n3 / 3\nsecond \u00A0page\n", pdf.getTextFromPage(2));
@@ -1612,12 +1621,12 @@ class PDFExportIT
      */
     @Test
     @Order(33)
-    void smallTableWithColAndRowSpan(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void smallTableWithColAndRowSpan(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "SmallTableWithColAndRowSpan"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // Verify the number of pages.
             assertEquals(2, pdf.getNumberOfPages());
 
@@ -1641,12 +1650,12 @@ class PDFExportIT
      */
     @Test
     @Order(34)
-    void autoScaleTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void autoScaleTable(TestUtils setup) throws Exception
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "AutoScaleTable"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
-        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+        try (PDFDocument pdf = export(exportOptions)) {
             // Verify the number of pages.
             assertEquals(2, pdf.getNumberOfPages());
 
@@ -1659,6 +1668,146 @@ class PDFExportIT
                   Sapphire Azure Mauve Palatinate Black Currant Lavender
                 one two three four five six seven eight nine ten
                 """.replaceAll("\\s+", ""), pdf.getTextFromPage(1).replaceAll("\\s+", ""));
+        }
+    }
+
+    /**
+     * Verify anchors that target headings that come from the non-generated output of a macro (e.g. headings inside a
+     * message box macro).
+     */
+    @Test
+    @Order(35)
+    void sectionAnchors(TestUtils setup) throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(List.of("PDFExportIT", "SectionAnchors"), "WebHome"));
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child pages in the export because we want to verify the section anchors from each child page.
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.SectionAnchors.WebHome").deselect().select();
+        exportTreeModal.export();
+
+        try (PDFDocument pdf = export(new PDFExportOptionsModal())) {
+            // We should have 5 pages: cover page, table of contents and one page for each wiki page (one parent and 2
+            // children).
+            assertEquals(5, pdf.getNumberOfPages());
+
+            assertEquals(Map.of("link", "HHeading"), pdf.getLinksFromPage(3));
+            assertEquals(Map.of("link", "HHeading-1"), pdf.getLinksFromPage(4));
+        }
+    }
+
+    /**
+     * Verify that a table of contents tree that doesn't fit a single print page is split between print pages without
+     * losing any entry.
+     */
+    @Test
+    @Order(36)
+    void longTableOfContents(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The number of headings is high enough for the table of contents to not fit a single print page.
+        int headingCount = 60;
+        List<String> headings = new ArrayList<>();
+        StringBuilder content = new StringBuilder("= Start =\n");
+        for (int i = 1; i <= headingCount; i++) {
+            // One of the headings has a long title, in order to have a table of contents entry that spans multiple
+            // lines of text. Note that we don't use any punctuation in the heading titles because we want to be able to
+            // compute the section anchors by simply removing the white space.
+            String heading = "Heading " + i + (i == headingCount / 2 ? " with a rather long title that does not fit on"
+                + " a single line of text and that therefore needs to be wrapped" : "");
+            headings.add(heading);
+            content.append("== ").append(heading).append(" ==\n");
+        }
+
+        ViewPage viewPage = setup.createPage(testReference, content.toString(), "Long Table of Contents");
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions)) {
+            List<String> expectedAnchors = new ArrayList<>();
+            expectedAnchors.add("HStart");
+            headings.stream().map(heading -> "H" + heading.replace(" ", "")).forEach(expectedAnchors::add);
+
+            // The table of contents entries are the only links in the exported PDF (the exported content has only
+            // headings), so we can use them to verify that no entry is lost when the table of contents is split
+            // between print pages.
+            List<String> actualAnchors = new ArrayList<>();
+            // The number of print pages holding the table of contents.
+            int tocPageCount = 0;
+            // Skip the cover page.
+            for (int i = 1; i < pdf.getNumberOfPages(); i++) {
+                Collection<String> anchors = pdf.getLinksFromPage(i).values();
+                if (!anchors.isEmpty()) {
+                    tocPageCount++;
+                    actualAnchors.addAll(anchors);
+                }
+            }
+
+            // Make sure we're actually testing a table of contents that is split between print pages.
+            assertTrue(tocPageCount > 1, "The table of contents is not split between print pages.");
+            assertEquals(expectedAnchors, actualAnchors);
+        }
+    }
+
+    @Test
+    @Order(37)
+    void liveData(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The page name is used both as the page title and as the value of the Location filter below, so that the live
+        // data lists only the pages created by this test.
+        String pageName = testReference.getLastSpaceReference().getName();
+        setup.createPage(testReference, """
+            {{liveData
+              id="docs"
+              properties="doc.title,doc.location,doc.date,doc.author"
+              source="liveTable"
+              sourceParameters="translationPrefix=platform.index."
+              pageSizes="1,15,25"
+            /}}""", pageName);
+        // Create a child page after the parent because we want to verify that the PDF export preserves the live data
+        // state (we sort by last modification date and show a single entry per page, so only the child page should be
+        // exported).
+        DocumentReference childReference = new DocumentReference("Child", testReference.getLastSpaceReference());
+        setup.createPage(childReference, "", "Child");
+
+        ViewPage viewPage = setup.gotoPage(testReference);
+
+        // Change the state of the live data in order to verify that the PDF export preserves it.
+        LiveDataElement liveData = new LiveDataElement("docs");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilReady();
+        // Keep only the pages from the space used by this test.
+        tableLayout.filterColumn("Location", pageName);
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        // Sort by date, descending, so that the child page comes first. The first click sorts ascending, replacing the
+        // default sort (by title, ascending), while the second click reverses the order.
+        tableLayout.sortBy("Date");
+        tableLayout.sortBy("Date");
+        // Show a single entry per page.
+        liveData.setPagination(1);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        assertEquals("Child", tableLayout.getCell("Title", 1).getText());
+
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions)) {
+            // We should have 2 pages: cover page and content page.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            String content = pdf.getTextFromPage(1);
+            // Depending on the screen width the text from the live data cells might be wrapped on multiple lines,
+            // which translates to new lines in the PDF text as well. For this reason we need to do the lookup ignoring
+            // line endings. Moreover, we normally get a space character between the text from two adjacent cells, but
+            // even this is not always consistent, so we need to ignore spaces also.
+            String contentWithoutWhitespace = content.replaceAll("\\s+", "");
+            // Verify the column headers.
+            assertTrue(contentWithoutWhitespace.contains("TitleLocationDateLastAuthor"),
+                "Unexpected content: " + content);
+            // Verify that the entries were actually fetched (2 pages match the filter) and that the page size was
+            // preserved (a single entry is displayed).
+            assertTrue(contentWithoutWhitespace.contains("Entries1-1outof2"), "Unexpected content: " + content);
+            // The displayed entry should be the child page, because we sorted by date descending.
+            String childLocation = setup.serializeLocalReference(childReference).replace(".", "");
+            assertTrue(contentWithoutWhitespace.contains(/* Title */ "Child" + /* Location */ childLocation),
+                "Unexpected content: " + content);
         }
     }
 
@@ -1679,25 +1828,17 @@ class PDFExportIT
         sectionPage.clickSave();
     }
 
-    private URL getHostURL(TestConfiguration testConfiguration) throws Exception
+    private PDFDocument export(PDFExportOptionsModal exportOptions) throws Exception
     {
-        return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),
-            testConfiguration.getServletEngine().getPort()));
+        return exportOptions.export("John", "pass");
     }
 
-    private PDFDocument export(PDFExportOptionsModal exportOptions, TestConfiguration testConfiguration)
-        throws Exception
-    {
-        return exportOptions.export(getHostURL(testConfiguration), "John", "pass");
-    }
-
-    private PDFDocument exportOnlyContent(PDFExportOptionsModal exportOptions, TestConfiguration testConfiguration)
-        throws Exception
+    private PDFDocument exportOnlyContent(PDFExportOptionsModal exportOptions) throws Exception
     {
         exportOptions.getCoverCheckbox().click();
         exportOptions.getTocCheckbox().click();
         exportOptions.getHeaderCheckbox().click();
         exportOptions.getFooterCheckbox().click();
-        return export(exportOptions, testConfiguration);
+        return export(exportOptions);
     }
 }

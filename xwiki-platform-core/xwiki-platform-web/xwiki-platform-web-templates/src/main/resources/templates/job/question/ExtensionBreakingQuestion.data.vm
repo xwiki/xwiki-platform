@@ -76,7 +76,8 @@ $response.setContentType("application/json")
     #set ($pageReference = $page.entityReference)
     #if ($foreach.count > $offset + $limit)
       #set ($howMany = $pages.size() - $foreach.count + 1)
-      #paginationNode($data, $howMany, $foreach.count)
+      #set ($newOffset = $foreach.count - 1)
+      #paginationNode($data, $howMany, $newOffset)
       #break
     #end
     #if ($foreach.count > $offset)

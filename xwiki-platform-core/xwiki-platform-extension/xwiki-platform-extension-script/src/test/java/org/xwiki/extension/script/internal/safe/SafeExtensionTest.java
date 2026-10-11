@@ -19,11 +19,11 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.script.safe.ScriptSafeProvider;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class SafeExtensionTest
+class SafeExtensionTest
 {
     private InstalledExtension extension = mock(InstalledExtension.class);
 
@@ -42,7 +42,7 @@ public class SafeExtensionTest
     private SafeExtension<InstalledExtension> safeExtension = new SafeExtension<>(extension, safeProvider);
 
     @Test
-    public void getPropertyWithDefaultValue()
+    void getPropertyWithDefaultValue()
     {
         when(this.extension.getProperty("foo", 23)).thenReturn(16);
         when(this.safeProvider.get(16)).thenReturn(61);

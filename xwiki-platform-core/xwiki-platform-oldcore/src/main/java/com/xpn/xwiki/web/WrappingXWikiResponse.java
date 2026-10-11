@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.xwiki.container.Container;
+import org.xwiki.jakartabridge.JavaxToJakartaWrapper;
+import org.xwiki.jakartabridge.servlet.internal.JakartaToJavaxHttpServletResponseWrapper;
 
 /**
  * A wrapper around {@link XWikiResponse}.
@@ -33,7 +35,8 @@ import org.xwiki.container.Container;
  */
 // TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
 // @Deprecated(since = "17.0.0RC1")
-public class WrappingXWikiResponse extends HttpServletResponseWrapper implements XWikiResponse
+public class WrappingXWikiResponse extends HttpServletResponseWrapper
+    implements XWikiResponse, JavaxToJakartaWrapper<jakarta.servlet.http.HttpServletResponse>
 {
     protected final XWikiResponse response;
 
@@ -45,6 +48,16 @@ public class WrappingXWikiResponse extends HttpServletResponseWrapper implements
         super(response);
 
         this.response = response;
+    }
+
+    @Override
+    public jakarta.servlet.http.HttpServletResponse getJakarta()
+    {
+        if (getResponse() instanceof JavaxToJakartaWrapper wrapper) {
+            return (jakarta.servlet.http.HttpServletResponse) wrapper.getJakarta();
+        }
+
+        return new JakartaToJavaxHttpServletResponseWrapper<>(this);
     }
 
     @Override

@@ -74,9 +74,9 @@ public class SignedMacroBlockReferenceResolver implements BlockReferenceResolver
     {
         EntityReference parent = null;
 
-        if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
+        if (parameters.length > 0 && parameters[0] instanceof EntityReference entityReference) {
             // Try to extract the type from the passed parameter.
-            parent = (EntityReference) parameters[0];
+            parent = entityReference;
         }
 
         Digest digest = digestFactory.getInstance();

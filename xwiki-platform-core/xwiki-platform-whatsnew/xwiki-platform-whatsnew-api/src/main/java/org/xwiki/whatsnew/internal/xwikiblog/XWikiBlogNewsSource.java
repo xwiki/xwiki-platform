@@ -69,15 +69,7 @@ public class XWikiBlogNewsSource implements NewsSource
 
     private static final String QUESTION_MARK = "?";
 
-    private UserReference userReference;
-
     private Set<NewsCategory> wantedCategories;
-
-    private Version targetXWikiVersion;
-
-    private Map<String, Object> extraParameters;
-
-    private int count;
 
     private String rssURL;
 
@@ -111,7 +103,7 @@ public class XWikiBlogNewsSource implements NewsSource
     @Override
     public NewsSource forUser(UserReference userReference)
     {
-        this.userReference = userReference;
+        // Not implemented yet.
         return this;
     }
 
@@ -125,21 +117,21 @@ public class XWikiBlogNewsSource implements NewsSource
     @Override
     public NewsSource forXWikiVersion(Version targetXWikiVersion)
     {
-        this.targetXWikiVersion = targetXWikiVersion;
+        // Not implemented yet.
         return this;
     }
 
     @Override
     public NewsSource forExtraParameters(Map<String, Object> extraParameters)
     {
-        this.extraParameters = Collections.unmodifiableMap(extraParameters);
+        // Not implemented yet.
         return this;
     }
 
     @Override
     public NewsSource withCount(int count)
     {
-        this.count = count;
+        // Not implemented yet.
         return this;
     }
 

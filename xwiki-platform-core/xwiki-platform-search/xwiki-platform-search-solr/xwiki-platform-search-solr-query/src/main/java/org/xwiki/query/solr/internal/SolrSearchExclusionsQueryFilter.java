@@ -121,7 +121,7 @@ public class SolrSearchExclusionsQueryFilter implements QueryFilter
         } catch (WikiManagerException e) {
             this.logger.warn("Failed to get the search exclusions. Root cause: [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
-            this.logger.debug("Full stack trace: ", e);
+            this.logger.debug("Full stack trace:", e);
             return Set.of();
         }
     }

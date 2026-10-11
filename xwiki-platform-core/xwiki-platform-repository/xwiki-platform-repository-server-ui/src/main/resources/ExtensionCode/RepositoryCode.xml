@@ -59,11 +59,12 @@
   #set($defaultIdPrefix = "${xcontext.userReference.name.toLowerCase().replace(' ', '-')}:")
 #end
 
+
 #macro (printThrowable $throwable)
-  $throwable.class: #if(!$throwable.message)null#else$throwable.message#end
+  $services.rendering.escape($throwable.class, 'xwiki/2.1'): #if(!$throwable.message)null#else$services.rendering.escape($throwable.message, 'xwiki/2.1')#end
 
   #foreach($stackTraceElement in $throwable.stackTrace)
-    ~    at $stackTraceElement
+    ~    at $services.rendering.escape($stackTraceElement, 'xwiki/2.1')
   #end
   #if ($throwable.cause)
     Caused by: #printThrowable($throwable.cause)

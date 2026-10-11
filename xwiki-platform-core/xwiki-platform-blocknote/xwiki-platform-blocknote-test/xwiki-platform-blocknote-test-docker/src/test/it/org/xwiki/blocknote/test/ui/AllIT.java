@@ -32,12 +32,41 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    class NestedBlockNoteIT extends BlockNoteIT
+    class NestedRoundTripIT extends RoundTripIT
     {
     }
 
     @Nested
-    class NestedRoundTripIT extends RoundTripIT
+    class NestedImageIT extends ImageIT
+    {
+    }
+
+    @Nested
+    class NestedLinkIT extends LinkIT
+    {
+    }
+
+    @Nested
+    class NestedMacroIT extends MacroIT
+    {
+    }
+
+    @Nested
+    class NestedAutoSaveIT extends AutoSaveIT
+    {
+    }
+
+    @Nested
+    class NestedSideMenuIT extends SideMenuIT
+    {
+    }
+
+    // CollaborationIT's multi-user scenario triggers a ClassCastException in DocumentUserReferenceModelSerializer
+    // (superadmin isn't handled) when resolving a collaborator's user details, which the collaboration manager
+    // doesn't catch. This can leave the shared browser/server session degraded, so this class must run last to
+    // avoid poisoning any of the other nested test classes above.
+    @Nested
+    class NestedCollaborationIT extends CollaborationIT
     {
     }
 }

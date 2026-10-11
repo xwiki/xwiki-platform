@@ -23,6 +23,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.BasePage;
 
 /**
  * Represents the advanced extension search form.
@@ -106,6 +107,9 @@ public class AdvancedSearchPane extends BaseElement
         getDriver().addPageNotYetReloadedMarker();
         searchButton.click();
         getDriver().waitUntilPageIsReloaded();
+
+        // Wait for the page to be actually ready.
+        new BasePage();
 
         return new SearchResultsPane();
     }

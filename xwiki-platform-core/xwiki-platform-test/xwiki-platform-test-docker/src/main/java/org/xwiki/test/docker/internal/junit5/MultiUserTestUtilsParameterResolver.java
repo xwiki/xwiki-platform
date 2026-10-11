@@ -23,7 +23,6 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.xwiki.test.docker.junit5.MultiUserTestUtils;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 
@@ -53,12 +52,10 @@ public class MultiUserTestUtilsParameterResolver implements ParameterResolver
         MultiUserTestUtils multiUsersSetup = store.get(MultiUserTestUtils.class, MultiUserTestUtils.class);
 
         if (multiUsersSetup == null) {
-            TestConfiguration testConfiguration = DockerTestUtils.getTestConfiguration(extensionContext);
-
             PersistentTestContext testContext = store.get(PersistentTestContext.class, PersistentTestContext.class);
             TestUtils testUtils = testContext.getUtil();
 
-            multiUsersSetup = new MultiUserTestUtils(testUtils, testConfiguration);
+            multiUsersSetup = new MultiUserTestUtils(testUtils);
             store.put(MultiUserTestUtils.class, multiUsersSetup);
         }
 

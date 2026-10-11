@@ -21,6 +21,7 @@ package org.xwiki.administration.test.ui;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationSectionPage;
@@ -63,6 +64,8 @@ class PresentationIT
         presentationSectionPage.setShowAttachments(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT);
         presentationSectionPage.setShowHistory(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT);
         presentationSectionPage.setShowInformation(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT);
+        presentationSectionPage.setCopyright("");
+        presentationSectionPage.setVersion("");
         presentationSectionPage.clickSave();
     }
 
@@ -70,6 +73,7 @@ class PresentationIT
      * Validate that the show information setting of the Presentation section of the administration has an effect.
      */
     @Test
+    @Order(1)
     void showPageInformationTabSettings(TestUtils setup, TestReference testReference)
     {
         ViewPage viewPage = setup.createPage(testReference, "");
@@ -91,6 +95,7 @@ class PresentationIT
     }
 
     @Test
+    @Order(2)
     void showPageAttachmentsTab(TestUtils setup, TestReference testReference)
     {
         setup.createPage(testReference, "");
@@ -115,6 +120,7 @@ class PresentationIT
     }
 
     @Test
+    @Order(3)
     void showPageCommentsTab(TestUtils setup, TestReference testReference)
     {
         ViewPage viewPage = setup.createPage(testReference, "");
@@ -136,6 +142,7 @@ class PresentationIT
     }
 
     @Test
+    @Order(4)
     void showPageHistoryTab(TestUtils setup, TestReference testReference)
     {
         ViewPage viewPage = setup.createPage(testReference, "");
@@ -154,6 +161,34 @@ class PresentationIT
         // Check that the history tab is no longer displayed.
         viewPage = setup.gotoPage(testReference);
         assertFalse(viewPage.hasHistoryDocExtraPane());
+    }
+
+    @Test
+    @Order(5)
+    void customizeCopyright(TestUtils setup, TestReference testReference)
+    {
+        PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
+        // Check that there is no copyright in the footer by default
+        assertTrue(presentationSectionPage.getFooterCopyright().isEmpty());
+        presentationSectionPage.setCopyright("test-copyright");
+        presentationSectionPage.clickSave();
+        // The page is reloaded, we can see directly on this page if the copyright is correctly applied.
+        assertEquals("test-copyright", presentationSectionPage.getFooterCopyright());
+    }
+
+    @Test
+    @Order(6)
+    void customizeVersion(TestUtils setup, TestReference testReference) throws Exception
+    {
+        PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
+        String defaultVersion = presentationSectionPage.getFooterVersion();
+        // The default version should contain the xwiki-platform project version.
+        String version = setup.getVersion();
+        assertTrue(defaultVersion.contains(version));
+        presentationSectionPage.setVersion("test-version");
+        presentationSectionPage.clickSave();
+        // The page is reloaded, we can see directly on this page if the version is correctly applied.
+        assertEquals("test-version", presentationSectionPage.getFooterVersion());
     }
 
     private static PresentationAdministrationSectionPage gotoPresentationAdministration()

@@ -34,7 +34,7 @@ require.config({
   }
 });
 
-require(['jquery', 'colpick'], function($, Colpick) {
+require(['jquery', 'colpick', 'xwiki-events-bridge'], function($, Colpick) {
   var initColorPicker = function() {
     var input = $(this);
     var parent = input.parent();
@@ -91,7 +91,10 @@ require(['jquery', 'colpick'], function($, Colpick) {
     }, 0);
   });
 
-  $(document).on('xwiki:dom:updated', init);
+  // This module can be loaded either before or after the DOM is ready, so we both listen for the event and check the
+  // flag: 'xwiki:dom:loaded' is fired only once and never again after XWiki.domIsLoaded becomes true, so there's no
+  // risk of initializing the color pickers twice.
+  $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
   return XWiki.domIsLoaded && init();
 });
 

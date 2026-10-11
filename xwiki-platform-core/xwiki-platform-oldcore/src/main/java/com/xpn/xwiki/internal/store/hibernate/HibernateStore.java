@@ -125,6 +125,15 @@ public class HibernateStore implements Disposable, Initializable
      */
     private static final String PROPERTY_TIMEZONE_VARIABLE = "${timezone}";
 
+    /**
+     * The transaction isolation level to use when the Hibernate configuration doesn't set one. Loading a document
+     * resolves the XClass of each of its objects in a nested read executed inside the transaction opened for that
+     * load. At {@code REPEATABLE READ} (the InnoDB default, so MySQL and MariaDB) such a read is answered from the
+     * snapshot taken when the load started, which makes an XClass committed by another thread in the meantime
+     * invisible, and the document cache then keeps that "does not exist" verdict with no expiry.
+     */
+    private static final String DEFAULT_ISOLATION = String.valueOf(Connection.TRANSACTION_READ_COMMITTED);
+
     @Inject
     private Logger logger;
 
@@ -206,7 +215,7 @@ public class HibernateStore implements Disposable, Initializable
             }
         } catch (Exception e) {
             // Probably running under -security, which prevents calling File.exists()
-            this.logger.debug("Failed load resource [{}] using a file path", path);
+            this.logger.debug("Failed to load resource [{}] using a file path", path, e);
         }
 
         try {
@@ -215,7 +224,7 @@ public class HibernateStore implements Disposable, Initializable
                 return res;
             }
         } catch (Exception e) {
-            this.logger.debug("Failed to load resource [{}] using the application context", path);
+            this.logger.debug("Failed to load resource [{}] using the application context", path, e);
         }
 
         URL url = Thread.currentThread().getContextClassLoader().getResource(path);
@@ -236,6 +245,7 @@ public class HibernateStore implements Disposable, Initializable
         // For retro compatibility reasons we have to create an old Configuration object since it's exposed in the API
         this.configuration = new HibernateStoreConfiguration(this.configurationURL);
         replaceVariables(this.configuration);
+        setDefaultIsolation(this.configuration);
     }
 
     private void disposeSessionFactory()
@@ -265,6 +275,8 @@ public class HibernateStore implements Disposable, Initializable
         LoadedConfig baseConfiguration = configLoader.loadConfigXmlUrl(this.configurationURL);
         // Resolve some variables
         replaceVariables(baseConfiguration);
+        // Make sure a transaction isolation level is set, whatever the database defaults to
+        setDefaultIsolation(baseConfiguration);
 
         StandardServiceRegistryBuilder standardRegistryBuilder =
             new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);
@@ -306,7 +318,7 @@ public class HibernateStore implements Disposable, Initializable
                 return StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
                     URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
             } catch (UnsupportedEncodingException e) {
-                this.logger.error("Failedd to encode the current timezone id", e);
+                this.logger.error("Failed to encode the current timezone id", e);
             }
         }
 
@@ -345,6 +357,36 @@ public class HibernateStore implements Disposable, Initializable
             // Set the new URL
             values.put(org.hibernate.cfg.AvailableSettings.URL, newURL);
             this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
+        }
+    }
+
+    /**
+     * Set the transaction isolation level to {@link #DEFAULT_ISOLATION} unless the configuration already contains one,
+     * so that the store doesn't silently inherit the isolation level the database happens to default to.
+     *
+     * @param hibernateConfiguration the Hibernate configuration to complete
+     */
+    private void setDefaultIsolation(Configuration hibernateConfiguration)
+    {
+        if (StringUtils.isBlank(hibernateConfiguration.getProperty(org.hibernate.cfg.AvailableSettings.ISOLATION))) {
+            hibernateConfiguration.setProperty(org.hibernate.cfg.AvailableSettings.ISOLATION, DEFAULT_ISOLATION);
+        }
+    }
+
+    /**
+     * Set the transaction isolation level to {@link #DEFAULT_ISOLATION} unless the configuration already contains one,
+     * so that the store doesn't silently inherit the isolation level the database happens to default to.
+     *
+     * @param hibernateConfiguration the Hibernate configuration to complete
+     */
+    private void setDefaultIsolation(LoadedConfig hibernateConfiguration)
+    {
+        Map values = hibernateConfiguration.getConfigurationValues();
+        Object isolation = values.get(org.hibernate.cfg.AvailableSettings.ISOLATION);
+        if (isolation == null || StringUtils.isBlank(isolation.toString())) {
+            values.put(org.hibernate.cfg.AvailableSettings.ISOLATION, DEFAULT_ISOLATION);
+            this.logger.debug("No Hibernate transaction isolation level configured, defaulting to [{}]",
+                DEFAULT_ISOLATION);
         }
     }
 
@@ -561,7 +603,7 @@ public class HibernateStore implements Disposable, Initializable
      */
     public String toDynamicMappingTableName(String className)
     {
-        return "xwikicustom_" + className.replaceAll("\\.", "_");
+        return "xwikicustom_" + className.replace(".", "_");
     }
 
     /**
@@ -725,7 +767,7 @@ public class HibernateStore implements Disposable, Initializable
         // XWiki uses a new Session for a new Transaction so we need to keep both in sync and thus we check if that's
         // the case. If it isn't it means some code is faulty somewhere.
         if (((session == null) && (transaction != null)) || ((transaction == null) && (session != null))) {
-            this.logger.warn("Incompatible session ({}) and transaction ({}) status", session, transaction);
+            this.logger.warn("Incompatible session [{}] and transaction [{}] status", session, transaction);
 
             // TODO: Fix this problem, don't ignore it!
             return false;
@@ -785,8 +827,8 @@ public class HibernateStore implements Disposable, Initializable
         this.logger.debug("Taken session from pool [{}]", session);
 
         // Put back legacy feature to the Hibernate session
-        if (session instanceof SessionImplementor) {
-            session = new LegacySessionImplementor((SessionImplementor) session, this.loggerConfiguration);
+        if (session instanceof SessionImplementor sessionImplementor) {
+            session = new LegacySessionImplementor(sessionImplementor, this.loggerConfiguration);
         }
 
         setCurrentSession(session);
@@ -869,11 +911,10 @@ public class HibernateStore implements Disposable, Initializable
             if (next == current) {
                 next = null;
             }
-            if (current instanceof SQLException) {
-                SQLException sx = (SQLException) current;
+            if (current instanceof SQLException sx) {
                 while (sx.getNextException() != null) {
                     sx = sx.getNextException();
-                    sb.append("\nSQL next exception = [" + sx + "]");
+                    sb.append("\nSQL next exception = [").append(sx).append(']');
                 }
             }
         }
@@ -992,7 +1033,7 @@ public class HibernateStore implements Disposable, Initializable
     {
         return this.<List<String>, String>executeNative(String
             .format("select SEQUENCE_NAME from all_sequences where SEQUENCE_OWNER = '%s'", schemaName.toUpperCase()),
-            query -> query.getResultList());
+            NativeQuery::getResultList);
     }
 
     /**
@@ -1041,7 +1082,7 @@ public class HibernateStore implements Disposable, Initializable
                 }
             } catch (Exception e) {
                 this.logger.warn(
-                    "Failed to get the sequences of the schema [{}] ({}). Trying to create hibernate_sequence anyway.",
+                    "Failed to get the sequences of the schema [{}]: [{}]. Trying to create hibernate_sequence anyway.",
                     schemaName, ExceptionUtils.getRootCauseMessage(e));
 
                 // Ignore errors in the log during the creation of the sequence since we know it can fail and we
@@ -1099,8 +1140,8 @@ public class HibernateStore implements Disposable, Initializable
             // FIXME: remove when https://hibernate.atlassian.net/browse/HHH-14627
             // (org.hibernate.mapping.PersistentClass#getProperty does not support composite ids) is fixed
             KeyValue identifier = persistentClass.getIdentifier();
-            if (identifier instanceof org.hibernate.mapping.Component) {
-                Iterator<Property> it = ((org.hibernate.mapping.Component) identifier).getPropertyIterator();
+            if (identifier instanceof org.hibernate.mapping.Component component) {
+                Iterator<Property> it = component.getPropertyIterator();
 
                 while (it.hasNext()) {
                     Property property = it.next();

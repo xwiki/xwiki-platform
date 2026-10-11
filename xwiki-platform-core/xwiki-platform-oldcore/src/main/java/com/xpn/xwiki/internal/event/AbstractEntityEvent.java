@@ -19,7 +19,8 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
+
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -38,14 +39,14 @@ public abstract class AbstractEntityEvent implements EntityEvent
     /**
      * Default constructor. Matches any {@link EntityEvent}.
      */
-    public AbstractEntityEvent()
+    protected AbstractEntityEvent()
     {
     }
 
     /**
      * @param reference the reference
      */
-    public AbstractEntityEvent(EntityReference reference)
+    protected AbstractEntityEvent(EntityReference reference)
     {
         this.reference = reference;
     }
@@ -63,7 +64,7 @@ public abstract class AbstractEntityEvent implements EntityEvent
             return true;
         }
 
-        return otherEvent instanceof EntityEvent && matchesReference(((EntityEvent) otherEvent).getReference());
+        return otherEvent instanceof EntityEvent entityEvent && matchesReference(entityEvent.getReference());
     }
 
     /**
@@ -84,7 +85,7 @@ public abstract class AbstractEntityEvent implements EntityEvent
             return true;
         }
 
-        return getClass() == obj.getClass() && ObjectUtils.equals(this.reference, ((EntityEvent) obj).getReference());
+        return getClass() == obj.getClass() && Objects.equals(this.reference, ((EntityEvent) obj).getReference());
     }
 
     @Override

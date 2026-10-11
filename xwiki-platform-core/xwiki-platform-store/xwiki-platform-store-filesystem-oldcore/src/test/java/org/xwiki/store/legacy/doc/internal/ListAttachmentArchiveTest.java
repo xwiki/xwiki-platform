@@ -22,7 +22,6 @@ package org.xwiki.store.legacy.doc.internal;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -64,10 +63,10 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @AllComponents
-public class ListAttachmentArchiveTest
+class ListAttachmentArchiveTest
 {
     @Test
-    public void sort()
+    void sort()
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
 
@@ -80,11 +79,7 @@ public class ListAttachmentArchiveTest
         XWikiAttachment attachment41 = new XWikiAttachment(document, "file1");
         attachment41.setVersion("4.1");
 
-        List<XWikiAttachment> attachments = new ArrayList<>();
-        attachments.add(attachment41);
-        attachments.add(attachment11);
-        attachments.add(attachment12);
-        attachments.add(attachment31);
+        List<XWikiAttachment> attachments = List.of(attachment41, attachment11, attachment12, attachment31);
 
         ListAttachmentArchive archive = new ListAttachmentArchive(attachments);
 
@@ -97,7 +92,7 @@ public class ListAttachmentArchiveTest
     }
 
     @Test
-    public void getArchiveAsString(MockitoComponentManager componentManager, @XWikiTempDir File tmpDir) throws Exception
+    void getArchiveAsString(MockitoComponentManager componentManager, @XWikiTempDir File tmpDir) throws Exception
     {
         Utils.setComponentManager(componentManager);
         ServletEnvironment servletEnvironment = componentManager.getInstance(Environment.class);
@@ -141,11 +136,7 @@ public class ListAttachmentArchiveTest
         attachment41.setMimeType("plain/text");
         attachment41.setCharset("UTF-8");
 
-        List<XWikiAttachment> attachments = new ArrayList<>();
-        attachments.add(attachment41);
-        attachments.add(attachment11);
-        attachments.add(attachment12);
-        attachments.add(attachment31);
+        List<XWikiAttachment> attachments = List.of(attachment41, attachment11, attachment12, attachment31);
 
         ListAttachmentArchive archive = new ListAttachmentArchive(attachments);
         String archiveAsString = archive.getArchiveAsString(xWikiContext);
@@ -187,7 +178,7 @@ public class ListAttachmentArchiveTest
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-16620">XWIKI-16620</a>.
      */
     @Test
-    public void getArchiveAsStringJRCSDates(MockitoComponentManager componentManager, @XWikiTempDir File tmpDir)
+    void getArchiveAsStringJRCSDates(MockitoComponentManager componentManager, @XWikiTempDir File tmpDir)
         throws Exception
     {
         Utils.setComponentManager(componentManager);
@@ -222,9 +213,7 @@ public class ListAttachmentArchiveTest
         attachment12.setCharset("UTF-8");
         attachment12.setDate(new Date(1000));
 
-        List<XWikiAttachment> attachments = new ArrayList<>();
-        attachments.add(attachment11);
-        attachments.add(attachment12);
+        List<XWikiAttachment> attachments = List.of(attachment11, attachment12);
 
         ListAttachmentArchive archive = new ListAttachmentArchive(attachments);
         String archiveAsString = archive.getArchiveAsString(xWikiContext);

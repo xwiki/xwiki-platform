@@ -34,8 +34,18 @@ import org.xwiki.rest.model.jaxb.Classes;
 @Path("/wikis/{wikiName}/classes")
 public interface ClassesResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns the XClasses defined in a wiki, sorted alphabetically by reference, with optional pagination.
+     *
+     * @param wikiName the identifier of the wiki whose classes are listed, for example {@code xwiki} for the main wiki
+     * @param start the 0-based index of the first class to return, used together with {@code number} for pagination;
+     *  defaults to {@code 0}, and a negative value is treated as {@code 0}
+     * @param number the maximum number of classes to return; when {@code null} the wiki's configured REST query limit
+     *  is used, and a value that is negative or larger than that configured limit is rejected with a {@code 400}
+     *  response
+     * @return the classes of the wiki that the current user is allowed to view, within the requested pagination window
+     * @throws XWikiRestException if the classes cannot be retrieved
+     */
     @GET Classes getClasses(
             @PathParam("wikiName") String wikiName,
             @QueryParam("start") @DefaultValue("0") Integer start,

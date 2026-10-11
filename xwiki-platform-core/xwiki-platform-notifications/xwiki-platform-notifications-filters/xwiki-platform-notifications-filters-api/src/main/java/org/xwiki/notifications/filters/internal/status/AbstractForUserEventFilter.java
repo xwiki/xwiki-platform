@@ -62,7 +62,7 @@ public abstract class AbstractForUserEventFilter implements NotificationFilter, 
      * @param read true if only read status should be included, false for only unread
      * @param not true when a NOT expression should be returned
      */
-    public AbstractForUserEventFilter(String filterName, NotificationFormat format, Boolean read, boolean not)
+    protected AbstractForUserEventFilter(String filterName, NotificationFormat format, Boolean read, boolean not)
     {
         this.filterName = filterName;
         this.format = format;

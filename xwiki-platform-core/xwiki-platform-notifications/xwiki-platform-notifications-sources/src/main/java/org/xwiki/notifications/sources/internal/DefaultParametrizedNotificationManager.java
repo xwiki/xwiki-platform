@@ -217,7 +217,7 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
      * 
      * @param event the event that is tested
      * @param userReference the user reference given by the parameters
-     * @return {@code true} iff the user is explicitely target, or through a group.
+     * @return {@code true} iff the user is explicitly target, or through a group.
      */
     private boolean eventTargetUser(Event event, DocumentReference userReference)
     {
@@ -225,7 +225,7 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
         if (event.getTarget() != null && !event.getTarget().isEmpty() && userReference != null) {
             String serializedUserReference = this.serializer.serialize(userReference);
 
-            // if the target explicitely contains the user reference we're good
+            // if the target explicitly contains the user reference we're good
             if (event.getTarget().contains(serializedUserReference)) {
                 result = true;
                 // else we need to check that the targets does not contain any group the user belongs to

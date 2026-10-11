@@ -32,9 +32,9 @@ import org.xwiki.logging.event.LogEvent;
  *
  * @version $Id$
  * @since 3.2M1
- * @deprecated Since 11.8RC1, prefer using {@link org.xwiki.store.merge.MergeManagerResult}.
+ * @deprecated Prefer using {@link org.xwiki.store.merge.MergeManagerResult}.
  */
-@Deprecated
+@Deprecated(since = "11.8RC1")
 public class MergeResult
 {
     /**
@@ -84,7 +84,7 @@ public class MergeResult
 
         for (LogEvent logEvent : getLog()) {
             if (logEvent.getLevel() == logLevel) {
-                if (logEvent.getThrowable() != null && logEvent.getThrowable() instanceof Exception) {
+                if (logEvent.getThrowable() instanceof Exception) {
                     exceptions.add(new MergeException(logEvent.getFormattedMessage(), logEvent.getThrowable()));
                 } else {
                     exceptions.add(new MergeException(logEvent.getFormattedMessage()));

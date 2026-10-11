@@ -19,6 +19,7 @@
  */
 
 import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
+import { centerOnFirstLine } from "./SideMenu/centerOnFirstLine";
 import { FilePanel } from "./files/FilePanel";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import {
@@ -28,7 +29,9 @@ import {
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
-import { useTimeoutCheck } from "../hooks";
+import { DepsContainerContext, MacrosContext } from "../contexts";
+import { syntaxHighlighter } from "@blocknote/code-block";
+import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
@@ -36,11 +39,13 @@ import {
   FormattingToolbar,
   FormattingToolbarController,
   LinkToolbarController,
+  SideMenuController,
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
+import { filterMap } from "@xwiki/platform-fn-utils";
 import { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type {
   BlockType,
@@ -55,11 +60,19 @@ import type {
   BlockNoteConcreteMacro,
   ContextForMacros,
 } from "../blocknote/utils";
-import type { LinkEditionContext } from "../misc/linkSuggest";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
+import type { LinkEditionHandler } from "./links/linkEdition";
+import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
-import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
+import type { CollaborationOptions } from "@blocknote/core/yjs";
+import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { Container } from "inversify";
 
 /**
  * Default options for the BlockNote editor
@@ -83,9 +96,16 @@ type BlockNoteViewWrapperProps = {
   /**
    * Options to forward to the BlockNote editor
    */
-  blockNoteOptions?: Partial<
-    Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">
-  >;
+  blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema">>;
+
+  /**
+   * The name of the editor instance, usually the name of the form field it is attached to. When realtime collaboration
+   * is enabled, this is used to identify the Yjs document fragment that the editor is bound to (because a document can
+   * have multiple fields that are being edited in realtime time).
+   *
+   * @since 18.3.0RC1
+   */
+  name?: string;
 
   /**
    * The display theme to use
@@ -96,6 +116,12 @@ type BlockNoteViewWrapperProps = {
    * The editor's language
    */
   lang: EditorLanguage;
+
+  /**
+   * The editor's label. Used for accessibility.
+   * @since 18.3.0RC1
+   */
+  label: string;
 
   /**
    * The editor's initial content
@@ -112,12 +138,13 @@ type BlockNoteViewWrapperProps = {
   macros:
     | {
         /**
-         * List of buildable macros
+         * List of buildable, client-rendered macros. Optional: consumers that only use the server-rendered
+         * xwikiMacroBlock / xwikiInlineMacro specs (edited/inserted through {@link ctx}) can omit it.
          *
          * @since 18.0.0RC1
          * @beta
          */
-        list: MacroWithUnknownParamsType[];
+        list?: MacroWithUnknownParamsType[];
 
         /**
          * Context for macros
@@ -130,12 +157,9 @@ type BlockNoteViewWrapperProps = {
     | false;
 
   /**
-   * Realtime options
+   * The collaboration session.
    */
-  realtime?: {
-    collaborationProvider: () => CollaborationInitializer;
-    user: { name: string; color: string };
-  };
+  collaboration?: Collaboration;
 
   /**
    * Run a function when the document's content change
@@ -144,9 +168,20 @@ type BlockNoteViewWrapperProps = {
   onChange?: (editor: EditorType) => void;
 
   /**
-   * Link edition utilities
+   * Container for dependency injection
+   *
+   * @since 18.5.0RC1
+   * @beta
    */
-  linkEditionCtx: LinkEditionContext;
+  depsContainer: Container;
+
+  /**
+   * Intercept link edition mechanism (i.e. inserting or editing a link)
+   *
+   * @since 18.4.0RC1
+   * @beta
+   */
+  linkEditionHandler: LinkEditionHandler;
 
   /**
    * Overrides for default behavior
@@ -158,7 +193,33 @@ type BlockNoteViewWrapperProps = {
      * Intercept image edition mechanism (i.e. clicking on the edition icon in images' toolbar)
      */
     imageEdition?: ImageEditionOverrideFn;
+
+    /**
+     * Hooks to intercept the link creation / edition flow.
+     *
+     * @since 18.7.0RC1
+     */
+    linkEdition?: LinkEditionHooks;
   };
+
+  /**
+   * List of features supported by the underlying syntax
+   *
+   * Features not enabled here will be disabled in the future (when possible)
+   *
+   * @since 18.6.0RC1
+   * @beta
+   */
+  syntax: SyntaxConfig;
+
+  /**
+   * The CSS classes (space separated) to add to the code blocks, e.g. to style them like the code snippets displayed in
+   * view mode.
+   *
+   * @since 18.9.0RC1
+   * @beta
+   */
+  codeBlockClassName?: string;
 
   /**
    * Make the wrapper forward some data through references
@@ -169,62 +230,90 @@ type BlockNoteViewWrapperProps = {
 };
 
 /**
+ * Replaces the middleware BlockNote uses to center the side menu vertically on the hovered block, which offsets the
+ * menu by a fixed amount per block type that only matches BlockNote's own styling.
+ */
+const SIDE_MENU_FLOATING_OPTIONS = {
+  useFloatingOptions: {
+    middleware: [centerOnFirstLine()],
+  },
+};
+
+/**
  * BlockNote editor wrapper
  */
-// eslint-disable-next-line max-statements
+
 const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   blockNoteOptions,
+  name = "content",
   theme,
   content,
   macros,
-  realtime,
+  collaboration,
   onChange,
   lang,
-  linkEditionCtx,
+  depsContainer,
+  linkEditionHandler,
   overrides,
+  label,
+  syntax,
+  codeBlockClassName,
   refs: { setEditor } = {},
+  // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
   const { t } = useTranslation();
-  const collaborationProvider = realtime?.collaborationProvider;
 
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
   if (macros) {
     const macroAstToReactJsxConverter = new MacrosAstToReactJsxConverter(
-      linkEditionCtx.remoteURLParser,
-      linkEditionCtx.remoteURLSerializer,
+      depsContainer
+        .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+        .get()!,
+
+      depsContainer
+        .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+        .get()!,
     );
 
-    for (const macro of macros.list) {
+    for (const macro of macros.list ?? []) {
       builtMacros.push(
         adaptMacroForBlockNote(macro, macros.ctx, macroAstToReactJsxConverter),
       );
     }
   }
 
-  const schema = createBlockNoteSchema(builtMacros);
+  const schema = createBlockNoteSchema(builtMacros, { codeBlockClassName });
 
-  const initializer: CollaborationInitializer | undefined =
-    collaborationProvider ? collaborationProvider() : undefined;
+  // When realtime collaboration is enabled, the initial content is set through the shared document. Moreover, BlockNote
+  // doesn't support empty content, as in an empty array of blocks, so instead of passing an empty array we don't pass
+  // the initial content at all and let it initialize the content with whatever makes sense (e.g. an empty paragraph).
+  const initialContent = collaboration || !content.length ? undefined : content;
 
-  // Prevent changes in the editor until the provider has synced with other clients
-  const [ready, setReady] = useState(!initializer);
+  const getCollaborationOptions = (): CollaborationOptions | undefined => {
+    if (!collaboration) {
+      return undefined;
+    }
 
-  // Check if the syncing is happing for too long, in order to display an information message
-  const longLoading = useTimeoutCheck(1000);
+    const { collaborator } = collaboration;
 
-  // Creates a new editor instance.
-  const editor = useCreateBlockNote({
+    return {
+      provider: collaboration.provider,
+      fragment: collaboration.doc.getXmlFragment(name),
+      user: {
+        name: collaborator.user.username!,
+        color: collaborator.color,
+      },
+    };
+  };
+
+  const editorOptions = {
     ...blockNoteOptions,
-    collaboration: initializer?.provider
-      ? {
-          provider: initializer.provider,
-          fragment: initializer.doc.getXmlFragment("document-store"),
-          user: realtime!.user,
-        }
-      : undefined,
+    initialContent,
     // Editor's schema, with custom blocks definition
     schema,
+    // Highlight the code blocks based on their language.
+    extensions: [...(blockNoteOptions?.extensions ?? []), syntaxHighlighter],
     // Use the provided language for the dictionary
     dictionary: createDictionary(lang),
     // The default drop cursor only shows up above and below blocks - we replace
@@ -232,153 +321,125 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     tables: {
       headers: true,
     },
-  });
+    domAttributes: {
+      editor: {
+        "aria-label": label,
+      },
+    },
+  };
 
+  const collaborationOptions = getCollaborationOptions();
+
+  // Create the BlockNote editor instance. Yjs based collaboration is opt-in: wrapping the options registers the Yjs
+  // extensions the editor needs, so it is only applied when a collaboration session is available.
+  const editor = useCreateBlockNote(
+    collaborationOptions
+      ? withCollaboration({
+          ...editorOptions,
+          collaboration: collaborationOptions,
+        })
+      : editorOptions,
+  );
+
+  // Allow the parent component to access the editor instance.
   useEffect(() => {
     setEditor?.(editor);
   }, [setEditor, editor]);
 
-  // When realtime is activated, the first user to join the session sets the content for everybody.
-  // The rest of the participants will just retrieve the editor content from the realtime server.
-  // We know who is the first user joining the session by checking for the absence of an initialContentLoaded key in the
-  // document's configuration map (shared across all session participants).
-  useEffect(() => {
-    // Replace the editor's current content with the provided blocks
-    const replaceContent = (blocks: BlockType[]) => {
-      // NOTE: replacing the content immediately seems to lead to a data race with the provider and/or BlockNote,
-      //       and we end up with an empty editor
-      //       So, to avoid this, we run the content replacement function separately with the smallest possible non-zero delay
-      // This is something we'll need to investigate, but this does the trick for now.
-      setTimeout(() => {
-        // TODO: with time, see if this fix actually works fine
-        //
-        // Some BlockNote crash seems to happen when replacing the whole document, but only sometimes.
-        // So here we ensure the document is never empty by introducing some empty inline content, which will be put
-        // inside a paragraph.
-        if (editor.document.length === 0) {
-          editor.insertInlineContent("");
-        }
-
-        editor.replaceBlocks(editor.document, blocks);
-      }, 1);
-    };
-
-    if (initializer?.provider) {
-      console.debug("Trying to connect to realtime server...");
-
-      // eslint-disable-next-line promise/catch-or-return
-      initializer.initialized.then(() => {
-        console.debug("Connected to realtime server and synced!");
-
-        const initialContentLoaded = initializer.doc
-          .getMap("configuration")
-          .get("initialContentLoaded");
-
-        // eslint-disable-next-line promise/always-return
-        if (!initialContentLoaded) {
-          initializer.doc
-            .getMap("configuration")
-            .set("initialContentLoaded", true);
-
-          console.debug("Setting initial content for realtime first player", {
-            content,
-          });
-
-          replaceContent(content);
-        }
-
-        setReady(true);
-      });
-
-      initializer.provider.on("destroy", () => {
-        initializer.provider.destroy();
-      });
-    } else {
-      // If we don't have a provider, we can simply load the content directly
+  // When realtime collaboration is enabled, the first user joining the session must set the initial content. The rest
+  // of the participants will retrieve the editor content from the realtime server. We know who is the first user
+  // joining the session by checking for the absence of an initialContentLoaded key in the document's configuration map
+  // (shared across all session participants).
+  if (collaboration) {
+    const config = collaboration.doc.getMap("configuration");
+    const initialContentLoaded = config.get("initialContentLoaded");
+    if (!initialContentLoaded) {
+      // This is the first user joining the realtime collaboration session.
+      config.set("initialContentLoaded", true);
       console.debug(
-        "No realtime provider, setting document's content directly",
+        "Setting initial content for realtime collaboration session.",
+        content,
       );
-
-      replaceContent(content);
+      // Initialize the realtime collaboration session with the provided content.
+      const fragment = collaboration.doc.getXmlFragment(name);
+      blocksToYXmlFragment(editor, content, fragment);
     }
-  }, [initializer]);
-
-  // Disconnect from the realtime provider when the component is unmounted
-  // Otherwise, our user profile may be left over and still be displayed to other users
-  useEffect(() => {
-    return () => {
-      console.debug(
-        "BlockNoteView is being unmounted, disconnecting from the realtime provider...",
-      );
-
-      initializer?.provider?.disconnect();
-    };
-  }, []);
-
-  if (!ready) {
-    // Only display the loading message after a given amount of time,
-    // otherwise we end up with a flashing pending message
-    //
-    // We still show the <h3> + <em> structure with an insecable space in order to keep the same height at all times
-    return (
-      <h3>
-        <em>{longLoading ? t("blocknote.realtime.pendingSync") : "\u00A0"}</em>
-      </h3>
-    );
   }
 
   // Renders the editor instance using a React component.
   return (
-    <BlockNoteView
-      editor={editor}
-      theme={theme}
-      // Override some builtin components
-      formattingToolbar={false}
-      linkToolbar={false}
-      filePanel={false}
-      slashMenu={false}
-      onChange={(editor) => onChange?.(editor)}
-    >
-      <SuggestionMenuController
-        triggerCharacter={"/"}
-        getItems={async (query) =>
-          querySuggestionsMenuItems(editor, query, builtMacros)
-        }
-      />
+    <DepsContainerContext.Provider value={depsContainer}>
+      <MacrosContext.Provider value={macros ? macros.ctx : null}>
+        <BlockNoteView
+          editor={editor}
+          theme={theme}
+          // Override some builtin components
+          formattingToolbar={false}
+          linkToolbar={false}
+          filePanel={false}
+          slashMenu={false}
+          sideMenu={false}
+          onChange={(editor) => onChange?.(editor)}
+        >
+          {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
+          <SideMenuController floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS} />
 
-      {/* TODO: suggestions menu for inline macros */}
-
-      <FormattingToolbarController
-        formattingToolbar={(props) => (
-          <CustomFormattingToolbar
-            formattingToolbarProps={props}
-            linkEditionCtx={linkEditionCtx}
-            imageEditionOverrideFn={overrides?.imageEdition}
+          <SuggestionMenuController
+            triggerCharacter={"/"}
+            getItems={async (query) =>
+              querySuggestionsMenuItems({
+                editor,
+                query,
+                macros: builtMacros,
+                syntax,
+                lang,
+                t,
+                linkEditionHandler,
+                openMacroInsertionEditor: macros
+                  ? macros.ctx.openInsertionEditor
+                  : undefined,
+              })
+            }
           />
-        )}
-      />
 
-      <LinkToolbarController
-        linkToolbar={(props) => (
-          <FormattingToolbar>
-            <CustomLinkToolbar
-              linkToolbarProps={props}
-              linkEditionCtx={linkEditionCtx}
-            />
-          </FormattingToolbar>
-        )}
-      />
+          {/* TODO: suggestions menu for inline macros */}
 
-      <FilePanelController
-        filePanel={({ blockId }) => (
-          <FilePanel
-            blockId={blockId}
-            editor={editor}
-            linkEditionCtx={linkEditionCtx}
+          <FormattingToolbarController
+            formattingToolbar={(props) => (
+              <CustomFormattingToolbar
+                formattingToolbarProps={props}
+                imageEditionOverrideFn={overrides?.imageEdition}
+                linkEditionHandler={linkEditionHandler}
+                linkEditionHooks={overrides?.linkEdition}
+                additionalBlockTypes={filterMap(
+                  builtMacros,
+                  (built) => built.dropdownTransformItem,
+                )}
+                macros={macros}
+              />
+            )}
           />
-        )}
-      />
-    </BlockNoteView>
+
+          <LinkToolbarController
+            linkToolbar={(props) => (
+              <FormattingToolbar>
+                <CustomLinkToolbar
+                  linkToolbarProps={props}
+                  linkEditionHandler={linkEditionHandler}
+                  linkEditionHooks={overrides?.linkEdition}
+                />
+              </FormattingToolbar>
+            )}
+          />
+
+          <FilePanelController
+            filePanel={({ blockId }) => (
+              <FilePanel blockId={blockId} editor={editor} />
+            )}
+          />
+        </BlockNoteView>
+      </MacrosContext.Provider>
+    </DepsContainerContext.Provider>
   );
 };
 

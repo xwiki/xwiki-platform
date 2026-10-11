@@ -23,8 +23,8 @@
 #if((!$request.editor) || ($request.editor.trim() == ""))
   #set($editor = "inline")
 #else
-  #set($editor = $request.editor)
+  ## Normally no special characters should exist in the editor parameter, so this is just a protection measure.
+  #set ($editor = "$!{escapetool.xml($request.getParameter('editor'))}")
 #end
-#template("startpage.vm")
-#template("edit${editor}.vm")
-#template("endpage.vm")
+## Load the edit template to be sure that this behaves exactly the same, just with a different default editor.
+#template("edit.vm")

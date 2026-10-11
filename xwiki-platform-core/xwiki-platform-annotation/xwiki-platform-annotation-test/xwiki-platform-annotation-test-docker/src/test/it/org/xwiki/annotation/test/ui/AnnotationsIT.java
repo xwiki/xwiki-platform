@@ -27,14 +27,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.annotation.test.po.AnnotatableViewPage;
+import org.xwiki.annotation.test.po.AnnotationsWindow;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.CommentElement;
+import org.xwiki.test.ui.po.CommentForm;
 import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -53,6 +61,8 @@ class AnnotationsIT
 
     private static final String ANNOTATION_TEXT_1 = "XWiki motto";
 
+    private static final String ANNOTATION_TEXT_1_UPDATED = "XWiki motto (updated)";
+
     private static final String ANNOTATED_TEXT_2 = "WebHome";
 
     private static final String ANNOTATION_TEXT_2 = "Every Space has it's own webhome";
@@ -65,6 +75,8 @@ class AnnotationsIT
 
     private static final String ANNOTATION_TEXT_4 = "Yes, we have our WYSIWYG";
 
+    private static final String REPLY_TEXT = "Indeed, that's the motto";
+
     private static final String USER_NAME = "UserAnnotation";
 
     private static final String USER_PASS = "pass";
@@ -76,13 +88,172 @@ class AnnotationsIT
 
         setup.deletePage(testReference);
 
-        setup.createUser(USER_NAME, USER_PASS, "", "");
-        setup.login(USER_NAME, USER_PASS);
+        setup.createUserAndLogin(USER_NAME, USER_PASS);
+    }
+
+    /**
+     * This test creates a XWiki 1.0 syntax page and tries to add annotations to it and checks if the warning messages
+     * are shown.
+     */
+    @Test
+    @Order(1)
+    void annotationsShouldNotBeShownInXWiki10Syntax(TestUtils setup, TestReference testReference)
+    {
+        AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(
+            setup.createPage(testReference, "Some content", "AnnotationsTest in XWiki 1.0 Syntax", "xwiki/1.0"));
+
+        annotatableViewPage.showAnnotationsPane();
+        // Annotations are disabled in 1.0 Pages. This element should not be here
+        assertTrue(annotatableViewPage.checkIfAnnotationsAreDisabled());
+        annotatableViewPage.simulateCTRL_M();
+        annotatableViewPage.waitforAnnotationWarningNotification();
+    }
+
+    @Test
+    @Order(2)
+    void addEditReplyToAndDeleteAnnotations(TestUtils setup, TestReference testReference)
+    {
+        AnnotatableViewPage annotatableViewPage =
+            new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
+        CommentsTab commentsTab = annotatableViewPage.getWrappedViewPage().openCommentsDocExtraPane();
+
+        // The close button of the creation dialog dismisses it, like its cancel button does.
+        AnnotationsWindow annotationsWindow = annotatableViewPage.beginAddAnnotation(ANNOTATED_TEXT_1);
+        annotationsWindow.clickCloseAnnotation();
+        annotationsWindow.waitUntilClosed();
+
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_2, ANNOTATION_TEXT_2);
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_3, ANNOTATION_TEXT_3);
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_4, ANNOTATION_TEXT_4);
+
+        int commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_1));
+        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
+        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
+        assertEquals(ANNOTATION_TEXT_1, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_1));
+        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_2));
+        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
+        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
+        assertEquals(ANNOTATION_TEXT_2, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_2));
+        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_3));
+        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
+        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
+        assertEquals(ANNOTATION_TEXT_3, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_3));
+        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_4));
+        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
+        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
+        assertEquals(ANNOTATION_TEXT_4, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_4));
+
+        // Editing an annotation must also be saved as a minor version (like comments), not as a major version.
+        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_1));
+        commentsTab.editCommentByID(commentId, ANNOTATION_TEXT_1_UPDATED);
+        assertEquals(ANNOTATION_TEXT_1_UPDATED, commentsTab.getCommentContentByID(commentId));
+
+        // It seems that there are some issues refreshing content while this tab is not open. This might be a bug in the
+        // Annotations Application
+        annotatableViewPage.showAnnotationsPane();
+
+        // Reply to an annotation from its bubble: the reply is saved as a reply to the annotation comment.
+        int commentId1 = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_1));
+        CommentForm replyForm = annotatableViewPage.replyToAnnotationByText(ANNOTATED_TEXT_1);
+        replyForm.addToContentField(REPLY_TEXT);
+        replyForm.clickSubmit();
+        assertEquals(commentId1, getReply(commentsTab, REPLY_TEXT).getReplyTo());
+
+        // On a fresh page the annotation thread is collapsed: the "View thread" button of the annotation bubble expands
+        // it in the Comments tab.
+        annotatableViewPage = new AnnotatableViewPage(setup.gotoPage(testReference));
+        commentsTab = annotatableViewPage.getWrappedViewPage().openCommentsDocExtraPane();
+        annotatableViewPage.showAnnotationsPane();
+        annotatableViewPage.clickShowAnnotations(true);
+        assertEquals("View thread (1)", annotatableViewPage.viewAnnotationThreadByText(ANNOTATED_TEXT_1));
+        // Only the displayed text is returned, so this also checks that the reply is visible.
+        assertEquals(REPLY_TEXT, getReply(commentsTab, REPLY_TEXT).getContent());
+
+        // Deleting an annotation from the Comments tab removes both the comment and the annotation.
+        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_4));
+        commentsTab.deleteCommentByID(commentId);
+        assertThat(commentsTab.getComments().stream().map(CommentElement::getContent).toList(),
+            not(hasItem(ANNOTATION_TEXT_4)));
+        annotatableViewPage = new AnnotatableViewPage(setup.gotoPage(testReference));
+        annotatableViewPage.showAnnotationsPane();
+        annotatableViewPage.clickShowAnnotations(true);
+        assertEquals(3, annotatableViewPage.getAnnotationCount());
+
+        // Deleting the other annotations from their bubble removes their highlight.
+        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_1);
+        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_2);
+        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_3);
+        annotatableViewPage.waitUntilAnnotationCount(0);
+
+        // None of the annotation operations above (add, edit, reply, delete) must create a major version: they must
+        // all be saved as minor edits, consistently with comments. Since the history hides minor edits by default, the
+        // only major version left must be "1.x", proving no operation created a major version.
+        HistoryPane historyPane = annotatableViewPage.getWrappedViewPage().openHistoryDocExtraPane();
+        assertEquals("1.11", historyPane.getCurrentVersion());
+    }
+
+    private CommentElement getReply(CommentsTab commentsTab, String content)
+    {
+        return commentsTab.getComments().stream().filter(c -> c.isReply() && content.equals(c.getContent()))
+            .findFirst().orElseThrow();
+    }
+
+    @Test
+    @Order(3)
+    void showAnnotationsByClickingOnAQuote(TestUtils setup, TestReference testReference)
+    {
+        // Adds 200 'a' after the content to make sure the content is not on-screen when the comment pane is visible.
+        // The intent is to make sure that clicking on the annotation quote makes the use jump to the corresponding
+        // annotation (by following the anchor).
+        String paddedContent = IntStream.rangeClosed(0, 200)
+            .mapToObj(i -> "a")
+            .collect(Collectors.joining("\n", CONTENT, ""));
+        AnnotatableViewPage annotatableViewPage =
+            new AnnotatableViewPage(setup.createPage(testReference, paddedContent, null));
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
+
+        // Force a page refresh to avoid having the annotations displayed.
+        setup.getDriver().navigate().refresh();
+
+        CommentsTab commentsTab = new ViewPage().openCommentsDocExtraPane();
+        commentsTab.clickOnAnnotationQuote(0);
+        annotatableViewPage = new AnnotatableViewPage(new ViewPage());
+        annotatableViewPage.waitForAnnotationsDisplayed();
+        assertTrue(annotatableViewPage.getAnnotationTextById(0).isDisplayed());
+    }
+
+    /**
+     * Ensure that annotations are still displayed after the annotated page has been moved (renamed). This is a
+     * regression test for the case where annotation targets used to point to the old document reference.
+     */
+    @Test
+    @Order(4)
+    void annotationsSurvivePageMove(TestUtils setup, TestReference testReference)
+    {
+        AnnotatableViewPage annotatableViewPage =
+            new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
+
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
+
+        // Move the page to check that the annotations are still displayed afterward.
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = annotatableViewPage
+            .getWrappedViewPage()
+            .rename()
+            .setNewTitle("NewName")
+            .clickRenameButton()
+            .waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+        renameStatusPage.gotoNewPage();
+
+        annotatableViewPage.showAnnotationsPane().clickShowAnnotations();
+        annotatableViewPage.waitForAnnotationsDisplayed();
+        assertEquals(1, annotatableViewPage.getAnnotationCount());
     }
 
     // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
     @Test
-    @Order(4)
+    @Order(5)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
@@ -118,86 +289,5 @@ class AnnotationsIT
             "java.util.zip.ZipException: zip file is empty",
             "Failed to read resource [iscroll/"
         );
-    }
-
-    @Test
-    @Order(2)
-    void addAndDeleteAnnotations(TestUtils setup, TestReference testReference)
-    {
-        AnnotatableViewPage annotatableViewPage =
-            new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
-        CommentsTab commentsTab = annotatableViewPage.getWrappedViewPage().openCommentsDocExtraPane();
-
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_2, ANNOTATION_TEXT_2);
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_3, ANNOTATION_TEXT_3);
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_4, ANNOTATION_TEXT_4);
-
-        int commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_1));
-        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
-        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
-        assertEquals(ANNOTATION_TEXT_1, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_1));
-        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_2));
-        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
-        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
-        assertEquals(ANNOTATION_TEXT_2, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_2));
-        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_3));
-        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
-        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
-        assertEquals(ANNOTATION_TEXT_3, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_3));
-        commentId = annotatableViewPage.getCommentId(annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_4));
-        assertTrue(commentsTab.hasEditButtonForCommentByID(commentId));
-        assertTrue(commentsTab.hasDeleteButtonForCommentByID(commentId));
-        assertEquals(ANNOTATION_TEXT_4, annotatableViewPage.getAnnotationContentByText(ANNOTATED_TEXT_4));
-
-        // It seems that there are some issues refreshing content while this tab is not open. This might be a bug in the
-        // Annotations Application
-        annotatableViewPage.showAnnotationsPane();
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_1);
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_2);
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_3);
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_4);
-    }
-
-    /**
-     * This test creates a XWiki 1.0 syntax page, and tries to add annotations to it, and checks if the warning messages
-     * are shown This test is against XAANNOTATIONS-17
-     */
-    @Test
-    @Order(1)
-    void annotationsShouldNotBeShownInXWiki10Syntax(TestUtils setup, TestReference testReference)
-    {
-        AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(
-            setup.createPage(testReference, "Some content", "AnnotationsTest in XWiki 1.0 Syntax", "xwiki/1.0"));
-
-        annotatableViewPage.showAnnotationsPane();
-        // Annotations are disabled in 1.0 Pages. This element should no be here
-        assertTrue(annotatableViewPage.checkIfAnnotationsAreDisabled());
-        annotatableViewPage.simulateCTRL_M();
-        annotatableViewPage.waitforAnnotationWarningNotification();
-    }
-
-    @Test
-    @Order(3)
-    void showAnnotationsByClickingOnAQuote(TestUtils setup, TestReference testReference)
-    {
-        // Adds 200 'a' after the content to make sure the content is not on-screen when the comment pane is visible.
-        // The intent is to make sure that clicking on the annotation quote makes the use jump to the corresponding 
-        // annotation (by following the anchor).
-        String paddedContent = IntStream.rangeClosed(0, 200)
-            .mapToObj(i -> "a")
-            .collect(Collectors.joining("\n", CONTENT, ""));
-        AnnotatableViewPage annotatableViewPage =
-            new AnnotatableViewPage(setup.createPage(testReference, paddedContent, null));
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
-
-        // Force a page refresh to avoid having the annotations displayed.
-        setup.getDriver().navigate().refresh();
-
-        CommentsTab commentsTab = new ViewPage().openCommentsDocExtraPane();
-        commentsTab.clickOnAnnotationQuote(0);
-        annotatableViewPage = new AnnotatableViewPage(new ViewPage());
-        annotatableViewPage.waitForAnnotationsDisplayed();
-        assertTrue(annotatableViewPage.getAnnotationTextById(0).isDisplayed());
     }
 }

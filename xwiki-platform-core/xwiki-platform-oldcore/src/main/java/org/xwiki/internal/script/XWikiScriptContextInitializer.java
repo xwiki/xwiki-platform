@@ -104,8 +104,8 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
                 try {
                     tdoc = doc.getTranslatedDocument(xcontext);
                 } catch (XWikiException e) {
-                    this.logger.warn("Failed to retrieve the translated document for [{}]. "
-                        + "Continue using the default translation.", doc.getDocumentReference(), e);
+                    this.logger.warn("Failed to retrieve the translated document for [{}]. Continue using the "
+                        + "default translation", doc.getDocumentReference(), e);
                     tdoc = doc;
                 }
             }

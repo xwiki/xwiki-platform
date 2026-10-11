@@ -36,7 +36,7 @@ public class InsufficientPrivilegesException extends Exception
     /**
      * Builds a new {@link InsufficientPrivilegesException} with the given error message.
      * 
-     * @param message error messge.
+     * @param message error message.
      */
     public InsufficientPrivilegesException(String message)
     {

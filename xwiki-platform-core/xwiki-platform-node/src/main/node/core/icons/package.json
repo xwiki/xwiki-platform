@@ -1,8 +1,8 @@
 {
   "name": "@xwiki/platform-icons",
-  "version": "18.3.0-SNAPSHOT",
+  "version": "18.9.0-SNAPSHOT",
   "description": "Provide UI components to display icons.",
-  "license": "LGPL 2.1",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -49,9 +49,12 @@
     "@microsoft/api-extractor": "catalog:",
     "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
+    "jsdom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

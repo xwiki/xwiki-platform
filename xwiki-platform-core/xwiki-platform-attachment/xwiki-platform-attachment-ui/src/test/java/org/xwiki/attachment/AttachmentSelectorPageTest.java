@@ -35,6 +35,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.container.Container;
 import org.xwiki.icon.IconManagerScriptServiceComponentList;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.AttachmentReference;
@@ -54,6 +55,7 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -97,11 +99,21 @@ class AttachmentSelectorPageTest extends PageTest
     private static final DocumentReference ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE =
         new DocumentReference("xwiki", "XWiki", "AttachmentSelector");
 
+    private static final String PAYLOAD = "]] {{noscript/}}";
+
+    private static final String ENCODED_PAYLOAD = "%5D%5D%20%7B%7Bnoscript%2F%7D%7D";
+
     /**
      * Mocked because we don't want to deal with actual sessions for this test.
      */
     @MockComponent
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    /**
+     * Required by {@link TemporaryAttachmentsScriptService}.
+     */
+    @MockComponent
+    private Container container;
 
     @BeforeEach
     void setUp() throws Exception
@@ -330,6 +342,123 @@ class AttachmentSelectorPageTest extends PageTest
         assertEquals("Space.]] {{noscript/}}", document.getElementById("attachment-picker-close").attr("href"));
     }
 
+    @Test
+    void cssClassEscapingWithDisplayImageTrue() throws Exception
+    {
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
+
+        XWikiDocument xwikiDocument = commonFixup("test.png");
+
+        xwikiDocument.setContent("""
+            {{attachmentSelector \
+                classname="Space.Test" \
+                property="avatar" \
+                savemode="direct" \
+                displayImage="true" \
+                cssClass="test ]] {{noscript/}}"/}}
+            """);
+
+        Document document = renderHTMLPage(xwikiDocument);
+        var div = document.select(".attachment-picker > .displayed.x-attachment");
+
+        assertEquals("displayed x-attachment test ]] {{noscript/}}", div.attr("class"));
+    }
+
+    @Test
+    void cssClassEscapingWithDisplayImageFalse() throws Exception
+    {
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
+
+        XWikiDocument xwikiDocument = commonFixup("test.png");
+
+        xwikiDocument.setContent("""
+            {{attachmentSelector
+                classname="Space.Test"
+                property="avatar"
+                savemode="direct"
+                displayImage="false"
+                cssClass="test ]] {{noscript/}}"
+                link="true"
+            /}}
+            """);
+
+        Document document = renderHTMLPage(xwikiDocument);
+        var div = document.select(".attachment-picker > p > .displayed.x-attachment");
+
+        assertEquals("displayed x-attachment test ]] {{noscript/}}", div.attr("class"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("emptyValueSelectUrlSource")
+    void emptyValueSelectUrlEscaping(String parameterName, String expectedHref) throws Exception
+    {
+        commonFixup("test.png");
+
+        this.request.put("docname", "xwiki:Space.Test");
+        this.request.put("object", "0");
+        this.request.put("xpage", "plain");
+        // The payload goes through one of the two request parameters that make up the "select" URL of the empty value
+        // box.
+        this.request.put("classname", "classname".equals(parameterName) ? PAYLOAD : "xwiki:Space.Test");
+        this.request.put("property", "property".equals(parameterName) ? PAYLOAD : "avatar");
+
+        Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
+
+        Element select = document.selectFirst(".gallery_emptyChoice .gallery_actions a.select");
+        assertNotNull(select, "The select action of the empty value box is expected to be found");
+        // The payload stays URL-encoded in the query string instead of closing the wiki link.
+        assertEquals(expectedHref, select.attr("href"));
+    }
+
+    @Test
+    void attachmentBoxActionUrlEncoding() throws Exception
+    {
+        // The delete action is only displayed to a user who can edit the document holding the attachment.
+        when(this.oldcore.getMockRightService()
+            .hasAccessLevel(any(String.class), any(String.class), any(String.class), any(XWikiContext.class)))
+            .thenReturn(true);
+        // The attachment name is the value reaching the action URLs of the attachment box.
+        commonFixup(PAYLOAD + ".png");
+
+        this.request.put("docname", "xwiki:Space.Test");
+        this.request.put("classname", "xwiki:Space.Test");
+        this.request.put("property", "avatar");
+        this.request.put("object", "0");
+        this.request.put("xpage", "plain");
+
+        Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
+
+        Element box = document.selectFirst(".gallery_attachmentbox.current");
+        assertNotNull(box, "The attachment box of the current value is expected to be found");
+        // The attachment name stays URL-encoded, in the query string of the select action...
+        assertEquals(String.format("path:/xwiki/bin/edit/Space/Test?xwiki%%3ASpace.Test_0_avatar=%s.png&form_token=",
+            ENCODED_PAYLOAD), box.selectFirst(".gallery_actions a.select").attr("href"));
+        // ... and in the path of the delete action.
+        assertEquals(String.format("path:/xwiki/bin/delattachment/Space/Test/%s.png"
+                + "?xredirect=%%2Fxwiki%%2Fbin%%2Fview%%2FXWiki%%2FAttachmentSelector&form_token=", ENCODED_PAYLOAD),
+            box.selectFirst(".gallery_actions a.delete").attr("href"));
+    }
+
+    @Test
+    void emptyValueSelectUrlDocumentNameEncoding() throws Exception
+    {
+        commonFixup("test.png");
+
+        // The payload goes through the document name, which makes up the path of the "select" URL.
+        this.request.put("docname", String.format("xwiki:Space.%s", PAYLOAD));
+        this.request.put("classname", "xwiki:Space.Test");
+        this.request.put("property", "avatar");
+        this.request.put("object", "0");
+        this.request.put("xpage", "plain");
+
+        Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
+
+        Element select = document.selectFirst(".gallery_emptyChoice .gallery_actions a.select");
+        assertNotNull(select, "The select action of the empty value box is expected to be found");
+        assertEquals(String.format("path:/xwiki/bin/edit/Space/%s?xwiki%%3ASpace.Test_0_avatar=&form_token=",
+            ENCODED_PAYLOAD), select.attr("href"));
+    }
+
     private XWikiDocument commonFixup(String fileName) throws XWikiException, IOException
     {
         // Initialize a document containing an XClass definition and an XObject of this XClass.
@@ -351,6 +480,17 @@ class AttachmentSelectorPageTest extends PageTest
         this.context.setDoc(xwikiDocument);
 
         return xwikiDocument;
+    }
+
+    public static Stream<Arguments> emptyValueSelectUrlSource()
+    {
+        return Stream.of(
+            arguments("property",
+                String.format("path:/xwiki/bin/edit/Space/Test?xwiki%%3ASpace.Test_0_%s=&form_token=",
+                    ENCODED_PAYLOAD)),
+            arguments("classname",
+                String.format("path:/xwiki/bin/edit/Space/Test?%s_0_avatar=&form_token=", ENCODED_PAYLOAD))
+        );
     }
 
     public static Stream<Arguments> attachmentSelectorMacroSource()

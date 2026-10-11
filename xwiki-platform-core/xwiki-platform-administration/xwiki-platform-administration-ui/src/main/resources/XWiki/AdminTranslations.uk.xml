@@ -139,11 +139,19 @@ administration.section.users.deleteUser.newAuthor.error=У вибраного к
 administration.section.users.deleteUser.newAuthor.programming=програмування
 administration.section.users.deleteUser.newAuthor.script=скрипт
 admin.usersgroups.extensionrights=Права розширення
+admin.usersgroups.extensionrights.space=Права розширень: сторінка та дочірні сторінки
+admin.usersgroups.extensionrights.page=Права розширень: сторінка
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Видалення учасника з групи
 administration.section.groups.deleteUserFromGroup.success=Учасника успішно видалено з групи
 administration.section.groups.deleteUserFromGroup.failure=Не вдалося видалити учасника з групи
+
+# Rights for page section
+administration.section.pagerights.hint=Ці права застосовуються лише до цієї сторінки. Вони не поширюються на {0}дочірні сторінки{1}.
+
+# Rights for page and children section
+administration.section.pageandchildrenrights.hint=Ці права застосовуються до цієї сторінки та {0}усіх її дочірніх сторінок{1}.
 
 # Other Category
 admin.other=Інше

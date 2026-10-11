@@ -80,7 +80,7 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
             this.eventGenerators = this.componentManager.get().getInstanceList(InstanceInputEventGenerator.class);
         } catch (ComponentLookupException e) {
             throw new FilterException(
-                "Failed to get regsitered instance of OutputInstanceFilterStreamFactory components", e);
+                "Failed to get registered instance of OutputInstanceFilterStreamFactory components", e);
         }
 
         for (InstanceInputEventGenerator eventGenerator : this.eventGenerators) {
@@ -192,7 +192,7 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
         // Write documents
         for (DocumentReference documentReference : this.instanceModel.getDocumentReferences(spaceReference)) {
             if (isDocumentEnabled(documentReference)) {
-                writeDocument(documentReference, filter, proxyFilter);
+                writeDocument(documentReference, proxyFilter);
             } else {
                 if (this.properties.isVerbose()) {
                     this.logger.info(LOG_DOCUMENT_SKIPPED, "Skipped document [{}]", documentReference);
@@ -216,7 +216,7 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
         proxyFilter.endWikiSpace(spaceReference.getName(), parameters);
     }
 
-    private void writeDocument(DocumentReference documentReference, Object filter, InstanceFilter proxyFilter)
+    private void writeDocument(DocumentReference documentReference, InstanceFilter proxyFilter)
         throws FilterException
     {
         FilterEventParameters parameters = new FilterEventParameters();

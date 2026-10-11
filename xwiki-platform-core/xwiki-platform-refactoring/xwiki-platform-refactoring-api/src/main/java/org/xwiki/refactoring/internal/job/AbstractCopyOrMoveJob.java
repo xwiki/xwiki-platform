@@ -63,7 +63,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             this.progressManager.startStep(this);
             BeginFoldEvent beginEvent = createBeginEvent();
             this.observationManager.notify(beginEvent, this, this.getRequest());
-            if (beginEvent instanceof CancelableEvent && ((CancelableEvent) beginEvent).isCanceled()) {
+            if (beginEvent instanceof CancelableEvent cancelableEvent && cancelableEvent.isCanceled()) {
                 return;
             }
             this.progressManager.endStep(this);

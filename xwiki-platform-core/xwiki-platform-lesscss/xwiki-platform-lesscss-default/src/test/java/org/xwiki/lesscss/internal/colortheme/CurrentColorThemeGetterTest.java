@@ -21,24 +21,24 @@ package org.xwiki.lesscss.internal.colortheme;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -47,23 +47,28 @@ import static org.mockito.Mockito.when;
 /**
  * Test class for {@link org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter}.
  *
- * @since 6.4M2
  * @version $Id$
+ * @since 6.4M2
  */
-public class CurrentColorThemeGetterTest
+@ComponentTest
+class CurrentColorThemeGetterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<CurrentColorThemeGetter> mocker =
-            new MockitoComponentMockingRule<>(CurrentColorThemeGetter.class);
+    @InjectMockComponents
+    private CurrentColorThemeGetter currentColorThemeGetter;
 
+    @MockComponent
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private AuthorizationManager authorizationManager;
 
     private XWikiContext xcontext;
@@ -72,66 +77,62 @@ public class CurrentColorThemeGetterTest
 
     private XWikiRequest request;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        authorizationManager = mocker.getInstance(AuthorizationManager.class);
-        documentReferenceResolver = mocker.getInstance(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
-                String.class));
-        entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null, EntityReferenceSerializer.class,
-                String.class));
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
 
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
-        request = mock(XWikiRequest.class);
-        when(xcontext.getRequest()).thenReturn(request);
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
+        this.request = mock(XWikiRequest.class);
+        when(this.xcontext.getRequest()).thenReturn(this.request);
         DocumentReference colorThemeReference = new DocumentReference("wikiId", "XWiki", "MyColorTheme");
         WikiReference mainWikiReference = new WikiReference("wikiId");
-        when(documentReferenceResolver.resolve(eq("myColorTheme"), eq(mainWikiReference))).thenReturn(colorThemeReference);
-        when(entityReferenceSerializer.serialize(colorThemeReference)).thenReturn("wikiId:ColorTheme.MyColorTheme");
-        when(xwiki.exists(colorThemeReference, xcontext)).thenReturn(true);
+        when(this.documentReferenceResolver.resolve("myColorTheme", mainWikiReference))
+            .thenReturn(colorThemeReference);
+        when(this.entityReferenceSerializer.serialize(colorThemeReference))
+            .thenReturn("wikiId:ColorTheme.MyColorTheme");
+        when(this.xwiki.exists(colorThemeReference, this.xcontext)).thenReturn(true);
         DocumentReference currentUser = new DocumentReference("xwiki", "XWiki", "CurrentUser");
-        when(xcontext.getUserReference()).thenReturn(currentUser);
-        when(authorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class),
-                any(DocumentReference.class))).thenReturn(true);
+        when(this.xcontext.getUserReference()).thenReturn(currentUser);
+        when(this.authorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class),
+            any(DocumentReference.class))).thenReturn(true);
     }
 
     @Test
-    public void getCurrentColorThemeTestWhenRequestParameter() throws Exception
+    void getCurrentColorThemeWhenRequestParameter()
     {
-         when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
-         assertEquals("wikiId:ColorTheme.MyColorTheme", mocker.getComponentUnderTest().getCurrentColorTheme("default"));
+        when(this.request.getParameter("colorTheme")).thenReturn("myColorTheme");
+        assertEquals("wikiId:ColorTheme.MyColorTheme", this.currentColorThemeGetter.getCurrentColorTheme("default"));
     }
 
     @Test
-    public void getCurrentColorThemeTestWhenNoRequestParameter() throws Exception
+    void getCurrentColorThemeWhenNoRequestParameter()
     {
-        when(xwiki.getUserPreference(eq("colorTheme"), any(XWikiContext.class))).thenReturn("myColorTheme");
-        assertEquals("wikiId:ColorTheme.MyColorTheme", mocker.getComponentUnderTest().getCurrentColorTheme("default"));
+        when(this.xwiki.getUserPreference(eq("colorTheme"), any(XWikiContext.class))).thenReturn("myColorTheme");
+        assertEquals("wikiId:ColorTheme.MyColorTheme", this.currentColorThemeGetter.getCurrentColorTheme("default"));
     }
 
     @Test
-    public void getCurrentColorThemeFallbackTest() throws Exception
+    void getCurrentColorThemeFallback() throws Exception
     {
-        when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
-        when(xwiki.exists(any(DocumentReference.class), eq(xcontext))).thenReturn(false);
-        assertEquals("fallback", mocker.getComponentUnderTest().getCurrentColorTheme("fallback"));
-        assertEquals("error", mocker.getComponentUnderTest().getCurrentColorTheme("error"));
+        when(this.request.getParameter("colorTheme")).thenReturn("myColorTheme");
+        when(this.xwiki.exists(any(DocumentReference.class), eq(this.xcontext))).thenReturn(false);
+        assertEquals("fallback", this.currentColorThemeGetter.getCurrentColorTheme("fallback"));
+        assertEquals("error", this.currentColorThemeGetter.getCurrentColorTheme("error"));
     }
 
     @Test
-    public void getCurrentColorWithAndWithoutRight() throws Exception
+    void getCurrentColorWithAndWithoutRight()
     {
-        when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
-        when(authorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class), any(DocumentReference.class)))
-                .thenReturn(false);
-        assertEquals("fallback", mocker.getComponentUnderTest().getCurrentColorTheme(true, "fallback"));
+        when(this.request.getParameter("colorTheme")).thenReturn("myColorTheme");
+        when(this.authorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class),
+            any(DocumentReference.class)))
+            .thenReturn(false);
+        assertEquals("fallback", this.currentColorThemeGetter.getCurrentColorTheme(true, "fallback"));
         assertEquals("wikiId:ColorTheme.MyColorTheme",
-            mocker.getComponentUnderTest().getCurrentColorTheme(false, "fallback"));
+            this.currentColorThemeGetter.getCurrentColorTheme(false, "fallback"));
     }
 }

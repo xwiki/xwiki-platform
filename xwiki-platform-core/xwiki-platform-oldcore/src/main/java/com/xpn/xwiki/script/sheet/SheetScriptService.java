@@ -224,7 +224,7 @@ public class SheetScriptService implements ScriptService
         try {
             // HACK: We try to get the modifiable XWikiDocument instance wrapped by the document API using reflection
             // because the corresponding method that clones the wrapped XWikiDocument instance is protected.
-            Method getDocMethod = Document.class.getDeclaredMethod("getDoc", new Class[] {});
+            Method getDocMethod = Document.class.getDeclaredMethod("getDoc");
             getDocMethod.setAccessible(true);
             return (DocumentModelBridge) getDocMethod.invoke(document);
         } catch (Exception e) {

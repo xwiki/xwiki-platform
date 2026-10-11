@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { useRemoteI18n } from "../index";
+import { useI18nAdapter } from "../index";
 import { flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, nextTick } from "vue";
@@ -47,11 +47,11 @@ function mountWithComposable(
   query: Query,
   i18n: ReturnType<typeof createI18n>,
 ) {
-  let exposed: ReturnType<typeof useRemoteI18n> | undefined;
+  let exposed: ReturnType<typeof useI18nAdapter> | undefined;
 
   const TestComponent = defineComponent({
     setup() {
-      exposed = useRemoteI18n(resolver, query);
+      exposed = useI18nAdapter(resolver, query);
       return exposed;
     },
     template: "<div />",
@@ -66,7 +66,7 @@ function mountWithComposable(
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("useRemoteI18n", () => {
+describe("useI18nAdapter", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -81,7 +81,10 @@ describe("useRemoteI18n", () => {
     await flushPromises();
 
     expect(resolver.resolve).toHaveBeenCalledOnce();
-    expect(resolver.resolve).toHaveBeenCalledWith(query);
+    expect(resolver.resolve).toHaveBeenCalledWith({
+      keys: query,
+      locale: "en",
+    });
   });
 
   it("merges translations into the current locale", async () => {
@@ -160,5 +163,38 @@ describe("useRemoteI18n", () => {
     await flushPromises();
 
     expect(resolver.resolve).toHaveBeenCalledTimes(2);
+    expect(resolver.resolve).toHaveBeenLastCalledWith({
+      keys: ["key1", "key2"],
+      locale: "fr",
+    });
+  });
+
+  it("keeps the prefix and resolves an object query in the current locale", async () => {
+    const resolver = buildResolver({});
+    const i18n = buildI18n("en");
+
+    mountWithComposable(resolver, { prefix: "ns.", keys: ["hello"] }, i18n);
+
+    await flushPromises();
+
+    expect(resolver.resolve).toHaveBeenCalledWith({
+      prefix: "ns.",
+      keys: ["hello"],
+      locale: "en",
+    });
+  });
+
+  it("does not override the locale pinned by the query", async () => {
+    const resolver = buildResolver({});
+    const i18n = buildI18n("en");
+
+    mountWithComposable(resolver, { keys: ["hello"], locale: "de" }, i18n);
+
+    await flushPromises();
+
+    expect(resolver.resolve).toHaveBeenCalledWith({
+      keys: ["hello"],
+      locale: "de",
+    });
   });
 });

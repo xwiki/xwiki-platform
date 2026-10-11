@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARClassPropertyModel;
+import org.xwiki.xar.internal.model.XarClassPropertyModel;
 
 /**
  * @version $Id$
@@ -96,13 +96,13 @@ public class ClassPropertyReader extends AbstractReader implements XARXMLReader<
             String elementName = xmlReader.getLocalName();
             String value = xmlReader.getElementText();
 
-            if (elementName.equals(XARClassPropertyModel.ELEMENT_CLASSTYPE)) {
+            if (elementName.equals(XarClassPropertyModel.ELEMENT_CLASSTYPE)) {
                 wikiClassProperty.type = value;
             } else {
                 wikiClassProperty.fields.put(elementName, value);
 
                 // If a <name> is defined it has priority over parent element local name
-                if (elementName.equals(XARClassPropertyModel.ELEMENT_NAME)) {
+                if (elementName.equals(XarClassPropertyModel.ELEMENT_NAME)) {
                     wikiClassProperty.name = value;
                 }
             }

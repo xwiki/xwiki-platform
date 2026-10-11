@@ -19,15 +19,15 @@
  */
 package org.xwiki.filter.xar.internal.input;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -41,11 +41,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.event.model.WikiAttachmentFilter;
+import org.xwiki.filter.event.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.filter.input.AbstractInputStreamInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
+import org.xwiki.xar.internal.model.XarAttachmentModel;
 import org.xwiki.xml.stax.StAXUtils;
 
 /**
@@ -56,6 +58,23 @@ import org.xwiki.xml.stax.StAXUtils;
 @Singleton
 public class AttachmentReader extends AbstractReader implements XARXMLReader<AttachmentReader.WikiAttachmentInputSource>
 {
+    /**
+     * The map of parameters to be used when reading attachments.
+     */
+    private static final Map<String, EventParameter> ATTACHMENT_PARAMETERS = Map.of(
+        XarAttachmentModel.ELEMENT_MIMETYPE, new EventParameter(WikiAttachmentFilter.PARAMETER_MIMETYPE),
+        XarAttachmentModel.ELEMENT_CHARSET, new EventParameter(WikiAttachmentFilter.PARAMETER_CHARSET),
+        XarAttachmentModel.ELEMENT_VERSION, new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION),
+        XarAttachmentModel.ELEMENT_REVISION_AUTHOR,
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR),
+        XarAttachmentModel.ELEMENT_REVISION_DATE,
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_DATE, Date.class),
+        XarAttachmentModel.ELEMENT_REVISION_COMMENT,
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT),
+        XarAttachmentModel.ELEMENT_REVISION_CONTENT_ALIAS,
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_CONTENT_ALIAS),
+        XarAttachmentModel.ELEMENT_JRCSVERSIONS, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+
     /**
      * Represents an abstract attachment content, be it an attachment or an attachment revision.
      */
@@ -69,14 +88,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         @Override
         protected InputStream openStream() throws IOException
         {
-            InputStream stream;
-            if (this.content.isInMemory()) {
-                stream = new ByteArrayInputStream(this.content.getData());
-            } else {
-                stream = new FileInputStream(this.content.getFile());
-            }
-
-            return new Base64InputStream(stream);
+            return new Base64InputStream(this.content.toInputStream());
         }
 
         @Override
@@ -225,33 +237,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
 
         try {
             for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
-                String elementName = xmlReader.getLocalName();
-
-                EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
-
-                if (parameter != null) {
-                    Object wsValue = convert(parameter.type, xmlReader.getElementText());
-                    if (wsValue != null) {
-                        wikiAttachmentSource.parameters.put(parameter.name, wsValue);
-                    }
-                } else {
-                    if (XARAttachmentModel.ELEMENT_NAME.equals(elementName)) {
-                        wikiAttachmentSource.name = xmlReader.getElementText();
-                    } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
-                        wikiAttachmentSource.size = Long.valueOf(xmlReader.getElementText());
-                    } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
-                        readContent(xmlReader, wikiAttachmentSource);
-                    } else if (XARAttachmentModel.ELEMENT_REVISIONS.equals(elementName)) {
-                        // Skip revisions if history is disabled
-                        if (properties.isWithHistory()) {
-                            readRevisions(xmlReader, wikiAttachmentSource);
-                        } else {
-                            StAXUtils.skipElement(xmlReader);
-                        }
-                    } else {
-                        unknownElement(xmlReader);
-                    }
-                }
+                readAttachmentElement(xmlReader, properties, wikiAttachmentSource);
             }
 
             return wikiAttachmentSource;
@@ -261,13 +247,43 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         }
     }
 
+    private void readAttachmentElement(XMLStreamReader xmlReader, XARInputProperties properties,
+        WikiAttachmentInputSource wikiAttachmentSource) throws XMLStreamException, FilterException
+    {
+        String elementName = xmlReader.getLocalName();
+
+        EventParameter parameter = ATTACHMENT_PARAMETERS.get(elementName);
+
+        if (parameter != null) {
+            Object wsValue = convert(parameter.type, xmlReader.getElementText());
+            if (wsValue != null) {
+                wikiAttachmentSource.parameters.put(parameter.name, wsValue);
+            }
+        } else if (XarAttachmentModel.ELEMENT_NAME.equals(elementName)) {
+            wikiAttachmentSource.name = xmlReader.getElementText();
+        } else if (XarAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
+            wikiAttachmentSource.size = Long.valueOf(xmlReader.getElementText());
+        } else if (XarAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
+            readContent(xmlReader, wikiAttachmentSource);
+        } else if (XarAttachmentModel.ELEMENT_REVISIONS.equals(elementName)) {
+            // Skip revisions if history is disabled
+            if (properties.isWithHistory()) {
+                readRevisions(xmlReader, wikiAttachmentSource);
+            } else {
+                StAXUtils.skipElement(xmlReader);
+            }
+        } else {
+            unknownElement(xmlReader);
+        }
+    }
+
     private void readRevisions(XMLStreamReader xmlReader, WikiAttachmentInputSource wikiAttachment)
         throws XMLStreamException, FilterException
     {
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
 
-            if (XARAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
+            if (XarAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
                 wikiAttachment.revisions.add(readRevision(xmlReader));
             }
         }
@@ -281,7 +297,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
                 String elementName = xmlReader.getLocalName();
 
-                EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
+                EventParameter parameter = ATTACHMENT_PARAMETERS.get(elementName);
 
                 if (parameter != null) {
                     Object wsValue = convert(parameter.type, xmlReader.getElementText());
@@ -289,11 +305,11 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                         wikiAttachmentRevisionSource.parameters.put(parameter.name, wsValue);
                     }
                 } else {
-                    if (XARAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
+                    if (XarAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
                         wikiAttachmentRevisionSource.version = xmlReader.getElementText();
-                    } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
+                    } else if (XarAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
                         wikiAttachmentRevisionSource.size = Long.valueOf(xmlReader.getElementText());
-                    } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
+                    } else if (XarAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
                         readContent(xmlReader, wikiAttachmentRevisionSource);
                     } else {
                         unknownElement(xmlReader);
@@ -324,17 +340,17 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             throw new FilterException(e);
         }
 
-        // Create a deferred file based content (if the content is bigger than 10000 bytes it will end up in
+        // Create a deferred file-based content (if the content is bigger than 100 thousand bytes, it will end up in
         // a file)
         content.content = new DeferredFileOutputStream(100000, temporaryFile);
 
-        // Copy the content to byte array or file depending on its size
-        for (xmlReader.next(); xmlReader.isCharacters(); xmlReader.next()) {
-            try {
-                content.content.write(xmlReader.getText().getBytes(StandardCharsets.UTF_8));
-            } catch (IOException e) {
-                throw new FilterException(e);
+        // Copy the content to byte array or file depending on its size and close the stream afterward.
+        try (DeferredFileOutputStream outputStream = content.content) {
+            for (xmlReader.next(); xmlReader.isCharacters(); xmlReader.next()) {
+                outputStream.write(xmlReader.getText().getBytes(StandardCharsets.UTF_8));
             }
+        } catch (IOException e) {
+            throw new FilterException(e);
         }
     }
 }

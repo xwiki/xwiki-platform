@@ -23,19 +23,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
-import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.transport.http.HttpTransporterFactory;
 
 /**
  * Handle Repository-related code.
@@ -113,14 +114,22 @@ public class RepositoryResolver
 
     private RepositorySystem newRepositorySystem()
     {
-        DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-        locator.addService(TransporterFactory.class, FileTransporterFactory.class);
-        locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
+        // Get the RepositorySystem (and all its dependencies, including the connectors and transporters available in
+        // the classpath) from a Sisu/Plexus container, the same way Maven does. Contrary to the deprecated
+        // DefaultServiceLocator (which does not exist anymore in Maven Resolver 2+), this works whatever the version
+        // of Maven Resolver available at runtime.
+        try {
+            ContainerConfiguration configuration = new DefaultContainerConfiguration();
+            configuration.setAutoWiring(true);
+            configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+            PlexusContainer container = new DefaultPlexusContainer(configuration);
 
-        this.remoteRepositoryManager = locator.getService(RemoteRepositoryManager.class);
+            this.remoteRepositoryManager = container.lookup(RemoteRepositoryManager.class);
 
-        return locator.getService(RepositorySystem.class);
+            return container.lookup(RepositorySystem.class);
+        } catch (PlexusContainerException | ComponentLookupException e) {
+            throw new RuntimeException("Failed to create the Maven RepositorySystem", e);
+        }
     }
 
     private RepositorySystemSession newSession(RepositorySystem system)
@@ -130,6 +139,11 @@ public class RepositoryResolver
         String localRepoLocation = System.getProperty("maven.repo.local",
             String.format("%s/.m2/repository", System.getProperty("user.home")));
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+        // Initialize the session with the current JVM system properties. Without this, the session has no system
+        // properties at all, and any POM in the resolved lineage that declares a profile activated by <jdk> (for
+        // example software.amazon.awssdk:aws-sdk-java-pom, imported transitively through xwiki-commons) cannot be
+        // evaluated since "java.version" is missing, which makes the Maven model building fail.
+        session.setSystemProperties(System.getProperties());
         LocalRepository localRepo = new LocalRepository(localRepoLocation);
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 

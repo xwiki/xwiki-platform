@@ -425,7 +425,7 @@ define(['ckeditor'], function(ckeditor) {
         event.editor.on('langLoaded', event =&gt; {
           // CKEditor uses '-' (dash) as locale separator.
           const locale = $jsontool.serialize($xcontext.locale.toString().toLowerCase().replace('_', '-'));
-          // We need to check against the initally configured language and not the one in use
+          // We need to check against the initially configured language and not the one in use
           // because CKEditor might have fallen back to another locale.
           if (event.editor.config.language === locale) {
             event.editor.lang[pluginName] = pluginTranslations;

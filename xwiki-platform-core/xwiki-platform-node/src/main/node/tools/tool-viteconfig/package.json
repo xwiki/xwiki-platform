@@ -1,7 +1,7 @@
 {
   "name": "@xwiki/platform-tool-viteconfig",
-  "version": "18.3.0-SNAPSHOT",
-  "license": "LGPL 2.1",
+  "version": "18.9.0-SNAPSHOT",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -25,10 +25,15 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
-    "vite": "catalog:"
+    "@jridgewell/remapping": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-css-injected-by-js": "catalog:",
+    "vite-plugin-dts": "catalog:"
   },
   "devDependencies": {
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "eslint": "catalog:"
   }
 }

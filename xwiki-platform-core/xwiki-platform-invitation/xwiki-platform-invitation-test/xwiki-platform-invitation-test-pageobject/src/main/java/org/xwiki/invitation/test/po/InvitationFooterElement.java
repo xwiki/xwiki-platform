@@ -64,8 +64,7 @@ public class InvitationFooterElement extends BaseElement
 
     public int myPendingInvitations()
     {
-        if (getDriver().findElementsWithoutWaiting(this.footer, By.id("my-pending-invitations")).size() == 0)
-        {
+        if (getDriver().findElementsWithoutWaiting(this.footer, By.id("my-pending-invitations")).isEmpty()) {
             return 0;
         }
         String message = getDriver().findElementsWithoutWaiting(this.footer,
@@ -75,7 +74,7 @@ public class InvitationFooterElement extends BaseElement
 
     public int spamReports()
     {
-        if (getDriver().findElementsWithoutWaiting(this.footer, By.id("spam-reports")).size() == 0) {
+        if (getDriver().findElementsWithoutWaiting(this.footer, By.id("spam-reports")).isEmpty()) {
             return 0;
         }
         String message = getDriver().findElementsWithoutWaiting(this.footer,

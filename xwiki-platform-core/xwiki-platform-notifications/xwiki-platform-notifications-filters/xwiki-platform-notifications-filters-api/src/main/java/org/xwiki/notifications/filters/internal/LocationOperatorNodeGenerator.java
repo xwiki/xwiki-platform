@@ -47,8 +47,9 @@ public class LocationOperatorNodeGenerator
     private EntityReferenceSerializer<String> localSerializer;
 
     /**
-     * @param location the reference of a location
+     * @param location the reference of a location, which must be a document, a space or a wiki reference
      * @return the AbstractOperatorNode to filter on this location
+     * @throws IllegalArgumentException if the location is neither a document, a space nor a wiki reference
      */
     public AbstractOperatorNode generateNode(EntityReference location)
     {
@@ -68,7 +69,9 @@ public class LocationOperatorNodeGenerator
                 return value(EventProperty.WIKI).eq(value(wiki));
 
             default:
-                return null;
+                throw new IllegalArgumentException(String.format(
+                    "Unsupported location type [%s], expected a document, a space or a wiki reference.",
+                    location.getType()));
         }
     }
 }

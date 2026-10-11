@@ -45,7 +45,7 @@ public abstract class AbstractMailQueueItem implements MailQueueItem
      * @param listener see {@link #getListener()}
      * @param batchId see {@link #getBatchId()}
      */
-    public AbstractMailQueueItem(Session session, MailListener listener, String batchId)
+    protected AbstractMailQueueItem(Session session, MailListener listener, String batchId)
     {
         this.session = session;
         this.listener = listener;

@@ -21,7 +21,7 @@ ul.macro-list > li {
   padding: 6px 12px;
 }
 ul.macro-list > li.selected {
-  background-color: var(--navbar-default-link-active-bg);
+  background-color: var(--nav-link-hover-bg);
 }
 
 ul.macro-list .macro-name,

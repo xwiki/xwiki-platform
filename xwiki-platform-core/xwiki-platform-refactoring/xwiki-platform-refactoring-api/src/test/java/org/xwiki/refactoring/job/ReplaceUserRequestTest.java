@@ -26,13 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link ReplaceUserRequest}.
- * 
+ *
  * @version $Id$
  */
-public class ReplaceUserRequestTest
+class ReplaceUserRequestTest
 {
     @Test
-    public void isReplaceDocumentAuthor()
+    void isReplaceDocumentAuthor()
     {
         ReplaceUserRequest request = new ReplaceUserRequest();
 
@@ -48,7 +48,7 @@ public class ReplaceUserRequestTest
     }
 
     @Test
-    public void isReplaceDocumentCreator()
+    void isReplaceDocumentCreator()
     {
         ReplaceUserRequest request = new ReplaceUserRequest();
 
@@ -64,7 +64,7 @@ public class ReplaceUserRequestTest
     }
 
     @Test
-    public void isReplaceDocumentContentAuthor()
+    void isReplaceDocumentContentAuthor()
     {
         ReplaceUserRequest request = new ReplaceUserRequest();
 

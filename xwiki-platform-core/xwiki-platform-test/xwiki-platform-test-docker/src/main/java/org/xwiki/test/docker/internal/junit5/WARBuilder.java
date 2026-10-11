@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -37,10 +37,9 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.configuration.ConfigurationFilesGenerator;
+import org.xwiki.test.docker.internal.junit5.database.JDBCDriverResolver;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
-import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -142,8 +141,13 @@ public class WARBuilder
                 this.testConfiguration.isResolveExtraJARs());
             this.mavenResolver.addCloverJAR(extraArtifacts);
             maybeAddS3BlobStore(extraArtifacts);
+            // Resolve WEB-INF/lib from the minimal dependencies by default, or from the standard distribution WAR
+            // dependencies when the test requested the standardFlavor mode (so that the bundled core extensions match
+            // a real XWiki instance). Note: ExtensionInstaller must use the same root so that it agrees on what is
+            // bundled (and thus must not be re-provisioned).
             Collection<ArtifactResult> artifactResults =
-                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
+                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts,
+                    this.testConfiguration.getWARDependenciesRootArtifactId());
             List<File> warDependencies = new ArrayList<>();
             List<Artifact> jarDependencies = new ArrayList<>();
             List<File> skinDependencies = new ArrayList<>();
@@ -197,11 +201,7 @@ public class WARBuilder
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
     {
         LOGGER.info("Copying resources to WEB-INF/classes ...");
-        // if we're building a jetty standalone it means we're using a standard maven build so the classes will be built
-        // in target/classes directly.
-        String outputDirectory = (testConfiguration.getServletEngine() != ServletEngine.JETTY_STANDALONE)
-            ? testConfiguration.getOutputDirectory() : "target";
-        File classesDirectory = new File(outputDirectory, "classes");
+        File classesDirectory = new File(testConfiguration.getMavenBuildDirectory(), "classes");
         if (classesDirectory.exists()) {
             copyDirectory(classesDirectory, webInfClassesDirectory);
         }
@@ -210,9 +210,9 @@ public class WARBuilder
     private void copyJDBCDriver(File libDirectory) throws Exception
     {
         LOGGER.info("Copying JDBC driver for database [{}]...", this.testConfiguration.getDatabase());
-        File jdbcDriverFile = getJDBCDriver(this.testConfiguration.getDatabase(), this.artifactResolver);
+        File jdbcDriverFile = JDBCDriverResolver.resolve(this.testConfiguration, this.mavenResolver);
         if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... JDBC driver file: {}", jdbcDriverFile);
+            LOGGER.info("... JDBC driver file: [{}]", jdbcDriverFile);
         }
         copyFile(jdbcDriverFile, libDirectory);
     }
@@ -224,7 +224,7 @@ public class WARBuilder
         for (File file : warDependencies) {
             // Unzip the WARs in the target directory
             if (testConfiguration.isVerbose()) {
-                LOGGER.info("... Unzipping WAR: {}", file);
+                LOGGER.info("... Unzipping WAR: [{}]", file);
             }
             unzip(file, targetWARDirectory);
         }
@@ -243,11 +243,11 @@ public class WARBuilder
         createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
             if (testConfiguration.isVerbose()) {
-                LOGGER.info("... Copying JAR: {}", artifact.getFile());
+                LOGGER.info("... Copying JAR: [{}]", artifact.getFile());
             }
             copyFile(artifact.getFile(), libDirectory);
             if (testConfiguration.isVerbose()) {
-                LOGGER.info("... Generating XED file for: {}", artifact.getFile());
+                LOGGER.info("... Generating XED file for: [{}]", artifact.getFile());
             }
             generateXEDForJAR(artifact, libDirectory, this.mavenResolver);
         }
@@ -260,25 +260,10 @@ public class WARBuilder
         File skinsDirectory = new File(targetWARDirectory, "skins");
         for (File file : skinDependencies) {
             if (testConfiguration.isVerbose()) {
-                LOGGER.info("... Unzipping skin: {}", file);
+                LOGGER.info("... Unzipping skin: [{}]", file);
             }
             unzip(file, skinsDirectory);
         }
-    }
-
-    private File getJDBCDriver(Database database, ArtifactResolver resolver) throws Exception
-    {
-        // Note: If the JDBC driver version is specified as "pom" or null then extract the information from the current
-        // POM.
-        Properties pomProperties = this.mavenResolver.getPropertiesFromCurrentPOM();
-        String driverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-            ? this.testConfiguration.getJDBCDriverVersion()
-            : getPropertyForDatabase("version", database, pomProperties);
-        String groupId = getPropertyForDatabase("groupId", database, pomProperties);
-        String artifactId = getPropertyForDatabase("artifactId", database, pomProperties);
-
-        Artifact artifact = new DefaultArtifact(groupId, artifactId, JAR, driverVersion);
-        return resolver.resolveArtifact(artifact).getArtifact().getFile();
     }
 
     private void maybeAddS3BlobStore(List<Artifact> extraArtifacts) throws Exception
@@ -291,26 +276,20 @@ public class WARBuilder
         }
     }
 
-    private String getPropertyForDatabase(String propertyName, Database database, Properties properties)
-    {
-        String value = properties.getProperty(String.format("%s.%s", database.getPomPropertyPrefix(), propertyName));
-        if (value == null) {
-            throw new RuntimeException(
-                String.format("Failed to get JDBC property [%s] for database [%s]. Database may not be supported yet!",
-                    propertyName, database));
-        }
-        return value;
-    }
-
-    private boolean isJDBCDriverSpecified(String jdbcDriverVersion)
-    {
-        return jdbcDriverVersion != null && !"pom".equalsIgnoreCase(jdbcDriverVersion);
-    }
-
     private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception
     {
-        File targetXEDFile =
-            new File(targetDirectory, artifact.getArtifactId() + '-' + artifact.getBaseVersion() + ".xed");
+        // The XED file must be named exactly like the JAR file it describes (minus the extension) since this is how
+        // the core extension scanner locates it at runtime. This includes the classifier, when there is one.
+        StringBuilder xedName = new StringBuilder();
+        xedName.append(artifact.getArtifactId());
+        xedName.append('-');
+        xedName.append(artifact.getBaseVersion());
+        if (StringUtils.isNotEmpty(artifact.getClassifier())) {
+            xedName.append('-');
+            xedName.append(artifact.getClassifier());
+        }
+        xedName.append(".xed");
+        File targetXEDFile = new File(targetDirectory, xedName.toString());
         generateXED(artifact, targetXEDFile, resolver);
     }
 

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
@@ -34,6 +35,8 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -50,6 +53,8 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -66,8 +71,14 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class RightsFilterListenerTest
+class RightsFilterListenerTest
 {
+    private static final String VIEW_RIGHT = "XWikiRights[0] with levels = [view], users = [], groups = [] "
+        + "and allow = [0]";
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @MockComponent
     private AuthorizationManager authorization;
 
@@ -87,7 +98,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void noRight()
+    void noRight()
     {
         XWikiDocument document = createTestDocument();
         document.setOriginalDocument(document.clone());
@@ -100,7 +111,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void noChange() throws XWikiException
+    void noChange() throws XWikiException
     {
         XWikiDocument document = createTestDocument();
         document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, oldcore.getXWikiContext());
@@ -114,7 +125,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void newEmptyRightObject() throws XWikiException
+    void newEmptyRightObject() throws XWikiException
     {
         XWikiDocument document = createTestDocument();
         document.setOriginalDocument(document.clone());
@@ -128,7 +139,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void newAllowedRightObject() throws XWikiException
+    void newAllowedRightObject() throws XWikiException
     {
         XWikiDocument document = createTestDocument();
         document.setOriginalDocument(document.clone());
@@ -144,7 +155,7 @@ public class RightsFilterListenerTest
     }
 
     @Test
-    public void newDeniedRightObject() throws XWikiException, AccessDeniedException
+    void newDeniedRightObject() throws XWikiException, AccessDeniedException
     {
         XWikiDocument document = createTestDocument();
         BaseObject rightObject =
@@ -162,6 +173,9 @@ public class RightsFilterListenerTest
 
         assertNotEquals(before, document);
         assertEquals(document.getOriginalDocument(), document);
+
+        assertEquals("The right [" + VIEW_RIGHT + "] has been removed from the document [wiki:space.page] because "
+            + "the user [null] is not allowed to set it", this.logCapture.getMessage(0));
     }
 
     @Test
@@ -184,6 +198,66 @@ public class RightsFilterListenerTest
         assertEquals(document.getOriginalDocument(), document);
         assertTrue(document.getXObjectsToRemove().isEmpty());
         assertNotEquals(before, document);
+
+        assertEquals("The right [" + VIEW_RIGHT + "] has been restored in the document [wiki:space.page] because "
+            + "the user [null] is not allowed to remove it", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void partiallyDeniedNewRightObjects() throws Exception
+    {
+        XWikiDocument document = createTestDocument();
+        document.setOriginalDocument(document.clone());
+        BaseObject deniedObject =
+            document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, this.oldcore.getXWikiContext());
+        deniedObject.setStringValue("levels", "view");
+        BaseObject allowedObject =
+            document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, this.oldcore.getXWikiContext());
+        allowedObject.setStringValue("levels", "edit");
+
+        doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.VIEW, null,
+            document.getDocumentReference());
+
+        UserUpdatingDocumentEvent event = new UserUpdatingDocumentEvent();
+        this.listener.onEvent(event, document, null);
+
+        assertFalse(event.isCanceled());
+        // Only the right object the user is not allowed to add is removed
+        assertNull(document.getXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, 0));
+        assertSame(allowedObject, document.getXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, 1));
+
+        assertEquals("The right [" + VIEW_RIGHT + "] has been removed from the document [wiki:space.page] because "
+            + "the user [null] is not allowed to set it", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void partiallyDeniedModifiedRightObjects() throws Exception
+    {
+        XWikiDocument document = createTestDocument();
+        BaseObject deniedObject =
+            document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, this.oldcore.getXWikiContext());
+        deniedObject.setStringValue("levels", "view");
+        BaseObject allowedObject =
+            document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, this.oldcore.getXWikiContext());
+        allowedObject.setStringValue("levels", "edit");
+        document.setOriginalDocument(document.clone());
+        deniedObject.setStringValue("levels", "view,admin");
+        allowedObject.setStringValue("levels", "edit,comment");
+
+        doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.ADMIN, null,
+            document.getDocumentReference());
+
+        UserUpdatingDocumentEvent event = new UserUpdatingDocumentEvent();
+        this.listener.onEvent(event, document, null);
+
+        assertFalse(event.isCanceled());
+        // Only the modification the user is not allowed to do is reverted
+        assertEquals("view", deniedObject.getStringValue("levels"));
+        assertEquals("edit,comment", allowedObject.getStringValue("levels"));
+
+        assertEquals("The modification of the right [XWikiRights[0] with levels = [view,admin], users = [], "
+            + "groups = [] and allow = [0]] in the document [wiki:space.page] has been reverted because the user "
+            + "[null] is not allowed to do it", this.logCapture.getMessage(0));
     }
 
     @Test

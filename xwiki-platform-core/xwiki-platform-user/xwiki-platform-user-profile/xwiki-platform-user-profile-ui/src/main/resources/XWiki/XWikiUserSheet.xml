@@ -80,7 +80,7 @@
   'children' : $categories
   }
 ])
-## Setting automaticaly url &amp; css fields of each category
+## Setting automatically url &amp; css fields of each category
 #foreach($category in $userMenu)
   #foreach($subcategory in $category.get('children'))
     #set($id = $subcategory.get('id')) 
@@ -124,10 +124,12 @@
 (((
   #foreach($category in $userMenu)
     #foreach($subcategory in $category.get('children'))
-      #set($tabKey = $subcategory.get('id')) 
-      (% id="${tabKey}Pane" class="user-page-pane#if($tabKey != $currentCategory) hidden#end" %)
+      #set($tabKey = $services.rendering.escape($subcategory.get('id'), 'xwiki/2.1'))
+      (% id="${tabKey}Pane" class="user-page-pane#if($subcategory.get('id') != $currentCategory) hidden#end" %)
       (((
-        {{html}}$services.rendering.render($subcategory.uix.execute(), 'html/5.0'){{/html}}
+
+{{uiextension id="$services.rendering.escape($subcategory.uix.id, 'xwiki/2.1')"/}}
+
       )))
     #end
   #end
@@ -669,12 +671,10 @@ span#avatarUpload {
 
 #user-menu-col .attachment-picker {
   .buttonwrapper {
-    .wikilink {
-      display: flex;
-      flex-flow: column;
-    }
+    display: flex;
+    flex-flow: column;
 
-    a.button {
+    .button {
       .btn;
       .btn-default;
       border-radius: 0 0 @border-radius-base @border-radius-base;

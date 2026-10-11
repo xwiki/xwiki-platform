@@ -19,6 +19,8 @@
  */
 package org.xwiki.internal.web;
 
+import java.util.Locale;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -76,7 +78,13 @@ public class ViewDocExistValidator implements DocExistValidator
                 && !VIEWER_CHILDREN.equals(viewer)
                 && !VIEWER_SIBLINGS.equals(viewer);
         } else if (hasRev) {
-            return !revisionExists(doc, rev);
+            // Handle the case of a revision of a translation.
+            XWikiDocument docToCheck = doc;
+            XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
+            if (tdoc != null && !Locale.ROOT.equals(tdoc.getLocale())) {
+                docToCheck = tdoc;
+            }
+            return !revisionExists(docToCheck, rev);
         }
         return result;
     }

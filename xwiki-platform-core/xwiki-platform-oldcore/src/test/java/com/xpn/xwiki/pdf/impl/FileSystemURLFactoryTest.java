@@ -19,27 +19,44 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.io.TempDir;
+import org.xwiki.environment.Environment;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -49,35 +66,48 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-@ComponentList({
-    DefaultLegacySpaceResolver.class
-})
-public class FileSystemURLFactoryTest
+@ComponentList({DefaultLegacySpaceResolver.class})
+class FileSystemURLFactoryTest
 {
+    private static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "Alice");
+
+    private static final String DOCUMENT_NAME = "document";
+
+    private static final String SPACE_NAME = "space";
+
+    private static final DocumentReference DOCUMENT_REFERENCE =
+        new DocumentReference("xwiki", SPACE_NAME, DOCUMENT_NAME);
+
+    private static final AttachmentReference ATTACHMENT_REFERENCE =
+        new AttachmentReference("test.txt", DOCUMENT_REFERENCE);
+
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
-    private FileSystemURLFactory urlFactory;
-
     private XWikiRequest mockXWikiRequest;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach() throws XWikiException, IOException
     {
+        this.oldcore.getXWikiContext().setUserReference(USER_REFERENCE);
+
         // Request
         this.mockXWikiRequest = mock(XWikiRequest.class);
         when(this.mockXWikiRequest.getContextPath()).thenReturn("/xwiki");
         this.oldcore.getXWikiContext().setRequest(mockXWikiRequest);
 
-        this.urlFactory = new FileSystemURLFactory();
-        this.urlFactory.init(this.oldcore.getXWikiContext());
+        // Document with attachment
+        XWikiDocument doc = this.oldcore.getSpyXWiki().getDocument(DOCUMENT_REFERENCE, this.oldcore.getXWikiContext());
+        doc.setAttachment(ATTACHMENT_REFERENCE.getName(),
+            new ByteArrayInputStream("content".getBytes(StandardCharsets.UTF_8)), this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(doc, this.oldcore.getXWikiContext());
     }
 
     @Test
-    public void createAttachmentURLWhenAttachmentDoesntExist() throws Exception
+    void createAttachmentURLWhenAttachmentDoesntExist()
     {
         Map<String, File> usedFiles = new HashMap<>();
         this.oldcore.getXWikiContext().put("pdfexport-file-mapping", usedFiles);
@@ -85,10 +115,100 @@ public class FileSystemURLFactoryTest
         tempDir.mkdirs();
         this.oldcore.getXWikiContext().put("pdfexportdir", tempDir);
 
-        assertNull(this.urlFactory.createAttachmentURL("nonexisting.png", "space", "page", "view", null,
+        FileSystemURLFactory urlFactory = new FileSystemURLFactory();
+        urlFactory.init(this.oldcore.getXWikiContext());
+
+        assertNull(urlFactory.createAttachmentURL("nonexisting.png", SPACE_NAME, DOCUMENT_NAME, "view", null,
             this.oldcore.getXWikiContext()));
 
-        assertEquals("Attachment [nonexisting.png] doesn't exist in [xwiki:space.page]. Generated content will have "
+        assertEquals("Attachment [nonexisting.png] doesn't exist in [xwiki:space.document]. Generated content will have "
             + "invalid content (empty image or broken link)", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void createAttachmentURLWhenAccessCheckIsDisabled(@TempDir File exportDir)
+    {
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, ATTACHMENT_REFERENCE))
+            .thenReturn(false);
+
+        this.oldcore.getXWikiContext().put("pdfexport-file-mapping", new HashMap<>());
+        this.oldcore.getXWikiContext().put("pdfexportdir", exportDir);
+
+        FileSystemURLFactory urlFactory = new FileSystemURLFactory();
+        urlFactory.init(this.oldcore.getXWikiContext());
+
+        assertNotNull(urlFactory.createAttachmentURL(ATTACHMENT_REFERENCE.getName(), SPACE_NAME, DOCUMENT_NAME, "view",
+            null, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void createAttachmentURLWhenUserHasViewRight(@TempDir File exportDir)
+    {
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, ATTACHMENT_REFERENCE))
+            .thenReturn(true);
+
+        this.oldcore.getXWikiContext().put("pdfexport-file-mapping", new HashMap<>());
+        this.oldcore.getXWikiContext().put("pdfexportdir", exportDir);
+
+        FileSystemURLFactory accessFactory = new FileSystemURLFactory(true);
+        accessFactory.init(this.oldcore.getXWikiContext());
+
+        assertNotNull(accessFactory.createAttachmentURL(ATTACHMENT_REFERENCE.getName(), SPACE_NAME, DOCUMENT_NAME,
+            "view", null, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void createAttachmentURLWhenUserHasNoViewRight(@TempDir File exportDir)
+    {
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, ATTACHMENT_REFERENCE))
+            .thenReturn(false);
+
+        this.oldcore.getXWikiContext().put("pdfexport-file-mapping", new HashMap<>());
+        this.oldcore.getXWikiContext().put("pdfexportdir", exportDir);
+
+        FileSystemURLFactory accessFactory = new FileSystemURLFactory(true);
+        accessFactory.init(this.oldcore.getXWikiContext());
+
+        assertNull(accessFactory.createAttachmentURL(ATTACHMENT_REFERENCE.getName(), SPACE_NAME, DOCUMENT_NAME, "view",
+            null, this.oldcore.getXWikiContext()));
+
+        assertEquals("User [xwiki:XWiki.Alice] doesn't have access to attachment "
+            + "[Attachment xwiki:space.document@test.txt] so it won't be exported", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void createResourceAndSkinURLs(@TempDir File exportDir) throws Exception
+    {
+        // The environment does not return resources located outside of the requested prefix.
+        Environment environment = this.oldcore.getMocker().registerMockComponent(Environment.class);
+        when(environment.getResourceAsStream("/resources/", "js/test.js"))
+            .thenReturn(new ByteArrayInputStream("resource".getBytes(StandardCharsets.UTF_8)));
+        when(environment.getResourceAsStream("/skins/", "flamingo/style.css"))
+            .thenReturn(new ByteArrayInputStream("skin".getBytes(StandardCharsets.UTF_8)));
+
+        XWikiResponse response = mock(XWikiResponse.class);
+        when(response.encodeURL(anyString())).then(invocation -> invocation.getArgument(0));
+        this.oldcore.getXWikiContext().setResponse(response);
+
+        this.oldcore.getXWikiContext().put("pdfexport-file-mapping", new HashMap<>());
+        this.oldcore.getXWikiContext().put("pdfexportdir", exportDir);
+
+        FileSystemURLFactory urlFactory = new FileSystemURLFactory();
+        urlFactory.init(this.oldcore.getXWikiContext());
+
+        URL url = urlFactory.createResourceURL("js/test.js", false, this.oldcore.getXWikiContext());
+        assertEquals("resource", FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8));
+        url = urlFactory.createSkinURL("style.css", "flamingo", this.oldcore.getXWikiContext());
+        assertEquals("skin", FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8));
+
+        // Path traversal attempts fallback on standard URLs.
+        assertEquals("http", urlFactory
+            .createResourceURL("../WEB-INF/xwiki.cfg", false, this.oldcore.getXWikiContext()).getProtocol());
+        assertEquals("http", urlFactory
+            .createSkinURL("../../WEB-INF/xwiki.cfg", "flamingo", this.oldcore.getXWikiContext()).getProtocol());
+
+        verify(environment).getResourceAsStream("/resources/", "../WEB-INF/xwiki.cfg");
+        verify(environment).getResourceAsStream("/skins/", "flamingo/../../WEB-INF/xwiki.cfg");
+        verify(environment, never()).getResourceAsStream(anyString());
     }
 }

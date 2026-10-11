@@ -19,26 +19,28 @@
  */
 package org.xwiki.wiki.internal.descriptor.document;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper}.
@@ -46,69 +48,68 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 6.0M1
  */
-public class DefaultWikiDescriptorDocumentHelperTest
+@ComponentTest
+class DefaultWikiDescriptorDocumentHelperTest
 {
-    @Rule
-    public org.xwiki.test.mockito.MockitoComponentMockingRule<DefaultWikiDescriptorDocumentHelper> mocker =
-            new MockitoComponentMockingRule<>(DefaultWikiDescriptorDocumentHelper.class);
+    @InjectMockComponents
+    private DefaultWikiDescriptorDocumentHelper documentHelper;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private QueryManager queryManager;
 
+    @MockComponent
+    @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     private XWikiContext context;
 
     private XWiki xwiki;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        wikiDescriptorManager = mocker.registerMockComponent(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
 
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        context = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(context);
-        xwiki = mock(XWiki.class);
-        when(context.getWiki()).thenReturn(xwiki);
-
-        queryManager = mocker.getInstance(QueryManager.class);
-        documentReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+        this.context = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.context);
+        this.xwiki = mock(XWiki.class);
+        when(this.context.getWiki()).thenReturn(this.xwiki);
     }
 
     @Test
-    public void getDocumentReferenceFromId() throws Exception
+    void getDocumentReferenceFromId()
     {
         DocumentReference docRef = new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, "XWikiServerWikiid1");
-        assertEquals(docRef, this.mocker.getComponentUnderTest().getDocumentReferenceFromId("wikiid1"));
+        assertEquals(docRef, this.documentHelper.getDocumentReferenceFromId("wikiid1"));
     }
 
     @Test
-    public void getDocumentFromWikiId() throws Exception
+    void getDocumentFromWikiId() throws Exception
     {
         DocumentReference docRef = new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, "XWikiServerWikiid1");
         XWikiDocument document = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(docRef), any(XWikiContext.class))).thenReturn(document);
+        when(this.xwiki.getDocument(eq(docRef), any(XWikiContext.class))).thenReturn(document);
 
-        XWikiDocument returnedDocument = this.mocker.getComponentUnderTest().getDocumentFromWikiId("wikiid1");
+        XWikiDocument returnedDocument = this.documentHelper.getDocumentFromWikiId("wikiid1");
         assertEquals(returnedDocument, document);
     }
 
     @Test
-    public void getWikiIdFromDocumentFullname() throws Exception
+    void getWikiIdFromDocumentFullname()
     {
-        String result = mocker.getComponentUnderTest().getWikiIdFromDocumentFullname("XWiki.XWikiServerSubwiki");
+        String result = this.documentHelper.getWikiIdFromDocumentFullname("XWiki.XWikiServerSubwiki");
         assertEquals("subwiki", result);
 
-        result = mocker.getComponentUnderTest().getWikiIdFromDocumentFullname("XWiki.XWikiServerXWikiServer");
+        result = this.documentHelper.getWikiIdFromDocumentFullname("XWiki.XWikiServerXWikiServer");
         assertEquals("xwikiserver", result);
 
-        result = mocker.getComponentUnderTest().getWikiIdFromDocumentFullname("XWiki.XWikiServerAbbc");
+        result = this.documentHelper.getWikiIdFromDocumentFullname("XWiki.XWikiServerAbbc");
         assertEquals("abbc", result);
     }
-
 }

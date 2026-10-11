@@ -33,7 +33,7 @@ import org.xwiki.url.URLNormalizer;
 import org.xwiki.vfs.VfsResourceReference;
 
 /**
- * Helper to implemet scheme-specific serializers to Converts a {@link VfsResourceReference} into a relative
+ * Helper to implement scheme-specific serializers to Converts a {@link VfsResourceReference} into a relative
  * {@link ExtendedURL} (with the Context Path added).
  *
  * @version $Id$

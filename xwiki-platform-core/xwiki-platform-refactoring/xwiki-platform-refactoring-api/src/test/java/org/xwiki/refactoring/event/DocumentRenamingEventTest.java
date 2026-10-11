@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link DocumentRenamingEvent}.
- * 
+ *
  * @version $Id$
  */
-public class DocumentRenamingEventTest
+class DocumentRenamingEventTest
 {
     private DocumentReference alice = new DocumentReference("wiki", "Users", "Alice");
 
@@ -42,25 +42,26 @@ public class DocumentRenamingEventTest
     private DocumentReference carol = new DocumentReference("wiki", "Users", "Carol");
 
     @Test
-    public void equalsAndHashCode()
+    void equalsAndHashCode()
     {
         assertEquals(new DocumentRenamingEvent(), new DocumentRenamingEvent());
         assertEquals(new DocumentRenamingEvent().hashCode(), new DocumentRenamingEvent().hashCode());
 
-        assertEquals(new DocumentRenamingEvent(alice, bob), new DocumentRenamingEvent(alice, bob));
-        assertEquals(new DocumentRenamingEvent(bob, carol).hashCode(),
-            new DocumentRenamingEvent(bob, carol).hashCode());
+        assertEquals(new DocumentRenamingEvent(this.alice, this.bob), new DocumentRenamingEvent(this.alice, this.bob));
+        assertEquals(new DocumentRenamingEvent(this.bob, this.carol).hashCode(),
+            new DocumentRenamingEvent(this.bob, this.carol).hashCode());
 
         assertNotEquals(new DocumentRenamingEvent(), null);
         assertNotEquals(new DocumentRenamingEvent(), new DocumentRenamedEvent());
-        assertNotEquals(new DocumentRenamingEvent(alice, bob), new DocumentRenamingEvent(alice, carol));
+        assertNotEquals(new DocumentRenamingEvent(this.alice, this.bob),
+            new DocumentRenamingEvent(this.alice, this.carol));
 
-        assertNotEquals(new DocumentRenamingEvent(alice, bob).hashCode(),
-            new DocumentRenamingEvent(alice, carol).hashCode());
+        assertNotEquals(new DocumentRenamingEvent(this.alice, this.bob).hashCode(),
+            new DocumentRenamingEvent(this.alice, this.carol).hashCode());
     }
 
     @Test
-    public void cancel()
+    void cancel()
     {
         DocumentRenamingEvent event = new DocumentRenamingEvent();
 
@@ -74,33 +75,37 @@ public class DocumentRenamingEventTest
     }
 
     @Test
-    public void matches()
+    void matches()
     {
         assertFalse(new DocumentRenamingEvent().matches(null));
         assertFalse(new DocumentRenamingEvent().matches(new DocumentRenamedEvent()));
 
         assertTrue(new DocumentRenamingEvent().matches(new DocumentRenamingEvent()));
-        assertTrue(new DocumentRenamingEvent().matches(new DocumentRenamingEvent(alice, bob)));
+        assertTrue(new DocumentRenamingEvent().matches(new DocumentRenamingEvent(this.alice, this.bob)));
 
-        assertFalse(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent()));
-        assertFalse(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent(bob, null)));
-        assertFalse(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent(null, alice)));
+        assertFalse(new DocumentRenamingEvent(this.alice, null).matches(new DocumentRenamingEvent()));
+        assertFalse(new DocumentRenamingEvent(this.alice, null).matches(new DocumentRenamingEvent(this.bob, null)));
+        assertFalse(new DocumentRenamingEvent(this.alice, null).matches(new DocumentRenamingEvent(null, this.alice)));
 
-        assertTrue(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent(alice, null)));
-        assertTrue(new DocumentRenamingEvent(alice, null).matches(new DocumentRenamingEvent(alice, carol)));
+        assertTrue(new DocumentRenamingEvent(this.alice, null).matches(new DocumentRenamingEvent(this.alice, null)));
+        assertTrue(new DocumentRenamingEvent(this.alice, null).matches(new DocumentRenamingEvent(this.alice, this.carol)));
 
-        assertFalse(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent()));
-        assertFalse(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent(null, bob)));
-        assertFalse(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent(alice, null)));
+        assertFalse(new DocumentRenamingEvent(null, this.alice).matches(new DocumentRenamingEvent()));
+        assertFalse(new DocumentRenamingEvent(null, this.alice).matches(new DocumentRenamingEvent(null, this.bob)));
+        assertFalse(new DocumentRenamingEvent(null, this.alice).matches(new DocumentRenamingEvent(this.alice, null)));
 
-        assertTrue(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent(null, alice)));
-        assertTrue(new DocumentRenamingEvent(null, alice).matches(new DocumentRenamingEvent(carol, alice)));
+        assertTrue(new DocumentRenamingEvent(null, this.alice).matches(new DocumentRenamingEvent(null, this.alice)));
+        assertTrue(new DocumentRenamingEvent(null, this.alice).matches(new DocumentRenamingEvent(this.carol, this.alice)));
 
-        assertFalse(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent()));
-        assertFalse(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent(bob, alice)));
-        assertFalse(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent(alice, carol)));
-        assertFalse(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent(carol, bob)));
+        assertFalse(new DocumentRenamingEvent(this.alice, this.bob).matches(new DocumentRenamingEvent()));
+        assertFalse(new DocumentRenamingEvent(this.alice, this.bob).matches(
+            new DocumentRenamingEvent(this.bob, this.alice)));
+        assertFalse(new DocumentRenamingEvent(this.alice, this.bob).matches(
+            new DocumentRenamingEvent(this.alice, this.carol)));
+        assertFalse(new DocumentRenamingEvent(this.alice, this.bob).matches(
+            new DocumentRenamingEvent(this.carol, this.bob)));
 
-        assertTrue(new DocumentRenamingEvent(alice, bob).matches(new DocumentRenamingEvent(alice, bob)));
+        assertTrue(new DocumentRenamingEvent(this.alice, this.bob).matches(
+            new DocumentRenamingEvent(this.alice, this.bob)));
     }
 }

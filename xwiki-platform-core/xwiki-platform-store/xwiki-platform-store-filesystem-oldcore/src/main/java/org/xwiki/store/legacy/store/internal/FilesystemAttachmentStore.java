@@ -336,7 +336,6 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         {
             boolean link = false;
 
-            //////////////////
             // ARCHIVE
 
             // If the versioning store supports TransactionRunnable then use it, otherwise don't.
@@ -374,7 +373,6 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 }.runIn(this);
             }
 
-            //////////////////
             // CURRENT
 
             Blob linkAttachFile = StoreFileUtils.getLinkBlob(attachFile);
@@ -407,7 +405,6 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 FilesystemAttachmentStore.this.fileTools.getTempFile(otherAttachFile),
                 FilesystemAttachmentStore.this.fileTools.getLockForFile(otherAttachFile.getPath())).runIn(this);
 
-            //////////////////
             // DOCUMENT
 
             // If updating of the parent document is required then add a TransactionRunnable to do that.
@@ -468,8 +465,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             // If the store supports deleting in the same transaction then do it.
             final AttachmentVersioningStore avs = context.getWiki().getDefaultAttachmentArchiveStore();
 
-            if (avs instanceof FilesystemAttachmentVersioningStore) {
-                final FilesystemAttachmentVersioningStore favs = (FilesystemAttachmentVersioningStore) avs;
+            if (avs instanceof FilesystemAttachmentVersioningStore favs) {
                 favs.getArchiveDeleteRunnable(attachment.loadArchive(context)).runIn(this);
             } else {
                 new TransactionRunnable<HibernateTransaction>()
@@ -491,7 +487,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         protected void onRun() throws Exception
         {
             // TODO: When the rest of storage is rewritten using TransactionRunnable,
-            // this method should be disolved.
+            // this method should be dissolved.
 
             final Session session = this.context.getWiki().getHibernateStore().getSession(this.context);
 
@@ -535,7 +531,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             try {
                 return this.componentManager.getInstance(AttachmentVersioningStore.class, storeType);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Can't find attachment versionning store for type [{}]", storeType, e);
+                this.logger.warn("Can't find attachment versioning store for type [{}]", storeType, e);
             }
         }
 

@@ -35,7 +35,7 @@ public abstract class AbstractUnaryOperatorNode extends AbstractOperatorNode
      *
      * @param operand the node operand
      */
-    public AbstractUnaryOperatorNode(AbstractNode operand)
+    protected AbstractUnaryOperatorNode(AbstractNode operand)
     {
         if (operand == null) {
             throw new NullPointerException("A unary operand should have its operand defined.");
@@ -55,8 +55,8 @@ public abstract class AbstractUnaryOperatorNode extends AbstractOperatorNode
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof AbstractUnaryOperatorNode
-                && operand.equals(((AbstractUnaryOperatorNode) o).operand));
+        return (o instanceof AbstractUnaryOperatorNode abstractUnaryOperatorNode
+                && operand.equals(abstractUnaryOperatorNode.operand));
     }
 
     @Override

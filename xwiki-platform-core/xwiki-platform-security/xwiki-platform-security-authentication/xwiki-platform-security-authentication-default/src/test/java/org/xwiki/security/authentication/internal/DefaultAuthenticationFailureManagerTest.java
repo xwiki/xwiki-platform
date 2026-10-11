@@ -138,7 +138,7 @@ class DefaultAuthenticationFailureManagerTest
     }
 
     @BeforeEach
-    public void setup() throws Exception
+    void setup() throws Exception
     {
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy1", "strategy2" });
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(3);
@@ -436,8 +436,8 @@ class DefaultAuthenticationFailureManagerTest
         HttpServletRequest request = getRequest("getForm");
         String formStrategy1 = "formStrategy1";
         String formStrategy2 = "formStrategy2";
-        when(this.strategy1.getForm(eq(this.failingLogin))).thenReturn(formStrategy1);
-        when(this.strategy2.getForm(eq(this.failingLogin))).thenReturn(formStrategy2);
+        when(this.strategy1.getForm(this.failingLogin)).thenReturn(formStrategy1);
+        when(this.strategy2.getForm(this.failingLogin)).thenReturn(formStrategy2);
 
         assertEquals("", this.defaultAuthenticationFailureManager.getForm(this.failingLogin, request));
 
@@ -454,8 +454,8 @@ class DefaultAuthenticationFailureManagerTest
         HttpServletRequest request = getRequest("failingSession2");
         String formStrategy1 = "formStrategy1";
         String formStrategy2 = "formStrategy2";
-        when(this.strategy1.getForm(eq(this.failingLogin))).thenReturn(formStrategy1);
-        when(this.strategy2.getForm(eq(this.failingLogin))).thenReturn(formStrategy2);
+        when(this.strategy1.getForm(this.failingLogin)).thenReturn(formStrategy1);
+        when(this.strategy2.getForm(this.failingLogin)).thenReturn(formStrategy2);
 
         when(this.sessionFailing.get("failingSession2")).thenReturn(new Date().toInstant());
         assertEquals("", this.defaultAuthenticationFailureManager.getForm(this.failingLogin, request));
@@ -474,8 +474,8 @@ class DefaultAuthenticationFailureManagerTest
         HttpServletRequest request = getRequest("errorMsg");
         String errorMessage1 = "errorMessage1";
         String errorMessage2 = "errorMessage2";
-        when(this.strategy1.getErrorMessage(eq(this.failingLogin))).thenReturn(errorMessage1);
-        when(this.strategy2.getErrorMessage(eq(this.failingLogin))).thenReturn(errorMessage2);
+        when(this.strategy1.getErrorMessage(this.failingLogin)).thenReturn(errorMessage1);
+        when(this.strategy2.getErrorMessage(this.failingLogin)).thenReturn(errorMessage2);
 
         assertEquals("", this.defaultAuthenticationFailureManager.getErrorMessage(this.failingLogin));
 
@@ -546,8 +546,8 @@ class DefaultAuthenticationFailureManagerTest
         assertNull(userReference);
         DocumentReference globalReference = new DocumentReference("mainwiki", "XWiki", "foo");
         DocumentReference localReference = new DocumentReference("currentwiki", "XWiki", "foo");
-        verify(xwiki).getDocument(eq(globalReference), eq(context));
-        verify(xwiki).getDocument(eq(localReference), eq(context));
+        verify(xwiki).getDocument(globalReference, context);
+        verify(xwiki).getDocument(localReference, context);
     }
 
     /**
@@ -563,13 +563,13 @@ class DefaultAuthenticationFailureManagerTest
         XWikiDocument xWikiDocument = mock(XWikiDocument.class);
 
         when(context.getWiki()).thenReturn(xwiki);
-        when(xwiki.getDocument(eq(globalReference), eq(context))).thenReturn(xWikiDocument);
+        when(xwiki.getDocument(globalReference, context)).thenReturn(xWikiDocument);
         when(xWikiDocument.isNew()).thenReturn(false);
         DocumentReference userReference = this.defaultAuthenticationFailureManager.findUser("foo");
         assertEquals(globalReference, userReference);
 
-        verify(xwiki).getDocument(eq(globalReference), eq(context));
-        verify(xwiki, never()).getDocument(eq(localReference), eq(context));
+        verify(xwiki).getDocument(globalReference, context);
+        verify(xwiki, never()).getDocument(localReference, context);
     }
 
     /**
@@ -586,15 +586,15 @@ class DefaultAuthenticationFailureManagerTest
         when(context.getWiki()).thenReturn(xwiki);
         XWikiDocument xWikiLocalDocument = mock(XWikiDocument.class);
         XWikiDocument xWikiGlobalDocument = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(globalReference), eq(context))).thenReturn(xWikiGlobalDocument);
-        when(xwiki.getDocument(eq(localReference), eq(context))).thenReturn(xWikiLocalDocument);
+        when(xwiki.getDocument(globalReference, context)).thenReturn(xWikiGlobalDocument);
+        when(xwiki.getDocument(localReference, context)).thenReturn(xWikiLocalDocument);
         when(xWikiGlobalDocument.isNew()).thenReturn(true);
         when(xWikiLocalDocument.isNew()).thenReturn(false);
         DocumentReference userReference = this.defaultAuthenticationFailureManager.findUser("foo");
         assertEquals(localReference, userReference);
 
-        verify(xwiki).getDocument(eq(globalReference), eq(context));
-        verify(xwiki).getDocument(eq(localReference), eq(context));
+        verify(xwiki).getDocument(globalReference, context);
+        verify(xwiki).getDocument(localReference, context);
     }
 
     @Test

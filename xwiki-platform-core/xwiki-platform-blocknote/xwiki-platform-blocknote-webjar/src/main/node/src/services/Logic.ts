@@ -23,7 +23,7 @@ import XWikiBlockNote from "../components/XWikiBlockNote.vue";
 import { createPinia } from "pinia";
 import { createApp, reactive } from "vue";
 import { createI18n } from "vue-i18n";
-import type { SkinManager } from "@xwiki/platform-api";
+import type { DesignSystemLoader, SkinManager } from "@xwiki/platform-api";
 import type { App } from "vue";
 import type { I18n } from "vue-i18n";
 
@@ -38,7 +38,6 @@ type Data = {
 export class Logic {
   private readonly _host: HTMLElement;
   private readonly _name?: string;
-  private readonly _realtimeServerURL?: string;
   private readonly _data: Data;
   private readonly _ready: Promise<Logic>;
   private _resolveReady?: (logic: Logic) => void;
@@ -47,14 +46,26 @@ export class Logic {
   private readonly _root: InstanceType<typeof XWikiBlockNote>;
 
   // eslint-disable-next-line max-statements
-  constructor(host: HTMLElement) {
+  constructor(
+    host: HTMLElement,
+    { designSystemLoader }: { designSystemLoader: DesignSystemLoader },
+  ) {
     this._host = host;
     this._name = host.getAttribute("name") ?? host.id ?? host.dataset.name;
-    this._data = reactive(this._parseDataFromHost());
+    this._data = reactive(this.parseDataFromHost());
 
     this._ready = new Promise((resolve) => {
       this._resolveReady = resolve;
     });
+
+    // TODO: Until all the components are moved to the new client-side component manager, the design system loader
+    // is resolved on the component manager side, then passed as a constant value to the Blocknote container. This
+    // is working as long as the graph of components from the component manager does not need to inject components
+    // from Blocknote's container.
+    container
+      .bind("DesignSystemLoader")
+      .toConstantValue(designSystemLoader)
+      .whenNamed("xwiki");
 
     const skinManager: SkinManager = container.get("SkinManager");
 
@@ -101,8 +112,8 @@ export class Logic {
   /**
    * @returns the data managed by this BlockNote instance
    */
-  async data(): Promise<Data> {
-    this._data.value = await this._root.updateValue();
+  data(): Data {
+    this._data.value = this._root.updateValue();
     return this._data;
   }
 
@@ -111,10 +122,6 @@ export class Logic {
    */
   get ready(): Promise<Logic> {
     return this._ready;
-  }
-
-  get realtimeServerURL(): string | undefined {
-    return this._realtimeServerURL;
   }
 
   /**
@@ -144,8 +151,9 @@ export class Logic {
   /**
    * @returns the data parsed from the host element
    */
-  _parseDataFromHost(): Data {
+  private parseDataFromHost(): Data {
     const data = Object.assign(
+      this.getBaseConfig(),
       this._host.dataset.config ? JSON.parse(this._host.dataset.config) : {},
       {
         ...this._host.dataset,
@@ -154,5 +162,19 @@ export class Logic {
     delete data.config;
     data.initialValue = data.value;
     return data;
+  }
+
+  /**
+   * @returns the base configuration for all BlockNote instances on the page
+   */
+  private getBaseConfig(): Data {
+    try {
+      return JSON.parse(
+        document.getElementById("blocknote-config")?.textContent ?? "{}",
+      );
+    } catch (e) {
+      console.error("Failed to parse the base BlockNote configuration.", e);
+      return {};
+    }
   }
 }

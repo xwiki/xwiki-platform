@@ -90,58 +90,60 @@ public class ExtensionSupportProtectionListener extends AbstractEventListener im
         BaseObject nextExtensionObject = nextDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
 
         // If the extension object was removed we cannot really filter anything
-        if (nextExtensionObject != null) {
-            // Get the new support plans
-            List<String> nextSupportPlans =
-                nextExtensionObject.getListValue(XWikiRepositoryModel.PROP_EXTENSION_SUPPORTPLANS);
+        if (nextExtensionObject == null) {
+            return;
+        }
 
-            // Get the previous support plans
-            List<String> previousSupportPlans;
-            if (previousExtensionObject != null) {
-                previousSupportPlans =
-                    previousExtensionObject.getListValue(XWikiRepositoryModel.PROP_EXTENSION_SUPPORTPLANS);
-            } else {
-                previousSupportPlans = List.of();
+        // Get the new support plans
+        List<String> nextSupportPlans =
+            nextExtensionObject.getListValue(XWikiRepositoryModel.PROP_EXTENSION_SUPPORTPLANS);
+
+        // Get the previous support plans
+        List<String> previousSupportPlans;
+        if (previousExtensionObject != null) {
+            previousSupportPlans =
+                previousExtensionObject.getListValue(XWikiRepositoryModel.PROP_EXTENSION_SUPPORTPLANS);
+        } else {
+            previousSupportPlans = List.of();
+        }
+
+        DocumentReference extensionReference = nextDocument.getDocumentReference();
+        DocumentReference userReference = ((UserEvent) event).getUserReference();
+
+        // Make sure the list is modifiable
+        nextSupportPlans = new ArrayList<>(nextSupportPlans);
+        boolean updated = false;
+
+        // Remove all the plans the current user is not allowed to add
+        List<String> addedSupportPlans = ListUtils.subtract(nextSupportPlans, previousSupportPlans);
+        for (String supportPlan : addedSupportPlans) {
+            if (!isAllowed(userReference, supportPlan, extensionReference)) {
+                this.logger.warn("The user [{}] tried to add the support plan [{}] to extension [{}]. Reverted.",
+                    userReference, supportPlan, extensionReference);
+
+                // Remove the support plan
+                nextSupportPlans.remove(supportPlan);
+                updated = true;
             }
+        }
 
-            DocumentReference extensionReference = nextDocument.getDocumentReference();
-            DocumentReference userReference = ((UserEvent) event).getUserReference();
+        // Restore all the plans the current user is not allowed to remove
+        List<String> removedSupportPlans = ListUtils.subtract(previousSupportPlans, nextSupportPlans);
+        for (String supportPlan : removedSupportPlans) {
+            if (!isAllowed(userReference, supportPlan, extensionReference)) {
+                this.logger.warn(
+                    "The user [{}] tried to remove the support plan [{}] from extension [{}]. Reverted.",
+                    userReference, supportPlan, extensionReference);
 
-            // Make sure the list is modifiable
-            nextSupportPlans = new ArrayList<>(nextSupportPlans);
-            boolean updated = false;
-
-            // Remove all the plans the current user is not allowed to add
-            List<String> addedSupportPlans = ListUtils.subtract(nextSupportPlans, previousSupportPlans);
-            for (String supportPlan : addedSupportPlans) {
-                if (!isAllowed(userReference, supportPlan, extensionReference)) {
-                    this.logger.warn("The user [{}] tried to add the support plan [{}] to extension [{}]. Reverted.",
-                        userReference, supportPlan, extensionReference);
-
-                    // Remove the support plan
-                    nextSupportPlans.remove(supportPlan);
-                    updated = true;
-                }
+                // Add back the support plan
+                nextSupportPlans.add(supportPlan);
+                updated = true;
             }
+        }
 
-            // Restore all the plans the current user is not allowed to remove
-            List<String> removedSupportPlans = ListUtils.subtract(previousSupportPlans, nextSupportPlans);
-            for (String supportPlan : removedSupportPlans) {
-                if (!isAllowed(userReference, supportPlan, extensionReference)) {
-                    this.logger.warn(
-                        "The user [{}] tried to remove the support plan [{}] from extension [{}]. Reverted.",
-                        userReference, supportPlan, extensionReference);
-
-                    // Add back the support plan
-                    nextSupportPlans.add(supportPlan);
-                    updated = true;
-                }
-            }
-
-            if (updated) {
-                nextExtensionObject.setStringListValue(XWikiRepositoryModel.PROP_EXTENSION_SUPPORTPLANS,
-                    nextSupportPlans);
-            }
+        if (updated) {
+            nextExtensionObject.setStringListValue(XWikiRepositoryModel.PROP_EXTENSION_SUPPORTPLANS,
+                nextSupportPlans);
         }
     }
 

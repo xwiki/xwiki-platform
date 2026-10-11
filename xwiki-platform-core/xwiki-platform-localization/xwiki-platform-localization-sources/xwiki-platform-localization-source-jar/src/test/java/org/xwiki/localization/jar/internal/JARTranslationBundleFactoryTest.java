@@ -28,7 +28,8 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.internal.embed.EmbeddableComponentManagerFactory;
 import org.xwiki.component.internal.multi.DefaultComponentManagerManager;
@@ -65,6 +66,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 
 @ComponentList({JARTranslationBundleFactory.class, MessageToolTranslationMessageParser.class,
     PlainTextBlockParser.class, ContextComponentManagerProvider.class, DefaultLocalizationManager.class,
@@ -91,7 +93,7 @@ class JARTranslationBundleFactoryTest
     private ExtensionPackager extensionPackager;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.extensionPackager = new ExtensionPackager(null, new File("target/test-" + new Date().getTime()));
         this.extensionPackager.generateExtensions();
@@ -112,7 +114,12 @@ class JARTranslationBundleFactoryTest
 
     private DefaultInstalledExtension mockInstalledExtension(ExtensionId extensionId, String namespace)
     {
-        DefaultLocalExtension localExtension = new DefaultLocalExtension(null, extensionId, "jar");
+        return mockInstalledExtension(extensionId, namespace, "jar");
+    }
+
+    private DefaultInstalledExtension mockInstalledExtension(ExtensionId extensionId, String namespace, String type)
+    {
+        DefaultLocalExtension localExtension = new DefaultLocalExtension(null, extensionId, type);
         localExtension.setFile(this.extensionPackager.getExtensionFile(extensionId));
 
         DefaultInstalledExtension installedExtension = new DefaultInstalledExtension(localExtension, null);
@@ -124,7 +131,12 @@ class JARTranslationBundleFactoryTest
 
     private void mockInstallExtension(ExtensionId extensionId, String namespace) throws ComponentLookupException
     {
-        DefaultInstalledExtension installedExtension = mockInstalledExtension(extensionId, namespace);
+        mockInstallExtension(extensionId, namespace, "jar");
+    }
+
+    private void mockInstallExtension(ExtensionId extensionId, String namespace, String type) throws ComponentLookupException
+    {
+        DefaultInstalledExtension installedExtension = mockInstalledExtension(extensionId, namespace, type);
 
         getObservationManager().notify(new ExtensionInstalledEvent(extensionId, namespace), installedExtension);
     }
@@ -184,12 +196,13 @@ class JARTranslationBundleFactoryTest
         assertTranslation("test.key", "en_US translation", Locale.US);
     }
 
-    @Test
-    void upgradeJar() throws ComponentLookupException
+    @ParameterizedTest
+    @ValueSource(strings = {"jar", "webjar"})
+    void upgradeJar(String type) throws ComponentLookupException
     {
         ExtensionId previousExtensionId = new ExtensionId("jar", "1.0");
 
-        mockInstallExtension(previousExtensionId, null);
+        mockInstallExtension(previousExtensionId, null, type);
 
         assertTranslation("test.key", "default translation", Locale.ROOT);
         assertTranslation("test.key", "en translation", Locale.ENGLISH);
@@ -223,7 +236,7 @@ class JARTranslationBundleFactoryTest
     {
         ExtensionId extensionId = new ExtensionId("jar", "1.0");
 
-        Mockito.when(mockInstalledExtensionRepository.getInstalledExtensions())
+        when(mockInstalledExtensionRepository.getInstalledExtensions())
             .thenReturn(Arrays.<InstalledExtension>asList(mockInstalledExtension(extensionId, null)));
 
         // Trigger initialization

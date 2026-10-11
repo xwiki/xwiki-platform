@@ -57,6 +57,6 @@ public class DebuggingDependencyVisitor implements DependencyVisitor
 
     private void printInfoLog(DependencyNode dependencyNode)
     {
-        LOGGER.info(StringUtils.repeat(" ", this.level) + "{}", dependencyNode.getArtifact());
+        LOGGER.info("{}[{}]", StringUtils.repeat(" ", this.level), dependencyNode.getArtifact());
     }
 }

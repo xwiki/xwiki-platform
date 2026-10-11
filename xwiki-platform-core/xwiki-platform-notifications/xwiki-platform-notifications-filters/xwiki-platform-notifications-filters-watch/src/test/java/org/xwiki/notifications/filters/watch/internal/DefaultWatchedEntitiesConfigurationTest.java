@@ -62,7 +62,7 @@ class DefaultWatchedEntitiesConfigurationTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @BeforeEach
-    public void setUp()
+    void setUp()
     {
         when(documentAccessBridge.getCurrentDocumentReference())
             .thenReturn(new DocumentReference("wikiA", "Main", "WebHome"));
@@ -70,7 +70,7 @@ class DefaultWatchedEntitiesConfigurationTest
     }
 
     @Test
-    void getAutomaticWatchMode() throws Exception
+    void getAutomaticWatchMode()
     {
         // Default value
         assertEquals(AutomaticWatchMode.MAJOR, watchedEntitiesConfiguration.getAutomaticWatchMode(CURRENT_USER));
@@ -85,7 +85,7 @@ class DefaultWatchedEntitiesConfigurationTest
     }
 
     @Test
-    void getDefaultAutomaticWatchMode() throws Exception
+    void getDefaultAutomaticWatchMode()
     {
         // Default value
         assertEquals(AutomaticWatchMode.MAJOR, watchedEntitiesConfiguration.getDefaultAutomaticWatchMode(CURRENT_WIKI));

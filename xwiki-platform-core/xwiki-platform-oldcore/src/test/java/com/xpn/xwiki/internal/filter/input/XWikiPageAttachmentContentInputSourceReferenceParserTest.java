@@ -25,11 +25,9 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
-import org.xwiki.environment.Environment;
 import org.xwiki.filter.FilterException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -54,9 +52,6 @@ class XWikiPageAttachmentContentInputSourceReferenceParserTest
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
-
-    @MockComponent
-    private Environment environment;
 
     @Test
     void parse() throws FilterException, IOException, XWikiException

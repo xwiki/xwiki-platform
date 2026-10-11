@@ -65,6 +65,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.Keys.BACK_SPACE;
 import static org.openqa.selenium.Keys.CONTROL;
@@ -91,6 +92,10 @@ class LiveDataIT
     private static final String NAME_CHARLY = "Charly";
 
     private static final String NAME_NIKOLAY = "Nikolay";
+
+    private static final String NAME_ZOE = "Zoe";
+
+    private static final String NAME_ABBY = "Abby";
 
     private static final String CHOICE_A = "value1";
 
@@ -128,6 +133,8 @@ class LiveDataIT
     private static final String FOOTNOTE_COMPUTED_TITLE =
         "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
             + "pages.";
+
+    private static final String FOOTNOTE_FROZEN_ENTRIES = "The positions of the entries are currently fixed.";
 
     public static final String ACTIONS_COLUMN = "_actions";
 
@@ -849,6 +856,239 @@ class LiveDataIT
         // Assert that the Velocity macro still fails because the user still doesn't have script right.
         assertTrue(viewPage.hasRenderingError());
         assertThat(viewPage.getContent(), containsString(velocityError));
+    }
+
+    /**
+     * Non-regression test (see XWIKI-24421). Makes sure that, for a selectize filter in the header of a column, moving
+     * from the (empty) filter to another value actually update the filters to the new value.
+     */
+    @Test
+    @Order(10)
+    void filterListSwitchFromEmptyToValue(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // The user filter suggestions are built from the existing users, so make sure they exist.
+        testUtils.createUser("U1", "U1", null);
+        testUtils.createUser("U2", "U2", null);
+
+        // Reuse the shared class/objects: O1 has user U1, O2 has user U2 and O3 has an empty user.
+        List<String> properties = List.of(NAME_COLUMN, USER_COLUMN);
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
+        createXClass(testUtils, testReference);
+        createXObjects(testUtils, testReference);
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(3);
+
+        // Filter the user list column by (empty): only the entry with Nikolay is expected.
+        tableLayout.filterColumn(USER_COLUMN, CHOICE_EMPTY, true, PICK_FROM_SUGGESTIONS);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
+
+        // Switch the filter from (empty) to an U1:  only the entry with Lynda is expected.
+        tableLayout.filterColumn(USER_COLUMN, "U1");
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+    }
+
+    @Test
+    @Order(11)
+    void addEntryFromTableLayout(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        createEditableLiveDataPage(testUtils, testReference, "", NAME_LYNDA);
+
+        testUtils.createUser("creator", "creator", null);
+        testUtils.setRightsOnSpace(testReference.getLastSpaceReference(), null, "XWiki.creator", "edit", true);
+        testUtils.login("creator", "creator");
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        assertTrue(liveData.hasEditModeAction());
+        assertFalse(liveData.isEditMode());
+        assertFalse(tableLayout.hasEditModeActionsColumn());
+        assertFalse(tableLayout.canAddEntry());
+
+        // Enable edit mode: the actions column and the "Add entry" row appear, and the button stays pressed.
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertTrue(liveData.isEditMode());
+        assertTrue(tableLayout.hasEditModeActionsColumn());
+        assertTrue(tableLayout.canAddEntry());
+
+        // Add a new entry from the layout and save it. It is persisted, so we now have two entries.
+        tableLayout.startNewEntry();
+        tableLayout.setNewEntryCell(NAME_COLUMN, NAME_COLUMN, NAME_ESTHER);
+        tableLayout.saveNewEntry();
+        assertEquals(2, tableLayout.getTotalEntries());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
+
+        // Start a new entry but cancel it: the draft entry is discarded and no new entry is persisted.
+        tableLayout.startNewEntry();
+        tableLayout.setNewEntryCell(NAME_COLUMN, NAME_COLUMN, NAME_CHARLY);
+        tableLayout.cancelNewEntry();
+        assertEquals(2, tableLayout.getTotalEntries());
+        // The "Add entry" row is available again once the draft is discarded.
+        assertTrue(tableLayout.canAddEntry());
+
+        // Disable edit mode: the actions column and the "Add entry" row are hidden again.
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertFalse(liveData.isEditMode());
+        assertFalse(tableLayout.hasEditModeActionsColumn());
+        assertFalse(tableLayout.canAddEntry());
+        assertEquals(2, tableLayout.getTotalEntries());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
+    }
+
+    @Test
+    @Order(12)
+    void frozenRowsInEditMode(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // The limit is lower than the number of entries, so that edited entries can be moved to another page.
+        createEditableLiveDataPage(testUtils, testReference, "limit=\"2\" sort=\"%s:asc\"".formatted(NAME_COLUMN),
+            NAME_CHARLY, NAME_ESTHER, NAME_LYNDA);
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        assertEquals(0, liveData.countFootnotes());
+
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertEquals(NAME_CHARLY, tableLayout.getCellText(NAME_COLUMN, 1));
+        assertEquals(NAME_ESTHER, tableLayout.getCellText(NAME_COLUMN, 2));
+        assertEquals(List.of(FOOTNOTE_FROZEN_ENTRIES), liveData.getFootnotesText());
+
+        // The edited entry keeps its position, even though it is now sorted on the next page.
+        tableLayout.editCell(NAME_COLUMN, 1, NAME_COLUMN, NAME_ZOE);
+        tableLayout.waitUntilCellText(NAME_COLUMN, 1, NAME_ZOE);
+        assertEquals(2, tableLayout.countRows());
+        assertEquals(NAME_ESTHER, tableLayout.getCellText(NAME_COLUMN, 2));
+
+        // The entry moved to the next page keeps its position on the following updates too.
+        tableLayout.editCell(NAME_COLUMN, 2, NAME_COLUMN, NAME_ABBY);
+        tableLayout.waitUntilCellText(NAME_COLUMN, 2, NAME_ABBY);
+        assertEquals(2, tableLayout.countRows());
+        assertEquals(NAME_ZOE, tableLayout.getCellText(NAME_COLUMN, 1));
+
+        // Leaving the edit mode sorts the entries again.
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertEquals(NAME_ABBY, tableLayout.getCellText(NAME_COLUMN, 1));
+        assertEquals(NAME_LYNDA, tableLayout.getCellText(NAME_COLUMN, 2));
+        assertEquals(3, tableLayout.getTotalEntries());
+        assertEquals(0, liveData.countFootnotes());
+    }
+
+    @Test
+    @Order(13)
+    void maximizedView(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        createEditableLiveDataPage(testUtils, testReference, "", NAME_LYNDA);
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(1);
+
+        assertFalse(liveData.isMaximized());
+        assertEquals("Maximize", liveData.getMaximizedActionLabel());
+        // Both states use a different icon name, so each of them must be mapped by the icon theme.
+        assertTrue(liveData.hasMaximizedActionIcon());
+
+        // Maximize the Live Data: it is displayed over the rest of the page, and the action now offers to go back to
+        // the normal view.
+        liveData.toggleMaximized();
+        liveData.waitUntilMaximized(true);
+        assertEquals("Minimize", liveData.getMaximizedActionLabel());
+        assertTrue(liveData.hasMaximizedActionIcon());
+        // The entries are still displayed once maximized.
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        // Going back to the normal view from the same action.
+        liveData.toggleMaximized();
+        liveData.waitUntilMaximized(false);
+        assertEquals("Maximize", liveData.getMaximizedActionLabel());
+
+        // Escape exits the maximized view too.
+        liveData.toggleMaximized();
+        liveData.waitUntilMaximized(true);
+        liveData.pressEscape();
+        liveData.waitUntilMaximized(false);
+
+        // Escape does nothing when the Live Data is not maximized.
+        liveData.pressEscape();
+        assertFalse(liveData.isMaximized());
+
+        // Escape is first consumed by the cell editor, so it takes a second one to leave the maximized view.
+        liveData.toggleMaximized();
+        liveData.waitUntilMaximized(true);
+        // The editor is opened from the cell popover, which is only offered outside of edit mode.
+        tableLayout.clickEditCell(NAME_COLUMN, 1);
+        tableLayout.waitUntilCellIsEditing(NAME_COLUMN, 1, NAME_COLUMN, true);
+
+        liveData.pressEscape();
+        tableLayout.waitUntilCellIsEditing(NAME_COLUMN, 1, NAME_COLUMN, false);
+        assertTrue(liveData.isMaximized());
+
+        liveData.pressEscape();
+        liveData.waitUntilMaximized(false);
+    }
+
+    /**
+     * Creates a Live Data page on an XClass, with a source supporting the edit mode.
+     *
+     * @param macroParameters additional parameters of the Live Data macro, for instance its limit or its sort
+     * @param names the names of the entries to create, each entry being saved in a page of the same name
+     */
+    private void createEditableLiveDataPage(TestUtils testUtils, DocumentReference testReference,
+        String macroParameters, String... names)
+    {
+        // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
+        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
+        String newRowLocation = testUtils.serializeReference(testReference.getLocalDocumentReference().getParent());
+
+        // The "uuid" row naming strategy generates a new page named after a random UUID in the "newRowLocation" space.
+        // "hasEditMode=true" exposes the edit mode button in the top bar.
+        String sourceParameters = String.format(
+            "translationPrefix=&className=%s&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=%s",
+            className, newRowLocation);
+        String content = """
+            {{liveData
+              id="test"
+              properties="%s"
+              %s
+              source="liveTable"
+              sourceParameters="%s"
+            /}}
+            """.formatted(NAME_COLUMN, macroParameters, sourceParameters);
+        testUtils.createPage(testReference, content, "Live Data with an edit mode");
+
+        // Define the XClass on the test page, and add the entries.
+        testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
+        for (String name : names) {
+            testUtils.addObject(new DocumentReference(name, testReference.getLastSpaceReference()), className,
+                singletonMap(NAME_COLUMN, name));
+        }
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

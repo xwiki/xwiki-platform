@@ -32,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 2.3M1
  */
-public class ObjectPropertyReferenceTest
+class ObjectPropertyReferenceTest
 {
     /**
      * Test equivalence of constructors.
      */
     @Test
-    public void testConstructors()
+    void testConstructors()
     {
         ObjectPropertyReference reference =
             new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY,
@@ -49,19 +49,21 @@ public class ObjectPropertyReferenceTest
     }
 
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
+        EntityReference reference = new EntityReference("space.page", EntityType.DOCUMENT);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new ObjectPropertyReference(new EntityReference("space.page", EntityType.DOCUMENT)));
+            () -> new ObjectPropertyReference(reference));
 
         assertEquals("Invalid type [DOCUMENT] for an object property reference", e.getMessage());
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
+        EntityReference reference = new EntityReference("property", EntityType.OBJECT_PROPERTY);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY)));
+            () -> new ObjectPropertyReference(reference));
 
         assertEquals("Invalid parent reference [null] in an object property reference", e.getMessage());
     }
@@ -70,17 +72,18 @@ public class ObjectPropertyReferenceTest
      * Tests that an object reference throws exception if it doesn't have a document as a parent.
      */
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
+        EntityReference reference = new EntityReference("property", EntityType.OBJECT_PROPERTY,
+            new EntityReference("Space", EntityType.SPACE));
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY,
-                new EntityReference("Space", EntityType.SPACE))));
+            () -> new ObjectPropertyReference(reference));
 
         assertEquals("Invalid parent reference [Space Space] in an object property reference", e.getMessage());
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         ObjectPropertyReference reference = new ObjectPropertyReference("prop",
             new ObjectReference("object", new DocumentReference("wiki", "space", "page")))

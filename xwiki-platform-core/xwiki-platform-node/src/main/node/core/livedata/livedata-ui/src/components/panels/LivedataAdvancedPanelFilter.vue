@@ -140,6 +140,7 @@
       <select
         class="add-filters-select"
         v-show="unfilteredProperties.length > 0"
+        :aria-label="$t('livedata.panel.filter.addProperty.hint')"
         @change="addFilterGroup($event.target.value)"
       >
         <!--
@@ -211,11 +212,11 @@ export default {
       this.$refs.selectFilterPropertiesNone.selected = true;
     },
     // Event handler called when filter entries are dragged and dropped
-    // When a property is simply reodered, it dispatches only one "move" event
+    // When a property is simply reordered, it dispatches only one "move" event
     // When a property is move between two different properties
     // it dispatches two event:
     // - a "remove" event for the property that had the moved property
-    // - a "added" evnet for the property that receive the moved property
+    // - a "added" event for the property that receive the moved property
     reorderFilter(e, filterGroup) {
       // Filter entry reordered in the same property
       if (e.moved) {

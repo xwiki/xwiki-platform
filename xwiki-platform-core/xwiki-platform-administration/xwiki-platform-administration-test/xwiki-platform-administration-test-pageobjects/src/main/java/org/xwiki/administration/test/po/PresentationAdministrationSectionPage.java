@@ -102,6 +102,12 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     @FindBy(id = "XWiki.XWikiPreferences_0_showinformation")
     private WebElement showInformation;
 
+    @FindBy(id = "XWiki.XWikiPreferences_0_webcopyright")
+    private WebElement copyright;
+
+    @FindBy(id = "XWiki.XWikiPreferences_0_version")
+    private WebElement version;
+
     /**
      * Default constructor.
      */
@@ -188,5 +194,23 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     public void setShowInformation(ShowTabValue value)
     {
         new Select(this.showInformation).selectByValue(value.getValue());
+    }
+
+    /**
+     * @param value the value to set for the "Copyright" option
+     */
+    public void setCopyright(String value)
+    {
+        this.copyright.clear();
+        this.copyright.sendKeys(value);
+    }
+
+    /**
+     * @param value the value to set for the "Version" option
+     */
+    public void setVersion(String value)
+    {
+        this.version.clear();
+        this.version.sendKeys(value);
     }
 }

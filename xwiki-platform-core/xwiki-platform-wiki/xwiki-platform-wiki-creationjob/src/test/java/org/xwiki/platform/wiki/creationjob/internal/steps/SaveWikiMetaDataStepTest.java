@@ -19,14 +19,14 @@
  */
 package org.xwiki.platform.wiki.creationjob.internal.steps;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.WikiSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -35,7 +35,8 @@ import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,28 +44,23 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class SaveWikiMetaDataStepTest
+@ComponentTest
+class SaveWikiMetaDataStepTest
 {
-    @Rule
-    public MockitoComponentMockingRule<SaveWikiMetaDataStep> mocker =
-            new MockitoComponentMockingRule<>(SaveWikiMetaDataStep.class);
+    @InjectMockComponents
+    private SaveWikiMetaDataStep saveWikiMetaDataStep;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private WikiTemplateManager wikiTemplateManager;
-    
+
+    @MockComponent
     private WikiUserManager wikiUserManager;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        wikiTemplateManager = mocker.getInstance(WikiTemplateManager.class);
-        wikiUserManager = mocker.getInstance(WikiUserManager.class);
-    }
-
     @Test
-    public void execute() throws Exception
+    void execute() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
@@ -80,49 +76,42 @@ public class SaveWikiMetaDataStepTest
 
         // Mock
         WikiDescriptor descriptor = new WikiDescriptor("wikiId", "alias");
-        when(wikiDescriptorManager.getById("wikiId")).thenReturn(descriptor);
-
+        when(this.wikiDescriptorManager.getById("wikiId")).thenReturn(descriptor);
 
         // Test
-        mocker.getComponentUnderTest().execute(request);
+        this.saveWikiMetaDataStep.execute(request);
 
         // Verify
         assertEquals("description", descriptor.getDescription());
         assertEquals("pretty name", descriptor.getPrettyName());
-        verify(wikiDescriptorManager).saveDescriptor(descriptor);
-        verify(wikiTemplateManager).setTemplate("wikiId", false);
-        verify(wikiUserManager).setUserScope("wikiId", UserScope.GLOBAL_ONLY);
-        verify(wikiUserManager).setMembershipType("wikiId", MembershipType.INVITE);
+        verify(this.wikiDescriptorManager).saveDescriptor(descriptor);
+        verify(this.wikiTemplateManager).setTemplate("wikiId", false);
+        verify(this.wikiUserManager).setUserScope("wikiId", UserScope.GLOBAL_ONLY);
+        verify(this.wikiUserManager).setMembershipType("wikiId", MembershipType.INVITE);
     }
 
     @Test
-    public void executeWithException() throws Exception
+    void executeWithException() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
 
         // Mock
         WikiDescriptor descriptor = new WikiDescriptor("wikiId", "alias");
-        when(wikiDescriptorManager.getById("wikiId")).thenReturn(descriptor);
+        when(this.wikiDescriptorManager.getById("wikiId")).thenReturn(descriptor);
 
         Exception exception = new WikiManagerException("Exception on WikiManager.");
-        doThrow(exception).when(wikiDescriptorManager).saveDescriptor(descriptor);
+        doThrow(exception).when(this.wikiDescriptorManager).saveDescriptor(descriptor);
 
-        // Test
-        WikiCreationException caughtException = null;
-        try {
-            mocker.getComponentUnderTest().execute(request);
-        } catch (WikiCreationException e) {
-            caughtException = e;
-        }
-
-        // Verify
+        // Test and verify
+        WikiCreationException caughtException = assertThrows(WikiCreationException.class,
+            () -> this.saveWikiMetaDataStep.execute(request));
         assertEquals("Failed to set metadata to the wiki [wikiId].", caughtException.getMessage());
         assertEquals(exception, caughtException.getCause());
     }
 
     @Test
-    public void executeWhenSourceIsTemplate() throws Exception
+    void executeWhenSourceIsTemplate() throws Exception
     {
         WikiCreationRequest request = new WikiCreationRequest();
         request.setWikiId("wikiId");
@@ -133,21 +122,20 @@ public class SaveWikiMetaDataStepTest
 
         // Mock
         WikiDescriptor descriptor = new WikiDescriptor("wikiId", "alias");
-        when(wikiDescriptorManager.getById("wikiId")).thenReturn(descriptor);
-        
+        when(this.wikiDescriptorManager.getById("wikiId")).thenReturn(descriptor);
+
         // Test
-        mocker.getComponentUnderTest().execute(request);
+        this.saveWikiMetaDataStep.execute(request);
 
         // Verify
-        verify(wikiDescriptorManager).saveDescriptor(descriptor);
-        verify(wikiUserManager).setUserScope("wikiId", UserScope.LOCAL_ONLY);
-        verify(wikiUserManager).setMembershipType("wikiId", MembershipType.OPEN);
+        verify(this.wikiDescriptorManager).saveDescriptor(descriptor);
+        verify(this.wikiUserManager).setUserScope("wikiId", UserScope.LOCAL_ONLY);
+        verify(this.wikiUserManager).setMembershipType("wikiId", MembershipType.OPEN);
     }
 
     @Test
-    public void getOrder() throws Exception
+    void getOrder()
     {
-        assertEquals(2000, mocker.getComponentUnderTest().getOrder());
+        assertEquals(2000, this.saveWikiMetaDataStep.getOrder());
     }
 }
-

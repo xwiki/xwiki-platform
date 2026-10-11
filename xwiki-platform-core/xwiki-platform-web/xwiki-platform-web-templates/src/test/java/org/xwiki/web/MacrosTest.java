@@ -22,10 +22,13 @@ package org.xwiki.web;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,12 +41,14 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.url.script.URLSecurityScriptService;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.xml.html.script.HTMLScriptService;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,6 +65,9 @@ import static org.mockito.Mockito.when;
 @ComponentList({XWikiDateTool.class, ModelScriptService.class})
 class MacrosTest extends PageTest
 {
+    private static final Pattern TRANSLATION_MACRO_OUTPUT_REGEX =
+        Pattern.compile("\\{\\{translation key=\"key\" scriptParameters=\"(txparams_key_.....)\"/}}");
+
     private VelocityManager velocityManager;
 
     @BeforeEach
@@ -72,12 +80,13 @@ class MacrosTest extends PageTest
     void setVariableGlobal() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-			+ "#macro(helloMacro $return)\n"
-			+ "  #set($return = $NULL)\n"
-			+ "  #setVariable(\"$return\" \"my new value\")\n"
-			+ "#end\n"
-			+ "#helloMacro($myVarToSet)"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #macro(helloMacro $return)
+              #set($return = $NULL)
+              #setVariable("$return" "my new value")
+            #end
+            #helloMacro($myVarToSet)"""));
         
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
         assertEquals("my new value", velocityContext.get("myVarToSet"));
@@ -87,16 +96,17 @@ class MacrosTest extends PageTest
     void setVariableInMacroContext() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-			+ "#macro(childMacro $return)\n"
-			+ "  #set($return = $NULL)\n"
-			+ "  #setVariable(\"$return\" \"value from child macro\")\n"
-			+ "#end\n"  		
-			+ "#macro(parentMacro $return)\n"
-			+ "  #childMacro($macro.childMacroResult)\n"
-			+ "  #setVariable(\"$return\" \"${macro.childMacroResult}/parentValue\")\n"
-			+ "#end\n"
-			+ "#parentMacro($myVarToSet)"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #macro(childMacro $return)
+              #set($return = $NULL)
+              #setVariable("$return" "value from child macro")
+            #end
+            #macro(parentMacro $return)
+              #childMacro($macro.childMacroResult)
+              #setVariable("$return" "${macro.childMacroResult}/parentValue")
+            #end
+            #parentMacro($myVarToSet)"""));
         
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
         assertEquals("value from child macro/parentValue", velocityContext.get("myVarToSet"));
@@ -106,11 +116,12 @@ class MacrosTest extends PageTest
     void addLivetableLocationFilter() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-            + "#set ($whereQL = '')\n"
-            + "#set ($whereParams = [])\n"
-            + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox')\n"
-            + "$whereQL $whereParams"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #set ($whereQL = '')
+            #set ($whereParams = [])
+            #addLivetableLocationFilter($whereQL, $whereParams, 'sandbox')
+            $whereQL $whereParams"""));
         assertEquals("AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!' [%sandbox%]", writer.toString().trim());
     }
 
@@ -118,11 +129,12 @@ class MacrosTest extends PageTest
     void addLivetableLocationFilterWhenFilteringWebHome() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-            + "#set ($whereQL = '')\n"
-            + "#set ($whereParams = [])\n"
-            + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true)\n"
-            + "$whereQL $whereParams"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #set ($whereQL = '')
+            #set ($whereParams = [])
+            #addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true)
+            $whereQL $whereParams"""));
         assertEquals("AND ((doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!') OR "
             + "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')) [%sandbox%, %sandbox%]",
             writer.toString().trim());
@@ -132,11 +144,12 @@ class MacrosTest extends PageTest
     void addLivetableLocationFilterWhenCustomWhere() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-            + "#set ($whereQL = '')\n"
-            + "#set ($whereParams = [])\n"
-            + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', false, 'SOMETHING')\n"
-            + "$whereQL $whereParams"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #set ($whereQL = '')
+            #set ($whereParams = [])
+            #addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', false, 'SOMETHING')
+            $whereQL $whereParams"""));
         assertEquals("SOMETHING []", writer.toString().trim());
     }
 
@@ -144,11 +157,12 @@ class MacrosTest extends PageTest
     void addLivetableLocationFilterWhenFilteringWebHomeAndCustomWhere() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-            + "#set ($whereQL = '')\n"
-            + "#set ($whereParams = [])\n"
-            + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true, 'SOMETHING')\n"
-            + "$whereQL $whereParams"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #set ($whereQL = '')
+            #set ($whereParams = [])
+            #addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true, 'SOMETHING')
+            $whereQL $whereParams"""));
         assertEquals("SOMETHING []", writer.toString().trim());
     }
 
@@ -403,5 +417,64 @@ class MacrosTest extends PageTest
         out = new StringWriter();
         this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
         assertEquals("", velocityContext.get("sanitizedResult"));
+    }
+
+    @Test
+    void getSanitizedURLAttributeValueWhenParseToSafeURIThrowsURISyntaxException() throws Exception
+    {
+        HTMLScriptService htmlScriptService = mock(HTMLScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "html", htmlScriptService);
+        SecurityScriptService securityScriptService = mock(SecurityScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "security", securityScriptService);
+        URLSecurityScriptService urlSecurityScriptService = mock(URLSecurityScriptService.class);
+        when(securityScriptService.get("url")).thenReturn(urlSecurityScriptService);
+
+        String htmlElement = "form";
+        String attributeName = "action";
+        String url = "1http://foo";
+        String fallbackUrl = "xwiki/bin/view/Sandbox";
+        String script = "#getSanitizedURLAttributeValue($myHtmlElement,$myAttributeName,$myUrl,$myFallback,"
+            + "$sanitizedResult)";
+
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        velocityContext.put("myHtmlElement", htmlElement);
+        velocityContext.put("myAttributeName", attributeName);
+        velocityContext.put("myUrl", url);
+        velocityContext.put("myFallback", fallbackUrl);
+
+        URI fallBackUri = new URI(fallbackUrl);
+
+        // parseToSafeURI() throws URISyntaxException (e.g. for an opaque-looking URI such as "1http://foo") instead of
+        // returning null; this must be treated the same as an unsafe URL rather than aborting the whole macro.
+        when(urlSecurityScriptService.parseToSafeURI(url)).thenThrow(new URISyntaxException(url, "not a valid URI"));
+        when(urlSecurityScriptService.parseToSafeURI(fallbackUrl)).thenReturn(fallBackUri);
+        when(htmlScriptService.isAttributeSafe(htmlElement, attributeName, fallBackUri.toString())).thenReturn(true);
+        StringWriter out = new StringWriter();
+        this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
+        assertEquals(fallbackUrl, velocityContext.get("sanitizedResult"));
+        // Logging the caught exception must not insert any character in the macro's (otherwise empty) output.
+        assertEquals("", out.toString());
+    }
+
+    @Test
+    void wikiTranslation() throws XWikiVelocityException
+    {
+        StringWriter writer = new StringWriter();
+        this.velocityManager.evaluate(writer, "translations", new StringReader("""
+            #wikiTranslation('key' ['string1'])
+            #wikiTranslation('key' ['string2', 42])"""));
+
+        Matcher matcher = TRANSLATION_MACRO_OUTPUT_REGEX.matcher(writer.toString());
+        assertTrue(matcher.find());
+        String parameters1 = matcher.group(1);
+
+        assertTrue(matcher.find());
+        String parameters2 = matcher.group(1);
+
+        assertNotEquals(parameters1, parameters2);
+
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        assertEquals(List.of("string1"), velocityContext.get(parameters1));
+        assertEquals(List.of("string2", 42), velocityContext.get(parameters2));
     }
 }

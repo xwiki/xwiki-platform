@@ -23,9 +23,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -59,6 +60,8 @@ class AttachmentValidationIT
 
     private static final String IMAGE_FILE_NAME = "image.gif";
 
+    private static final String DISGUISED_FILE_NAME = "fake.gif";
+
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
     {
@@ -67,6 +70,51 @@ class AttachmentValidationIT
     }
 
     @Test
+    @Order(1)
+    void validateDisguisedAttachment(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        setup.createPage(testReference, "");
+        // Only allow images to be uploaded on this space.
+        AttachmentRestrictionAdministrationSectionPage administrationSectionPage =
+            AttachmentRestrictionAdministrationSectionPage.goToPage(testReference.getLastSpaceReference());
+        administrationSectionPage.setAllowedMimetypes("image/*");
+        administrationSectionPage.save();
+
+        // Navigate back to the test page to upload.
+        setup.createPage(testReference, "");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+
+        // Upload a text file disguised as a GIF image (extension is .gif but content is text/plain).
+        // The client-side validation uses the browser-reported MIME type (image/gif from the .gif extension), which
+        // matches image/*, so the client-side check passes and the file is sent to the server. The server uses Tika
+        // to detect the real MIME type from the file content (text/plain) and rejects it, causing a generic upload
+        // error. The server-side content-based MIME detection is verified through the REST API below.
+        upload(attachmentsPane, testConfiguration, DISGUISED_FILE_NAME);
+        WebElement error = getNotificationError(setup);
+        assertEquals("An error occurred while uploading " + DISGUISED_FILE_NAME, error.getText());
+
+        cleanNotification(setup, error);
+
+        // Check if the same validation is applied when uploading through the REST API.
+        CloseableHttpResponse response = restUploadImage(setup, testReference, DISGUISED_FILE_NAME);
+        assertEquals(415, response.getCode());
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> mapResult = objectMapper.readValue(response.getEntity().getContent(), Map.class);
+        assertEquals(Map.of(
+            "message", "Invalid mimetype [text/plain]",
+            "translationKey", "attachment.validation.mimetype.rejected",
+            "translationParameters", List.of(List.of("image/*"), List.of())
+        ), mapResult);
+
+        // Check that no attachment was saved.
+        setup.gotoPage(testReference);
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(0, attachmentsPane.getNumberOfAttachments());
+    }
+
+    @Test
+    @Order(2)
     void validateAttachment(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {
@@ -98,10 +146,10 @@ class AttachmentValidationIT
         assertEquals("File image.gif is too large (194 bytes). Max file size: 10 bytes.", errorSize.getText());
 
         // Check if the attachment validators are also executed when uploading attachment through the rest API.
-        PutMethod putMethodText = restUploadImage(setup, subPage, TEXT_FILE_NAME);
-        assertEquals(415, putMethodText.getStatusCode());
+        CloseableHttpResponse testResponse = restUploadImage(setup, subPage, TEXT_FILE_NAME);
+        assertEquals(415, testResponse.getCode());
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> mapResult = objectMapper.readValue(putMethodText.getResponseBodyAsStream(), Map.class);
+        Map<String, Object> mapResult = objectMapper.readValue(testResponse.getEntity().getContent(), Map.class);
         Map<String, Object> expectedMap = Map.of(
             "message", "Invalid mimetype [text/plain]",
             "translationKey", "attachment.validation.mimetype.rejected",
@@ -109,22 +157,23 @@ class AttachmentValidationIT
         );
         assertEquals(expectedMap, mapResult);
 
-        PutMethod putMethodImage = restUploadImage(setup, subPage, IMAGE_FILE_NAME);
-        assertEquals(413, putMethodImage.getStatusCode());
-        mapResult = objectMapper.readValue(putMethodImage.getResponseBodyAsStream(), Map.class);
+        CloseableHttpResponse imageResponse = restUploadImage(setup, subPage, IMAGE_FILE_NAME);
+        assertEquals(413, imageResponse.getCode());
+        mapResult = objectMapper.readValue(imageResponse.getEntity().getContent(), Map.class);
         expectedMap = Map.of(
             "message", "File size too big",
             "translationKey", "attachment.validation.filesize.rejected",
             "translationParameters", List.of("10 bytes")
         );
         assertEquals(expectedMap, mapResult);
-        // Check that no image are saved to the document after the various upload tries.
+        // Check that no image is saved to the document after the various upload tries.
         page.reloadPage();
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(0, attachmentsPane.getNumberOfAttachments());
     }
 
-    private PutMethod restUploadImage(TestUtils setup, DocumentReference subPage, String imageFileName) throws Exception
+    private CloseableHttpResponse restUploadImage(TestUtils setup, DocumentReference subPage, String imageFileName)
+        throws Exception
     {
         return setup.rest().executePut(AttachmentResource.class,
             IOUtils.toByteArray(this.getClass().getResourceAsStream("/" + imageFileName)),

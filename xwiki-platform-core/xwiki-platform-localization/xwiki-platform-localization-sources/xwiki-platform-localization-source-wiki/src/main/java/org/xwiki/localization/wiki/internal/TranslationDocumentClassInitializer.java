@@ -28,7 +28,7 @@ import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Update XWiki.TranslationDocumentClass document with all required informations.
+ * Update XWiki.TranslationDocumentClass document with all required information.
  * 
  * @version $Id$
  * @since 4.3M2

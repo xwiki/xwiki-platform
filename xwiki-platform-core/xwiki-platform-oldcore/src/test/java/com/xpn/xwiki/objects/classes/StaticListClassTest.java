@@ -25,7 +25,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ListProperty;
@@ -54,6 +56,9 @@ class StaticListClassTest
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     /** Tests that {@link StaticListClass#getList} returns values sorted according to the property's sort option. */
     @Test
@@ -144,7 +149,7 @@ class StaticListClassTest
         staticListClass.setSize(7);
         StringBuilder values = new StringBuilder();
         for (String value : VALUES_WITH_HTML_SPECIAL_CHARS) {
-            if (values.length() > 0) {
+            if (!values.isEmpty()) {
                 values.append('|');
             }
             values.append(value).append('=').append(StringUtils.reverse(value));
@@ -171,7 +176,8 @@ class StaticListClassTest
     @Test
     void testDisplayEditSelect()
     {
-        String expectedHTML = "<select id='w&#62;vb&#38;a&#60;r' name='w&#62;vb&#38;a&#60;r' size='7'>"
+        String expectedHTML = "<select size='7' id='w&#62;vb&#38;a&#60;r' "
+            + "aria-label='core.model.xclass.editClassProperty.textAlternative' name='w&#62;vb&#38;a&#60;r'>"
             + "<option value='' label='---'>---</option>"
             + "<option value='a&#60;b&#62;c' label='c&#62;b&#60;a'>c&#62;b&#60;a</option>"
             + "<option selected='selected' value='1&#34;2&#39;3' label='3&#39;2&#34;1'>3&#39;2&#34;1</option>"
@@ -244,7 +250,7 @@ class StaticListClassTest
      * Tests the suggest code generated when "use suggest" is set.
      */
     @Test
-    void testDisplayEditWithSuggest() throws Exception
+    void testDisplayEditWithSuggest()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
@@ -263,7 +269,7 @@ class StaticListClassTest
         staticListClass.setSize(7);
         StringBuilder values = new StringBuilder();
         for (String value : VALUES_WITH_HTML_SPECIAL_CHARS) {
-            if (values.length() > 0) {
+            if (!values.isEmpty()) {
                 values.append('|');
             }
             values.append(value).append('=').append(StringUtils.reverse(value));

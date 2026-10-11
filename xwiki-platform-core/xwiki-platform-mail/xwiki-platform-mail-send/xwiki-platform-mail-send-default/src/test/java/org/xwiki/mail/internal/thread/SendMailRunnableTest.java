@@ -30,7 +30,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
@@ -51,7 +50,8 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
     MemoryMailListener.class,
     SendMailQueueManager.class
 })
-public class SendMailRunnableTest
+class SendMailRunnableTest
 {
     @InjectMockComponents
     private SendMailRunnable sendMailRunnable;
@@ -74,7 +74,7 @@ public class SendMailRunnableTest
     private MockitoComponentManager componentManager;
 
     @BeforeComponent
-    public void beforeInitializable() throws Exception
+    void beforeInitializable() throws Exception
     {
         MailSenderConfiguration configuration =
             this.componentManager.registerMockComponent(MailSenderConfiguration.class);
@@ -82,15 +82,16 @@ public class SendMailRunnableTest
     }
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         Provider<XWikiContext> xwikiContextProvider =
             this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+        XWikiContext xWikiContextMock = mock(XWikiContext.class);
+        when(xwikiContextProvider.get()).thenReturn(xWikiContextMock);
     }
 
     @Test
-    public void sendMailWhenSendingFails() throws Exception
+    void sendMailWhenSendingFails() throws Exception
     {
         // Create a Session with an invalid host so that it generates an error
         Properties properties = new Properties();
@@ -149,14 +150,14 @@ public class SendMailRunnableTest
             // "UnknownHostException: xwiki-unknown"
             // "ConnectException: Connection refused"
             // Thus for now I only assert that there's an error set, but not its content.
-            assertTrue(status.getErrorSummary() != null);
+            assertNotNull(status.getErrorSummary());
             errorCount++;
         }
         assertEquals(2, errorCount);
     }
 
     @Test
-    public void sendMailWhenMailRetrievalFails() throws Exception
+    void sendMailWhenMailRetrievalFails() throws Exception
     {
         // Create a Session with an invalid host so that it generates an error
         Properties properties = new Properties();

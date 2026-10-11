@@ -64,7 +64,7 @@ export class MacrosAstToReactJsxConverter {
    * Render a macro's AST blocks to JSX elements
    *
    * Will force re-render every time, even if the AST is exactly the same
-   * (see the private `generateId` function for more informations)
+   * (see the private `generateId` function for more information)
    *
    * @param blocks - The blocks to render
    * @param editableZoneRef - The macro's editable zone reference
@@ -84,7 +84,7 @@ export class MacrosAstToReactJsxConverter {
    * Render a macro's AST inline contents to JSX elements
    *
    * Will force re-render every time, even if the AST is exactly the same
-   * (see the private `generateId` function for more informations)
+   * (see the private `generateId` function for more information)
    *
    * @param inlineContents - The inline contents to render
    * @param editableZoneRef - The macro's editable zone reference

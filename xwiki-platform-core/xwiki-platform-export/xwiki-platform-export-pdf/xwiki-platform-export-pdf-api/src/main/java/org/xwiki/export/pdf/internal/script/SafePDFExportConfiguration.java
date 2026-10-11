@@ -21,7 +21,6 @@ package org.xwiki.export.pdf.internal.script;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.model.reference.DocumentReference;
@@ -103,7 +102,7 @@ public class SafePDFExportConfiguration extends AbstractSafeObject<PDFExportConf
     {
         return getWrapped().getTemplates().stream()
             .filter(templateReference -> this.authorization.hasAccess(Right.VIEW, templateReference))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override

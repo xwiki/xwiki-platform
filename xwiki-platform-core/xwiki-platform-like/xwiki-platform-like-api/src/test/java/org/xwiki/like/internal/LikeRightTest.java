@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  *
  * @version $Id$
  */
-public class LikeRightTest
+class LikeRightTest
 {
     @Test
     void getters()

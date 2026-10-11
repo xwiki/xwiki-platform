@@ -50,7 +50,7 @@ public interface WikiObjectComponentBuilder
      * @param reference the reference of the object that should be used to create the component.
      * @return the new component
      * @throws WikiComponentException if the given {@link ObjectReference} is incompatible with the current builder or
-     * if the {@link WikiComponentBuilder} has not been able to instanciate the component.
+     * if the {@link WikiComponentBuilder} has not been able to instantiate the component.
      */
     List<WikiComponent> buildComponents(ObjectReference reference) throws WikiComponentException;
 }

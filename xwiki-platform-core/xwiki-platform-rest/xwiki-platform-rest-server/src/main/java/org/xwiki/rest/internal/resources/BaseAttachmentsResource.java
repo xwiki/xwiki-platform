@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.attachment.validation.AttachmentValidationException;
@@ -41,6 +43,7 @@ import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -70,6 +73,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class BaseAttachmentsResource extends XWikiResource
 {
     /**
@@ -136,6 +140,9 @@ public class BaseAttachmentsResource extends XWikiResource
     @Inject
     @Named("document")
     private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
 
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
@@ -209,6 +216,12 @@ public class BaseAttachmentsResource extends XWikiResource
         applyFileTypeFilter(filters, whereClause, suffixParams, containsParams);
 
         statement.append(" where ").append(StringUtils.join(whereClause, " and "));
+
+        // Always order by a unique key (the document row is identified by its full name and locale, the attachment by
+        // its file name inside that document) so that pagination via limit/offset returns a stable, deterministic
+        // order. Without it, the database is free to return rows in an arbitrary order that can differ between
+        // queries, breaking paginated retrieval.
+        statement.append(" order by doc.fullName asc, doc.language asc, attachment.filename asc");
 
         Query query = queryManager.createQuery(statement.toString(), Query.HQL);
 
@@ -330,7 +343,7 @@ public class BaseAttachmentsResource extends XWikiResource
         // * the media type is stored (which means it was already filtered at the query level) or
         // * the file name matches the filter or
         // * the computed media type matches the filter
-        return (attachment) -> acceptedMediaTypes.isEmpty() || !StringUtils.isEmpty(attachment.getMimeType())
+        return attachment -> acceptedMediaTypes.isEmpty() || !StringUtils.isEmpty(attachment.getMimeType())
             || hasAcceptedFileNameExtension(attachment, acceptedFileNameExtensions)
             || hasAcceptedMediaType(attachment, acceptedMediaTypes);
     }
@@ -339,14 +352,14 @@ public class BaseAttachmentsResource extends XWikiResource
     {
         String fileName = attachment.getFilename().toUpperCase();
         return acceptedFileNameExtensions.stream()
-            .anyMatch(acceptedFileNamedExtension -> fileName.endsWith(acceptedFileNamedExtension));
+            .anyMatch(fileName::endsWith);
     }
 
     private boolean hasAcceptedMediaType(XWikiAttachment attachment, Set<String> acceptedMediaTypes)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         String detectedMediaType = attachment.getMimeType(xcontext).toUpperCase();
-        return acceptedMediaTypes.stream().anyMatch(acceptedMediaType -> detectedMediaType.contains(acceptedMediaType));
+        return acceptedMediaTypes.stream().anyMatch(detectedMediaType::contains);
     }
 
     private Attachment toRestAttachment(XWikiAttachment xwikiAttachment, Boolean withPrettyNames)
@@ -441,5 +454,34 @@ public class BaseAttachmentsResource extends XWikiResource
         xwiki.saveDocument(document, xcontext);
 
         return attachment;
+    }
+
+    /**
+     * Compute a proper Response for the REST API based on the given attachment to return.
+     * @param xwikiAttachment the attachment to return
+     * @return a {@link Response} with proper metadata to return the attachment
+     * @throws XWikiRestException in case of problem when loading the content of the attachment
+     * @since 18.4.0
+     * @since 17.10.9
+     */
+    public Response answerWithAttachment(com.xpn.xwiki.api.Attachment xwikiAttachment) throws XWikiRestException
+    {
+        if (xwikiAttachment == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+
+        boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(xwikiAttachment);
+        try {
+            return Response
+                .ok()
+                .type(xwikiAttachment.getMimeType())
+                .entity(xwikiAttachment.getContent())
+                .header("Content-Disposition",
+                    attachmentSecurityManager.getContentDispositionHeader(
+                        xwikiAttachment.getFilename(), shouldBeDownloaded))
+                .build();
+        } catch (XWikiException e) {
+            throw new XWikiRestException(e);
+        }
     }
 }

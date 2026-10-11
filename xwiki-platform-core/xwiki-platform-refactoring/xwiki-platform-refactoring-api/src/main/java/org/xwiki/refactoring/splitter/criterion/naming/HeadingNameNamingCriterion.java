@@ -35,7 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.BlockFilter;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
@@ -85,10 +84,10 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
      * @param plainTextRenderer the renderer to convert to plain text
      * @param prependBasePageName a flag indicating if each generated page name should be prepended with base page name.
-     * @deprecated since 14.10.2, 15.0RC1 inject this as a component instead and set the base reference through
+     * @deprecated inject this as a component instead and set the base reference through
      *             {@link #getParameters()}
      */
-    @Deprecated
+    @Deprecated(since = "14.10.2,15.0RC1")
     public HeadingNameNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge,
         BlockRenderer plainTextRenderer, boolean prependBasePageName)
     {
@@ -132,21 +131,17 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
 
     private Optional<String> getFirstHeadingName(XDOM xdom)
     {
-        if (xdom.getChildren().size() > 0) {
+        if (!xdom.getChildren().isEmpty()) {
             Block firstChild = xdom.getChildren().get(0);
             if (firstChild instanceof HeaderBlock) {
                 // Clone the header block and remove any unwanted stuff.
-                Block clonedHeaderBlock = firstChild.clone(new BlockFilter()
-                {
-                    public List<Block> filter(Block block)
-                    {
-                        List<Block> blocks = new ArrayList<>();
-                        if (block instanceof WordBlock || block instanceof SpaceBlock
-                            || block instanceof SpecialSymbolBlock) {
-                            blocks.add(block);
-                        }
-                        return blocks;
+                Block clonedHeaderBlock = firstChild.clone(block -> {
+                    List<Block> blocks = new ArrayList<>();
+                    if (block instanceof WordBlock || block instanceof SpaceBlock
+                        || block instanceof SpecialSymbolBlock) {
+                        blocks.add(block);
                     }
+                    return blocks;
                 });
                 XDOM heading = new XDOM(clonedHeaderBlock.getChildren());
 
@@ -180,10 +175,14 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
 
     private DocumentReference maybeTruncate(DocumentReference documentReference)
     {
+        // Fallback max size in case of issue when accessing the document reference
+        var maxSize = this.docBridge.getLocalReferenceMaxLength();
+        var suffixSize = 3;
+
         // Reserve 3 characters for the suffix needed to avoid name clashes in case the document reference was used
-        // previously or it exists already.
-        // TODO: The max length should be taken from the store API instead of being hard-coded.
-        int maxLength = (this.documentReferences.contains(documentReference) || exists(documentReference)) ? 765 : 768;
+        // previously, or it exists already.
+        int maxLength = this.documentReferences.contains(documentReference) || exists(documentReference) ?
+            maxSize - suffixSize : maxSize;
 
         // We can only truncate the document name, so we can't do much if the base space reference is already too large.
         // The document name can contain special characters that are escaped when serialized, requiring more length, so

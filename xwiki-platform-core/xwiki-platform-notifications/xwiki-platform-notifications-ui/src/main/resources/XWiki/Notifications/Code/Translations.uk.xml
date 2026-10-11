@@ -168,7 +168,7 @@ notifications.events.lastChange=Остання зміна: {0}.
 notifications.events.lastComment=Останній коментар: {0}.
 notifications.preferences.scope.table.scope=Область видимості
 notifications.preferences.scope.table.location=Розташування
-### Missing: notifications.preferences.scope.table.scopeFilterType=Filter Type
+notifications.preferences.scope.table.scopeFilterType=Тип фільтра
 notifications.preferences.scope.table._actions=Дії
 notifications.email.title=Подія(ї) на вікі:
 notifications.email.subject={0} подія(й) на вікі
@@ -185,7 +185,7 @@ notifications.globalsettings.email=Сповіщення електронною �
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Щоденно
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Погодинно
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Щотижня
-### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Live
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=У реальному часі
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Деталі змін
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Нічого
 XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Звичайні
@@ -212,12 +212,12 @@ notifications.userprofile.saving=Збереження...
 notifications.userprofile.error=Помилка збереження налаштувань сповіщень
 
 ## Macros description
-### Missing: rendering.macro.notificationsApplicationsPreferences.name=Notifications Applications Preferences
+rendering.macro.notificationsApplicationsPreferences.name=Налаштування сповіщень для програм
 rendering.macro.notificationsApplicationsPreferences.description=Показати налаштування поточного користувача щодо додатків сповіщень.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Ціль
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Ціль макросу (може бути "user" для поточного користувача або "wiki" для поточної вікі)
-### Missing: rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
-### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
+rendering.macro.notificationsAutoWatchPreferences.name=Налаштування автоматичного відстеження сповіщень
+rendering.macro.notificationsAutoWatchPreferences.description=Відображає налаштування поточного користувача щодо сторінок, які автоматично відстежуються.
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Ціль
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Ціль макросу (може бути "user" для поточного користувача або "wiki" для поточної вікі)
 
@@ -302,7 +302,7 @@ notifications.filters.preferences.addPreference.notificationFormat.label=Фор�
 notifications.filters.preferences.addPreference.notificationFormat.hint=До якого формату сповіщень має застосовуватися фільтр?
 notifications.filters.preferences.addPreference.eventType.label=Тип події
 notifications.filters.preferences.addPreference.eventType.hint=На який тип події має націлюватися фільтр?
-### Missing: notifications.filters.preferences.addPreference.location.label=Filter Scope
+notifications.filters.preferences.addPreference.location.label=Область дії фільтра
 notifications.filters.preferences.addPreference.location.hint=На яку сторінку має націлюватися фільтр?
 
 

@@ -19,71 +19,66 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
  * @version $Id$
- * @since
  */
-public class RecordableEventDescriptorHelperTest
+@ComponentTest
+class RecordableEventDescriptorHelperTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<RecordableEventDescriptorHelper> mocker =
-            new MockitoComponentMockingRule<>(RecordableEventDescriptorHelper.class);
+    @InjectMockComponents
+    private RecordableEventDescriptorHelper helper;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @MockComponent
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
+
+    @MockComponent
     private Execution execution;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        recordableEventDescriptorManager = mocker.getInstance(RecordableEventDescriptorManager.class);
-        execution = mocker.getInstance(Execution.class);
-    }
-
     @Test
-    public void hasDescriptorTest() throws Exception
+    void hasDescriptorTest() throws Exception
     {
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "UserA");
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
         ExecutionContext executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
 
         RecordableEventDescriptor descriptor1 = mock(RecordableEventDescriptor.class);
         RecordableEventDescriptor descriptor2 = mock(RecordableEventDescriptor.class);
         when(descriptor1.getEventType()).thenReturn("eventType1");
         when(descriptor2.getEventType()).thenReturn("eventType2");
 
-        when(recordableEventDescriptorManager.getRecordableEventDescriptors(true)).thenReturn(
-                Arrays.asList(descriptor1, descriptor2));
+        when(this.recordableEventDescriptorManager.getRecordableEventDescriptors(true)).thenReturn(
+            List.of(descriptor1, descriptor2));
 
-        assertTrue(mocker.getComponentUnderTest().hasDescriptor("eventType1", user));
-        assertFalse(mocker.getComponentUnderTest().hasDescriptor("eventType3", user));
+        assertTrue(this.helper.hasDescriptor("eventType1", user));
+        assertFalse(this.helper.hasDescriptor("eventType3", user));
 
         List<RecordableEventDescriptor> descriptorList = (List<RecordableEventDescriptor>) executionContext
-                .getProperty("RecordableEventDescriptorHelperCache_xwiki:XWiki.UserA");
+            .getProperty("RecordableEventDescriptorHelperCache_xwiki:XWiki.UserA");
         assertNotNull(descriptorList);
         assertTrue(descriptorList.contains(descriptor1));
         assertTrue(descriptorList.contains(descriptor2));
@@ -91,21 +86,21 @@ public class RecordableEventDescriptorHelperTest
     }
 
     @Test
-    public void hasDescriptorWhenInCacheTest() throws Exception
+    void hasDescriptorWhenInCacheTest() throws Exception
     {
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "UserA");
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
         ExecutionContext executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
 
         RecordableEventDescriptor descriptor1 = mock(RecordableEventDescriptor.class);
         RecordableEventDescriptor descriptor2 = mock(RecordableEventDescriptor.class);
         when(descriptor2.getEventType()).thenReturn("eventType");
 
         executionContext.setProperty("RecordableEventDescriptorHelperCache_xwiki:XWiki.UserA",
-                Arrays.asList(descriptor1, descriptor2));
+            List.of(descriptor1, descriptor2));
 
-        assertTrue(mocker.getComponentUnderTest().hasDescriptor("eventType", user));
-        verifyNoInteractions(recordableEventDescriptorManager);
+        assertTrue(this.helper.hasDescriptor("eventType", user));
+        verifyNoInteractions(this.recordableEventDescriptorManager);
     }
 }

@@ -149,15 +149,11 @@ public class XarExtensionJobFinishedListener implements EventListener
                         rootNextPages = Collections.emptyMap();
                     }
 
-                    ////////////////////
                     // Delete pages
-                    ////////////////////
 
                     maybeDeletePages(jobFinishingEvent, xarExtensionPlan, previousXAREntries, (Job) source);
 
-                    ////////////////////////////////////////
                     // Invalidate security cache
-                    ////////////////////////////////////////
 
                     invalidateSecurityCache(previousXAREntries, rootPreviousPages, nextXAREntries, rootNextPages);
                 }
@@ -256,7 +252,6 @@ public class XarExtensionJobFinishedListener implements EventListener
                     this.logger.error("Failed to load attachments", e);
                     // Lets be safe and skip removing that page
                     pages.put(reference, false);
-                    continue;
                 }
             }
 

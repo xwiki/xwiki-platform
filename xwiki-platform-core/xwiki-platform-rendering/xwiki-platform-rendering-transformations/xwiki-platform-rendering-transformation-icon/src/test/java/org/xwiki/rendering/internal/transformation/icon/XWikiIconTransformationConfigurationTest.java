@@ -21,13 +21,16 @@ package org.xwiki.rendering.internal.transformation.icon;
 
 import java.util.Properties;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWikiIconTransformationConfiguration}.
@@ -35,21 +38,23 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 2.6RC1
  */
-public class XWikiIconTransformationConfigurationTest
+@ComponentTest
+class XWikiIconTransformationConfigurationTest
 {
-    @Rule
-    public MockitoComponentMockingRule<XWikiIconTransformationConfiguration> mocker =
-        new MockitoComponentMockingRule<>(XWikiIconTransformationConfiguration.class);
+    @InjectMockComponents
+    private XWikiIconTransformationConfiguration configuration;
+
+    @MockComponent
+    private ConfigurationSource source;
 
     @Test
-    public void getMappings() throws Exception
+    void getMappings()
     {
-        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
         Properties props = new Properties();
         props.setProperty("::", "test");
-        when(source.getProperty("rendering.transformation.icon.mappings", Properties.class)).thenReturn(props);
+        when(this.source.getProperty("rendering.transformation.icon.mappings", Properties.class)).thenReturn(props);
 
-        Properties mappings = this.mocker.getComponentUnderTest().getMappings();
+        Properties mappings = this.configuration.getMappings();
         assertNotNull(mappings);
         // Make sure we have our mapping coming from the configuration source + the default mappings
         assertTrue(mappings.size() > 1);

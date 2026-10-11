@@ -70,6 +70,22 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class ExportAction extends XWikiAction
 {
+    private static final String EXCEPTION = "exception";
+
+    private static final String HTTP_METHOD_POST = "POST";
+
+    /**
+     * Not taken from a servlet API constant, so that this stays identical on the branches where oldcore has only the
+     * javax namespace and on those where it has only the jakarta one.
+     */
+    private static final int STATUS_METHOD_NOT_ALLOWED = 405;
+
+    /**
+     * Template listing the parameters of an export that was requested with a method the action doesn't export on, and
+     * offering to submit that same export again with a POST request.
+     */
+    private static final String RESUBMIT_TEMPLATE = "exportresubmit";
+
     /**
      * Define the different format supported by the export.
      */
@@ -90,7 +106,8 @@ public class ExportAction extends XWikiAction
             String format = request.get("format");
 
             if (!validateExportRequest(request)) {
-                return "docdoesnotexist";
+                refuseExportRequest(context);
+                return RESUBMIT_TEMPLATE;
             } else if (format == null || "xar".equals(format)) {
                 defaultPage = exportXAR(context);
             } else if ("html".equals(format)) {
@@ -111,30 +128,34 @@ public class ExportAction extends XWikiAction
      * many resources and we want to allocate those resources only when there is a clear intent.
      *
      * @param request the export request to validate
-     * @return {@code true} if the request is a valid (e.g. the user intended to perform an export), {@code false} otherwise
+     * @return {@code true} if the request is a valid export request (e.g. the user intended to perform an export),
+     *         {@code false} otherwise
      */
     private boolean validateExportRequest(XWikiRequest request)
     {
-        // We used to consider all requests to the /export/ action as export requests but this was causing problems with
-        // the PDF export where resources loaded by the print preview page using relative URLs ended up targeting the
-        // export action and thus triggering a backup XAR export. See XWIKI-23768: Missing RequireJS module can slow
-        // down or even block the PDF export
-        //
-        // Ideally we should ask for a CSRF token, but this would break backwards compatibility. We can't rely on the
-        // Accept HTTP header either becuse it includes */* most of the time, even when the request originates from a
-        // script or image HTML tag. The best option seems to be to rely on the Sec-Fetch-Dest header which is set by
-        // modern browsers to indicate the context in which the request is made.
-        // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest
-        //
-        // As such, we validate the export request if:
-        String secFetchDest = request.getHeader("Sec-Fetch-Dest");
-        return
-            // either the Sec-Fetch-Dest header is missing, which is a sign that the request was made by a non-browser
-            // user agent (e.g. curl, wget),
-            secFetchDest == null
-            // or the Sec-Fetch-Dest header is set to "document", which is a sign that the export request is the result
-            // of a user navigating to an export URL (e.g. by clicking on a link or submitting a form).
-            || "document".equals(secFetchDest);
+        // A GET request to this action can be triggered without any user intent, for instance by a resource loaded
+        // with a relative URL from a page that is itself served by the export action (this is the case of the PDF
+        // export print preview), and an unintended backup XAR export is very expensive. Requiring POST means an export
+        // can only be started by submitting one of the export forms. Requests that are refused here get the
+        // RESUBMIT_TEMPLATE, from which the user can start the same export again with a POST request.
+        return HTTP_METHOD_POST.equalsIgnoreCase(request.getMethod());
+    }
+
+    /**
+     * Describes on the response why the export was not performed. These headers belong to the refused export request
+     * rather than to {@link #RESUBMIT_TEMPLATE}, which is plain markup and is also rendered on its own, through
+     * actions for which they would be wrong.
+     *
+     * @param context the context carrying the response to describe the refusal on
+     */
+    private void refuseExportRequest(XWikiContext context)
+    {
+        XWikiResponse response = context.getResponse();
+        response.setStatus(STATUS_METHOD_NOT_ALLOWED);
+        response.addHeader("Allow", HTTP_METHOD_POST);
+        // Submitting the resubmission form starts an operation that can consume a lot of resources, so the page must
+        // not be displayed in an IFRAME, where the user could be tricked into submitting it.
+        response.addHeader("X-FRAME-OPTIONS", "DENY");
     }
 
     /**
@@ -190,7 +211,7 @@ public class ExportAction extends XWikiAction
         handleRevision(context);
 
         // We currently use the PDF export infrastructure but we have to redesign the export code.
-        XWikiURLFactory urlFactory = new OfficeExporterURLFactory();
+        XWikiURLFactory urlFactory = new OfficeExporterURLFactory(true);
         PdfExport exporter = new OfficeExporter();
         // Check if the office exporter supports the specified format.
         ExportType exportType = ((OfficeExporter) exporter).getExportType(format);
@@ -202,7 +223,7 @@ public class ExportAction extends XWikiAction
             exportType = ExportType.PDF;
         } else if (exportType == null) {
             context.put("message", "core.export.formatUnknown");
-            return "exception";
+            return EXCEPTION;
         }
 
         urlFactory.init(context);
@@ -216,7 +237,7 @@ public class ExportAction extends XWikiAction
         // a directory hierarchy but a file name
         EntityReferenceSerializer<String> serializer =
             Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
-        String filename = serializer.serialize(doc.getDocumentReference()).replaceAll("/", "_");
+        String filename = serializer.serialize(doc.getDocumentReference()).replace("/", "_");
         // Make sure we don't go over 255 chars since several filesystems don't support filename longer than that!
         filename = StringUtils.abbreviateMiddle(filename, "__", 255);
         context.getResponse().addHeader("Content-disposition",
@@ -248,18 +269,18 @@ public class ExportAction extends XWikiAction
     {
         if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
             context.put("message", "needadminrights");
-            return "exception";
+            return EXCEPTION;
         }
 
         XWikiRequest request = context.getRequest();
 
         String name = request.get("name");
         String description = request.get("description");
-        boolean history = Boolean.valueOf(request.get("history"));
+        boolean history = Boolean.parseBoolean(request.get("history"));
         boolean attachmentJRCS =
             getBooleanProperty("attachment_jrcs", "xwiki.action.export.xar.attachment.jrcs", true, context);
         boolean optimized = getBooleanProperty("optimized", "xwiki.action.export.xar.optimized", true, context);
-        boolean backup = Boolean.valueOf(request.get("backup"));
+        boolean backup = Boolean.parseBoolean(request.get("backup"));
         String author = request.get("author");
         String licence = request.get("licence");
         String version = request.get("version");
@@ -358,7 +379,7 @@ public class ExportAction extends XWikiAction
             PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
             if (export == null) {
                 // No Packaging plugin configured
-                return "exception";
+                return EXCEPTION;
             }
 
             export.setWithVersions(history);

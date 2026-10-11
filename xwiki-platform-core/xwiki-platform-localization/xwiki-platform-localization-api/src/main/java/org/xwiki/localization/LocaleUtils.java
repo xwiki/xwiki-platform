@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
 {
     // class to avoid synchronization (Init on demand)
-    static class SyncAvoid
+    static final class SyncAvoid
     {
         /**
          * Unmodifiable list of available locales.
@@ -60,6 +60,11 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
             }
             AVAILABLE_LOCALE_LIST = Collections.unmodifiableList(list);
             AVAILABLE_LOCALE_SET = Collections.unmodifiableSet(new HashSet<>(list));
+        }
+
+        private SyncAvoid()
+        {
+            // Utility class, no instantiation.
         }
     }
 
@@ -134,7 +139,11 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
      */
     public static boolean isValid(Locale locale)
     {
-        if (locale != null) {
+        // Locales with a script (e.g. "zh__#Hans") or extensions (e.g. "ja_JP_#u-ca-japanese") are not supported:
+        // their String representation is not one XWiki can store and parse back to the same locale, and they mostly
+        // duplicate a plain language/country locale. Commons Lang accepts their String representation since 3.21.0
+        // so it has to be checked explicitly.
+        if (locale != null && locale.getScript().isEmpty() && !locale.hasExtensions()) {
             try {
                 // Make sure we can parse the locale String representation
                 LocaleUtils.toLocale(locale.toString());

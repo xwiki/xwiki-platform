@@ -129,11 +129,11 @@ public class SolrQueryExecutor extends AbstractQueryExecutor
             // A better way would be using a PostFilter as described in this article:
             // http://java.dzone.com/articles/custom-security-filtering-solr
             List<DocumentReference> usersToCheck = new ArrayList<>(2);
-            if (query instanceof SecureQuery) {
-                if (((SecureQuery) query).isCurrentUserChecked()) {
+            if (query instanceof SecureQuery secureQuery) {
+                if (secureQuery.isCurrentUserChecked()) {
                     usersToCheck.add(xcontextProvider.get().getUserReference());
                 }
-                if (((SecureQuery) query).isCurrentAuthorChecked()) {
+                if (secureQuery.isCurrentAuthorChecked()) {
                     usersToCheck.add(xcontextProvider.get().getAuthorReference());
                 }
             } else {
@@ -171,8 +171,8 @@ public class SolrQueryExecutor extends AbstractQueryExecutor
         for (Entry<String, Object> entry : query.getNamedParameters().entrySet()) {
             Object value = entry.getValue();
 
-            if (value instanceof Iterable) {
-                solrQuery.set(entry.getKey(), toStringArray((Iterable) value));
+            if (value instanceof Iterable iterable) {
+                solrQuery.set(entry.getKey(), toStringArray(iterable));
             } else if (value != null && value.getClass().isArray()) {
                 solrQuery.set(entry.getKey(), toStringArray(value));
             } else {
@@ -243,7 +243,7 @@ public class SolrQueryExecutor extends AbstractQueryExecutor
             } catch (Exception e) {
                 // Don't take any risk of including a result for which we cannot determine the document reference and
                 // thus cannot determine if the given users have access to it or not.
-                this.logger.warn("Removing bad result: {}", result, e);
+                this.logger.warn("Removing bad result: [{}]", result, e);
             }
 
             // FIXME: We should update maxScore as well when removing the top scored item. How do we do that?

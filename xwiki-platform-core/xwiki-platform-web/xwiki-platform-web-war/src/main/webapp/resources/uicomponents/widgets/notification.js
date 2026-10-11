@@ -19,7 +19,7 @@
  */
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
-var widgets = XWiki.widgets = XWiki.widgets || {};
+const widgets = XWiki.widgets = XWiki.widgets || {};
 /**
  * A general purpose notification class, displaying a simple message for the user, at the bottom of the screen.
  * Features:
@@ -32,10 +32,13 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
  * <li> After hiding, call the function specified in the options.</li>
  * <li>Configurable icon, background and text color.</li>
  * </ul>
- * To display a notification, it suffices to create a new XWiki.widgets.Notification object. Constructor parameters:
+ * The preferred way to display a notification is to call XWiki.widgets.Notification.show. Creating a new
+ * XWiki.widgets.Notification object displays it as well. Constructor parameters:
  * <dl>
  *   <dt>text</dt>
- *   <dd>The notification text</dd>
+ *   <dd>The notification text. Since 18.4.0RC1 and 17.10.9, its values is used as plain text unless textHtml is true.
+ *   Before, it was used as HTML content. You can check for the presence of the Notification.textFormat static
+ *   method to know which default behavior applies at runtime.</dd>
  *   <dt>type (optional)</dt>
  *   <dd>The notification type, one of <tt>plain</tt>, <tt>info</tt>, <tt>warning</tt>, <tt>error</tt>, <tt>inprogress</tt>,
  *    <tt>done</tt>. If an unknown or no type is passed, <tt>plain</tt> is used by default.</dd>
@@ -47,6 +50,10 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
  *     <li><tt>icon</tt>: a custom image to use</li>
  *     <li><tt>color</tt>: a custom color for the text</li>
  *     <li><tt>backgroundColor</tt>: a custom color for the background</li>
+ *     <li><tt>textHtml</tt> (since 18.4.0RC1): when true, the <tt>text</tt> parameter is interpreted as HTML; when
+ *      false (default), it is used as plain text. <strong>Warning:</strong> setting this to true exposes the
+ *      notification to XSS attacks if the <tt>text</tt> value contains untrusted content; callers are responsible
+ *      for properly escaping any user-provided data before passing it in.</li>
  *   </ul>
  *   </dd>
  * </dl>
@@ -84,70 +91,71 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
  *   <dd>background: #EFD</dd>
  * </dl>
  */
-widgets.Notification = Class.create({
-  text : "Hello world!",
-  defaultOptions : {
-    /** supported types: plain, info, warning, error, inprogress, done */
-    "plain"      : {timeout : 5},
-    "info"       : {timeout : 5},
-    "warning"    : {timeout : 5},
-    "error"      : {timeout : 10},
-    "inprogress" : {timeout : false},
-    "done"       : {timeout : 2}
-  },
-  initialize : function(text, type, options) {
+class Notification {
+  constructor(text, type, options) {
     this.text = text || this.text;
     this.type = (typeof this.defaultOptions[type] != "undefined") ? type : "plain";
-    this.options = Object.extend(Object.clone(this.defaultOptions[this.type]), options || { });
+    this.options = {...this.defaultOptions[this.type], ...options};
     this.createElement();
     if (!this.options.inactive) {
       this.show();
     }
-  },
+  }
+
   /** Creates the HTML structure for the notification. */
-  createElement : function() {
+  createElement() {
     if (!this.element) {
       // The notification container is already an ARIA "alert", those notifications do not need extra semantics.
-      this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type}).update(this.text);
+      const notification = document.createElement("div");
+      notification.className = "xnotification xnotification-" + this.type;
+      if (this.options.textHtml) {
+        notification.innerHTML = this.text;
+      } else {
+        notification.textContent = this.text;
+      }
       if (this.options.icon) {
-        this.element.setStyle({backgroundImage : this.options.icon, paddingLeft : "22px"});
+        Object.assign(notification.style, {backgroundImage : this.options.icon, paddingLeft : "22px"});
       }
       if (this.options.backgroundColor) {
-        this.element.setStyle({backgroundColor : this.options.backgroundColor});
+        notification.style.backgroundColor = this.options.backgroundColor;
       }
       if (this.options.color) {
-        this.element.setStyle({color : this.options.color});
+        notification.style.color = this.options.color;
       }
-      this.element = this.element.wrap(new Element("div", {"class" : "xnotification-wrapper"}));
-      Event.observe(this.element, "click", this.hide.bindAsEventListener(this));
+      this.element = document.createElement("div");
+      this.element.className = "xnotification-wrapper";
+      this.element.append(notification);
+      this.element.addEventListener("click", () => this.hide());
     }
-  },
+  }
+
   /** Display the notification and schedule an automatic hide after the configured period of time, if any. */
-  show : function() {
-    if (!this.element.descendantOf(widgets.Notification.getContainer())) {
-      widgets.Notification.getContainer().insert({top: this.element});
+  show() {
+    const container = Notification.getContainer();
+    if (!container.contains(this.element)) {
+      container.prepend(this.element);
     }
-    this.element.show();
+    this.element.style.display = '';
     if (this.options.timeout) {
-      this.timer = window.setTimeout(this.hide.bind(this), this.options.timeout * 1000);
+      this.timer = window.setTimeout(() => this.hide(), this.options.timeout * 1000);
     }
-  },
+  }
+
   /** Hide the notification. */
-  hide : function() {
-    this.element.hide();
-    if (this.element.parentNode) {
-      this.element.remove();
-    }
+  hide() {
+    this.element.style.display = 'none';
+    this.element.remove();
     if (this.timer) {
       window.clearTimeout(this.timer);
       this.timer = null;
     }
     (typeof this.options.onHide == 'function') && this.options.onHide();
-  },
+  }
+
   /** Silently replace this notification with another one, keeping the same place. */
-  replace : function(notification) {
+  replace(notification) {
     if (this.element.parentNode) {
-      this.element.replace(notification.element);
+      this.element.replaceWith(notification.element);
     }
     if (this.timer) {
       window.clearTimeout(this.timer);
@@ -156,20 +164,62 @@ widgets.Notification = Class.create({
     notification.show();
     return notification;
   }
-});
+}
+
+Notification.prototype.text = "Hello world!";
+
+Notification.prototype.defaultOptions = {
+  /** supported types: plain, info, warning, error, inprogress, done */
+  "plain"      : {timeout : 5},
+  "info"       : {timeout : 5},
+  "warning"    : {timeout : 5},
+  "error"      : {timeout : 10},
+  "inprogress" : {timeout : false},
+  "done"       : {timeout : 2},
+  textHtml     : false
+};
+
+widgets.Notification = Notification;
 
 /** The container for all the notifications. */
 widgets.Notification.container = null;
 
+/**
+ *
+ * Indicates how the text parameter is interpreted by XWiki.widgets.Notification.
+ * Callers can check for the presence of this method to decide whether to escape their input:
+ * When this method is available, the text parameter is treated as plain text and must not be escaped.
+ * When this method is missing (before 18.4.0RC1/17.10.9), the text parameter is interpreted as HTML and may need to be
+ * escaped.
+ * The returned value is always the "plain" string.
+ * @return {string} the expected format of the text property
+ * @since 18.4.0RC1
+ * @since 17.10.9
+ */
+widgets.Notification.textFormat = () => "plain"
+
+/**
+ * Displays a notification (unless `options.inactive is set`). Equivalent to creating a Notification object, which displays itself, but makes that side
+ * effect explicit at the call site.
+ *
+ * @param {string} text the notification text, interpreted as described on the constructor
+ * @param {string} type one of "plain", "info", "warning", "error", "inprogress" or "done"
+ * @param {object} options the additional configuration supported by the constructor
+ * @return {XWiki.widgets.Notification} the displayed notification, on which hide or replace can be called
+ * @since 18.9.0RC1
+ */
+widgets.Notification.show = (text, type, options) => new widgets.Notification(text, type, options);
+
 /** Returns the container for all the notifications. The container is created the first time this function is called. */
 widgets.Notification.getContainer = function() {
   if (!widgets.Notification.container) {
-    widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
+    widgets.Notification.container = document.createElement('div');
+    widgets.Notification.container.className = "xnotification-container";
     // Make notifications alert / accessible for screen readers
     // The ARIA role `alert` should give implicit values for `aria-live` and `aria-atomic`.
-    widgets.Notification.container.writeAttribute("role", "alert");
+    widgets.Notification.container.setAttribute("role", "alert");
     // Insert the container in the document body.
-    $('body').insert(widgets.Notification.container);
+    document.body.append(widgets.Notification.container);
   }
   return widgets.Notification.container;
 };

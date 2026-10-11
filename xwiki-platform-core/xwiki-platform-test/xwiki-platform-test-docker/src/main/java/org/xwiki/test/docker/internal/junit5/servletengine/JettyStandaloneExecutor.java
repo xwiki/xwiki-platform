@@ -23,8 +23,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
@@ -35,6 +37,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
@@ -54,6 +57,15 @@ public class JettyStandaloneExecutor
 
     private static final String DATA_SUBDIR = "data";
 
+    private static final String XWIKI_OPTS = "XWIKI_OPTS";
+
+    /**
+     * The memory option which start_xwiki.sh sets when {@code XWIKI_OPTS} is not defined.
+     */
+    private static final String DEFAULT_MEMORY_OPTION = "-Xmx1024m";
+
+    private final int index;
+
     private ArtifactResolver artifactResolver;
 
     private MavenResolver mavenResolver;
@@ -67,13 +79,16 @@ public class JettyStandaloneExecutor
     private XWikiExecutor executor;
 
     /**
+     * @param index the index of the executor
      * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
+     * @since 18.3.0RC1
      */
-    public JettyStandaloneExecutor(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+    public JettyStandaloneExecutor(int index, TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
         MavenResolver mavenResolver)
     {
+        this.index = index;
         this.testConfiguration = testConfiguration;
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
@@ -90,9 +105,11 @@ public class JettyStandaloneExecutor
     /**
      * Create a Jetty Standalone packaging on the file system and start Jetty.
      *
+     * @return the executor used to start Jetty
      * @throws Exception when an error occurs
+     * @since 18.3.0RC1
      */
-    public void start() throws Exception
+    public XWikiExecutor start() throws Exception
     {
         // For performance reason, skip creating the jetty packaging if it already exists
         File jettyDirectory = new File(getJettyDirectory());
@@ -136,6 +153,8 @@ public class JettyStandaloneExecutor
         }
 
         getExecutor().start();
+
+        return this.executor;
     }
 
     /**
@@ -151,9 +170,28 @@ public class JettyStandaloneExecutor
     private XWikiExecutor getExecutor()
     {
         if (this.executor == null) {
-            System.setProperty("xwikiExecutionDirectory", getJettyDirectory());
-            this.executor = new XWikiExecutor(0);
+            // Note: the property is suffixed with the index since each XWiki instance has its own Jetty packaging (the
+            // property without index is a static in XWikiExecutor and thus cannot be changed for each instance).
+            System.setProperty("xwikiExecutionDirectory" + this.index, getJettyDirectory());
+            // Note: the browser runs in a container and thus reaches the instance, which runs on the host, through
+            // the host name exposing the host. Each instance listens on its own port.
+            this.executor = new XWikiExecutor(this.index, GenericContainer.INTERNAL_HOST_HOSTNAME,
+                XWikiExecutor.resolvePort(this.index));
+
+            // Tell the instance where to find the other members of the cluster (when there are several instances)
+            List<String> clusterOptions = RemoteObservationJavaOptions.get(this.index, this.testConfiguration);
+            if (!clusterOptions.isEmpty()) {
+                // Note: start_xwiki.sh only sets the default memory option when XWIKI_OPTS is not set, so it needs to
+                // be passed along with the cluster options.
+                String currentOptions = System.getenv(XWIKI_OPTS);
+                List<String> xwikiOptions = new ArrayList<>();
+                xwikiOptions.add(currentOptions == null || currentOptions.isBlank() ? DEFAULT_MEMORY_OPTION
+                    : currentOptions);
+                xwikiOptions.addAll(clusterOptions);
+                this.executor.addEnvironmentVariable(XWIKI_OPTS, String.join(" ", xwikiOptions));
+            }
         }
+
         return this.executor;
     }
 
@@ -181,6 +219,9 @@ public class JettyStandaloneExecutor
 
     private String getJettyDirectory(String directory)
     {
-        return String.format("%s/jetty", directory);
+        // Each XWiki instance gets its own Jetty packaging since each of them has its own configuration (ports, data
+        // directory, etc). The first instance keeps the standard location to make it easier to find.
+        return this.index > 0 ? String.format("%s/jetty-%s", directory, this.index)
+            : String.format("%s/jetty", directory);
     }
 }

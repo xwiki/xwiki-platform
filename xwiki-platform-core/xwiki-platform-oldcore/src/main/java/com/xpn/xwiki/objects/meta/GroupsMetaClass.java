@@ -51,8 +51,8 @@ public class GroupsMetaClass extends ListMetaClass
         BooleanClass useListClass = new BooleanClass(this);
         useListClass.setName("usesList");
         useListClass.setPrettyName("Uses List");
-        useListClass.setDisplayType("yesno");
-        useListClass.setDisplayFormType("checkbox");
+        useListClass.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        useListClass.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         useListClass.setDefaultValue(0);
         safeput(useListClass.getName(), useListClass);
     }

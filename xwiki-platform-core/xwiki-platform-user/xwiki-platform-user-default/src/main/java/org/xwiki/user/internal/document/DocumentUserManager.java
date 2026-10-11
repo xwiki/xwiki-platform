@@ -21,6 +21,10 @@ package org.xwiki.user.internal.document;
 
 import javax.inject.Provider;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -40,10 +44,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 /**
  * Document-based implementation of {@link UserManager}.
@@ -144,11 +144,11 @@ public class DocumentUserManager implements UserManager
     }
 
     @Override
-    public boolean hasAccess(Right right, UserReference user, UserReference target)
+    public boolean hasViewAccess(UserReference user, UserReference target)
     {
         DocumentReference userReference = this.documentUserReferenceSerializer.serialize(user);
         DocumentReference targetReference = this.documentUserReferenceSerializer.serialize(target);
 
-        return this.authorizationManager.hasAccess(right, userReference, targetReference);
+        return this.authorizationManager.hasAccess(Right.VIEW, userReference, targetReference);
     }
 }

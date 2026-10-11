@@ -52,13 +52,7 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
             Document doc = documentInfo.getDocument();
-
-            final com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
-            if (xwikiAttachment == null) {
-                throw new WebApplicationException(Status.NOT_FOUND);
-            }
-
-            return Response.ok().type(xwikiAttachment.getMimeType()).entity(xwikiAttachment.getContent()).build();
+            return answerWithAttachment(doc.getAttachment(attachmentName));
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

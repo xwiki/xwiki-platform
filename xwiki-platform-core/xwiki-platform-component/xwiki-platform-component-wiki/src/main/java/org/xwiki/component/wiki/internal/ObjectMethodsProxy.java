@@ -50,7 +50,7 @@ public final class ObjectMethodsProxy
         try {
             if (method.equals(Object.class.getMethod("hashCode"))) {
                 return proxyHashCode(proxy);
-            } else if (method.equals(Object.class.getMethod("equals", new Class[] {Object.class}))) {
+            } else if (method.equals(Object.class.getMethod("equals", Object.class))) {
                 return proxyEquals(proxy, args[0]);
             } else if (method.equals(Object.class.getMethod("toString"))) {
                 return proxyToString(proxy);

@@ -27,10 +27,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverterException;
 
 public privileged aspect DefaultOfficeConverterCompatibilityAspect
 {
+    /**
+     * The logger to log.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOfficeConverter.class);
+
     /**
      * Overrides {@link org.xwiki.officeimporter.converter.CompatibilityOfficeConverter#convert(Map, String, String)}.
      */

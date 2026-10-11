@@ -110,8 +110,7 @@ public class TargetDocumentDescriptor
     public boolean equals(Object obj)
     {
         boolean equals = false;
-        if (obj instanceof TargetDocumentDescriptor) {
-            TargetDocumentDescriptor other = (TargetDocumentDescriptor) obj;
+        if (obj instanceof TargetDocumentDescriptor other) {
             equals = other.getDocumentReference().equals(getDocumentReference());
         }
         return equals;

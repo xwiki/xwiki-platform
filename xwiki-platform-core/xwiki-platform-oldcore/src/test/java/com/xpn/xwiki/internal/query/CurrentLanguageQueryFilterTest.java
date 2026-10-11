@@ -21,16 +21,17 @@ package com.xpn.xwiki.internal.query;
 
 import java.util.Locale;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,25 +42,27 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 5.1M2
  */
-public class CurrentLanguageQueryFilterTest
+@ComponentTest
+class CurrentLanguageQueryFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<CurrentLanguageQueryFilter> mocker =
-        new MockitoComponentMockingRule<CurrentLanguageQueryFilter>(CurrentLanguageQueryFilter.class);
+    @InjectMockComponents
+    private CurrentLanguageQueryFilter filter;
+
+    @MockComponent
+    private Execution execution;
 
     @Test
-    public void filterStatement() throws Exception
+    void filterStatement()
     {
-        Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
         XWikiContext xwikiContext = mock(XWikiContext.class);
         when(executionContext.getProperty("xwikicontext")).thenReturn(xwikiContext);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xwikiContext.getWiki()).thenReturn(xwiki);
         when(xwiki.getDefaultLocale(any(XWikiContext.class))).thenReturn(Locale.FRANCE);
 
-        String result = this.mocker.getComponentUnderTest().filterStatement(
+        String result = this.filter.filterStatement(
             "select doc.fullName from XWikiDocument doc where 1=1", Query.HQL);
         assertEquals("select doc.fullName from XWikiDocument doc where (doc.language is null or doc.language = '' or "
             + "doc.language = 'fr_FR') and (1=1)", result);

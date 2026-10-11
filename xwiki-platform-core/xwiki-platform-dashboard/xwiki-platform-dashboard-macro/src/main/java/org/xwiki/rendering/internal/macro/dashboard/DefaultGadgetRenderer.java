@@ -71,9 +71,10 @@ public class DefaultGadgetRenderer implements GadgetRenderer
             HeaderBlock titleBlock = new HeaderBlock(gadget.getTitle(), HeaderLevel.LEVEL2);
             titleBlock.setParameter(CLASS, "gadget-title");
 
-            // And then the content wrapped in a group block with class, to style it
+            // And then the content wrapped in a group block with class, to style it. The gadget content is also marked
+            // as a narrow container so that the widgets it holds, such as a tree, can adapt to the reduced width.
             GroupBlock contentGroup = new GroupBlock();
-            contentGroup.setParameter(CLASS, "gadget-content");
+            contentGroup.setParameter(CLASS, "gadget-content xwiki-narrow-container");
             contentGroup.addChildren(gadget.getContent());
 
             // and wrap everything in a container, to give it a class

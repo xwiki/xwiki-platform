@@ -45,7 +45,7 @@ public abstract class AbstractDistributionStep implements DistributionStep
 
     private State state;
 
-    public AbstractDistributionStep(String stepId)
+    protected AbstractDistributionStep(String stepId)
     {
         this.stepId = stepId;
     }

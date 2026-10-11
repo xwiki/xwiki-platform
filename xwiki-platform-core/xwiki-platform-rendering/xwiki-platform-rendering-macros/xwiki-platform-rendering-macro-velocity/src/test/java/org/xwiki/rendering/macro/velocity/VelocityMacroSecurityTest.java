@@ -21,9 +21,8 @@ package org.xwiki.rendering.macro.velocity;
 
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.BeanManager;
@@ -40,8 +39,13 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -53,33 +57,38 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 4.2M1
  */
+@ComponentTest
 @ComponentList({VelocityMacroPermissionPolicy.class, DefaultObservationManager.class, PermissionCheckerListener.class})
-public class VelocityMacroSecurityTest
+class VelocityMacroSecurityTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Macro<VelocityMacroParameters>> mocker =
-        new MockitoComponentMockingRule<Macro<VelocityMacroParameters>>(VelocityMacro.class);
+    @MockComponent
+    private ContextualAuthorizationManager authorizationManager;
 
-    ContextualAuthorizationManager authorizationManager;
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
-    @Before
-    public void setUp() throws Exception
+    @MockComponent
+    private MacroManager macroManager;
+
+    @MockComponent
+    private BeanManager beanManager;
+
+    @InjectMockComponents
+    private VelocityMacro velocityMacro;
+
+    @BeforeEach
+    void setUp() throws Exception
     {
-        authorizationManager = mocker.registerMockComponent(ContextualAuthorizationManager.class);
-
         BeanDescriptor mockBeanDescriptor = mock(BeanDescriptor.class);
-        when(mockBeanDescriptor.getProperties()).thenReturn(Collections.EMPTY_LIST);
+        when(mockBeanDescriptor.getProperties()).thenReturn(Collections.emptyList());
 
-        BeanManager beanManager = mocker.getInstance(BeanManager.class);
-        when(beanManager.getBeanDescriptor(any(Class.class))).thenReturn(mockBeanDescriptor);
+        when(this.beanManager.getBeanDescriptor(any(Class.class))).thenReturn(mockBeanDescriptor);
 
-        Macro velocityMacro = mocker.getComponentUnderTest();
-        MacroManager mockMacroManager = mocker.registerMockComponent(MacroManager.class);
-        when(mockMacroManager.getMacro(any(MacroId.class))).thenReturn(velocityMacro);
+        when(this.macroManager.getMacro(any(MacroId.class))).thenReturn((Macro) this.velocityMacro);
     }
 
-    @Test(expected = MacroExecutionException.class)
-    public void testRestrictedByContext() throws Exception
+    @Test
+    void restrictedByContext()
     {
         VelocityMacroParameters params = new VelocityMacroParameters();
         MacroTransformationContext context = new MacroTransformationContext();
@@ -90,13 +99,15 @@ public class VelocityMacroSecurityTest
         // Restrict the transformation context.
         context.getTransformationContext().setRestricted(true);
 
-        when(authorizationManager.hasAccess(Right.SCRIPT)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT)).thenReturn(true);
 
-        mocker.getComponentUnderTest().execute(params, "#macro(testMacrosAreLocal)mymacro#end", context);
+        assertThrows(MacroExecutionException.class, () -> {
+            this.velocityMacro.execute(params, "#macro(testMacrosAreLocal)mymacro#end", context);
+        });
     }
 
-    @Test(expected = MacroExecutionException.class)
-    public void testRestrictedByRights() throws Exception
+    @Test
+    void restrictedByRights()
     {
         VelocityMacroParameters params = new VelocityMacroParameters();
         MacroTransformationContext context = new MacroTransformationContext();
@@ -107,10 +118,12 @@ public class VelocityMacroSecurityTest
         context.getTransformationContext().setRestricted(false);
 
         // Restrict the SCRIPT right.
-        when(authorizationManager.hasAccess(Right.SCRIPT)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT)).thenReturn(false);
 
-        mocker.getComponentUnderTest().execute(params, "#macro(testMacrosAreLocal)mymacro#end", context);
+        assertThrows(MacroExecutionException.class, () -> {
+            this.velocityMacro.execute(params, "#macro(testMacrosAreLocal)mymacro#end", context);
+        });
 
-        verify(authorizationManager.hasAccess(Right.SCRIPT));
+        verify(this.authorizationManager).hasAccess(Right.SCRIPT);
     }
 }

@@ -59,7 +59,7 @@ class CopyAsJobTest extends AbstractEntityJobTest
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
 
         DocumentReference copyReference = new DocumentReference("wiki", "Copy", "Page");
-        when(this.modelBridge.copy(sourceReference, copyReference)).thenReturn(true);
+        when(this.modelBridge.copy(sourceReference, copyReference, true)).thenReturn(true);
 
         CopyRequest request = new CopyRequest();
         request.setEntityReferences(List.of(sourceReference));
@@ -71,7 +71,7 @@ class CopyAsJobTest extends AbstractEntityJobTest
         request.setEntityParameters(sourceReference, parameters);
         run(request);
 
-        verify(this.modelBridge).copy(sourceReference, copyReference);
+        verify(this.modelBridge).copy(sourceReference, copyReference, false);
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
 

@@ -384,7 +384,7 @@ public class MockitoOldcore
         // Make sure to provide a EntityReferenceFactory
         if (!getMocker().hasComponent(EntityReferenceFactory.class)) {
             EntityReferenceFactory factory = getMocker().registerMockComponent(EntityReferenceFactory.class);
-            when(factory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
+            when(factory.getReference(any())).thenAnswer(invocation -> invocation.getArgument(0));
         }
 
         // Make sure a default ConfigurationSource is available
@@ -677,7 +677,7 @@ public class MockitoOldcore
             @Override
             public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
             {
-                // The store is based on the contex for the wiki
+                // The store is based on the context for the wiki
                 DocumentReference reference = invocation.<XWikiDocument>getArgument(0).getDocumentReferenceWithLocale();
                 XWikiContext xcontext = invocation.getArgument(1);
                 if (!xcontext.getWikiReference().equals(reference.getWikiReference())) {
@@ -748,7 +748,7 @@ public class MockitoOldcore
                     reference = reference.setWikiReference(xcontext.getWikiReference());
                 }
 
-                saveDocument(reference, document, xcontext);
+                saveDocument(document, xcontext);
 
                 return null;
             }
@@ -905,7 +905,7 @@ public class MockitoOldcore
                     XWikiDocument document = invocation.getArgument(0);
                     String comment = invocation.getArgument(1);
                     boolean minorEdit = invocation.getArgument(2);
-                    XWikiContext xcontext = invocation.getArgument(3);
+                    XWikiContext xcontext = invocation.getArgument(4);
 
                     boolean isNew = document.isNew();
 
@@ -930,7 +930,7 @@ public class MockitoOldcore
                         document.setOriginalDocument(originalDocument);
                     }
 
-                    saveDocument(document.getDocumentReferenceWithLocale(), document, xcontext);
+                    saveDocument(document, xcontext);
 
                     XWikiDocument newOriginal = document.getOriginalDocument();
 
@@ -954,10 +954,11 @@ public class MockitoOldcore
 
                     return null;
                 }
-            }).when(getSpyXWiki()).saveDocument(anyXWikiDocument(), any(String.class), anyBoolean(), anyXWikiContext());
+            }).when(getSpyXWiki()).saveDocument(anyXWikiDocument(), any(String.class), anyBoolean(), anyBoolean(),
+                anyXWikiContext());
             doNothing().when(getSpyXWiki()).checkSavingDocument(any(DocumentReference.class), anyXWikiDocument(),
                 any(String.class), anyBoolean(), anyXWikiContext());
-            doAnswer(new Answer<Void>()
+            Answer<Void> deleteDocumentAnswer = new Answer<Void>()
             {
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable
@@ -982,7 +983,11 @@ public class MockitoOldcore
 
                     return null;
                 }
-            }).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
+            };
+            doAnswer(deleteDocumentAnswer).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class),
+                anyXWikiContext());
+            doAnswer(deleteDocumentAnswer).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), anyBoolean(),
+                anyBoolean(), anyXWikiContext());
             doNothing().when(getSpyXWiki()).checkDeletingDocument(any(DocumentReference.class), anyXWikiDocument(),
                 anyXWikiContext());
             doAnswer(new Answer<BaseClass>()
@@ -1243,7 +1248,7 @@ public class MockitoOldcore
         }
     }
 
-    private void saveDocument(DocumentReference reference, XWikiDocument document, XWikiContext xcontext)
+    private void saveDocument(XWikiDocument document, XWikiContext xcontext)
         throws XWikiException
     {
         boolean supportRevisionStore = this.componentManager.hasComponent(XWikiDocumentFilterUtils.class);
@@ -1474,11 +1479,9 @@ public class MockitoOldcore
      */
     public WikiDescriptorManager getWikiDescriptorManager() throws ComponentLookupException
     {
-        if (this.wikiDescriptorManager == null) {
-            // Avoid initializing it if not needed
-            if (this.componentManager.hasComponent(WikiDescriptorManager.class)) {
-                this.wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
-            }
+        // Avoid initializing it if not needed
+        if (this.wikiDescriptorManager == null && this.componentManager.hasComponent(WikiDescriptorManager.class)) {
+            this.wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
         }
 
         return this.wikiDescriptorManager;

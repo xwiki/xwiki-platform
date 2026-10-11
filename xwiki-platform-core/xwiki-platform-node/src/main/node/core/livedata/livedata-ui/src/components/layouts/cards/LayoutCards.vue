@@ -39,7 +39,7 @@
       <template #right>
         <LivedataPagination side="right" />
         <LivedataEntrySelectorAll v-if="isSelectionEnabled" />
-        <LivedataDropdownMenu />
+        <LivedataActions />
       </template>
     </LivedataTopbar>
 
@@ -81,8 +81,8 @@
 <script>
 import LayoutCardsCard from "./LayoutCardsCard.vue";
 import LayoutCardsNewCard from "./LayoutCardsNewCard.vue";
+import LivedataActions from "../../LivedataActions.vue";
 import LivedataBottombar from "../../LivedataBottombar.vue";
-import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
@@ -93,9 +93,9 @@ export default {
   name: "layout-cards",
 
   components: {
+    LivedataActions,
     LivedataBottombar,
     LivedataTopbar,
-    LivedataDropdownMenu,
     LivedataEntrySelectorAll,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
@@ -144,10 +144,10 @@ export default {
   /* Make the cards 30rem large, and display as many of them on one row */
   .layout-cards .layout-table-root {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 30rem);
+    grid-template-columns: repeat(auto-fill, 22rem);
     grid-auto-rows: min-content;
-    gap: 1.5rem;
-    grid-gap: 1.5rem; /* safari */
+    gap: 1rem;
+    grid-gap: 1rem; /* safari */
   }
 }
 

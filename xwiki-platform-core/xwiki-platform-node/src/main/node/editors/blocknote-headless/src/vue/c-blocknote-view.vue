@@ -19,133 +19,134 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
-import { computeCurrentUser } from "../components/currentUser";
-import { createLinkEditionContext } from "../components/linkEditionContext";
-import messages from "../translations";
-import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
-import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
+import {
+  LinkModal,
+  linkTargetToResourceReference,
+  parseLinkTarget,
+  resourceReferenceToLinkTarget,
+} from "@xwiki/platform-link-modal-ui";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
   onBeforeUnmount,
   onMounted,
+  onUnmounted,
   ref,
   shallowRef,
+  toRaw,
   useTemplateRef,
 } from "vue";
-import { useI18n } from "vue-i18n";
-import type { AuthenticationManagerProvider } from "@xwiki/platform-authentication-api";
-import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
+import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
+  BlockType,
   ContextForMacros,
   EditorType,
+  LinkEditionData,
+  LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { LinkData, LinkTarget } from "@xwiki/platform-link-modal-ui";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type { UniAst } from "@xwiki/platform-uniast-api";
+import type {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 
 type Props = {
   /** Main properties for the BlockNote editor */
   editorProps: Omit<
     BlockNoteViewWrapperProps,
-    "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros"
+    | "depsContainer"
+    | "content"
+    | "linkEditionHandler"
+    | "macroAstToReactJsxConverter"
+    | "macros"
   >;
 
   /** Set to `false` to disable macros entirely */
   macros:
     | {
-        list: MacroWithUnknownParamsType[];
+        /** Optional list of client-rendered macros; omit it when only the server-rendered macros are used. */
+        list?: MacroWithUnknownParamsType[];
         ctx: ContextForMacros;
       }
     | false;
 
   /** Content to initialize the editor with */
-  editorContent: UniAst | Error;
+  editorContent: BlockType[];
 
-  /** Collaboration initialization method */
-  collaborationProvider?: () => CollaborationInitializer;
+  collaboration?: Collaboration;
 
-  /** InversifyJS container to inject dependencies from */
-  container: Container;
+  /** Container to inject dependencies from */
+  depsContainer: Container;
 };
 
 const {
   editorProps,
-  editorContent: uniAst,
+  editorContent,
   macros,
-  collaborationProvider = undefined,
-  container,
+  collaboration = undefined,
+  depsContainer,
 } = defineProps<Props>();
 
 const editorRef = shallowRef<EditorType | null>(null);
 
+let unsubscribeFromLocalChanges: (() => void) | undefined;
+
 const emit = defineEmits<{
-  // Emitted as soon as a user-triggered change happens into the editor
-  // The event won't be triggered when the editor is filled with its initial content,
-  // or when the editor's content changes due to modifications made by other players in the realtime session
+  // Emitted as soon as the editor's content changes, whoever caused the change: the local user, the initial content
+  // being loaded, or another participant of the realtime session. Use it to invalidate anything derived from the
+  // content, and "local-instant-change" to react to what the local user did.
   "instant-change": [];
 
   // Emitted in the same context as "instant-change", but debounced
-  "debounced-change": [content: UniAst];
+  "debounced-change": [content: BlockType[]];
+
+  // The subset of "instant-change" caused by the local user. It is emitted neither when the editor is filled with
+  // its initial content, nor when the content changes because of another participant of the realtime session: both
+  // of those reach the editor through the Yjs synchronization plugin, which is what this excludes. Note that the
+  // initial content load is a local change as far as Yjs itself is concerned, so it cannot be told apart by looking
+  // at the shared document.
+  "local-instant-change": [];
 }>();
 
-defineExpose({
-  // Get the editor's content
-  getContent: (): UniAst | Error => extractEditorContent(),
-});
+const remoteURLParser = depsContainer
+  .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+  .get()!;
 
-/**
- * Extract the editor's content and convert it to UniAst
- */
-function extractEditorContent(): UniAst | Error {
-  return blockNoteToUniAst.blocksToUniAst(editorRef.value!.document);
+const remoteURLSerializer = depsContainer
+  .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+  .get()!;
+
+const modelReferenceParser = depsContainer
+  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+  .get()!;
+
+const modelReferenceSerializer = depsContainer
+  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+  .get()!;
+
+function getContent(): BlockType[] {
+  return editorRef.value!.document;
 }
+
+defineExpose({
+  getContent,
+});
 
 /**
  * Notify the parent component the editor's content changed
  */
 function notifyChanges(): void {
-  const content = extractEditorContent();
-
-  // TODO: error reporting
-  if (content instanceof Error) {
-    throw content;
-  }
-
-  emit("debounced-change", content);
+  emit("debounced-change", getContent());
 }
 
 const notifyChangesDebounced = debounce(notifyChanges, 500);
-
-/**
- * This function's purpose is to build the realtime provider that will be used throughout the app
- */
-async function getRealtimeOptions(): Promise<
-  BlockNoteViewWrapperProps["realtime"]
-> {
-  const authenticationManager = container
-    .get<AuthenticationManagerProvider>("AuthenticationManagerProvider")
-    .get()!;
-
-  if (!collaborationProvider) {
-    return undefined;
-  }
-
-  const user = await computeCurrentUser(authenticationManager);
-
-  return {
-    collaborationProvider,
-    user,
-  };
-}
-
-const { t } = useI18n({
-  messages,
-});
-
-// Create the link edition context
-const linkEditionCtx = createLinkEditionContext(container);
 
 // Build the properties object for the React BlockNoteView component
 const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
@@ -156,47 +157,89 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
   blockNoteOptions: editorProps.blockNoteOptions,
   macros,
-  linkEditionCtx,
-  realtime: await getRealtimeOptions(),
+  // We need to pass the raw version of the collaboration session (but most importantly for the yjs document inside it),
+  // otherwise realtime synchronization fails.
+  collaboration: toRaw(collaboration),
   refs: {
     setEditor(editor) {
       editorRef.value = editor;
+      unsubscribeFromLocalChanges?.();
+      // Ask the editor itself which changes are the local user's, rather than watching the shared Yjs document: a
+      // document update cannot tell typing apart from the initial content load, since both are local Yjs changes.
+      unsubscribeFromLocalChanges = editor.onChange(
+        () => emit("local-instant-change"),
+        false,
+      );
     },
+  },
+  depsContainer,
+  linkEditionHandler: (props) => {
+    editingLink.value = props;
   },
 };
 
-const blockNoteToUniAst = new BlockNoteToUniAstConverter(
-  linkEditionCtx.remoteURLParser,
-  linkEditionCtx.modelReferenceSerializer,
-  macros ? macros.list : [],
-);
+/**
+ * The reference of the linked resource is the authoritative link target (the URL is only a rendering
+ * of it), so build the target to configure in the link modal from that reference when the
+ * integration provides one, and fall back on reverse-engineering the URL otherwise.
+ */
+function currentLinkTarget(current: LinkEditionData): LinkTarget {
+  return (
+    (current.reference &&
+      resourceReferenceToLinkTarget(current.reference, modelReferenceParser)) ??
+    parseLinkTarget(current.url, remoteURLParser)
+  );
+}
 
-const uniAstToBlockNote = new UniAstToBlockNoteConverter(
-  linkEditionCtx.remoteURLSerializer,
-);
+const submitEditedLink = ({ displayText, target }: LinkData) => {
+  const { type, config } = target;
 
-const content =
-  uniAst instanceof Error
-    ? uniAst
-    : uniAstToBlockNote.uniAstToBlockNote(uniAst);
+  // TODO: support
+
+  const url =
+    type === "url"
+      ? config.url
+      : type === "email"
+        ? `mailto:${config.address}`
+        : remoteURLSerializer.serialize(config.ref!)!;
+
+  editingLink.value?.onSubmit({
+    title: displayText,
+    url,
+    reference: linkTargetToResourceReference(target, modelReferenceSerializer),
+  });
+
+  editingLink.value = null;
+};
 
 const blockNoteContainer = useTemplateRef<HTMLElement>("blocknote-container");
+const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 
 const mountedBlockNote = ref<{ unmount: () => void }>();
 
-onMounted(() => {
-  if (content instanceof Error) {
-    throw content;
+const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
+
+function handleLinkEditorOutsideClick(e: MouseEvent) {
+  if (!editingLink.value || !linkModalContainer.value) {
+    return;
   }
 
+  if (!e.composedPath().includes(linkModalContainer.value)) {
+    editingLink.value = null;
+  }
+}
+
+onMounted(() => {
   if (!blockNoteContainer.value) {
     throw new Error("Missing DOM container for BlockNote!");
   }
 
   mountedBlockNote.value = mountBlockNote(blockNoteContainer.value, {
     ...initializedEditorProps,
-    content,
+    content: editorContent,
   });
+
+  window.addEventListener("mousedown", handleLinkEditorOutsideClick);
 });
 
 onBeforeUnmount(() => {
@@ -206,14 +249,28 @@ onBeforeUnmount(() => {
 
   mountedBlockNote.value.unmount();
 });
+
+onUnmounted(() => {
+  window.removeEventListener("mousedown", handleLinkEditorOutsideClick);
+  unsubscribeFromLocalChanges?.();
+  unsubscribeFromLocalChanges = undefined;
+});
 </script>
 
 <template>
-  <h1 v-if="content instanceof Error">
-    {{ t("blocknote.document.parsingError", { reason: content }) }}
-  </h1>
-
   <div ref="blocknote-container" />
+
+  <div ref="link-modal-container" v-if="editingLink">
+    <LinkModal
+      :current="{
+        displayText: editingLink.current.title,
+        target: currentLinkTarget(editingLink.current),
+      }"
+      :deps-container="depsContainer"
+      @submit="submitEditedLink"
+      @cancel="editingLink = null"
+    />
+  </div>
 </template>
 
 <style scoped>
@@ -282,10 +339,32 @@ onBeforeUnmount(() => {
     font-family: var(--cr-font-mono);
     color: var(--cr-base-text-color);
 
+    /* Keep the padding from BlockNote because the language selector is displayed in the top padding. */
     & pre {
       margin: 0;
-      padding: 0;
     }
+
+    /* BlockNote uses the dark syntax highlighting theme because its code blocks have a dark background, but ours have
+      a light background. */
+    & .shiki {
+      color: var(--shiki-light);
+    }
+
+    /* BlockNote displays the language selector in white, which is not visible on our light background. */
+    & > div > select {
+      color: inherit;
+    }
+  }
+
+  /* Since BlockNote 0.51 the image element no longer gets a fallback "alt" attribute, so a broken or not-yet-loaded
+    image (e.g. a missing attachment) collapses to a zero size and can no longer be selected or clicked in the editor
+    (to edit or remove it). Give images a minimum size so they stay visible and selectable. Real images are larger
+    than this minimum so they are not affected. */
+  & .bn-visual-media {
+    /* 2em minimum width to keep some space to click on the image even with the resize handles displayed on hover,
+    this is especially useful for very small images, of missing images. */
+    min-width: 2em;
+    min-height: 1em;
   }
 }
 </style>

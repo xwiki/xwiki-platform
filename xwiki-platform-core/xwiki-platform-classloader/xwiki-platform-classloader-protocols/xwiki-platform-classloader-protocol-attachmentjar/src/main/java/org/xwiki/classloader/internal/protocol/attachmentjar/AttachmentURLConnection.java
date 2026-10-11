@@ -40,6 +40,8 @@ public class AttachmentURLConnection extends URLConnection
 
     /**
      * @param url the URL to connect to
+     * @param attachmentReference the reference to the attachment providing the connection's content
+     * @param documentAccessBridge the bridge used to access the attachment's content
      * @since 2.2M1
      */
     public AttachmentURLConnection(URL url, AttachmentReference attachmentReference,

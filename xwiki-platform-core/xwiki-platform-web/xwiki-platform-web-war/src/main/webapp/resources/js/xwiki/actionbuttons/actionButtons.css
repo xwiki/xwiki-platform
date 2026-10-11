@@ -14,3 +14,11 @@
   width: inherit;
   vertical-align: middle;
 }
+#csrf-warning-modal .main-explanation {
+  color: var(--brand-danger);
+  font-weight: var(--font-weight-semibold)
+}
+#csrf-warning-modal .csrf-warning-buttons {
+  padding-top: 1em;
+  text-align: center;
+}

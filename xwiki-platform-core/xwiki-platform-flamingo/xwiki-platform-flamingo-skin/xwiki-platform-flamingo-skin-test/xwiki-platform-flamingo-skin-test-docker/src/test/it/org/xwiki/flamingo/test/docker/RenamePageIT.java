@@ -20,6 +20,7 @@
 package org.xwiki.flamingo.test.docker;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +56,8 @@ import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
@@ -66,6 +69,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class RenamePageIT
 {
+    private static final String RIGHTS_USER = "RenameRightsUser";
+
+    private static final String XWIKI_RIGHTS_CLASS = "XWiki.XWikiRights";
+
+    private static final String MOVED_PAGE_CONTENT = "This page carries a right its mover cannot grant";
+
     @BeforeAll
     public void setup(TestUtils setup)
     {
@@ -74,7 +83,7 @@ class RenamePageIT
 
     @Order(1)
     @Test
-    void convertNestedPageToTerminalPage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void convertNestedPageToTerminalPage(TestUtils setup) throws Exception
     {
         // Note: we use a 3-level-deep nested page since 2 levels wouldn't show problems such as the regression
         // we've had with https://jira.xwiki.org/browse/XWIKI-16170
@@ -88,7 +97,7 @@ class RenamePageIT
         ViewPage vp = setup.createPage(reference, "", "");
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.3.WebHome and check the Terminal checkbox. We also need to uncheck the
         // Auto Redirect checkbox so the page 1.2.3.WebHome will not appear as existing after the Rename operation.
@@ -126,7 +135,7 @@ class RenamePageIT
         ViewPage vp = new ViewPage();
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.WebHome.
         RenamePage renamePage = vp.rename();
@@ -399,7 +408,7 @@ class RenamePageIT
             "testPage");
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 1
         ViewPage viewPage = setup.gotoPage(sourcePageReference1);
@@ -416,7 +425,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 2
         viewPage = setup.gotoPage(sourcePageReference2);
@@ -433,7 +442,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 3
         viewPage = setup.gotoPage(sourcePageReference3);
@@ -450,7 +459,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 4
         viewPage = setup.gotoPage(sourcePageReference4);
@@ -467,7 +476,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // rename link 5
         viewPage = setup.gotoPage(sourcePageReference5);
@@ -489,8 +498,7 @@ class RenamePageIT
      */
     @Order(5)
     @Test
-    void renamePageRelativeLinkPageAndTranslation(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+    void renamePageRelativeLinkPageAndTranslation(TestUtils setup, TestReference testReference) throws Exception
     {
         String parent = "RenamePageIT";
         String name = "renamePageRefactorOutgoingLinksInPageAndTranslation";
@@ -503,7 +511,7 @@ class RenamePageIT
         assertEquals("[[OtherPage]]", setup.rest().<Page>get(reference).getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Rename the page
         ViewPage vp = setup.gotoPage(reference);
@@ -520,6 +528,12 @@ class RenamePageIT
 
         newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName, Locale.FRENCH));
         assertEquals("fr [[OtherPage]]", newPage.getContent());
+
+        // Make sure both the original page and its translation were moved away from the old location: since the
+        // rename is done without auto-redirect (unchecked by default), neither the default-locale page nor its
+        // French translation must exist anymore at the source reference.
+        assertFalse(setup.rest().exists(reference));
+        assertFalse(setup.rest().exists(new LocalDocumentReference(reference, Locale.FRENCH)));
     }
 
     @Order(6)
@@ -610,8 +624,7 @@ class RenamePageIT
     @ParameterizedTest
     @ValueSource(strings = { "true", "false" })
     @NullSource
-    void renameWithIndexingWaiting(String strategy, TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+    void renameWithIndexingWaiting(String strategy, TestUtils setup, TestReference testReference) throws Exception
     {
         // Create two pages that link to each other.
         SpaceReference spaceReference = testReference.getLastSpaceReference();
@@ -629,7 +642,7 @@ class RenamePageIT
 
         // Wait for an empty queue here to ensure that the deleted page has been removed from the index and links
         // won't be updated just because the page is still in the index.
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Make the other page slow to index by sleeping when we're in Solr.
         String slowTitle = "$services.sleep.sleepInSolr(20) Slow Title";
@@ -680,16 +693,21 @@ class RenamePageIT
 
     @Order(9)
     @Test
-    void renameWithRelativeLinks(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    void renameWithRelativeLinks(TestUtils testUtils, TestReference testReference)
         throws Exception
     {
         SpaceReference rootSpaceReference = testReference.getLastSpaceReference();
         DocumentReference externalLinkPage = new DocumentReference("xwiki", "RenamePageIT", "ExternalPage");
         testUtils.rest().savePage(externalLinkPage);
-        testUtils.rest().savePage(testReference, 
+        // The absolute references to the renamed page itself (link and image) must follow the rename, while the
+        // relative one must be kept as is.
+        String selfReferencesFormat =
+            "%n[[Self link>>doc:%1$s]]%n[[image:%1$s@image.png]]%n[[Relative self link>>doc:]]";
+        testUtils.rest().savePage(testReference,
             String.format("[[Alice]]%n[[page:../%s/Alice]]%n[[Bob]]%n[[Eve]]"
                     + "%n[[Other link>>RenamePageIT.ExternalPage]]",
-                rootSpaceReference.getName()),
+                rootSpaceReference.getName())
+                + String.format(selfReferencesFormat, testUtils.serializeLocalReference(testReference)),
             "Test relative links");
         
         SpaceReference aliceSpace = new SpaceReference("Alice", rootSpaceReference);
@@ -699,7 +717,7 @@ class RenamePageIT
 
         // Wait for an empty queue here to ensure that the deleted page has been removed from the index and links
         // won't be updated just because the page is still in the index.
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         ViewPage viewPage = testUtils.gotoPage(testReference);
         RenamePage rename = viewPage.rename();
@@ -711,8 +729,10 @@ class RenamePageIT
             new SpaceReference(rootSpaceReference.getName() + "Foo", rootSpaceReference.getParent());
         WikiEditPage wikiEditPage = statusPage.gotoNewPage().editWiki();
         String newRootSpaceSerialized = testUtils.serializeLocalReference(newRootSpace).replaceAll("\\.", "/");
+        String newSelfReferences = String.format(selfReferencesFormat,
+            testUtils.serializeLocalReference(new DocumentReference("WebHome", newRootSpace)));
         assertEquals(String.format("[[Alice]]%n[[page:%s/Alice]]%n[[Bob]]%n[[Eve]]"
-                + "%n[[Other link>>RenamePageIT.ExternalPage]]", newRootSpaceSerialized),
+                + "%n[[Other link>>RenamePageIT.ExternalPage]]", newRootSpaceSerialized) + newSelfReferences,
             wikiEditPage.getContent());
 
         SpaceReference newBobSpace = new SpaceReference("Bob", newRootSpace);
@@ -733,7 +753,7 @@ class RenamePageIT
         String serializedAlice2Reference = testUtils.serializeLocalReference(alice2Reference);
         assertEquals(String.format("[[%s]]%n[[page:%s/Alice2]]%n[[Bob]]%n[[Eve]]"
                 + "%n[[Other link>>RenamePageIT.ExternalPage]]",
-            serializedAlice2Reference, newRootSpaceSerialized), wikiEditPage.getContent());
+            serializedAlice2Reference, newRootSpaceSerialized) + newSelfReferences, wikiEditPage.getContent());
 
         // FIXME: ideally this one should be refactored too, however it's not a regression.
         //wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newBobSpace));
@@ -742,7 +762,7 @@ class RenamePageIT
 
     @Order(10)
     @Test
-    void renameLinkContainingWiki(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    void renameLinkContainingWiki(TestUtils testUtils, TestReference testReference)
         throws Exception
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "TestLinkWithWiki", "WebHome");
@@ -750,7 +770,7 @@ class RenamePageIT
         testUtils.rest().savePage(documentReference, "Some content", "TestLinkWithWiki");
         testUtils.rest().savePage(testReference, "[[MyPage>>xwiki:TestLinkWithWiki.WebHome]]",
             "renameLinkContainingWiki");
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
         RenamePage renamePage = testUtils.gotoPage(documentReference).rename();
         renamePage.getDocumentPicker().setName("TestLinkWithWikiNew");
         CopyOrRenameOrDeleteStatusPage statusPage =
@@ -808,7 +828,7 @@ class RenamePageIT
             p3Content);
 
         testUtils.loginAsSuperAdmin();
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
         RenamePage renamePage = testUtils.gotoPage(p1).rename();
         renamePage.getDocumentPicker().setName("P43");
         CopyOrRenameOrDeleteStatusPage statusPage = renamePage.clickRenameButton().waitUntilFinished();
@@ -822,5 +842,221 @@ class RenamePageIT
         assertEquals(String.format(displayedContent, "xwiki:XWiki." + userLogin, "XWiki.superadmin",
                 "xwiki:XWiki." + userLogin),
             p3Content);
+    }
+
+    @Order(12)
+    @Test
+    void convertTerminalPageToNestedPage(TestUtils setup) throws Exception
+    {
+        DocumentReference sourceParent = new DocumentReference("xwiki", Arrays.asList("a", "b", "c"), "WebHome");
+        DocumentReference sourceTerminal = new DocumentReference("xwiki", Arrays.asList("a", "b", "c"), "4");
+        DocumentReference targetParent = new DocumentReference("xwiki", Arrays.asList("1", "2", "3"), "WebHome");
+        DocumentReference targetNested = new DocumentReference("xwiki", Arrays.asList("1", "2", "3", "4"), "WebHome");
+        DocumentReference childPage =
+            new DocumentReference("xwiki", Arrays.asList("1", "2", "3", "4", "child"), "WebHome");
+
+        setup.rest().delete(sourceParent);
+        setup.rest().delete(sourceTerminal);
+        setup.rest().delete(targetParent);
+        setup.rest().delete(targetNested);
+        setup.rest().delete(childPage);
+
+        setup.createPage(targetParent, "", "");
+        setup.createPage(sourceParent, "", "");
+        setup.createPage(sourceTerminal, "Content of terminal page", "4");
+
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        ViewPage vp = setup.gotoPage(sourceTerminal);
+        RenamePage renamePage = vp.rename();
+        renamePage.setTerminal(false);
+        renamePage.getDocumentPicker().setParent("1.2.3");
+        renamePage.getDocumentPicker().setName("4");
+        renamePage.setAutoRedirect(false);
+        renamePage.clickRenameButton().waitUntilFinished();
+
+        assertTrue(setup.pageExists(Arrays.asList("1", "2", "3", "4"), "WebHome"),
+            "Page 1.2.3.4.WebHome doesn't exist!");
+        assertFalse(setup.pageExists(Arrays.asList("a", "b", "c"), "4"), "Page a.b.c.4 still exists!");
+
+        setup.createPage(childPage, "Child page content", "child");
+        ViewPage childVP = setup.gotoPage(childPage);
+        String breadcrumb = childVP.getBreadcrumbContent();
+        assertTrue(breadcrumb.endsWith("/4/child"),
+            "Expected breadcrumb to end with /4/child but was [" + breadcrumb + "]");
+    }
+
+    /**
+     * Verify that a user moving a page cannot bring along a right that this user is not allowed to grant at the target
+     * location. The source page grants {@code admin} to the user through an {@code XWiki.XWikiRights} object and the
+     * user is not administrator of the target space, so the move must be refused: otherwise the user would gain
+     * administration rights simply by moving a page. Unlike a copy, where the offending rights are filtered out, a
+     * rename cannot modify the document on the fly, so the whole operation is cancelled.
+     */
+    @Order(13)
+    @Test
+    void renameIsRefusedWhenItWouldMoveRightsTheUserCannotGrant(TestUtils setup, TestReference testReference)
+        throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        SpaceReference sourceSpace = new SpaceReference("Source", testSpace);
+        SpaceReference targetSpace = new SpaceReference("Target", testSpace);
+        DocumentReference sourcePage = new DocumentReference("Page", sourceSpace);
+        DocumentReference targetPage = new DocumentReference("Page", targetSpace);
+
+        setup.rest().delete(sourcePage);
+        setup.rest().delete(targetPage);
+
+        setup.createUser(RIGHTS_USER, RIGHTS_USER, null, "usertype", "Advanced");
+        String userFullName = "XWiki." + RIGHTS_USER;
+
+        // The user may delete in the source space and create in the target space, so it is allowed to perform the move
+        // itself, but it is administrator of neither space.
+        setup.setRightsOnSpace(sourceSpace, "", userFullName, "view,edit,delete", true);
+        setup.setRightsOnSpace(targetSpace, "", userFullName, "view,edit", true);
+
+        // The source page carries a right granting admin to the user. It has been set by an administrator, so it is
+        // legitimate at this location.
+        setup.rest().savePage(sourcePage, MOVED_PAGE_CONTENT, "Source Page");
+        setup.addObject(sourcePage, XWIKI_RIGHTS_CLASS, "levels", "admin", "users", userFullName, "allow", 1);
+
+        // Move the page as the restricted user.
+        setup.login(RIGHTS_USER, RIGHTS_USER);
+        RenamePage renamePage = setup.gotoPage(sourcePage).rename();
+        renamePage.getDocumentPicker().setParent(setup.serializeReference(targetSpace)).setName("Page");
+        renamePage.clickRenameButton().waitUntilFinished();
+
+        setup.loginAsSuperAdmin();
+
+        // The move must have been refused: the target must not have been created and the source must be untouched,
+        // still carrying its right.
+        List<String> classAndMethodSpaces = List.of(testSpace.getParent().getName(), testSpace.getName());
+        assertFalse(setup.pageExists(newSpaces(classAndMethodSpaces, "Target"), "Page"),
+            "The page must not have been moved to a location where the user moving it is not allowed to grant the "
+                + "[admin] right it carries.");
+        assertTrue(setup.pageExists(newSpaces(classAndMethodSpaces, "Source"), "Page"),
+            "The source page must still exist since the move was refused.");
+
+        setup.gotoPage(sourcePage, "edit", "editor=object");
+        List<ObjectEditPane> rightObjects = new ObjectEditPage().getObjectsOfClass(XWIKI_RIGHTS_CLASS, true);
+        assertEquals(1, rightObjects.size(), "The refused move must have left the source page's right in place.");
+    }
+
+    /**
+     * Move a page that has children without preserving them: only the page itself is moved, its children stay at
+     * their old location.
+     */
+    @Order(14)
+    @Test
+    void moveParentWithoutChildren(TestUtils setup, TestReference testReference) throws Exception
+    {
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        SpaceReference space1 = new SpaceReference("1", testSpace);
+        SpaceReference space2 = new SpaceReference("2", space1);
+        SpaceReference space3 = new SpaceReference("3", space2);
+        SpaceReference space4 = new SpaceReference("4", space3);
+        SpaceReference spaceA = new SpaceReference("A", testSpace);
+        SpaceReference spaceB = new SpaceReference("B", spaceA);
+        DocumentReference page2 = new DocumentReference("WebHome", space2);
+        DocumentReference page3 = new DocumentReference("WebHome", space3);
+        DocumentReference page4 = new DocumentReference("WebHome", space4);
+        SpaceReference movedSpace2 = new SpaceReference("2", spaceB);
+        DocumentReference movedPage2 = new DocumentReference("WebHome", movedSpace2);
+
+        // Clean-up and create 1/2/3/4 and A/B, every page existing.
+        setup.rest().delete(movedPage2);
+        setup.rest().delete(new DocumentReference("WebHome", new SpaceReference("3", movedSpace2)));
+        for (SpaceReference space : List.of(space1, space2, space3, space4, spaceA, spaceB)) {
+            DocumentReference page = new DocumentReference("WebHome", space);
+            setup.rest().delete(page);
+            setup.rest().savePage(page, "", space.getName());
+        }
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        // Move 2 under A/B without its children.
+        RenamePage renamePage = setup.gotoPage(page2).rename();
+        renamePage.setPreserveChildren(false);
+        renamePage.getDocumentPicker().setParent(setup.serializeLocalReference(spaceB));
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+
+        // Only 2 has been moved.
+        assertTrue(setup.rest().exists(movedPage2), "Page A/B/2 doesn't exist!");
+        assertFalse(setup.rest().exists(new DocumentReference("WebHome", new SpaceReference("3", movedSpace2))),
+            "Page A/B/2/3 exists!");
+        // The children are still at their old location, reachable at their old URLs.
+        assertTrue(setup.gotoPage(page3).exists(), "Page 1/2/3 doesn't exist anymore!");
+        assertTrue(setup.gotoPage(page4).exists(), "Page 1/2/3/4 doesn't exist anymore!");
+    }
+
+    /**
+     * Renaming a page that belongs to an installed extension asks the user to confirm, page by page.
+     */
+    @Order(15)
+    @Test
+    void renameExtensionPage(TestUtils setup) throws Exception
+    {
+        // Macros.WebHome is a page of the installed Rendering UI extension that is not used by the other tests. The
+        // question is only asked for pages that the extension doesn't allow to delete, i.e. not for demo pages (such
+        // as the Sandbox ones).
+        DocumentReference extensionPage = new DocumentReference("xwiki", "Macros", "WebHome");
+        String renamedPageName = "MacrosRenamed";
+        DocumentReference renamedPage = new DocumentReference("xwiki", renamedPageName, "WebHome");
+        setup.rest().delete(renamedPage);
+
+        // Wait for the solr indexing to be completed before doing any rename
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        // Cancelling the question leaves the page in place.
+        JobQuestionPane jobQuestionPane = startRename(setup, extensionPage, renamedPageName);
+        assertEquals("You are about to rename pages that belong to extensions.", jobQuestionPane.getQuestionTitle());
+        jobQuestionPane.cancelQuestion();
+        assertTrue(jobQuestionPane.isCanceled());
+        assertTrue(setup.rest().exists(extensionPage), "The extension page has been renamed!");
+        assertFalse(setup.rest().exists(renamedPage), "The renamed page exists!");
+
+        // Confirming the question with the page selected renames it.
+        jobQuestionPane = startRename(setup, extensionPage, renamedPageName);
+        assertEquals("You are about to rename pages that belong to extensions.", jobQuestionPane.getQuestionTitle());
+        TreeElement treeElement = jobQuestionPane.getQuestionTree();
+        TreeNodeElement extensionNode = treeElement.getTopLevelNodes().get(0);
+        assertEquals("org.xwiki.platform:xwiki-platform-rendering-ui", extensionNode.getId());
+        List<TreeNodeElement> extensionPages = extensionNode.open().waitForIt().getChildren();
+        assertEquals(1, extensionPages.size());
+        TreeNodeElement pageNode = extensionPages.get(0);
+        assertEquals("xwiki:Macros.WebHome", pageNode.getId());
+        pageNode.select();
+        jobQuestionPane.confirmQuestion().waitUntilFinished();
+        assertFalse(setup.rest().exists(extensionPage), "The extension page has not been renamed!");
+        assertTrue(setup.rest().exists(renamedPage), "The renamed page doesn't exist!");
+
+        // Restore the extension page. The renamed page doesn't belong to the extension, so no question is asked.
+        RenamePage renamePage = setup.gotoPage(renamedPage).rename();
+        renamePage.getDocumentPicker().setName(extensionPage.getLastSpaceReference().getName());
+        renamePage.setPreserveChildren(false);
+        renamePage.setAutoRedirect(false);
+        renamePage.clickRenameButton().waitUntilFinished();
+        assertTrue(setup.rest().exists(extensionPage), "The extension page has not been restored!");
+    }
+
+    private JobQuestionPane startRename(TestUtils setup, DocumentReference page, String newName)
+    {
+        RenamePage renamePage = setup.gotoPage(page).rename();
+        renamePage.getDocumentPicker().setName(newName);
+        renamePage.setPreserveChildren(false);
+        renamePage.setAutoRedirect(false);
+        renamePage.clickRenameButton();
+        return new JobQuestionPane().waitForQuestionPane();
+    }
+
+    private static List<String> newSpaces(List<String> parentSpaces, String lastSpace)
+    {
+        List<String> spaces = new ArrayList<>(parentSpaces);
+        spaces.add(lastSpace);
+        return spaces;
     }
 }

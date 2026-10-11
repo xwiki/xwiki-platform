@@ -108,9 +108,8 @@ public class XWikiAllGroupDocumentInitializer implements MandatoryDocumentInitia
                 obj.setStringValue("member", "");
                 needsUpdate = true;
             } catch (XWikiException e) {
-                logger.error(
-                    String.format("Impossible to add an object to the document XWiki.XWikiAllGroups in the wiki [%s].",
-                        document.getDocumentReference().getWikiReference().getName()), e);
+                logger.error("Impossible to add an object to the document XWiki.XWikiAllGroups in the wiki [{}]",
+                    document.getDocumentReference().getWikiReference().getName(), e);
             }
         }
         

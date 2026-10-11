@@ -91,7 +91,7 @@ class DefaultXHTMLOfficeDocumentBuilderTest
     private OfficeServer officeServer;
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure()
     {
         when(this.officeServer.getConverter()).thenReturn(this.officeConverter);
     }

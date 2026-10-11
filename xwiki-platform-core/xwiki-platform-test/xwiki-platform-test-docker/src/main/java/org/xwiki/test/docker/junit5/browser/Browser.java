@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.docker.junit5.browser;
 
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.openqa.selenium.Capabilities;
@@ -54,6 +55,10 @@ public enum Browser
      */
     private static final String TEST_RESOURCES_PATH = "/tmp/test-resources";
 
+    private static final String BEFORE_UNLOAD = "beforeUnload";
+
+    private static final String DEFAULT = "default";
+
     private Capabilities capabilities;
 
     Browser()
@@ -63,7 +68,7 @@ public enum Browser
 
     Browser(Capabilities capabilities)
     {
-        this.capabilities = capabilities.merge(buildCommonCapabilities());
+        this.capabilities = buildCommonCapabilities().merge(capabilities);
     }
 
     /**
@@ -98,6 +103,11 @@ public enum Browser
         if (options.getProfile() == null) {
             options.setProfile(new FirefoxProfile());
         }
+        // Firefox 149+ does not apply the legacy string value to beforeunload when BiDi is enabled, so we need to
+        // set the beforeUnload handler explicitly in order to keep the prompt open for tests that interact with it.
+        options.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR,
+            Map.of(DEFAULT, UnexpectedAlertBehaviour.IGNORE.toString(), BEFORE_UNLOAD,
+                UnexpectedAlertBehaviour.IGNORE.toString()));
         options.enableBiDi();
         options.addPreference("dom.disable_beforeunload", false);
         // Workaround for https://github.com/mozilla/geckodriver/issues/2212
@@ -110,6 +120,13 @@ public enum Browser
         ChromeOptions options = new ChromeOptions();
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(LogType.BROWSER, Level.ALL);
+        // Chrome only applies the beforeUnload handler from the structured unhandled prompt behavior capability when
+        // BiDi is enabled.
+        options.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR,
+            Map.of("alert", UnexpectedAlertBehaviour.IGNORE.toString(), BEFORE_UNLOAD,
+                UnexpectedAlertBehaviour.IGNORE.toString(), "confirm", UnexpectedAlertBehaviour.IGNORE.toString(),
+                DEFAULT, UnexpectedAlertBehaviour.IGNORE.toString(), "file",
+                UnexpectedAlertBehaviour.IGNORE.toString(), "prompt", UnexpectedAlertBehaviour.IGNORE.toString()));
         options.enableBiDi();
         options.setCapability(ChromeOptions.LOGGING_PREFS, logPrefs);
         options.addArguments(

@@ -307,7 +307,7 @@ class UpdatedDocumentMentionsAnalyzerTest
             buildMentionMacro(USER_U1, "anchor2", FIRST_NAME));
         when(this.xdomService.listMentionMacros(newXDOM)).thenReturn(newMentions);
 
-        // anchor0 is removed and anchor1 and anchor2 are added, all mentionning U1.
+        // anchor0 is removed and anchor1 and anchor2 are added, all mentioning U1.
         Map<MentionedActorReference, List<String>> oldCounts = new HashMap<>();
         oldCounts.put(new MentionedActorReference(USER_U1, "user"), List.of("anchor0"));
         when(this.xdomService.groupAnchorsByUserReference(oldMentions)).thenReturn(oldCounts);
@@ -366,7 +366,7 @@ class UpdatedDocumentMentionsAnalyzerTest
         );
         when(this.xdomService.listMentionMacros(newXDOM)).thenReturn(newMentions);
 
-        // anchor0 is removed and anchor1 and anchor2 are added, all mentionning U1.
+        // anchor0 is removed and anchor1 and anchor2 are added, all mentioning U1.
         Map<MentionedActorReference, List<String>> oldCounts = new HashMap<>();
         oldCounts.put(new MentionedActorReference(USER_U1, "user"), List.of("anchor0"));
         when(this.xdomService.groupAnchorsByUserReference(oldMentions)).thenReturn(oldCounts);
@@ -427,7 +427,7 @@ class UpdatedDocumentMentionsAnalyzerTest
             buildMentionMacro(USER_U1, "anchor2", FIRST_NAME));
         when(this.xdomService.listMentionMacros(newXDOM)).thenReturn(newMentions);
 
-        // anchor0 is removed and anchor1 and anchor2 are added, all mentionning U1.
+        // anchor0 is removed and anchor1 and anchor2 are added, all mentioning U1.
         Map<MentionedActorReference, List<String>> oldCounts = new HashMap<>();
         oldCounts.put(new MentionedActorReference(USER_U1, "user"), asList("anchor0"));
         when(this.xdomService.groupAnchorsByUserReference(oldMentions)).thenReturn(oldCounts);
@@ -492,7 +492,7 @@ class UpdatedDocumentMentionsAnalyzerTest
         );
         when(this.xdomService.listMentionMacros(newXDOM)).thenReturn(newMentions);
 
-        // anchor0 is removed and anchor1 and anchor2 are added, all mentionning U1.
+        // anchor0 is removed and anchor1 and anchor2 are added, all mentioning U1.
         Map<MentionedActorReference, List<String>> oldCounts = new HashMap<>();
         oldCounts.put(new MentionedActorReference(USER_U1, "user"), List.of("anchor0"));
         when(this.xdomService.groupAnchorsByUserReference(oldMentions)).thenReturn(oldCounts);

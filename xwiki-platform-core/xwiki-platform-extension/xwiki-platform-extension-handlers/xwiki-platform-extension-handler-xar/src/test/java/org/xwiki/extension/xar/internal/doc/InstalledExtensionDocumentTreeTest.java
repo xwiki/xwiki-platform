@@ -19,10 +19,9 @@
  */
 package org.xwiki.extension.xar.internal.doc;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @since 11.10
  */
 @ComponentTest
-public class InstalledExtensionDocumentTreeTest
+class InstalledExtensionDocumentTreeTest
 {
     @InjectMockComponents
     private InstalledExtensionDocumentTree tree;
@@ -55,11 +54,11 @@ public class InstalledExtensionDocumentTreeTest
 
     private DocumentReference path = new DocumentReference("foo", "Path", "WebHome");
 
-    private DocumentReference to = new DocumentReference("foo", Arrays.asList("Path", "To"), "WebHome");
+    private DocumentReference to = new DocumentReference("foo", List.of("Path", "To"), "WebHome");
 
-    private DocumentReference bob = new DocumentReference("foo", Arrays.asList("Path", "Bob"), "WebHome");
+    private DocumentReference bob = new DocumentReference("foo", List.of("Path", "Bob"), "WebHome");
 
-    private DocumentReference alice = new DocumentReference("foo", Arrays.asList("Path", "To"), "Alice");
+    private DocumentReference alice = new DocumentReference("foo", List.of("Path", "To"), "Alice");
 
     private DocumentReference carol = new DocumentReference("bar", "Carol", "WebHome");
 
@@ -70,7 +69,7 @@ public class InstalledExtensionDocumentTreeTest
     private DocumentReference denis = new DocumentReference("bar", "Users", "Denis");
 
     @BeforeEach
-    public void configure()
+    void configure()
     {
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
@@ -83,83 +82,81 @@ public class InstalledExtensionDocumentTreeTest
     }
 
     @Test
-    public void getChildren()
+    void getChildren()
     {
-        assertEquals(Collections.singleton(this.path), this.tree.getChildren(this.alice.getWikiReference()));
-        assertEquals(new HashSet<>(Arrays.asList(this.to, this.bob)), this.tree.getChildren(path));
-        assertEquals(Collections.singleton(alice), this.tree.getChildren(this.to));
-        assertEquals(Collections.emptySet(), this.tree.getChildren(alice));
-        assertEquals(Collections.emptySet(), this.tree.getChildren(bob));
+        assertEquals(Set.of(this.path), this.tree.getChildren(this.alice.getWikiReference()));
+        assertEquals(Set.of(this.to, this.bob), this.tree.getChildren(this.path));
+        assertEquals(Set.of(this.alice), this.tree.getChildren(this.to));
+        assertEquals(Set.of(), this.tree.getChildren(this.alice));
+        assertEquals(Set.of(), this.tree.getChildren(this.bob));
 
-        assertEquals(new HashSet<>(Arrays.asList(this.carol, this.users)),
-            this.tree.getChildren(carol.getWikiReference()));
-        assertEquals(Collections.singleton(this.john), this.tree.getChildren(carol));
-        assertEquals(Collections.singleton(this.denis), this.tree.getChildren(users));
-        assertEquals(Collections.emptySet(), this.tree.getChildren(denis));
+        assertEquals(Set.of(this.carol, this.users), this.tree.getChildren(this.carol.getWikiReference()));
+        assertEquals(Set.of(this.john), this.tree.getChildren(this.carol));
+        assertEquals(Set.of(this.denis), this.tree.getChildren(this.users));
+        assertEquals(Set.of(), this.tree.getChildren(this.denis));
 
-        assertEquals(Collections.emptySet(), this.tree.getChildren(new WikiReference("test")));
-        assertEquals(Collections.emptySet(), this.tree.getChildren(this.bob.getLastSpaceReference()));
-        assertEquals(Collections.emptySet(),
-            this.tree.getChildren(new DocumentReference("bar", Arrays.asList("Carol", "John"), "WebHome")));
-        assertEquals(Collections.emptySet(), this.tree.getChildren(new DocumentReference(this.path, Locale.FRENCH)));
+        assertEquals(Set.of(), this.tree.getChildren(new WikiReference("test")));
+        assertEquals(Set.of(), this.tree.getChildren(this.bob.getLastSpaceReference()));
+        assertEquals(Set.of(),
+            this.tree.getChildren(new DocumentReference("bar", List.of("Carol", "John"), "WebHome")));
+        assertEquals(Set.of(), this.tree.getChildren(new DocumentReference(this.path, Locale.FRENCH)));
     }
 
     @Test
-    public void getNestedExtensionPages()
+    void getNestedExtensionPages()
     {
-        assertEquals(new HashSet<>(Arrays.asList(this.alice, this.bob)),
+        assertEquals(Set.of(this.alice, this.bob),
             this.tree.getNestedExtensionPages(this.alice.getWikiReference()));
-        assertEquals(new HashSet<>(Arrays.asList(this.alice, this.bob)), this.tree.getNestedExtensionPages(this.path));
-        assertEquals(Collections.singleton(this.alice), this.tree.getNestedExtensionPages(this.to));
+        assertEquals(Set.of(this.alice, this.bob), this.tree.getNestedExtensionPages(this.path));
+        assertEquals(Set.of(this.alice), this.tree.getNestedExtensionPages(this.to));
 
-        assertEquals(new HashSet<>(Arrays.asList(this.carol, this.denis, this.john)),
+        assertEquals(Set.of(this.carol, this.denis, this.john),
             this.tree.getNestedExtensionPages(this.carol.getWikiReference()));
-        assertEquals(Collections.singleton(this.john), this.tree.getNestedExtensionPages(this.carol));
-        assertEquals(Collections.singleton(this.denis), this.tree.getNestedExtensionPages(this.users));
+        assertEquals(Set.of(this.john), this.tree.getNestedExtensionPages(this.carol));
+        assertEquals(Set.of(this.denis), this.tree.getNestedExtensionPages(this.users));
 
-        assertEquals(Collections.emptySet(), this.tree.getNestedExtensionPages(new WikiReference("test")));
-        assertEquals(Collections.emptySet(), this.tree.getNestedExtensionPages(this.bob));
-        assertEquals(Collections.emptySet(), this.tree.getNestedExtensionPages(this.path.getLastSpaceReference()));
-        assertEquals(Collections.emptySet(),
+        assertEquals(Set.of(), this.tree.getNestedExtensionPages(new WikiReference("test")));
+        assertEquals(Set.of(), this.tree.getNestedExtensionPages(this.bob));
+        assertEquals(Set.of(), this.tree.getNestedExtensionPages(this.path.getLastSpaceReference()));
+        assertEquals(Set.of(),
             this.tree.getNestedExtensionPages(new DocumentReference("bar", "Path", "WebHome")));
-        assertEquals(Collections.emptySet(),
+        assertEquals(Set.of(),
             this.tree.getNestedExtensionPages(new DocumentReference(this.path, Locale.FRENCH)));
     }
 
     @Test
-    public void getNestedCustomizedExtensionPages()
+    void getNestedCustomizedExtensionPages()
     {
         this.tree.setCustomizedExtensionPage(this.alice, true);
         this.tree.setCustomizedExtensionPage(this.bob, false);
         this.tree.setCustomizedExtensionPage(new DocumentReference(this.denis, Locale.FRENCH), true);
 
-        assertEquals(Collections.singleton(this.alice),
+        assertEquals(Set.of(this.alice),
             this.tree.getNestedCustomizedExtensionPages(this.alice.getWikiReference()));
-        assertEquals(Collections.singleton(this.alice), this.tree.getNestedCustomizedExtensionPages(this.path));
+        assertEquals(Set.of(this.alice), this.tree.getNestedCustomizedExtensionPages(this.path));
 
-        assertEquals(Collections.singleton(this.denis),
+        assertEquals(Set.of(this.denis),
             this.tree.getNestedCustomizedExtensionPages(this.carol.getWikiReference()));
-        assertEquals(Collections.emptySet(), this.tree.getNestedCustomizedExtensionPages(this.carol));
-        assertEquals(Collections.singleton(this.denis), this.tree.getNestedCustomizedExtensionPages(this.users));
+        assertEquals(Set.of(), this.tree.getNestedCustomizedExtensionPages(this.carol));
+        assertEquals(Set.of(this.denis), this.tree.getNestedCustomizedExtensionPages(this.users));
 
-        assertEquals(Collections.emptySet(), this.tree.getNestedCustomizedExtensionPages(new WikiReference("test")));
-        assertEquals(Collections.emptySet(), this.tree.getNestedCustomizedExtensionPages(this.bob));
-        assertEquals(Collections.emptySet(),
+        assertEquals(Set.of(), this.tree.getNestedCustomizedExtensionPages(new WikiReference("test")));
+        assertEquals(Set.of(), this.tree.getNestedCustomizedExtensionPages(this.bob));
+        assertEquals(Set.of(),
             this.tree.getNestedCustomizedExtensionPages(this.path.getLastSpaceReference()));
-        assertEquals(Collections.emptySet(),
+        assertEquals(Set.of(),
             this.tree.getNestedCustomizedExtensionPages(new DocumentReference("bar", "Path", "WebHome")));
-        assertEquals(Collections.emptySet(),
+        assertEquals(Set.of(),
             this.tree.getNestedCustomizedExtensionPages(new DocumentReference(this.path, Locale.FRENCH)));
     }
 
     @Test
-    public void removeExtensionPage()
+    void removeExtensionPage()
     {
         this.tree.removeExtensionPage(this.carol);
-        assertEquals(new HashSet<>(Arrays.asList(this.carol, this.users)),
-            this.tree.getChildren(carol.getWikiReference()));
+        assertEquals(Set.of(this.carol, this.users), this.tree.getChildren(this.carol.getWikiReference()));
 
         this.tree.removeExtensionPage(this.john);
-        assertEquals(Collections.singleton(this.users), this.tree.getChildren(this.carol.getWikiReference()));
+        assertEquals(Set.of(this.users), this.tree.getChildren(this.carol.getWikiReference()));
     }
 }

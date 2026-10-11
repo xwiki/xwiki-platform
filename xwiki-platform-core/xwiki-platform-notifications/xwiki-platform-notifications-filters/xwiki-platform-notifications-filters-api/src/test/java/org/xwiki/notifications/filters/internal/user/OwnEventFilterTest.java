@@ -19,9 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal.user;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,34 +55,34 @@ class OwnEventFilterTest
     private DocumentReference user2Reference = new DocumentReference("xwiki", "XWiki", "user2");
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
-        when(this.entityReferenceSerializer.serialize(user1Reference)).thenReturn("xwiki:XWiki.user1");
-        when(this.entityReferenceSerializer.serialize(user2Reference)).thenReturn("xwiki:XWiki.user2");
+        when(this.entityReferenceSerializer.serialize(this.user1Reference)).thenReturn("xwiki:XWiki.user1");
+        when(this.entityReferenceSerializer.serialize(this.user2Reference)).thenReturn("xwiki:XWiki.user2");
 
         this.user1Event = mock(Event.class);
-        when(this.user1Event.getUser()).thenReturn(user1Reference);
+        when(this.user1Event.getUser()).thenReturn(this.user1Reference);
 
         this.user2Event = mock(Event.class);
-        when(this.user2Event.getUser()).thenReturn(user2Reference);
+        when(this.user2Event.getUser()).thenReturn(this.user2Reference);
     }
 
     @Test
-    void filterEvent() throws Exception
+    void filterEvent()
     {
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT, this.filter.filterEvent(this.user1Event,
-            this.user2Reference, Collections.emptyList(), NotificationFormat.ALERT));
+            this.user2Reference, List.of(), NotificationFormat.ALERT));
 
         assertEquals(NotificationFilter.FilterPolicy.FILTER, this.filter.filterEvent(this.user1Event,
-            this.user1Reference, Collections.emptyList(), NotificationFormat.ALERT));
+            this.user1Reference, List.of(), NotificationFormat.ALERT));
     }
 
     @Test
-    void filterTargetedSystemEvent() throws Exception
+    void filterTargetedSystemEvent()
     {
-        when(this.user1Event.getTarget()).thenReturn(new HashSet<>(Arrays.asList("user1", "user2")));
+        when(this.user1Event.getTarget()).thenReturn(Set.of("user1", "user2"));
 
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT, this.filter.filterEvent(this.user1Event,
-            this.user1Reference, Collections.emptyList(), NotificationFormat.ALERT));
+            this.user1Reference, List.of(), NotificationFormat.ALERT));
     }
 }

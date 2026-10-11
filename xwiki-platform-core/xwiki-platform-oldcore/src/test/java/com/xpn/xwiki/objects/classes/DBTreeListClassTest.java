@@ -19,49 +19,68 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryBuilder;
+import org.xwiki.security.SecurityConfiguration;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.objects.classes.DBTreeListClass}.
  * 
  * @version $Id$
  */
+@OldcoreTest
 @ReferenceComponentList
-public class DBTreeListClassTest
+class DBTreeListClassTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
-    @Before
-    public void before() throws Exception
+    @MockComponent
+    private QueryBuilder<DBListClass> queryBuilder;
+
+    @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
+    @MockComponent
+    private AuthorExecutor authorExecutor;
+
+    @MockComponent
+    private ContextualLocalizationManager localization;
+
+    @BeforeEach
+    void before()
     {
-        doAnswer(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.getArgument(0);
-            }
-        }).when(this.oldcore.getSpyXWiki()).parseContent(any(), any(XWikiContext.class));
+        doAnswer(invocation -> invocation.getArgument(0))
+            .when(this.oldcore.getSpyXWiki()).parseContent(any(), any(XWikiContext.class));
 
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument());
     }
 
     @Test
-    public void testGetQueryWhenNoSQLSCriptSpecified()
+    void getQueryWhenNoSQLScriptSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         assertEquals("select doc.name from XWikiDocument doc where 1 = 0",
@@ -69,7 +88,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithSqlScriptSpecified()
+    void getQueryWithSqlScriptSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         assertEquals("", dbtlc.getSql());
@@ -79,7 +98,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithClassSpecified()
+    void getQueryWithClassSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -90,7 +109,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithClassAndParentSpecified()
+    void getQueryWithClassAndParentSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -102,7 +121,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdSpecified()
+    void getQueryWithIdSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
@@ -118,7 +137,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdAndParentSpecified()
+    void getQueryWithIdAndParentSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
@@ -167,7 +186,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithValueSpecified()
+    void getQueryWithValueSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setValueField("doc.name");
@@ -176,7 +195,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdAndClassnameSpecified()
+    void getQueryWithIdAndClassnameSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -200,7 +219,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdParentAndClassnameSpecified()
+    void getQueryWithIdParentAndClassnameSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -271,7 +290,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdAndValueSpecified()
+    void getQueryWithIdAndValueSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
@@ -330,7 +349,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdValueAndParentSpecified()
+    void getQueryWithIdValueAndParentSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
@@ -350,7 +369,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdValueAndClassSpecified()
+    void getQueryWithIdValueAndClassSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -391,7 +410,7 @@ public class DBTreeListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdValueParentAndClassSpecified()
+    void getQueryWithIdValueParentAndClassSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setClassname("XWiki.XWikiUsers");
@@ -433,5 +452,65 @@ public class DBTreeListClassTest
                 + " and obj.id=valueprop.id.id and valueprop.id.name='prop2'"
                 + " and obj.id=parentprop.id.id and parentprop.id.name='prop3'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
+    }
+
+    /**
+     * Creates a tree list property backed by a two-level tree whose ids and values contain characters that need to be
+     * escaped in the generated HTML.
+     *
+     * @return the property to display, already selecting the child node
+     */
+    private DBTreeListClass setUpTreeWithValuesNeedingEscaping() throws Exception
+    {
+        Query query = mock();
+        when(query.execute()).thenReturn(List.of(
+            new Object[] { "root'id", "Root & <b>", "" },
+            new Object[] { "child", "{{macro}}Child<em>", "root'id" }
+        ));
+        when(this.authorExecutor.call(any(), any(), any())).then(invocation -> {
+            Callable<?> callable = invocation.getArgument(0);
+            return callable.call();
+        });
+
+        DBTreeListClass dbtlc = new DBTreeListClass();
+        dbtlc.setName("prop");
+        dbtlc.setOwnerDocument(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
+        when(this.queryBuilder.build(dbtlc)).thenReturn(query);
+
+        return dbtlc;
+    }
+
+    @Test
+    void displayViewEscapesValues() throws Exception
+    {
+        DBTreeListClass dbtlc = setUpTreeWithValuesNeedingEscaping();
+
+        BaseObject object = new BaseObject();
+        object.setStringValue("prop", "child");
+
+        StringBuffer buffer = new StringBuffer();
+        dbtlc.displayView(buffer, "prop", "", object, this.oldcore.getXWikiContext());
+
+        assertEquals("Root &#38; &#60;b> &gt; &#123;&#123;macro}}Child&#60;em>", buffer.toString());
+    }
+
+    @Test
+    void displayEditEscapesValues() throws Exception
+    {
+        DBTreeListClass dbtlc = setUpTreeWithValuesNeedingEscaping();
+
+        BaseObject object = new BaseObject();
+        object.setStringValue("prop", "child");
+
+        StringBuffer buffer = new StringBuffer();
+        // The picker is disabled by default, so this displays the select input and not the tree widget.
+        dbtlc.displayEdit(buffer, "prop", "", object, this.oldcore.getXWikiContext());
+
+        assertEquals("<select id='prop' name='prop' size='1'>"
+            + "<option value='root&#39;id' label='Root &#38; &#60;b&#62;'>Root &#38; &#60;b&#62;</option>"
+            + "<option selected='selected' value='child'"
+            + " label='\u00A0&#123;&#123;macro}}Child&#60;em&#62;'>"
+            + "\u00A0&#123;&#123;macro}}Child&#60;em&#62;</option>"
+            + "</select>", buffer.toString());
     }
 }

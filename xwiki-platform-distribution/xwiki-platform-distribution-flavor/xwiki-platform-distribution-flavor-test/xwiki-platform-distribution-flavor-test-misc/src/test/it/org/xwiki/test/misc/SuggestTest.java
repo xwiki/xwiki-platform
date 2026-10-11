@@ -19,16 +19,17 @@
  */
 package org.xwiki.test.misc;
 
-import junit.framework.TestCase;
-
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import junit.framework.TestCase;
 
 /**
  * Test that the suggest service works without programming rights on {@code Main.WebHome}.

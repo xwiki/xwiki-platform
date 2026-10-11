@@ -68,6 +68,20 @@ public class PageTypePicker extends XWikiSelectWidget
         return availableTemplates;
     }
 
+    /**
+     * @return the value of the option currently selected by default in the picker: a template provider's local
+     *         reference when a recommended template is pre-selected based on the current location, or {@code blank}
+     *         when the blank page option is selected by default; {@code null} if no option is selected
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    public String getSelectedTemplate()
+    {
+        return getOptionInputsStream().filter(WebElement::isSelected).map(input -> input.getAttribute("value"))
+            .findFirst().orElse(null);
+    }
+
     public void selectTemplateByValue(String template)
     {
         List<WebElement> templates = getAvailableTemplateInputs();
@@ -81,5 +95,37 @@ public class PageTypePicker extends XWikiSelectWidget
             }
         }
         throw new RuntimeException("Failed to find template [" + template + "]");
+    }
+
+    /**
+     * @param template the value of the template option
+     * @return the icon name displayed for the specified template option, extracted from the {@code <img>} element's
+     *         {@code src} attribute, or an empty string if no icon is displayed
+     */
+    public String getTemplateIcon(String template)
+    {
+        WebElement option = getOptionByValue(template);
+        WebElement iconSpan = option.findElement(By.className("xwiki-select-option-icon"));
+        List<WebElement> iconImages = iconSpan.findElements(By.tagName("img"));
+        if (iconImages.isEmpty()) {
+            return "";
+        }
+        String src = iconImages.getFirst().getAttribute("src");
+        String fileName = src.substring(src.lastIndexOf('/') + 1);
+        return fileName.contains(".") ? fileName.substring(0, fileName.indexOf('.')) : fileName;
+    }
+
+    /**
+     * @param template the value of the template option
+     * @return the description text displayed for the specified template option, or an empty string if none
+     */
+    public String getTemplateDescription(String template)
+    {
+        WebElement option = getOptionByValue(template);
+        List<WebElement> hints = option.findElements(By.className("xHint"));
+        if (hints.isEmpty()) {
+            return "";
+        }
+        return hints.getFirst().getText();
     }
 }

@@ -35,7 +35,7 @@ import org.xwiki.observation.event.Event;
  */
 @Component
 @Singleton
-@Named(LegacyUserEventDispatcherListener.NAME)
+@Named(UserEventDispatcherListener.NAME)
 public class LegacyUserEventDispatcherListener extends UserEventDispatcherListener
 {
     @Inject

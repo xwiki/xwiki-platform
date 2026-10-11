@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
@@ -44,6 +45,9 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
     @Inject
     private Container container;
 
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
+
     protected void serveResource(String resourceName, InputStream resourceStream)
         throws ResourceReferenceHandlerException
     {
@@ -59,23 +63,21 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
         //
         // Note that even though the stream returned by TrueVFS returns true for markSupported() in practice it
         // doesn't! Thus we need to wrap the stream to make it support mark and reset.
-        InputStream markResetSupportingStream = new BufferedInputStream(resourceStream);
-
-        try {
+        try (InputStream markResetSupportingStream = new BufferedInputStream(resourceStream)) {
             Response response = this.container.getResponse();
 
+            String actualContentType = (contentType != null) ? contentType
+                : TikaUtils.detect(markResetSupportingStream, resourceName);
             // Set the content type
-            if (contentType != null) {
-                response.setContentType(contentType);
-            } else {
-                response.setContentType(TikaUtils.detect(markResetSupportingStream, resourceName));
-            }
+            response.setContentType(actualContentType);
+
+            boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(actualContentType);
+            response.addHeader("Content-disposition",
+                attachmentSecurityManager.getContentDispositionHeader(resourceName, shouldBeDownloaded));
 
             IOUtils.copy(markResetSupportingStream, response.getOutputStream());
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException(String.format("Failed to read resource [%s]", resourceName), e);
-        } finally {
-            IOUtils.closeQuietly(markResetSupportingStream);
         }
     }
 }

@@ -22,11 +22,11 @@ package org.xwiki.model.validation.edit.internal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +34,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.Container;
+import org.xwiki.container.Session;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
@@ -48,13 +50,13 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.XWikiRequest;
 
 import static ch.qos.logback.classic.Level.WARN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -91,6 +93,9 @@ class DefaultEditConfirmationCheckersManagerTest
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @MockComponent
+    private Container container;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
@@ -110,10 +115,7 @@ class DefaultEditConfirmationCheckersManagerTest
     private XWikiDocument xWikiDocument;
 
     @Mock
-    private XWikiRequest request;
-
-    @Mock
-    private HttpSession session;
+    private Session session;
 
     @BeforeEach
     void setUp()
@@ -125,8 +127,7 @@ class DefaultEditConfirmationCheckersManagerTest
         when(this.context.getDoc()).thenReturn(this.xWikiDocument);
         when(this.xWikiDocument.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
         when(this.entityReferenceSerializer.serialize(DOCUMENT_REFERENCE)).thenReturn("xwiki:Page.Space");
-        when(this.context.getRequest()).thenReturn(this.request);
-        when(this.request.getSession()).thenReturn(this.session);
+        when(this.container.getSession()).thenReturn(this.session);
     }
 
     @Test
@@ -212,5 +213,23 @@ class DefaultEditConfirmationCheckersManagerTest
         verify(this.session).getAttribute("force_edit_xwiki:Page.Space_cached_warn2");
         verify(this.session).removeAttribute("force_edit_xwiki:Page.Space_cached_warn2");
         verify(this.session).setAttribute(eq("force_edit_xwiki:Page.Space_forced_warn2"), any());
+    }
+
+    @Test
+    void checkWithSkip() throws Exception
+    {
+        // TreeMap is used to make the order in which the components are evaluated deterministic, making it easier
+        // to assert the results.
+        Map<String, EditConfirmationChecker> componentsMap = new TreeMap<>();
+        componentsMap.put("warn", this.editConfirmationCheckerWarn);
+        componentsMap.put("warn2", this.editConfirmationCheckerWarn2);
+        when(this.componentManager.<EditConfirmationChecker>getInstanceMap(EditConfirmationChecker.class))
+            .thenReturn(componentsMap);
+        EditConfirmationCheckerResults expected = new EditConfirmationCheckerResults();
+        expected.append(WARNING_MESSAGE_2);
+        assertEquals(expected, this.manager.check(Set.of("warn")));
+        verify(this.editConfirmationCheckerWarn2).check();
+        verify(this.editConfirmationCheckerWarn, never()).check();
+        verify(this.session).removeAttribute("force_edit_xwiki:Page.Space_cached_warn");
     }
 }

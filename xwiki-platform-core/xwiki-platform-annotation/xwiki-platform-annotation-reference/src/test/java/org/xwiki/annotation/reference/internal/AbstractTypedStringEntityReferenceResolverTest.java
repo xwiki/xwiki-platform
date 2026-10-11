@@ -21,7 +21,6 @@ package org.xwiki.annotation.reference.internal;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.Extensions;
 import org.mockito.Mock;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -37,7 +36,7 @@ import static org.mockito.Mockito.verify;
  * @since 13.4.4
  * @since 12.10.11
  */
-@Extensions({ @ExtendWith({ MockitoComponentManagerExtension.class }) })
+@ExtendWith({ MockitoComponentManagerExtension.class })
 class AbstractTypedStringEntityReferenceResolverTest
 {
     @Mock

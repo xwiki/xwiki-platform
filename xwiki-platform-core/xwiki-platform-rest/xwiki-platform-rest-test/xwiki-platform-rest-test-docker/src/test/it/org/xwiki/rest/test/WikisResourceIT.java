@@ -1,0 +1,958 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.rest.test;
+
+import java.io.ByteArrayInputStream;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import org.apache.commons.io.input.ReaderInputStream;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rest.Relations;
+import org.xwiki.rest.model.jaxb.Attachment;
+import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.PageSummary;
+import org.xwiki.rest.model.jaxb.Pages;
+import org.xwiki.rest.model.jaxb.SearchResult;
+import org.xwiki.rest.model.jaxb.SearchResults;
+import org.xwiki.rest.model.jaxb.Wiki;
+import org.xwiki.rest.model.jaxb.Wikis;
+import org.xwiki.rest.resources.wikis.WikiAttachmentsResource;
+import org.xwiki.rest.resources.wikis.WikiChildrenResource;
+import org.xwiki.rest.resources.wikis.WikiPagesResource;
+import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
+import org.xwiki.rest.resources.wikis.WikiSearchResource;
+import org.xwiki.rest.resources.wikis.WikisResource;
+import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
+import org.xwiki.rest.test.framework.AbstractHttpIT;
+import org.xwiki.test.ui.TestUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class WikisResourceIT extends AbstractHttpIT
+{
+    private static final int MAX_REPORTED_INVERSIONS = 10;
+
+    private String wikiName;
+
+    private List<String> spaces;
+
+    private String pageName;
+
+    private String fullName;
+
+    private DocumentReference reference;
+
+    @BeforeEach
+    @Override
+    protected void setUp(TestUtils setup, TestInfo info) throws Exception
+    {
+        super.setUp(setup, info);
+
+        this.wikiName = getWiki();
+        this.spaces = Arrays.asList(getTestClassName());
+        this.pageName = getTestMethodName();
+        this.fullName = getTestClassName() + '.' + getTestMethodName();
+
+        this.reference = new DocumentReference(this.wikiName, this.spaces, this.pageName);
+    }
+
+    private SearchResults search(int expectedSize, String query)
+    {
+        try {
+            CloseableHttpResponse getMethod = executeGet(query);
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+            SearchResults searchResults =
+                (SearchResults) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            int resultSize = searchResults.getSearchResults().size();
+            if (resultSize == expectedSize) {
+                return searchResults;
+            }
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+
+        return null;
+    }
+
+    @Override
+    @Test
+    protected void testRepresentation() throws Exception
+    {
+        CloseableHttpResponse getMethod = executeGet(getFullUri(WikisResource.class));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+        assertTrue(!wikis.getWikis().isEmpty(), getHttpResponseInfo(getMethod));
+
+        for (Wiki wiki : wikis.getWikis()) {
+            Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
+            assertNotNull(link);
+
+            link = getFirstLinkByRelation(wiki, Relations.CLASSES);
+            assertNotNull(link);
+
+            link = getFirstLinkByRelation(wiki, Relations.MODIFICATIONS);
+            assertNotNull(link);
+
+            link = getFirstLinkByRelation(wiki, Relations.SEARCH);
+            assertNotNull(link);
+
+            link = getFirstLinkByRelation(wiki, Relations.QUERY);
+            assertNotNull(link);
+
+            checkLinks(wiki);
+        }
+    }
+
+    @Test
+    void testSearchWikisNameDatabase() throws Exception
+    {
+        testSearchWikisName("database");
+    }
+
+    @Test
+    void testSearchWikisNameSolr() throws Exception
+    {
+        testSearchWikisName("solr");
+    }
+
+    // This method should be turned into a parameterized test when migrating to JUnit 5.
+    private void testSearchWikisName(String sourceHint) throws Exception
+    {
+        setSearchSource(sourceHint);
+
+        try {
+            getUtil().rest().delete(reference);
+            getUtil().rest().savePage(reference, "Name Content", "Name Title " + this.pageName);
+            List<String> nonTerminalSpaces = List.of(this.spaces.get(0), this.pageName);
+            DocumentReference nonTerminalReference = new DocumentReference(this.wikiName, nonTerminalSpaces, "WebHome");
+            getUtil().rest().delete(nonTerminalReference);
+
+            this.solrUtils.waitEmptyQueue();
+
+            CloseableHttpResponse getMethod = executeGet(
+                String.format("%s?scope=name&q=" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
+            SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            // Ensure that the terminal page is found by its name.
+            int resultSize = searchResults.getSearchResults().size();
+            assertEquals(1, resultSize);
+            assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+
+            // Create a non-terminal page with the same "name" but this time as last space.
+            String nonTerminalFullName = String.join(".", nonTerminalSpaces) + "." + "WebHome";
+            getUtil().rest().savePage(nonTerminalReference, "content2" + this.pageName, "title2" + this.pageName);
+
+            this.solrUtils.waitEmptyQueue();
+
+            getMethod = executeGet(
+                String.format("%s?scope=name&q=" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
+            searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            // Ensure that searching by name finds both terminal and non-terminal page.
+            resultSize = searchResults.getSearchResults().size();
+            assertEquals(2, resultSize);
+            List<String> foundPages = searchResults.getSearchResults().stream()
+                .map(SearchResult::getPageFullName)
+                .collect(Collectors.toList());
+            assertTrue(foundPages.contains(this.fullName));
+            assertTrue(foundPages.contains(nonTerminalFullName));
+
+            // Ensure that searching by space finds both pages in Solr but none in the database (stricter filtering).
+            getMethod =
+                executeGet(String.format("%s?scope=name&q=" + this.spaces.get(0),
+                    buildURI(WikiSearchResource.class, getWiki())));
+            searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            foundPages = searchResults.getSearchResults().stream()
+                .map(SearchResult::getPageFullName)
+                .toList();
+
+            if ("solr".equals(sourceHint)) {
+                assertTrue(foundPages.contains(this.fullName));
+                assertTrue(foundPages.contains(nonTerminalFullName));
+            } else {
+                assertEquals(List.of(), foundPages);
+            }
+        } finally {
+            resetSearchSource(sourceHint);
+        }
+    }
+
+    private void resetSearchSource(String sourceHint) throws Exception
+    {
+        assertEquals(sourceHint, getUtil().executeWikiPlain("""
+            {{groovy}}
+            System.clearProperty("xconf.xwikiproperties.rest.keywordSearchSource")
+            {{/groovy}}
+            """, Syntax.XWIKI_2_1).trim());
+    }
+
+    private void setSearchSource(String sourceHint) throws Exception
+    {
+        assertEquals("", getUtil().executeWikiPlain("""
+            {{groovy}}
+            System.setProperty("xconf.xwikiproperties.rest.keywordSearchSource", "%s")
+            {{/groovy}}
+            """.formatted(sourceHint), Syntax.XWIKI_2_1).trim());
+    }
+
+    @Test
+    void testSearchWikisContentNameTitleSpaceDatabase() throws Exception
+    {
+        testSearchWikisContentNameTitleSpace("database");
+    }
+
+    @Test
+    void testSearchWikisContentNameTitleSpaceSolr() throws Exception
+    {
+        testSearchWikisContentNameTitleSpace("solr");
+    }
+
+    private void testSearchWikisContentNameTitleSpace(String sourceHint) throws Exception
+    {
+        setSearchSource(sourceHint);
+
+        try {
+            // Create the document in a nested space to ensure that the space name is unique.
+            List<String> nestedSpace = List.of(this.spaces.get(0), this.pageName);
+            String nestedPageName = this.pageName + "PageName";
+            DocumentReference nestedDocumentReference =
+                new DocumentReference(this.wikiName, nestedSpace, nestedPageName);
+            getUtil().rest().delete(nestedDocumentReference);
+            getUtil().rest().savePage(nestedDocumentReference, "content" + this.pageName, "title" + this.pageName);
+
+            this.solrUtils.waitEmptyQueue();
+
+            CloseableHttpResponse getMethod =
+                executeGet(
+                    String.format("%s?q=content" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+            SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            int resultSize = searchResults.getSearchResults().size();
+            assertEquals(1, resultSize);
+
+            for (SearchResult searchResult : searchResults.getSearchResults()) {
+                checkLinks(searchResult);
+            }
+
+            getMethod = executeGet(
+                String.format("%s?q=" + nestedPageName + "&scope=name", buildURI(WikiSearchResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+            searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            resultSize = searchResults.getSearchResults().size();
+            assertEquals(1, resultSize);
+
+            for (SearchResult searchResult : searchResults.getSearchResults()) {
+                checkLinks(searchResult);
+            }
+
+            // Search in titles
+            getMethod = executeGet(String.format("%s?q=title" + this.pageName + "&scope=title",
+                buildURI(WikiSearchResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+            searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            resultSize = searchResults.getSearchResults().size();
+            assertEquals(1, resultSize);
+
+            for (SearchResult searchResult : searchResults.getSearchResults()) {
+                checkLinks(searchResult);
+            }
+
+            // Search for space names
+            getMethod = executeGet(String.format("%s?q=" + this.pageName + "&scope=spaces",
+                buildURI(WikiSearchResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+            searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            List<String> searchResultNames = searchResults.getSearchResults()
+                .stream()
+                .map(SearchResult::getSpace)
+                .toList();
+            assertEquals(List.of(String.join(".", nestedSpace)), searchResultNames);
+
+            for (SearchResult searchResult : searchResults.getSearchResults()) {
+                checkLinks(searchResult);
+            }
+        } finally {
+            resetSearchSource(sourceHint);
+        }
+    }
+
+    @Test
+    void testObjectSearchNotAuthenticated() throws Exception
+    {
+        /* Check search for an object containing XWiki.Admin (i.e., the admin profile) */
+        CloseableHttpResponse getMethod =
+            executeGet(String.format("%s?q=XWiki.Admin&scope=objects", buildURI(WikiSearchResource.class, getWiki())));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        int resultSize = searchResults.getSearchResults().size();
+        assertTrue(resultSize == 0, String.format("Found %s results", resultSize));
+    }
+
+    @Test
+    void testObjectSearchAuthenticated() throws Exception
+    {
+        /* Check search for an object containing XWiki.Admin (i.e., the admin profile) */
+        CloseableHttpResponse getMethod = executeGet(
+            String.format("%s?q=XWiki.XWikiGuest&scope=objects", buildURI(WikiSearchResource.class, getWiki())),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        /*
+         * We get more results because previous tests have also created comments on behalf of XWiki.Admin. They will
+         * appear in the results.
+         */
+        int resultSize = searchResults.getSearchResults().size();
+        assertTrue(resultSize >= 1, String.format("Found %s results", resultSize));
+    }
+
+    @Test
+    void testPages() throws Exception
+    {
+        // Create a clean test page.
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
+
+        // Get all pages
+        CloseableHttpResponse getMethod = executeGet(String.format("%s", buildURI(WikiPagesResource.class, getWiki())));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        Pages pages = (Pages) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        assertTrue(!pages.getPageSummaries().isEmpty());
+
+        for (PageSummary pageSummary : pages.getPageSummaries()) {
+            checkLinks(pageSummary);
+        }
+
+        // Get all pages having a document name that contains "WebHome" (for all spaces)
+        getMethod = executeGet(String.format("%s?name=" + this.pageName, buildURI(WikiPagesResource.class, getWiki())));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        pages = (Pages) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        List<PageSummary> pageSummaries = pages.getPageSummaries();
+        assertTrue(pageSummaries.size() == 1);
+        PageSummary pageSummary = pageSummaries.get(0);
+        assertEquals(this.fullName, pageSummary.getFullName());
+        checkLinks(pageSummary);
+
+        // Get all pages having a document name that contains "WebHome" and a space with an "s" in its name.
+        getMethod = executeGet(String.format("%s?name=" + this.pageName + "&space=" + this.fullName.charAt(2),
+            buildURI(WikiPagesResource.class, getWiki())));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        pages = (Pages) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        pageSummaries = pages.getPageSummaries();
+        assertTrue(pageSummaries.size() == 1);
+        pageSummary = pageSummaries.get(0);
+        assertEquals(this.fullName, pageSummary.getFullName());
+        checkLinks(pageSummary);
+    }
+
+    @Test
+    void testAttachments() throws Exception
+    {
+        getUtil().rest().delete(reference);
+        getUtil().rest().attachFile(new AttachmentReference(getTestClassName() + ".txt", reference),
+            new ReaderInputStream(new StringReader("attachment content"), StandardCharsets.UTF_8), true);
+
+        // Verify there are attachments in the whole wiki
+        CloseableHttpResponse getMethod = executeGet(buildURI(WikiAttachmentsResource.class, getWiki()).toString());
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        Attachments attachments = (Attachments) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        assertTrue(!attachments.getAttachments().isEmpty());
+
+        for (Attachment attachment : attachments.getAttachments()) {
+            checkLinks(attachment);
+        }
+
+        // Verify we can search for a specific attachment name in the whole wiki
+        getMethod = executeGet(
+            String.format("%s?name=" + getTestClassName(), buildURI(WikiAttachmentsResource.class, getWiki())));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        attachments = (Attachments) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        assertEquals(1, attachments.getAttachments().size(), getAttachmentsInfo(attachments));
+
+        for (Attachment attachment : attachments.getAttachments()) {
+            checkLinks(attachment);
+        }
+
+        // Verify we can search for all attachments in a given space (sandbox)
+        // Also verify that a space can be looked up independently of its case ("sandbox" will match the "Sandbox"
+        // space)
+        getMethod = executeGet(
+            String.format("%s?space=" + getTestClassName(), buildURI(WikiAttachmentsResource.class, getWiki())));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        attachments = (Attachments) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        assertEquals(1, attachments.getAttachments().size(), getAttachmentsInfo(attachments));
+
+        for (Attachment attachment : attachments.getAttachments()) {
+            checkLinks(attachment);
+        }
+
+        // Verify we can search for an attachment in a given space (sandbox)
+        getMethod = executeGet(String.format("%s?name=" + getTestClassName() + "&space=" + getTestClassName(),
+            buildURI(WikiAttachmentsResource.class, getWiki())));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        attachments = (Attachments) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        assertEquals(1, attachments.getAttachments().size(), getAttachmentsInfo(attachments));
+
+        for (Attachment attachment : attachments.getAttachments()) {
+            checkLinks(attachment);
+        }
+    }
+
+    @Test
+    void testHQLQuerySearch() throws Exception
+    {
+        setAllowedQueryTypes("solr,hql");
+        try {
+            getUtil().rest().delete(this.reference);
+            getUtil().rest().savePage(this.reference);
+
+            CloseableHttpResponse getMethod =
+                executeGet(buildURI(WikiSearchQueryResource.class, List.of(getWiki()), Map.of("q",
+                    "where doc.name='" + this.pageName + "' order by doc.space desc", "type", "hql")));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+            SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            int resultSize = searchResults.getSearchResults().size();
+            assertEquals(1, resultSize);
+            assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+        } finally {
+            resetAllowedQueryTypes();
+        }
+    }
+
+    @Test
+    void testHQLQuerySearchWithClassnameAuthenticated() throws Exception
+    {
+        setAllowedQueryTypes("solr,hql");
+        try {
+            CloseableHttpResponse getMethod = executeGet(
+                buildURI(WikiSearchQueryResource.class, List.of(getWiki()),
+                    Map.of("q", "where doc.space='XWiki' and doc.name='XWikiPreferences'", "type", "hql", "className",
+                        "XWiki.XWikiGlobalRights")),
+                TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+            SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            int resultSize = searchResults.getSearchResults().size();
+            assertEquals(1, resultSize);
+            assertNotNull(searchResults.getSearchResults().get(0).getObject());
+        } finally {
+            resetAllowedQueryTypes();
+        }
+    }
+
+    @Test
+    void testHQLQuerySearchWithClassnameNotAuthenticated() throws Exception
+    {
+        setAllowedQueryTypes("solr,hql");
+        try {
+            CloseableHttpResponse getMethod =
+                executeGet(buildURI(WikiSearchQueryResource.class, List.of(getWiki()),
+                    Map.of("q", "where doc.space='XWiki' and doc.name='XWikiPreferences'", "type", "hql", "className",
+                        "XWiki.XWikiGlobalRights")));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+            SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            int resultSize = searchResults.getSearchResults().size();
+            assertEquals(1, resultSize);
+            assertNull(searchResults.getSearchResults().get(0).getObject());
+        } finally {
+            resetAllowedQueryTypes();
+        }
+    }
+
+    @Test
+    void testSolrSearch() throws Exception
+    {
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
+
+        this.solrUtils.waitEmptyQueue();
+
+        CloseableHttpResponse getMethod = executeGet(buildURI(WikiSearchQueryResource.class, List.of(getWiki()),
+            Map.of("q", '"' + this.pageName + '"', "type", "solr")));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+        int resultSize = searchResults.getSearchResults().size();
+        assertEquals(1, resultSize);
+        assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+    }
+
+    @Test
+    void testGlobalSearch() throws Exception
+    {
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
+
+        // Wait for the Solr queue to be empty
+        this.solrUtils.waitEmptyQueue();
+
+        String query = buildURI(WikisSearchQueryResource.class, List.of(getWiki()),
+            Map.of("q", '"' + this.pageName + '"'));
+        // Even if the Solr queue appear to be empty we also make sure to wait for the number of results we expect, in
+        // case there is some race condition on server side
+        SearchResults searchResults = getUtil().getDriver().waitUntilCondition(d -> search(1, query));
+
+        assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+    }
+
+    /**
+     * Check that the pages are returned ordered by full name, which is what makes paginating them with
+     * number/start stable.
+     */
+    @Test
+    void testPagesOrder() throws Exception
+    {
+        // Names whose order differs between a binary and a locale-aware collation, see also SolrIndexerIT#sortOrder:
+        // XWiki requires a binary collation in all databases, also for consistency with Solr.
+        List<String> suffixes = List.of("Abc", "aBc", "Bac", "bAc", "Äbc", "äBc");
+        List<DocumentReference> references = suffixes.stream()
+            .map(suffix -> new DocumentReference(this.wikiName, this.spaces, this.pageName + suffix))
+            .toList();
+        // The expected order is the binary order of the full names.
+        List<String> createdOrdered = suffixes.stream().map(suffix -> this.fullName + suffix).sorted().toList();
+        try {
+            for (DocumentReference reference : references) {
+                getUtil().rest().savePage(reference, "content", "title");
+            }
+
+            CloseableHttpResponse getMethod =
+                executeGet(String.format("%s?number=1000", buildURI(WikiPagesResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            List<String> fullNames = pages.getPageSummaries().stream().map(PageSummary::getFullName).toList();
+            // The whole result must be ordered by full name, translations of the same document compare equal.
+            assertEquals("", describeInversions(fullNames, Comparator.naturalOrder()),
+                "The pages aren't ordered by full name.");
+            // Check the pages created by this test explicitly, so that the assertion above cannot pass just because
+            // no page exercised the ordering.
+            assertEquals(createdOrdered, fullNames.stream().filter(createdOrdered::contains).distinct().toList());
+        } finally {
+            for (DocumentReference reference : references) {
+                getUtil().rest().delete(reference);
+            }
+        }
+    }
+
+    /**
+     * Check that the attachments are returned ordered by page and file name, which is what makes paginating them
+     * with number/start stable.
+     */
+    @Test
+    void testAttachmentsOrder() throws Exception
+    {
+        getUtil().rest().delete(this.reference);
+
+        // Names whose order differs between a binary and a locale-aware collation, see also SolrIndexerIT#sortOrder:
+        // XWiki requires a binary collation in all databases, also for consistency with Solr.
+        List<String> fileNames = Stream.of("Abc", "aBc", "Bac", "bAc", "Äbc", "äBc")
+            .map(name -> getTestMethodName() + name + ".txt")
+            .toList();
+        // The expected order is the binary order of the file names, all attachments are on the same page.
+        List<String> createdOrdered = fileNames.stream().sorted().toList();
+        try {
+            for (String fileName : fileNames) {
+                getUtil().rest().attachFile(new AttachmentReference(fileName, this.reference),
+                    new ByteArrayInputStream(fileName.getBytes(StandardCharsets.UTF_8)), true);
+            }
+
+            CloseableHttpResponse getMethod =
+                executeGet(String.format("%s?number=1000", buildURI(WikiAttachmentsResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+
+            // The whole result must be ordered by page and then file name.
+            List<List<String>> keys = attachments.getAttachments().stream()
+                .map(attachment -> List.of(attachment.getPageId(), attachment.getName()))
+                .toList();
+            Comparator<List<String>> keyComparator =
+                Comparator.<List<String>, String>comparing(key -> key.get(0)).thenComparing(key -> key.get(1));
+            assertEquals("", describeInversions(keys, keyComparator),
+                "The attachments aren't ordered by page and file name.");
+            // Check the attachments created by this test explicitly, so that the assertion above cannot pass just
+            // because no attachment exercised the ordering.
+            assertEquals(createdOrdered, attachments.getAttachments().stream()
+                .map(Attachment::getName)
+                .filter(createdOrdered::contains)
+                .toList());
+        } finally {
+            getUtil().rest().delete(this.reference);
+        }
+    }
+
+    /**
+     * @return a description of the pairs of consecutive items that are in the wrong order, so that a failure reports
+     *     the actual problem and not the whole result, empty when the items are correctly ordered
+     */
+    private static <T> String describeInversions(List<T> items, Comparator<T> comparator)
+    {
+        List<String> inversions = IntStream.range(1, items.size())
+            .filter(i -> comparator.compare(items.get(i - 1), items.get(i)) > 0)
+            .mapToObj(i -> "[%d] %s > [%d] %s".formatted(i - 1, items.get(i - 1), i, items.get(i)))
+            .toList();
+
+        if (inversions.isEmpty()) {
+            return "";
+        }
+
+        // Only report the first few pairs, an unordered result inverts a lot of them.
+        return "%d of %d consecutive pairs are in the wrong order: %s".formatted(inversions.size(),
+            Math.max(items.size() - 1, 0), inversions.stream().limit(MAX_REPORTED_INVERSIONS).toList());
+    }
+
+    @Test
+    void testAttachmentsNumberParameter() throws Exception
+    {
+        // Setup: Ensure at least 2 attachments exist
+        getUtil().rest().delete(this.reference);
+
+        try {
+            getUtil().rest().attachFile(new AttachmentReference(getTestClassName() + "1.txt", this.reference),
+                new ByteArrayInputStream("attachment content 1".getBytes(StandardCharsets.UTF_8)), true);
+            getUtil().rest().attachFile(new AttachmentReference(getTestClassName() + "2.txt", this.reference),
+                new ByteArrayInputStream("attachment content 2".getBytes(StandardCharsets.UTF_8)), true);
+
+            // Test: number=-1 should return error
+            CloseableHttpResponse getMethod = executeGet(
+                String.format("%s?number=-1", buildURI(WikiAttachmentsResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: number=1001 should return error
+            getMethod = executeGet(
+                String.format("%s?number=1001", buildURI(WikiAttachmentsResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: pagination with number=1
+            getMethod = executeGet(
+                String.format("%s?number=1", buildURI(WikiAttachmentsResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, attachments.getAttachments().size());
+
+            String firstName = attachments.getAttachments().get(0).getName();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(
+                String.format("%s?number=1&start=1", buildURI(WikiAttachmentsResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, attachments.getAttachments().size());
+            // Check that we got a different attachment
+            assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
+        } finally {
+            // Clean up attachments
+            getUtil().rest().delete(this.reference);
+        }
+    }
+
+    @Test
+    void testPagesNumberParameter() throws Exception
+    {
+        // Setup: Ensure at least 2 pages exist
+        DocumentReference ref1 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "1");
+        DocumentReference ref2 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "2");
+        try {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "content1", "title1");
+            getUtil().rest().savePage(ref2, "content2", "title2");
+
+            // Test: number=-1 should return error
+            CloseableHttpResponse getMethod = executeGet(
+                String.format("%s?number=-1", buildURI(WikiPagesResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: number=1001 should return error
+            getMethod = executeGet(
+                String.format("%s?number=1001", buildURI(WikiPagesResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: pagination with number=1
+            getMethod = executeGet(
+                String.format("%s?number=1", buildURI(WikiPagesResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, pages.getPageSummaries().size());
+
+            String firstName = pages.getPageSummaries().get(0).getName();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(
+                String.format("%s?number=1&start=1", buildURI(WikiPagesResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            pages = (Pages) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, pages.getPageSummaries().size());
+            // Check that we got a different page
+            assertNotEquals(firstName, pages.getPageSummaries().get(0).getName());
+        } finally {
+            // Clean up pages
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+        }
+    }
+
+    @Test
+    void testWikiChildrenLimitParameter() throws Exception
+    {
+        // Setup: Ensure at least 2 top-level pages exist
+        DocumentReference ref1 = new DocumentReference(this.wikiName, List.of("ChildSpace1"), "WebHome");
+        DocumentReference ref2 = new DocumentReference(this.wikiName, List.of("ChildSpace2"), "WebHome");
+        try {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "content1", "title1");
+            getUtil().rest().savePage(ref2, "content2", "title2");
+
+            // Test: limit=-1 should return error.
+            CloseableHttpResponse getMethod =
+                executeGet("%s?limit=-1".formatted(buildURI(WikiChildrenResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: limit=1001 should return error.
+            getMethod = executeGet("%s?limit=1001".formatted(buildURI(WikiChildrenResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: pagination with limit=1.
+            getMethod = executeGet("%s?limit=1".formatted(buildURI(WikiChildrenResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, pages.getPageSummaries().size());
+            assertEquals("ChildSpace1.WebHome", pages.getPageSummaries().get(0).getFullName());
+
+            // Test: pagination with limit=1 and offset=1.
+            getMethod = executeGet("%s?limit=1&offset=1".formatted(buildURI(WikiChildrenResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            pages = (Pages) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, pages.getPageSummaries().size());
+            assertEquals("ChildSpace2.WebHome", pages.getPageSummaries().get(0).getFullName());
+        } finally {
+            // Clean up pages
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+        }
+    }
+
+    @Test
+    void testWikiSearchNumberParameter() throws Exception
+    {
+        // Setup: Ensure at least 2 pages exist for search
+        DocumentReference ref1 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "A");
+        DocumentReference ref2 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "B");
+        try {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "searchcontent", "searchtitleA");
+            getUtil().rest().savePage(ref2, "searchcontent", "searchtitleB");
+
+            this.solrUtils.waitEmptyQueue();
+
+            // Test: number=-1 should return error
+            CloseableHttpResponse getMethod = executeGet(
+                "%s?q=searchcontent&number=-1".formatted(buildURI(WikiSearchResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: number=1001 should return error
+            getMethod = executeGet(
+                "%s?q=searchcontent&number=1001".formatted(buildURI(WikiSearchResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: pagination with number=1
+            getMethod = executeGet(
+                "%s?q=searchcontent&number=1&scope=content".formatted(buildURI(WikiSearchResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            SearchResults results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, results.getSearchResults().size());
+            assertEquals(ref1.getName(), results.getSearchResults().get(0).getPageName());
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(
+                "%s?q=searchcontent&number=1&start=1&scope=content".formatted(
+                    buildURI(WikiSearchResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, results.getSearchResults().size());
+            assertEquals(ref2.getName(), results.getSearchResults().get(0).getPageName());
+        } finally {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+        }
+    }
+
+    @Test
+    void testWikiSearchQueryNumberParameter() throws Exception
+    {
+        // Setup: Ensure at least 2 pages exist for query search
+        DocumentReference ref1 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "Q1");
+        DocumentReference ref2 = new DocumentReference(this.wikiName, this.spaces, this.pageName + "Q2");
+        try {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "querycontent", "querytitle1");
+            getUtil().rest().savePage(ref2, "querycontent", "querytitle2");
+
+            this.solrUtils.waitEmptyQueue();
+
+            // Test: number=-1 should return error
+            CloseableHttpResponse getMethod = executeGet(
+                "%s?q=querycontent1&number=-1".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_MINUS_1, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: number=1001 should return error
+            getMethod = executeGet(
+                "%s?q=querycontent1&number=1001".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
+            assertEquals(400, getMethod.getCode());
+            assertEquals(INVALID_LIMIT_1001, EntityUtils.toString(getMethod.getEntity()));
+
+            // Test: pagination with number=1
+            getMethod = executeGet(
+                "%s?q=querycontent&number=1&type=solr".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            SearchResults results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, results.getSearchResults().size());
+            assertEquals(ref1.getName(), results.getSearchResults().get(0).getPageName());
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(
+                "%s?q=querycontent&number=1&start=1&type=solr".formatted(buildURI(WikiSearchQueryResource.class,
+                    getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+            results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
+            assertEquals(1, results.getSearchResults().size());
+            assertEquals(ref2.getName(), results.getSearchResults().get(0).getPageName());
+        } finally {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+        }
+    }
+
+    @Test
+    void testForbiddenQueryType() throws Exception
+    {
+        // By default, only "solr" is allowed; "hql" and "xwql" are forbidden.
+        CloseableHttpResponse getMethod = executeGet(
+            "%s?q=somequery&type=hql".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
+        assertEquals(400, getMethod.getCode());
+        assertEquals("Query type [hql] is not allowed. Allowed query types are: [solr].",
+            EntityUtils.toString(getMethod.getEntity()));
+
+        getMethod = executeGet(
+            "%s?q=somequery&type=xwql".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
+        assertEquals(400, getMethod.getCode());
+        assertEquals("Query type [xwql] is not allowed. Allowed query types are: [solr].",
+            EntityUtils.toString(getMethod.getEntity()));
+
+        // "solr" is allowed by default (no pages needed, just check the status is not 400).
+        getMethod = executeGet(
+            "%s?q=somequery&type=solr".formatted(buildURI(WikiSearchQueryResource.class, getWiki())));
+        assertNotEquals(400, getMethod.getCode());
+
+        // After allowing "hql" via configuration, it should succeed.
+        setAllowedQueryTypes("solr,hql");
+        try {
+            getMethod = executeGet(buildURI(WikiSearchQueryResource.class, List.of(getWiki()),
+                Map.of("q", "where 1=0", "type", "hql")));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+        } finally {
+            resetAllowedQueryTypes();
+        }
+    }
+
+    private void setAllowedQueryTypes(String allowedQueryTypes) throws Exception
+    {
+        assertEquals("", getUtil().executeWikiPlain("""
+            {{groovy}}
+            System.setProperty("xconf.xwikiproperties.rest.allowedQueryTypes", "%s")
+            {{/groovy}}
+            """.formatted(allowedQueryTypes), Syntax.XWIKI_2_1).trim());
+    }
+
+    private void resetAllowedQueryTypes() throws Exception
+    {
+        getUtil().executeWikiPlain("""
+            {{groovy}}
+            System.clearProperty("xconf.xwikiproperties.rest.allowedQueryTypes")
+            {{/groovy}}
+            """, Syntax.XWIKI_2_1);
+    }
+}

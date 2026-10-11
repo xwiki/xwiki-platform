@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.test.docker.internal.junit5.MultiUserTestUtilsParameterResolver;
+import org.xwiki.test.docker.internal.junit5.SubWikiTestUtilsParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestLocalReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
@@ -35,6 +36,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -56,6 +58,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(TestReferenceParameterResolver.class)
 @ExtendWith(TestLocalReferenceParameterResolver.class)
 @ExtendWith(MultiUserTestUtilsParameterResolver.class)
+@ExtendWith(SubWikiTestUtilsParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public @interface UITest
@@ -69,7 +72,7 @@ public @interface UITest
      * @return the database to use, see {@link Database}
      * @since 10.9
      */
-    Database database() default Database.HSQLDB_EMBEDDED;
+    Database database() default Database.HSQLDB;
 
     /**
      * @return the Servlet Engine to use, see {@link ServletEngine}
@@ -197,6 +200,18 @@ public @interface UITest
     boolean office() default false;
 
     /**
+     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor
+     *         distribution. When true, two things happen: (1) the generated WAR contains the full set of core
+     *         extensions of the standard XWiki distribution WAR (i.e. the {@code WEB-INF/lib} JARs resolved from
+     *         {@code xwiki-platform-distribution-war-dependencies}) instead of the minimal set (resolved from
+     *         {@code xwiki-platform-minimaldependencies}); and (2) the standard flavor
+     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically, so the test does
+     *         not need to declare it as a dependency. False by default.
+     * @since 18.6.0RC1
+     */
+    boolean standardFlavor() default false;
+
+    /**
      * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
      *         then the test will be skipped
      * @since 10.11RC1
@@ -218,6 +233,16 @@ public @interface UITest
     boolean saveDatabaseData() default false;
 
     /**
+     * @return true if the extensions declared in the resources of the module executing the test must be made available
+     *     to the XWiki instances as an extension repository, so that the test can ask XWiki to install them (see
+     *     {@code src/test/resources/packagefile} and {@code src/test/resources/repository})
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    boolean testExtensionRepository() default false;
+
+    /**
      * @return true if the XWiki permanent directory should be preserved after the test is finished and the XWiki
      *         container stopped (doesn't make sense for Servlet containers running outside of Docker). Can be useful
      *         for debugging purposes
@@ -236,14 +261,47 @@ public @interface UITest
     String[] servletEngineNetworkAliases() default {};
 
     /**
+     * Configure the blob store backend to use for the tests. By default the filesystem blob store is used unless
+     * clustering is enabled, in which case it's S3 by default.
+     * 
      * @return the blob store backend to use, see {@link BlobStore}
      * @since 17.10.0RC1
      */
-    BlobStore blobStore() default BlobStore.FILESYSTEM;
+    BlobStore blobStore() default BlobStore.DEFAULT;
 
     /**
      * @return the docker image tag to use for the blob store (if not specified, uses the "latest" tag)
      * @since 17.10.0RC1
      */
     String blobStoreTag() default "";
+
+    /**
+     * Configure whether a remote Solr instance should be used for the tests, instead of an embedded one. It's disabled
+     * by default, unless clustering in enabled, in which case it's always enabled.
+     * 
+     * @return true if a remote Solr instance should be used for the tests, instead of an embedded one
+     * @since 18.3.0RC1
+     */
+    SolrMode solrMode() default SolrMode.DEFAULT;
+
+    /**
+     * @return the docker image tag to use for Solr (if not specified, uses the "latest" tag)
+     * @since 18.3.0RC1
+     */
+    String remoteSolrTag() default "";
+
+    /**
+     * @return the instances to run during tests.
+     * @since 18.3.0RC1
+     */
+    XWikiInstances xwikiInstances() default @XWikiInstances;
+
+    /**
+     * @return the host/port to set as the default one in the wiki descriptor, and which is thus used to generate
+     *         external URLs from background threads, that is when no request is available to get the host/port from.
+     *         This is the value used by all the tests of the XWiki instance, unless they override it with
+     *         {@link UseWikiDescriptorTarget}.
+     * @since 18.8.0RC1
+     */
+    WikiDescriptorTarget wikiDescriptorTarget() default WikiDescriptorTarget.BROWSER;
 }

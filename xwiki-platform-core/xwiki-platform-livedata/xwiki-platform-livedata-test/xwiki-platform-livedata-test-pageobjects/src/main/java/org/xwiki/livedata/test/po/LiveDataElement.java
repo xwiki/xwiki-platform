@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -39,6 +41,14 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class LiveDataElement extends BaseElement
 {
+    /**
+     * Loading the Live Data can take a while, especially the first time it's displayed on a page since the browser then
+     * needs to fetch and evaluate the Vue.js library and the Live Data components, and even more so on a loaded CI
+     * agent. We thus wait longer than the default timeout to avoid false negatives, using the same timeout as
+     * {@link TableLayoutElement#waitUntilReady()}.
+     */
+    private static final int READY_TIMEOUT_SECONDS = 20;
+
     // TODO: add the operations to switch between the layouts.
 
     private final String id;
@@ -122,6 +132,118 @@ public class LiveDataElement extends BaseElement
     }
 
     /**
+     * Check if the livedata supports edit mode.
+     *
+     * @return {@code true} if the edit mode button is available in the top bar, {@code false} otherwise
+     * @since 18.7.0RC1
+     */
+    public boolean hasEditModeAction()
+    {
+        return getRootElement().findElements(By.cssSelector(".livedata-edit-button"))
+            .stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    /**
+     * Toggle edit mode.
+     *
+     * @since 18.7.0RC1
+     */
+    public void toggleEditMode()
+    {
+        getRootElement().findElement(By.cssSelector(".livedata-edit-button")).click();
+    }
+
+    /**
+     * Check if edit mode is currently enabled. The edit mode button stays pressed as long as the user is in edit mode.
+     * Only a Live Data whose source supports the edit mode displays that button, so call {@link #hasEditModeAction()}
+     * first when the source is not known to support it.
+     *
+     * @return {@code true} if edit mode is enabled, {@code false} otherwise
+     * @throws NoSuchElementException if the Live Data does not offer the edit mode
+     * @since 18.9.0RC1
+     */
+    public boolean isEditMode()
+    {
+        WebElement editModeButton = getRootElement().findElement(By.cssSelector(".livedata-edit-button"));
+        return Boolean.parseBoolean(editModeButton.getDomAttribute("aria-pressed"))
+            && Arrays.asList(editModeButton.getDomAttribute("class").split("\\s+")).contains("active");
+    }
+
+    /**
+     * Toggle the maximized view from the actions menu. The maximized view displays the Live Data over the rest of the
+     * page.
+     *
+     * @since 18.9.0RC1
+     */
+    public void toggleMaximized()
+    {
+        openDropDownMenu().findElement(By.cssSelector(".livedata-action-maximize")).click();
+    }
+
+    /**
+     * @return the label of the action toggling the maximized view, which describes the view the user switches to
+     *     (e.g., "Maximize" or "Minimize")
+     * @since 18.9.0RC1
+     */
+    public String getMaximizedActionLabel()
+    {
+        WebElement dropdownMenu = openDropDownMenu();
+        String label = dropdownMenu.findElement(By.cssSelector(".livedata-action-maximize")).getText();
+        // Close the dropdown menu back so it doesn't overlap the layout.
+        dropdownMenu.findElement(By.cssSelector(".dropdown-toggle")).click();
+        return label;
+    }
+
+    /**
+     * Check that the icon of the action toggling the maximized view is known by the current icon theme. An icon name
+     * that the theme does not map is displayed as an empty placeholder.
+     *
+     * @return {@code true} if the action displays an actual icon, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean hasMaximizedActionIcon()
+    {
+        WebElement dropdownMenu = openDropDownMenu();
+        // The placeholder is expected to be absent, so looking for it must not wait for it to appear.
+        boolean resolved = !getDriver().hasElementWithoutWaiting(dropdownMenu,
+            By.cssSelector(".livedata-action-maximize .icon-placeholder"));
+        // Close the dropdown menu back so it doesn't overlap the layout.
+        dropdownMenu.findElement(By.cssSelector(".dropdown-toggle")).click();
+        return resolved;
+    }
+
+    /**
+     * @return {@code true} if the Live Data is displayed over the rest of the page, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean isMaximized()
+    {
+        return getDriver().hasElementWithoutWaiting(getRootElement(),
+            By.cssSelector(".xwiki-livedata.livedata-maximized"));
+    }
+
+    /**
+     * Wait until the Live Data enters or leaves the maximized view.
+     *
+     * @param maximized {@code true} to wait for the maximized view, {@code false} to wait for the normal view
+     * @since 18.9.0RC1
+     */
+    public void waitUntilMaximized(boolean maximized)
+    {
+        getDriver().waitUntilCondition(input -> isMaximized() == maximized);
+    }
+
+    /**
+     * Press the escape key, which exits the maximized view when no other component consumes it.
+     *
+     * @since 18.9.0RC1
+     */
+    public void pressEscape()
+    {
+        new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
+    }
+
+    /**
      * @return the id of the Live Data
      */
     public String getId()
@@ -162,9 +284,9 @@ public class LiveDataElement extends BaseElement
 
     public void waitUntilReady()
     {
-        getDriver().waitUntilCondition(input -> isVueLoaded());
+        getDriver().waitUntilCondition(input -> isVueLoaded(), READY_TIMEOUT_SECONDS);
 
-        getDriver().waitUntilCondition(input -> areComponentsLoaded());
+        getDriver().waitUntilCondition(input -> areComponentsLoaded(), READY_TIMEOUT_SECONDS);
     }
 
     private boolean areComponentsLoaded()
@@ -193,8 +315,9 @@ public class LiveDataElement extends BaseElement
 
     private List<WebElement> getFootnotes()
     {
-        return getDriver().findElementWithoutWaiting(By.id(this.id))
-            .findElements(By.cssSelector(".footnotes > .footnote"));
+        // Don't wait: the footnotes are displayed along with the entries, and there are often none.
+        return getDriver().findElementsWithoutWaiting(getDriver().findElementWithoutWaiting(By.id(this.id)),
+            By.cssSelector(".footnotes > .footnote"));
     }
 
     private WebElement getRootElement()
@@ -212,6 +335,19 @@ public class LiveDataElement extends BaseElement
         openDropDownMenu().findElement(By.linkText("Filter...")).click();
         return new FiltersPanelElement(this,
             getRootElement().findElement(By.className("livedata-advanced-panel-filter")));
+    }
+
+    /**
+     * Open the panel listing the properties, from which a property is displayed as a column or hidden.
+     *
+     * @return an instance of {@link PropertiesPanelElement} once it's opened.
+     * @since 18.8.0RC1
+     */
+    public PropertiesPanelElement openPropertiesPanel()
+    {
+        openDropDownMenu().findElement(By.linkText("Properties...")).click();
+        return new PropertiesPanelElement(this,
+            getRootElement().findElement(By.className("livedata-advanced-panel-properties")));
     }
 
     /**

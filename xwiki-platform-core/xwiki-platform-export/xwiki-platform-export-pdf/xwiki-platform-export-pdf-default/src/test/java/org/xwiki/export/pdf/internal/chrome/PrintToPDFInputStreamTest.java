@@ -34,6 +34,7 @@ import com.github.kklisura.cdt.protocol.commands.IO;
 import com.github.kklisura.cdt.protocol.types.io.Read;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,6 +62,20 @@ class PrintToPDFInputStreamTest
     void readBase64Encoded() throws IOException
     {
         assertRead("The quick brown fox jumps over the laz\u00FF dog.", 8, true);
+    }
+
+    @Test
+    void closeIsIdempotent() throws IOException
+    {
+        String streamHandle = "test";
+        PrintToPDFInputStream inputStream =
+            new PrintToPDFInputStream(this.io, streamHandle, this.closeCallback, 5);
+
+        inputStream.close();
+        inputStream.close();
+
+        verify(this.io, times(1)).close(streamHandle);
+        verify(this.closeCallback, times(1)).run();
     }
 
     private void assertRead(String content, int bufferSize, boolean useBase64Encoding) throws IOException

@@ -52,7 +52,7 @@ describe("defaultAttachmentsService", () => {
     await service.upload(pageReference, []);
     expect(service.isLoading().value).eq(false);
 
-    // Check individiually each method before checking if they are called in the
+    // Check individually each method before checking if they are called in the
     // right order, to make it easier to debug in case of failure.
     expect(storageMock.saveAttachments).toHaveBeenCalled();
     expect(storageMock.getAttachments).toHaveBeenCalled();

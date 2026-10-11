@@ -19,94 +19,93 @@
  */
 package org.xwiki.localization.messagetool.internal;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.junit.jupiter.api.Test;
 import org.xwiki.localization.message.TranslationMessage;
-import org.xwiki.localization.message.TranslationMessageParser;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
 import org.xwiki.rendering.internal.parser.plain.PlainTextStreamParser;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-@MockingRequirement(value = MessageToolTranslationMessageParser.class, exceptions = Parser.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@ComponentTest
 @ComponentList({PlainTextBlockParser.class, PlainTextStreamParser.class})
-public class MessageToolTranslationMessageParserTest extends AbstractMockingComponentTestCase<TranslationMessageParser>
+class MessageToolTranslationMessageParserTest
 {
-    @Test
-    public void messageEmpty() throws ComponentLookupException
-    {
-        TranslationMessage translationMessage = getMockedComponent().parse("");
+    @InjectMockComponents
+    private MessageToolTranslationMessageParser parser;
 
-        Assert.assertEquals("", translationMessage.getRawSource());
-        Assert.assertEquals(new CompositeBlock(), translationMessage.render(null, null));
+    @Test
+    void messageEmpty()
+    {
+        TranslationMessage translationMessage = this.parser.parse("");
+
+        assertEquals("", translationMessage.getRawSource());
+        assertEquals(new CompositeBlock(), translationMessage.render(null, null));
     }
 
     @Test
-    public void messageSimple() throws ComponentLookupException
+    void messageSimple()
     {
-        TranslationMessage translationMessage = getMockedComponent().parse("word");
+        TranslationMessage translationMessage = this.parser.parse("word");
 
-        Assert.assertEquals("word", translationMessage.getRawSource());
-        Assert.assertEquals(new WordBlock("word"), translationMessage.render(null, null));
+        assertEquals("word", translationMessage.getRawSource());
+        assertEquals(new WordBlock("word"), translationMessage.render(null, null));
     }
 
     @Test
-    public void messageWithOneParameter() throws ComponentLookupException
+    void messageWithOneParameter()
     {
-        TranslationMessage translationMessage = getMockedComponent().parse("{0}");
+        TranslationMessage translationMessage = this.parser.parse("{0}");
 
-        Assert.assertEquals("{0}", translationMessage.getRawSource());
-        Assert.assertEquals(new WordBlock("word"), translationMessage.render(null, null, "word"));
+        assertEquals("{0}", translationMessage.getRawSource());
+        assertEquals(new WordBlock("word"), translationMessage.render(null, null, "word"));
     }
 
     @Test
-    public void messageWithExpectedParameter() throws ComponentLookupException
+    void messageWithExpectedParameter()
     {
-        TranslationMessage translationMessage = getMockedComponent().parse("{0}");
+        TranslationMessage translationMessage = this.parser.parse("{0}");
 
-        Assert.assertEquals("{0}", translationMessage.getRawSource());
-        Assert.assertEquals(
-            new CompositeBlock(Arrays.<Block> asList(new SpecialSymbolBlock('{'), new WordBlock("0"),
+        assertEquals("{0}", translationMessage.getRawSource());
+        assertEquals(
+            new CompositeBlock(List.of(new SpecialSymbolBlock('{'), new WordBlock("0"),
                 new SpecialSymbolBlock('}'))), translationMessage.render(null, null));
     }
 
     @Test
-    public void messageWithApostrophe() throws ComponentLookupException
+    void messageWithApostrophe()
     {
-        TranslationMessage translationMessage = getMockedComponent().parse("'");
+        TranslationMessage translationMessage = this.parser.parse("'");
 
-        Assert.assertEquals("'", translationMessage.getRawSource());
-        Assert.assertEquals(new SpecialSymbolBlock('\''), translationMessage.render(null, null));
+        assertEquals("'", translationMessage.getRawSource());
+        assertEquals(new SpecialSymbolBlock('\''), translationMessage.render(null, null));
     }
 
     @Test
-    public void messageWithEscapedParameter() throws ComponentLookupException
+    void messageWithEscapedParameter()
     {
-        TranslationMessage translationMessage = getMockedComponent().parse("'{0}");
+        TranslationMessage translationMessage = this.parser.parse("'{0}");
 
-        Assert.assertEquals("'{0}", translationMessage.getRawSource());
-        Assert.assertEquals(
-            new CompositeBlock(Arrays.<Block> asList(new SpecialSymbolBlock('{'), new WordBlock("0"),
+        assertEquals("'{0}", translationMessage.getRawSource());
+        assertEquals(
+            new CompositeBlock(List.of(new SpecialSymbolBlock('{'), new WordBlock("0"),
                 new SpecialSymbolBlock('}'))), translationMessage.render(null, null, "word"));
     }
-    
+
     @Test
-    public void messageWithChoiceSyntax() throws ComponentLookupException
+    void messageWithChoiceSyntax()
     {
-        TranslationMessage translationMessage = getMockedComponent().parse("{0,choice,0#choice1|0<choice2}");
+        TranslationMessage translationMessage = this.parser.parse("{0,choice,0#choice1|0<choice2}");
 
-        Assert.assertEquals("{0,choice,0#choice1|0<choice2}", translationMessage.getRawSource());
-        Assert.assertEquals(new WordBlock("choice1"), translationMessage.render(null, null, 0));
-        Assert.assertEquals(new WordBlock("choice2"), translationMessage.render(null, null, 42));
+        assertEquals("{0,choice,0#choice1|0<choice2}", translationMessage.getRawSource());
+        assertEquals(new WordBlock("choice1"), translationMessage.render(null, null, 0));
+        assertEquals(new WordBlock("choice2"), translationMessage.render(null, null, 42));
     }
-
 }

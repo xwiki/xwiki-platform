@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
  * Test class for {@link org.xwiki.lesscss.internal.LESSConfiguration}.
  */
 @ComponentTest
-public class LESSConfigurationTest
+class LESSConfigurationTest
 {
     @InjectMockComponents
     private LESSConfiguration lessConfiguration;
@@ -41,18 +41,18 @@ public class LESSConfigurationTest
     private ConfigurationSource configurationSource;
 
     @Test
-    public void maxSimultaneousCompilations() throws Exception
+    void maxSimultaneousCompilations()
     {
-        when(configurationSource.getProperty("lesscss.maximumSimultaneousCompilations", 4)).thenReturn(4);
-        lessConfiguration.getMaximumSimultaneousCompilations();
-        verify(configurationSource).getProperty("lesscss.maximumSimultaneousCompilations", 4);
+        when(this.configurationSource.getProperty("lesscss.maximumSimultaneousCompilations", 4)).thenReturn(4);
+        this.lessConfiguration.getMaximumSimultaneousCompilations();
+        verify(this.configurationSource).getProperty("lesscss.maximumSimultaneousCompilations", 4);
     }
 
     @Test
-    public void generateSourceMaps() throws Exception
+    void generateSourceMaps()
     {
-        when(configurationSource.getProperty("lesscss.generateInlineSourceMaps", false)).thenReturn(false);
-        lessConfiguration.isGenerateInlineSourceMaps();
-        verify(configurationSource).getProperty("lesscss.generateInlineSourceMaps", false);
+        when(this.configurationSource.getProperty("lesscss.generateInlineSourceMaps", false)).thenReturn(false);
+        this.lessConfiguration.isGenerateInlineSourceMaps();
+        verify(this.configurationSource).getProperty("lesscss.generateInlineSourceMaps", false);
     }
 }

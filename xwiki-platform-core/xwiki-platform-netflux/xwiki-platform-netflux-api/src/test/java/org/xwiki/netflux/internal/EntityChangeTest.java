@@ -19,16 +19,16 @@
  */
 package org.xwiki.netflux.internal;
 
+import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.netflux.internal.EntityChange.ScriptLevel;
+import org.xwiki.user.UserReference;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.Test;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.netflux.internal.EntityChange.ScriptLevel;
-import org.xwiki.user.UserReference;
 
 /**
  * Unit tests for {@link EntityChange}.
@@ -62,5 +62,16 @@ class EntityChangeTest
 
         EntityChange secondChange = new EntityChange(this.documentReference, this.userReference, ScriptLevel.SCRIPT);
         assertNotEquals(firstChange, secondChange);
+    }
+
+    @Test
+    void verifyHashCode()
+    {
+        EntityChange firstChange =
+            new EntityChange(this.documentReference, this.userReference, ScriptLevel.SCRIPT, 1000L);
+        EntityChange sameChange =
+            new EntityChange(this.documentReference, this.userReference, ScriptLevel.SCRIPT, 1000L);
+        assertEquals(firstChange, sameChange);
+        assertEquals(firstChange.hashCode(), sameChange.hashCode());
     }
 }

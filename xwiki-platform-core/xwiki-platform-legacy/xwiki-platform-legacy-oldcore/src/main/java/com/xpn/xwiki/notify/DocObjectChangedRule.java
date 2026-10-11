@@ -19,16 +19,16 @@
  */
 package com.xpn.xwiki.notify;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 @Deprecated
 public class DocObjectChangedRule extends DocChangeRule
@@ -127,6 +127,7 @@ public class DocObjectChangedRule extends DocChangeRule
             return hasEqualsObjectsFromClass(newdoc, olddoc, className);
     }
 
+    @Override
     public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
     {
         if (!hasEqualObjects(newdoc, olddoc, className))

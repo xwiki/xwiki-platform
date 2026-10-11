@@ -101,27 +101,29 @@ class BaseCollectionBlockSupplierProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(block, printer);
 
-        String expected = "beginDefinitionList [[class]=[xform]]\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [Text]\n"
-            + "onSpace\n"
-            + "onWord [Area]\n"
-            + "beginFormat [NONE] [[class]=[xHint]]\n"
-            + "onWord [textAreaHint]\n"
-            + "endFormat [NONE] [[class]=[xHint]]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "beginGroup [[class]=[code box]]\n"
-            + "onWord [textAreaValue]\n"
-            + "endGroup [[class]=[code box]]\n"
-            + "endDefinitionDescription\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [String]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "onRawText [displayedStringValue] [html/5.0]\n"
-            + "endDefinitionDescription\n"
-            + "endDefinitionList [[class]=[xform]]\n";
+        String expected = """
+            beginDefinitionList [[class]=[xform]]
+            beginDefinitionTerm
+            onWord [Text]
+            onSpace
+            onWord [Area]
+            beginFormat [NONE] [[class]=[xHint]]
+            onWord [textAreaHint]
+            endFormat [NONE] [[class]=[xHint]]
+            endDefinitionTerm
+            beginDefinitionDescription
+            beginGroup [[class]=[code box]]
+            onWord [textAreaValue]
+            endGroup [[class]=[code box]]
+            endDefinitionDescription
+            beginDefinitionTerm
+            onWord [String]
+            endDefinitionTerm
+            beginDefinitionDescription
+            onRawText [displayedStringValue] [html/5.0]
+            endDefinitionDescription
+            endDefinitionList [[class]=[xform]]
+            """;
 
         assertEquals(expected, printer.toString());
     }
@@ -144,20 +146,22 @@ class BaseCollectionBlockSupplierProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(block, printer);
 
-        String expected = "beginDefinitionList [[class]=[xform]]\n"
-            + "endDefinitionList [[class]=[xform]]\n"
-            + "beginGroup [[class]=[box warningmessage deprecatedProperties]]\n"
-            + "beginDefinitionList [[class]=[xform]]\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [deprecatedName]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "beginGroup [[class]=[code box]]\n"
-            + "onWord [deprecatedValue]\n"
-            + "endGroup [[class]=[code box]]\n"
-            + "endDefinitionDescription\n"
-            + "endDefinitionList [[class]=[xform]]\n"
-            + "endGroup [[class]=[box warningmessage deprecatedProperties]]\n";
+        String expected = """
+            beginDefinitionList [[class]=[xform]]
+            endDefinitionList [[class]=[xform]]
+            beginGroup [[class]=[box warningmessage deprecatedProperties]]
+            beginDefinitionList [[class]=[xform]]
+            beginDefinitionTerm
+            onWord [deprecatedName]
+            endDefinitionTerm
+            beginDefinitionDescription
+            beginGroup [[class]=[code box]]
+            onWord [deprecatedValue]
+            endGroup [[class]=[code box]]
+            endDefinitionDescription
+            endDefinitionList [[class]=[xform]]
+            endGroup [[class]=[box warningmessage deprecatedProperties]]
+            """;
 
         assertEquals(expected, printer.toString());
     }

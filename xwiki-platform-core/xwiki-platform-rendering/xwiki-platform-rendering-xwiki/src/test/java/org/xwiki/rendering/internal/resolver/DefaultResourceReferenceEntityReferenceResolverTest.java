@@ -410,7 +410,7 @@ class DefaultResourceReferenceEntityReferenceResolverTest
     @Test
     void trySpaceSiblingFallback()
     {
-        VoidResourceReferenceEntityReferenceResolve resolver = new VoidResourceReferenceEntityReferenceResolve();
+        VoidResourceReferenceEntityReferenceResolve voidResolver = new VoidResourceReferenceEntityReferenceResolve();
 
         String defaultDocumentName = "Foo";
         EntityReference sourceReference = new EntityReference("Bar", EntityType.DOCUMENT);
@@ -418,17 +418,17 @@ class DefaultResourceReferenceEntityReferenceResolverTest
             "WebHome");
         EntityReference baseReference = sourceReference;
 
-        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, null,
+        assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, null,
             defaultDocumentName));
-        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
+        assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
             defaultDocumentName));
 
         defaultDocumentName = "Bar";
-        assertTrue(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
+        assertTrue(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
             defaultDocumentName));
 
         this.existingDocuments.add(finalReference);
-        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
+        assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
             defaultDocumentName));
     }
 

@@ -73,7 +73,7 @@ public class DomainWikiReferenceExtractor extends AbstractWikiReferenceExtractor
             // - "localhost"
             // - IP address
             if ("www".equals(domainAlias) || "localhost".equals(alias)
-                || alias.matches("[0-9]{1,3}(?:\\.[0-9]{1,3}){3}"))
+                || alias.matches("\\d{1,3}(?:\\.\\d{1,3}){3}"))
             {
                 wikiId = getMainWikiId();
             } else {

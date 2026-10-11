@@ -125,7 +125,8 @@ class MentionPageTest extends PageTest
 
         LocalizationScriptService localizationScriptService =
             this.componentManager.getInstance(ScriptService.class, "localization");
-        when(localizationScriptService.get(any())).thenReturn(mock(Translation.class));
+        Translation translationMock = mock();
+        when(localizationScriptService.get(any())).thenReturn(translationMock);
 
         // Initialization of the velocity context.
         DefaultEvent event1 = new DefaultEvent();
@@ -178,7 +179,6 @@ class MentionPageTest extends PageTest
 
         DocumentReference page1 = new DocumentReference("design", "XWiki", "Page1");
         DocumentReference userPage1 = new DocumentReference("xwiki", "XWiki", "U1");
-        DocumentReference userPage2 = new DocumentReference("xwiki", "YWiki", "U2");
         Date eventDate = new Date();
 
         // Create and save page 1 with a title.
@@ -191,7 +191,8 @@ class MentionPageTest extends PageTest
 
         LocalizationScriptService localizationScriptService =
                 this.componentManager.getInstance(ScriptService.class, "localization");
-        when(localizationScriptService.get(any())).thenReturn(mock(Translation.class));
+        Translation translationMock = mock();
+        when(localizationScriptService.get(any())).thenReturn(translationMock);
 
         // Initialization of the velocity context.
         DefaultEvent event1 = new DefaultEvent();

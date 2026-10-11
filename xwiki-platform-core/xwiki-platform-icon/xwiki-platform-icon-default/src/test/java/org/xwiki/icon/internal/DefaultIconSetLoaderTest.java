@@ -87,7 +87,7 @@ class DefaultIconSetLoaderTest
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
     }
 
-    private void verifies(IconSet result) throws Exception
+    private void verifies(IconSet result)
     {
         assertNotNull(result);
         assertEquals("http://url_to_css", result.getCss());
@@ -105,14 +105,15 @@ class DefaultIconSetLoaderTest
     @Test
     void loadIconSet() throws Exception
     {
-        Reader content = new InputStreamReader(getClass().getResourceAsStream("/test.iconset"));
+        try (Reader content = new InputStreamReader(getClass().getResourceAsStream("/test.iconset"))) {
 
-        // Test
-        IconSet result = this.iconSetLoader.loadIconSet(content, "FontAwesome");
+            // Test
+            IconSet result = this.iconSetLoader.loadIconSet(content, "FontAwesome");
 
-        // Verify
-        verifies(result);
-        assertEquals("FontAwesome", result.getName());
+            // Verify
+            verifies(result);
+            assertEquals("FontAwesome", result.getName());
+        }
     }
 
     @Test

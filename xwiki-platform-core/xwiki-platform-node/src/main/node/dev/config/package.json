@@ -2,7 +2,7 @@
   "private": true,
   "name": "@xwiki/platform-dev-config",
   "version": "0.0.0",
-  "license": "LGPL 2.1",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -20,6 +20,9 @@
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "clean": "rimraf dist"

@@ -19,22 +19,24 @@
  */
 package org.xwiki.mail.internal.factory.users;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.mail.MessagingException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -43,71 +45,60 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4.1
  */
+@ComponentTest
 @Deprecated
-public class UsersMimeMessageFactoryTest
+class UsersMimeMessageFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<UsersMimeMessageFactory> mocker =
-        new MockitoComponentMockingRule<>(UsersMimeMessageFactory.class);
+    @InjectMockComponents
+    private UsersMimeMessageFactory factory;
+
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @Test
-    public void createMessageWhenNullParametersPassed() throws Exception
+    void createMessageWhenNullParametersPassed()
     {
         DocumentReference userReference = new DocumentReference("wiki", "space", "page");
 
-        try {
-            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference), null);
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("You must pass parameters for this Mime Message Factory to work!", expected.getMessage());
-        }
+        MessagingException e = assertThrows(MessagingException.class,
+            () -> this.factory.createMessage(List.of(userReference), null));
+        assertEquals("You must pass parameters for this Mime Message Factory to work!", e.getMessage());
     }
 
     @Test
-    public void createMessageWhenNoHintParameterPassed() throws Exception
+    void createMessageWhenNoHintParameterPassed()
     {
         DocumentReference userReference = new DocumentReference("wiki", "space", "page");
 
-        try {
-            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference), Collections.emptyMap());
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("The parameter [hint] is mandatory.", expected.getMessage());
-        }
+        MessagingException e = assertThrows(MessagingException.class,
+            () -> this.factory.createMessage(List.of(userReference), Map.of()));
+        assertEquals("The parameter [hint] is mandatory.", e.getMessage());
     }
 
     @Test
-    public void createMessageWhenNoSourceParameterPassed() throws Exception
+    void createMessageWhenNoSourceParameterPassed()
     {
         DocumentReference userReference = new DocumentReference("wiki", "space", "page");
 
-        try {
-            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference),
-                Collections.singletonMap("hint", "factoryHint"));
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("The parameter [source] is mandatory.", expected.getMessage());
-        }
+        MessagingException e = assertThrows(MessagingException.class,
+            () -> this.factory.createMessage(List.of(userReference), Map.of("hint", "factoryHint")));
+        assertEquals("The parameter [source] is mandatory.", e.getMessage());
     }
 
     @Test
-    public void createMessageWhenNotExistingMimeMessageFactory() throws Exception
+    void createMessageWhenNotExistingMimeMessageFactory()
     {
         DocumentReference userReference = new DocumentReference("wiki", "space", "page");
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("hint", "factoryHint");
-        parameters.put("source", "factoryHint");
+        Map<String, Object> parameters = Map.of("hint", "factoryHint", "source", "factoryHint");
 
-        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(componentManagerProvider.get()).thenReturn(this.mocker);
+        when(this.componentManagerProvider.get()).thenReturn(this.componentManager);
 
-        try {
-            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference), parameters);
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("Failed to find a [MimeMessageFactory<MimeMessage>] for hint [factoryHint]",
-                expected.getMessage());
-        }
+        MessagingException e = assertThrows(MessagingException.class,
+            () -> this.factory.createMessage(List.of(userReference), parameters));
+        assertEquals("Failed to find a [MimeMessageFactory<MimeMessage>] for hint [factoryHint]", e.getMessage());
     }
 }

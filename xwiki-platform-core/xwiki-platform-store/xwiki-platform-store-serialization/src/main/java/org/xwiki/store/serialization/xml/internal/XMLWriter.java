@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Stack;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
@@ -62,9 +63,10 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     private static final int BASE64_WIDTH = 80;
 
     /**
-     * Platform dependent line seperator.
+     * Platform dependent line separator.
      */
-    private static final byte[] NEWLINE;
+    private static final byte[] NEWLINE =
+        System.getProperty("line.separator").getBytes(StandardCharsets.UTF_8);
 
     /**
      * If the last character written is this then it is safe to indent the next tag.
@@ -88,15 +90,6 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * The underlying writer which is not cast to Writer.
      */
     private LastCharWriter lcWriter;
-
-    // Need to catch this exception so this has to be done in an initializer block.
-    static {
-        try {
-            NEWLINE = System.getProperty("line.separator").getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("No UTF-8, this Java VM is not standards compliant!", e);
-        }
-    }
 
     /**
      * Default constructor used by <code>{@link DOMXMLWriter}</code>.
@@ -177,7 +170,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * </p>
      *
      * @param element <code>{@link Element}</code> to output.
-     * @param rd <code>{@link Reader}</code> that will be fully read and transfered
+     * @param rd <code>{@link Reader}</code> that will be fully read and transferred
      * into the element content.
      * @throws IOException a problem occurs during reading or writing.
      */
@@ -194,11 +187,11 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * <code>{@link InputStream}</code> for its content.
      * <p>
      * Note that no decoding/encoding of the InputStream will be ensured during this operation.
-     * The byte content is transfered untouched.
+     * The byte content is transferred untouched.
      * </p>
      *
      * @param element <code>{@link Element}</code> to output.
-     * @param is <code>{@link InputStream}</code> that will be fully read and transfered into
+     * @param is <code>{@link InputStream}</code> that will be fully read and transferred into
      * the element content.
      * @throws IOException a problem occurs during reading or writing.
      */

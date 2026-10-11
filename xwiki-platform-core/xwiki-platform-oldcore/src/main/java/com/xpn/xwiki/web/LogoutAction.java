@@ -19,19 +19,22 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.script.ScriptContext;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -48,13 +51,27 @@ import com.xpn.xwiki.XWikiException;
 @Singleton
 public class LogoutAction extends XWikiAction
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogoutAction.class);
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private CSRFToken csrf;
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
+
+        String invalidCSRFMessageKey = "core.logout.error.invalidCSRF";
+
+        if (context.get(invalidCSRFMessageKey) != null) {
+            // If the CSRF token can't be validated, the logout request should not be performed.
+            // Instead, we render an error message to the user.
+            getCurrentScriptContext().setAttribute("message",
+                localizeOrReturnKey(invalidCSRFMessageKey, Syntax.HTML_5_0), ScriptContext.ENGINE_SCOPE);
+            return true;
+        }
 
         // Destroy the current session, if any, so that any private data stored in the session won't be accessible by
         // the next user on the same computer
@@ -88,10 +105,17 @@ public class LogoutAction extends XWikiAction
 
             sendRedirect(response, redirect);
         } else {
-            LOGGER.debug("Skipping the redirect because the response has already been committed"
+            this.logger.debug("Skipping the redirect because the response has already been committed"
                 + " (e.g. by a custom authenticator)");
         }
 
         return false;
+    }
+
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        // Used to render errors, e.g., invalid CSRF token.
+        return "error";
     }
 }

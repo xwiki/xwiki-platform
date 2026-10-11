@@ -44,11 +44,11 @@ import static org.xwiki.rest.internal.resources.classes.AbstractClassPropertyVal
 /**
  * Test for {@link StaticListClassPropertyValuesProvider}.
  *
- * @since 11.5RC1
  * @version $Id$
+ * @since 11.5RC1
  */
 @OldcoreTest
-public class StaticListClassPropertyValuesProviderTest
+class StaticListClassPropertyValuesProviderTest
 {
     @InjectMockComponents
     private StaticListClassPropertyValuesProvider staticListClassPropertyValuesProvider;
@@ -103,7 +103,8 @@ public class StaticListClassPropertyValuesProviderTest
         // Needed to build localization string.
         when(this.baseClass.getName()).thenReturn("XWiki.TestClass");
         // Needed to actually consider the localization in the display code.
-        when(this.context.getWiki()).thenReturn(mock(XWiki.class));
+        XWiki xWikiMock = mock(XWiki.class);
+        when(this.context.getWiki()).thenReturn(xWikiMock);
 
         StaticListClass staticListClass = new StaticListClass();
         staticListClass.setName("Test");
@@ -135,7 +136,8 @@ public class StaticListClassPropertyValuesProviderTest
         // Needed to build localization string.
         when(this.baseClass.getName()).thenReturn("XWiki.TestQueryResult");
         // Needed to actually consider the localization in the display code.
-        when(this.context.getWiki()).thenReturn(mock(XWiki.class));
+        XWiki xWikiMock2 = mock(XWiki.class);
+        when(this.context.getWiki()).thenReturn(xWikiMock2);
 
         StaticListClass staticListClass = new StaticListClass();
         staticListClass.setName("Query");
@@ -170,7 +172,8 @@ public class StaticListClassPropertyValuesProviderTest
         // Needed to build localization string.
         when(this.baseClass.getName()).thenReturn("XWiki.TestQueryResultSpecial");
         // Needed to actually consider the localization in the display code.
-        when(this.context.getWiki()).thenReturn(mock(XWiki.class));
+        XWiki xWikiMock3 = mock(XWiki.class);
+        when(this.context.getWiki()).thenReturn(xWikiMock3);
 
         StaticListClass staticListClass = new StaticListClass();
         staticListClass.setName("Query");
@@ -192,7 +195,8 @@ public class StaticListClassPropertyValuesProviderTest
 
         String translatedLabel = "<Translated & &amp; Label>";
         expected.getMetaData().put(META_DATA_LABEL, translatedLabel);
-        when(this.localization.getTranslationPlain("XWiki.TestQueryResultSpecial_Query_Id")).thenReturn(translatedLabel);
+        when(this.localization.getTranslationPlain("XWiki.TestQueryResultSpecial_Query_Id"))
+            .thenReturn(translatedLabel);
 
         // Test filter by translated label.
         actual = this.staticListClassPropertyValuesProvider.getValueFromQueryResult("Id", staticListClass);

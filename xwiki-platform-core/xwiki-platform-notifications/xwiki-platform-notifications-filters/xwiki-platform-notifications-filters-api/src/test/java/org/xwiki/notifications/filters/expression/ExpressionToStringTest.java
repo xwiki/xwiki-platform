@@ -27,10 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @version $Id$
  */
-public class ExpressionToStringTest
+class ExpressionToStringTest
 {
     @Test
-    void test() throws Exception
+    void test()
     {
         AbstractNode node = new AndNode(
             new OrNode(new EqualsNode(new PropertyValueNode(EventProperty.WIKI), new StringValueNode("value1")),

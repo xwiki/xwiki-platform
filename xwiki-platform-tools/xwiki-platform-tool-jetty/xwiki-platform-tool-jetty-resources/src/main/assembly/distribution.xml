@@ -34,6 +34,7 @@
       <outputDirectory>/</outputDirectory>
       <excludes>
         <exclude>**/*.sh</exclude>
+        <exclude>**/*.bat</exclude>
       </excludes>
     </fileSet>
 
@@ -50,6 +51,7 @@
       <outputDirectory>/</outputDirectory>
       <includes>
         <include>**/*.sh</include>
+        <include>**/*.bat</include>
       </includes>
       <filtered>true</filtered>
       <fileMode>755</fileMode>

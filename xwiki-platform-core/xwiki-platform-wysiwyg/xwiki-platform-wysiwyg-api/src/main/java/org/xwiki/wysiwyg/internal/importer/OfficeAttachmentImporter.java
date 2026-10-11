@@ -101,8 +101,8 @@ public class OfficeAttachmentImporter implements AttachmentImporter
     @Override
     public String toHTML(AttachmentReference attachmentReference, Map<String, Object> parameters) throws Exception
     {
-        boolean filterStyles = Boolean.valueOf(String.valueOf(parameters.get("filterStyles")));
-        if (Boolean.valueOf(String.valueOf(parameters.get("useOfficeViewer")))) {
+        boolean filterStyles = Boolean.parseBoolean(String.valueOf(parameters.get("filterStyles")));
+        if (Boolean.parseBoolean(String.valueOf(parameters.get("useOfficeViewer")))) {
             return this.officeMacroImporter
                 .render(this.officeMacroImporter.buildXDOM(attachmentReference, filterStyles));
         } else {
@@ -143,39 +143,51 @@ public class OfficeAttachmentImporter implements AttachmentImporter
     private String convertAttachmentContent(AttachmentReference attachmentReference, boolean filterStyles)
         throws Exception
     {
-        InputStream officeFileStream;
-        if (this.documentAccessBridge.getAttachmentVersion(attachmentReference) != null) {
-            officeFileStream = documentAccessBridge.getAttachmentContent(attachmentReference);
-        } else {
-            Optional<XWikiAttachment> uploadedAttachment =
-                this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachmentReference);
-            if (uploadedAttachment.isPresent()) {
-                officeFileStream = uploadedAttachment.get().getContentInputStream(this.contextProvider.get());
-            } else {
-                throw new OfficeImporterException(
-                    String.format("Cannot find temporary uplodaded attachment [%s]", attachmentReference));
-            }
-        }
-        String officeFileName = attachmentReference.getName();
         DocumentReference targetDocRef = attachmentReference.getDocumentReference();
-        XDOMOfficeDocument xdomOfficeDocument;
-        if (isPresentation(attachmentReference.getName())) {
-            xdomOfficeDocument = presentationBuilder.build(officeFileStream, officeFileName, targetDocRef);
-        } else {
-            xdomOfficeDocument = documentBuilder.build(officeFileStream, officeFileName, targetDocRef, filterStyles);
+
+        try (XDOMOfficeDocument xdomOfficeDocument = getXDOMOfficeDocument(attachmentReference, filterStyles)) {
+            // Attach the images extracted from the imported office document to the target wiki document.
+            for (Map.Entry<String, OfficeDocumentArtifact> entry : xdomOfficeDocument.getArtifactsMap().entrySet()) {
+                String filename = entry.getKey();
+                OfficeDocumentArtifact artifact = entry.getValue();
+                AttachmentReference artifactReference = new AttachmentReference(filename, targetDocRef);
+                try (InputStream is = artifact.getContentInputStream()) {
+                    this.documentAccessBridge.setAttachmentContent(artifactReference, is);
+                }
+            }
+
+            return xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");
         }
-        // Attach the images extracted from the imported office document to the target wiki document.
-        for (Map.Entry<String, OfficeDocumentArtifact> entry : xdomOfficeDocument.getArtifactsMap().entrySet()) {
-            String filename = entry.getKey();
-            OfficeDocumentArtifact artifact = entry.getValue();
-            AttachmentReference artifactReference = new AttachmentReference(filename, targetDocRef);
-            try (InputStream is = artifact.getContentInputStream()) {
-                this.documentAccessBridge.setAttachmentContent(artifactReference, is);
+    }
+
+    private XDOMOfficeDocument getXDOMOfficeDocument(AttachmentReference attachmentReference, boolean filterStyles)
+        throws Exception
+    {
+        try (InputStream officeFileStream = getOfficeInputStream(attachmentReference)) {
+            String officeFileName = attachmentReference.getName();
+            DocumentReference targetDocRef = attachmentReference.getDocumentReference();
+            if (isPresentation(attachmentReference.getName())) {
+                return presentationBuilder.build(officeFileStream, officeFileName, targetDocRef);
+            } else {
+                return documentBuilder.build(officeFileStream, officeFileName, targetDocRef, filterStyles);
             }
         }
-        String result = xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");
-        xdomOfficeDocument.close();
-        return result;
+    }
+
+    private InputStream getOfficeInputStream(AttachmentReference attachmentReference) throws Exception
+    {
+        if (this.documentAccessBridge.getAttachmentVersion(attachmentReference) != null) {
+            return documentAccessBridge.getAttachmentContent(attachmentReference);
+        }
+
+        Optional<XWikiAttachment> uploadedAttachment =
+            this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachmentReference);
+        if (uploadedAttachment.isPresent()) {
+            return uploadedAttachment.get().getContentInputStream(this.contextProvider.get());
+        }
+
+        throw new OfficeImporterException(
+            String.format("Cannot find temporary uploaded attachment [%s]", attachmentReference));
     }
 
     /**

@@ -50,8 +50,7 @@ public class DocumentColorThemeReference implements ColorThemeReference
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof DocumentColorThemeReference) {
-            DocumentColorThemeReference documentSkinReference = (DocumentColorThemeReference) o;
+        if (o instanceof DocumentColorThemeReference documentSkinReference) {
             return colorThemeDocument.equals(documentSkinReference.colorThemeDocument);
         }
         return false;

@@ -27,13 +27,20 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -70,9 +77,6 @@ public class SxDocumentSource implements SxSource
     /** The document containing the extension. */
     private XWikiDocument document;
 
-    /** The current XWikiContext. */
-    private XWikiContext context;
-
     /** The type of Extension for getting the right kind of object from the document. */
     private Extension extension;
 
@@ -84,7 +88,6 @@ public class SxDocumentSource implements SxSource
      */
     public SxDocumentSource(XWikiContext context, Extension extension)
     {
-        this.context = context;
         this.document = context.getDoc();
         this.extension = extension;
     }
@@ -107,9 +110,9 @@ public class SxDocumentSource implements SxSource
                         finalCache = cache;
                     }
                 } catch (Exception ex) {
-                    LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]",
-                        new Object[]{this.document.getFullName(), sxObj.getStringValue(NAME_PROPERTY_NAME),
-                            sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME)});
+                    LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]. Root cause is [{}]",
+                        this.document.getFullName(), sxObj.getStringValue(NAME_PROPERTY_NAME),
+                        sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME), ExceptionUtils.getRootCauseMessage(ex));
                 }
             }
         }
@@ -123,12 +126,19 @@ public class SxDocumentSource implements SxSource
 
         List<BaseObject> objects = this.document.getObjects(this.extension.getClassName());
         if (objects != null) {
+            UserReference authorReference = this.document.getAuthors().getEffectiveMetadataAuthor();
+            boolean velocityAllowed = isVelocityAllowed(authorReference);
             for (BaseObject sxObj : objects) {
                 if (sxObj == null) {
                     continue;
                 }
                 String sxContent = sxObj.getLargeStringValue(CONTENT_PROPERTY_NAME);
-                int parse = sxObj.getIntValue(PARSE_CONTENT_PROPERTY_NAME);
+                boolean parseRequested = sxObj.getIntValue(PARSE_CONTENT_PROPERTY_NAME) == 1;
+                if (parseRequested && !velocityAllowed) {
+                    LOGGER.warn("The Velocity content of the skin extension [{}] is ignored because of lack of script "
+                        + "right from the author.", sxObj.getReference());
+                }
+                boolean parse = parseRequested && velocityAllowed;
                 if ("LESS".equals(sxObj.getStringValue(CONTENT_TYPE_PROPERTY_NAME))) {
                     LESSCompiler lessCompiler = Utils.getComponent(LESSCompiler.class);
                     LESSResourceReferenceFactory lessResourceReferenceFactory =
@@ -138,7 +148,7 @@ public class SxDocumentSource implements SxSource
                     LESSResourceReference lessResourceReference =
                         lessResourceReferenceFactory.createReferenceForXObjectProperty(objectPropertyReference);
                     try {
-                        sxContent = lessCompiler.compile(lessResourceReference, true, (parse == 1),
+                        sxContent = lessCompiler.compile(lessResourceReference, true, parse,
                             CachePolicy.FORBID == getCachePolicy());
                     } catch (LESSCompilerException e) {
                         // Set the error message in a CSS comment to help the developer understand why its SSX is not
@@ -146,31 +156,69 @@ public class SxDocumentSource implements SxSource
                         sxContent = String.format("/* LESS errors while parsing skin extension [%s]. */\n/* %s */",
                             sxObj.getStringValue(NAME_PROPERTY_NAME), ExceptionUtils.getRootCauseMessage(e));
                     }
-                } else if (parse == 1) {
-                    try {
-                        StringWriter writer = new StringWriter();
-                        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-                        VelocityContext vcontext = velocityManager.getVelocityContext();
-                        velocityManager.getVelocityEngine().evaluate(vcontext, writer,
-                            this.document.getPrefixedFullName(), sxContent);
-                        sxContent = writer.toString();
-                    } catch (XWikiVelocityException ex) {
-                        LOGGER.error("Failed to interpret the Velocity in skin extension [{}] with content [{}]",
-                            sxObj.getReference(), sxContent, ex);
-                    }
+                } else if (parse) {
+                    sxContent = parseContent(sxObj, sxContent, authorReference);
                 }
                 // Also add a newline, in case the different object contents don't end with a blank
                 // line, and could cause syntax errors when concatenated.
-                resultBuilder.append(sxContent + "\n");
+                resultBuilder.append(sxContent).append('\n');
             }
         }
         return resultBuilder.toString();
+    }
+
+    private String parseContent(BaseObject sxObj, String sxContent, UserReference authorReference)
+    {
+        String result = sxContent;
+        try {
+            StringWriter writer = new StringWriter();
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
+            result = authorExecutor.call(() -> {
+                VelocityContext vcontext = velocityManager.getVelocityContext();
+                velocityManager.getVelocityEngine().evaluate(vcontext, writer,
+                    this.document.getPrefixedFullName(), sxContent);
+                return writer.toString();
+            }, toDocumentReference(authorReference), this.document.getDocumentReference());
+        } catch (Exception ex) {
+            LOGGER.error("Failed to interpret the Velocity in skin extension [{}] with content [{}]",
+                sxObj.getReference(), sxContent, ex);
+        }
+        return result;
     }
 
     @Override
     public long getLastModifiedDate()
     {
         return this.document.getDate().getTime();
+    }
+
+    /**
+     * The content of an extension is evaluated with the rights of its author, so the author must be allowed to write
+     * scripts.
+     *
+     * @param authorReference the effective metadata author of the document holding the extension
+     * @return {@code true} if the Velocity content of the extensions of this document can be evaluated
+     */
+    private boolean isVelocityAllowed(UserReference authorReference)
+    {
+        DocumentAuthorizationManager authorizationManager = Utils.getComponent(DocumentAuthorizationManager.class);
+        return authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            toDocumentReference(authorReference), this.document.getDocumentReference());
+    }
+
+    /**
+     * Converts a user reference into a document reference, as expected by the authorization APIs.
+     *
+     * @param userReference the user reference to convert
+     * @return the document reference of the given user
+     */
+    private DocumentReference toDocumentReference(UserReference userReference)
+    {
+        UserReferenceSerializer<DocumentReference> userReferenceSerializer =
+            Utils.getComponent(new DefaultParameterizedType(null, UserReferenceSerializer.class,
+                DocumentReference.class), "document");
+        return userReferenceSerializer.serialize(userReference);
     }
 
 }

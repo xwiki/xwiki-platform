@@ -30,7 +30,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 
 /**
- * Remove a non-null constraint from a colomn.
+ * Remove a non-null constraint from a column.
  *
  * @version $Id$
  * @since 9.11RC1
@@ -45,7 +45,7 @@ public abstract class AbstractDropNotNullDataMigration extends AbstractHibernate
      * @param table the {@link Class} corresponding to the table from which to remove the non-null constraint
      * @param property the name of the hibernate property from which to remove the non-null constraint
      */
-    public AbstractDropNotNullDataMigration(Class<?> table, String property)
+    protected AbstractDropNotNullDataMigration(Class<?> table, String property)
     {
         this.table = table;
         this.property = property;

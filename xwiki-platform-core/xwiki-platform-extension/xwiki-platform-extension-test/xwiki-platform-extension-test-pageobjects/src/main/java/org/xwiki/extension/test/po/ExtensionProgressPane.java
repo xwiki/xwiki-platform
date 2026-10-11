@@ -63,7 +63,7 @@ public class ExtensionProgressPane extends BaseElement
      */
     public WebElement getJobLogLabel()
     {
-        String xpath = "//*[@class = 'log']/parent::dd/preceding-sibling::dt[last()]/label";
+        String xpath = "//*[@class = 'log']/parent::dd/preceding-sibling::dt[last()]/button";
         return getDriver().findElementWithoutWaiting(container, By.xpath(xpath));
     }
 
@@ -112,7 +112,7 @@ public class ExtensionProgressPane extends BaseElement
      */
     public MergeConflictPane getMergeConflict()
     {
-        if (getDriver().findElementsWithoutWaiting(container, By.name("versionToKeep")).size() > 0) {
+        if (!getDriver().findElementsWithoutWaiting(container, By.name("versionToKeep")).isEmpty()) {
             return new MergeConflictPane();
         }
         return null;
@@ -123,8 +123,9 @@ public class ExtensionProgressPane extends BaseElement
      */
     public UnusedPagesPane getUnusedPages()
     {
-        if (getDriver().findElementsWithoutWaiting(this.container, By.cssSelector(".extension-question .document-tree"))
-            .size() > 0) {
+        if (!getDriver().findElementsWithoutWaiting(this.container,
+            By.cssSelector(".extension-question .document-tree")).isEmpty())
+        {
             return new UnusedPagesPane(
                 getDriver().findElementWithoutWaiting(container, By.className("extension-question")));
         }

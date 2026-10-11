@@ -137,8 +137,8 @@ public class LogoAttachmentExtractor
     {
         InputSource inputSource = sourceImageIS.getInputSource();
 
-        if (inputSource instanceof InputStreamInputSource) {
-            try (InputStreamInputSource inputStreamSource = (InputStreamInputSource) inputSource) {
+        if (inputSource instanceof InputStreamInputSource inputStreamSource) {
+            try (inputStreamSource) {
                 XWikiAttachmentContent content = new XWikiAttachmentContent();
                 content.setContent(inputStreamSource.getInputStream());
 

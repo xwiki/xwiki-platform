@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.validation.EntityNameValidation;
-import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
+import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
 import org.xwiki.model.validation.internal.SlugEntityNameValidationConfiguration;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -86,7 +86,7 @@ class ModelValidationScriptServiceTest
     private EntityReference entityReferenceTarget;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         when(this.nameStrategy.transform(TEST_NAME)).thenReturn(TRANSFORMED_NAME);
         when(this.nameStrategy.transform(this.entityReferenceSource)).thenReturn(this.entityReferenceTarget);

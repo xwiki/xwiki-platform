@@ -19,20 +19,23 @@
  */
 package org.xwiki.wysiwyg.internal.importer;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link OfficeMacroImporter}.
@@ -40,23 +43,25 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 9.8
  */
-public class OfficeMacroImporterTest
+@ComponentTest
+class OfficeMacroImporterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<OfficeMacroImporter> mocker =
-        new MockitoComponentMockingRule<>(OfficeMacroImporter.class);
+    @InjectMockComponents
+    private OfficeMacroImporter officeMacroImporter;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
 
     @Test
-    public void buildXDOM() throws Exception
+    void buildXDOM() throws Exception
     {
-        DocumentAccessBridge documentAccessBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         XWikiDocument xwikiDocument = mock(XWikiDocument.class);
-        when(documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(xwikiDocument);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference)).thenReturn(xwikiDocument);
         when(xwikiDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
         XDOM xdom =
-            this.mocker.getComponentUnderTest().buildXDOM(new AttachmentReference("file", documentReference), true);
+            this.officeMacroImporter.buildXDOM(new AttachmentReference("file", documentReference), true);
 
         assertNotNull(xdom);
 

@@ -214,7 +214,7 @@
           #submenuseparator()
           #set ($canHaveMenuSeparator = false)
         #end
-        #set ($content = $services.rendering.render($uix.execute(), 'html/5.0'))
+        #set ($content = $services.uix.render($uix, 'html/5.0'))
         $content
         #if (!$canHaveMenuSeparator &amp;&amp; $stringtool.isNotBlank($content))
           #set ($canHaveMenuSeparator = true)

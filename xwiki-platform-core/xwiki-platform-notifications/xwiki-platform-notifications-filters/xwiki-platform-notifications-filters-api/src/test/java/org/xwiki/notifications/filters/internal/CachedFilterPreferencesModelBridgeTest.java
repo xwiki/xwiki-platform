@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,11 +56,11 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class CachedFilterPreferencesModelBridgeTest
 {
-    private final static DocumentReference USER = new DocumentReference("wiki", "XWiki", "User");
+    private static final DocumentReference USER = new DocumentReference("wiki", "XWiki", "User");
 
-    private final static String USER_STRING = "wiki:XWiki.User";
+    private static final String USER_STRING = "wiki:XWiki.User";
 
-    private final static WikiReference WIKI = new WikiReference("wiki");
+    private static final WikiReference WIKI = new WikiReference("wiki");
 
     @InjectMockComponents
     private CachedFilterPreferencesModelBridge cachedModelBridge;
@@ -120,7 +119,7 @@ class CachedFilterPreferencesModelBridgeTest
     void saveFilterPreferencesForUser() throws Exception
     {
         List<NotificationFilterPreference> filterPreferenceList =
-            Arrays.asList(mock(NotificationFilterPreference.class), mock(NotificationFilterPreference.class));
+            List.of(mock(NotificationFilterPreference.class), mock(NotificationFilterPreference.class));
 
         this.cachedModelBridge.saveFilterPreferences(USER, filterPreferenceList);
 
@@ -131,7 +130,7 @@ class CachedFilterPreferencesModelBridgeTest
     void saveFilterPreferencesForWiki() throws Exception
     {
         List<NotificationFilterPreference> filterPreferenceList =
-            Arrays.asList(mock(NotificationFilterPreference.class), mock(NotificationFilterPreference.class));
+            List.of(mock(NotificationFilterPreference.class), mock(NotificationFilterPreference.class));
 
         this.cachedModelBridge.saveFilterPreferences(WIKI, filterPreferenceList);
 

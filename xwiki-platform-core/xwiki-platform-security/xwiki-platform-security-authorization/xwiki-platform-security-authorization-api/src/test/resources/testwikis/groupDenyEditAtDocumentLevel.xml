@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#groupDenyEditAtDocumentLevel() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" alt="Main Wiki without any rule">
+    <user name="userA" alt="a member of groupA" />
+    <user name="userB" alt="a user which is not a member of groupA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+
+    <space name="space" alt="a space without any rule">
+      <document name="any document" />
+
+      <document name="docDenyEditToGroupA" alt="a document denying the edit right to groupA">
+        <denyGroup name="groupA" type="edit" />
+      </document>
+    </space>
+  </wiki>
+</wikis>

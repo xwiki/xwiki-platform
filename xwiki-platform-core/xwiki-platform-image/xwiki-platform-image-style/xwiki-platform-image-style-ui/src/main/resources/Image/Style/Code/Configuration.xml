@@ -325,7 +325,7 @@
       <displayInSection>image.style</displayInSection>
     </property>
     <property>
-      <heading>$services.localization.render('image.style.admin.heading')</heading>
+      <heading/>
     </property>
     <property>
       <iconAttachment/>

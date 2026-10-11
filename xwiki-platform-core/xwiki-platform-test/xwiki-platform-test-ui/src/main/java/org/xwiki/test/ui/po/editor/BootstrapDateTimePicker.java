@@ -261,8 +261,8 @@ public class BootstrapDateTimePicker extends BaseElement
      */
     public boolean hasTimePicker()
     {
-        return getDriver().findElementsWithoutWaiting(this.container,
-            By.cssSelector("[data-action='togglePicker'][title='Select Time']")).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(this.container,
+            By.cssSelector("[data-action='togglePicker'][title='Select Time']")).isEmpty();
     }
 
     /**

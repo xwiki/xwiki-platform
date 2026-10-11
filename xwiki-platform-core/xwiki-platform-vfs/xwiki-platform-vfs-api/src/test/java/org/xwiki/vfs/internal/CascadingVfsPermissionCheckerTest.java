@@ -128,7 +128,7 @@ class CascadingVfsPermissionCheckerTest
     }
 
     @Test
-    public void checkPermissionWhenNoSpecificSchemeCheckerAndNotAllowed() throws Exception
+    void checkPermissionWhenNoSpecificSchemeCheckerAndNotAllowed() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(URI.create("customscheme:whatever"), "whatever");
 

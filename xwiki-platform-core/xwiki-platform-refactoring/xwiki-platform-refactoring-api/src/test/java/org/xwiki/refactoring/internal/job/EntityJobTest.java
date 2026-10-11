@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class EntityJobTest extends AbstractEntityJobTest
+class EntityJobTest extends AbstractEntityJobTest
 {
     public static class NoopEntityJob extends AbstractEntityJob<EntityRequest, EntityJobStatus<EntityRequest>>
     {
@@ -159,7 +159,7 @@ public class EntityJobTest extends AbstractEntityJobTest
         initialize(new EntityRequest());
 
         final List<DocumentReference> documentReferences = new ArrayList<>();
-        this.job.visitDocuments(spaceReference, documentReference -> documentReferences.add(documentReference));
+        this.job.visitDocuments(spaceReference, documentReferences::add);
         // Space preferences documents are handled after their siblings.
         assertEquals(Arrays.asList(carolBio, aliceBio, bobBio, bob, bobPrefs, alice, alicePrefs), documentReferences);
     }

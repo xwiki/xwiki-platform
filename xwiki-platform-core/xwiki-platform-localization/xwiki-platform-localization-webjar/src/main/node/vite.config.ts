@@ -25,7 +25,6 @@ import { resolve } from "node:path";
 export default mergeConfig(
   generateWebjarNodeConfig(import.meta.url, [
     "@xwiki/platform-localization-default",
-    "@xwiki/platform-localization-resolver-dom",
     "@xwiki/platform-localization-resolver-xwiki-rest",
   ]),
   {

@@ -58,35 +58,55 @@ define('xwiki-wysiwyg-macro-service', [
     return deferred.promise();
   }
 
-  let getMacroParametersFromHTML = function (
+  let convertMacroParameters = async function (
     macroId,
     parameters = {},
-    sourceDocumentReference = XWiki.currentDocument.documentReference
+    sourceDocumentReference = XWiki.currentDocument.documentReference,
+    inputSyntax = undefined,
+    outputSyntaxId = undefined
   ) {
-    let deferred = $.Deferred();
-    if (!Object.keys(parameters).length) {
-      return deferred.resolve(parameters);
-    } else {
+    if (Object.keys(parameters).length) {
       let url = new XWiki.Document(sourceDocumentReference).getURL('get', $.param({
         language: $('html').attr('lang'),
         sheet: 'XWiki.WYSIWYG.MacroService',
       }));
-      $.post(url, {
+      const outputSyntax = resolveSyntax(outputSyntaxId) || getSyntaxFromMacroId(macroId);
+      parameters = await $.post(url, {
         data: 'macroParameters',
         macroId,
         macroParameters: JSON.stringify(parameters),
-      }).done(function (parameters) {
-        if (typeof parameters === 'object' && parameters !== null) {
-          deferred.resolve(parameters);
-        } else {
-          deferred.reject(...arguments);
-        }
-      }).fail(function (...args) {
-        deferred.reject(...args);
+        inputSyntax,
+        outputSyntax: outputSyntax?.type,
+        outputSyntaxVersion: outputSyntax?.version
       });
-      return deferred.promise();
+      if (typeof parameters === 'object' && parameters !== null) {
+        return parameters;
+      } else {
+        throw new Error('Unexpected conversion result: ' + JSON.stringify(parameters));
+      }
+    } else {
+      return parameters;
     }
   };
+
+  function resolveSyntax(syntaxId) {
+    if (syntaxId) {
+      const versionStart = syntaxId.lastIndexOf('/');
+      if (versionStart > 0) {
+        return {type: syntaxId.substring(0, versionStart), version: syntaxId.substring(versionStart + 1)};
+      } else {
+        return {type: syntaxId, version: undefined};
+      }
+    }
+  }
+
+  function getSyntaxFromMacroId(macroId) {
+    const syntaxStart = macroId.indexOf('/');
+    if (syntaxStart > 0) {
+      const syntaxId = macroId.substring(syntaxStart + 1);
+      return resolveSyntax(syntaxId);
+    }
+  }
 
   const macrosBySyntax = {};
 
@@ -145,6 +165,6 @@ define('xwiki-wysiwyg-macro-service', [
     getMacroDescriptor,
     installMacro,
     getMacros,
-    getMacroParametersFromHTML
+    convertMacroParameters
   };
 });

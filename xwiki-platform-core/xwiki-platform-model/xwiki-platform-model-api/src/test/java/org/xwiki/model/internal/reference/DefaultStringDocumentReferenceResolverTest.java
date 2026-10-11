@@ -19,46 +19,47 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver}.
- * 
+ *
  * @version $Id$
  */
+@ComponentTest
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class DefaultStringDocumentReferenceResolverTest
+class DefaultStringDocumentReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultStringEntityReferenceResolver> mocker =
-        new MockitoComponentMockingRule<>(DefaultStringEntityReferenceResolver.class);
+    @InjectMockComponents
+    private DefaultStringEntityReferenceResolver entityReferenceResolver;
 
     private DocumentReferenceResolver<String> resolver;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
         this.resolver = new DefaultStringDocumentReferenceResolver();
-        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.mocker.getComponentUnderTest());
+        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.entityReferenceResolver);
     }
 
     @Test
-    public void resolveWithExplicitDocumentReference()
+    void resolveWithExplicitDocumentReference()
     {
         DocumentReference reference = this.resolver.resolve("", new DocumentReference("wiki", "space", "page"));
 
-        Assert.assertEquals("page", reference.getName());
-        Assert.assertEquals("space", reference.getLastSpaceReference().getName());
-        Assert.assertEquals("wiki", reference.getWikiReference().getName());
+        assertEquals("page", reference.getName());
+        assertEquals("space", reference.getLastSpaceReference().getName());
+        assertEquals("wiki", reference.getWikiReference().getName());
     }
 }

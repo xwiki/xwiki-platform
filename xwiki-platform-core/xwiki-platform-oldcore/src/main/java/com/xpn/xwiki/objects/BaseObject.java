@@ -80,9 +80,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
      * </p>
      *
-     * @deprecated since 2.2M2 use {@link #getDocumentReference()}
+     * @deprecated use {@link #getDocumentReference()}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public String getName()
     {
@@ -95,9 +95,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
      * </p>
      *
-     * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
+     * @deprecated use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public void setName(String name)
     {
@@ -341,11 +341,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             return false;
         }
 
-        if (getNumber() != ((BaseObject) obj).getNumber()) {
-            return false;
-        }
-
-        return true;
+        return getNumber() == ((BaseObject) obj).getNumber();
     }
 
     @Override
@@ -407,17 +403,15 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         if (!isSensitive && oldProperty != null) {
             isSensitive = oldProperty.isSensitive(context);
         }
-        if (newProperty == null) {
-            // The property exists in the old object, but not in the new one
-            if ((oldProperty != null) && (!oldProperty.toText().isEmpty())) {
-                String oldPropertyValue = getDiffPropertyValue(context, oldProperty, oldpclass, propertyName,
-                    oldObject);
-                String pClassType = (oldpclass != null) ? oldpclass.getClassType() : "";
-                difflist.add(
-                    new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
-                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, pClassType, oldPropertyValue, "",
-                        isSensitive));
-            }
+        // The property exists in the old object, but not in the new one
+        if (newProperty == null && (oldProperty != null) && (!oldProperty.toText().isEmpty())) {
+            String oldPropertyValue = getDiffPropertyValue(context, oldProperty, oldpclass, propertyName,
+                oldObject);
+            String pClassType = (oldpclass != null) ? oldpclass.getClassType() : "";
+            difflist.add(
+                new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
+                    ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, pClassType, oldPropertyValue, "",
+                    isSensitive));
         }
     }
 
@@ -501,7 +495,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     /**
      * Set the defined property with the given value in the current object.
      * The given value might be a {@link String} or a type supported by the property. If a {@link String} is given
-     * then {@link com.xpn.xwiki.objects.classes.PropertyClassInterface#fromString(String)} will be used.
+     * then {@link com.xpn.xwiki.objects.classes.PropertyClassInterface#fromString(String)} will be used: if it
+     * returns {@code null}, the property is left unchanged.
      * @param fieldname the name of the property to set
      * @param value the value to set
      * @param context the context to use for setting the value
@@ -513,14 +508,16 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         BaseProperty prop = (BaseProperty) safeget(fieldname);
         boolean createProp = false;
-        if ((value instanceof String) && (pclass != null)) {
-            BaseProperty newProp = pclass.fromString((String) value);
+        if ((value instanceof String stringValue) && (pclass != null)) {
+            BaseProperty newProp = pclass.fromString(stringValue);
             if (prop == null) {
                 prop = newProp;
                 createProp = true;
-            } else {
+            } else if (newProp != null) {
                 prop.setValue(newProp.getValue());
             }
+            // When fromString returns null (e.g. PasswordClass for the password placeholder sent back by a form),
+            // the existing property keeps its current value.
         } else {
             if ((prop == null) && (pclass != null)) {
                 prop = pclass.newProperty();

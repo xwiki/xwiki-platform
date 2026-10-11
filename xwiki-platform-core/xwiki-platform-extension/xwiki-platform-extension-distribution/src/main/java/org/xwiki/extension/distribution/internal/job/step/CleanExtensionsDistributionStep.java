@@ -24,6 +24,7 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -95,8 +96,9 @@ public class CleanExtensionsDistributionStep extends AbstractExtensionDistributi
                         }
                     }
                 } catch (ResolveException e) {
-                    this.logger.warn("Failed to resolve backward dependencies for extension id [{}] on namespace [{}]",
-                        installedExtension.getId().getId(), namespace);
+                    this.logger.warn("Failed to resolve backward dependencies for extension id [{}] on namespace "
+                        + "[{}]. Root cause is [{}]", installedExtension.getId().getId(), namespace,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }

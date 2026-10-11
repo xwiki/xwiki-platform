@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { collaborationManagerName } from "./collaborationManagerName";
+import { collaborationManagerName } from "./collaborationManager";
 import { inject, injectable } from "inversify";
 import type { CollaborationManager } from "./collaborationManager";
 import type { CollaborationManagerProvider } from "./collaborationManagerProvider";

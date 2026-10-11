@@ -22,40 +22,47 @@ package org.xwiki.mail.internal.factory.files;
 import javax.inject.Provider;
 import javax.mail.MessagingException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.factory.files.SerializedFilesMimeMessageFactory}.
+ * Unit tests for {@link SerializedFilesMimeMessageFactory}.
  *
  * @version $Id$
  * @since 6.4.1
  */
-public class SerializedFilesMimeMessageFactoryTest
+@ComponentTest
+class SerializedFilesMimeMessageFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<SerializedFilesMimeMessageFactory> mocker =
-        new MockitoComponentMockingRule<>(SerializedFilesMimeMessageFactory.class);
+    @InjectMockComponents
+    private SerializedFilesMimeMessageFactory factory;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @BeforeComponent
+    void beforeComponent() throws Exception
+    {
+        Provider<ComponentManager> contextProvider = this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        when(contextProvider.get()).thenReturn(this.componentManager);
+    }
 
     @Test
-    public void createMessageWhenNoExecution() throws Exception
+    void createMessageWhenNoExecution()
     {
-        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(componentManagerProvider.get()).thenReturn(this.mocker);
-
-        try {
-            this.mocker.getComponentUnderTest().createMessage("batchId", null);
-            fail("Should have thrown an exception");
-        } catch (MessagingException expected) {
-            assertEquals("Failed to find an Environment Component", expected.getMessage());
-        }
+        Throwable exception = assertThrows(MessagingException.class, () ->
+            this.factory.createMessage("batchId", null));
+        assertEquals("Failed to find an Environment Component", exception.getMessage());
     }
 }

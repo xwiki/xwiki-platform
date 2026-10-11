@@ -24,7 +24,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 /**
  * Configurator interface.
  *
- * Currently, the parameter handling in the Chart macro is a mess, whith most things thrown into the generic "param"
+ * Currently, the parameter handling in the Chart macro is a mess, with most things thrown into the generic "param"
  * parameter.  The configurator interface is used by classes that use the macro parameters for configuration.
  *
  * All parameters will be set by calling setParameter in all configurators before the validation is performed.

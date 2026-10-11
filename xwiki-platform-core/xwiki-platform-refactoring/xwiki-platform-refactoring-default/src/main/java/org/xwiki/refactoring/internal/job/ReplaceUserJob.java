@@ -79,7 +79,7 @@ public class ReplaceUserJob extends AbstractReplaceUserJob
             document.setCreatorReference(getRequest().getNewUserReference());
             updatedFields.add("creator");
         }
-        if (updatedFields.size() > 0) {
+        if (!updatedFields.isEmpty()) {
             XWikiContext xcontext = this.xcontextProvider.get();
             String comment = String.format("Replaced user [%s] in fields %s to user [%s]",
                 getRequest().getOldUserReference(), updatedFields, getRequest().getNewUserReference());

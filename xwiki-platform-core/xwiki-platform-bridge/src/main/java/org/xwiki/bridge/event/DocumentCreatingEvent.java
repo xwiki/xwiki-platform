@@ -50,7 +50,7 @@ public class DocumentCreatingEvent extends AbstractDocumentEvent
      */
     public DocumentCreatingEvent()
     {
-        super();
+        // Nothing to do.
     }
     
     /**

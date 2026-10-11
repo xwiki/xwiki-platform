@@ -68,13 +68,14 @@ public class PageTranslationResourceImpl extends ModifiablePageResource implemen
     }
 
     @Override
-    public void deletePageTranslation(String wikiName, String spaceName, String pageName, String language)
+    public void deletePageTranslation(String wikiName, String spaceName, String pageName, String language,
+        Boolean skipRecycleBin)
         throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, true, false);
 
-            deletePage(documentInfo);
+            deletePage(documentInfo, skipRecycleBin);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

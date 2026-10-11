@@ -31,35 +31,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for cleaning html lists in {@link OfficeHTMLCleaner}.
- * 
+ *
  * @version $Id$
  * @since 1.8
  */
 @ComponentTest
-public class ListOfficeCleaningTest extends AbstractHTMLCleaningTest
+class ListOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * If there are leading spaces within the content of a list item ({@code<li/>}) they should be trimmed.
      */
     @Test
-    public void listItemContentLeadingSpaceTrimming()
+    void listItemContentLeadingSpaceTrimming()
     {
-        String html = header + "<ol><li> Test</li></ol>" + footer;
-        Document doc = officeHTMLCleaner.clean(new StringReader(html));
+        String html = this.header + "<ol><li> Test</li></ol>" + this.footer;
+        Document doc = this.officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("li");
         Node listContent = nodes.item(0).getFirstChild();
         assertEquals(Node.TEXT_NODE, listContent.getNodeType());
         assertEquals("Test", listContent.getNodeValue());
     }
-    
+
     /**
      * If there is a leading paragraph inside a list item, it should be replaced with it's content.
      */
     @Test
-    public void listItemContentIsolatedParagraphCleaning()
+    void listItemContentIsolatedParagraphCleaning()
     {
-        String html = header + "<ol><li><p>Test</p></li></ol>" + footer;
-        Document doc = officeHTMLCleaner.clean(new StringReader(html));
+        String html = this.header + "<ol><li><p>Test</p></li></ol>" + this.footer;
+        Document doc = this.officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("li");
         Node listContent = nodes.item(0).getFirstChild();
         assertEquals(Node.TEXT_NODE, listContent.getNodeType());

@@ -19,33 +19,34 @@
  */
 package org.xwiki.extension.xar.internal.question;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.extension.xar.question.CleanPagesQuestion;
 import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link CleanPagesQuestionRecorder}.
- * 
+ *
  * @version $Id$
  * @since 7.1RC1
  */
-public class CleanPagesQuestionRecorderTest
+class CleanPagesQuestionRecorderTest
 {
     @Test
-    public void recordAndReplay()
+    void recordAndReplay()
     {
         DocumentReference aliceReference = new DocumentReference("dev", "Users", "Alice");
         DocumentReference bobReference = new DocumentReference("dev", "Users", "Bob");
         DocumentReference carolReference = new DocumentReference("dev", "Users", "Carol");
 
-        CleanPagesQuestion firstQuestion = new CleanPagesQuestion(Arrays.asList(aliceReference, bobReference));
+        CleanPagesQuestion firstQuestion = new CleanPagesQuestion(List.of(aliceReference, bobReference));
         firstQuestion.getPages().put(aliceReference, false);
 
-        CleanPagesQuestion secondQuestion = new CleanPagesQuestion(Arrays.asList(carolReference));
+        CleanPagesQuestion secondQuestion = new CleanPagesQuestion(List.of(carolReference));
         secondQuestion.getPages().put(carolReference, false);
 
         CleanPagesQuestionRecorder recorder = new CleanPagesQuestionRecorder();
@@ -56,7 +57,7 @@ public class CleanPagesQuestionRecorderTest
         DocumentReference johnReference = new DocumentReference("drafts", "Users", "John");
         DocumentReference aliceDraftsRef =
             aliceReference.replaceParent(aliceReference.getWikiReference(), johnReference.getWikiReference());
-        CleanPagesQuestion thirdQuestion = new CleanPagesQuestion(Arrays.asList(aliceDraftsRef, johnReference));
+        CleanPagesQuestion thirdQuestion = new CleanPagesQuestion(List.of(aliceDraftsRef, johnReference));
         assertFalse(recorder.replay(thirdQuestion));
         assertFalse(thirdQuestion.getPages().get(aliceDraftsRef));
         assertTrue(thirdQuestion.getPages().get(johnReference));
@@ -65,7 +66,7 @@ public class CleanPagesQuestionRecorderTest
             bobReference.replaceParent(bobReference.getWikiReference(), johnReference.getWikiReference());
         DocumentReference carolDraftsRef =
             carolReference.replaceParent(carolReference.getWikiReference(), johnReference.getWikiReference());
-        CleanPagesQuestion fourthQuestion = new CleanPagesQuestion(Arrays.asList(bobDraftsRef, carolDraftsRef));
+        CleanPagesQuestion fourthQuestion = new CleanPagesQuestion(List.of(bobDraftsRef, carolDraftsRef));
         assertTrue(recorder.replay(fourthQuestion));
         assertTrue(fourthQuestion.getPages().get(bobDraftsRef));
         assertFalse(fourthQuestion.getPages().get(carolDraftsRef));

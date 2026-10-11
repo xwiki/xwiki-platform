@@ -31,7 +31,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -145,8 +146,8 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         Response response = this.container.getResponse();
         response.setContentType("application/json; charset=utf-8");
 
-        if (response instanceof ServletResponse) {
-            ((ServletResponse) response).getHttpServletResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
+        if (response instanceof ServletResponse servletResponse) {
+            servletResponse.getResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
         }
 
         // TODO: Send back a REST version of the job status
@@ -177,7 +178,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     private void addUse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status, Response response)
     {
         Map<String, Collection<Object>> uses = status.getUses();
-        if (uses != null && response instanceof ServletResponse) {
+        if (uses != null && response instanceof ServletResponse servletResponse) {
             // Create the asynchronous HTML meta
             StringBuilder head = new StringBuilder();
             StringBuilder scripts = new StringBuilder();
@@ -195,11 +196,11 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
                     this.logger.error("Failed to get HTML head for handler type [{}]", entry.getKey(), e);
                 }
             }
-            if (head.length() > 0) {
-                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
+            if (!head.isEmpty()) {
+                servletResponse.getResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
             }
-            if (scripts.length() > 0) {
-                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
+            if (!scripts.isEmpty()) {
+                servletResponse.getResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
                     scripts.toString());
             }
         }

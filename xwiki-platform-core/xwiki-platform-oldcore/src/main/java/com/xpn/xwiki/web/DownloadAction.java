@@ -22,8 +22,6 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +41,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -80,7 +78,7 @@ public class DownloadAction extends XWikiAction
 
     /** List of authorized attachment mimetypes. */
     public static final List<String> MIMETYPE_WHITELIST =
-        Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
+        List.of("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
             "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg",
             "image/png", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf", "video/mpeg",
             "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", "video/x-flv");
@@ -104,10 +102,13 @@ public class DownloadAction extends XWikiAction
     private static final String RANGE_HEADER_NAME = "Range";
 
     /** The format of a valid range header. */
-    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
+    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=(\\d+)?-(\\d+)?");
 
     @Inject
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
 
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -248,7 +249,7 @@ public class DownloadAction extends XWikiAction
                 end = attachment.getContentLongSize(context) - 1L;
             }
             end = Math.min(end, attachment.getContentLongSize(context) - 1L);
-            writeByteRange(attachment, start, end, request, response, context);
+            writeByteRange(attachment, start, end, response, context);
             return true;
         }
         return false;
@@ -261,27 +262,32 @@ public class DownloadAction extends XWikiAction
      * @param attachment the attachment to get content from
      * @param start the first byte to write
      * @param end the last byte to write
-     * @param request the current client request
      * @param response the response to write to.
      * @param context the current request context
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
-    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end, final XWikiRequest request,
+    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end,
         final XWikiResponse response, final XWikiContext context) throws XWikiException, IOException
     {
         if (start >= 0 && start < attachment.getContentLongSize(context)) {
-            InputStream data = attachment.getContentInputStream(context);
-            data = new BoundedInputStream(data, end + 1);
-            data.skip(start);
-            setCommonHeaders(attachment, request, response, context);
-            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-            if ((end - start + 1L) < Integer.MAX_VALUE) {
-                setContentLength(response, end - start + 1);
+            try (InputStream data = attachment.getContentInputStream(context)) {
+                InputStream boundedData = BoundedInputStream.builder().setInputStream(data).setMaxCount(end + 1).get();
+                long skip = boundedData.skip(start);
+                if (skip != start) {
+                    throw new IOException(
+                        String.format("Error while skipping [%s] data for [%s]: [%s] data skipped.",
+                            start, attachment.getReference(), skip));
+                }
+                setCommonHeaders(attachment, response, context);
+                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+                if ((end - start + 1L) < Integer.MAX_VALUE) {
+                    setContentLength(response, end - start + 1);
+                }
+                response.setHeader("Content-Range",
+                    "bytes " + start + "-" + end + SEPARATOR + attachment.getContentLongSize(context));
+                IOUtils.copyLarge(boundedData, response.getOutputStream());
             }
-            response.setHeader("Content-Range",
-                "bytes " + start + "-" + end + SEPARATOR + attachment.getContentLongSize(context));
-            IOUtils.copyLarge(data, response.getOutputStream());
         } else {
             response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
         }
@@ -302,7 +308,7 @@ public class DownloadAction extends XWikiAction
     {
         InputStream stream = null;
         try {
-            setCommonHeaders(attachment, request, response, context);
+            setCommonHeaders(attachment, response, context);
             setContentLength(response, attachment.getContentLongSize(context));
             stream = attachment.getContentInputStream(context);
             IOUtils.copy(stream, response.getOutputStream());
@@ -414,6 +420,12 @@ public class DownloadAction extends XWikiAction
 
     private XWikiAttachment getAttachment(XWikiRequest request, XWikiDocument document, String filename)
     {
+        // The document comes from the context and is null when the URL didn't resolve to one. There's then no
+        // attachment to look for here and the caller falls back on re-parsing the URL.
+        if (document == null) {
+            return null;
+        }
+
         XWikiAttachment attachment = null;
 
         String idStr = request.getParameter("id");
@@ -451,12 +463,10 @@ public class DownloadAction extends XWikiAction
      * Set the response HTTP headers common to both partial (Range) and full responses.
      *
      * @param attachment the attachment to get content from
-     * @param request the current client request
      * @param response the response to write to.
      * @param context the current request context
      */
-    private void setCommonHeaders(final XWikiAttachment attachment, final XWikiRequest request,
-        final XWikiResponse response, final XWikiContext context)
+    private void setCommonHeaders(XWikiAttachment attachment, XWikiResponse response, XWikiContext context)
     {
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
@@ -468,31 +478,9 @@ public class DownloadAction extends XWikiAction
             response.setCharacterEncoding(characterEncoding);
         }
 
-        String ofilename = Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", "%20");
-
-        // The inline attribute of Content-Disposition tells the browser that they should display
-        // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
-        // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
-        // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
-        // Save dialog box (exe, zip, xar, etc).
-        String dispType = "inline";
-
-        // Determine whether the user who attached the file has Programming Rights or not.
-        boolean hasPR = false;
-        String author = attachment.getAuthor();
-        try {
-            hasPR = context.getWiki().getRightService().hasAccessLevel("programming", author, "XWiki.XWikiPreferences",
-                context);
-        } catch (Exception e) {
-            hasPR = false;
-        }
-        // If the mimetype is not authorized to be displayed inline, let's force its content disposition to download.
-        if (shouldBeDownloaded(hasPR, request, mimetype)) {
-            dispType = ATTACHMENT;
-        }
-        // Use RFC 2231 for encoding filenames, since the normal HTTP headers only allows ASCII characters.
-        // See http://tools.ietf.org/html/rfc2231 for more details.
-        response.addHeader("Content-disposition", dispType + "; filename*=utf-8''" + ofilename);
+        boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(attachment);
+        response.addHeader("Content-disposition",
+            attachmentSecurityManager.getContentDispositionHeader(attachment.getFilename(), shouldBeDownloaded));
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Advertise that downloads can be resumed
@@ -504,9 +492,9 @@ public class DownloadAction extends XWikiAction
      * at least one of the ends must be specified, and if both are present, the range end must be greater than the range
      * start.
      *
-     * @param start the requested range start, i.e. the first byte to be transfered, or {@code null} if missing from the
-     *            Range header
-     * @param end the requested range end, i.e. the last byte to be transfered, or {@code null} if missing from the
+     * @param start the requested range start, i.e. the first byte to be transferred, or {@code null} if missing from
+     *            the Range header
+     * @param end the requested range end, i.e. the last byte to be transferred, or {@code null} if missing from the
      *            Range header
      * @return {@code true} if the range is valid, {@code false} otherwise
      */
@@ -516,50 +504,5 @@ public class DownloadAction extends XWikiAction
             return false;
         }
         return start == null || end == null || end >= start;
-    }
-
-    /**
-     * Check if an attachment should be downloaded or can be displayed inline.
-     * Attachments should be downloaded if:
-     * <ul>
-     *     <li>the request contains a force-download parameter with the value 1</li>
-     *     <li>or the mimetype is part of the forceDownload property list</li>
-     *     <li>or no custom whitelist exists and a custom blacklist exists and contains the mimetype and the attachment
-     *     has not been added by a user with programming rights</li>
-     *     <li>or the whitelist (default or custom) does not contains the mimetype and the attachment has not been added
-     *     by a user with programming rights</li>
-     * </ul>
-     *
-     * Note that in the case of the request does not contain a force-downloaded parameter with the value 1 and the
-     * mimetype is not part of the forceDownload property list, but the attachment has been added by a user with
-     * programming right, then the attachment is always displayed inline.
-     *
-     * @param hasPR a boolean indicating if the attachment has been added by someone with programming rights.
-     * @param request the current download request.
-     * @param mimeType the mimetype of the attachment.
-     * @return {@code true} if the attachment should be downloaded, and {@code false} if it can be displayed inline.
-     */
-    private boolean shouldBeDownloaded(boolean hasPR, XWikiRequest request, String mimeType)
-    {
-        boolean result;
-        ConfigurationSource configuration = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
-
-        boolean whiteListExists = configuration.containsKey(WHITELIST_PROPERTY);
-        boolean blackListExists = configuration.containsKey(BLACKLIST_PROPERTY);
-        List<String> blackList = configuration.getProperty(BLACKLIST_PROPERTY, Collections.emptyList());
-        List<String> whiteList = configuration.getProperty(WHITELIST_PROPERTY, MIMETYPE_WHITELIST);
-        List<String> forceDownloadList = configuration.getProperty(FORCE_DOWNLOAD_PROPERTY, Collections.emptyList());
-
-        if ("1".equals(request.getParameter("force-download")) || forceDownloadList.contains(mimeType)) {
-            result = true;
-        } else if (hasPR) {
-            result = false;
-        } else if (blackListExists && !whiteListExists) {
-            result = blackList.contains(mimeType);
-        } else {
-            result = !whiteList.contains(mimeType);
-        }
-
-        return result;
     }
 }

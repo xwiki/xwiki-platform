@@ -63,6 +63,11 @@ import static org.junit.jupiter.api.Assertions.fail;
     "xwikiPropertiesAdditionalProperties=url.trustedDomains=www.xwiki.org,extensions.xwiki.org\n"
         + "url.frontendUrlCheckPolicy=comments\n"
         + "url.allowedFrontendUrls=https://github.com/xwiki/xwiki-platform,https://github.com/xwiki/"
+}, extraJARs = {
+    // The macro service uses the extension index script service to get the list of uninstalled macros (from
+    // extensions) which expects an implementation of the extension index. The extension index script service is a
+    // core extension so we need to make the extension index also core.
+    "org.xwiki.platform:xwiki-platform-extension-index"
 })
 public class NavigationIT
 {
@@ -226,11 +231,14 @@ public class NavigationIT
      */
     @Order(4)
     @Test
-    public void simpleBinUrlDoesNotThrowException(TestUtils testUtils)
+    void simpleBinUrlDoesNotThrowException(TestUtils testUtils)
     {
+        // Create the main page so we can assert its title later.
+        testUtils.createPage("Main", "WebHome", "", "Home Page");
+
         testUtils.gotoPage(testUtils.getBaseBinURL());
         ViewPage viewPage = new ViewPage();
-        assertEquals("XWiki - Main - Main", viewPage.getPageTitle());
+        assertEquals("XWiki - Main - Home Page", viewPage.getPageTitle());
     }
 
     @Order(5)

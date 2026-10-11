@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.internal.transformation.macro;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 
@@ -100,7 +100,7 @@ class CurrentMacroEntityReferenceResolverTest
 
         Block wordBlock = new WordBlock("whatever");
         MetaData metaData =
-            new MetaData(Collections.singletonMap(MetaData.BASE, "basewiki:basespace.basepage"));
+            new MetaData(Map.of(MetaData.BASE, "basewiki:basespace.basepage"));
         new XDOM(List.of(new MetaDataBlock(List.of(wordBlock), metaData)));
 
         assertEquals(expectedReference, this.resolver.resolve("file", EntityType.ATTACHMENT, wordBlock));

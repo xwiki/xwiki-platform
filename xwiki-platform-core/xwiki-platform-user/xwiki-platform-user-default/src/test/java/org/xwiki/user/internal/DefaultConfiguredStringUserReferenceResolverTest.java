@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
  * @since 12.8RC1
  */
 @ComponentTest
-public class DefaultConfiguredStringUserReferenceResolverTest
+class DefaultConfiguredStringUserReferenceResolverTest
 {
     @InjectMockComponents
     private DefaultConfiguredStringUserReferenceResolver resolver;

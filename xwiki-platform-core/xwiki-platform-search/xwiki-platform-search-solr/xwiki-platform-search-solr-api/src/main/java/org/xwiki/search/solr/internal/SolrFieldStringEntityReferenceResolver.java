@@ -73,7 +73,7 @@ public class SolrFieldStringEntityReferenceResolver extends AbstractEntityRefere
     @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
-        EntityType[] entityTypesForType = ENTITY_TYPES.get(type);
+        EntityType[] entityTypesForType = type != null ? ENTITY_TYPES.get(type) : null;
         if (entityTypesForType == null) {
             throw new RuntimeException("No parsing definition found for Entity Type [" + type + "]");
         }

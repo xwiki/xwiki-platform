@@ -20,6 +20,12 @@
 
 import localConfig from "./vite.config";
 import { vitestVue as defaultConfig } from "@xwiki/platform-dev-config";
+import { UserConfig } from "vite";
 import { mergeConfig } from "vitest/config";
 
-export default mergeConfig(defaultConfig, localConfig);
+export default mergeConfig(defaultConfig, {
+  ...localConfig,
+  test: {
+    include: ["src/__tests__/vitest/**.ts", "src/__tests__/vitest/**.tsx"],
+  },
+} satisfies UserConfig);

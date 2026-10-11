@@ -37,5 +37,8 @@ class StopStatsRegisterObject implements XWikiStatsStoreItem
     @Override
     public void store(List<XWikiStatsStoreItem> register)
     {
+        // Intentionally empty: this item is only a marker used to signal that the statistics storing must stop.
+        // It never carries any statistics to store and it's recognized through an "instanceof" check before "store"
+        // would ever be called, so there's nothing to do here.
     }
 }

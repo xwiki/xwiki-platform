@@ -215,7 +215,7 @@ viewers.Comments = Class.create({
                 item._x_notification.replace(new XWiki.widgets.Notification(
                     "$services.localization.render('core.viewers.comments.editForm.fetch.failed')" + failureReason,
                     "error"));
-              }.bind(this),
+              },
               on0 : function (response) {
                 response.request.options.onFailure(response);
               },
@@ -278,6 +278,8 @@ viewers.Comments = Class.create({
       }
       // Insert the form on top of that comment's discussion
       item.up(this.xcommentSelector).next('.commentthread').insert({'top': this.form});
+      // Expand the thread
+      item.adjacent('.thread-toggle[aria-expanded="false"]')[0]?.click();
 
       this.reloadEditor({
         callback: function () {
@@ -317,7 +319,7 @@ viewers.Comments = Class.create({
           formData.set('xpage', 'xpart');
           formData.set('vm', 'commentsinline.vm');
           formData.set('skin', XWiki.skin);
-          // Strip form parameters from the form action query string to prevent them from being overwriten.
+          // Strip form parameters from the form action query string to prevent them from being overwritten.
           var queryStringParams = $H(form.action.toQueryParams());
           formData.keys().each(queryStringParams.unset.bind(queryStringParams));
           var url = form.action.replace(/\?.*/, '?' + queryStringParams.toQueryString());
@@ -340,7 +342,7 @@ viewers.Comments = Class.create({
               var failureReason = response.statusText || 'Server not responding';
               form._x_notification.replace(new XWiki.widgets.Notification(
                   "$services.localization.render('core.viewers.comments.add.failed')" + failureReason, "error"));
-            }.bind(this),
+            },
             on0 : function (response) {
               response.request.options.onFailure(response);
             },
@@ -360,7 +362,19 @@ viewers.Comments = Class.create({
               this.destroyEditor("[name='" + name + "']");
 
               if (this.requestSucceeded) {
+                // We save the current state of the comment container.
+                // We don't need to keep this state on full page refresh so we can do it here.
+                // Right now, this state is only whether or not each thread is expanded.
+                let expandedThreadsIDs = [];
+                $$('.commentthread.collapse.in').forEach((thread) => expandedThreadsIDs.push(thread.id));
+                // Restore the state of the comment container.
                 this.container.update(response.responseText);
+                expandedThreadsIDs.forEach(threadID => {
+                  document.getElementById(threadID).classList.add('in');
+                  let toggle = document.querySelector(`.thread-toggle[aria-controls="${threadID}"`);
+                  toggle.setAttribute('aria-expanded','true');
+                  toggle.classList.remove('collapsed');
+                });
 
                 // If a content is found in submittedcomment that means the submission was not valid.
                 // For instance, the captcha was not accepted.
@@ -483,7 +497,7 @@ viewers.Comments = Class.create({
           },
           onComplete: function (response) {
             form.previewButton.disabled = false;
-          }.bind(this)
+          }
         });
       } else {
         this.cancelPreview(form);
@@ -513,7 +527,7 @@ viewers.Comments = Class.create({
       commentElt.hide();
       $(form.previewButton).find('input')
         .val("$services.localization.render('core.viewers.comments.preview.button.back')");
-    }.bind(this))
+    })
   },
   /**
    * Display the comment textarea instead of the comment preview.
@@ -536,7 +550,7 @@ viewers.Comments = Class.create({
       if (commentElt) {
         commentElt.show();
       }
-    }.bind(this));
+    });
   },
   resetForm: function (event) {
     if (event) {
@@ -665,6 +679,34 @@ require(['jquery'], function($) {
   $(document).on('click', '#permalinkModal input.btn-primary', function() {
     window.location = $('#permalinkModal').find('.form-control').val();
   });
+  /**
+   * Copy the permalink to the clipboard, preferring the modern Clipboard API and falling back to the deprecated
+   * execCommand('copy') when it's unavailable or fails - e.g. because the document isn't focused, which is common
+   * in browsers automated by Selenium/WebDriver.
+   */
+  $(document).on('click', '#permalink-copy-button', function() {
+    const button = this;
+    const permalinkField = $('#permalinkModal').find('.form-control');
+    function notifyCopied() {
+      XWiki.widgets.Notification.show($(button).data('copiedMessage'), 'info');
+    }
+    function notifyFailed() {
+      XWiki.widgets.Notification.show($(button).data('copyFailedMessage'), 'error');
+    }
+    function copyWithExecCommand() {
+      permalinkField.select();
+      try {
+        document.execCommand('copy') ? notifyCopied() : notifyFailed();
+      } catch (e) {
+        notifyFailed();
+      }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(permalinkField.val()).then(notifyCopied, copyWithExecCommand);
+    } else {
+      copyWithExecCommand();
+    }
+  });
 });
 
 /**
@@ -686,7 +728,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var notification;
     /**
      * Ajax request made for deleting the comment.
-     * Delete the HTML element on succes (replace it with a small notification message).
+     * Delete the HTML element on success (replace it with a box message).
      * Display error message on failure.
      * Disable the delete button before the request is send, so the user cannot resend it in case it takes longer.
      */
@@ -728,7 +770,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    * Just a simple message box that is used as a placeholder for a deleted comment.
    */
   var createNotification = function(message) {
-    var msg = new Element('div', {'class' : 'notification' });
+    var msg = new Element('div', {'class' : 'box infomessage' });
     msg.update(message);
     return msg;
   };

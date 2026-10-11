@@ -36,6 +36,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.WithParameters;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -48,6 +49,7 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -75,6 +77,10 @@ class DefaultLiveDataConfigurationResolverTest
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
+    @MockComponent
+    @Named("uuid")
+    private LiveTableNewRowNamingStrategy namingStrategy;
+
     private final LiveDataConfiguration defaultConfig = new LiveDataConfiguration();
 
     private final LiveDataConfiguration config = new LiveDataConfiguration();
@@ -91,6 +97,29 @@ class DefaultLiveDataConfigurationResolverTest
 
         this.config.initialize();
         this.objectMapper.setSerializationInclusion(Include.NON_DEFAULT);
+    }
+
+    @Test
+    void addEntryCreationAllowed() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        when(this.namingStrategy.isCreationAllowed(any())).thenReturn(true);
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        assertTrue(actualConfig.getMeta().getActions().stream()
+            .anyMatch(action -> "addEntry".equals(action.getId())));
+    }
+
+    @Test
+    void addEntryCreationNotAllowed() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        assertFalse(actualConfig.getMeta().getActions().stream()
+            .anyMatch(action -> "addEntry".equals(action.getId())));
     }
 
     @Test

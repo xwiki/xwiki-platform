@@ -92,9 +92,9 @@ public class WikiMacroInitializerListener implements EventListener
             } catch (Exception e) {
                 this.logger.error("Error while registering wiki macros.", e);
             }
-        } else if (event instanceof WikiReadyEvent) {
+        } else if (event instanceof WikiReadyEvent wikiReadyEvent) {
             try {
-                initializer.registerExistingWikiMacros(((WikiReadyEvent) event).getWikiId());
+                initializer.registerExistingWikiMacros(wikiReadyEvent.getWikiId());
             } catch (Exception e) {
                 this.logger.error("Error while initializing wiki macro classes.", e);
             }

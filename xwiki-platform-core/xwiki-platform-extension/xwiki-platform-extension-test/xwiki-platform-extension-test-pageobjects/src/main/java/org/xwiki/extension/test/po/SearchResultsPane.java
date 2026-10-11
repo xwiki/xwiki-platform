@@ -59,7 +59,7 @@ public class SearchResultsPane extends BaseElement
         String xpath =
             "//div[contains(@class, 'infomessage') and preceding-sibling::div[1][@class = 'extension-search-bar']]";
         List<WebElement> found = getDriver().findElementsWithoutWaiting(By.xpath(xpath));
-        return found.size() > 0 ? found.get(0).getText() : null;
+        return !found.isEmpty() ? found.get(0).getText() : null;
     }
 
     /**

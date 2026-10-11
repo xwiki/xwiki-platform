@@ -19,6 +19,8 @@
  */
 package org.xwiki.model.validation.edit.internal;
 
+import java.util.Set;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
@@ -36,7 +38,22 @@ public interface EditConfirmationCheckersManager
     /**
      * @return the aggregated results of the {@link EditConfirmationChecker} components
      */
-    EditConfirmationCheckerResults check();
+    default EditConfirmationCheckerResults check()
+    {
+        return check(Set.of());
+    }
+
+    /**
+     * Run the edit confirmation checkers, skipping the ones whose component hints are in the given set.
+     *
+     * @param skipHints the set of component hints to skip
+     * @return the aggregated results of the {@link EditConfirmationChecker} components
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    EditConfirmationCheckerResults check(Set<String> skipHints);
 
     /**
      * Force the results, meaning that any result matching the result at the time it was forced will be ignored, unless

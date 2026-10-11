@@ -341,19 +341,19 @@
       <code>#watchModal {
   text-align: left;
 }
-.panel-heading a {
+#watchModal .panel-heading a {
   color: black;
 }
-.panel-radio {
+#watchModal .panel-radio {
   padding: 8px 15px;
 }
-.help-icon {
+#watchModal .help-icon {
   float: right;
 }
-.panel-group .panel.wiki-option {
+#watchModal .panel-group .panel.wiki-option {
   margin-top: 2em;
 }
-.panel-title &gt; label {
+#watchModal .panel-title &gt; label {
   font-weight: unset;
   display: inline;
 }</code>

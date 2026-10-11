@@ -19,11 +19,12 @@
  */
 package org.xwiki.blocknote.test.ui;
 
-import java.util.concurrent.Callable;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.ui.TestUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Base class for all BlockNote integration tests.
@@ -33,6 +34,8 @@ import org.xwiki.test.ui.TestUtils;
  */
 abstract class AbstractBlockNoteIT
 {
+    public static final String XWIKI_ALIAS = "xwiki-alias";
+
     @BeforeAll
     static void beforeAll(TestUtils setup)
     {
@@ -44,12 +47,23 @@ abstract class AbstractBlockNoteIT
         // Create a user without administration and script rights, then make it advanced in order to have access to the
         // edit dropdown and also to be able to edit in-place.
         setup.createUserAndLogin("John", "pass", "editor", "Wysiwyg", "usertype", "Advanced");
+
+        // The BlockNote tests are often failing because clicking on the "Edit" goes to Wiki edit mode instead of
+        // loading the in-place edit mode. The cause seems to be that we're not logged in as John. Adding an assert here
+        // for debugging purposes, to catch the problem earlier.
+        assertEquals("John", setup.getLoggedInUserName());
     }
 
     @AfterEach
-    void afterEach(TestUtils setup)
+    void afterEach(TestUtils setup, MultiUserTestUtils multiUserSetup)
     {
-        setup.maybeLeaveEditMode();
+        // Handle the edit mode leave confirmation modal (when there are unsaved changes).
+        setup.getDriver().getWindowHandles().forEach(handle -> {
+            multiUserSetup.switchToBrowserTab(handle);
+            setup.maybeLeaveEditMode();
+        });
+
+        multiUserSetup.closeTabs();
     }
 
     protected void loginAsJohn(TestUtils setup)
@@ -57,14 +71,8 @@ abstract class AbstractBlockNoteIT
         setup.login("John", "pass");
     }
 
-    protected <T> T disableWCAG(TestUtils setup, Callable<T> testCode) throws Exception
+    protected void loginAsAlice(TestUtils setup)
     {
-        boolean wcagEnabled = setup.getWCAGUtils().getWCAGContext().isWCAGEnabled();
-        setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(false);
-        try {
-            return testCode.call();
-        } finally {
-            setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(wcagEnabled);
-        }
+        setup.createUserAndLogin("Alice", "pass", "editor", "Wysiwyg");
     }
 }

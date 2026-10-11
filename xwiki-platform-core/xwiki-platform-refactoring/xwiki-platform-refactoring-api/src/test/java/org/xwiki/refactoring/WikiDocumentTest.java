@@ -19,21 +19,21 @@
  */
 package org.xwiki.refactoring;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Tests for {@link WikiDocument}.
  *
  * @version $Id$
  */
-public class WikiDocumentTest
+class WikiDocumentTest
 {
     @Test
-    public void equalsTest()
+    void equals()
     {
         WikiDocument documentA = new WikiDocument(new DocumentReference("test", "Some", "Page"), null, null);
         WikiDocument documentA2 = new WikiDocument(new DocumentReference("test", "Some", "Page"), null, null);
@@ -46,7 +46,7 @@ public class WikiDocumentTest
     }
 
     @Test
-    public void hashCodeTest()
+    void hashCodeEquality()
     {
         WikiDocument documentA = new WikiDocument(new DocumentReference("test", "Some", "Page"), null, null);
         WikiDocument documentA2 = new WikiDocument(new DocumentReference("test", "Some", "Page"), null, null);

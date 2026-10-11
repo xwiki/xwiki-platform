@@ -39,7 +39,7 @@ public abstract class AbstractResourceReferenceHandlerEvent implements ResourceR
     /**
      * Match any {@link ResourceReferenceHandlerEvent}.
      */
-    public AbstractResourceReferenceHandlerEvent()
+    protected AbstractResourceReferenceHandlerEvent()
     {
         // Empty voluntarily, just here to offer a default constructor
     }
@@ -49,7 +49,7 @@ public abstract class AbstractResourceReferenceHandlerEvent implements ResourceR
      * 
      * @param reference the reference handled
      */
-    public AbstractResourceReferenceHandlerEvent(ResourceReference reference)
+    protected AbstractResourceReferenceHandlerEvent(ResourceReference reference)
     {
         this.reference = reference;
     }

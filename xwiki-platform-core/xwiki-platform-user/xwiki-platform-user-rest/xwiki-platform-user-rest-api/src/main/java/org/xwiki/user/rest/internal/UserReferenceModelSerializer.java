@@ -43,22 +43,24 @@ public interface UserReferenceModelSerializer
      * Return a summary of the user's information to include in, e.g., user lists.
      *
      * @param baseUri the base URL of the current instance
-     * @param userId the id of the user (e.g., "wikiName:Space.Page" for a user stored as a document)
      * @param userReference the user reference to serialize
      * @return a user summary
      * @throws XWikiException if there was a problem during serialization
+     * @since 18.4.4
+     * @since 18.7.0RC1
      */
-    UserSummary toRestUserSummary(URI baseUri, String userId, UserReference userReference) throws XWikiException;
+    UserSummary toRestUserSummary(URI baseUri, UserReference userReference) throws XWikiException;
 
     /**
      * Return all the information available on the user.
      *
      * @param baseUri the base URL of the current instance
-     * @param userId the id of the user (e.g., "wikiName:Space.Page" for a user stored as a document)
      * @param userReference the user reference to serialize
      * @param preferences whether to include user preferences in the output
      * @return a user
      * @throws XWikiException if there was a problem during serialization
+     * @since 18.4.4
+     * @since 18.7.0RC1
      */
-    User toRestUser(URI baseUri, String userId, UserReference userReference, boolean preferences) throws XWikiException;
+    User toRestUser(URI baseUri, UserReference userReference, boolean preferences) throws XWikiException;
 }

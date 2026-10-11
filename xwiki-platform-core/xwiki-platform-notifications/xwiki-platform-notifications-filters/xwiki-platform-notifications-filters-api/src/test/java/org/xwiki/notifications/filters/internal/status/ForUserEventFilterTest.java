@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  *
  * @version $Id$
  */
-public class ForUserEventFilterTest
+class ForUserEventFilterTest
 {
     @Test
-    public void equals()
+    void equals()
     {
         ForUserEventFilter forUserEventFilter1 = new ForUserEventFilter(NotificationFormat.ALERT, true);
         ForUserEventFilter forUserEventFilter2 = new ForUserEventFilter(NotificationFormat.ALERT, true);

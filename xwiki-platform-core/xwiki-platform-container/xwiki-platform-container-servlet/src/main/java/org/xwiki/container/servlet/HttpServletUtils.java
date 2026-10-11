@@ -209,7 +209,8 @@ public final class HttpServletUtils
                 }
                 return;
             } catch (MalformedURLException e) {
-                LOGGER.error("The request URL indicated by the application server is wrong: {}", requestURLString, e);
+                LOGGER.error("The request URL indicated by the application server is wrong: [{}]", requestURLString,
+                    e);
             }
         }
 

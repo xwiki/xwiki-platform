@@ -36,6 +36,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
@@ -75,6 +76,10 @@ public class ExplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
     @Named("secure")
     private QueryManager secureQueryManager;
 
+    @Inject
+    @Named("viewableAllowedDBListPropertyValue")
+    private QueryFilter viewableValueFilter;
+
     @Override
     public Query build(DBListClass dbListClass) throws QueryException
     {
@@ -98,6 +103,17 @@ public class ExplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
 
         Query query = this.secureQueryManager.createQuery(statement, Query.HQL);
         query.setWiki(documentReference.getWikiReference().getName());
+        // The custom HQL query should pass "doc.fullName as unfilterableRightCheck" as the first select row, whenever
+        // it needs that the current user has "view" rights on the returned documents. This is used to filter out
+        // inaccessible documents and not propose them. The "unfilterable" prefix in the alias also makes the text
+        // (suggest) filter skip this column, so that typing in the suggest filters on the displayed value(s) and not
+        // on the document full name. Note that the "doc.fullName as unfilterableRightCheck" column results will be
+        // filtered out by the QueryFilter and if you need to return doc.fullName results, you should select 2 columns,
+        // as in:
+        //   select doc.fullName as unfilterableRightCheck, doc.fullName, ...
+        if (dbListClass.getSql() != null && dbListClass.getSql().contains("doc.fullName as unfilterableRightCheck")) {
+            query.addFilter(this.viewableValueFilter);
+        }
         return query;
     }
 

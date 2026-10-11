@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+// eslint-disable-next-line import-x/no-named-as-default
 import EventEmitter from "eventemitter3";
 import { reactive } from "vue";
 import type { Logic, Values } from "@xwiki/platform-livedata-api";
@@ -117,10 +118,9 @@ export class EditBusService {
         .setValues({ entryId, values: vals })
         // eslint-disable-next-line promise/always-return
         .then(() => {
-          this.editStates[entryId] = {};
+          delete this.editStates[entryId][keyEntry];
         })
         .catch(() => {
-          // @ts-expect-error leftover from initial javascript implementation
           new XWiki.widgets.Notification(
             `The row save action failed.`,
             "error",

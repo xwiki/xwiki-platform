@@ -187,9 +187,6 @@ class UserEventDispatcherTest
         CompletableFuture futureE1R1 = mock(CompletableFuture.class, "futureE1R1");
         when(this.events.prefilterEvent(event1Result1)).thenReturn(futureE1R1);
 
-        // verify(this.events).prefilterEvent(event1Result1);
-        // verify(futureE1R1).join();
-
         // Handling of Event2R1
         when(event2Result1.getType()).thenReturn(SUPPORTED_TYPE2);
         WikiReference mainWiki = new WikiReference("xwiki");
@@ -236,9 +233,6 @@ class UserEventDispatcherTest
         CompletableFuture futureE2R1 = mock(CompletableFuture.class, "futureE2R1");
         when(this.events.prefilterEvent(event2Result1)).thenReturn(futureE2R1);
 
-        // verify(this.events).prefilterEvent(event2Result1);
-        // verify(futureE2R1).join();
-
         // Handling of Event3R1
         when(event3Result1.getType()).thenReturn(SUPPORTED_TYPE1);
         when(event3Result1.getWiki()).thenReturn(mainWiki);
@@ -265,9 +259,6 @@ class UserEventDispatcherTest
 
         CompletableFuture futureE3R1 = mock(CompletableFuture.class, "futureE3R1");
         when(this.events.prefilterEvent(event3Result1)).thenReturn(futureE3R1);
-
-        // verify(this.events).prefilterEvent(event3Result1);
-        // verify(futureE3R1).join();
 
         // Handling of event1R2
         when(event1Result2.getType()).thenReturn(SUPPORTED_TYPE1);
@@ -315,16 +306,11 @@ class UserEventDispatcherTest
         CompletableFuture futureE1R2 = mock(CompletableFuture.class, "futureE1R2");
         when(this.events.prefilterEvent(event1Result2)).thenReturn(futureE1R2);
 
-        // verify(this.events).prefilterEvent(event1Result2);
-        // verify(futureE1R2).join();
-
         // Handling of event2R2
         when(event2Result2.getType()).thenReturn("bar");
         when(event2Result2.getWiki()).thenReturn(mainWiki);
         CompletableFuture futureE2R2 = mock(CompletableFuture.class, "futureE2R2");
         when(this.events.prefilterEvent(event2Result2)).thenReturn(futureE2R2);
-        // verify(this.events).prefilterEvent(event2Result2);
-        // verify(futureE2R2).join();
 
         this.dispatcher.flush();
 

@@ -45,5 +45,9 @@ administration.templateProvider.creationRestrictions.hint=Die Liste der Speicher
 administration.templateProvider.creationRestrictions.none=Mit dieser Vorlage können überall Seiten erstellt werden
 administration.templateProvider.creationRestrictionsAreSuggestions=Erstellungsbeschränkungen als Vorschläge
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=Ermöglicht es dem Benutzer, einen beliebigen Ort zum Erstellen der Seite mit dieser Vorlage auszuwählen, wobei die erste Erstellungsbeschränkung als vorausgefüllter Standardort verwendet wird, wenn die Vorlage aus der Liste ausgewählt wird.
+administration.templateProvider.creationRestrictions.add=Erstellungsbeschränkung hinzufügen
+administration.templateProvider.creationRestrictions.remove=Erstellungsbeschränkung entfernen
+administration.templateProvider.visibilityRestrictions.add=Sichtbarkeitseinschränkung hinzufügen
+administration.templateProvider.visibilityRestrictions.remove=Sichtbarkeitseinschränkung entfernen
 </content>
 </xwikidoc>

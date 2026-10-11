@@ -19,18 +19,18 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.live;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.Test;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.SessionFactory;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -45,62 +45,50 @@ import static org.mockito.Mockito.when;
  * @since 9.6RC1
  * @version $Id$
  */
-public class LiveNotificationEmailSenderTest
+@ComponentTest
+class LiveNotificationEmailSenderTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<LiveNotificationEmailSender> mocker =
-            new MockitoComponentMockingRule<>(LiveNotificationEmailSender.class);
+    @InjectMockComponents
+    private LiveNotificationEmailSender sender;
 
+    @MockComponent
     private MailSender mailSender;
 
+    @MockComponent
     private SessionFactory sessionFactory;
 
+    @MockComponent
+    @Named("database")
     private Provider<MailListener> mailListenerProvider;
 
+    @MockComponent
     private Provider<NotificationUserIterator> notificationUserIteratorProvider;
 
+    @MockComponent
     private Provider<LiveMimeMessageIterator> liveMimeMessageIteratorProvider;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        this.mailSender = this.mocker.registerMockComponent(MailSender.class);
-
-        this.sessionFactory = this.mocker.registerMockComponent(SessionFactory.class);
-
-        this.mailListenerProvider = this.mocker.registerMockComponent(Provider.class, "database");
-
-        this.notificationUserIteratorProvider = mock(Provider.class);
-        this.mocker.registerComponent(
-                new DefaultParameterizedType(null, Provider.class, NotificationUserIterator.class),
-                this.notificationUserIteratorProvider);
-
-        this.liveMimeMessageIteratorProvider = mock(Provider.class);
-        this.mocker.registerComponent(
-                new DefaultParameterizedType(null, Provider.class, LiveMimeMessageIterator.class),
-                this.liveMimeMessageIteratorProvider);
-
-        this.wikiDescriptorManager = this.mocker.registerMockComponent(WikiDescriptorManager.class);
-    }
-
     @Test
-    public void testSendMail() throws Exception
+    void sendMail()
     {
         CompositeEvent event1 = mock(CompositeEvent.class);
 
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
 
-        when(this.notificationUserIteratorProvider.get()).thenReturn(mock(NotificationUserIterator.class));
+        NotificationUserIterator notificationUserIteratorMock = mock();
+        when(this.notificationUserIteratorProvider.get()).thenReturn(notificationUserIteratorMock);
 
-        when(this.liveMimeMessageIteratorProvider.get()).thenReturn(mock(LiveMimeMessageIterator.class));
+        LiveMimeMessageIterator liveMimeMessageIteratorMock = mock();
+        when(this.liveMimeMessageIteratorProvider.get()).thenReturn(liveMimeMessageIteratorMock);
 
         when(this.sessionFactory.create(any())).thenReturn(null);
 
-        when(this.mailListenerProvider.get()).thenReturn(mock(MailListener.class));
+        MailListener mailListenerMock = mock();
+        when(this.mailListenerProvider.get()).thenReturn(mailListenerMock);
 
-        this.mocker.getComponentUnderTest().sendEmails(event1);
+        this.sender.sendEmails(event1);
 
         verify(this.mailSender, times(1)).sendAsynchronously(
                 any(LiveMimeMessageIterator.class), any(), any(MailListener.class));

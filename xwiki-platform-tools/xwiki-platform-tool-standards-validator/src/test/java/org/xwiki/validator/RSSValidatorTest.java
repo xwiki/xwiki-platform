@@ -25,18 +25,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RSSValidatorTest
+class RSSValidatorTest
 {
     private RSSValidator validator;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp()
     {
         this.validator = new RSSValidator();
     }
 
     @Test
-    public void testValidRSS() throws Exception
+    void testValidRSS()
     {
         this.validator.setDocument(getClass().getResourceAsStream("/rss-valid.xml"));
         this.validator.validate();
@@ -45,7 +45,7 @@ public class RSSValidatorTest
     }
 
     @Test
-    public void testInvalidRSS() throws Exception
+    void testInvalidRSS()
     {
         this.validator.setDocument(getClass().getResourceAsStream("/rss-invalid.xml"));
         this.validator.validate();

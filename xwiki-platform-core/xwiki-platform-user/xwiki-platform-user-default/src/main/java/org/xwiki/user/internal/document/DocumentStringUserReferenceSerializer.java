@@ -87,10 +87,9 @@ public class DocumentStringUserReferenceSerializer implements UserReferenceSeria
     private String serializeInternal(UserReference userReference, Object... parameters)
     {
         String result;
-        if (!(userReference instanceof DocumentUserReference)) {
+        if (!(userReference instanceof DocumentUserReference documentUserReference)) {
             throw new IllegalArgumentException("Only DocumentUserReference are handled");
         } else {
-            DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
             result = getEntityReferenceSerializer().serialize(documentUserReference.getReference(), parameters);
         }
         return result;

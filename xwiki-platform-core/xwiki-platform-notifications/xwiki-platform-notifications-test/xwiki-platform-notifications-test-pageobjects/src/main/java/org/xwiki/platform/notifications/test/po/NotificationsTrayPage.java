@@ -21,14 +21,15 @@ package org.xwiki.platform.notifications.test.po;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -53,13 +54,15 @@ public class NotificationsTrayPage extends ViewPage
 {
     private static final String CLASS = "class";
 
+    private static final String NOTIFICATION_BUTTON_CSS_SELECTOR = "li#tmNotifications";
+
     @FindBy(css = "li#tmNotifications div.notifications-area")
     private WebElement notificationsArea;
 
     @FindBy(css = "li#tmNotifications button[title='Notifications']")
     private WebElement bellButton;
 
-    @FindBy(css = "li#tmNotifications")
+    @FindBy(css = NOTIFICATION_BUTTON_CSS_SELECTOR)
     private WebElement notificationsButton;
 
     @FindBy(css = "span.notifications-count")
@@ -79,6 +82,7 @@ public class NotificationsTrayPage extends ViewPage
      * Wait until the given number of unread notification is received. This method uses a request to the REST
      * notification endpoint to compute how many unread notifications the given user has on the given wiki, using user
      * preferences.
+     * Note that the given userId needs to be the logged-in user.
      *
      * @param userId the serialized user reference for which to get notifications
      * @param wiki the wiki on which to get notifications
@@ -133,11 +137,11 @@ public class NotificationsTrayPage extends ViewPage
             .queryParam("_", System.currentTimeMillis())
             .build();
         try {
-            GetMethod getMethod = testUtils.rest().executeGet(attemptURI);
-            if (Set.of(200, 202).contains(getMethod.getStatusCode())) {
-                String responseBody = IOUtils.toString(getMethod.getResponseBodyAsStream(), UTF_8);
+            CloseableHttpResponse response = testUtils.rest().executeGet(attemptURI);
+            if (Set.of(200, 202).contains(response.getCode())) {
+                String responseBody = IOUtils.toString(response.getEntity().getContent(), UTF_8);
                 Map<?, ?> map = new ObjectMapper().readValue(responseBody, Map.class);
-                return getOptionalLong(String.valueOf(map.get("unread")), responseBody);
+                return getOptionalLong(String.valueOf(map.get("unread")));
             } else {
                 return Optional.empty();
             }
@@ -146,7 +150,7 @@ public class NotificationsTrayPage extends ViewPage
         }
     }
 
-    private static Optional<Long> getOptionalLong(String str, String responseBody)
+    private static Optional<Long> getOptionalLong(String str)
     {
         try {
             return Optional.of(Long.parseLong(str));
@@ -160,7 +164,7 @@ public class NotificationsTrayPage extends ViewPage
      */
     public boolean isMenuOpen()
     {
-        return Arrays.asList(notificationsButton.getAttribute(CLASS).split(" ")).contains("open");
+        return Arrays.asList(getNotificationsButton().getAttribute(CLASS).split(" ")).contains("open");
     }
 
     /**
@@ -170,11 +174,9 @@ public class NotificationsTrayPage extends ViewPage
      */
     public boolean isNotificationMenuVisible()
     {
-        try {
-            return notificationsButton.isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        List<WebElement> buttons =
+            getDriver().findElementsWithoutWaiting(By.cssSelector(NOTIFICATION_BUTTON_CSS_SELECTOR));
+        return !buttons.isEmpty() && buttons.getFirst().isDisplayed();
     }
 
     /**
@@ -206,6 +208,20 @@ public class NotificationsTrayPage extends ViewPage
         } else {
             return Integer.parseInt(this.countBadge.getText());
         }
+    }
+
+    /**
+     * @return {@code true} if the badge holding the number of unread notifications is displayed on the bell, without
+     *     opening the notification tray
+     * @since 18.9.0RC1
+     */
+    public boolean isCountBadgeDisplayed()
+    {
+        // The badge is added asynchronously, once the number of unread notifications is known, and removed when there
+        // is no unread notification.
+        List<WebElement> badges = getDriver().findElementsWithoutWaiting(
+            By.cssSelector(NOTIFICATION_BUTTON_CSS_SELECTOR + " .notifications-count"));
+        return !badges.isEmpty() && badges.getFirst().isDisplayed();
     }
 
     /**
@@ -319,7 +335,7 @@ public class NotificationsTrayPage extends ViewPage
      */
     public GroupedNotificationElementPage getGroupedNotificationsPage()
     {
-        return new GroupedNotificationElementPage(this.getNotificationsButton());
+        return new GroupedNotificationElementPage(getNotificationsButton());
     }
 
     /**
@@ -351,6 +367,19 @@ public class NotificationsTrayPage extends ViewPage
     public String getNotificationType(int notificationNumber)
     {
         return getNotificationsContainerElement().getNotificationType(notificationNumber);
+    }
+
+    /**
+     * Get the index of the first notification of a given type. Useful when several notifications share the same date,
+     * since their order in the list is then not deterministic.
+     *
+     * @param type the type of the notification to find, for instance {@code update} or {@code addComment}
+     * @return the index of the first notification of that type in the list, or {@code -1} if there is none
+     * @since 18.9.0RC1
+     */
+    public int getNotificationIndex(String type)
+    {
+        return getNotificationsContainerElement().getNotificationIndex(type);
     }
 
     /**
@@ -395,6 +424,30 @@ public class NotificationsTrayPage extends ViewPage
     public String getNotificationRawContent(int notificationNumber)
     {
         return getNotificationsContainerElement().getNotificationRawContent(notificationNumber);
+    }
+
+    /**
+     * @return {@code true} if the "Load older notifications" button is displayed in the notification tray
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public boolean hasOlderNotifications()
+    {
+        return getNotificationsContainerElement().hasOlderNotifications();
+    }
+
+    /**
+     * Click the "Load older notifications" button of the notification tray and wait for the older notifications to be
+     * displayed.
+     *
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public void loadOlderNotifications()
+    {
+        getNotificationsContainerElement().loadOlderNotifications();
     }
 
     /**

@@ -301,7 +301,7 @@ define('xwiki-wysiwyg-image-editor', [
        * and a ratio of 0.5, the result is 15px.
        * @param field the field type ('width' or 'height')
        * @param inputvalue the input value of the updated field (e.g., 100, or 33px)
-       * @returns {*|jQuery} a Defered, resolved with the computed value
+       * @returns {*|jQuery} a Deferred, resolved with the computed value
        */
       function updateRatio(field, inputvalue) {
         return loadImage(modal).then(function (image) {
@@ -454,7 +454,7 @@ define('xwiki-wysiwyg-image-editor', [
             addToggleImageWidthLock(modal);
             addToggleAlignmentTextWrap(modal);
           }).fail(function(error) {
-            new XWiki.widgets.Notification(translations.get('initialization.fail'), 'error');
+            XWiki.widgets.Notification.show(translations.get('initialization.fail'), 'error');
             console.log('Failed to retrieve the image edition form.', error);
         });
       }
@@ -618,7 +618,8 @@ define('xwiki-wysiwyg-image-editor', [
       $('#advanced [name="textWrap"]').prop('checked', imageData.textWrap);
 
       //  Override with the style values only if it's a new image.
-      updateAdvancedFromStyle($('#imageStyles')[0].selectize.getValue(), modal);
+      updateAdvancedFromStyle($('#imageStyles')[0]?.selectize.getValue() || '', modal);
+
       // Initial check of the image dimensions on load.
       checkDimensions(modal);
       updateLockStatus(modal);

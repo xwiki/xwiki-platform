@@ -29,8 +29,8 @@ import javax.inject.Inject;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
-import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 
 /**
  * Default and abstract implementation of {@link org.xwiki.lesscss.internal.cache.LESSCache}.
@@ -108,12 +108,10 @@ public abstract class AbstractCache<T> implements LESSCache<T>
      */
     private void registerCacheKey(Map<Object, List<String>> cachedFilesKeysMap, String cacheKey, Object reference)
     {
-        List<String> cachedFilesKeys = cachedFilesKeysMap.get(reference);
-        if (cachedFilesKeys == null) {
-            // if the list of cached files keys corresponding to the skin/colortheme name does not exist, we create it
-            cachedFilesKeys = new ArrayList<>();
-            cachedFilesKeysMap.put(reference, cachedFilesKeys);
-        }
+        // if the list of cached files keys corresponding to the skin/colortheme name does not exist, we
+        // create it
+        List<String> cachedFilesKeys =
+            cachedFilesKeysMap.computeIfAbsent(reference, key -> new ArrayList<>());
         if (!cachedFilesKeys.contains(cacheKey)) {
             cachedFilesKeys.add(cacheKey);
         }
@@ -167,12 +165,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     {
         // The mutex is a string (actually the cache key) to help debugging.
         String cacheKey = cacheKeyFactory.getCacheKey(lessResourceReference, skin, colorTheme, isContextHandled);
-        String mutex = mutexList.get(cacheKey);
-        if (mutex == null) {
-            // the mutex is the key, so no extra memory is needed
-            mutex = cacheKey;
-            mutexList.put(cacheKey, mutex);
-        }
-        return mutex;
+        // the mutex is the key, so no extra memory is needed
+        return mutexList.computeIfAbsent(cacheKey, key -> key);
     }
 }

@@ -1,4 +1,5 @@
 org.xwiki.captcha.internal.JCaptchaCaptcha
+org.xwiki.captcha.internal.JCaptchaConfigurationSource
 org.xwiki.captcha.internal.JCaptchaResourceReferenceHandler
 org.xwiki.captcha.internal.CaptchaServiceManager
 org.xwiki.captcha.internal.script.JCaptchaInternalScriptService

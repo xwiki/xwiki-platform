@@ -53,7 +53,7 @@ class DefaultWikiReferenceProviderTest implements TestConstants
     void beforeEach()
     {
         when(this.entityProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
-        when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
+        when(this.entityReferenceFactory.getReference(any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test

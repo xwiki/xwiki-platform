@@ -26,9 +26,8 @@ import javax.inject.Provider;
 
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
@@ -43,29 +42,33 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link ExtensionHistoryScriptService}.
- * 
+ *
  * @version $Id$
  * @since 7.1RC1
  */
-public class ExtensionHistoryScriptServiceTest
+@ComponentTest
+class ExtensionHistoryScriptServiceTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ExtensionHistoryScriptService> mocker =
-        new MockitoComponentMockingRule<ExtensionHistoryScriptService>(ExtensionHistoryScriptService.class,
-            ScriptService.class);
+    @InjectMockComponents
+    private ExtensionHistoryScriptService scriptService;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private XWikiContext xcontext = mock(XWikiContext.class);
 
@@ -77,22 +80,23 @@ public class ExtensionHistoryScriptServiceTest
 
     private DocumentAccessBridge documentAccessBridge;
 
-    @Before
-    public void configure() throws Exception
+    @BeforeEach
+    void configure() throws Exception
     {
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider =
+            this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
 
-        Execution execution = this.mocker.getInstance(Execution.class);
+        Execution execution = this.componentManager.getInstance(Execution.class);
         when(execution.getContext()).thenReturn(this.executionContext);
 
-        this.jobExecutor = this.mocker.getInstance(JobExecutor.class);
-        this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
-        this.documentAccessBridge = this.mocker.getInstance(DocumentAccessBridge.class);
+        this.jobExecutor = this.componentManager.getInstance(JobExecutor.class);
+        this.authorization = this.componentManager.getInstance(ContextualAuthorizationManager.class);
+        this.documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
     }
 
     @Test
-    public void getRecords() throws Exception
+    void getRecords() throws Exception
     {
         InstallRequest devInstallReq = new InstallRequest();
         devInstallReq.addNamespace("wiki:dev");
@@ -117,7 +121,7 @@ public class ExtensionHistoryScriptServiceTest
 
         List<ExtensionJobHistoryRecord> records = Arrays.asList(devInstall, globalInstall);
 
-        ExtensionJobHistory history = this.mocker.getInstance(ExtensionJobHistory.class);
+        ExtensionJobHistory history = this.componentManager.getInstance(ExtensionJobHistory.class);
         ArgumentCaptor<Predicate<ExtensionJobHistoryRecord>> predicateCaptor =
             ArgumentCaptor.forClass((Class) Predicate.class);
         when(history.getRecords(predicateCaptor.capture(), eq("offsetRecordId"), eq(5))).thenReturn(records);
@@ -126,7 +130,7 @@ public class ExtensionHistoryScriptServiceTest
 
         assertEquals(
             records,
-            this.mocker.getComponentUnderTest().getRecords().fromThisWiki().ofType(Arrays.asList("install"))
+            this.scriptService.getRecords().fromThisWiki().ofType(List.of("install"))
                 .list("offsetRecordId", 5));
 
         Predicate<ExtensionJobHistoryRecord> predicate = predicateCaptor.getValue();
@@ -138,12 +142,12 @@ public class ExtensionHistoryScriptServiceTest
     }
 
     @Test
-    public void replayWithoutAdmin() throws Exception
+    void replayWithoutAdmin() throws Exception
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.addNamespace("wiki:dev");
         ExtensionJobHistoryRecord install = new ExtensionJobHistoryRecord("install", installRequest, null, null, null);
-        List<ExtensionJobHistoryRecord> records = Arrays.asList(install);
+        List<ExtensionJobHistoryRecord> records = List.of(install);
 
         when(this.xcontext.getWikiId()).thenReturn("dev");
         when(this.authorization.hasAccess(Right.ADMIN, new WikiReference("dev"))).thenReturn(false);
@@ -152,20 +156,20 @@ public class ExtensionHistoryScriptServiceTest
         ArgumentCaptor<ReplayRequest> requestCaptor = ArgumentCaptor.forClass(ReplayRequest.class);
         when(jobExecutor.execute(eq(ReplayJob.JOB_TYPE), requestCaptor.capture())).thenReturn(replayJob);
 
-        assertSame(replayJob, this.mocker.getComponentUnderTest().replay(records));
+        assertSame(replayJob, this.scriptService.replay(records));
 
         ReplayRequest request = requestCaptor.getValue();
         assertTrue(request.getRecords().isEmpty());
     }
 
     @Test
-    public void replayWithAdminButNoPR() throws Exception
+    void replayWithAdminButNoPR() throws Exception
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.addNamespace("wiki:drafts");
         installRequest.setProperty("user.reference", new DocumentReference("drafts", "Users", "Alice"));
         ExtensionJobHistoryRecord install = new ExtensionJobHistoryRecord("install", installRequest, null, null, null);
-        List<ExtensionJobHistoryRecord> records = Arrays.asList(install);
+        List<ExtensionJobHistoryRecord> records = List.of(install);
 
         when(this.xcontext.getWikiId()).thenReturn("dev");
         when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(
@@ -177,24 +181,24 @@ public class ExtensionHistoryScriptServiceTest
         ArgumentCaptor<ReplayRequest> requestCaptor = ArgumentCaptor.forClass(ReplayRequest.class);
         when(jobExecutor.execute(eq(ReplayJob.JOB_TYPE), requestCaptor.capture())).thenReturn(replayJob);
 
-        assertSame(replayJob, this.mocker.getComponentUnderTest().replay(records));
+        assertSame(replayJob, this.scriptService.replay(records));
 
         ReplayRequest request = requestCaptor.getValue();
-        assertEquals(Arrays.asList(install), request.getRecords());
+        assertEquals(List.of(install), request.getRecords());
 
-        assertEquals(Arrays.asList("wiki:dev"), install.getRequest().getNamespaces());
+        assertEquals(List.of("wiki:dev"), install.getRequest().getNamespaces());
         assertEquals(this.documentAccessBridge.getCurrentUserReference(),
             install.getRequest().getProperty("user.reference"));
     }
 
     @Test
-    public void replayWithPR() throws Exception
+    void replayWithPR() throws Exception
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.addNamespace("wiki:drafts");
         installRequest.setProperty("user.reference", new DocumentReference("drafts", "Users", "Alice"));
         ExtensionJobHistoryRecord install = new ExtensionJobHistoryRecord("install", installRequest, null, null, null);
-        List<ExtensionJobHistoryRecord> records = Arrays.asList(install);
+        List<ExtensionJobHistoryRecord> records = List.of(install);
 
         when(this.xcontext.getWikiId()).thenReturn("dev");
         when(this.xcontext.getAction()).thenReturn("foo");
@@ -207,17 +211,17 @@ public class ExtensionHistoryScriptServiceTest
         ArgumentCaptor<ReplayRequest> requestCaptor = ArgumentCaptor.forClass(ReplayRequest.class);
         when(jobExecutor.execute(eq(ReplayJob.JOB_TYPE), requestCaptor.capture())).thenReturn(replayJob);
 
-        assertSame(replayJob, this.mocker.getComponentUnderTest().replay(records));
+        assertSame(replayJob, this.scriptService.replay(records));
 
         ReplayRequest request = requestCaptor.getValue();
         assertTrue(StringUtils.join(request.getId(), '/').startsWith("extension/history/"));
         assertTrue(request.isInteractive());
-        assertEquals(Arrays.asList(install), request.getRecords());
+        assertEquals(List.of(install), request.getRecords());
         assertEquals(this.xcontext.getWikiId(), request.getProperty("context.wiki"));
         assertEquals(this.xcontext.getAction(), request.getProperty("context.action"));
         assertEquals(this.documentAccessBridge.getCurrentUserReference(), request.getProperty("user.reference"));
 
-        assertEquals(Arrays.asList("wiki:drafts"), install.getRequest().getNamespaces());
+        assertEquals(List.of("wiki:drafts"), install.getRequest().getNamespaces());
         assertEquals(new DocumentReference("drafts", "Users", "Alice"),
             install.getRequest().getProperty("user.reference"));
     }

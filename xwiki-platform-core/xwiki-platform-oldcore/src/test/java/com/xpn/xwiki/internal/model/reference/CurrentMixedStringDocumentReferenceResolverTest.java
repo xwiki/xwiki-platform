@@ -19,60 +19,68 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link CurrentMixedStringDocumentReferenceResolver}.
- * 
+ *
  * @version $Id$
  */
-public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBridgedComponentTestCase
+@OldcoreTest
+@ReferenceComponentList
+class CurrentMixedStringDocumentReferenceResolverTest
 {
     private static final String CURRENT_SPACE = "currentspace";
 
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
     private EntityReferenceResolver<String> resolver;
 
-    @Override
-    public void setUp() throws Exception
+    @BeforeEach
+    void beforeEach() throws Exception
     {
-        super.setUp();
-
-        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "currentmixed");
+        this.resolver = this.oldcore.getMocker().getInstance(EntityReferenceResolver.TYPE_STRING, "currentmixed");
     }
 
     @Test
-    public void testResolveDocumentReferenceWhenContextDocument() throws Exception
+    void resolveDocumentReferenceWhenContextDocument()
     {
-        getContext().setDoc(new XWikiDocument(new DocumentReference("not used", CURRENT_SPACE, "notused")));
-
-        getContext().setWikiId("currentwiki");
+        this.oldcore.getXWikiContext()
+            .setDoc(new XWikiDocument(new DocumentReference("not used", CURRENT_SPACE, "notused")));
+        this.oldcore.getXWikiContext().setWikiId("currentwiki");
 
         EntityReference reference = this.resolver.resolve("", EntityType.DOCUMENT);
-        Assert.assertEquals("currentwiki", reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals("WebHome", reference.getName());
+        assertEquals("currentwiki", reference.extractReference(EntityType.WIKI).getName());
+        assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
+        assertEquals("WebHome", reference.getName());
     }
 
     @Test
-    public void testResolveDocumentReferenceForDefaultWikiWhenNoContextDocument() throws Exception
+    void resolveDocumentReferenceForDefaultWikiWhenNoContextDocument()
     {
-        getContext().setWikiId("currentwiki");
+        this.oldcore.getXWikiContext().setWikiId("currentwiki");
 
         EntityReference reference = this.resolver.resolve("space.page", EntityType.DOCUMENT);
 
         // Make sure the resolved wiki is the current wiki and not the wiki from the current document (since that
         // doc isn't set).
-        Assert.assertEquals("currentwiki", reference.extractReference(EntityType.WIKI).getName());
+        assertEquals("currentwiki", reference.extractReference(EntityType.WIKI).getName());
 
-        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals("page", reference.getName());
+        assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        assertEquals("page", reference.getName());
     }
 }

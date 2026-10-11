@@ -19,29 +19,30 @@
  */
 package org.xwiki.localization.internal;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.localization.TranslationBundle;
-import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,43 +52,45 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 8.0RC1
  */
-public class DefaultTranslationBundleContextTest
+@ComponentTest
+class DefaultTranslationBundleContextTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<TranslationBundleContext> mocker =
-        new MockitoComponentMockingRule<TranslationBundleContext>(DefaultTranslationBundleContext.class);
+    @InjectMockComponents
+    private DefaultTranslationBundleContext translationBundleContext;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    private Execution mockExecution;
+
+    @MockComponent
+    private ModelContext mockModelContext;
+
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> mockContextComponentManagerProvider;
 
     private ExecutionContext mockExecutionContext;
 
-    private ModelContext mockModelContext;
-
-    private Provider<ComponentManager> mockContextComponentManagerProvider;
-
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    void before()
     {
         this.mockExecutionContext = new ExecutionContext();
 
-        Execution mockExecution = this.mocker.getInstance(Execution.class);
-        when(mockExecution.getContext()).thenReturn(mockExecutionContext);
-
-        this.mockModelContext = this.mocker.getInstance(ModelContext.class);
+        when(this.mockExecution.getContext()).thenReturn(this.mockExecutionContext);
         when(this.mockModelContext.getCurrentEntityReference()).thenReturn(new WikiReference("currentWiki"));
-
-        this.mockContextComponentManagerProvider =
-            this.mocker.registerMockComponent(
-                new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
     }
 
     @Test
-    public void getBundlesNewContext() throws Exception
+    void getBundlesNewContext() throws Exception
     {
         // Map the context component manager to the test component manager for easier test setup.
-        when(this.mockContextComponentManagerProvider.get()).thenReturn(this.mocker);
+        when(this.mockContextComponentManagerProvider.get()).thenReturn(this.componentManager);
 
-        TranslationBundle mockTranslationBundle = this.mocker.registerMockComponent(TranslationBundle.class);
+        TranslationBundle mockTranslationBundle = this.componentManager.registerMockComponent(TranslationBundle.class);
 
-        Collection<TranslationBundle> bundles = this.mocker.getComponentUnderTest().getBundles();
+        Collection<TranslationBundle> bundles = this.translationBundleContext.getBundles();
 
         // Verify that an internal bundles cache is created and stored in the ExecutionContext.
         assertNotNull(this.mockExecutionContext.getProperty(DefaultTranslationBundleContext.CKEY_BUNDLES));
@@ -97,18 +100,18 @@ public class DefaultTranslationBundleContextTest
     }
 
     @Test
-    public void getBundlesSwitchContext() throws Exception
+    void getBundlesSwitchContext() throws Exception
     {
         // Mock the first wiki bundles.
         ComponentManager mockWiki1ComponentManager = mock(ComponentManager.class);
         when(this.mockContextComponentManagerProvider.get()).thenReturn(mockWiki1ComponentManager);
 
         TranslationBundle mockWiki1TranslationBundle = mock(TranslationBundle.class);
-        List<TranslationBundle> wiki1Bundles = Arrays.asList(mockWiki1TranslationBundle);
-        when(mockWiki1ComponentManager.<TranslationBundle>getInstanceList(TranslationBundle.class)).thenReturn(
-            wiki1Bundles);
+        List<TranslationBundle> wiki1Bundles = List.of(mockWiki1TranslationBundle);
+        when(mockWiki1ComponentManager.<TranslationBundle>getInstanceList(TranslationBundle.class))
+            .thenReturn(wiki1Bundles);
 
-        Collection<TranslationBundle> firstBundles = this.mocker.getComponentUnderTest().getBundles();
+        Collection<TranslationBundle> firstBundles = this.translationBundleContext.getBundles();
 
         // Check the output
         assertEquals(1, firstBundles.size());
@@ -122,11 +125,11 @@ public class DefaultTranslationBundleContextTest
         when(this.mockContextComponentManagerProvider.get()).thenReturn(mockWiki2ComponentManager);
 
         TranslationBundle mockWiki2TranslationBundle = mock(TranslationBundle.class);
-        List<TranslationBundle> wiki2Bundles = Arrays.asList(mockWiki2TranslationBundle);
+        List<TranslationBundle> wiki2Bundles = List.of(mockWiki2TranslationBundle);
         when(mockWiki2ComponentManager.<TranslationBundle>getInstanceList(TranslationBundle.class)).thenReturn(
             wiki2Bundles);
 
-        Collection<TranslationBundle> secondBundles = this.mocker.getComponentUnderTest().getBundles();
+        Collection<TranslationBundle> secondBundles = this.translationBundleContext.getBundles();
 
         // Check the output.
         assertEquals(1, secondBundles.size());
@@ -140,27 +143,27 @@ public class DefaultTranslationBundleContextTest
         // Switch back to the first wiki and get the same (cached) first bundles.
         when(this.mockModelContext.getCurrentEntityReference()).thenReturn(new WikiReference("currentWiki"));
 
-        Collection<TranslationBundle> thirdBundles = this.mocker.getComponentUnderTest().getBundles();
+        Collection<TranslationBundle> thirdBundles = this.translationBundleContext.getBundles();
 
         assertEquals(firstBundles.iterator().next(), thirdBundles.iterator().next());
     }
 
     @Test
-    public void addBundlesToCurrentContext() throws Exception
+    void addBundlesToCurrentContext()
     {
         // Map the context component manager to the test component manager for easier test setup.
-        when(this.mockContextComponentManagerProvider.get()).thenReturn(this.mocker);
+        when(this.mockContextComponentManagerProvider.get()).thenReturn(this.componentManager);
 
-        Collection<TranslationBundle> bundles = this.mocker.getComponentUnderTest().getBundles();
+        Collection<TranslationBundle> bundles = this.translationBundleContext.getBundles();
 
         // No bundles.
         assertEquals(0, bundles.size());
 
         // Add a bundle
         TranslationBundle mockBundleToAdd = mock(TranslationBundle.class);
-        this.mocker.getComponentUnderTest().addBundle(mockBundleToAdd);
+        this.translationBundleContext.addBundle(mockBundleToAdd);
 
-        bundles = this.mocker.getComponentUnderTest().getBundles();
+        bundles = this.translationBundleContext.getBundles();
 
         // Check that it was added.
         assertEquals(1, bundles.size());

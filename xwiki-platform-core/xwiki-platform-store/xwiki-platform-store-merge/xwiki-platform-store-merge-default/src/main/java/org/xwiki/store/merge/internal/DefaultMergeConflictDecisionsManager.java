@@ -32,6 +32,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.diff.Conflict;
@@ -80,7 +81,7 @@ public class DefaultMergeConflictDecisionsManager implements MergeConflictDecisi
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         lru.setMaxEntries(1000);
         lru.setLifespan(3600);
-        cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
         try {
             conflictsCache = cacheManager.createNewCache(cacheConfiguration);
         } catch (CacheException e) {

@@ -64,10 +64,12 @@ public class XWikiActionRule implements XWikiNotificationRule
 
     public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
     {
+        // Nothing to do, this rule only reacts to actions.
     }
 
     public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
     {
+        // Nothing to do, this rule only reacts to actions.
     }
 
     public void verify(XWikiDocument doc, String action, XWikiContext context)
@@ -79,7 +81,7 @@ public class XWikiActionRule implements XWikiNotificationRule
         } catch (Throwable e) {
             // protect from bad listeners
             LOGGER.error("Failed to notify target [{}] for event [{}], doc = [{}], action = [{}]",
-                new Object[] {getTarget(), this, doc, action, e});
+                getTarget(), this, doc, action, e);
         }
     }
 
@@ -92,7 +94,7 @@ public class XWikiActionRule implements XWikiNotificationRule
         } catch (Throwable e) {
             // protect from bad listeners
             LOGGER.error("Failed to notify target [{}] for pre event [{}], doc = [{}], action = [{}]",
-                new Object[] {getTarget(), this, doc, action, e});
+                getTarget(), this, doc, action, e);
         }
     }
 

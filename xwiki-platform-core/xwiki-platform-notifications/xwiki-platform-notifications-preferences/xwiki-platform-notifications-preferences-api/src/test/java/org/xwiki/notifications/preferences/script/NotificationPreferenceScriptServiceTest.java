@@ -19,9 +19,7 @@
  */
 package org.xwiki.notifications.preferences.script;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,11 +54,9 @@ import org.xwiki.user.internal.document.DocumentUserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -109,7 +105,7 @@ class NotificationPreferenceScriptServiceTest
         private NotificationPreferenceImpl(boolean isNotificationEnabled, NotificationFormat format,
                 String eventType)
         {
-            super(isNotificationEnabled, format, null, null, null, new HashMap<>());
+            super(isNotificationEnabled, format, null, null, null, new EnumMap<>(NotificationPreferenceProperty.class));
             properties.put(NotificationPreferenceProperty.EVENT_TYPE, eventType);
         }
     }
@@ -126,8 +122,8 @@ class NotificationPreferenceScriptServiceTest
         NotificationPreferenceImpl existingPref3 = new NotificationPreferenceImpl(false,
                 NotificationFormat.EMAIL, "delete");
 
-        when(notificationPreferenceManager.getAllPreferences(eq(userRef))).thenReturn(
-                Arrays.asList(existingPref1, existingPref2, existingPref3));
+        when(notificationPreferenceManager.getAllPreferences(userRef)).thenReturn(
+                List.of(existingPref1, existingPref2, existingPref3));
 
         final MutableBoolean isOk = new MutableBoolean(false);
         doAnswer(invocationOnMock -> {
@@ -157,7 +153,7 @@ class NotificationPreferenceScriptServiceTest
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(user);
         DocumentUserReference documentUserReference = new DocumentUserReference(user, true);
 
-        when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(Collections.emptyList());
+        when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(List.of());
         assertTrue(this.scriptService
             .isEventTypeEnabledForUser("update", NotificationFormat.ALERT, documentUserReference));
 
@@ -165,17 +161,17 @@ class NotificationPreferenceScriptServiceTest
         NotificationPreference pref2 = mock(NotificationPreference.class);
 
         when(pref1.getFormat()).thenReturn(NotificationFormat.EMAIL);
-        Map<NotificationPreferenceProperty, Object> properties1 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties1 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref1.getProperties()).thenReturn(properties1);
 
         when(pref2.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties2 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties2.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref2.getProperties()).thenReturn(properties2);
         when(pref2.isNotificationEnabled()).thenReturn(true);
 
-        when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(Arrays.asList(pref1, pref2));
+        when(notificationPreferenceManager.getAllPreferences(user)).thenReturn(List.of(pref1, pref2));
 
         assertTrue(this.scriptService
             .isEventTypeEnabledForUser("update", NotificationFormat.ALERT, documentUserReference));
@@ -210,7 +206,7 @@ class NotificationPreferenceScriptServiceTest
     {
         WikiReference wiki = new WikiReference("whatever");
 
-        when(notificationPreferenceManager.getAllPreferences(wiki)).thenReturn(Collections.emptyList());
+        when(notificationPreferenceManager.getAllPreferences(wiki)).thenReturn(List.of());
         assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT,
                 wiki.getName()));
 
@@ -218,17 +214,17 @@ class NotificationPreferenceScriptServiceTest
         NotificationPreference pref2 = mock(NotificationPreference.class);
 
         when(pref1.getFormat()).thenReturn(NotificationFormat.EMAIL);
-        Map<NotificationPreferenceProperty, Object> properties1 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties1 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref1.getProperties()).thenReturn(properties1);
 
         when(pref2.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties2 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties2.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref2.getProperties()).thenReturn(properties2);
         when(pref2.isNotificationEnabled()).thenReturn(true);
 
-        when(notificationPreferenceManager.getAllPreferences(wiki)).thenReturn(Arrays.asList(pref1, pref2));
+        when(notificationPreferenceManager.getAllPreferences(wiki)).thenReturn(List.of(pref1, pref2));
         assertTrue(this.scriptService.isEventTypeEnabled("update", NotificationFormat.ALERT,
                 wiki.getName()));
         assertFalse(this.scriptService.isEventTypeEnabled("update", NotificationFormat.EMAIL,
@@ -244,14 +240,8 @@ class NotificationPreferenceScriptServiceTest
         doThrow(e).when(authorizationManager).checkAccess(Right.ADMIN, new WikiReference("wikiA"));
 
         String json = "";
-        Exception caughtException = null;
-        try {
-            this.scriptService.saveNotificationPreferencesForCurrentWiki(json);
-        } catch (Exception ex) {
-            caughtException = ex;
-        }
-
-        assertNotNull(caughtException);
+        AccessDeniedException caughtException = assertThrows(AccessDeniedException.class,
+            () -> this.scriptService.saveNotificationPreferencesForCurrentWiki(json));
         assertEquals(e, caughtException);
     }
 
@@ -263,14 +253,8 @@ class NotificationPreferenceScriptServiceTest
         doThrow(e).when(authorizationManager).checkAccess(Right.EDIT, userDoc);
 
         String json = "";
-        Exception caughtException = null;
-        try {
-            this.scriptService.saveNotificationPreferences(json, userDoc);
-        } catch (Exception ex) {
-            caughtException = ex;
-        }
-
-        assertNotNull(caughtException);
+        AccessDeniedException caughtException = assertThrows(AccessDeniedException.class,
+            () -> this.scriptService.saveNotificationPreferences(json, userDoc));
         assertEquals(e, caughtException);
     }
 }

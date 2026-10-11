@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -57,6 +58,20 @@ public class BasePage extends BaseElement
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
 
     private static final By EDIT_BUTTON_LOCATOR = By.xpath("//li[@id='tmEdit']/a[contains(@class, 'btn')]");
+
+    /**
+     * Number of times the axe-core accessibility analysis is attempted before giving up, to work around the
+     * axe-injection race (see {@link #analyzeWithAxeReadyRetry}).
+     */
+    private static final int WCAG_ANALYZE_ATTEMPTS = 3;
+
+    /**
+     * Message fragments identifying a JavaScript error raised because axe-core was not present in the frame when the
+     * analysis probed it. Browsers word it differently: Chrome reports the failing property read on the axe object
+     * ({@code runPartial} is the axe entry point the analysis calls), while Firefox reports the missing binding itself.
+     */
+    private static final List<String> AXE_NOT_READY_ERRORS =
+        List.of("runPartial", "window.axe", "axe is not defined", "axe is undefined");
 
     /**
      * Used for sending keyboard shortcuts to.
@@ -110,7 +125,8 @@ public class BasePage extends BaseElement
     private WebElement notificationsMenu;
 
     /**
-     * Used to scroll the page to the top before accessing the floating menu.
+     * The wiki logo displayed in the page header. Also used to scroll the page to the top before accessing the
+     * floating menu.
      */
     @FindBy(id = "companylogo")
     protected WebElement logo;
@@ -261,7 +277,7 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Performs a click on the "edit acces rights" entry of the content menu.
+     * Performs a click on the "edit access rights" entry of the content menu.
      */
     public RightsEditPage editRights()
     {
@@ -535,6 +551,17 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * @return the URL of the image displayed as the wiki logo in the page header
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public String getLogoImageURL()
+    {
+        return this.logo.findElement(By.tagName("img")).getAttribute("src");
+    }
+
+    /**
      * @since 4.5M1
      */
     public void watchSpace()
@@ -704,7 +731,7 @@ public class BasePage extends BaseElement
             if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
                 XWikiWebDriver driver = this.getDriver();
                 AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
-                Results axeResult = axeBuilder.analyze(driver);
+                Results axeResult = analyzeWithAxeReadyRetry(axeBuilder, driver);
                 wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
                 long stopTime = System.currentTimeMillis();
                 long deltaTime = stopTime - startTime;
@@ -720,9 +747,36 @@ public class BasePage extends BaseElement
             if (wcagContext.shouldWCAGStopOnError()) {
                 throw e;
             } else {
-                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag:", e);
             }
         }
+    }
+
+    private Results analyzeWithAxeReadyRetry(AxeBuilder axeBuilder, XWikiWebDriver driver)
+    {
+        // The axe-core library injects its script and then immediately probes window.axe. On a page that changes
+        // underneath the analysis (e.g. the refactoring job status page refreshing while the job runs), the page can
+        // navigate between the injection and the probe, leaving window.axe undefined and making analyze() fail. Waiting
+        // for the page to settle and re-running the analysis avoids this race.
+        JavascriptException lastError = null;
+        for (int attempt = 0; attempt < WCAG_ANALYZE_ATTEMPTS; attempt++) {
+            try {
+                return axeBuilder.analyze(driver);
+            } catch (JavascriptException e) {
+                if (!isAxeNotReadyError(e)) {
+                    throw e;
+                }
+                lastError = e;
+                waitUntilPageIsReady();
+            }
+        }
+        throw lastError;
+    }
+
+    static boolean isAxeNotReadyError(JavascriptException error)
+    {
+        String message = error.getMessage();
+        return message != null && AXE_NOT_READY_ERRORS.stream().anyMatch(message::contains);
     }
 
     /**
@@ -854,5 +908,23 @@ public class BasePage extends BaseElement
     public boolean hasRenderingError()
     {
         return getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror"));
+    }
+
+    /**
+     * @return {@code true} if an icon rendered by the Font Awesome (font-based) icon theme is displayed in the page
+     *         content; Font Awesome renders icons as {@code <span class="fa ...">} elements
+     */
+    public boolean isFontAwesomeIconDisplayedInContent()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector("#xwikicontent span.fa"));
+    }
+
+    /**
+     * @return {@code true} if an icon rendered by the Silk (image-based) icon theme is displayed in the page content;
+     *         Silk renders icons as {@code <img src=".../icons/silk/...">} elements
+     */
+    public boolean isSilkIconDisplayedInContent()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector("#xwikicontent img[src*='/icons/silk/']"));
     }
 }

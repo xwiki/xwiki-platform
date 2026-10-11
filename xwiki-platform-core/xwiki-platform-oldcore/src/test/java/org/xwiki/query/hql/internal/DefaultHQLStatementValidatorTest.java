@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultHQLStatementValidatorTest
+class DefaultHQLStatementValidatorTest
 {
     @InjectMockComponents
     private DefaultHQLStatementValidator validator;

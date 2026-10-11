@@ -24,6 +24,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -68,8 +69,8 @@ public class AddressUserDataExtractor implements UserDataExtractor<Address>
                 address = InternetAddress.parse(email)[0];
             } catch (AddressException e) {
                 // Invalid address, skip it, but log a warning!
-                LOGGER.warn("Found invalid email address [{}] for user [{}]. Email will not been sent to that user.",
-                    email, reference);
+                LOGGER.warn("Found invalid email address [{}] for user [{}]. Email will not been sent to that user. "
+                    + "Root cause is [{}].", email, reference, ExceptionUtils.getRootCauseMessage(e));
             }
         } else {
             LOGGER.warn("User [{}] has no email defined. Email will not been sent to that user.", reference);

@@ -114,6 +114,8 @@ public class Document extends Api
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Document.class);
 
+    private static final String DELETE = "delete";
+
     /**
      * The XWikiDocument object wrapped by this API.
      */
@@ -164,7 +166,7 @@ public class Document extends Api
         return this.currentMixedDocumentReferenceResolver;
     }
 
-    private EntityReferenceSerializer<String> getDefaultEntityReferenceSerializer()
+    private EntityReferenceSerializer<String> getDefaultReferenceSerializer()
     {
         if (this.defaultEntityReferenceSerializer == null) {
             this.defaultEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
@@ -234,7 +236,7 @@ public class Document extends Api
 
     /**
      * Get the XWikiDocument wrapped by this API. This function is accessible only if you have the programming rights
-     * give access to the priviledged API of the Document.
+     * give access to the privileged API of the Document.
      *
      * @return The XWikiDocument wrapped by this API.
      */
@@ -319,9 +321,9 @@ public class Document extends Api
      *         {@code getDocumentReference().getParent().getName()}.
      * @see #getPageReference()
      * @see #getDocumentReference()
-     * @deprecated since 11.0, use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.0")
     public String getName()
 {
     return this.doc.getDocumentReference().getName();
@@ -372,7 +374,7 @@ public class Document extends Api
      */
     public String getPrefixedFullName()
     {
-        return getDefaultEntityReferenceSerializer().serialize(this.doc.getDocumentReference());
+        return getDefaultReferenceSerializer().serialize(this.doc.getDocumentReference());
     }
 
     /**
@@ -450,12 +452,12 @@ public class Document extends Api
         try {
             return this.doc.getRenderedTitle(Syntax.valueOf(syntaxId), getXWikiContext());
         } catch (ParseException e) {
-            LOGGER.error("Failed to parse provided syntax identifier [" + syntaxId + "]", e);
+            LOGGER.error("Failed to parse provided syntax identifier [{}]", syntaxId, e);
 
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to parse syntax identifier [" + syntaxId + "]", e);
         } catch (Exception e) {
-            LOGGER.error("Failed to render document [" + getPrefixedFullName() + "] title content", e);
+            LOGGER.error("Failed to render document [{}] title content", getPrefixedFullName(), e);
 
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to render document [" + getPrefixedFullName() + "] content title", e);
@@ -610,9 +612,9 @@ public class Document extends Api
      * version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
      *
      * @return The syntax id representing the syntax used for the document.
-     * @deprecated since 2.3M1 use {@link #getSyntax()} instead
+     * @deprecated use {@link #getSyntax()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.3M1")
     public String getSyntaxId()
     {
         return this.doc.getSyntax().toIdString();
@@ -622,9 +624,9 @@ public class Document extends Api
      * Same as {@link #getLocale()} but as String.
      *
      * @return the locale of the document.
-     * @deprecated since 5.4M1 use {@link #getLocale()} instead
+     * @deprecated use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.4M1")
     public String getLanguage()
     {
         return this.doc.getLanguage();
@@ -659,9 +661,9 @@ public class Document extends Api
      * Same as {@link #getRealLocale()} but as String.
      *
      * @return the real locale
-     * @deprecated since 8.0M1, use {@link #getRealLocale()} instead
+     * @deprecated use {@link #getRealLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getRealLanguage() throws XWikiException
     {
         return this.doc.getRealLanguage(getXWikiContext());
@@ -684,9 +686,9 @@ public class Document extends Api
      * Same as {@link #getDefaultLocale()} but as String.
      * 
      * @return the locale of the default document
-     * @deprecated since 8.0M1, use {@link #getDefaultLocale()} instead
+     * @deprecated use {@link #getDefaultLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getDefaultLanguage()
     {
         return this.doc.getDefaultLanguage();
@@ -772,7 +774,7 @@ public class Document extends Api
     }
 
     /**
-     * @return the tranlated Document if the wiki is multilingual, the locale is first checked in the URL, the cookie,
+     * @return the translated Document if the wiki is multilingual, the locale is first checked in the URL, the cookie,
      *         the user profile and finally the wiki configuration if not, the locale is the one on the wiki
      *         configuration.
      */
@@ -847,9 +849,9 @@ public class Document extends Api
     /**
      * @param text the text to render
      * @return the given text rendered in the context of this document
-     * @deprecated since 1.6M1 use {@link #getRenderedContent(String, String)}
+     * @deprecated use {@link #getRenderedContent(String, String)}
      */
-    @Deprecated
+    @Deprecated(since = "1.6M1")
     public String getRenderedContent(String text) throws XWikiException
     {
         return getRenderedContent(text, Syntax.XWIKI_1_0.toIdString());
@@ -887,7 +889,7 @@ public class Document extends Api
      * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @return the given text rendered in the context of this document using the passed Syntax
      */
-    private String getRenderedContent(String text, String syntaxId, boolean restricted) throws XWikiException
+    private String getRenderedContent(String text, String syntaxId, boolean restricted)
     {
         // Make sure we keep using current author as passed content author
         return this.doc.getRenderedContent(text, syntaxId, restricted, getCallerDocument(getXWikiContext()),
@@ -1322,7 +1324,7 @@ public class Document extends Api
         }
         try {
             Vector<BaseObject> allObjects = this.getDoc().getObjects(classname);
-            if (allObjects == null || allObjects.size() == 0) {
+            if (allObjects == null || allObjects.isEmpty()) {
                 return result;
             } else {
                 for (BaseObject obj : allObjects) {
@@ -1338,6 +1340,8 @@ public class Document extends Api
                 }
             }
         } catch (Exception e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The objects that could be retrieved so far are returned.
         }
         return result;
     }
@@ -2186,7 +2190,7 @@ public class Document extends Api
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         List<DocumentStats> stats = statisticsService.getDocumentStatistics(action, scope, period, range, this.context);
-        if (stats.size() > 0) {
+        if (!stats.isEmpty()) {
             return stats.get(0);
         }
         return new DocumentStats();
@@ -2205,7 +2209,7 @@ public class Document extends Api
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         List<DocumentStats> stats = statisticsService.getDocumentStatistics(action, scope, period, range, this.context);
-        if (stats.size() > 0) {
+        if (!stats.isEmpty()) {
             return stats.get(0);
         }
         return new DocumentStats();
@@ -2222,8 +2226,7 @@ public class Document extends Api
         Range range = RangeFactory.ALL;
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
-        List<RefererStats> stats = statisticsService.getRefererStatistics("", scope, period, range, this.context);
-        return stats;
+        return statisticsService.getRefererStatistics("", scope, period, range, this.context);
     }
 
     public boolean checkAccess(String right)
@@ -2290,11 +2293,7 @@ public class Document extends Api
     {
         try {
             XWikiLock lock = this.doc.getLock(getXWikiContext());
-            if (lock != null && !getXWikiContext().getUser().equals(lock.getUserName())) {
-                return true;
-            } else {
-                return false;
-            }
+            return lock != null && !getXWikiContext().getUser().equals(lock.getUserName());
         } catch (Exception e) {
             return false;
         }
@@ -2390,7 +2389,7 @@ public class Document extends Api
     /**
      * Returns data needed for a generation of Table of Content for this document.
      *
-     * @param init an intial level where the TOC generation should start at
+     * @param init an initial level where the TOC generation should start at
      * @param max maximum level TOC is generated for
      * @param numbered if should generate numbering for headings
      * @return a map where an heading (title) ID is the key and value is another map with two keys: text, level and
@@ -2398,7 +2397,7 @@ public class Document extends Api
      */
     public Map<String, Map<String, java.lang.Object>> getTOC(int init, int max, boolean numbered)
     {
-        getXWikiContext().put("tocNumbered", new Boolean(numbered));
+        getXWikiContext().put("tocNumbered", Boolean.valueOf(numbered));
         return TOCGenerator.generateTOC(getContent(), init, max, numbered, getXWikiContext());
     }
 
@@ -2767,7 +2766,7 @@ public class Document extends Api
                 saveAsAuthor(comment, minorEdit);
             }
         } else {
-            java.lang.Object[] args = {getDefaultEntityReferenceSerializer().serialize(getDocumentReference())};
+            java.lang.Object[] args = {getDefaultReferenceSerializer().serialize(getDocumentReference())};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }
@@ -2798,7 +2797,7 @@ public class Document extends Api
                     saveDocument(comment, minorEdit, false);
                 } else {
                     java.lang.Object[] args =
-                        { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), getWiki() };
+                        { getDefaultReferenceSerializer().serialize(getDocumentReference()), getWiki() };
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                         "Access denied in edit mode on document [{0}]. The wiki [{1}] is in read only mode.", null,
@@ -2880,18 +2879,18 @@ public class Document extends Api
 
     private void saveDocument(String comment, boolean minorEdit, boolean checkSaving) throws XWikiException
     {
-        XWikiDocument doc = getDoc();
+        XWikiDocument xdoc = getDoc();
 
         UserReference currentUserReference = getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE);
-        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
+        xdoc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
-        if (doc.isNew()) {
-            doc.getAuthors().setCreator(currentUserReference);
+        if (xdoc.isNew()) {
+            xdoc.getAuthors().setCreator(currentUserReference);
         }
 
         XWikiContext xWikiContext = getXWikiContext();
         if (checkSaving) {
-            DocumentReference author = doc.getAuthorReference();
+            DocumentReference author = xdoc.getAuthorReference();
 
             XWikiDocument secureDocument = xWikiContext.getSecureDocument();
             if (secureDocument != null) {
@@ -2899,15 +2898,15 @@ public class Document extends Api
                 // this shouldn't rely on the current user but the script author.
                 // The existing required rights on doc have already been verified by the edit right check.
                 // If required rights shall be changed, they are checked by a listener in checkSavingDocument() below.
-                checkRequiredRightsForSaving(secureDocument, doc, xWikiContext.getAuthorReference());
+                checkRequiredRightsForSaving(secureDocument, xdoc, xWikiContext.getAuthorReference());
             }
 
             // Make sure the user is allowed to make this modification
-            xWikiContext.getWiki().checkSavingDocument(author, doc, comment, minorEdit,
+            xWikiContext.getWiki().checkSavingDocument(author, xdoc, comment, minorEdit,
                 xWikiContext);
         }
 
-        xWikiContext.getWiki().saveDocument(doc, comment, minorEdit, xWikiContext);
+        xWikiContext.getWiki().saveDocument(xdoc, comment, minorEdit, xWikiContext);
         this.initialDoc = this.doc;
     }
 
@@ -3100,13 +3099,18 @@ public class Document extends Api
      */
     protected void deleteDocument() throws XWikiException
     {
-        getXWikiContext().getWiki().deleteDocument(this.doc, getXWikiContext());
+        deleteDocument(true);
+    }
+
+    private void deleteDocument(boolean checkDeleting) throws XWikiException
+    {
+        getXWikiContext().getWiki().deleteDocument(this.doc, true, checkDeleting, getXWikiContext());
         this.initialDoc = this.doc;
     }
 
     public void delete() throws XWikiException
     {
-        if (hasAccessLevel("delete")) {
+        if (hasAccessLevel(DELETE)) {
             deleteDocument();
         } else {
             java.lang.Object[] args = { this.getFullName() };
@@ -3147,7 +3151,8 @@ public class Document extends Api
     public void deleteWithProgrammingRights() throws XWikiException
     {
         if (hasProgrammingRights()) {
-            deleteDocument();
+            // Programming right allows bypassing the protections applied to a delete done by the context user
+            deleteDocument(false);
         } else {
             java.lang.Object[] args = { this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
@@ -3200,7 +3205,7 @@ public class Document extends Api
                 i = fname.lastIndexOf("/");
             }
             filename = fname.substring(i + 1);
-            filename = filename.replaceAll("\\+", " ");
+            filename = filename.replace("+", " ");
 
             if ((data != null) && (data.length > 0)) {
                 XWikiAttachment attachment = this.getDoc().addAttachment(filename, data, getXWikiContext());
@@ -3302,7 +3307,7 @@ public class Document extends Api
     public void rename(DocumentReference newReference) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
-        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+        if (hasAccessLevel(DELETE) && xWiki.checkAccess("edit",
             xWiki.getDocument(newReference, this.context), this.context)) {
             List<DocumentReference> backLinkedReferences = getDocument().getBackLinkedReferences(this.context);
             List<DocumentReference> childrenReferences = getDocument().getChildrenReferences(this.context);
@@ -3396,7 +3401,7 @@ public class Document extends Api
         List<DocumentReference> childDocumentNames) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
-        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+        if (hasAccessLevel(DELETE) && xWiki.checkAccess("edit",
             xWiki.getDocument(newReference, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.
@@ -3491,8 +3496,7 @@ public class Document extends Api
         try {
             getDoc().convertSyntax(targetSyntaxId, this.context);
         } catch (Exception ex) {
-            LOGGER.error(
-                "Failed to convert document [" + getPrefixedFullName() + "] to syntax [" + targetSyntaxId + "]", ex);
+            LOGGER.error("Failed to convert document [{}] to syntax [{}]", getPrefixedFullName(), targetSyntaxId, ex);
 
             return false;
         } finally {

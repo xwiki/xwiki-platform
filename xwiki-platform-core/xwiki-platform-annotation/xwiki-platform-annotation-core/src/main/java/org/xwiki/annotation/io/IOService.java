@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Role;
 /**
  * This component provides services related to annotations storage and retrieval. It operates with string serialized
  * references for the targets of annotations. This interface does not restrict the implementation of the annotation
- * targets, they can be anything referencable through a string.
+ * targets, they can be anything referenceable through a string.
  *
  * @version $Id$
  * @since 2.3M1

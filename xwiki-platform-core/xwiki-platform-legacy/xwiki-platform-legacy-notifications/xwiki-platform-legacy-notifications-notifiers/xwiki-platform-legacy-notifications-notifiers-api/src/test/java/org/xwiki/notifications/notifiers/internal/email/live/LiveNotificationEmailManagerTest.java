@@ -20,16 +20,17 @@
 package org.xwiki.notifications.notifiers.internal.email.live;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.internal.SimilarityCalculator;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,37 +40,35 @@ import static org.mockito.Mockito.when;
  * @since 9.6RC1
  * @version $Id$
  */
-public class LiveNotificationEmailManagerTest
+@ComponentTest
+class LiveNotificationEmailManagerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<LiveNotificationEmailManager> mocker =
-            new MockitoComponentMockingRule<>(LiveNotificationEmailManager.class);
+    @InjectMockComponents
+    private LiveNotificationEmailManager manager;
 
+    @MockComponent
     private NotificationConfiguration notificationConfiguration;
 
+    @MockComponent
     private LiveNotificationEmailSender liveNotificationEmailSender;
 
+    @MockComponent
     private SimilarityCalculator similarityCalculator;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        this.notificationConfiguration = this.mocker.registerMockComponent(NotificationConfiguration.class);
         when(this.notificationConfiguration.liveNotificationsGraceTime()).thenReturn(1);
-
-        this.liveNotificationEmailSender = this.mocker.registerMockComponent(LiveNotificationEmailSender.class);
-
-        this.similarityCalculator = this.mocker.registerMockComponent(SimilarityCalculator.class);
     }
 
     @Test
-    public void testNextExecutionWithNoEvents() throws Exception
+    void nextExecutionWithNoEvents()
     {
-        assertEquals(null, this.mocker.getComponentUnderTest().getNextExecutionDate());
+        assertNull(this.manager.getNextExecutionDate());
     }
 
     @Test
-    public void testAddNewEvent() throws Exception
+    void addNewEvent() throws Exception
     {
         // No event is currently defined
         Event event1 = mock(Event.class);
@@ -81,15 +80,15 @@ public class LiveNotificationEmailManagerTest
         when(this.similarityCalculator.computeSimilarity(event2, event3))
                 .thenReturn(SimilarityCalculator.SAME_DOCUMENT_AND_TYPE);
 
-        this.mocker.getComponentUnderTest().initialize();
-        this.mocker.getComponentUnderTest().addEvent(event1);
-        this.mocker.getComponentUnderTest().addEvent(event2);
-        this.mocker.getComponentUnderTest().addEvent(event3);
+        this.manager.initialize();
+        this.manager.addEvent(event1);
+        this.manager.addEvent(event2);
+        this.manager.addEvent(event3);
 
         // We assume that this test will take no more than 15 seconds to execute
-        assertTrue(this.mocker.getComponentUnderTest().getNextExecutionDate().isAfter(
+        assertTrue(this.manager.getNextExecutionDate().isAfter(
                 DateTime.now().plusSeconds(45).getMillis()));
-        assertTrue(this.mocker.getComponentUnderTest().getNextExecutionDate().isBefore(
+        assertTrue(this.manager.getNextExecutionDate().isBefore(
                 DateTime.now().plusMinutes(1).getMillis()));
     }
 }

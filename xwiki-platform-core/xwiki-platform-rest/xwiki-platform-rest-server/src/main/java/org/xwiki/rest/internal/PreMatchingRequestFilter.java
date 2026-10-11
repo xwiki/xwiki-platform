@@ -259,7 +259,7 @@ public class PreMatchingRequestFilter implements ContainerRequestFilter, XWikiRe
                     mediaType = MediaType.valueOf(mediaOverride);
                 } catch (IllegalArgumentException e) {
                     // Ignore badly formed media type
-                    this.logger.warn("Bad media type value [{}] provided: {}", mediaOverride,
+                    this.logger.warn("Bad media type value [{}] provided: [{}]", mediaOverride,
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }

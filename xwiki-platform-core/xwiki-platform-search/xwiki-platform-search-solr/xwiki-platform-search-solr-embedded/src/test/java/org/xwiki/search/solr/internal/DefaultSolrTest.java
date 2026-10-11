@@ -103,7 +103,7 @@ class DefaultSolrTest
     }
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         when(this.mockEnvironment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
 
@@ -321,10 +321,10 @@ class DefaultSolrTest
 
         SchemaResponse.FieldTypeResponse response = new SchemaRequest.FieldType("__xversion").process(client);
         assertEquals(String.valueOf(AbstractSolrCoreInitializer.SCHEMA_BASE_VERSION),
-            response.getFieldType().getAttributes().get("defVal"));
+            response.getFieldType().getAttributes().get(SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE));
         response = new SchemaRequest.FieldType("__cversion").process(client);
         assertEquals(String.valueOf(TestSolrCoreInitializer.VERSION),
-            response.getFieldType().getAttributes().get("defVal"));
+            response.getFieldType().getAttributes().get(SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE));
 
         inputDocument = new SolrInputDocument();
 

@@ -49,9 +49,9 @@ import com.xpn.xwiki.XWikiContext;
  *
  * @since 6.0M1
  * @version $Id$
- * @deprecated since 7.0M2
+ * @deprecated
  */
-@Deprecated
+@Deprecated(since = "7.0M2")
 @Component
 @Singleton
 public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobExecutor, Initializable
@@ -123,7 +123,6 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Override
     public WikiProvisioningJob getJob(List<String> jobId) throws WikiProvisioningJobException
     {
-        WikiProvisioningJob job = jobs.get(jobId);
-        return job;
+        return jobs.get(jobId);
     }
 }

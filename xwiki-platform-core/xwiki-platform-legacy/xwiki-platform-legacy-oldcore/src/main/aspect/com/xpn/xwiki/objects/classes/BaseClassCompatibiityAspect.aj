@@ -110,7 +110,7 @@ public aspect BaseClassCompatibiityAspect
         }
 
         OrderClause order = null;
-        if ((query != null) && (query.getOrderProperties() != null) && (query.getOrderProperties().size() > 0)) {
+        if ((query != null) && (query.getOrderProperties() != null) && !query.getOrderProperties().isEmpty()) {
             order = query.getOrderProperties().get(0);
         }
 

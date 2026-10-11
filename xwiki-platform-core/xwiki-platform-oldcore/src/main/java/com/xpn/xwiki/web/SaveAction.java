@@ -40,7 +40,6 @@ import javax.script.ScriptContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
@@ -90,7 +89,8 @@ public class SaveAction extends EditAction
     protected static final String ASYNC_PARAM = "async";
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SaveAction.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The key used to store the JSON answer for the save action on the XWiki context.
@@ -107,6 +107,10 @@ public class SaveAction extends EditAction
      * override the previous one.
      */
     private static final String FORCE_SAVE_OVERRIDE = "override";
+
+    private static final String EXCEPTION = "exception";
+
+    private static final String PREVIOUS_VERSION = "previousVersion";
 
     @Inject
     private DocumentRevisionProvider documentRevisionProvider;
@@ -134,7 +138,7 @@ public class SaveAction extends EditAction
      * @param context The current request {@link XWikiContext context}.
      * @return <code>true</code> if there was an error and the response needs to render an error page,
      *         <code>false</code> if the document was correctly saved.
-     * @throws XWikiException If an error occured: cannot communicate with the storage module, or cannot update the
+     * @throws XWikiException If an error occurred: cannot communicate with the storage module, or cannot update the
      *             document because the request contains invalid parameters.
      */
     public boolean save(XWikiContext context) throws XWikiException
@@ -204,7 +208,7 @@ public class SaveAction extends EditAction
             readFromTemplate(tdoc, form.getTemplate(), context);
         } catch (XWikiException e) {
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
-                context.put("exception", e);
+                context.put(EXCEPTION, e);
                 return true;
             }
         }
@@ -280,7 +284,7 @@ public class SaveAction extends EditAction
         // Detect merge conflicts. We do this only if the previous version is known, otherwise a 3-way merge is not
         // possible, and the save request is asynchronous, i.e. the user is waiting in edit mode for the save result. If
         // a merge conflict is detected the editor will display the merge conflict modal.
-        if (isConflictCheckEnabled() && Utils.isAjaxRequest(context) && request.getParameter("previousVersion") != null
+        if (isConflictCheckEnabled() && Utils.isAjaxRequest(context) && request.getParameter(PREVIOUS_VERSION) != null
             && isConflictingWithVersion(context, originalDoc, tdoc)) {
             return true;
         }
@@ -389,7 +393,7 @@ public class SaveAction extends EditAction
                 try {
                     customValue = URLDecoder.decode(customValue, request.getCharacterEncoding());
                 } catch (UnsupportedEncodingException e) {
-                    LOGGER.error("Error while decoding a custom value decision.", e);
+                    this.logger.error("Error while decoding a custom value decision.", e);
                 }
                 customChoicesMap.put(conflictReference, customValue);
             }
@@ -441,7 +445,7 @@ public class SaveAction extends EditAction
 
         // TODO The check of the previousVersion should be done at a lower level or with a semaphore since
         // another job might have saved a different version of the document
-        Version previousVersion = new Version(request.getParameter("previousVersion"));
+        Version previousVersion = new Version(request.getParameter(PREVIOUS_VERSION));
         Version latestVersion = originalDoc.getRCSVersion();
 
         Date editingVersionDate = new Date(Long.parseLong(request.getParameter("editingVersionDate")));
@@ -528,7 +532,7 @@ public class SaveAction extends EditAction
                 // we have a conflict.
                 // TODO: Improve it to return the diff between the current version and the latest recorder
                 Map<String, String> jsonObject = new LinkedHashMap<>();
-                jsonObject.put("previousVersion", previousVersion.toString());
+                jsonObject.put(PREVIOUS_VERSION, previousVersion.toString());
                 jsonObject.put("previousVersionDate", editingVersionDate.toString());
                 jsonObject.put("latestVersion", latestVersion.toString());
                 jsonObject.put("latestVersionDate", latestVersionDate.toString());
@@ -577,7 +581,7 @@ public class SaveAction extends EditAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        XWikiException e = (XWikiException) context.get("exception");
+        XWikiException e = (XWikiException) context.get(EXCEPTION);
         if ((e != null) && (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY)) {
             return "docalreadyexists";
         }
@@ -589,7 +593,7 @@ public class SaveAction extends EditAction
             return context.getAction();
         }
 
-        return "exception";
+        return EXCEPTION;
     }
 
     private boolean isAsync(XWikiRequest request)

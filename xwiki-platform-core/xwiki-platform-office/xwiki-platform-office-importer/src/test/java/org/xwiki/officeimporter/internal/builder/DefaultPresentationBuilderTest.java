@@ -80,7 +80,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Test case for {@link DefaultPresentationBuilder}.
- * 
+ *
  * @version $Id$
  * @since 2.1M1
  */
@@ -122,7 +122,7 @@ class DefaultPresentationBuilderTest
     private File outputDirectory;
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure()
     {
         when(this.officeServer.getConverter()).thenReturn(this.officeConverter);
 
@@ -169,7 +169,7 @@ class DefaultPresentationBuilderTest
         when(this.officeHTMLCleaner.clean(any(), eq(config)))
             .then(returnMatchingDocument(presentationHTML, xhtmlDoc));
 
-        XDOM galleryContent = new XDOM(Collections.<Block>emptyList());
+        XDOM galleryContent = new XDOM(Collections.emptyList());
         when(this.xhtmlParser.parse(any(Reader.class))).thenReturn(galleryContent);
 
         XDOMOfficeDocument result = this.presentationBuilder.build(officeFileStream, "file.odp", documentReference);

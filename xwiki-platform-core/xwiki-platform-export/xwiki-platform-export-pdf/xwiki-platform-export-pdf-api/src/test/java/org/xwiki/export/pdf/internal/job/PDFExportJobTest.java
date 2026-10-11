@@ -34,7 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
-import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
@@ -47,6 +46,7 @@ import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -248,15 +248,11 @@ class PDFExportJobTest
         this.request.getContext().put("request.cookies", "cookies");
         this.request.getContext().put("request.foo", "bar");
         this.pdfExportJob.initialize(this.request);
-        try {
-            this.pdfExportJob.runInternal();
-            fail();
-        } catch (Exception e) {
-            assertEquals(
-                "The content size exceeds the configured 1KB limit. Wiki administrators can increase"
-                    + " or disable this limit from the PDF Export administration section or from XWiki properties.",
-                e.getMessage());
-        }
+        Exception e = assertThrows(Exception.class, () -> this.pdfExportJob.runInternal());
+        assertEquals(
+            "The content size exceeds the configured 1KB limit. Wiki administrators can increase"
+                + " or disable this limit from the PDF Export administration section or from XWiki properties.",
+            e.getMessage());
 
         assertFalse(this.request.getContext().containsKey("request.cookies"));
         assertEquals("bar", this.request.getContext().get("request.foo"));

@@ -51,8 +51,8 @@ public class CurrentReferencePageReferenceResolver implements PageReferenceResol
     @Override
     public PageReference resolve(EntityReference pageReferenceRepresentation, Object... parameters)
     {
-        if (pageReferenceRepresentation instanceof PageReference) {
-            return (PageReference) pageReferenceRepresentation;
+        if (pageReferenceRepresentation instanceof PageReference pageReference) {
+            return pageReference;
         }
 
         return new PageReference(

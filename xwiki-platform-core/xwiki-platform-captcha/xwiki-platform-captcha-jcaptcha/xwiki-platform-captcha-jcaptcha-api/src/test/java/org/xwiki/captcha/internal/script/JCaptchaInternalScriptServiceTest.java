@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class JCaptchaInternalScriptServiceTest
+class JCaptchaInternalScriptServiceTest
 {
     @InjectMockComponents
     private JCaptchaInternalScriptService scriptService;
@@ -61,7 +61,7 @@ public class JCaptchaInternalScriptServiceTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    public void getURL() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
+    void getURL() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
     {
         ExtendedURL extendedURL = mock(ExtendedURL.class);
         when(serializer.serialize(any())).thenReturn(extendedURL);
@@ -75,7 +75,7 @@ public class JCaptchaInternalScriptServiceTest
     }
 
     @Test
-    public void getURLSerializerError() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
+    void getURLSerializerError() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
     {
         when(serializer.serialize(any())).thenThrow(new UnsupportedResourceReferenceException("customMessage"));
         assertNull(this.scriptService.getURL("myType", "myEngine", null));
@@ -89,7 +89,7 @@ public class JCaptchaInternalScriptServiceTest
     }
 
     @Test
-    public void getURLNullParams()
+    void getURLNullParams()
     {
         assertNull(this.scriptService.getURL(null, "foo", null));
         assertNull(this.scriptService.getURL("foo", null, null));

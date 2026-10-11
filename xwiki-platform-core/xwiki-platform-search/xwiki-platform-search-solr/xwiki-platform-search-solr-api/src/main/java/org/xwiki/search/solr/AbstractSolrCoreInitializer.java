@@ -152,9 +152,16 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_17_10_1 = 171001000;
 
     /**
+     * The base schema version for XWiki 17.10.9.
+     *
+     * @since 17.10.9
+     */
+    public static final long SCHEMA_VERSION_17_10_9 = 171009000;
+
+    /**
      * The base schema version.
      */
-    public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_12_10;
+    public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_17_10_9;
 
     /**
      * The name of the attribute containing the name of the Solr field.
@@ -266,9 +273,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         // because they are required for things located in solrconfig.xml which is unfortunately impossible to
         // update at runtime
 
-        //////////
         // TYPES
-        //////////
 
         addFieldType(DefaultSolrUtils.SOLR_TYPE_STRINGS, SolrSchemaUtils.SOLR_FIELD_CLASS_STR,
             SOLR_FIELD_SORTMISSINGLAST, true, SOLR_FIELD_MULTIVALUED, true, SOLR_FIELD_DOCVALUES, true);
@@ -318,9 +323,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     private void migrateBaseSchema(long xversion) throws SolrException
     {
         if (xversion < SCHEMA_VERSION_12_10) {
-            //////////
             // TYPES
-            //////////
 
             addTextGeneralFieldType(DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, false);
             addTextGeneralFieldType(DefaultSolrUtils.SOLR_TYPE_TEXT_GENERALS, true);
@@ -796,7 +799,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * Add a field in the Solr schema.
      * 
      * @param name the name of the field to add
-     * @param type the tpe of the field to addd
+     * @param type the type of the field to add
      * @param dynamic true to create a dynamic field
      * @param attributes attributed to add to the field definition
      * @throws SolrException when failing to add the field

@@ -33,13 +33,13 @@ import org.xwiki.script.service.ScriptService;
  * Various XAR oriented APIs for scripts.
  * 
  * @version $Id$
- * @deprecated since 5.3M1, it's a sub {@link ScriptService} of the extension one now, see
+ * @deprecated it's a sub {@link ScriptService} of the extension one now, see
  *             {@link XarExtensionScriptService}
  */
 @Component
 @Named("xarextension")
 @Singleton
-@Deprecated
+@Deprecated(since = "5.3M1")
 public class DeprecatedXarExtensionScriptService implements ScriptService, Initializable
 {
     @Inject

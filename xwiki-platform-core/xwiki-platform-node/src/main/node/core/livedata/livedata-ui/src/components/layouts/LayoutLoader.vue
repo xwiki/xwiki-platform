@@ -121,7 +121,8 @@ export default {
 
 .layout-loader.waiting.visible {
   visibility: visible;
-  display: unset;
+  /* Use block (not `unset`, which resolves to `inline` on a div and would collapse the bar's height). */
+  display: block;
 }
 
 .layout-loader.waiting.visible .loader-fill {

@@ -177,11 +177,6 @@ public final class StatsUtil
     private static String[] cookieDomains;
 
     /**
-     * The expiration date of the cookie.
-     */
-    private static Date cookieExpirationDate;
-
-    /**
      * The type of the period.
      *
      * @version $Id$
@@ -265,9 +260,8 @@ public final class StatsUtil
         // Let's init the expirationDate for the cookie
         Calendar cal = Calendar.getInstance();
         cal.set(2030, 0, 0);
-        cookieExpirationDate = cal.getTime();
 
-        return cookieExpirationDate;
+        return cal.getTime();
     }
 
     /**
@@ -476,10 +470,8 @@ public final class StatsUtil
                 // Let's log a message here
                 // Since the session is also maintained using a cookie
                 // then there is something wrong here
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Found visit with cookie " + visitObject.getCookie() + " in session "
-                        + session.getId() + " for request with cookie " + cookie.getValue());
-                }
+                LOGGER.debug("Found visit with cookie [{}] in session [{}] for request with cookie [{}]",
+                    visitObject.getCookie(), session.getId(), cookie.getValue());
 
                 valid = false;
             } else if ((nowDate.getTime() - visitObject.getEndDate().getTime()) > 30 * 60 * 1000) {
@@ -592,12 +584,12 @@ public final class StatsUtil
                             + " order by obj.endDate desc", Query.HQL).bindValue(sfieldValue, fieldValue)
                         .bindValue(sdate, currentDate).execute();
             } catch (Exception e) {
-                LOGGER.error("Failed to search visit object in the database from " + fieldName, e);
+                LOGGER.error("Failed to search visit object in the database from [{}]", fieldName, e);
             }
         } else {
             throw new UnsupportedOperationException("The current storage engine does not support querying statistics");
         }
-        if (solist != null && solist.size() > 0) {
+        if (solist != null && !solist.isEmpty()) {
             visitStats = solist.get(0);
         }
 
@@ -667,10 +659,8 @@ public final class StatsUtil
         //  cookie is not added. To prevent any stack trace in the logs, we have added the IF on the response.
         //  However, this whole logic needs to be reviewed since right now it means this cookie is never set.
         if (!context.getResponse().isCommitted()) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Setting cookie " + cookie.getValue() + " for name " + cookie.getName() + " with domain "
-                    + cookie.getDomain() + " and path " + cookie.getPath() + " and maxage " + cookie.getMaxAge());
-            }
+            LOGGER.debug("Setting cookie [{}] for name [{}] with domain [{}] and path [{}] and maxage [{}]",
+                cookie.getValue(), cookie.getName(), cookie.getDomain(), cookie.getPath(), cookie.getMaxAge());
             context.getResponse().addCookie(cookie);
         }
 

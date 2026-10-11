@@ -19,23 +19,24 @@
  */
 package org.xwiki.eventstream.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,117 +45,113 @@ import static org.mockito.Mockito.when;
  * @since 10.5RC1
  * @since 9.11.6
  */
-public class DefaultRecordableEventDescriptorManagerTest
+@ComponentTest
+class DefaultRecordableEventDescriptorManagerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultRecordableEventDescriptorManager> mocker =
-            new MockitoComponentMockingRule<>(DefaultRecordableEventDescriptorManager.class);
+    @InjectMockComponents
+    private DefaultRecordableEventDescriptorManager manager;
 
+    @MockComponent
+    @Named("context")
     private ComponentManager contextComponentManager;
+
+    @MockComponent
     private ComponentManagerManager componentManagerManager;
+
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        contextComponentManager = mocker.getInstance(ComponentManager.class, "context");
-        componentManagerManager = mocker.getInstance(ComponentManagerManager.class);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-    }
-
     @Test
-    public void getRecordableEventDescriptors() throws Exception
+    void getRecordableEventDescriptors() throws Exception
     {
         // Mocks
-        RecordableEventDescriptor descriptorWiki1_1 = mock(RecordableEventDescriptor.class);
-        RecordableEventDescriptor descriptorWiki1_2 = mock(RecordableEventDescriptor.class);
-        UntypedRecordableEventDescriptor descriptorWiki1_3 = mock(UntypedRecordableEventDescriptor.class);
-        UntypedRecordableEventDescriptor descriptorWiki1_4 = mock(UntypedRecordableEventDescriptor.class);
+        RecordableEventDescriptor descriptorWiki11 = mock(RecordableEventDescriptor.class);
+        RecordableEventDescriptor descriptorWiki12 = mock(RecordableEventDescriptor.class);
+        UntypedRecordableEventDescriptor descriptorWiki13 = mock(UntypedRecordableEventDescriptor.class);
+        UntypedRecordableEventDescriptor descriptorWiki14 = mock(UntypedRecordableEventDescriptor.class);
 
-        RecordableEventDescriptor descriptorWiki2_1 = mock(RecordableEventDescriptor.class);
-        RecordableEventDescriptor descriptorWiki2_2 = mock(RecordableEventDescriptor.class);
-        UntypedRecordableEventDescriptor descriptorWiki2_3 = mock(UntypedRecordableEventDescriptor.class);
-        UntypedRecordableEventDescriptor descriptorWiki2_4 = mock(UntypedRecordableEventDescriptor.class);
+        RecordableEventDescriptor descriptorWiki21 = mock(RecordableEventDescriptor.class);
+        RecordableEventDescriptor descriptorWiki22 = mock(RecordableEventDescriptor.class);
+        UntypedRecordableEventDescriptor descriptorwiki23 = mock(UntypedRecordableEventDescriptor.class);
+        UntypedRecordableEventDescriptor descriptorWiki24 = mock(UntypedRecordableEventDescriptor.class);
 
+        when(this.contextComponentManager.getInstanceList(RecordableEventDescriptor.class))
+            .thenReturn(List.of(descriptorWiki11, descriptorWiki12));
+        when(this.contextComponentManager.getInstanceList(UntypedRecordableEventDescriptor.class))
+            .thenReturn(List.of(descriptorWiki13, descriptorWiki14));
 
-        when(contextComponentManager.getInstanceList(RecordableEventDescriptor.class)).thenReturn(
-                Arrays.asList(descriptorWiki1_1, descriptorWiki1_2));
-        when(contextComponentManager.getInstanceList(UntypedRecordableEventDescriptor.class)).thenReturn(
-                Arrays.asList(descriptorWiki1_3, descriptorWiki1_4));
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki1");
 
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki1");
+        when(descriptorWiki11.isEnabled("wiki1")).thenReturn(true);
+        when(descriptorWiki12.isEnabled("wiki1")).thenReturn(false);
+        when(descriptorWiki13.isEnabled("wiki1")).thenReturn(false);
+        when(descriptorWiki14.isEnabled("wiki1")).thenReturn(true);
 
-        when(descriptorWiki1_1.isEnabled("wiki1")).thenReturn(true);
-        when(descriptorWiki1_2.isEnabled("wiki1")).thenReturn(false);
-        when(descriptorWiki1_3.isEnabled("wiki1")).thenReturn(false);
-        when(descriptorWiki1_4.isEnabled("wiki1")).thenReturn(true);
-
-        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("wiki1", "wiki2", "wiki3"));
+        when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of("wiki1", "wiki2", "wiki3"));
 
         ComponentManager wiki1ComponentManager = mock(ComponentManager.class);
-        when(componentManagerManager.getComponentManager("wiki:wiki1", false)).thenReturn(wiki1ComponentManager);
-        when(wiki1ComponentManager.getInstanceList(RecordableEventDescriptor.class)).thenReturn(
-                Arrays.asList(descriptorWiki1_1, descriptorWiki1_2));
-        when(wiki1ComponentManager.getInstanceList(UntypedRecordableEventDescriptor.class)).thenReturn(
-                Arrays.asList(descriptorWiki1_3, descriptorWiki1_4));
+        when(this.componentManagerManager.getComponentManager("wiki:wiki1", false)).thenReturn(wiki1ComponentManager);
+        when(wiki1ComponentManager.getInstanceList(RecordableEventDescriptor.class))
+            .thenReturn(List.of(descriptorWiki11, descriptorWiki12));
+        when(wiki1ComponentManager.getInstanceList(UntypedRecordableEventDescriptor.class))
+            .thenReturn(List.of(descriptorWiki13, descriptorWiki14));
 
         ComponentManager wiki2ComponentManager = mock(ComponentManager.class);
-        when(componentManagerManager.getComponentManager("wiki:wiki2", false)).thenReturn(wiki2ComponentManager);
-        when(wiki2ComponentManager.getInstanceList(RecordableEventDescriptor.class)).thenReturn(
-                Arrays.asList(descriptorWiki2_1, descriptorWiki2_2));
-        when(wiki2ComponentManager.getInstanceList(UntypedRecordableEventDescriptor.class)).thenReturn(
-                Arrays.asList(descriptorWiki2_3, descriptorWiki2_4));
+        when(this.componentManagerManager.getComponentManager("wiki:wiki2", false)).thenReturn(wiki2ComponentManager);
+        when(wiki2ComponentManager.getInstanceList(RecordableEventDescriptor.class))
+            .thenReturn(List.of(descriptorWiki21, descriptorWiki22));
+        when(wiki2ComponentManager.getInstanceList(UntypedRecordableEventDescriptor.class))
+            .thenReturn(List.of(descriptorwiki23, descriptorWiki24));
 
-        when(descriptorWiki2_1.isEnabled("wiki2")).thenReturn(false);
-        when(descriptorWiki2_2.isEnabled("wiki2")).thenReturn(true);
-        when(descriptorWiki2_3.isEnabled("wiki2")).thenReturn(true);
-        when(descriptorWiki2_4.isEnabled("wiki2")).thenReturn(false);
+        when(descriptorWiki21.isEnabled("wiki2")).thenReturn(false);
+        when(descriptorWiki22.isEnabled("wiki2")).thenReturn(true);
+        when(descriptorwiki23.isEnabled("wiki2")).thenReturn(true);
+        when(descriptorWiki24.isEnabled("wiki2")).thenReturn(false);
 
         // Test 1
-        List<RecordableEventDescriptor> result = mocker.getComponentUnderTest().getRecordableEventDescriptors(true);
+        List<RecordableEventDescriptor> result = this.manager.getRecordableEventDescriptors(true);
 
         // Checks
         assertNotNull(result);
         assertEquals(4, result.size());
-        assertTrue(result.contains(descriptorWiki1_1));
-        assertTrue(result.contains(descriptorWiki1_4));
-        assertTrue(result.contains(descriptorWiki2_2));
-        assertTrue(result.contains(descriptorWiki2_3));
+        assertTrue(result.contains(descriptorWiki11));
+        assertTrue(result.contains(descriptorWiki14));
+        assertTrue(result.contains(descriptorWiki22));
+        assertTrue(result.contains(descriptorwiki23));
 
         // Test 2
-        List<RecordableEventDescriptor> result2 = mocker.getComponentUnderTest().getRecordableEventDescriptors(false);
+        List<RecordableEventDescriptor> result2 = this.manager.getRecordableEventDescriptors(false);
         assertNotNull(result2);
         assertEquals(2, result2.size());
-        assertTrue(result2.contains(descriptorWiki1_1));
-        assertTrue(result2.contains(descriptorWiki1_4));
+        assertTrue(result2.contains(descriptorWiki11));
+        assertTrue(result2.contains(descriptorWiki14));
     }
 
     @Test
-    public void getRecordableEventDescriptorsForEventType() throws Exception
+    void getRecordableEventDescriptorsForEventType() throws Exception
     {
         // Mocks
-        RecordableEventDescriptor descriptorWiki1_1 = mock(RecordableEventDescriptor.class);
-        RecordableEventDescriptor descriptorWiki1_2 = mock(RecordableEventDescriptor.class);
+        RecordableEventDescriptor descriptorWiki11 = mock(RecordableEventDescriptor.class);
+        RecordableEventDescriptor descriptorWiki12 = mock(RecordableEventDescriptor.class);
 
-        when(contextComponentManager.getInstanceList(RecordableEventDescriptor.class)).thenReturn(
-                Arrays.asList(descriptorWiki1_1, descriptorWiki1_2));
+        when(this.contextComponentManager.getInstanceList(RecordableEventDescriptor.class))
+            .thenReturn(List.of(descriptorWiki11, descriptorWiki12));
 
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki1");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki1");
 
-        when(descriptorWiki1_1.isEnabled("wiki1")).thenReturn(true);
-        when(descriptorWiki1_2.isEnabled("wiki1")).thenReturn(true);
-        when(descriptorWiki1_1.getEventType()).thenReturn("type1");
-        when(descriptorWiki1_2.getEventType()).thenReturn("someType");
+        when(descriptorWiki11.isEnabled("wiki1")).thenReturn(true);
+        when(descriptorWiki12.isEnabled("wiki1")).thenReturn(true);
+        when(descriptorWiki11.getEventType()).thenReturn("type1");
+        when(descriptorWiki12.getEventType()).thenReturn("someType");
 
         // Test
-        RecordableEventDescriptor result = mocker.getComponentUnderTest().getDescriptorForEventType("someType", false);
+        RecordableEventDescriptor result = this.manager.getDescriptorForEventType("someType", false);
 
         // Checks
         assertNotNull(result);
-        assertEquals(descriptorWiki1_2, result);
+        assertEquals(descriptorWiki12, result);
 
         // Test 2
-        assertNull(mocker.getComponentUnderTest().getDescriptorForEventType("unknowType", false));
+        assertNull(this.manager.getDescriptorForEventType("unknowType", false));
     }
-
 }

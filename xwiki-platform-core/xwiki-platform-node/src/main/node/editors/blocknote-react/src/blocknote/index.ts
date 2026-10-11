@@ -18,7 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { MACRO_NAME_PREFIX } from "./utils";
+import { XWikiCodeBlock } from "./codeBlock";
+import { DefinitionListItemBlock } from "./definitionList";
+import { XWikiGroupBlock } from "./group";
+import { XWikiInlineMacro, XWikiMacroBlock } from "./macro";
+import { XWikiRawBlock } from "./raw";
+import {
+  SubscriptStyle,
+  SuperscriptStyle,
+  VerbatimStyle,
+  XWikiParametersStyle,
+} from "./styles";
+import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -26,14 +37,20 @@ import {
   combineByGroup,
   defaultBlockSpecs,
   defaultInlineContentSpecs,
+  defaultStyleSpecs,
 } from "@blocknote/core";
 import { filterSuggestionItems } from "@blocknote/core/extensions";
 import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
-import type { BlockNoteConcreteMacro } from "./utils";
+import { createElement } from "react";
+import { RiFileList3Fill, RiLink } from "react-icons/ri";
+import type { BlockNoteConcreteMacro, ContextForMacros } from "./utils";
+import type { LinkEditionHandler } from "../components/links/linkEdition";
 import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { useTranslation } from "react-i18next";
 
 /**
  * Create the BlockNote editor's schema
@@ -41,15 +58,11 @@ import type { DefaultReactSuggestionItem } from "@blocknote/react";
  * Contains all the blocks usable inside the editor
  *
  * @returns The created schema
- * @since 18.0.0RC1
- * @beta
  */
-function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
-  // Get rid of some block types
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { audio, video, file, toggleListItem, ...remainingBlockSpecs } =
-    defaultBlockSpecs;
-
+function createBlockNoteSchema(
+  macros: BlockNoteConcreteMacro[],
+  options?: { codeBlockClassName?: string },
+) {
   macros = [
     ...macros.sort((a, b) =>
       a.macro.infos.name.localeCompare(b.macro.infos.name),
@@ -58,7 +71,12 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
 
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
-      ...remainingBlockSpecs,
+      ...defaultBlockSpecs,
+      codeBlock: XWikiCodeBlock({ className: options?.codeBlockClassName }),
+      xwikiDefinitionListItem: DefinitionListItemBlock(),
+      xwikiGroup: XWikiGroupBlock(),
+      xwikiMacroBlock: XWikiMacroBlock(),
+      xwikiRaw: XWikiRawBlock(),
 
       // Macros
       ...Object.fromEntries(
@@ -76,6 +94,12 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
     inlineContentSpecs: {
       ...defaultInlineContentSpecs,
 
+      // The generic inline macro (server-rendered inline macros without a dedicated client-side rendering). It is
+      // registered through Object.fromEntries so that its type stays erased under an index signature, like the dynamic
+      // macros below: a statically-typed custom inline content entry would tighten the inline content schema and break
+      // the call sites that expect the default inline content schema.
+      ...Object.fromEntries([["xwikiInlineMacro", XWikiInlineMacro]]),
+
       // Macros
       ...Object.fromEntries(
         filterMap(macros, ({ macro, bnRendering }) =>
@@ -88,6 +112,14 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
         ),
       ),
     },
+
+    styleSpecs: {
+      ...defaultStyleSpecs,
+      subscript: SubscriptStyle,
+      superscript: SuperscriptStyle,
+      xwikiVerbatim: VerbatimStyle,
+      xwikiParameters: XWikiParametersStyle,
+    },
   });
 
   return blockNoteSchema;
@@ -99,11 +131,9 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
  * @param lang - The dictionary's language
  *
  * @returns The dictionary in the requested language
- * @since 18.0.0RC1
- * @beta
  */
 function createDictionary(lang: EditorLanguage) {
-  // eslint-disable-next-line import/namespace
+  // eslint-disable-next-line import-x/namespace
   return locales[lang];
 }
 
@@ -114,40 +144,189 @@ function createDictionary(lang: EditorLanguage) {
 type EditorLanguage = keyof typeof locales & keyof typeof translations;
 
 /**
+ * Parameters used for generating the slash menu
+ */
+type SuggestionMenuItemsParams = {
+  /** The query to filter the suggestions by */
+  query: string;
+  /** Instance of the BlockNote editor */
+  editor: EditorType;
+  /** The list of all available macros */
+  macros: BlockNoteConcreteMacro[];
+  /** Syntax of the current document */
+  syntax: SyntaxConfig;
+  /** Language to translate the items as */
+  lang: EditorLanguage;
+  /** `t` property from `react-i18n`'s useTranslation() return value */
+  t: ReturnType<typeof useTranslation>["t"];
+  /** Handler for link editions, same as provided to `BlockNoteViewWrapper` */
+  linkEditionHandler: LinkEditionHandler;
+  /** Macro insertion editor, same as provided to `BlockNoteViewWrapper` */
+  openMacroInsertionEditor?: ContextForMacros["openInsertionEditor"];
+};
+
+/**
  * Suggests a set of suggestion from the menu items.
  *
- * @param editor - the editor type
- * @param query - the query to filter the suggestions by
- * @param macros - the available macros
- * @since 18.0.0RC1
- * @beta
+ * @param params - see {@link SuggestionMenuItemsParams}
  */
-function querySuggestionsMenuItems(
-  editor: EditorType,
-  query: string,
-  macros: BlockNoteConcreteMacro[],
-): DefaultReactSuggestionItem[] {
-  return filterSuggestionItems(
+// eslint-disable-next-line max-statements
+function querySuggestionsMenuItems({
+  editor,
+  query,
+  macros,
+  syntax,
+  lang,
+  t,
+  linkEditionHandler,
+  openMacroInsertionEditor,
+}: SuggestionMenuItemsParams): DefaultReactSuggestionItem[] {
+  const { blocks: blocksSupport, inlineContents: inlineSupport } =
+    syntax.features;
+
+  // A single generic "Link" entry that opens the link wizard.
+  // Only enabled if the syntax supports it
+  const genericLinkItem: DefaultReactSuggestionItem[] = inlineSupport.links
+    .basicLinks
+    ? [
+        {
+          title: t("blocknote.slashMenu.link.title"),
+          subtext: t("blocknote.slashMenu.link.subtext"),
+          aliases: ["link"],
+          group: t("blocknote.slashMenu.link.group"),
+          icon: createElement(RiLink),
+          onItemClick() {
+            linkEditionHandler({
+              mode: "createNew",
+              current: { title: "", url: "" },
+              onSubmit({ title, url }) {
+                editor.createLink(url, title);
+                editor.focus();
+              },
+            });
+          },
+        },
+      ]
+    : [];
+
+  // A single generic "Macro" entry that opens the macro wizard. It is used to insert the server-rendered
+  // xwikiMacroBlock / xwikiInlineMacro (the per-macro entries below only exist for client-rendered macros).
+  const genericMacroItem: DefaultReactSuggestionItem[] =
+    openMacroInsertionEditor && (blocksSupport.macros || inlineSupport.macros)
+      ? [
+          {
+            title: t("blocknote.slashMenu.macro.title"),
+            subtext: t("blocknote.slashMenu.macro.subtext"),
+            aliases: ["macro"],
+            group: t("blocknote.slashMenu.macro.group"),
+            icon: createElement(RiFileList3Fill),
+            onItemClick: () =>
+              openMacroInsertionEditor(
+                {
+                  kind: "block",
+                  id: null,
+                  params: null,
+                  body: { type: "none" },
+                },
+                (invocation) => insertMacroInvocation(editor, invocation),
+              ),
+          },
+        ]
+      : [];
+
+  let items = filterSuggestionItems(
     combineByGroup(
       getDefaultReactSlashMenuItems(editor),
 
       // Block macros
-      filterMap(macros, ({ bnRendering }) =>
-        bnRendering.type === "block" && bnRendering.block.slashMenuEntry
-          ? bnRendering.block.slashMenuEntry(editor)
-          : null,
-      ),
+      blocksSupport.macros
+        ? filterMap(macros, ({ bnRendering }) =>
+            bnRendering.type === "block" && bnRendering.block.slashMenuEntry
+              ? bnRendering.block.slashMenuEntry(editor)
+              : null,
+          )
+        : [],
 
       // Inline macros
-      filterMap(macros, ({ bnRendering }) =>
-        bnRendering.type === "inline" &&
-        bnRendering.inlineContent.slashMenuEntry
-          ? bnRendering.inlineContent.slashMenuEntry(editor)
-          : null,
-      ),
+      inlineSupport.macros
+        ? filterMap(macros, ({ bnRendering }) =>
+            bnRendering.type === "inline" &&
+            bnRendering.inlineContent.slashMenuEntry
+              ? bnRendering.inlineContent.slashMenuEntry(editor)
+              : null,
+          )
+        : [],
+
+      genericLinkItem,
+      genericMacroItem,
     ),
     query,
   );
+
+  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
+  // eslint-disable-next-line import-x/namespace
+  const locale = locales[lang].slash_menu;
+
+  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
+    candidates.some(
+      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
+    );
+
+  if (!blocksSupport.headings.levels1To3) {
+    items = items.filter(
+      (item) =>
+        !isLocale(item.title, [
+          "heading",
+          "heading_2",
+          "heading_3",
+          "toggle_heading",
+          "toggle_heading_2",
+          "toggle_heading_3",
+        ]),
+    );
+  }
+
+  if (!blocksSupport.headings.levels4To6) {
+    items = items.filter(
+      (item) => !isLocale(item.title, ["heading_4", "heading_5", "heading_6"]),
+    );
+  }
+
+  if (!blocksSupport.code.basicCodeBlocks) {
+    items = items.filter((item) => !isLocale(item.title, ["code_block"]));
+  }
+
+  if (!blocksSupport.quotes) {
+    items = items.filter((item) => !isLocale(item.title, ["quote"]));
+  }
+
+  if (!blocksSupport.lists.bulletLists) {
+    items = items.filter(
+      (item) => !isLocale(item.title, ["bullet_list", "toggle_list"]),
+    );
+  }
+
+  if (!blocksSupport.lists.contiguousNumberedLists) {
+    items = items.filter((item) => !isLocale(item.title, ["numbered_list"]));
+  }
+
+  if (!blocksSupport.lists.checkableLists) {
+    items = items.filter((item) => !isLocale(item.title, ["check_list"]));
+  }
+
+  if (!blocksSupport.tables.basicTables) {
+    items = items.filter((item) => !isLocale(item.title, ["table"]));
+  }
+
+  if (!blocksSupport.images.basicImages) {
+    items = items.filter((item) => !isLocale(item.title, ["image"]));
+  }
+
+  if (!blocksSupport.dividers) {
+    items = items.filter((item) => !isLocale(item.title, ["divider"]));
+  }
+
+  return items;
 }
 
 /**
@@ -269,7 +448,6 @@ type EditorStyledText = StyledText<EditorStyleSchema>;
 type EditorLink = Link<EditorStyleSchema>;
 
 export type {
-  BlockNoteConcreteMacro,
   BlockOfType,
   BlockType,
   EditorBlockSchema,

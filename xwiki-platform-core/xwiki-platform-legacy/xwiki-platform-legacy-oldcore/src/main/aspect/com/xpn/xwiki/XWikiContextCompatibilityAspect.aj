@@ -173,4 +173,13 @@ public privileged aspect XWikiContextCompatibilityAspect
     {
         // Cannot do anything
     }
+
+    /**
+     * @deprecated use {@link XWikiContext#setOriginalWikiId(String)} instead
+     */
+    @Deprecated(since = "6.1M1")
+    public void XWikiContext.setOriginalDatabase(String wikiId)
+    {
+        setOriginalWikiId(wikiId);
+    }
 }

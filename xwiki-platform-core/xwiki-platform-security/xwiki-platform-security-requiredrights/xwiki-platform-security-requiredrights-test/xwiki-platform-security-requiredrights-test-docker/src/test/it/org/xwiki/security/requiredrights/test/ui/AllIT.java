@@ -32,8 +32,22 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    class NestedRequiredRightsIT extends RequiredRightsIT
+    class NestedRequiredRightsWarningIT extends RequiredRightsWarningIT
     {
     }
 
+    @Nested
+    class NestedEnforceRequiredRightsIT extends EnforceRequiredRightsIT
+    {
+    }
+
+    @Nested
+    class NestedEditablePropertyEditConfirmationIT extends EditablePropertyEditConfirmationIT
+    {
+    }
+
+    @Nested
+    class NestedLiveDataXObjectEditConfirmationIT extends LiveDataXObjectEditConfirmationIT
+    {
+    }
 }

@@ -95,7 +95,7 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode implements
 
     protected <E extends EntityReference> List<String> serialize(List<E> entityReferences)
     {
-        return entityReferences.stream().map(this::serialize).collect(Collectors.toList());
+        return entityReferences.stream().map(this::serialize).toList();
     }
 
     protected boolean areHiddenEntitiesShown()

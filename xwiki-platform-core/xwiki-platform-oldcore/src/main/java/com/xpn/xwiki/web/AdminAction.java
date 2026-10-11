@@ -22,8 +22,9 @@ package com.xpn.xwiki.web;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -42,7 +43,8 @@ import com.xpn.xwiki.doc.XWikiLock;
 public class AdminAction extends XWikiAction
 {
     /** The logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdminAction.class);
+    @Inject
+    private Logger logger;
 
     /**
      * Default constructor.
@@ -146,7 +148,7 @@ public class AdminAction extends XWikiAction
             } catch (Exception e) {
                 // Lock should never make XWiki fail
                 // But we should log any related information
-                LOGGER.error("Exception while setting up lock", e);
+                this.logger.error("Exception while setting up lock", e);
             }
         }
 

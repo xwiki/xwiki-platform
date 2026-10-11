@@ -21,11 +21,20 @@ package org.xwiki.filter.instance.internal;
 
 
 /**
- * 
+ * Various helpers and constants related to the instance filter streams.
+ *
  * @version $Id$
  * @since 6.2M1
  */
-public class InstanceUtils
+public final class InstanceUtils
 {
+    /**
+     * The role hint shared by the instance input and output filter streams.
+     */
     public static final String ROLEHINT = "xwiki+instance";
+
+    private InstanceUtils()
+    {
+        // Utility class, no instantiation.
+    }
 }

@@ -22,12 +22,13 @@ package com.xpn.xwiki.plugin.image;
 import java.awt.Image;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -53,7 +54,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * Logging helper object.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(ImagePlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImagePlugin.class);
 
     /**
      * The name used for retrieving this plugin from the context.
@@ -124,10 +125,11 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String defaultQualityParam = context.getWiki().Param(DEFAULT_QUALITY_PARAM);
         if (!StringUtils.isBlank(defaultQualityParam)) {
             try {
-                this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
+                this.defaultQuality = Math.clamp(Float.parseFloat(defaultQualityParam.trim()), 0, 1);
             } catch (NumberFormatException e) {
-                LOG.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality.",
-                    DEFAULT_QUALITY_PARAM, this.defaultQuality);
+                LOGGER.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality. "
+                    + "Root cause is [{}].", DEFAULT_QUALITY_PARAM, this.defaultQuality,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }
@@ -153,9 +155,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
                 try {
                     this.capacity = Integer.parseInt(capacityParam.trim());
                 } catch (NumberFormatException e) {
-                    LOG.warn(String.format(
-                        "Failed to parse xwiki.plugin.image.cache.capacity configuration parameter. "
-                            + "Using %s as the cache capacity.", this.capacity), e);
+                    LOGGER.warn("Failed to parse the [xwiki.plugin.image.cache.capacity] configuration parameter. "
+                        + "Using [{}] as the cache capacity", this.capacity, e);
                 }
             }
             lru.setMaxEntries(this.capacity);
@@ -163,7 +164,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
             try {
                 this.imageCache = Utils.getComponent(CacheManager.class).createNewLocalCache(configuration);
             } catch (CacheException e) {
-                LOG.error("Error initializing the image cache.", e);
+                LOGGER.error("Error initializing the image cache.", e);
             }
         }
     }
@@ -220,10 +221,10 @@ public class ImagePlugin extends XWikiDefaultPlugin
                     // Transform the image attachment before is it downloaded.
                     result = downloadImage(attachment, width, height, quality, context);
                 } catch (Exception e) {
-                    LOG.warn("Failed to transform image attachment [{}] for scaling, falling back to original "
+                    LOGGER.warn("Failed to transform image attachment [{}] for scaling, falling back to original "
                         + "attachment. Root error: [{}]", attachment.getFilename(),
                         ExceptionUtils.getRootCauseMessage(e));
-                    LOG.debug("Full stack trace for image attachment scaling error: ", e);
+                    LOGGER.debug("Full stack trace for image attachment scaling error:", e);
                 }
             }
         }
@@ -248,7 +249,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     {
         initCache(context);
 
-        boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
+        boolean keepAspectRatio = Boolean.parseBoolean(context.getRequest().getParameter("keepAspectRatio"));
 
         XWikiAttachment thumbnail = (this.imageCache == null)
             ? shrinkImage(image, width, height, keepAspectRatio, quality, context)
@@ -313,7 +314,10 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private XWikiAttachment shrinkImage(XWikiAttachment attachment, int requestedWidth, int requestedHeight,
         boolean keepAspectRatio, float requestedQuality, XWikiContext context) throws Exception
     {
-        Image image = this.imageProcessor.readImage(attachment.getContentInputStream(context));
+        Image image;
+        try (InputStream stream = attachment.getContentInputStream(context)) {
+            image = this.imageProcessor.readImage(stream);
+        }
 
         // Compute the new image dimension.
         int currentWidth = image.getWidth(null);
@@ -430,7 +434,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     public int getWidth(XWikiAttachment attachment, XWikiContext context) throws IOException, XWikiException
     {
-        return this.imageProcessor.readImage(attachment.getContentInputStream(context)).getWidth(null);
+        try (InputStream imageInputStream = attachment.getContentInputStream(context)) {
+            return this.imageProcessor.readImage(imageInputStream).getWidth(null);
+        }
     }
 
     /**
@@ -442,6 +448,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
      */
     public int getHeight(XWikiAttachment attachment, XWikiContext context) throws IOException, XWikiException
     {
-        return this.imageProcessor.readImage(attachment.getContentInputStream(context)).getHeight(null);
+        try (InputStream imageInputStream = attachment.getContentInputStream(context)) {
+            return this.imageProcessor.readImage(imageInputStream).getHeight(null);
+        }
     }
 }

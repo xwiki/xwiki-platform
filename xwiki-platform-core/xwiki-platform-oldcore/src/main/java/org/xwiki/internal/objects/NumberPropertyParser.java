@@ -19,6 +19,9 @@
  */
 package org.xwiki.internal.objects;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 
@@ -29,9 +32,6 @@ import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LongProperty;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 /**
  * Component implementation for all types of number properties.
@@ -75,7 +75,7 @@ public class NumberPropertyParser extends AbstractObjectPropertyParser
             default:
                 throw new XWikiException(
                     XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    String.format("Invalid role hint [{}] is not a supported type number.", descriptor.getRoleHint()));
+                    String.format("Invalid role hint [%s] is not a supported type number.", descriptor.getRoleHint()));
         }
 
         return numberClass;

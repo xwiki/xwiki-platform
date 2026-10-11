@@ -64,7 +64,7 @@ public class XWikiDBVersion implements Comparable<XWikiDBVersion>
         if (o == null) {
             return -1;
         }
-        return Integer.valueOf(getVersion()).compareTo(o.getVersion());
+        return Integer.compare(getVersion(), o.getVersion());
     }
 
     @Override

@@ -21,14 +21,15 @@ package org.xwiki.csrf;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.util.Random;
-import java.security.SecureRandom;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.csrf.internal.DefaultCSRFToken;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.LogLevel;
@@ -51,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -69,13 +72,24 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultCSRFTokenTest
 {
-    /** URL of the current document. */
-    private static final String mockDocumentUrl = "http://host/xwiki/bin/save/Main/Test";
+    /**
+     * Characters that might break the layout and must thus not appear in a token.
+     */
+    private static final Pattern BAD_CHARACTERS = Pattern.compile("[&?*_/#^,.({\\[\\]})~!=+-]");
 
-    /** Resubmission URL. */
-    private static final String resubmitUrl = mockDocumentUrl;
+    /**
+     * URL of the current document.
+     */
+    private static final String MOCK_DOCUMENT_URL = "http://host/xwiki/bin/save/Main/Test";
 
-    /** Tested CSRF token component. */
+    /**
+     * Resubmission URL.
+     */
+    private static final String RESUBMIT_URL = MOCK_DOCUMENT_URL;
+
+    /**
+     * Tested CSRF token component.
+     */
     @InjectMockComponents
     private DefaultCSRFToken csrf;
 
@@ -84,6 +98,8 @@ class DefaultCSRFTokenTest
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    private final HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 
     /**
      * This class is here because it doesn't require a SecureRandom generator
@@ -111,11 +127,11 @@ class DefaultCSRFTokenTest
     void configure(MockitoComponentManager componentManager) throws Exception
     {
         // set up mocked dependencies
-        final CopyStringMatcher returnValue = new CopyStringMatcher(resubmitUrl + "?", "");
+        final CopyStringMatcher returnValue = new CopyStringMatcher(RESUBMIT_URL + "?", "");
         when(mockDocumentAccessBridge.getDocumentURL(any(DocumentReference.class), eq("view"), argThat(returnValue),
             anyString())).thenAnswer(returnValue);
         when(mockDocumentAccessBridge.getDocumentURL(isNull(), eq("view"), isNull(), isNull()))
-            .thenReturn(mockDocumentUrl);
+            .thenReturn(MOCK_DOCUMENT_URL);
 
         // configuration
         final CSRFTokenConfiguration mockConfiguration = componentManager.getInstance(CSRFTokenConfiguration.class);
@@ -123,11 +139,10 @@ class DefaultCSRFTokenTest
 
         // request
         final HttpSession mockSession = mock(HttpSession.class);
-        final HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         final ServletRequest servletRequest = new ServletRequest(httpRequest);
 
-        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(mockDocumentUrl));
-        when(httpRequest.getRequestURI()).thenReturn(mockDocumentUrl);
+        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(MOCK_DOCUMENT_URL));
+        when(httpRequest.getRequestURI()).thenReturn(MOCK_DOCUMENT_URL);
         when(httpRequest.getParameterMap()).thenReturn(new HashMap<>());
         when(httpRequest.getSession()).thenReturn(mockSession);
         when(mockSession.getAttribute(anyString())).thenReturn(new HashMap<>());
@@ -227,7 +242,7 @@ class DefaultCSRFTokenTest
      * Test that the prefix of the valid token is not valid.
      */
     @Test
-    void testPrefixNotValid()
+    void prefixNotValid()
     {
         userIsLogged();
 
@@ -243,34 +258,80 @@ class DefaultCSRFTokenTest
      * Test that the resubmission URL is correct.
      */
     @Test
-    void testResubmissionURL() throws Exception
+    void resubmissionURLWhenPost()
     {
         userIsLogged();
 
+        when(this.httpRequest.getMethod()).thenReturn("POST");
         String url = this.csrf.getResubmissionURL();
         // srid is random, extract it from the url
         Matcher matcher = Pattern.compile(".*srid%3D([a-zA-Z0-9]+).*").matcher(url);
         String srid = matcher.matches() ? matcher.group(1) : "asdf";
-        String resubmit = URLEncoder.encode(mockDocumentUrl + "?srid=" + srid, StandardCharsets.UTF_8);
-        String back = URLEncoder.encode(mockDocumentUrl, StandardCharsets.UTF_8);
-        String expected = resubmitUrl + "?resubmit=" + resubmit + "&xback=" + back + "&xpage=resubmit";
+        String resubmit = URLEncoder.encode(MOCK_DOCUMENT_URL + "?srid=" + srid, StandardCharsets.UTF_8);
+        String back = URLEncoder.encode(MOCK_DOCUMENT_URL, StandardCharsets.UTF_8);
+        String expected = RESUBMIT_URL + "?xpage=resubmit&xback=" + back + "&resubmit=" + resubmit + "&sridKey=" + srid;
         assertEquals(expected, url, "Invalid resubmission URL");
+    }
+
+    /**
+     * Test that the resubmission URL is correct.
+     */
+    @Test
+    void resubmissionURLWhenGet()
+    {
+        userIsLogged();
+
+        when(this.httpRequest.getMethod()).thenReturn("GET");
+        String url = this.csrf.getResubmissionURL();
+        String expected = RESUBMIT_URL + "?xpage=resubmit";
+        assertEquals(expected, url, "Invalid resubmission URL");
+    }
+
+    @Test
+    void isResubmitAllowedForCurrentRequest()
+    {
+        userIsLogged();
+        when(this.httpRequest.getMethod()).thenReturn("GET");
+        assertFalse(this.csrf.isResubmitAllowedForCurrentRequest());
+        when(this.httpRequest.getMethod()).thenReturn("POST");
+        assertTrue(this.csrf.isResubmitAllowedForCurrentRequest());
+    }
+
+    @Test
+    void isResubmitAllowedForRequestId()
+    {
+        assertFalse(this.csrf.isResubmitAllowedForRequestId(""));
+        HttpSession httpSession = mock(HttpSession.class);
+        when(this.httpRequest.getSession()).thenReturn(httpSession);
+        assertFalse(this.csrf.isResubmitAllowedForRequestId("test"));
+        when(httpSession.getAttribute(SavedRequestManager.getSavedRequestKey())).thenReturn(Map.of());
+        assertFalse(this.csrf.isResubmitAllowedForRequestId("test"));
+        when(httpSession.getAttribute(SavedRequestManager.getSavedRequestKey()))
+            .thenReturn(Map.of("test", mock(SavedRequestManager.SavedRequest.class)));
+        assertTrue(this.csrf.isResubmitAllowedForRequestId("test"));
     }
 
     /**
      * Test that the request URI is correct.
      */
     @Test
-    void testRequestURI()
+    void requestURIWhenPost()
     {
         userIsLogged();
-
+        when(this.httpRequest.getMethod()).thenReturn("POST");
         String requestURI = this.csrf.getRequestURI();
         // srid is random, extract it from the url
         Matcher matcher = Pattern.compile(".*srid=([a-zA-Z0-9]+)$").matcher(requestURI);
         String srid = matcher.matches() ? matcher.group(1) : "asdf";
-        String resubmit = mockDocumentUrl + "?srid=" + srid;
+        String resubmit = MOCK_DOCUMENT_URL + "?srid=" + srid;
         assertEquals(resubmit, requestURI, "Invalid request URI URL");
+    }
+
+    @Test
+    void requestURIWhenGet()
+    {
+        userIsLogged();
+        assertNull(this.csrf.getRequestURI());
     }
 
     /**
@@ -278,7 +339,7 @@ class DefaultCSRFTokenTest
      * where XWiki-syntax is allowed.
      */
     @Test
-    void testXWikiSyntaxCompatibility()
+    void xWikiSyntaxCompatibility()
     {
         userIsLogged();
 
@@ -288,7 +349,7 @@ class DefaultCSRFTokenTest
         for (int i = 0; i < 30; ++i) {
             this.csrf.clearToken();
             String token = this.csrf.getToken();
-            assertFalse(token.matches(".*[&?*_/#^,.({\\[\\]})~!=+-].*"),
+            assertFalse(BAD_CHARACTERS.matcher(token).find(),
                 "The token \"" + token + "\" contains a character that might break the layout");
         }
     }

@@ -40,7 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Apply {@link InvitationInternalDocumentParameterEscapingFixer} on the documents queued by
  * {@link R150000000XWIKI20285DataMigration} if applicable, and log the skipped ones. This translation key is initially
- * introduced by the invitation application but the fix is localed in oldcore so that the fix is applied on pages even
+ * introduced by the invitation application but the fix is located in oldcore so that the fix is applied on pages even
  * if the invitation application has been uninstalled.
  *
  * @version $Id$

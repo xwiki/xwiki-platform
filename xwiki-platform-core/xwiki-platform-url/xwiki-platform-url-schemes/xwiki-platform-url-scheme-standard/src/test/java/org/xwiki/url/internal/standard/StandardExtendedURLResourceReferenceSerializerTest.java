@@ -58,7 +58,7 @@ class StandardExtendedURLResourceReferenceSerializerTest
     }
 
     @BeforeComponent
-    void setUp(MockitoComponentManager componentManager) throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         // Register the real mockito component manager as the context component manager so we can easily mock
         // components on it. This needs to be done before the component to test is initialized.

@@ -33,6 +33,14 @@ import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 @Role
 public interface EntityEventGenerator<E>
 {
+    /**
+     * Generate the filter events corresponding to the passed entity.
+     *
+     * @param entity the entity to generate events for
+     * @param filter the filter to send the events to
+     * @param properties the properties controlling the event generation
+     * @throws FilterException when failing to generate the events
+     */
     void write(E entity, Object filter, Map<String, Object> properties) throws FilterException;
 
     /**

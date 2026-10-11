@@ -22,6 +22,7 @@ package org.xwiki.model.reference;
 import java.beans.Transient;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -205,9 +206,7 @@ public class PageReference extends AbstractLocalizedEntityReference
 
         pageNames.add(inputPageName);
 
-        for (String pageName : inputPageNames) {
-            pageNames.add(pageName);
-        }
+        Collections.addAll(pageNames, inputPageNames);
 
         return pageNames;
     }

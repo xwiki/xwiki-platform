@@ -77,7 +77,7 @@ public class PrintPreviewURLBuilder
         String hash = Objects.toString(request.getBaseURL().getRef(), "");
 
         // Note that URL#getRef() returns the raw value, similar to URI#getRawFragment(), so we need to decode it
-        // (because the fragment identifer can contain special characters that were URL encoded when the base URL was
+        // (because the fragment identifier can contain special characters that were URL encoded when the base URL was
         // created). Otherwise the fragment identifier will be double encoded in the print preview URL.
         hash = URLDecoder.decode(hash, StandardCharsets.UTF_8);
 

@@ -35,7 +35,7 @@ import org.xwiki.test.annotation.AllComponents;
  */
 @AllComponents
 @Scope(value = "xar"/*, pattern = "test1-noforcedocument.input.test"*/)
-public class XARIntegrationTests extends FilterTest
+class XARIntegrationTests extends FilterTest
 {
     @Override
     public void beforeTests() throws Exception

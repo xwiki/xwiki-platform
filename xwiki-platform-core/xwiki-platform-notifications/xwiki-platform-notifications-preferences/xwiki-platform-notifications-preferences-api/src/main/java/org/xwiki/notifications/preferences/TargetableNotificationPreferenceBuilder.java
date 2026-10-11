@@ -36,7 +36,7 @@ import org.xwiki.notifications.NotificationFormat;
 public interface TargetableNotificationPreferenceBuilder
 {
     /**
-     * @return a freshly instanciated {@link TargetableNotificationPreference}
+     * @return a freshly instantiated {@link TargetableNotificationPreference}
      */
     TargetableNotificationPreference build();
 

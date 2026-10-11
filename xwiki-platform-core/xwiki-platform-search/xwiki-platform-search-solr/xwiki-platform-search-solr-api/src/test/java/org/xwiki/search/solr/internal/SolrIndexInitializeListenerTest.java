@@ -19,7 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Provider;
 
@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @since 12.5RC1
  */
 @ComponentTest
-public class SolrIndexInitializeListenerTest
+class SolrIndexInitializeListenerTest
 {
     @InjectMockComponents
     private SolrIndexInitializeListener solrIndexInitializeListener;
@@ -91,7 +91,7 @@ public class SolrIndexInitializeListenerTest
         when(this.configuration.synchronizeAtStartup()).thenReturn(true);
         this.solrIndexInitializeListener.onEvent(new ApplicationReadyEvent(), null, null);
         IndexerRequest indexerRequest = new IndexerRequest();
-        indexerRequest.setId(Arrays.asList("solr", "indexer"));
+        indexerRequest.setId(List.of("solr", "indexer"));
         verify(this.solrIndexer).startIndex(indexerRequest);
     }
 
@@ -109,7 +109,7 @@ public class SolrIndexInitializeListenerTest
         this.solrIndexInitializeListener.onEvent(new WikiReadyEvent("mywiki"), null, null);
         IndexerRequest indexerRequest = new IndexerRequest();
         indexerRequest.setRootReference(new WikiReference("mywiki"));
-        indexerRequest.setId(Arrays.asList("solr", "indexer", "wiki:mywiki"));
+        indexerRequest.setId(List.of("solr", "indexer", "wiki:mywiki"));
         verify(this.solrIndexer).startIndex(indexerRequest);
     }
 
@@ -146,7 +146,7 @@ public class SolrIndexInitializeListenerTest
 
         IndexerRequest indexerRequest = new IndexerRequest();
         indexerRequest.setRootReference(wikiReference);
-        indexerRequest.setId(Arrays.asList("solr", "indexer", "wiki:foo"));
+        indexerRequest.setId(List.of("solr", "indexer", "wiki:foo"));
         verify(this.solrIndexer).startIndex(indexerRequest);
     }
 }

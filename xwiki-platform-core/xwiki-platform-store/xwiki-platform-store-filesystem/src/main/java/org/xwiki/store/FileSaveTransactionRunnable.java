@@ -289,7 +289,7 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
         throw new IllegalStateException("Tried to rollback the saving of file " + this.toSave.getAbsolutePath()
             + " and encountered a backup, a temp file, and a main file. Since any existing "
             + "main file is renamed to a temp location and the content is saved in the backup location and then "
-            + "renamed to the main location, the existance of all 3 at once should never happen.");
+            + "renamed to the main location, the existence of all 3 at once should never happen.");
     }
 
     /**

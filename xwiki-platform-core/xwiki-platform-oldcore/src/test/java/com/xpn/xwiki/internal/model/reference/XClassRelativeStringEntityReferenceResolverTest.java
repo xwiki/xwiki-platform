@@ -19,68 +19,58 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link XClassRelativeStringEntityReferenceResolver}.
  *
  * @version $Id$
  */
+@ComponentTest
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class XClassRelativeStringEntityReferenceResolverTest
+class XClassRelativeStringEntityReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<EntityReferenceResolver<String>> mocker =
-        new MockitoComponentMockingRule<>(XClassRelativeStringEntityReferenceResolver.class);
-
-    private EntityReferenceResolver<String> resolver;
-
-    @Before
-    public void before() throws Exception
-    {
-        this.resolver = this.mocker.getComponentUnderTest();
-    }
+    @InjectMockComponents
+    private XClassRelativeStringEntityReferenceResolver resolver;
 
     @Test
-    public void testResolve()
+    void resolve()
     {
         EntityReference reference = this.resolver.resolve("page", EntityType.DOCUMENT);
-        Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
-        Assert.assertEquals("XWiki", reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertNull(reference.extractReference(EntityType.WIKI));
+        assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
+        assertEquals("XWiki", reference.extractReference(EntityType.SPACE).getName());
+        assertNull(reference.extractReference(EntityType.WIKI));
     }
 
     @Test
-    public void testResolveWhenExplicitParameterAndNoPageInStringRepresentation()
+    void resolveWhenExplicitParameterAndNoPageInStringRepresentation()
     {
         EntityReference reference =
             this.resolver.resolve("", EntityType.DOCUMENT, new DocumentReference("dummy", "dummy", "page"));
-        Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
-        Assert.assertEquals("XWiki", reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertNull(reference.extractReference(EntityType.WIKI));
+        assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
+        assertEquals("XWiki", reference.extractReference(EntityType.SPACE).getName());
+        assertNull(reference.extractReference(EntityType.WIKI));
     }
 
     @Test
-    public void testResolveWhenNoPageReferenceSpecified()
+    void resolveWhenNoPageReferenceSpecified()
     {
-        try {
-            this.resolver.resolve("", EntityType.DOCUMENT);
-            Assert.fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("A Reference to a page must be passed as a parameter when the string to resolve "
-                + "doesn't specify a page", expected.getMessage());
-        }
+        Exception expected = assertThrows(IllegalArgumentException.class,
+            () -> this.resolver.resolve("", EntityType.DOCUMENT));
+        assertEquals("A Reference to a page must be passed as a parameter when the string to resolve "
+            + "doesn't specify a page", expected.getMessage());
     }
 }

@@ -19,40 +19,56 @@
  */
 package com.xpn.xwiki.internal.cache;
 
-import org.junit.Assert;
-
-import org.jmock.Expectations;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.cache.internal.MapCache;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.internal.DefaultObservationManager;
+import org.xwiki.test.annotation.ComponentList;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit test for {@link DefaultDocumentCache}.
- * 
+ *
  * @version $Id$
  * @since 2.4M1
  */
-public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
+@OldcoreTest
+@ComponentList({DefaultDocumentCache.class, DefaultObservationManager.class,
+    DefaultStringEntityReferenceSerializer.class, DefaultSymbolScheme.class})
+class DefaultDocumentCacheTest
 {
-    private XWiki mockXWiki;
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private XWikiDocument document;
 
     private DefaultDocumentCache<String> cache;
 
-    @Override
-    public void setUp() throws Exception
+    @BeforeEach
+    void beforeEach() throws Exception
     {
-        super.setUp();
+        CacheManager cacheManager = this.oldcore.getMocker().registerMockComponent(CacheManager.class);
+        when(cacheManager.createNewCache(any())).thenReturn(new MapCache<>(), new MapCache<>());
 
-        this.cache = (DefaultDocumentCache<String>) getComponentManager().getInstance(DocumentCache.class);
+        this.cache = this.oldcore.getMocker().getInstance(DocumentCache.class);
 
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setConfigurationId("documentcachetest");
@@ -62,44 +78,36 @@ public class DefaultDocumentCacheTest extends AbstractBridgedComponentTestCase
 
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         this.document.setOriginalDocument(this.document.clone());
-
-        this.mockXWiki = getMockery().mock(XWiki.class);
-        getContext().setWiki(this.mockXWiki);
-        
-        getMockery().checking(new Expectations() {{
-            allowing(mockXWiki).getDocument(document.getDocumentReference(), getContext()); will(returnValue(document));
-        }});
     }
 
-    @Override
-    public void tearDown() throws Exception
+    @AfterEach
+    void afterEach()
     {
         this.cache.dispose();
-
-        super.tearDown();
     }
 
     @Test
-    public void testGetSet()
+    void getSet()
     {
         this.cache.set("data", this.document.getDocumentReference());
         this.cache.set("data2", this.document.getDocumentReference(), "ext1", "ext2");
 
-        Assert.assertEquals("data", this.cache.get(this.document.getDocumentReference()));
-        Assert.assertEquals("data2", this.cache.get(this.document.getDocumentReference(), "ext1", "ext2"));
+        assertEquals("data", this.cache.get(this.document.getDocumentReference()));
+        assertEquals("data2", this.cache.get(this.document.getDocumentReference(), "ext1", "ext2"));
     }
 
     @Test
-    public void testEventBasedCleanup() throws Exception
+    void eventBasedCleanup() throws Exception
     {
         this.cache.set("data", this.document.getDocumentReference());
         this.cache.set("data", this.document.getDocumentReference(), "ext1", "ext2");
 
-        ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
+        ObservationManager observationManager = this.oldcore.getMocker().getInstance(ObservationManager.class);
         observationManager.notify(
-            new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document, getContext());
+            new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
+            this.oldcore.getXWikiContext());
 
-        Assert.assertNull(this.cache.get(this.document.getDocumentReference()));
-        Assert.assertNull(this.cache.get(this.document.getDocumentReference(), "ext1", "ext2"));
+        assertNull(this.cache.get(this.document.getDocumentReference()));
+        assertNull(this.cache.get(this.document.getDocumentReference(), "ext1", "ext2"));
     }
 }

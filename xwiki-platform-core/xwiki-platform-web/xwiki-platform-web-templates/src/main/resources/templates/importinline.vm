@@ -54,7 +54,7 @@
   $xwiki.jsfx.use('js/xwiki/importer/import.js', true)##
   $xwiki.ssfx.use('js/xwiki/importer/import.css', true)##
   $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})##
-  $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)##
+  $xwiki.ssfx.use('uicomponents/widgets/upload.css')##
   <div id="import" class="row">
     <div id="packagelist" class="col-xs-12 col-sm-6 col-md-6">
       <div class="legend">
@@ -224,8 +224,7 @@
                     $escapetool.xml($services.localization.render('core.importer.resetHistory'))
                   </div>
                 </div>
-                ## TODO: replace with a new API to introduce (impossible to safely test right on a different wiki from velocity without PR)
-                #if($xwiki.package.hasBackupPackImportRights())
+                #if ($services.security.authorization.hasAccess('admin', $services.model.createWikiReference($xcontext.mainWikiName)))
                 <div class="importOption">
                   <input type="checkbox" name="importAsBackup" value="true" #if($packager.isBackupPack())checked="checked"#end/>
                   $escapetool.xml($services.localization.render('core.importer.importAsBackup'))

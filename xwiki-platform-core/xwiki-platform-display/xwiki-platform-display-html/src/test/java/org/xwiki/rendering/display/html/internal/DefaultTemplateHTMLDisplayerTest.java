@@ -20,13 +20,16 @@
 package org.xwiki.rendering.display.html.internal;
 
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.script.ScriptContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.model.EntityType;
@@ -44,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,7 +58,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultTemplateHTMLDisplayerTest
+class DefaultTemplateHTMLDisplayerTest
 {
     @MockComponent
     private TemplateManager templateManager;
@@ -68,7 +72,7 @@ public class DefaultTemplateHTMLDisplayerTest
     private DocumentReference documentReference;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         ScriptContext scriptContext = mock(ScriptContext.class);
         this.documentReference = new DocumentReference("wiki", "space", "page");
@@ -77,7 +81,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void getTemplateTest() throws Exception
+    void getTemplateTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(DocumentReference.class, documentReference);
         verify(this.templateManager).getTemplate("html_displayer/documentreference/view.vm");
@@ -87,7 +91,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
     
     @Test
-    public void getTemplateForEnum() throws Exception
+    void getTemplateForEnum() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(EntityType.class, EntityType.DOCUMENT);
         verify(this.templateManager).getTemplate("html_displayer/entitytype/view.vm");
@@ -99,7 +103,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void getTemplateWithNullTypeTest() throws Exception
+    void getTemplateWithNullTypeTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(null, "test");
         verify(this.templateManager).getTemplate("html_displayer/string/view.vm");
@@ -109,7 +113,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void getTemplateWithNullValueTest() throws Exception
+    void getTemplateWithNullValueTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display((new ArrayList<String>()).getClass(), null);
         verify(this.templateManager).getTemplate("html_displayer/arraylist/view.vm");
@@ -119,18 +123,51 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void getTemplateWithNullValueAndSpecialTypeTest() throws Exception
+    void getTemplateWithNullValueAndSpecialTypeTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(null, List.class, Block.class), null);
-        verify(this.templateManager)
+        // The fully qualified type name is looked up before the short one, so that a template targeting one precise
+        // type wins over a template sharing its short name.
+        InOrder inOrder = inOrder(this.templateManager);
+        inOrder.verify(this.templateManager)
             .getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block)/view.vm");
-        verify(this.templateManager).getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block).vm");
-        verify(this.templateManager).getTemplate("html_displayer/view.vm");
-        verify(this.templateManager).getTemplate("html_displayer/default.vm");
+        inOrder.verify(this.templateManager)
+            .getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/list(block)/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/list(block).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/default.vm");
+        this.defaultTemplateHTMLDisplayer.display(new Type()
+        {
+            @Override
+            public String getTypeName()
+            {
+                return "unknownType";
+            }
+        }, null);
+        verify(this.templateManager).getTemplate("html_displayer/unknowntype.vm");
     }
 
     @Test
-    public void getTemplateWithNullTypeAndNullValueTest() throws Exception
+    void getTemplateWithComplexParameterizedTypeTest() throws Exception
+    {
+        // The short name shortens every level of the type, so that a name is either fully qualified or fully
+        // shortened, never a mix of both.
+        this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(null, Map.class, String.class,
+            new DefaultParameterizedType(null, List.class, Block.class)), null);
+        InOrder inOrder = inOrder(this.templateManager);
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/java.util.map(java.lang.string,java.util."
+            + "list(org.xwiki.rendering.block.block))/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/java.util.map(java.lang.string,java.util."
+            + "list(org.xwiki.rendering.block.block)).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/map(string,list(block))/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/map(string,list(block)).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/default.vm");
+    }
+
+    @Test
+    void getTemplateWithNullTypeAndNullValueTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(null, null);
         verify(this.templateManager).getTemplate("html_displayer/view.vm");
@@ -138,7 +175,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void displayTest() throws Exception
+    void displayTest() throws Exception
     {
         Template template = mock(Template.class);
 
@@ -151,7 +188,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void displayWithExceptionTest() throws Exception
+    void displayWithExceptionTest() throws Exception
     {
         Template template = mock(Template.class);
 

@@ -42,7 +42,7 @@ export type Block = {
     type: "break";
 } | {
     type: "macroBlock";
-    call: MacroInvocation;
+    call: MacroBlockInvocation;
 };
 
 // @beta (undocumented)
@@ -74,7 +74,23 @@ export type InlineContent = ({
     type: "link";
 } & Link) | {
     type: "inlineMacro";
-    call: MacroInvocation;
+    call: InlineMacroInvocation;
+};
+
+// @beta (undocumented)
+export type InlineMacroInvocation = {
+    kind: "inline";
+    id: string;
+    params: Record<string, boolean | number | string>;
+    body: {
+        type: "none";
+    } | {
+        type: "raw";
+        content: string;
+    } | {
+        type: "inlineContent";
+        inlineContent: InlineContent;
+    };
 };
 
 // @beta (undocumented)
@@ -104,7 +120,8 @@ export type ListItem = {
 };
 
 // @beta (undocumented)
-export type MacroInvocation = {
+export type MacroBlockInvocation = {
+    kind: "block";
     id: string;
     params: Record<string, boolean | number | string>;
     body: {
@@ -115,9 +132,6 @@ export type MacroInvocation = {
     } | {
         type: "inlineContents";
         inlineContents: InlineContent[];
-    } | {
-        type: "inlineContent";
-        inlineContent: InlineContent;
     };
 };
 

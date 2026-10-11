@@ -21,16 +21,14 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Provider;
-import javax.servlet.http.Part;
 
-import ch.qos.logback.classic.Level;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +58,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
+
+import ch.qos.logback.classic.Level;
 
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -118,7 +118,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     private ServletSession servletSession;
 
     @BeforeEach
-    void setup(MockitoComponentManager mockitoComponentManager) throws Exception
+    void setup(MockitoComponentManager mockitoComponentManager)
     {
         when(this.contextProvider.get()).thenReturn(this.context);
         Utils.setComponentManager(mockitoComponentManager);
@@ -276,11 +276,11 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         XWikiAttachment attachment2 = mock(XWikiAttachment.class);
         XWikiAttachment attachment3 = mock(XWikiAttachment.class);
 
-        List<XWikiAttachment> expectedList = Arrays.asList(attachment1, attachment2, attachment3);
+        List<XWikiAttachment> expectedList = List.of(attachment1, attachment2, attachment3);
         when(temporaryAttachmentSession.getAttachments(documentReference)).thenReturn(expectedList);
 
         // session is null
-        assertEquals(Collections.emptyList(), this.attachmentManager.getUploadedAttachments(documentReference));
+        assertEquals(List.of(), this.attachmentManager.getUploadedAttachments(documentReference));
 
         setupSession();
         assertEquals(expectedList,

@@ -240,7 +240,7 @@ public class DefaultRenderingCacheConfiguration implements RenderingCacheConfigu
             StringBuffer patternBuffer = new StringBuffer();
 
             for (String patternString : configuration) {
-                if (patternBuffer.length() > 0) {
+                if (!patternBuffer.isEmpty()) {
                     patternBuffer.append('|');
                 }
                 patternBuffer.append('(');

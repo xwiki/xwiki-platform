@@ -42,12 +42,16 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
         try {
             param = context.getWiki().getXWikiPreference(name, context);
         } catch (Exception e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The value is then looked up in the configuration below.
         }
         if (param == null || "".equals(param)) {
             try {
                 param =
                     context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "groovy_", "groovy."));
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // The parameter is then left empty.
             }
         }
         if (param == null) {
@@ -60,9 +64,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
     {
         String authservicepage = getParam("groovy_pagename", context);
         if ((authservicepage == null) || authservicepage.trim().isEmpty()) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("No page specified for auth service implementation");
-            }
+            LOGGER.error("No page specified for auth service implementation");
             return null;
         }
 
@@ -71,16 +73,12 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
             if (context.getWiki().getRightService().hasProgrammingRights(doc, context)) {
                 return (XWikiAuthService) context.getWiki().parseGroovyFromString(doc.getContent(), context);
             } else {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Auth service implementation page " + authservicepage
-                        + " missing programming rights, requires ownership by authorized user.");
-                }
+                LOGGER.error("Auth service implementation page [{}] missing programming rights, requires ownership "
+                    + "by authorized user.", authservicepage);
                 return null;
             }
         } catch (XWikiException e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Exception while parsing groovy authentication service code", e);
-            }
+            LOGGER.error("Exception while parsing groovy authentication service code", e);
             return null;
         }
     }

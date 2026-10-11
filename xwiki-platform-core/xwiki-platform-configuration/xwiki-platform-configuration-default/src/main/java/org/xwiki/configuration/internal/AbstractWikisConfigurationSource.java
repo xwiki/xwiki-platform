@@ -23,7 +23,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
@@ -67,7 +66,7 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
         @Override
         public List<String> getKeys()
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getKeysInternal());
+            return getFromWiki(AbstractWikisConfigurationSource.super::getKeysInternal);
         }
 
         @Override
@@ -97,7 +96,7 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
         @Override
         public boolean isEmpty()
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.isEmptyInternal());
+            return getFromWiki(AbstractWikisConfigurationSource.super::isEmptyInternal);
         }
 
         @Override
@@ -182,7 +181,7 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
     {
         CompositeConfigurationSource compositeConfigSource = new CompositeConfigurationSource();
         getWikis().stream().map(WikiConfigurationSource::new)
-            .forEachOrdered(wikiConfigSource -> compositeConfigSource.addConfigurationSource(wikiConfigSource));
+            .forEachOrdered(compositeConfigSource::addConfigurationSource);
         return compositeConfigSource;
     }
 
@@ -196,6 +195,6 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
         wikis.add(this.wikiManager.getCurrentWikiId());
         // And then in the main wiki (of course, if it's not the same as the current wiki).
         wikis.add(this.wikiManager.getMainWikiId());
-        return wikis.stream().collect(Collectors.toList());
+        return wikis.stream().toList();
     }
 }

@@ -24,6 +24,6 @@ public class XWikiCacheNeedsRefreshException extends Exception
 {
     public XWikiCacheNeedsRefreshException()
     {
-        
+        // Nothing to do, this deprecated exception carries no state.
     }
 }

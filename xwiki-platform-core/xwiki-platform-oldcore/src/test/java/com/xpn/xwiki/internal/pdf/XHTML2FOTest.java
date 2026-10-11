@@ -42,15 +42,15 @@ import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.io.ResourceResolverFactory;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xwiki.rendering.internal.parser.xhtml.wikimodel.XWikiXMLReaderFactory;
-import org.xwiki.test.AllLogRule;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.xml.EntityResolver;
 import org.xwiki.xml.XMLReaderFactory;
 import org.xwiki.xml.XMLUtils;
@@ -58,9 +58,14 @@ import org.xwiki.xml.internal.LocalEntityResolverComponent;
 import org.xwiki.xml.internal.XMLReaderFactoryComponent;
 
 import com.xpn.xwiki.pdf.api.PdfExport;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Integration tests to verify that the {@code html2fo.xsl} XSL stylesheet works.
@@ -72,13 +77,11 @@ import static org.junit.Assert.*;
     XWikiXMLReaderFactory.class,
     LocalEntityResolverComponent.class
 })
-public class XHTML2FOTest
+@OldcoreTest
+class XHTML2FOTest
 {
-    @Rule
-    public AllLogRule logRule = new AllLogRule(LogLevel.WARN);
-
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private static FopFactory fopFactory;
 
@@ -86,8 +89,11 @@ public class XHTML2FOTest
 
     private static TransformerFactory transformerFactory;
 
-    @BeforeClass
-    public static void setUp() throws Exception
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    @BeforeAll
+    static void setUp()
     {
         EnvironmentProfile environmentProfile = EnvironmentalProfileFactory.createDefault(new File(".").toURI(),
             ResourceResolverFactory.createDefaultResourceResolver());
@@ -102,74 +108,97 @@ public class XHTML2FOTest
      * Verifies that we can have some style using the "font" attribute.
      */
     @Test
-    public void transformWithFontStyle() throws Exception
+    void transformWithFontStyle() throws Exception
     {
-        String xml = constructXML(
-            "<p style=\"display: block; margin: 1em 0; color: red; \">\n"
-            + "  <span style=\"font: 7px 14px Courier; \">Test</span>\n"
-            + "</p>");
+        String xml = constructXML("""
+            <p style="display: block; margin: 1em 0; color: red; ">
+              <span style="font: 7px 14px Courier; ">Test</span>
+            </p>""");
 
         String transformedXML = getTransformedXML(xml);
         String expectedXML = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("xhtml2fo.expected"));
 
         XMLUnit.setIgnoreWhitespace(true);
         Diff diff = new Diff(expectedXML, transformedXML);
-        assertTrue("XML is not similar [" + diff.toString() + "]", diff.identical());
+        assertTrue(diff.identical(), "XML is not similar [" + diff + "]");
 
         // FOUserAgent may output a warning such as
         // [Font "14px Courier,normal,400" not found. Substituting with "any,normal,400".]. We're ignoring it and
         // considering it normal.
-        this.logRule.ignoreMessage(0);
+        this.logCapture.ignoreMessage(0);
+
     }
 
     @Test
-    public void transformWhenUnrecognizedCSSProperties() throws Exception
+    void transformWhenUnrecognizedCSSProperties() throws Exception
     {
-        String xml = constructXML(
-            "<div style=\"box-sizing: border-box; \">\n"
-            + "<span style=\"text-justify: inter-ideograph; line-height: normal; text-autospace: none;\">text</span>\n"
-            + "</div>");
+        String xml = constructXML("""
+            <div style="box-sizing: border-box; ">
+            <span style="text-justify: inter-ideograph; line-height: normal; text-autospace: none;">text</span>
+            </div>""");
 
         String transformedXML = getTransformedXML(xml);
-        assertFalse("Generated FO shouldn't contain 'box-sizing'", transformedXML.contains("box-sizing"));
-        assertFalse("Generated FO shouldn't contain 'text-justify'", transformedXML.contains("text-justify"));
-        assertFalse("Generated FO shouldn't contain 'text-autospace'", transformedXML.contains("text-autospace"));
+        assertThat(transformedXML, not(containsString("box-sizing")));
+        assertThat(transformedXML, not(containsString("text-justify")));
+        assertThat(transformedXML, not(containsString("text-autospace")));
+    }
+
+    /**
+     * CSS4J computes {@code background: none} into {@code background-color: #0000}, i.e. a CSS Color Level 4 hex
+     * notation with an alpha channel, which FOP doesn't support.
+     *
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-24582">XWIKI-24582</a>
+     */
+    @Test
+    void transformWithTransparentColors() throws Exception
+    {
+        String xml = constructXML("""
+            <p style="background-color: #0000; color: #f00c; ">
+              <span style="border: 1pt solid #12345678; background-color: #11223300; color: #0000; ">Test</span>
+            </p>""");
+
+        String transformedXML = getTransformedXML(xml);
+        // The fully transparent colors become the 'transparent' keyword, the others just lose their alpha channel.
+        assertThat(transformedXML, containsString("background-color=\"transparent\""));
+        assertThat(transformedXML, containsString("color=\"#f00\""));
+        assertThat(transformedXML, containsString("border=\"1pt solid #123456\""));
+        assertThat(transformedXML, not(containsString("#11223300")));
     }
 
     private String constructXML(String xmlContent)
     {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-            + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-            + "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-            + "<head>\n"
-            + "    <title>\n"
-            + "          Main.test2 - test2\n"
-            + "    </title>\n"
-            + "    <meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\" />\n"
-            + "    <meta content=\"en\" name=\"language\" />\n"
-            + "</head>\n"
-            + "<body class=\"exportbody\" id=\"body\" pdfcover=\"0\" pdftoc=\"0\" "
-            + "style=\"display: block; margin: 8pt; \">\n"
-            + "    <div class=\"pdfheader\" style=\"display: block; \">\n"
-            + "            Main.test2 - test2\n"
-            + "        \n"
-            + "    </div>\n"
-            + "    <div class=\"pdffooter\" style=\"display: block; \">\n"
-            + "          Page <span class=\"page-number\">\n"
-            + "    </span> of <span class=\"page-total\">\n"
-            + "    </span> - last modified by Administrator on 2016/01/25 14:07\n"
-            + "    \n"
-            + "</div>\n"
-            + "<div id=\"xwikimaincontainer\" style=\"display: block; \">\n"
-            + "    <div id=\"xwikimaincontainerinner\" style=\"display: block; \">\n"
-            + "        <div id=\"xwikicontent\" style=\"display: block; \">\n"
-            + xmlContent + "\n"
-            + "        </div>\n"
-            + "    </div>\n"
-            + "</div>\n"
-            + "</body>\n"
-            + "</html>\n";
+        return """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>
+                      Main.test2 - test2
+                </title>
+                <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+                <meta content="en" name="language" />
+            </head>
+            <body class="exportbody" id="body" pdfcover="0" pdftoc="0" style="display: block; margin: 8pt; ">
+                <div class="pdfheader" style="display: block; ">
+                        Main.test2 - test2
+
+                </div>
+                <div class="pdffooter" style="display: block; ">
+                      Page <span class="page-number">
+                </span> of <span class="page-total">
+                </span> - last modified by Administrator on 2016/01/25 14:07
+
+            </div>
+            <div id="xwikimaincontainer" style="display: block; ">
+                <div id="xwikimaincontainerinner" style="display: block; ">
+                    <div id="xwikicontent" style="display: block; ">
+            %s
+                    </div>
+                </div>
+            </div>
+            </body>
+            </html>
+            """.formatted(xmlContent);
     }
 
     private String getTransformedXML(String xml) throws Exception

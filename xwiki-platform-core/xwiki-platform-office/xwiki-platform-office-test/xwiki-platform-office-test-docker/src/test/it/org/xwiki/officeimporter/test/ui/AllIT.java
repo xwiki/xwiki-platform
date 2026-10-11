@@ -45,4 +45,9 @@ public class AllIT
     {
     }
 
+    @Nested
+    class NestedOfficeMacroIT extends OfficeMacroIT
+    {
+    }
+
 }

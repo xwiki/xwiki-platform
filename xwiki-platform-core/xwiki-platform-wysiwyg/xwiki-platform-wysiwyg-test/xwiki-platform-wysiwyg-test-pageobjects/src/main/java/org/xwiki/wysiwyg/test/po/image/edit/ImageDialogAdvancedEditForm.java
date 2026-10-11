@@ -39,7 +39,39 @@ public class ImageDialogAdvancedEditForm extends BaseElement
      */
     public ImageDialogAdvancedEditForm selectCenterAlignment()
     {
-        getDriver().findElement(By.cssSelector("#advanced [name='alignment'][value='center']")).click();
+        return selectAlignment("center");
+    }
+
+    /**
+     * Select the centered alignment.
+     *
+     * @return the current page object
+     * @since 18.3.0RC1
+     */
+    public ImageDialogAdvancedEditForm selectEndAlignment()
+    {
+        return selectAlignment("end");
+    }
+
+    /**
+     * Remove the alignment by selecting the "none" option.
+     *
+     * @return the current page object
+     * @since 18.6.0
+     */
+    public ImageDialogAdvancedEditForm removeAlignment()
+    {
+        return selectAlignment("none");
+    }
+
+    /**
+     * Select the centered alignment.
+     *
+     * @return the current page object
+     */
+    private ImageDialogAdvancedEditForm selectAlignment(String alignment)
+    {
+        getDriver().findElement(By.cssSelector("#advanced [name='alignment'][value='" + alignment + "']")).click();
         return this;
     }
 
@@ -80,6 +112,15 @@ public class ImageDialogAdvancedEditForm extends BaseElement
             // re-enabled soon enough.
             getDriver().waitUntilElementIsEnabled(imageWidth);
         }
+    }
+
+    /**
+     * @return the image width
+     * @since 18.3.0RC1
+     */
+    public String getWidth()
+    {
+        return getImageWidthElement().getDomProperty("value");
     }
 
     /**

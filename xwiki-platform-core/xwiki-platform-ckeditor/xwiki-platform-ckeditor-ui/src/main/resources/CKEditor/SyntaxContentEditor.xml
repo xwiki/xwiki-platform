@@ -46,6 +46,10 @@
   #getTextArea
   #if ($services.wysiwyg.isSyntaxSupported($syntaxId))
     #set ($discard = $textArea.attributes.put('data-sourceDocumentReference', $edit.parameters.sourceDocumentReference))
+    ## The source property reference (when the edited content is an object property) is used server-side only, to
+    ## render the content with the rights of the document author. It's removed from the attributes by #ckeditor so that
+    ## it's not output as an HTML attribute.
+    #set ($discard = $textArea.attributes.put('data-sourcePropertyReference', $edit.parameters.sourcePropertyReference))
     #ckeditor($textArea)
   #else
     ## Fall back on a plain text area.

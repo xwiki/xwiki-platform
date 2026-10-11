@@ -31,24 +31,29 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
 import org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactory;
@@ -58,10 +63,12 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.edit.EditModeResolver;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * The WYSIWYG editor API exposed to server-side scripts like Velocity.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -73,7 +80,7 @@ public class WysiwygEditorScriptService implements ScriptService
     /**
      * The context property which indicates if the current code was called from a template (only Velocity execution) or
      * from a wiki page (wiki syntax rendering).
-     * 
+     *
      * @see #parseAndRender(String, String)
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
@@ -90,6 +97,9 @@ public class WysiwygEditorScriptService implements ScriptService
 
     @Inject
     private ContextualAuthorizationManager authorization;
+
+    @Inject
+    private EditModeResolver editModeResolver;
 
     /**
      * The component used to convert HTML to wiki syntax.
@@ -119,30 +129,27 @@ public class WysiwygEditorScriptService implements ScriptService
     @Inject
     private MacroIdFactory macroIdFactory;
 
+    @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userDocumentReferenceSerializer;
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
+
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
      * <p>
      * This method should be called before attempting to load the WYSIWYG editor.
-     * 
+     *
      * @param syntaxId the syntax identifier, like {@code xwiki/2.0}
      * @return {@code true} if the specified syntax is currently supported by the editor, {@code false} otherwise
      */
     public boolean isSyntaxSupported(String syntaxId)
     {
-        // Special handling for XHTML since right the XHTML renderer doesn't produce valid XHTML. Thus if, for example,
-        // you the WYSIWYG editor and add 2 paragraphs, it'll generate {@code <p>a</p><p>b</p>} which is invalid XHTML
-        // and the page will fail to render.
-        if (syntaxId.equals(Syntax.XHTML_1_0.toIdString())) {
-            return false;
-        }
-
-        try {
-            this.contextComponentManager.getInstance(Parser.class, syntaxId);
-            this.contextComponentManager.getInstance(PrintRendererFactory.class, syntaxId);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return this.editModeResolver.isSyntaxWYSIWYGEditable(syntaxId);
     }
 
     /**
@@ -159,13 +166,13 @@ public class WysiwygEditorScriptService implements ScriptService
      * <p>
      * This method is currently used in {@code wysiwyginput.vm} and its purpose is to refresh the content of the WYSIWYG
      * editor. This method is called for instance when a macro is inserted or edited.
-     * 
+     *
      * @param html the HTML fragment to be rendered
      * @param syntaxId the storage syntax identifier
      * @return the XHTML result of rendering the given HTML fragment
-     * @deprecated since 11.9RC1, use {@link #parseAndRender(String, Syntax, EntityReference)} instead
+     * @deprecated use {@link #parseAndRender(String, Syntax, EntityReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     public String parseAndRender(String html, String syntaxId)
     {
         return parseAndRender(html, getSyntax(syntaxId), null);
@@ -198,7 +205,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param syntax the storage syntax identifier
      * @param sourceReference the reference of the html (where it's coming from)
      * @param restricted true if the content of this property should be executed in a restricted content, false
-     *            otherwise
+     *     otherwise
      * @return the XHTML result of rendering the given HTML fragment
      * @since 14.10
      * @since 14.4.7
@@ -224,7 +231,7 @@ public class WysiwygEditorScriptService implements ScriptService
             // results. We do this because the main caller of this method is the CKEditor extension and it needs to
             // work with several version of XWiki (including versions older than 11.9RC1 - in which this new method
             // signature was added) and for simplicity reasons is currently passing null.
-            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and reomve this
+            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and remove this
             // fallback.
             EntityReference resolvedSourceReference = sourceReference;
             if (resolvedSourceReference == null) {
@@ -253,7 +260,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * Velocity context is not isolated so you can put the data needed by the template in the Velocity context before
      * calling this method. The advantage of using this method to obtain the editor input is that the editor doesn't
      * have to make an additional HTTP request for the content template.
-     * 
+     *
      * @param templateReference specifies the document that serves as the template for the editor content
      * @return the result of rendering the specified content template
      */
@@ -279,16 +286,20 @@ public class WysiwygEditorScriptService implements ScriptService
     /**
      * Converts the given source text from the specified syntax to annotated XHTML, which can be used as input for the
      * WYSIWYG editor.
-     * 
+     *
      * @param source the text to be converted
      * @param syntaxId the syntax identifier
      * @return the annotated XHTML result of the conversion
-     * @deprecated since 11.9RC1 use
+     * @deprecated use
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
-        return toAnnotatedXHTML(source, getSyntax(syntaxId), null);
+        XWikiDocument currentDocument = this.xcontextProvider.get().getDoc();
+        // Pass a null source reference when there's no current document and let the overload below handle it, so that
+        // the null case is handled in a single place.
+        EntityReference sourceReference = currentDocument == null ? null : currentDocument.getDocumentReference();
+        return toAnnotatedXHTML(source, getSyntax(syntaxId), sourceReference);
     }
 
     /**
@@ -314,7 +325,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param syntax the syntax of the source
      * @param sourceReference the reference of the source
      * @param restricted true if the content of this property should be executed in a restricted content, false
-     *            otherwise
+     *     otherwise
      * @return the annotated XHTML result of the conversion
      * @since 14.10
      * @since 14.4.7
@@ -322,6 +333,12 @@ public class WysiwygEditorScriptService implements ScriptService
      */
     public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference, boolean restricted)
     {
+        if (sourceReference == null) {
+            // Without a source reference, we can't resolve either the author to execute as, or the document to convert
+            // against. Thus we return the source unchanged, as is also done when the conversion fails below.
+            return source;
+        }
+
         XWikiDocument securityDocument = createSecurityDocument();
         XWikiDocument originalSecurityDocument = setSecurityDocument(securityDocument);
 
@@ -334,20 +351,16 @@ public class WysiwygEditorScriptService implements ScriptService
             // templates using only Velocity for example).
             this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, true);
 
-            // If the source reference is not set, do a best effort by using the security doc reference (i.e. the
-            // current document reference since most of the time the content comes from the current document.
-            // However, callers of this method are expected to provide a non-null source reference for more accurate
-            // results. We do this because the main caller of this method is the CKEditor extension and it needs to
-            // work with several version of XWiki (including versions older than 11.9RC1 - in which this new method
-            // signature was added) and for simplicity reasons is currently passing null.
-            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and reomve this
-            // fallback.
-            EntityReference resolvedSourceReference = sourceReference;
-            if (resolvedSourceReference == null) {
-                resolvedSourceReference = securityDocument.getDocumentReference();
-            }
-
-            return this.htmlConverter.toHTML(source, syntax, resolvedSourceReference, restricted);
+            DocumentReference userAuthorReference = getAuthorExecutor(source, sourceReference);
+            // The source reference can be an object property reference (e.g. when editing a TextArea property),
+            // but the converter and the author executor work at the document level, so we resolve the document
+            // reference from the source reference.
+            DocumentReference sourceDocumentReference =
+                new DocumentReference(sourceReference.extractReference(EntityType.DOCUMENT));
+            return this.authorExecutor.call(
+                () -> this.htmlConverter.toHTML(source, syntax, sourceDocumentReference, restricted),
+                userAuthorReference,
+                sourceDocumentReference);
         } catch (Exception e) {
             // Return the source text in case of an exception.
             return source;
@@ -363,9 +376,31 @@ public class WysiwygEditorScriptService implements ScriptService
         }
     }
 
+    private DocumentReference getAuthorExecutor(String source, EntityReference sourceReference) throws XWikiException
+    {
+        XWikiContext context = this.xcontextProvider.get();
+        DocumentReference result = context.getUserReference();
+        if (sourceReference instanceof DocumentReference documentReference) {
+            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+            if (document.getContent().equals(source)) {
+                UserReference contentAuthor = document.getAuthors().getContentAuthor();
+                result = this.userDocumentReferenceSerializer.serialize(contentAuthor);
+            }
+        } else if (sourceReference instanceof ObjectPropertyReference objectPropertyReference) {
+            XWikiDocument document = context.getWiki().getDocument(objectPropertyReference, context);
+            // getXObject() doesn't accept an object property reference, so we extract the object reference from it.
+            BaseObject object = document.getXObject(objectPropertyReference.extractReference(EntityType.OBJECT));
+            if (object != null && source.equals(object.getStringValue(objectPropertyReference.getName()))) {
+                UserReference author = document.getAuthors().getEffectiveMetadataAuthor();
+                result = this.userDocumentReferenceSerializer.serialize(author);
+            }
+        }
+        return result;
+    }
+
     /**
      * Converts the given annotated HTML produced by the WYSIWYG editor to the specified target syntax.
-     * 
+     *
      * @param html the annotated HTML to be converted
      * @param targetSyntaxId the target syntax
      * @return the result of converting the given annotated HTML to the specified target syntax
@@ -411,7 +446,10 @@ public class WysiwygEditorScriptService implements ScriptService
         XWikiContext xwikiContext = this.xcontextProvider.get();
         // We clone the document in order to not impact the environment (the document cache for example).
         XWikiDocument clonedDocument = xwikiContext.getDoc().clone();
-        xwikiContext.getRequest().getEffectiveAuthor().ifPresent(clonedDocument.getAuthors()::setContentAuthor);
+        // In cases where there is no effective author (e.g., a REST request), fallback to the current user
+        UserReference contentAuthor = xwikiContext.getRequest().getEffectiveAuthor()
+            .orElseGet(() -> this.currentUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
+        clonedDocument.getAuthors().setContentAuthor(contentAuthor);
         this.injectTemoraryAttachments(clonedDocument);
         return clonedDocument;
     }
@@ -429,7 +467,7 @@ public class WysiwygEditorScriptService implements ScriptService
 
     /**
      * Sets the document that is going to be used to check for programming rights.
-     * 
+     *
      * @param document the document that is going to be used to check for programming rights
      * @return the previous security document
      */
@@ -440,11 +478,11 @@ public class WysiwygEditorScriptService implements ScriptService
 
     /**
      * Builds the annotated XHTML needed to import the specified office attachment in the WYSIWYG editor.
-     * 
+     *
      * @param attachmentReference the office attachment to import
-     * @param parameters the import parameters; {@code filterStyles} controls whether styles are filtered when importing
-     *            office text documents; {@code useOfficeViewer} controls whether the office viewer macro is used
-     *            instead of converting the content of the office file to wiki syntax
+     * @param parameters the import parameters; {@code filterStyles} controls whether styles are filtered when
+     *     importing office text documents; {@code useOfficeViewer} controls whether the office viewer macro is used
+     *     instead of converting the content of the office file to wiki syntax
      * @return the annotated XHTML needed to import the specified attachment into the content of the WYSIWYG editor
      */
     public String importOfficeAttachment(AttachmentReference attachmentReference, Map<String, Object> parameters)
@@ -452,7 +490,7 @@ public class WysiwygEditorScriptService implements ScriptService
         try {
             return this.officeAttachmentImporter.toHTML(attachmentReference, parameters);
         } catch (Exception e) {
-            this.logger.warn("Failed to import office attachment [{}]. Root cause is: {}",
+            this.logger.warn("Failed to import office attachment [{}]. Root cause is [{}]",
                 this.entityReferenceSerializer.serialize(attachmentReference), ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
@@ -469,10 +507,10 @@ public class WysiwygEditorScriptService implements ScriptService
 
     /**
      * Get a macro descriptor UI information to be used for configuring a macro.
-     * @param macroIdAsString the identifier of a macro
-     * @return an instance of {@link MacroDescriptorUI} containing all info for configuring the macro or {@code null}
-     * if it couldn't be found or initialized.
      *
+     * @param macroIdAsString the identifier of a macro
+     * @return an instance of {@link MacroDescriptorUI} containing all info for configuring the macro or {@code null} if
+     *     it couldn't be found or initialized.
      * @since 17.5.0
      */
     @Unstable

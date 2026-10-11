@@ -85,16 +85,15 @@ public class XObjectEventGeneratorListener implements EventListener
         } else if (event instanceof DocumentDeletedEvent) {
             onDocumentDeletedEvent(originalDoc, doc, context);
         } else if (event instanceof DocumentCreatedEvent) {
-            onDocumentCreatedEvent(originalDoc, doc, context);
+            onDocumentCreatedEvent(doc, context);
         }
     }
 
     /**
-     * @param originalDoc the previous version of the document
      * @param doc the new version of the document
      * @param context the XWiki context
      */
-    private void onDocumentCreatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
+    private void onDocumentCreatedEvent(XWikiDocument doc, XWikiContext context)
     {
         for (List<BaseObject> xobjects : doc.getXObjects().values()) {
             for (BaseObject xobject : xobjects) {

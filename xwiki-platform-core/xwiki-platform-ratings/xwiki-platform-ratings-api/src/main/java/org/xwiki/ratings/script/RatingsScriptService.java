@@ -98,14 +98,11 @@ public class RatingsScriptService extends AbstractScriptRatingsManager implement
                 scriptRatingsManager.setRatingsManager(ratingsManager);
                 executionContext.setProperty(executionContextCacheKey, scriptRatingsManager);
             } catch (RatingsException e) {
-                this.logger.error(
-                    String.format("Error when trying to retrieve RatingsManager instance with hint [%s]", managerHint),
+                this.logger.error("Error when trying to retrieve RatingsManager instance with hint [{}]", managerHint,
                     e);
             } catch (ComponentLookupException e) {
-                this.logger.error(
-                    String.format("Error when trying to retrieve DefaultScriptRatingsManager instance with hint [%s]",
-                        managerHint),
-                    e);
+                this.logger.error("Error when trying to retrieve DefaultScriptRatingsManager instance with hint [{}]",
+                    managerHint, e);
             }
         }
 

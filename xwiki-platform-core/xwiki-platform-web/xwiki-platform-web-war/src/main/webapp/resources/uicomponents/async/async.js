@@ -30,7 +30,7 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
             // custom HTTP response headers that contain the required stylesheets and JavaScript files are handled
             // automatically by xwiki.js
             element.replaceWith(xhr.responseText);
-
+            $(document).trigger('xwiki:dom:updated', {elements: element.toArray()});
             break;
 
           case 202:

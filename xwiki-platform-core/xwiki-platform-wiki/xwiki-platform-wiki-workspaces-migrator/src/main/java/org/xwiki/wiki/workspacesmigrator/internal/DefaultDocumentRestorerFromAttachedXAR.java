@@ -103,28 +103,28 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
             if (tempZipFile == null) {
                 return;
             }
-            ZipFile zipFile = new ZipFile(tempZipFile);
-            // We look for each document to restore if there is a corresponding zipEntry.
-            Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
-            while (itDocumentsToRestore.hasNext()) {
-                DocumentReference docRef = itDocumentsToRestore.next();
+            try (ZipFile zipFile = new ZipFile(tempZipFile)) {
+                // We look for each document to restore if there is a corresponding zipEntry.
+                Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
+                while (itDocumentsToRestore.hasNext()) {
+                    DocumentReference docRef = itDocumentsToRestore.next();
 
-                // Compute what should be the filename of the document to restore
-                String fileNameToRestore = String.format("%s/%s.xml", docRef.getLastSpaceReference().getName(),
-                        docRef.getName());
+                    // Compute what should be the filename of the document to restore
+                    String fileNameToRestore = String.format("%s/%s.xml",
+                        docRef.getLastSpaceReference().getName(), docRef.getName());
 
-                // Get the corresponding zip Entry
-                ZipArchiveEntry zipEntry = zipFile.getEntry(fileNameToRestore);
-                if (zipEntry != null) {
-                    // Restore the document
-                    XWikiDocument docToRestore = xwiki.getDocument(docRef, xcontext);
-                    docToRestore.fromXML(zipFile.getInputStream(zipEntry));
-                    xwiki.saveDocument(docToRestore, xcontext);
-                    // We have restored this document
-                    itDocumentsToRestore.remove();
+                    // Get the corresponding zip Entry
+                    ZipArchiveEntry zipEntry = zipFile.getEntry(fileNameToRestore);
+                    if (zipEntry != null) {
+                        // Restore the document
+                        XWikiDocument docToRestore = xwiki.getDocument(docRef, xcontext);
+                        docToRestore.fromXML(zipFile.getInputStream(zipEntry));
+                        xwiki.saveDocument(docToRestore, xcontext);
+                        // We have restored this document
+                        itDocumentsToRestore.remove();
+                    }
                 }
             }
-            zipFile.close();
         } catch (IOException e) {
             logger.error("Error during the decompression of [{}].", attachmentName, e);
         } finally {

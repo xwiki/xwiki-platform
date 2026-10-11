@@ -102,7 +102,7 @@ public class QueryRegistrationHandler implements EventListener
             // created.
             this.sessionFactory.getConfiguration().addInputStream(replacedStream);
         } catch (IOException e) {
-            this.logger.error("Failed to close the resoure stream", e);
+            this.logger.error("Failed to close the resource stream", e);
         }
     }
 }

@@ -28,11 +28,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
@@ -60,10 +58,6 @@ import net.java.truevfs.access.TPath;
 @Authenticate
 public class VfsResourceReferenceHandler extends AbstractContentResourceReferenceHandler
 {
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
-
     @Inject
     @Named("cascading")
     private VfsPermissionChecker permissionChecker;

@@ -19,12 +19,12 @@
  */
 package org.xwiki.resource;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link ResourceReferenceHandler}.
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.1M2
  */
-public class ResourceReferenceHandlerTest
+class ResourceReferenceHandlerTest
 {
     private class TestableResourceReferenceHandler extends AbstractResourceReferenceHandler<ResourceType>
     {
@@ -44,24 +44,25 @@ public class ResourceReferenceHandlerTest
         @Override
         public List<ResourceType> getSupportedResourceReferences()
         {
-            return Arrays.asList(new ResourceType("test"));
+            return List.of(new ResourceType("test"));
         }
 
         @Override
         public void handle(ResourceReference reference, ResourceReferenceHandlerChain chain) throws
             ResourceReferenceHandlerException
         {
+            // Does nothing: this test handler only needs to declare a priority and a supported resource type.
         }
-    };
+    }
 
     @Test
-    public void priority()
+    void priority()
     {
-        ResourceReferenceHandler handler1 = new TestableResourceReferenceHandler(500);
+        ResourceReferenceHandler<ResourceType> handler1 = new TestableResourceReferenceHandler(500);
         assertEquals(500, handler1.getPriority());
         assertTrue(handler1.getSupportedResourceReferences().contains(new ResourceType("test")));
 
-        ResourceReferenceHandler handler2 = new TestableResourceReferenceHandler(200);
-        assertEquals(300, handler1.compareTo(handler2));
+        ResourceReferenceHandler<ResourceType> handler2 = new TestableResourceReferenceHandler(200);
+        assertTrue(handler1.compareTo(handler2) > 0);
     }
 }

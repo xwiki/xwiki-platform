@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.macro.include;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 
@@ -32,14 +30,14 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters;
  */
 public privileged aspect IncludeMacroCompatibilityAspect
 {
-    @Around("call(* org.xwiki.rendering.internal.macro.include.IncludeMacro.execute(..)) && args(parameters)")
-    public Object aroundExecute(ProceedingJoinPoint joinPoint, IncludeMacroParameters parameters) throws Throwable
+    Object around(IncludeMacroParameters parameters) throws MacroExecutionException :
+        execution(* org.xwiki.rendering.internal.macro.include.IncludeMacro.execute(..)) && args(parameters, ..)
     {
-        // Step 1: Perform legacy checks.
+        // Perform legacy checks.
         if (parameters.getDocument() == null) {
             throw new MacroExecutionException(
                 "You must specify a 'reference' parameter pointing to the entity to include.");
         }
-        return joinPoint.proceed(joinPoint.getArgs());
+        return proceed(parameters);
     }
 }

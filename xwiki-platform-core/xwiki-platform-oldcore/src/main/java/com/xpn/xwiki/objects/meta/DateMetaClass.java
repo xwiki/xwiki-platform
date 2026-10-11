@@ -60,8 +60,8 @@ public class DateMetaClass extends PropertyMetaClass
         BooleanClass emptyIsTodayClass = new BooleanClass(this);
         emptyIsTodayClass.setName("emptyIsToday");
         emptyIsTodayClass.setPrettyName("Empty Is Today");
-        emptyIsTodayClass.setDisplayType("yesno");
-        emptyIsTodayClass.setDisplayFormType("checkbox");
+        emptyIsTodayClass.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        emptyIsTodayClass.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         emptyIsTodayClass.setDefaultValue(1);
         safeput(emptyIsTodayClass.getName(), emptyIsTodayClass);
 

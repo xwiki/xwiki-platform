@@ -132,7 +132,6 @@ public class PluginException extends XWikiException
     /** Empty constructor, with no information provided. */
     public PluginException()
     {
-        super();
         this.pluginName = "unknown";
     }
 

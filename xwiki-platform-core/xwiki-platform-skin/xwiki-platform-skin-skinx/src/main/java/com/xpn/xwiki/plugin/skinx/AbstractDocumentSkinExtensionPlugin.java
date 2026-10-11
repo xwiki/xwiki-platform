@@ -100,7 +100,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
      * @param context The current request context.
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
-    public AbstractDocumentSkinExtensionPlugin(String name, String className, XWikiContext context)
+    protected AbstractDocumentSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
 
@@ -183,7 +183,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         EntityReferenceSerializer<String> serializer = getDefaultEntityReferenceSerializer();
         Set<DocumentReference> references = getAlwaysUsedExtensions();
-        Set<String> names = new HashSet<>(references.size());
+        Set<String> names = HashSet.newHashSet(references.size());
         for (DocumentReference reference : references) {
             names.add(serializer.serialize(reference));
         }
@@ -369,8 +369,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent) {
-            this.alwaysUsedExtensions.remove(((WikiDeletedEvent) event).getWikiId());
+        if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            this.alwaysUsedExtensions.remove(wikiDeletedEvent.getWikiId());
         } else {
             onDocumentEvent((XWikiDocument) source);
         }

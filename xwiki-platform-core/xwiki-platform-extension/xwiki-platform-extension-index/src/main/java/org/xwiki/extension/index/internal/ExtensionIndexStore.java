@@ -44,10 +44,12 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.SolrParams;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
@@ -259,6 +261,8 @@ public class ExtensionIndexStore implements Initializable, Disposable
     }
 
     /**
+     * The document is looked up with a real-time get, so that a document added but not yet committed is found.
+     *
      * @param extensionId the extension id and version
      * @return true if a document corresponding to the passed extension can be found in the index
      * @throws SolrServerException
@@ -266,31 +270,8 @@ public class ExtensionIndexStore implements Initializable, Disposable
      */
     public boolean exists(ExtensionId extensionId) throws SolrServerException, IOException
     {
-        return exists(extensionId, null);
-    }
-
-    /**
-     * @param extensionId the extension id and version
-     * @param local true if it's the searched extension is a local extension
-     * @return true if a document corresponding to the passed extension can be found in the index
-     * @throws SolrServerException
-     * @throws IOException
-     */
-    public boolean exists(ExtensionId extensionId, Boolean local) throws SolrServerException, IOException
-    {
-        SolrQuery solrQuery = new SolrQuery();
-
-        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
-            + this.utils.toCompleteFilterQueryString(this.extensionIndexSolrUtil.toSolrId(extensionId)));
-
-        if (local != null) {
-            solrQuery.addFilterQuery(Extension.FIELD_REPOSITORY + ":local");
-        }
-
-        // We don't want to actually get the document, we just want to know if one exist
-        solrQuery.setRows(0);
-
-        return this.client.query(solrQuery).getResults().getNumFound() > 0;
+        return this.client.getById(this.extensionIndexSolrUtil.toSolrId(extensionId),
+            new SolrQuery().setFields(AbstractSolrCoreInitializer.SOLR_FIELD_ID)) != null;
     }
 
     /**
@@ -303,7 +284,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extensionId), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST,
@@ -313,7 +294,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     }
 
     /**
-     * Update variable informations (support plans, ratings, etc.).
+     * Update variable information (support plans, ratings, etc.).
      *
      * @param extensionId the identifier of the extension to update
      * @param remoteExtension the remote extension from which to extract variable information
@@ -324,7 +305,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extensionId), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_SUPPORT_PLANS,
@@ -333,9 +314,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_RECOMMENDED,
             remoteExtension.isRecommended(), document);
 
-        if (remoteExtension instanceof RatingExtension) {
-            RatingExtension ratingExtension = (RatingExtension) remoteExtension;
-
+        if (remoteExtension instanceof RatingExtension ratingExtension) {
             this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RatingExtension.FIELD_TOTAL_VOTES,
                 ratingExtension.getRating().getTotalVotes(), document);
             this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RatingExtension.FIELD_AVERAGE_VOTE,
@@ -373,15 +352,15 @@ public class ExtensionIndexStore implements Initializable, Disposable
         }
         Stream<String> cveIds =
             result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getId);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_ID, cveIds.collect(Collectors.toList()),
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_ID, cveIds.toList(),
             doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_LINK,
             result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getURL)
-                .collect(Collectors.toList()),
+                .toList(),
             doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_CVSS,
             result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getScore)
-                .collect(Collectors.toList()),
+                .toList(),
             doc);
         String fixVersion =
             result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getFixVersion)
@@ -392,10 +371,10 @@ public class ExtensionIndexStore implements Initializable, Disposable
             result.getSecurityVulnerabilities().size(), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_CORE_EXTENSION, result.isCoreExtension(), doc);
         List<Boolean> safeMapping = result.getSecurityVulnerabilities().stream()
-            .map(SecurityVulnerabilityDescriptor::isSafe).collect(Collectors.toList());
+            .map(SecurityVulnerabilityDescriptor::isSafe).toList();
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_REVIEWED_SAFE, safeMapping, doc);
         List<String> reviewExplanations = result.getSecurityVulnerabilities().stream()
-            .map(SecurityVulnerabilityDescriptor::getReviews).collect(Collectors.toList());
+            .map(SecurityVulnerabilityDescriptor::getReviews).toList();
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_SAFE_EXPLANATIONS, reviewExplanations, doc);
 
         add(doc);
@@ -403,7 +382,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     }
 
     /**
-     * Update variable informations (support plans, ratings, etc.) by copying it from another version.
+     * Update variable information (support plans, ratings, etc.) by copying it from another version.
      *
      * @param extensionId the identifier of the extension to update
      * @param copyVersion the version of the extension to copy
@@ -415,7 +394,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         // Get the version to copy
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.addFilterQuery(
-            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':' + this.utils.toCompleteFilterQueryString(
+            AbstractSolrCoreInitializer.SOLR_FIELD_ID + ':' + this.utils.toCompleteFilterQueryString(
                 this.extensionIndexSolrUtil.toSolrId(new ExtensionId(extensionId.getId(), copyVersion))));
         solrQuery.setFields(RemoteExtension.FIELD_SUPPORT_PLANS, RemoteExtension.FIELD_RECOMMENDED,
             RatingExtension.FIELD_TOTAL_VOTES, RatingExtension.FIELD_AVERAGE_VOTE);
@@ -432,7 +411,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
 
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extensionId), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_SUPPORT_PLANS,
@@ -466,8 +445,8 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
-            this.extensionIndexSolrUtil.toSolrId(extensionId), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, this.extensionIndexSolrUtil.toSolrId(extensionId),
+            document);
 
         // Update installed
         this.utils.setAtomic(
@@ -486,7 +465,9 @@ public class ExtensionIndexStore implements Initializable, Disposable
             }
         }
 
-        add(document);
+        // An installed extension is not necessarily indexed (for example an extension coming from a non searchable
+        // repository like Maven Central). The installed state is set when an extension is added to the index.
+        updateIfExists(document);
     }
 
     /**
@@ -502,12 +483,12 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
-            this.extensionIndexSolrUtil.toSolrId(extensionId), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, this.extensionIndexSolrUtil.toSolrId(extensionId),
+            document);
 
         updateCompatible(document, namespace, compatible, incompatible);
 
-        add(document);
+        updateIfExists(document);
     }
 
     private void updateCompatible(SolrInputDocument document, String namespace, Boolean compatible,
@@ -534,7 +515,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
+        solrQuery.addFilterQuery(AbstractSolrCoreInitializer.SOLR_FIELD_ID + ':'
             + this.utils.toCompleteFilterQueryString(this.extensionIndexSolrUtil.toSolrId(extensionId)));
 
         solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES,
@@ -578,7 +559,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extension.getId()), document);
 
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID, extension.getId().getId(), document);
@@ -599,7 +580,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
 
         this.utils.setString(Extension.FIELD_AUTHORS, extension.getAuthors(), ExtensionAuthor.class, document);
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX,
-            extension.getAuthors().stream().map(ExtensionAuthor::getName).collect(Collectors.toList()), document);
+            extension.getAuthors().stream().map(ExtensionAuthor::getName).toList(), document);
 
         this.utils.setString(Extension.FIELD_COMPONENTS, extension.getComponents(), ExtensionComponent.class, document);
         for (ExtensionComponent component : extension.getComponents()) {
@@ -644,8 +625,35 @@ public class ExtensionIndexStore implements Initializable, Disposable
         // Add the document to the Solr queue
         this.client.add(document);
 
+        return added(document);
+    }
+
+    /**
+     * Apply an atomic update only if the document already exists in the index (committed or not).
+     * <p>
+     * Solr creates the document when an atomic update targets a document which does not exist, and such a document
+     * would only contain the updated fields (no extension id, version, repository, etc.). A {@code _version_} of 1
+     * requires the document to exist, and disabling the failure on version conflicts makes Solr silently skip the
+     * update when it does not.
+     */
+    private boolean updateIfExists(SolrInputDocument document) throws SolrServerException, IOException
+    {
+        document.setField(CommonParams.VERSION_FIELD, 1L);
+
+        UpdateRequest request = new UpdateRequest();
+        request.add(document);
+        request.setParam(CommonParams.FAIL_ON_VERSION_CONFLICTS, Boolean.FALSE.toString());
+
+        // Add the document to the Solr queue
+        request.process(this.client);
+
+        return added(document);
+    }
+
+    private boolean added(SolrInputDocument document) throws SolrServerException, IOException
+    {
         // Remember the modified entry
-        addMofiedId((String) document.getFieldValue(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID));
+        addMofiedId((String) document.getFieldValue(AbstractSolrCoreInitializer.SOLR_FIELD_ID));
 
         // Check if it should be auto committed
         ++this.documentsToStore;
@@ -869,9 +877,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         }
 
         // Indexed
-        if (query instanceof IndexedExtensionQuery) {
-            IndexedExtensionQuery indexedQuery = (IndexedExtensionQuery) query;
-
+        if (query instanceof IndexedExtensionQuery indexedQuery) {
             // Compatible
             if (indexedQuery.getCompatible() != null) {
                 StringBuilder builder = new StringBuilder();
@@ -988,13 +994,13 @@ public class ExtensionIndexStore implements Initializable, Disposable
         if (solrQuery.getRows() == null) {
             solrQuery.setRows(Integer.MAX_VALUE);
         }
-        solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID);
+        solrQuery.setFields(AbstractSolrCoreInitializer.SOLR_FIELD_ID);
 
         QueryResponse response = search(solrQuery);
 
         SolrDocumentList documents = response.getResults();
 
-        Set<ExtensionId> extensionId = new LinkedHashSet<>(documents.size());
+        Set<ExtensionId> extensionId = LinkedHashSet.newLinkedHashSet(documents.size());
         for (SolrDocument document : documents) {
             extensionId.add(this.extensionIndexSolrUtil.fromSolrId(this.utils.getId(document)));
         }
@@ -1038,7 +1044,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         }
 
         return documents.stream().map(d -> this.utils.<Version>get(Extension.FIELD_VERSION, d, Version.class))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**

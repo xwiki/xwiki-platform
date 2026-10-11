@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
  * @since 9.8
  */
 @ComponentTest
-public class DocumentQueryFilterTest
+class DocumentQueryFilterTest
 {
     @InjectMockComponents
     private DocumentQueryFilter filter;
@@ -55,50 +55,50 @@ public class DocumentQueryFilterTest
     private DocumentReferenceResolver<String> resolver;
 
     @Test
-    public void filterStatement()
+    void filterStatement()
     {
         String statement = "select doc.fullName from XWikiDocument doc";
         assertSame(statement, this.filter.filterStatement(statement, Query.HQL));
     }
 
     @Test
-    public void filterResultsWithOneColumn()
+    void filterResultsWithOneColumn()
     {
-        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        DocumentReference documentReference = new DocumentReference("wiki", List.of("Path", "To"), "Page");
         when(this.resolver.resolve("Path.To.Page")).thenReturn(documentReference);
 
         List<Object> results = Arrays.asList("Path.To.Page");
-        assertEquals(Arrays.asList(documentReference), this.filter.filterResults(results));
+        assertEquals(List.of(documentReference), this.filter.filterResults(results));
     }
 
     @Test
-    public void filterResultsWithTwoColumns()
+    void filterResultsWithTwoColumns()
     {
-        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        DocumentReference documentReference = new DocumentReference("wiki", List.of("Path", "To"), "Page");
         when(this.resolver.resolve("Path.To.Page")).thenReturn(documentReference);
 
-        List<Object> results = Arrays.asList((Object) new Object[]{ "Path.To.Page", "red" });
+        List<Object> results = List.of((Object) new Object[] { "Path.To.Page", "red" });
         List<Object> filteredResults = this.filter.filterResults(results);
         assertEquals(1, filteredResults.size());
-        assertArrayEquals(new Object[]{ documentReference, "red" }, (Object[]) filteredResults.get(0));
+        assertArrayEquals(new Object[] { documentReference, "red" }, (Object[]) filteredResults.get(0));
     }
 
     @Test
-    public void filterResultsWithOneColumnButNotString()
+    void filterResultsWithOneColumnButNotString()
     {
         List<Object> results = Collections.singletonList(23);
         assertSame(results, this.filter.filterResults(results));
     }
 
     @Test
-    public void filterResultsWithTwoColumnsButNotString()
+    void filterResultsWithTwoColumnsButNotString()
     {
-        List<Object> results = Collections.singletonList(new Object[]{ 23, "Path.To.Page" });
+        List<Object> results = Collections.singletonList(new Object[] { 23, "Path.To.Page" });
         assertSame(results, this.filter.filterResults(results));
     }
 
     @Test
-    public void filterResultsEmpty()
+    void filterResultsEmpty()
     {
         List<Object> results = Collections.emptyList();
         assertSame(results, this.filter.filterResults(results));

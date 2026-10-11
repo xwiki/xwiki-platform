@@ -138,12 +138,20 @@ administration.section.users.deleteUser.newAuthor.hint=Seleccione un usuario que
 administration.section.users.deleteUser.newAuthor.error=¡El usuario seleccionado no tiene permisos de {0}!
 administration.section.users.deleteUser.newAuthor.programming=programando
 administration.section.users.deleteUser.newAuthor.script=script
-### Missing: admin.usersgroups.extensionrights=Extension Rights
+admin.usersgroups.extensionrights=Extension Rights
+### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 ### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
 ### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
 ### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
+
+# Rights for page section
+### Missing: administration.section.pagerights.hint=These rights apply on this page only. They do not affect the {0}children{1}.
+
+# Rights for page and children section
+### Missing: administration.section.pageandchildrenrights.hint=These rights apply on this page and {0}all its children{1}.
 
 # Other Category
 admin.other=Otro
@@ -154,6 +162,10 @@ administration.section.analytics.status.hint=Determinar si el seguimiento en Goo
 # Social category
 admin.social=Social
 admin.social.description=Configuración de funciones sociales.
+
+# Network category
+### Missing: admin.network=Network
+### Missing: admin.network.description=Network related features.
 
 # Configurable Class
 ### Missing: XWiki.ConfigurableClass_displayInSection=Display in section

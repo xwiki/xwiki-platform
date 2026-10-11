@@ -41,9 +41,6 @@ public class ExtensionInlinePage extends InlinePage
     @FindBy(id = "ExtensionCode.ExtensionClass_0_summary")
     private WebElement summaryInput;
 
-    @FindBy(id = "ExtensionCode.ExtensionClass_0_authors")
-    private WebElement authorsInput;
-
     @FindBy(id = "ExtensionCode.ExtensionClass_0_licenseName")
     private WebElement licenseNameList;
 
@@ -83,12 +80,6 @@ public class ExtensionInlinePage extends InlinePage
     {
         this.summaryInput.clear();
         this.summaryInput.sendKeys(summary);
-    }
-
-    public void setAuthors(String author)
-    {
-        this.authorsInput.clear();
-        this.authorsInput.sendKeys(author);
     }
 
     public void setLicenseName(String licenseName)

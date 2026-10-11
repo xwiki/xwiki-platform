@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>18.3.0-SNAPSHOT</version>
+    <version>18.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -35,7 +35,7 @@
     <xwiki.extension.features>${xwiki.platform.oldcore.extension.features}</xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.44</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
@@ -136,7 +136,7 @@
     </dependency>
 
     <!-- Used by parse groovy from page -->
-    <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
+    <!-- Note: We only depend on the minimum required to compile oldcore since the distributions will depend on
          xwiki-commons-groovy which has dependencies on all the various groovy jars and thus they'll be bundled -->
     <dependency>
       <groupId>org.apache.groovy</groupId>
@@ -209,7 +209,7 @@
     <dependency>
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
-      <version>12.9</version>
+      <version>13.0</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -486,36 +486,23 @@
       <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
 
-    <!-- Test dependencies -->
-
-    <!-- Used to mock XWiki class -->
+    <!-- Used for PasswordClass -->
     <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock</artifactId>
-      <version>1.2.0</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock-cglib</artifactId>
-      <version>1.2.0</version>
-      <scope>test</scope>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
       <exclusions>
-        <!-- We use cglib:cglig instead -->
         <exclusion>
-          <groupId>cglib</groupId>
-          <artifactId>cglib-nodep</artifactId>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-aop</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
+
+    <!-- Test dependencies -->
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -645,12 +632,6 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
@@ -791,7 +772,6 @@
                 **/monitor/api/MonitorPlugin.java,
                 **/monitor/api/MonitorTimer.java,
                 **/monitor/api/MonitorTimerSummary.java,
-                **/objects/BaseCollection.java,
                 **/objects/BaseElement.java,
                 **/objects/BaseProperty.java,
                 **/objects/BaseStringProperty.java,

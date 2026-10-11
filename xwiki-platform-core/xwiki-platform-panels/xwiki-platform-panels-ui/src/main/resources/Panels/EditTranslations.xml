@@ -143,10 +143,10 @@
   #set ($translationLocales = $doc.translationLocales)
   #if (("$!tdoc.locale" == '' || $tdoc.locale == $doc.defaultLocale) &amp;&amp; ($forcetrans == ''))
     (% class="important" %)
-    **$services.localization.render('panels.translation.editingOriginal', [$defaultLanguage])**
+    **#wikiTranslation('panels.translation.editingOriginal', [$defaultLanguage])**
     #if ($translationLocales.size() &gt; 0)
 
-      $services.localization.render('panels.translation.existingTranslations')##
+      #wikiTranslation('panels.translation.existingTranslations')##
       #foreach ($locale in $translationLocales) ##
         [[$locale&gt;&gt;path:$doc.getURL('edit', "editor=${editor}&amp;language=${locale}")]]##
       #end
@@ -154,12 +154,12 @@
     #end
   #else
     (% class="important" %)
-    **$services.localization.render('panels.translation.editingTranslation', [${rlanguage}])**
+    **#wikiTranslation('panels.translation.editingTranslation', [${rlanguage}])**
 
     $services.localization.render('panels.translation.editOriginalLanguage', ["[[$defaultLanguage&gt;&gt;path:$doc.getURL('edit', ""editor=${editor}&amp;language=${doc.defaultLocale}"")]]"])
     #if ($translationLocales.size() &gt; 1)
 
-      $services.localization.render('panels.translation.otherTranslations')##
+      #wikiTranslation('panels.translation.otherTranslations')##
       #foreach ($locale in $translationLocales)
         #if ($locale != $tdoc.locale) ##
           [[$locale&gt;&gt;path:$doc.getURL('edit', "editor=${editor}&amp;language=${locale}")]]##
@@ -176,7 +176,7 @@
   #end
   #if ($extraTranslations != '')
 
-    $services.localization.render('panels.translation.translate') $extraTranslations
+    #wikiTranslation('panels.translation.translate') $extraTranslations
   #end
   #panelfooter()
 #end

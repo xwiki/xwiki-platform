@@ -28,6 +28,7 @@ org.xwiki.search.solr.internal.metadata.SolrLinkSerializer
 org.xwiki.search.solr.internal.metadata.SolrMetadataExtractorUtils
 org.xwiki.search.solr.internal.migration.R141005000XWIKI20575XWIKI20619DataMigration
 org.xwiki.search.solr.internal.migration.R141015000XWIKI20371XWIKI21208DataMigration
+org.xwiki.search.solr.internal.migration.R171009000XWIKI24390DataMigration
 org.xwiki.search.solr.internal.reference.AttachmentSolrReferenceResolver
 org.xwiki.search.solr.internal.reference.DefaultSolrReferenceResolver
 org.xwiki.search.solr.internal.reference.DocumentSolrReferenceResolver
@@ -40,4 +41,5 @@ org.xwiki.search.solr.internal.reference.WikiSolrReferenceResolver
 org.xwiki.search.solr.internal.search.SearchCoreInitializer
 org.xwiki.search.solr.internal.search.SearchCoreMigrationManager
 org.xwiki.search.solr.internal.search.V170700000SearchCoreMigration
+org.xwiki.search.solr.internal.search.V171009000SearchCoreMigration
 org.xwiki.search.solr.script.SolrIndexScriptService

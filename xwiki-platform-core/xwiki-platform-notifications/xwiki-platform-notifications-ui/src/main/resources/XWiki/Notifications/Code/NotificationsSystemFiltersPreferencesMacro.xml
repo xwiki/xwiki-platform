@@ -153,11 +153,11 @@
         };
         $.post(restURL, params).then(data =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.done'], 'done');
+          XWiki.widgets.Notification.show(l10n['filters.preferences.setEnabled.done'], 'done');
           resolve({objectNumber: data.number, checked})
         }).catch(() =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.error'], 'error');
+          XWiki.widgets.Notification.show(l10n['filters.preferences.setEnabled.error'], 'error');
           resolve({checked: !checked});
         });
       } else if (objectNumber !== '') {
@@ -171,11 +171,11 @@
           data: checked ? '1' : '0'
         }).then(() =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.done'], 'done');
+          XWiki.widgets.Notification.show(l10n['filters.preferences.setEnabled.done'], 'done');
           resolve({checked});
         }).catch(() =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.error'], 'error');
+          XWiki.widgets.Notification.show(l10n['filters.preferences.setEnabled.error'], 'error');
           resolve({checked: !checked});
         });
       }

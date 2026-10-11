@@ -19,21 +19,22 @@
  */
 package com.xpn.xwiki.internal.objects.classes;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -42,22 +43,22 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 9.8RC1
  */
-public class ViewableAllowedDBListValueFilterTest
+@ComponentTest
+class ViewableAllowedDBListValueFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<QueryFilter> mocker =
-        new MockitoComponentMockingRule<QueryFilter>(ViewableAllowedDBListValueFilter.class);
+    @InjectMockComponents
+    private ViewableAllowedDBListValueFilter filter;
 
+    @MockComponent
     private ContextualAuthorizationManager authorization;
 
+    @MockComponent
+    @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
-    @Before
-    public void configure() throws Exception
+    @BeforeEach
+    void configure()
     {
-        this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
-        this.documentReferenceResolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
-
         DocumentReference aliceReference = new DocumentReference("wiki", "User", "alice");
         when(this.documentReferenceResolver.resolve("alice")).thenReturn(aliceReference);
         when(this.authorization.hasAccess(Right.VIEW, aliceReference)).thenReturn(false);
@@ -68,27 +69,26 @@ public class ViewableAllowedDBListValueFilterTest
     }
 
     @Test
-    public void filterStatement() throws Exception
+    void filterStatement()
     {
         String statement = "select doc.fullName from XWikiDocument doc";
-        assertEquals("The statement should not be filtered", statement,
-            this.mocker.getComponentUnderTest().filterStatement(statement, Query.HQL));
+        assertEquals(statement, this.filter.filterStatement(statement, Query.HQL),
+            "The statement should not be filtered");
     }
 
     @Test
-    public void filterResultsStrings() throws Exception
+    void filterResultsStrings()
     {
-        assertEquals(Arrays.asList("bob"),
-            this.mocker.getComponentUnderTest().filterResults(Arrays.asList("alice", "bob")));
+        assertEquals(List.of("bob"), this.filter.filterResults(List.of("alice", "bob")));
     }
 
     @Test
-    public void filterResultsArray() throws Exception
+    void filterResultsArray()
     {
-        List<?> filteredResults = this.mocker.getComponentUnderTest()
-            .filterResults(Arrays.asList(new Object[] {"alice", 13}, new Object[] {"bob", 7}));
+        List<?> filteredResults = this.filter.filterResults(
+            List.of(new Object[] {"alice", 13}, new Object[] {"bob", 7}));
         assertEquals(1, filteredResults.size());
-        Object[] result = (Object[]) filteredResults.get(0);
+        Object[] result = (Object[]) filteredResults.getFirst();
         assertEquals(1, result.length);
         assertEquals(7, result[0]);
     }

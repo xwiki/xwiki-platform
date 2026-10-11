@@ -77,6 +77,8 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLSecurityManager;
@@ -191,6 +193,12 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     private URLSecurityManager urlSecurityManager;
 
     /**
+     * Used to check that the current user is allowed to see the attachment to view.
+     */
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorization;
+
+    /**
      * The logger to log.
      */
     @Inject
@@ -254,8 +262,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
                         // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
                         temporaryFiles.add(tempFile);
                     } catch (Exception ex) {
-                        String message = "Error while processing artifact image [%s].";
-                        this.logger.error(String.format(message, imageReference), ex);
+                        this.logger.error("Error while processing artifact image [{}].", imageReference, ex);
                     }
                 }
             }
@@ -269,7 +276,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             block.getFirstBlock(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.ANCESTOR_OR_SELF);
         if (expandedMacro != null) {
             Block parent = expandedMacro.getParent();
-            if (!(parent instanceof MetaDataBlock) || !((MetaDataBlock) parent).getMetaData().contains(MODULE_NAME)) {
+            if (!(parent instanceof MetaDataBlock metaBlock) || !metaBlock.getMetaData().contains(MODULE_NAME)) {
                 MetaDataBlock metaData = new MetaDataBlock(Collections.emptyList());
                 // Use a syntax that supports relative path resource references (we use relative paths to include the
                 // temporary files).
@@ -389,6 +396,10 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     private OfficeDocumentView getView(ResourceReference reference, AttachmentReference attachmentReference,
         Map<String, ?> parameters) throws Exception
     {
+        // The view right on the attachment is checked first, before the cache is read and before the attachment
+        // itself is accessed, so that the check applies to every view this method returns.
+        this.contextualAuthorization.checkAccess(Right.VIEW, attachmentReference);
+
         // Search the cache.
         String cacheKey =
             getCacheKey(attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);

@@ -25,6 +25,9 @@ import java.util.List;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rest.XWikiRestException;
@@ -34,9 +37,6 @@ import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 /**
  * @version $Id$
@@ -97,12 +97,13 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
     }
 
     @Override
-    public void deletePage(String wikiName, String spaceName, String pageName) throws XWikiRestException
+    public void deletePage(String wikiName, String spaceName, String pageName, Boolean skipRecycleBin)
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
 
-            deletePage(documentInfo);
+            deletePage(documentInfo, skipRecycleBin);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

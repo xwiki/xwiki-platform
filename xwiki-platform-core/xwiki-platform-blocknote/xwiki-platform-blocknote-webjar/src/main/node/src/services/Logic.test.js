@@ -18,18 +18,34 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { Logic } from "./Logic";
+import { container } from "./container";
 import { mockI18n } from "../testUtils";
+import { DocumentReference } from "@xwiki/platform-xwiki-model-api";
 import { describe, it, vi } from "vitest";
 
 define("xwiki-l10n!xwiki-blocknote-translation-keys", () => ({}));
 
-global.matchMedia = vi.fn().mockImplementation((query) => ({
+container.bind("XWikiMeta").toConstantValue({});
+
+globalThis.XWiki = {
+  currentDocument: {
+    documentReference: new DocumentReference("xwiki", ["Space"], "Page"),
+  },
+};
+
+globalThis.matchMedia = vi.fn().mockImplementation((query) => ({
   matches: false,
   media: query,
   onchange: null,
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
   dispatchEvent: vi.fn(),
+}));
+
+vi.mock("xwiki-platform-localization-webjar", () => ({
+  resolver: {
+    resolve: () => ({ translations: [] }),
+  },
 }));
 
 describe("Logic", () => {
@@ -39,7 +55,7 @@ describe("Logic", () => {
     const host = document.createElement("div");
     host.name = "test";
 
-    const logic = new Logic(host);
+    const logic = new Logic(host, { designSystemLoader: undefined });
     await logic.ready;
   });
 });

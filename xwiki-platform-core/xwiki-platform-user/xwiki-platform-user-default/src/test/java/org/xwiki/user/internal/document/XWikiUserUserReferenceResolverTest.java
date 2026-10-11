@@ -26,7 +26,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -39,7 +38,7 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  */
 @ComponentTest
-public class XWikiUserUserReferenceResolverTest
+class XWikiUserUserReferenceResolverTest
 {
     @InjectMockComponents
     private XWikiUserUserReferenceResolver resolver;
@@ -52,7 +51,7 @@ public class XWikiUserUserReferenceResolverTest
     void resolve()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        UserReference userReference = this.resolver.resolve(new XWikiUser(documentReference));
+        this.resolver.resolve(new XWikiUser(documentReference));
 
         verify(this.documentReferenceUserReferenceResolver).resolve(documentReference);
     }

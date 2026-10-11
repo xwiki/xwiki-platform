@@ -209,9 +209,9 @@ Il formato completo di un link è **##[etichetta&gt;&gt;] (risorsa) [||parametri
 ** **Relative path** Percorso relativo, riferimento sul server nella forma **##path: (relPath)##**. Esempio: ##path:$doc.getURL('reset')## produce l'indirizzo di destinazione ##http:~/~/server.domain.com/xwiki/bin/reset/Space/Page## dove ##/xwiki/bin/reset/Space/Page## è prodotto da ##$doc.getURL('reset')##.
 *** **##path:##** Stringa richiesta che identifica la risorsa come percorso relativo.
 *** **##relPath##**: Stringa richiesta contenente il percorso relativo della risorsa sul server cui punta il link.
-** **UNC (Windows Explorer)** riferimento nella forma **##unc: (path)##**. Il link è reso come un link ad un ##file:~/~/## . Esempi: ##unc:C:\Windows\##, ##unc:~\~\myserver\path\img.png##, ##unc:home/user/somefile##
+** **UNC (Windows Explorer)** riferimento nella forma **##unc: (path)##**. Il link è reso come un link ad un ##file:~/~/## . Esempi: ##unc:C:Windows##, ##unc:~~myserverpathimg.png##, ##unc:home/user/somefile##
 *** **##unc:##** Stringa richiesta che identifica la risorsa come un percorso UNC (Windows Explorer).
-*** **##path##**: Stringa richiesta contenente il percorso locale della risorsa acessibile dall'utente. Esempi: ##C:\Windows\##, ##~\~\myserver\path\img.png##, ##home/user/somefile##
+*** **##path##**: Stringa richiesta contenente il percorso locale della risorsa acessibile dall'utente. Esempi: ##C:Windows##, ##~~myserverpathimg.png##, ##home/user/somefile##
 * **##parametri##**: Lista opzionale separata da spazi di parametri passati al link. Esempio: ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" rel="~_~_blank"##
 ** **##Stringaquery##**: Stringa opzionale di query per specifici parametri che saranno appesi all'indirizzo del link e usati nel rendering dell'URL. Eaempio: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## produce l'indirizzo di destinazione ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
 ** **##ancora##**: Nome opzionale di un ancora che punta ad un ancora definita nel link cui si riferisce. Notare che in XWiki le ancore per i titoli sono create automaticamente. Esempio: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produce l'indirizzo di destinazione ##http:~/~/domain.com/path#HTableOfContents##

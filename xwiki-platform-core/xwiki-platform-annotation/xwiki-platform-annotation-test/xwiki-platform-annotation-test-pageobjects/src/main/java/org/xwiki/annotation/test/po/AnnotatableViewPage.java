@@ -24,6 +24,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.CommentForm;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -148,6 +149,49 @@ public class AnnotatableViewPage extends BaseElement
         deleteAnnotationByID(this.annotationsLabel.getAnnotationIdByText(annotatedText));
     }
 
+    /**
+     * Replies to an annotation stored as a comment, from its bubble. The Comments tab must be loaded, since the bubble
+     * opens the reply form of the annotation comment in that tab.
+     *
+     * @param annotatedText the text selected by the annotation
+     * @return the reply form, in the Comments tab
+     * @since 18.9.0RC1
+     */
+    public CommentForm replyToAnnotationByText(String annotatedText)
+    {
+        this.annotationsLabel.clickReplyById(getAnnotationIdByText(annotatedText));
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".collapse.in form#AddComment"));
+        return new CommentForm(By.id("AddComment"));
+    }
+
+    /**
+     * Displays the replies to an annotation stored as a comment, from the "View thread" button of its bubble, and waits
+     * for the thread of the annotation comment to be expanded in the Comments tab. The Comments tab must be loaded.
+     *
+     * @param annotatedText the text selected by the annotation
+     * @return the label of the "View thread" button
+     * @since 18.9.0RC1
+     */
+    public String viewAnnotationThreadByText(String annotatedText)
+    {
+        String annotationId = getAnnotationIdByText(annotatedText);
+        int commentId = getCommentId(annotationId);
+        String label = this.annotationsLabel.clickViewThreadById(annotationId);
+        getDriver().waitUntilElementIsVisible(By.cssSelector("#comment-thread-" + commentId + ".collapse.in"));
+        return label;
+    }
+
+    /**
+     * Waits until the specified number of annotations is displayed on the page, e.g. after an annotation is deleted.
+     *
+     * @param count the expected number of displayed annotations
+     * @since 18.9.0RC1
+     */
+    public void waitUntilAnnotationCount(int count)
+    {
+        getDriver().waitUntilCondition(driver -> getAnnotationCount() == count);
+    }
+
     public String getAnnotationContentByText(String searchText)
     {
         return annotationsLabel.getAnnotationContentByText(searchText);
@@ -268,13 +312,12 @@ public class AnnotatableViewPage extends BaseElement
 
     public void simulateCTRL_M()
     {
+        // The annotation shortcut is registered as "Meta+M". The Keypress library resolves the "meta" key to the
+        // actual Command key only when the browser runs on macOS; on any other platform it resolves to the Control
+        // key. Since the browser always runs in a Linux Docker container, the shortcut is effectively "Ctrl+M" there,
+        // regardless of the operating system running these tests. We therefore always send Ctrl+M.
         WebElement body = getDriver().findElement(By.id("body"));
-        String os = System.getProperty("os.name");
-        if ("Mac OS X".equals(os)) {
-            body.sendKeys(Keys.chord(Keys.COMMAND, "m"));
-        } else {
-            body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
-        }
+        body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
     }
 
     /**
@@ -287,7 +330,7 @@ public class AnnotatableViewPage extends BaseElement
 
     public boolean checkIfAnnotationsAreDisabled()
     {
-        if (getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).size() > 0) {
+        if (!getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).isEmpty()) {
             return false;
         } else {
             return true;

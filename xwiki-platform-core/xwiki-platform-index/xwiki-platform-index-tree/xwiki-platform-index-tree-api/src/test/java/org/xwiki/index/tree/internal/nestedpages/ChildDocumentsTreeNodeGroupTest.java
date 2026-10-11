@@ -19,14 +19,6 @@
  */
 package org.xwiki.index.tree.internal.nestedpages;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -60,6 +52,14 @@ import org.xwiki.tree.TreeFilter;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ChildDocumentsTreeNodeGroup}.
@@ -136,7 +136,7 @@ class ChildDocumentsTreeNodeGroupTest
     private DocumentReference terminalDocumentReference = new DocumentReference("wiki", "Some", "Page");
 
     @BeforeEach
-    public void before(MockitoComponentManager componentManager) throws Exception
+    void before(MockitoComponentManager componentManager) throws Exception
     {
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));

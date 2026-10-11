@@ -21,6 +21,8 @@ package org.xwiki.flamingo.test.docker;
 
 import java.io.File;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,7 @@ import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,8 +58,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class RecycleBinIT
 {
+    private static final String ATTACHMENT_NAME = "SmallAttachment.txt";
+
     /**
-     * @see "XWIKI-9421: Attachment version is incremented when a document is restored from recycle bin"
+     * The default date format of the wiki ({@code yyyy/MM/dd HH:mm}).
+     */
+    private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}");
+
+    /**
+     * Verifies that restoring a document from the recycle bin preserves its attachments' versions, i.e. the
+     * attachment version must not be incremented as a side effect of the restore.
      */
     @Test
     @Order(1)
@@ -64,16 +75,30 @@ class RecycleBinIT
     {
         setup.loginAsSuperAdmin();
 
+        // Use a UUID-prefixed page name so that each execution operates on a fresh page (idempotent across
+        // repetitions). This works around the fact that TestUtils can only send pages to the recycle bin and
+        // cannot delete them permanently: reusing a fixed page name would leave recycle bin entries behind and
+        // the test would not start from a clean state on repeated runs. Revert to a fixed page name once
+        // TestUtils is able to delete pages permanently (i.e. without putting them in the recycle bin).
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        DocumentReference pageReference = new DocumentReference(testReference.getName(),
+            new SpaceReference(UUID.randomUUID() + "-" + testSpace.getName(), testSpace.getParent()));
+
         // Clean up.
-        setup.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
+        setup.rest().deletePage(pageReference.getLastSpaceReference().getName(), pageReference.getName());
 
         // Create a new page.
-        ViewPage page = setup.createPage(testReference, "Once upon a time..", "A story");
+        ViewPage page = setup.createPage(pageReference, "Once upon a time..", "A story");
 
-        // Add an attachment.
-        new AttachmentsViewPage().openAttachmentsDocExtraPane().setFileToUpload(
-            new File(testConfiguration.getBrowser().getTestResourcesPath(),
-                "RecycleBinIT/SmallAttachment.txt").getAbsolutePath());
+        // Add an attachment. The upload is asynchronous and, once it's over, it refreshes the attachments live data
+        // and then rewrites the "Attachments" entry of the "More actions" menu. Wait for that whole chain to be over
+        // (i.e. for the attachments count to be refreshed, which is its last step) before going on: otherwise it
+        // races with the click on the "Delete" entry of that same menu just below, and the click can be lost.
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane.setFileToUpload(new File(testConfiguration.getBrowser().getTestResourcesPath(),
+            "RecycleBinIT/" + ATTACHMENT_NAME).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(ATTACHMENT_NAME);
+        attachmentsPane.waitForNumberOfAttachments(1);
 
         // Delete the page.
         page.delete().clickYes();
@@ -103,12 +128,12 @@ class RecycleBinIT
         assertEquals("2.1", historyPane.getCurrentVersion());
 
         // Check the attachment.
-        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
-        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("SmallAttachment.txt"));
+        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment(ATTACHMENT_NAME));
 
         // Check the attachment content.
-        attachmentsPane.getAttachmentLink("SmallAttachment.txt").click();
+        attachmentsPane.getAttachmentLink(ATTACHMENT_NAME).click();
         assertEquals("This is a small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
     }
 
@@ -285,6 +310,18 @@ class RecycleBinIT
 
         assertTrue(deletedPagesEntries.get(0).canBeRestored());
         assertTrue(deletedTerminalPagesEntries.get(0).canBeRestored());
+
+        // The deleter, who is not an admin, restores the deleted page.
+        testUtils.login(user1, user1);
+        testUtils.gotoPage(page1);
+        recycleBinPage1 = new DeletePageOutcomePage();
+        assertEquals("The requested page could not be found.", recycleBinPage1.getMessage());
+        DeletedPageEntry deletedPageEntry = recycleBinPage1.getDeletedPagesEntries().get(0);
+        assertEquals(user1, deletedPageEntry.getDeleter());
+        assertThat(deletedPageEntry.getDeletionDate(), matchesPattern(DATE_PATTERN));
+        viewPage = deletedPageEntry.clickRestore();
+        assertEquals("Page 1 Non Terminal", viewPage.getDocumentTitle());
+        assertEquals("Page 1 non terminal page content", viewPage.getContent());
     }
 
     @Test

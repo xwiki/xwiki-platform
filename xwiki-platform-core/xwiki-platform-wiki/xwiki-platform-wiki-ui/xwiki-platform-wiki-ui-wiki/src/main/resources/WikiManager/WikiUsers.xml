@@ -156,7 +156,7 @@
     &lt;div class='candidateDetails'&gt;
       &lt;form class='xformInline' method='post'&gt;
         &lt;div class='candidateNameAndComment'&gt;
-          $xwiki.getUserName($userFullName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$userComment&lt;/span&gt;#end
+          $xwiki.getUserName($userFullName)#if("$!userComment" != ''): &lt;span class='candidateCommentSpan'&gt;$escapetool.xml($userComment)&lt;/span&gt;#end
         &lt;/div&gt;
         &lt;div class='date xHint'&gt;
           #if ($candidateMember.getValue('date'))
@@ -521,9 +521,9 @@ require(['jquery'], function($) {
       // Reload the live table.
       editgrouptable.refresh();
       // Show notification message.
-      new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
+      XWiki.widgets.Notification.show("$services.localization.render('xe.admin.groups.addSuccess')", 'done', {timeout: 5});
     }).catch(function(response) {
-      new XWiki.widgets.Notification("$services.localization.render('xe.admin.groups.addFailure')" +
+      XWiki.widgets.Notification.show("$services.localization.render('xe.admin.groups.addFailure')" +
         response.statusText, 'error', {timeout: 5});
     }).finally(function() {
       addMembersButton.prop('disabled', false);

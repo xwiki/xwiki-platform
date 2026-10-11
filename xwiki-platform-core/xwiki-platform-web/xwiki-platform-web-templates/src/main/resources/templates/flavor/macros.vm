@@ -40,7 +40,7 @@
     <input type="text" id="${escapetool.xml($fieldName)}_filter" class="xwiki-flavor-picker-filter" placeholder="$escapetool.xml($services.localization.render('flavor.picker.filterPlaceHolder'))" />
     ## Results
     <div class="ui-progress-background hidden" id="xwiki-flavor-picker-progress-background">
-      <div class="ui-progress-bar green" id="xwiki-flavor-picker-progress-bar"/>
+      <div class="ui-progress-bar green" id="xwiki-flavor-picker-progress-bar"></div>
       #set ($flavorSearchJobStatus = $services.flavor.getSearchValidFlavorsStatus())
       ###if ($flavorSearchJobStatus)
       ##  <input type="hidden" value="$flavorSearchJobStatus.state"/>

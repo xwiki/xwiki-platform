@@ -205,9 +205,9 @@ public class WikiUIExtensionParameters
                                     writer, namespace, propertyValue);
                                 return writer.toString();
                             } catch (XWikiVelocityException e) {
-                                LOGGER.warn(String.format(
-                                    "Failed to evaluate UI extension data value, key [%s], value [%s]. Reason: [%s]",
-                                    propertyKey, propertyValue, e.getMessage()));
+                                LOGGER.warn("Failed to evaluate UI extension data value, key [{}], value [{}]. "
+                                    + "Reason: [{}]", propertyKey, propertyValue,
+                                    ExceptionUtils.getRootCauseMessage(e));
                             }
 
                             return propertyValue;
@@ -216,7 +216,8 @@ public class WikiUIExtensionParameters
                         return null;
                     }, this.authorReference, this.documentReference);
                 } catch (Exception ex) {
-                    LOGGER.warn(String.format("Failed to get velocity engine. Reason: [%s]", ex.getMessage()));
+                    LOGGER.warn("Failed to get velocity engine. Reason: [{}]",
+                        ExceptionUtils.getRootCauseMessage(ex));
                 }
             }
 

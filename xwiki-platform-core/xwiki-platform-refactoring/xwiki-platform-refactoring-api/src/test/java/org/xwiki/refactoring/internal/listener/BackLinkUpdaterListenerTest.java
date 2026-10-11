@@ -109,7 +109,7 @@ class BackLinkUpdaterListenerTest
     private DeleteRequest deleteRequest = new DeleteRequest();
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         when(this.modelBridge.getBackLinkedDocuments(aliceReference))
             .thenReturn(Set.of(carolReference, denisReference));
@@ -133,7 +133,7 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(carolReference, aliceReference, bobReference, Map.of());
         verify(this.updater).update(denisReference, aliceReference, bobReference, Map.of());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", this.logCapture.getMessage(0));
     }
 
     @Test
@@ -151,7 +151,7 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(carolReference, aliceReference, bobReference, Map.of());
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", this.logCapture.getMessage(0));
     }
 
     @Test
@@ -167,7 +167,7 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(carolReference, aliceReference, bobReference, Map.of());
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", this.logCapture.getMessage(0));
         verify(this.waitingHelper).maybeWaitForLinkIndexingWithLog(10, TimeUnit.SECONDS);
     }
 
@@ -193,7 +193,7 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(carolReference, aliceReference, bobReference, Map.of());
         verify(this.updater).update(denisReference, aliceReference, bobReference, Map.of());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", this.logCapture.getMessage(0));
     }
 
     @Test
@@ -208,7 +208,7 @@ class BackLinkUpdaterListenerTest
         verify(this.updater, never()).update(eq(carolReference), any(DocumentReference.class), any());
         verify(this.updater).update(denisReference, aliceReference, bobReference, Map.of());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", this.logCapture.getMessage(0));
     }
 
     @Test
@@ -224,7 +224,7 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(carolReference, aliceReference, bobReference, Map.of());
         verify(this.updater).update(denisReference, aliceReference, bobReference, Map.of());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", this.logCapture.getMessage(0));
     }
 
     @Test

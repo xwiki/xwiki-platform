@@ -17,8 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 import type { CollaborationManager } from "./collaborationManager";
+
+/**
+ * The role name used to retrieve the collaboration manager provider from the component manager.
+ *
+ * @since 18.4.0RC1
+ * @beta
+ */
+const collaborationManagerProviderName: string = "CollaborationManagerProvider";
 
 /**
  * Dynamically resolves a CollaborationManager based on the configuration.
@@ -26,9 +33,11 @@ import type { CollaborationManager } from "./collaborationManager";
  * @since 18.0.0RC1
  * @beta
  */
-export interface CollaborationManagerProvider {
+interface CollaborationManagerProvider {
   /**
    * @returns the resolved collaboration manager
    */
   get(): CollaborationManager;
 }
+
+export { type CollaborationManagerProvider, collaborationManagerProviderName };

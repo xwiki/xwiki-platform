@@ -38,6 +38,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -677,6 +678,37 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * @param columnLabel the label of the column, for instance {@code "Title"}
+     * @param rowNumber the row number, starting at 1
+     * @return the text displayed in the cell
+     * @since 18.9.0RC1
+     */
+    public String getCellText(String columnLabel, int rowNumber)
+    {
+        return getCell(columnLabel, rowNumber).getText();
+    }
+
+    /**
+     * Waits until a cell displays the expected text, for instance after its edited value is saved.
+     *
+     * @param columnLabel the label of the column, for instance {@code "Title"}
+     * @param rowNumber the row number, starting at 1
+     * @param expectedText the text expected to be displayed in the cell
+     * @since 18.9.0RC1
+     */
+    public void waitUntilCellText(String columnLabel, int rowNumber, String expectedText)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return expectedText.equals(getCellText(columnLabel, rowNumber));
+            } catch (NoSuchElementException | StaleElementReferenceException e) {
+                // The rows are being refreshed.
+                return false;
+            }
+        });
+    }
+
+    /**
      * Return the list of {@link WebElement} of a column by its label.
      *
      * @param columnLabel the label of the column to get, for instance {@code "Title"}
@@ -688,6 +720,18 @@ public class TableLayoutElement extends BaseElement
     {
         int columnNumber = findColumnIndex(columnLabel);
         return getRoot().findElements(By.cssSelector(String.format("tbody tr td:nth-child(%d)", columnNumber)));
+    }
+
+    /**
+     * Return the text of the cells of a column, in the order of the displayed rows.
+     *
+     * @param columnLabel the label of the column to get, for instance {@code "Title"}
+     * @return the text of each cell of the requested column
+     * @since 18.9.0RC1
+     */
+    public List<String> getColumnValues(String columnLabel)
+    {
+        return getAllCells(columnLabel).stream().map(WebElement::getText).toList();
     }
 
     /**
@@ -776,6 +820,21 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Same as {@link #hasAction(int, String)} but doesn't wait for the action to appear, so that checking for the
+     * absence of an action doesn't wait for the full timeout. The rows are expected to be already loaded.
+     *
+     * @param rowNumber the row number to inspect
+     * @param actionName the expected action
+     * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean hasActionWithoutWaiting(int rowNumber, String actionName)
+    {
+        return !getDriver().findElementsWithoutWaiting(getRowElement(rowNumber), getActionSelector(actionName))
+            .isEmpty();
+    }
+
+    /**
      * Clicks on an action based on a row and the provided selector.
      *
      * @param rowNumber the row number, for instance 3 for the third row
@@ -815,6 +874,181 @@ public class TableLayoutElement extends BaseElement
     public void editAndCancel(String columnLabel, int rowNumber, String fieldName, String newValue)
     {
         internalEdit(columnLabel, rowNumber, fieldName, newValue, false);
+    }
+
+    /**
+     * Check if the table has an "Actions" column.
+     *
+     * @return {@code true} if the actions column is present, {@code false} otherwise
+     * @since 18.7.0RC1
+     */
+    public boolean hasEditModeActionsColumn()
+    {
+        return getRoot().findElements(By.cssSelector(".column-header-names > th")).stream()
+            .anyMatch(th -> "Actions".equals(th.getText().trim()));
+    }
+
+    /**
+     * Check if the table has an "Add entry" row creation button.
+     *
+     * @return {@code true} if the "Add entry" row is displayed at the bottom of the table, {@code false} otherwise
+     * @since 18.7.0RC1
+     */
+    public boolean canAddEntry()
+    {
+        return !getRoot().findElements(By.cssSelector("tr.layout-table-new-row")).isEmpty();
+    }
+
+    /**
+     * Create a new draft entry without saving it.
+     *
+     * @since 18.7.0RC1
+     */
+    public void startNewEntry()
+    {
+        getRoot().findElement(By.cssSelector("tr.layout-table-new-row a")).click();
+        // Wait for the draft row to be ready (by checking there is a save button).
+        getDriver().waitUntilElementIsVisible(getRoot(), getNewEntrySaveButtonSelector());
+        // The first editable cell is automatically focused, we blur it to keep a consistent state for the other
+        // helpers.
+        By editorInput = By.cssSelector("tbody tr td.cell input");
+        getDriver().waitUntilElementIsVisible(getRoot(), editorInput);
+        getRoot().findElement(editorInput).sendKeys(Keys.ESCAPE);
+        getDriver().waitUntilCondition(
+            driver -> getDriver().findElementsWithoutWaiting(getRoot(), editorInput).isEmpty());
+    }
+
+    /**
+     * Fill a field of the current draft entry without saving it.
+     *
+     * @param columnLabel the label of the column to fill
+     * @param fieldName the name of the field to fill (i.e., the corresponding XClass property)
+     * @param value the value to set
+     * @since 18.7.0RC1
+     */
+    public void setNewEntryCell(String columnLabel, String fieldName, String value)
+    {
+        setNewEntryCell(countRows(), columnLabel, fieldName, value);
+    }
+
+    /**
+     * Save the current draft entry, then wait for the Live Data to be reloaded.
+     *
+     * @since 18.7.0RC1
+     */
+    public void saveNewEntry()
+    {
+        WebElement saveButton = getRoot().findElement(getNewEntrySaveButtonSelector());
+        saveButton.click();
+        getDriver().waitUntilCondition(ExpectedConditions.stalenessOf(saveButton));
+        waitUntilReady();
+    }
+
+    /**
+     * Cancel the current draft entry.
+     *
+     * @since 18.7.0RC1
+     */
+    public void cancelNewEntry()
+    {
+        // Only the draft row holds action buttons, so the cancel button uniquely identifies it.
+        WebElement cancelButton = getRoot().findElement(getNewEntryCancelButtonSelector());
+        cancelButton.click();
+        getDriver().waitUntilCondition(ExpectedConditions.stalenessOf(cancelButton));
+    }
+
+    private WebElement setNewEntryCell(int rowNumber, String columnLabel, String fieldName, String value)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement cell = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        cell.click();
+        By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
+        getDriver().waitUntilElementIsVisible(cell, selector);
+        WebElement input = cell.findElement(selector);
+        new FormContainerElement(By.cssSelector(".livedata-displayer .edit")).setFieldValue(input, value);
+        return input;
+    }
+
+    private By getNewEntrySaveButtonSelector()
+    {
+        // Only the draft row holds action buttons, so the save button uniquely identifies it.
+        return By.cssSelector("tbody tr td button[title='Save']");
+    }
+
+    private By getNewEntryCancelButtonSelector()
+    {
+        // Only the draft row holds action buttons, so the cancel button uniquely identifies it.
+        return By.cssSelector("tbody tr td button[title='Cancel']");
+    }
+
+    /**
+     * Starts editing the nth cell of a column by clicking the inline edit button on the cell's popover, or the cell
+     * itself in edit mode, without waiting for the editor to appear. This is useful when clicking the edit button may trigger an edit confirmation modal
+     * before the editor is shown.
+     *
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row to edit (the first line is number 1)
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public void clickEditCell(String columnLabel, int rowNumber)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        // In edit mode, the cells don't have an edit popover and are edited as soon as they are focused.
+        if (hasEditModeActionsColumn()) {
+            element.click();
+            return;
+        }
+        By editButton = By.cssSelector(".displayer-action-list span[title='Edit']");
+        // Hover on the property and click on the edit button on the displayed popover. We first move the mouse away
+        // from the cell so that moving back onto it reliably triggers the popover, in particular when re-editing a
+        // cell right after closing an edit confirmation modal (the mouse might still be over the cell from the
+        // previous attempt). We then move slightly at the right of the center of the targeted element and back towards
+        // the center, simulating the mouse trajectory of a real user hovering the cell above the one to edit.
+        new Actions(getDriver().getWrappedDriver())
+            .moveToElement(getRoot())
+            .moveToElement(element, 50, 0)
+            .moveToElement(element, 0, 0)
+            .perform();
+        // The popover holding the edit button is displayed asynchronously after hovering, so wait for it before
+        // clicking instead of failing immediately when it is not there yet.
+        getDriver().waitUntilElementIsVisible(element, editButton);
+        element.findElement(editButton).click();
+    }
+
+    /**
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row (the first line is number 1)
+     * @param fieldName the name of the edited XClass property
+     * @return {@code true} if the inline editor for the given XObject property cell is currently displayed
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public boolean isCellEditing(String columnLabel, int rowNumber, String fieldName)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        // This is called to observe the editor closing as well as opening, so it must not wait for the editor.
+        return getDriver().hasElementWithoutWaiting(element, By.cssSelector(String.format("[name$='_%s']", fieldName)));
+    }
+
+    /**
+     * Wait until the inline editor of the given XObject property cell is displayed, or until it is closed.
+     *
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row (the first line is number 1)
+     * @param fieldName the name of the edited XClass property
+     * @param editing {@code true} to wait for the editor to be displayed, {@code false} to wait for it to be closed
+     * @since 18.9.0RC1
+     */
+    public void waitUntilCellIsEditing(String columnLabel, int rowNumber, String fieldName, boolean editing)
+    {
+        getDriver().waitUntilCondition(input -> isCellEditing(columnLabel, rowNumber, fieldName) == editing);
     }
 
     /**
@@ -1013,15 +1247,8 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
-        // Hover on the property and click on the edit button on the displayed popover. We move slightly at the right of
-        // the center of the targeted element, then slightly to the left, towards the center of the element. This
-        // simulates the mouse trajectory of a real user hovering the cell above the one he/she wants to edit.
-        new Actions(getDriver().getWrappedDriver())
-            .moveToElement(element, 50, 0)
-            .moveToElement(element, 0, 0)
-            .perform();
-
-        element.findElement(By.cssSelector(".displayer-action-list span[title='Edit']")).click();
+        // Hover on the property and click on the edit button on the displayed popover.
+        clickEditCell(columnLabel, rowNumber);
 
         // Selector of the edited field.
         By selector;
@@ -1039,10 +1266,19 @@ public class TableLayoutElement extends BaseElement
         // Waits for the text input to be displayed.
         getDriver().waitUntilElementIsVisible(element, selector);
 
-        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements
-        // displayed in the live data (they are the same as the one of the inline edit mode).
-        new FormContainerElement(By.cssSelector(".livedata-displayer .edit"))
-            .setFieldValue(element.findElement(selector), newValue);
+        WebElement field = element.findElement(selector);
+        if (isPlainTextField(field)) {
+            // Do not clear the field with FormContainerElement#setFieldValue here: it uses WebElement#clear(), which
+            // releases the focus of the field, and the Live Data cell editor saves and closes as soon as it is
+            // blurred, destroying the input before the new value can be typed. We instead clear the field with the
+            // keyboard.
+            field.sendKeys(Keys.chord(Keys.CONTROL, "a") + Keys.DELETE);
+            field.sendKeys(newValue);
+        } else {
+            // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements
+            // displayed in the live data (they are the same as the one of the inline edit mode).
+            new FormContainerElement(By.cssSelector(".livedata-displayer .edit")).setFieldValue(field, newValue);
+        }
 
         if (save) {
             // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
@@ -1074,6 +1310,17 @@ public class TableLayoutElement extends BaseElement
     private String[] getClasses(WebElement element)
     {
         return StringUtils.defaultString(element.getAttribute(ATTRIBUTE_CLASS)).split("\\s+");
+    }
+
+    private boolean isPlainTextField(WebElement field)
+    {
+        // Date pickers are actually text inputs.
+        if ("input".equals(field.getTagName()) && !List.of(getClasses(field)).contains("datetime")) {
+            String type = field.getAttribute("type");
+            return type == null
+                || List.of("text", "email", "password", "number", "tel", "search", "url").contains(type);
+        }
+        return false;
     }
 
     private String urlWithoutFormToken(EntityReference entityReference, String action)

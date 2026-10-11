@@ -21,15 +21,19 @@ package org.xwiki.rendering.macro.groovy;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.lang3.Strings;
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
@@ -39,7 +43,16 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration test to verify the security configuration of the Groovy Macro.
@@ -47,95 +60,106 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
  * @version $Id$
  * @since 4.1M1
  */
-public class SecurityTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents(excludes = {
+    org.xwiki.environment.internal.StandardEnvironment.class,
+    org.xwiki.velocity.internal.VelocityExecutionContextInitializer.class
+})
+class SecurityTest
 {
+    @MockComponent
     private ContextualAuthorizationManager cam;
 
+    @MockComponent
     private ConfigurationSource configurationSource;
 
-    @Before
-    public void setUpMocks() throws Exception
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    @Named("current")
+    private AttachmentReferenceResolver<String> attachmentReferenceResolver;
+
+    @MockComponent
+    private Environment environment;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @BeforeEach
+    void setUp() throws Exception
     {
-        // Mock Model dependencies.
-        registerMockComponent(DocumentAccessBridge.class);
-
-        // Mock the authorization manager.
-        this.cam = registerMockComponent(ContextualAuthorizationManager.class);
-        registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
-
-        // Mock Configuration Source so that we can configure security parameters
-        this.configurationSource = registerMockComponent(ConfigurationSource.class);
+        Execution execution = this.componentManager.getInstance(Execution.class);
+        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        ecm.initialize(new ExecutionContext());
+        execution.getContext().setProperty("xwikicontext", new HashMap<>());
     }
 
     // Using a customizer
 
     @Test
-    public void testExecutionWhenSecureCustomizerWithScriptRightsAndNoProgrammingRights() throws Exception
+    void testExecutionWhenSecureCustomizerWithScriptRightsAndNoProgrammingRights() throws Exception
     {
         // Conclusion: Can run with a customizer and SR to avoid PR.
         testExecution(true, false, true, false);
     }
 
-    @Test(expected = MacroExecutionException.class)
-    public void testExecutionWhenSecureCustomizerWithNoScriptRightsAndNoProgrammingRights() throws Exception
+    @Test
+    void testExecutionWhenSecureCustomizerWithNoScriptRightsAndNoProgrammingRights()
     {
         // Conclusion: When running with a customizer and no PR, SR is needed.
-        testExecution(true, false, false, false);
+        assertThrows(MacroExecutionException.class, () -> testExecution(true, false, false, false));
     }
 
     @Test
-    public void testExecutionWhenSecureCustomizerWithNoScriptRightsAndProgrammingRights() throws Exception
+    void testExecutionWhenSecureCustomizerWithNoScriptRightsAndProgrammingRights() throws Exception
     {
         // Conclusion: When running with a customizer and PR, SR are implied by the PR.
         testExecution(true, false, false, true);
     }
 
-    @Test(expected = MacroExecutionException.class)
-    public void testExecutionWhenSecureCustomizerAndRestricted() throws Exception
+    @Test
+    void testExecutionWhenSecureCustomizerAndRestricted()
     {
         // Conclusion: When running with a customizer and SR to avoid PR, transformations have to not be restricted.
-        testExecution(true, true, true, false);
+        assertThrows(MacroExecutionException.class, () -> testExecution(true, true, true, false));
     }
 
-    @Test(expected = MacroExecutionException.class)
-    public void testExecutionWhenSecureCustomizerAndRestrictedWithScriptRightsAndProgrammingRights() throws Exception
+    @Test
+    void testExecutionWhenSecureCustomizerAndRestrictedWithScriptRightsAndProgrammingRights()
     {
         // Conclusion: When running with a customizer, event with PR (and inherited SR), transformations have to not be
         // restricted.
-        testExecution(true, true, false, true);
+        assertThrows(MacroExecutionException.class, () -> testExecution(true, true, false, true));
     }
 
     // Not using a customizer
 
     @Test
-    public void testExecutionWhenNoSecureCustomizerAndNoRights() throws Exception
+    void testExecutionWhenNoSecureCustomizerAndNoRights()
     {
         // Conclusion: When running with no customizer and no PR, execution fails.
-        try {
-            testExecution(false, false, false, false);
-            Assert.fail("Should have thrown an exception here!");
-        } catch (MacroExecutionException expected) {
-            Assert.assertTrue(Strings.CS.startsWith(expected.getMessage(),
-                "The execution of the [groovy] script macro is not allowed."));
-        }
-    }
-
-    @Test(expected = MacroExecutionException.class)
-    public void testExecutionWhenNoSecureCustomizerAndScriptRights() throws Exception
-    {
-        // Conclusion: When running with no customizer, SR is not enough. You need PR.
-        testExecution(false, false, true, false);
+        MacroExecutionException exception = assertThrows(MacroExecutionException.class,
+            () -> testExecution(false, false, false, false));
+        assertTrue(exception.getMessage().startsWith("The execution of the [groovy] script macro is not allowed."));
     }
 
     @Test
-    public void testExecutionWhenNoSecureCustomizerAndProgrammingRights() throws Exception
+    void testExecutionWhenNoSecureCustomizerAndScriptRights()
+    {
+        // Conclusion: When running with no customizer, SR is not enough. You need PR.
+        assertThrows(MacroExecutionException.class, () -> testExecution(false, false, true, false));
+    }
+
+    @Test
+    void testExecutionWhenNoSecureCustomizerAndProgrammingRights() throws Exception
     {
         // Conclusion: When running with no customizer, PR is needed.
         testExecution(false, false, false, true);
     }
 
     @Test
-    public void testExecutionWhenNoSecureCustomizerAndExecutionRestrictedAndProgrammingRights() throws Exception
+    void testExecutionWhenNoSecureCustomizerAndExecutionRestrictedAndProgrammingRights() throws Exception
     {
         // Conclusion: When running with no customizer, transformation restrictions do not matter, only PR does.
         testExecution(false, true, false, true);
@@ -145,50 +169,34 @@ public class SecurityTest extends AbstractComponentTestCase
      * Utility methods.
      */
 
-    private void testExecution(final boolean hasCustomizer, final boolean isRestricted, final boolean hasSR,
-        final boolean hasPR) throws Exception
+    private void testExecution(boolean hasCustomizer, boolean isRestricted, boolean hasSR, boolean hasPR)
+        throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                // Programming Rights
-                allowing(cam).hasAccess(Right.PROGRAM);
-                will(returnValue(hasPR));
+        when(this.cam.hasAccess(Right.PROGRAM)).thenReturn(hasPR);
+        when(this.cam.hasAccess(Right.SCRIPT)).thenReturn(hasSR || hasPR);
 
-                // Script Rights
-                allowing(cam).hasAccess(Right.SCRIPT);
-                will(returnValue(hasSR || hasPR));
-
-                // Secure AST Customizer
-                List<String> customizers = new ArrayList<>();
-                if (hasCustomizer) {
-                    customizers.add("secure");
-                }
-                allowing(configurationSource).getProperty("groovy.compilationCustomizers", Collections.emptyList());
-                will(returnValue(customizers));
-
-            }
-        });
+        List<String> customizers = new ArrayList<>();
+        if (hasCustomizer) {
+            customizers.add("secure");
+        }
+        doReturn(customizers).when(this.configurationSource)
+            .getProperty("groovy.compilationCustomizers", Collections.emptyList());
 
         // Note: We execute something that works with the Groovy Security customizer...
         executeGroovyMacro("new Integer(0)", isRestricted);
     }
 
-    private void executeGroovyMacro(String script) throws Exception
-    {
-        executeGroovyMacro(script, false);
-    }
-
     private void executeGroovyMacro(String script, boolean restricted) throws Exception
     {
-        Macro macro = getComponentManager().getInstance(Macro.class, "groovy");
+        Macro<JSR223ScriptMacroParameters> macro =
+            this.componentManager.getInstance(Macro.class, "groovy");
         JSR223ScriptMacroParameters parameters = new JSR223ScriptMacroParameters();
 
         MacroTransformationContext context = new MacroTransformationContext();
         context.getTransformationContext().setRestricted(restricted);
         context.setSyntax(Syntax.XWIKI_2_1);
         // The script macro checks the current block (which is a macro block) to see what engine to use.
-        context.setCurrentMacroBlock(new MacroBlock("groovy", Collections.<String, String>emptyMap(), false));
+        context.setCurrentMacroBlock(new MacroBlock("groovy", Collections.emptyMap(), false));
 
         macro.execute(parameters, script, context);
     }

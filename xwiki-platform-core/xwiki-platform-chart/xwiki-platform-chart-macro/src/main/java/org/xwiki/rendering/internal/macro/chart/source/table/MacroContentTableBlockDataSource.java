@@ -69,7 +69,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
 
         // Take the first TableBlock found in the macro content.
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
-        if (tableBlocks.size() == 0) {
+        if (tableBlocks.isEmpty()) {
             throw new MacroExecutionException("Unable to locate a suitable data table.");
         }
 

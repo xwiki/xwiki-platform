@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,42 +20,38 @@
 
 import react from "@vitejs/plugin-react";
 import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vite";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
   build: {
-    outDir: '../../../target/node-dist',
+    outDir: "../../../target/node-dist",
     lib: {
       entry: resolve(__dirname, "src/main.js"),
       fileName: (format, entryName) => `${entryName}.${format}.js`,
       formats: ["es"],
     },
     rollupOptions: {
-      external: ["jquery", "vue", "vue-i18n"],
-      output: {
-        globals: {
-          vue: "Vue",
-        },
-      },
+      external: [
+        "jquery",
+        "vue",
+        "vue-i18n",
+        "xwiki-platform-localization-webjar",
+        "@xwiki/platform-component-manager-default",
+      ],
     },
     sourcemap: true,
   },
   define: {
+    // Oxc replaces whole expressions only, so the entry below does not cover
+    // this one, on which React selects its production build.
+    "process.env.NODE_ENV": JSON.stringify("production"),
     // Define process to avoid runtime error with jQuery.
-    "process.env": {},
+    "process.env": "{}",
   },
   plugins: [react(), vue()],
-  esbuild: {
-    tsconfigRaw: {
-      compilerOptions: {
-        // Workaround for a vite bug (see https://github.com/vitejs/vite/issues/13736)
-        experimentalDecorators: true,
-      },
-    },
-  },
 });

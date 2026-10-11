@@ -36,12 +36,12 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  *
  * @version $Id$
  * @since 2.3M1
- * @deprecated since 7.2M1, use {@link CurrentMixedEntityReferenceProvider} instead
+ * @deprecated use {@link CurrentMixedEntityReferenceProvider} instead
  */
 @Component
 @Named("currentmixed")
 @Singleton
-@Deprecated
+@Deprecated(since = "7.2M1")
 public class CurrentMixedEntityReferenceValueProvider extends CurrentEntityReferenceValueProvider
 {
     @Inject

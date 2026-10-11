@@ -30,23 +30,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for tag removing in {@link OfficeHTMLCleaner}.
- * 
+ *
  * @version $Id$
  * @since 1.8
  */
 @ComponentTest
-public class InvalidTagOfficeCleaningTest extends AbstractHTMLCleaningTest
+class InvalidTagOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * {@code STYLE} tags should be stripped from HTML content.
      */
     @Test
-    public void styleTagRemoving()
+    void styleTagRemoving()
     {
         String html =
             "<html><head><title>Title</title>" + "<style type=\"text/css\">h1 {color:red} p {color:blue} </style>"
-                + "</head><body>" + footer;
-        Document doc = officeHTMLCleaner.clean(new StringReader(html));
+                + "</head><body>" + this.footer;
+        Document doc = this.officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("style");
         assertEquals(0, nodes.getLength());
     }
@@ -55,10 +55,11 @@ public class InvalidTagOfficeCleaningTest extends AbstractHTMLCleaningTest
      * {@code STYLE} tags should be stripped from HTML content.
      */
     @Test
-    public void scriptTagRemoving()
+    void scriptTagRemoving()
     {
-        String html = header + "<script type=\"text/javascript\">document.write(\"Hello World!\")</script>" + footer;
-        Document doc = officeHTMLCleaner.clean(new StringReader(html));
+        String html =
+            this.header + "<script type=\"text/javascript\">document.write(\"Hello World!\")</script>" + this.footer;
+        Document doc = this.officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("script");
         assertEquals(0, nodes.getLength());
     }

@@ -52,16 +52,20 @@ public class UsersClass extends ListClass
      */
     @Unstable
     public static final String PROPERTY_TYPE = "Users";
+
+    /**
+     * The meta property that specifies whether the picker should also suggest inactive (disabled) users. When not set
+     * (the default) only active users are suggested.
+     *
+     * @since 18.6.0RC1
+     */
+    @Unstable
+    public static final String META_PROPERTY_INCLUDE_INACTIVE_USERS = "includeInactiveUsers";
+
     private static final long serialVersionUID = 1L;
 
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(UsersClass.class);
-
-    /**
-     * The meta property that specifies if the list box that is used to select the users should be filled with all the
-     * available users. This property should not be set when the number of users is very large.
-     */
-    private static final String META_PROPERTY_USES_LIST = "usesList";
 
     private static final String COMMA = ",";
 
@@ -102,7 +106,7 @@ public class UsersClass extends ListClass
             return (List<String>) context.getWiki().getGroupService(context)
                 .getAllMatchedUsers(null, false, 0, 0, null, context);
         } catch (XWikiException e) {
-            LOGGER.warn("Failed to retrieve the list of users.", e);
+            LOGGER.warn("Failed to retrieve the list of users", e);
             return Collections.emptyList();
         }
     }
@@ -114,7 +118,7 @@ public class UsersClass extends ListClass
         // return an iterator instead that gets users by batches.
         Map<String, ListItem> result;
         List<String> users = getList(context);
-        if (users != null && users.size() > 0) {
+        if (users != null && !users.isEmpty()) {
             result = new LinkedHashMap<>();
             for (String userName : users) {
                 // Get the user name for pretty display
@@ -128,28 +132,14 @@ public class UsersClass extends ListClass
     }
 
     /**
-     * @return {@code true} if the list box that is used to select the users should be filled with all the available
-     *         users, {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
+     * @return {@code true} if disabled (inactive) users should also be suggested by the picker, {@code false} (the
+     *         default) to suggest only active users
+     * @since 18.6.0RC1
      */
-    @Deprecated
-    public boolean isUsesList()
+    @Unstable
+    public boolean isIncludeInactiveUsers()
     {
-        return getIntValue(META_PROPERTY_USES_LIST) == 1;
-    }
-
-    /**
-     * Sets whether to list all the available users in the list box used to select the users. This property should not
-     * be set when the number of users is very large.
-     *
-     * @param usesList {@code true} to fill the list box that is used to select the users with all the available users,
-     *            {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
-     */
-    @Deprecated
-    public void setUsesList(boolean usesList)
-    {
-        setIntValue(META_PROPERTY_USES_LIST, usesList ? 1 : 0);
+        return getIntValue(META_PROPERTY_INCLUDE_INACTIVE_USERS) == 1;
     }
 
     @Override

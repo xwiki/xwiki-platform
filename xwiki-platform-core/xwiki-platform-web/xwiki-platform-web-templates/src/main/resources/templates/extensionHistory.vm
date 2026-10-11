@@ -148,7 +148,7 @@
           'forceSkinAction': true,
           'language': $xcontext.locale
         }))
-        #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/upload.css', true))
+        #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/upload.css'))
         <form action="$uploadDoc.getURL('upload')" enctype="multipart/form-data" method="post"
             class="extension-history-source-upload">
           <div class="hidden">
@@ -485,7 +485,7 @@
     #displayExtensionHistoryReplayStatus($replayJobStatus)
   #else
     <h2>$services.localization.render('extension.history.replayStatus.title')</h2>
-    #info($services.localization.render('extension.history.replayStatus.notFound', [$replayJobId]))
+    #info($escapetool.xml($services.localization.render('extension.history.replayStatus.notFound', [$replayJobId])))
   #end
 #end
 

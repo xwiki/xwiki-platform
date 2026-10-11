@@ -17,9 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const XWiki: any;
-}
+/// <reference types="@xwiki/platform-xwiki-utils/global" />
 
 export {};

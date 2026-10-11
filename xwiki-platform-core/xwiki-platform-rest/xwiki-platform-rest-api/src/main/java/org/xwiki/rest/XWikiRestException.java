@@ -31,7 +31,7 @@ public class XWikiRestException extends Exception
      */
     public XWikiRestException()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

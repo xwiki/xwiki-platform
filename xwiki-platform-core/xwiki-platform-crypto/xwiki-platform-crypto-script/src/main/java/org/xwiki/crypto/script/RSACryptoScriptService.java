@@ -418,7 +418,8 @@ public class RSACryptoScriptService implements ScriptService
      *
      * @param signature the CMS signature to verify.
      * @param certificateProvider Optionally, a certificate provider for obtaining the chain of certificate for
-     *                            verifying the signatures. If null, certificat should all be embedded in the signature.
+     *                            verifying the signatures. If null, certificates should all be embedded in the
+     *                            signature.
      * @return a the result of the verification.
      * @throws GeneralSecurityException on error.
      */
@@ -434,7 +435,8 @@ public class RSACryptoScriptService implements ScriptService
      * @param signature the CMS signature to verify.
      * @param data the content to verify the signature against, or null of the content is embedded in the signature.
      * @param certificateProvider Optionally, a certificate provider for obtaining the chain of certificate for
-     *                            verifying the signatures. If null, certificat should all be embedded in the signature.
+     *                            verifying the signatures. If null, certificates should all be embedded in the
+     *                            signature.
      * @return a the result of the verification.
      * @throws GeneralSecurityException on error.
      */

@@ -87,9 +87,41 @@ public class CreatePagePage extends BaseElement
         return this.pageTypePicker.getAvailableTemplates();
     }
 
+    /**
+     * @return the value of the template option selected by default in the page type picker: a template provider's
+     *         local reference when a recommended template is pre-selected based on the current location, or
+     *         {@code blank} when the blank page option is selected by default
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    public String getSelectedTemplate()
+    {
+        return this.pageTypePicker.getSelectedTemplate();
+    }
+
     public void setTemplate(String template)
     {
         this.pageTypePicker.selectTemplateByValue(template);
+    }
+
+    /**
+     * @param template the value of the template option
+     * @return the icon name displayed for the specified template option, extracted from the {@code <img>} element's
+     *         {@code src} attribute
+     */
+    public String getTemplateIcon(String template)
+    {
+        return this.pageTypePicker.getTemplateIcon(template);
+    }
+
+    /**
+     * @param template the value of the template option
+     * @return the description text displayed for the specified template option
+     */
+    public String getTemplateDescription(String template)
+    {
+        return this.pageTypePicker.getTemplateDescription(template);
     }
 
     public void setType(String type)
@@ -260,7 +292,7 @@ public class CreatePagePage extends BaseElement
     public boolean isTerminalOptionDisplayed()
     {
         List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.id("terminal"));
-        return elements.size() > 0 && elements.get(0).isDisplayed();
+        return !elements.isEmpty() && elements.get(0).isDisplayed();
     }
 
     /**

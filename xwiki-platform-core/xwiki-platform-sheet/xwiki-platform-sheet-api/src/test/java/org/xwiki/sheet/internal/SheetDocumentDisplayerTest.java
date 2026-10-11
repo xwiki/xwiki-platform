@@ -19,37 +19,42 @@
  */
 package org.xwiki.sheet.internal;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.block.Block;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.sheet.SheetManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link SheetDocumentDisplayer}.
- * 
+ *
  * @version $Id$
  */
-public class SheetDocumentDisplayerTest
+@ComponentTest
+class SheetDocumentDisplayerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DocumentDisplayer> mocker = new MockitoComponentMockingRule<DocumentDisplayer>(
-        SheetDocumentDisplayer.class);
+    @InjectMockComponents
+    private SheetDocumentDisplayer displayer;
 
     /**
      * The reference to the displayed document.
@@ -64,28 +69,40 @@ public class SheetDocumentDisplayerTest
     /**
      * The component used to access the documents.
      */
+    @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component used to access the model.
      */
+    @MockComponent
     private ModelBridge modelBridge;
 
-    @Before
-    public void configure() throws Exception
+    @MockComponent
+    private SheetManager sheetManager;
+
+    @MockComponent
+    private DocumentDisplayer documentDisplayer;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    @BeforeEach
+    void configure()
     {
-        this.modelBridge = this.mocker.getInstance(ModelBridge.class);
         // Assume the current action is view.
         when(this.modelBridge.getCurrentAction()).thenReturn("view");
 
-        this.documentAccessBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         // Assume all documents are viewable by the current user.
         when(this.documentAccessBridge.isDocumentViewable(any(DocumentReference.class))).thenReturn(true);
     }
 
     /**
      * Creates a mock {@link DocumentModelBridge} that has the specified reference.
-     * 
+     *
      * @param documentReference the document reference
      * @return the mock {@link DocumentModelBridge}
      * @throws Exception if creating the mock fails
@@ -107,7 +124,7 @@ public class SheetDocumentDisplayerTest
 
     /**
      * Sets the given document as the current document, adding the necessary expectations.
-     * 
+     *
      * @param document an XWiki document
      */
     private void setCurrentDocument(DocumentModelBridge document)
@@ -119,29 +136,27 @@ public class SheetDocumentDisplayerTest
 
     /**
      * Tests if the programming rights of the sheet are preserved when the document is already on the context.
-     * 
+     *
      * @throws Exception if something wrong happens
      */
     @Test
-    public void testPreserveSheetPRWhenDocumentIsOnContext() throws Exception
+    void preserveSheetPRWhenDocumentIsOnContext() throws Exception
     {
         DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
         DocumentModelBridge sheet = mockDocument(SHEET_REFERENCE);
 
         setCurrentDocument(document);
 
-        SheetManager sheetManager = this.mocker.getInstance(SheetManager.class);
-        when(sheetManager.getSheets(document, "view")).thenReturn(Collections.singletonList(SHEET_REFERENCE));
+        when(this.sheetManager.getSheets(document, "view")).thenReturn(List.of(SHEET_REFERENCE));
 
         DocumentModelBridge originalSecurityDoc = mock(DocumentModelBridge.class, "sdoc");
         // Required in order to preserve the programming rights of the sheet.
         when(this.modelBridge.setSecurityDocument(sheet)).thenReturn(originalSecurityDoc);
 
-        XDOM output = new XDOM(Collections.<Block>emptyList());
-        DocumentDisplayer documentDisplayer = this.mocker.getInstance(DocumentDisplayer.class);
-        when(documentDisplayer.display(eq(sheet), any(DocumentDisplayerParameters.class))).thenReturn(output);
+        XDOM output = new XDOM(List.of());
+        when(this.documentDisplayer.display(eq(sheet), any(DocumentDisplayerParameters.class))).thenReturn(output);
 
-        assertSame(output, this.mocker.getComponentUnderTest().display(document, new DocumentDisplayerParameters()));
+        assertSame(output, this.displayer.display(document, new DocumentDisplayerParameters()));
 
         // The security document must be reverted.
         verify(this.modelBridge).setSecurityDocument(originalSecurityDoc);
@@ -149,11 +164,11 @@ public class SheetDocumentDisplayerTest
 
     /**
      * Tests if the programming rights of the sheet are preserved when the document is not on the context.
-     * 
+     *
      * @throws Exception if something wrong happens
      */
     @Test
-    public void testPreserveSheetPRWhenDocumentIsNotOnContext() throws Exception
+    void preserveSheetPRWhenDocumentIsNotOnContext() throws Exception
     {
         DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
         DocumentModelBridge sheet = mockDocument(SHEET_REFERENCE);
@@ -164,26 +179,100 @@ public class SheetDocumentDisplayerTest
 
         // The sheet must be determined and displayed in a new execution context that has the target document as
         // the current document.
-        Map<String, Object> backupObjects = new HashMap<String, Object>();
+        Map<String, Object> backupObjects = new HashMap<>();
         when(this.modelBridge.pushDocumentInContext(document)).thenReturn(backupObjects);
 
-        SheetManager sheetManager = this.mocker.getInstance(SheetManager.class);
-        when(sheetManager.getSheets(document, "view")).thenReturn(Collections.singletonList(SHEET_REFERENCE));
+        when(this.sheetManager.getSheets(document, "view")).thenReturn(List.of(SHEET_REFERENCE));
 
         DocumentModelBridge originalSecurityDoc = mock(DocumentModelBridge.class, "sdoc");
         // Required in order to preserve the programming rights of the sheet.
         when(this.modelBridge.setSecurityDocument(sheet)).thenReturn(originalSecurityDoc);
 
-        XDOM output = new XDOM(Collections.<Block>emptyList());
-        DocumentDisplayer documentDisplayer = this.mocker.getInstance(DocumentDisplayer.class);
-        when(documentDisplayer.display(eq(sheet), any(DocumentDisplayerParameters.class))).thenReturn(output);
+        XDOM output = new XDOM(List.of());
+        when(this.documentDisplayer.display(eq(sheet), any(DocumentDisplayerParameters.class))).thenReturn(output);
 
-        assertSame(output, this.mocker.getComponentUnderTest().display(document, new DocumentDisplayerParameters()));
+        assertSame(output, this.displayer.display(document, new DocumentDisplayerParameters()));
 
         // The security document must be reverted.
         verify(this.modelBridge).setSecurityDocument(originalSecurityDoc);
 
         // The previous execution context must be restored.
         verify(this.documentAccessBridge).popDocumentFromContext(backupObjects);
+    }
+
+    /**
+     * Tests that the document is displayed by the default document displayer when the sheet is the document itself.
+     * This ensures the unsaved changes of the document are not lost by rendering the version from the database.
+     *
+     * @throws Exception if something wrong happens
+     */
+    @Test
+    void displayWithoutSheetWhenTheSheetIsTheDocumentItself() throws Exception
+    {
+        DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
+
+        setCurrentDocument(document);
+
+        when(this.sheetManager.getSheets(document, "view")).thenReturn(List.of(DOCUMENT_REFERENCE));
+
+        XDOM output = new XDOM(List.of());
+        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        when(this.documentDisplayer.display(document, parameters)).thenReturn(output);
+
+        assertSame(output, this.displayer.display(document, parameters));
+    }
+
+    /**
+     * Tests that the default document displayer is used when the title is displayed but the sheet doesn't control it.
+     *
+     * @throws Exception if something wrong happens
+     */
+    @Test
+    void displayWithoutSheetWhenTheSheetDoesNotControlTheTitle() throws Exception
+    {
+        DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
+        // The sheet has no title.
+        mockDocument(SHEET_REFERENCE);
+
+        setCurrentDocument(document);
+
+        when(this.sheetManager.getSheets(document, "view")).thenReturn(List.of(SHEET_REFERENCE));
+
+        XDOM output = new XDOM(List.of());
+        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        parameters.setTitleDisplayed(true);
+        when(this.documentDisplayer.display(document, parameters)).thenReturn(output);
+
+        assertSame(output, this.displayer.display(document, parameters));
+
+        // The sheet is not applied so there's no need to change the security document.
+        verify(this.modelBridge, never()).setSecurityDocument(any(DocumentModelBridge.class));
+    }
+
+    /**
+     * Tests that the default document displayer is used when applying the sheet fails.
+     *
+     * @throws Exception if something wrong happens
+     */
+    @Test
+    void displayWithoutSheetWhenApplyingTheSheetFails() throws Exception
+    {
+        DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
+
+        setCurrentDocument(document);
+
+        when(this.sheetManager.getSheets(document, "view")).thenReturn(List.of(SHEET_REFERENCE));
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(SHEET_REFERENCE))
+            .thenThrow(new Exception("Database is down"));
+        when(this.entityReferenceSerializer.serialize(SHEET_REFERENCE)).thenReturn("wiki2:Code.Sheet");
+
+        XDOM output = new XDOM(List.of());
+        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        when(this.documentDisplayer.display(document, parameters)).thenReturn(output);
+
+        assertSame(output, this.displayer.display(document, parameters));
+
+        assertEquals("Failed to apply sheet [wiki2:Code.Sheet]",
+            this.logCapture.getMessage(0));
     }
 }

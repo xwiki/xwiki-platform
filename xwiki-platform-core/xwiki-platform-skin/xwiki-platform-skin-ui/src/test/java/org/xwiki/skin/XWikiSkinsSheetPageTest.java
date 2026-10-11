@@ -35,7 +35,6 @@ import org.xwiki.edit.internal.DefaultEditorDescriptorBuilder;
 import org.xwiki.edit.internal.DefaultEditorManager;
 import org.xwiki.edit.internal.PureTextSyntaxContentEditor;
 import org.xwiki.icon.IconManagerScriptService;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
@@ -93,7 +92,6 @@ import static org.mockito.Mockito.when;
     TestNoScriptMacro.class,
     // Various classes to prevent errors in the displayed document
     ModelScriptService.class,
-    TranslationMacro.class,
     WarningMessageMacro.class,
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class,

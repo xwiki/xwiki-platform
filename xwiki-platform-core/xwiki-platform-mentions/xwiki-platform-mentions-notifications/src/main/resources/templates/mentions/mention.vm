@@ -49,7 +49,7 @@
   <tr>
     <td colspan="3">
       <blockquote class="mention-quote">
-        $eventParams.getQuote()
+        $escapetool.xml($eventParams.getQuote())
       </blockquote>
     </td>
   </tr>

@@ -51,12 +51,13 @@ public class DefaultWikiPropertyGroupManager implements WikiPropertyGroupManager
     public void loadForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException
     {
         String wikiId = descriptor.getId();
-        for (String propertyGroupName : propertyGroupProviders.keySet()) {
-            WikiPropertyGroupProvider provider = propertyGroupProviders.get(propertyGroupName);
+        for (Map.Entry<String, WikiPropertyGroupProvider> entry : propertyGroupProviders.entrySet()) {
+            String propertyGroupName = entry.getKey();
+            WikiPropertyGroupProvider provider = entry.getValue();
             try {
                 descriptor.addPropertyGroup(provider.get(wikiId));
             } catch (WikiPropertyGroupException e) {
-                logger.warn(String.format("Unable to load property groups [%s].", propertyGroupName), e);
+                logger.warn("Unable to load property groups [{}]", propertyGroupName, e);
             }
         }
     }
@@ -65,10 +66,11 @@ public class DefaultWikiPropertyGroupManager implements WikiPropertyGroupManager
     public void saveForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException
     {
         String wikiId = descriptor.getId();
-        for (String propertyGroupName : propertyGroupProviders.keySet()) {
+        for (Map.Entry<String, WikiPropertyGroupProvider> entry : propertyGroupProviders.entrySet()) {
+            String propertyGroupName = entry.getKey();
             WikiPropertyGroup group = descriptor.getPropertyGroup(propertyGroupName);
             if (group != null) {
-                WikiPropertyGroupProvider provider = propertyGroupProviders.get(propertyGroupName);
+                WikiPropertyGroupProvider provider = entry.getValue();
                 provider.save(group, wikiId);
             }
         }

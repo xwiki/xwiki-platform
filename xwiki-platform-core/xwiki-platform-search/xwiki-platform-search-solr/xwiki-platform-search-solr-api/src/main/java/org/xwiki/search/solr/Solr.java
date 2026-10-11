@@ -50,6 +50,25 @@ public interface Solr
      */
     default XWikiSolrCore getCore(String name) throws SolrException
     {
-        return new DefaultXWikiSolrCore(name, name, getClient(name));
+        return new DefaultXWikiSolrCore(name, name, getClient(name), getSolrMajorVersion());
+    }
+
+    /**
+     * @return true if the implementation is able to create cores on the fly when they don't exist yet, false if the
+     *         cores must be created beforehand (e.g. by the administrator) before being used by XWiki.
+     * @since 18.5.0RC1
+     */
+    default boolean canCreateCore()
+    {
+        return false;
+    }
+
+    /**
+     * @return the major version of Solr server behind this implementation, -1 if unknown.
+     * @since 18.5.0RC1
+     */
+    default int getSolrMajorVersion()
+    {
+        return -1;
     }
 }

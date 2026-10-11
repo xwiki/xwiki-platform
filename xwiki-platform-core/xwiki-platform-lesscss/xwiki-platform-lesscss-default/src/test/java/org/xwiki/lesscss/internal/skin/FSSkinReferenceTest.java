@@ -19,20 +19,20 @@
  */
 package org.xwiki.lesscss.internal.skin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test class for {@link FSSkinReference}.
- *  
- * @since 7.0RC1
+ *
  * @version $Id$
+ * @since 7.0RC1
  */
-public class FSSkinReferenceTest
+class FSSkinReferenceTest
 {
     @Test
-    public void serialize() throws Exception
+    void serialize()
     {
         assertEquals("SkinFS[skin]", new FSSkinReference("skin").serialize());
     }

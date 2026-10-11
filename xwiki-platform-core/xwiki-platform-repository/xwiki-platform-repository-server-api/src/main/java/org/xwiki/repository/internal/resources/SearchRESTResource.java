@@ -112,9 +112,9 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         // Rights
         // /////////////////
 
-        if (query instanceof SecureQuery) {
+        if (query instanceof SecureQuery secureQuery) {
             // Show only what the current user has the right to see
-            ((SecureQuery) query).checkCurrentUser(true);
+            secureQuery.checkCurrentUser(true);
         }
 
         // /////////////////
@@ -177,7 +177,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
                 if (fiter.getComparison() == COMPARISON.EQUAL) {
                     builder.append(fiter.getValueString());
                 } else {
-                    builder.append('*' + fiter.getValueString() + '*');
+                    builder.append('*').append(fiter.getValueString()).append('*');
                 }
 
                 fq.add(builder.toString());

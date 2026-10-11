@@ -131,7 +131,6 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-async'], function($, xm) {
   $('.location-picker').each(function() {
     var picker = $(this);
-    var form = picker.closest('form');
 
     var titleInput = picker.find('input.location-title-field');
     // The wiki field can be either a select (drop down) or an input (text or hidden).
@@ -205,7 +204,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
         }
       }).catch(() => {
         if (titleInputVal === titleInput.val()) {
-          new XWiki.widgets.Notification(l10n['entitynamevalidation.nametransformation.error'], 'error');
+          XWiki.widgets.Notification.show(l10n['entitynamevalidation.nametransformation.error'], 'error');
           // Re-enable the page name input and trigger a change event to execute the client-side validations.
           nameInput.prop('disabled', false).val(titleInputVal).trigger('change');
           // Update the location preview.
@@ -233,7 +232,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
 
     var updateLocationFromTitleOrNameInput = function() {
       var title = titleInput.val();
-      updateLocationLastElement(title ? title : nameInput.val());
+      updateLocationLastElement(title || nameInput.val());
     };
 
     /**
@@ -311,7 +310,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
 
     // Synchronize the location fields while the user types.
     // We catch the change event because we want to make sure everything's updated when the user change fields
-    // (particulary useful in our automated tests).
+    // (particularly useful in our automated tests).
     titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
     wikiField.on('change', updateLocationFromWikiField);
     nameInput.on('input change', updateLocationFromNameInput);
@@ -370,7 +369,7 @@ require(['jquery'], function($) {
       failureMessage: l10n['core.validation.required.message'],
       against: function(value) {
         // The page name must not be blank.
-        return typeof value === 'string' && value.strip().length > 0;
+        return typeof value === 'string' && value.trim().length > 0;
       }
     });
 
@@ -398,12 +397,18 @@ require(['jquery'], function($) {
         insertAfterWhatNode: isSimpleUser ? breadcrumbContainer[0] : spaceReferenceInput[0]
       });
       spaceValidator.displayMessageWhenEmpty = true;
+      // A space/page name may legitimately contain dots, which are escaped with a backslash in the
+      // serialized reference (e.g. "Foo\." is the reference of a space named "Foo."). Neutralize the
+      // escaped sequences before checking, so that an escaped dot is not mistaken for a separator and
+      // flagged as a partial reference (leading / trailing / double dot). The double backslashes are
+      // collapsed first so that "\\." (escaped backslash followed by a separator) is handled correctly.
       let dotRegex = /(^\.)|(\.$)|(\.\.+)/
       spaceValidator.add(Validate.Custom, {
         failureMessage: l10n['core.validation.spacevalidation.message.invalidreference'],
         against: function(value) {
           if (typeof value === 'string') {
-            return value.strip().search(dotRegex) === -1;
+            let separatorsOnly = value.trim().replaceAll('\\\\', 'x').replaceAll(/\\./g, 'x');
+            return separatorsOnly.search(dotRegex) === -1;
           } else {
             return true;
           }
@@ -450,7 +455,7 @@ require(['jquery'], function($) {
       against: function(value) {
         if (terminalCheckbox.prop('checked')) {
           // Space reference is required for terminal documents.
-          return typeof value === 'string' && value.strip().length > 0;
+          return typeof value === 'string' && value.trim().length > 0;
         } else {
           // Space reference can be empty for non-terminal documents.
           return true;
@@ -528,7 +533,7 @@ require(['jquery'], function($) {
 
       var allowedSpaces = [];
       var allowedSpacesData = input.attr('data-allowed-spaces');
-      // Read the alowed spaces specified by the template provider, unless they are just suggestions in which case they
+      // Read the allowed spaces specified by the template provider, unless they are just suggestions in which case they
       // should be ignored by validation.
       if (!restrictionsAreSuggestions && allowedSpacesData) {
         allowedSpaces = JSON.parse(input.attr('data-allowed-spaces'));

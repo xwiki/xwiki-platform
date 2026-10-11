@@ -19,12 +19,13 @@
  */
 package org.xwiki.webjars;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.webjars.internal.WebJarsResourceReference;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Unit tests for {@link org.xwiki.webjars.internal.WebJarsResourceReference}.
@@ -32,22 +33,28 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 7.1M1
  */
-public class WebJarResourceReferenceTest
+class WebJarResourceReferenceTest
 {
     @Test
-    public void testEqualsAndHashCode()
+    // This method verifies the equals() and hashCode() contracts themselves, so the assertions
+    // deliberately call equals() (or compare hashCode() values) explicitly: the boolean form is what makes
+    // visible which object is the receiver and which argument it gets. Using
+    // assertEquals()/assertNotEquals() would move that into JUnit's internals and would invite a later
+    // SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
+    void equalsAndHashCode()
     {
-        WebJarsResourceReference reference1 = new WebJarsResourceReference("namespace", Arrays.asList("one", "two"));
+        WebJarsResourceReference reference1 = new WebJarsResourceReference("namespace", List.of("one", "two"));
         reference1.addParameter("key1", "value1");
         reference1.addParameter("key2", new String[]{ "value2", "value3" });
 
-        WebJarsResourceReference reference2 = new WebJarsResourceReference("namespace", Arrays.asList("one", "two"));
+        WebJarsResourceReference reference2 = new WebJarsResourceReference("namespace", List.of("one", "two"));
         reference2.addParameter("key1", "value1");
         reference2.addParameter("key2", new String[]{ "value2", "value3" });
 
-        WebJarsResourceReference reference3 = new WebJarsResourceReference("namespace", Arrays.asList("one", "two"));
+        WebJarsResourceReference reference3 = new WebJarsResourceReference("namespace", List.of("one", "two"));
 
-        WebJarsResourceReference reference4 = new WebJarsResourceReference("namespace2", Arrays.asList("one", "two"));
+        WebJarsResourceReference reference4 = new WebJarsResourceReference("namespace2", List.of("one", "two"));
 
         assertEquals(reference2, reference1);
         assertEquals(reference2.hashCode(), reference1.hashCode());

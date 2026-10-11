@@ -20,9 +20,9 @@
 package org.xwiki.tool.packager;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.tool.packager.PackageMojo}.
@@ -30,10 +30,10 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 6.2
  */
-public class PackageMojoTest
+class PackageMojoTest
 {
     @Test
-    public void replaceProperty()
+    void replaceProperty()
     {
         VelocityContext context = new VelocityContext();
         context.put("xwikiDataDir", "/some/path");
@@ -43,18 +43,18 @@ public class PackageMojoTest
         // - that ${xwikiDataDir} is going to be replaced
         // - that $XWIKI_OPTS, $XWIKI_DATA_DIR and $XWIKI_PID are not going to be modified
         // - that $! is not going to be modified either
-        String content = ""
-            + "# Location where XWiki stores generated data and where database files are.\n"
-            + "XWIKI_DATA_DIR=${xwikiDataDir}\n"
-            + "XWIKI_OPTS=\"$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR\"\n"
-            + "XWIKI_PID=$!\n"
-            + "whatever";
-        String expected = ""
-            + "# Location where XWiki stores generated data and where database files are.\n"
-            + "XWIKI_DATA_DIR=/some/path\n"
-            + "XWIKI_OPTS=\"$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR\"\n"
-            + "XWIKI_PID=$!\n"
-            + "whatever";
+        String content = """
+            # Location where XWiki stores generated data and where database files are.
+            XWIKI_DATA_DIR=${xwikiDataDir}
+            XWIKI_OPTS="$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR"
+            XWIKI_PID=$!
+            whatever""";
+        String expected = """
+            # Location where XWiki stores generated data and where database files are.
+            XWIKI_DATA_DIR=/some/path
+            XWIKI_OPTS="$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR"
+            XWIKI_PID=$!
+            whatever""";
         assertEquals(expected, mojo.replaceProperty(content, context));
     }
 }

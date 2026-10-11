@@ -20,19 +20,20 @@
 package org.xwiki.filter.instance.internal.output;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.EmptyExtension;
-import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
+import org.xwiki.extension.test.MockitoRepositoryUtilsExtension;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.filterxml.input.FilterXMLInputProperties;
 import org.xwiki.filter.input.BeanInputFilterStreamFactory;
@@ -45,23 +46,35 @@ import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
 import org.xwiki.filter.output.OutputFilterStream;
 import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 /**
  * Validate {@link ExtensionInstanceOutputProperties}.
- * 
+ *
  * @version $Id$
  */
+@ComponentTest
 @AllComponents
-public class ExtensionInstanceOutputFilterStreamTest
+@ExtendWith(MockitoRepositoryUtilsExtension.class)
+class ExtensionInstanceOutputFilterStreamTest
 {
-    @Rule
-    public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private BeanInputFilterStreamFactory<FilterXMLInputProperties> xmlInputFilterStreamFactory;
 
@@ -71,28 +84,34 @@ public class ExtensionInstanceOutputFilterStreamTest
 
     private ExtensionRepositoryManager extensionRepositoryMock;
 
+    @MockComponent
+    private ObservationManager observationManagerMock;
+
+    private List<Event> events = new ArrayList<>();
+
     @AfterComponent
-    public void afterComponent() throws Exception
+    void afterComponent() throws Exception
     {
-        this.extensionRepositoryMock =
-            this.repositoryUtil.getComponentManager().registerMockComponent(ExtensionRepositoryManager.class);
+        this.extensionRepositoryMock = this.componentManager.registerMockComponent(ExtensionRepositoryManager.class);
         doThrow(ResolveException.class).when(this.extensionRepositoryMock).resolve((ExtensionId) any());
     }
 
     // Tests
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    void before() throws Exception
     {
         this.xmlInputFilterStreamFactory =
-            this.repositoryUtil.getComponentManager().getInstance(InputFilterStreamFactory.class,
-                FilterStreamType.FILTER_XML.serialize());
-        this.outputFilterStreamFactory =
-            this.repositoryUtil.getComponentManager().getInstance(OutputFilterStreamFactory.class,
-                FilterStreamType.XWIKI_INSTANCE.serialize());
+            this.componentManager.getInstance(InputFilterStreamFactory.class, FilterStreamType.FILTER_XML.serialize());
+        this.outputFilterStreamFactory = this.componentManager.getInstance(OutputFilterStreamFactory.class,
+            FilterStreamType.XWIKI_INSTANCE.serialize());
 
-        this.installedExtensionRepository =
-            this.repositoryUtil.getComponentManager().getInstance(InstalledExtensionRepository.class);
+        this.installedExtensionRepository = this.componentManager.getInstance(InstalledExtensionRepository.class);
+
+        doAnswer(invocation -> {
+            this.events.add((Event) invocation.getArgument(0));
+            return null;
+        }).when(this.observationManagerMock).notify(any(), any());
     }
 
     protected void importFromXML(String resource) throws FilterException
@@ -134,41 +153,47 @@ public class ExtensionInstanceOutputFilterStreamTest
     // tests
 
     @Test
-    public void testImportExtensionId() throws FilterException, ResolveException, UnsupportedEncodingException
+    void importExtensionId() throws FilterException, ResolveException
     {
-        doReturn(new EmptyExtension(new ExtensionId("extensionid1", "version1"), "test")).when(
-            this.extensionRepositoryMock).resolve(new ExtensionId("extensionid1", "version1"));
-        doReturn(new EmptyExtension(new ExtensionId("extensionid2", "version2"), "test")).when(
-            this.extensionRepositoryMock).resolve(new ExtensionId("extensionid2", "version2"));
+        doReturn(new EmptyExtension(new ExtensionId("extensionid1", "version1"), "test"))
+            .when(this.extensionRepositoryMock).resolve(new ExtensionId("extensionid1", "version1"));
+        doReturn(new EmptyExtension(new ExtensionId("extensionid2", "version2"), "test"))
+            .when(this.extensionRepositoryMock).resolve(new ExtensionId("extensionid2", "version2"));
 
         importFromXML("extensionid");
 
-        Assert.assertNull(this.installedExtensionRepository.getInstalledExtension("extensionid1", null));
-        Assert.assertNotNull(this.installedExtensionRepository.getInstalledExtension("extensionid1", "namespace1"));
-        Assert.assertEquals("version1",
-            this.installedExtensionRepository.getInstalledExtension("extensionid1", "namespace1").getId().getVersion()
-                .getValue());
+        assertNull(this.installedExtensionRepository.getInstalledExtension("extensionid1", null));
+        assertNotNull(this.installedExtensionRepository.getInstalledExtension("extensionid1", "namespace1"));
+        assertEquals("version1", this.installedExtensionRepository.getInstalledExtension("extensionid1", "namespace1")
+            .getId().getVersion().getValue());
 
-        Assert.assertNull(this.installedExtensionRepository.getInstalledExtension("extensionid2", null));
-        Assert.assertNotNull(this.installedExtensionRepository.getInstalledExtension("extensionid2", "wiki:wiki2"));
-        Assert.assertEquals("version2",
-            this.installedExtensionRepository.getInstalledExtension("extensionid2", "wiki:wiki2").getId().getVersion()
-                .getValue());
+        assertNull(this.installedExtensionRepository.getInstalledExtension("extensionid2", null));
+        assertNotNull(this.installedExtensionRepository.getInstalledExtension("extensionid2", "wiki:wiki2"));
+        assertEquals("version2", this.installedExtensionRepository.getInstalledExtension("extensionid2", "wiki:wiki2")
+            .getId().getVersion().getValue());
+
+        assertEquals(2, this.events.size());
+        assertEquals("extensionid1", ((ExtensionInstalledEvent) this.events.get(0)).getExtensionId().getId());
+        assertEquals("namespace1", ((ExtensionInstalledEvent) this.events.get(0)).getNamespace());
+        assertEquals("extensionid2", ((ExtensionInstalledEvent) this.events.get(1)).getExtensionId().getId());
+        assertEquals("wiki:wiki2", ((ExtensionInstalledEvent) this.events.get(1)).getNamespace());
     }
 
     @Test
-    public void testImportExtensionIdWithoutNamespace() throws FilterException, ResolveException,
-        UnsupportedEncodingException
+    void importExtensionIdWithoutNamespace() throws FilterException, ResolveException
     {
-        doReturn(new EmptyExtension(new ExtensionId("extensionid", "version"), "test")).when(
-            this.extensionRepositoryMock).resolve(new ExtensionId("extensionid", "version"));
+        doReturn(new EmptyExtension(new ExtensionId("extensionid", "version"), "test"))
+            .when(this.extensionRepositoryMock).resolve(new ExtensionId("extensionid", "version"));
 
         importFromXML("extensionidwithoutnamespace");
 
-        Assert.assertNotNull(this.installedExtensionRepository.getInstalledExtension("extensionid", null));
-        Assert.assertNotNull(this.installedExtensionRepository.getInstalledExtension("extensionid", "namespace"));
-        Assert.assertEquals("version",
-            this.installedExtensionRepository.getInstalledExtension("extensionid", "namespace").getId().getVersion()
-                .getValue());
+        assertNotNull(this.installedExtensionRepository.getInstalledExtension("extensionid", null));
+        assertNotNull(this.installedExtensionRepository.getInstalledExtension("extensionid", "namespace"));
+        assertEquals("version", this.installedExtensionRepository.getInstalledExtension("extensionid", "namespace")
+            .getId().getVersion().getValue());
+
+        assertEquals(1, this.events.size());
+        assertEquals("extensionid", ((ExtensionInstalledEvent) this.events.get(0)).getExtensionId().getId());
+        assertNull(((ExtensionInstalledEvent) this.events.get(0)).getNamespace());
     }
 }

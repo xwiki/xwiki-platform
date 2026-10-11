@@ -22,7 +22,6 @@ package org.xwiki.test.ui.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -63,11 +62,13 @@ public class DeletePageConfirmationPage extends ConfirmationPage
      */
     public boolean isRecycleBinOptionsDisplayed()
     {
-        try {
-            return this.optionSkipRecycleBin.isDisplayed() && this.optionSkipRecycleBin.isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        // The two "shouldSkipRecycleBin" radios are rendered together by delete.vm (or not at all), so checking for one
+        // is enough. Use a no-wait lookup because this method is also called to assert that the options are absent, and
+        // a waiting lookup would block for the full implicit-wait timeout before reporting their absence. The positive
+        // callers are safe without a wait too: the confirmation page object is only built after waitUntilPageIsReady(),
+        // by which point these server-rendered radios are already in the DOM.
+        return getDriver().hasElementWithoutWaiting(
+            By.cssSelector("input[name='shouldSkipRecycleBin'][value='true']"));
     }
 
     /**

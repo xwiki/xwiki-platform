@@ -21,6 +21,7 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -49,7 +50,7 @@ public final class StoreFileUtils
     }
 
     /**
-     * Get the stored (optionally versionned) name of a file name assuming it's in an associated unique folder.
+     * Get the stored (optionally versioned) name of a file name assuming it's in an associated unique folder.
      *
      * @param filename the name of the file to save. This will be URL encoded.
      * @param versionName the name of the version of the file. This will also be URL encoded.
@@ -96,7 +97,10 @@ public final class StoreFileUtils
             if (linkBlob.exists()) {
                 if (followLinks) {
                     // Move the target blob to the link's target blob
-                    String linkContent = IOUtils.toString(linkBlob.getStream(), StandardCharsets.UTF_8).trim();
+                    String linkContent;
+                    try (InputStream stream = linkBlob.getStream()) {
+                        linkContent = IOUtils.toString(stream, StandardCharsets.UTF_8).trim();
+                    }
                     blob = linkBlob.getStore().getBlob(linkBlob.getPath().resolveSibling(linkContent));
                 } else {
                     // Stop at the link blob if we don't follow it

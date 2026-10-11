@@ -26,16 +26,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -55,46 +56,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     private AttachmentVersioningStore attachmentVersioningStore;
 
     /**
-     * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
-     * in the WEB-INF directory.
-     *
-     * @param xwiki
-     * @param context
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateAttachmentStore(XWiki xwiki, XWikiContext context)
-    {
-        super(xwiki, context);
-    }
-
-    /**
-     * @see #XWikiHibernateAttachmentStore(XWiki, XWikiContext)
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateAttachmentStore(XWikiContext context)
-    {
-        this(context.getWiki(), context);
-    }
-
-    /**
-     * Initialize the storage engine with a specific path This is used for tests.
-     *
-     * @param hibpath
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateAttachmentStore(String hibpath)
-    {
-        super(hibpath);
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public XWikiHibernateAttachmentStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     @Override
@@ -145,8 +111,18 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                         attachment.loadArchive(context);
                     }
 
+                    // If the archive has no history yet, seed it with the current attachment so that the initial
+                    // version (typically 1.1) is not lost when the attachment is later updated. Without this seed,
+                    // the second upload increments to 1.2 and creates a fresh archive at 1.2, making 1.1
+                    // unrecoverable. This mirrors the seeding done in AttachmentArchiveSaveRunnable for the
+                    // filesystem store.
+                    XWikiAttachmentArchive archive = attachment.getAttachment_archive();
+                    if (archive != null && archive.getArchiveAsString().isEmpty()) {
+                        archive.addCurrentAttachment(context);
+                    }
+
                     // The archive has been updated in XWikiHibernateStore.saveAttachment()
-                    store.saveArchive(attachment.getAttachment_archive(), context, false);
+                    store.saveArchive(archive, context, false);
 
                     if (parentUpdate) {
                         context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, true);
@@ -160,6 +136,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                         try {
                             endTransaction(context, false);
                         } catch (Exception e) {
+                            // TODO: log a warning instead of ignoring this exception.
+                            // A failure to close the transaction must not hide the original error.
                         }
                     }
                 }
@@ -209,6 +187,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -334,8 +314,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 try {
                     session.delete(new XWikiAttachmentContent(attachment));
                 } catch (Exception e) {
-                    this.logger.warn("Error deleting attachment content [{}] of document [{}]",
-                        attachment.getFilename(), attachment.getDoc().getDocumentReference());
+                    this.logger.warn("Error deleting attachment content [{}] of document [{}]. Root cause is [{}]",
+                        attachment.getFilename(), attachment.getDoc().getDocumentReference(),
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
 
                 AttachmentVersioningStore store = resolveAttachmentVersioningStore(attachment, context);
@@ -344,8 +325,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 try {
                     session.delete(attachment);
                 } catch (Exception e) {
-                    this.logger.warn("Error deleting attachment meta data [{}] of document [{}]",
-                        attachment.getFilename(), attachment.getDoc().getDocumentReference());
+                    this.logger.warn("Error deleting attachment meta data [{}] of document [{}]. Root cause is [{}]",
+                        attachment.getFilename(), attachment.getDoc().getDocumentReference(),
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
 
                 try {
@@ -361,8 +343,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                         context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, false);
                     }
                 } catch (Exception e) {
-                    this.logger.warn("Error updating document when deleting attachment [{}] of document [{}]",
-                        attachment.getFilename(), attachment.getDoc().getDocumentReference());
+                    this.logger.warn("Error updating document when deleting attachment [{}] of document [{}]. Root "
+                        + "cause is [{}]", attachment.getFilename(), attachment.getDoc().getDocumentReference(),
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
 
                 if (bTransaction) {
@@ -373,6 +356,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -407,7 +392,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             try {
                 return this.componentManager.getInstance(AttachmentVersioningStore.class, storeType);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Can't find attachment versionning store for type [{}]", storeType, e);
+                this.logger.warn("Can't find attachment versioning store for type [{}]", storeType, e);
             }
         }
 

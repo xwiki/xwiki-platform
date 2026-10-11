@@ -322,7 +322,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
                      [$mathtool.sub($messageIDs.size(), $messages.size()), $messageIDs.size()]){{error}})))
       #end
     #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-      ## If the user accidently selected messages to which this action cannot be done, just skip over them.
+      ## If the user accidentally selected messages to which this action cannot be done, just skip over them.
       #set($changed = false)
       #foreach($message in $messages)
         #if($message.getProperty('status').getValue() == 'pending')
@@ -375,7 +375,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       #end
       {{/error}})))
     #elseif($confirm &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-      ## If the user accidently selected messages to which this action cannot be done, just skip over them.
+      ## If the user accidentally selected messages to which this action cannot be done, just skip over them.
       #set($changed = false)
       #foreach($message in $messages)
         #if($message.getProperty('status').getValue() == 'reported')

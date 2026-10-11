@@ -149,7 +149,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
 
                     for (Locale newLocale : newLocales) {
                         for (Locale locale : getParentLocales(newLocale)) {
-                            if (builder.length() > 0) {
+                            if (!builder.isEmpty()) {
                                 builder.append(" OR ");
                             }
                             builder.append(FieldUtils.DOCUMENT_LOCALE);
@@ -183,7 +183,10 @@ public class SolrIndexAvailableLocalesListener implements EventListener
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to handle event [{}] with source [{}]", event, source.toString(), e);
+            // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+            // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and the source is
+            // an arbitrary object whose graph would be written out and read back as null if it cannot be resolved.
+            this.logger.error("Failed to handle event [{}] with source [{}]", event, String.valueOf(source), e);
         }
     }
 

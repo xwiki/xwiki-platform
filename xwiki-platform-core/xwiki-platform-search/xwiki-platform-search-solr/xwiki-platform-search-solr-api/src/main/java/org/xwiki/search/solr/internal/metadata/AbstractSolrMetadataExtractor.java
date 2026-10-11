@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -195,9 +196,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
         DocumentReference documentReferenceWithoutLocale = documentReference.getLocale() == null ? documentReference
             : new DocumentReference(documentReference, (Locale) null);
-        XWikiDocument document = xcontext.getWiki().getDocument(documentReferenceWithoutLocale, xcontext);
-
-        return document;
+        return xcontext.getWiki().getDocument(documentReferenceWithoutLocale, xcontext);
     }
 
     /**
@@ -309,10 +308,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
         for (Locale locale : availableLocales) {
             // Add locale only if there is no explicit translation for it
-            if (!documentLocales.contains(locale)) {
-                if (entityLocale == null || locale.toString().startsWith(entityLocaleString)) {
-                    locales.add(locale);
-                }
+            if (!documentLocales.contains(locale)
+                && (entityLocale == null || locale.toString().startsWith(entityLocaleString))) {
+                locales.add(locale);
             }
         }
 
@@ -394,8 +392,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         PropertyClass propertyClass, Locale locale)
     {
         Object propertyValue = property.getValue();
-        if (propertyClass instanceof StaticListClass) {
-            setStaticListPropertyValue(solrDocument, property, (StaticListClass) propertyClass, locale);
+        if (propertyClass instanceof StaticListClass staticListClass) {
+            setStaticListPropertyValue(solrDocument, property, staticListClass, locale);
         } else if (propertyClass instanceof TextAreaClass
             || (propertyClass != null && "String".equals(propertyClass.getClassType()))
             || (propertyValue instanceof CharSequence
@@ -430,9 +428,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                     setPropertyValue(solrDocument, property, new TypedValue(value), locale);
                 }
             }
-        } else if (propertyValue instanceof Integer && propertyClass instanceof BooleanClass) {
+        } else if (propertyValue instanceof Integer integerValue && propertyClass instanceof BooleanClass) {
             // Boolean properties are stored as integers (0 is false and 1 is true).
-            Boolean booleanValue = ((Integer) propertyValue) != 0;
+            Boolean booleanValue = integerValue != 0;
             setPropertyValue(solrDocument, property, new TypedValue(booleanValue), locale);
         } else if (!property.isSensitive(xcontextProvider.get())) {
             // Avoid indexing passwords and, when obfuscation is enabled, emails.
@@ -529,25 +527,52 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 in.close();
             }
         } catch (Exception e) {
-            this.logger.error("Failed to retrieve the content of attachment [{}]", attachment.getReference(), e);
+            if (isDeleted(attachment)) {
+                // The attachment was deleted while being indexed (e.g. right after being added), and its deletion
+                // updates the index anyway.
+                this.logger.debug("Failed to retrieve the content of attachment [{}] which doesn't exist anymore",
+                    attachment.getReference(), e);
+            } else {
+                this.logger.error("Failed to retrieve the content of attachment [{}]", attachment.getReference(), e);
+            }
             return null;
+        }
+    }
+
+    private boolean isDeleted(XWikiAttachment attachment)
+    {
+        try {
+            // The document doesn't have the attachment anymore if the attachment or the document was deleted.
+            return getDocument(attachment.getReference().getDocumentReference())
+                .getAttachment(attachment.getFilename()) == null;
+        } catch (Exception e) {
+            // We can't know, so report the failure to retrieve the content.
+            return false;
         }
     }
 
     private void setHierarchyFields(SolrInputDocument solrDocument, EntityReference path)
     {
         solrDocument.setField(FieldUtils.SPACE_EXACT, this.localSerializer.serialize(path));
+
+        // Add the hierarchy fields for the spaces
         List<EntityReference> ancestors = path.getReversedReferenceChain();
+        List<String> spaces = new ArrayList<>(ancestors.size() - 1);
+        List<String> spacePrefix = new ArrayList<>(ancestors.size() - 1);
+        List<String> spaceFacet = new ArrayList<>(ancestors.size() - 1);
         // Skip the wiki reference because we want to index the local space references.
         for (int i = 1; i < ancestors.size(); i++) {
-            solrDocument.addField(FieldUtils.SPACES, ancestors.get(i).getName());
+            spaces.add(ancestors.get(i).getName());
             String localAncestorReference = this.localSerializer.serialize(ancestors.get(i));
-            solrDocument.addField(FieldUtils.SPACE_PREFIX, localAncestorReference);
+            spacePrefix.add(localAncestorReference);
             // We prefix the local ancestor reference with the depth in order to use 'facet.prefix'. We also add a
             // trailing slash in order to distinguish between space names with the same prefix (e.g. 0/Gallery/ and
             // 0/GalleryCode/).
-            solrDocument.addField(FieldUtils.SPACE_FACET, (i - 1) + "/" + localAncestorReference + ".");
+            spaceFacet.add((i - 1) + "/" + localAncestorReference + ".");
         }
+        solrDocument.setField(FieldUtils.SPACES, spaces);
+        solrDocument.setField(FieldUtils.SPACE_PREFIX, spacePrefix);
+        solrDocument.setField(FieldUtils.SPACE_FACET, spaceFacet);
     }
 
     protected void extendLink(EntityReference reference, Set<String> linksExtended)

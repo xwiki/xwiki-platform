@@ -272,7 +272,7 @@
       $('.XWikiColorThemeDisplayer').each(function() {
         var displayer = $(this);
 
-        // Refresh the displayer to hide unecessary elements
+        // Refresh the displayer to hide unnecessary elements
         refreshDisplayer(displayer);
 
         /**

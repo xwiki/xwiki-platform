@@ -20,10 +20,10 @@
 package org.xwiki.security.authorization.internal;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.security.authorization.RightSet;
-import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightSet;
 import org.xwiki.security.authorization.RuleState;
+import org.xwiki.security.authorization.SecurityAccess;
 
 /**
  * Default implementation for an {@link org.xwiki.security.authorization.SecurityAccess}.

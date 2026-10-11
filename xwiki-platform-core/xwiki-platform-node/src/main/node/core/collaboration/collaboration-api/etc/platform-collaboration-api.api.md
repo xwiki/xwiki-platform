@@ -4,25 +4,61 @@
 
 ```ts
 
+import { AuthenticationManagerProvider } from '@xwiki/platform-authentication-api';
 import { Container } from 'inversify';
 import { Doc } from 'yjs';
+import { DocumentReference } from '@xwiki/platform-model-api';
+import { DocumentService } from '@xwiki/platform-document-api';
+import { Logger } from '@xwiki/platform-api';
+import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
 import { Ref } from 'vue';
+import { Saver } from '@xwiki/platform-autosave-api';
+import { SaverState } from '@xwiki/platform-autosave-api';
+import { SaveTransport } from '@xwiki/platform-autosave-api';
+import { UserDetails } from '@xwiki/platform-authentication-api';
 
 // @beta
-export type CollaborationInitializer = {
+export abstract class AbstractCollaborationManager implements CollaborationManager {
+    constructor(authenticationManagerProvider: AuthenticationManagerProvider, documentService: DocumentService, modelReferenceSerializer: ModelReferenceSerializer);
+    // (undocumented)
+    protected readonly authenticationManagerProvider: AuthenticationManagerProvider;
+    protected readonly collaborations: Map<string, {
+        promise: Promise<Collaboration>;
+        usageCount: number;
+    }>;
+    // (undocumented)
+    protected abstract createCollaboration(provider: any, collaborator: Collaborator): Promise<Collaboration>;
+    // (undocumented)
+    protected abstract createProvider(documentReference: DocumentReference): Promise<any>;
+    // (undocumented)
+    protected abstract disconnect(collaboration: Collaboration): void;
+    // (undocumented)
+    protected readonly documentService: DocumentService;
+    // (undocumented)
+    join(documentReference?: DocumentReference): Promise<Collaboration>;
+    // (undocumented)
+    leave(documentReference?: DocumentReference): void;
+    // (undocumented)
+    protected readonly modelReferenceSerializer: ModelReferenceSerializer;
+}
+
+// @beta
+export type Collaboration = {
+    connectionStatus: Ref<ConnectionStatus>;
+    collaborators: Ref<Collaborator[]>;
+    collaborator: Collaborator;
     provider: any;
     doc: Doc;
-    initialized: Promise<unknown>;
+    saver?: Saver<any>;
 };
 
 // @beta
 export interface CollaborationManager {
-    get(): Promise<() => CollaborationInitializer>;
-    status(): Ref<Status>;
-    users(): Ref<User[]>;
+    join(documentReference?: DocumentReference): Promise<Collaboration>;
+    leave(documentReference?: DocumentReference): void;
 }
 
-// @beta (undocumented)
+// @beta
 export const collaborationManagerName: string;
 
 // @beta
@@ -31,8 +67,15 @@ export interface CollaborationManagerProvider {
     get(): CollaborationManager;
 }
 
-// @beta (undocumented)
+// @beta
 export const collaborationManagerProviderName: string;
+
+// @beta
+export type Collaborator = {
+    id?: string;
+    user: UserDetails;
+    color: string;
+};
 
 // @beta (undocumented)
 export class ComponentInit {
@@ -40,7 +83,7 @@ export class ComponentInit {
 }
 
 // @beta
-export enum Status {
+export enum ConnectionStatus {
     // (undocumented)
     Connected = 2,
     // (undocumented)
@@ -50,12 +93,30 @@ export enum Status {
 }
 
 // @beta
-export type User = {
-    user: {
-        name: string;
-        color: string;
-    };
-    clientId: string;
+export class YjsAwarenessSaveTransport<C extends object = object> extends SaveTransport<C> {
+    constructor(saver: Saver<C>, config: YjsAwarenessSaveTransportConfig);
+    // (undocumented)
+    dispose(): Promise<void>;
+    // (undocumented)
+    getClientId(): string;
+    // (undocumented)
+    getStates(): Record<string, SaverState>;
+    // (undocumented)
+    initialize(): void;
+    // (undocumented)
+    toBeReady(): Promise<void>;
+    // (undocumented)
+    updateLocalState(patch: Partial<SaverState>, input?: {
+        push?: boolean;
+        immediate?: boolean;
+    }): Promise<void>;
+    whenSettled(): Promise<void>;
+}
+
+// @beta
+export type YjsAwarenessSaveTransportConfig = {
+    collaboration: Collaboration;
+    logger?: Logger;
 };
 
 // (No @packageDocumentation comment for this package)

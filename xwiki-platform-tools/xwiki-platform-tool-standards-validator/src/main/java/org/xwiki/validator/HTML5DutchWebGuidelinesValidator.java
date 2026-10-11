@@ -50,6 +50,14 @@ import org.xwiki.validator.framework.AbstractHTML5Validator;
 public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
 {
     /**
+     * Pattern an email address must match. The domain labels are matched by an atomic group because they are
+     * fully determined by the dot that ends each of them, so allowing the group to be re-entered on backtracking
+     * would only grow the stack.
+     */
+    private static final Pattern EMAIL =
+        Pattern.compile("^[\\w-][.\\w]+\\w@(?>[\\w-]+\\.)+[a-zA-Z]{2,4}$");
+
+    /**
      * String used to identify the charset in the content-type meta.
      */
     private static final String CONTENT_CHARSET_FRAGMENT = "charset=";
@@ -61,8 +69,6 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
 
     private static final String SUBMIT_BUTTONS = StringUtils.join(Arrays.asList("button[type='submit']",
         "button:not([type])", "input[type='submit']", "input[type='image'][alt]:not([alt=''])"), ", ");
-
-    private static final String DOCTYPE_ATT_NAME = "name";
 
     /**
      * Message resources.
@@ -690,8 +696,8 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
         for (Element link : getElements(ELEM_LINK)) {
 
             // Look for images in the link.
-            boolean hasImages = link.select("img").size() > 0;
-            boolean hasImagesWithoutAlt = link.select("img[alt=''], img:not([alt])").size() > 0;
+            boolean hasImages = !link.select("img").isEmpty();
+            boolean hasImagesWithoutAlt = !link.select("img[alt=''], img:not([alt])").isEmpty();
 
             // Look for text in the link.
             boolean hasText = false;
@@ -919,8 +925,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
             String href = getAttributeValue(link, ATTR_HREF);
             if (href != null && href.startsWith(MAILTO)) {
                 String email = StringUtils.substringAfter(href, MAILTO);
-                assertTrue(Type.ERROR, "rpd8s17.email", email
-                    .matches("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-zA-Z]{2,4}$"));
+                assertTrue(Type.ERROR, "rpd8s17.email", EMAIL.matcher(email).matches());
             }
         }
     }

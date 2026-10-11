@@ -26,22 +26,26 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ForceEditLockModal;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,7 +59,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 12.10.6
  * @since 13.2RC1
  */
-@UITest
+@UITest(
+    extraJARs = {
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index"
+    },
+    resolveExtraJARs = true
+)
 class InplaceEditIT
 {
     @BeforeAll
@@ -71,15 +83,9 @@ class InplaceEditIT
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup)
     {
-        // We might have an alert in case one test failed during an edition, in which case we just want to get rid of
-        // the alert to move to next page.
-        try {
-            setup.gotoPage(testReference);
-        } catch (UnhandledAlertException e) {
-            setup.getDriver().switchTo().alert().accept();
-        }
+        setup.maybeLeaveEditMode();
     }
 
     @Test
@@ -172,14 +178,7 @@ class InplaceEditIT
         richTextArea.clear();
 
         // Insert a macro that is editable in-line.
-        richTextArea.sendKeys("/inf");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/inf", "Info Box");
-        richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-
-        // The content is reloaded after the macro is inserted.
-        ckeditor.getRichTextArea();
+        richTextArea.insertMacro("/inf", "Info Box");
 
         // Switch to Source mode and save without making any change.
         ckeditor.getToolBar().toggleSourceMode();
@@ -332,25 +331,14 @@ class InplaceEditIT
         richTextArea.sendKeys("a first line", Keys.ENTER);
 
         // Insert the Id macro. The macro placeholder should be displayed.
-        richTextArea.sendKeys(Keys.ENTER, "/id");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/id", "Id");
         richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-
         // We need to set the required name parameter through the Macro Edit dialog.
-        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
-        macroEditModal.setMacroParameter("name", "test").clickSubmit();
-        richTextArea.waitForContentRefresh();
+        richTextArea.insertMacroWithRequiredParameters("/id", "Id").setMacroParameter("name", "test").clickSubmit();
 
         // Insert the Children macro. The macro placeholder is initially displayed but then hidden, because the macro
         // output is empty until the tree is lazy loaded.
-        richTextArea.sendKeys(Keys.UP, "/chi");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/chi", "Children");
-        richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        richTextArea.waitForContentRefresh();
+        richTextArea.sendKeys(Keys.UP);
+        richTextArea.insertMacro("/chi", "Children");
 
         // Wait until the children macro has loaded the tree content.
         richTextArea.waitUntilTextContains("No pages found");
@@ -395,7 +383,7 @@ class InplaceEditIT
 
         // Verify that the top left corner of the Source text area is visible (inside the viewport).
         // The toolbar is overlapping the text area so we need to add some offset.
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 3));
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 10));
 
         // Select something from the middle of the edited content.
         for (int i = 0; i < 46; i++) {
@@ -448,8 +436,8 @@ class InplaceEditIT
         assertEquals("50", sourceTextArea.getDomProperty("value").substring(selectionStart, selectionEnd));
 
         // Verify that the restored selection is visible (inside the viewport).
-        // Note that we have to subtract 4 from the height because the floating toolbar is overlapping the text area.
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 4));
+        // Note that we have to subtract 7 from the height because the floating toolbar is overlapping the text area.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 7));
 
         viewPage.cancel();
     }
@@ -472,19 +460,13 @@ class InplaceEditIT
         richTextArea.clear();
 
         // Insert the Velocity macro. The macro placeholder should be displayed.
-        richTextArea.sendKeys("/velocity");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velocity", "Velocity");
-        richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        MacroDialogEditModal macroEditModal = richTextArea.insertMacroWithRequiredParameters("/velocity", "Velocity");
 
         // check the behaviour of boolean parameters of macro.
-        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
         assertTrue(macroEditModal.getMacroParameterInput("wiki").isSelected());
         macroEditModal.setMacroContent("#set($discard = $NULL)");
         macroEditModal.setMacroParameterCheckbox("wiki", false);
         macroEditModal.clickSubmit();
-        richTextArea.waitForContentRefresh();
 
         assertEquals("macro:velocity", richTextArea.getText());
 
@@ -515,9 +497,142 @@ class InplaceEditIT
         viewPage.cancel();
         WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
         String content = wikiEditPage.getContent();
-        assertEquals("{{velocity wiki=\"false\"}}\n"
-            + "#set($discard = $NULL)\n"
-            + "{{/velocity}}", content);
+        assertEquals("""
+            {{velocity wiki="false"}}
+            #set($discard = $NULL)
+            {{/velocity}}""", content);
         wikiEditPage.clickCancel();
+    }
+
+    @Test
+    @Order(9)
+    void editInplaceWithRequiredRightsEditWarning(TestUtils setup, TestReference testReference)
+    {
+        // Create a page as superadmin with a Velocity macro. Add some text before the Velocity macro to ensure that 
+        // the cursor is initially not on the Velocity macro but on the plain text so we can directly change it later.
+        setup.loginAsSuperAdmin();
+        ViewPage viewPage = 
+            setup.createPage(testReference, "Before\n\n{{velocity}}\nVelocity content\n{{/velocity}}", "");
+        assertEquals("Before\nVelocity content", viewPage.getContent());
+
+        // Login as alice and we should get a warning that editing the page may break things due to missing rights.
+        setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
+        InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+        inplaceEditablePage.edit();
+
+        // Creating the page object waits until the modal is actually displayed.
+        ForceEditLockModal forceEditLockModal = new ForceEditLockModal();
+        assertEquals("Warning", forceEditLockModal.getTitle());
+        assertThat(forceEditLockModal.getMessage(),
+            containsString(
+                "Editing this page may result in breakage because you are missing the following rights"));
+        forceEditLockModal.clickOk();
+
+        inplaceEditablePage.waitForInplaceEditor();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.sendKeys(Keys.END, " Edited content");
+        inplaceEditablePage.saveAndView();
+
+        // We should have an error message that the Velocity macro failed to execute.
+        assertThat(inplaceEditablePage.getContent(), containsString(
+            "Failed to execute the [velocity] macro."));
+    }
+
+    @Test
+    @Order(10)
+    void dropNonImageFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        RichTextAreaElement richTextArea = new CKEditor("content").getRichTextArea();
+        richTextArea.clear();
+        richTextArea.sendKeys("Attachment: ");
+
+        // Dropping a file that is not an image uploads it as an attachment and inserts a link to it.
+        richTextArea.dropFile("/notes.txt");
+        assertEquals("Attachment: notes.txt", richTextArea.getText());
+        // Move the caret out of the inserted link to hide its balloon tool bar, which can cover the action buttons.
+        richTextArea.sendKeys(Keys.HOME);
+        viewPage.saveAndView();
+
+        assertEquals("Attachment: notes.txt", viewPage.getContent());
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("notes.txt"));
+
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
+        assertEquals("Attachment: [[attach:notes.txt||target=\"_blank\"]]", wikiEditPage.getContent());
+        wikiEditPage.clickCancel();
+    }
+
+    @Test
+    @Order(11)
+    void liveMacroRendering(TestUtils setup, TestReference testReference)
+    {
+        // A child page, so that the Children macro has something to display.
+        setup.createPage(new DocumentReference("Child", testReference.getLastSpaceReference()), "", "Child Title");
+        setup.gotoPage(testReference);
+
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.clear();
+        richTextArea.sendKeys("children:");
+
+        // Insert the macro from the Insert menu. Its output is rendered as soon as the macro is inserted.
+        MacroDialogEditModal macroEditModal =
+            ckeditor.getToolBar().insertOtherMacro().filterByText("Children", 1).clickSelect();
+        macroEditModal.clickSubmit();
+        richTextArea.waitUntilTextContains("Child Title");
+        assertEquals("children:\nChild Title", richTextArea.getText());
+
+        viewPage.cancel();
+    }
+
+    @Test
+    @Order(12)
+    void switchToSourcePreservesSelection(TestUtils setup, TestReference testReference)
+    {
+        String source = "first paragraph\n\n= The Heading Title =\n\n|=Name|=Value\n|alpha|beta gamma";
+        setup.createPage(testReference, source, "");
+
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+
+        // Collapsed selection (caret) inside a paragraph word, at the start of the content.
+        // Firefox keeps the Control key pressed until the end of the sendKeys call, so we send the shortcut alone.
+        richTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.HOME));
+        richTextArea.sendKeys(Keys.RIGHT, Keys.RIGHT, Keys.RIGHT);
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals(source, ckeditor.getSource());
+        assertEquals(3, ckeditor.getSourceSelectionStart());
+        assertEquals(3, ckeditor.getSourceSelectionEnd());
+        ckeditor.getToolBar().toggleSourceMode();
+
+        // A word selected in the heading, on the line below the paragraph.
+        richTextArea.sendKeys(Keys.DOWN, Keys.HOME, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT,
+            Keys.chord(Keys.SHIFT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT, Keys.RIGHT));
+        assertEquals("Heading", richTextArea.getSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("Heading", ckeditor.getSourceSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("Heading", richTextArea.getSelectedText());
+
+        // A word selected at the end of the last table cell, i.e. at the end of the content. We don't select the whole
+        // cell value because the selection is then moved to the previous cell when switching back from Source
+        // (XWIKI-23209: Switching to Source multiple times after selecting a cell value expands the selection to other
+        // cells).
+        // Control+End moves the caret after the table. Left moves it inside the last table cell but also before its
+        // last character, so we move it back to the end of the cell value before selecting.
+        richTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.END));
+        richTextArea.sendKeys(Keys.LEFT, Keys.RIGHT,
+            Keys.chord(Keys.SHIFT, Keys.LEFT, Keys.LEFT, Keys.LEFT, Keys.LEFT, Keys.LEFT));
+        assertEquals("gamma", richTextArea.getSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("gamma", ckeditor.getSourceSelectedText());
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("gamma", richTextArea.getSelectedText());
+
+        viewPage.cancel();
     }
 }

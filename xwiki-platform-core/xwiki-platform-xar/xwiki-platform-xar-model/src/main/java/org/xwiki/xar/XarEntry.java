@@ -183,9 +183,9 @@ public class XarEntry extends LocalDocumentReference
 
     /**
      * @return the space of the document
-     * @deprecated since 7.2M1, does not make much sense anymore with nested space
+     * @deprecated does not make much sense anymore with nested space
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     @Transient
     public String getSpaceName()
     {

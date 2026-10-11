@@ -22,11 +22,12 @@ import XMenu from "../XMenu.vue";
 import XMenuItem from "../XMenuItem.vue";
 import XMenuLabel from "../XMenuLabel.vue";
 import { mountHelper, runTest } from "@xwiki/platform-test-accessibility";
+import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import { describe, expect } from "vitest";
-import Module from "module";
 
 function getAccessibilityMount() {
-  Module.prototype.require = () => {};
+  // Bootstrap is not loaded in the tests, so stub the jQuery plugin the component initializes on mount.
+  mockRequireJS({ jquery: () => ({ dropdown: () => {} }), bootstrap: {} });
   return mountHelper(XDropdown, {
     global: {
       components: {

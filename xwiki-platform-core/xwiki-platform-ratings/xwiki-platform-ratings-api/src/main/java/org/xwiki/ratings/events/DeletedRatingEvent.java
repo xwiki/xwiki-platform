@@ -24,7 +24,7 @@ import org.xwiki.ratings.RatingsManager;
 
 /**
  * Event sent whenever a {@link Rating} is deleted.
- * The event is sent with the following informations:
+ * The event is sent with the following information:
  *   - source: the identifier of the {@link RatingsManager}
  *   - data: the {@link Rating} deleted.
  *

@@ -51,7 +51,7 @@ public abstract class AbstractParentResourceReferenceResolver extends AbstractRe
             StringBuilder pathBuilder = new StringBuilder();
             try {
                 for (String pathSegment : extendedURL.getSegments()) {
-                    if (pathBuilder.length() > 0) {
+                    if (!pathBuilder.isEmpty()) {
                         pathBuilder.append('/');
                     }
                     pathBuilder.append(URLEncoder.encode(pathSegment, "UTF8"));

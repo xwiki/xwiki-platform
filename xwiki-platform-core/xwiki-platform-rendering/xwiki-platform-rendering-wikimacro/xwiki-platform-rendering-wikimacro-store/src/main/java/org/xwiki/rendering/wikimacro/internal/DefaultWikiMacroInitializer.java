@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -181,10 +182,11 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
                 DocumentReference wikiMacroDocumentReference =
                     new DocumentReference((String) wikiMacroDocumentData[1], spaceReference);
 
-                registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
+                registerMacro(wikiMacroDocumentReference, xcontext);
             }
         } catch (Exception ex) {
-            this.logger.warn("Failed to register macros for wiki [{}]: {}", wikiName, ex.getMessage());
+            this.logger.warn("Failed to register macros for wiki [{}]: [{}]", wikiName,
+                ExceptionUtils.getRootCauseMessage(ex));
         }
     }
 
@@ -207,10 +209,9 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
      * Register a wiki macro in the component manager, if the macro author has the required rights.
      * 
      * @param wikiMacroDocumentReference the document holding the macro definition
-     * @param wikiMacroDocumentAuthor the author of the macro document
      * @param xcontext the current request context
      */
-    private void registerMacro(DocumentReference wikiMacroDocumentReference, String wikiMacroDocumentAuthor,
+    private void registerMacro(DocumentReference wikiMacroDocumentReference,
         XWikiContext xcontext)
     {
         this.logger.debug("Registering macro in document [{}]...", wikiMacroDocumentReference);
@@ -233,10 +234,11 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         } catch (InsufficientPrivilegesException ex) {
             // Just log the exception and skip to the next.
             // We only log at the debug level here as this is not really an error
-            this.logger.debug(ex.getMessage(), ex);
+            this.logger.debug("The author of the macro document [{}] is not allowed to register it.",
+                wikiMacroDocumentReference, ex);
         } catch (WikiMacroException ex) {
             // Just log the exception and skip to the next.
-            this.logger.error(ex.getMessage(), ex);
+            this.logger.error("Failed to register the macro defined in document [{}]", wikiMacroDocumentReference, ex);
         } finally {
             xcontext.setUserReference(originalAuthor);
         }

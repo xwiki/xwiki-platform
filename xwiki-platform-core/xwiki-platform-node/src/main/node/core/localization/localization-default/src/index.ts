@@ -25,6 +25,14 @@ import type {
 } from "@xwiki/platform-localization-api";
 
 /**
+ * Combines a chain of translators into a full localizations resolvers. Translators are called in a chain. Only
+ * requested translations unresolved by the first translator are passed to the next one. The chaining stops either
+ * when all requested translation keys, or when the chain is exhausted. Unresolved keys at the end of the chain are
+ * returned as missed.
+ *
+ * Translators receive fully-qualified keys, with the prefix of the query already concatenated, together with the
+ * locale requested by the query.
+ *
  * @param translators - the list of translators to combine to build a full resolver.
  * @since 18.3.0RC1
  * @beta
@@ -32,6 +40,7 @@ import type {
 export function initialize(...translators: Translator[]): Resolver {
   return {
     async resolve(query: Query): Promise<TranslationsWithMissed> {
+      const locale = Array.isArray(query) ? undefined : query.locale;
       let remainingTranslations = Array.isArray(query)
         ? query
         : query.keys.map((key) => (query.prefix ?? "") + key);
@@ -40,7 +49,7 @@ export function initialize(...translators: Translator[]): Resolver {
       for (const translator of translators) {
         resolved = Object.assign(
           resolved,
-          await translator.resolve(remainingTranslations),
+          await translator.resolve({ keys: remainingTranslations, locale }),
         );
         remainingTranslations = remainingTranslations.filter(
           (translation) => !Object.keys(resolved).includes(translation),

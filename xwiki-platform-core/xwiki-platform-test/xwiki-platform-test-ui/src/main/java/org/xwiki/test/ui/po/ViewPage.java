@@ -32,6 +32,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Represents the common actions possible on all Pages when using the "view" action.
@@ -103,6 +104,34 @@ public class ViewPage extends BasePage
         getDriver().waitUntilElementIsVisible(By.id(id + "pane"));
     }
 
+    /**
+     * Requests the document extra tab with the given id without waiting for it to be displayed, so that another tab
+     * can be requested while this one is still loading. Use {@link #openDocExtraPane(String)} in all other cases.
+     *
+     * @param id the tab identifier
+     * @since 18.9.0RC1
+     */
+    public void startOpeningDocExtraPane(String id)
+    {
+        getDriver().findElement(By.id(id + "link")).click();
+    }
+
+    /**
+     * Waits for the content of the document extra tab with the given id to be loaded and returns it. The tab doesn't
+     * need to be displayed, which is what allows getting the content of a tab whose response arrived while another tab
+     * was displayed.
+     *
+     * @param id the tab identifier
+     * @return the text content of the tab, trimmed
+     * @since 18.9.0RC1
+     */
+    public String waitForDocExtraPaneContent(String id)
+    {
+        WebElement pane = getDriver().findElement(By.id(id + "pane"));
+        getDriver().waitUntilCondition(driver -> !pane.getDomProperty("textContent").isBlank());
+        return pane.getDomProperty("textContent").trim();
+    }
+
     public DocExtraPane useShortcutForDocExtraPane(String id, CharSequence... shortcut)
     {
         // We send the shortcut to the active element because using the Actions API doesn't seem to work with key
@@ -137,6 +166,21 @@ public class ViewPage extends BasePage
     public CommentsTab useShortcutKeyForCommentPane()
     {
         useShortcutForDocExtraPane(COMMENTS_TAB_ID, "c");
+        return new CommentsTab();
+    }
+
+    /**
+     * Opens the comments viewer (i.e. the current page displayed with {@code viewer=comments}) through the "Comments"
+     * entry of the "More actions" menu.
+     *
+     * @return element for controlling the comments of the comments viewer
+     * @since 18.9.0RC1
+     */
+    public CommentsTab openCommentsViewerFromMoreActions()
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        clickMoreActionsSubMenuEntry("tmComment");
+        getDriver().waitUntilPageIsReloaded();
         return new CommentsTab();
     }
 
@@ -207,7 +251,35 @@ public class ViewPage extends BasePage
         return this.content.getText();
     }
 
+    /**
+     * @return the element wrapping the page's main content, e.g. to take a screenshot of it
+     * @since 18.9.0RC1
+     */
+    public WebElement getContentContainer()
+    {
+        return this.content;
+    }
+
     public WYSIWYGEditPage editSection(int sectionNumber)
+    {
+        clickEditSection(sectionNumber);
+        return new WYSIWYGEditPage();
+    }
+
+    /**
+     * Clicks the edit link of a section, when the default editor of the current user is the wiki (Text) editor.
+     *
+     * @param sectionNumber the number of the section to edit, starting at 1
+     * @return the wiki editor, displaying only the content of the section
+     * @since 18.9.0RC1
+     */
+    public WikiEditPage editSectionInWikiEditor(int sectionNumber)
+    {
+        clickEditSection(sectionNumber);
+        return new WikiEditPage();
+    }
+
+    private void clickEditSection(int sectionNumber)
     {
         By sectionBy = By.cssSelector("a.edit_section[href*=\"section=" + sectionNumber + "\"]");
 
@@ -216,7 +288,6 @@ public class ViewPage extends BasePage
         getDriver().waitUntilElementIsVisible(sectionBy);
 
         getDriver().findElement(sectionBy).click();
-        return new WYSIWYGEditPage();
     }
 
     /**
@@ -230,13 +301,16 @@ public class ViewPage extends BasePage
     }
 
     /**
-     * @return {@code true} if the "Translate" page button is present, {@code false} otherwise
+     * @return {@code true} if the "Translate" page button is displayed, {@code false} otherwise; note that the button
+     *         can be present in the page but hidden, e.g. because the in-place editor hides it while the translation
+     *         is being created
      * @since 12.10.6
      * @since 13.2RC1
      */
     public boolean hasTranslateButton()
     {
-        return getDriver().hasElementWithoutWaiting(By.id("#tmTranslate"));
+        return getDriver().findElementsWithoutWaiting(By.cssSelector("#tmTranslate > a.btn")).stream()
+            .anyMatch(WebElement::isDisplayed);
     }
 
     /**
@@ -312,7 +386,7 @@ public class ViewPage extends BasePage
 
     public boolean isInlinePage()
     {
-        return getDriver().findElements(By.xpath("//form[@id = 'inline']")).size() > 0;
+        return !getDriver().findElements(By.xpath("//form[@id = 'inline']")).isEmpty();
     }
 
     /**
@@ -355,6 +429,60 @@ public class ViewPage extends BasePage
     }
 
     /**
+     * @return the texts displayed in bold in the content of the page, in the order in which they are displayed
+     * @since 18.9.0RC1
+     */
+    public List<String> getBoldTexts()
+    {
+        return getDriver().findElementsWithoutWaiting(this.content, By.tagName("strong")).stream()
+            .map(WebElement::getText).toList();
+    }
+
+    /**
+     * @param label the label of a link displayed in the content of the page
+     * @return the target of the first link from the content of the page that has the given label, as specified in the
+     *         HTML (i.e. not resolved against the page URL), or {@code null} if there's no such link
+     * @since 18.9.0RC1
+     */
+    public String getContentLinkTarget(String label)
+    {
+        return getDriver().findElementsWithoutWaiting(this.content, By.tagName("a")).stream()
+            .filter(link -> label.equals(link.getText())).map(link -> link.getDomAttribute("href")).findFirst()
+            .orElse(null);
+    }
+
+    /**
+     * @param imageName the name of an image displayed in the content of the page (e.g. its attachment file name)
+     * @return the caption of the first captioned image from the content of the page whose source contains the given
+     *         image name, or {@code null} if there's no such captioned image
+     * @since 18.9.0RC1
+     */
+    public String getImageCaption(String imageName)
+    {
+        return getDriver().findElementsWithoutWaiting(this.content, By.tagName("figure")).stream()
+            .filter(figure -> getDriver().findElementsWithoutWaiting(figure, By.tagName("img")).stream()
+                .anyMatch(image -> {
+                    String source = image.getDomAttribute("src");
+                    return source != null && source.contains(imageName);
+                }))
+            .flatMap(figure -> getDriver().findElementsWithoutWaiting(figure, By.tagName("figcaption")).stream())
+            .map(WebElement::getText).findFirst().orElse(null);
+    }
+
+    /**
+     * @return the message boxes displayed in the content of the page (such as the ones rendered by the {@code info}
+     *         or {@code warning} macros), in the order in which they are displayed
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public List<MessageBoxElement> getMessageBoxes()
+    {
+        return getDriver().findElementsWithoutWaiting(this.content, MessageBoxElement.LOCATOR).stream()
+            .map(MessageBoxElement::new).toList();
+    }
+
+    /**
      * Instantaneously scrolls to the top of the screen.
      *
      * @since 13.3RC1
@@ -384,9 +512,29 @@ public class ViewPage extends BasePage
         return getElementCSSValue(By.id("document-title"), "font-family");
     }
 
-    private String getElementCSSValue(By locator, String attribute)
+    /**
+     * @return the color of the page's text, i.e. the color set on the {@code body} element and inherited by all the
+     *     text of the page that doesn't define a color of its own
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public String getTextColor()
     {
-        return getDriver().findElement(locator).getCssValue(attribute);
+        return getElementCSSValue(By.tagName("body"), "color");
+    }
+
+    /**
+     * @param locator the locator of an element of the page
+     * @param propertyName the name of a CSS property, e.g. {@code color}
+     * @return the computed value of that CSS property for that element
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public String getElementCSSValue(By locator, String propertyName)
+    {
+        return getDriver().findElement(locator).getCssValue(propertyName);
     }
 
     /**
@@ -428,6 +576,22 @@ public class ViewPage extends BasePage
         getDriver().waitUntilCondition(driver -> reviewButton.isEnabled());
         reviewButton.click();
         return new RequiredRightsModal();
+    }
+
+    /**
+     * @return the content of the copyright section in the page footer
+     */
+    public String getFooterCopyright()
+    {
+        return getDriver().findElement(By.id("xwikilicence")).getText();
+    }
+
+    /**
+     * @return the content of the version section in the page footer
+     */
+    public String getFooterVersion()
+    {
+        return getDriver().findElement(By.id("xwikiplatformversion")).getText();
     }
 
     /**

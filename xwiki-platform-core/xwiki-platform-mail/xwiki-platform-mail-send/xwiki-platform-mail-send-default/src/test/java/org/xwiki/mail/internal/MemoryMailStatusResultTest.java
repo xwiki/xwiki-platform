@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class MemoryMailStatusResultTest
+class MemoryMailStatusResultTest
 {
     private static final String BATCH_ID = "batch1";
     private static final String UNIQUE_MESSAGE_ID1 = "message1";
@@ -49,7 +49,7 @@ public class MemoryMailStatusResultTest
     private static final String UNIQUE_MESSAGE_ID5 = "message5";
 
     @Test
-    public void getAllErrorTest()
+    void getAllErrors()
     {
         MemoryMailStatusResult statusResult = new MemoryMailStatusResult();
         ExtendedMimeMessage message1 = mock(ExtendedMimeMessage.class);

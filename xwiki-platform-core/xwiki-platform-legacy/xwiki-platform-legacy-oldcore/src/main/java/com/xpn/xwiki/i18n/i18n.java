@@ -43,4 +43,11 @@ public class i18n
 
     public static final String LANGUAGE_ITALIAN = "it";
 
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private i18n()
+    {
+        // Utility class
+    }
 }

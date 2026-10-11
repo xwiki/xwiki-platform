@@ -315,7 +315,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
         EntityReference reference = this;
         while (reference != null) {
             if (reference.getType() == EntityType.SPACE) {
-                references.add((SpaceReference) reference);
+                references.add(new SpaceReference(reference));
             }
             reference = reference.getParent();
         }
@@ -348,9 +348,9 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     /**
      * @return the {@link LocalDocumentReference} corresponding to this {@link DocumentReference}
      * @since 8.3
-     * @deprecated since 9.3RC1/8.4.5, use {@link #getLocalDocumentReference()} instead
+     * @deprecated use {@link #getLocalDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.3RC1,8.4.5")
     public LocalDocumentReference getLocaleDocumentReference()
     {
         return getLocalDocumentReference();
@@ -394,12 +394,12 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     {
         Optional<DocumentReference> result = Optional.empty();
         if (entityReference != null) {
-            if (entityReference instanceof DocumentReference) {
-                result = Optional.of((DocumentReference) entityReference);
+            if (entityReference instanceof DocumentReference documentReference) {
+                result = Optional.of(documentReference);
             } else {
                 EntityReference extractedRef = entityReference.extractReference(EntityType.DOCUMENT);
-                if (extractedRef instanceof DocumentReference) {
-                    result = Optional.of((DocumentReference) extractedRef);
+                if (extractedRef instanceof DocumentReference documentReference) {
+                    result = Optional.of(documentReference);
                 } else if (extractedRef != null) {
                     result = Optional.of(new DocumentReference(extractedRef));
                 }

@@ -153,11 +153,14 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
   #set ($deleterFilter = $request.get('datt.deleter'))
   #set ($sql = '')
   #set ($params = {})
+  #set ($likeParams = [])
   #if ("$!filenameFilter" != '')
-    #set ($sql = "and lower(datt.filename) like '%${filenameFilter.trim().toLowerCase()}%' ")
+    #set ($sql = "${sql} and lower(datt.filename) like :filenameFilter ")
+    #set ($discard = $likeParams.add({'name': 'filenameFilter', 'value': $filenameFilter.trim().toLowerCase()}))
   #end
   #if ("$!docNameFilter" != '')
-    #set ($sql = "and lower(datt.docName) like '%${docNameFilter.trim().toLowerCase()}%' ")
+    #set ($sql = "${sql} and lower(datt.docName) like :docNameFilter ")
+    #set ($discard = $likeParams.add({'name': 'docNameFilter', 'value': $docNameFilter.trim().toLowerCase()}))
   #end
   #if ("$!dateFilter" != '')
     #set ($dates = $dateFilter.split('-'))
@@ -173,28 +176,41 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
     #end
   #end
   #if ("$!deleterFilter" != '')
-    #set ($sql = $sql + "and lower(datt.deleter) like '%${deleterFilter.trim().toLowerCase()}%' ")
+    #set ($sql = "${sql} and lower(datt.deleter) like :deleterFilter ")
+    #set ($discard = $likeParams.add({'name': 'deleterFilter', 'value': $deleterFilter.trim().toLowerCase()}))
   #end
-  #if ("$!request.sort" != '')
+  #if ("$!{request.sort}" != '')
     #set ($order = $request.sort)
+    #set ($discard = $services.query.hql.checkOrderBySafe(['datt.'], $order))
   #else
     #set ($order = 'datt.id')
   #end
-  #if ("$!request.dir" != '')
-    #set ($dir = $request.dir)
-  #else
-    #set ($dir = 'asc')
+  #set ($dir = 'asc')
+  #if ("$!{request.dir}" != '')
+    #set ($dirValue = $request.dir.toLowerCase())
+    #if ($dirValue == 'desc')
+      #set ($dir = 'desc')
+    #end
   #end
+  ## Notes:
+  ## - The $order has already been checked for sanitation above in the call to checkOrderBySafe.
+  ## - It's used to ensure it works for all DBs since some DBs may need that a column in the ORDER BY clause be listed
+  ##   in the selected columns.
   #set ($selectSql = "select datt.id, $order from DeletedAttachment as datt where 1=1 " + $sql + " order by $order $dir")
   #set ($countSql = "select count(*) from DeletedAttachment as datt where 1=1 " + $sql)
-  #set ($items = $services.query.hql($selectSql).bindValues($params).setLimit($limit).setOffset($offset).execute())
-  #set ($totalItems = $services.query.hql($countSql).bindValues($params).execute().get(0))
+  #set ($selectQuery = $services.query.hql($selectSql).bindValues($params).setLimit($limit).setOffset($offset))
+  #set ($countQuery = $services.query.hql($countSql).bindValues($params))
+  #foreach ($likeParam in $likeParams)
+    #set ($selectQuery = $selectQuery.bindValue($likeParam.name).anyChars().literal($likeParam.value).anyChars().query())
+    #set ($countQuery = $countQuery.bindValue($likeParam.name).anyChars().literal($likeParam.value).anyChars().query())
+  #end
+  #set ($items = $selectQuery.execute())
+  #set ($totalItems = $countQuery.execute().get(0))
   #set ($json = {
     'totalrows': $totalItems,
     'returnedrows': $items.size(),
     'offset': $mathtool.add($offset, 1),
     'reqNo': $request.reqNo,
-    'query': $selectSql,
     "rows": []
   })
   #foreach ($item in $items)

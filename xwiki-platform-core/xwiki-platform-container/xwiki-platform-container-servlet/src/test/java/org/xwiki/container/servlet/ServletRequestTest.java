@@ -19,7 +19,6 @@
  */
 package org.xwiki.container.servlet;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,13 +38,13 @@ import static org.mockito.Mockito.when;
  * @since 3.2M3
  */
 @ExtendWith(MockitoExtension.class)
-public class ServletRequestTest
+class ServletRequestTest
 {
     @Mock
     private HttpServletRequest httpRequest;
 
     @Test
-    public void getPropertyWhenNoExistAsRequestParam()
+    void getPropertyWhenNoExistAsRequestParam()
     {
         when(this.httpRequest.getParameter("key")).thenReturn("value");
 
@@ -54,7 +53,7 @@ public class ServletRequestTest
     }
 
     @Test
-    public void getPropertyWhenNoExistAsAttributeParam()
+    void getPropertyWhenNoExistAsAttributeParam()
     {
         when(this.httpRequest.getParameter("key")).thenReturn(null);
         when(this.httpRequest.getAttribute("key")).thenReturn("value");
@@ -64,29 +63,29 @@ public class ServletRequestTest
     }
 
     @Test
-    public void getPropertiesWhenNoConflict()
+    void getPropertiesWhenNoConflict()
     {
-        when(this.httpRequest.getParameterValues("key")).thenReturn(new String[]{ "value1", "value2" });
+        when(this.httpRequest.getParameterValues("key")).thenReturn(new String[] {"value1", "value2"});
         when(this.httpRequest.getAttribute("key")).thenReturn("value3");
 
         ServletRequest request = new ServletRequest(this.httpRequest);
         List<Object> values = request.getProperties("key");
-        assertEquals(Arrays.asList("value1", "value2", "value3"), values);
+        assertEquals(List.of("value1", "value2", "value3"), values);
     }
 
     @Test
-    public void getPropertiesWhenConflict()
+    void getPropertiesWhenConflict()
     {
-        when(this.httpRequest.getParameterValues("key")).thenReturn(new String[]{ "value" });
+        when(this.httpRequest.getParameterValues("key")).thenReturn(new String[] {"value"});
         when(this.httpRequest.getAttribute("key")).thenReturn("value");
 
         ServletRequest request = new ServletRequest(this.httpRequest);
         List<Object> values = request.getProperties("key");
-        assertEquals(Arrays.asList("value", "value"), values);
+        assertEquals(List.of("value", "value"), values);
     }
 
     @Test
-    public void getPropertiesWhenNoExistAsRequestParam()
+    void getPropertiesWhenNoExistAsRequestParam()
     {
         when(this.httpRequest.getParameterValues("key")).thenReturn(null);
         when(this.httpRequest.getAttribute("key")).thenReturn("value");
@@ -94,13 +93,13 @@ public class ServletRequestTest
         ServletRequest request = new ServletRequest(this.httpRequest);
         List<Object> result = request.getProperties("key");
         assertEquals(1, result.size());
-        assertEquals("value", result.get(0));
+        assertEquals("value", result.getFirst());
     }
 
     @Test
-    public void getPropertiesWhenNoValueSetAsRequestAttribute()
+    void getPropertiesWhenNoValueSetAsRequestAttribute()
     {
-        when(this.httpRequest.getParameterValues("key")).thenReturn(new String[]{ "value" });
+        when(this.httpRequest.getParameterValues("key")).thenReturn(new String[] {"value"});
         when(this.httpRequest.getAttribute("key")).thenReturn(null);
 
         ServletRequest request = new ServletRequest(this.httpRequest);

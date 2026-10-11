@@ -39,6 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +50,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultIndexingUserConfigTest
+class DefaultIndexingUserConfigTest
 {
     private static final String MAIN_WIKI_ID = "wiki";
 
@@ -70,7 +71,7 @@ public class DefaultIndexingUserConfigTest
     private XWikiDocument testMainwikiConfigDocument;
 
     @BeforeEach
-    public void setUp() throws XWikiException
+    void setUp() throws XWikiException
     {
         testMainwikiConfigDocument = mock(XWikiDocument.class);
 
@@ -84,13 +85,13 @@ public class DefaultIndexingUserConfigTest
     }
 
     @Test
-    public void mainWikiWithoutSettings() throws XWikiException
+    void mainWikiWithoutSettings() throws XWikiException
     {
-        assertEquals(null, indexUserConfig.getIndexingUserReference());
+        assertNull(indexUserConfig.getIndexingUserReference());
     }
 
     @Test
-    public void mainWikiWithSettings() throws XWikiException
+    void mainWikiWithSettings() throws XWikiException
     {
         String mainwikiIndexingUserString = "expected by mock resolver";
         DocumentReference mainwikiIndexingUser = new DocumentReference(MAIN_WIKI_ID, "XWiki", "SomeIndexingUser");

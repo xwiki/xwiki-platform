@@ -21,14 +21,17 @@ package org.xwiki.index.test.ui.docker;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.index.test.po.AllDocsLiveData;
 import org.xwiki.index.test.po.AllDocsPage;
+import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -39,6 +42,7 @@ import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.EditRightsPane;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
+import org.xwiki.tree.test.po.TreeNodeElement;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -65,6 +69,12 @@ class AllDocsIT
 
     private static final String AUTHOR_COLUMN_LABEL = "Author";
 
+    private static final String TITLE_COLUMN_LABEL = "Title";
+
+    private static final String FOOTNOTE_COMPUTED_TITLE =
+        "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
+            + "pages.";
+
     @Test
     @Order(1)
     void verifyAllDocs(TestUtils setup, TestInfo testInfo, TestReference testReference)
@@ -85,8 +95,6 @@ class AllDocsIT
 
     /**
      * Test attachment listing, filtering and sorting.
-     * <p>
-     * This test is against XWiki Enterprise XE-701 https://jira.xwiki.org/browse/XE-701 (fixed in 2.5M1).
      */
     @Test
     @Order(2)
@@ -146,6 +154,164 @@ class AllDocsIT
         liveData.sortBy(LOCATION_COLUMN_LABEL);
         assertEquals(2, liveData.countRows());
         assertEquals(className + "Page", liveData.getCell(LOCATION_COLUMN_LABEL, 1).getText());
+    }
+
+    /**
+     * Verify that the "Deleted documents" and "Deleted attachments" tabs are only visible to logged in users with the
+     * right to see them (i.e. not to guests).
+     */
+    @Test
+    @Order(3)
+    void recycleBinTab(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference, true);
+
+        // Create a document with an attachment and then delete it so that there are both a deleted document and a
+        // deleted attachment.
+        setup.createPageWithAttachment(testReference, "", "Document", "file.txt",
+            new ByteArrayInputStream("File content".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
+        setup.deletePage(testReference, true);
+
+        setup.gotoPage(AllDocsPage.getURL());
+        AllDocsPage page = new AllDocsPage();
+        assertTrue(page.hasDeletedDocsTab(), "Deleted documents tab is not visible to Admin");
+        assertTrue(page.hasDeletedAttachmentsTab(), "Deleted attachments tab is not visible to Admin");
+
+        // Logs out to be guest to verify that Deleted attachments/documents are not visible to guests.
+        setup.forceGuestUser();
+
+        assertFalse(page.hasDeletedDocsTab(), "Deleted documents shouldn't be visible to guests");
+        assertFalse(page.hasDeletedAttachmentsTab(), "Deleted attachments shouldn't be visible to guests");
+    }
+
+    /**
+     * Validate the tree view.
+     */
+    @Test
+    @Order(4)
+    void treeViewTab(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String spaceName = testReference.getLastSpaceReference().getName();
+
+        setup.loginAsSuperAdmin();
+        // Clean up any leftover from a previous run.
+        setup.deletePage(new DocumentReference("xwiki", spaceName, "WebHome"), true);
+
+        // Create a tree structure.
+        setup.createPage(spaceName, "WebHome", null, null);
+        setup.createPageWithAttachment(Arrays.asList(spaceName, "A", "B"), "C", null, "Child Page", null, null,
+            "file.txt", new ByteArrayInputStream("File content".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
+
+        DocumentTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
+
+        // The AllDocs tree lists and paginates (15 per page) all the top-level spaces of the wiki, and the functional
+        // test suite shares a single XWiki instance, so this test's top-level space is not guaranteed to be on the
+        // first page. We use openTo on the top space node only: it resolves the node path on the server, loads the
+        // right page and opens that node (which lazily loads its direct child "A"). The deeper levels are then expanded
+        // manually below so that we still verify the tree loads children lazily, level by level.
+        tree.openToDocument(spaceName, "WebHome");
+
+        TreeNodeElement root = tree.getDocumentNode(spaceName, "WebHome");
+        assertEquals(spaceName, root.getLabel());
+
+        // "A" is already loaded because openTo opened the top space node above (revealing it past the pagination
+        // requires opening it). Its descendants are still loaded lazily, which we verify in the following steps.
+        TreeNodeElement alice = tree.getDocumentNode(spaceName, "A", "WebHome");
+        assertEquals("A", alice.getLabel());
+
+        assertFalse(tree.hasDocument(spaceName, "A", "B", "WebHome"));
+        alice.open().waitForIt();
+        TreeNodeElement bob = tree.getDocumentNode(spaceName, "A", "B", "WebHome");
+        assertEquals("B", bob.getLabel());
+
+        assertFalse(tree.hasDocument(spaceName, "A", "B", "C"));
+        bob.open().waitForIt();
+        TreeNodeElement child = tree.getDocumentNode(spaceName, "A", "B", "C");
+        assertEquals("Child Page", child.getLabel());
+
+        assertFalse(tree.hasAttachment(spaceName, "A", "B", "C", "file.txt"));
+        // Open the Attachments node.
+        child.open().waitForIt().getChildren().get(0).open().waitForIt();
+        TreeNodeElement file = tree.getAttachmentNode(spaceName, "A", "B", "C", "file.txt");
+        assertEquals("file.txt", file.getLabel());
+    }
+
+    /**
+     * @see "XWIKI-5187: XWiki Explorer doesn't support very well spaces and pages with special characters in their
+     * names"
+     */
+    @Test
+    @Order(5)
+    void treeViewTabWithSpecialCharactersInEntityNames(TestUtils setup, TestReference testReference)
+    {
+        String spaceName = testReference.getLastSpaceReference().getName() + ".0";
+
+        setup.loginAsSuperAdmin();
+        // Clean up any leftover from a previous run.
+        setup.deletePage(new DocumentReference("xwiki", spaceName, "WebHome"), true);
+
+        // Create a tree structure.
+        setup.createPage(Arrays.asList(spaceName, "Level.1", "Level{[(2)]}", "Level@3"), "End", null, null);
+
+        DocumentTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
+        tree.openToDocument(spaceName, "Level.1", "Level{[(2)]}", "Level@3", "End");
+
+        assertTrue(tree.hasDocument(spaceName, "Level.1", "WebHome"));
+        assertTrue(tree.hasDocument(spaceName, "Level.1", "Level{[(2)]}", "WebHome"));
+        assertTrue(tree.hasDocument(spaceName, "Level.1", "Level{[(2)]}", "Level@3", "WebHome"));
+    }
+
+    /**
+     * Filter the Index tab on the location and the title of nested pages.
+     */
+    @Test
+    @Order(6)
+    void filterNestedDocuments(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference, true);
+
+        // Create the nested pages "1", "1/2" and "1/2/3", plus a page with a computed title next to "2".
+        SpaceReference level1 = testReference.getLastSpaceReference();
+        SpaceReference level2 = new SpaceReference("Level2", level1);
+        setup.createPage(testReference, "", "Level 1");
+        setup.createPage(new DocumentReference("WebHome", level2), "", "Level 2");
+        setup.createPage(new DocumentReference("WebHome", new SpaceReference("Level3", level2)), "", "Level 3");
+        setup.createPage(new DocumentReference("WebHome", new SpaceReference("Computed", level1)), "",
+            "Level $mathtool.add(4, 0)");
+
+        AllDocsLiveData liveData = AllDocsPage.gotoPage().clickIndexTab();
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+
+        // The "/" of the location filter matches any level: the pages below "1/2" are listed, and the WebHome of a
+        // nested page is matched on its parent location, so "1/2/" doesn't list "2" itself.
+        String level1Name = level1.getName();
+        liveData.filterColumn(LOCATION_COLUMN_LABEL, level1Name + "/Level2");
+        assertEquals(List.of("Level 2", "Level 3"), getTitles(tableLayout));
+        liveData.filterColumn(LOCATION_COLUMN_LABEL, level1Name + "/Level2/");
+        assertEquals(List.of("Level 3"), getTitles(tableLayout));
+
+        // All the pages, with the computed title marked and explained in a footnote.
+        liveData.filterColumn(LOCATION_COLUMN_LABEL, level1Name);
+        assertEquals(List.of("Level 1", "Level 2", "Level 3", "Level 4 1"), getTitles(tableLayout));
+        assertEquals(List.of(FOOTNOTE_COMPUTED_TITLE), liveData.getFootnotesText());
+
+        // Filter by title, among the pages of this test. The filter applies to the stored title, which is why the
+        // computed title doesn't use the digits 1, 2 and 3.
+        liveData.filterColumn(TITLE_COLUMN_LABEL, "1");
+        assertEquals(List.of("Level 1"), getTitles(tableLayout));
+        assertEquals(0, liveData.countFootnotes());
+        liveData.filterColumn(TITLE_COLUMN_LABEL, "2");
+        assertEquals(List.of("Level 2"), getTitles(tableLayout));
+        liveData.filterColumn(TITLE_COLUMN_LABEL, "3");
+        assertEquals(List.of("Level 3"), getTitles(tableLayout));
+    }
+
+    private List<String> getTitles(TableLayoutElement tableLayout)
+    {
+        // Sorted, since the order of the rows isn't what this test is about.
+        return tableLayout.getColumnValues(TITLE_COLUMN_LABEL).stream().sorted().toList();
     }
 
     /**

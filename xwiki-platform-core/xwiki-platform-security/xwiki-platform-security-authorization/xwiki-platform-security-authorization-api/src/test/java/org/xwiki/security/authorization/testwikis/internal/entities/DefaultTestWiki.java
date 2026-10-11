@@ -71,7 +71,6 @@ public class DefaultTestWiki extends AbstractSecureTestEntity implements TestWik
         this.owner = (owner != null) ? new DocumentReference(owner)
                 : new DocumentReference(XWikiConstants.SUPERADMIN, new SpaceReference(XWikiConstants.XWIKI_SPACE,
                     getWikiReference()));
-        ;
         this.description = description;
 
         if (isMainWiki) {

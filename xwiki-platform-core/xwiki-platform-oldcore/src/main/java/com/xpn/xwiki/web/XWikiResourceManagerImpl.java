@@ -19,19 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
-import org.apache.velocity.runtime.resource.Resource;
 import org.apache.velocity.runtime.resource.ResourceManagerImpl;
 
 public class XWikiResourceManagerImpl extends ResourceManagerImpl
 {
-
-    @Override
-    public Resource getResource(String string, int i, String string1) throws ResourceNotFoundException,
-        ParseErrorException
-    {
-        Resource result = super.getResource(string, i, string1);
-        return result;
-    }
 }

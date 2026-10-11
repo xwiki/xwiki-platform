@@ -21,6 +21,7 @@ package org.xwiki.panels.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -55,6 +56,9 @@ public class PageLayoutTabContent extends BaseElement
 
     @FindBy(css = "#XWiki\\.XWikiPreferences_0_rightPanels")
     private WebElement rightPanelsInput;
+
+    @FindBy(css = "#XWiki\\.XWikiPreferences_0_leftPanels")
+    private WebElement leftPanelsInput;
 
     @FindBy(id = "rightPanels")
     private WebElement rightPanels;
@@ -112,13 +116,32 @@ public class PageLayoutTabContent extends BaseElement
 
     public String getRightPanels()
     {
-        return this.rightPanelsInput.getText();
+        return this.rightPanelsInput.getDomProperty("value");
     }
 
     public PageLayoutTabContent setRightPanels(String rightPanels)
     {
         this.rightPanelsInput.clear();
         this.rightPanelsInput.sendKeys(rightPanels);
+        return this;
+    }
+
+    /**
+     * @return the comma-separated list of panels configured for the left column
+     */
+    public String getLeftPanels()
+    {
+        return this.leftPanelsInput.getDomProperty("value");
+    }
+
+    /**
+     * @param leftPanels the comma-separated list of panels to set for the left column
+     * @return this object
+     */
+    public PageLayoutTabContent setLeftPanels(String leftPanels)
+    {
+        this.leftPanelsInput.clear();
+        this.leftPanelsInput.sendKeys(leftPanels);
         return this;
     }
 
@@ -137,6 +160,32 @@ public class PageLayoutTabContent extends BaseElement
         } else {
             getDriver().dragAndDrop(element, leftPanels);
         }
+    }
+
+    /**
+     * Drags a panel of a column and drops it right below another panel of the same column.
+     *
+     * @param panelName the name of the panel to move (e.g. {@code Applications})
+     * @param targetPanelName the name of the panel below which to drop it (e.g. {@code Navigation}), which must be
+     *     located below the moved panel
+     * @param column the column holding both panels
+     * @since 18.9.0RC1
+     */
+    public void dragPanelBelow(String panelName, String targetPanelName, Column column)
+    {
+        WebElement columnElement = column == Column.RIGHT ? this.rightPanels : this.leftPanels;
+        WebElement panel = columnElement.findElement(By.cssSelector(".panel." + panelName));
+        WebElement targetPanel = columnElement.findElement(By.cssSelector(".panel." + targetPanelName));
+        // The panel wizard moves the dragged panel by one position on each mouse move, when the top of the dragged
+        // panel passes the top of the next panel. Thus we move the mouse by small steps until the top of the dragged
+        // panel is just below the top of the target panel, which is not enough to pass the panel after the target.
+        int distance = targetPanel.getLocation().getY() - panel.getLocation().getY() + 1;
+        Actions actions = getDriver().createActions().clickAndHold(panel.findElement(By.tagName("h2")));
+        int step = 10;
+        for (int moved = 0; moved < distance; moved += step) {
+            actions.moveByOffset(0, Math.min(step, distance - moved));
+        }
+        actions.release().perform();
     }
 
     public void removePanelFromColumn(String panelName, Column column)

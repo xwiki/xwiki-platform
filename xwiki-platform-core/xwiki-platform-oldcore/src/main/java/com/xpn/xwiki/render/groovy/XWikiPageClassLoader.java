@@ -24,6 +24,7 @@ import java.net.URLClassLoader;
 import java.net.URLStreamHandlerFactory;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,13 +71,10 @@ public class XWikiPageClassLoader extends URLClassLoader
                     String downloadURL = doc.getExternalAttachmentURL(filename, "download", context);
                     try {
                         addURL(new URL(downloadURL));
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Adding [" + downloadURL + "] JAR from page [" + jarWikiPage
-                                + "] to Groovy classloader");
-                        }
+                        LOGGER.debug("Adding [{}] JAR from page [{}] to Groovy classloader", downloadURL, jarWikiPage);
                     } catch (Exception e) {
-                        LOGGER.warn("Failed to add [" + downloadURL + "] JAR from page [" + jarWikiPage
-                            + "], ignoring it.");
+                        LOGGER.warn("Failed to add [{}] JAR from page [{}], ignoring it. Root cause is [{}]",
+                            downloadURL, jarWikiPage, ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
             }

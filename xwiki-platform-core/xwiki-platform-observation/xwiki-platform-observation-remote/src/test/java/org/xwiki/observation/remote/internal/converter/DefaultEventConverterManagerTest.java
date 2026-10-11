@@ -22,8 +22,10 @@ package org.xwiki.observation.remote.internal.converter;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.observation.remote.converter.LocalEventConverter;
 import org.xwiki.observation.remote.converter.RemoteEventConverter;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -38,10 +40,14 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList({EventConverters.class})
 class DefaultEventConverterManagerTest
 {
     @InjectMockComponents
     private DefaultEventConverterManager manager;
+
+    @InjectMockComponents
+    private EventConvertersListener listerner;
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -69,6 +75,27 @@ class DefaultEventConverterManagerTest
     }
 
     @Test
+    void getLocalEventConvertersWithLateConverters() throws Exception
+    {
+        assertEquals(List.of(), this.manager.getLocalEventConverters());
+
+        LocalEventConverter converter1 =
+            this.componentManager.registerMockComponent(LocalEventConverter.class, "converter1");
+        when(converter1.getPriority()).thenReturn(2);
+        LocalEventConverter converter2 =
+            this.componentManager.registerMockComponent(LocalEventConverter.class, "converter2");
+        when(converter2.getPriority()).thenReturn(3);
+        LocalEventConverter converter3 =
+            this.componentManager.registerMockComponent(LocalEventConverter.class, "converter3");
+        when(converter3.getPriority()).thenReturn(1);
+
+        // There is no observation manager in this test setup, so we need to trigger the listener
+        this.listerner.onEvent(new ComponentDescriptorAddedEvent(LocalEventConverter.class), null, null);
+
+        assertEquals(List.of(converter3, converter1, converter2), this.manager.getLocalEventConverters());
+    }
+
+    @Test
     void getRemoteEventConvertersWithNoConverter()
     {
         assertEquals(List.of(), this.manager.getRemoteEventConverters());
@@ -86,6 +113,27 @@ class DefaultEventConverterManagerTest
         RemoteEventConverter converter3 =
             this.componentManager.registerMockComponent(RemoteEventConverter.class, "converter3");
         when(converter3.getPriority()).thenReturn(1);
+
+        assertEquals(List.of(converter3, converter1, converter2), this.manager.getRemoteEventConverters());
+    }
+
+    @Test
+    void getRemoteEventConvertersWithLateConverters() throws Exception
+    {
+        assertEquals(List.of(), this.manager.getRemoteEventConverters());
+
+        RemoteEventConverter converter1 =
+            this.componentManager.registerMockComponent(RemoteEventConverter.class, "converter1");
+        when(converter1.getPriority()).thenReturn(2);
+        RemoteEventConverter converter2 =
+            this.componentManager.registerMockComponent(RemoteEventConverter.class, "converter2");
+        when(converter2.getPriority()).thenReturn(3);
+        RemoteEventConverter converter3 =
+            this.componentManager.registerMockComponent(RemoteEventConverter.class, "converter3");
+        when(converter3.getPriority()).thenReturn(1);
+
+        // There is no observation manager in this test setup, so we need to trigger the listener
+        this.listerner.onEvent(new ComponentDescriptorAddedEvent(RemoteEventConverter.class), null, null);
 
         assertEquals(List.of(converter3, converter1, converter2), this.manager.getRemoteEventConverters());
     }

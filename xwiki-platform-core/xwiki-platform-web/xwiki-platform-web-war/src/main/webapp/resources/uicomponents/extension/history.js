@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(['jquery', 'xwiki-events-bridge'], function($) {
+require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploader) {
   //
   // Extension History Sources
   //
@@ -54,7 +54,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   };
 
   var onSelectHistorySource = function(event) {
-    event && event.preventDefault();
+    event?.preventDefault();
     var source = $(this).closest('.extension-history-source');
     if (source.hasClass('selected')) {
       // Source already selected.
@@ -105,10 +105,10 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     }
   };
 
-  if (typeof(XWiki.FileUploader) != 'undefined') {
+  if (typeof(FileUploader) != 'undefined') {
     $('.extension-history-source-upload input[type="file"]').each(function() {
       $(this).on('xwiki:html5upload:message', onUploadMessage);
-      new XWiki.FileUploader(this, {
+      new FileUploader(this, {
         'maxFilesize': 1000000,
         'fileFilter': /application\/xml|text\/xml/i,
         'progressAutohide': true,
@@ -184,7 +184,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
   $('.extension-history-replay-options a.btn-default').on('click', function(event) {
     event.preventDefault();
-    replayPlanRequest && replayPlanRequest.abort();
+    replayPlanRequest?.abort();
     $(event.target).closest('.extension-history-replay-options').addClass('hidden').prevAll().show();
   });
 
@@ -226,7 +226,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     $.post(form.attr('action'), data).then(data => {
       // Make sure we remove the document fragment identifier from the end of the URL.
       var replayStatusURL = window.location.href.replace(/#.*$/, '');
-      replayStatusURL += replayStatusURL.indexOf('?') < 0 ? '?' : '&';
+      replayStatusURL += replayStatusURL.includes('?') ? '&' : '?';
       window.location = replayStatusURL + $.param({
         'data': 'replayStatus',
         'jobId': data.jobId

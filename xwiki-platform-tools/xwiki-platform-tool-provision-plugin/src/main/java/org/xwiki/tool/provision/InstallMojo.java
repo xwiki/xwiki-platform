@@ -19,21 +19,22 @@
  */
 package org.xwiki.tool.provision;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -43,6 +44,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionId;
+import org.xwiki.http.internal.XWikiCredentials;
+import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
@@ -84,6 +87,7 @@ import org.xwiki.rest.model.jaxb.JobStatus;
  * @since 10.0
  */
 @Mojo(name = "install", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class InstallMojo extends AbstractMojo
 {
     /**
@@ -131,18 +135,27 @@ public class InstallMojo extends AbstractMojo
             Unmarshaller unmarshaller = context.createUnmarshaller();
             Marshaller marshaller = context.createMarshaller();
 
-            HttpClient httpClient = new HttpClient();
-            httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(this.username, this.password));
-            httpClient.getParams().setAuthenticationPreemptive(true);
+            try (XWikiHTTPClient httpClient = new XWikiHTTPClient()) {
+                httpClient.setDefaultCredentials(new XWikiCredentials(this.username, this.password));
 
-            installExtensions(marshaller, unmarshaller, httpClient);
+                installExtensions(marshaller, unmarshaller, httpClient);
+            }
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to install Extension(s) into XWiki", e);
         }
     }
 
-    private void installExtensions(Marshaller marshaller, Unmarshaller unmarshaller, HttpClient httpClient)
+    private void addExtensions(InstallRequest installRequest)
+    {
+        for (ExtensionId extensionId : this.extensionIds) {
+            org.xwiki.extension.ExtensionId extId =
+                new org.xwiki.extension.ExtensionId(extensionId.getId(), extensionId.getVersion());
+            getLog().info(String.format("Installing extension [%s]...", extId));
+            installRequest.addExtension(extId);
+        }
+    }
+
+    private void installExtensions(Marshaller marshaller, Unmarshaller unmarshaller, XWikiHTTPClient httpClient)
         throws Exception
     {
         InstallRequest installRequest = new InstallRequest();
@@ -153,12 +166,7 @@ public class InstallMojo extends AbstractMojo
         installRequest.setInteractive(false);
 
         // Set the extension list to install
-        for (ExtensionId extensionId : this.extensionIds) {
-            org.xwiki.extension.ExtensionId extId =
-                new org.xwiki.extension.ExtensionId(extensionId.getId(), extensionId.getVersion());
-            getLog().info(String.format("Installing extension [%s]...", extId));
-            installRequest.addExtension(extId);
-        }
+        addExtensions(installRequest);
 
         // Set the namespaces into which to install the extensions
         if (this.namespaces == null || this.namespaces.isEmpty()) {
@@ -177,44 +185,40 @@ public class InstallMojo extends AbstractMojo
         JobRequest request = getModelFactory().toRestJobRequest(installRequest);
 
         String uri = String.format("%s/jobs?jobType=install&async=false", this.xwikiRESTURL);
-        PutMethod putMethod = executePutXml(uri, request, marshaller, httpClient);
 
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(request, writer);
+
+        httpClient.executePut(uri, new StringEntity(writer.toString(), ContentType.APPLICATION_XML),
+            (response, context) -> installExtensions(response, unmarshaller));
+    }
+
+    private Void installExtensions(ClassicHttpResponse response, Unmarshaller unmarshaller)
+        throws HttpException, IOException
+    {
         // Verify results
         // Verify that we got a 200 response
-        int statusCode = putMethod.getStatusCode();
+        int statusCode = response.getCode();
         if (statusCode < 200 || statusCode >= 300) {
-            throw new MojoExecutionException(
-                String.format("Job execution failed. Response status code [%s], reason [%s]", statusCode,
-                    putMethod.getResponseBodyAsString()));
+            throw new HttpException(String.format("Job execution failed. Response status code [%s], reason [%s]",
+                statusCode, EntityUtils.toString(response.getEntity())));
         }
 
         // Get the job status
-        JobStatus jobStatus = (JobStatus) unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
-        if (jobStatus.getErrorMessage() != null && jobStatus.getErrorMessage().length() > 0) {
-            throw new MojoExecutionException(
-                String.format("Job execution failed. Reason [%s]", jobStatus.getErrorMessage()));
+        try (InputStream stream = response.getEntity().getContent()) {
+            JobStatus jobStatus;
+            try {
+                jobStatus = (JobStatus) unmarshaller.unmarshal(stream);
+            } catch (JAXBException e) {
+                throw new HttpException("Failed to parse the response body", e);
+            }
+            if (jobStatus.getErrorMessage() != null && !jobStatus.getErrorMessage().isEmpty()) {
+                throw new HttpException(
+                    String.format("Job execution failed. Reason [%s]", jobStatus.getErrorMessage()));
+            }
         }
 
-        // Release connection
-        putMethod.releaseConnection();
-    }
-
-    private PutMethod executePutXml(String uri, Object object, Marshaller marshaller, HttpClient httpClient)
-        throws Exception
-    {
-        PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(object, writer);
-
-        RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
-        putMethod.setRequestEntity(entity);
-
-        httpClient.executeMethod(putMethod);
-
-        return putMethod;
+        return null;
     }
 
     private ModelFactory getModelFactory() throws Exception

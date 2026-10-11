@@ -68,7 +68,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public abstract class AbstractPageHistoryResourceImplTest
+abstract class AbstractPageHistoryResourceImplTest
 {
     protected static final String WIKI_NAME = "wiki";
 
@@ -138,7 +138,7 @@ public abstract class AbstractPageHistoryResourceImplTest
     }
 
     @Test
-    void getPageTranslationHistoryAccessDenied() throws AccessDeniedException, XWikiRestException
+    void getPageTranslationHistoryAccessDenied() throws Exception
     {
         doThrow(new AccessDeniedException(Right.VIEW, DOCUMENT_REFERENCE, USER_REFERENCE))
             .when(this.contextualAuthorizationManager).checkAccess(Right.VIEW, DOCUMENT_REFERENCE);

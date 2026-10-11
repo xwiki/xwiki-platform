@@ -104,7 +104,10 @@ public class ArtifactResolver
             new ArtifactRequest(artifact, this.repositoryResolver.getRepositories(), null);
         ArtifactResult artifactResult = this.repositoryResolver.getSystem().resolveArtifact(
             this.repositoryResolver.getSession(), artifactRequest);
-        if (!artifactResult.getExceptions().isEmpty()) {
+        // Don't fail on the mere presence of exceptions: they are also recorded for the repositories which did not
+        // provide the artifact (e.g. the ones excluded by the Maven Resolver remote repository filters) even when
+        // another repository did.
+        if (!artifactResult.isResolved()) {
             sendError(artifact, artifactResult.getExceptions());
         }
         return artifactResult;
@@ -159,7 +162,7 @@ public class ArtifactResolver
             DependencyNode node = collectResult.getRoot();
 
             if (this.isVerbose) {
-                LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
+                LOGGER.info("collect = [{}] ms", (System.currentTimeMillis() - t1));
                 node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
             }
 
@@ -168,7 +171,7 @@ public class ArtifactResolver
             DependencyResult dependencyResult = this.repositoryResolver.getSystem().resolveDependencies(
                 this.repositoryResolver.getSession(), request);
             if (this.isVerbose) {
-                LOGGER.info("resolve = {} ms", (System.currentTimeMillis() - t1));
+                LOGGER.info("resolve = [{}] ms", (System.currentTimeMillis() - t1));
             }
 
             if (!dependencyResult.getCollectExceptions().isEmpty()) {
@@ -193,8 +196,29 @@ public class ArtifactResolver
     public Collection<ArtifactResult> getDistributionDependencies(String commonsVersion, String platformVersion,
         List<Artifact> extraArtifacts) throws Exception
     {
+        return getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts,
+            "xwiki-platform-minimaldependencies");
+    }
+
+    /**
+     * @param commonsVersion the version to use for xwiki-commons artifacts
+     * @param platformVersion the version to use for xwiki-platform artifacts
+     * @param extraArtifacts the list of extra artifacts that should be added to {@code WEB-INF/lib}. Can be empty
+     * @param rootDistributionArtifactId the artifactId (in the {@code org.xwiki.platform} groupId) of the {@code pom}
+     *        artifact whose dependencies define the set of JARs to put in {@code WEB-INF/lib}. Use
+     *        {@code xwiki-platform-minimaldependencies} for the minimal WAR or
+     *        {@code xwiki-platform-distribution-war-dependencies} (or the {@code -legacydependencies} variant) to
+     *        generate a WAR with the same core extensions as the standard XWiki distribution WAR
+     * @return the collection of resolved artifact results for the XWiki distribution/flavor to be used for
+     *         functional tests
+     * @throws Exception if an error occurred during resolving
+     * @since 18.6.0RC1
+     */
+    public Collection<ArtifactResult> getDistributionDependencies(String commonsVersion, String platformVersion,
+        List<Artifact> extraArtifacts, String rootDistributionArtifactId) throws Exception
+    {
         Artifact rootDistributionArtifact = new DefaultArtifact(PLATFORM_GROUPID,
-            "xwiki-platform-minimaldependencies", "pom", platformVersion);
+            rootDistributionArtifactId, "pom", platformVersion);
 
         List<Artifact> dependentArtifacts = new ArrayList<>();
 

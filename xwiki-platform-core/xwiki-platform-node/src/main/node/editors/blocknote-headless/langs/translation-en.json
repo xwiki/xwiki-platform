@@ -3,6 +3,5 @@
   "blocknote.image.insertView.upload": "Upload",
   "blocknote.image.insertView.uploadOrSelect": "Upload or select and attachment.",
   "blocknote.image.insertView.noResults": "No results",
-  "blocknote.image.insertView.search.placeholder": "Image name or image URL",
-  "blocknote.document.parsingError": "Failed to load document: {reason}"
+  "blocknote.image.insertView.search.placeholder": "Image name or image URL"
 }

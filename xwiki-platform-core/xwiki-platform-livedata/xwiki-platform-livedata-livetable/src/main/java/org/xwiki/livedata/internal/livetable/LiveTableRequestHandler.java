@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -39,9 +38,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
+import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -80,6 +82,9 @@ public class LiveTableRequestHandler
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     /**
      * Converts the given live data query into a fake live table request and executes the given live table results
@@ -128,12 +133,19 @@ public class LiveTableRequestHandler
         String contextDocRefString = (String) (source != null ? source : new Source()).getParameters().get(CONTEXT_DOC);
         if (contextDocRefString != null) {
             DocumentReference contextDocRef = this.currentDocumentReferenceResolver.resolve(contextDocRefString);
-            try {
-                XWikiDocument contextDoc = xcontext.getWiki().getDocument(contextDocRef, xcontext);
-                xcontext.setDoc(contextDoc);
-            } catch (XWikiException e) {
-                this.logger.debug("Failed to set context document [{}] for live table results.", contextDocRefString,
-                    e);
+            // Only honor the requested context document if the current user is allowed to view it, so that a caller
+            // cannot have the live table results rendered in the context of a document they are not allowed to access.
+            if (this.authorization.hasAccess(Right.VIEW, contextDocRef)) {
+                try {
+                    XWikiDocument contextDoc = xcontext.getWiki().getDocument(contextDocRef, xcontext);
+                    xcontext.setDoc(contextDoc);
+                } catch (XWikiException e) {
+                    this.logger.debug("Failed to set context document [{}] for live table results.",
+                        contextDocRefString, e);
+                }
+            } else {
+                this.logger.debug("Denied setting context document [{}] for live table results: the current user is "
+                    + "not allowed to view it.", contextDocRefString);
             }
         }
 
@@ -175,7 +187,7 @@ public class LiveTableRequestHandler
 
         // Add the filters.
         if (query.getFilters() != null) {
-            query.getFilters().stream().forEach(filter -> addFilterRequestParameters(filter, requestParams));
+            query.getFilters().forEach(filter -> addFilterRequestParameters(filter, requestParams));
         }
 
         // Add offset and limit. Note that the default live table results expects the offset to start from 1.
@@ -206,7 +218,7 @@ public class LiveTableRequestHandler
                     stream = Stream.of(entry.getValue());
                 }
                 List<String> values =
-                    stream.filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
+                    stream.filter(Objects::nonNull).map(Object::toString).toList();
                 if (!values.isEmpty()) {
                     requestParams.put(entry.getKey(), values.toArray(new String[values.size()]));
                 }
@@ -218,10 +230,10 @@ public class LiveTableRequestHandler
     {
         if (query.getSort() != null && !query.getSort().isEmpty()) {
             List<String> sortList =
-                query.getSort().stream().map(sortEntry -> sortEntry.getProperty()).collect(Collectors.toList());
+                query.getSort().stream().map(SortEntry::getProperty).toList();
             requestParams.put("sort", sortList.toArray(new String[sortList.size()]));
             List<String> dirList = query.getSort().stream().map(sortEntry -> sortEntry.isDescending() ? "desc" : "asc")
-                .collect(Collectors.toList());
+                .toList();
             requestParams.put("dir", dirList.toArray(new String[dirList.size()]));
         }
     }
@@ -229,15 +241,15 @@ public class LiveTableRequestHandler
     private void addFilterRequestParameters(Filter filter, Map<String, String[]> requestParams)
     {
         List<String> values = filter.getConstraints().stream().filter(Objects::nonNull).map(Constraint::getValue)
-            .filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
+            .filter(Objects::nonNull).map(Object::toString).toList();
         if (!values.isEmpty()) {
             requestParams.put(filter.getProperty(), values.toArray(new String[values.size()]));
             requestParams.put(filter.getProperty() + "/join_mode", new String[] {filter.isMatchAll() ? "AND" : "OR"});
 
             List<String> matchType = filter.getConstraints().stream()
                 .map(constraint -> constraint == null ? null : constraint.getOperator())
-                .map(operator -> MATCH_TYPE.getOrDefault(operator, StringUtils.defaultString(operator)))
-                .collect(Collectors.toList());
+                .map(operator -> operator == null ? "" : MATCH_TYPE.getOrDefault(operator, operator))
+                .toList();
             requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[matchType.size()]));
 
             // Add a value to the empty fields since otherwise they are dismissed by LiveTableResultMacros.

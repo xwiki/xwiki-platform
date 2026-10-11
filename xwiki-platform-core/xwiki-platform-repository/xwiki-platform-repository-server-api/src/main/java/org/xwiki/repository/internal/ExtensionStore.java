@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,6 +40,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -58,7 +60,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.PageReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -116,6 +121,10 @@ public class ExtensionStore implements Initializable, Disposable
     @Named("current")
     private DocumentReferenceResolver<String> currentStringResolver;
 
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localSerializer;
+
     /**
      * Link extension id to document reference. The tabe contains null if the id link to no extension.
      */
@@ -154,7 +163,7 @@ public class ExtensionStore implements Initializable, Disposable
         cacheConfiguration.setConfigurationId("repository.extensionid.documentreference");
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         lru.setMaxEntries(10000);
-        cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
         try {
             this.documentReferenceCache = this.cacheManager.createNewCache(cacheConfiguration);
@@ -252,8 +261,8 @@ public class ExtensionStore implements Initializable, Disposable
             try {
                 url = new URL(urlString);
             } catch (MalformedURLException e) {
-                this.logger.warn("The format of the URL property [{}] is wrong ({})", property.getReference(),
-                    urlString);
+                this.logger.warn("The format of the URL property [{}] is wrong: [{}]. Root cause is [{}]",
+                    property.getReference(), urlString, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -280,12 +289,14 @@ public class ExtensionStore implements Initializable, Disposable
      */
     public boolean getBooleanValue(BaseObject xobject, String propertyName, boolean def)
     {
-        BaseProperty<?> property = (BaseProperty<?>) xobject.safeget(propertyName);
+        if (xobject != null) {
+            BaseProperty<?> property = (BaseProperty<?>) xobject.safeget(propertyName);
 
-        if (property instanceof NumberProperty) {
-            Number number = (Number) property.getValue();
-            if (number != null) {
-                return number.intValue() == 1;
+            if (property instanceof NumberProperty) {
+                Number number = (Number) property.getValue();
+                if (number != null) {
+                    return number.intValue() == 1;
+                }
             }
         }
 
@@ -447,15 +458,117 @@ public class ExtensionStore implements Initializable, Disposable
     public XWikiDocument getExtensionVersionDocument(XWikiDocument extensionDocument, String extensionVersion,
         XWikiContext xcontext) throws XWikiException
     {
+        // It's not possible to find the version document if there is no main document
+        Objects.requireNonNull(extensionDocument);
+
         if (isVersionPageEnabled(extensionDocument)) {
-            return xcontext.getWiki()
-                .getDocument(
-                    new PageReference(extensionVersion, new PageReference(
-                        XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME, extensionDocument.getPageReference())),
-                    xcontext);
+            return getVersionDocument(extensionDocument, extensionVersion, xcontext);
         }
 
         return extensionDocument;
+    }
+
+    /**
+     * Retrieve the project version document for the given extension document and the given version.
+     * 
+     * @param projectDocument the document of the extension
+     * @param projectVersion the version for which to retrieve the document
+     * @param xcontext the current context
+     * @return the version document or the given extension document
+     * @throws XWikiException in case of problem for loading the document
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public XWikiDocument getProjectVersionDocument(XWikiDocument projectDocument, Version projectVersion,
+        XWikiContext xcontext) throws XWikiException
+    {
+        return getProjectVersionDocument(projectDocument, projectVersion.getValue(), xcontext);
+    }
+
+    /**
+     * Retrieve the project version document for the given extension document and the given version.
+     * 
+     * @param projectDocument the document of the extension
+     * @param projectVersion the version for which to retrieve the document
+     * @param xcontext the current context
+     * @return the version document or the given extension document
+     * @throws XWikiException in case of problem for loading the document
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public XWikiDocument getProjectVersionDocument(XWikiDocument projectDocument, String projectVersion,
+        XWikiContext xcontext) throws XWikiException
+    {
+        // It's not possible to find the version document if there is no main document
+        Objects.requireNonNull(projectDocument);
+
+        return getVersionDocument(projectDocument, projectVersion, xcontext);
+    }
+
+    /**
+     * Retrieve the reference of the extension version document, without loading it.
+     * 
+     * @param extensionDocument the document of the extension
+     * @param extensionVersion the version for which to retrieve the document reference
+     * @param xcontext the current context
+     * @return the reference of the version document, or the reference of the given extension document when the
+     *         extension does not use dedicated version pages
+     * @since 17.10.14
+     * @since 18.4.6
+     * @since 18.8.0
+     */
+    public DocumentReference getExtensionVersionDocumentReference(XWikiDocument extensionDocument,
+        String extensionVersion, XWikiContext xcontext)
+    {
+        if (isVersionPageEnabled(extensionDocument)) {
+            return getVersionDocumentReference(extensionDocument, extensionVersion, xcontext);
+        }
+
+        return extensionDocument.getDocumentReference();
+    }
+
+    /**
+     * Retrieve the reference of the project version document, without loading it.
+     * 
+     * @param projectDocument the document of the project
+     * @param projectVersion the version for which to retrieve the document reference
+     * @param xcontext the current context
+     * @return the reference of the version document
+     * @since 18.4.6
+     * @since 18.8.0
+     */
+    public DocumentReference getProjectVersionDocumentReference(XWikiDocument projectDocument, String projectVersion,
+        XWikiContext xcontext)
+    {
+        return getVersionDocumentReference(projectDocument, projectVersion, xcontext);
+    }
+
+    private DocumentReference getVersionDocumentReference(XWikiDocument mainDocument, String version,
+        XWikiContext xcontext)
+    {
+        return xcontext.getWiki().getDocumentReference(getVersionPageReference(mainDocument, version), xcontext);
+    }
+
+    private PageReference getVersionPageReference(XWikiDocument mainDocument, String version)
+    {
+        if (mainDocument != null) {
+            return new PageReference(version,
+                new PageReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME, mainDocument.getPageReference()));
+        }
+
+        return null;
+    }
+
+    private XWikiDocument getVersionDocument(XWikiDocument mainDocument, String version, XWikiContext xcontext)
+        throws XWikiException
+    {
+        PageReference versionPageReference = getVersionPageReference(mainDocument, version);
+
+        if (versionPageReference != null) {
+            return xcontext.getWiki().getDocument(versionPageReference, xcontext);
+        }
+
+        return null;
     }
 
     /**
@@ -499,17 +612,9 @@ public class ExtensionStore implements Initializable, Disposable
         return getExtensionVersionObject(document, new DefaultVersion(version));
     }
 
-    /**
-     * Retrieve the xobject of the version from the given document.
-     * 
-     * @param document the document where to retrieve the version object.
-     * @param version the version for which to retrieve the object
-     * @return the version object or {@code null} if it doesn't exist and shouldn't be created
-     * @since 17.9.0RC1
-     */
-    public BaseObject getExtensionVersionObject(XWikiDocument document, Version version)
+    private BaseObject getVersionObject(XWikiDocument document, Version version, LocalDocumentReference classReference)
     {
-        List<BaseObject> objects = document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
+        List<BaseObject> objects = document.getXObjects(classReference);
         if (objects != null) {
             for (BaseObject versionObject : objects) {
                 if (versionObject != null) {
@@ -524,6 +629,48 @@ public class ExtensionStore implements Initializable, Disposable
         }
 
         return null;
+    }
+
+    /**
+     * Retrieve the xobject of the version from the given document.
+     * 
+     * @param document the document where to retrieve the version object.
+     * @param version the version for which to retrieve the object
+     * @return the version object or {@code null} if it doesn't exist and shouldn't be created
+     * @since 17.9.0RC1
+     */
+    public BaseObject getExtensionVersionObject(XWikiDocument document, Version version)
+    {
+        return getVersionObject(document, version, XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
+    }
+
+    /**
+     * Retrieve the xobject of the version from the given document.
+     * 
+     * @param document the document where to retrieve the version object.
+     * @param version the version for which to retrieve the object
+     * @return the version object or {@code null} if it doesn't exist and shouldn't be created
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public BaseObject getProjectVersionObject(XWikiDocument document, Version version)
+    {
+        return getVersionObject(document, version, XWikiRepositoryModel.PROJECTVERSION_CLASSREFERENCE);
+    }
+
+    /**
+     * Retrieve the xobject of the version from the given document.
+     * 
+     * @param document the document where to retrieve the version object.
+     * @param version the version for which to retrieve the object
+     * @return the version object or {@code null} if it doesn't exist and shouldn't be created
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public BaseObject getProjectVersionObject(XWikiDocument document, String version)
+    {
+        return getVersionObject(document, new DefaultVersion(version),
+            XWikiRepositoryModel.PROJECTVERSION_CLASSREFERENCE);
     }
 
     /**
@@ -543,32 +690,23 @@ public class ExtensionStore implements Initializable, Disposable
             .equals(getValue(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_PROXYLEVEL, (String) null));
     }
 
-    /**
-     * @param extensionId the identifier of the extension
-     * @return the main document holder the extension metadata, or null if none count be found
-     * @throws QueryException when failing to search for the extension document
-     * @throws XWikiException when failing to get the extension document
-     * @since 17.9.0RC1
-     */
-    public XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException
+    private DocumentReference getExistingDocumentReferenceById(String extensionId, String clazz) throws QueryException
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-
         DocumentReference[] cachedDocumentReference = this.documentReferenceCache.get(extensionId);
 
         if (cachedDocumentReference == null) {
             Query query = this.queryManager.createQuery(
-                "select doc.fullName from Document doc, doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME
-                    + ") as extension where extension." + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :extensionId",
+                "select doc.fullName from Document doc, doc.object(" + clazz + ") as extension where extension."
+                    + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :" + XWikiRepositoryModel.PROP_EXTENSION_ID,
                 Query.XWQL);
+            query.bindValue(XWikiRepositoryModel.PROP_EXTENSION_ID, extensionId);
+            query.setLimit(1);
 
-            query.bindValue("extensionId", extensionId);
+            List<String> documentReferences = query.execute();
 
-            List<String> documentNames = query.execute();
-
-            if (!documentNames.isEmpty()) {
+            if (!documentReferences.isEmpty()) {
                 cachedDocumentReference =
-                    new DocumentReference[] {this.currentStringResolver.resolve(documentNames.get(0))};
+                    new DocumentReference[] {this.currentStringResolver.resolve(documentReferences.get(0))};
             } else {
                 cachedDocumentReference = new DocumentReference[1];
             }
@@ -576,26 +714,104 @@ public class ExtensionStore implements Initializable, Disposable
             this.documentReferenceCache.set(extensionId, cachedDocumentReference);
         }
 
-        return cachedDocumentReference[0] != null ? xcontext.getWiki().getDocument(cachedDocumentReference[0], xcontext)
-            : null;
+        return cachedDocumentReference[0] != null ? cachedDocumentReference[0] : null;
+    }
+
+    private XWikiDocument getExistingDocumentById(String extensionId, String clazz)
+        throws QueryException, XWikiException
+    {
+        DocumentReference documentReference = getExistingDocumentReferenceById(extensionId, clazz);
+
+        if (documentReference != null) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+
+            return xcontext.getWiki().getDocument(documentReference, xcontext);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param extensionId the identifier of the extension
+     * @return the main document holding the extension metadata, or null if none count be found
+     * @throws QueryException when failing to search for the extension document
+     * @throws XWikiException when failing to get the extension document
+     * @since 17.9.0RC1
+     */
+    public XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException
+    {
+        return getExistingDocumentById(extensionId, XWikiRepositoryModel.EXTENSION_CLASSNAME);
+    }
+
+    /**
+     * @param extensionId the identifier of the extension
+     * @return the reference of main document holding the extension metadata, or null if none count be found
+     * @throws QueryException when failing to search for the extension document
+     * @since 18.9.0RC1
+     * @since 18.4.6
+     */
+    public DocumentReference getExistingExtensionDocumentReferenceById(String extensionId) throws QueryException
+    {
+        return getExistingDocumentReferenceById(extensionId, XWikiRepositoryModel.EXTENSION_CLASSNAME);
+    }
+
+    /**
+     * @param projectId the identifier of the project
+     * @return the main document holding the project metadata, or null if none count be found
+     * @throws QueryException when failing to search for the extension document
+     * @throws XWikiException when failing to get the extension document
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public XWikiDocument getExistingProjectDocumentById(String projectId) throws QueryException, XWikiException
+    {
+        return getExistingDocumentById(projectId, XWikiRepositoryModel.PROJECT_CLASSNAME);
+    }
+
+    /**
+     * @param projectId the identifier of the project
+     * @return the reference of the main document holding the project metadata, or null if none count be found
+     * @throws QueryException when failing to search for the extension document
+     * @since 18.9.0RC1
+     * @since 18.4.6
+     */
+    public DocumentReference getExistingProjectDocumentReferenceById(String projectId) throws QueryException
+    {
+        return getExistingDocumentReferenceById(projectId, XWikiRepositoryModel.PROJECT_CLASSNAME);
     }
 
     /**
      * @param extensionId the identifier of the extension
      * @return the latest version of the extension
      * @throws QueryException when failing to search for the extension latest version
-     * @since 17.9.0RC1
+     * @since 18.5.0RC1
+     * @since 18.4.2
      */
-    public String getLastVersion(String extensionId) throws QueryException
+    public String getExtensionLastVersion(String extensionId) throws QueryException
     {
-        Query query =
-            this.queryManager.createQuery("select version.version, version.index from Document doc, doc.object("
-                + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME
-                + ") as version where version.id = :versionId and version.index is not null "
-                + "order by version.index desc", Query.XWQL);
+        return getLastVersion(extensionId, XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
+    }
 
-        query.bindValue("versionId", extensionId);
-        query.setLimit(1);
+    /**
+     * @param projectId the identifier of the project
+     * @return the latest version of the project
+     * @throws QueryException when failing to search for the extension latest version
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public String getProjectLastVersion(String projectId) throws QueryException
+    {
+        return getLastVersion(projectId, XWikiRepositoryModel.PROJECTVERSION_CLASSNAME);
+    }
+
+    private String getLastVersion(String id, String classStringReference) throws QueryException
+    {
+        Query query = this.queryManager.createQuery(
+            "select version.version, version.index from Document doc, doc.object(" + classStringReference
+                + ") as version where version.id = :id and version.index is not null order by version.index desc",
+            Query.XWQL);
+
+        query.bindValue("id", id);
 
         List<Object[]> results = query.execute();
 
@@ -613,7 +829,19 @@ public class ExtensionStore implements Initializable, Disposable
      */
     public BaseObject getExtensionObject(XWikiDocument extensionDocument)
     {
-        return extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+        return extensionDocument != null ? extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE)
+            : null;
+    }
+
+    /**
+     * @param projectDocument the document holder the extension metadata
+     * @return the object holding the main extension metadata
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public BaseObject getProjectObject(XWikiDocument projectDocument)
+    {
+        return projectDocument.getXObject(XWikiRepositoryModel.PROJECT_CLASSREFERENCE);
     }
 
     /**
@@ -649,7 +877,8 @@ public class ExtensionStore implements Initializable, Disposable
      */
     public boolean isVersionPageEnabled(BaseObject extensionOject)
     {
-        return getBooleanValue(extensionOject, XWikiRepositoryModel.PROP_EXTENSION_VERSIONPAGE, false);
+        return extensionOject == null
+            || getBooleanValue(extensionOject, XWikiRepositoryModel.PROP_EXTENSION_VERSIONPAGE, false);
     }
 
     /**
@@ -679,6 +908,17 @@ public class ExtensionStore implements Initializable, Disposable
     }
 
     /**
+     * @param document the document holding the project metadata
+     * @return the identifier of the project
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public String getProjectId(XWikiDocument document)
+    {
+        return document.getStringValue(XWikiRepositoryModel.PROP_PROJECT_ID);
+    }
+
+    /**
      * @param document the document holding the extension metadata
      * @return the name of the extension
      * @since 17.9.0RC1
@@ -696,5 +936,24 @@ public class ExtensionStore implements Initializable, Disposable
     public String getExtensionType(XWikiDocument document)
     {
         return document.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+    }
+
+    /**
+     * @param spaceReference the reference of the space where to search for extensions
+     * @return the list of extension ids found in the given space and its subspaces
+     * @throws QueryException when failing to search for the extension ids
+     * @since 18.5.0RC1
+     * @since 18.4.2
+     */
+    public List<String> getExtensionIds(SpaceReference spaceReference) throws QueryException
+    {
+        Query query = this.queryManager
+            .createQuery("select extension.id from Document doc, doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME
+                + ") as extension where doc.space = :spaceExact OR doc.space LIKE :spaceLike", Query.XWQL);
+
+        query.bindValue("spaceExact", this.localSerializer.serialize(spaceReference));
+        query.bindValue("spaceLike").like(this.localSerializer.serialize(spaceReference) + ".%");
+
+        return query.execute();
     }
 }

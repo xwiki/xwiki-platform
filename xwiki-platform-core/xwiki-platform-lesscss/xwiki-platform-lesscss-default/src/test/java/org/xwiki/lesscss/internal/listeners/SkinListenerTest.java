@@ -20,12 +20,9 @@
 package org.xwiki.lesscss.internal.listeners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -37,12 +34,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.event.Event;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -51,48 +50,43 @@ import static org.mockito.Mockito.when;
 /**
  * Test class for {@link SkinListener}.
  *
- * @since 7.0RC1
  * @version $Id $
+ * @since 7.0RC1
  */
-public class SkinListenerTest
+@ComponentTest
+class SkinListenerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<SkinListener> mocker =
-            new MockitoComponentMockingRule<>(SkinListener.class);
+    @InjectMockComponents
+    private SkinListener skinListener;
 
+    @MockComponent
     private LESSResourcesCache lessResourcesCache;
 
+    @MockComponent
     private ColorThemeCache colorThemeCache;
 
+    @MockComponent
     private SkinReferenceFactory skinReferenceFactory;
 
-    @Before
-    public void setUp() throws Exception
+    @Test
+    void getName()
     {
-        lessResourcesCache = mocker.getInstance(LESSResourcesCache.class);
-        colorThemeCache = mocker.getInstance(ColorThemeCache.class);
-        skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
+        assertEquals("LESS Skin Listener", this.skinListener.getName());
     }
 
     @Test
-    public void getName() throws Exception
+    void getEvents()
     {
-        assertEquals("LESS Skin Listener", mocker.getComponentUnderTest().getName());
+        List<Event> eventsToObserve = List.of(
+            new DocumentCreatedEvent(),
+            new DocumentUpdatedEvent(),
+            new DocumentDeletedEvent());
+
+        assertEquals(eventsToObserve, this.skinListener.getEvents());
     }
 
     @Test
-    public void getEvents() throws Exception
-    {
-        List<Event> eventsToObserve = Arrays.<Event>asList(
-                new DocumentCreatedEvent(),
-                new DocumentUpdatedEvent(),
-                new DocumentDeletedEvent());
-
-        assertEquals(eventsToObserve, mocker.getComponentUnderTest().getEvents());
-    }
-
-    @Test
-    public void onEventWhenSkinIsChanged() throws Exception
+    void onEventWhenSkinIsChanged()
     {
         // Mocks
         Event event = mock(Event.class);
@@ -107,20 +101,20 @@ public class SkinListenerTest
 
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(doc.getDocumentReference()).thenReturn(documentReference);
-        
+
         DocumentSkinReference skinReference = new DocumentSkinReference(documentReference, null);
-        when(skinReferenceFactory.createReference(documentReference)).thenReturn(skinReference);
+        when(this.skinReferenceFactory.createReference(documentReference)).thenReturn(skinReference);
 
         // Test
-        mocker.getComponentUnderTest().onEvent(event, doc, data);
+        this.skinListener.onEvent(event, doc, data);
 
         // Verify
-        verify(lessResourcesCache).clearFromSkin(skinReference);
-        verify(colorThemeCache).clearFromSkin(skinReference);
+        verify(this.lessResourcesCache).clearFromSkin(skinReference);
+        verify(this.colorThemeCache).clearFromSkin(skinReference);
     }
 
     @Test
-    public void onEventWhenNoObject() throws Exception
+    void onEventWhenNoObject()
     {
         // Mocks
         Event event = mock(Event.class);
@@ -132,10 +126,10 @@ public class SkinListenerTest
         when(doc.getXObjects(classReference)).thenReturn(objects);
 
         // Test
-        mocker.getComponentUnderTest().onEvent(event, doc, data);
+        this.skinListener.onEvent(event, doc, data);
 
         // Verify
-        verifyNoInteractions(lessResourcesCache);
-        verifyNoInteractions(colorThemeCache);
+        verifyNoInteractions(this.lessResourcesCache);
+        verifyNoInteractions(this.colorThemeCache);
     }
 }

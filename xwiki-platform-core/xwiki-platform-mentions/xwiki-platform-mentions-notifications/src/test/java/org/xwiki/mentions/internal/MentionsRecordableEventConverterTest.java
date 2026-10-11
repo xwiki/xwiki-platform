@@ -24,10 +24,10 @@ import java.util.HashSet;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.mentions.events.MentionEvent;
-import org.xwiki.mentions.events.MentionEventParams;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.RecordableEventConverter;
+import org.xwiki.mentions.events.MentionEvent;
+import org.xwiki.mentions.events.MentionEventParams;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
  * @since 12.5RC1
  */
 @ComponentTest
-public class MentionsRecordableEventConverterTest
+class MentionsRecordableEventConverterTest
 {
     @InjectMockComponents
     private MentionsRecordableEventConverter converter;

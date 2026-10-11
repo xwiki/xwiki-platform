@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.container.Container;
@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @since 7.4M1
  */
 @ComponentTest
-public class ContextAndActionURLNormalizerTest
+class ContextAndActionURLNormalizerTest
 {
     @InjectMockComponents
     private ContextAndActionURLNormalizer normalizer;
@@ -74,7 +74,7 @@ public class ContextAndActionURLNormalizerTest
         componentManager.registerComponent(Environment.class, this.environment);
 
         this.servletContext = mock(ServletContext.class);
-        when(this.environment.getServletContext()).thenReturn(this.servletContext);
+        when(this.environment.getJakartaServletContext()).thenReturn(this.servletContext);
 
         ServletRegistration sr = mock(ServletRegistration.class);
         when(this.servletContext.getServletRegistration("action")).thenReturn(sr);
@@ -164,7 +164,7 @@ public class ContextAndActionURLNormalizerTest
         when(this.container.getRequest()).thenReturn(request);
 
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        when(request.getHttpServletRequest()).thenReturn(httpRequest);
+        when(request.getRequest()).thenReturn(httpRequest);
 
         return httpRequest;
     }

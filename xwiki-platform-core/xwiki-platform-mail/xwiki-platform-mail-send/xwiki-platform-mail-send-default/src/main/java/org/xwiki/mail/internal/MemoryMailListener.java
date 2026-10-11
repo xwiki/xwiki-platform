@@ -72,7 +72,7 @@ public class MemoryMailListener extends AbstractMailListener
         super.onPrepareFatalError(exception, parameters);
 
         //TODO: Store failure exception
-        logger.error("Failure during preparation phase of thread [" + getBatchId() + "]");
+        logger.error("Failure during preparation phase of thread [{}]", getBatchId(), exception);
     }
 
     @Override

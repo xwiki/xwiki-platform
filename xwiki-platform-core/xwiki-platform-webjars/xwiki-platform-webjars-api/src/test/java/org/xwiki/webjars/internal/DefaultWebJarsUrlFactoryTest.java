@@ -19,8 +19,6 @@
  */
 package org.xwiki.webjars.internal;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,10 +67,10 @@ class DefaultWebJarsUrlFactoryTest
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
 
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("wiki:math", Arrays.asList("ang:ular", "2.1.11", "angular.css"));
+            new WebJarsResourceReference("wiki:math", List.of("ang:ular", "2.1.11", "angular.css"));
         // Test that colon is not interpreted as groupId/artifactId separator (for backwards compatibility).
         when(this.serializer.serialize(resourceReference))
-            .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "ang:ular", "2.1.11", "angular.css")));
+            .thenReturn(new ExtendedURL(List.of("xwiki", "ang:ular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/ang%3Aular/2.1.11/angular.css", this.webJarsUrlFactory.url("ang:ular/2.1.11/angular.css"));
     }
@@ -88,9 +86,9 @@ class DefaultWebJarsUrlFactoryTest
         when(extension.getId()).thenReturn(new ExtensionId("org.webjars:angular", "2.1.11"));
 
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("wiki:math", Arrays.asList("angular", "2.1.11", "angular.css"));
+            new WebJarsResourceReference("wiki:math", List.of("angular", "2.1.11", "angular.css"));
         when(this.serializer.serialize(resourceReference))
-            .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
+            .thenReturn(new ExtendedURL(List.of("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css", this.webJarsUrlFactory.url("angular", "angular.css"));
     }
@@ -106,9 +104,9 @@ class DefaultWebJarsUrlFactoryTest
         when(extension.getId()).thenReturn(new ExtensionId("org.webjars:bar", "2.1.11"));
 
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("wiki:math", Arrays.asList("bar", "2.1.11", "angular.css"));
+            new WebJarsResourceReference("wiki:math", List.of("bar", "2.1.11", "angular.css"));
         when(this.serializer.serialize(resourceReference))
-            .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
+            .thenReturn(new ExtendedURL(List.of("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css", this.webJarsUrlFactory.url("foo", "angular.css"));
     }
@@ -119,9 +117,9 @@ class DefaultWebJarsUrlFactoryTest
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
 
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("wiki:math", Arrays.asList("angular", "angular.css"));
+            new WebJarsResourceReference("wiki:math", List.of("angular", "angular.css"));
         when(this.serializer.serialize(resourceReference))
-            .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.css")));
+            .thenReturn(new ExtendedURL(List.of("xwiki", "angular", "angular.css")));
 
         assertEquals("/xwiki/angular/angular.css", this.webJarsUrlFactory.url("angular", "angular.css"));
     }
@@ -130,10 +128,10 @@ class DefaultWebJarsUrlFactoryTest
     void computeURLWithParameters() throws Exception
     {
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", List.of("angular", "2.1.11", "angular.js"));
         resourceReference.addParameter("evaluate", "true");
-        resourceReference.addParameter("list", Arrays.asList("one", "two"));
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.js"),
+        resourceReference.addParameter("list", List.of("one", "two"));
+        ExtendedURL extendedURL = new ExtendedURL(List.of("xwiki", "angular", "2.1.11", "angular.js"),
             resourceReference.getParameters());
         when(this.serializer.serialize(resourceReference)).thenReturn(extendedURL);
 
@@ -151,10 +149,10 @@ class DefaultWebJarsUrlFactoryTest
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
 
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("wiki:math", Arrays.asList("angular", "angular.js"));
+            new WebJarsResourceReference("wiki:math", List.of("angular", "angular.js"));
         resourceReference.addParameter("r", "1");
         when(this.serializer.serialize(resourceReference)).thenReturn(
-            new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.js"), resourceReference.getParameters()));
+            new ExtendedURL(List.of("xwiki", "angular", "angular.js"), resourceReference.getParameters()));
 
         assertEquals("/xwiki/angular/angular.js?r=1", this.webJarsUrlFactory.url("angular", "angular.js"));
     }
@@ -168,12 +166,12 @@ class DefaultWebJarsUrlFactoryTest
         when(extension.getId()).thenReturn(new ExtensionId("angular", "2.1.11"));
 
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("wiki:math", Arrays.asList("angular", "2.1.11", "angular.css"));
+            new WebJarsResourceReference("wiki:math", List.of("angular", "2.1.11", "angular.css"));
         when(this.serializer.serialize(resourceReference))
-            .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
+            .thenReturn(new ExtendedURL(List.of("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css",
-            this.webJarsUrlFactory.url("angular", "angular.css", Collections.singletonMap("wiki", "math")));
+            this.webJarsUrlFactory.url("angular", "angular.css", Map.of("wiki", "math")));
     }
 
     @Test
@@ -187,12 +185,12 @@ class DefaultWebJarsUrlFactoryTest
         when(extension.getId()).thenReturn(new ExtensionId("angular", "2.1.11"));
 
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference("wiki:math", Arrays.asList("angular", "2.1.11", "angular.css"));
+            new WebJarsResourceReference("wiki:math", List.of("angular", "2.1.11", "angular.css"));
         when(this.serializer.serialize(resourceReference))
-            .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
+            .thenReturn(new ExtendedURL(List.of("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css",
-            this.webJarsUrlFactory.url("angular", "angular.css", Collections.<String, Object>emptyMap()));
+            this.webJarsUrlFactory.url("angular", "angular.css", Map.of()));
     }
 
     @Test

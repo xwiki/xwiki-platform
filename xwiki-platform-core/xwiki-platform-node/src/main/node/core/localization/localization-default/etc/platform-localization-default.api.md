@@ -7,7 +7,7 @@
 import { Resolver } from '@xwiki/platform-localization-api';
 import { Translator } from '@xwiki/platform-localization-api';
 
-// @beta (undocumented)
+// @beta
 export function initialize(...translators: Translator[]): Resolver;
 
 // (No @packageDocumentation comment for this package)

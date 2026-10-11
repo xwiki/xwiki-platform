@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>18.3.0-SNAPSHOT</version>
+    <version>18.9.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>18.3.0-SNAPSHOT</version>
+  <version>18.9.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -57,37 +57,32 @@
 
     <!-- Dependencies versions -->
     <batik.version>1.19</batik.version>
-    <restlet.version>2.3.12</restlet.version>
-    <tika.version>3.2.3</tika.version>
-    <pdfbox.version>3.0.7</pdfbox.version>
+    <tika.version>4.1.0</tika.version>
+    <pdfbox.version>3.0.8</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.7</jetty.server.version>
+    <jetty.server.version>12.1.14</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.10.Final</netty.version>
+    <netty.version>4.2.19.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.7.0</dockerJava.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.153.1</metaeffekt.version>
+    <metaeffekt.version>0.158.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
-    <jersey.version>2.47</jersey.version>
+    <solr.minimum.java.version>11</solr.minimum.java.version>
+    <jersey.version>2.48</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.5</zookeeper.version>
+    <zookeeper.version>3.9.6</zookeeper.version>
     <rssreader.version>3.12.0</rssreader.version>
+    <calcite.version>1.42.0</calcite.version>
 
     <!-- The default Tomcat cache size  -->
-    <xwiki.tomcat.cacheMaxSize>100176</xwiki.tomcat.cacheMaxSize>
+    <xwiki.tomcat.cacheMaxSize>120176</xwiki.tomcat.cacheMaxSize>
 
-    <!-- Versions of other software we need in our functional tests -->
-    <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
-         sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
-         Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
-         (e.g. 7.2.7).
-    -->
-    <libreoffice.version>25.8.5</libreoffice.version>
+	<!-- Test with latest version of previous branch (what we call LTS) of LibreOffice by default. -->
+    <libreoffice.version>lts</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -115,23 +110,26 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.6.0</mysql.version>
+    <mysql.version>26.7.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.7</mariadb.version>
+    <mariadb.version>3.5.10</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.10</pgsql.version>
+    <pgsql.version>42.7.13</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
-    <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.21.0.0</oracle.version>
+    <oracle.artifactId>ojdbc17</oracle.artifactId>
+    <oracle.version>23.26.3.0.0</oracle.version>
 
     <!-- npm registries configuration -->
     <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
     <xwiki.npm.release.registry>https://registry.npmjs.org</xwiki.npm.release.registry>
+
+    <!-- Enable reproducible builds -->
+    <project.build.outputTimestamp>2026-09-14T15:40:23Z</project.build.outputTimestamp>
   </properties>
   <scm>
     <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>
@@ -191,11 +189,6 @@
         <version>${tika.version}</version>
       </dependency>
       <!-- Tika Parsers modules -->
-      <dependency>
-        <groupId>org.apache.tika</groupId>
-        <artifactId>tika-parser-advancedmedia-module</artifactId>
-        <version>${tika.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-scientific-module</artifactId>
@@ -315,7 +308,7 @@
       <dependency>
         <groupId>com.github.junrar</groupId>
         <artifactId>junrar</artifactId>
-        <version>7.5.8</version>
+        <version>8.1.1</version>
       </dependency>
 
       <dependency>
@@ -345,7 +338,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.14.1</version>
+        <version>2.15.0</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -405,7 +398,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>moment</artifactId>
-        <version>2.30.1</version>
+        <version>2.31.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -429,7 +422,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>tom-select</artifactId>
-        <version>2.5.2</version>
+        <version>2.6.2</version>
         <scope>runtime</scope>
       </dependency>
 
@@ -447,6 +440,11 @@
       <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi-ooxml</artifactId>
+        <version>${poi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml-full</artifactId>
         <version>${poi.version}</version>
       </dependency>
 
@@ -536,7 +534,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.22.1</version>
+        <version>1.23.2</version>
       </dependency>
 
       <!-- PDF -->
@@ -633,24 +631,30 @@
       <dependency>
         <groupId>com.github.jsqlparser</groupId>
         <artifactId>jsqlparser</artifactId>
-        <version>4.6</version>
+        <version>5.4</version>
       </dependency>
 
       <!-- JNR -->
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.3.14</version>
+        <version>1.4.3</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.jnr</groupId>
+        <artifactId>jffi</artifactId>
+        <classifier>native</classifier>
+        <version>1.4.3</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-constants</artifactId>
-        <version>0.10.4</version>
+        <version>0.11.2</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.18</version>
+        <version>2.3.3</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -660,7 +664,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.21</version>
+        <version>3.2.4</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -706,7 +710,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>2.1.8</version>
+        <version>2.1.14</version>
         <exclusions>
           <!--  -->
           <exclusion>
@@ -803,6 +807,7 @@
         <groupId>io.netty</groupId>
         <artifactId>netty-transport-native-epoll</artifactId>
         <version>${netty.version}</version>
+        <classifier>linux-x86_64</classifier>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
@@ -831,33 +836,6 @@
         <artifactId>fast-diff</artifactId>
         <version>1.3.0</version>
         <scope>runtime</scope>
-      </dependency>
-
-      <!-- Docker -->
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java-api</artifactId>
-        <version>${dockerJava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java</artifactId>
-        <version>${dockerJava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java-core</artifactId>
-        <version>${dockerJava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java-transport-httpclient5</artifactId>
-        <version>${dockerJava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java-transport-zerodep</artifactId>
-        <version>${dockerJava.version}</version>
       </dependency>
 
       <!-- Solr -->
@@ -948,24 +926,29 @@
         <version>${lucene.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.opennlp</groupId>
+        <artifactId>opennlp</artifactId>
+        <version>1.9.5</version>
+      </dependency>
+      <dependency>
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
-        <version>1.1.10.8</version>
+        <version>1.1.10.11</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-core</artifactId>
-        <version>1.41.0</version>
+        <version>${calcite.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-linq4j</artifactId>
-        <version>1.41.0</version>
+        <version>${calcite.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
-        <version>1.27.0</version>
+        <version>1.29.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.zookeeper</groupId>
@@ -1203,27 +1186,24 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.30</version>
+        <version>3.5.43</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.2.8</version>
+        <version>11.4.12</version>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>font-awesome</artifactId>
-        <version>7.2.0</version>
+        <version>7.3.0</version>
       </dependency>
       <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>inversify</artifactId>
-        <version>7.10.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.npm</groupId>
-        <artifactId>reflect-metadata</artifactId>
-        <version>0.2.2</version>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-bom</artifactId>
+        <version>7.1.1</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1267,6 +1247,8 @@
               <!-- This property makes it simple for some module to exclude the check (for example for functional
                    tests) -->
               <xwiki.surefire.captureconsole.skip>${xwiki.surefire.captureconsole.skip}</xwiki.surefire.captureconsole.skip>
+              <!-- Same as above but for the check that tests don't generate files outside of "target". -->
+              <xwiki.surefire.captureworkingdir.skip>${xwiki.surefire.captureworkingdir.skip}</xwiki.surefire.captureworkingdir.skip>
             </systemPropertyVariables>
           </configuration>
           <dependencies>
@@ -1421,30 +1403,27 @@
               <extensionOverride>
                 <id>org.bouncycastle:bcmail-jdk18on</id>
                 <features>
-                  bouncycastle:bcmail-jdk16/140,
-                  bouncycastle:bcmail-jdk15/140,
                   bouncycastle:bcmail-jdk14/140,
-                  bouncycastle:bcmail-jdk13/140,
-                  bouncycastle:bcmail-jdk12/140,
-                  org.bouncycastle:bcmail-jdk16,
-                  org.bouncycastle:bcmail-jdk15,
+                  bouncycastle:bcmail-jdk15/140,
+                  bouncycastle:bcmail-jdk16/140,
                   org.bouncycastle:bcmail-jdk14,
-                  org.bouncycastle:bcmail-jdk13,
-                  org.bouncycastle:bcmail-jdk12,
-                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk15,
+                  org.bouncycastle:bcmail-jdk15+,
                   org.bouncycastle:bcmail-jdk15on
+                  org.bouncycastle:bcmail-jdk15to18,
+                  org.bouncycastle:bcmail-jdk16
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.bouncycastle:bcjmail-jdk18on</id>
+                <features>
+                  org.bouncycastle:bcjmail-jdk15on,
+                  org.bouncycastle:bcjmail-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>
                 <id>commons-beanutils:commons-beanutils</id>
                 <features>commons-beanutils:commons-beanutils-core</features>
-              </extensionOverride>
-              <extensionOverride>
-                <id>org.jdom:jdom</id>
-                <features>
-                  jdom:jdom,
-                  org.jdom:jdom-legacy
-                </features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.sun.mail:jakarta.mail</id>
@@ -1561,7 +1540,7 @@
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
               </extensionOverride>
               <extensionOverride>
-                <id>org.webjars.npm:momentjs</id>
+                <id>org.webjars.npm:moment</id>
                 <features>org.webjars:momentjs</features>
               </extensionOverride>
               <extensionOverride>
@@ -1585,12 +1564,12 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>2.0.0</version>
+          <version>2.0.2</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>
           <artifactId>gmavenplus-plugin</artifactId>
-          <version>4.3.1</version>
+          <version>5.1.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1599,6 +1578,17 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <!-- The "test" execution (inherited from the Commons POM) runs the TemporaryFileCheck verifying that tests
+               don't generate files outside of "target". We skip it (using the same property that skips the equivalent
+               runtime check) until the platform tests that currently violate it have been fixed. -->
+          <execution>
+            <id>test</id>
+            <configuration>
+              <skip>${xwiki.surefire.captureworkingdir.skip}</skip>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <!-- Check license headers -->
       <plugin>
@@ -1870,6 +1860,9 @@
         <!-- Don't check that unit tests don't output anything to the console since for example Clover will output
              messages such as "Updating existing database at '...'." during tests! -->
         <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+        <!-- Don't check that tests don't generate files outside "target" since Clover generates a coverage database
+             that can be located outside of it. -->
+        <xwiki.surefire.captureworkingdir.skip>true</xwiki.surefire.captureworkingdir.skip>
       </properties>
       <build>
         <pluginManagement>

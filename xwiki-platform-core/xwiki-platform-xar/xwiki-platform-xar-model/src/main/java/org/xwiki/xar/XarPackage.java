@@ -44,6 +44,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -195,16 +196,12 @@ public class XarPackage
      */
     public void read(InputStream xarStream) throws IOException
     {
-        ZipArchiveInputStream zis = new ZipArchiveInputStream(xarStream, "UTF-8", false);
-
-        try {
+        try (ZipArchiveInputStream zis = new ZipArchiveInputStream(xarStream, "UTF-8", false)) {
             for (ZipArchiveEntry entry = zis.getNextZipEntry(); entry != null; entry = zis.getNextZipEntry()) {
                 if (!entry.isDirectory() && zis.canReadEntryData(entry)) {
                     readEntry(zis, entry.getName());
                 }
             }
-        } finally {
-            zis.close();
         }
     }
 
@@ -310,9 +307,9 @@ public class XarPackage
 
     /**
      * @param preserveVersion true if the history should be preserved by default
-     * @deprecated since 7.2M1, use {@link #setPackagePreserveVersion(boolean)} instead
+     * @deprecated use {@link #setPackagePreserveVersion(boolean)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public void setPreserveVersion(boolean preserveVersion)
     {
         this.packagePreserveVersion = preserveVersion;
@@ -446,9 +443,9 @@ public class XarPackage
      * Add a new entry to the package.
      * 
      * @param reference the entry reference
-     * @deprecated since 7.2M1, use {@link #addPackageFile(LocalDocumentReference, int)} instead
+     * @deprecated use {@link #addPackageFile(LocalDocumentReference, int)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public void addEntry(LocalDocumentReference reference)
     {
         addEntry(reference, null);
@@ -666,9 +663,7 @@ public class XarPackage
 
     private void updateEntry(XarEntry packageFile)
     {
-        if (this.entries.containsKey(packageFile)) {
-            this.entries.put(packageFile, packageFile);
-        }
+        this.entries.replace(packageFile, packageFile);
     }
 
     private String getElementText(Element element, String tagName, boolean ignoreEmpty)
@@ -734,7 +729,7 @@ public class XarPackage
             try {
                 writer.close();
             } catch (XMLStreamException e) {
-                throw new XarException("Failed to close XML writer", e);
+                LOGGER.warn("Failed to close XML writer: [{}]", ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

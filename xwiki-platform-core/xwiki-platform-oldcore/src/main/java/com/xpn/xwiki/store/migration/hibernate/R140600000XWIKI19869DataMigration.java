@@ -27,7 +27,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -80,7 +79,8 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
     private static final String FILENAME = HINT + "DataMigration-users.txt";
 
     private static final String XWQL_QUERY = "select distinct doc.fullName from Document doc, "
-        + "doc.object(XWiki.XWikiUsers) objUser where objUser.password not like 'hash:%' and objUser.password <> '' "
+        + "doc.object(XWiki.XWikiUsers) objUser where objUser.password not like 'hash:%' and "
+        + "length(objUser.password) > 0 "
         + "order by doc.fullName";
 
     private static final String PASSWORD_FIELD = "password";
@@ -208,7 +208,7 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
                 .setLimit(BATCH_SIZE);
             List<String> usersList = query.execute();
 
-            return usersList.stream().map(this.documentReferenceResolver::resolve).collect(Collectors.toList());
+            return usersList.stream().map(this.documentReferenceResolver::resolve).toList();
         } catch (QueryException e) {
             throw new DataMigrationException("Error while querying the list of users", e);
         }
@@ -252,7 +252,7 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
                 }
             } catch (Exception e) {
                 this.logger.warn(
-                    "Failed to handler revision [{}] for user page [{}]: {}. It's recommended to delete this version.",
+                    "Failed to handle revision [{}] for user page [{}]: {}. It's recommended to delete this version.",
                     node.getVersion().toString(), userDoc.getDocumentReference(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
@@ -288,7 +288,7 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
                     }
                 } catch (XWikiException e) {
                     // Note: this should never happen since it's a standard string field.
-                    this.logger.error("Error while reseting password field for user [{}]", userDoc, e);
+                    this.logger.error("Error while resetting password field for user [{}]", userDoc, e);
                 }
                 result = true;
             } else if (isMain) {

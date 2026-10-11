@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.tag;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     /**
      * Get cardinality map of tags within the wiki.
      * 
-     * @return map of tags with their occurences counts.
+     * @return map of tags with their occurrences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      */
     public Map<String, Integer> getTagCount() throws XWikiException
@@ -83,7 +84,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * Get cardinality map of tags for a specific wiki space.
      * 
      * @param space the space to get tags in
-     * @return map of tags with their occurences counts
+     * @return map of tags with their occurrences counts
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      * @since 1.2
      */
@@ -96,7 +97,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * Get cardinality map of tags for list wiki spaces.
      * 
      * @param spaces the list of space to get tags in, as a comma separated, quoted string
-     * @return map of tags with their occurences counts
+     * @return map of tags with their occurrences counts
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      * @since 8.1
      */
@@ -219,7 +220,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
-            LOGGER.warn("Failed to add tag to document: [{}]", ex.getMessage());
+            LOGGER.warn("Failed to add tag to document: [{}]", ExceptionUtils.getRootCauseMessage(ex));
             result = TagOperationResult.FAILED;
         }
         return result;
@@ -248,7 +249,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
-            LOGGER.warn("Failed to add tags to document: [{}]", ex.getMessage());
+            LOGGER.warn("Failed to add tags to document: [{}]", ExceptionUtils.getRootCauseMessage(ex));
             result = TagOperationResult.FAILED;
         }
         return result;
@@ -272,7 +273,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
-            LOGGER.warn("Failed to remove tag from document: [{}]", ex.getMessage());
+            LOGGER.warn("Failed to remove tag from document: [{}]", ExceptionUtils.getRootCauseMessage(ex));
             result = TagOperationResult.FAILED;
         }
         return result;
@@ -296,7 +297,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
-            LOGGER.warn("Failed to rename tag: [{}]", ex.getMessage());
+            LOGGER.warn("Failed to rename tag: [{}]", ExceptionUtils.getRootCauseMessage(ex));
             result = TagOperationResult.FAILED;
         }
         return result;
@@ -319,7 +320,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
-            LOGGER.warn("Failed to delete tag: [{}]", ex.getMessage());
+            LOGGER.warn("Failed to delete tag: [{}]", ExceptionUtils.getRootCauseMessage(ex));
             result = TagOperationResult.FAILED;
         }
         return result;

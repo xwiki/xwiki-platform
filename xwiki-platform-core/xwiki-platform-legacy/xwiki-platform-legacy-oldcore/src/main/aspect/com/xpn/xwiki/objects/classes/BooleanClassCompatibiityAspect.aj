@@ -60,8 +60,8 @@ public privileged aspect BooleanClassCompatibiityAspect
         select select = new select(prefix + name, 1);
         select.setMultiple(true);
         select.setSize(3);
-        String String0 = getDisplayValue(context, 0);
-        String String1 = getDisplayValue(context, 1);
+        String String0 = getDisplayValue(0);
+        String String1 = getDisplayValue(1);
         String fieldFullName = getFieldFullName();
         Number[] selectArray = ((Number[]) criteria.getParameter(fieldFullName));
         List<Number> selectlist = (selectArray != null) ? Arrays.asList(selectArray) : new ArrayList<Number>();

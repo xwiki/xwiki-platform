@@ -48,6 +48,9 @@ import org.xwiki.script.service.ScriptService;
 @Singleton
 public class InstanceFilterScriptService extends AbstractFilterScriptService
 {
+    /**
+     * The role hint of this script service.
+     */
     public static final String ROLEHINT = FilterScriptService.ROLEHINT + ".instance";
 
     @Inject
@@ -58,17 +61,24 @@ public class InstanceFilterScriptService extends AbstractFilterScriptService
     @Named("filter")
     private ScriptService filterScriptService;
 
+    /**
+     * @return a new empty set of entity references, to be used to filter the entities to import or export
+     */
     public EntityReferenceSet newEntityReferenceSet()
     {
         return new EntityReferenceSet();
     }
 
+    /**
+     * @return a new empty set of properties controlling how the instance input stream behaves
+     */
     public InstanceInputProperties newInstanceInputProperties()
     {
         return new InstanceInputProperties();
     }
 
     /**
+     * @return the descriptor of the instance input stream
      * @since 6.2M1
      */
     public FilterStreamDescriptor getInputFilterStreamDescriptor()
@@ -78,6 +88,7 @@ public class InstanceFilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * @return the descriptor of the instance output stream
      * @since 6.2M1
      */
     public FilterStreamDescriptor getOutputFilterStreamDescriptor()
@@ -87,6 +98,12 @@ public class InstanceFilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * Start importing into the current instance.
+     *
+     * @param inputType the type of the input stream to read the data from
+     * @param inputProperties the properties controlling the input stream
+     * @param instanceProperties the properties controlling how the data is written into the instance
+     * @return the job importing the data
      * @since 6.2M1
      */
     public Job startImport(FilterStreamType inputType, Map<String, Object> inputProperties,
@@ -97,6 +114,12 @@ public class InstanceFilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * Start exporting the current instance.
+     *
+     * @param outputType the type of the output stream to write the data to
+     * @param outputProperties the properties controlling the output stream
+     * @param instanceProperties the properties controlling how the data is read from the instance
+     * @return the job exporting the data
      * @since 6.2M1
      */
     public Job startExport(FilterStreamType outputType, Map<String, Object> outputProperties,

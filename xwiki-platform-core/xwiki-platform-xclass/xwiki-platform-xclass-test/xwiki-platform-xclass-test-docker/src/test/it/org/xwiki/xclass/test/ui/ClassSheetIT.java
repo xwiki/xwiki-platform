@@ -24,6 +24,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -118,7 +119,9 @@ class ClassSheetIT
         classSheetPage = classSheetPage.clickCreateSheetButton().clickBindSheetLink();
         ViewPage sheetPage = classSheetPage.clickSheetLink();
         assertEquals(className + " Sheet", sheetPage.getDocumentTitle());
-        sheetPage.clickBreadcrumbLink(classTitle);
+        // Go back to the class page directly (the breadcrumb is exercised by other tests).
+        setup.gotoPage(spaceName, classDocName);
+        classSheetPage = new ClassSheetPage();
 
         // Create the template.
         classSheetPage = classSheetPage.clickCreateTemplateButton().clickAddObjectToTemplateLink();
@@ -134,7 +137,23 @@ class ClassSheetIT
         editPage.setValue("color", "red");
         editPage.setValue("age", "13");
         editPage.clickSaveAndContinue();
-        editPage.clickBreadcrumbLink(classTitle);
+        setup.gotoPage(spaceName, classDocName);
+        classSheetPage = new ClassSheetPage();
+
+        // Create the template provider from the class UI.
+        classSheetPage = classSheetPage.clickCreateTemplateProviderButton();
+        ViewPage templateProviderPage = classSheetPage.clickTemplateProviderLink();
+        assertEquals(className + " Template Provider", templateProviderPage.getDocumentTitle());
+
+        // The created template provider must be listed in the "Available Template Providers" list of the Page
+        // Templates administration section.
+        TemplatesAdministrationSectionPage templatesAdminPage = TemplatesAdministrationSectionPage.gotoPage();
+        assertTrue(templatesAdminPage.getExistingTemplatesLinks().stream()
+            .anyMatch(link -> (className + " Template Provider").equals(link.getText())));
+
+        // Go back to the class page to create a document based on the class template.
+        setup.gotoPage(spaceName, classDocName);
+        classSheetPage = new ClassSheetPage();
 
         // Create a document based on the class template.
         assertEquals(spaceName, classSheetPage.getNewPagePicker().getParentInput().getAttribute("value"));
@@ -163,7 +182,8 @@ class ClassSheetIT
 
         assertEquals(pageName, viewPage.getDocumentTitle());
         assertEquals("Your favorite color\npink\nYour current age\n27\nDescription\nTester", viewPage.getContent());
-        viewPage.clickBreadcrumbLink(classTitle);
+        setup.gotoPage(spaceName, classDocName);
+        classSheetPage = new ClassSheetPage();
 
         // Assert the created document is listed.
         assertTrue(classSheetPage.hasDocument(pageName));

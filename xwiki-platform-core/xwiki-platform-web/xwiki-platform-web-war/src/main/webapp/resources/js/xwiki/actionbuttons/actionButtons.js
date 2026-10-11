@@ -34,7 +34,7 @@ var XWiki = (function(XWiki) {
   }
 
   /**
-   * Allow custom validation messages to be set on the validated field usin data attributes.
+   * Allow custom validation messages to be set on the validated field using data attributes.
    *
    * @param field the validated field
    */
@@ -78,6 +78,11 @@ var XWiki = (function(XWiki) {
         item.observe('click', this.onSubmit.bindAsEventListener(this, 'preview'));
       }.bind(this));
       $$('input[name=action_save]').each(function(item) {
+        item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
+      }.bind(this));
+      // Bind also on propupdate which is used in the class editor. This is a custom form, but we still bind the
+      // button here to have the same save events.
+      $$('input[name=action_propupdate]').each(function(item) {
         item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
       }.bind(this));
       $$('input[name=action_saveandcontinue]').each(function(item) {
@@ -219,7 +224,7 @@ var XWiki = (function(XWiki) {
       this.savedBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.done'))", "done", {inactive: true});
       this.failedBox = new XWiki.widgets.Notification(
         '$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""></span>"]))',
-        "error", {inactive: true});
+        "error", {inactive: true, textHtml: true});
       this.progressMessageTemplate = "$escapetool.javascript($services.localization.render('core.editors.savewithprogress.notification'))";
       this.progressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', '0'), "inprogress", {inactive: true});
       this.savedWithMergeBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.doneWithMerge'))", "done", {inactive: true});
@@ -452,7 +457,7 @@ var XWiki = (function(XWiki) {
       // We don't rely on window.location.reload(true) either since it's unclear if it's properly supported by
       // all browsers. Instead we rely on a query parameter with the current date.
       var params = new URLSearchParams(window.location.search);
-      params.set("timestamp", new Date().getTime());
+      params.set("timestamp", Date.now());
       window.location.search = "?" + params.toString();
     },
     // 401 happens when the user is not authorized to do that: can be a logout or a change in perm
@@ -524,29 +529,42 @@ var XWiki = (function(XWiki) {
         };
 
         var content =  new Element('div', {'class': 'modal-popup', 'id': 'csrf-warning-modal'});
-        var buttonsDiv =  new Element('div');
 
-        content.insert("<p>$services.localization.render('csrf.confirmation.status')</p>" +
-          "<p>$services.localization.render('csrf.confirmation.possibleReasons.description')</p>" +
-          "<ul><li>$services.localization.render('csrf.confirmation.possibleReasons.firstReason')</li>" +
-          "<li>$services.localization.render('csrf.confirmation.possibleReasons.secondReason')</li>" +
-          "<li>$services.localization.render('csrf.confirmation.possibleReasons.thirdReason')</li></ul>" +
-          "<p class='force-underline'>" +
-          "$services.localization.render('csrf.confirmation.unsure', ['<a href=\"http://jira.xwiki.org/\">', '</a>'])" +
+        content.insert("<p class=\"main-explanation\">$services.localization.render('csrf.error.message')</p>" +
+          "<p class=\"resubmit-causes-introduction\">" +
+          "  $services.localization.render('csrf.error.causes.introduction')" +
           "</p>" +
-          "<p>$services.localization.render('csrf.confirmation.question', ['<strong>', '</strong>'])</p>");
-        content.insert(new Element('br'));
-        var buttonCreate = new Element('button', {'class': 'btn btn-default', 'id': 'force-save-csrf'});
-        buttonCreate.insert("$services.localization.render('yes')");
-        buttonsDiv.insert(buttonCreate);
-        buttonCreate.on("click", resubmit);
+          "<ul class=\"resubmit-causes\">" +
+          "  <li>$services.localization.render('csrf.error.causes.stalesession')</li>" +
+          "  <li>$services.localization.render('csrf.error.causes.forgedrequest')</li>" +
+          "</ul>");
+        var buttonsDiv =  new Element('div', {'class': 'csrf-warning-buttons'});
+        if (answerJson.allowResubmit === 'true') {
+          content.insert("<div class=\"resubmit-question\">" +
+            "  $services.localization.render('csrf.error.resubmit.question')" +
+            "</div>");
 
-        buttonCreate = new Element('button', {'class': 'btn btn-primary', 'id': 'cancel-save-csrf'});
-        buttonCreate.insert("$services.localization.render('no')");
-        buttonsDiv.insert(buttonCreate);
-        buttonCreate.on("click", function () {
-          modal.closeDialog();
-        });
+          var buttonCreate = new Element('button', {'class': 'resubmit-primary btn btn-primary', 'id': 'cancel-save-csrf'});
+          buttonCreate.insert("$services.localization.render('csrf.error.resubmit.question.no')");
+          buttonsDiv.insert(buttonCreate);
+          buttonCreate.on("click", function () {
+            modal.closeDialog();
+          });
+
+          buttonCreate = new Element('button', {'class': 'btn btn-default resubmit-secondary', 'id': 'force-save-csrf'});
+          buttonCreate.insert("$services.localization.render('csrf.error.resubmit.question.yes')");
+          buttonsDiv.insert(buttonCreate);
+          buttonCreate.on("click", resubmit);
+        } else {
+          content.insert("<p>$services.localization.render('csrf.confirmation.noResubmit')</p>");
+          buttonCreate = new Element('button', {'class': 'btn btn-primary', 'id': 'cancel-save-csrf'});
+          buttonCreate.insert("$services.localization.render('close')");
+          buttonsDiv.insert(buttonCreate);
+          buttonCreate.on("click", function () {
+            modal.closeDialog();
+          });
+        }
+
         content.insert(buttonsDiv);
         return content;
       };
@@ -728,16 +746,22 @@ var XWiki = (function(XWiki) {
       this.enableEditors();
       this.savingBox.replace(this.failedBox);
       this.progressBox.replace(this.failedBox);
-      if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
-        // Regard the body of plain text responses as custom status messages.
-        $('ajaxRequestFailureReason').update(response.responseText);
-      } else if (response.statusText) {
-        $('ajaxRequestFailureReason').update(response.statusText);
-      } else {
-        $('ajaxRequestFailureReason').update('Server not responding');
+      try {
+        // There is no Content-Type header when the request fails before receiving a response from the server (e.g. when
+        // the network is down or when the request is blocked by the browser).
+        if (response.getHeader('Content-Type')?.match(/^\s*text\/plain/)) {
+          // Regard the body of plain text responses as custom status messages.
+          $('ajaxRequestFailureReason').update(response.responseText);
+        } else if (response.statusText) {
+          $('ajaxRequestFailureReason').update(response.statusText);
+        } else {
+          $('ajaxRequestFailureReason').update('Server not responding');
+        }
+      } finally {
+        // Announce that a document save attempt has failed, even if we failed to display the reason. Otherwise the code
+        // waiting for the save result (e.g. the in-place editor or the realtime auto-save) would wait forever.
+        state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
       }
-      // Announce that a document save attempt has failed
-      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
     startStatusReport : function(statusUrl) {
       updateStatus(0);

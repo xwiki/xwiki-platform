@@ -43,4 +43,14 @@ public interface XWikiSolrCore
      * @return the Solr client which can be used to directly communicate with the Solr native API
      */
     SolrClient getClient();
+
+    /**
+     * @return the major version of Solr this core is designed for (which can be different for the version of the Solr
+     *         server it's currently running on)
+     * @since 18.5.0RC1
+     */
+    default int getSolrMajorVersion()
+    {
+        return -1;
+    }
 }

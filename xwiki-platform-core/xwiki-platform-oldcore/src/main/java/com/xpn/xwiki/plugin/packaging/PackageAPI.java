@@ -31,8 +31,9 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * @version $Id$
- * @deprecated since 5.2, use Filter framework instead
+ * @deprecated use Filter framework instead
  */
+@Deprecated(since = "5.2")
 public class PackageAPI extends Api
 {
     Package pack;
@@ -161,7 +162,8 @@ public class PackageAPI extends Api
      * Sets the flag for the packager to import or not history revisions included in the archive when installing with
      * {@link #install()}. This flag will be ignored if {@link #isWithVersions()} flag is set to true. This means it's
      * not possible to import with versions, preserving the existing document history. The behavior of the packager in
-     * this case fall backs on just adding a new version to the exsting history (ignoring the history from the package).
+     * this case fall backs on just adding a new version to the existing history (ignoring the history from the
+     * package).
      *
      * @param withVersions should the versions contained in the archive (if any) be imported when installing.
      */
@@ -187,9 +189,9 @@ public class PackageAPI extends Api
         return apiFiles;
     }
 
-    public boolean add(String docFullName, int DefaultAction) throws XWikiException
+    public boolean add(String docFullName, int defaultAction) throws XWikiException
     {
-        return this.pack.add(docFullName, DefaultAction, getXWikiContext());
+        return this.pack.add(docFullName, defaultAction, getXWikiContext());
     }
 
     public boolean add(String docFullName) throws XWikiException
@@ -235,15 +237,12 @@ public class PackageAPI extends Api
      *         message is placed in the velocity context under the <code>import_error</code> key,
      * @since 2.2M1
      */
-    public boolean importPackageFromByteArray(byte data[])
+    public boolean importPackageFromByteArray(byte[] data)
     {
         try {
             this.pack.Import(data, getXWikiContext());
             return true;
-        } catch (XWikiException e) {
-            getXWikiContext().put("import_error", e.getMessage());
-            return false;
-        } catch (IOException e) {
+        } catch (XWikiException | IOException e) {
             getXWikiContext().put("import_error", e.getMessage());
             return false;
         }
@@ -258,7 +257,7 @@ public class PackageAPI extends Api
      * @throws IOException while reading the ZipFile
      * @throws XWikiException when package content is broken
      */
-    public String Import(byte file[]) throws IOException, XWikiException
+    public String Import(byte[] file) throws IOException, XWikiException
     {
         return this.pack.Import(file, getXWikiContext());
     }
@@ -295,7 +294,7 @@ public class PackageAPI extends Api
 
     public String toXml()
     {
-        return this.pack.toXml(getXWikiContext());
+        return this.pack.toXMLString(getXWikiContext());
     }
 
     /**

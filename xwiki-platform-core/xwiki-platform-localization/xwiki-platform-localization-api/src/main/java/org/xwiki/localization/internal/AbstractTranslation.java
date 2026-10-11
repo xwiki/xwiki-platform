@@ -22,9 +22,9 @@ package org.xwiki.localization.internal;
 import java.util.Collection;
 import java.util.Locale;
 
+import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
-import org.xwiki.localization.Translation;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.rendering.block.Block;
 
@@ -62,7 +62,7 @@ public abstract class AbstractTranslation implements Translation
      * @param key the key associated to the translation
      * @param message the actual translation message
      */
-    public AbstractTranslation(TranslationBundleContext context, LocalizedTranslationBundle localeBundle, String key,
+    protected AbstractTranslation(TranslationBundleContext context, LocalizedTranslationBundle localeBundle, String key,
         TranslationMessage message)
     {
         this.context = context;

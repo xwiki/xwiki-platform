@@ -21,8 +21,10 @@ package com.xpn.xwiki.internal.objects.classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -135,7 +137,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         spec.idField = StringUtils.defaultString(dbListClass.getIdField());
         spec.valueField = StringUtils.defaultString(dbListClass.getValueField());
         spec.parentField =
-            dbListClass instanceof DBTreeListClass ? ((DBTreeListClass) dbListClass).getParentField() : "";
+            dbListClass instanceof DBTreeListClass dbTreeListClass ? dbTreeListClass.getParentField() : "";
 
         spec.hasClassName = !StringUtils.isBlank(spec.className);
         spec.hasIdField = !StringUtils.isBlank(spec.idField);
@@ -156,7 +158,8 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
             statement = getStatementWhenIdOrValueFieldsAreSpecified(spec, parameters);
         } else if (spec.hasClassName) {
             statement = "select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj"
-                + " where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName";
+                + " where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+                + " order by doc.fullName";
             parameters.put(CLASS_NAME, spec.className);
             parameters.put(TEMPLATE_NAME, getTemplateName(spec.className));
         }
@@ -171,15 +174,16 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         return query;
     }
 
-    private void addFieldToQuery(String fieldName, String fieldAlias, DBListQuerySpec spec, List<String> selectClause,
+    private String addFieldToQuery(String fieldName, String fieldAlias, DBListQuerySpec spec, List<String> selectClause,
         List<String> fromClause, List<String> whereClause, Map<String, Object> parameters) throws QueryException
     {
+        String column;
         if (fieldName.startsWith(DOC_PREFIX) || fieldName.startsWith(OBJ_PREFIX)) {
             checkSimpleFieldName(fieldName);
-            selectClause.add(fieldName);
+            column = fieldName;
         } else if (!spec.hasClassName) {
             checkSimpleFieldName(fieldName);
-            selectClause.add(DOC_PREFIX + fieldName);
+            column = DOC_PREFIX + fieldName;
         } else {
             try {
                 // Only load the XClass when really needed.
@@ -199,7 +203,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
                     throw new QueryException(("Queries for email property [%s] on class [%s] aren't allowed as email "
                         + "obfuscation is enabled.").formatted(fieldName, spec.className), null);
                 }
-                selectClause.add(fieldAlias + ".value");
+                column = fieldAlias + ".value";
                 fromClause.add("StringProperty as " + fieldAlias);
                 whereClause.add(String.format("obj.id = %1$s.id.id and %1$s.id.name = :%1$s", fieldAlias));
                 parameters.put(fieldAlias, fieldName);
@@ -207,6 +211,8 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
                 throw new QueryException("Failed to get the XClass definition", null, e);
             }
         }
+        selectClause.add(column);
+        return column;
     }
 
     private void checkSimpleFieldName(String fieldName) throws QueryException
@@ -267,16 +273,19 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
             }
         }
 
-        addFieldToQuery(spec.idField, "idProp", spec, selectClause, fromClause, whereClause, parameters);
+        String idColumn = addFieldToQuery(spec.idField, "idProp", spec, selectClause, fromClause, whereClause,
+            parameters);
+        String valueColumn = null;
+        String parentColumn = null;
 
         if (spec.hasValueField) {
-            addFieldToQuery(spec.valueField, "valueProp", spec, selectClause, fromClause, whereClause,
+            valueColumn = addFieldToQuery(spec.valueField, "valueProp", spec, selectClause, fromClause, whereClause,
                 parameters);
 
             // We cannot include the parent field if there's no value field because we would confuse it with the value
             // field (the second column in the result set is reserved for the value).
             if (spec.hasParentField) {
-                addFieldToQuery(spec.parentField, "parentProp", spec, selectClause, fromClause,
+                parentColumn = addFieldToQuery(spec.parentField, "parentProp", spec, selectClause, fromClause,
                     whereClause, parameters);
             }
         }
@@ -284,11 +293,33 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         StringBuilder statementBuilder =
             new StringBuilder("select distinct ").append(StringUtils.join(selectClause, COLUMN_SEPARATOR))
                 .append(" from ").append(StringUtils.join(fromClause, COLUMN_SEPARATOR));
-        if (whereClause.size() > 0) {
+        if (!whereClause.isEmpty()) {
             statementBuilder.append(" where ").append(StringUtils.join(whereClause, " and "));
         }
+        statementBuilder.append(" order by ")
+            .append(StringUtils.join(getOrderByColumns(idColumn, valueColumn, parentColumn), COLUMN_SEPARATOR));
 
         return statementBuilder.toString();
+    }
+
+    /**
+     * Builds a deterministic order for the results so that they don't depend on the database's natural row order. We
+     * order by the displayed value first (the label the user sees), then by the remaining selected columns and finally
+     * by the document full name which is unique and thus guarantees a total order.
+     */
+    private Set<String> getOrderByColumns(String idColumn, String valueColumn, String parentColumn)
+    {
+        // Use a set to avoid ordering by the same column twice, e.g. when the id and value fields are the same.
+        Set<String> orderByColumns = new LinkedHashSet<>();
+        if (valueColumn != null) {
+            orderByColumns.add(valueColumn);
+        }
+        orderByColumns.add(idColumn);
+        if (parentColumn != null) {
+            orderByColumns.add(parentColumn);
+        }
+        orderByColumns.add("doc.fullName");
+        return orderByColumns;
     }
 
     private String getTemplateName(String className)

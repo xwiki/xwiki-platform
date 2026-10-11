@@ -52,8 +52,8 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
             reference = CurrentUserReference.INSTANCE;
         } else {
             EntityReference baseEntityReference;
-            if (parameters.length == 1 && parameters[0] instanceof WikiReference) {
-                baseEntityReference = new EntityReference(USER_SPACE_REFERENCE, (WikiReference) parameters[0]);
+            if (parameters.length == 1 && parameters[0] instanceof WikiReference wikiReference) {
+                baseEntityReference = new EntityReference(USER_SPACE_REFERENCE, wikiReference);
             } else {
                 baseEntityReference = USER_SPACE_REFERENCE;
             }

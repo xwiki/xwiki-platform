@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @since 11.8RC1
  */
 @ComponentTest
-public class ReplaceUserJobTest
+class ReplaceUserJobTest
 {
     @InjectMockComponents
     private ReplaceUserJob replaceUserJob;
@@ -68,7 +68,7 @@ public class ReplaceUserJobTest
     private ReplaceUserRequest request = new ReplaceUserRequest();
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
@@ -83,7 +83,7 @@ public class ReplaceUserJobTest
     }
 
     @Test
-    public void updateCreator() throws Exception
+    void updateCreator() throws Exception
     {
         this.request.setReplaceDocumentCreator(true);
         // Verify this doesn't have any effect if the document author doesn't match the request author.
@@ -100,7 +100,7 @@ public class ReplaceUserJobTest
     }
 
     @Test
-    public void updateAuthor() throws Exception
+    void updateAuthor() throws Exception
     {
         this.request.setReplaceDocumentAuthor(true);
         this.request.setReplaceDocumentContentAuthor(true);

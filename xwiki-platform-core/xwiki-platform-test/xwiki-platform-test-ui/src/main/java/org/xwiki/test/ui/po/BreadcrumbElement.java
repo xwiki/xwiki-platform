@@ -87,7 +87,7 @@ public class BreadcrumbElement extends BaseElement
                 result = getDriver().findElementsWithoutWaiting(this.container, By.xpath("//li[. = '" + text + "']"));
             }
         }
-        return result.size() > 0;
+        return !result.isEmpty();
     }
 
     public void expand()

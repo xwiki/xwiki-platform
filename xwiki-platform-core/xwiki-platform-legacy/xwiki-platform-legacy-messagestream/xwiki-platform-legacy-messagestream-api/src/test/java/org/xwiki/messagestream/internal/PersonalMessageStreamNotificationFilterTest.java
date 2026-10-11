@@ -19,7 +19,7 @@
  */
 package org.xwiki.messagestream.internal;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -93,14 +93,14 @@ class PersonalMessageStreamNotificationFilterTest
     void matchesPreference()
     {
         NotificationPreference notificationPreference = mock(NotificationPreference.class);
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties = new EnumMap<>(NotificationPreferenceProperty.class);
         properties.put(EVENT_TYPE, "personalMessage");
         when(notificationPreference.getProperties()).thenReturn(properties);
 
         assertTrue(this.personalMessageFilter.matchesPreference(notificationPreference));
 
         NotificationPreference notificationPreference2 = mock(NotificationPreference.class);
-        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties2 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties2.put(EVENT_TYPE, "otherEventType");
         when(notificationPreference2.getProperties()).thenReturn(properties2);
 

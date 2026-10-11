@@ -22,6 +22,7 @@ package org.xwiki.query.jpql.internal;
 import org.junit.jupiter.api.Test;
 import org.xwiki.query.internal.jpql.node.Start;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -34,39 +35,49 @@ class JPQLParserTest
     private JPQLParser parser = new JPQLParser();
 
     @Test
-    void parseVariousJPQL() throws Exception
+    void parseVariousJPQL()
     {
         // quotes
-        parser.parse("select a from A as a where a.f='str'");
-        parser.parse("select a from A as a where a.f=\"str\"");
+        assertDoesNotThrow(() -> parser.parse("select a from A as a where a.f='str'"));
+        assertDoesNotThrow(() -> parser.parse("select a from A as a where a.f=\"str\""));
 
         // order by
-        parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number");
-        parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number desc");
-        parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number asc");
-        parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by 1 asc");
+        assertDoesNotThrow(() -> parser.parse(
+            "select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number"));
+        assertDoesNotThrow(() -> parser.parse(
+            "select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number desc"));
+        assertDoesNotThrow(() -> parser.parse(
+            "select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number asc"));
+        assertDoesNotThrow(() -> parser.parse(
+            "select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by 1 asc"));
 
         // group by
-        parser.parse("select doc.XWD_FULLNAME from Document doc group by doc.XWD_FULLNAME");
-        parser.parse("select doc.XWD_FULLNAME from Document doc group by 1");
+        assertDoesNotThrow(() -> parser.parse(
+            "select doc.XWD_FULLNAME from Document doc group by doc.XWD_FULLNAME"));
+        assertDoesNotThrow(() -> parser.parse(
+            "select doc.XWD_FULLNAME from Document doc group by 1"));
 
         // member of
-        parser.parse("select a from A as a where :param member of a.prop");
+        assertDoesNotThrow(() -> parser.parse(
+            "select a from A as a where :param member of a.prop"));
 
         // input parameters
-        parser.parse("select a from A as a where a.p = ?1 or :name = a.p or ?2 member of a.p or a.p like :qwe");
+        assertDoesNotThrow(() -> parser.parse(
+            "select a from A as a where a.p = ?1 or :name = a.p or ?2 member of a.p or a.p like :qwe"));
     }
 
     @Test
-    void parseXWQLExtensions() throws Exception
+    void parseXWQLExtensions()
     {
         // object() in from clause
-        parser.parse("select doc from Document as doc, doc.object('XWiki.Test') as test where test.some=1");
-        parser.parse("select doc from Document as doc, doc.object(XWiki.Test) as test where test.some=1");
+        assertDoesNotThrow(() -> parser.parse(
+            "select doc from Document as doc, doc.object('XWiki.Test') as test where test.some=1"));
+        assertDoesNotThrow(() -> parser.parse(
+            "select doc from Document as doc, doc.object(XWiki.Test) as test where test.some=1"));
 
         // object() in where clause
-        parser.parse("select doc from Document as doc where doc.object('XWiki.Test').prop=1");
-        parser.parse("select doc from Document as doc where doc.object(XWiki.Test).prop=1");
+        assertDoesNotThrow(() -> parser.parse("select doc from Document as doc where doc.object('XWiki.Test').prop=1"));
+        assertDoesNotThrow(() -> parser.parse("select doc from Document as doc where doc.object(XWiki.Test).prop=1"));
     }
 
     @Test

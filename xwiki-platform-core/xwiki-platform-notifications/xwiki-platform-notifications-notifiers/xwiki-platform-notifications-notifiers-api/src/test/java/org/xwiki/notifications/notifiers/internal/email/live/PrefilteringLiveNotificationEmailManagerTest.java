@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class PrefilteringLiveNotificationEmailManagerTest
+class PrefilteringLiveNotificationEmailManagerTest
 {
     @InjectMockComponents
     private PrefilteringLiveNotificationEmailManager manager;
@@ -73,10 +73,10 @@ public class PrefilteringLiveNotificationEmailManagerTest
     void beforeComponent() throws ComponentLookupException
     {
         ExecutionContextManager executionContextManager = mock(ExecutionContextManager.class);
-        Execution execution = mock(Execution.class);
+        Execution executionMock = mock(Execution.class);
 
         when(this.componentManager.getInstance(ExecutionContextManager.class)).thenReturn(executionContextManager);
-        when(this.componentManager.getInstance(Execution.class)).thenReturn(execution);
+        when(this.componentManager.getInstance(Execution.class)).thenReturn(executionMock);
     }
 
     @Test

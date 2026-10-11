@@ -21,7 +21,6 @@ package org.xwiki.url.internal;
 
 import java.util.Collections;
 import java.util.List;
-
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -85,7 +84,7 @@ public abstract class AbstractExtendedURLResourceTypeResolver implements Resourc
         // Resource.
         List<String> segments = extendedURL.getSegments();
 
-        String nextSegment = segments.size() > 0 ? segments.get(0) : null;
+        String nextSegment = !segments.isEmpty() ? segments.get(0) : null;
         resourceType = this.defaultStringResourceTypeResolver.resolve(nextSegment, Collections.emptyMap());
 
         // First, find out if an ExtendedURL Resource Resolver exists, only for this URL scheme.

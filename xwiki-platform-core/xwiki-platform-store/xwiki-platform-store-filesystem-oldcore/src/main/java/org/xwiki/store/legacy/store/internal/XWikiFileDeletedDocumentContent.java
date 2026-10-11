@@ -20,6 +20,7 @@
 package org.xwiki.store.legacy.store.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
@@ -55,8 +56,8 @@ public class XWikiFileDeletedDocumentContent implements XWikiDeletedDocumentCont
     @Override
     public String getContentAsString() throws IOException
     {
-        try {
-            return IOUtils.toString(this.content.getStream(), this.charset);
+        try (InputStream stream = this.content.getStream()) {
+            return IOUtils.toString(stream, this.charset);
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {

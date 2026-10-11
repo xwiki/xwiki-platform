@@ -87,8 +87,7 @@ public class StyleFilter extends AbstractHTMLFilter
      */
     private void filter(Node node, Map<String, String> attributeMappings)
     {
-        if (node instanceof Element) {
-            Element element = (Element) node;
+        if (node instanceof Element element) {
             String allowedAttributes = attributeMappings.get(element.getNodeName().toLowerCase());
             NamedNodeMap currentAttributes = element.getAttributes();
             if (null == allowedAttributes) {

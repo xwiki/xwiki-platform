@@ -19,24 +19,33 @@
  */
 package org.xwiki.flamingo.test.ui;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.support.Color;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
 import org.xwiki.flamingo.test.po.EditThemePage;
 import org.xwiki.flamingo.test.po.PreviewBox;
 import org.xwiki.flamingo.test.po.ThemeApplicationWebHomePage;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -51,6 +60,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class FlamingoThemeIT
 {
+    private static final String THEMES_SPACE = "FlamingoThemes";
+
+    private static final String COLOR_THEME_PREFERENCE = "colorTheme";
+
+    private static final String LOGO_NAME = "logo.png";
+
+    /**
+     * The brand colors set by {@link #changeBaseBrandColors}. They are dark enough to keep a proper contrast with the
+     * light backgrounds and texts they are combined with.
+     */
+    private static final String BRAND_PRIMARY = "#1a4d80";
+
+    private static final String BRAND_INFO = "#0b5c73";
+
+    private static final String BRAND_DANGER = "#a11212";
+
     @AfterEach
     void verify(LogCaptureConfiguration logCaptureConfiguration)
     {
@@ -59,18 +84,19 @@ class FlamingoThemeIT
     }
 
     @Test
+    @Order(1)
     void validateColorThemeFeatures(TestUtils setup, TestInfo info)
     {
         setup.loginAsSuperAdmin();
 
         // First make sure the theme we'll create doesn't exist
         String testMethodName = info.getTestMethod().get().getName();
-        setup.deletePage("FlamingoThemes", testMethodName);
+        setup.deletePage(THEMES_SPACE, testMethodName);
 
         // Note: we don't reset the color theme before we start even though the test below could fail and thus have
         // our test theme set. We don't do that since we want to test that the default CT is Charcoal by default.
-        // The reason why it's ok is because we have only a single UI test in this module and thus there's no risk
-        // that another test would fail because it's expecting to have Charcoal defined.
+        // The reason why it's ok is that this test is executed first (see @Order) and the other tests of this class
+        // restore the color theme they set, so the default one is still in place here.
         // Only caveat is that if you run this test several times and it fails the first time then it may fail the
         // second time when we test that the default CT is Charcoal...
 
@@ -101,10 +127,102 @@ class FlamingoThemeIT
         validateViewAndSetThemeFromThemeHomePage(testMethodName);
 
         // Validate setting a color theme from the wiki Admin UI
-        validateSetThemeFromWikiAdminUI(testMethodName);
+        validateSetThemeFromWikiAdminUI(testMethodName, setup);
 
         // Validate setting a color theme from the page Admin UI for the page and its children
         validateSetThemeFromPageAdminUI(testMethodName, setup, info);
+    }
+
+    @Test
+    @Order(2)
+    void changeThemeLogo(TestUtils setup, TestConfiguration testConfiguration, TestInfo info) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        // First make sure the theme we'll create doesn't exist
+        String themeName = info.getTestMethod().get().getName();
+        DocumentReference themeReference = new DocumentReference("xwiki", THEMES_SPACE, themeName);
+        setup.deletePage(themeReference);
+
+        // Set the logo of a new theme by uploading an image with the attachment picker of the "Logos" category.
+        EditThemePage editThemePage = ThemeApplicationWebHomePage.gotoPage().createNewTheme(themeName);
+        // Disable the auto refresh of the preview because it slows down the test.
+        editThemePage.setAutoRefresh(false);
+        editThemePage.selectVariableCategory("Logos");
+        File logoFile = new File(testConfiguration.getBrowser().getTestResourcesPath(), LOGO_NAME);
+        editThemePage.setImageVariableValue("logo", logoFile.getAbsolutePath());
+        // The picker selects the image it has just uploaded, but as a temporary attachment: it's only attached to the
+        // theme when the theme is saved.
+        assertEquals(LOGO_NAME, editThemePage.getImageVariableValue("logo"));
+        editThemePage.clickSaveAndView();
+        AttachmentReference logoReference = new AttachmentReference(LOGO_NAME, themeReference);
+        assertTrue(setup.rest().exists(logoReference),
+            String.format("The [%s] image was not attached to the theme when saving it", LOGO_NAME));
+
+        // Verify that the uploaded image is displayed as the wiki logo when the theme is used, in place of the logo
+        // provided by the skin.
+        String previousColorTheme = setup.setWikiPreference(COLOR_THEME_PREFERENCE, THEMES_SPACE + '.' + themeName);
+        try {
+            ViewPage viewPage = setup.gotoPage("Main", "WebHome");
+            // The logo URL also carries the revision of the attachment, which is not relevant here.
+            assertEquals(setup.getURL(logoReference, "download", null),
+                StringUtils.substringBefore(viewPage.getLogoImageURL(), "?"));
+        } finally {
+            // Restore the color theme that was in use so that this test doesn't affect the other tests.
+            setup.setWikiPreference(COLOR_THEME_PREFERENCE, Objects.toString(previousColorTheme, ""));
+        }
+    }
+
+    @Test
+    @Order(3)
+    void changeBaseBrandColors(TestUtils setup, TestInfo info) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        // First make sure the theme we'll create doesn't exist
+        String themeName = info.getTestMethod().get().getName();
+        setup.deletePage(THEMES_SPACE, themeName);
+
+        // Set the brand colors of the "Base colors" category in a new theme.
+        EditThemePage editThemePage = ThemeApplicationWebHomePage.gotoPage().createNewTheme(themeName);
+        // Disable the auto refresh of the preview because it slows down the test.
+        editThemePage.setAutoRefresh(false);
+        editThemePage.selectVariableCategory("Base colors");
+        // Set the first color with the color picker, to check that the picker is there and works, and the remaining
+        // ones by typing their value directly, which is faster.
+        editThemePage.pickVariableColor("brand-primary", BRAND_PRIMARY);
+        editThemePage.setVariableValue("brand-info", BRAND_INFO);
+        editThemePage.setVariableValue("brand-danger", BRAND_DANGER);
+
+        // The preview box next to each input is only filled in by the color picker, so these assertions also verify
+        // that the picker is initialized for the variables whose value was typed directly.
+        assertColor(BRAND_PRIMARY, editThemePage.getColorPreview("brand-primary"));
+        assertColor(BRAND_INFO, editThemePage.getColorPreview("brand-info"));
+        assertColor(BRAND_DANGER, editThemePage.getColorPreview("brand-danger"));
+
+        editThemePage.clickSaveAndView();
+
+        // The brand info and brand danger colors are exposed to wiki pages through the color theme variables they are
+        // mapped to, so use these variables to color some text. The brand primary color is not exposed as a color theme
+        // variable, but the skin uses it for the "text-primary" style.
+        DocumentReference testPage =
+            new DocumentReference("xwiki", info.getTestClass().get().getSimpleName(), themeName);
+        setup.createPage(testPage, "{{velocity}}\n"
+            + "(% id=\"brandPrimary\" class=\"text-primary\" %)brand primary\n\n"
+            + "(% id=\"brandInfo\" style=\"color: $theme.notificationInfoColor\" %)brand info\n\n"
+            + "(% id=\"brandDanger\" style=\"color: $theme.notificationErrorColor\" %)brand danger\n"
+            + "{{/velocity}}");
+
+        String previousColorTheme = setup.setWikiPreference(COLOR_THEME_PREFERENCE, THEMES_SPACE + '.' + themeName);
+        try {
+            ViewPage viewPage = setup.gotoPage(testPage);
+            assertColor(BRAND_PRIMARY, viewPage.getElementCSSValue(By.id("brandPrimary"), "color"));
+            assertColor(BRAND_INFO, viewPage.getElementCSSValue(By.id("brandInfo"), "color"));
+            assertColor(BRAND_DANGER, viewPage.getElementCSSValue(By.id("brandDanger"), "color"));
+        } finally {
+            // Restore the color theme that was in use so that this test doesn't affect the other tests.
+            setup.setWikiPreference(COLOR_THEME_PREFERENCE, Objects.toString(previousColorTheme, ""));
+        }
     }
 
     private void validateThemeCreation(ThemeApplicationWebHomePage themeApplicationWebHomePage, String testMethodName)
@@ -144,7 +262,7 @@ class FlamingoThemeIT
         themeApplicationWebHomePage.useTheme("Charcoal");
     }
 
-    private void validateSetThemeFromWikiAdminUI(String testMethodName)
+    private void validateSetThemeFromWikiAdminUI(String testMethodName, TestUtils setup)
     {
         // Go back to the Theme Admin UI to verify we can set the new theme from there too (using the select control)
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
@@ -163,6 +281,14 @@ class FlamingoThemeIT
         EditThemePage editThemePage = new EditThemePage();
         assertFalse(editThemePage.getPreviewBox().hasError(true));
         editThemePage.clickSaveAndView();
+
+        // Verify that the default button background defined by the theme is applied on a wiki page, the "Cancel"
+        // button of the editor being one of the buttons using that style.
+        // Note: the skin doesn't use the @btn-default-bg value as-is, it lightens it by 5% (see buttons.less), which
+        // turns the #99ccff set on the theme into #b3d9ff.
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage("Main", "WebHome");
+        assertColor(179, 217, 255, wikiEditPage.getCancelButtonBackgroundColor());
+        wikiEditPage.clickCancel();
 
         // Switch back to Charcoal
         // TODO: Replace this with a setup.updateObject() call since we don't need to test the useTheme() UI as it's
@@ -209,14 +335,23 @@ class FlamingoThemeIT
 
     private void assertCustomThemeColors(ViewPage page)
     {
-        // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed
-        // for now we get rgb value with Firefox and rgba value with Chrome
-        //assertEquals("rgb(255, 0, 0)", page.getPageBackgroundColor());
-        // Test 'lessCode' is correctly handled
-        //assertEquals("rgb(0, 0, 255)", page.getTextColor());
         assertColor(255, 218, 218, page.getPageBackgroundColor());
+        // The text color set by the theme is inherited from the "body" element. Note that we cannot assert it on the
+        // page content since the 'lessCode' variable set by this test colors the whole ".main" block in blue.
+        assertColor(102, 51, 0, page.getTextColor());
+        // Test 'lessCode' is correctly handled, the title being inside the ".main" block it colors.
         assertColor(0, 0, 255, page.getTitleColor());
         assertEquals("monospace", page.getTitleFontFamily().toLowerCase());
+    }
+
+    /**
+     * @param expectedColor the expected color, in any CSS notation (e.g. {@code #1a4d80})
+     * @param obtainedColor the obtained color, in any CSS notation (e.g. {@code rgb(26, 77, 128)})
+     */
+    private void assertColor(String expectedColor, String obtainedColor)
+    {
+        assertEquals(Color.fromString(expectedColor), Color.fromString(obtainedColor),
+            String.format("Wrong color [expected = %s | obtained = %s]", expectedColor, obtainedColor));
     }
 
     private void assertColor(int red, int green, int blue, String obtainedValue)
@@ -268,26 +403,49 @@ class FlamingoThemeIT
         editThemePage.setVariableValue("link-color", "#2c699c");
         // Change another value. We don't deactivate all WCAG checks, so we need to take care about contrast.
         editThemePage.setVariableValue("xwiki-page-content-bg", "#ffdada");
+        // Change the color of the page's text. It's dark enough to keep a proper contrast with the page backgrounds.
+        editThemePage.setVariableValue("text-color", "#663300");
         // Again...
         editThemePage.selectVariableCategory("Typography");
+        // Verify that setting only "Font Family Sans Serif" (and leaving "Font Family Base" empty) is enough for the
+        // custom font to be applied, since Bootstrap's LESS makes @font-family-base fall back to
+        // @font-family-sans-serif. Note that "math" is a CSS generic font family and not a font name: the assertion
+        // below reads the computed CSS value, so no matching font needs to be installed on the OS running the browser.
+        // Avoid the "fantasy" generic family here since Firefox doesn't support it on Linux.
+        editThemePage.setVariableValue("font-family-sans-serif", "math");
+        refreshPreviewWithRetry(editThemePage);
+        previewBox = editThemePage.getPreviewBox();
+        assertFalse(previewBox.hasError());
+        assertEquals("math", previewBox.getTitleFontFamily().toLowerCase());
+        previewBox.switchToDefaultContent();
+
         editThemePage.setVariableValue("font-family-base", "Monospace");
+        // Change the background of the buttons using the default style. It's light enough to keep a proper contrast
+        // with the button text color.
+        editThemePage.selectVariableCategory("Buttons");
+        editThemePage.setVariableValue("btn-default-bg", "#99ccff");
         // Test that the @lessCode variable is handled too!
         editThemePage.selectVariableCategory("Advanced");
         editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");
         // Refresh
-        // From time-to-time the preview does not load on Firefox certainly because of some JS race condition.
-        // Right now we cannot get the javascript console logs because of a geckodriver limitation, so it's hard to
-        // fix properly. For now, I'm trying to just trigger once again the refresh in case of first timeout.
-        try {
-            editThemePage.refreshPreview();
-        } catch (TimeoutException e) {
-            editThemePage.refreshPreview();
-        }
+        refreshPreviewWithRetry(editThemePage);
         previewBox = editThemePage.getPreviewBox();
         // Verify that there is still no errors
         assertFalse(previewBox.hasError());
         // Verify colors
         assertCustomThemeColors(previewBox);
         previewBox.switchToDefaultContent();
+    }
+
+    // From time-to-time the preview does not load on Firefox certainly because of some JS race condition.
+    // Right now we cannot get the javascript console logs because of a geckodriver limitation, so it's hard to
+    // fix properly. For now, we just trigger once again the refresh in case of first timeout.
+    private void refreshPreviewWithRetry(EditThemePage editThemePage)
+    {
+        try {
+            editThemePage.refreshPreview();
+        } catch (TimeoutException e) {
+            editThemePage.refreshPreview();
+        }
     }
 }

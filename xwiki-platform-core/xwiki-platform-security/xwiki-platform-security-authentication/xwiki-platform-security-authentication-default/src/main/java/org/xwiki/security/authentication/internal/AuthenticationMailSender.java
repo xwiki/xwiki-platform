@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -210,7 +209,7 @@ public class AuthenticationMailSender
         Map<String, Object> velocityVariables = new HashMap<>();
         List<String> usernames = userReferences.stream()
             .map(this.userReferenceSerializer::serialize)
-            .collect(Collectors.toList());
+            .toList();
         velocityVariables.put("usernames", usernames);
 
         Map<String, Object> parameters = this.getEmailParameters(email, "Forgot Username", velocityVariables);

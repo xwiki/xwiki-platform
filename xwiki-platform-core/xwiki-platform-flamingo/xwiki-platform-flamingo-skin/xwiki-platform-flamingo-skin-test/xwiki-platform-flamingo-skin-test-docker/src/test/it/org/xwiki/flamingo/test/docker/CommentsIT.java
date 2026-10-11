@@ -19,8 +19,9 @@
  */
 package org.xwiki.flamingo.test.docker;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
@@ -38,8 +39,11 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CommentElement;
 import org.xwiki.test.ui.po.CommentForm;
 import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.PermalinkModal;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -68,7 +72,13 @@ class CommentsIT
 
     private static final String COMMENT_REPLACED_CONTENT = "Some replaced content";
 
-    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    /**
+     * The dates sent to the server are parsed by the server in its own timezone, and the dates asserted below are
+     * expressed in UTC (the test sets the wiki timezone to UTC). Thus the dates must be formatted in UTC and not in
+     * the timezone of the machine running the test, otherwise the assertions are off by that timezone's offset.
+     */
+    private static final DateTimeFormatter DEFAULT_DATE_FORMAT =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneOffset.UTC);
 
     @BeforeEach
     void beforeEach(TestUtils setup)
@@ -98,8 +108,8 @@ class CommentsIT
         assertEquals(COMMENT_AUTHOR_GUEST, commentsTab.getCommentAuthorByID(0));
 
         // Reply as anonymous.
-        commentsTab.postCommentAsGuest(COMMENT_CONTENT, COMMENT_AUTHOR_GUEST, true);
-        commentsTab.replyToCommentByID(commentsTab.getCommentID(COMMENT_CONTENT), COMMENT_REPLY);
+        int commentIndex = commentsTab.postCommentAsGuest(COMMENT_CONTENT, COMMENT_AUTHOR_GUEST, true);
+        commentsTab.replyToCommentByID(commentIndex, COMMENT_REPLY);
         assertEquals(COMMENT_REPLY, commentsTab.getCommentContentByID(commentsTab.getCommentID(COMMENT_REPLY)));
         assertEquals(COMMENT_AUTHOR_GUEST, commentsTab.getCommentAuthorByID(commentsTab.getCommentID(COMMENT_REPLY)));
         
@@ -160,6 +170,19 @@ class CommentsIT
         commentsTab.cancelCommentForm();
         commentsTab.clickOnReplyToCommentByID(commentIndex);
         commentsTab.cancelCommentForm();
+
+        // Comment from the comments viewer, opened through the "More actions" menu.
+        ViewPage viewPage = new ViewPage();
+        CommentsTab commentsViewer = viewPage.openCommentsViewerFromMoreActions();
+        assertThat(viewPage.getPageURL(), containsString("viewer=comments"));
+        String viewerComment = "Comment from the comments viewer";
+        commentIndex = commentsViewer.postComment(viewerComment, true);
+        assertEquals(USER_NAME, commentsViewer.getCommentAuthorByID(commentIndex));
+
+        // The comment is listed in the comments of the page.
+        CommentsTab pageCommentsTab = setup.gotoPage(reference).openCommentsDocExtraPane();
+        commentIndex = pageCommentsTab.getCommentID(viewerComment);
+        assertEquals(USER_NAME, pageCommentsTab.getCommentAuthorByID(commentIndex));
     }
 
     @Test
@@ -191,7 +214,7 @@ class CommentsIT
 
     private String getDateString(int seconds)
     {
-        return DEFAULT_DATE_FORMAT.format(new Date(seconds * 1000L));
+        return DEFAULT_DATE_FORMAT.format(Instant.ofEpochSecond(seconds));
     }
 
     @ParameterizedTest
@@ -307,6 +330,7 @@ class CommentsIT
         assertFalse(commentElement.isReply());
 
         commentElement = comments.get(2);
+        commentsTab.toggleCommentThread(1);
         assertEquals("Comment object 7 at date 66 reply to 1", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
         assertDate("1970", "01", "01", "01", commentElement.getDate(), isFrenchDateFormat);
@@ -380,5 +404,26 @@ class CommentsIT
     {
         setup.loginAsSuperAdmin();
         setup.setPropertyInXWikiPreferences("dateformat", "String", "");
+    }
+
+    @Test
+    @Order(5)
+    void shareCommentPermalink(TestUtils setup, TestReference reference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.deletePage(reference);
+        setup.createAdminUser();
+        setup.loginAsAdmin();
+
+        CommentsTab commentsTab = setup.createPage(reference, "").openCommentsDocExtraPane();
+        int commentId = commentsTab.postComment(COMMENT_CONTENT, true);
+
+        PermalinkModal permalinkModal = commentsTab.openPermalinkModalByID(commentId);
+        assertTrue(permalinkModal.getPermalinkValue().endsWith("#xwikicomment_" + commentId),
+            () -> String.format("Expected the permalink to end with [#xwikicomment_%d], got [%s] instead.", commentId,
+                permalinkModal.getPermalinkValue()));
+
+        permalinkModal.clickCopyToClipboard();
+        permalinkModal.waitForNotificationInfoMessage("Link copied to clipboard");
     }
 }

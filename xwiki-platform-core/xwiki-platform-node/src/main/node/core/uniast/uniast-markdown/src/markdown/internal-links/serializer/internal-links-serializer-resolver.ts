@@ -38,7 +38,9 @@ export class InternalLinksSerializerResolver {
       return factory();
     } catch (e) {
       console.debug(e);
-      throw new Error(`Could not resolve serializer for type ${type}`);
+      throw new Error(`Could not resolve serializer for type ${type}`, {
+        cause: e,
+      });
     }
   }
 }

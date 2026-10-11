@@ -53,7 +53,7 @@ public class EntitySelection implements Comparable<EntitySelection>
          * Default state. By default, UNKNOWN is considered as selected: see {@link #isSelected()}.
          */
         UNKNOWN
-    };
+    }
 
     /**
      * Reference to the entity to select for the refactoring.

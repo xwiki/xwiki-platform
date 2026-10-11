@@ -63,7 +63,7 @@ class DefaultIconSetCacheTest
     private Cache<IconSet> cache;
 
     @BeforeComponent
-    void setUp() throws Exception
+    void setup() throws Exception
     {
         CacheFactory cacheFactory = mock(CacheFactory.class);
         when(this.cacheManager.getCacheFactory()).thenReturn(cacheFactory);

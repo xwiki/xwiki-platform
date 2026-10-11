@@ -22,11 +22,14 @@ package com.xpn.xwiki.objects.classes;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ecs.xhtml.div;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.label;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.stability.Unstable;
 import org.xwiki.xml.XMLUtils;
 
@@ -40,12 +43,38 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class BooleanClass extends PropertyClass
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BooleanClass.class);
+
     /**
      * The type used as a hint to find the class.
      * @since 18.2.0RC1
      */
     @Unstable
     public static final String PROPERTY_TYPE = "Boolean";
+
+    /**
+     * Display value showing the property as a "yes/no" label. Usable as a display type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_YESNO = "yesno";
+
+    /**
+     * Display value using a select box. Usable both as a display type and as a form (edit) type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_SELECT = "select";
+
+    /**
+     * Display value using a checkbox. Usable both as a display type and as a form (edit) type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_CHECKBOX = "checkbox";
+
+    /**
+     * Display value using radio buttons. Usable as a form (edit) type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_RADIO = "radio";
 
     private static final long serialVersionUID = 1L;
 
@@ -59,13 +88,13 @@ public class BooleanClass extends PropertyClass
     
     public BooleanClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Boolean", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
     public BooleanClass()
     {
         this(null);
-        setDisplayFormType("select");
+        setDisplayFormType(DISPLAY_SELECT);
     }
 
     public void setDisplayType(String type)
@@ -77,7 +106,7 @@ public class BooleanClass extends PropertyClass
     {
         String dtype = getStringValue("displayType");
         if ((dtype == null) || (dtype.isEmpty())) {
-            return "yesno";
+            return DISPLAY_YESNO;
         }
         return dtype;
     }
@@ -86,7 +115,7 @@ public class BooleanClass extends PropertyClass
     {
         String dtype = getStringValue("displayFormType");
         if ((dtype == null) || (dtype.isEmpty())) {
-            return "radio";
+            return DISPLAY_RADIO;
         }
         return dtype;
     }
@@ -151,7 +180,7 @@ public class BooleanClass extends PropertyClass
         Integer iValue = (Integer) prop.getValue();
         if (iValue != null) {
             int value = iValue.intValue();
-            buffer.append(getDisplayValue(context, value));
+            buffer.append(XMLUtils.escapeElementText(getDisplayValue(value)));
         }
     }
 
@@ -174,13 +203,13 @@ public class BooleanClass extends PropertyClass
     {
         String displayFormType = getDisplayFormType();
 
-        if ("checkbox".equals(getDisplayType())) {
-            displayFormType = "checkbox";
+        if (DISPLAY_CHECKBOX.equals(getDisplayType())) {
+            displayFormType = DISPLAY_CHECKBOX;
         }
 
-        if ("checkbox".equals(displayFormType)) {
+        if (DISPLAY_CHECKBOX.equals(displayFormType)) {
             displayCheckboxEdit(buffer, name, prefix, object, context);
-        } else if ("select".equals(displayFormType)) {
+        } else if (DISPLAY_SELECT.equals(displayFormType)) {
             displaySelectEdit(buffer, name, prefix, object, context);
         } else {
             displayRadioEdit(buffer, name, prefix, object, context);
@@ -195,23 +224,27 @@ public class BooleanClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
+        // This is a text alternative fallback to explain what the select is about. If the select has already been
+        // labelled in another way, this fallback will be ignored by Assistive Techs.
+        select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+            getTranslatedPrettyName(context)));
 
-        String String0 = getDisplayValue(context, 0);
-        String String1 = getDisplayValue(context, 1);
+        String string0 = getDisplayValue(0);
+        String string1 = getDisplayValue(1);
         int nb1 = 1;
         int nb2 = 2;
 
         option[] options;
 
         if (getDefaultValue() == -1) {
-            options = new option[] { new option("---", ""), new option(String1, "1"), new option(String0, "0") };
+            options = new option[] { new option("---", ""), new option(string1, "1"), new option(string0, "0") };
             options[0].addElement("---");
-            options[1].addElement(XMLUtils.escape(String1));
-            options[2].addElement(XMLUtils.escape(String0));
+            options[1].addElement(XMLUtils.escape(string1));
+            options[2].addElement(XMLUtils.escape(string0));
         } else {
-            options = new option[] { new option(String1, "1"), new option(String0, "0") };
-            options[0].addElement(XMLUtils.escape(String1));
-            options[1].addElement(XMLUtils.escape(String0));
+            options = new option[] { new option(string1, "1"), new option(string0, "0") };
+            options[0].addElement(XMLUtils.escape(string1));
+            options[1].addElement(XMLUtils.escape(string0));
             nb1 = 0;
             nb2 = 1;
         }
@@ -221,12 +254,10 @@ public class BooleanClass extends PropertyClass
         }
 
         int value = getValue(name, object);
-        if (value == 1) {
-            options[nb1].setSelected(true);
-        } else if (value == 0) {
-            options[nb2].setSelected(true);
-        } else {
-            options[0].setSelected(true);
+        switch (value) {
+            case 1 -> options[nb1].setSelected(true);
+            case 0 -> options[nb2].setSelected(true);
+            default -> options[0].setSelected(true);
         }
 
         select.addElement(options);
@@ -236,9 +267,9 @@ public class BooleanClass extends PropertyClass
     public void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        String StringNone = getDisplayValue(context, 2);
-        String StringTrue = getDisplayValue(context, 1);
-        String StringFalse = getDisplayValue(context, 0);
+        String stringNone = getDisplayValue(2);
+        String stringTrue = getDisplayValue(1);
+        String stringFalse = getDisplayValue(0);
         div[] inputs;
 
         input radioNone = new input(input.radio, prefix + name, "");
@@ -251,19 +282,25 @@ public class BooleanClass extends PropertyClass
         radioTrue.setDisabled(isDisabled());
         radioFalse.setDisabled(isDisabled());
         label labelNone = new label();
+        labelNone.setAttributeFilter(new XMLAttributeValueFilter());
         label labelTrue = new label();
+        labelTrue.setAttributeFilter(new XMLAttributeValueFilter());
         label labelFalse = new label();
+        labelFalse.setAttributeFilter(new XMLAttributeValueFilter());
         div divNone = new div();
+        divNone.setAttributeFilter(new XMLAttributeValueFilter());
         div divTrue = new div();
+        divTrue.setAttributeFilter(new XMLAttributeValueFilter());
         div divFalse = new div();
+        divFalse.setAttributeFilter(new XMLAttributeValueFilter());
         labelNone.addElement(radioNone);
-        labelNone.addElement(StringNone);
+        labelNone.addElement(XMLUtils.escape(stringNone));
         divNone.addElement(labelNone);
         labelTrue.addElement(radioTrue);
-        labelTrue.addElement(StringTrue);
+        labelTrue.addElement(XMLUtils.escape(stringTrue));
         divTrue.addElement(labelTrue);
         labelFalse.addElement(radioFalse);
-        labelFalse.addElement(StringFalse);
+        labelFalse.addElement(XMLUtils.escape(stringFalse));
         divFalse.addElement(labelFalse);
 
         radioNone.setID(prefix + name + "_none");
@@ -282,12 +319,10 @@ public class BooleanClass extends PropertyClass
         }
 
         int value = getValue(name, object);
-        if (value == 1) {
-            radioTrue.setChecked(true);
-        } else if (value == 0) {
-            radioFalse.setChecked(true);
-        } else {
-            radioNone.setChecked(true);
+        switch (value) {
+            case 1 -> radioTrue.setChecked(true);
+            case 0 -> radioFalse.setChecked(true);
+            default -> radioNone.setChecked(true);
         }
 
         for (div input : inputs) {
@@ -323,11 +358,10 @@ public class BooleanClass extends PropertyClass
      * <li>else return V if V is 0 or 1, or --- if V is 2 (undecided)</li>
      * </ol>
      *
-     * @param context The request context.
      * @param value The internal value.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
      */
-    private String getDisplayValue(XWikiContext context, int value)
+    private String getDisplayValue(int value)
     {
         try {
             // <classname>_<property>_<value>
@@ -348,7 +382,8 @@ public class BooleanClass extends PropertyClass
             }
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to get the display value of [{}] for property [{}]. Root cause is [{}]", value,
+                getFieldFullName(), ExceptionUtils.getRootCauseMessage(e));
             return "" + value;
         }
     }

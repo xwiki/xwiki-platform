@@ -17,33 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Status } from "./status";
-import type { CollaborationInitializer } from "./collaborationInitializer";
-import type { User } from "./user";
-import type { Ref } from "vue";
+import type { Collaboration } from "./collaboration";
+import type { DocumentReference } from "@xwiki/platform-model-api";
 
 /**
- * The manager for a given collaboration provider (e.g., hocuspocus, or y-websocket).
- * @since 18.0.0RC1
+ * The role name used to retrieve the collaboration manager from the component manager.
+ *
+ * @since 18.4.0RC1
+ * @beta
+ */
+const collaborationManagerName: string = "CollaborationManager";
+
+/**
+ * Used to connect to a realtime collaboration session using a specific collaboration provider (e.g. hocuspocus or
+ * y-websocket).
+ *
+ * @since 18.4.0RC1
  * @beta
  */
 interface CollaborationManager {
   /**
-   * A lazy initializer for a collaboration initializer. We proceed that way to allow the collaboration provider to
-   * be resolved and assigned outside the editor, but to be effectively initialized inside the editor, where
-   * access to the internal editor structure is available.
+   * Attempts to connect to the realtime collaboration session for the specified document (or the current document), and
+   * returns the joined collaboration once the connection is established and the initial synchronization is done.
+   *
+   * @param documentReference - the reference of the document for which to join the realtime collaboration session;
+   *   falls back to the current document reference when not specified
+   * @returns a promise that resolves with the joined collaboration, once the connection is established and the initial
+   *   synchronization is done
    */
-  get(): Promise<() => CollaborationInitializer>;
+  join(documentReference?: DocumentReference): Promise<Collaboration>;
 
   /**
-   * The current status.
+   * Leave the collaboration session for the specified document (or the current document), disconnecting the current
+   * user and notifying the other collaborators.
    */
-  status(): Ref<Status>;
-
-  /**
-   * The list of currently connected users.
-   */
-  users(): Ref<User[]>;
+  leave(documentReference?: DocumentReference): void;
 }
 
-export type { CollaborationManager };
+export { type CollaborationManager, collaborationManagerName };

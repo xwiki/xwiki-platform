@@ -19,6 +19,7 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -43,17 +44,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 public class VelocityIT
 {
+    private String previousIconTheme;
+
     @BeforeAll
     public void setup(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
     }
 
+    @AfterAll
+    public void tearDown(TestUtils setup) throws Exception
+    {
+        // Restore the icon theme changed by verifyMacros() so that we don't leak this global wiki preference to the
+        // other tests: all the Flamingo skin ITs share a single XWiki instance (see AllIT) and rely on the default
+        // (image-based) icon theme.
+        setup.setWikiPreference("iconTheme", this.previousIconTheme == null ? "" : this.previousIconTheme);
+    }
+
     @Order(1)
     @Test
     public void verifyMacros(TestUtils setup, TestReference testReference) throws Exception
     {
-        setup.setWikiPreference("iconTheme",  "IconThemes.FontAwesome");
+        this.previousIconTheme = setup.setWikiPreference("iconTheme",  "IconThemes.FontAwesome");
         setup.deletePage(testReference);
         String macroContent = "{{velocity}}"
             + "{{html}}"
@@ -180,13 +192,13 @@ public class VelocityIT
         assertTrue(viewPage.getContent().isEmpty(), "File in parent directory call should not display anything.");
 
         viewPage = testUtils.createPage(testReference, "{{velocity}}"
-                + String.format(templateCode, "../WEB-INF/version.properties")
+                + String.format(templateCode, "../WEB-INF/web.xml")
                 + "{{/velocity}}",
             "TestTemplate");
         assertTrue(viewPage.getContent().isEmpty(), "File in the wrong directory call should not display anything.");
 
         viewPage = testUtils.createPage(testReference, "{{velocity}}"
-                + String.format(templateCode, "/chw/../../WEB-INF/../WEB-INF/lib/../version.properties")
+                + String.format(templateCode, "/chw/../../WEB-INF/../WEB-INF/lib/../web.xml")
                 + "{{/velocity}}",
             "TestTemplate");
         assertTrue(viewPage.getContent().isEmpty(), "File in the wrong directory, with not normalized path call should "

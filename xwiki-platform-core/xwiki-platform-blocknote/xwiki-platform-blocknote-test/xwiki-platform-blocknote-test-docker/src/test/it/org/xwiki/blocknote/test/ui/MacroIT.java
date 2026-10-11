@@ -1,0 +1,373 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.blocknote.test.ui;
+
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
+import org.xwiki.blocknote.test.po.BlockNoteEditor;
+import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
+import org.xwiki.blocknote.test.po.BlockNoteToolBar;
+import org.xwiki.blocknote.test.po.SlashMenu;
+import org.xwiki.edit.test.po.InplaceEditablePage;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
+import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+/**
+ * Verify macro related features of the BlockNote editor integration.
+ *
+ * @version $Id$
+ * @since 18.3.0RC1
+ */
+@UITest(
+    properties = {
+        // The Image Wizard needs this to be able to upload images.
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+    },
+    extraJARs = {
+        // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
+        "org.xwiki.platform:xwiki-platform-websocket",
+
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index",
+
+        // Solr search is used to get suggestions for the link quick action.
+        "org.xwiki.platform:xwiki-platform-search-solr-query"
+    },
+    servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS
+)
+class MacroIT extends AbstractBlockNoteIT
+{
+    @Test
+    @Order(1)
+    void editMacro(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, """
+            first {{success cSSclaSS="one" tiTle="inline"}}red {{info foo="bar"}}green{{/info}} blue{{/success}} line
+
+            {{info TItle="My title"}}
+            My content.
+
+            {{error}}
+            Some error
+
+            {{warning title="Final warning"}}
+            and a warning.
+            {{/warning}}
+            {{/error}}
+            {{/info}}
+
+            end""");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Verify the macro output is rendered.
+        String text = textArea.getText();
+        assertThat(text, containsString("green"));
+        assertThat(text, containsString("and a warning."));
+
+        // Edit the inline macro.
+        MacroDialogEditModal macroEditModal = textArea.doubleClickMacro(0);
+        assertEquals("Success Message", macroEditModal.getMacroName());
+        assertEquals("inline", macroEditModal.getMacroParameter("title"));
+        assertEquals("one", macroEditModal.getMacroParameter("cssClass"));
+        assertEquals("red {{info foo=\"bar\"}}green{{/info}} blue", macroEditModal.getMacroContent());
+
+        macroEditModal.setMacroParameter("title", "Inline title").setMacroParameter("cssClass", "two")
+            .setMacroContent("Red {{error}}Green{{/error}} Blue").clickSubmit();
+
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertThat(textArea.getText(), containsString("macro:success"));
+
+        // Edit the block macro.
+        macroEditModal = textArea.doubleClickMacro(1);
+        assertEquals("Info Message", macroEditModal.getMacroName());
+        assertEquals("My title", macroEditModal.getMacroParameter("title"));
+        assertEquals("""
+            My content.
+
+            {{error}}
+            Some error
+
+            {{warning title="Final warning"}}
+            and a warning.
+            {{/warning}}
+            {{/error}}""", macroEditModal.getMacroContent());
+
+        macroEditModal.setMacroParameter("title", "New title").setMacroParameter("cssClass", "test")
+            .setMacroContent("New content.").clickSubmit();
+
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertEquals("""
+            first macro:success line
+            macro:info
+            end""", textArea.getText());
+
+        // Edit again the inline macro.
+        macroEditModal = textArea.doubleClickMacro(0);
+        assertEquals("Success Message", macroEditModal.getMacroName());
+        assertEquals("Inline title", macroEditModal.getMacroParameter("title"));
+        assertEquals("two", macroEditModal.getMacroParameter("cssClass"));
+        assertEquals("Red {{error}}Green{{/error}} Blue", macroEditModal.getMacroContent());
+
+        macroEditModal.setMacroParameter("title", "My Inline Title").setMacroParameter("cssClass", "three")
+            .clickSubmit();
+
+        // Edit again the block macro.
+        macroEditModal = textArea.doubleClickMacro(1);
+        assertEquals("Info Message", macroEditModal.getMacroName());
+        assertEquals("New title", macroEditModal.getMacroParameter("title"));
+        assertEquals("test", macroEditModal.getMacroParameter("cssClass"));
+        assertEquals("New content.", macroEditModal.getMacroContent());
+
+        macroEditModal.setMacroParameter("cssClass", "newTest")
+            .setMacroContent("//Some// {{success}}information{{/success}}.").clickSubmit();
+
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            first {{success cssClass="three" title="My Inline Title"}}Red {{error}}Green{{/error}} Blue{{/success}} line
+
+            {{info cssClass="newTest" title="New title"}}
+            //Some// {{success}}information{{/success}}.
+            {{/info}}
+
+            end""", wikiEditor.getContent());
+
+        // Edit the page again to verify that we can also change the macro, not just its parameters.
+        wikiEditor.clickCancel();
+        page.editInplace();
+
+        editor = new BlockNoteEditor("content");
+        textArea = editor.getRichTextArea();
+
+        // Change the inline macro from success to error.
+        macroEditModal = textArea.doubleClickMacro(0);
+        assertEquals("Success Message", macroEditModal.getMacroName());
+        assertEquals("My Inline Title", macroEditModal.getMacroParameter("title"));
+        assertEquals("three", macroEditModal.getMacroParameter("cssClass"));
+        assertEquals("Red {{error}}Green{{/error}} Blue", macroEditModal.getMacroContent());
+
+        MacroDialogSelectModal macroSelectModal = macroEditModal.clickChangeMacro();
+        macroSelectModal.filterByText("error", 1).getFirstMacro().orElseThrow().click();
+        macroEditModal = macroSelectModal.clickSelect();
+        assertEquals("Error Message", macroEditModal.getMacroName());
+        assertEquals("My Inline Title", macroEditModal.getMacroParameter("title"));
+        // Values of parameters that are not editable in-place seem to be lost when changing the macro. This is not
+        // specific to BlockNote.
+        assertEquals("", macroEditModal.getMacroParameter("cssClass"));
+        assertEquals("Red {{error}}Green{{/error}} Blue", macroEditModal.getMacroContent());
+        macroEditModal.setMacroParameter("cssClass", "four").setMacroContent("**Failed**!").clickSubmit();
+
+        // Change the block macro from info to warning.
+        macroEditModal = textArea.doubleClickMacro(1);
+        assertEquals("Info Message", macroEditModal.getMacroName());
+        assertEquals("New title", macroEditModal.getMacroParameter("title"));
+        assertEquals("newTest", macroEditModal.getMacroParameter("cssClass"));
+        assertEquals("//Some// {{success}}information{{/success}}.", macroEditModal.getMacroContent());
+
+        macroSelectModal = macroEditModal.clickChangeMacro();
+        macroSelectModal.filterByText("warning", 1).getFirstMacro().orElseThrow().click();
+        macroEditModal = macroSelectModal.clickSelect();
+        assertEquals("Warning Message", macroEditModal.getMacroName());
+        assertEquals("New title", macroEditModal.getMacroParameter("title"));
+        // Values of parameters that are not editable in-place seem to be lost when changing the macro. This is not
+        // specific to BlockNote.
+        assertEquals("", macroEditModal.getMacroParameter("cssClass"));
+        assertEquals("//Some// {{success}}information{{/success}}.", macroEditModal.getMacroContent());
+        macroEditModal.setMacroParameter("cssClass", "new-test").setMacroContent("""
+            //Some//
+
+            {{box}}warning{{/box}}!""").clickSubmit();
+
+        // Edit again the inline macro.
+        macroEditModal = textArea.doubleClickMacro(0);
+        assertEquals("Error Message", macroEditModal.getMacroName());
+        assertEquals("My Inline Title", macroEditModal.getMacroParameter("title"));
+        assertEquals("four", macroEditModal.getMacroParameter("cssClass"));
+        assertEquals("**Failed**!", macroEditModal.getMacroContent());
+        macroEditModal.clickCancel();
+
+        // Edit again the block macro.
+        macroEditModal = textArea.doubleClickMacro(1);
+        assertEquals("Warning Message", macroEditModal.getMacroName());
+        assertEquals("New title", macroEditModal.getMacroParameter("title"));
+        assertEquals("new-test", macroEditModal.getMacroParameter("cssClass"));
+        assertEquals("""
+            //Some//
+
+            {{box}}warning{{/box}}!""", macroEditModal.getMacroContent());
+        macroEditModal.clickCancel();
+
+        page.save();
+        wikiEditor = page.editWiki();
+        assertEquals("""
+            first {{error cssClass="four" title="My Inline Title"}}**Failed**!{{/error}} line
+
+            {{warning cssClass="new-test" title="New title"}}
+            //Some//
+
+            {{box}}warning{{/box}}!
+            {{/warning}}
+
+            end""", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(2)
+    void insertMacroUsingSlashMenu(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+
+        WYSIWYGEditPage page = WYSIWYGEditPage.gotoPage(testReference);
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Insert a macro using the slash menu.
+        textArea.click().sendKeys("/").sendKeys("macro");
+        SlashMenu slashMenu = new SlashMenu().waitForItemSelected("Macro");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+
+        MacroDialogSelectModal macroSelectModal = new MacroDialogSelectModal();
+        macroSelectModal.filterByText("info", 1).getFirstMacro().orElseThrow().click();
+        MacroDialogEditModal macroEditModal = macroSelectModal.clickSelect();
+        macroEditModal.setMacroContent("foo").setMacroParameter("title", "bar").clickSubmit();
+
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertEquals("macro:info", textArea.getText());
+
+        page.clickSaveAndView();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            {{info title="bar"}}
+            foo
+            {{/info}}""", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(3)
+    void insertAndEditMacroUsingToolbar(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Insert a macro using the toolbar. We need to select some text in order to get the toolbar.
+        textArea.click().sendKeys("text").sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.LEFT));
+
+        MacroDialogSelectModal macroSelectModal = editor.getToolBar().insertMacro();
+        macroSelectModal.filterByText("success", 1).getFirstMacro().orElseThrow().click();
+        MacroDialogEditModal macroEditModal = macroSelectModal.clickSelect();
+        macroEditModal.setMacroContent("foo").setMacroParameter("title", "bar").clickSubmit();
+
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertEquals("macro:success", textArea.getText());
+
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            {{success title="bar"}}
+            foo
+            {{/success}}""", wikiEditor.getContent());
+
+        // Now edit the macro using the toolbar: select the (server-rendered) block macro with a single click and click
+        // the edit button that shows up in the toolbar.
+        wikiEditor.clickCancel();
+        page.editInplace();
+
+        editor = new BlockNoteEditor("content");
+        textArea = editor.getRichTextArea();
+
+        textArea.selectMacro(0);
+        BlockNoteToolBar toolBar = editor.getToolBar();
+        assertFalse(toolBar.hasCreateLinkButton());
+        macroEditModal = toolBar.editMacro();
+        assertEquals("Success Message", macroEditModal.getMacroName());
+        assertEquals("bar", macroEditModal.getMacroParameter("title"));
+        assertEquals("foo", macroEditModal.getMacroContent());
+
+        macroEditModal.setMacroParameter("title", "baz").clickSubmit();
+
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertEquals("macro:success", textArea.getText());
+
+        page.save();
+        wikiEditor = page.editWiki();
+        assertEquals("""
+            {{success title="baz"}}
+            foo
+            {{/success}}""", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(4)
+    void editCodeMacro(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, """
+            {{code language="java" layout="linenumbers"}}
+            int count = 0;
+            {{/code}}""", "");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // The code macro is edited as a code block, so its content can be modified directly.
+        textArea.clickBlock(0).moveCaretTo(0).sendKeys("final ").waitUntilTextContains("final int count = 0;");
+
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            {{code language="java" layout="linenumbers"}}
+            final int count = 0;
+            {{/code}}""", wikiEditor.getContent());
+    }
+}

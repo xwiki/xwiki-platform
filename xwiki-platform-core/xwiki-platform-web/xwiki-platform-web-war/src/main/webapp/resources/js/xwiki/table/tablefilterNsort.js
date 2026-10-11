@@ -41,8 +41,8 @@
                                    for creating alternating tables
     sortHeader (tr)(mandatory) = is the row in the table that is the header row
     noFilter (td)(optional) =  declares a column as non filterable
-    selectFilter (td) (optional)  = declares a column as filterable using a selct box,
-                                    that is autimatically populated with "available" line values
+    selectFilter (td) (optional)  = declares a column as filterable using a select box,
+                                    that is automatically populated with "available" line values
     unsortable (td) (optional) = declares a column as non sortable
     sortBottom (tr) (optional) = declares a row as the bottom of the sortable rows ( used for totals etc...)
 
@@ -86,7 +86,7 @@ addEvent(window, "load", init_sortnfilter);
 var SORT_COLUMN_INDEX;
 
 function init_sortnfilter() {
-// Intiates the sorting and filtering triggered on an event
+// Initiates the sorting and filtering triggered on an event
   sortables_init();
   filterable_init();
 }
@@ -375,7 +375,7 @@ function ts_makeSortable(table) {
 function alternate(table) {
 /*====================================================
   - check if the table passed to the function is set
-  to doOddEven, if that is the case it colors the lines acordingly.
+  to doOddEven, if that is the case it colors the lines accordingly.
 =====================================================*/
   if (table.className.indexOf("doOddEven") > -1) {
     var visibleRows = 1;
@@ -545,7 +545,7 @@ function AddRow(id,n,f) {
 function PopulateOptions(id, cellIndex, ncells) {
 /*====================================================
   - populates select
-  - adds only 1 occurence of a value
+  - adds only 1 occurrence of a value
 =====================================================*/
   var t = document.getElementById(id);
   var start_row = getStartRow(id);

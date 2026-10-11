@@ -127,10 +127,12 @@ public class BaseSearchResult extends XWikiResource
     {
         List<KeywordSearchScope> searchScopes = new ArrayList<>();
         for (String searchScopeString : searchScopeStrings) {
-            if (searchScopeString != null && !searchScopes.contains(searchScopeString)) {
+            if (searchScopeString != null) {
                 try {
                     KeywordSearchScope searchScope = KeywordSearchScope.valueOf(searchScopeString.toUpperCase());
-                    searchScopes.add(searchScope);
+                    if (!searchScopes.contains(searchScope)) {
+                        searchScopes.add(searchScope);
+                    }
                 } catch (IllegalArgumentException e) {
                     // Ignore unrecognized scopes
                 }

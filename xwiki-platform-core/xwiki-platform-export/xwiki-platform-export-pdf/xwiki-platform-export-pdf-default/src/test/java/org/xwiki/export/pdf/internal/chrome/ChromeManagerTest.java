@@ -47,8 +47,8 @@ import com.github.kklisura.cdt.services.types.ChromeVersion;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -110,14 +110,11 @@ class ChromeManagerTest
 
         assertTrue(this.chromeManager.isConnected());
 
-        try {
-            this.chromeManager.connect("localhost", 9223);
-            fail();
-        } catch (IllegalStateException e) {
-            assertEquals(
-                "Chrome is already connected. Please close the current connection before establishing a new one.",
-                e.getMessage());
-        }
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+            () -> this.chromeManager.connect("localhost", 9223));
+        assertEquals(
+            "Chrome is already connected. Please close the current connection before establishing a new one.",
+            e.getMessage());
 
         this.chromeManager.close();
         assertFalse(this.chromeManager.isConnected());
@@ -130,12 +127,9 @@ class ChromeManagerTest
     @Test
     void createIncognitoTab() throws Exception
     {
-        try {
-            this.chromeManager.createIncognitoTab();
-            fail();
-        } catch (IllegalStateException e) {
-            assertEquals("The Chrome web browser is not connected.", e.getMessage());
-        }
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+            () -> this.chromeManager.createIncognitoTab());
+        assertEquals("The Chrome web browser is not connected.", e.getMessage());
 
         when(this.chromeServiceFactory.createChromeService("localhost", 9222)).thenReturn(this.chromeService);
         this.chromeManager.connect("localhost", 9222);
@@ -164,19 +158,14 @@ class ChromeManagerTest
 
         assertFalse(this.chromeManager.isConnected());
 
-        try {
-            this.chromeManager.createIncognitoTab();
-            fail("The Chrome Manager shouldn't be able to create a new incognito tab after being disposed.");
-        } catch (IllegalStateException e) {
-            assertEquals("The Chrome web browser is not connected.", e.getMessage());
-        }
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+            () -> this.chromeManager.createIncognitoTab(),
+            "The Chrome Manager shouldn't be able to create a new incognito tab after being disposed.");
+        assertEquals("The Chrome web browser is not connected.", e.getMessage());
 
-        try {
-            this.chromeManager.connect("localhost", 9222);
-            fail("The Chrome Manager shouldn't be able to connect after being disposed.");
-        } catch (IllegalStateException e) {
-            assertEquals("The Chrome Manager must be initialized before making a connection.", e.getMessage());
-        }
+        e = assertThrows(IllegalStateException.class, () -> this.chromeManager.connect("localhost", 9222),
+            "The Chrome Manager shouldn't be able to connect after being disposed.");
+        assertEquals("The Chrome Manager must be initialized before making a connection.", e.getMessage());
     }
 
     @Test
@@ -188,15 +177,13 @@ class ChromeManagerTest
         when(this.chromeServiceFactory.createChromeService("localhost", 9222)).thenReturn(this.chromeService);
         when(this.chromeService.getVersion()).thenThrow(new ChromeServiceException("Remote Chrome is not available."));
 
-        try {
-            this.chromeManager.connect("localhost", 9222);
-            fail("We shouldn't be able to connect if we can't get the browser version.");
-        } catch (TimeoutException e) {
-            assertEquals(
-                "Timeout waiting for Chrome remote debugging to become available."
-                    + " Waited [4] seconds. Root cause: [ChromeServiceException: Remote Chrome is not available.]",
-                e.getMessage());
-        }
+        TimeoutException e = assertThrows(TimeoutException.class,
+            () -> this.chromeManager.connect("localhost", 9222),
+            "We shouldn't be able to connect if we can't get the browser version.");
+        assertEquals(
+            "Timeout waiting for Chrome remote debugging to become available."
+                + " Waited [4] seconds. Root cause: [ChromeServiceException: Remote Chrome is not available.]",
+            e.getMessage());
 
         // It should have tried twice to get the version.
         verify(this.chromeService, times(2)).getVersion();

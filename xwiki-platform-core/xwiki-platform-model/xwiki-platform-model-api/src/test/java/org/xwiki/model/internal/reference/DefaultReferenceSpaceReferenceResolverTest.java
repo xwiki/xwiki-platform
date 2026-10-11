@@ -19,26 +19,27 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.DefaultReferenceSpaceReferenceResolver}.
- * 
+ *
  * @version $Id$
  */
-public class DefaultReferenceSpaceReferenceResolverTest
+class DefaultReferenceSpaceReferenceResolverTest
 {
     private SpaceReferenceResolver<EntityReference> resolver;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
         this.resolver = new DefaultReferenceSpaceReferenceResolver();
         ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver",
@@ -46,11 +47,11 @@ public class DefaultReferenceSpaceReferenceResolverTest
     }
 
     @Test
-    public void testResolveWithExplicitSpaceReference()
+    void resolveWithExplicitSpaceReference()
     {
         SpaceReference reference = this.resolver.resolve(null, new SpaceReference("space", new WikiReference("wiki")));
 
-        Assert.assertEquals("space", reference.getName());
-        Assert.assertEquals("wiki", reference.getWikiReference().getName());
+        assertEquals("space", reference.getName());
+        assertEquals("wiki", reference.getWikiReference().getName());
     }
 }

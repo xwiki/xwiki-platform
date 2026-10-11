@@ -22,7 +22,7 @@ package com.xpn.xwiki.internal.event;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * An event triggered when an class property is deleted.
+ * An event triggered when a class property is deleted.
  * <p>
  * The event also send the following parameters:
  * </p>

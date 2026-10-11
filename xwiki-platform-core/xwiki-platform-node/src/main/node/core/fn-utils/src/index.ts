@@ -115,7 +115,7 @@ function tryFallibleOrError<T>(func: () => T): T | Error {
 }
 
 /**
- * Get a funcion's promise's output or the thrown error
+ * Get a function's promise's output or the thrown error
  * Will construct a new Error object if the thrown value is not an instance of the Error class
  *
  * @since 18.0.0RC1

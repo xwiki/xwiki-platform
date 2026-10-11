@@ -24,7 +24,7 @@ import type { Reactive, Ref } from "vue";
 
 /**
  * Present the public API of the logic used inside the Live Data UI.
- * It provides the operations and data to display Live Datas. It is build to be shared by most of the UI elements of
+ * It provides the operations and data to display Live Data. It is build to be shared by most of the UI elements of
  * a Live Data.
  * @since 18.2.0RC1
  * @beta
@@ -48,7 +48,7 @@ export interface Logic {
   /**
    * Listen for an event.
    * @param event - the event to listen to
-   * @param callback - a callback, taking the received event in paramter
+   * @param callback - a callback, taking the received event in parameter
    */
   onEvent(event: string, callback: (e: Event) => void): void;
 
@@ -228,4 +228,18 @@ export interface Logic {
    * @param panel - the panel to add
    */
   registerPanel(panel: Panel): void;
+
+  /**
+   * Indicates whether the view is currently maximized.
+   *
+   * @returns whether the Live Data is currently displayed maximized
+   * @since 18.9.0RC1
+   */
+  isMaximized(): boolean;
+
+  /**
+   * Switches between the maximized view and the normal view.
+   * @since 18.9.0RC1
+   */
+  toggleMaximized(): void;
 }

@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
  * @since 6.2M1
  */
 @ComponentTest
-public class MemoryMailListenerTest
+class MemoryMailListenerTest
 {
     private static final String UNIQUE_MESSAGE_ID1 = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
     private static final String UNIQUE_MESSAGE_ID2 = "6ys1BeC6gnKA7srO/vs06XBZKZM=";
@@ -52,7 +52,7 @@ public class MemoryMailListenerTest
     private MemoryMailListener listener;
 
     @Test
-    public void onErrorAndGetMailStatusResult()
+    void onErrorAndGetMailStatusResult()
     {
         String batchId = UUID.randomUUID().toString();
         this.listener.onPrepareBegin(batchId, Collections.emptyMap());

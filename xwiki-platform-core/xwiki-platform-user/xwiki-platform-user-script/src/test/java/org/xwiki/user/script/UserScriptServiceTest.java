@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class UserScriptServiceTest
+class UserScriptServiceTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;

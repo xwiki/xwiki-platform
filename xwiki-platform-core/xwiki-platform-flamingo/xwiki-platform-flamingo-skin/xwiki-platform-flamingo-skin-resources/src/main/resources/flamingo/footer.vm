@@ -25,11 +25,11 @@
   #if ("$!version" == "")
     #set ($version = $xwiki.getXWikiPreference("version"))
   #end
+  <div id="xwikiplatformversion">
   #if ("$!version" != "")
     ## The version information coming from preferences is usually Velocity code, so make sure to evaluate it.
-    <div id="xwikiplatformversion">#evaluate($version)</div>
+    #evaluate($version)
   #else
-    <div id="xwikiplatformversion">
       #set($productURL = $services.extension.core.repository.environmentExtension.website)
       #if ($productURL)
         <a href="$services.extension.core.repository.environmentExtension.website">
@@ -38,8 +38,11 @@
       #if ($productURL)
         </a>
       #end
-    </div>
   #end
+  #if ($services.observation.remote.isEnabled())
+    - $escapetool.html($services.observation.remote.id)
+  #end
+  </div>
 </footer>
 #end
 ### TODO: Format the footer for pdf output

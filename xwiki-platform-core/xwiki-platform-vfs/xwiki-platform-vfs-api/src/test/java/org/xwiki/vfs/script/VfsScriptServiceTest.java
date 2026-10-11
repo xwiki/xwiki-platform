@@ -31,7 +31,7 @@ import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link VfsScriptService}.
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.*;
  * @since 7.4M2
  */
 @ComponentTest
-public class VfsScriptServiceTest
+class VfsScriptServiceTest
 {
     @InjectMockComponents
     private VfsScriptService scriptService;
@@ -49,12 +49,12 @@ public class VfsScriptServiceTest
     private VfsManager manager;
 
     @Test
-    public void url() throws Exception
+    void url() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
 
-        when(manager.getURL(reference)).thenReturn("/generated/url");
+        when(this.manager.getURL(reference)).thenReturn("/generated/url");
 
         assertEquals("/generated/url",
             this.scriptService.url(
@@ -62,12 +62,12 @@ public class VfsScriptServiceTest
     }
 
     @Test
-    public void urlError() throws Exception
+    void urlError() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
 
-        when(manager.getURL(reference)).thenThrow(new VfsException("error"));
+        when(this.manager.getURL(reference)).thenThrow(new VfsException("error"));
 
         assertNull(this.scriptService.url(
             new VfsResourceReference(URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt")));

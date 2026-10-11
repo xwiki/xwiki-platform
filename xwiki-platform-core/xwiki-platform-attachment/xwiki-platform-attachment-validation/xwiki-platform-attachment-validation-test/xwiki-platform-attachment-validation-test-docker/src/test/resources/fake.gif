@@ -1,0 +1,2 @@
+This is a plain text file disguised as a GIF image.
+Its extension is .gif but its MIME type should be detected as text/plain by Apache Tika.

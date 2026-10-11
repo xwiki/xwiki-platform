@@ -23,7 +23,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -140,7 +139,7 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
         List<String> templates = this.configDocument.getProperty("templates", List.class,
             Collections.singletonList("XWiki.PDFExport.Template"));
         return templates.stream().filter(StringUtils::isNotBlank)
-            .map(template -> this.documentReferenceResolver.resolve(template)).collect(Collectors.toList());
+            .map(template -> this.documentReferenceResolver.resolve(template)).toList();
     }
 
     @Override

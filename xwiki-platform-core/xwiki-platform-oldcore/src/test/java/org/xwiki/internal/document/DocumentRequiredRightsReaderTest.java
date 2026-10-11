@@ -99,8 +99,9 @@ class DocumentRequiredRightsReaderTest
 
         List<String> invalidValues = values.stream().filter(v -> Strings.CS.startsWith(v, "foo")).toList();
         for (int i = 0; i < invalidValues.size(); i++) {
-            assertEquals("Illegal required right value [%s] in object [%s]".formatted(invalidValues.get(i),
-                objectReferenceName), this.logCapture.getMessage(i));
+            assertEquals(("Illegal required right value [%s] in object [%s]. Root cause is "
+                + "[IllegalArgumentException: No enum constant org.xwiki.model.EntityType.FOO]")
+                .formatted(invalidValues.get(i), objectReferenceName), this.logCapture.getMessage(i));
         }
     }
 

@@ -42,11 +42,11 @@ public class LogCaptureValidator
     private static final String NL = "\n";
 
     /**
-     * For now we only check for Velocity deprecations. In the future we should put back validations for:
+     * For now, we only check for Velocity deprecations. In the future we should put back validations for:
      * <ul>
      *     <li>ERROR</li>
      *     <li>WARN</li>
-     *     <li>JavaScript erro</li>
+     *     <li>JavaScript errors</li>
      * </ul>
      * See <a href=" https://forum.xwiki.org/t/remove-log-validation-for-functional-tests/6026">this forum thread</a>
      * for why these checks were removed.
@@ -54,7 +54,11 @@ public class LogCaptureValidator
      * kept specific checks in the functional tests for the same reason. In the future we'll need to assess is the
      * strategy can work (i.e. not be swamped by false positives).
      */
-    private static final List<String> SEARCH_STRINGS = Arrays.asList("Deprecated usage of");
+    private static final List<String> SEARCH_STRINGS = Arrays.asList(
+        "Deprecated usage of",
+        // Tomcat emits this WARN when its resource cache (cacheMaxSize in the WAR's META-INF/context.xml) is too small
+        // to hold all XWiki static resources. Fail the build so we raise cacheMaxSize.
+        "because there was insufficient free space available after evicting expired cache entries");
 
     private static final List<Line> GLOBAL_EXCLUDES = Arrays.asList(
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
@@ -182,6 +186,8 @@ public class LogCaptureValidator
         // queries happening on the server side. These are normal errors that can happen for normal users too and
         // we shouldn't consider them faults.
         new Line("Caused by: java.io.IOException: Broken pipe"),
+        // Same, when the action reports it without the stack trace.
+        new Line("Connection aborted. Root cause is [IOException: Broken pipe]"),
         // Can happen when the Servlet Container fails to write the response to the socket open with the client
         // (Browser). This probably means that the docker containers don't see each other anymore, probably because
         // one is closed (client one) before the server one is stopped.
@@ -293,7 +299,7 @@ public class LogCaptureValidator
                 }
             }
             return true;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     private void displayMissingWarning(List<Line> definitions, List<Line> matchingDefinitions, String missingType)
@@ -305,8 +311,10 @@ public class LogCaptureValidator
             }
         }
         if (!notMatchingLines.isEmpty()) {
-            LOGGER.warn("The following {} were not matched and could be candidates for removal "
-                + "(beware of configs): [\n{}\n]", missingType, StringUtils.join(notMatchingLines, NL));
+            LOGGER.warn("""
+                The following {} were not matched and could be candidates for removal (beware of configs): [
+                {}
+                ]""", missingType, StringUtils.join(notMatchingLines, NL));
         }
     }
 

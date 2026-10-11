@@ -59,7 +59,8 @@ class StandardHQLCompleteStatementValidatorTest
         "select 1.0 from OtherTable",
         "select 'test' from OtherTable",
         "select null from OtherTable",
-        "select x'1A' from OtherTable"
+        "select x'1A' from OtherTable",
+        "select doc.fullName from XWikiDocument doc, StringProperty as global"
     })
     void safe(String statement)
     {

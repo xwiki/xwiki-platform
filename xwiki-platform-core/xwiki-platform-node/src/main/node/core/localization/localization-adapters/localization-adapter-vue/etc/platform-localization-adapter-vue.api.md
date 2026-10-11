@@ -9,8 +9,8 @@ import { Query } from '@xwiki/platform-localization-api';
 import { Ref } from 'vue';
 import { Resolver } from '@xwiki/platform-localization-api';
 
-// @beta (undocumented)
-export function useRemoteI18n(resolver: Resolver, query: Query): {
+// @beta
+export function useI18nAdapter(resolver: Resolver, query: Query): {
     t: Composer["t"];
     isLoading: Ref<boolean>;
 };

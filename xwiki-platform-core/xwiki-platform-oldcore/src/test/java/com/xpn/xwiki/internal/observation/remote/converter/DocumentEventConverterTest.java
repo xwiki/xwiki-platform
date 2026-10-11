@@ -30,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.internal.converter.DefaultEventConverterManager;
+import org.xwiki.observation.remote.internal.converter.EventConverters;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -47,12 +48,12 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Validate {@link DocumentEventConverter};
+ * Validate {@link DocumentEventConverter}.
  * 
  * @version $Id$
  */
 @OldcoreTest
-@ComponentList(DocumentEventConverter.class)
+@ComponentList({DocumentEventConverter.class, EventConverters.class})
 class DocumentEventConverterTest
 {
     @InjectMockitoOldcore
@@ -69,7 +70,7 @@ class DocumentEventConverterTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-        // Setup of document which just been created and recived by a document event listener
+        // Setup of document which just been created and received by a document event listener
         XWikiDocument document =
             this.oldcore.getSpyXWiki().getDocument(documentReference, this.oldcore.getXWikiContext());
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());

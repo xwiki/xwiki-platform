@@ -131,7 +131,7 @@ class AuthenticationMailSenderTest
     }
 
     @BeforeEach
-    void setup(MockitoComponentManager componentManager) throws Exception
+    void setup(MockitoComponentManager componentManager)
     {
         this.xWikiContext = mock(XWikiContext.class);
         when(contextProvider.get()).thenReturn(xWikiContext);

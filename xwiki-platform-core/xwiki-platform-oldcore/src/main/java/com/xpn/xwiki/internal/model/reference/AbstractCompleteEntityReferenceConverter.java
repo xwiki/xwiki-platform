@@ -55,7 +55,7 @@ public abstract class AbstractCompleteEntityReferenceConverter<R extends EntityR
     /**
      * @param type the type of reference
      */
-    public AbstractCompleteEntityReferenceConverter(EntityType type)
+    protected AbstractCompleteEntityReferenceConverter(EntityType type)
     {
         this.type = type;
     }
@@ -69,8 +69,8 @@ public abstract class AbstractCompleteEntityReferenceConverter<R extends EntityR
 
         EntityReference result;
 
-        if (value instanceof EntityReference) {
-            result = this.referenceResolver.resolve((EntityReference) value, this.type);
+        if (value instanceof EntityReference entityReference) {
+            result = this.referenceResolver.resolve(entityReference, this.type);
         } else {
             result = this.stringResolver.resolve(value.toString(), this.type);
         }

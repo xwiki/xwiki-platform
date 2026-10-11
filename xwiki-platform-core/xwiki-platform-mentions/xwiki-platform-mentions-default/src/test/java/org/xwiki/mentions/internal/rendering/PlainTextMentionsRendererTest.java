@@ -24,8 +24,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.mentions.MentionsFormatter;
+import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;

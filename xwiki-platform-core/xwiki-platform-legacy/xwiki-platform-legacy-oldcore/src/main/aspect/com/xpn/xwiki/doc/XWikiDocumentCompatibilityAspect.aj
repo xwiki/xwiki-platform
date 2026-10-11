@@ -296,6 +296,7 @@ privileged public aspect XWikiDocumentCompatibilityAspect
             }
         } catch (Exception e) {
             // Don't stop when there's a problem rendering the title.
+            LOGGER.debug("Failed to render the document title. Ignoring and returning an empty title.", e);
         }
 
         return title;
@@ -360,7 +361,34 @@ privileged public aspect XWikiDocumentCompatibilityAspect
     {
         cloneXObjects(templatedoc);
     }
-    
+
+    /**
+     * @deprecated use {@link #getXObject()} instead
+     */
+    @Deprecated(since = "2.2M1")
+    public BaseObject XWikiDocument.getxWikiObject()
+    {
+        return getXObject();
+    }
+
+    /**
+     * @deprecated use {@link #mergeXClass(XWikiDocument)} instead
+     */
+    @Deprecated(since = "2.2M1")
+    public void XWikiDocument.mergexWikiClass(XWikiDocument templatedoc)
+    {
+        mergeXClass(templatedoc);
+    }
+
+    /**
+     * @deprecated use {@link #mergeXObjects(XWikiDocument)} instead
+     */
+    @Deprecated(since = "2.2M1")
+    public void XWikiDocument.mergexWikiObjects(XWikiDocument templatedoc)
+    {
+        mergeXObjects(templatedoc);
+    }
+
     /**
      * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
      */
@@ -613,7 +641,7 @@ privileged public aspect XWikiDocumentCompatibilityAspect
                     result = context.getWiki().addTooltip(img, tooltip, context);
                 }
             } catch (Exception e) {
-
+                LOGGER.debug("Failed to display the tooltip for field [{}]. Ignoring.", fieldname, e);
             }
 
             return result;

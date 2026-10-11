@@ -39,13 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @since 11.10
  */
 @ComponentTest
-public class JCaptchaResourceReferenceResolverTest
+class JCaptchaResourceReferenceResolverTest
 {
     @InjectMockComponents
     private JCaptchaResourceReferenceResolver jCaptchaResourceReferenceResolver;
 
     @Test
-    public void resolve() throws CreateResourceReferenceException, UnsupportedResourceReferenceException
+    void resolve() throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
         ExtendedURL extendedURL =
             new ExtendedURL(Arrays.asList("foo", "bar"), Collections.singletonMap("customValue", Arrays.asList("baz")));
@@ -58,7 +58,7 @@ public class JCaptchaResourceReferenceResolverTest
     }
 
     @Test
-    public void resolveWrongUrl()
+    void resolveWrongUrl()
     {
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("foo"), Collections.emptyMap());
 

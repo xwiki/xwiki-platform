@@ -34,6 +34,7 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.event.AbstractCacheEntryListener;
 import org.xwiki.cache.event.CacheEntryEvent;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
@@ -88,7 +89,7 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
         {
             this.direct = Collections.unmodifiableCollection(direct);
 
-            addToIndex(this.key, direct);
+            addToIndex(direct);
 
             return this.direct;
         }
@@ -109,9 +110,16 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
         {
             this.all = Collections.unmodifiableCollection(all);
 
-            addToIndex(this.key, all);
+            addToIndex(all);
 
             return this.all;
+        }
+
+        private void addToIndex(Collection<DocumentReference> references)
+        {
+            for (DocumentReference reference : references) {
+                AbstractGroupCache.this.addToIndex(this.key, reference);
+            }
         }
     }
 
@@ -135,7 +143,7 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
     /**
      * @param id the id of the cache
      */
-    public AbstractGroupCache(String id)
+    protected AbstractGroupCache(String id)
     {
         this.id = id;
     }
@@ -147,7 +155,7 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
         cacheConfig.setConfigurationId(this.id);
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         lru.setMaxEntries(DEFAULT_CAPACITY);
-        cacheConfig.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        cacheConfig.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
         try {
             this.cache = this.cacheManager.createNewCache(cacheConfig);
             this.cache.addCacheEntryListener(this);
@@ -191,13 +199,6 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
     private void addToIndex(String key, DocumentReference reference)
     {
         this.cacheDocumentIndex.computeIfAbsent(reference, k -> new HashSet<>()).add(key);
-    }
-
-    private void addToIndex(String key, Collection<DocumentReference> references)
-    {
-        for (DocumentReference reference : references) {
-            addToIndex(key, reference);
-        }
     }
 
     private void cleanIndex(String key, Collection<DocumentReference> references)

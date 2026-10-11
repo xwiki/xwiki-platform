@@ -19,12 +19,11 @@
  */
 package org.xwiki.test.webstandards;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.test.webstandards.framework.DefaultValidationTest;
-import org.xwiki.validator.Validator;
-
 import org.xwiki.test.webstandards.framework.Target;
+import org.xwiki.validator.Validator;
 
 public class CustomDutchWebGuidelinesValidationTest extends DefaultValidationTest
 {
@@ -38,10 +37,10 @@ public class CustomDutchWebGuidelinesValidationTest extends DefaultValidationTes
      */
     private static final String whitelistedClasses = System.getProperty("whitelistedWCAGClasses", "");
 
-    public CustomDutchWebGuidelinesValidationTest(Target target, HttpClient client, Validator validator,
-        String credentials) throws Exception
+    public CustomDutchWebGuidelinesValidationTest(Target target, XWikiHTTPClient client, Validator validator)
+        throws Exception
     {
-        super(target, client, validator, credentials);
+        super(target, client, validator);
     }
 
     @Override

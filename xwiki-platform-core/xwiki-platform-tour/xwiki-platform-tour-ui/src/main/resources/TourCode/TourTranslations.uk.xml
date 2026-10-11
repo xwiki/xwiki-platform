@@ -76,6 +76,7 @@ TourCode.StepClass_placement=Розміщення
 TourCode.StepClass_targetPage=Цільова сторінка
 TourCode.StepClass_action=Цільова дія
 TourCode.StepClass_queryString=Строка запиту
+TourCode.StepClass_reflex=Рефлекс
 tour.steps=Кроки
 tour.steps.new_step=Новий крок
 tour.steps.add_step=Додати крок

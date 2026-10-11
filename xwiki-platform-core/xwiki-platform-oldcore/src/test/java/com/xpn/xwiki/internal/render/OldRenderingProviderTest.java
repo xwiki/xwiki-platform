@@ -19,48 +19,54 @@
  */
 package com.xpn.xwiki.internal.render;
 
-import javax.inject.Provider;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
 
 /**
  * Unit tests for {@link OldRenderingProvider}.
  * 
  * @version $Id$
  */
+@ComponentTest
 @ComponentList(ContextComponentManagerProvider.class)
-public class OldRenderingProviderTest
+class OldRenderingProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Provider<OldRendering>> mocker =
-        new MockitoComponentMockingRule<Provider<OldRendering>>(OldRenderingProvider.class);
+    @MockComponent
+    private OldRendering oldRendering1;
+
+    @InjectMockComponents
+    private OldRenderingProvider provider;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @Test
-    public void testInstallNewOldCoreRendering() throws Exception
+    void installNewOldCoreRendering() throws Exception
     {
-        OldRendering oldRendering1 = this.mocker.registerMockComponent(OldRendering.class);
-
-        assertSame(oldRendering1, this.mocker.getComponentUnderTest().get());
+        assertSame(this.oldRendering1, this.provider.get());
 
         // Install new OldRendering implementation
 
-        OldRendering oldRendering2 = this.mocker.registerMockComponent(OldRendering.class);
-        assertNotSame(oldRendering1, oldRendering2);
+        OldRendering oldRendering2 = mock(OldRendering.class);
+        assertNotSame(this.oldRendering1, oldRendering2);
 
-        DefaultComponentDescriptor<OldRendering> componentDescriptor = new DefaultComponentDescriptor<OldRendering>();
+        DefaultComponentDescriptor<OldRendering> componentDescriptor = new DefaultComponentDescriptor<>();
         componentDescriptor.setImplementation(oldRendering2.getClass());
         componentDescriptor.setRoleType(OldRendering.class);
-        ((OldRenderingProvider) this.mocker.getComponentUnderTest())
-            .onNewOldRendering(componentDescriptor, this.mocker);
+        this.componentManager.registerComponent(OldRendering.class, oldRendering2);
+        this.provider.onNewOldRendering(componentDescriptor, this.componentManager);
 
-        assertSame(oldRendering2, this.mocker.getComponentUnderTest().get());
+        assertSame(oldRendering2, this.provider.get());
     }
 }

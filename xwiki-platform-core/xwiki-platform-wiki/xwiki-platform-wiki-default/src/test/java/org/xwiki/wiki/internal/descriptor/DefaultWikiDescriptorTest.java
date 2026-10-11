@@ -24,14 +24,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Vaidate {@link DefaultWikiDescriptor}.
+ * Validate {@link DefaultWikiDescriptor}.
  * 
  * @version $Id$
  */
-public class DefaultWikiDescriptorTest
+class DefaultWikiDescriptorTest
 {
     @Test
-    public void constructor()
+    void constructor()
     {
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("id", "alias", "owner");
 

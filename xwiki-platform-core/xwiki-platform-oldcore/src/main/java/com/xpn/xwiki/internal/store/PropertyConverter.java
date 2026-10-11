@@ -87,8 +87,8 @@ public class PropertyConverter
                     try {
                         newProperty = modifiedPropertyClass.fromString(storedProperty.toText());
                     } catch (XWikiException ex) {
-                        this.logger.warn(errorLog,
-                            modifiedPropertyClass.getName(), modifiedPropertyClass.getClassName(), ex);
+                        this.logger.warn(errorLog, modifiedPropertyClass.getName(),
+                            modifiedPropertyClass.getClassName(), ex);
                     }
                 }
                 if (newProperty != null) {
@@ -108,15 +108,13 @@ public class PropertyConverter
 
     private Object convertPropertyValue(Object storedValue, PropertyClass modifiedPropertyClass)
     {
-        if (modifiedPropertyClass instanceof ListClass) {
-            return convertPropertyValue(storedValue, (ListClass) modifiedPropertyClass);
-        } else if (modifiedPropertyClass instanceof NumberClass) {
-            return convertPropertyValue(storedValue, (NumberClass) modifiedPropertyClass);
-        } else {
+        return switch (modifiedPropertyClass) {
+            case ListClass listClass -> convertPropertyValue(storedValue, listClass);
+            case NumberClass numberClass -> convertPropertyValue(storedValue, numberClass);
             // Return the stored value if no specific converter has been found. We will attempt to convert the stored
             // value through string deserialization later.
-            return storedValue;
-        }
+            case null, default -> storedValue;
+        };
     }
 
     private Object convertPropertyValue(Object storedValue, ListClass modifiedListClass)
@@ -137,9 +135,8 @@ public class PropertyConverter
     private Object convertPropertyValue(Object storedValue, NumberClass modifiedNumberClass)
     {
         Object newValue = storedValue;
-        if (storedValue instanceof Number) {
+        if (storedValue instanceof Number storedNumber) {
             // Convert the stored value to the new number type.
-            Number storedNumber = (Number) storedValue;
             String newNumberType = modifiedNumberClass.getNumberType();
             if ("integer".equals(newNumberType)) {
                 newValue = Integer.valueOf(storedNumber.intValue());

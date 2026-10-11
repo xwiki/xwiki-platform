@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.inject.Named;
@@ -32,16 +33,20 @@ import jakarta.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -72,9 +77,6 @@ import com.xpn.xwiki.util.Util;
 public class SkinAction extends XWikiAction
 {
 
-    /** Logging helper. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SkinAction.class);
-
     /** Path delimiter. */
     private static final String DELIMITER = "/";
 
@@ -86,8 +88,28 @@ public class SkinAction extends XWikiAction
 
     private static final String DOCDOESNOTEXIST = "docdoesnotexist";
 
+    /** Logging helper. */
+    @Inject
+    private Logger logger;
+
     @Inject
     private Environment environment;
+
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
+
+    @Inject
+    private DocumentAuthorizationManager documentAuthorizationManager;
+
+    @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserSerializer;
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -95,7 +117,7 @@ public class SkinAction extends XWikiAction
         // Disallow template override with xpage parameter.
         if (!DOCDOESNOTEXIST.equals(Utils.getPage(context.getRequest(), DOCDOESNOTEXIST))) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Template may not be overriden with 'xpage' in [skin] action.");
+                "Template may not be overridden with 'xpage' in [skin] action.");
         }
 
         return super.action(context);
@@ -141,8 +163,8 @@ public class SkinAction extends XWikiAction
         // The default base skin is always a filesystem directory.
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
 
-        LOGGER.debug("document: [{}] ; baseskin: [{}] ; defaultbaseskin: [{}]",
-            new Object[] { doc.getDocumentReference(), baseskin, defaultbaseskin });
+        this.logger.debug("document: [{}] ; baseskin: [{}] ; defaultbaseskin: [{}]",
+            doc.getDocumentReference(), baseskin, defaultbaseskin);
 
         // Since we don't know exactly what does the URL point at, meaning that we don't know where the skin identifier
         // ends and where the path to the file starts, we must try to split at every '/' character.
@@ -151,7 +173,7 @@ public class SkinAction extends XWikiAction
         while (idx > 0) {
             try {
                 String filename = Util.decodeURI(path.substring(idx + 1), context);
-                LOGGER.debug("Trying [{}]", filename);
+                this.logger.debug("Trying [{}]", filename);
 
                 // Try on the current skin document.
                 if (renderSkin(filename, doc, context)) {
@@ -160,22 +182,20 @@ public class SkinAction extends XWikiAction
                 }
 
                 // Try on the base skin document, if it is not the same as above.
-                if (StringUtils.isNotEmpty(baseskin) && !doc.getName().equals(baseskin)) {
-                    if (renderSkin(filename, baseskindoc, context)) {
-                        found = true;
-                        break;
-                    }
+                if (StringUtils.isNotEmpty(baseskin) && !doc.getName().equals(baseskin)
+                    && renderSkin(filename, baseskindoc, context)) {
+                    found = true;
+                    break;
                 }
 
                 // Try on the default base skin, if it wasn't already tested above.
+                // defaultbaseskin can only be on the filesystem, so don't try to use it as a
+                // skin document.
                 if (StringUtils.isNotEmpty(baseskin)
-                    && !(doc.getName().equals(defaultbaseskin) || baseskin.equals(defaultbaseskin))) {
-                    // defaultbaseskin can only be on the filesystem, so don't try to use it as a
-                    // skin document.
-                    if (renderSkinFileFromResource(defaultbaseskin, filename, context)) {
-                        found = true;
-                        break;
-                    }
+                    && !(doc.getName().equals(defaultbaseskin) || baseskin.equals(defaultbaseskin))
+                    && renderSkinFileFromResource(defaultbaseskin, filename, context)) {
+                    found = true;
+                    break;
                 }
 
                 // Try in the resources directory.
@@ -189,7 +209,7 @@ public class SkinAction extends XWikiAction
                     // successfully found. Signal this further, and stop trying to render.
                     throw ex;
                 }
-                LOGGER.debug(String.valueOf(idx), ex);
+                this.logger.debug(String.valueOf(idx), ex);
             }
             idx = path.lastIndexOf(DELIMITER, idx - 1);
         }
@@ -215,7 +235,7 @@ public class SkinAction extends XWikiAction
         String path = URI.create(getSkinPath(skin) + filename).normalize().toString();
         // Test to prevent someone from using "../" in the filename!
         if (!path.startsWith(DELIMITER + SKINS_DIRECTORY)) {
-            LOGGER.warn("Illegal access, tried to use file [{}] as a skin. Possible break-in attempt!", path);
+            this.logger.warn("Illegal access, tried to use file [{}] as a skin. Possible break-in attempt!", path);
             throw new IOException("Invalid filename: '" + filename + "' for skin '" + skin + "'");
         }
         return path;
@@ -245,7 +265,7 @@ public class SkinAction extends XWikiAction
         String path = URI.create(getResourcePath() + filename).normalize().toString();
         // Test to prevent someone from using "../" in the filename!
         if (!path.startsWith(DELIMITER + RESOURCES_DIRECTORY)) {
-            LOGGER.warn("Illegal access, tried to use file [{}] as a resource. Possible break-in attempt!", path);
+            this.logger.warn("Illegal access, tried to use file [{}] as a resource. Possible break-in attempt!", path);
             throw new IOException("Invalid filename: '" + filename + "'");
         }
         return path;
@@ -271,10 +291,10 @@ public class SkinAction extends XWikiAction
     private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
         throws XWikiException, IOException
     {
-        LOGGER.debug("Rendering file [{}] within the [{}] document", filename, doc.getDocumentReference());
+        this.logger.debug("Rendering file [{}] within the [{}] document", filename, doc.getDocumentReference());
         try {
             if (doc.isNew()) {
-                LOGGER.debug("[{}] is not a document", doc.getDocumentReference().getName());
+                this.logger.debug("[{}] is not a document", doc.getDocumentReference().getName());
             } else {
                 return renderFileFromObjectField(filename, doc, context)
                     || renderFileFromAttachment(filename, doc, context) || (SKINS_DIRECTORY.equals(doc.getSpace())
@@ -299,11 +319,11 @@ public class SkinAction extends XWikiAction
      */
     private boolean renderSkinFileFromResource(String skinName, String path, XWikiContext context) throws XWikiException
     {
-        LOGGER.debug("Rendering filesystem file from path [{}] in skin [{}]", path, skinName);
+        this.logger.debug("Rendering filesystem file from path [{}] in skin [{}]", path, skinName);
 
         // Make sure the skin exist
         if (this.environment.getResource(SKINS_DIRECTORY, skinName + "/") == null) {
-            LOGGER.debug("No filesystem skin with name [{}] can be found in resources", skinName);
+            this.logger.debug("No filesystem skin with name [{}] can be found in resources", skinName);
 
             return false;
         }
@@ -325,48 +345,57 @@ public class SkinAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         try (InputStream input = this.environment.getResourceAsStream(prefixPath, path)) {
             if (input != null) {
-                // Always force UTF-8, as this is the assumed encoding for text files.
-                String content = IOUtils.toString(input, StandardCharsets.UTF_8);
-                String filename = path.substring(path.lastIndexOf("/") + 1, path.length());
+                byte[] data = IOUtils.toByteArray(input);
+                if (data != null && data.length > 0) {
+                    String filename = path.substring(path.lastIndexOf("/") + 1, path.length());
 
-                Date modified = null;
+                    Date modified = null;
 
-                // Evaluate the file only if it's of a supported type.
-                String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
-                if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype) || isLessCssFile(filename)) {
-                    // Evaluate the content with the rights of the superadmin user, since this is a filesystem file.
-                    DocumentReference superadminUserReference = new DocumentReference(context.getMainXWiki(),
-                        XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
-                    String evaluatedContent =
-                        evaluateVelocity(content, path, superadminUserReference, null, context);
+                    // Evaluate the file only if it's of a supported type.
+                    String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
+                    if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype) || isLessCssFile(filename)) {
+                        // Always force UTF-8, as this is the assumed encoding for text files.
+                        String rawContent = new String(data, StandardCharsets.UTF_8);
 
-                    // If the content contained velocity code, then it should not be cached
-                    if (Strings.CS.equals(evaluatedContent, content)) {
-                        modified = context.getWiki().getResourceLastModificationDate(path);
+                        // Evaluate the content with the rights of the superadmin user, since this is a filesystem file.
+                        DocumentReference superadminUserReference = new DocumentReference(context.getMainXWiki(),
+                            XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
+                        String evaluatedContent =
+                            evaluateVelocity(rawContent, path, superadminUserReference, null, context);
+
+                        byte[] newdata = evaluatedContent.getBytes(StandardCharsets.UTF_8);
+                        // If the content contained velocity code, then it should not be cached
+                        if (Arrays.equals(newdata, data)) {
+                            modified = this.environment.getResourceLastModified(prefixPath, path);
+                        } else {
+                            data = newdata;
+                        }
+
+                        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
                     } else {
-                        modified = new Date();
-                        content = evaluatedContent;
+                        modified = this.environment.getResourceLastModified(prefixPath, path);
                     }
 
-                    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-                } else {
-                    modified = context.getWiki().getResourceLastModificationDate(path);
-                }
+                    // Use current date by default
+                    if (modified == null) {
+                        modified = new Date();
+                    }
 
-                // Write the content to the response's output stream.
-                byte[] data = content.getBytes(StandardCharsets.UTF_8);
-                setupHeaders(response, mimetype, modified, data.length);
-                try {
-                    response.getOutputStream().write(data);
-                } catch (IOException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
-                }
+                    // Write the content to the response's output stream.
+                    setupHeaders(response, mimetype, modified, data.length);
+                    try {
+                        response.getOutputStream().write(data);
+                    } catch (IOException e) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                            XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
+                    }
 
-                return true;
+                    return true;
+                }
             }
         } catch (IOException ex) {
-            LOGGER.info("Skin file [{}] does not exist or cannot be accessed", path);
+            this.logger.info("Skin file [{}] does not exist or cannot be accessed. Root cause is [{}]", path,
+                ExceptionUtils.getRootCauseMessage(ex));
         }
 
         return false;
@@ -385,7 +414,7 @@ public class SkinAction extends XWikiAction
     public boolean renderFileFromObjectField(String filename, XWikiDocument doc, final XWikiContext context)
         throws IOException
     {
-        LOGGER.debug("... as object property");
+        this.logger.debug("... as object property");
 
         BaseObject object = doc.getObject("XWiki.XWikiSkins");
         String content = null;
@@ -402,9 +431,16 @@ public class SkinAction extends XWikiAction
                 final ObjectPropertyReference propertyReference =
                     new ObjectPropertyReference(filename, object.getReference());
 
-                // Evaluate the content with the rights of the document's author.
-                content = evaluateVelocity(content, propertyReference, doc.getAuthorReference(),
-                    doc.getDocumentReference(), context);
+                // The object properties are written by the effective metadata author of the document, so the content
+                // is evaluated with the rights of that author, provided the author is allowed to write scripts.
+                DocumentReference author = getEffectiveMetadataAuthor(doc);
+                if (isVelocityAllowed(author, doc)) {
+                    content = evaluateVelocity(content, propertyReference, author, doc.getDocumentReference(),
+                        context);
+                } else {
+                    this.logger.warn("The Velocity code of [{}] is not evaluated because its author [{}] doesn't have "
+                        + "script right on the document.", propertyReference, author);
+                }
             }
 
             // Prepare the response.
@@ -420,17 +456,35 @@ public class SkinAction extends XWikiAction
 
             return true;
         } else {
-            LOGGER.debug("Object field not found or empty");
+            this.logger.debug("Object field not found or empty");
         }
 
         return false;
     }
 
+    private DocumentReference getEffectiveMetadataAuthor(XWikiDocument doc)
+    {
+        return this.documentUserSerializer.serialize(doc.getAuthors().getEffectiveMetadataAuthor());
+    }
+
+    /**
+     * Velocity code is evaluated with the rights of its author, so that author must be allowed to write scripts on the
+     * document holding the code, and the document must not be restricted (i.e. its scripts must not be disabled).
+     *
+     * @param author the author of the Velocity code
+     * @param doc the document holding the Velocity code
+     * @return {@code true} if the Velocity code can be evaluated
+     */
+    private boolean isVelocityAllowed(DocumentReference author, XWikiDocument doc)
+    {
+        return !doc.isRestricted() && this.documentAuthorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            author, doc.getDocumentReference());
+    }
+
     private String evaluateVelocity(String content, EntityReference reference, DocumentReference author,
         final DocumentReference sourceDocument, XWikiContext context)
     {
-        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
-        String namespace = serializer.serialize(reference);
+        String namespace = this.entityReferenceSerializer.serialize(reference);
 
         return evaluateVelocity(content, namespace, author, sourceDocument, context);
     }
@@ -441,11 +495,11 @@ public class SkinAction extends XWikiAction
         String result = content;
 
         try {
-            result = Utils.getComponent(AuthorExecutor.class)
-                .call(() -> context.getWiki().evaluateVelocity(content, namespace), author, sourceDocument);
+            result = this.authorExecutor.call(() -> context.getWiki().evaluateVelocity(content, namespace), author,
+                sourceDocument);
         } catch (Exception e) {
             // Should not happen since there is nothing in the call() method throwing an exception.
-            LOGGER.error("Failed to evaluate velocity content for namespace {} with the rights of the user {}",
+            this.logger.error("Failed to evaluate velocity content for namespace [{}] with the rights of the user [{}]",
                 namespace, author, e);
         }
 
@@ -465,7 +519,7 @@ public class SkinAction extends XWikiAction
     public boolean renderFileFromAttachment(String filename, XWikiDocument doc, XWikiContext context)
         throws IOException, XWikiException
     {
-        LOGGER.debug("... as attachment");
+        this.logger.debug("... as attachment");
 
         XWikiAttachment attachment = doc.getAttachment(filename);
         if (attachment != null) {
@@ -479,10 +533,23 @@ public class SkinAction extends XWikiAction
                 // Always force UTF-8, as this is the assumed encoding for text files.
                 String velocityCode = new String(data, StandardCharsets.UTF_8);
 
-                // Evaluate the content with the rights of the document's author.
-                String evaluatedContent =
-                    evaluateVelocity(velocityCode, attachment.getReference(), doc.getAuthorReference(),
+                // The content of the attachment is written by the author of the attachment, not by the author of
+                // the document, so the content is evaluated with the rights of the attachment's author. The effective
+                // metadata author of the document must also be allowed to write scripts, since that author is the one
+                // who put the attachment on this document when it is copied, renamed or restored.
+                // FIXME: This should be changed when XWIKI-25193 is properly implemented.
+                DocumentReference attachmentAuthor = attachment.getAuthorReference();
+                DocumentReference documentAuthor = getEffectiveMetadataAuthor(doc);
+                String evaluatedContent;
+                if (isVelocityAllowed(attachmentAuthor, doc) && isVelocityAllowed(documentAuthor, doc)) {
+                    evaluatedContent = evaluateVelocity(velocityCode, attachment.getReference(), attachmentAuthor,
                         doc.getDocumentReference(), context);
+                } else {
+                    this.logger.warn("The Velocity code of [{}] is not evaluated because either its author [{}] or "
+                        + "the author [{}] of the document doesn't have script right on the document.",
+                        attachment.getReference(), attachmentAuthor, documentAuthor);
+                    evaluatedContent = velocityCode;
+                }
 
                 // Prepare the response.
                 response.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -494,12 +561,19 @@ public class SkinAction extends XWikiAction
             } else {
                 // Otherwise, return the raw content.
                 setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentLongSize(context));
-                IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
+                boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(attachment);
+
+                response.setHeader("Content-Disposition",
+                    attachmentSecurityManager.getContentDispositionHeader(attachment.getFilename(),
+                        shouldBeDownloaded));
+                try (InputStream input = attachment.getContentInputStream(context)) {
+                    IOUtils.copy(input, response.getOutputStream());
+                }
             }
 
             return true;
         } else {
-            LOGGER.debug("Attachment not found");
+            this.logger.debug("Attachment not found");
         }
 
         return false;
@@ -549,9 +623,9 @@ public class SkinAction extends XWikiAction
      * @param mimetype The mimetype of the file. Used in the "Content-Type" header.
      * @param lastChanged The date of the last change of the file. Used in the "Last-Modified" header.
      * @param length The length of the content (in bytes). Used in the "Content-Length" header.
-     * @deprecated since 11.10RC1, use {@link #setupHeaders(XWikiResponse, String, Date, long)} instead
+     * @deprecated use {@link #setupHeaders(XWikiResponse, String, Date, long)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.10RC1")
     protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, int length)
     {
         setupHeaders(response, mimetype, lastChanged, (long) length);
@@ -567,6 +641,7 @@ public class SkinAction extends XWikiAction
      * @since 11.10
      * @since 11.3.6
      * @since 10.11.10
+     * @deprecated this API manipulates {@link XWikiResponse} which is deprecated.
      */
     @Deprecated(since = "17.0.0RC1")
     protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, long length)

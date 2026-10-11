@@ -107,7 +107,10 @@ public class ApplicationHomePage extends ViewPage
      */
     public boolean hasEntriesLiveTable()
     {
-        return getDriver().findElements(By.className("xwiki-livetable")).size() > 0;
+        // The livetable container element is rendered server-side (only its rows are loaded asynchronously), so once
+        // this view page is ready the element's presence is stable and won't appear later. We can thus check for it
+        // without waiting, which avoids blocking for the full timeout when it's legitimately absent.
+        return getDriver().hasElementWithoutWaiting(By.className("xwiki-livetable"));
     }
 
     public ConfirmationPage clickDeleteAllEntries()
@@ -120,6 +123,18 @@ public class ApplicationHomePage extends ViewPage
     {
         this.deleteApplicationLink.click();
         return new ConfirmationPage();
+    }
+
+    /**
+     * Clicks the Rename page action, which the application home page replaces with its own rename modal.
+     *
+     * @return the modal used to rename the application
+     * @since 18.9.0RC1
+     */
+    public RenameApplicationModal clickRenameApplication()
+    {
+        clickMoreActionsSubMenuEntry("tmActionRename");
+        return new RenameApplicationModal();
     }
 
     /**

@@ -88,15 +88,15 @@ class DefaultSecurityEntryReaderTest
     @Test
     void readUnexistingWikiReference() throws AuthorizationException, XWikiException
     {
-        when(context.getWikiReference()).thenReturn(new WikiReference("xwiki"));
-        when(context.getMainXWiki()).thenReturn("xwiki");
-        SecurityReference securityReference = securityReferenceFactory.newEntityReference(new WikiReference("foo"));
-        when(wiki.getWikiOwner("foo", context)).thenThrow(
+        when(this.context.getWikiReference()).thenReturn(new WikiReference("xwiki"));
+        when(this.context.getMainXWiki()).thenReturn("xwiki");
+        SecurityReference securityReference = this.securityReferenceFactory.newEntityReference(new WikiReference("foo"));
+        when(this.wiki.getWikiOwner("foo", this.context)).thenThrow(
             new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
                 "Does not exist"));
         SecurityRuleEntry ruleEntry = this.defaultSecurityEntryReader.read(securityReference);
 
         assertTrue(ruleEntry.getRules().isEmpty());
-        verify(wiki).getWikiOwner("foo", this.context);
+        verify(this.wiki).getWikiOwner("foo", this.context);
     }
 }

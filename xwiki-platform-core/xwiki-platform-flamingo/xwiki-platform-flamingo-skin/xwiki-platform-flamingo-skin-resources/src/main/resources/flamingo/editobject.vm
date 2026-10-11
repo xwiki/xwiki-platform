@@ -24,27 +24,14 @@
 #if($xcontext.getAction() != 'edit')
   $response.sendRedirect($doc.getURL('edit',"editor=object"))
 #end
+## Include xwikivars to ensure variables are available
+#template('xwikivars.vm')
 ## Macros
 ##
 #*
  * Displays a class name without its space prefix. XML-escapes the output.
  *#
 #macro(cleanClassname $classname)$!{escapetool.xml($classname.substring($classname.indexOf('.')).substring(1))}#end
-
-#*
- * Displays a warning box, with an extra class. Note that the implementation of this macro should be very close to the 
- * one of the #warning macro defined in the web templates macros.
- * This is the only place where we use this extraClass feature, so the implementation is contained here.
- * Note that the exact context this content is rendered in is not fixed, using the XWiki macro 
- * would have ended up in unstable behaviour.
- *#
-#macro (_warningWithExtraClass $text $extraClass)
-<div class="box warningmessage ${extraClass}">
-  <span class="icon-block">$services.icon.renderHTML('warning')</span>
-  <span class="sr-only">$services.localization.render('warning')</span>
-  <div>$text</div>
-</div>
-#end
 ##
 #*
  * Display an object
@@ -113,14 +100,15 @@
         #end
       </dl>
       <div>
-        <a class="syncProperties" href='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
+        <button class="btn btn-danger syncProperties"
+          data-action='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
           title="$services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip')">
           $services.icon.renderHTML('cross')
           $services.localization.render('core.editors.object.removeDeprecatedProperties.link')
-        </a>
+        </button>
       </div>
     #end
-    #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
+    #warning($warningMessageContent 'deprecatedProperties')
   #end
 </div>
 #end
@@ -273,12 +261,15 @@
   #if ($mustSync)
     #define ($warningMessageContent)
       $services.localization.render('core.editors.object.removeDeprecatedProperties.all.info')
-      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" 
-        title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">
+      <div>
+        <button class="btn btn-danger syncProperties syncAllProperties" data-action="$doc.getURL('objectsync')"
+              title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">
+        $services.icon.renderHTML('cross')
         $services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')
-      </a></div>
+        </button>
+      </div>
     #end
-    #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
+    #warning($warningMessageContent 'deprecatedProperties')
   #end
 #end ## checkPropertyDeprecation
 ##

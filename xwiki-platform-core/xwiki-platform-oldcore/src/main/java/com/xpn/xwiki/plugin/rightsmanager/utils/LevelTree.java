@@ -45,7 +45,7 @@ public class LevelTree
 
         if (this.inherited != null) {
             String heritedString = this.inherited.toString();
-            if (heritedString.length() > 0) {
+            if (!heritedString.isEmpty()) {
                 sb.append('{');
                 sb.append("inherited : ");
                 sb.append(this.inherited);
@@ -55,7 +55,7 @@ public class LevelTree
 
         if (this.direct != null) {
             String directString = this.direct.toString();
-            if (directString.length() > 0) {
+            if (!directString.isEmpty()) {
                 sb.append('{');
                 sb.append("direct : ");
                 sb.append(this.direct);

@@ -39,6 +39,7 @@ import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSInput;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.xml.XMLUtils;
 
@@ -51,7 +52,7 @@ import org.xwiki.xml.XMLUtils;
 @Component
 @Named("xml")
 @Singleton
-public class XMLScriptService implements ScriptService
+public class XMLScriptService implements ScriptService, Initializable
 {
     /**
      * The logger to log.
@@ -62,10 +63,8 @@ public class XMLScriptService implements ScriptService
     /** Helper object for manipulating DOM Level 3 Load and Save APIs. */
     private DOMImplementationLS lsImpl;
 
-    /**
-     * Default component constructor.
-     */
-    public XMLScriptService()
+    @Override
+    public void initialize()
     {
         try {
             this.lsImpl = (DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation("LS 3.0");

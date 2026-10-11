@@ -19,17 +19,21 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.IntegerProperty;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -37,37 +41,41 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class BooleanClassTest
+@OldcoreTest
+class BooleanClassTest
 {
-    @Rule
-    public MockitoOldcoreRule mocker = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
+
+    @MockComponent
+    @Named("local")
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /** Test localization. */
     @Test
-    public void testLocalization() throws Exception
+    void localization()
     {
         // Setup
-        ContextualLocalizationManager contextualLocalizationManager =
-            this.mocker.getMocker().registerMockComponent(ContextualLocalizationManager.class);
-        when(contextualLocalizationManager.getTranslationPlain("Some.Class_prop_0")).thenReturn("Nay");
-        when(contextualLocalizationManager.getTranslationPlain("Some.Class_prop_1")).thenReturn("Aye");
-        when(contextualLocalizationManager.getTranslationPlain("Some.Class_prop_2")).thenReturn("Dunno");
-        when(contextualLocalizationManager.getTranslationPlain("yesno_0")).thenReturn("No");
-        when(contextualLocalizationManager.getTranslationPlain("yesno_1")).thenReturn("Yes");
-        when(contextualLocalizationManager.getTranslationPlain("truefalse_0")).thenReturn("False");
-        when(contextualLocalizationManager.getTranslationPlain("truefalse_1")).thenReturn("True");
-        when(contextualLocalizationManager.getTranslationPlain("active_0")).thenReturn("Inactive");
-        when(contextualLocalizationManager.getTranslationPlain("active_1")).thenReturn("Active");
-        when(contextualLocalizationManager.getTranslationPlain("allow_0")).thenReturn("Deny");
-        when(contextualLocalizationManager.getTranslationPlain("allow_1")).thenReturn("Allow");
+        when(this.contextualLocalizationManager.getTranslationPlain("Some.Class_prop_0")).thenReturn("Nay");
+        when(this.contextualLocalizationManager.getTranslationPlain("Some.Class_prop_1")).thenReturn("Aye");
+        when(this.contextualLocalizationManager.getTranslationPlain("Some.Class_prop_2")).thenReturn("Dunno");
+        when(this.contextualLocalizationManager.getTranslationPlain("yesno_0")).thenReturn("No");
+        when(this.contextualLocalizationManager.getTranslationPlain("yesno_1")).thenReturn("Yes");
+        when(this.contextualLocalizationManager.getTranslationPlain("truefalse_0")).thenReturn("False");
+        when(this.contextualLocalizationManager.getTranslationPlain("truefalse_1")).thenReturn("True");
+        when(this.contextualLocalizationManager.getTranslationPlain("active_0")).thenReturn("Inactive");
+        when(this.contextualLocalizationManager.getTranslationPlain("active_1")).thenReturn("Active");
+        when(this.contextualLocalizationManager.getTranslationPlain("allow_0")).thenReturn("Deny");
+        when(this.contextualLocalizationManager.getTranslationPlain("allow_1")).thenReturn("Allow");
         
 
         DocumentReference classReference =
-            new DocumentReference(this.mocker.getXWikiContext().getWikiId(), "Some", "Class");
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Some", "Class");
 
-        EntityReferenceSerializer<String> entityReferenceSerializer =
-            this.mocker.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(entityReferenceSerializer.serialize(classReference)).thenReturn("Some.Class");
+        when(this.entityReferenceSerializer.serialize(classReference)).thenReturn("Some.Class");
 
         // Create a Boolean meta-property and an associated object with a property instance
         BooleanClass metaProperty = new BooleanClass();
@@ -82,68 +90,155 @@ public class BooleanClassTest
         StringBuffer out = new StringBuffer();
 
         // Test the default translations, should be the default "yesno" display type
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("No", out.toString());
 
         out.setLength(0);
         prop.setValue(1);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("Yes", out.toString());
 
         out.setLength(0);
         prop.setValue(2);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("---", out.toString());
 
         // Test translations when display type is "active"
         metaProperty.setDisplayType("active");
         out.setLength(0);
         prop.setValue(0);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("Inactive", out.toString());
 
         out.setLength(0);
         prop.setValue(1);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("Active", out.toString());
 
         out.setLength(0);
         prop.setValue(2);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("---", out.toString());
 
         // Test translations when display type is the non-existing "blacktive"
         metaProperty.setDisplayType("blacktive");
         out.setLength(0);
         prop.setValue(0);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("0", out.toString());
 
         out.setLength(0);
         prop.setValue(1);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("1", out.toString());
 
         out.setLength(0);
         prop.setValue(2);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("---", out.toString());
 
         // Test translations with the full classname_prop_value format
         metaProperty.setName("prop");
         out.setLength(0);
         prop.setValue(0);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("Nay", out.toString());
 
         out.setLength(0);
         prop.setValue(1);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("Aye", out.toString());
 
         out.setLength(0);
         prop.setValue(2);
-        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
+        metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("Dunno", out.toString());
+    }
+
+    /**
+     * Builds a Boolean property whose display values contain characters that need to be escaped in the generated
+     * HTML.
+     *
+     * @param object the object receiving the property instance, set to the "true" value
+     * @return the Boolean meta-property to display
+     */
+    private BooleanClass setUpDisplayValuesNeedingEscaping(BaseObject object)
+    {
+        when(this.contextualLocalizationManager.getTranslationPlain("yesno_0")).thenReturn("No <b>& {{macro}}");
+        when(this.contextualLocalizationManager.getTranslationPlain("yesno_1")).thenReturn("Yes '\"<em>");
+        when(this.contextualLocalizationManager.getTranslationPlain("yesno_2")).thenReturn("None <img/>");
+
+        DocumentReference classReference =
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Some", "Class");
+        when(this.entityReferenceSerializer.serialize(classReference)).thenReturn("Some.Class");
+
+        BooleanClass metaProperty = new BooleanClass();
+        BaseClass cls = new BaseClass();
+        cls.setDocumentReference(classReference);
+        metaProperty.setObject(cls);
+
+        IntegerProperty prop = new IntegerProperty();
+        prop.setValue(1);
+        object.safeput("prop", prop);
+
+        return metaProperty;
+    }
+
+    @Test
+    void displayViewEscapesDisplayValue()
+    {
+        BaseObject object = new BaseObject();
+        BooleanClass metaProperty = setUpDisplayValuesNeedingEscaping(object);
+
+        StringBuffer buffer = new StringBuffer();
+        metaProperty.displayView(buffer, "prop", "", object, this.oldcore.getXWikiContext());
+
+        assertEquals("Yes '\"&#60;em>", buffer.toString());
+    }
+
+    @Test
+    void displayRadioEditEscapesValues()
+    {
+        BaseObject object = new BaseObject();
+        BooleanClass metaProperty = setUpDisplayValuesNeedingEscaping(object);
+
+        // The prefix is built by XWikiDocument#display from the reference of the XClass document. Unlike the property
+        // name, which is restricted to valid XML element names, the name of that document isn't restricted.
+        StringBuffer buffer = new StringBuffer();
+        metaProperty.displayRadioEdit(buffer, "prop", "Some.My{{macro}}Class_0_", object,
+            this.oldcore.getXWikiContext());
+
+        String escapedPrefix = "Some.My&#123;&#123;macro}}Class_0_prop";
+        assertEquals("<div><label for='" + escapedPrefix + "_none'>"
+            + "<input id='" + escapedPrefix + "_none' value='' name='" + escapedPrefix + "' type='radio'/>"
+            + "None &#60;img/&#62;</label></div>"
+            + "<div><label for='" + escapedPrefix + "'>"
+            + "<input id='" + escapedPrefix + "' checked='checked' value='1' name='" + escapedPrefix
+            + "' type='radio'/>"
+            + "Yes &#39;&#34;&#60;em&#62;</label></div>"
+            + "<div><label for='" + escapedPrefix + "_false'>"
+            + "<input id='" + escapedPrefix + "_false' value='0' name='" + escapedPrefix + "' type='radio'/>"
+            + "No &#60;b&#62;&#38; &#123;&#123;macro}}</label></div>", buffer.toString());
+    }
+
+    @Test
+    void displaySelectEditEscapesValues()
+    {
+        BaseObject object = new BaseObject();
+        BooleanClass metaProperty = setUpDisplayValuesNeedingEscaping(object);
+
+        StringBuffer buffer = new StringBuffer();
+        metaProperty.displaySelectEdit(buffer, "prop", "Some.My{{macro}}Class_0_", object,
+            this.oldcore.getXWikiContext());
+
+        String escapedPrefix = "Some.My&#123;&#123;macro}}Class_0_prop";
+        assertEquals("<select size='1' id='" + escapedPrefix
+            + "' aria-label='core.model.xclass.editClassProperty.textAlternative' name='" + escapedPrefix + "'>"
+            + "<option value='' label='---'>---</option>"
+            + "<option selected='selected' value='1' label='Yes &#39;&#34;&#60;em&#62;'>"
+            + "Yes &#39;&#34;&#60;em&#62;</option>"
+            + "<option value='0' label='No &#60;b&#62;&#38; &#123;&#123;macro}}'>"
+            + "No &#60;b&#62;&#38; &#123;&#123;macro}}</option>"
+            + "</select>", buffer.toString());
     }
 }

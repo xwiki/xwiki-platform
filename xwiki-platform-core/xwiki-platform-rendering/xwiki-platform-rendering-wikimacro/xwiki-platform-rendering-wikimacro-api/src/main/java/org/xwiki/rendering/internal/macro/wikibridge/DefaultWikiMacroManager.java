@@ -163,7 +163,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
             componentDescriptor.setRoleType(Macro.class);
             componentDescriptor.setRoleHint(wikiMacro.getDescriptor().getId().getId());
 
-            // Save current context informations
+            // Save current context information
             String currentUser = this.bridge.getCurrentUser();
             EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
             try {
@@ -181,7 +181,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                 throw new WikiMacroException(String.format("Failed to register macro [%s] in [%s] for visibility [%s]",
                     wikiMacro.getDescriptor().getId().getId(), documentReference, visibility), e);
             } finally {
-                // Restore previous context informations
+                // Restore previous context information
                 this.bridge.setCurrentUser(currentUser);
                 this.modelContext.setCurrentEntityReference(currentEntityReference);
             }

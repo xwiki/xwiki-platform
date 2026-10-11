@@ -25,9 +25,10 @@ import type {
   Block,
   Image,
   InlineContent,
+  InlineMacroInvocation,
   Link,
   ListItem,
-  MacroInvocation,
+  MacroBlockInvocation,
   TableCell,
   Text,
   UniAst,
@@ -221,7 +222,9 @@ export class DefaultUniAstToMarkdownConverter
     }
   }
 
-  private async convertMacro(call: MacroInvocation): Promise<string> {
+  private async convertMacro(
+    call: MacroBlockInvocation | InlineMacroInvocation,
+  ): Promise<string> {
     const opening = `${call.id}${Object.entries(call.params)
       .map(
         ([name, value]) =>

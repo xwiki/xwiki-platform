@@ -19,8 +19,6 @@
  */
 package org.xwiki.uiextension.internal.macro;
 
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +33,8 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionManager;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the

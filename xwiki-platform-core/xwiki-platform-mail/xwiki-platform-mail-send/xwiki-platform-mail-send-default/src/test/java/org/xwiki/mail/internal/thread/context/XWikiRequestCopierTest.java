@@ -42,7 +42,7 @@ class XWikiRequestCopierTest
     @InjectMockComponents
     private XWikiRequestCopier copier;
 
-    XWikiServletRequestStub originalRequest;
+    private XWikiServletRequestStub originalRequest;
 
     @BeforeEach
     void beforeEach()

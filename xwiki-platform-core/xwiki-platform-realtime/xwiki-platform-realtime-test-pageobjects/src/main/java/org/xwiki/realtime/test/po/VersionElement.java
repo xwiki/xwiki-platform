@@ -50,7 +50,7 @@ public class VersionElement extends BaseElement
      */
     public CoeditorElement getAuthor()
     {
-        return new CoeditorElement(this.container.findElement(By.className("realtime-user")));
+        return new CoeditorElement(() -> this.container.findElement(By.className("realtime-user")));
     }
 
     /**

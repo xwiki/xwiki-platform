@@ -1,0 +1,262 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="AppWithinMinutes.Code.CSRFTokenRefresh" locale="">
+  <web>AppWithinMinutes.Code</web>
+  <name>CSRFTokenRefresh</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AppWithinMinutes.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>CSRF Token Refresh</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="AppWithinMinutes.VelocityMacros" /}}
+
+This page provides a reusable JavaScript helper (the {{code}}xwiki-appwithinminutes-csrf{{/code}} RequireJS module) that lets a page
+recover gracefully when an AJAX request is rejected because the CSRF (form) token has expired (for instance after a
+server restart). Load this extension with {{code}}#set ($discard = $xwiki.jsx.use('AppWithinMinutes.Code.CSRFTokenRefresh')){{/code}}
+then, from the failure handler of your request:
+
+{{code language="javascript"}}
+require(['xwiki-appwithinminutes-csrf'], function(csrf) {
+  csrf.recoverFromExpiredToken(response, function(newToken) {
+    // Retry the request with the refreshed token.
+  });
+});
+{{/code}}</content>
+  <object>
+    <name>AppWithinMinutes.Code.CSRFTokenRefresh</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>0d4a9f0e-2f3a-4d2b-9c4f-2b8a4f6e8c10</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/*
+ * Reusable helper to recover gracefully when an AJAX request is rejected (HTTP 403) because the CSRF (form) token
+ * expired, e.g. after a server restart. The server is expected to answer such a 403 with the JSON shape produced by
+ * XWikiAction#csrfTokenCheck: {"errorType": "CSRF", "newToken": "..."}.
+ */
+define('xwiki-appwithinminutes-csrf-messages', {
+  prefix: 'csrf.error.',
+  keys: ['message', 'causes.introduction', 'causes.stalesession', 'causes.forgedrequest', 'resubmit.question',
+    'resubmit.question.no', 'resubmit.question.yes']
+});
+
+define('xwiki-appwithinminutes-csrf', ['xwiki-l10n!xwiki-appwithinminutes-csrf-messages'], function (l10n) {
+  'use strict';
+
+  // Update the token everywhere it is stored in the page so that any subsequent request uses the fresh one.
+  const refreshToken = function (newToken) {
+    document.querySelectorAll('input[name="form_token"]').forEach(function (input) {
+      input.value = newToken;
+    });
+    if (window.XWiki?.meta) {
+      XWiki.meta.form_token = newToken;
+    }
+  };
+
+  // Extract the fresh token from a 403 response carrying the {"errorType": "CSRF", "newToken": "..."} JSON body.
+  const extractNewToken = function (response) {
+    if (response?.status !== 403) {
+      return null;
+    }
+    let json = response.responseJSON;
+    if (!json) {
+      try {
+        json = JSON.parse(response.responseText);
+      } catch (e) {
+        return null;
+      }
+    }
+    return json?.errorType === 'CSRF' ? json.newToken : null;
+  };
+
+  return {
+    /**
+     * Recover from a request that was rejected because the CSRF (form) token expired.
+     *
+     * IMPORTANT: this must only be called in reaction to a genuine user-triggered action. It asks the user, through
+     * an explicit confirmation, whether to refresh the security token and retry; it never refreshes the token
+     * silently. When the user confirms, the new token is written everywhere it is stored in the page (the form_token
+     * inputs and XWiki.meta) and the provided callback is invoked so that the caller can retry its request.
+     *
+     * @param response the failed AJAX response; recovery only happens when it is a 403 carrying the CSRF JSON body
+     * @param onConfirm a function called with the new token once the user confirmed and the token has been refreshed
+     * @return true if the response was a recoverable CSRF error and the confirmation has been displayed, false
+     *   otherwise (in which case the caller should handle the failure on its own)
+     */
+    recoverFromExpiredToken: function (response, onConfirm) {
+      const newToken = extractNewToken(response);
+      if (!newToken) {
+        return false;
+      }
+      // Same modal (id and CSS classes) as the one displayed by actionButtons.js when a document save is rejected
+      // because of an expired CSRF token, so that both flows look and behave consistently.
+      const createContent = function (modal) {
+        // Duplicates resubmit.vm to align user experience while make it easy to backport the code to older versions.
+        const content = new Element('div', {'class': 'modal-popup', 'id': 'csrf-warning-modal'});
+        content.insert(`&lt;p class="main-explanation"&gt;${l10n.get('message')}&lt;/p&gt;` +
+          `&lt;p class="resubmit-causes-introduction"&gt;${l10n.get('causes.introduction')}&lt;/p&gt;` +
+          '&lt;ul class="resubmit-causes"&gt;' +
+          `&lt;li&gt;${l10n.get('causes.stalesession')}&lt;/li&gt;` +
+          `&lt;li&gt;${l10n.get('causes.forgedrequest')}&lt;/li&gt;` +
+          '&lt;/ul&gt;' +
+          `&lt;div class="resubmit-question"&gt;${l10n.get('resubmit.question')}&lt;/div&gt;`);
+
+        const buttonsDiv = new Element('div', {'class': 'csrf-warning-buttons'});
+        const cancelButton = new Element('button',
+          {'class': 'resubmit-primary btn btn-primary', 'id': 'cancel-save-csrf'});
+        cancelButton.insert(l10n.get('resubmit.question.no'));
+        cancelButton.on('click', function () {
+          modal.closeDialog();
+        });
+        buttonsDiv.insert(cancelButton);
+
+        const retryButton = new Element('button',
+          {'class': 'btn btn-default resubmit-secondary', 'id': 'force-save-csrf'});
+        retryButton.insert(l10n.get('resubmit.question.yes'));
+        retryButton.on('click', function () {
+          modal.closeDialog();
+          refreshToken(newToken);
+          onConfirm(newToken);
+        });
+        buttonsDiv.insert(retryButton);
+
+        content.insert(buttonsDiv);
+        return content;
+      };
+
+      const ModalClass = Class.create(XWiki.widgets.ModalPopup, {
+        initialize: function ($super) {
+          $super(createContent(this), {'show': {method: this.showDialog, keys: []}}, {
+            displayCloseButton: false,
+            verticalPosition: 'center',
+            backgroundColor: '#FFF',
+            removeOnClose: true
+          });
+          this.showDialog();
+        }
+      });
+      new ModalClass();
+      return true;
+    }
+  };
+});</code>
+    </property>
+    <property>
+      <name>CSRF token refresh</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

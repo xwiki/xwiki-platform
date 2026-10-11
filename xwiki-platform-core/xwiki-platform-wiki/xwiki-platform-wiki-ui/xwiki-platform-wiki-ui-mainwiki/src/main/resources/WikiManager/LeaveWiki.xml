@@ -48,11 +48,14 @@
   #set ($wiki = $services.wiki.getById($wikiId))
   ##
   #if ("$!wiki" == '')
-    #if ("$!{$services.wiki.lastError}" != '')
-      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastError.message]){{/error}}
+    #if ("$!{services.wiki.lastError}" != '')
+      #set ($translationKey = 'platform.wiki.error.exceptionWithMessage')
+      #set ($translationParameters = [$services.wiki.lastError.message])
     #else
-      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
+      #set ($translationKey = 'platform.wiki.error.wikidoesnotexist')
+      #set ($translationParameters = [$wikiId])
     #end
+    {{error}}{{translation key="$translationKey" scriptParameters='translationParameters'/}}{{/error}}
   #else
     #set ($wikiName = $wiki.prettyName)
     #if ("$!wikiName" == '')

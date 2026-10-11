@@ -163,6 +163,8 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
           getEditBus() {
             return {
               start() {},
+              cancel() {},
+              save() {},
               isEditable() {
                 return true;
               },

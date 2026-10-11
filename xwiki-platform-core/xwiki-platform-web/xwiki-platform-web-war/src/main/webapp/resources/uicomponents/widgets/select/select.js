@@ -271,7 +271,7 @@ require(['jquery'], function($) {
           for (var k = 0; k < filterValues.length; ++k) {
             var filterValue = filterValues[k].toLowerCase();
             // If one of the filter values is missing from the label of this option, we must hide it.
-            if (optionText.indexOf(filterValue) == -1) {
+            if (!optionText.includes(filterValue)) {
               optionShouldBeVisible = false;
               break;
             }

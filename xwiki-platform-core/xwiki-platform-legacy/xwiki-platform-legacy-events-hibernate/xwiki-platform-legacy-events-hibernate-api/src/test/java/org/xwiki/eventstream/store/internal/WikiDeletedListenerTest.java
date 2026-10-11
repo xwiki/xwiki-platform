@@ -19,56 +19,45 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.job.JobExecutor;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
-/**
- * Validate {@link WikiDeletedListener}.
- * 
- * @version $Id$
- */
-public class WikiDeletedListenerTest
+@ComponentTest
+class WikiDeletedListenerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WikiDeletedListener> mocker =
-        new MockitoComponentMockingRule<>(WikiDeletedListener.class);
+    @InjectMockComponents
+    private WikiDeletedListener wikiDeletedListener;
 
+    @MockComponent
     private JobExecutor jobExecutor;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        jobExecutor = mocker.getInstance(JobExecutor.class);
-    }
-
     @Test
-    public void onEvent() throws Exception
+    void onEvent() throws Exception
     {
         doAnswer(invocationOnMock -> {
             EventStreamWikiCleanerJobRequest request = invocationOnMock.getArgument(1);
             assertEquals("someWiki", request.getWikiId());
-            assertEquals(Arrays.asList("EventStreamWikiCleanerJob", "someWiki"), request.getId());
+            assertEquals(List.of("EventStreamWikiCleanerJob", "someWiki"), request.getId());
             return null;
-        }).when(jobExecutor).execute(eq("EventStreamWikiCleanerJob"), any(EventStreamWikiCleanerJobRequest.class));
+        }).when(this.jobExecutor).execute(eq("EventStreamWikiCleanerJob"), any(EventStreamWikiCleanerJobRequest.class));
 
         WikiDeletedEvent wikiDeletedEvent = new WikiDeletedEvent("someWiki");
-        mocker.getComponentUnderTest().onEvent(wikiDeletedEvent, null, null);
+        this.wikiDeletedListener.onEvent(wikiDeletedEvent, null, null);
 
-        // Verify
         EventStreamWikiCleanerJobRequest request = new EventStreamWikiCleanerJobRequest("someWiki");
-        request.setId(Arrays.asList("EventStreamWikiCleanerJob", "someWiki"));
-        verify(jobExecutor).execute(eq("EventStreamWikiCleanerJob"), any(EventStreamWikiCleanerJobRequest.class));
+        request.setId(List.of("EventStreamWikiCleanerJob", "someWiki"));
+        verify(this.jobExecutor).execute(eq("EventStreamWikiCleanerJob"), any(EventStreamWikiCleanerJobRequest.class));
     }
 }

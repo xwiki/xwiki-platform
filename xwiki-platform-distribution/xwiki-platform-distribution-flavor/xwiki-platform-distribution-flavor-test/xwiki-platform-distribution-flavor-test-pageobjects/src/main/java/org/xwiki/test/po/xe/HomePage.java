@@ -29,17 +29,34 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class HomePage extends ViewPage
 {
+    /** The name of the space holding the home page. */
+    private static final String SPACE = "Main";
+
+    /** The name of the home page document. */
+    private static final String PAGE = "WebHome";
+
+    /**
+     * Opens the home page.
+     *
+     * @return the home page object
+     */
     public static HomePage gotoPage()
     {
-        getUtil().gotoPage("Main", "WebHome");
+        getUtil().gotoPage(SPACE, PAGE);
         return new HomePage();
     }
 
+    /**
+     * @return the URL of the home page
+     */
     public String getURL()
     {
-        return getUtil().getURL("Main", "WebHome");
+        return getUtil().getURL(SPACE, PAGE);
     }
 
+    /**
+     * @return {@code true} if the browser is currently on the home page
+     */
     public boolean isOnHomePage()
     {
         return getDriver().getCurrentUrl().equals(getURL());

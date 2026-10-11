@@ -354,7 +354,7 @@ public class DefaultWikiUserManager implements WikiUserManager
                         object.getStringValue(WikiCandidateMemberClassInitializer.FIELD_TYPE).toUpperCase())
         );
         candidacy.setDateOfCreation(object.getDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CREATION));
-        candidacy.setDateOfCreation(object.getDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE));
+        candidacy.setDateOfClosure(object.getDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE));
 
         return candidacy;
     }
@@ -433,9 +433,10 @@ public class DefaultWikiUserManager implements WikiUserManager
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
-        // Get the candidacy
+        // Get the candidacy. It can be null when the candidacy has been removed in the meantime (e.g. an invitation
+        // that has been canceled) while a stale candidacy id is still being requested (e.g. on a form resubmission).
         BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, candidacyId);
-        return readCandidacyFromObject(object, wikiId);
+        return object != null ? readCandidacyFromObject(object, wikiId) : null;
     }
 
     @Override

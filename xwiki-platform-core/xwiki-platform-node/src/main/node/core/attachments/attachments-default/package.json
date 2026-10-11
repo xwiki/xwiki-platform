@@ -1,7 +1,7 @@
 {
   "name": "@xwiki/platform-attachments-default",
-  "version": "18.3.0-SNAPSHOT",
-  "license": "LGPL 2.1",
+  "version": "18.9.0-SNAPSHOT",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -46,8 +46,8 @@
     "@xwiki/platform-model-remote-url-api": "workspace:*"
   },
   "peerDependencies": {
-    "inversify": "7.x",
-    "pinia": "3.x",
+    "inversify": "8.x",
+    "pinia": "4.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
@@ -55,7 +55,9 @@
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",

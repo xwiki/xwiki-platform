@@ -20,6 +20,7 @@
 package org.xwiki.csrf;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Anti-CSRF (Cross Site Request Forgery) protection using secret token validation mechanism.
@@ -75,5 +76,30 @@ public interface CSRFToken
     {
         // Avoid revapi complaints.
         throw new RuntimeException("Method not implemented.");
+    }
+
+    /**
+     * @return {@code true} if the current request can be resubmitted.
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    @Unstable
+    default boolean isResubmitAllowedForCurrentRequest()
+    {
+        return false;
+    }
+
+    /**
+     * @return {@code true} if a request identified by the given id can be resubmitted.
+     * @param srid the request identifier
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    @Unstable
+    default boolean isResubmitAllowedForRequestId(String srid)
+    {
+        return false;
     }
 }

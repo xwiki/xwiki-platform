@@ -23,15 +23,17 @@ import java.net.URL;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,36 +41,36 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class XWikiContextCacheKeyFactoryTest
+@ComponentTest
+class XWikiContextCacheKeyFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<XWikiContextCacheKeyFactory> mocker =
-            new MockitoComponentMockingRule<>(XWikiContextCacheKeyFactory.class);
+    @InjectMockComponents
+    private XWikiContextCacheKeyFactory xWikiContextCacheKeyFactory;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @Mock
     private XWikiContext xcontext;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
     }
 
     @Test
-    public void getCacheKey() throws Exception
+    void getCacheKey() throws Exception
     {
         // Mocks
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
-        when(xcontext.getURLFactory()).thenReturn(urlFactory);
-        
+        when(this.xcontext.getURLFactory()).thenReturn(urlFactory);
+
         when(urlFactory.createSkinURL(any(), any(), any(XWikiContext.class))).thenReturn(
-                new URL("http://host/path"));
-        
+            new URL("http://host/path"));
+
         // Test
         assertEquals("XWikiContext[URLFactory[" + urlFactory.getClass().getName() + ", /path]]",
-                mocker.getComponentUnderTest().getCacheKey());
+            this.xWikiContextCacheKeyFactory.getCacheKey());
     }
 }

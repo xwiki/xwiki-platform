@@ -38,9 +38,17 @@ public enum Database
     MARIADB("mariadb"),
 
     /**
-     * Represents the HyperSQL database, running outside of a Docker contaier.
+     * Represents the HyperSQL database. It's embedded in the XWiki instance when there's a single instance and it runs
+     * in server mode in a Docker container when several XWiki instances need to share it (see
+     * {@link org.xwiki.test.docker.junit5.TestConfiguration#isDatabaseEmbedded()}).
+     * <p>
+     * Note that, since there's no HSQLDB Docker image, the server mode is executed in a JRE image from the HSQLDB JAR:
+     * the HSQLDB version is thus the version of the JDBC driver and the configured database tag, if any, is the tag of
+     * the JRE image.
+     *
+     * @since 18.7.0RC1
      */
-    HSQLDB_EMBEDDED("hsqldb"),
+    HSQLDB("hsqldb"),
 
     /**
      * Represents the PostgreSQL database.

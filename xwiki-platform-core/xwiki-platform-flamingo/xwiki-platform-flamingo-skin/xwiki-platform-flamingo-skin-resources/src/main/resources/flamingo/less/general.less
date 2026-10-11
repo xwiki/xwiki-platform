@@ -65,6 +65,26 @@ table {
   height: 1em;
 }
 
+// Badges & Labels ============================================================
+.badge,
+.label {
+  // Horizontal spacing from surrounding text, in em like Bootstrap's own
+  // .label padding, so it stays proportional to the font size.
+  margin: 0 .2em;
+}
+
+.badge {
+  // Overrides Bootstrap 3's default vertical-align: middle, which sits a
+  // bit low inline in text; raise it slightly instead.
+  vertical-align: 0.1em;
+}
+
+.label {
+  // Bootstrap 3 already uses vertical-align: baseline here, but it still
+  // sits a bit low; raise it slightly too, smaller offset than .badge.
+  vertical-align: 0.05em;
+}
+
 // Code =======================================================================
 
 pre {
@@ -189,7 +209,8 @@ body {
       & .vertical-menu, // In vertical menus (user menu, syntax guide, ...), do not underline the menu items.
       & .jstree-xwiki, // Do not underline links in jstrees
       & .xwiki-livedata .cell .displayer-link, // Do not underline links that are in their own livedata cell
-      & .xwiki-livedata .cell .breadcrumb // Do not underline links that are in breadcrumbs in livedatas
+      & .breadcrumb, // The breadcrumb contains enough presentation to distinguish it from neighboring text.
+      & nav, & *[role="navigation"] // Navigation nodes are meant to contain anchors. This meaning is most of the time conveyed through the style.
       {
         & a {
           .not-inline-link();
@@ -229,7 +250,8 @@ body {
     }
   }
 
-  &.preference-underlining-no {
+  /* We make sure the 'No underlining' preference reflects the legacy behaviour, which still underlined when hovering. */
+  &.preference-underlining-no:not(:hover):not(:focus) {
     a {
       text-decoration: none;
     }

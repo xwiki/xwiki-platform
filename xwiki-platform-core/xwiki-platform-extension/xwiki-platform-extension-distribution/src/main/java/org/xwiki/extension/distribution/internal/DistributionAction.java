@@ -61,7 +61,7 @@ public class DistributionAction extends XWikiAction
         // Disallow template override with xpage parameter.
         if (!DISTRIBUTION_ACTION.equals(Utils.getPage(context.getRequest(), DISTRIBUTION_ACTION))) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                String.format("Template may not be overriden with 'xpage' in [%s] action.", DISTRIBUTION_ACTION));
+                String.format("Template may not be overridden with 'xpage' in [%s] action.", DISTRIBUTION_ACTION));
         }
 
         // Make sure the user has the right to access the distribution action

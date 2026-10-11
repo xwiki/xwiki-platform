@@ -19,7 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.ClassPropertyReference;
@@ -45,11 +45,11 @@ class SolrFieldStringEntityReferenceSerializerTest
     void serialize()
     {
         assertNull(this.serializer.serialize(null));
-        assertEquals(this.serializer.serialize(new ClassPropertyReference("title",
-            new DocumentReference("math", Arrays.asList("My App", "Code"), "Some Class"))),
-            "math.My App.Code.Some Class.title");
-        assertEquals(this.serializer.serialize(new ClassPropertyReference("ti.tle",
-            new DocumentReference("ma.th", Arrays.asList("My.App", "Co..de"), "Some.Class"))),
-            "ma..th.My..App.Co....de.Some..Class.ti..tle");
+        assertEquals("math.My App.Code.Some Class.title",
+            this.serializer.serialize(new ClassPropertyReference("title",
+                new DocumentReference("math", List.of("My App", "Code"), "Some Class"))));
+        assertEquals("ma..th.My..App.Co....de.Some..Class.ti..tle",
+            this.serializer.serialize(new ClassPropertyReference("ti.tle",
+                new DocumentReference("ma.th", List.of("My.App", "Co..de"), "Some.Class"))));
     }
 }

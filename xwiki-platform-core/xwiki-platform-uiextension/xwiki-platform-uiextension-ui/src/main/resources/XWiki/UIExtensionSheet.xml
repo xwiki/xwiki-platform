@@ -43,7 +43,7 @@
   #foreach ($prop in $class.properties)
     ; $prop.prettyName
     #if ($prop.getType() == 'TextAreaClass')
-      : (% class="box" %)((({{{$uix.getProperty($prop.getName()).getValue()}}})))
+      : (% class="box code" %)((($services.rendering.escape($uix.getProperty($prop.getName()).getValue(), 'xwiki/2.1'))))
     #else
       : $doc.display($prop.getName(), $uix)
     #end

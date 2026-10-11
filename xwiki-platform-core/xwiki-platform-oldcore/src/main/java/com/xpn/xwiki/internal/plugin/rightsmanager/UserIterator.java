@@ -265,7 +265,7 @@ public class UserIterator<T> implements Iterator<T>
             }
         }
 
-        cleanStackIfNeeded(currentIterator);
+        cleanStackIfNeeded();
         return currentValue;
     }
 
@@ -295,17 +295,15 @@ public class UserIterator<T> implements Iterator<T>
         boolean isGroupReference = members != null && !members.isEmpty();
 
         // If we have a group reference then stack the group members
-        if (isGroupReference) {
-            // Ensure groups are visited only once to prevent potential infinite loops
-            if (!processedGroups.contains(currentReference)) {
-                processedGroups.add(currentReference);
+        // Ensure groups are visited only once to prevent potential infinite loops
+        if (isGroupReference && !processedGroups.contains(currentReference)) {
+            processedGroups.add(currentReference);
 
-                // Extract the references and push them on the stack as an iterator
-                Collection<DocumentReference> groupMemberReferences =
-                    convertToDocumentReferences(members, currentReference);
-                if (!groupMemberReferences.isEmpty()) {
-                    this.userAndGroupIteratorStack.push(groupMemberReferences.iterator());
-                }
+            // Extract the references and push them on the stack as an iterator
+            Collection<DocumentReference> groupMemberReferences =
+                convertToDocumentReferences(members, currentReference);
+            if (!groupMemberReferences.isEmpty()) {
+                this.userAndGroupIteratorStack.push(groupMemberReferences.iterator());
             }
         }
         // If we have a user reference then we'll just return it
@@ -316,7 +314,7 @@ public class UserIterator<T> implements Iterator<T>
         return value;
     }
 
-    private void cleanStackIfNeeded(Iterator<DocumentReference> currentIterator)
+    private void cleanStackIfNeeded()
     {
         // If there is no more reference to handle in the current iterator, pop the stack!
         while (!this.userAndGroupIteratorStack.isEmpty() && !this.userAndGroupIteratorStack.peek().hasNext()) {

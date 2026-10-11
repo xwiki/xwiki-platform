@@ -63,7 +63,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -117,7 +117,7 @@ class ContextMacroTest
     private BlockAsyncRendererExecutor executor;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         // Macro Descriptor set up
         BeanDescriptor descriptor = mock(BeanDescriptor.class);
@@ -167,14 +167,10 @@ class ContextMacroTest
     {
         doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.VIEW, AUTHOR, TARGET_REFERENCE);
 
-        try {
-            executeInDOCUMENTContext();
-
-            fail("Should have thrown an exception");
-        } catch (MacroExecutionException expected) {
-            assertEquals("Author [wiki:XWiki.author] is not allowed to access target document [wiki:space.target]",
-                expected.getMessage());
-        }
+        MacroExecutionException expected =
+            assertThrows(MacroExecutionException.class, this::executeInDOCUMENTContext);
+        assertEquals("Author [wiki:XWiki.author] is not allowed to access target document [wiki:space.target]",
+            expected.getMessage());
     }
 
     @Test

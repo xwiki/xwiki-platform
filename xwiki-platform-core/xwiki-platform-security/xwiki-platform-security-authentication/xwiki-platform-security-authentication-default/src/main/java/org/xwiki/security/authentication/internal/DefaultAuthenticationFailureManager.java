@@ -110,6 +110,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
      */
     public DefaultAuthenticationFailureManager()
     {
+        // Nothing to initialize here: see initialize(), called by the component manager.
     }
 
     @Override
@@ -138,7 +139,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
                 this.failureStrategyList
                     .add(this.componentManager.getInstance(AuthenticationFailureStrategy.class, failureStrategyName));
             } catch (ComponentLookupException e) {
-                logger.error("Error while getting authentication failure strategy [{}]. ", failureStrategyName, e);
+                logger.error("Error while getting authentication failure strategy [{}].", failureStrategyName, e);
             }
         }
     }
@@ -350,7 +351,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
 
     /**
      * This class aims at storing the authentication failure record information about a login. It only stores the first
-     * failing date and the number of failing attempts since then. Those two are resetted if another failure happens
+     * failing date and the number of failing attempts since then. Those two are reset if another failure happens
      * outside of the given time window. (See {@link AuthenticationConfiguration#getTimeWindow()})
      */
     class AuthFailureRecord

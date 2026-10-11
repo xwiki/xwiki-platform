@@ -211,6 +211,8 @@ require([
   };
 
   var notifyConnectionFailure = function() {
+    // Intentionally empty: when the connection to the job status fails we leave the job UI as it is instead of
+    // replacing the progress bar with a message.
   };
 
   $('.job-status').has('.ui-progress').each(function() {

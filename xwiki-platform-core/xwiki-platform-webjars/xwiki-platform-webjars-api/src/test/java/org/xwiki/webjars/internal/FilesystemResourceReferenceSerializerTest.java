@@ -22,7 +22,7 @@ package org.xwiki.webjars.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Provider;
@@ -88,7 +88,7 @@ class FilesystemResourceReferenceSerializerTest
 
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
-        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", List.of(
             "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
@@ -108,7 +108,7 @@ class FilesystemResourceReferenceSerializerTest
 
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
-        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", List.of(
             "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
@@ -128,7 +128,7 @@ class FilesystemResourceReferenceSerializerTest
 
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
-        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", List.of(
             "font-awesome", this.fontAwesomeVersion, "webfonts/fa-regular-400.woff2"));
 
         // Verify that the returned URL is ok
@@ -147,7 +147,7 @@ class FilesystemResourceReferenceSerializerTest
 
         when(this.exportContextProvider.get()).thenReturn(exportContext);
 
-        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", List.of(
             "font-awesome", this.fontAwesomeVersion, "css/all.min.css"));
 
         assertEquals(this.webjarPrefix + "/css/all.min.css", this.serializer.serialize(reference).serialize());

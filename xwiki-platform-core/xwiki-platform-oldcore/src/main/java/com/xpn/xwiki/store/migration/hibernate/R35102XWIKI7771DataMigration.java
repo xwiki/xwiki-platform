@@ -34,6 +34,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
@@ -80,9 +81,7 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
             shouldExecute = (startupVersion.getVersion() > 0
                 && getStore().getDatabaseProductName() == DatabaseProduct.POSTGRESQL);
             getStore().endTransaction(getXWikiContext(), false);
-        } catch (XWikiException ex) {
-            // Shouldn't happen, ignore
-        } catch (DataMigrationException ex) {
+        } catch (XWikiException | DataMigrationException ex) {
             // Shouldn't happen, ignore
         }
         return shouldExecute;
@@ -111,6 +110,9 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
      */
     private static class R35102Work implements Work
     {
+        /** Logging helper object. */
+        private static final Logger LOGGER = LoggerFactory.getLogger(R35102Work.class);
+
         /** The name of the table to fix. */
         private String tableName;
 
@@ -122,9 +124,6 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
 
         /** What kind of data is corrupt when a migration fails. */
         private String dataType;
-
-        /** Logging helper object. */
-        private Logger logger = LoggerFactory.getLogger(R35102Work.class);
 
         /**
          * Constructor specifying the table and columns to fix.
@@ -146,47 +145,51 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
         @Override
         public void execute(Connection connection) throws SQLException
         {
-            Statement stmt = connection.createStatement();
-            ResultSet lobs = stmt.executeQuery("SELECT " + this.columnName + ", " + this.idColumnName + " FROM "
-                + this.tableName + ";");
             Map<String, Long> lobsToProcess = new HashMap<>();
-            while (lobs.next()) {
-                // If we're not migrating data created by a version between 3.2 and 3.5, then the data is already OK
-                if (StringUtils.isNumeric(lobs.getString(1))) {
-                    lobsToProcess.put(lobs.getString(1), lobs.getLong(2));
+            try (Statement stmt = connection.createStatement();
+                ResultSet lobs = stmt.executeQuery("SELECT " + this.columnName + ", " + this.idColumnName + " FROM "
+                    + this.tableName + ";"))
+            {
+                while (lobs.next()) {
+                    // If we're not migrating data created by a version between 3.2 and 3.5, then the data is already OK
+                    if (StringUtils.isNumeric(lobs.getString(1))) {
+                        lobsToProcess.put(lobs.getString(1), lobs.getLong(2));
+                    }
                 }
             }
-            PreparedStatement inlineLob = connection.prepareStatement(MessageFormat.format("UPDATE {0} SET {1} ="
-                + " convert_from(loread(lo_open({1}::int, 262144), 10000000), ''LATIN1'') WHERE {1} = ?",
-                this.tableName, this.columnName));
-            PreparedStatement emptyLob = connection.prepareStatement(MessageFormat.format("UPDATE {0} SET {1} = ''''"
-                + " WHERE {1} = ?", this.tableName, this.columnName));
-            PreparedStatement removeLob = connection.prepareStatement("select lo_unlink(?)");
-            for (Entry<String, Long> lob : lobsToProcess.entrySet()) {
-                try {
-                    inlineLob.setString(1, lob.getKey());
-                    inlineLob.executeUpdate();
-                    // We commit early since any error will invalidate the whole transaction
-                    removeLob.setLong(1, Long.valueOf(lob.getKey()));
-                    removeLob.execute();
-                    connection.commit();
-                } catch (SQLException ex) {
-                    if (ex.getMessage().contains("0x00")) {
-                        // The hibernate mapping file was broken between 3.2 and 3.5 for PostgreSQL, and any non-ASCII
-                        // characters written to the database got broken since for each character, only the last 8 bits
-                        // of the character's unicode value was sent to the database. There's no way of getting back the
-                        // missing bytes, we can just empty the value set in this row.
-                        // Start a new transaction
-                        connection.rollback();
-                        this.logger.warn(this.dataType + " [{}] cannot be recovered",
-                            lob.getValue());
-                        emptyLob.setString(1, lob.getKey());
-                        emptyLob.executeUpdate();
+            try (PreparedStatement inlineLob = connection.prepareStatement(MessageFormat.format("UPDATE {0} SET {1} ="
+                    + " convert_from(loread(lo_open({1}::int, 262144), 10000000), ''LATIN1'') WHERE {1} = ?",
+                    this.tableName, this.columnName));
+                PreparedStatement emptyLob = connection.prepareStatement(MessageFormat.format(
+                    "UPDATE {0} SET {1} = '''' WHERE {1} = ?", this.tableName, this.columnName));
+                PreparedStatement removeLob = connection.prepareStatement("select lo_unlink(?)"))
+            {
+                for (Entry<String, Long> lob : lobsToProcess.entrySet()) {
+                    try {
+                        inlineLob.setString(1, lob.getKey());
+                        inlineLob.executeUpdate();
+                        // We commit early since any error will invalidate the whole transaction
                         removeLob.setLong(1, Long.valueOf(lob.getKey()));
                         removeLob.execute();
                         connection.commit();
-                    } else {
-                        throw ex;
+                    } catch (SQLException ex) {
+                        if (ex.getMessage().contains("0x00")) {
+                            // The hibernate mapping file was broken between 3.2 and 3.5 for PostgreSQL, and any
+                            // non-ASCII characters written to the database got broken since for each character, only
+                            // the last 8 bits of the character's unicode value was sent to the database. There's no
+                            // way of getting back the missing bytes, we can just empty the value set in this row.
+                            // Start a new transaction
+                            connection.rollback();
+                            LOGGER.warn("[{}] [{}] cannot be recovered. Root cause is [{}]", this.dataType,
+                                lob.getValue(), ExceptionUtils.getRootCauseMessage(ex));
+                            emptyLob.setString(1, lob.getKey());
+                            emptyLob.executeUpdate();
+                            removeLob.setLong(1, Long.valueOf(lob.getKey()));
+                            removeLob.execute();
+                            connection.commit();
+                        } else {
+                            throw ex;
+                        }
                     }
                 }
             }

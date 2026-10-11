@@ -20,7 +20,6 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -53,7 +52,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
  * @version $Id$
  */
 @ComponentTest
-public class TagNotificationFilterTest
+class TagNotificationFilterTest
 {
     @InjectMockComponents
     private TagNotificationFilter tagNotificationFilter;
@@ -62,36 +61,36 @@ public class TagNotificationFilterTest
     private QueryManager queryManager;
 
     @Test
-    public void filterEvent()
+    void filterEvent()
     {
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
             tagNotificationFilter.filterEvent(null, null, null, null));
     }
 
     @Test
-    public void matchesPreference()
+    void matchesPreference()
     {
         assertFalse(tagNotificationFilter.matchesPreference(null));
     }
 
     @Test
-    public void filterExpressionWithNotificationPreference()
+    void filterExpressionWithNotificationPreference()
     {
         assertNull(tagNotificationFilter.filterExpression(null, null, null));
     }
 
     @Test
-    public void filterExpressionWithType() throws QueryException
+    void filterExpressionWithType() throws QueryException
     {
         assertNull(tagNotificationFilter.filterExpression(null, null,
             NotificationFilterType.INCLUSIVE,
             NotificationFormat.ALERT));
 
         assertNull(tagNotificationFilter.filterExpression(null,
-            Collections.emptyList(),
+            List.of(),
             NotificationFilterType.INCLUSIVE, null));
 
-        List<NotificationFilterPreference> preferenceList = Arrays.asList(
+        List<NotificationFilterPreference> preferenceList = List.of(
             new TagNotificationFilterPreference("foo", "mywiki"),
             new TagNotificationFilterPreference("bar", "otherwiki"),
             new TagNotificationFilterPreference("baz", "mywiki")
@@ -100,8 +99,8 @@ public class TagNotificationFilterTest
         Query query = mock(Query.class);
         when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
 
-        List pagesHoldingTags = Arrays.asList("Page1", "Page2");
-        when(query.execute()).thenReturn(pagesHoldingTags);
+        List<String> pagesHoldingTags = List.of("Page1", "Page2");
+        when(query.execute()).thenReturn(Arrays.asList(pagesHoldingTags.toArray()));
 
         ExpressionNode filter = value(EventProperty.PAGE).inStrings(pagesHoldingTags)
             .and(value(EventProperty.WIKI).eq(value("mywiki")));
@@ -109,13 +108,13 @@ public class TagNotificationFilterTest
         assertEquals(filter,
             tagNotificationFilter.filterExpression(null, preferenceList, NotificationFilterType.EXCLUSIVE, null));
 
-        verify(query).bindValue("tagList", Arrays.asList("foo", "bar", "baz"));
+        verify(query).bindValue("tagList", List.of("foo", "bar", "baz"));
         verify(query).setWiki("mywiki");
 
-        ExpressionNode emptyPages = value(EventProperty.PAGE).inStrings(Arrays.asList())
+        ExpressionNode emptyPages = value(EventProperty.PAGE).inStrings(List.of())
             .and(value(EventProperty.WIKI).eq(value("mywiki")));
 
-        List pagesForUnusedTags = Collections.EMPTY_LIST;
+        List<Object> pagesForUnusedTags = List.of();
         when(query.execute()).thenReturn(pagesForUnusedTags);
         assertEquals(emptyPages, tagNotificationFilter.filterExpression(null,
             preferenceList, NotificationFilterType.EXCLUSIVE, null));

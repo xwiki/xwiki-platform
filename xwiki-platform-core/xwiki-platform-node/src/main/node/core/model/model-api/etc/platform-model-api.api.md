@@ -26,6 +26,7 @@ export interface BaseEntityReference {
 // @beta (undocumented)
 export class DocumentReference implements BaseEntityReference {
     constructor(name: string, space?: SpaceReference, terminal?: boolean);
+    locale?: string;
     // (undocumented)
     name: string;
     // (undocumented)

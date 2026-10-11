@@ -52,7 +52,7 @@
     class XDataEditors {
       constructor() {
         let self = this;
-        // Maintain informations about actions performed on the editor.
+        // Maintain information about actions performed on the editor.
         // Data abouts xobjects are map whom keys are xclass names and values are list of sorted xobjects ids
         this.editorStatus = {
           savedXObjects: {}, // already saved objects
@@ -60,6 +60,7 @@
           deletedXObjects: {} // objects deleted but not removed yet
         };
         this.editedDocument = XWiki.currentDocument;
+        this.submitInProgress = false;
         this.unsavedChanges = false;
 
         $('.xclass').each(function() {
@@ -99,7 +100,12 @@
           }
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.submitInProgress = false;
           self.unsavedChanges = false;
+        });
+
+        $(document).on('xwiki:document:saveFailed', function () {
+          self.submitInProgress = false;
         });
 
         // in case of cancel we just clean everything so that we don't get any warnings for leaving the page without saving.
@@ -109,7 +115,15 @@
           $('input[name=addedObjects]').remove();
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.submitInProgress = false;
           self.unsavedChanges = false;
+        });
+        // Disable the leave confirmation during Save & View navigation while preserving the dirty state for Save &
+        // Continue until the save has actually completed.
+        $(document).on('xwiki:actions:save', function (event, data) {
+          if (!data?.continue) {
+            self.submitInProgress = true;
+          }
         });
         // We want to listen on inputs related to an xclass or an xobject, but not the actual inputs allowing
         // to create a property or an object.
@@ -117,11 +131,11 @@
             return $(this).parents('#add_xproperty,#add_xobject').length === 0
                 && $(this).parents('.xclass').length > 0;
         };
-        $('input,textarea').filter(filterInputs).on('change', function(e) {
+        $('input,textarea,select').filter(filterInputs).on('change', function(e) {
           self.unsavedChanges = true;
         });
         $(document).on('xwiki:dom:updated', function (event, data) {
-          $(data.elements).find('input,textarea').filter(filterInputs).on('change', function (e) {
+          $(data.elements).find('input,textarea,select').filter(filterInputs).on('change', function (e) {
             self.unsavedChanges = true;
           });
         });
@@ -130,6 +144,10 @@
         // We cannot use jQuery style to listen on event for this one as apparently it's not working
         // See: https://stackoverflow.com/questions/4376596/jquery-unload-or-beforeunload
         window.onbeforeunload = function(event) {
+          if (self.submitInProgress) {
+            self.submitInProgress = false;
+            return;
+          }
           if (Object.keys(self.editorStatus.addedXObjects).length > 0
             || Object.keys(self.editorStatus.deletedXObjects).length > 0
             || self.unsavedChanges) {
@@ -175,9 +193,9 @@
        */
       xObjectAlreadyExist(xclassName, objectNumber) {
         return (this.editorStatus.savedXObjects[xclassName] !== undefined
-          && this.editorStatus.savedXObjects[xclassName].indexOf(objectNumber) !== -1)
+          && this.editorStatus.savedXObjects[xclassName].includes(objectNumber))
           || (this.editorStatus.addedXObjects[xclassName] !== undefined
-            && this.editorStatus.addedXObjects[xclassName].indexOf(objectNumber) !== -1);
+            && this.editorStatus.addedXObjects[xclassName].includes(objectNumber));
       }
 
       /**
@@ -197,7 +215,7 @@
        * Helper to remove an element from an array if and only if it was already in the array.
        */
       removeElementFromArray(array, element) {
-        if (array.indexOf(element) !== -1) {
+        if (array.includes(element)) {
           array.splice(array.indexOf(element), 1);
         }
       }
@@ -221,7 +239,7 @@
 
         // if an object with this number was already deleted, we remove the info from deleted objects.
         let deletedArray = this.editorStatus.deletedXObjects[xclassName];
-        if (deletedArray !== undefined && deletedArray.indexOf(objectNumberVal) !== -1) {
+        if (deletedArray !== undefined && deletedArray.includes(objectNumberVal)) {
           this.getDeletedXObject(xclassName, objectNumberVal).remove();
           this.removeElementFromArray(deletedArray, objectNumberVal);
           if (deletedArray.length === 0) {
@@ -296,7 +314,6 @@
           this.ajaxObjectDeletion(object);
           this.editButtonBehavior(object);
           this.expandCollapseObject(object);
-          this.ajaxRemoveDeprecatedProperties(object, ".syncProperties");
         }
       }
 
@@ -364,7 +381,7 @@
                       if (self.editorStatus.deletedXObjects[xclassName] !== undefined) {
                         let deletionArray = self.editorStatus.deletedXObjects[xclassName];
                         // be sure to remove the requested object number from the array first.
-                        if (deletionArray.indexOf(objectNumberVal) !== -1) {
+                        if (deletionArray.includes(objectNumberVal)) {
                           self.removeElementFromArray(deletionArray, objectNumberVal);
                           self.getDeletedXObject(xclassName, objectNumberVal).remove();
                         }
@@ -429,7 +446,7 @@
                 let addedObjects = self.editorStatus.addedXObjects[xclassName];
 
                 // if the object was already saved, then we need to add the right form information to delete it on server
-                if (addedObjects === undefined || addedObjects.indexOf(xObjectNumber) === -1) {
+                if (addedObjects === undefined || !addedObjects.includes(xObjectNumber)) {
                   if (self.editorStatus.deletedXObjects[xclassName] === undefined) {
                     self.editorStatus.deletedXObjects[xclassName] = [];
                   }
@@ -484,7 +501,9 @@
             if (!item.disabled) {
               item.prop('disabled', true);
               let notification = new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.inProgress'], "inprogress");
-              $.post(item.href).done(function(data) {
+              $.post(item.attr('data-action'), {
+                'form_token': xm.form_token
+              }).done(function(data) {
                 // Remove deprecated properties box
                 container.find(".deprecatedProperties").remove();
                 notification.replace(new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.done'], "done"));
@@ -537,7 +556,8 @@
               }).fail(function (error) {
                 // FIXME: we should change translation value for action.addClassProperty.error.invalidName
                 let failureReason = error.responseText.replaceAll("&#60;br/&#62;", "<br/>") || 'Server not responding';
-                notification.replace(new XWiki.widgets.Notification(l10n['class.addProperty.failed'] + failureReason, "error"));
+                notification.replace(new XWiki.widgets.Notification(l10n['class.addProperty.failed'] + failureReason,
+                  "error", {textHtml: true}));
               }).always(function () {
                 item.prop('disabled', false);
               });
@@ -647,6 +667,7 @@
               // display the elements before firing the event to be sure they are visible.
               object.toggleClass('collapsed');
               $(document).trigger('xwiki:dom:updated', {elements: objectContent.toArray()});
+              self.ajaxRemoveDeprecatedProperties(objectContent, ".syncProperties");
               notification.replace(new XWiki.widgets.Notification(l10n['object.loadObject.done'], "done"));
             }).fail(function (error) {
               let failureReason = error.responseText || 'Server not responding';
@@ -688,7 +709,7 @@
         if(!startExpanded) {
           property.addClass('collapsed');
         }
-        // The click event is catched only on the icon and title to avoid breaking behaviour when using actions, 
+        // The click event is caught only on the icon and title to avoid breaking behaviour when using actions, 
         // especially the move action which is dragAndDrop.
         propertyTitle.find('.toggle-collapsable, h2').on('click', function() {
           propertyTitle.parent().toggleClass('collapsed');
@@ -704,7 +725,7 @@
             let item = $(this);
             item.find("input").each(function () {
               let input = $(this);
-              if (input.attr('id') && input.attr('id').endsWith("_number")) {
+              if (input.attr('id')?.endsWith("_number")) {
                 item.data('numberProperty', input);
                 input.parent().hide();
                 if (input.parent().prev('dt')) {
@@ -797,7 +818,7 @@
     }
 
     function init() {
-      XWiki = window.XWiki || {};
+      const XWiki = globalThis.XWiki = globalThis.XWiki || {};
       XWiki.editors = XWiki.editors || {};
       XWiki.editors.XDataEditors = new XDataEditors();
       initSwitchClassListener();

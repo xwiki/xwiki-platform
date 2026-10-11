@@ -22,7 +22,7 @@ package org.xwiki.test.docker.internal.junit5;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -60,12 +60,7 @@ public class DurationImagePullPolicyTest
         assertTrue(policy.shouldPull(DockerImageName.parse("something:latest")));
         // Also verify that the file has been created
         assertTrue(Files.exists(path));
-        try (Stream<String> lines = Files.lines(path)) {
-            List<String> filteredLines = lines
-                .filter(s -> s.startsWith("something:latest|"))
-                .toList();
-            assertEquals(1, filteredLines.size());
-        }
+        assertEquals(1, countMatchingLines(path, line -> line.startsWith("something:latest|")));
 
         // Try again, we shouldn't pull since it's not been 500ms yet.
         assertFalse(policy.shouldPull(DockerImageName.parse("something:latest")));
@@ -76,11 +71,42 @@ public class DurationImagePullPolicyTest
 
         // Try with a different image name and make sure the file contains the new name
         assertTrue(policy.shouldPull(DockerImageName.parse("something2:1.0")));
+        assertEquals(2, countMatchingLines(path,
+            line -> line.startsWith("something:latest|") || line.startsWith("something2:1.0|")));
+    }
+
+    @Test
+    void clearPullDate() throws Exception
+    {
+        Path path = new File(this.tmpDir, "duration").toPath();
+        DurationImagePullPolicy policy = new DurationImagePullPolicy(60000L);
+        policy.setPath(path);
+
+        DockerImageName imageName = DockerImageName.parse("cleared:latest");
+
+        // The first call records the pull date, so that we don't pull again right away.
+        assertTrue(policy.shouldPull(imageName));
+        assertFalse(policy.shouldPull(imageName));
+        assertEquals(1, countMatchingLines(path, line -> line.startsWith("cleared:latest|")));
+
+        // Once the recorded date has been cleared, we should pull again and the image should be gone from the file.
+        policy.clearPullDate(imageName);
+        assertEquals(0, countMatchingLines(path, line -> line.startsWith("cleared:latest|")));
+        assertTrue(policy.shouldPull(imageName));
+
+        // Clearing an image that has never been pulled is a no-op.
+        policy.clearPullDate(DockerImageName.parse("nevercleared:latest"));
+        assertEquals(0, countMatchingLines(path, line -> line.startsWith("nevercleared:latest|")));
+    }
+
+    private static long countMatchingLines(Path path, Predicate<String> filter) throws Exception
+    {
+        if (!Files.exists(path)) {
+            return 0;
+        }
+
         try (Stream<String> lines = Files.lines(path)) {
-            List<String> filteredLines = lines
-                .filter(s -> s.startsWith("something:latest|") || s.startsWith("something2:1.0"))
-                .toList();
-            assertEquals(2, filteredLines.size());
+            return lines.filter(filter).count();
         }
     }
 }

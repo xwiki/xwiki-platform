@@ -53,9 +53,9 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
      * The Constructor.
      *
      * @param archive the attachment archive to save.
-     * @param fileTools a set of tools for getting the file corrisponding to each version of the
+     * @param fileTools a set of tools for getting the file corresponding to each version of the
      * attachment content and the file for the meta data, as well as temporary
-     * and backup files corrisponding to each. Also for getting locks.
+     * and backup files corresponding to each. Also for getting locks.
      * @param provider the means to get the blobs to store each version of the attachment.
      * @param serializer an attachment list metadata serializer for serializing the metadata of each
      * version of the attachment.

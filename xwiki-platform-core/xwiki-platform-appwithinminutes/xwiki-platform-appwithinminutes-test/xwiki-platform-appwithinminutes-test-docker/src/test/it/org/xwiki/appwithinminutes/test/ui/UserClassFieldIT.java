@@ -38,6 +38,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
 import static java.util.Arrays.asList;
@@ -327,10 +328,11 @@ class UserClassFieldIT
 
         // Change the selected user.
         userPicker.clearSelectedSuggestions().sendKeys("eduard").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
-        entryEditPage.clickSaveAndView();
+        ViewPage entryViewPage = entryEditPage.clickSaveAndView();
 
-        // Assert the view mode.
-        List<WebElement> users = setup.getDriver().findElements(By.className("user"));
+        // Assert the view mode. Look for the displayed users only in the page content, since the page UI (e.g. the
+        // drawer) displays the current user too.
+        List<WebElement> users = entryViewPage.getContentContainer().findElements(By.className("user"));
         assertEquals(1, users.size());
         assertEquals("Eduard Moraru", users.get(0).getText());
         assertTrue(

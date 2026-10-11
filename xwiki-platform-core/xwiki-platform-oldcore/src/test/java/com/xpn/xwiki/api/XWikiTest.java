@@ -184,4 +184,13 @@ class XWikiTest
 
         assertEquals(768, this.apiXWiki.getDocumentTitleMaxLength());
     }
+
+    @Test
+    void getDocumentLocalReferenceMaxLength(MockitoOldcore mockitoOldcore)
+    {
+        when(mockitoOldcore.getMockStore().getLimitSize(mockitoOldcore.getXWikiContext(), XWikiDocument.class,
+            "fullName")).thenReturn(255);
+
+        assertEquals(255, this.apiXWiki.getDocumentLocalReferenceMaxLength());
+    }
 }

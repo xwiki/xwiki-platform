@@ -646,4 +646,20 @@ privileged public aspect XWikiDocumentCompatibilityAspect
 
             return result;
         }
+
+    /**
+     * Compute and return the maximum authorized length for the full name (i.e. the serialized reference of the
+     * document) based on the current store limitation.
+     *
+     * @return the maximum authorized length for a document full name.
+     * @since 11.4RC1
+     * @deprecated the limit comes from the store and is the same for all documents, use
+     *             {@link com.xpn.xwiki.XWiki#getDocumentLocalReferenceMaxLength(XWikiContext)} instead
+     */
+    @Deprecated(since = "18.9.0RC1")
+    public int XWikiDocument.getLocalReferenceMaxLength()
+    {
+        XWikiContext xcontext = getXWikiContext();
+        return xcontext.getWiki().getDocumentLocalReferenceMaxLength(xcontext);
+    }
 }

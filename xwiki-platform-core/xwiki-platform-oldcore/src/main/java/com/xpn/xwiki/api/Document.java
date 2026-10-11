@@ -3602,15 +3602,6 @@ public class Document extends Api
     }
 
     /**
-     * @return the maximum authorized length for a document full name (see {@link #getFullName()}).
-     * @since 11.4RC1
-     */
-    public int getLocalReferenceMaxLength()
-    {
-        return this.doc.getLocalReferenceMaxLength();
-    }
-
-    /**
      * @return the authors of the document.
      * @since 14.0RC1
      */

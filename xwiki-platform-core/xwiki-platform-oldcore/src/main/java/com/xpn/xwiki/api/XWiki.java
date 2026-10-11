@@ -3067,6 +3067,17 @@ public class XWiki extends Api
     }
 
     /**
+     * @return the maximum authorized length for a document local reference (see {@link Document#getFullName()}),
+     *         based on the current store limitation
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public int getDocumentLocalReferenceMaxLength()
+    {
+        return this.xwiki.getDocumentLocalReferenceMaxLength(getXWikiContext());
+    }
+
+    /**
      * Get the syntax of the content currently being executed.
      * <p>
      * The document currently being executed is not the same than the actual content syntax since the executed code

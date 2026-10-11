@@ -121,7 +121,8 @@ class NotificationsSettingsIT
         NotificationsUserProfilePage notificationsUserProfilePage =
             NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
 
-        assertEquals(1, notificationsUserProfilePage.getApplicationPreferences().size());
+        // The System application, plus the Likes and Mentions applications installed for NotificationsEmailsIT.
+        assertEquals(3, notificationsUserProfilePage.getApplicationPreferences().size());
 
         // Open system
         ApplicationPreferences system = notificationsUserProfilePage.getApplication(SYSTEM);

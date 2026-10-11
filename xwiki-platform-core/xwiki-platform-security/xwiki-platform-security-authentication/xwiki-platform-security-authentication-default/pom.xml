@@ -30,7 +30,7 @@
   <name>XWiki Platform - Security - Authentication - Default</name>
   <description>Default implementation of the Authentication API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Authentication API Implementation</xwiki.extension.name>
   </properties>
@@ -58,6 +58,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-observation-remote</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

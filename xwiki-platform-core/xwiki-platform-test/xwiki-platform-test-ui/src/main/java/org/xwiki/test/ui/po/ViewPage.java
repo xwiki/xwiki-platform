@@ -146,6 +146,8 @@ public class ViewPage extends BasePage
      * entry of the "More actions" menu.
      *
      * @return element for controlling the comments of the comments viewer
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public CommentsTab openCommentsViewerFromMoreActions()
@@ -234,6 +236,8 @@ public class ViewPage extends BasePage
      *
      * @param sectionNumber the number of the section to edit, starting at 1
      * @return the wiki editor, displaying only the content of the section
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public WikiEditPage editSectionInWikiEditor(int sectionNumber)
@@ -390,6 +394,8 @@ public class ViewPage extends BasePage
 
     /**
      * @return the texts displayed in bold in the content of the page, in the order in which they are displayed
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public List<String> getBoldTexts()

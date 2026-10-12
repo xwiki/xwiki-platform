@@ -71,6 +71,8 @@ public class DeletedPageEntry extends BaseElement
 
     /**
      * @return the formatted date of the deletion
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getDeletionDate()

@@ -69,6 +69,8 @@ public class AttachmentsViewPage extends ViewPage
      * "Attachments" entry of the "More actions" menu.
      *
      * @return the element corresponding to the attachments of the attachments viewer
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public AttachmentsPane openAttachmentsViewerFromMoreActions()

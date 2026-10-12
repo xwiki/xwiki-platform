@@ -86,6 +86,8 @@ public class AttachmentHistoryPage extends ViewPage
     /**
      * @param rowIdx the index of the row of the attachment, starting at 1
      * @return the formatted date of the requested attachment version
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getDate(int rowIdx)

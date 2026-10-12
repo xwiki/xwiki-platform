@@ -29,6 +29,8 @@ import org.xwiki.test.ui.po.ViewPage;
  * Models the {@code Main.Tags} page, which displays the tag cloud of the wiki when no action is requested.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class TagCloudPage extends ViewPage

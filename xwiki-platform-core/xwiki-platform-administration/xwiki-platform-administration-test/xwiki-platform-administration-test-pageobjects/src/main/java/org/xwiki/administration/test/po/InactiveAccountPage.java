@@ -28,6 +28,8 @@ import org.xwiki.test.ui.po.BasePage;
  * validated. It holds a form to enter the validation key received by email.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class InactiveAccountPage extends BasePage

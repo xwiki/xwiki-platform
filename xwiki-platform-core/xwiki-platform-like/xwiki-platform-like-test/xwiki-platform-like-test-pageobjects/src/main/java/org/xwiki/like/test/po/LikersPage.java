@@ -51,6 +51,8 @@ public class LikersPage extends ViewPage
      * Go to the likers page of the current page through the "Likes" entry of the "More actions" menu.
      *
      * @return the likers page object for the current page
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public static LikersPage goToLikersFromMoreActions()

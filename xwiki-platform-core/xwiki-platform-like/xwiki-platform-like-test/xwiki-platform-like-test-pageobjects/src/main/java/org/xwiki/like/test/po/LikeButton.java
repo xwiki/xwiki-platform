@@ -99,6 +99,8 @@ public class LikeButton extends BaseElement
      * Click on the number of likes displayed next to the Like button, which leads to the list of likers.
      *
      * @return the likers page
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public LikersPage clickLikersLink()

@@ -89,6 +89,8 @@ public class AnnotationsLabel extends BaseElement
      * Comments tab is loaded, since it forwards the click to the Reply button of the annotation comment in that tab.
      *
      * @param idText the annotation id
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void clickReplyById(String idText)
@@ -104,6 +106,8 @@ public class AnnotationsLabel extends BaseElement
      *
      * @param idText the annotation id
      * @return the label of the clicked button
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String clickViewThreadById(String idText)

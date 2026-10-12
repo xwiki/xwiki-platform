@@ -28,6 +28,8 @@ import org.xwiki.test.ui.po.BasePage;
  * The page displayed instead of the requested page when the current user account is disabled or not yet active.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class UserInactivePage extends BasePage
@@ -43,6 +45,8 @@ public class UserInactivePage extends BasePage
      * requested page is loaded.
      *
      * @return {@code true} if the notice is displayed instead of the requested page, {@code false} otherwise
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public static boolean isDisplayed()

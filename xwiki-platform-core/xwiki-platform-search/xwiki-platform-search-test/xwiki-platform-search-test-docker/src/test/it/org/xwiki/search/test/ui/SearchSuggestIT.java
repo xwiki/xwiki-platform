@@ -88,7 +88,7 @@ class SearchSuggestIT
             """.formatted(setup.serializeReference(scriptPageReference), scriptPageTitle), Syntax.XWIKI_2_1);
         assertEquals(scriptPageTitle, setup.gotoPage(scriptPageReference).getDocumentTitle());
 
-        new SolrTestUtils(setup).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         quickSearchElement = new QuickSearchElement();
         quickSearchElement.search(scriptPageTitle);

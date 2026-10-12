@@ -346,7 +346,8 @@ class SolrSearchIT
      */
     @Test
     @Order(7)
-    void highlightSearchedWords(TestUtils setup, TestReference testReference) throws Exception
+    void highlightSearchedWords(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference)
+        throws Exception
     {
         setup.loginAsSuperAdmin();
 
@@ -366,7 +367,7 @@ class SolrSearchIT
         setup.attachFile(terminalPageReference, attachmentWord + "-terminal.txt",
             new ByteArrayInputStream("terminal".getBytes(StandardCharsets.UTF_8)), false);
 
-        new SolrTestUtils(setup).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Search the title on the Solr search page.
         SolrSearchPage searchPage = SolrSearchPage.gotoPage().search(titleWord);

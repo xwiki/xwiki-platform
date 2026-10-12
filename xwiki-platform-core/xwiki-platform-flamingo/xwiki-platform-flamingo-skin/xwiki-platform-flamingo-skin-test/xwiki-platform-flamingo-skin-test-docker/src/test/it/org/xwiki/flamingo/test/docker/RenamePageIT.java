@@ -1030,10 +1030,10 @@ class RenamePageIT
         assertFalse(setup.rest().exists(extensionPage), "The extension page has not been renamed!");
         assertTrue(setup.rest().exists(renamedPage), "The renamed page doesn't exist!");
 
-        // Restore the extension page. The renamed page doesn't belong to the extension, so no question is asked.
+        // Restore the extension page. The renamed page doesn't belong to the extension, so no question is asked. It
+        // has no children, so the "Preserve children" option is not displayed.
         RenamePage renamePage = setup.gotoPage(renamedPage).rename();
         renamePage.getDocumentPicker().setName(extensionPage.getLastSpaceReference().getName());
-        renamePage.setPreserveChildren(false);
         renamePage.setAutoRedirect(false);
         renamePage.clickRenameButton().waitUntilFinished();
         assertTrue(setup.rest().exists(extensionPage), "The extension page has not been restored!");

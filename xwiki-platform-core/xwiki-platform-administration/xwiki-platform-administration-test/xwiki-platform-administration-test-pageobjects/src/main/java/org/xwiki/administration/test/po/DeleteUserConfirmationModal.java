@@ -82,6 +82,8 @@ public class DeleteUserConfirmationModal extends ConfirmationModal
      *
      * @param userName the name of the user to select, in the main wiki (e.g. {@code "JohnDoe"})
      * @return this modal
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public DeleteUserConfirmationModal setNewAuthor(String userName)
@@ -96,6 +98,8 @@ public class DeleteUserConfirmationModal extends ConfirmationModal
     /**
      * @return {@code true} if the error stating that the selected new author doesn't have the required right is
      *         displayed, {@code false} otherwise
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public boolean isNewAuthorErrorDisplayed()

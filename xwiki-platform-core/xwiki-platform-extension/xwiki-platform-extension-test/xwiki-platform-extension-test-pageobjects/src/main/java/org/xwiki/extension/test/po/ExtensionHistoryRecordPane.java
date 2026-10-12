@@ -31,6 +31,8 @@ import org.xwiki.test.ui.po.BaseElement;
  * A record of the Extension History (an install, uninstall or repair job).
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class ExtensionHistoryRecordPane extends BaseElement

@@ -47,6 +47,8 @@ public class DashboardEditPage extends DashboardElement
      *
      * @param reference the reference of a page holding a dashboard macro
      * @return the dashboard editor, once ready
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public static DashboardEditPage gotoPage(EntityReference reference)
@@ -59,6 +61,8 @@ public class DashboardEditPage extends DashboardElement
      * Waits until the dashboard editor is initialized, i.e. until its add buttons are displayed.
      *
      * @return this page object
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public DashboardEditPage waitUntilReady()
@@ -72,6 +76,8 @@ public class DashboardEditPage extends DashboardElement
      * Click on the "Add column" button and wait for the new (empty) column to be added at the end of the dashboard.
      * The new column is only saved once it holds a gadget.
      *
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void addColumn()
@@ -86,6 +92,8 @@ public class DashboardEditPage extends DashboardElement
      *
      * @param gadgetTitle the title of the gadget to move
      * @param column the target column, starting at 1
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void moveGadgetToColumn(String gadgetTitle, int column)
@@ -110,6 +118,8 @@ public class DashboardEditPage extends DashboardElement
      * submitted.
      *
      * @return the view page of the dashboard
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public ViewPage clickSaveAndView()
@@ -143,6 +153,8 @@ public class DashboardEditPage extends DashboardElement
      * @param macroName the name of the macro to add as a gadget, as listed in the macro selection modal
      * @param content the content of the macro
      * @return this page object, once the gadget is added
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public DashboardEditPage addGadget(String macroName, String content)

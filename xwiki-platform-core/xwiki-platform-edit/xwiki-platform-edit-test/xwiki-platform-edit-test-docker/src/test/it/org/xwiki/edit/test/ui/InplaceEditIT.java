@@ -611,10 +611,12 @@ class InplaceEditIT
         // cell value because the selection is then moved to the previous cell when switching back from Source
         // (XWIKI-23209: Switching to Source multiple times after selecting a cell value expands the selection to other
         // cells).
-        // Control+End moves the caret after the table. Left moves it inside the last table cell but also before its
-        // last character, so we move it back to the end of the cell value before selecting.
+        // Control+End moves the caret after the table. Left moves it inside the last table cell, but browsers don't
+        // agree on where: Firefox puts it before the last character of the cell value while Chrome puts it at the end
+        // of the cell value. End moves it to the end of the cell value in both cases (whereas Right would move it back
+        // after the table on Chrome).
         richTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.END));
-        richTextArea.sendKeys(Keys.LEFT, Keys.RIGHT,
+        richTextArea.sendKeys(Keys.LEFT, Keys.END,
             Keys.chord(Keys.SHIFT, Keys.LEFT, Keys.LEFT, Keys.LEFT, Keys.LEFT, Keys.LEFT));
         assertEquals("gamma", richTextArea.getSelectedText());
         ckeditor.getToolBar().toggleSourceMode();

@@ -945,7 +945,8 @@ class RenamePageIT
      */
     @Order(14)
     @Test
-    void moveParentWithoutChildren(TestUtils setup, TestReference testReference) throws Exception
+    void moveParentWithoutChildren(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
     {
         SpaceReference testSpace = testReference.getLastSpaceReference();
         SpaceReference space1 = new SpaceReference("1", testSpace);
@@ -970,7 +971,7 @@ class RenamePageIT
         }
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Move 2 under A/B without its children.
         RenamePage renamePage = setup.gotoPage(page2).rename();
@@ -993,7 +994,7 @@ class RenamePageIT
      */
     @Order(15)
     @Test
-    void renameExtensionPage(TestUtils setup) throws Exception
+    void renameExtensionPage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         // Macros.WebHome is a page of the installed Rendering UI extension that is not used by the other tests. The
         // question is only asked for pages that the extension doesn't allow to delete, i.e. not for demo pages (such
@@ -1004,7 +1005,7 @@ class RenamePageIT
         setup.rest().delete(renamedPage);
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Cancelling the question leaves the page in place.
         JobQuestionPane jobQuestionPane = startRename(setup, extensionPage, renamedPageName);

@@ -88,6 +88,8 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
 
     /**
      * Represents the available email frequency settings values.
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public enum EmailInterval
@@ -297,6 +299,8 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     /**
      * Wait until the live data of the system and custom filter preferences are loaded.
      *
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     protected void waitForNotificationsSettingsLiveData()
@@ -353,6 +357,8 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
 
     /**
      * @return the value of the email frequency setting
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public EmailInterval getNotificationEmailInterval()
@@ -365,6 +371,8 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      * Set the email frequency setting.
      *
      * @param value the email frequency to set
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void setNotificationEmailInterval(EmailInterval value)

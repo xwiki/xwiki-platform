@@ -197,6 +197,16 @@
                   <code>java.method.removed</code>
                   <old>method void com.xpn.xwiki.doc.XWikiDocument::mergexWikiObjects(com.xpn.xwiki.doc.XWikiDocument)</old>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method int com.xpn.xwiki.api.Document::getLocalReferenceMaxLength()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method int com.xpn.xwiki.doc.XWikiDocument::getLocalReferenceMaxLength()</old>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

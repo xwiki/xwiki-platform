@@ -316,13 +316,10 @@
     $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'edit')?editor=wiki")
   #end
   ##
-  ## If this document has PR and is not included from another document then it's author should be set to Guest
-  ## for the duration of it's execution in order to improve security.
-  ## Note we compare document ids because
-  #if($sandbox
-      &amp;&amp; $xcontext.hasProgrammingRights()
-      &amp;&amp; $xcontext.getDoc().getDocumentReference().equals($xwiki.getDocument($documentName).getDocumentReference()))
-  ##
+  ## Programming rights are only needed when another document with programming rights (Invitation app) includes this
+  ## document and sets $invited to true. In any other case drop them for the duration of the execution in order to
+  ## improve security, whatever the way this document is displayed.
+  #if($sandbox &amp;&amp; !$invited &amp;&amp; $xcontext.hasProgrammingRights())
     $xcontext.dropPermissions()##
   #end
   ##
@@ -333,6 +330,7 @@
     ## document and set $invited to true.
     #if(!$invited || !$xcontext.hasProgrammingRights())
       $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'login')")
+      #stop
     #end
   #end
   ##

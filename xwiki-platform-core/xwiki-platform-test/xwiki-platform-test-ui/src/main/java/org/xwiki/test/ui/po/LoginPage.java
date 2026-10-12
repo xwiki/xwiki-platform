@@ -127,6 +127,8 @@ public class LoginPage extends ViewPage
      * Click the "Forgot your username?" link and wait for the page it leads to. The page object of that page is not
      * returned because it is not part of this module.
      *
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void clickForgotUsername()
@@ -138,6 +140,8 @@ public class LoginPage extends ViewPage
      * Click the "Forgot your password?" link and wait for the page it leads to. The page object of that page is not
      * returned because it is not part of this module.
      *
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void clickForgotPassword()

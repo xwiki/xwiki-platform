@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -75,18 +76,14 @@ public class RemoteSolr extends AbstractSolr implements Initializable
      */
     public static final String DEFAULT_CORE_PREFIX = "xwiki";
 
-    /**
-     * Only used by unit test to disable the server version gathering at init.
-     */
-    private static final boolean REQUEST_VERSION =
-        Boolean.parseBoolean(System.getProperty("xwiki.solr.remote.requestVersion", "true"));
+    private static final int UNKNOWN_VERSION = -1;
 
     @Inject
     private SolrConfiguration configuration;
 
     private HttpSolrClient rootClient;
 
-    private int solrMajorVersion;
+    private volatile int solrMajorVersion = UNKNOWN_VERSION;
 
     @Override
     public void initialize() throws InitializationException
@@ -116,23 +113,14 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         // Create the root client
         this.rootClient = new HttpSolrClient.Builder(baseURL).build();
 
-        if (REQUEST_VERSION) {
-            // Gather information about the server
-            NamedList<Object> systemInfo;
-            try {
-                systemInfo = this.rootClient
-                    .request(new GenericSolrRequest(SolrRequest.METHOD.GET, CommonParams.SYSTEM_INFO_PATH));
-            } catch (Exception e) {
-                throw new InitializationException("Failed to access the Solr server information", e);
-            }
-            String version = (String) systemInfo.findRecursive("lucene", "solr-impl-version");
-            if (version != null) {
-                this.solrMajorVersion = Integer.parseInt(StringUtils.substringBefore(version, '.'));
-            } else {
-                throw new InitializationException(
-                    "The Solr server does not give any information about its version in lucene -> solr-impl-version."
-                        + " Received [" + systemInfo + "].");
-            }
+        // Gather information about the server, but don't fail: a Solr server which cannot be reached while XWiki
+        // starts must not make this component, and all the components which depend on it, unavailable until XWiki is
+        // restarted. The information is requested again when a core is needed.
+        try {
+            initializeServerInformation();
+        } catch (SolrException e) {
+            this.logger.warn("Failed to access the Solr server at [{}]: [{}]. The connection will be retried when a"
+                + " Solr core is needed.", baseURL, ExceptionUtils.getRootCauseMessage(e));
         }
     }
 
@@ -171,6 +159,52 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     public int getSolrMajorVersion()
     {
         return this.solrMajorVersion;
+    }
+
+    @Override
+    public XWikiSolrCore getCore(String name) throws SolrException
+    {
+        initializeServerInformation();
+
+        return super.getCore(name);
+    }
+
+    /**
+     * Gather information about the Solr server, if not already done. A failure is not remembered: the server is asked
+     * again the next time a core is requested.
+     *
+     * @throws SolrException when failing to get the information from the Solr server
+     */
+    private void initializeServerInformation() throws SolrException
+    {
+        if (this.solrMajorVersion == UNKNOWN_VERSION) {
+            synchronized (this) {
+                if (this.solrMajorVersion == UNKNOWN_VERSION) {
+                    this.solrMajorVersion = requestSolrMajorVersion();
+                }
+            }
+        }
+    }
+
+    private int requestSolrMajorVersion() throws SolrException
+    {
+        NamedList<Object> systemInfo;
+        try {
+            systemInfo =
+                this.rootClient.request(new GenericSolrRequest(SolrRequest.METHOD.GET, CommonParams.SYSTEM_INFO_PATH));
+        } catch (Exception e) {
+            throw new SolrException(
+                String.format("Failed to access the Solr server information at [%s]", this.rootClient.getBaseURL()), e);
+        }
+
+        String version = (String) systemInfo.findRecursive("lucene", "solr-impl-version");
+        if (version == null) {
+            throw new SolrException(
+                "The Solr server does not give any information about its version in lucene -> solr-impl-version."
+                    + " Received [" + systemInfo + "].");
+        }
+
+        return Integer.parseInt(StringUtils.substringBefore(version, '.'));
     }
 
     @Override

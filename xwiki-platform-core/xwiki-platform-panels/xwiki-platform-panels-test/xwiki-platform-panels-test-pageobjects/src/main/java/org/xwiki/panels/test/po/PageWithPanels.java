@@ -98,6 +98,8 @@ public class PageWithPanels extends BasePage
     /**
      * @param panelSide the column to look into
      * @return the titles of the panels displayed in the given column, in the order in which they are displayed
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public List<String> getPanelTitles(Column panelSide)

@@ -1,3 +1,4 @@
+org.xwiki.notifications.filters.internal.event.CleaningFilterEventConverter
 org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceEventConverter
 org.xwiki.notifications.filters.internal.livedata.custom.NotificationCustomFiltersLiveDataConfigurationProvider
 org.xwiki.notifications.filters.internal.livedata.custom.NotificationCustomFiltersLiveDataConfigurationResolver

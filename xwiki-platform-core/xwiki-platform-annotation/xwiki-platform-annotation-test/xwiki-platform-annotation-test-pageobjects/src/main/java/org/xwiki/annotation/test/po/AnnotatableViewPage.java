@@ -162,27 +162,8 @@ public class AnnotatableViewPage extends BaseElement
     public CommentForm replyToAnnotationByText(String annotatedText)
     {
         this.annotationsLabel.clickReplyById(getAnnotationIdByText(annotatedText));
-        getDriver().waitUntilElementIsVisible(By.cssSelector(".collapse.in form#AddComment"));
+        getDriver().waitUntilElementIsVisible(By.cssSelector("#Commentspane form#AddComment"));
         return new CommentForm(By.id("AddComment"));
-    }
-
-    /**
-     * Displays the replies to an annotation stored as a comment, from the "View thread" button of its bubble, and waits
-     * for the thread of the annotation comment to be expanded in the Comments tab. The Comments tab must be loaded.
-     *
-     * @param annotatedText the text selected by the annotation
-     * @return the label of the "View thread" button
-     * @since 17.10.14
-     * @since 18.4.7
-     * @since 18.9.0RC1
-     */
-    public String viewAnnotationThreadByText(String annotatedText)
-    {
-        String annotationId = getAnnotationIdByText(annotatedText);
-        int commentId = getCommentId(annotationId);
-        String label = this.annotationsLabel.clickViewThreadById(annotationId);
-        getDriver().waitUntilElementIsVisible(By.cssSelector("#comment-thread-" + commentId + ".collapse.in"));
-        return label;
     }
 
     /**

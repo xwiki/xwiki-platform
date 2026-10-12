@@ -168,13 +168,11 @@ class AnnotationsIT
         replyForm.clickSubmit();
         assertEquals(commentId1, getReply(commentsTab, REPLY_TEXT).getReplyTo());
 
-        // On a fresh page the annotation thread is collapsed: the "View thread" button of the annotation bubble expands
-        // it in the Comments tab.
+        // On a fresh page the reply is displayed in the Comments tab, below the annotation comment.
         annotatableViewPage = new AnnotatableViewPage(setup.gotoPage(testReference));
         commentsTab = annotatableViewPage.getWrappedViewPage().openCommentsDocExtraPane();
         annotatableViewPage.showAnnotationsPane();
         annotatableViewPage.clickShowAnnotations(true);
-        assertEquals("View thread (1)", annotatableViewPage.viewAnnotationThreadByText(ANNOTATED_TEXT_1));
         // Only the displayed text is returned, so this also checks that the reply is visible.
         assertEquals(REPLY_TEXT, getReply(commentsTab, REPLY_TEXT).getContent());
 

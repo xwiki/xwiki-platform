@@ -51,6 +51,8 @@ public class MentionNotificationPage extends GroupedNotificationElementPage
      * Access the mention notifications listed in the given notification tray.
      *
      * @param tray the notification tray holding the mention notifications
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public MentionNotificationPage(NotificationsTrayPage tray)

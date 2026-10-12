@@ -150,4 +150,13 @@ class OracleHibernateAdapterTest
 
         verify(query, never()).setParameter(anyString(), any());
     }
+
+    @Test
+    void getColumnName()
+    {
+        // Oracle stores the unquoted column names in upper case, whatever the case used in the mapping
+        assertEquals("ASE_PAGE", this.adapter.getColumnName("ase_page"));
+        assertEquals("ASE_PAGE", this.adapter.getColumnName("ASE_PAGE"));
+        assertNull(this.adapter.getColumnName(null));
+    }
 }

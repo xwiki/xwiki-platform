@@ -49,7 +49,6 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.index.IndexException;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
@@ -66,6 +65,7 @@ import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 import org.xwiki.search.solr.internal.metadata.XWikiSolrInputDocument;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.store.ReadyIndicator;
+import org.xwiki.store.StoreStoppedException;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.xpn.xwiki.XWikiContext;
@@ -486,7 +486,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         // queue will remain empty after the clear call because we set the disposed flag above.
         for (ResolveQueueEntry entry = this.resolveQueue.poll(); entry != null; entry = this.resolveQueue.poll()) {
             if (entry.operation == IndexOperation.READY_MARKER && entry.readyIndicator != null) {
-                entry.readyIndicator.completeExceptionally(new IndexException("Indexing stopped."));
+                entry.readyIndicator.completeExceptionally(new StoreStoppedException("Indexing stopped."));
             } else if (entry.operation != IndexOperation.READY_MARKER) {
                 this.pendingResolveItems.decrementAndGet();
             }
@@ -504,7 +504,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     {
         for (IndexQueueEntry entry = this.indexQueue.poll(); entry != null; entry = this.indexQueue.poll()) {
             if (entry.operation == IndexOperation.READY_MARKER && entry.readyIndicator != null) {
-                entry.readyIndicator.completeExceptionally(new IndexException("Indexing stopped."));
+                entry.readyIndicator.completeExceptionally(new StoreStoppedException("Indexing stopped."));
             }
         }
         this.indexQueue.offer(INDEX_QUEUE_ENTRY_STOP);
@@ -830,7 +830,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             }
         } else {
             // The indexer has been stopped and won't become ready again.
-            readyIndicator.completeExceptionally(new SolrIndexerException("The indexer has been disposed"));
+            readyIndicator.completeExceptionally(new StoreStoppedException("The indexer has been disposed"));
         }
 
         return readyIndicator;

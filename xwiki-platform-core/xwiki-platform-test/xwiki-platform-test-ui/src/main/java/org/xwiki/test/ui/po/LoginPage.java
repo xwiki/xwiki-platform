@@ -45,6 +45,12 @@ public class LoginPage extends ViewPage
     @FindBy(xpath = "//input[@type='submit' and @value='Log-in']")
     private WebElement submitButton;
 
+    @FindBy(xpath = "//form[@id='loginForm']//a[. = 'Forgot your username?']")
+    private WebElement forgotUsernameLink;
+
+    @FindBy(xpath = "//form[@id='loginForm']//a[. = 'Forgot your password?']")
+    private WebElement forgotPasswordLink;
+
     private static final LocalDocumentReference LOCAL_DOCUMENT_REFERENCE =
         new LocalDocumentReference("XWiki", "XWikiLogin");
 
@@ -140,5 +146,48 @@ public class LoginPage extends ViewPage
     public boolean hasCaptchaChallenge()
     {
         return getDriver().hasElementWithoutWaiting(By.className("captcha-challenge"));
+    }
+
+    /**
+     * Click the "Forgot your username?" link and wait for the page it leads to. The page object of that page is not
+     * returned because it is not part of this module.
+     *
+     * @since 18.9.0RC1
+     */
+    public void clickForgotUsername()
+    {
+        clickAndWaitForPageLoad(this.forgotUsernameLink);
+    }
+
+    /**
+     * Click the "Forgot your password?" link and wait for the page it leads to. The page object of that page is not
+     * returned because it is not part of this module.
+     *
+     * @since 18.9.0RC1
+     */
+    public void clickForgotPassword()
+    {
+        clickAndWaitForPageLoad(this.forgotPasswordLink);
+    }
+
+    private void clickAndWaitForPageLoad(WebElement link)
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        link.click();
+        getDriver().waitUntilPageIsReloaded();
+    }
+
+    /**
+     * Fill the answer to the CAPTCHA challenge displayed in the login form, to be submitted with the next
+     * {@link #loginAs(String, String)}.
+     *
+     * @param answer the answer to the CAPTCHA challenge
+     * @since 18.9.0RC1
+     */
+    public void setCaptchaAnswer(String answer)
+    {
+        WebElement answerInput = getDriver().findElement(By.name("captchaAnswer"));
+        answerInput.clear();
+        answerInput.sendKeys(answer);
     }
 }

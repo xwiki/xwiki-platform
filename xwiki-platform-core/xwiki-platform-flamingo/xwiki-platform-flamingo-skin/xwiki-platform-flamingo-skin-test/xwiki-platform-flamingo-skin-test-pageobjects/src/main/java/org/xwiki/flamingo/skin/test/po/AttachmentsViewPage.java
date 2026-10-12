@@ -63,4 +63,21 @@ public class AttachmentsViewPage extends ViewPage
         useShortcutForDocExtraPane(ATTACHMENTS, "a");
         return new AttachmentsPane();
     }
+
+    /**
+     * Open the attachments viewer (i.e. the current page displayed with {@code viewer=attachments}) through the
+     * "Attachments" entry of the "More actions" menu.
+     *
+     * @return the element corresponding to the attachments of the attachments viewer
+     * @since 18.9.0RC1
+     */
+    public AttachmentsPane openAttachmentsViewerFromMoreActions()
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        clickMoreActionsSubMenuEntry("tmAttachments");
+        getDriver().waitUntilPageIsReloaded();
+        AttachmentsPane attachmentsPane = new AttachmentsPane();
+        attachmentsPane.waitForAttachmentsLiveData();
+        return attachmentsPane;
+    }
 }

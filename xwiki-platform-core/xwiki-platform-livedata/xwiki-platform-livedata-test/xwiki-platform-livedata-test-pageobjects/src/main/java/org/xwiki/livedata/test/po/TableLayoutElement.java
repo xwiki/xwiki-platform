@@ -38,6 +38,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -677,6 +678,37 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * @param columnLabel the label of the column, for instance {@code "Title"}
+     * @param rowNumber the row number, starting at 1
+     * @return the text displayed in the cell
+     * @since 18.9.0RC1
+     */
+    public String getCellText(String columnLabel, int rowNumber)
+    {
+        return getCell(columnLabel, rowNumber).getText();
+    }
+
+    /**
+     * Waits until a cell displays the expected text, for instance after its edited value is saved.
+     *
+     * @param columnLabel the label of the column, for instance {@code "Title"}
+     * @param rowNumber the row number, starting at 1
+     * @param expectedText the text expected to be displayed in the cell
+     * @since 18.9.0RC1
+     */
+    public void waitUntilCellText(String columnLabel, int rowNumber, String expectedText)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return expectedText.equals(getCellText(columnLabel, rowNumber));
+            } catch (NoSuchElementException | StaleElementReferenceException e) {
+                // The rows are being refreshed.
+                return false;
+            }
+        });
+    }
+
+    /**
      * Return the list of {@link WebElement} of a column by its label.
      *
      * @param columnLabel the label of the column to get, for instance {@code "Title"}
@@ -688,6 +720,18 @@ public class TableLayoutElement extends BaseElement
     {
         int columnNumber = findColumnIndex(columnLabel);
         return getRoot().findElements(By.cssSelector(String.format("tbody tr td:nth-child(%d)", columnNumber)));
+    }
+
+    /**
+     * Return the text of the cells of a column, in the order of the displayed rows.
+     *
+     * @param columnLabel the label of the column to get, for instance {@code "Title"}
+     * @return the text of each cell of the requested column
+     * @since 18.9.0RC1
+     */
+    public List<String> getColumnValues(String columnLabel)
+    {
+        return getAllCells(columnLabel).stream().map(WebElement::getText).toList();
     }
 
     /**
@@ -773,6 +817,21 @@ public class TableLayoutElement extends BaseElement
     public boolean hasAction(int rowNumber, String actionName)
     {
         return !findElementsInRow(rowNumber, getActionSelector(actionName)).isEmpty();
+    }
+
+    /**
+     * Same as {@link #hasAction(int, String)} but doesn't wait for the action to appear, so that checking for the
+     * absence of an action doesn't wait for the full timeout. The rows are expected to be already loaded.
+     *
+     * @param rowNumber the row number to inspect
+     * @param actionName the expected action
+     * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean hasActionWithoutWaiting(int rowNumber, String actionName)
+    {
+        return !getDriver().findElementsWithoutWaiting(getRowElement(rowNumber), getActionSelector(actionName))
+            .isEmpty();
     }
 
     /**
@@ -923,8 +982,8 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Starts editing the nth cell of a column by clicking the inline edit button on the cell's popover, without waiting
-     * for the editor to appear. This is useful when clicking the edit button may trigger an edit confirmation modal
+     * Starts editing the nth cell of a column by clicking the inline edit button on the cell's popover, or the cell
+     * itself in edit mode, without waiting for the editor to appear. This is useful when clicking the edit button may trigger an edit confirmation modal
      * before the editor is shown.
      *
      * @param columnLabel the label of the column
@@ -938,6 +997,11 @@ public class TableLayoutElement extends BaseElement
     {
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        // In edit mode, the cells don't have an edit popover and are edited as soon as they are focused.
+        if (hasEditModeActionsColumn()) {
+            element.click();
+            return;
+        }
         By editButton = By.cssSelector(".displayer-action-list span[title='Edit']");
         // Hover on the property and click on the edit button on the displayed popover. We first move the mouse away
         // from the cell so that moving back onto it reliably triggers the popover, in particular when re-editing a
@@ -969,7 +1033,22 @@ public class TableLayoutElement extends BaseElement
     {
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
-        return !element.findElements(By.cssSelector(String.format("[name$='_%s']", fieldName))).isEmpty();
+        // This is called to observe the editor closing as well as opening, so it must not wait for the editor.
+        return getDriver().hasElementWithoutWaiting(element, By.cssSelector(String.format("[name$='_%s']", fieldName)));
+    }
+
+    /**
+     * Wait until the inline editor of the given XObject property cell is displayed, or until it is closed.
+     *
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row (the first line is number 1)
+     * @param fieldName the name of the edited XClass property
+     * @param editing {@code true} to wait for the editor to be displayed, {@code false} to wait for it to be closed
+     * @since 18.9.0RC1
+     */
+    public void waitUntilCellIsEditing(String columnLabel, int rowNumber, String fieldName, boolean editing)
+    {
+        getDriver().waitUntilCondition(input -> isCellEditing(columnLabel, rowNumber, fieldName) == editing);
     }
 
     /**

@@ -81,6 +81,42 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String OFFICE_IMAGE_VERSION_LABEL = "image-version";
 
+    /**
+     * Revision of the image embedding LibreOffice, to increment whenever a change is brought to it so that it's rebuilt
+     * on all the machines having it already.
+     */
+    private static final int OFFICE_IMAGE_REVISION = 2;
+
+    /**
+     * Stable path to the Python home bundled with LibreOffice, whose directory name contains the Python version.
+     */
+    private static final String OFFICE_PYTHON_HOME = "/opt/libreoffice-python";
+
+    /**
+     * The CPU architectures for which LibreOffice publishes deb packages: the name of the download directory and the
+     * architecture name used in the archive name.
+     */
+    private enum LibreOfficePackageArchitecture
+    {
+        X86_64("x86_64", "x86-64"),
+        AARCH64("aarch64");
+
+        private final String directory;
+
+        private final String archiveName;
+
+        LibreOfficePackageArchitecture(String name)
+        {
+            this(name, name);
+        }
+
+        LibreOfficePackageArchitecture(String directory, String archiveName)
+        {
+            this.directory = directory;
+            this.archiveName = archiveName;
+        }
+    }
+
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
 
     /**
@@ -440,6 +476,21 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         return imageId;
     }
 
+    /**
+     * @return the architecture of the LibreOffice deb packages matching the CPU architecture of the Docker host (and
+     *     thus of the servlet container base image)
+     */
+    private LibreOfficePackageArchitecture getLibreOfficePackageArchitecture()
+    {
+        String dockerArchitecture = DockerClientFactory.instance().getInfo().getArchitecture();
+        if (LibreOfficePackageArchitecture.AARCH64.directory.equals(dockerArchitecture)
+            || "arm64".equals(dockerArchitecture))
+        {
+            return LibreOfficePackageArchitecture.AARCH64;
+        }
+        return LibreOfficePackageArchitecture.X86_64;
+    }
+
     private String getBaseImageName()
     {
         return String.format("%s:%s",
@@ -463,15 +514,17 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             // Resolve the version of LibreOffice to install in the image
             String officeVersion = 
                 LibreOfficeResolver.resolve(this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version"));
-            // We rebuild every time the LibreOffice version changes
-            String imageVersion = String.format("LO-%S", officeVersion);
+            // We rebuild every time the LibreOffice version or the image revision changes
+            String imageVersion = String.format("LO-%S-%d", officeVersion, OFFICE_IMAGE_REVISION);
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
                 .withReferenceFilter(imageName)
                 .withLabelFilter(Collections.singletonMap(OFFICE_IMAGE_VERSION_LABEL, imageVersion))
                 .exec();
 
             if (imageSearchResults.isEmpty()) {
-                LOGGER.info("(*) Build a dedicated image embedding LibreOffice [{}]...", officeVersion);
+                LibreOfficePackageArchitecture officeArchitecture = getLibreOfficePackageArchitecture();
+                LOGGER.info("(*) Build a dedicated image embedding LibreOffice [{}] for [{}]...", officeVersion,
+                    officeArchitecture.directory);
 
                 // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
                 // at the end of the test container execution.
@@ -481,14 +534,18 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             .from(baseImageName)
                             .user(ROOT_USER)
                             .env("LIBREOFFICE_VERSION", officeVersion)
+                            // The deb packages are specific to the CPU architecture of the Docker host, which is the
+                            // one of the base image.
+                            .env("LIBREOFFICE_ARCH_DIRECTORY", officeArchitecture.directory)
+                            .env("LIBREOFFICE_ARCH", officeArchitecture.archiveName)
                             // Note: we use https://download.documentfoundation.org/libreoffice/stable/ and not
                             // https://downloadarchive.documentfoundation.org/libreoffice/old so that we can benefit
                             // from automatic LTS updates without any maintenance on our side. This is because the
                             // LTS version is exposed without the full versions, e.g. 7.2.7 instead of 7.2.7.2.
                             .env("LIBREOFFICE_DOWNLOAD_URL",
                                 "https://download.documentfoundation.org/libreoffice/stable/"
-                                + "$LIBREOFFICE_VERSION/deb/x86_64/"
-                                + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
+                                + "$LIBREOFFICE_VERSION/deb/$LIBREOFFICE_ARCH_DIRECTORY/"
+                                + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_${LIBREOFFICE_ARCH}_deb.tar.gz")
                             // Install the required tools to download the LibreOffice files
                             // Also installed dependencies of LibreOffice which are apparently missing from the deb
                             // packages declarations
@@ -512,11 +569,17 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 + "exit 1")
                             // Install the LibreOffice deb packages and create a symlink to have a consistent path to
                             // the LibreOffice installation directory
-                            .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
+                            .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*"
+                                + "_Linux_${LIBREOFFICE_ARCH}_deb/DEBS` && "
                                 + "apt-get install --no-install-recommends ./*.deb &&"
-                                + " ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
-                            // Increment the image version whenever a change is brought to the image so that it can
-                            // reconstructed on all machines needing it.
+                                + " ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice &&"
+                                + " ln -fs `ls -d /opt/libreoffice/program/python-core-*` " + OFFICE_PYTHON_HOME)
+                            // The Python bundled with LibreOffice cannot find its home by itself when it's loaded by
+                            // LibreOffice (e.g. when importing HTML), and complains about it on the error output,
+                            // which JODConverter logs as errors.
+                            .env("PYTHONHOME", OFFICE_PYTHON_HOME)
+                            // Increment OFFICE_IMAGE_REVISION whenever a change is brought to the image so that it's
+                            // rebuilt on all machines needing it.
                             .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);
                         if (this.testConfiguration.getServletEngine() == ServletEngine.JETTY) {
                             // Create the right jetty user directory since it doesn't exist

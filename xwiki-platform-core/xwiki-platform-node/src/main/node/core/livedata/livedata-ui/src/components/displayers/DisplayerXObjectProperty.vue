@@ -52,7 +52,6 @@
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin.js";
-import { XWiki } from "../../services/xwiki.js";
 import { edit } from "../displayerXObjectPropertyHelper.js";
 import { loadById } from "@xwiki/platform-xwiki-utils";
 

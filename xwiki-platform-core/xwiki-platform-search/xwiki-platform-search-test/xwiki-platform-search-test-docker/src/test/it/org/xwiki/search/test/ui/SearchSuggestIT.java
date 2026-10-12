@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.search.test.po.QuickSearchElement;
 import org.xwiki.search.test.po.QuickSearchResult;
@@ -41,6 +43,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UI tests for Search Suggest features.
@@ -72,6 +75,35 @@ class SearchSuggestIT
         QuickSearchElement quickSearchElement = new QuickSearchElement();
         quickSearchElement.search(testDocumentTitle);
         assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
+
+        // Verify that "Go to search page..." is displayed last.
+        assertTrue(quickSearchElement.isShowAllResultsLast());
+
+        // Verify that closing and reopening the suggestions panel doesn't leave "Go to search page..." behind.
+        quickSearchElement.closeSuggestions();
+        quickSearchElement.reopenSuggestions(testDocumentTitle);
+        assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
+        assertTrue(quickSearchElement.isShowAllResultsLast());
+
+        // A page saved from a script, without setting its locale, is found too.
+        DocumentReference scriptPageReference =
+            new DocumentReference("SomePage", new SpaceReference("SomeSpace", testReference.getLastSpaceReference()));
+        String scriptPageTitle = "Scriptonite";
+        setup.executeWiki("""
+            {{velocity}}
+            #set ($myDoc = $xwiki.getDocument('%s'))
+            #set ($discard = $myDoc.setTitle('%s'))
+            #set ($discard = $myDoc.save())
+            {{/velocity}}
+            """.formatted(setup.serializeReference(scriptPageReference), scriptPageTitle), Syntax.XWIKI_2_1);
+        assertEquals(scriptPageTitle, setup.gotoPage(scriptPageReference).getDocumentTitle());
+
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        quickSearchElement = new QuickSearchElement();
+        quickSearchElement.search(scriptPageTitle);
+        assertEquals(List.of(scriptPageTitle), quickSearchElement.getResults("Page titles").stream()
+            .map(QuickSearchResult::getTitle).toList());
     }
 
     /**
@@ -108,7 +140,7 @@ class SearchSuggestIT
 
         // Configure search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();
-        searchAdminPage.getSearchExclusionsField().sendKeys("Banana").waitForSuggestions().selectByVisibleText("Banana")
+        searchAdminPage.getSearchExclusionsField().sendKeys("Banana").selectByVisibleText("Banana")
             .hideSuggestions();
         searchAdminPage.clickSave();
 
@@ -120,7 +152,8 @@ class SearchSuggestIT
     }
 
     /**
-     * Note: must be the last test since it de-activates the search suggest.
+     * Note: the search suggest is re-activated at the end, since the other test classes of the module (e.g.
+     * {@link SolrSearchIT}) share the same XWiki instance and use it.
      */
     @Test
     @Order(3)
@@ -139,10 +172,16 @@ class SearchSuggestIT
         ssaPage.setActivated(false);
         ssaPage.clickSave();
 
-        // Navigate to any page and verify that the page source doesn't load the search suggest script.
-        // We could also wait for the search suggest modal to not appear (it would be closer to what a user would do)
-        // but we would need to wait for a long timeout and that would slow down the test.
-        vp = setup.gotoPage(testReference);
-        assertThat(setup.getDriver().getPageSource(), not(matchesPattern(expected)));
+        try {
+            // Navigate to any page and verify that the page source doesn't load the search suggest script.
+            // We could also wait for the search suggest modal to not appear (it would be closer to what a user would
+            // do) but we would need to wait for a long timeout and that would slow down the test.
+            vp = setup.gotoPage(testReference);
+            assertThat(setup.getDriver().getPageSource(), not(matchesPattern(expected)));
+        } finally {
+            ssaPage = SearchSuggestAdministrationPage.gotoPage();
+            ssaPage.setActivated(true);
+            ssaPage.clickSave();
+        }
     }
 }

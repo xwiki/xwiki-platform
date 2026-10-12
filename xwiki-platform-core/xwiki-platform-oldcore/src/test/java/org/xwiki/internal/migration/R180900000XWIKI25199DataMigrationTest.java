@@ -32,9 +32,12 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -76,6 +79,21 @@ class R180900000XWIKI25199DataMigrationTest
     void getVersion()
     {
         assertEquals(180900000, this.dataMigration.getVersion().getVersion());
+    }
+
+    @Test
+    void shouldExecute()
+    {
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(171013000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(171014000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(171014001)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(171015000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180100000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180405000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(180407000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(180408000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180500000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180800000)));
     }
 
     @Test

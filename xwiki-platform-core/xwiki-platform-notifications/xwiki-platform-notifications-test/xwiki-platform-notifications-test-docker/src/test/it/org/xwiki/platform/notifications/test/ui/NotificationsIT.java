@@ -21,7 +21,12 @@ package org.xwiki.platform.notifications.test.ui;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +55,11 @@ import org.xwiki.test.ui.po.CommentsTab;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -98,6 +108,10 @@ class NotificationsIT
     // share an event group id, and an update sharing the group id of a more specific event is grouped with it
     // rather than with the content updates, then hidden from the details of that group.
     private static final int PAGE_UPDATE_COUNT = 21;
+
+    // Number of pages whose creation notifications are loaded batch after batch in the notification tray: more than
+    // two batches of 10, and not more than 21, the maximum unread count computed by the notifications REST resource.
+    private static final int OLDER_NOTIFICATIONS_PAGE_COUNT = 21;
 
     private static final String SYSTEM = "org.xwiki.platform";
 
@@ -195,7 +209,7 @@ class NotificationsIT
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
             setup.deletePage(space, "Page" + i);
-            setup.createPage(space, "Page" + i, "Simple content", "Simple title");
+            setup.createPage(space, "Page" + i, "Simple content", "Simple title " + i);
         }
         setup.createPage(space, "DTP", "Deletion test page", "Deletion test content");
 
@@ -227,13 +241,38 @@ class NotificationsIT
         // Ensure that a notification has a correct type
         assertEquals("create", tray.getNotificationType(0));
 
-        // Reset the notifications count of the user 2
+        // Load the older notifications, by batches of 10, until all of them are listed.
+        NotificationsContainerElement trayContainer = tray.getNotificationsContainerElement();
+        assertTrue(trayContainer.hasOlderNotifications());
+        trayContainer.loadOlderNotifications();
+        assertEquals(20, trayContainer.getNotificationsListCount());
+        assertTrue(trayContainer.hasOlderNotifications());
+        trayContainer.loadOlderNotifications();
+        assertEquals(PAGES_TOP_CREATION_COUNT, trayContainer.getNotificationsListCount());
+        assertFalse(trayContainer.hasOlderNotifications());
+        // Each page is listed exactly once.
+        Set<String> expectedPages = IntStream.range(1, PAGES_TOP_CREATION_COUNT)
+            .mapToObj(i -> "Simple title " + i)
+            .collect(Collectors.toCollection(HashSet::new));
+        expectedPages.add("Deletion test content");
+        assertEquals(expectedPages, IntStream.range(0, PAGES_TOP_CREATION_COUNT)
+            .mapToObj(trayContainer::getNotificationPage)
+            .collect(Collectors.toSet()));
+        // Once all the notifications are listed, the badge count is the number of unread listed notifications.
+        assertEquals(20, tray.getUnreadNotificationsCount());
+        assertEquals(1, tray.getReadNotificationsCount());
+        assertEquals(tray.getUnreadNotificationsCount(), tray.getNotificationsCount());
+
+        // Reset the notifications count of the user 2: the badge disappears, and is still absent after a reload.
+        assertTrue(tray.isCountBadgeDisplayed());
         tray.clearAllNotifications();
+        assertFalse(tray.isCountBadgeDisplayed());
         // Clearing the notifications is done async, so we need to wait to be sure it has been taken into account.
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 0);
         tray = new NotificationsTrayPage();
         assertEquals(0, tray.getNotificationsCount());
         assertFalse(tray.areNotificationsAvailable());
+        assertFalse(tray.isCountBadgeDisplayed());
 
         // The user 2 will get notifications only for pages deletions
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
@@ -370,6 +409,38 @@ class NotificationsIT
         assertTrue(descriptionValue.contains("Linux as a title"), "Value was: " + descriptionValue);
         assertTrue(descriptionValue.contains("edited by " + FIRST_USER_NAME), "Value was: " + descriptionValue);
 
+        // The user 2 puts the notifications macro on a page, with the user preferences: it lists the same
+        // notifications as the tray. The creation of this page is not notified, since "create" events are disabled.
+        DocumentReference macroPage =
+            new DocumentReference("NotificationsMacro", testReference.getLastSpaceReference());
+        setup.rest().runAs(SECOND_USER_CREDENTIALS, rest -> rest.savePage(macroPage,
+            "{{notifications useUserPreferences=\"true\" /}}", "Notifications macro"));
+        setup.gotoPage(macroPage);
+        NotificationsContainerElement macro = NotificationsContainerElement.waitUntilNotificationCount(2);
+        assertEquals(2, macro.getNotificationsListCount());
+        commentIndex = macro.getNotificationIndex(ADD_COMMENT);
+        updateIndex = macro.getNotificationIndex(UPDATE);
+        assertNotEquals(-1, commentIndex, "No comment notification in the macro.");
+        assertNotEquals(-1, updateIndex, "No update notification in the macro.");
+        assertEquals("Linux as a title", macro.getNotificationPage(commentIndex));
+        assertEquals("Linux as a title", macro.getNotificationPage(updateIndex));
+        assertTrue(macro.isNotificationUnread(commentIndex));
+        assertTrue(macro.isNotificationUnread(updateIndex));
+
+        // Marking the comment notification as read from the macro also marks it as read in the tray.
+        macro.markAsRead(commentIndex);
+        assertFalse(macro.isNotificationUnread(commentIndex));
+        // Marking the notification as read is done async, so we need to wait to be sure it has been taken into account.
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 1);
+        macro = NotificationsContainerElement.waitUntilNotificationCount(2);
+        assertFalse(macro.isNotificationUnread(macro.getNotificationIndex(ADD_COMMENT)));
+        assertTrue(macro.isNotificationUnread(macro.getNotificationIndex(UPDATE)));
+        tray = new NotificationsTrayPage();
+        assertEquals(1, tray.getNotificationsCount());
+        NotificationsContainerElement trayContainer = tray.getNotificationsContainerElement();
+        assertFalse(trayContainer.isNotificationUnread(trayContainer.getNotificationIndex(ADD_COMMENT)));
+        assertTrue(trayContainer.isNotificationUnread(trayContainer.getNotificationIndex(UPDATE)));
+
         tray.clearAllNotifications();
     }
 
@@ -471,6 +542,15 @@ class NotificationsIT
                 notificationsTrayPage.getNotificationDescription(0));
             assertEquals(testReference.getLastSpaceReference().getName(), notificationsTrayPage.getNotificationPage(0));
 
+            // The activity gadget of the Dashboard lists the creation of the page, as the latest event of the wiki.
+            setup.gotoPage(new LocalDocumentReference("Dashboard", "WebHome"));
+            NotificationsContainerElement activity = NotificationsContainerElement.waitUntilNotifications(
+                gadget -> gadget.getNotificationsListCount() > 0
+                    && testReference.getLastSpaceReference().getName().equals(gadget.getNotificationPage(0)));
+            assertEquals(CREATE, activity.getNotificationType(0));
+            String description = activity.getNotificationDescription(0);
+            assertThat(description, startsWith("created by " + FIRST_USER_NAME));
+
             // Go back to enable the own even filter
             p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             preferences = p.getSystemNotificationFilterPreferences();
@@ -526,14 +606,18 @@ class NotificationsIT
         // We perform waits to ensure of the order of the events for next asserts
         // TODO: we should probably implement an ordering of the events strictly based on the moment the event is
         //  triggered to avoid having to rely on this kind of hack...
+        // The two test pages are created by the user 1 (setup.login() also logs the REST client in), whose profile
+        // lists them below, and the dashboards by the user 2, whose events this profile must not list.
         setup.rest().savePage(testReference, "Some content", "Test Notif Main");
         Thread.sleep(1000);
         setup.rest().savePage(testReference.replaceParent(new WikiReference("xwiki"), wikiReference),
             "Some content", "Test Notif Subwiki");
         Thread.sleep(1000);
-        setup.rest().savePage(mainWikiDashboard, notificationMacroDashboard, "Main Wiki Dashboard");
+        setup.rest().runAs(SECOND_USER_CREDENTIALS,
+            rest -> rest.savePage(mainWikiDashboard, notificationMacroDashboard, "Main Wiki Dashboard"));
         Thread.sleep(1000);
-        setup.rest().savePage(subWikiDashboard, notificationMacroDashboard, "Sub Wiki Dashboard");
+        setup.rest().runAs(SECOND_USER_CREDENTIALS,
+            rest -> rest.savePage(subWikiDashboard, notificationMacroDashboard, "Sub Wiki Dashboard"));
 
         setup.forceGuestUser();
         setup.gotoPage(subWikiDashboard);
@@ -563,6 +647,107 @@ class NotificationsIT
 
         assertTrue(notificationsContainerElement.getNotificationPage(4).startsWith("Profile of "));
         assertTrue(notificationsContainerElement.getNotificationPage(5).startsWith("Profile of "));
+
+        // The activity stream of the profile of the user 1 lists the pages that this user created, on the main wiki
+        // and on the subwiki, but not the events of the other users.
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        setup.gotoPage(new LocalDocumentReference("XWiki", FIRST_USER_NAME));
+        NotificationsContainerElement profileActivity = NotificationsContainerElement.waitUntilNotificationCount(2);
+        List<String> profilePages = IntStream.range(0, profileActivity.getNotificationsListCount())
+            .mapToObj(profileActivity::getNotificationPage)
+            .toList();
+        assertThat(profilePages, hasItems("Test Notif Main", "Test Notif Subwiki (wiki1)"));
+        assertThat(profilePages, not(hasItem("Main Wiki Dashboard")));
+        assertThat(profilePages, not(hasItem("Sub Wiki Dashboard (wiki1)")));
+        assertThat(profilePages, not(hasItem("Profile of " + SECOND_USER_NAME)));
+
+        // On the subwiki, the notifications macro can be restricted to some pages or to some spaces. The user 2
+        // creates, updates and comments two pages there, and the user 1 creates a page with a restricted macro for
+        // each of them.
+        DocumentReference subWikiP1 = new DocumentReference("WebHome", new SpaceReference("P1", subWikiSpace));
+        DocumentReference subWikiSandbox =
+            new DocumentReference("WebHome", new SpaceReference("Sandbox", subWikiSpace));
+        setup.rest().runAs(SECOND_USER_CREDENTIALS, rest -> {
+            for (DocumentReference page : List.of(subWikiP1, subWikiSandbox)) {
+                String title = "Subwiki " + page.getLastSpaceReference().getName();
+                rest.savePage(page, "Some content", title);
+                rest.savePage(page, "Some updated content", title);
+                CommentsTab.restPostComment(page, "Some comment");
+            }
+        });
+        String restrictedMacro = "{{notifications useUserPreferences=\"false\" displayOwnEvents=\"true\" %s=\"%s\" /}}";
+        DocumentReference pagesMacroPage = new DocumentReference("PagesMacro", subWikiSpace);
+        DocumentReference spacesMacroPage = new DocumentReference("SpacesMacro", subWikiSpace);
+        setup.rest().runAs(FIRST_USER_CREDENTIALS, rest -> {
+            rest.savePage(pagesMacroPage,
+                String.format(restrictedMacro, "pages", setup.serializeReference(subWikiSandbox)), "Pages macro");
+            rest.savePage(spacesMacroPage, String.format(restrictedMacro, "spaces",
+                setup.serializeReference(subWikiP1.getLastSpaceReference())), "Spaces macro");
+        });
+        setup.gotoPage(pagesMacroPage);
+        assertOnlyNotificationsOfPage("Subwiki Sandbox");
+        setup.gotoPage(spacesMacroPage);
+        assertOnlyNotificationsOfPage("Subwiki P1");
+    }
+
+    private void assertOnlyNotificationsOfPage(String page)
+    {
+        // The comment is the last event of the page: wait for it to be listed.
+        NotificationsContainerElement macro = NotificationsContainerElement.waitUntilNotifications(
+            element -> element.getNotificationIndex(ADD_COMMENT) != -1);
+        for (int i = 0; i < macro.getNotificationsListCount(); i++) {
+            assertEquals(page, macro.getNotificationPage(i));
+        }
+    }
+
+    @Test
+    @Order(7)
+    void loadOlderNotifications(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The user 2 enables the notifications for page creations and watches the entire wiki.
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+        p.getApplication(SYSTEM).setCollapsed(false);
+        p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
+        new NotificationWatchButtonElement().openModal()
+            .selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
+
+        // The date of a creation event has no milliseconds, while the date from which the preferences saved just
+        // above apply has some: an event fired within that same second is dated before them, and the notification is
+        // then filtered out. Wait for the next second, which is the granularity of the event dates and not an
+        // asynchronous operation, so there is nothing to poll on.
+        Thread.sleep(1000);
+
+        // The user 1 creates the pages over REST, so that several of them are saved within the same second, which is
+        // the granularity of the date of their creation events: the last notification of a batch shares its date with
+        // notifications of the next batch, which must still be loaded.
+        String space = testReference.getLastSpaceReference().getName();
+        setup.rest().runAs(FIRST_USER_CREDENTIALS, rest -> {
+            for (int i = 1; i <= OLDER_NOTIFICATIONS_PAGE_COUNT; i++) {
+                rest.savePage(new LocalDocumentReference(space, "Page" + i), "Content " + i, "Page " + i);
+            }
+        });
+
+        setup.gotoPage(space, "WebHome");
+        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki",
+            OLDER_NOTIFICATIONS_PAGE_COUNT);
+        NotificationsTrayPage tray = new NotificationsTrayPage();
+        // The tray displays 10 notifications by default.
+        assertEquals(10, tray.getNotificationsListCount());
+        while (tray.hasOlderNotifications()) {
+            tray.loadOlderNotifications();
+        }
+
+        // Every page creation is listed exactly once.
+        List<String> pages = new ArrayList<>();
+        for (int i = 0; i < tray.getNotificationsListCount(); i++) {
+            pages.add(tray.getNotificationPage(i));
+        }
+        List<String> expectedPages = new ArrayList<>();
+        for (int i = 1; i <= OLDER_NOTIFICATIONS_PAGE_COUNT; i++) {
+            expectedPages.add("Page " + i);
+        }
+        assertEquals(expectedPages.stream().sorted().toList(), pages.stream().sorted().toList());
     }
 
     private SyndEntry getEntryByTitle(NotificationsRSS rss, String title)

@@ -19,9 +19,12 @@
  */
 package org.xwiki.wysiwyg.test.po;
 
+import java.util.function.Consumer;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Page Object for the macro edition modal.
@@ -35,6 +38,30 @@ public class MacroDialogEditModal extends BaseElement
      * We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
      */
     private static final By MACRO_NAME = By.cssSelector("[class*=-editor-modal] .macro-name");
+
+    private final Consumer<Runnable> submitHandler;
+
+    /**
+     * Creates a page object whose {@link #clickSubmit()} only clicks the submit button.
+     */
+    public MacroDialogEditModal()
+    {
+        this(Runnable::run);
+    }
+
+    /**
+     * Creates a page object whose {@link #clickSubmit()} lets the editor that opened the modal wait for the result of
+     * the submission, which only that editor knows (e.g. CKEditor refreshes its content to render the macro).
+     *
+     * @param submitHandler receives the action that clicks the submit button, runs it and waits for its result
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public MacroDialogEditModal(Consumer<Runnable> submitHandler)
+    {
+        this.submitHandler = submitHandler;
+    }
 
     /**
      * Wait until the macro selection edition is loaded.
@@ -104,11 +131,31 @@ public class MacroDialogEditModal extends BaseElement
         return getMacroParameterInput(name).getDomProperty("value");
     }
 
+    /**
+     * @param name the name of a macro parameter
+     * @return the element holding the value of the parameter: an {@code input}, or the {@code select} behind a picker
+     *     (e.g. an attachment picker), see {@link #getMacroParameterSuggestInput(String)}
+     */
     public WebElement getMacroParameterInput(String name)
     {
-        return getDriver().findElementWithoutWaitingWithoutScrolling(
-            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
-            By.cssSelector("[class*=-editor-modal] .macro-parameter-field input[name='" + name + "']"));
+        // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+        String fieldSelector = "[class*=-editor-modal] .macro-parameter-field ";
+        return getDriver().findElementWithoutWaitingWithoutScrolling(By.cssSelector(
+            String.format("%1$sinput[name='%2$s'], %1$sselect[name='%2$s']", fieldSelector, name)));
+    }
+
+    /**
+     * Use this for a macro parameter whose value is picked from a list of suggestions, such as a page reference.
+     *
+     * @param name the macro parameter name
+     * @return the suggest input used to edit the value of the specified macro parameter
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public SuggestInputElement getMacroParameterSuggestInput(String name)
+    {
+        return new SuggestInputElement(getMacroParameterInput(name));
     }
 
     /**
@@ -155,13 +202,14 @@ public class MacroDialogEditModal extends BaseElement
     }
 
     /**
-     * Click on the macro submission button.
+     * Click on the macro submission button, then wait for the result of the submission when the editor that opened
+     * the modal knows how to (see {@link #MacroDialogEditModal(Consumer)}).
      */
     public void clickSubmit()
     {
-        getDriver().findElement(
+        this.submitHandler.accept(() -> getDriver().findElement(
             // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
-            By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click();
+            By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click());
     }
 
     /**
@@ -186,6 +234,6 @@ public class MacroDialogEditModal extends BaseElement
     public MacroDialogSelectModal clickChangeMacro()
     {
         getDriver().findElement(By.xpath("//*[contains(@class, '-editor-modal')]//button[. = 'Change Macro']")).click();
-        return new MacroDialogSelectModal().waitUntilReady();
+        return new MacroDialogSelectModal(this.submitHandler).waitUntilReady();
     }
 }

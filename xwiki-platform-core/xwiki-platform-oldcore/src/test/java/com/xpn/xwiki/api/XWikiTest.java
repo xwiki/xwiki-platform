@@ -175,4 +175,22 @@ class XWikiTest
         verify(revisionProvider).checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, DOCUMENT_REFERENCE, revision);
         verify(contextualAuthorizationManager).hasAccess(Right.VIEW, DOCUMENT_REFERENCE);
     }
+
+    @Test
+    void getDocumentTitleMaxLength(MockitoOldcore mockitoOldcore)
+    {
+        when(mockitoOldcore.getMockStore().getLimitSize(mockitoOldcore.getXWikiContext(), XWikiDocument.class,
+            "title")).thenReturn(768);
+
+        assertEquals(768, this.apiXWiki.getDocumentTitleMaxLength());
+    }
+
+    @Test
+    void getDocumentLocalReferenceMaxLength(MockitoOldcore mockitoOldcore)
+    {
+        when(mockitoOldcore.getMockStore().getLimitSize(mockitoOldcore.getXWikiContext(), XWikiDocument.class,
+            "fullName")).thenReturn(255);
+
+        assertEquals(255, this.apiXWiki.getDocumentLocalReferenceMaxLength());
+    }
 }

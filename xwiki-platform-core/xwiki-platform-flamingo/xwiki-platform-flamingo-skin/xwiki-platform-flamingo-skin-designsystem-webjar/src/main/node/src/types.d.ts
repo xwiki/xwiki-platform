@@ -17,15 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/// <reference types="@xwiki/platform-xwiki-utils/global" />
+
 export {};
-
-// Declares XWiki as a global constant. This is currently done locally at the level of this module instead of just
-// ignoring the type checking issue.
-// TODO: This should be moved to a shared place.
-interface XWikiGlobal {
-  contextPath: string;
-}
-
-declare global {
-  const XWiki: XWikiGlobal;
-}

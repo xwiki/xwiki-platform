@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.test.docker.internal.junit5.MultiUserTestUtilsParameterResolver;
+import org.xwiki.test.docker.internal.junit5.SubWikiTestUtilsParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestLocalReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
@@ -57,6 +58,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(TestReferenceParameterResolver.class)
 @ExtendWith(TestLocalReferenceParameterResolver.class)
 @ExtendWith(MultiUserTestUtilsParameterResolver.class)
+@ExtendWith(SubWikiTestUtilsParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public @interface UITest
@@ -234,6 +236,8 @@ public @interface UITest
      * @return true if the extensions declared in the resources of the module executing the test must be made available
      *     to the XWiki instances as an extension repository, so that the test can ask XWiki to install them (see
      *     {@code src/test/resources/packagefile} and {@code src/test/resources/repository})
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.7.0RC1
      */
     boolean testExtensionRepository() default false;

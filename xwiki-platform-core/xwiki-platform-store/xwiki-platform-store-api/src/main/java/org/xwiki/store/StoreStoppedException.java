@@ -1,4 +1,4 @@
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,4 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export const XWiki = window.XWiki || {};
+package org.xwiki.store;
+
+import org.xwiki.stability.Unstable;
+
+/**
+ * Indicate that a pending operation of a store could not be completed because the store was stopped (e.g. when XWiki
+ * is stopping). It's not an error: the operation was interrupted on purpose. In particular, a {@link ReadyIndicator}
+ * whose store is stopped before becoming ready is completed with this exception.
+ *
+ * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
+ * @since 18.9.0RC1
+ */
+@Unstable
+public class StoreStoppedException extends Exception
+{
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * @param message the detail message
+     */
+    public StoreStoppedException(String message)
+    {
+        super(message);
+    }
+}

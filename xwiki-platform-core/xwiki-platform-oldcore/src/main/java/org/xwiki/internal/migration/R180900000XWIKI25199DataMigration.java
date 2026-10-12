@@ -69,6 +69,18 @@ public class R180900000XWIKI25199DataMigration extends AbstractHibernateDataMigr
     }
 
     @Override
+    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    {
+        int version = startupVersion.getVersion();
+        // The password migrations of a DB coming from 17.10.14 or a later 17.10.x were executed with the cache flush
+        // of XWIKI-25203, and a DB coming from 18.4.7 or a later 18.4.x already executed this migration (as
+        // R180407000XWIKI25199DataMigration): there's nothing to fix for them.
+        boolean notNeeded = (version >= 171014000 && version < 180000000)
+            || (version >= 180407000 && version < 180500000);
+        return super.shouldExecute(startupVersion) && !notNeeded;
+    }
+
+    @Override
     protected void hibernateMigrate() throws DataMigrationException
     {
         // The storage needs to be migrated first since the re-encoding only handles the passwords stored in the

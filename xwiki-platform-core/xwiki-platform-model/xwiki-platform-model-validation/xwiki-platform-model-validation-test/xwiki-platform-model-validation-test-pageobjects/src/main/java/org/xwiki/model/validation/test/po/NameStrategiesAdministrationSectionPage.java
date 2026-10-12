@@ -54,6 +54,15 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     private static final By USE_VALIDATION_SELECT =
         By.id("XWiki.EntityNameValidation.ConfigurationClass_0_useValidation");
 
+    private static final By SLUG_LOWERCASE_SELECT =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_slug.lowercase");
+
+    private static final By SLUG_DOTS_BETWEEN_DIGITS_SELECT =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_slug.dotsBetweenDigits");
+
+    private static final By SLUG_FORBIDDEN_WORDS_TEXTAREA =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_slug.forbiddenWords");
+
     /**
      * Open the Name Strategies administration section.
      *
@@ -113,6 +122,54 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     public void setValidateNames(boolean enabled)
     {
         new Select(getDriver().findElement(USE_VALIDATION_SELECT)).selectByValue(enabled ? "1" : "0");
+    }
+
+    /**
+     * Enable or disable the conversion to lowercase done by the Kebab-case (Slug) strategy. The Kebab-case options are
+     * only displayed once that strategy is selected, see {@link #selectStrategy(String)}. This only changes the
+     * selected value in the form; call {@link #save()} to persist it.
+     *
+     * @param enabled {@code true} to convert names to lowercase, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public void setSlugConvertToLowercase(boolean enabled)
+    {
+        selectSlugOption(SLUG_LOWERCASE_SELECT, enabled);
+    }
+
+    /**
+     * Allow or forbid, in the Kebab-case (Slug) strategy, the dots placed between digits (e.g. in versions). The
+     * Kebab-case options are only displayed once that strategy is selected, see {@link #selectStrategy(String)}. This
+     * only changes the selected value in the form; call {@link #save()} to persist it.
+     *
+     * @param allowed {@code true} to keep the dots placed between digits, {@code false} to replace them
+     * @since 18.9.0RC1
+     */
+    public void setSlugAllowDots(boolean allowed)
+    {
+        selectSlugOption(SLUG_DOTS_BETWEEN_DIGITS_SELECT, allowed);
+    }
+
+    /**
+     * Set the words that the Kebab-case (Slug) strategy removes from names. The Kebab-case options are only displayed
+     * once that strategy is selected, see {@link #selectStrategy(String)}. This only changes the value in the form;
+     * call {@link #save()} to persist it.
+     *
+     * @param forbiddenWords the comma-separated list of forbidden words
+     * @since 18.9.0RC1
+     */
+    public void setSlugForbiddenWords(String forbiddenWords)
+    {
+        getDriver().waitUntilElementIsVisible(SLUG_FORBIDDEN_WORDS_TEXTAREA);
+        WebElement textarea = getDriver().findElement(SLUG_FORBIDDEN_WORDS_TEXTAREA);
+        textarea.clear();
+        textarea.sendKeys(forbiddenWords);
+    }
+
+    private void selectSlugOption(By locator, boolean enabled)
+    {
+        getDriver().waitUntilElementIsVisible(locator);
+        new Select(getDriver().findElement(locator)).selectByValue(enabled ? "1" : "0");
     }
 
     /**

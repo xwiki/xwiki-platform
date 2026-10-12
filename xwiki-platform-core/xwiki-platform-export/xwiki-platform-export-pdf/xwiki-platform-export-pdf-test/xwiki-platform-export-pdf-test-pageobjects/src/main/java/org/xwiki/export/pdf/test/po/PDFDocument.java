@@ -38,6 +38,10 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureNode;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.StandardStructureTypes;
 import org.apache.pdfbox.pdmodel.interactive.action.PDAction;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
@@ -381,5 +385,40 @@ public class PDFDocument implements AutoCloseable
     private List<PDFImage> getImagesFromPage(PDPage page) throws IOException
     {
         return this.imageExtractor.getImages(page);
+    }
+
+    /**
+     * Looks for the figures from the specified page in the structure tree of this tagged PDF document and returns their
+     * alternative text.
+     *
+     * @param pageNumber the page number
+     * @return the alternative text of each figure on the specified page, in document order, with {@code null} for a
+     *         figure that has no alternative text
+     * @since 18.9.0RC1
+     */
+    public List<String> getImageAlternativeTextsFromPage(int pageNumber)
+    {
+        List<String> alternativeTexts = new ArrayList<>();
+        PDStructureTreeRoot structureTreeRoot = this.document.getDocumentCatalog().getStructureTreeRoot();
+        if (structureTreeRoot != null) {
+            collectImageAlternativeTexts(structureTreeRoot, null, this.document.getPage(pageNumber),
+                alternativeTexts);
+        }
+        return alternativeTexts;
+    }
+
+    private void collectImageAlternativeTexts(PDStructureNode node, PDPage inheritedPage, PDPage page,
+        List<String> alternativeTexts)
+    {
+        for (Object kid : node.getKids()) {
+            if (kid instanceof PDStructureElement element) {
+                // The page can be specified on an ancestor rather than on the element itself.
+                PDPage elementPage = element.getPage() != null ? element.getPage() : inheritedPage;
+                if (StandardStructureTypes.Figure.equals(element.getStructureType()) && page.equals(elementPage)) {
+                    alternativeTexts.add(element.getAlternateDescription());
+                }
+                collectImageAlternativeTexts(element, elementPage, page, alternativeTexts);
+            }
+        }
     }
 }

@@ -258,7 +258,7 @@ class BrowserPDFPrinterTest
         when(this.browserTab.navigate(toStrEq(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"))))
             .thenReturn(true);
         when(this.browserTab.getSource()).thenReturn("{\"ip\":\"172.12.0.3\"}");
-        when(this.browserTab.navigate(toStrEq(browserPrintPreviewURL), eq((Cookie[]) null), eq(true), eq(30)))
+        when(this.browserTab.navigate(toStrEq(browserPrintPreviewURL), eq(new Cookie[0]), eq(true), eq(30)))
             .thenReturn(true);
 
         this.printer.print(printPreviewURL);

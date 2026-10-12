@@ -251,7 +251,10 @@ $syntaxMenu.add($cat)
     $heading $section.name $heading
 
     #end
-    {{include reference="XWiki.XWikiSyntax${section.id}" section="H${displayVersion}${section.id}"/}}
+    ## Escape the values used as macro parameters.
+    #set ($includeReference = $services.rendering.escape("XWiki.XWikiSyntax${section.id}", 'xwiki/2.1'))
+    #set ($includeSection = $services.rendering.escape("H${displayVersion}${section.id}", 'xwiki/2.1'))
+    {{include reference="$includeReference" section="$includeSection"/}}
 #end
 
 

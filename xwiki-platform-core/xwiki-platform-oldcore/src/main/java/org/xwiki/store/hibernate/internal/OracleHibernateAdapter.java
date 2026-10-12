@@ -50,6 +50,8 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
      */
     public static final String HINT = "oracle";
 
+    private static final String OWNER_PARAMETER = "owner";
+
     @Override
     public void updateDatabaseAfter(Metadata metadata, Session session) throws HibernateStoreException
     {
@@ -75,6 +77,8 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
             // Compute the query statement
             String statement = getAlterCompressionString(tableName, compressed, compressedTables);
             if (statement != null) {
+                this.logger.info("Changing the compression of table [{}] with [{}]", tableName, statement);
+
                 // Create the query
                 NativeQuery<?> query = session.createNativeQuery(statement);
 
@@ -126,28 +130,33 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
      */
     public Set<String> getCompressedTables(Session session)
     {
-        NativeQuery<String> query = session.createNativeQuery(getCompressedTablesStatement());
+        String schema = getDatabaseFromWikiName();
+
+        NativeQuery<String> query = session.createNativeQuery(getCompressedTablesStatement(schema));
+        if (schema != null) {
+            query.setParameter(OWNER_PARAMETER, schema);
+        }
 
         return query.list().stream().map(String::toUpperCase).collect(Collectors.toSet());
     }
 
     /**
-     * @return the SQL statement listing the compressed tables of the current wiki
+     * @param schema the schema of the current wiki, or null if there is no current wiki
+     * @return the SQL statement listing the compressed tables of the schema, expecting the schema as the
+     *         {@code owner} parameter when the schema is not null
      */
-    public String getCompressedTablesStatement()
+    public String getCompressedTablesStatement(String schema)
     {
         // ALL_TABLES restricted to the schema of the current wiki, and not USER_TABLES: USER_TABLES only lists the
         // tables owned by the connected user, while XWiki connects with a single user and reaches each wiki by
         // switching the schema of the session.
-        StringBuilder statement =
-            new StringBuilder("SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED'");
+        String statement = "SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED'";
 
-        String schema = getDatabaseFromWikiName();
         if (schema != null) {
-            statement.append(" AND owner = '").append(schema).append('\'');
+            statement += " AND owner = :" + OWNER_PARAMETER;
         }
 
-        return statement.toString();
+        return statement;
     }
 
     @Override

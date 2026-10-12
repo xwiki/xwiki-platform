@@ -35,7 +35,11 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -101,20 +105,18 @@ class OracleHibernateAdapterTest
     }
 
     @Test
-    void getCompressedTablesStatementIsRestrictedToTheCurrentWikiSchema()
+    void getCompressedTablesStatementIsRestrictedToTheSchema()
     {
         // USER_TABLES would list the tables owned by the connected user instead of those of the wiki being updated.
-        assertEquals("SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED' AND owner = 'SUBWIKI'",
-            this.adapter.getCompressedTablesStatement());
+        assertEquals("SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED' AND owner = :owner",
+            this.adapter.getCompressedTablesStatement("SUBWIKI"));
     }
 
     @Test
-    void getCompressedTablesStatementWhenNoCurrentWiki()
+    void getCompressedTablesStatementWhenNoSchema()
     {
-        when(this.wikis.getCurrentWikiId()).thenReturn(null);
-
         assertEquals("SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED'",
-            this.adapter.getCompressedTablesStatement());
+            this.adapter.getCompressedTablesStatement(null));
     }
 
     @Test
@@ -123,10 +125,29 @@ class OracleHibernateAdapterTest
         Session session = mock(Session.class);
         NativeQuery<String> query = mock(NativeQuery.class);
         when(session.createNativeQuery(
-            "SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED' AND owner = 'SUBWIKI'"))
+            "SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED' AND owner = :owner"))
                 .thenReturn(query);
         when(query.list()).thenReturn(List.of("xwikircs", "XWikiDoc"));
 
         assertEquals(Set.of("XWIKIRCS", "XWIKIDOC"), this.adapter.getCompressedTables(session));
+
+        // The schema of the current wiki is passed as a bind parameter rather than concatenated in the statement.
+        verify(query).setParameter("owner", "SUBWIKI");
+    }
+
+    @Test
+    void getCompressedTablesWhenNoCurrentWiki()
+    {
+        when(this.wikis.getCurrentWikiId()).thenReturn(null);
+
+        Session session = mock(Session.class);
+        NativeQuery<String> query = mock(NativeQuery.class);
+        when(session.createNativeQuery("SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED'"))
+            .thenReturn(query);
+        when(query.list()).thenReturn(List.of("XWIKIRCS"));
+
+        assertEquals(Set.of("XWIKIRCS"), this.adapter.getCompressedTables(session));
+
+        verify(query, never()).setParameter(anyString(), any());
     }
 }

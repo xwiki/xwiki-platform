@@ -99,7 +99,13 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
     };
     this.watchAwarenessChange(collaboration);
     this.watchConnectionStatus(collaboration);
-    await this.sync(collaboration);
+    try {
+      await this.sync(collaboration);
+    } catch (error) {
+      // Nobody is going to use this session, so stop the provider from reconnecting in the background.
+      provider.destroy();
+      throw error;
+    }
     return collaboration;
   }
 
@@ -140,13 +146,31 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
     });
   }
 
+  /**
+   * @returns a promise that is resolved once the initial synchronization is done, and rejected when the first
+   *   connection attempt fails, so that joining a session doesn't hang while the server is unreachable
+   */
   private sync(collaboration: Collaboration): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const provider: WebsocketProvider = collaboration.provider;
-      provider.once("sync", () => {
+      const onSync = () => {
+        stopListening();
         console.debug("Collaboration synchronized.");
         resolve();
-      });
+      };
+      const onConnectionClose = () => {
+        stopListening();
+        reject(new Error("Failed to connect to the collaboration server."));
+      };
+      // Stop listening as soon as we know, because the disconnections that follow a successful synchronization are
+      // transient and the provider recovers from them on its own.
+      function stopListening() {
+        provider.off("sync", onSync);
+        provider.off("connection-close", onConnectionClose);
+      }
+      // We can't use once() here: it registers a wrapper that off() doesn't remove.
+      provider.on("sync", onSync);
+      provider.on("connection-close", onConnectionClose);
     });
   }
 

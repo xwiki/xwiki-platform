@@ -25,13 +25,21 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
+import org.xwiki.rendering.internal.block.BlockMatcherConverter;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
+import org.xwiki.rendering.internal.plain.Plain10SyntaxProvider;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
@@ -44,6 +52,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.contains;
 import static org.mockito.Mockito.mock;
@@ -59,12 +68,23 @@ import static org.mockito.Mockito.when;
 @HTML50ComponentList
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
+@ComponentList({
+    BlockMatcherConverter.class,
+    Plain10SyntaxProvider.class,
+    PlainTextBlockRenderer.class,
+    PlainTextRenderer.class,
+    PlainTextRendererFactory.class
+})
 class HelpTest extends PageTest
 {
     private static final DocumentReference XWIKI_SYNTAX_REFERENCE =
         new DocumentReference("xwiki", "XWiki", "XWikiSyntax");
 
     private static final String SPECIAL_VALUE = "\"/}}(% id=\"special\" %)**special**";
+
+    private static final String SECTION_CONTENT = "= Category =\n\n== Section ==";
+
+    private static final String SPECIAL_SYNTAX = "~{~{/html~}~}~*~*special~*~*";
 
     private ScriptQuery syntaxSectionsQuery;
 
@@ -124,7 +144,8 @@ class HelpTest extends PageTest
     @Test
     void displaySectionWithSpecialMaxSyntaxId() throws Exception
     {
-        createSyntaxSection(new DocumentReference("xwiki", "Sandbox", "XWikiSyntaxSection"), SPECIAL_VALUE);
+        createSyntaxSection(new DocumentReference("xwiki", "Sandbox", "XWikiSyntaxSection"), SPECIAL_VALUE,
+            SECTION_CONTENT);
 
         Document document = renderHTMLPage(XWIKI_SYNTAX_REFERENCE);
 
@@ -134,19 +155,44 @@ class HelpTest extends PageTest
     @Test
     void displaySectionWithSpecialName() throws Exception
     {
-        createSyntaxSection(new DocumentReference("xwiki", "Sandbox", "XWikiSyntaxSection" + SPECIAL_VALUE), "2.1");
+        createSyntaxSection(new DocumentReference("xwiki", "Sandbox", "XWikiSyntaxSection" + SPECIAL_VALUE), "2.1",
+            SECTION_CONTENT);
 
         Document document = renderHTMLPage(XWIKI_SYNTAX_REFERENCE);
 
         assertNull(document.getElementById("special"));
     }
 
-    private void createSyntaxSection(DocumentReference sectionReference, String maxSyntaxId) throws Exception
+    @ParameterizedTest
+    @CsvSource({
+        ",",
+        "category, 0",
+        "section, Section"
+    })
+    void displaySectionWithSyntaxInHeadings(String parameterName, String parameterValue) throws Exception
+    {
+        if (parameterName != null) {
+            this.request.put(parameterName, parameterValue);
+        }
+        // XWiki.XWikiSyntax needs programming rights to access the XDOM of the syntax pages.
+        when(this.oldcore.getMockRightService().hasProgrammingRights(this.context)).thenReturn(true);
+        // The escaped syntax of the headings is rendered as plain text when computing the category and section names.
+        createSyntaxSection(new DocumentReference("xwiki", "XWiki", "XWikiSyntaxSection"), "2.1",
+            "= Category " + SPECIAL_SYNTAX + " =\n\n== Section " + SPECIAL_SYNTAX + " ==");
+
+        Document document = renderHTMLPage(XWIKI_SYNTAX_REFERENCE);
+
+        assertTrue(document.select("strong").isEmpty());
+        assertThat(document.text(), containsString("Section {{/html}}**special**"));
+    }
+
+    private void createSyntaxSection(DocumentReference sectionReference, String maxSyntaxId, String content)
+        throws Exception
     {
         loadPage(new DocumentReference("xwiki", "XWiki", "XWikiSyntaxClass"));
         XWikiDocument sectionDocument = this.xwiki.getDocument(sectionReference, this.context);
         sectionDocument.setSyntax(Syntax.XWIKI_2_1);
-        sectionDocument.setContent("= Category =\n\n== Section ==");
+        sectionDocument.setContent(content);
         BaseObject sectionObject = sectionDocument.newXObject(
             new DocumentReference("xwiki", "XWiki", "XWikiSyntaxClass"), this.context);
         sectionObject.setIntValue("category", 99);

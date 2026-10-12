@@ -500,6 +500,10 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# [Since 17.5.0]
 #-# Indicate the unique identifier of the instance among the members of a cluster.
 #-# By default it is automatically generated from a UUID and stored in the permanent directory.
+#-# The identifier should stay the same when the instance is restarted (keep the permanent directory or set this
+#-# property): some of the work of the instance is associated with its identifier and handled by the member with that
+#-# identifier. An identifier which has been absent from the cluster for observation.remote.reclaimDelay is considered
+#-# gone for good, and the cluster singleton node can then take over the work which was left pending.
 #-# 
 # observation.remote.id = node1
 
@@ -539,6 +543,32 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#
 #-# The default is:
 # observation.remote.singletonPriority = 0
+
+#-# [Since 18.10.0RC1]
+#-# How long, in seconds, a member must be absent from the cluster before the other members consider it gone for good
+#-# (for example after the cluster was scaled down, or when a member comes back with another identifier), so that the
+#-# cluster singleton node can take over the work which was left pending by that member. It should be longer than the
+#-# time a member needs to restart (including the restart of the machine hosting it), since a member which comes back
+#-# handles its own pending work, and longer than the time all the members need to join the cluster after a full start
+#-# of the cluster. Each member measures the absence in memory from the moment it sees the member leave (or finds work
+#-# left by a member which is not part of the cluster), so a restart of the cluster singleton node delays the decision.
+#-# No quorum is required: a member which is alone in the cluster, because the other members left or because it is cut
+#-# from them by a network failure longer than this delay, takes over the work of the others.
+#-# A negative value means that a member is never considered gone for good.
+#-#
+#-# The default is:
+# observation.remote.reclaimDelay = 900
+
+#-# [Since 18.10.0RC1]
+#-# The maximum age, in seconds, of the pending work of a member gone for good which is taken over (see
+#-# observation.remote.reclaimDelay): the work produced more than this before the member left is not taken over. It
+#-# avoids, for example, notifying users about very old events left by a member whose identifier changed long ago.
+#-# The members forget a member gone for good once it has been absent for observation.remote.reclaimDelay plus this
+#-# maximum age. A negative value means no limit (the members then remember every member gone for good until they
+#-# restart).
+#-#
+#-# The default is:
+# observation.remote.reclaimMaxAge = 86400
 
 #-------------------------------------------------------------------------------------
 # CSRF token component

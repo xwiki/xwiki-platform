@@ -90,6 +90,18 @@ public class DefaultRemoteObservationManagerConfiguration
     }
 
     @Override
+    public long getReclaimDelay()
+    {
+        return this.configurationSource.getProperty("observation.remote.reclaimDelay", 900L);
+    }
+
+    @Override
+    public long getReclaimMaxAge()
+    {
+        return this.configurationSource.getProperty("observation.remote.reclaimMaxAge", 86400L);
+    }
+
+    @Override
     public String getId()
     {
         return this.id;

@@ -56,6 +56,8 @@ public class QuickSearchResult extends BaseElement
     /**
      * @return the parts of the title of this quick search result that are highlighted because they match the search
      *     terms
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public List<String> getHighlights()

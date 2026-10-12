@@ -69,6 +69,8 @@ public class SolrSearchResult extends BaseElement
      * them all visible.
      *
      * @return a map from the name of the field to the words that are highlighted in the snippets of the field
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public Map<String, List<String>> getHighlightedWords()

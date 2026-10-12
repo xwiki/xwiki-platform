@@ -205,6 +205,10 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
         textArea.sendKeys("zero");
 
+        // The user data (e.g. our caret position) is synchronized again.
+        assertEquals("John",
+            textArea.getCoeditorPosition(inplaceEditablePage.getToolbar().getUserId()).getAvatarHint());
+
         // Wait for auto-save.
         inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
         inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
@@ -2910,6 +2914,38 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(editPage.getToolbar().getHistoryDropdown().hasSummarizeChangesAction());
         viewPage = editPage.clickDone();
         assertEquals(6, viewPage.openHistoryDocExtraPane().showMinorEdits().getNumberOfVersions());
+    }
+
+    @Test
+    @Order(29)
+    void failGracefullyIfWeCannotReconnect(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh, with a page that guests can't edit, so that we can't rejoin the realtime session once our user
+        // session has expired.
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "");
+        setup.setRights(testReference, "", "XWiki.XWikiGuest", "edit", false);
+        loginAsJohn(setup);
+
+        RealtimeWYSIWYGEditPage editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeRichTextAreaElement textArea = editPage.getContenEditor().getRichTextArea();
+        textArea.sendKeys("one");
+
+        // Our user session expires so we can't get the realtime session channels when the connection is restored
+        // (regression test for XWIKI-25236).
+        RealtimeTestUtils.simulateSessionExpiration(setup);
+        editPage.getToolbar().simulateConnectionLoss(false);
+
+        // We leave the realtime session and continue editing alone.
+        editPage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
+        assertFalse(editPage.getToolbar().isCollaborating());
+        assertTrue(editPage.getToolbar().canJoinCollaboration());
+        textArea.sendKeys(" two");
+        assertEquals("one two", textArea.getText());
+
+        setup.maybeLeaveEditMode();
+        loginAsJohn(setup);
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

@@ -83,8 +83,12 @@ class RealtimeWikiEditorIT
     {
         // First tab
         RealtimeWikiEditPage firstRtWikiEditor = RealtimeWikiEditPage.gotoPage(testReference);
-        String firstUserId = firstRtWikiEditor.getToolbar().getUserId();
         firstRtWikiEditor.sendKeys("one");
+
+        // Verify that we reconnect after a connection loss. We're editing alone, so the server removes the realtime
+        // session when we're disconnected and we have to join a new one (regression test for XWIKI-25236). Note that
+        // our user id changes when we reconnect.
+        String firstUserId = firstRtWikiEditor.getToolbar().simulateConnectionLoss().getUserId();
 
         // Second tab
         String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();

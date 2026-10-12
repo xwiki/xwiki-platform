@@ -26,10 +26,11 @@ define('xwiki-realtime-wikiEditor', [
   'xwiki-realtime-saver',
   'chainpad',
   'xwiki-realtime-crypto',
-  'jquery'
+  'jquery',
+  'xwiki-l10n!xwiki-realtime-messages'
 ], function(
   /* jshint maxparams:false */
-  Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $
+  Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $, Messages
 ) {
   'use strict';
 
@@ -286,7 +287,8 @@ define('xwiki-realtime-wikiEditor', [
         onLocal: this.onLocal.bind(this),
         onAbort: this.onAbort.bind(this),
         beforeReconnecting: this.beforeReconnecting.bind(this),
-        onConnectionChange: this.onConnectionChange.bind(this)
+        onConnectionChange: this.onConnectionChange.bind(this),
+        onError: this.onRealtimeError.bind(this)
       };
     }
 
@@ -295,6 +297,15 @@ define('xwiki-realtime-wikiEditor', [
     }
 
     async onReady(info) {
+      try {
+        await this.joinRealtimeSession(info);
+      } catch (error) {
+        // We failed to join the user data or the saver channel.
+        this.onRealtimeError(error);
+      }
+    }
+
+    async joinRealtimeSession(info) {
       this.chainpad = info.realtime;
       this.leaveChannel = info.leave;
 
@@ -304,7 +315,9 @@ define('xwiki-realtime-wikiEditor', [
         user: this.editorConfig.user,
         onChange: info.userList.onChange,
         crypto: Crypto,
-        editor: this.editorId
+        editor: this.editorId,
+        // Used to check if the user data channel is still available when the WebSocket connection is restored.
+        getChannel: async () => (await this.editorConfig.updateChannels()).userData
       });
       this.onUserListChange(info.userList, this.userData);
       info.userList.change.push(this.onUserListChange.bind(this, info.userList));
@@ -346,17 +359,44 @@ define('xwiki-realtime-wikiEditor', [
 
     onAbort() {
       console.log('Aborting the session!');
-      this.chainpad.abort();
-      this.leaveChannel();
+      // We may not have finished joining the realtime session (e.g. if we failed to join one of the channels).
+      this.chainpad?.abort();
+      this.leaveChannel?.();
       this.aborted = true;
-      this.saver.stop();
+      this.saver?.stop();
       this.toolbar.destroy();
-      this.userData.stop?.();
+      this.userData?.stop?.();
+    }
+
+    /**
+     * Called when we fail to join or rejoin the realtime session. We leave the realtime session and let the user
+     * continue editing alone.
+     *
+     * @param {*} error the reason why we failed to join the realtime session
+     */
+    onRealtimeError(error) {
+      if (this.aborted) {
+        // We already left the realtime session (e.g. because of a previous error).
+        return;
+      }
+
+      console.error('Failed to join the realtime session.', error);
+      this.onAbort();
+      this.setEditable(true);
+      // Let the user know that they're not editing in realtime anymore.
+      Interface.getAllowRealtimeCheckbox().prop('checked', false).prop('disabled', false);
+      this.editorConfig.setRealtimeEnabled(false);
+      XWiki.widgets.Notification.show(Messages['join.error'], 'error');
     }
 
     async beforeReconnecting(callback) {
-      await this.updateKeys();
-      callback(this.channel, this.editor.getValue());
+      try {
+        await this.updateKeys();
+        callback(this.channel, this.editor.getValue());
+      } catch (error) {
+        // We failed to fetch the channels (e.g. because the user session has expired).
+        this.onRealtimeError(error);
+      }
     }
 
     onConnectionChange(info) {

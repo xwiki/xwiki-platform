@@ -78,14 +78,18 @@ define('xwiki-realtime-saver', [
       // The callbacks of the callers waiting for the local state to reach the server, see whenSettled.
       this._settleWaiters = new Set();
 
-      this._initializing = new Promise(resolve => {
+      this._initializing = new Promise((resolve, reject) => {
         this._notifyReady = () => {
           // Mark the transport as ready right away (rather than using a promise callback which would be called on the
           // next tick), to be visible to the code executed right after _notifyReady is called.
           this._initializing = false;
           resolve();
         };
+        this._notifyError = reject;
       });
+      // The failure is reported to the caller of toBeReady, which may not be waiting yet when we fail to join the
+      // channel, so mark it as handled to avoid an unhandled promise rejection.
+      this._initializing.catch(() => {});
 
       // The cached states of all the clients.
       this._states = {
@@ -205,6 +209,13 @@ define('xwiki-realtime-saver', [
         onAbort: () => {
           this._onConnectionLost();
           this.saver.stop();
+        },
+        // Called when we fail to join the channel.
+        onError: error => {
+          logger.warn('Failed to join the saver channel.', error);
+          if (this._initializing) {
+            this._notifyError(error);
+          }
         }
       };
     }

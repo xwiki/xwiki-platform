@@ -79,6 +79,20 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public RealtimeEditToolbar simulateConnectionLoss()
     {
+        return simulateConnectionLoss(true);
+    }
+
+    /**
+     * Simulates a temporary loss of the network connection, which closes the WebSocket connection used by the realtime
+     * editing session. The browser stays online, so the editor tries to reconnect right away.
+     *
+     * @param waitForReconnect whether to wait for the editor to reconnect; pass {@code false} when the reconnection is
+     *            expected to fail
+     * @return this instance
+     * @since 18.9.0RC1
+     */
+    public RealtimeEditToolbar simulateConnectionLoss(boolean waitForReconnect)
+    {
         waitUntilConnected();
         // The realtime WebSocket client closes the connection when the browser goes offline (unless XWiki is accessed
         // from localhost) and the editor shows that it's disconnected right away.
@@ -90,7 +104,7 @@ public class RealtimeEditToolbar extends BaseElement
             throw new IllegalStateException("The realtime editor didn't notice the connection loss. "
                 + "Note that the connection loss can't be simulated when XWiki is accessed from localhost.");
         }
-        return waitUntilConnected();
+        return waitForReconnect ? waitUntilConnected() : this;
     }
 
     /**

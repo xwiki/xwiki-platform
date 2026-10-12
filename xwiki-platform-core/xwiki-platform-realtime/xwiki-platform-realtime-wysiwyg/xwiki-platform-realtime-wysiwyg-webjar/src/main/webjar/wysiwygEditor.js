@@ -470,8 +470,10 @@ define('xwiki-realtime-wysiwyg', [
       }
       this._connection.oldUserDataJSON = userDataJSON;
 
-      // Update the list of users displayed on the toolbar.
-      const users = this._connection.userList.users.filter(id => userData[id]).map(id => ({id, ...userData[id]}));
+      // Update the list of users displayed on the toolbar. The user list is missing if we failed to join the realtime
+      // session.
+      const users = (this._connection.userList?.users || []).filter(id => userData[id])
+        .map(id => ({id, ...userData[id]}));
       this._connection.toolbar.onUserListChange(users);
 
       // Update the user caret indicators displayed on the side of the text area.
@@ -539,7 +541,8 @@ define('xwiki-realtime-wysiwyg', [
         onLocal: this._onLocal.bind(this),
         onRemote: this._onRemote.bind(this),
         onConnectionChange: this._onConnectionChange.bind(this),
-        beforeReconnecting: this._beforeReconnecting.bind(this)
+        beforeReconnecting: this._beforeReconnecting.bind(this),
+        onError: this._onRealtimeError.bind(this)
       };
     }
 
@@ -566,6 +569,15 @@ define('xwiki-realtime-wysiwyg', [
         return;
       }
 
+      try {
+        await this._joinRealtimeSession(info);
+      } catch (error) {
+        // We failed to join the user data or the saver channel.
+        await this._onRealtimeError(error);
+      }
+    }
+
+    async _joinRealtimeSession(info) {
       this._connection.chainpad = info.realtime;
 
       if (!this._connection.isOnReadyPreviouslyCalled) {
@@ -578,6 +590,8 @@ define('xwiki-realtime-wysiwyg', [
           onChange: this._connection.userList.onChange,
           crypto: Crypto,
           editor: EDITOR_TYPE,
+          // Used to check if the user data channel is still available when the WebSocket connection is restored.
+          getChannel: async () => (await this._realtimeContext.updateChannels()).userData,
           getCursor: () => {
             // We take into account only the first selection range when showing the user cursor.
             let node = this._editor.getSelection()[0]?.startContainer;
@@ -734,6 +748,16 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     async _beforeReconnecting(callback) {
+      try {
+        await this._reconnect(callback);
+      } catch (error) {
+        // We failed to fetch the channels (e.g. because the user session has expired) or to rejoin the realtime
+        // session.
+        await this._onRealtimeError(error);
+      }
+    }
+
+    async _reconnect(callback) {
       const oldChannel = this._channel;
       await this._updateChannels();
       if (this._channel === oldChannel) {
@@ -752,6 +776,26 @@ define('xwiki-realtime-wysiwyg', [
         this.setEditable(true);
         await this._startRealtimeSync();
       }
+    }
+
+    /**
+     * Called when we fail to join or rejoin the realtime session. We leave the realtime session and let the user
+     * continue editing alone. The user can try to join the realtime session again using the "Allow Realtime
+     * Collaboration" checkbox.
+     *
+     * @param {*} error the reason why we failed to join the realtime session
+     */
+    async _onRealtimeError(error) {
+      if (this._connection.status === ConnectionStatus.DISCONNECTED) {
+        // We already left the realtime session (e.g. because of a previous error).
+        return;
+      }
+
+      console.error('Failed to join the realtime session.', error);
+      await this._onAbort();
+      // The checkbox is disabled while we're trying to join the realtime session.
+      Interface.getAllowRealtimeCheckbox().prop('disabled', false);
+      XWiki.widgets.Notification.show(Messages['join.error'], 'error');
     }
 
     async _onAbort() {

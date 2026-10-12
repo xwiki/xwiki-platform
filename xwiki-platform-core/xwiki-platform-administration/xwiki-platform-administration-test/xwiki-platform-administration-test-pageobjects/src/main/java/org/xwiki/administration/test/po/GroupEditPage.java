@@ -101,7 +101,7 @@ public class GroupEditPage extends InlinePage
         }
         picker.hideSuggestions();
         clickAddMemberButton();
-        waitForNotificationSuccessMessage("Members successfully added");
+        waitForMembersUpdate("Members successfully added");
         return this;
     }
 
@@ -112,14 +112,31 @@ public class GroupEditPage extends InlinePage
             for (WebElement row : getMembersTable().getRows()) {
                 if (Objects.equals(getRowUserName(row), member)) {
                     getMembersTable().clickAction(index, "delete");
-                    // Wait for the confirmation message before moving to the next member.
-                    waitForNotificationSuccessMessage("Member successfully removed from group");
+                    // Wait for the members live data to be reloaded before moving to the next member.
+                    waitForMembersUpdate("Member successfully removed from group");
                     break;
                 }
                 index++;
             }
         }
         return this;
+    }
+
+    /**
+     * Waits for the success notification of a members change and then for the members live data to be reloaded.
+     * <p>
+     * The success notification is not enough: it is displayed right after the live data reload is triggered, but
+     * before the reload completes, so the members table can still show the previous members at that point. The live
+     * data reload is started synchronously, in the same JavaScript task that displays the notification, so the live
+     * data is already marked as loading when the notification becomes visible, and waiting for it to be ready thus
+     * waits for the reload to complete.
+     *
+     * @param message the expected success notification message
+     */
+    private void waitForMembersUpdate(String message)
+    {
+        waitForNotificationSuccessMessage(message);
+        getMembersTable().waitUntilReady();
     }
 
     public void filterMembers(String member)

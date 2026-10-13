@@ -20,7 +20,9 @@
 package org.xwiki.tour.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -34,6 +36,16 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class PageWithTour extends ViewPage
 {
+    private static final By SHOWN_STEP = By.cssSelector(".tour.in");
+
+    private static final By PREVIOUS_BUTTON = By.id("bootstrap_tour_prev");
+
+    private static final By NEXT_BUTTON = By.id("bootstrap_tour_next");
+
+    private static final By END_BUTTON = By.cssSelector(".popover-navigation #bootstrap_tour_end");
+
+    private static final By CLOSE_BUTTON = By.id("bootstrap_tour_close");
+
     public static PageWithTour gotoPage(String space, String page)
     {
         return gotoPage(new LocalDocumentReference(space, page));
@@ -58,7 +70,12 @@ public class PageWithTour extends ViewPage
 
     public boolean isTourDisplayed()
     {
-        return getDriver().hasElement(By.className("tour"));
+        try {
+            findStepElement(By.className("tour"));
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
     }
 
     public String getStepTitle()
@@ -95,7 +112,7 @@ public class PageWithTour extends ViewPage
     {
         return getDriver().waitUntilCondition(driver -> {
             try {
-                String text = driver.findElement(locator).getText();
+                String text = findStepElement(locator).getText();
                 return text.isEmpty() ? null : text;
             } catch (StaleElementReferenceException e) {
                 return null;
@@ -105,23 +122,40 @@ public class PageWithTour extends ViewPage
 
     public boolean hasPreviousStep()
     {
-        return getDriver().hasElementWithoutWaiting(By.xpath("//a[@id='bootstrap_tour_prev']"));
+        return getDriver().hasElementWithoutWaitingWithoutScrolling(PREVIOUS_BUTTON);
     }
 
     public boolean hasNextStep()
     {
-        return getDriver().hasElementWithoutWaiting(By.xpath("//a[@id='bootstrap_tour_next']"));
+        return getDriver().hasElementWithoutWaitingWithoutScrolling(NEXT_BUTTON);
     }
 
     public boolean hasEndButton()
     {
-        return getDriver().hasElementWithoutWaiting(
-            By.xpath("//div[contains(@class, 'popover-navigation')]//a[@id='bootstrap_tour_end']"));
+        return getDriver().hasElementWithoutWaitingWithoutScrolling(END_BUTTON);
     }
 
     private String getStepId()
     {
-        return getDriver().findElement(By.className("tour")).getAttribute("id");
+        return findStepElement(By.className("tour")).getAttribute("id");
+    }
+
+    /**
+     * Look for an element of the displayed step popover, without scrolling it into view.
+     * <p>
+     * The tour already scrolls the page to show the step popover next to the element of the step. Scrolling it into
+     * view again (as {@link org.xwiki.test.ui.XWikiWebDriver#findElement(By)} does, by aligning the element with the
+     * top of the viewport) moves the page under the popover, and the tour reacts to that scroll by replacing the
+     * popover with a new one (from its debounced window scroll listener), placed somewhere else in the viewport. A
+     * click computed against the replaced popover then lands on the tour backdrop and the tour silently stays on the
+     * same step.
+     *
+     * @param locator the locator of the element to look for
+     * @return the element, without scrolling the page
+     */
+    private WebElement findStepElement(By locator)
+    {
+        return getDriver().findElementWithoutScrolling(locator);
     }
 
     public void previousStep()
@@ -129,7 +163,7 @@ public class PageWithTour extends ViewPage
         // Get the current step id
         String stepId = getStepId();
         // Click
-        clickStepButton(By.xpath("//a[@id='bootstrap_tour_prev']"));
+        clickStepButton(PREVIOUS_BUTTON);
         // Wait until current state disappears
         getDriver().waitUntilCondition(
             ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(stepId))));
@@ -142,7 +176,7 @@ public class PageWithTour extends ViewPage
         // Get the current step id
         String stepId = getStepId();
         // Click
-        clickStepButton(By.xpath("//a[@id='bootstrap_tour_next']"));
+        clickStepButton(NEXT_BUTTON);
         // Wait until current state disappears
         getDriver().waitUntilCondition(
             ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(stepId))));
@@ -152,14 +186,14 @@ public class PageWithTour extends ViewPage
 
     public void end()
     {
-        clickStepButton(By.xpath("//div[contains(@class, 'popover-navigation')]//a[@id='bootstrap_tour_end']"));
+        clickStepButton(END_BUTTON);
         getDriver().waitUntilCondition(
             ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("tour"))));
     }
 
     public void close()
     {
-        clickStepButton(By.xpath("//a[@id='bootstrap_tour_close']"));
+        clickStepButton(CLOSE_BUTTON);
         getDriver().waitUntilCondition(
             ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("tour"))));
     }
@@ -206,7 +240,7 @@ public class PageWithTour extends ViewPage
         // matched while the popover is invisible, and the popover can be replaced by a new one meanwhile.
         return getDriver().waitUntilCondition(driver -> {
             try {
-                return driver.findElement(By.cssSelector(".tour .popover-content")).findElement(By.linkText(linkLabel))
+                return findStepElement(By.cssSelector(".tour .popover-content")).findElement(By.linkText(linkLabel))
                     .getDomAttribute("href");
             } catch (StaleElementReferenceException e) {
                 return null;
@@ -227,28 +261,28 @@ public class PageWithTour extends ViewPage
     }
 
     /**
-     * Click a button of the displayed step popover, once that popover has stopped moving.
+     * Click a button of the displayed step popover, once that popover is fully shown.
      * <p>
-     * When the tour scrolls the page to the element of a step, the step popover can be displayed while the page is
-     * still scrolling (it's shown both at the end of the scroll animation and from the tour's debounced window scroll
-     * listener), so it keeps moving for a moment after it becomes visible. WebDriver computes where to click before
-     * dispatching the click, so a click on a moving popover can land on the tour backdrop instead of the button, and
-     * then the tour silently stays on the same step. Hence we wait until the popover is fully shown and keeps the same
-     * position in the viewport between two polls.
+     * The step popover fades in, and the tour can replace it by a new one that fades in again (it shows it both at the
+     * end of its scroll animation and from its debounced window scroll listener). Hence we wait for a popover that is
+     * fully opaque, and look for it again if it's replaced before we click its button. The popover isn't scrolled into
+     * view, see {@link #findStepElement(By)}.
      *
-     * @param buttonLocator the locator of the button to click
+     * @param buttonLocator the locator of the button to click, inside the popover
      */
     private void clickStepButton(By buttonLocator)
     {
-        String[] lastPosition = new String[1];
         getDriver().waitUntilCondition(driver -> {
-            Object position = getDriver().executeJavascript("const popover = document.querySelector('.tour.in');"
-                + "return popover && getComputedStyle(popover).opacity === '1'"
-                + " ? JSON.stringify(popover.getBoundingClientRect()) : null;");
-            boolean settled = position != null && position.equals(lastPosition[0]);
-            lastPosition[0] = (String) position;
-            return settled;
+            try {
+                WebElement popover = findStepElement(SHOWN_STEP);
+                if (!"1".equals(popover.getCssValue("opacity"))) {
+                    return false;
+                }
+                popover.findElement(buttonLocator).click();
+                return true;
+            } catch (StaleElementReferenceException e) {
+                return false;
+            }
         });
-        getDriver().findElement(buttonLocator).click();
     }
 }

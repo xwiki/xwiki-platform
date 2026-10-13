@@ -154,6 +154,8 @@ public class CKEditorToolBar extends BaseElement
      * entry is disabled.
      *
      * @return the page object for the office importer modal
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public OfficeImporterDialog importOfficeFile()

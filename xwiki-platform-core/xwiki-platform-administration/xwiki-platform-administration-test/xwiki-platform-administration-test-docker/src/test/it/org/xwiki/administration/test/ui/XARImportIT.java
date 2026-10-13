@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +34,15 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -670,8 +675,13 @@ class XARImportIT
         HttpPost request = new HttpPost(
             setup.getCurrentExecutor().getHttpClientBaseURL() + setup.getPath(reference, "export", ""));
         request.setEntity(new UrlEncodedFormEntity(formParameters, StandardCharsets.UTF_8));
-        try (CloseableHttpResponse response =
-            TestUtils.assertStatusCodes(setup.execute(request), false, HttpStatus.SC_OK)) {
+        UsernamePasswordCredentials credentials = setup.getDefaultCredentials();
+        String auth = credentials.getUserName() + ":" + credentials.getPassword();
+        request.setHeader(HttpHeaders.AUTHORIZATION,
+            "Basic " + Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8)));
+        try (CloseableHttpClient client = HttpClients.createDefault();
+            CloseableHttpResponse response = client.execute(request)) {
+            assertEquals(HttpStatus.SC_OK, response.getCode());
             return EntityUtils.toByteArray(response.getEntity());
         }
     }

@@ -19,6 +19,9 @@
  */
 package org.xwiki.tour.test.po;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -86,6 +89,46 @@ public class PageWithTour extends ViewPage
     public String getStepDescription()
     {
         return getShownStepElement(By.className("popover-content"));
+    }
+
+    /**
+     * @return {@code true} if the step popover is announced to assistive technologies as a modal dialog
+     * @since 18.9.0RC1
+     */
+    public boolean isStepModalDialog()
+    {
+        return readShownStep(step -> "dialog".equals(step.getDomAttribute("role"))
+            && "true".equals(step.getDomAttribute("aria-modal")));
+    }
+
+    /**
+     * @return the text of the element that labels the step popover for assistive technologies, or {@code null} if
+     *     the step popover has no label
+     * @since 18.9.0RC1
+     */
+    public String getStepDialogLabel()
+    {
+        String labelId = readShownStep(step -> step.getDomAttribute("aria-labelledby"));
+        return labelId == null ? null : getShownStepElement(By.id(labelId));
+    }
+
+    /**
+     * Read some information from the displayed step popover, looking for the popover again if it's replaced by a new
+     * one meanwhile, for the same reasons as in {@link #getShownStepElement(By)}.
+     *
+     * @param reader the function reading the information from the step popover
+     * @param <T> the type of the information
+     * @return the information read
+     */
+    private <T> T readShownStep(Function<WebElement, T> reader)
+    {
+        return getDriver().waitUntilCondition(driver -> {
+            try {
+                return Optional.ofNullable(reader.apply(findStepElement(SHOWN_STEP)));
+            } catch (NoSuchElementException | StaleElementReferenceException e) {
+                return null;
+            }
+        }).orElse(null);
     }
 
     /**

@@ -23,7 +23,6 @@
       <BlocknoteEditor
         v-if="editorContent"
         ref="editor"
-        :key="editorGeneration"
         :editor-props
         :editor-content
         :deps-container="container"
@@ -199,12 +198,6 @@ const value = ref(initialValue);
 const dirty = ref(false);
 const isLoading = ref(true);
 
-// Bumped to recreate the editor, which is the only way to attach a collaboration session joined after it was created.
-const editorGeneration = ref(0);
-
-// Whether the local user has typed since the editor was created.
-let contentModifiedLocally = false;
-
 let blockNoteDocument: BlockNoteDocument | undefined;
 
 // This is passed to the BlockNote editor component.
@@ -348,9 +341,6 @@ const editorProps = shallowRef<
 const collaboration: Ref<Collaboration | undefined> = ref(undefined);
 let collaborationManager: CollaborationManager | undefined = undefined;
 const collaborationKey: Ref<string | undefined> = ref();
-let collaborationRetryTimeout: ReturnType<typeof setTimeout> | undefined;
-let collaborationRetryCount = 0;
-let unmounted = false;
 
 // Resolved before the collaboration session is joined, so that creating the auto-saver doesn't have to wait for it.
 let autoSaveVersionSummary: string | undefined;
@@ -366,7 +356,7 @@ onBeforeMount(async () => {
     try {
       await joinCollaborationSession(collaborationURL, docRef);
     } catch (error) {
-      await onCollaborationUnavailable(error, collaborationURL, docRef);
+      await onCollaborationUnavailable(error);
     }
   }
 
@@ -396,66 +386,20 @@ async function joinCollaborationSession(
 }
 
 /**
- * Called when the collaboration session can't be joined. Realtime editing is a bonus, so the editor still has to load
- * without it, and we keep trying to join in the background.
+ * Called when the collaboration session can't be joined. Realtime editing is disabled for the rest of the editing
+ * session: the editor still loads, but the changes are not shared with the other users.
  *
  * @param error - the reason the session couldn't be joined
- * @param url - the URL of the collaboration server
- * @param reference - the reference of the document to collaborate on
  */
-async function onCollaborationUnavailable(
-  error: unknown,
-  url: string,
-  reference: DocumentReference,
-): Promise<void> {
+async function onCollaborationUnavailable(error: unknown): Promise<void> {
   console.warn("Failed to join the realtime collaboration session.", error);
   new XWiki.widgets.Notification(
     await translate("collaboration.unavailable"),
     "warning",
   );
-  scheduleCollaborationRetry(url, reference);
-}
-
-/**
- * Keep trying to join the collaboration session in the background, and recreate the editor to attach it once we get
- * in. We give up as soon as the local user types, because their changes are not in the shared document and we have no
- * way to merge them into a session that may already hold the content of other users.
- *
- * @param url - the URL of the collaboration server
- * @param reference - the reference of the document to collaborate on
- */
-function scheduleCollaborationRetry(
-  url: string,
-  reference: DocumentReference,
-): void {
-  if (unmounted) {
-    return;
-  }
-  // Back off like the Yjs WebSocket provider does, so that a server that stays down is not hammered.
-  const delay = Math.min(2 ** collaborationRetryCount++ * 1000, 30000);
-  collaborationRetryTimeout = setTimeout(async () => {
-    if (contentModifiedLocally) {
-      return;
-    }
-    try {
-      await joinCollaborationSession(url, reference);
-      if (unmounted) {
-        // Nothing is going to use the session we just joined, so don't hold it open.
-        collaborationManager?.leave();
-        return;
-      }
-      // Recreating the editor loads the content from the shared document, which is why we only do it while the user
-      // hasn't typed: what they would lose is exactly what the shared document doesn't have.
-      editorGeneration.value++;
-    } catch {
-      scheduleCollaborationRetry(url, reference);
-    }
-  }, delay);
 }
 
 onUnmounted(() => {
-  unmounted = true;
-  clearTimeout(collaborationRetryTimeout);
   // The collaboration manager stops the auto-saver when the last editor leaves the session.
   collaborationManager?.leave();
 });
@@ -465,7 +409,6 @@ onUnmounted(() => {
  * neither the initial content load nor the updates received from the other collaborators are counted.
  */
 function onLocalInstantChange(): void {
-  contentModifiedLocally = true;
   collaboration.value?.saver?.contentModifiedLocally();
 }
 

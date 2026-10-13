@@ -32,7 +32,11 @@ import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
 import org.xwiki.rendering.internal.macro.message.InfoMessageMacro;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authentication.RegistrationConfiguration;
+import org.xwiki.security.authentication.script.RegistrationScriptService;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.internal.macro.TemplateMacro;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -66,11 +70,13 @@ import static org.mockito.Mockito.when;
 @HTML50ComponentList
 @XWikiSyntax20ComponentList
 @XWikiSyntax21ComponentList
+@SecurityScriptServiceComponentList
 @ComponentList({
     CSRFTokenScriptService.class,
     ErrorMessageMacro.class,
     InfoMessageMacro.class,
     ModelScriptService.class,
+    RegistrationScriptService.class,
     TemplateMacro.class
 })
 class RegistrationPageTest extends PageTest
@@ -82,6 +88,9 @@ class RegistrationPageTest extends PageTest
 
     @MockComponent
     private CSRFToken csrfToken;
+
+    @MockComponent
+    private RegistrationConfiguration registrationConfiguration;
 
     @BeforeEach
     void setUp() throws Exception
@@ -156,17 +165,44 @@ class RegistrationPageTest extends PageTest
 
 
     @Test
-    void keepsPermissionsWhenInvited() throws Exception
+    void keepsPermissionsWhenInvitedRegistrationIsAllowed() throws Exception
     {
         when(this.oldcore.getMockRightService().hasProgrammingRights(any())).thenReturn(true);
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("register"), any(), any(), any())).thenReturn(false);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.PROGRAM)).thenReturn(true);
         XWikiDocument registration = loadPage(REGISTRATION);
-        // The Invitation application sets $invited before including the page.
+        // The Invitation application allows the registration before including the page.
         this.context.setDoc(new XWikiDocument(new DocumentReference("xwiki", "Invitation", "InvitationGuestActions")));
+        assertTrue(getRegistrationScriptService().allowInvitedRegistration());
+
+        String result = registration.getRenderedContent(this.context);
+
+        assertFalse(this.context.hasDroppedPermissions());
+        // The registration form is displayed although the register right is denied.
+        assertTrue(result.contains("id=\"register\""));
+        // The permission applies to a single display of the page.
+        assertFalse(getRegistrationScriptService().claimInvitedRegistration());
+    }
+
+    @Test
+    void ignoresInvitedVariable() throws Exception
+    {
+        when(this.oldcore.getMockRightService().hasProgrammingRights(any())).thenReturn(true);
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("register"), any(), any(), any())).thenReturn(false);
+        XWikiDocument registration = loadPage(REGISTRATION);
+        // Any script including the page can set Velocity variables, so they cannot allow the registration.
+        this.context.setDoc(new XWikiDocument(new DocumentReference("xwiki", "Space", "IncludingPage")));
         this.componentManager.<ScriptContextManager>getInstance(ScriptContextManager.class).getCurrentScriptContext()
             .setAttribute("invited", true, ScriptContext.ENGINE_SCOPE);
 
-        registration.getRenderedContent(this.context);
+        String result = registration.getRenderedContent(this.context);
 
-        assertFalse(this.context.hasDroppedPermissions());
+        assertTrue(this.context.hasDroppedPermissions());
+        assertFalse(result.contains("id=\"register\""));
+    }
+
+    private RegistrationScriptService getRegistrationScriptService() throws Exception
+    {
+        return this.componentManager.getInstance(ScriptService.class, "security.registration");
     }
 }

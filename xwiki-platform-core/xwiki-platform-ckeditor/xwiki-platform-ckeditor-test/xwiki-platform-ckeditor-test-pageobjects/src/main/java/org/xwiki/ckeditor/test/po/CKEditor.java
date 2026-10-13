@@ -172,6 +172,8 @@ public class CKEditor extends BaseElement
 
     /**
      * @return the edited source, but you need to switch to Source first
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getSource()
@@ -181,6 +183,8 @@ public class CKEditor extends BaseElement
 
     /**
      * @return the offset in the edited source where the selection starts, but you need to switch to Source first
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public int getSourceSelectionStart()
@@ -190,6 +194,8 @@ public class CKEditor extends BaseElement
 
     /**
      * @return the offset in the edited source where the selection ends, but you need to switch to Source first
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public int getSourceSelectionEnd()
@@ -199,6 +205,8 @@ public class CKEditor extends BaseElement
 
     /**
      * @return the source text that is currently selected, but you need to switch to Source first
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getSourceSelectedText()

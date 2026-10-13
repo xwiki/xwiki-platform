@@ -104,6 +104,8 @@ public class ImportAdministrationSectionPage extends ViewPage
     /**
      * Click the "none" link of the package explorer, which unselects all the documents of the package.
      *
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void selectNoDocuments()
@@ -114,6 +116,8 @@ public class ImportAdministrationSectionPage extends ViewPage
     /**
      * Click the "all" link of the package explorer, which selects all the documents of the package.
      *
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void selectAllDocuments()

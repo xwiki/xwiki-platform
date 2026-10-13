@@ -91,6 +91,8 @@ public class ExportModal extends BaseModal
      *
      * @param format the label of the export format (e.g. "ODT"), which must be listed (i.e. enabled)
      * @return the absolute URL of the export of the current page in the given format
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getExportURL(String format)

@@ -48,6 +48,8 @@ public class DeletedAttachmentsPage extends ViewPage
      * Filters the deleted attachments on the "Page" column and waits for the table to be reloaded.
      *
      * @param location the text to look for in the location of the page the attachments were deleted from
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void filterByLocation(String location)
@@ -59,6 +61,8 @@ public class DeletedAttachmentsPage extends ViewPage
      * Filters the deleted attachments on the "Deleted by" column and waits for the table to be reloaded.
      *
      * @param deleter the text to look for in the name of the user who deleted the attachments
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void filterByDeleter(String deleter)
@@ -72,6 +76,8 @@ public class DeletedAttachmentsPage extends ViewPage
      *
      * @param fileName the name of the deleted attachment, as displayed in the "Attachment" column; its row must be
      *     displayed
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void deletePermanently(String fileName)

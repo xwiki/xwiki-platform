@@ -174,6 +174,8 @@ public class ViewPage extends BasePage
      * entry of the "More actions" menu.
      *
      * @return element for controlling the comments of the comments viewer
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public CommentsTab openCommentsViewerFromMoreActions()
@@ -271,6 +273,8 @@ public class ViewPage extends BasePage
      *
      * @param sectionNumber the number of the section to edit, starting at 1
      * @return the wiki editor, displaying only the content of the section
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public WikiEditPage editSectionInWikiEditor(int sectionNumber)
@@ -430,6 +434,8 @@ public class ViewPage extends BasePage
 
     /**
      * @return the texts displayed in bold in the content of the page, in the order in which they are displayed
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public List<String> getBoldTexts()
@@ -442,6 +448,8 @@ public class ViewPage extends BasePage
      * @param label the label of a link displayed in the content of the page
      * @return the target of the first link from the content of the page that has the given label, as specified in the
      *         HTML (i.e. not resolved against the page URL), or {@code null} if there's no such link
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getContentLinkTarget(String label)
@@ -455,6 +463,8 @@ public class ViewPage extends BasePage
      * @param imageName the name of an image displayed in the content of the page (e.g. its attachment file name)
      * @return the caption of the first captioned image from the content of the page whose source contains the given
      *         image name, or {@code null} if there's no such captioned image
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getImageCaption(String imageName)

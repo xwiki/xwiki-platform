@@ -193,6 +193,8 @@ public class LiveTableElement extends BaseElement
      *
      * @param columnTitle the title of the live table column
      * @return the text of each cell of the specified column
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public List<String> getColumnValues(String columnTitle)

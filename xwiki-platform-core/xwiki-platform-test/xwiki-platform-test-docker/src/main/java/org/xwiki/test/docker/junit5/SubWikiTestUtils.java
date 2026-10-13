@@ -40,6 +40,8 @@ import org.xwiki.wiki.user.UserScope;
  * Inject it as a test (or {@code @BeforeAll}) method parameter.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class SubWikiTestUtils

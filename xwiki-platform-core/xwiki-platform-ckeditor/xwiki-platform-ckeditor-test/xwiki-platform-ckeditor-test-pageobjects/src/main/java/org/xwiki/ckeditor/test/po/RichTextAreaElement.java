@@ -170,6 +170,8 @@ public class RichTextAreaElement extends BaseElement
      * Clicks on the caption of a captioned image from the edited content, e.g. to edit the caption in-line.
      *
      * @param captionedImageIndex the index of the captioned image, among the captioned images from the edited content
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void clickImageCaption(int captionedImageIndex)

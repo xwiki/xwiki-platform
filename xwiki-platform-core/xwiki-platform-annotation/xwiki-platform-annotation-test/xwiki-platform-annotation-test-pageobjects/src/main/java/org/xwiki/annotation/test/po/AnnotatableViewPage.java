@@ -155,6 +155,8 @@ public class AnnotatableViewPage extends BaseElement
      *
      * @param annotatedText the text selected by the annotation
      * @return the reply form, in the Comments tab
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public CommentForm replyToAnnotationByText(String annotatedText)
@@ -185,6 +187,8 @@ public class AnnotatableViewPage extends BaseElement
      * Waits until the specified number of annotations is displayed on the page, e.g. after an annotation is deleted.
      *
      * @param count the expected number of displayed annotations
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void waitUntilAnnotationCount(int count)

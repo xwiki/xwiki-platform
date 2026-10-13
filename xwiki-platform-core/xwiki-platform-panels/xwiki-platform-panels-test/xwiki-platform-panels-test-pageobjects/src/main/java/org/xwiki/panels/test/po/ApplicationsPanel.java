@@ -79,6 +79,8 @@ public class ApplicationsPanel extends ViewPage
      * own!" entry) can be clicked.
      *
      * @return this panel
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public ApplicationsPanel clickMoreApplications()
@@ -92,6 +94,8 @@ public class ApplicationsPanel extends ViewPage
     /**
      * @param applicationName the label of the application entry
      * @return the HTML of the icon displayed for the specified application entry
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getApplicationIcon(String applicationName)

@@ -81,6 +81,8 @@ public class NotificationsContainerElement extends BaseElement
      *
      * @param expectedCount the minimum number of notifications to wait for
      * @return an instance of {@link NotificationsContainerElement} located on the up-to-date page
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.6.0RC1
      */
     public static NotificationsContainerElement waitUntilNotificationCount(int expectedCount)
@@ -95,6 +97,8 @@ public class NotificationsContainerElement extends BaseElement
      *
      * @param condition the condition that the displayed notifications must match
      * @return an instance of {@link NotificationsContainerElement} located on the up-to-date page
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public static NotificationsContainerElement waitUntilNotifications(
@@ -164,6 +168,8 @@ public class NotificationsContainerElement extends BaseElement
      *
      * @param type the type of the notification to find, for instance {@code update} or {@code addComment}
      * @return the index of the first notification of that type in the list, or {@code -1} if there is none
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public int getNotificationIndex(String type)
@@ -275,6 +281,8 @@ public class NotificationsContainerElement extends BaseElement
     /**
      * @param notificationNumber index of the notification in the list
      * @return {@code true} if the notification is displayed as unread
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public boolean isNotificationUnread(int notificationNumber)

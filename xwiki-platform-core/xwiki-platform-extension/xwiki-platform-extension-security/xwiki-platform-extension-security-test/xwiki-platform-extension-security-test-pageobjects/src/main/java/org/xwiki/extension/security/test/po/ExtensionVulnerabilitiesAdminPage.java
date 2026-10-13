@@ -27,7 +27,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**

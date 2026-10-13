@@ -344,6 +344,10 @@ public class ExtensionIndexStore implements Initializable, Disposable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Extension.FIELD_VERSION,
             extensionId.getVersion().getValue(), doc);
 
+        // The analyzed extension is not necessarily indexed yet (for example an extension coming from a non searchable
+        // repository like Maven Central), in which case this update creates its document, so set its installed state.
+        this.extensionIndexSolrUtil.updateInstalledState(extensionId, doc);
+
         if (!result.getSecurityVulnerabilities().isEmpty()) {
             this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS, result.getMaxCVSS(), doc);
         } else {

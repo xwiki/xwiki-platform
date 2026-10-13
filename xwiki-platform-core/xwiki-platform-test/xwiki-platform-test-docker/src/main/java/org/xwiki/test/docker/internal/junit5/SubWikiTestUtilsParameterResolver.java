@@ -29,6 +29,8 @@ import org.xwiki.test.ui.PersistentTestContext;
  * Add support for injecting {@link SubWikiTestUtils} as a parameter in JUnit 5 tests.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class SubWikiTestUtilsParameterResolver implements ParameterResolver

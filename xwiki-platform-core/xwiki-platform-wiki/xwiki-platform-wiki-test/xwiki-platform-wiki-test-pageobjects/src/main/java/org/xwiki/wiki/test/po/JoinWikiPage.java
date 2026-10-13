@@ -27,6 +27,8 @@ import org.openqa.selenium.support.FindBy;
  * Represents the {@code WikiManager.JoinWiki} page, where a user joins a wiki whose membership type is open.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class JoinWikiPage extends ExtendedViewPage

@@ -83,6 +83,8 @@ public class InplaceEditablePage extends ViewPage
      * Hover the Translate button and wait for its popover.
      *
      * @return the title of the popover displayed when hovering the Translate button, i.e. the button tooltip
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getTranslateButtonHint()
@@ -95,6 +97,8 @@ public class InplaceEditablePage extends ViewPage
      * Wait for the popover displayed below the page title input when starting to translate the page.
      *
      * @return the hint displayed below the page title input
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getDocumentTitleHint()
@@ -117,6 +121,8 @@ public class InplaceEditablePage extends ViewPage
      *
      * @param locale the locale to switch to
      * @return the page object for the reloaded page
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public InplaceEditablePage switchToLocale(Locale locale)

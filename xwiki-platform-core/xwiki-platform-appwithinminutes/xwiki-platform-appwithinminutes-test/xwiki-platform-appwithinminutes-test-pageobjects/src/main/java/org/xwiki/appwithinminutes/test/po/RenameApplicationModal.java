@@ -29,6 +29,8 @@ import org.xwiki.test.ui.po.DocumentPicker;
  * home page.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class RenameApplicationModal extends BaseModal

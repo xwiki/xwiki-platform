@@ -62,7 +62,11 @@ import static org.hamcrest.Matchers.not;
     extraJARs = {
         // The office macro and the viewer it relies on are not part of the minimal WAR built for the tests.
         "org.xwiki.platform:xwiki-platform-office-macro",
-        "org.xwiki.platform:xwiki-platform-office-viewer"
+        "org.xwiki.platform:xwiki-platform-office-viewer",
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index"
     }
 )
 class OfficeMacroIT

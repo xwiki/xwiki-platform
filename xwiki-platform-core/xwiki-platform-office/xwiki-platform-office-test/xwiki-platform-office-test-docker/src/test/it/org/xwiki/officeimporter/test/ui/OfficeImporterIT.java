@@ -74,6 +74,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
         // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference)
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.OfficeImporterAdmin"
+    },
+    extraJARs = {
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index"
     }
 )
 class OfficeImporterIT

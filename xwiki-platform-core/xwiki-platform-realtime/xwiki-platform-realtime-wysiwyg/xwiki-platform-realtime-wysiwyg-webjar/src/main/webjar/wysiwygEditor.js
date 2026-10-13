@@ -392,9 +392,14 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     async _createSaver(info) {
+      // The changes we didn't save before rejoining the realtime session, if any (see _reconnect).
+      const unsavedChanges = this._connection.unsavedChanges;
+      delete this._connection.unsavedChanges;
+
       // Remember the last saved content in order to be able to restore unsaved changes in case the user leaves the edit
       // mode or closes the browser tab / window without saving.
-      this._connection.lastSavedContent = this._patchedEditor.getHyperJSON() || '{}';
+      this._connection.lastSavedContent = unsavedChanges?.lastSavedContent || this._patchedEditor.getHyperJSON() ||
+        '{}';
       this._saver = await new Saver({
         // Edit form ID.
         formId: RealtimeEditor._getFormId(),
@@ -419,6 +424,11 @@ define('xwiki-realtime-wysiwyg', [
           this._connection.toolbar?.onCreateVersion(version);
         }
       }).toBeReady();
+
+      if (unsavedChanges) {
+        // Mark the content as dirty in order to show the right save status and to trigger the auto-save.
+        this._saver.contentModifiedLocally();
+      }
     }
 
     async _resetContent() {
@@ -765,8 +775,13 @@ define('xwiki-realtime-wysiwyg', [
         callback(this._channel, this._patchedEditor.getHyperJSON());
       } else {
         // The Netflux channels used before the WebSocket connection closed are not available anymore so we have to
-        // abort the current realtime session and then rejoin using the new channels.
+        // abort the current realtime session and then rejoin using the new channels. We rejoin with a new saver that
+        // doesn't know about the changes we didn't save before the WebSocket connection was closed, and these changes
+        // aren't detected as local changes when we rejoin because they are already part of the realtime content.
+        const unsavedChanges = this._saver?.isDirty() && {lastSavedContent: this._connection.lastSavedContent};
         await this._onAbort();
+        // Let the new saver know about our unsaved changes (see _createSaver).
+        this._connection.unsavedChanges = unsavedChanges;
 
         // The editor was previously put in read-only mode when we got disconnected from the WebSocket (i.e. when
         // the WebSocket connection status changed, see above). The editor takes into account nested calls to

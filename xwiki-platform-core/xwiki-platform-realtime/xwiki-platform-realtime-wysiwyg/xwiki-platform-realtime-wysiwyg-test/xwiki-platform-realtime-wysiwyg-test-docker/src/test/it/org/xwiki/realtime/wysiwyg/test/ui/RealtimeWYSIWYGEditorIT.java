@@ -195,22 +195,31 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Edit again to verify the autosave.
         inplaceEditablePage.editInplace();
+        editor = new RealtimeCKEditor();
+        textArea = editor.getRichTextArea();
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        textArea.sendKeys("ze");
+        inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
 
         // Verify that we reconnect after a connection loss. We're editing alone, so the server removes the realtime
         // session when we're disconnected and we have to join a new one (regression test for XWIKI-25236).
         inplaceEditablePage.getToolbar().simulateConnectionLoss();
 
+        // The changes we made before the connection loss are still unsaved.
+        assertEquals(SaveStatus.UNSAVED, inplaceEditablePage.getToolbar().getSaveStatus());
+
+        // We can continue editing (at the end of the first line), once the content is editable again.
         editor = new RealtimeCKEditor();
         textArea = editor.getRichTextArea();
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
-        textArea.sendKeys("zero");
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.HOME));
+        textArea.sendKeys(Keys.END, "ro");
+        textArea.waitUntilTextContains("zero");
 
         // The user data (e.g. our caret position) is synchronized again.
         assertEquals("John",
             textArea.getCoeditorPosition(inplaceEditablePage.getToolbar().getUserId()).getAvatarHint());
 
         // Wait for auto-save.
-        inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
         inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
 
         setup.leaveEditMode();

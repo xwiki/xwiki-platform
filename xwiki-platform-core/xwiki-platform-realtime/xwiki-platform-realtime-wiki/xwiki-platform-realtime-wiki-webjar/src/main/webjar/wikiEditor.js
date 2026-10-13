@@ -322,7 +322,17 @@ define('xwiki-realtime-wikiEditor', [
       this.onUserListChange(info.userList, this.userData);
       info.userList.change.push(this.onUserListChange.bind(this, info.userList));
 
+      // When we rejoin the realtime session after the WebSocket connection was closed we create a new saver. If we use
+      // the same saver channel, the new saver gets our saver state from the other users, but if the saver channel has
+      // been removed in the mean time (because we were the only one using it) then the new saver doesn't know about the
+      // changes we didn't save before the connection was closed.
+      const hasUnsavedChanges = this.saver?.isDirty() && this.joinedSaverChannel !== this.saverChannel;
       this.saver = await this.createSaver(info);
+      this.joinedSaverChannel = this.saverChannel;
+      if (hasUnsavedChanges) {
+        // Mark the content as dirty in order to show the right save status and to trigger the auto-save.
+        this.saver.contentModifiedLocally();
+      }
       this.initializing = false;
       // Initialize the edited content with the content from the realtime session.
       this.onRemote(info);

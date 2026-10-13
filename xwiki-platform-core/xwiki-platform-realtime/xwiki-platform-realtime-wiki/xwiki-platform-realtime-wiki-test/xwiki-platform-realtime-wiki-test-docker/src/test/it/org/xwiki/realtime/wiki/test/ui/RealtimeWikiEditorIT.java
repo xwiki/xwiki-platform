@@ -27,6 +27,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WindowType;
 import org.xwiki.realtime.test.RealtimeTestUtils;
 import org.xwiki.realtime.test.po.RealtimeEditToolbar;
+import org.xwiki.realtime.test.po.SaveStatus;
 import org.xwiki.realtime.wiki.test.po.RealtimeWikiEditPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -89,6 +90,8 @@ class RealtimeWikiEditorIT
         // session when we're disconnected and we have to join a new one (regression test for XWIKI-25236). Note that
         // our user id changes when we reconnect.
         String firstUserId = firstRtWikiEditor.getToolbar().simulateConnectionLoss().getUserId();
+        // The changes we made before the connection loss are still unsaved.
+        assertEquals(SaveStatus.UNSAVED, firstRtWikiEditor.getToolbar().getSaveStatus());
 
         // Second tab
         String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();

@@ -112,7 +112,10 @@ class WikiCreationRightIT
         setup.loginAsSuperAdmin();
         EditRightsPane rightsPane = WikiCreationRightsAdministrationSectionPage.gotoPage().getEditRightsPane();
         rightsPane.switchToUsers();
-        rightsPane.setRight(WIKI_CREATOR, CREATE_WIKI_RIGHT, EditRightsPane.State.ALLOW);
+        // EditRightsPane#setRight only accepts the Right enum (which has no Create Wiki right) on this branch.
+        while (rightsPane.getRight(WIKI_CREATOR, CREATE_WIKI_RIGHT) != EditRightsPane.State.ALLOW) {
+            rightsPane.clickRight(WIKI_CREATOR, CREATE_WIKI_RIGHT);
+        }
         // Check that the right has been saved.
         rightsPane = WikiCreationRightsAdministrationSectionPage.gotoPage().getEditRightsPane();
         rightsPane.switchToUsers();

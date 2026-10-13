@@ -30,6 +30,8 @@ import org.xwiki.test.ui.po.BaseElement;
  * Models the modal used to import an office file in CKEditor (Insert &gt; Import Office File).
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 @Unstable

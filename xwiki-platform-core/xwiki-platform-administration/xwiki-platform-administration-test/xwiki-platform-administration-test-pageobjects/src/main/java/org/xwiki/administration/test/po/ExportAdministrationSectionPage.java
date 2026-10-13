@@ -36,6 +36,8 @@ import org.xwiki.tree.test.po.TreeNodeElement;
  * Represents the Export administration section (Administer Wiki &gt; Content &gt; Export).
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class ExportAdministrationSectionPage extends AdministrationSectionPage
@@ -43,6 +45,8 @@ public class ExportAdministrationSectionPage extends AdministrationSectionPage
     /**
      * The filters that can be applied on the export tree, from the "Select from" drop-down.
      *
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public enum Filter

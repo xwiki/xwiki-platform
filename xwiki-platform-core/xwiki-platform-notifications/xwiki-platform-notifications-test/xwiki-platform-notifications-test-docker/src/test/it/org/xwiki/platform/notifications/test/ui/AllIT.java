@@ -19,7 +19,10 @@
  */
 package org.xwiki.platform.notifications.test.ui;
 
+import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestClassOrder;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
@@ -29,19 +32,26 @@ import org.xwiki.test.docker.junit5.UITest;
  * @version $Id$
  */
 @UITest
+// NotificationsEmailsIT#liveEmailsOnSubwiki creates events on the subwiki, which
+// NotificationsIT#displayNotificationsOnSubwikis would then list, so NotificationsEmailsIT runs after NotificationsIT.
+// NotificationsSettingsIT still runs last.
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class AllIT
 {
     @Nested
+    @Order(3)
     class NestedNotificationsSettingsIT extends NotificationsSettingsIT
     {
     }
 
     @Nested
+    @Order(1)
     class NestedNotificationsIT extends NotificationsIT
     {
     }
 
     @Nested
+    @Order(2)
     class NestedNotificationsEmailsIT extends NotificationsEmailsIT
     {
     }

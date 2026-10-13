@@ -44,7 +44,6 @@
 @import "misc";
 @import "panels";
 @import "tables";
-@import "tree";
 @import "type";
 @import "vertical-menus";
 @import "xlist";

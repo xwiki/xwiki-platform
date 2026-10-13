@@ -152,6 +152,20 @@ export class XWikiLiveDataSource implements LiveDataSource {
     ).then((newEntry) => newEntry?.values);
   }
 
+  async removeEntry(source: Source, entryId: string): Promise<void> {
+    try {
+      await this.$.ajax({
+        type: "DELETE",
+        url: this.getEntryURL(source, entryId),
+      });
+    } catch (e) {
+      // An entry that is not found has already been deleted.
+      if ((e as JQuery.jqXHR).status !== 404) {
+        throw e;
+      }
+    }
+  }
+
   private getEntriesURL(source: Source) {
     const entriesURL =
       this.baseURL + encodeURIComponent(source.id) + "/entries";

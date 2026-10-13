@@ -84,6 +84,33 @@ export interface Logic {
   getEntryId(entry: Values): string | undefined;
 
   /**
+   * Return a key identifying an entry, stable across the refreshes of the live data and across the creation of the
+   * entry of a new row.
+   * @param entry - an entry
+   * @returns the key of the entry
+   * @since 18.9.0RC1
+   */
+  getEntryKey(entry: Values): string;
+
+  /**
+   * Return the keys of the given entries, in the same order. Each entry gets the key returned by
+   * getEntryKey, made unique among the given entries in case of inconsistent data, for instance
+   * duplicated entry IDs.
+   * @param entries - the entries to get the keys of
+   * @returns the keys of the entries
+   * @since 18.9.0RC1
+   */
+  getEntryKeys(entries: Values[]): string[];
+
+  /**
+   * Delete an entry, or drop the row when its entry does not exist yet.
+   * @param entry - the entry to delete
+   * @returns a promise completing when the entry is deleted
+   * @since 18.9.0RC1
+   */
+  deleteEntry(entry: Values): Promise<void>;
+
+  /**
    * Trigger a refresh of the Live Data.
    * @returns a promise completing when the refresh is done
    */

@@ -59,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -205,6 +206,44 @@ class LiveTableLiveDataEntryStoreTest
 
         assertEquals(Optional.of("NewEntries.uuid"), this.entryStore.save(entry));
         verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true);
+    }
+
+    @Test
+    void remove() throws Exception
+    {
+        Map<String, Object> row = new HashMap<>();
+        row.put("doc_fullName", "MySpace.MyEntry");
+        row.put("status", "done");
+
+        Map<String, Object> liveTableResults = new HashMap<>();
+        liveTableResults.put("totalrows", 1);
+        liveTableResults.put("rows", Collections.singletonList(row));
+
+        when(this.resultsRenderer.getLiveTableResultsFromPage(eq("XWiki.LiveTableResults"), any()))
+            .thenReturn(this.objectMapper.writeValueAsString(liveTableResults));
+        DocumentReference entryReference = new DocumentReference("xwiki", "MySpace", "MyEntry");
+        when(this.currentDocumentReferenceResolver.resolve("MySpace.MyEntry")).thenReturn(entryReference);
+
+        Map<String, Object> expectedEntry = new HashMap<>();
+        expectedEntry.put("doc.fullName", "MySpace.MyEntry");
+        expectedEntry.put("status", "done");
+
+        assertEquals(Optional.of(expectedEntry), this.entryStore.remove("MySpace.MyEntry"));
+        verify(this.modelBridge).delete(entryReference);
+    }
+
+    @Test
+    void removeUnknownEntry() throws Exception
+    {
+        Map<String, Object> liveTableResults = new HashMap<>();
+        liveTableResults.put("totalrows", 0);
+        liveTableResults.put("rows", Collections.emptyList());
+
+        when(this.resultsRenderer.getLiveTableResultsFromPage(eq("XWiki.LiveTableResults"), any()))
+            .thenReturn(this.objectMapper.writeValueAsString(liveTableResults));
+
+        assertEquals(Optional.empty(), this.entryStore.remove("MySpace.MyEntry"));
+        verifyNoInteractions(this.modelBridge);
     }
 
     @Test

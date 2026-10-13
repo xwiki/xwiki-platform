@@ -168,6 +168,7 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
               isEditable() {
                 return true;
               },
+              whenSaved: () => Promise.resolve(),
               onAnyEvent: () => {},
               ...editBus,
             };

@@ -408,6 +408,8 @@ public class ViewPage extends BasePage
      * @param label the label of a link displayed in the content of the page
      * @return the target of the first link from the content of the page that has the given label, as specified in the
      *         HTML (i.e. not resolved against the page URL), or {@code null} if there's no such link
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getContentLinkTarget(String label)
@@ -421,6 +423,8 @@ public class ViewPage extends BasePage
      * @param imageName the name of an image displayed in the content of the page (e.g. its attachment file name)
      * @return the caption of the first captioned image from the content of the page whose source contains the given
      *         image name, or {@code null} if there's no such captioned image
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public String getImageCaption(String imageName)

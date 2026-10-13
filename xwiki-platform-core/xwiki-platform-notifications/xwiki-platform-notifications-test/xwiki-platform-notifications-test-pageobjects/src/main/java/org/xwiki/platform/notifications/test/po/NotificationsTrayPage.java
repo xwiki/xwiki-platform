@@ -213,6 +213,8 @@ public class NotificationsTrayPage extends ViewPage
     /**
      * @return {@code true} if the badge holding the number of unread notifications is displayed on the bell, without
      *     opening the notification tray
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public boolean isCountBadgeDisplayed()

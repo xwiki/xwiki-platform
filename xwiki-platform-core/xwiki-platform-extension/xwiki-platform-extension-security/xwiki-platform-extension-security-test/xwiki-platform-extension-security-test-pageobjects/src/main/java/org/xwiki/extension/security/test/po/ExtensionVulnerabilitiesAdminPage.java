@@ -103,7 +103,6 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
      * @param timeout the maximum time to wait for, in seconds
      * @since 18.9.0RC1
      */
-    @Unstable
     public void waitUntilScanIsDone(int timeout)
     {
         getDriver().waitUntilCondition(driver -> {

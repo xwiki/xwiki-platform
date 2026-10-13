@@ -24,12 +24,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
-import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.index.test.po.DeletedAttachmentsPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -116,8 +116,8 @@ public class DeletedAttachmentsIT
         // The nested page and its deleted "deletedFile1.txt" attachment are created by setUp(). Note that the
         // attachment names are chosen to be sorted after "deletedFile1.txt", since the other tests of this class
         // expect it in the first row of the table, which is sorted by attachment name by default.
-        XWikiCredentials deleter = new XWikiCredentials("DeletedAttachmentsDeleter", "pass");
-        setup.rest().createUser(deleter);
+        UsernamePasswordCredentials deleter = new UsernamePasswordCredentials("DeletedAttachmentsDeleter", "pass");
+        setup.createUser(deleter.getUserName(), deleter.getPassword(), null);
         setup.attachFile(testReference, NESTED_FILE, new ByteArrayInputStream("nested".getBytes()), true);
         DocumentReference terminalPage = new DocumentReference("Terminal", testReference.getLastSpaceReference());
         setup.deletePage(terminalPage);
@@ -126,8 +126,12 @@ public class DeletedAttachmentsIT
         setup.attachFile(terminalPage, TERMINAL_FILE_2, new ByteArrayInputStream("terminal2".getBytes()), true);
         setup.deleteAttachement(new AttachmentReference(NESTED_FILE, testReference));
         setup.deleteAttachement(new AttachmentReference(TERMINAL_FILE_1, terminalPage));
-        setup.rest().runAs(deleter,
-            rest -> rest.deleteAttachement(new AttachmentReference(TERMINAL_FILE_2, terminalPage)));
+        UsernamePasswordCredentials previousCredentials = setup.setDefaultCredentials(deleter);
+        try {
+            setup.deleteAttachement(new AttachmentReference(TERMINAL_FILE_2, terminalPage));
+        } finally {
+            setup.setDefaultCredentials(previousCredentials);
+        }
 
         DeletedAttachmentsPage deletedAttachmentsPage = DeletedAttachmentsPage.gotoPage();
         LiveTableElement livetable = deletedAttachmentsPage.getDeletedAttachmentsLiveTable();

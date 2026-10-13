@@ -133,7 +133,11 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
      */
     public void setIcon(String icon)
     {
-        applicationIconInput.clear();
+        // Replace the value like a user would (focus the input and select its content) instead of using clear(), which
+        // blurs and refocuses the input: that leaves the page keyboard shortcuts enabled for an advanced user, so typed
+        // letters such as 'e' would leave the wizard.
+        applicationIconInput.click();
+        applicationIconInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         applicationIconInput.sendKeys(icon);
         // Send 'escape' to close the icon picker after having filled the input.
         applicationIconInput.sendKeys(Keys.ESCAPE);

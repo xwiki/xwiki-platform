@@ -111,7 +111,7 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
     protected void setLocaleAndContentFields(XWikiAttachment attachment, SolrInputDocument solrDocument)
         throws Exception
     {
-        String attachmentTextContent = getContentAsText(attachment);
+        String attachmentTextContent = getContentAsText(attachment, attachment.getReference());
 
         // Do the work for each locale.
         for (Locale documentLocale : getLocales(attachment.getDoc(), null)) {

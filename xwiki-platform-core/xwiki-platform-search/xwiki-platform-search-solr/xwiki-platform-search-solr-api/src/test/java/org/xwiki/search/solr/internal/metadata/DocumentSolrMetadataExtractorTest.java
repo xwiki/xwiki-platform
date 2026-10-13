@@ -43,6 +43,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.GeneralMailConfiguration;
@@ -58,6 +59,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
+import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.test.LogLevel;
@@ -95,6 +97,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -143,6 +147,11 @@ class DocumentSolrMetadataExtractorTest
     @MockComponent
     @Named("document")
     private SolrReferenceResolver documentSolrReferenceResolver;
+
+    @MockComponent
+    private Provider<SolrIndexer> solrIndexerProvider;
+
+    private SolrIndexer solrIndexer = mock(SolrIndexer.class);
 
     private XWikiContext xcontext = mock(XWikiContext.class);
 
@@ -687,6 +696,59 @@ class DocumentSolrMetadataExtractorTest
     }
 
     @Test
+    void getDocumentWithAttachmentDeletedWhileSaved() throws Exception
+    {
+        XWikiAttachment attachment = createMockAttachment("deleted.txt", "text/plain", new Date(), "", "Alice",
+            "Shy Alice");
+        when(attachment.getContentInputStream(this.xcontext)).thenThrow(new XWikiException());
+        when(this.document.getAttachmentList()).thenReturn(List.of(attachment));
+        // The content of the attachment is already deleted while the document still has it, until the deletion is
+        // saved.
+        when(this.document.getAttachment("deleted.txt")).thenReturn(attachment);
+        when(this.solrIndexerProvider.get()).thenReturn(this.solrIndexer);
+        ReflectionUtils.setFieldValue(this.metadataExtractor, "retryDelay", 0L);
+
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
+
+        assertNull(solrDocument.getFieldValue("attcontent_en_US"));
+        // The document is indexed again, once the deletion is saved.
+        verify(this.solrIndexer, timeout(10000)).index(this.documentReference, false);
+
+        when(this.document.getAttachmentList()).thenReturn(List.of());
+
+        this.metadataExtractor.getSolrDocument(this.documentReference);
+
+        // Nothing is reported since the attachment was deleted.
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void getDocumentWithAttachmentContentRetrievedAgain() throws Exception
+    {
+        XWikiAttachment attachment = createMockAttachment("found.txt", "text/plain", new Date(), "content", "Alice",
+            "Shy Alice");
+        InputStream content = attachment.getContentInputStream(this.xcontext);
+        when(attachment.getContentInputStream(this.xcontext)).thenThrow(new XWikiException()).thenReturn(content)
+            .thenThrow(new XWikiException());
+        when(this.document.getAttachmentList()).thenReturn(List.of(attachment));
+        when(this.document.getAttachment("found.txt")).thenReturn(attachment);
+        when(this.solrIndexerProvider.get()).thenReturn(this.solrIndexer);
+        ReflectionUtils.setFieldValue(this.metadataExtractor, "retryDelay", 0L);
+
+        assertNull(this.metadataExtractor.getSolrDocument(this.documentReference).getFieldValue("attcontent_en_US"));
+        verify(this.solrIndexer, timeout(10000)).index(this.documentReference, false);
+
+        assertEquals("content\n",
+            this.metadataExtractor.getSolrDocument(this.documentReference).getFieldValue("attcontent_en_US"));
+
+        // The content was retrieved, so the next failure leads to indexing the document again too.
+        this.metadataExtractor.getSolrDocument(this.documentReference);
+        verify(this.solrIndexer, timeout(10000).times(2)).index(this.documentReference, false);
+
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
     void getDocumentWithMissingAttachmentContent() throws Exception
     {
         XWikiAttachment attachment = createMockAttachment("missing.txt", "text/plain", new Date(), "", "Alice",
@@ -694,13 +756,39 @@ class DocumentSolrMetadataExtractorTest
         when(attachment.getContentInputStream(this.xcontext)).thenThrow(new XWikiException());
         when(this.document.getAttachmentList()).thenReturn(List.of(attachment));
         when(this.document.getAttachment("missing.txt")).thenReturn(attachment);
+        when(this.solrIndexerProvider.get()).thenReturn(this.solrIndexer);
+        ReflectionUtils.setFieldValue(this.metadataExtractor, "retryDelay", 0L);
+
+        this.metadataExtractor.getSolrDocument(this.documentReference);
+
+        verify(this.solrIndexer, timeout(10000)).index(this.documentReference, false);
+        assertEquals(0, this.logCapture.size());
 
         SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
 
         assertNull(solrDocument.getFieldValue("attcontent_en_US"));
-        // The attachment still exists, so its content is really missing.
+        // The attachment still exists when its document is indexed again, so its content is really missing.
         assertEquals("Failed to retrieve the content of attachment [Attachment wiki:Path.To.Page.WebHome@missing.txt]",
             this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void getDocumentWithMissingAttachmentContentBeforeRetry() throws Exception
+    {
+        XWikiAttachment attachment = createMockAttachment("missing.txt", "text/plain", new Date(), "", "Alice",
+            "Shy Alice");
+        when(attachment.getContentInputStream(this.xcontext)).thenThrow(new XWikiException());
+        when(this.document.getAttachmentList()).thenReturn(List.of(attachment));
+        when(this.document.getAttachment("missing.txt")).thenReturn(attachment);
+        when(this.solrIndexerProvider.get()).thenReturn(this.solrIndexer);
+        ReflectionUtils.setFieldValue(this.metadataExtractor, "retryDelay", 60000L);
+
+        this.metadataExtractor.getSolrDocument(this.documentReference);
+        // The document is indexed again before its retry is due (e.g. after the deletion of another attachment).
+        this.metadataExtractor.getSolrDocument(this.documentReference);
+
+        // The content is checked again when the retry is due.
+        assertEquals(0, this.logCapture.size());
     }
 
     @Test

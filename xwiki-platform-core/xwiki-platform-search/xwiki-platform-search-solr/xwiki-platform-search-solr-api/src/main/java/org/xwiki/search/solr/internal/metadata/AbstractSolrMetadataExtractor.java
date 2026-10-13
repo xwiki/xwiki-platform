@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,11 +44,13 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.tika.internal.TikaUtils;
 
@@ -76,6 +81,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * The format used when indexing the objcontent field: "&lt;propertyName&gt;:&lt;propertyValue&gt;".
      */
     private static final String OBJCONTENT_FORMAT = "%s : %s";
+
+    /**
+     * How long after its retry is due an attachment is forgotten, when the entity indexed again doesn't retrieve its
+     * content anymore (e.g. the attachment was deleted) or wasn't indexed again (e.g. its document was deleted).
+     */
+    private static final long RETRY_EXPIRATION = TimeUnit.MINUTES.toMillis(1);
 
     /**
      * Logging framework.
@@ -122,7 +133,32 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     @Inject
     protected SolrLinkSerializer linkSerializer;
 
+    @Inject
+    private Provider<SolrIndexer> solrIndexerProvider;
+
     private int shortTextLimit = -1;
+
+    /**
+     * How long to wait before indexing again an entity having an attachment whose content couldn't be retrieved, in
+     * milliseconds.
+     */
+    private long retryDelay = TimeUnit.SECONDS.toMillis(1);
+
+    /**
+     * The attachments whose content couldn't be retrieved while their document still had them, with the time from
+     * which the entity being indexed is indexed again for them.
+     */
+    private final Map<RetriedAttachment, Long> retriedAttachments = new ConcurrentHashMap<>();
+
+    /**
+     * An attachment whose content is retrieved again when indexing an entity again.
+     *
+     * @param indexedReference the reference of the indexed entity
+     * @param attachmentReference the reference of the attachment
+     */
+    private record RetriedAttachment(EntityReference indexedReference, AttachmentReference attachmentReference)
+    {
+    }
 
     /**
      * @return the maximum size of a short text as defined by the database
@@ -511,10 +547,14 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * Tries to extract text indexable content from a generic attachment.
      * 
      * @param attachment the attachment to extract the content from
+     * @param indexedReference the reference of the entity being indexed, which is indexed again if the content of the
+     *            attachment is missing while its document still has it
      * @return the text representation of the attachment's content
      */
-    protected String getContentAsText(XWikiAttachment attachment)
+    protected String getContentAsText(XWikiAttachment attachment, EntityReference indexedReference)
     {
+        RetriedAttachment retriedAttachment = new RetriedAttachment(indexedReference, attachment.getReference());
+
         try {
             Metadata metadata = new Metadata();
             metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, attachment.getFilename());
@@ -522,20 +562,54 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             InputStream in = attachment.getContentInputStream(this.xcontextProvider.get());
 
             try {
-                return TikaUtils.parseToString(in, metadata);
+                String content = TikaUtils.parseToString(in, metadata);
+                this.retriedAttachments.remove(retriedAttachment);
+                return content;
             } finally {
                 in.close();
             }
         } catch (Exception e) {
             if (isDeleted(attachment)) {
+                this.retriedAttachments.remove(retriedAttachment);
                 // The attachment was deleted while being indexed (e.g. right after being added), and its deletion
                 // updates the index anyway.
                 this.logger.debug("Failed to retrieve the content of attachment [{}] which doesn't exist anymore",
                     attachment.getReference(), e);
             } else {
-                this.logger.error("Failed to retrieve the content of attachment [{}]", attachment.getReference(), e);
+                handleMissingContent(retriedAttachment, e);
             }
             return null;
+        }
+    }
+
+    /**
+     * The content of an attachment is deleted before its document is updated and cached again, so while the deletion
+     * is saved the document still has an attachment without content. Index the entity again once the deletion is
+     * saved, and report the missing content only if it is still missing at that time.
+     *
+     * @param retriedAttachment the attachment whose content couldn't be retrieved
+     * @param cause the reason why the content couldn't be retrieved
+     */
+    private void handleMissingContent(RetriedAttachment retriedAttachment, Exception cause)
+    {
+        long now = System.currentTimeMillis();
+        Long retryTime = this.retriedAttachments.get(retriedAttachment);
+
+        if (retryTime == null || now > retryTime + RETRY_EXPIRATION) {
+            this.retriedAttachments.values().removeIf(time -> now > time + RETRY_EXPIRATION);
+            this.retriedAttachments.put(retriedAttachment, now + this.retryDelay);
+            this.logger.debug("Failed to retrieve the content of attachment [{}], indexing [{}] again later",
+                retriedAttachment.attachmentReference(), retriedAttachment.indexedReference(), cause);
+            CompletableFuture.delayedExecutor(this.retryDelay, TimeUnit.MILLISECONDS)
+                .execute(() -> this.solrIndexerProvider.get().index(retriedAttachment.indexedReference(), false));
+        } else if (now < retryTime) {
+            // The entity is indexed before its retry is due, which comes later anyway.
+            this.logger.debug("Failed to retrieve the content of attachment [{}], waiting for [{}] to be indexed again",
+                retriedAttachment.attachmentReference(), retriedAttachment.indexedReference(), cause);
+        } else {
+            this.retriedAttachments.remove(retriedAttachment);
+            this.logger.error("Failed to retrieve the content of attachment [{}]",
+                retriedAttachment.attachmentReference(), cause);
         }
     }
 

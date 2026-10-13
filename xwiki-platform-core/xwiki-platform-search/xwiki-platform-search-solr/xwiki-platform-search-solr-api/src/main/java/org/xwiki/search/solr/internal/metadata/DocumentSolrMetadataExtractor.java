@@ -235,7 +235,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // comments) and attachments for each translation. If we don`t do this then only the original document will be
         // found. That's why we pass the locale of the translated document to the following method calls.
         setObjects(solrDocument, locale, originalDocument);
-        setAttachments(solrDocument, locale, originalDocument);
+        setAttachments(documentReference, solrDocument, locale, originalDocument);
     }
 
     /**
@@ -302,25 +302,29 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     }
 
     /**
+     * @param documentReference the reference of the indexed document
      * @param solrDocument the Solr document where to add the attachments data
      * @param locale the locale for which to index the attachments
      * @param originalDocument the original document, that should be used to access the attachments
      */
-    private void setAttachments(SolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
+    private void setAttachments(DocumentReference documentReference, SolrInputDocument solrDocument, Locale locale,
+        XWikiDocument originalDocument)
     {
         for (XWikiAttachment attachment : originalDocument.getAttachmentList()) {
-            setAttachment(solrDocument, locale, attachment);
+            setAttachment(documentReference, solrDocument, locale, attachment);
         }
     }
 
     /**
      * Extracts the meta data from the given attachment and adds it to the given Solr document.
      * 
+     * @param documentReference the reference of the indexed document
      * @param solrDocument the Solr document where to add the attachment data
      * @param locale the locale for which to index the attachments
      * @param attachment the attachment to index
      */
-    private void setAttachment(SolrInputDocument solrDocument, Locale locale, XWikiAttachment attachment)
+    private void setAttachment(DocumentReference documentReference, SolrInputDocument solrDocument, Locale locale,
+        XWikiAttachment attachment)
     {
         XWikiContext xcontext = xcontextProvider.get();
 
@@ -329,7 +333,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.addField(FieldUtils.ATTACHMENT_DATE, attachment.getDate());
         solrDocument.addField(FieldUtils.ATTACHMENT_SIZE, attachment.getLongSize());
 
-        String attachmentTextContent = getContentAsText(attachment);
+        String attachmentTextContent = getContentAsText(attachment, documentReference);
         solrDocument.addField(FieldUtils.getFieldName(FieldUtils.ATTACHMENT_CONTENT, locale), attachmentTextContent);
 
         // Index the full author reference for exact matching (faceting).

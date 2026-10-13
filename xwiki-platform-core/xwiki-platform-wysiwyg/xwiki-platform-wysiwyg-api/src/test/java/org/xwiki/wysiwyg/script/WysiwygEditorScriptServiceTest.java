@@ -124,6 +124,7 @@ class WysiwygEditorScriptServiceTest
         XWikiContext context = this.oldcore.getXWikiContext();
         XWikiDocument sourceDocument = new XWikiDocument(DOCUMENT_REFERENCE);
         sourceDocument.setContent(source);
+        sourceDocument.setSyntax(SYNTAX);
         // Saving a document with dirty content sets the content author to the effective metadata author, so we set
         // both to end up with the expected content author.
         sourceDocument.getAuthors().setEffectiveMetadataAuthor(contentAuthor);
@@ -138,6 +139,30 @@ class WysiwygEditorScriptServiceTest
     }
 
     @Test
+    void toAnnotatedXHTMLWithSyntaxDifferentFromDocumentSyntax() throws Exception
+    {
+        String source = "some source";
+
+        DocumentReference currentUser = new DocumentReference("xwiki", "XWiki", "CurrentUser");
+        this.oldcore.getXWikiContext().setUserReference(currentUser);
+
+        XWikiDocument sourceDocument = new XWikiDocument(DOCUMENT_REFERENCE);
+        sourceDocument.setContent(source);
+        sourceDocument.setSyntax(SYNTAX);
+        sourceDocument.getAuthors().setContentAuthor(mock());
+        this.oldcore.getSpyXWiki().saveDocument(sourceDocument, this.oldcore.getXWikiContext());
+
+        // The content matches the stored content but it's parsed with a different syntax than the stored one, so the
+        // current user's rights are used.
+        when(this.htmlConverter.toHTML(source, Syntax.XWIKI_2_0, DOCUMENT_REFERENCE, false))
+            .thenReturn(EXPECTED_HTML);
+
+        assertEquals(EXPECTED_HTML,
+            this.editorScriptService.toAnnotatedXHTML(source, Syntax.XWIKI_2_0, DOCUMENT_REFERENCE, false));
+        verify(this.authorExecutor).call(any(), eq(currentUser), eq(DOCUMENT_REFERENCE));
+    }
+
+    @Test
     void toAnnotatedXHTMLForObjectProperty() throws Exception
     {
         String source = "some source";
@@ -149,7 +174,7 @@ class WysiwygEditorScriptServiceTest
         DocumentReference metadataAuthorReference = new DocumentReference("xwiki", "XWiki", "MetadataAuthor");
         when(this.userDocumentReferenceSerializer.serialize(metadataAuthor)).thenReturn(metadataAuthorReference);
 
-        saveDocumentWithProperty(source, metadataAuthor);
+        saveDocumentWithProperty(source, metadataAuthor, false);
 
         // The converter and the author executor work at the document level, so the document reference is resolved from
         // the object property reference.
@@ -172,7 +197,7 @@ class WysiwygEditorScriptServiceTest
 
         // The content doesn't match the stored value of the property (it was modified by the current user), so the
         // current user's rights are used instead of the author's, to prevent privilege escalation.
-        saveDocumentWithProperty("stored source", mock());
+        saveDocumentWithProperty("stored source", mock(), false);
 
         when(this.htmlConverter.toHTML(source, SYNTAX, DOCUMENT_REFERENCE, false)).thenReturn(EXPECTED_HTML);
 
@@ -181,6 +206,50 @@ class WysiwygEditorScriptServiceTest
             .toAnnotatedXHTML(source, SYNTAX, sourceReference, false));
         verify(this.authorExecutor)
             .call(any(), eq(currentUser), eq(DOCUMENT_REFERENCE));
+    }
+
+    @Test
+    void toAnnotatedXHTMLForObjectPropertyWithSyntaxDifferentFromDocumentSyntax() throws Exception
+    {
+        String source = "some source";
+        ObjectPropertyReference sourceReference = new ObjectPropertyReference(LONG_TEXT_PROPERTY,
+            new ObjectReference("Sandbox.MyClass[0]", DOCUMENT_REFERENCE));
+
+        DocumentReference currentUser = new DocumentReference("xwiki", "XWiki", "CurrentUser");
+        this.oldcore.getXWikiContext().setUserReference(currentUser);
+
+        // The content matches the stored value of the property but it's parsed with a different syntax than the
+        // syntax of the document, so the current user's rights are used.
+        saveDocumentWithProperty(source, mock(), false);
+
+        when(this.htmlConverter.toHTML(source, Syntax.XWIKI_2_0, DOCUMENT_REFERENCE, false))
+            .thenReturn(EXPECTED_HTML);
+
+        assertEquals(EXPECTED_HTML,
+            this.editorScriptService.toAnnotatedXHTML(source, Syntax.XWIKI_2_0, sourceReference, false));
+        verify(this.authorExecutor).call(any(), eq(currentUser), eq(DOCUMENT_REFERENCE));
+    }
+
+    @Test
+    void toAnnotatedXHTMLForRestrictedObjectProperty() throws Exception
+    {
+        String source = "some source";
+        ObjectPropertyReference sourceReference = new ObjectPropertyReference(LONG_TEXT_PROPERTY,
+            new ObjectReference("Sandbox.MyClass[0]", DOCUMENT_REFERENCE));
+
+        UserReference metadataAuthor = mock();
+        DocumentReference metadataAuthorReference = new DocumentReference("xwiki", "XWiki", "MetadataAuthor");
+        when(this.userDocumentReferenceSerializer.serialize(metadataAuthor)).thenReturn(metadataAuthorReference);
+
+        saveDocumentWithProperty(source, metadataAuthor, true);
+
+        // The property is restricted, so its stored value is converted in a restricted context, like when it's
+        // displayed, even if the caller doesn't ask for it.
+        when(this.htmlConverter.toHTML(source, SYNTAX, DOCUMENT_REFERENCE, true)).thenReturn(EXPECTED_HTML);
+
+        assertEquals(EXPECTED_HTML,
+            this.editorScriptService.toAnnotatedXHTML(source, SYNTAX, sourceReference, false));
+        verify(this.authorExecutor).call(any(), eq(metadataAuthorReference), eq(DOCUMENT_REFERENCE));
     }
 
     @Test
@@ -264,16 +333,19 @@ class WysiwygEditorScriptServiceTest
      *
      * @param propertyValue the value stored in the TextArea property
      * @param metadataAuthor the effective metadata author of the source document
+     * @param restricted whether the TextArea property is restricted
      */
-    private void saveDocumentWithProperty(String propertyValue, UserReference metadataAuthor) throws Exception
+    private void saveDocumentWithProperty(String propertyValue, UserReference metadataAuthor, boolean restricted)
+        throws Exception
     {
         XWikiContext context = this.oldcore.getXWikiContext();
 
         XWikiDocument classDocument = new XWikiDocument(CLASS_REFERENCE);
-        classDocument.getXClass().addTextAreaField(LONG_TEXT_PROPERTY, "Long Text", 40, 10);
+        classDocument.getXClass().addTextAreaField(LONG_TEXT_PROPERTY, "Long Text", 40, 10, restricted);
         this.oldcore.getSpyXWiki().saveDocument(classDocument, context);
 
         XWikiDocument sourceDocument = new XWikiDocument(DOCUMENT_REFERENCE);
+        sourceDocument.setSyntax(SYNTAX);
         BaseObject object = sourceDocument.newXObject(CLASS_REFERENCE, context);
         object.setLargeStringValue(LONG_TEXT_PROPERTY, propertyValue);
         sourceDocument.getAuthors().setEffectiveMetadataAuthor(metadataAuthor);

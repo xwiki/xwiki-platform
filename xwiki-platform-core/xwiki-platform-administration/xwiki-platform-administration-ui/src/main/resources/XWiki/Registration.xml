@@ -56,20 +56,27 @@
   ## If this document is changed such that it must have programming permission in order to run, change this to false.
   #set($sandbox = true)
   ##
+  ## Whether a script with programming right (e.g. the Invitation application) allowed this registration even if the
+  ## current user does not have the register right. It's checked with the registration script service and not with a
+  ## Velocity variable since any script displaying this document can set Velocity variables.
+  #set ($invitedRegistration = $services.security.registration.claimInvitedRegistration())
+  ##
   #set ($registrationConfig = $NULL)
   #_loadConfig($registrationConfig)
   ##
   #*
    * You may include this document in other documents using {{include reference="XWiki.Registration"/}}
    * To specify that the user is invited and should be allowed to register even if Guest does not have permission to
-   * register, set $invited to true. NOTE: The including script must have programming permission to do this.
+   * register, call $services.security.registration.allowInvitedRegistration() right before including this document.
+   * NOTE: The including script must have programming permission to do this.
    *
    * To specify some code which should run after registration is successfully completed, set
    * $doAfterRegistration to a define block of velocity code like so:
    * #define($doAfterRegistration)
    *   some code
    * #end
-   * Output from running this code will not be printed.
+   * Output from running this code will not be printed. It runs without programming permission, unless the registration
+   * was allowed with $services.security.registration.allowInvitedRegistration().
    *
    * The fields which will be seen on the registration page are defined here.
    * $fields is an array and each field is a Map. The names shown below are Map keys.
@@ -272,7 +279,7 @@
   ## To disable the CAPTCHA on this page, comment out the next entry.
   ## The CAPTCHA, not really an input field but still defined the same way.
   #if($services.captcha
-      &amp;&amp; !$invited
+      &amp;&amp; !$invitedRegistration
       &amp;&amp; $xcontext.getUser() == "XWiki.XWikiGuest"
       &amp;&amp; $registrationConfig.requireCaptcha)
     ## The CAPTCHA field, programmatically checked to make sure the CAPTCHA is right.
@@ -316,19 +323,19 @@
     $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'edit')?editor=wiki")
   #end
   ##
-  ## Programming rights are only needed when another document with programming rights (Invitation app) includes this
-  ## document and sets $invited to true. In any other case drop them for the duration of the execution in order to
+  ## Programming rights are only needed when another document with programming rights (Invitation app) allowed this
+  ## registration before including this document. In any other case drop them for the rest of the request in order to
   ## improve security, whatever the way this document is displayed.
-  #if($sandbox &amp;&amp; !$invited &amp;&amp; $xcontext.hasProgrammingRights())
+  #if($sandbox &amp;&amp; !$invitedRegistration &amp;&amp; $xcontext.hasProgrammingRights())
     $xcontext.dropPermissions()##
   #end
   ##
   ## Access level to register must be explicitly checked because it is only checked in XWiki.prepareDocuments
   ## and this page is accessible through view action.
   #if(!$xcontext.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
-    ## Make an exception if another document with programming permission (Invitation app) has included this
-    ## document and set $invited to true.
-    #if(!$invited || !$xcontext.hasProgrammingRights())
+    ## Make an exception if another document with programming permission (Invitation app) allowed this registration
+    ## before including this document.
+    #if(!$invitedRegistration || !$xcontext.hasProgrammingRights())
       $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'login')")
       #stop
     #end

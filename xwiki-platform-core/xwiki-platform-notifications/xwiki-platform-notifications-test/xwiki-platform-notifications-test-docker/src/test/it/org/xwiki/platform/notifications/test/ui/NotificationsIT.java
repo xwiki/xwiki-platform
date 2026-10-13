@@ -103,6 +103,12 @@ class NotificationsIT
 
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";
 
+    private static final UsernamePasswordCredentials FIRST_USER_CREDENTIALS =
+        new UsernamePasswordCredentials(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+
+    private static final UsernamePasswordCredentials SECOND_USER_CREDENTIALS =
+        new UsernamePasswordCredentials(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+
     // Number of pages that have to be created in order for the notifications badge to show «X+»
     private static final int PAGES_TOP_CREATION_COUNT = 21;
 
@@ -403,13 +409,13 @@ class NotificationsIT
         // notifications as the tray. The creation of this page is not notified, since "create" events are disabled.
         DocumentReference macroPage =
             new DocumentReference("NotificationsMacro", testReference.getLastSpaceReference());
-        setup.rest().runAs(SECOND_USER_CREDENTIALS, rest -> rest.savePage(macroPage,
-            "{{notifications useUserPreferences=\"true\" /}}", "Notifications macro"));
+        setup.rest().savePageAs(SECOND_USER_CREDENTIALS, macroPage,
+            "{{notifications useUserPreferences=\"true\" /}}", "Notifications macro");
         setup.gotoPage(macroPage);
         NotificationsContainerElement macro = NotificationsContainerElement.waitUntilNotificationCount(2);
         assertEquals(2, macro.getNotificationsListCount());
-        commentIndex = macro.getNotificationIndex(ADD_COMMENT);
-        updateIndex = macro.getNotificationIndex(UPDATE);
+        int commentIndex = macro.getNotificationIndex(ADD_COMMENT);
+        int updateIndex = macro.getNotificationIndex(UPDATE);
         assertNotEquals(-1, commentIndex, "No comment notification in the macro.");
         assertNotEquals(-1, updateIndex, "No update notification in the macro.");
         assertEquals("Linux as a title", macro.getNotificationPage(commentIndex));
@@ -619,11 +625,11 @@ class NotificationsIT
         setup.rest().savePage(testReference.replaceParent(new WikiReference("xwiki"), wikiReference),
             "Some content", "Test Notif Subwiki");
         Thread.sleep(1000);
-        setup.rest().runAs(SECOND_USER_CREDENTIALS,
-            rest -> rest.savePage(mainWikiDashboard, notificationMacroDashboard, "Main Wiki Dashboard"));
+        setup.rest().savePageAs(SECOND_USER_CREDENTIALS, mainWikiDashboard, notificationMacroDashboard,
+            "Main Wiki Dashboard");
         Thread.sleep(1000);
-        setup.rest().runAs(SECOND_USER_CREDENTIALS,
-            rest -> rest.savePage(subWikiDashboard, notificationMacroDashboard, "Sub Wiki Dashboard"));
+        setup.rest().savePageAs(SECOND_USER_CREDENTIALS, subWikiDashboard, notificationMacroDashboard,
+            "Sub Wiki Dashboard");
 
         setup.forceGuestUser();
         setup.gotoPage(subWikiDashboard);
@@ -673,23 +679,25 @@ class NotificationsIT
         DocumentReference subWikiP1 = new DocumentReference("WebHome", new SpaceReference("P1", subWikiSpace));
         DocumentReference subWikiSandbox =
             new DocumentReference("WebHome", new SpaceReference("Sandbox", subWikiSpace));
-        setup.rest().runAs(SECOND_USER_CREDENTIALS, rest -> {
+        UsernamePasswordCredentials previousCredentials = setup.getDefaultCredentials();
+        setup.setDefaultCredentials(SECOND_USER_CREDENTIALS);
+        try {
             for (DocumentReference page : List.of(subWikiP1, subWikiSandbox)) {
                 String title = "Subwiki " + page.getLastSpaceReference().getName();
-                rest.savePage(page, "Some content", title);
-                rest.savePage(page, "Some updated content", title);
-                CommentsTab.restPostComment(page, "Some comment");
+                setup.rest().savePage(page, "Some content", title);
+                setup.rest().savePage(page, "Some updated content", title);
+                setup.rest().addObject(page, "XWiki.XWikiComments", "comment", "Some comment");
             }
-        });
+        } finally {
+            setup.setDefaultCredentials(previousCredentials);
+        }
         String restrictedMacro = "{{notifications useUserPreferences=\"false\" displayOwnEvents=\"true\" %s=\"%s\" /}}";
         DocumentReference pagesMacroPage = new DocumentReference("PagesMacro", subWikiSpace);
         DocumentReference spacesMacroPage = new DocumentReference("SpacesMacro", subWikiSpace);
-        setup.rest().runAs(FIRST_USER_CREDENTIALS, rest -> {
-            rest.savePage(pagesMacroPage,
-                String.format(restrictedMacro, "pages", setup.serializeReference(subWikiSandbox)), "Pages macro");
-            rest.savePage(spacesMacroPage, String.format(restrictedMacro, "spaces",
-                setup.serializeReference(subWikiP1.getLastSpaceReference())), "Spaces macro");
-        });
+        setup.rest().savePageAs(FIRST_USER_CREDENTIALS, pagesMacroPage,
+            String.format(restrictedMacro, "pages", setup.serializeReference(subWikiSandbox)), "Pages macro");
+        setup.rest().savePageAs(FIRST_USER_CREDENTIALS, spacesMacroPage, String.format(restrictedMacro, "spaces",
+            setup.serializeReference(subWikiP1.getLastSpaceReference())), "Spaces macro");
         setup.gotoPage(pagesMacroPage);
         assertOnlyNotificationsOfPage("Subwiki Sandbox");
         setup.gotoPage(spacesMacroPage);

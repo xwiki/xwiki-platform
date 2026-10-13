@@ -21,6 +21,7 @@ package org.xwiki.platform.notifications.test.po;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -219,8 +220,8 @@ public class NotificationsTrayPage extends ViewPage
         // The badge is added asynchronously, once the number of unread notifications is known, and removed when there
         // is no unread notification.
         List<WebElement> badges = getDriver().findElementsWithoutWaiting(
-            By.cssSelector(NOTIFICATION_BUTTON_CSS_SELECTOR + " .notifications-count"));
-        return !badges.isEmpty() && badges.getFirst().isDisplayed();
+            By.cssSelector("li#tmNotifications .notifications-count"));
+        return !badges.isEmpty() && badges.get(0).isDisplayed();
     }
 
     /**

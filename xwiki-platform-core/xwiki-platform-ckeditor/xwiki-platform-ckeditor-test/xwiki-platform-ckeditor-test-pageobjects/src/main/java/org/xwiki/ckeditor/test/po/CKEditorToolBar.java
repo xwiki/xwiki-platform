@@ -317,6 +317,8 @@ public class CKEditorToolBar extends BaseElement
 
     /**
      * @return {@code true} if the editor is currently in full screen mode, {@code false} otherwise
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public boolean isInFullScreenMode()

@@ -24,7 +24,6 @@ import java.io.OutputStream;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.container.RedirectResponse;
 import org.xwiki.container.Response;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
@@ -131,19 +130,12 @@ public class ServletResponse implements RedirectResponse
     @Override
     public void setHeader(String name, String value)
     {
-        this.jakartaHttpServletResponse.setHeader(name, cleanHeaderValue(value));
+        this.jakartaHttpServletResponse.setHeader(name, value);
     }
 
     @Override
     public void addHeader(String name, String value)
     {
-        this.jakartaHttpServletResponse.addHeader(name, cleanHeaderValue(value));
-    }
-
-    private static String cleanHeaderValue(String value)
-    {
-        // Line breaks are forbidden in HTTP header values: browsers reject the whole response over HTTP/2, while
-        // servlet containers replace them by spaces over HTTP/1.1. Do the same for all protocols.
-        return StringUtils.replaceChars(value, "\r\n", "  ");
+        this.jakartaHttpServletResponse.addHeader(name, value);
     }
 }

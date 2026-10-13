@@ -73,6 +73,21 @@ public class AbstractUserProfilePage extends ViewPage
         return new ProfileUserProfilePage(getUsername());
     }
 
+    /**
+     * Use the given keyboard shortcut to edit the user profile, and wait for the edit page to load.
+     *
+     * @param shortcut the keyboard key combination bound to the default edit mode
+     * @return the edit page of the user profile
+     * @since 18.9.0RC1
+     */
+    public ProfileEditPage useShortcutKeyForProfileEditing(CharSequence... shortcut)
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().createActions().sendKeys(shortcut).perform();
+        getDriver().waitUntilPageIsReloaded();
+        return new ProfileEditPage();
+    }
+
     public PreferencesUserProfilePage switchToPreferences()
     {
         this.preferencesCategory.click();

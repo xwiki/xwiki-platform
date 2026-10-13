@@ -51,6 +51,8 @@ public class DeletedDocsPage extends ViewPage
      * Filters the deleted pages on the "Page" column and waits for the table to be reloaded.
      *
      * @param docName the text to look for in the full name of the deleted pages
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void filterByDocName(String docName)
@@ -75,6 +77,8 @@ public class DeletedDocsPage extends ViewPage
      *
      * @param docName the full name of the deleted page, as displayed in the "Page" column
      * @return the restored page, to which the restore action redirects
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public ViewPage restoreDoc(String docName)
@@ -90,6 +94,8 @@ public class DeletedDocsPage extends ViewPage
     /**
      * @param docName the full name of a deleted page, as displayed in the "Page" column
      * @return {@code true} if the deleted page is listed in the currently displayed rows, {@code false} otherwise
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public boolean hasDoc(String docName)

@@ -1816,10 +1816,11 @@ class PDFExportIT
     {
         WCAGContext wcagContext = setup.getWCAGUtils().getWCAGContext();
         boolean wcagEnabled = wcagContext.isWCAGEnabled();
-        // We disable WCAG validation.
-        // Here, the test `scrollable-region-focusable` fails while this is now a browser feature in Chrome.
-        // The docker tests run on Chrome.
-        // Once https://github.com/dequelabs/axe-core/issues/4788 is fixed, we might be able to remove this workaround.
+        // The page has a scrollable region without focusable content, which fails the axe-core rule
+        // `scrollable-region-focusable`. Chrome and Firefox make such regions keyboard focusable on their own, only
+        // Safari doesn't, and the rule only targets Safari since axe-core 4.11.2. The tests run on Chrome, so we
+        // disable the WCAG validation for this page load. This workaround can be removed once Safari makes scrollable
+        // regions focusable, see https://bugs.webkit.org/show_bug.cgi?id=190870 .
         wcagContext.setWCAGEnabled(false);
         try {
             return setup.gotoPage(reference);

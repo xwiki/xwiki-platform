@@ -20,7 +20,6 @@
 package org.xwiki.extension.test.po;
 
 import org.openqa.selenium.By;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -130,8 +129,9 @@ public class ExtensionAdministrationPage extends ViewPage
      *
      * @param timeout the maximum time to wait for, in seconds
      * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
      */
-    @Unstable
     public void waitUntilIndexIsDone(int timeout)
     {
         getDriver().waitUntilCondition(

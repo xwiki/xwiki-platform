@@ -126,6 +126,8 @@ public class ApplicationHomePage extends ViewPage
      * Clicks the Rename page action, which the application home page replaces with its own rename modal.
      *
      * @return the modal used to rename the application
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public RenameApplicationModal clickRenameApplication()

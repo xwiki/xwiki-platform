@@ -102,6 +102,8 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
      *
      * @param timeout the maximum time to wait for, in seconds
      * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
      */
     public void waitUntilScanIsDone(int timeout)
     {

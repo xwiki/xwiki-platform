@@ -695,6 +695,8 @@ public class TableLayoutElement extends BaseElement
      *
      * @param columnLabel the label of the column to get, for instance {@code "Title"}
      * @return the text of each cell of the requested column
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public List<String> getColumnValues(String columnLabel)

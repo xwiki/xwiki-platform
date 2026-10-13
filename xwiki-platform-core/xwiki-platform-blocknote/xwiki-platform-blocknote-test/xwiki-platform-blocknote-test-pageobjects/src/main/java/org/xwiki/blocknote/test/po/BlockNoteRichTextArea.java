@@ -115,7 +115,7 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea clickBlock(int index)
     {
-        getBlockContent(index).click();
+        getBlock(index).click();
         waitUntilFocused();
         return this;
     }
@@ -448,11 +448,16 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public SideMenu hoverBlock(int index)
     {
-        getDriver().createActions().moveToElement(getBlockContent(index)).perform();
+        getDriver().createActions().moveToElement(getBlock(index)).perform();
         return new SideMenu();
     }
 
-    private WebElement getBlockContent(int index)
+    /**
+     * @param index the index of the block, starting from 0
+     * @return the element holding the content of the specified block
+     * @since 18.9.0RC1
+     */
+    public WebElement getBlock(int index)
     {
         return this.container.findElements(By.className("bn-block-content")).get(index);
     }

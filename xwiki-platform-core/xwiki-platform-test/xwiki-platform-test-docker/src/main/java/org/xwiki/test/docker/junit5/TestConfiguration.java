@@ -42,6 +42,17 @@ import org.xwiki.tool.extension.ExtensionOverride;
  */
 public class TestConfiguration
 {
+    /**
+     * The width, in pixels, of the screen of the browser container when the test doesn't specify one. It is one of
+     * the resolutions most used by our users.
+     */
+    public static final int DEFAULT_SCREEN_WIDTH = 1280;
+
+    /**
+     * The height, in pixels, of the screen of the browser container when the test doesn't specify one.
+     */
+    public static final int DEFAULT_SCREEN_HEIGHT = 960;
+
     private static final String DEFAULT = "default";
 
     private Browser browser;
@@ -63,6 +74,10 @@ public class TestConfiguration
     private String browserTag;
 
     private String jdbcDriverVersion;
+
+    private int screenWidth;
+
+    private int screenHeight;
 
     private boolean vnc;
 
@@ -130,6 +145,8 @@ public class TestConfiguration
         mergeServletEngineTag(testConfiguration.getServletEngineTag());
         mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
         mergeBrowserTag(testConfiguration.getBrowserTag());
+        mergeScreenWidth(testConfiguration.screenWidth);
+        mergeScreenHeight(testConfiguration.screenHeight);
         mergeVNC(testConfiguration.vnc());
         mergeWCAG(testConfiguration.isWCAG());
         mergeWCAGStopOnError(testConfiguration.shouldWCAGStopOnError());
@@ -462,6 +479,17 @@ public class TestConfiguration
         }
     }
 
+    private void mergeScreenWidth(int screenWidth)
+    {
+        // The tests merged together share a single browser container, so keep the largest screen asked for.
+        this.screenWidth = Math.max(this.screenWidth, screenWidth);
+    }
+
+    private void mergeScreenHeight(int screenHeight)
+    {
+        this.screenHeight = Math.max(this.screenHeight, screenHeight);
+    }
+
     private void mergeXWikiInstances(XWikiInstances xwikiInstances)
     {
         // Select the configuration with the biggest number of instances.
@@ -469,6 +497,42 @@ public class TestConfiguration
             || (xwikiInstances != null && xwikiInstances.value() > getXWikiInstances().value())) {
             setXWikiInstances(xwikiInstances);
         }
+    }
+
+    /**
+     * @return the width, in pixels, of the screen of the browser container
+     * @since 18.9.0RC1
+     */
+    public int getScreenWidth()
+    {
+        return this.screenWidth > 0 ? this.screenWidth : DEFAULT_SCREEN_WIDTH;
+    }
+
+    /**
+     * @param screenWidth see {@link #getScreenWidth()}
+     * @since 18.9.0RC1
+     */
+    public void setScreenWidth(int screenWidth)
+    {
+        this.screenWidth = screenWidth;
+    }
+
+    /**
+     * @return the height, in pixels, of the screen of the browser container
+     * @since 18.9.0RC1
+     */
+    public int getScreenHeight()
+    {
+        return this.screenHeight > 0 ? this.screenHeight : DEFAULT_SCREEN_HEIGHT;
+    }
+
+    /**
+     * @param screenHeight see {@link #getScreenHeight()}
+     * @since 18.9.0RC1
+     */
+    public void setScreenHeight(int screenHeight)
+    {
+        this.screenHeight = screenHeight;
     }
 
     /**

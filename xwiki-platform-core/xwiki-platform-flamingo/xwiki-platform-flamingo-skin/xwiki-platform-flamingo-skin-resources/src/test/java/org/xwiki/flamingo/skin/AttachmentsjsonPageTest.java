@@ -47,8 +47,9 @@ import org.xwiki.velocity.tools.JSONTool;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -116,8 +117,7 @@ class AttachmentsjsonPageTest extends PageTest
 
         List<Map<String, Object>> rows = (List<Map<String, Object>>) result.get("rows");
         assertEquals(List.of("first.txt", "second.txt"), rows.stream().map(row -> row.get("id")).toList());
-        assertTrue(((String) rows.get(1).get("filesize")).contains("data-size=\"10\""),
-            () -> "Unexpected file size: " + rows.get(1).get("filesize"));
+        assertThat((String) rows.get(1).get("filesize"), containsString("data-size=\"10\""));
         assertEquals(2, result.get("returnedrows"));
     }
 

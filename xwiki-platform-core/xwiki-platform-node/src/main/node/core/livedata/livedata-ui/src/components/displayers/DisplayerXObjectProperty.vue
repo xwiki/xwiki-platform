@@ -137,8 +137,12 @@ export default {
      * @returns a `Promise` with the content of the updated view
      */
     update(updateMethod) {
-      this.isLoading = true;
       // A row that has no entry yet is displayed against the location it is created in.
+      // Without one there is no document to load the field from, nor to check the edit rights against.
+      if (this.entry._new && !this.entry._displayReference) {
+        throw new Error("Unknown location for the row that has no entry yet.");
+      }
+      this.isLoading = true;
       const documentName = this.entry._new
         ? this.entry._displayReference
         : this.logic.getEntryId(this.entry);

@@ -769,10 +769,7 @@ export class LiveDataLogic implements Logic {
       }
       return this.createEntry(newEntry, values as Values);
     } else {
-      const source = this.data.query.source;
-      return this.liveDataSource
-        .updateEntry(source, entryId, values)
-        .then(() => this.updateEntries());
+      return this.updateEntry(entryId, values);
     }
   }
 
@@ -802,8 +799,8 @@ export class LiveDataLogic implements Logic {
         newEntry._displayReference = displayReference;
       }
     } catch (e) {
-      // The cells then fall back on the page holding the Live Data.
-      console.warn("Failed to compute where to display the new row", e);
+      // The row is still added, but the cells that need a page to load their editor from can't be edited.
+      console.warn("Failed to compute the display reference of the new row", e);
     }
     this.data.data.entries.push(newEntry);
   }
@@ -1808,6 +1805,27 @@ export class LiveDataLogic implements Logic {
     }
 
     this.adoptCreatedEntry(newEntry, createdEntry);
+    await this.updateEntries();
+  }
+
+  /**
+   * Save values edited on an existing entry.
+   *
+   * @param entryId - the identifier of the entry
+   * @param values - the values edited on that entry
+   */
+  private async updateEntry(entryId: string, values: unknown) {
+    try {
+      await this.liveDataSource.updateEntry(
+        this.data.query.source,
+        entryId,
+        values,
+      );
+    } catch (e) {
+      console.error("Failed to update entry", e);
+      await this.notifyError("livedata.error.saveEntryFailed");
+      throw e;
+    }
     await this.updateEntries();
   }
 

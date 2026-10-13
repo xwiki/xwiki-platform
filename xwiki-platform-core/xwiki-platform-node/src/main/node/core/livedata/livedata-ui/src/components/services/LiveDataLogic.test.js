@@ -460,6 +460,33 @@ describe("Creating the entry of a new row", () => {
     );
   });
 
+  // eslint-disable-next-line max-statements
+  it("keeps the row and creates the entry on the next save when the creation failed", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const { logic, liveDataSource } = await initLogicWithNewRow();
+    liveDataSource.addEntry
+      .mockRejectedValueOnce(new Error("Server error"))
+      .mockResolvedValue({ id: "4", name: "Esther" });
+    globalThis.XWiki = { widgets: { Notification: vi.fn() } };
+    const editBus = logic.getEditBus();
+    const row = logic.data.data.entries.find((entry) => entry._new);
+
+    editBus.start(row, "name");
+    await editBus.save(row, "name", { name: "Ester" });
+    // The row stays so that the value can be fixed.
+    expect(row._new).toBe("true");
+    editBus.start(row, "name");
+    await editBus.save(row, "name", { name: "Esther" });
+
+    expect(liveDataSource.addEntry).toHaveBeenCalledTimes(2);
+    expect(liveDataSource.addEntry.mock.calls[1][1]).toEqual({
+      name: "Esther",
+    });
+    consoleError.mockRestore();
+  });
+
   it("does not create the entry when the value is left empty", async () => {
     const { logic, liveDataSource } = await initLogicWithNewRow();
 
@@ -661,5 +688,61 @@ describe("Saving the cells of an entry", () => {
       "1",
       { status: "done" },
     );
+  });
+
+  // eslint-disable-next-line max-statements
+  it("saves the next cell after a cell failed to be saved", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const { logic, liveDataSource } = initLogic([
+      { id: "1", name: "one", status: "todo" },
+    ]);
+    logic.updateEntries = vi.fn().mockResolvedValue(undefined);
+    liveDataSource.updateEntry
+      .mockRejectedValueOnce(new Error("Server error"))
+      .mockResolvedValue(undefined);
+    globalThis.XWiki = { widgets: { Notification: vi.fn() } };
+    const editBus = logic.getEditBus();
+    const entry = logic.data.data.entries[0];
+
+    editBus.start(entry, "name");
+    await editBus.save(entry, "name", { name: "two" });
+    editBus.start(entry, "status");
+    await editBus.save(entry, "status", { status: "done" });
+
+    // The failed cell is not saved again in place of the next one.
+    expect(liveDataSource.updateEntry).toHaveBeenCalledTimes(2);
+    expect(liveDataSource.updateEntry).toHaveBeenLastCalledWith(
+      expect.anything(),
+      "1",
+      { status: "done" },
+    );
+    consoleError.mockRestore();
+  });
+
+  // eslint-disable-next-line max-statements
+  it("keeps the cells locked when a cell is opened again while it is being saved", async () => {
+    const { logic, liveDataSource } = initLogic([{ id: "1", name: "one" }]);
+    logic.updateEntries = vi.fn().mockResolvedValue(undefined);
+    let resolveSave;
+    liveDataSource.updateEntry.mockReturnValue(
+      new Promise((resolve) => {
+        resolveSave = resolve;
+      }),
+    );
+    const editBus = logic.getEditBus();
+    const entry = logic.data.data.entries[0];
+
+    editBus.start(entry, "name");
+    const save = editBus.save(entry, "name", { name: "two" });
+    // The cell is opened again while its value is being sent.
+    await flushPromises();
+    editBus.start(entry, "name");
+    resolveSave();
+    await save;
+
+    // The cell is being edited again, so no other cell can be opened.
+    expect(editBus.isEditable()).toBe(false);
   });
 });

@@ -33,11 +33,10 @@ import type { Reactive } from "vue";
 export class EditBusService {
   private eventEmitter: EventEmitter;
   private readonly editStates: Reactive<{
-    [key: string]: {
-      [key: string]: { editing: boolean; tosave: boolean; content: unknown };
-    };
+    [key: string]: { [key: string]: { editing: boolean } };
   }>;
-  // The last save, the saves being run one after the other.
+  // The last queued save.
+  // Each save starts once the previous one is done, preventing entries from being created multiple times.
   private runningSave: Promise<void> = Promise.resolve();
 
   /**
@@ -63,75 +62,25 @@ export class EditBusService {
     });
 
     this.eventEmitter.on("cancel-editing-entry", ({ entryId, propertyId }) => {
-      const entryState = this.editStates[entryId];
-      const propertyState = entryState[propertyId];
-
-      // The entry is not edited anymore.
-      // The content is not edited, and should be `undefined` if the property was edited for the
-      // first time. If the property was edited and saved a first time, then edited and
-      // cancelled, the content must stay to one from the first edit.
-      propertyState.editing = false;
+      this.editStates[entryId][propertyId].editing = false;
     });
 
-    this.eventEmitter.on(
-      "save-editing-entry",
-      ({ entryId, propertyId, content }) => {
-        const entryState = this.editStates[entryId];
-        const propertyState = entryState[propertyId];
-        // The entry is not edited anymore but its content will need to be saved once the rest of
-        // the properties of the  entry are not in edit mode.
-        propertyState.editing = false;
-        propertyState.tosave = true;
-        propertyState.content = content;
-      },
-    );
+    this.eventEmitter.on("save-editing-entry", ({ entryId, propertyId }) => {
+      // The cell is not edited anymore, its content is saved by save().
+      this.editStates[entryId][propertyId].editing = false;
+    });
   }
 
   /**
-   * Save the changed values of an entry server side.
-   * @param entryId - the entry id of the entry to save
+   * Save the value of a cell server side.
+   * @param entryId - the entry id of the cell to save
+   * @param content - the values of the cell to save
    */
-  // eslint-disable-next-line max-statements
-  private _save(entryId: string) {
-    const values = this.editStates[entryId];
-    let canBeSaved = false;
-    // This variable can't be initialized in the for loop since it's value is used after the loop.
-    let keyEntry;
-
-    // Look for the single cell to save.
-    for (keyEntry in values) {
-      const entryValue = values[keyEntry];
-
-      const editing = entryValue.editing;
-      const tosave = entryValue.tosave;
-      canBeSaved = !editing && tosave;
-
-      if (canBeSaved) {
-        break;
-      }
-    }
-
-    // If a cell to save is found, we get its content and save it.
-    if (canBeSaved && keyEntry) {
-      const vals = values[keyEntry].content;
-      const savedKey = keyEntry;
-
-      return (
-        this.logic
-          .setValues({ entryId, values: vals })
-          // eslint-disable-next-line promise/always-return
-          .then(() => {
-            // The states are deleted where they are now, which is not necessarily where they were read
-            // from, since the entry may have got an identifier in the meantime.
-            delete values[savedKey];
-          })
-          .catch(() => {
-            new XWiki.widgets.Notification(
-              `The row save action failed.`,
-              "error",
-            );
-          })
-      );
+  private async _save(entryId: string, content: unknown) {
+    try {
+      await this.logic.setValues({ entryId, values: content });
+    } catch {
+      // The logic already notified the user of failure, the next saves must still run.
     }
   }
 
@@ -178,11 +127,10 @@ export class EditBusService {
     });
   }
 
-  private saveEvent(entry: Values, propertyId: string, content: unknown) {
+  private saveEvent(entry: Values, propertyId: string) {
     this.eventEmitter.emit("save-editing-entry", {
       entryId: this.logic.getEntryId(entry),
-      propertyId: propertyId,
-      content: content,
+      propertyId,
     });
   }
 
@@ -206,18 +154,17 @@ export class EditBusService {
   }
 
   /**
-   * Notifies the save of  a cell. With the current save strategy, the cell is directly saved and the table is reload
-   * after this notification.
+   * Notifies the save of a cell, and saves its content once the previous saves are done.
    * @param entry - the entry of the edit row
    * @param propertyId - the property id of the edited cell
    * @param content - the attributes of the edit cell form, in the form of an object
+   * @returns a promise completing when the save is done
    */
   save(entry: Values, propertyId: string, content: unknown) {
-    this.saveEvent(entry, propertyId, content);
-    // A save starts once the previous one is done, so that it does not pick the cell being saved again, and so that it
-    // targets the entry created by the previous save, if any.
+    this.saveEvent(entry, propertyId);
+    // A new row only gets an id once the save creating its entry is done, so the id is read here, not when queueing.
     this.runningSave = this.runningSave.then(() =>
-      this._save(this.logic.getEntryId(entry) as string),
+      this._save(this.logic.getEntryId(entry) as string, content),
     );
     return this.runningSave;
   }

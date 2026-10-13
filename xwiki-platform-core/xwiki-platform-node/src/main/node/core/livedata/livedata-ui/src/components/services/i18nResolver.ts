@@ -100,6 +100,7 @@ export async function i18nResolver(
       "bottombar.noEntries",
       "error.updateEntriesFailed",
       "error.addEntryFailed",
+      "error.saveEntryFailed",
       "error.deleteEntryFailed",
       "table.action.header",
       "table.action.cancel",

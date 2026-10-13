@@ -121,6 +121,8 @@ public class WikiIndexPage extends ExtendedViewPage
 
     /**
      * @return {@code true} if the current user is offered the Create Wiki action, {@code false} otherwise
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public boolean canCreateWiki()
@@ -133,6 +135,8 @@ public class WikiIndexPage extends ExtendedViewPage
      *
      * @param wikiName the name of the wiki to join
      * @return the page asking to confirm the join
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public JoinWikiPage joinWiki(String wikiName)
@@ -146,6 +150,8 @@ public class WikiIndexPage extends ExtendedViewPage
     /**
      * @param wikiName the name of the wiki
      * @return {@code true} if the current user is offered to join the given wiki, {@code false} otherwise
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public boolean canJoinWiki(String wikiName)
@@ -156,6 +162,8 @@ public class WikiIndexPage extends ExtendedViewPage
     /**
      * @param wikiName the name of the wiki
      * @return {@code true} if the current user is offered to leave the given wiki, {@code false} otherwise
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public boolean canLeaveWiki(String wikiName)

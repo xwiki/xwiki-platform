@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  * @version $Id$
  * @since 18.9.0RC1
+ * @since 18.4.7
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList

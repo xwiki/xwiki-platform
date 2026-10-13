@@ -139,24 +139,34 @@
   })
   #foreach ($attachmentReference in $attachmentsReferences)
     #set ($hasAccess = $services.security.authorization.hasAccess('view', $attachmentReference))
-    #set ($row = {
-      'doc_viewable': $hasAccess
-    })
+    #set ($attachment = $NULL)
     #if ($hasAccess)
-      #set ($attachment = $doc.getAttachment($attachmentReference.name))
-      #set ($authorReference = $services.model.resolveDocument($attachment.author))
-      #set ($discard = $row.putAll({
-        'id': $attachment.filename,
-        'filename': "#displayFileNameAndVersion($attachmentReference $attachment)",
-        'mimeType': "#displayAttachmentMimeType($attachment)",
-        'filesize': "#displayAttachmentSize($attachment.longSize)",
-        'date': $xwiki.formatDate($attachment.date),
-        'author': "#displayUserNameWithAvatar($attachment.author)",
-        'actions': "#displayAttachmentActions($attachment)"
-      }))
+      ## Get the attachment from the current version of the document and not from $doc, which was loaded before the
+      ## query was executed: an attachment saved in between is returned by the query but is missing from $doc.
+      #set ($attachmentDocument = $xwiki.getDocument($attachmentReference.documentReference))
+      #set ($attachment = $attachmentDocument.getAttachment($attachmentReference.name))
     #end
-    #set ($discard = $results.rows.add($row))
+    ## Skip the attachments deleted after the query was executed.
+    #if (!$hasAccess || $attachment)
+      #set ($row = {
+        'doc_viewable': $hasAccess
+      })
+      #if ($hasAccess)
+        #set ($authorReference = $services.model.resolveDocument($attachment.author))
+        #set ($discard = $row.putAll({
+          'id': $attachment.filename,
+          'filename': "#displayFileNameAndVersion($attachmentReference $attachment)",
+          'mimeType': "#displayAttachmentMimeType($attachment)",
+          'filesize': "#displayAttachmentSize($attachment.longSize)",
+          'date': $xwiki.formatDate($attachment.date),
+          'author': "#displayUserNameWithAvatar($attachment.author)",
+          'actions': "#displayAttachmentActions($attachment)"
+        }))
+      #end
+      #set ($discard = $results.rows.add($row))
+    #end
   #end
+  #set ($discard = $results.put('returnedrows', $results.rows.size()))
   #jsonResponse($results)
   #end## rev
 #end

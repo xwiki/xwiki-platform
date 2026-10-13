@@ -105,7 +105,8 @@ platform.flamingo.themes.category.panels=Panels
 platform.flamingo.themes.category.breadcrumb=Breadcrumb
 platform.flamingo.themes.category.advanced=Advanced
 platform.flamingo.themes.defaultvalue=Default
-platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
+platform.flamingo.themes.cssCode.description=In this field, you can directly write CSS code which will be added into the skin, after its other styles. You can also override CSS properties here, for example: :root { --brand-primary: #0075b0; }
+platform.flamingo.themes.lessCode.description.cssFirst=In this field, you can directly write LESS code which will be added into the skin. Prefer the CSS field above, and use this one only when you need LESS features such as mixins, LESS functions or LESS variables used by the skin.
 platform.flamingo.themes.local=Local
 platform.flamingo.themes.global=Global
 FlamingoThemesCode.ThemeClass_logo-description_hint=Alternative text for the logo. It should describe the logo's meaning. The localized value associated with the key "core.document.header.logo.image.text" is used by default.
@@ -127,6 +128,11 @@ platform.flamingo.themes.lessCode.warning=Unfortunately, this field is not taken
 ## until 12.9RC1
 #######################################
 platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
+
+#######################################
+## until 18.10.0RC1
+#######################################
+platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
 
 #@deprecatedend
 </content>

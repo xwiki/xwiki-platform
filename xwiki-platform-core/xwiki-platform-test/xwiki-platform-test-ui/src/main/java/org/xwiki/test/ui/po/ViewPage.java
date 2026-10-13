@@ -523,6 +523,15 @@ public class ViewPage extends BasePage
     }
 
     /**
+     * @return the font style of the page title, e.g. {@code normal} or {@code italic}
+     * @since 18.10.0RC1
+     */
+    public String getTitleFontStyle()
+    {
+        return getElementCSSValue(By.id("document-title"), "font-style");
+    }
+
+    /**
      * @return the color of the page's text, i.e. the color set on the {@code body} element and inherited by all the
      *     text of the page that doesn't define a color of its own
      * @since 17.10.13

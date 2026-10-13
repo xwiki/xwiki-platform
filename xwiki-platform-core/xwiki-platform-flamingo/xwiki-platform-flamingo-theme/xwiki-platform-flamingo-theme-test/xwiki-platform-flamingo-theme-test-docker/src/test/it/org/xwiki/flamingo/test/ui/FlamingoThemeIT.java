@@ -337,10 +337,11 @@ class FlamingoThemeIT
     {
         assertColor(255, 218, 218, page.getPageBackgroundColor());
         // The text color set by the theme is inherited from the "body" element. Note that we cannot assert it on the
-        // page content since the 'lessCode' variable set by this test colors the whole ".main" block in blue.
+        // page content since the 'cssCode' variable set by this test colors the whole ".main" block in dark blue.
         assertColor(102, 51, 0, page.getTextColor());
-        // Test 'lessCode' is correctly handled, the title being inside the ".main" block it colors.
-        assertColor(0, 0, 255, page.getTitleColor());
+        // Test 'lessCode' and 'cssCode' are correctly handled, the title being inside the ".main" block they style.
+        assertEquals("italic", page.getTitleFontStyle());
+        assertColor(0, 0, 153, page.getTitleColor());
         assertEquals("monospace", page.getTitleFontFamily().toLowerCase());
     }
 
@@ -426,7 +427,10 @@ class FlamingoThemeIT
         editThemePage.setVariableValue("btn-default-bg", "#99ccff");
         // Test that the @lessCode variable is handled too!
         editThemePage.selectVariableCategory("Advanced");
-        editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");
+        editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; font-style: italic; }");
+        // The CSS code overrides the color set by the LESS code with the same selector, which is only possible if it's
+        // added after the styles compiled from LESS.
+        editThemePage.setTextareaValue("cssCode", ".main { color: #000099; }");
         // Refresh
         refreshPreviewWithRetry(editThemePage);
         previewBox = editThemePage.getPreviewBox();

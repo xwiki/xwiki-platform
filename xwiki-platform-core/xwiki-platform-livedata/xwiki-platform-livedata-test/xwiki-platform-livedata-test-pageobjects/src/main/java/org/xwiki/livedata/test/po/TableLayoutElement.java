@@ -732,6 +732,8 @@ public class TableLayoutElement extends BaseElement
      *
      * @param columnLabel the label of the column to get, for instance {@code "Title"}
      * @return the text of each cell of the requested column
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public List<String> getColumnValues(String columnLabel)
@@ -831,6 +833,8 @@ public class TableLayoutElement extends BaseElement
      * @param rowNumber the row number to inspect
      * @param actionName the expected action
      * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public boolean hasActionWithoutWaiting(int rowNumber, String actionName)

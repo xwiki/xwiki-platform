@@ -28,6 +28,8 @@ import org.xwiki.test.ui.po.ViewPage;
  * The Extension History administration section (Administer Wiki &gt; Extensions &gt; History).
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class ExtensionHistoryPage extends ViewPage

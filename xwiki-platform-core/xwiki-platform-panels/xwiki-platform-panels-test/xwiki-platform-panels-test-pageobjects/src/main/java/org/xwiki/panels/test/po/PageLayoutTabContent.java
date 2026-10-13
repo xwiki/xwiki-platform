@@ -169,6 +169,8 @@ public class PageLayoutTabContent extends BaseElement
      * @param targetPanelName the name of the panel below which to drop it (e.g. {@code Navigation}), which must be
      *     located below the moved panel
      * @param column the column holding both panels
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void dragPanelBelow(String panelName, String targetPanelName, Column column)

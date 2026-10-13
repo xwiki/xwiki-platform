@@ -30,6 +30,8 @@ import org.xwiki.test.ui.po.ViewPage;
  * The Extension Updater administration section (Administer Wiki &gt; Extensions &gt; Updater).
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class ExtensionUpdaterPage extends ViewPage

@@ -130,6 +130,7 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
      * selected value in the form; call {@link #save()} to persist it.
      *
      * @param enabled {@code true} to convert names to lowercase, {@code false} otherwise
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void setSlugConvertToLowercase(boolean enabled)
@@ -143,6 +144,7 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
      * only changes the selected value in the form; call {@link #save()} to persist it.
      *
      * @param allowed {@code true} to keep the dots placed between digits, {@code false} to replace them
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void setSlugAllowDots(boolean allowed)
@@ -156,6 +158,7 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
      * call {@link #save()} to persist it.
      *
      * @param forbiddenWords the comma-separated list of forbidden words
+     * @since 18.4.7
      * @since 18.9.0RC1
      */
     public void setSlugForbiddenWords(String forbiddenWords)

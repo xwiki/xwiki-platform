@@ -29,6 +29,8 @@ import org.xwiki.test.ui.po.BaseElement;
  * Represents a dashboard (rendered by the dashboard macro), in view or in edit mode.
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.9.0RC1
  */
 public class DashboardElement extends BaseElement

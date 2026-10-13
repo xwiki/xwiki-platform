@@ -27,9 +27,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authentication.RegistrationConfiguration;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Script service for accessing configuration related to registration.
@@ -47,8 +52,20 @@ public class RegistrationScriptService implements ScriptService
      */
     public static final String ID = "registration";
 
+    /**
+     * The execution context property holding the permission to register a user without the register right. It's not
+     * a Velocity variable so that it cannot be set by the scripts which display the registration page.
+     */
+    private static final String INVITED_REGISTRATION_PROPERTY = "security.registration.invited";
+
     @Inject
     private RegistrationConfiguration registrationConfiguration;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
+    @Inject
+    private Execution execution;
 
     /**
      * @return the minimum required length for a new password.
@@ -102,5 +119,52 @@ public class RegistrationScriptService implements ScriptService
     public boolean isLoginEnabled()
     {
         return this.registrationConfiguration.isLoginEnabled();
+    }
+
+    /**
+     * Allow the next display of the registration page in the current request to register a user, even if the current
+     * user doesn't have the register right (e.g. a guest who accepts an invitation on a wiki where registration is
+     * disabled). The registration page claims this permission with {@link #claimInvitedRegistration()}, and keeps
+     * the programming right of the calling script only when it claimed it, so the calling script is responsible for
+     * what it has set up before displaying the registration page (e.g. {@code $doAfterRegistration}).
+     *
+     * @return {@code true} if the permission has been given, {@code false} if the current author doesn't have
+     *     programming right
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    @Unstable
+    public boolean allowInvitedRegistration()
+    {
+        ExecutionContext context = this.execution.getContext();
+        if (context != null && this.authorization.hasAccess(Right.PROGRAM)) {
+            context.setProperty(INVITED_REGISTRATION_PROPERTY, Boolean.TRUE);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Consume the permission given by {@link #allowInvitedRegistration()}, so that it applies to a single display of
+     * the registration page.
+     *
+     * @return {@code true} if a script with programming right allowed an invited registration in the current request
+     *     and it was not claimed yet, {@code false} otherwise
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    @Unstable
+    public boolean claimInvitedRegistration()
+    {
+        ExecutionContext context = this.execution.getContext();
+        if (context != null && Boolean.TRUE.equals(context.getProperty(INVITED_REGISTRATION_PROPERTY))) {
+            context.removeProperty(INVITED_REGISTRATION_PROPERTY);
+            return true;
+        }
+
+        return false;
     }
 }

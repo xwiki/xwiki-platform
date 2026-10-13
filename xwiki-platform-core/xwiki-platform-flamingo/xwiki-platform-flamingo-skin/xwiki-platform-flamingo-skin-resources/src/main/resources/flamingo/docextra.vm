@@ -106,7 +106,7 @@
     ##
     ## Display panes (AJAX placeholders)
     ##
-      <div id="docextrapanes">
+    <div id="docextrapanes">
       #foreach($docextra in $docextras)
         <div id="${docextra.get(0)}pane" class="hidden empty"></div>
       #end
@@ -120,7 +120,6 @@
         #set ($extraAnchor = $docextra[0])
         #set ($extraName = $docextra[1])
         #set ($extraTemplate = $docextra[4])
-        #set ($extraShortcut = $docextra[5])
         ##
         ## Set the extra to load
         ##
@@ -156,7 +155,7 @@
         ##
         #set ($extraShortcutWithUserPreferences = "#getShortcutValue(""core.shortcuts.view.$!{extraName}"")")
         #if ($keyboardShortcutsEnabled && "$!extraShortcutWithUserPreferences" != "")
-          shortcut.remove("$extraShortcutWithUserPreferences");
+          shortcut.remove("$escapetool.javascript($extraShortcutWithUserPreferences)");
           shortcut.add("$escapetool.javascript($extraShortcutWithUserPreferences)", function() { XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'disable_in_input':true });
         #end
       #end

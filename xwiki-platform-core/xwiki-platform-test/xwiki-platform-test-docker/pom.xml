@@ -121,6 +121,12 @@
       <groupId>${oracle.groupId}</groupId>
       <artifactId>${oracle.artifactId}</artifactId>
     </dependency>
+    <!-- Used to compare screenshots with reference images, see ScreenshotComparator. -->
+    <dependency>
+      <groupId>com.github.romankh3</groupId>
+      <artifactId>image-comparison</artifactId>
+      <version>4.4.0</version>
+    </dependency>
     <!-- Dependencies for WARBuilder -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

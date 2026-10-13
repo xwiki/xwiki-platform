@@ -99,6 +99,16 @@ class TestConfigurationTest
     {
     }
 
+    @UITest(screenWidth = 1600, screenHeight = 1400)
+    class LargeScreenAnnotation
+    {
+    }
+
+    @UITest(screenHeight = 1200)
+    class TallScreenAnnotation
+    {
+    }
+
     @BeforeEach
     void setUp()
     {
@@ -119,6 +129,40 @@ class TestConfigurationTest
         assertEquals(Database.HSQLDB, configuration.getDatabase());
         assertNull(configuration.getServletEngineTag());
         assertNull(configuration.getDatabaseTag());
+        assertEquals(TestConfiguration.DEFAULT_SCREEN_WIDTH, configuration.getScreenWidth());
+        assertEquals(TestConfiguration.DEFAULT_SCREEN_HEIGHT, configuration.getScreenHeight());
+    }
+
+    @Test
+    void getScreenSizeWhenInAnnotation()
+    {
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(LargeScreenAnnotation.class.getAnnotation(UITest.class));
+        assertEquals(1600, configuration.getScreenWidth());
+        assertEquals(1400, configuration.getScreenHeight());
+    }
+
+    @Test
+    void mergeScreenSize() throws Exception
+    {
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(TallScreenAnnotation.class.getAnnotation(UITest.class));
+        configuration.merge(resolver.resolve(LargeScreenAnnotation.class.getAnnotation(UITest.class)));
+
+        // The merged tests share a single browser container, so the largest screen asked for wins.
+        assertEquals(1600, configuration.getScreenWidth());
+        assertEquals(1400, configuration.getScreenHeight());
+    }
+
+    @Test
+    void mergeScreenSizeWithTheDefault() throws Exception
+    {
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(TallScreenAnnotation.class.getAnnotation(UITest.class));
+        configuration.merge(resolver.resolve(EmptyAnnotation.class.getAnnotation(UITest.class)));
+
+        // A test that doesn't ask for a screen size doesn't bring the merged one back to the default.
+        assertEquals(1200, configuration.getScreenHeight());
     }
 
     @Test

@@ -30,6 +30,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
+import org.xwiki.ckeditor.test.po.MacroDialogSelectModal;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
@@ -568,8 +569,9 @@ class InplaceEditIT
         richTextArea.sendKeys("children:");
 
         // Insert the macro from the Insert menu. Its output is rendered as soon as the macro is inserted.
-        MacroDialogEditModal macroEditModal =
-            ckeditor.getToolBar().insertOtherMacro().filterByText("Children", 1).clickSelect();
+        MacroDialogSelectModal macroSelectModal = ckeditor.getToolBar().insertOtherMacro();
+        macroSelectModal.filterByText("Children", 1);
+        MacroDialogEditModal macroEditModal = macroSelectModal.clickSelect();
         macroEditModal.clickSubmit();
         richTextArea.waitUntilTextContains("Child Title");
         assertEquals("children:\nChild Title", richTextArea.getText());

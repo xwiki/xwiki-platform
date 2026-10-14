@@ -1,6 +1,7 @@
 packages:
   - xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-bootstrap/src/main/node
+  - xwiki-platform-core/xwiki-platform-ckeditor/xwiki-platform-ckeditor-plugins/src/test/node
   - xwiki-platform-core/xwiki-platform-component/xwiki-platform-component-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-designsystem-webjar/src/main/node
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-node/xwiki-platform-livedata-node-componentstore/src/main/node
@@ -75,6 +76,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsdocconfig
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
+  - xwiki-platform-core/xwiki-platform-realtime/xwiki-platform-realtime-wysiwyg/xwiki-platform-realtime-wysiwyg-webjar/src/test/node
   - xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/test/node
   - xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-webjar/src/main/node
 
@@ -121,7 +123,9 @@ catalog:
   "@vue/tsconfig": 0.9.1
   axe-core: 4.13.0
   bootstrap-icons: 1.13.1
+  chainpad: 5.3.0
   cross-env: 10.1.0
+  diff-dom: 5.2.1
   dompurify: 3.4.16
   eslint: 10.12.0
   eslint-import-resolver-typescript: 4.4.5
@@ -193,3 +197,13 @@ allowBuilds:
   esbuild: true
   nx: true
   unrs-resolver: true
+# The chainpad package declares the tools it is built and tested with as dependencies, although its entry point is a
+# self-contained bundle that needs none of them. They would pull outdated packages (e.g. a vulnerable minimist) into
+# the workspace. Remove these overrides when upgrading to a chainpad release that includes
+# https://github.com/cryptpad/chainpad/pull/20.
+overrides:
+  chainpad>fast-diff: "-"
+  chainpad>gluejs: "-"
+  chainpad>json.sortify: "-"
+  chainpad>nthen: "-"
+  chainpad>xmhell: "-"

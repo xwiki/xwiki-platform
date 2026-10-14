@@ -234,6 +234,6 @@ require(['jquery', 'xwiki-suggestSpaces', 'xwiki-events-bridge'], function($) {
     container.find('.suggest-spaces').suggestSpaces();
   };
 
-  $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
+  $(document).on('xwiki:dom:updated', init);
   $(init);
 });

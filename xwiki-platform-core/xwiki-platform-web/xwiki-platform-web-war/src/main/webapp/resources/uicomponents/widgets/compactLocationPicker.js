@@ -312,6 +312,6 @@ require(['jquery', 'xwiki-compactLocationPicker', 'xwiki-events-bridge'], functi
     elements.filter('.location-picker-compact').add(elements.find('.location-picker-compact')).compactLocationPicker();
   };
 
-  $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
+  $(document).on('xwiki:dom:updated', init);
   $(init);
 });

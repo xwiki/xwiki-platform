@@ -62,6 +62,10 @@ class FlamingoThemeIT
 {
     private static final String THEMES_SPACE = "FlamingoThemes";
 
+    private static final String THEME_CLASS = "FlamingoThemesCode.ThemeClass";
+
+    private static final String CSS_CODE = ".main { color: #000099; }";
+
     private static final String COLOR_THEME_PREFERENCE = "colorTheme";
 
     private static final String LOGO_NAME = "logo.png";
@@ -124,7 +128,7 @@ class FlamingoThemeIT
         validateThemeCreation(themeApplicationWebHomePage, testMethodName);
 
         // Validate viewing and setting a color theme from the color theme home page
-        validateViewAndSetThemeFromThemeHomePage(testMethodName);
+        validateViewAndSetThemeFromThemeHomePage(testMethodName, setup);
 
         // Validate setting a color theme from the wiki Admin UI
         validateSetThemeFromWikiAdminUI(testMethodName, setup);
@@ -240,7 +244,7 @@ class FlamingoThemeIT
         editThemePage.clickSaveAndView();
     }
 
-    private void validateViewAndSetThemeFromThemeHomePage(String testMethodName)
+    private void validateViewAndSetThemeFromThemeHomePage(String testMethodName, TestUtils setup)
     {
         // Go back to the theme application
         ThemeApplicationWebHomePage themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
@@ -254,6 +258,13 @@ class FlamingoThemeIT
 
         // Verify we can view a theme by clicking it
         themeApplicationWebHomePage.seeTheme(testMethodName);
+
+        // The 'cssCode' color overrides the 'lessCode' one, so remove it to verify that the 'lessCode' color is applied
+        // too, then put it back for the next checks.
+        setup.updateObject(THEMES_SPACE, testMethodName, THEME_CLASS, 0, "cssCode", "");
+        ViewPage viewPage = setup.gotoPage(THEMES_SPACE, testMethodName);
+        assertColor(0, 0, 255, viewPage.getTitleColor());
+        setup.updateObject(THEMES_SPACE, testMethodName, THEME_CLASS, 0, "cssCode", CSS_CODE);
 
         // Switch back to Charcoal
         // TODO: Replace this with a setup.updateObject() call since we don't need to test the useTheme() UI as it's
@@ -433,7 +444,7 @@ class FlamingoThemeIT
         // Test that the @cssCode variable is handled too. It overrides the color set by the LESS code with the same
         // selector, which is only possible if it's added after the styles compiled from LESS.
         editThemePage.selectVariableCategory("Advanced");
-        editThemePage.setTextareaValue("cssCode", ".main { color: #000099; }");
+        editThemePage.setTextareaValue("cssCode", CSS_CODE);
         // Refresh
         refreshPreviewWithRetry(editThemePage);
         previewBox = editThemePage.getPreviewBox();

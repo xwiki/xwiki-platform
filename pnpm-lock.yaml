@@ -4059,6 +4059,39 @@ importers:
         specifier: 'catalog:'
         version: 3.3.11(typescript@5.9.3)
 
+  xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/test/node:
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.13.6
+      '@xwiki/platform-test-requirejs':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/test/requirejs
+      '@xwiki/platform-tool-eslintconfig':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
+      jiti:
+        specifier: 'catalog:'
+        version: 2.7.0
+      jquery:
+        specifier: 'catalog:'
+        version: 4.0.0
+      jsdom:
+        specifier: 'catalog:'
+        version: 30.1.1
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+      xwiki-platform-web-webjar:
+        specifier: workspace:*
+        version: link:../../../../xwiki-platform-web-webjar/src/main/node
+
   xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-webjar/src/main/node:
     dependencies:
       '@xwiki/platform-autosave-api':

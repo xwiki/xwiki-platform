@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.templateprovider.test.po;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.Select;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
- * Represents a template provider page in inline mode
+ * Represents a template provider page in inline mode.
  *
  * @version $Id$
  * @since 4.2M1

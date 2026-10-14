@@ -56,6 +56,8 @@ public class PrepareMailQueueItem extends AbstractMailQueueItem
     /**
      * @return the list of mail messages to be sent
      */
+    // Returns the messages as they were passed to the constructor, i.e. a list of any MimeMessage subtype.
+    @SuppressWarnings("java:S1452")
     public Iterable<? extends MimeMessage> getMessages()
     {
         return this.messages;

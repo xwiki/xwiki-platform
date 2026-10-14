@@ -113,6 +113,8 @@ public class WikiSkinUtils
         return getSkinDocument(id) != null;
     }
 
+    // The resource type depends on the skin storage, so its input source type parameter cannot be named.
+    @SuppressWarnings("java:S1452")
     public Resource<?> getResource(String resourceName, Skin skin)
     {
         Resource<?> source = null;

@@ -170,10 +170,10 @@
   #if($varName == 'cssCode')
     ## TODO: Replace this textarea with a code editor offering CSS syntax highlighting and linting, once one is
     ## available in the platform without adding a dependency.
-    &lt;div class="alert alert-info"&gt;$escapetool.xml($services.localization.render("platform.flamingo.themes.cssCode.description"))&lt;/div&gt;
+    #info($escapetool.xml($services.localization.render("platform.flamingo.themes.cssCode.description")))
   #elseif($varName == 'lessCode')
-    &lt;div class="alert alert-info"&gt;$escapetool.xml($services.localization.render("platform.flamingo.themes.lessCode.description"))&lt;/div&gt;
-    &lt;div class="alert alert-warning"&gt;$escapetool.xml($services.localization.render("platform.flamingo.themes.lessCode.status"))&lt;/div&gt;
+    #info($escapetool.xml($services.localization.render("platform.flamingo.themes.lessCode.description")))
+    #warning($escapetool.xml($services.localization.render("platform.flamingo.themes.lessCode.status")))
   #end
   &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
     $!escapetool.xml($!doc.getValue($varName, $obj))

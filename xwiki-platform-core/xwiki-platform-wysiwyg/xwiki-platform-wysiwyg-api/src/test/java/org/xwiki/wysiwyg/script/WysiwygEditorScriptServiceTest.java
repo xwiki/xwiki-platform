@@ -27,11 +27,14 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.CurrentUserReference;
@@ -41,6 +44,7 @@ import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -53,6 +57,7 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -97,6 +102,9 @@ class WysiwygEditorScriptServiceTest
 
     @MockComponent
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setup() throws Exception
@@ -250,6 +258,30 @@ class WysiwygEditorScriptServiceTest
         assertEquals(EXPECTED_HTML,
             this.editorScriptService.toAnnotatedXHTML(source, SYNTAX, sourceReference, false));
         verify(this.authorExecutor).call(any(), eq(metadataAuthorReference), eq(DOCUMENT_REFERENCE));
+    }
+
+    @Test
+    void toAnnotatedXHTMLForObjectPropertyWhenClassCannotBeLoaded() throws Exception
+    {
+        String source = "some source";
+        ObjectPropertyReference sourceReference = new ObjectPropertyReference(LONG_TEXT_PROPERTY,
+            new ObjectReference("Sandbox.MyClass[0]", DOCUMENT_REFERENCE));
+
+        UserReference metadataAuthor = mock();
+        DocumentReference metadataAuthorReference = new DocumentReference("xwiki", "XWiki", "MetadataAuthor");
+        when(this.userDocumentReferenceSerializer.serialize(metadataAuthor)).thenReturn(metadataAuthorReference);
+
+        saveDocumentWithProperty(source, metadataAuthor, false);
+        doThrow(new XWikiException()).when(this.oldcore.getSpyXWiki()).getXClass(eq(CLASS_REFERENCE), any());
+
+        // Without its class, we can't know if the property is restricted, so its stored value is converted in a
+        // restricted context to be safe, even if the caller doesn't ask for it.
+        when(this.htmlConverter.toHTML(source, SYNTAX, DOCUMENT_REFERENCE, true)).thenReturn(EXPECTED_HTML);
+
+        assertEquals(EXPECTED_HTML,
+            this.editorScriptService.toAnnotatedXHTML(source, SYNTAX, sourceReference, false));
+        verify(this.authorExecutor).call(any(), eq(metadataAuthorReference), eq(DOCUMENT_REFERENCE));
+        assertEquals("Failed to get class [xwiki:Sandbox.MyClass]", this.logCapture.getMessage(0));
     }
 
     @Test

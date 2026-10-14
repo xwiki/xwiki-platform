@@ -269,7 +269,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
       // we remove the extra path elements afterwards from the breadcrumb HTML.
       // The space reference may already specify the wiki, in which case it takes precedence over the selected wiki.
       var spaceReference = XWiki.Model.resolve(localSpaceReference || xm.space, XWiki.EntityType.SPACE,
-        wiki ? [wiki] : undefined);
+        [wiki || xm.wiki]);
       var documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, spaceReference);
 
       return $.post(getCurrentPageURL(), {

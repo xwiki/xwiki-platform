@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki CSRF Protection Module</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
     </properties>
   <dependencies>
     <dependency>
@@ -63,6 +63,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

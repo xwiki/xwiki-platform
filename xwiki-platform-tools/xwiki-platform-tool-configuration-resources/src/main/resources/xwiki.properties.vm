@@ -547,6 +547,16 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Default value is true
 # csrf.enabled = true
 
+#-# [Since 18.9.0RC1]
+#-# The lifetime of the secret tokens, in hours. The token of a user is derived from the authentication validation
+#-# key (xwiki.authentication.validationKey in xwiki.cfg, which must be set to the same random value on all the nodes
+#-# of a cluster), the user and the current time period, so all the nodes of a cluster accept the same token and the
+#-# tokens survive a restart. A token stays valid during its time period and the next one, i.e. between one and two
+#-# lifetimes. Use 0 to never expire the tokens: they then only change when the validation key changes.
+#-#
+#-# Default value is 24
+# csrf.tokenLifetime = 24
+
 #-------------------------------------------------------------------------------------
 # Jobs
 #-------------------------------------------------------------------------------------

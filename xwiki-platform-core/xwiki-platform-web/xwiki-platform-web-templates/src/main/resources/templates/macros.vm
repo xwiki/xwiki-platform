@@ -2740,6 +2740,46 @@ $string##
 #end
 
 #**
+* Pulls all the JavaScript and CSS resources needed by the space picker.
+*
+* @since 18.9.0RC1
+*#
+#macro (spacePicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestSpaces.js'))
+#end
+
+#**
+* Outputs a suggest input for picking one or more spaces. The value of the input is the serialized space reference,
+* relative to the wiki of the document where the value is saved, or the list of such references when multiple selection
+* is enabled.
+*
+* @param $parameters the parameters, most of them being output as HTML attributes of the suggest input:
+*   'name' the name of the form field holding the value;
+*   'value' the initially selected spaces, as serialized space references;
+*   'multiple' set it to 'multiple' to allow selecting more than one space;
+*   'data-document-reference' the document where the value is saved, defaults to the current document;
+*   'data-search-scope' where to look for spaces, either 'wiki:wikiName' or 'space:spaceReference', defaults to the
+*     current wiki
+* @since 18.9.0RC1
+*#
+#macro (spacePicker $parameters)
+  #spacePicker_import
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-spaces"))
+  #if ($parameters.get('multiple') == 'multiple')
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.spacePicker.multi.title')))
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.spacePicker.single.title')))
+  #end
+  #suggestInput($parameters)
+#end
+
+#**
 * Pulls all the JavaScript and CSS resources needed by the attachment picker.
 *#
 #macro (attachmentPicker_import)

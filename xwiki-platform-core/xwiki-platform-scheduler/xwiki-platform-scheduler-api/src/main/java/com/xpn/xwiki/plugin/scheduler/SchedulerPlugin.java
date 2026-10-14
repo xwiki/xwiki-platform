@@ -945,24 +945,30 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             } else if (isJobDefinitionModified(originalJobObj, jobObj)) {
-                // Modified job. The scheduler holds the job xobject that was passed to it when the job was registered,
-                // so the new definition is only taken into account once the job has been registered again.
-                try {
-                    // Leave alone a job the scheduler doesn't know about: it gets registered with its new definition
-                    // when it's scheduled.
-                    JobState state = getCurrentJobState(jobObj);
-                    if (state != null && !JobState.STATE_NONE.equals(state.getValue())) {
-                        // We get the document from the store as we don't want to corrupt the document instance
-                        // associated with the event
-                        BaseObject jobObject = getModifiableObject(document.getDocumentReference(), xcontext);
-
-                        reloadJob(jobObject, xcontext);
-                    }
-                } catch (Exception e) {
-                    LOGGER.warn("Failed to reload job in document [{}]: [{}]", document.getDocumentReference(),
-                        ExceptionUtils.getRootCauseMessage(e));
-                }
+                // Modified job
+                onJobModified(jobObj, document, xcontext);
             }
+        }
+    }
+
+    private void onJobModified(BaseObject jobObj, XWikiDocument document, XWikiContext xcontext)
+    {
+        // The scheduler holds the job xobject that was passed to it when the job was registered, so the new definition
+        // is only taken into account once the job has been registered again.
+        try {
+            // Leave alone a job the scheduler doesn't know about: it gets registered with its new definition when it's
+            // scheduled.
+            JobState state = getCurrentJobState(jobObj);
+            if (state != null && !JobState.STATE_NONE.equals(state.getValue())) {
+                // We get the document from the store as we don't want to corrupt the document instance associated
+                // with the event
+                BaseObject jobObject = getModifiableObject(document.getDocumentReference(), xcontext);
+
+                reloadJob(jobObject, xcontext);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Failed to reload job in document [{}]: [{}]", document.getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

@@ -28,6 +28,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -56,5 +57,15 @@ public class DefaultCSRFTokenConfigurationTest
         when(configuration.getProperty(propertyName, Boolean.TRUE)).thenReturn(true);
         assertTrue(this.defaultCSRFTokenConfiguration.isEnabled());
         verify(configuration, atLeastOnce()).getProperty(propertyName, Boolean.TRUE);
+    }
+
+    @Test
+    void getTokenLifetime()
+    {
+        String propertyName = "csrf.tokenLifetime";
+        when(configuration.getProperty(propertyName, 24)).thenReturn(24);
+        assertEquals(24, this.defaultCSRFTokenConfiguration.getTokenLifetime());
+        when(configuration.getProperty(propertyName, 24)).thenReturn(0);
+        assertEquals(0, this.defaultCSRFTokenConfiguration.getTokenLifetime());
     }
 }

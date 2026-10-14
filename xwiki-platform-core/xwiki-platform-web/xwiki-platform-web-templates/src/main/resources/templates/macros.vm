@@ -2818,40 +2818,35 @@ $string##
   #end
 #end
 
-#macro (tagPicker $parameters)
+#**
+ * Outputs a suggest input for picking one or more values listed by a REST resource, such as tags or wikis.
+ *
+ * @param $type the type of value, used to build the CSS class (suggest-${type}s) and the title translation keys
+ * @param $parameters the picker parameters, see #suggestInput
+ *#
+#macro (_restListPicker $type $parameters)
   #picker_import
   #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestValues.js'))
   #if ("$!parameters" == "")
     #set ($parameters = {})
   #end
-  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-tags"))
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-${type}s"))
   #if ($parameters.get('multiple') == 'multiple')
-    #set ($discard = $parameters.putIfAbsent('title',
-      $services.localization.render('core.widgets.suggest.tagPicker.multi.title')))
+    #set ($macro.titleKey = "core.widgets.suggest.${type}Picker.multi.title")
   #else
-    #set ($discard = $parameters.putIfAbsent('title',
-      $services.localization.render('core.widgets.suggest.tagPicker.single.title')))
+    #set ($macro.titleKey = "core.widgets.suggest.${type}Picker.single.title")
   #end
+  #set ($discard = $parameters.putIfAbsent('title', $services.localization.render($macro.titleKey)))
   #picker_freeText($parameters)
   #suggestInput($parameters)
 #end
 
+#macro (tagPicker $parameters)
+  #_restListPicker('tag' $parameters)
+#end
+
 #macro (wikiPicker $parameters)
-  #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestValues.js'))
-  #if ("$!parameters" == "")
-    #set ($parameters = {})
-  #end
-  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-wikis"))
-  #if ($parameters.get('multiple') == 'multiple')
-    #set ($discard = $parameters.putIfAbsent('title',
-      $services.localization.render('core.widgets.suggest.wikiPicker.multi.title')))
-  #else
-    #set ($discard = $parameters.putIfAbsent('title',
-      $services.localization.render('core.widgets.suggest.wikiPicker.single.title')))
-  #end
-  #picker_freeText($parameters)
-  #suggestInput($parameters)
+  #_restListPicker('wiki' $parameters)
 #end
 
 #**

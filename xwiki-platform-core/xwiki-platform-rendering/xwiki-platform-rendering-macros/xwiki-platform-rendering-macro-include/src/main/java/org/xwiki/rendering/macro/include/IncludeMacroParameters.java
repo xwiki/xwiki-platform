@@ -174,6 +174,7 @@ public class IncludeMacroParameters
     /**
      * @param context defines whether the included page is executed in its separated execution context or whether it's
      *            executed in the context of the current page.
+     * @deprecated use the Display macro instead
      */
     @PropertyDescription("defines whether the included page is executed in its separated execution context"
         + " or whether it's executed in the context of the current page")

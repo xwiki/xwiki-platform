@@ -66,6 +66,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.edit.EditModeResolver;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
@@ -451,8 +452,11 @@ public class WysiwygEditorScriptService implements ScriptService
 
     private boolean isRestrictedProperty(BaseObject object, String propertyName, XWikiContext context)
     {
-        return object.getXClass(context).get(propertyName) instanceof TextAreaClass textAreaClass
-            && textAreaClass.isRestricted();
+        // The class is null when it couldn't be loaded, in which case we can't tell if the property is restricted, so
+        // we consider it restricted to be safe.
+        BaseClass xclass = object.getXClass(context);
+        return xclass == null
+            || xclass.get(propertyName) instanceof TextAreaClass textAreaClass && textAreaClass.isRestricted();
     }
 
     /**

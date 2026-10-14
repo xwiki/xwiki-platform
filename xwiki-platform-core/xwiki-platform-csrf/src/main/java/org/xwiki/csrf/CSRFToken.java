@@ -25,9 +25,9 @@ import org.xwiki.stability.Unstable;
 /**
  * Anti-CSRF (Cross Site Request Forgery) protection using secret token validation mechanism.
  * <p>
- * A random secret token should be included into every request that modifies or stores some data. If the token included
- * into the request does not match the token stored on the server side, the request is redirected to a resubmission page
- * where a legitimate user has a chance to confirm his action.
+ * A secret token should be included into every request that modifies or stores some data. If the token included into
+ * the request is not a valid token of the current user, the request is redirected to a resubmission page where a
+ * legitimate user has a chance to confirm their action.
  * 
  * @see <a href="http://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet">CSRF
  *      Prevention Cheat Sheet</a>
@@ -57,9 +57,9 @@ public interface CSRFToken
     void clearToken();
 
     /**
-     * Check if the given <code>token</code> matches the internally stored token associated with the current user.
+     * Check if the given <code>token</code> is a valid anti-CSRF token of the current user.
      * 
-     * @param token random token from the request
+     * @param token the token from the request
      * @return {@code true} if the component is disabled or the given token is correct, {@code false} otherwise
      */
     boolean isTokenValid(String token);

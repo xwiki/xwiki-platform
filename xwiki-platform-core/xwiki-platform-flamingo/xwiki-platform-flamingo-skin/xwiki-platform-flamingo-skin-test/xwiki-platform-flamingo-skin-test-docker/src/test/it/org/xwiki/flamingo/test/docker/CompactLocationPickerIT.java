@@ -138,6 +138,6 @@ class CompactLocationPickerIT
     {
         setup.createPage(reference, String.format(PICKER_TEMPLATE, setup.serializeLocalReference(value),
             setup.serializeReference(reference), multiple), reference.getLastSpaceReference().getName());
-        return CompactLocationPickerElement.getFirstInPageContent();
+        return CompactLocationPickerElement.get("locations");
     }
 }

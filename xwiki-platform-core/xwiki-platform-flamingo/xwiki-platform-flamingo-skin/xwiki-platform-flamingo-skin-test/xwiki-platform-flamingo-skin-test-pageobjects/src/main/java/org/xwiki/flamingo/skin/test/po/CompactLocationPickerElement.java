@@ -50,12 +50,14 @@ public class CompactLocationPickerElement extends BaseElement
     }
 
     /**
-     * @return the first compact location picker displayed in the content of the current page
+     * @param name the name of the form field holding the value of the picker
+     * @return the compact location picker with the given name, displayed anywhere in the current page
      */
-    public static CompactLocationPickerElement getFirstInPageContent()
+    public static CompactLocationPickerElement get(String name)
     {
-        return new CompactLocationPickerElement(getUtil().getDriver().findElement(
-            By.cssSelector("#xwikicontent .location-picker-compact")));
+        return new CompactLocationPickerElement(getUtil().getDriver().findElement(By.xpath(String.format(
+            "//*[contains(concat(' ', normalize-space(@class), ' '), ' location-picker-compact ')]"
+                + "[.//select[@name = '%s']]", name))));
     }
 
     /**

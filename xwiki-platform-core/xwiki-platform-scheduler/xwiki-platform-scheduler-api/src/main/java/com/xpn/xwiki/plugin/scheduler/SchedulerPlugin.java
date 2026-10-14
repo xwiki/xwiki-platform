@@ -376,9 +376,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
     private void register(XWikiDocument jobDoc, XWikiContext context) throws SchedulerPluginException
     {
-        BaseObject jobObj = jobDoc.getXObject(XWIKI_JOB_CLASSREFERENCE);
-
-        register(jobObj, context);
+        for (BaseObject jobObj : jobDoc.getXObjects(XWIKI_JOB_CLASSREFERENCE)) {
+            register(jobObj, context);
+        }
     }
 
     private void register(BaseObject jobObj, XWikiContext context) throws SchedulerPluginException
@@ -841,7 +841,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         // Avoid modifying the cache document
         jobHolder = jobHolder.clone();
 
-        BaseObject job = jobHolder.getXObject(XWIKI_JOB_CLASSREFERENCE);
+        BaseObject job = jobHolder.getXObject(XWIKI_JOB_CLASSREFERENCE, object.getNumber());
         job.setStringValue(STATUS, status);
         jobHolder.setMinorEdit(true);
         context.getWiki().saveDocument(jobHolder, context);
@@ -904,14 +904,15 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         }
     }
 
-    private BaseObject getModifiableObject(DocumentReference reference, XWikiContext xcontext) throws XWikiException
+    private BaseObject getModifiableObject(DocumentReference reference, int number, XWikiContext xcontext)
+        throws XWikiException
     {
         XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
 
         // Avoid modifying a cache document
         document = document.clone();
 
-        return document.getXObject(XWIKI_JOB_CLASSREFERENCE);
+        return document.getXObject(XWIKI_JOB_CLASSREFERENCE, number);
     }
 
     private void onDocumentEvent(Object source, Object data)
@@ -920,51 +921,73 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         XWikiDocument document = (XWikiDocument) source;
         XWikiDocument originalDocument = document.getOriginalDocument();
 
-        BaseObject jobObj = document.getXObject(XWIKI_JOB_CLASSREFERENCE);
-        BaseObject originalJobObj = originalDocument.getXObject(XWIKI_JOB_CLASSREFERENCE);
-
-        if (jobObj == null) {
-            if (originalJobObj != null) {
+        // A document can hold several jobs, which are matched by object number.
+        for (BaseObject originalJobObj : originalDocument.getXObjects(XWIKI_JOB_CLASSREFERENCE)) {
+            if (originalJobObj != null
+                && document.getXObject(XWIKI_JOB_CLASSREFERENCE, originalJobObj.getNumber()) == null) {
                 // Job deleted
-                try {
-                    unregister(originalJobObj);
-                } catch (SchedulerPluginException e) {
-                    LOGGER.warn("Failed to unregister job in document [{}]: [{}]", document.getDocumentReference(),
-                        ExceptionUtils.getRootCauseMessage(e));
+                onJobDeleted(originalJobObj, document);
+            }
+        }
+
+        for (BaseObject jobObj : document.getXObjects(XWIKI_JOB_CLASSREFERENCE)) {
+            if (jobObj != null) {
+                BaseObject originalJobObj =
+                    originalDocument.getXObject(XWIKI_JOB_CLASSREFERENCE, jobObj.getNumber());
+                if (originalJobObj == null) {
+                    // New job
+                    onJobAdded(jobObj, document, xcontext);
+                } else if (isJobDefinitionModified(originalJobObj, jobObj)) {
+                    // Modified job
+                    onJobModified(jobObj, document, xcontext);
                 }
             }
-        } else {
-            if (originalJobObj == null) {
-                // New job
-                try {
-                    // We get the document from the store as we don't want to corrupt the document instance associated
-                    // with the event
-                    BaseObject jobObject = getModifiableObject(document.getDocumentReference(), xcontext);
+        }
+    }
 
-                    register(jobObject, xcontext);
-                } catch (Exception e) {
-                    LOGGER.warn("Failed to register job in document [{}]: [{}]", document.getDocumentReference(),
-                        ExceptionUtils.getRootCauseMessage(e));
-                }
-            } else if (isJobDefinitionModified(originalJobObj, jobObj)) {
-                // Modified job. The scheduler holds the job xobject that was passed to it when the job was registered,
-                // so the new definition is only taken into account once the job has been registered again.
-                try {
-                    // Leave alone a job the scheduler doesn't know about: it gets registered with its new definition
-                    // when it's scheduled.
-                    JobState state = getCurrentJobState(jobObj);
-                    if (state != null && !JobState.STATE_NONE.equals(state.getValue())) {
-                        // We get the document from the store as we don't want to corrupt the document instance
-                        // associated with the event
-                        BaseObject jobObject = getModifiableObject(document.getDocumentReference(), xcontext);
+    private void onJobDeleted(BaseObject originalJobObj, XWikiDocument document)
+    {
+        try {
+            unregister(originalJobObj);
+        } catch (SchedulerPluginException e) {
+            LOGGER.warn("Failed to unregister job in document [{}]: [{}]", document.getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
 
-                        reloadJob(jobObject, xcontext);
-                    }
-                } catch (Exception e) {
-                    LOGGER.warn("Failed to reload job in document [{}]: [{}]", document.getDocumentReference(),
-                        ExceptionUtils.getRootCauseMessage(e));
-                }
+    private void onJobAdded(BaseObject jobObj, XWikiDocument document, XWikiContext xcontext)
+    {
+        try {
+            // We get the document from the store as we don't want to corrupt the document instance associated
+            // with the event
+            BaseObject jobObject = getModifiableObject(document.getDocumentReference(), jobObj.getNumber(), xcontext);
+
+            register(jobObject, xcontext);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to register job in document [{}]: [{}]", document.getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
+
+    private void onJobModified(BaseObject jobObj, XWikiDocument document, XWikiContext xcontext)
+    {
+        // The scheduler holds the job xobject that was passed to it when the job was registered, so the new
+        // definition is only taken into account once the job has been registered again.
+        try {
+            // Leave alone a job the scheduler doesn't know about: it gets registered with its new definition when
+            // it's scheduled.
+            JobState state = getCurrentJobState(jobObj);
+            if (state != null && !JobState.STATE_NONE.equals(state.getValue())) {
+                // We get the document from the store as we don't want to corrupt the document instance associated
+                // with the event
+                BaseObject jobObject =
+                    getModifiableObject(document.getDocumentReference(), jobObj.getNumber(), xcontext);
+
+                reloadJob(jobObject, xcontext);
             }
+        } catch (Exception e) {
+            LOGGER.warn("Failed to reload job in document [{}]: [{}]", document.getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

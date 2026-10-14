@@ -516,6 +516,79 @@ class SchedulerPluginTest
     }
 
     @Test
+    void scheduleJobOfSecondObjectSavesItsOwnStatus() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(JOB_DOCUMENT);
+        addJobObject(document, JobState.STATE_NONE);
+        addJobObject(document, "");
+        this.oldcore.getSpyXWiki().saveDocument(document, this.context);
+
+        this.plugin.scheduleJob(loadJob(JOB_DOCUMENT, 1), this.context);
+
+        assertEquals(TriggerState.NORMAL, getTriggerState(JOB_DOCUMENT, 1));
+        assertEquals(TriggerState.NONE, getTriggerState(JOB_DOCUMENT, 0));
+        assertEquals(JobState.STATE_NORMAL, loadJob(JOB_DOCUMENT, 1).getStringValue(STATUS));
+        assertEquals(JobState.STATE_NONE, loadJob(JOB_DOCUMENT, 0).getStringValue(STATUS));
+    }
+
+    @Test
+    void onDocumentCreatedWithSeveralJobs() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(JOB_DOCUMENT);
+        addJobObject(document, JobState.STATE_NORMAL);
+        addJobObject(document, JobState.STATE_PAUSED);
+        this.oldcore.getSpyXWiki().saveDocument(document, this.context);
+        XWikiDocument createdDocument = loadDocument(JOB_DOCUMENT);
+        createdDocument.setOriginalDocument(new XWikiDocument(JOB_DOCUMENT));
+
+        this.plugin.onEvent(new DocumentCreatedEvent(JOB_DOCUMENT), createdDocument, this.context);
+
+        assertEquals(TriggerState.NORMAL, getTriggerState(JOB_DOCUMENT, 0));
+        assertEquals(TriggerState.PAUSED, getTriggerState(JOB_DOCUMENT, 1));
+    }
+
+    @Test
+    void onDocumentUpdatedWithTheSecondJobModified() throws Exception
+    {
+        scheduleTwoJobs();
+        clearInvocations(this.schedulersClassLoaderManager);
+
+        updateDocument(document -> document.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, 1)
+            .setStringValue(CRON_FIELD, OTHER_CRON));
+
+        // Only the modified job is reloaded.
+        verify(this.schedulersClassLoaderManager).loadClassAndRegister(any(), any());
+        assertEquals(CRON, getCronExpression(JOB_DOCUMENT, 0));
+        assertEquals(OTHER_CRON, getCronExpression(JOB_DOCUMENT, 1));
+        assertEquals(TriggerState.NORMAL, getTriggerState(JOB_DOCUMENT, 1));
+    }
+
+    @Test
+    void onDocumentUpdatedWithTheSecondJobRemoved() throws Exception
+    {
+        scheduleTwoJobs();
+
+        updateDocument(document -> document
+            .removeXObject(document.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, 1)));
+
+        assertTrue(this.scheduler.checkExists(getJobKey(JOB_DOCUMENT, 0)));
+        assertFalse(this.scheduler.checkExists(getJobKey(JOB_DOCUMENT, 1)));
+    }
+
+    @Test
+    void onDocumentDeletedWithSeveralJobs() throws Exception
+    {
+        scheduleTwoJobs();
+        XWikiDocument document = new XWikiDocument(JOB_DOCUMENT);
+        document.setOriginalDocument(loadDocument(JOB_DOCUMENT));
+
+        this.plugin.onEvent(new DocumentDeletedEvent(JOB_DOCUMENT), document, this.context);
+
+        assertFalse(this.scheduler.checkExists(getJobKey(JOB_DOCUMENT, 0)));
+        assertFalse(this.scheduler.checkExists(getJobKey(JOB_DOCUMENT, 1)));
+    }
+
+    @Test
     void onWikiDeleted() throws Exception
     {
         DocumentReference fooJob = new DocumentReference("foo", "Scheduler", "Job");
@@ -586,9 +659,17 @@ class SchedulerPluginTest
      */
     private void updateJob(Consumer<BaseObject> modification) throws XWikiException
     {
+        updateDocument(document -> modification.accept(document.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE)));
+    }
+
+    /**
+     * Save a modification of the job document and send the corresponding document updated event.
+     */
+    private void updateDocument(Consumer<XWikiDocument> modification) throws XWikiException
+    {
         XWikiDocument originalDocument = loadDocument(JOB_DOCUMENT);
         XWikiDocument document = loadDocument(JOB_DOCUMENT);
-        modification.accept(document.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE));
+        modification.accept(document);
         this.oldcore.getSpyXWiki().saveDocument(document, this.context);
 
         XWikiDocument updatedDocument = loadDocument(JOB_DOCUMENT);
@@ -603,6 +684,20 @@ class SchedulerPluginTest
         this.oldcore.getSpyXWiki().saveDocument(document, this.context);
 
         return loadJob(documentReference);
+    }
+
+    /**
+     * Create a document holding two jobs and schedule both of them.
+     */
+    private void scheduleTwoJobs() throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(JOB_DOCUMENT);
+        addJobObject(document, "");
+        addJobObject(document, "");
+        this.oldcore.getSpyXWiki().saveDocument(document, this.context);
+
+        this.plugin.scheduleJob(loadJob(JOB_DOCUMENT, 0), this.context);
+        this.plugin.scheduleJob(loadJob(JOB_DOCUMENT, 1), this.context);
     }
 
     private BaseObject addJobObject(XWikiDocument document, String status) throws XWikiException
@@ -623,32 +718,58 @@ class SchedulerPluginTest
 
     private BaseObject loadJob(DocumentReference documentReference) throws XWikiException
     {
-        return loadDocument(documentReference).getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);
+        return loadJob(documentReference, 0);
     }
 
-    private String getJobId(DocumentReference documentReference)
+    private BaseObject loadJob(DocumentReference documentReference, int number) throws XWikiException
     {
-        return documentReference.getWikiReference().getName() + ":Scheduler.Job_0";
+        return loadDocument(documentReference).getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, number);
+    }
+
+    private String getJobId(DocumentReference documentReference, int number)
+    {
+        return documentReference.getWikiReference().getName() + ":Scheduler.Job_" + number;
     }
 
     private JobKey getJobKey(DocumentReference documentReference)
     {
-        return new JobKey(getJobId(documentReference));
+        return getJobKey(documentReference, 0);
+    }
+
+    private JobKey getJobKey(DocumentReference documentReference, int number)
+    {
+        return new JobKey(getJobId(documentReference, number));
     }
 
     private TriggerKey getTriggerKey(DocumentReference documentReference)
     {
-        return new TriggerKey(getJobId(documentReference));
+        return getTriggerKey(documentReference, 0);
+    }
+
+    private TriggerKey getTriggerKey(DocumentReference documentReference, int number)
+    {
+        return new TriggerKey(getJobId(documentReference, number));
     }
 
     private TriggerState getTriggerState(DocumentReference documentReference) throws Exception
     {
-        return this.scheduler.getTriggerState(getTriggerKey(documentReference));
+        return getTriggerState(documentReference, 0);
+    }
+
+    private TriggerState getTriggerState(DocumentReference documentReference, int number) throws Exception
+    {
+        return this.scheduler.getTriggerState(getTriggerKey(documentReference, number));
     }
 
     private String getCronExpression(DocumentReference documentReference) throws Exception
     {
-        return ((CronTrigger) this.scheduler.getTrigger(getTriggerKey(documentReference))).getCronExpression();
+        return getCronExpression(documentReference, 0);
+    }
+
+    private String getCronExpression(DocumentReference documentReference, int number) throws Exception
+    {
+        return ((CronTrigger) this.scheduler.getTrigger(getTriggerKey(documentReference, number)))
+            .getCronExpression();
     }
 
     /**

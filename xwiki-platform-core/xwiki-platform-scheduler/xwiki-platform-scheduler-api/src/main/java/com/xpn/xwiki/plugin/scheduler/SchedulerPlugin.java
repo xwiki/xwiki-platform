@@ -694,9 +694,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                         // Pause it
                         getScheduler().pauseJob(new JobKey(jobID));
                         break;
-                    case NORMAL:
-                    case BLOCKED:
-                    case ERROR:
+                    case NORMAL, BLOCKED, ERROR:
                         // A blocked job is currently running and does not allow concurrent executions: Quartz keeps
                         // the new trigger blocked until the end of the current execution. A job in error could not be
                         // instantiated: the reloaded job gets a new chance.

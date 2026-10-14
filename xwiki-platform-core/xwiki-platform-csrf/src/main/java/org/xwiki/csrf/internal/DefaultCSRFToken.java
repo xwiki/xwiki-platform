@@ -21,12 +21,15 @@ package org.xwiki.csrf.internal;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.time.Clock;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -39,8 +42,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
 import org.xwiki.container.servlet.ServletRequest;
@@ -48,17 +49,21 @@ import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.csrf.CSRFTokenConfiguration;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.security.authentication.AuthenticationConfiguration;
 
 /**
  * Concrete implementation of the {@link CSRFToken} component.
  * <p>
- * This implementation uses a <code>user =&gt; token</code> map to store the tokens. The tokens are random BASE64
- * encoded bit-strings.
- * </p>
- * <p>
- * TODO Expire tokens every couple of hours (configurable). Expiration can be implemented using two maps, oldTokens and
- * currentTokens, old tokens are replaced by current tokens every 1/2 period, check is performed on both and new tokens
- * are added to the current tokens.
+ * The token of a user is not stored: it is derived from the authentication validation key (see
+ * {@link AuthenticationConfiguration#getValidationKey()}), the serialized reference of the user and the current time
+ * period, as the first 16 bytes of an HMAC-SHA256, BASE64 encoded. All the nodes of a cluster must already share that
+ * key for the authentication cookies to be accepted by every node, so they all compute the same token for the same
+ * user without any state to replicate. As a consequence the token does not change on restart or logout: it rotates
+ * when the time period changes (see {@link CSRFTokenConfiguration#getTokenLifetime()}, the token of the
+ * previous period is still accepted) and when the validation key changes. The validation key must be a random value
+ * set explicitly on every node of a cluster; the example value of the configuration documentation must not be used.
+ * The key is read once, the first time a token is needed, and changing it requires a restart.
  * </p>
  * 
  * @version $Id$
@@ -66,36 +71,71 @@ import org.xwiki.model.reference.DocumentReference;
  */
 @Component
 @Singleton
-public class DefaultCSRFToken implements CSRFToken, Initializable
+public class DefaultCSRFToken implements CSRFToken
 {
-    /** Length of the random string in bytes. */
+    /**
+     * Length of the token in bytes, before encoding.
+     */
     private static final int TOKEN_LENGTH = 16;
 
-    /** Resubmission template name. */
+    /**
+     * Algorithm used to derive the tokens.
+     */
+    private static final String HMAC_ALGORITHM = "HmacSHA256";
+
+    /**
+     * Prefix of the HMAC message, so that the derived tokens cannot collide with other uses of the same key.
+     */
+    private static final String MESSAGE_PREFIX = "csrf:";
+
+    /**
+     * Subject used in the HMAC message when there is no current user.
+     */
+    private static final String GUEST_SUBJECT = "guest";
+
+    /**
+     * Value of the time period when the tokens never expire.
+     */
+    private static final long NO_PERIOD = -1;
+
+    private static final long SECONDS_PER_HOUR = 3600;
+
+    /**
+     * Resubmission template name.
+     */
     private static final String RESUBMIT_TEMPLATE = "resubmit";
 
     private static final String SEC_FETCH_SITE_HEADER = "Sec-Fetch-Site";
 
-    /** Token storage (one token per user). */
-    private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<>();
-
-    /** Token for guest user. */
-    private String guestToken;
-
-    /** Random number generator. */
-    private SecureRandom random;
-
-    /** Used to find out the current username and the current document. */
+    /**
+     * Used to find out the current username and the current document.
+     */
     @Inject
     private DocumentAccessBridge docBridge;
 
-    /** Needed to access the current request. */
+    /**
+     * Needed to access the current request.
+     */
     @Inject
     private Container container;
 
-    /** CSRFToken component configuration. */
+    /**
+     * CSRFToken component configuration.
+     */
     @Inject
     private CSRFTokenConfiguration configuration;
+
+    /**
+     * Provides the secret the tokens are derived from.
+     */
+    @Inject
+    private AuthenticationConfiguration authenticationConfiguration;
+
+    /**
+     * Used to identify the current user in the HMAC message.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     /**
      * The logger to log.
@@ -104,85 +144,120 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private Logger logger;
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * Initializes the storage and random number generator.
-     * </p>
+     * Clock used to compute the current time period (replaced in tests).
      */
-    @Override
-    public void initialize() throws InitializationException
-    {
-        try {
-            this.random = SecureRandom.getInstance("SHA1PRNG");
-        } catch (NoSuchAlgorithmException e) {
-            // use the default implementation then
-            this.random = new SecureRandom();
-            this.logger.warn("Using default implementation of SecureRandom for CSRF token");
-        }
-        byte[] seed = this.random.generateSeed(TOKEN_LENGTH);
-        this.random.setSeed(seed);
-        this.logger.debug("Anti-CSRF secret token component has been initialized");
-    }
+    private Clock clock = Clock.systemUTC();
 
     /**
-     * Set the source of random numbers manually.
-     *
-     * @param random a source of random numbers to use.
+     * The secret used to derive the tokens, read once from the configuration.
      */
-    protected void setRandom(final SecureRandom random)
-    {
-        this.random = random;
-    }
+    private volatile byte[] secret;
 
     @Override
     public String getToken()
     {
-        DocumentReference key = getTokenKey();
-        // Handle the case where the current user is Guest
-        if (key == null) {
-            if (guestToken == null) {
-                guestToken = newToken();
-            }
-            return guestToken;
-        }
-
-        // Return the current token if it exists, or generate a new one and return it.
-        return this.tokens.computeIfAbsent(key, documentReference -> newToken());
-    }
-
-    private String newToken()
-    {
-        byte[] bytes = new byte[TOKEN_LENGTH];
-        this.random.nextBytes(bytes);
-        // Base64 encoded token can contain __ or -- which breaks the layout (see XWIKI-5996). Replacing them
-        // with x reduces randomness a bit, but it seems that other special characters are either used in XWiki
-        // syntax or not URL-safe
-        return Base64.encodeBase64URLSafeString(bytes).replaceAll("[_=+-]", "x");
+        return computeToken(getSubject(), getCurrentPeriod());
     }
 
     @Override
     public void clearToken()
     {
-        this.logger.debug("Forgetting CSRF token for [{}]", getTokenKey());
-        this.tokens.remove(getTokenKey());
+        // The token is derived from the validation key and the current user, there is nothing to forget.
+        this.logger.debug("Ignoring request to clear the CSRF token for [{}]: tokens are derived from the "
+            + "authentication validation key and cannot be cleared", getTokenKey());
     }
 
     @Override
-    // The token is generated and not user-controlled
+    // The received token is logged to help investigating failed checks (as before); it is an opaque short string
     @SuppressWarnings("javasecurity:S5145")
     public boolean isTokenValid(String token)
     {
         if (!this.configuration.isEnabled()) {
             return true;
         }
-        String storedToken = getToken();
-        if (token == null || token.isEmpty() || !storedToken.equals(token)) {
-            this.logger.warn("Secret CSRF token verification failed (token: [{}], stored token: [{}])", token,
-                storedToken);
-
-            return false;
+        if (token != null && !token.isEmpty()) {
+            String subject = getSubject();
+            long period = getCurrentPeriod();
+            // Accept the token of the current period and the one of the previous period, so that a form rendered
+            // just before the period changed can still be submitted.
+            if (matches(token, computeToken(subject, period))
+                || (period > 0 && matches(token, computeToken(subject, period - 1)))) {
+                return true;
+            }
         }
-        return true;
+        this.logger.warn("Secret CSRF token verification failed for user [{}] (token: [{}])", getTokenKey(), token);
+
+        return false;
+    }
+
+    private boolean matches(String token, String expected)
+    {
+        return MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8),
+            token.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * @return the subject identifying the current user in the HMAC message
+     */
+    private String getSubject()
+    {
+        DocumentReference user = getTokenKey();
+        return user == null ? GUEST_SUBJECT : this.serializer.serialize(user);
+    }
+
+    /**
+     * @return the current time period (the number of token lifetimes elapsed since the epoch), or {@link #NO_PERIOD}
+     *         when the tokens never expire
+     */
+    private long getCurrentPeriod()
+    {
+        long lifetime = this.configuration.getTokenLifetime() * SECONDS_PER_HOUR;
+        if (lifetime <= 0) {
+            return NO_PERIOD;
+        }
+        return this.clock.instant().getEpochSecond() / lifetime;
+    }
+
+    /**
+     * @return the secret the tokens are derived from
+     * @throws IllegalStateException when no validation key is configured
+     */
+    private byte[] getSecret()
+    {
+        byte[] result = this.secret;
+        if (result == null) {
+            String key = this.authenticationConfiguration.getValidationKey();
+            if (StringUtils.isBlank(key)) {
+                throw new IllegalStateException(
+                    "No authentication validation key configured, cannot derive CSRF tokens");
+            }
+            result = key.getBytes(StandardCharsets.UTF_8);
+            this.secret = result;
+        }
+        return result;
+    }
+
+    private String computeToken(String subject, long period)
+    {
+        String message = MESSAGE_PREFIX + subject;
+        if (period != NO_PERIOD) {
+            message += ':' + Long.toString(period);
+        }
+
+        byte[] mac;
+        try {
+            Mac hmac = Mac.getInstance(HMAC_ALGORITHM);
+            hmac.init(new SecretKeySpec(getSecret(), HMAC_ALGORITHM));
+            mac = hmac.doFinal(message.getBytes(StandardCharsets.UTF_8));
+        } catch (GeneralSecurityException e) {
+            // HmacSHA256 is mandatory for every Java implementation, this should never happen
+            throw new IllegalStateException("Failed to derive the CSRF token", e);
+        }
+
+        // Base64 encoded token can contain __ or -- which breaks the layout (see XWIKI-5996). Replacing them
+        // with x reduces randomness a bit, but it seems that other special characters are either used in XWiki
+        // syntax or not URL-safe
+        return Base64.encodeBase64URLSafeString(Arrays.copyOf(mac, TOKEN_LENGTH)).replaceAll("[_=+-]", "x");
     }
 
     @Override
@@ -308,9 +383,9 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     }
 
     /**
-     * Get the token map key for the current user.
+     * Get the reference of the current user, {@code null} for guests.
      * 
-     * @return key for the token map
+     * @return the reference of the current user
      */
     private DocumentReference getTokenKey()
     {

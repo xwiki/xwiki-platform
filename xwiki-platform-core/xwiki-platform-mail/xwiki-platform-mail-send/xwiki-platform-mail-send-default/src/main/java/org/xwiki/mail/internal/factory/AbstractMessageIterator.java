@@ -21,6 +21,7 @@ package org.xwiki.mail.internal.factory;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -73,6 +74,10 @@ public abstract class AbstractMessageIterator implements Iterator<MimeMessage>, 
     @Override
     public MimeMessage next()
     {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+
         MimeMessage mimeMessage;
         try {
             mimeMessage = createMessage();

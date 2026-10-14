@@ -183,6 +183,11 @@ public class AllIT
     }
 
     @Nested
+    class NestedWikiPickerIT extends WikiPickerIT
+    {
+    }
+
+    @Nested
     class NestedCompareIT extends CompareIT
     {
     }

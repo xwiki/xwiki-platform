@@ -197,3 +197,13 @@ allowBuilds:
   esbuild: true
   nx: true
   unrs-resolver: true
+# The chainpad package declares the tools it is built and tested with as dependencies, although its entry point is a
+# self-contained bundle that needs none of them. They would pull outdated packages (e.g. a vulnerable minimist) into
+# the workspace. Remove these overrides when upgrading to a chainpad release that includes
+# https://github.com/cryptpad/chainpad/pull/20.
+overrides:
+  chainpad>fast-diff: "-"
+  chainpad>gluejs: "-"
+  chainpad>json.sortify: "-"
+  chainpad>nthen: "-"
+  chainpad>xmhell: "-"

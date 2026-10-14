@@ -36,15 +36,15 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
   // The prefix used by the document tree for the id of the nodes backing a page.
   const documentNodePrefix = 'document:';
 
-  const getLabels = function(tree, node) {
-    const labels = [node.text];
+  const getHierarchy = function(tree, node) {
+    const hierarchy = [node.text];
     // The parents are listed from the closest one to the root of the tree.
     node.parents.forEach(function(parentId) {
       if (parentId.indexOf(documentNodePrefix) === 0) {
-        labels.unshift(tree.get_node(parentId).text);
+        hierarchy.unshift(tree.get_node(parentId).text);
       }
     });
-    return labels;
+    return hierarchy;
   };
 
   /**
@@ -64,7 +64,7 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
     return {
       reference: documentReference.parent,
       // The tree already knows the pretty name of each ancestor, so we get a proper hierarchy hint for free.
-      labels: getLabels(tree, node)
+      hierarchy: getHierarchy(tree, node)
     };
   };
 
@@ -85,7 +85,7 @@ define('xwiki-compactLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-t
    */
   const toSuggestion = function(suggestInput, tree, node) {
     const location = toLocation(tree, node);
-    return location && suggestSpaces.createSuggestion(suggestInput.settings, location.reference, location.labels);
+    return location && suggestSpaces.createSuggestion(suggestInput.settings, location.reference, location.hierarchy);
   };
 
   //

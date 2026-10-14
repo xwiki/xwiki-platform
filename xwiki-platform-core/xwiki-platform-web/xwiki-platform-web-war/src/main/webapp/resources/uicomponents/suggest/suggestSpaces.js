@@ -185,9 +185,9 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-icon!xwiki-suggestSpaces-icons',
    */
   const processPage = function(options, page) {
     const spaceReference = resolveSpaceReference(page.space, page.wiki);
-    const hierarchy = page.hierarchy?.items || [];
-    const labels = hierarchy.filter(item => item.type === 'space').map(item => item.label);
-    return createSuggestion(options, spaceReference, labels);
+    const hierarchyItems = page.hierarchy?.items || [];
+    const hierarchy = hierarchyItems.filter(item => item.type === 'space').map(item => item.label);
+    return createSuggestion(options, spaceReference, hierarchy);
   };
 
   /**
@@ -197,20 +197,20 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-icon!xwiki-suggestSpaces-icons',
    *
    * @param options the Selectize settings, used to know the document the value is saved in
    * @param spaceReference the reference of the space to suggest
-   * @param labels the labels of the spaces in the hierarchy, the last one being the label of the given space; when not
-   *   specified the names from the space reference are used instead
+   * @param hierarchy the labels of the spaces in the hierarchy, the last one being the label of the given space; when
+   *   not specified the names from the space reference are used instead
    */
-  const createSuggestion = function(options, spaceReference, labels) {
-    if (!labels?.length) {
-      labels = getSpaceNames(spaceReference);
+  const createSuggestion = function(options, spaceReference, hierarchy) {
+    if (!hierarchy?.length) {
+      hierarchy = getSpaceNames(spaceReference);
     }
     const relativeReference = spaceReference.relativeTo(options.documentReference.getRoot());
     const homeReference = new XWiki.EntityReference(webHome, XWiki.EntityType.DOCUMENT, spaceReference);
     return {
       value: XWiki.Model.serialize(relativeReference),
-      label: labels[labels.length - 1],
+      label: hierarchy[hierarchy.length - 1],
       // The hierarchy of the space, without the space itself.
-      hint: labels.slice(0, -1).join(' / '),
+      hint: hierarchy.slice(0, -1).join(' / '),
       icon: icons.folder,
       url: new XWiki.Document(homeReference).getURL()
     };

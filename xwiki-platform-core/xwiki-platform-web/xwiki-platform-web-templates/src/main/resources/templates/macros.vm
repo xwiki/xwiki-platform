@@ -2811,7 +2811,7 @@ $string##
  * Moves the 'freeText' option, if any, to the data attribute the picker widgets read it from. It has to be removed from
  * the parameters because everything left in there is displayed as an HTML attribute.
  *#
-#macro (picker_freeText $parameters)
+#macro (_picker_freeText $parameters)
   #set ($macro.freeText = "$!parameters.remove('freeText')")
   #if ($macro.freeText != '')
     #set ($discard = $parameters.put('data-freeText', $macro.freeText))
@@ -2837,14 +2837,33 @@ $string##
     #set ($macro.titleKey = "core.widgets.suggest.${type}Picker.single.title")
   #end
   #set ($discard = $parameters.putIfAbsent('title', $services.localization.render($macro.titleKey)))
-  #picker_freeText($parameters)
+  #_picker_freeText($parameters)
   #suggestInput($parameters)
 #end
 
+#**
+ * Outputs a suggest input for picking one or more tags of the current wiki. A value that is not an existing tag can be
+ * entered too, so that new tags can be picked.
+ *
+ * @param $parameters the parameters, most of them being output as HTML attributes of the suggest input:
+ *   'name' the name of the form field holding the value;
+ *   'value' the initially selected tags;
+ *   'multiple' set it to 'multiple' to allow selecting more than one tag
+ * @since 18.10.0RC1
+ *#
 #macro (tagPicker $parameters)
   #_restListPicker('tag' $parameters)
 #end
 
+#**
+ * Outputs a suggest input for picking one or more wikis, by their identifiers.
+ *
+ * @param $parameters the parameters, most of them being output as HTML attributes of the suggest input:
+ *   'name' the name of the form field holding the value;
+ *   'value' the initially selected wiki identifiers;
+ *   'multiple' set it to 'multiple' to allow selecting more than one wiki
+ * @since 18.10.0RC1
+ *#
 #macro (wikiPicker $parameters)
   #_restListPicker('wiki' $parameters)
 #end

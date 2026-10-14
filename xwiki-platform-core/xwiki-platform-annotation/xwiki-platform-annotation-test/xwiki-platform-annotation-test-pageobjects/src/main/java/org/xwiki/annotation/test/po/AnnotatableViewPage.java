@@ -263,7 +263,8 @@ public class AnnotatableViewPage extends BaseElement
     }
 
     /**
-     * Wait for at least one annotation to be displayed.
+     * Wait for at least one annotation to be displayed, and for the document extra tab that displaying the annotations
+     * reloads (e.g. the Comments tab) to be loaded again.
      * 
      * @since 12.10.9
      * @since 13.4.1
@@ -272,6 +273,9 @@ public class AnnotatableViewPage extends BaseElement
     public void waitForAnnotationsDisplayed()
     {
         getDriver().waitUntilElementIsVisible(By.className("annotation-highlight"));
+        // Displaying the annotations also reloads the open document extra tab asynchronously, and the tab is empty
+        // until its content is received.
+        getDriver().waitUntilElementDisappears(By.cssSelector("#docextrapanes.loading"));
     }
 
     // Un-checks the "Show Annotations" check box.

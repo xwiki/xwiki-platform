@@ -128,6 +128,32 @@
               <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
             </configuration>
           </execution>
+          <!-- Extract Prototype.js for the JavaScript unit tests located in src/test/node, which load it the way the
+               browser does before loading the legacy JavaScript code that depends on it. Prototype.js isn't published
+               on npm, so it can't be a dependency of the Node package holding those tests. -->
+          <execution>
+            <id>unpack-prototype-for-javascript-tests</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>prototype</artifactId>
+                  <type>jar</type>
+                  <includes>**/prototype.js</includes>
+                  <!-- Drop the "META-INF/resources/webjars/prototype/<version>" prefix so that the tests don't need to
+                       know the version. -->
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+                  </fileMappers>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/test-webjars</outputDirectory>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <!-- Minify and optimize the JavaScript code. -->

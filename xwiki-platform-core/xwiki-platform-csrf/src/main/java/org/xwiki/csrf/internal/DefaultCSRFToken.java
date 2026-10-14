@@ -27,6 +27,7 @@ import java.security.MessageDigest;
 import java.time.Clock;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -51,6 +52,8 @@ import org.xwiki.csrf.CSRFTokenConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
+
+import com.google.common.base.Suppliers;
 
 /**
  * Concrete implementation of the {@link CSRFToken} component.
@@ -149,9 +152,10 @@ public class DefaultCSRFToken implements CSRFToken
     private Clock clock = Clock.systemUTC();
 
     /**
-     * The secret used to derive the tokens, read once from the configuration.
+     * The secret used to derive the tokens, read from the configuration the first time it is needed (a failure is not
+     * memoized, so a key configured later is picked up).
      */
-    private volatile byte[] secret;
+    private final Supplier<byte[]> secret = Suppliers.memoize(this::readSecret);
 
     @Override
     public String getToken()
@@ -224,17 +228,16 @@ public class DefaultCSRFToken implements CSRFToken
      */
     private byte[] getSecret()
     {
-        byte[] result = this.secret;
-        if (result == null) {
-            String key = this.authenticationConfiguration.getValidationKey();
-            if (StringUtils.isBlank(key)) {
-                throw new IllegalStateException(
-                    "No authentication validation key configured, cannot derive CSRF tokens");
-            }
-            result = key.getBytes(StandardCharsets.UTF_8);
-            this.secret = result;
+        return this.secret.get();
+    }
+
+    private byte[] readSecret()
+    {
+        String key = this.authenticationConfiguration.getValidationKey();
+        if (StringUtils.isBlank(key)) {
+            throw new IllegalStateException("No authentication validation key configured, cannot derive CSRF tokens");
         }
-        return result;
+        return key.getBytes(StandardCharsets.UTF_8);
     }
 
     private String computeToken(String subject, long period)

@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStore;
@@ -60,7 +61,8 @@ class EventSearcherTest
     @MockComponent
     private EventStreamConfiguration configuration;
 
-    private NotificationParameters parameters = new NotificationParameters();
+    @Mock
+    private NotificationParameters parameters;
 
     @BeforeEach
     void beforeEach()

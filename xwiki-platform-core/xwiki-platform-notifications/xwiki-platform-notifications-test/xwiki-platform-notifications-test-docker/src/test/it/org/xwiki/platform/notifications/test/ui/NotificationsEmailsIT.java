@@ -87,8 +87,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     properties = {
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml,notification-filter-preferences.hbm.xml",
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin",
-        // Switch to domain-based URL
-        "xwikiCfgVirtualUsepath=0",
         // Send the live notification emails as soon as the events are processed, instead of waiting 10 minutes.
         "xwikiPropertiesAdditionalProperties=notifications.emails.live.graceTime=0"
     },
@@ -426,8 +424,7 @@ class NotificationsEmailsIT
             setup.updateObject("WikiManager", "WikiUserConfiguration", "WikiManager.WikiUserClass", 0, "userScope",
                 "local_and_global");
             setup.createUser(SUBWIKI_USER_NAME, PASSWORD, "", "email", subwikiUserEmail);
-            // The email frequency selector saves through a URL using the domain of the subwiki, which the browser
-            // can't reach since this test class switches to domain-based URLs. Set the frequency with REST instead.
+            // Set the email frequency with REST, the user profile below checks that it is taken into account.
             setup.rest().addObject(new DocumentReference(wiki.getName(), USERS_SPACE, SUBWIKI_USER_NAME),
                 "XWiki.Notifications.Code.NotificationEmailPreferenceClass", "interval", "live");
 

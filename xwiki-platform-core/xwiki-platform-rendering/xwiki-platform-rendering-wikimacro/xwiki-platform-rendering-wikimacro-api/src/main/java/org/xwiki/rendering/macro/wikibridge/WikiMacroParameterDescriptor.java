@@ -214,6 +214,9 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
         return this.description;
     }
 
+    /**
+     * @deprecated use {@link #getParameterType()} instead
+     */
     @Override
     @Deprecated
     public Class<?> getType()

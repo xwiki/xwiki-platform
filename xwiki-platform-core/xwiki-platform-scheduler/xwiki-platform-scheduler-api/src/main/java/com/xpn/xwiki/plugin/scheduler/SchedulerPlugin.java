@@ -176,6 +176,18 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         return this.enabled;
     }
 
+    /**
+     * Enable or disable the plugin without starting the default Quartz scheduler, so that the jobs are handled by the
+     * scheduler set with {@link #setScheduler(Scheduler)}. {@link #init(XWikiContext)} starts the default scheduler in
+     * a separate thread when the plugin is enabled, which would replace the scheduler set by a test.
+     *
+     * @param enabled {@code true} to enable the plugin
+     */
+    void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
+    }
+
     private void checkEnabled() throws SchedulerPluginException
     {
         if (!isEnabled()) {

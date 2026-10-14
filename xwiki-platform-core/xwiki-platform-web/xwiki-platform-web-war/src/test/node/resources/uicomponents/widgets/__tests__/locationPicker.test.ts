@@ -140,6 +140,11 @@ describe("Location Picker", () => {
       expect(getPreviewReference()).toEqual("otherwiki:Space.Target.WebHome");
     });
 
+    it("uses the current wiki when no wiki is selected", () => {
+      setParent("", "Space.Target");
+      expect(getPreviewReference()).toEqual("xwiki:Space.Target.WebHome");
+    });
+
     it("uses the selected wiki when the wiki changes", () => {
       jquery(".location-parent-field").val("Space.Target");
       jquery(".location-wiki-field").val("subwiki").trigger("change");

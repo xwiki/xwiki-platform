@@ -362,9 +362,7 @@ class MacroIT extends AbstractCKEditorIT
         setSource(String.format("before\n\n{{%s spaces=\"Main\" pages=\"Main.WebHome\"/}}\n\nafter", macroId));
 
         this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
-        this.textArea.waitUntilWidgetSelected();
-        this.textArea.sendKeys(Keys.ENTER);
-        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
+        MacroDialogEditModal macroEditModal = this.textArea.editSelectedMacro();
 
         // Every typed parameter is edited with a picker. Note that looking up the picker already asserts that the
         // suggestion widget has been applied to the parameter field.
@@ -388,7 +386,6 @@ class MacroIT extends AbstractCKEditorIT
         macroEditModal.getMacroParameterSuggestInput("pages").sendKeys("Target Page").waitForNonTypedSuggestions()
             .selectByValue(targetPageValue);
         macroEditModal.clickSubmit();
-        this.textArea.waitForContentRefresh();
 
         assertSourceContains("wikis=\"xwiki\"");
         assertSourceContains(String.format("spaces=\"Main,%s\"", targetSpaceValue));

@@ -46,31 +46,12 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
     return alice.label.localeCompare(bob.label);
   };
 
-  /**
-   * Builds a selectize 'load'/'loadSelected' function for a REST resource that returns a flat list of values under the
-   * given response key (e.g. {tags: [...]} or {wikis: [...]}).
-   */
-  var getRestListLoad = function(loadURL, responseKey, toSuggestion) {
-    return function(getParams) {
-      return async function(text, callback) {
-        try {
-          const response = await $.getJSON(loadURL, getParams(text));
-          const list = Array.isArray(response?.[responseKey]) ? response[responseKey] : [];
-          callback(list.map(toSuggestion));
-        } catch {
-          callback();
-        }
-      };
-    };
-  };
-
   return {
     loadSuggestions: function(sources, params) {
       return sources.reduce(function(promise, source) {
         return promise.then(maybeLoadMoreSuggestions(source, params));
       }, Promise.resolve([]));
-    },
-    getRestListLoad: getRestListLoad
+    }
   };
 });
 
@@ -207,85 +188,40 @@ require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-br
 });
 
 /**
- * Tags
+ * Values listed by a REST resource, such as tags and wikis.
  */
-define('xwiki-suggestTags', ['jquery', 'xwiki-entityReference', 'xwiki-selectize-utils', 'xwiki-selectize'],
-  function($, XWiki, utils) {
-    function getSelectizeOptions(select) {
-      const loadURL = [
-        XWiki.contextPath, 'rest',
-        'wikis', encodeURIComponent(XWiki.currentWiki),
-        'tags'
-      ].join('/');
-
-      const getLoad = utils.getRestListLoad(loadURL, 'tags', getSuggestion);
-
-      return {
-        create: true,
-        load: getLoad(function(text) {
-          return {};
-        }),
-        loadSelected: getLoad(function(text) {
-          return {};
-        })
-      };
+define('xwiki-suggestRestListValues', ['jquery', 'xwiki-entityReference', 'xwiki-selectize'], function($, XWiki) {
+  /**
+   * Builds the selectize options for a REST resource that returns the list of values under the given response key,
+   * each value having a name.
+   */
+  function getSelectizeOptions(restPath, responseKey) {
+    const loadURL = [XWiki.contextPath, 'rest', ...restPath].join('/');
+    async function load(text, callback) {
+      try {
+        const response = await $.getJSON(loadURL);
+        const values = Array.isArray(response?.[responseKey]) ? response[responseKey] : [];
+        callback(values.map(value => ({value: value.name})));
+      } catch {
+        callback();
+      }
     }
+    return {create: true, load, loadSelected: load};
+  }
 
-    function getSuggestion(tagValue) {
-      return {
-        value: tagValue.name
-      };
-    }
+  $.fn.suggestRestListValues = function(restPath, responseKey) {
+    return this.each(function() {
+      $(this).xwikiSelectize(getSelectizeOptions(restPath, responseKey));
+    });
+  };
+});
 
-    $.fn.suggestTagValues = function() {
-      return this.each(function() {
-        $(this).xwikiSelectize(getSelectizeOptions($(this)));
-      });
-    };
-  });
-
-/**
- * Wikis
- */
-define('xwiki-suggestWikis', ['jquery', 'xwiki-entityReference', 'xwiki-selectize-utils', 'xwiki-selectize'],
-  function($, XWiki, utils) {
-    function getSelectizeOptions(select) {
-      const loadURL = [
-        XWiki.contextPath, 'rest',
-        'wikis'
-      ].join('/');
-
-      const getLoad = utils.getRestListLoad(loadURL, 'wikis', getSuggestion);
-
-      return {
-        create: true,
-        load: getLoad(function(text) {
-          return {};
-        }),
-        loadSelected: getLoad(function(text) {
-          return {};
-        })
-      };
-    }
-
-    function getSuggestion(wikiValue) {
-      return {
-        value: wikiValue.name
-      };
-    }
-
-    $.fn.suggestWikiValues = function() {
-      return this.each(function() {
-        $(this).xwikiSelectize(getSelectizeOptions($(this)));
-      });
-    };
-  });
-
-require(['jquery', 'xwiki-suggestTags', 'xwiki-suggestWikis', 'xwiki-events-bridge'], function($) {
+require(['jquery', 'xwiki-entityReference', 'xwiki-suggestRestListValues', 'xwiki-events-bridge'], function($, XWiki) {
   function init(event, data) {
     const container = $(data?.elements || document);
-    container.find('.suggest-tags').suggestTagValues();
-    container.find('.suggest-wikis').suggestWikiValues();
+    container.find('.suggest-tags')
+      .suggestRestListValues(['wikis', encodeURIComponent(XWiki.currentWiki), 'tags'], 'tags');
+    container.find('.suggest-wikis').suggestRestListValues(['wikis'], 'wikis');
   }
 
   $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);

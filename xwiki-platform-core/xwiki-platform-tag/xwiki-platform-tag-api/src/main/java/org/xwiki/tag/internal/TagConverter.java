@@ -21,7 +21,7 @@ package org.xwiki.tag.internal;
 
 import java.lang.reflect.Type;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.properties.converter.AbstractConverter;

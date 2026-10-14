@@ -68,8 +68,8 @@ public class PackageConfiguration implements Cloneable
         try {
             return (PackageConfiguration) super.clone();
         } catch (CloneNotSupportedException e) {
-            // Should never happen
-            return null;
+            // Should never happen since this class implements Cloneable.
+            throw new IllegalStateException("Failed to clone the package configuration", e);
         }
     }
 

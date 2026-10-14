@@ -86,12 +86,10 @@ public class XWikiAttachmentArchive implements Cloneable
     {
         try {
             return super.clone();
-        } catch (Exception e) {
-            // This should not happen
-            LOGGER.error("Error while attachmentArchive.clone()", e);
+        } catch (CloneNotSupportedException e) {
+            // Should never happen since this class implements Cloneable.
+            throw new IllegalStateException("Failed to clone the attachment archive", e);
         }
-
-        return null;
     }
 
     /**

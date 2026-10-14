@@ -25,11 +25,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.export.ExportFormatHandler;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
@@ -75,6 +80,11 @@ public class ExportAction extends XWikiAction
     private static final String HTTP_METHOD_POST = "POST";
 
     /**
+     * The export format used when the request doesn't specify one.
+     */
+    private static final String DEFAULT_FORMAT = "xar";
+
+    /**
      * Not taken from a servlet API constant, so that this stays identical on the branches where oldcore has only the
      * javax namespace and on those where it has only the jakarta one.
      */
@@ -85,6 +95,9 @@ public class ExportAction extends XWikiAction
      */
     private static final String RESUBMIT_TEMPLATE = "exportresubmit";
 
+    @Inject
+    private Logger logger;
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -93,11 +106,15 @@ public class ExportAction extends XWikiAction
         try {
             XWikiRequest request = context.getRequest();
             String format = request.get("format");
+            ExportFormatHandler formatHandler = getExportFormatHandler(format);
 
-            if (!validateExportRequest(request)) {
+            if (!validateExportRequest(context, formatHandler)) {
                 refuseExportRequest(context);
                 return RESUBMIT_TEMPLATE;
-            } else if (format == null || "xar".equals(format)) {
+            } else if (formatHandler != null) {
+                handleRevision(context);
+                defaultPage = formatHandler.export(context);
+            } else if (format == null || DEFAULT_FORMAT.equals(format)) {
                 defaultPage = exportXAR(context);
             } else if ("html".equals(format)) {
                 defaultPage = exportHTML(context);
@@ -116,18 +133,45 @@ public class ExportAction extends XWikiAction
      * Checks if the given request is intended to perform an export. We need this check because large exports require
      * many resources and we want to allocate those resources only when there is a clear intent.
      *
-     * @param request the export request to validate
+     * @param context the XWiki context, holding the export request to validate
+     * @param formatHandler the component that handles the requested export format, {@code null} if the export format
+     *            is handled by this action
      * @return {@code true} if the request is a valid export request (e.g. the user intended to perform an export),
      *         {@code false} otherwise
      */
-    private boolean validateExportRequest(XWikiRequest request)
+    private boolean validateExportRequest(XWikiContext context, ExportFormatHandler formatHandler)
     {
         // A GET request to this action can be triggered without any user intent, for instance by a resource loaded
         // with a relative URL from a page that is itself served by the export action (this is the case of the PDF
         // export print preview), and an unintended backup XAR export is very expensive. Requiring POST means an export
         // can only be started by submitting one of the export forms. Requests that are refused here get the
-        // RESUBMIT_TEMPLATE, from which the user can start the same export again with a POST request.
-        return HTTP_METHOD_POST.equalsIgnoreCase(request.getMethod());
+        // RESUBMIT_TEMPLATE, from which the user can start the same export again with a POST request. Export format
+        // handlers validate the request themselves, because those that only render a page (e.g. the PDF export print
+        // preview, loaded with GET by the browser that generates the PDF) can accept GET requests.
+        if (formatHandler != null) {
+            return formatHandler.validate(this.container.getRequest());
+        }
+        return HTTP_METHOD_POST.equalsIgnoreCase(context.getRequest().getMethod());
+    }
+
+    /**
+     * @param format the requested export format, {@code null} for the default (XAR) export format
+     * @return the component that handles the given export format, {@code null} if there's none (or if it fails to be
+     *         initialized), in which case the export format is handled by this action (if supported)
+     */
+    private ExportFormatHandler getExportFormatHandler(String format)
+    {
+        String hint = format == null ? DEFAULT_FORMAT : format;
+        if (this.componentManager.hasComponent(ExportFormatHandler.class, hint)) {
+            try {
+                return this.componentManager.getInstance(ExportFormatHandler.class, hint);
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Failed to load the handler for the [{}] export format. Root cause is: [{}].", hint,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
+        return null;
     }
 
     /**

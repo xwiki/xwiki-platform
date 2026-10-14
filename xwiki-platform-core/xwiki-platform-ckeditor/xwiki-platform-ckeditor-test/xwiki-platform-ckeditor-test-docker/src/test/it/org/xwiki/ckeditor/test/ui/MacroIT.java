@@ -379,8 +379,10 @@ class MacroIT extends AbstractCKEditorIT
         assertEquals(List.of("Main.WebHome"), macroEditModal.getMacroParameterSuggestInput("pages").getValues());
         assertEquals(List.of(), macroEditModal.getMacroParameterSuggestInput("tags").getValues());
 
-        // Select an additional space and an additional page with their pickers and check that they end up in the
-        // macro call, so that the save round-trip is verified for more than just the 'spaces' picker.
+        // Select a wiki, an additional space and an additional page with their pickers and check that they end up in
+        // the macro call, so that the save round-trip is verified for more than just the 'spaces' picker.
+        macroEditModal.getMacroParameterSuggestInput("wikis").sendKeys("xwiki").waitForNonTypedSuggestions()
+            .selectByValue("xwiki");
         macroEditModal.getMacroParameterSuggestInput("spaces").sendKeys("Target Space").waitForNonTypedSuggestions()
             .selectByValue(targetSpaceValue);
         macroEditModal.getMacroParameterSuggestInput("pages").sendKeys("Target Page").waitForNonTypedSuggestions()
@@ -388,6 +390,7 @@ class MacroIT extends AbstractCKEditorIT
         macroEditModal.clickSubmit();
         this.textArea.waitForContentRefresh();
 
+        assertSourceContains("wikis=\"xwiki\"");
         assertSourceContains(String.format("spaces=\"Main,%s\"", targetSpaceValue));
         assertSourceContains(String.format("pages=\"Main.WebHome,%s\"", targetPageValue));
     }

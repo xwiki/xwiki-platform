@@ -669,8 +669,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         // Get current state of the job
         JobState currentState = getCurrentJobState(jobID);
 
-        // If no job exist in the scheduler by this id, there is nothing to do
-        if (currentState != null) {
+        // If no job exist in the scheduler by this id, there is nothing to do (Quartz returns NONE for an unknown
+        // trigger)
+        if (currentState != null && currentState.getQuartzState() != TriggerState.NONE) {
             // Rebuild the job
             JobDetail job = buildJobDetails(jobObject, context);
 
@@ -693,12 +694,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                         // Pause it
                         getScheduler().pauseJob(new JobKey(jobID));
                         break;
-                    case NORMAL:
-                        // Scheduler the job
+                    case NORMAL, BLOCKED, ERROR:
+                        // A blocked job is currently running and does not allow concurrent executions: Quartz keeps
+                        // the new trigger blocked until the end of the current execution. A job in error could not be
+                        // instantiated: the reloaded job gets a new chance.
                         getScheduler().scheduleJob(buildTrigger(jobObject));
                         break;
                     default:
-                        // do nothing
+                        // A complete trigger won't fire anymore, so there is nothing to schedule
                 }
             } catch (SchedulerException e) {
                 throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB,

@@ -20,20 +20,32 @@
 package com.xpn.xwiki.plugin.scheduler;
 
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.quartz.CronTrigger;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
+import org.quartz.JobBuilder;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.KeyMatcher;
+import org.quartz.listeners.JobListenerSupport;
+import org.quartz.listeners.SchedulerListenerSupport;
 import org.quartz.simpl.RAMJobStore;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -42,6 +54,8 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.classloader.internal.ClassLoaderResetEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
@@ -71,8 +85,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link SchedulerPlugin}, using an in-memory Quartz scheduler which is never started so that the jobs
- * are registered but never executed.
+ * Unit tests for {@link SchedulerPlugin}, using an in-memory Quartz scheduler which is only started by the tests which
+ * need to execute jobs, so that the jobs are otherwise registered but never executed.
  *
  * @version $Id$
  */
@@ -91,6 +105,18 @@ class SchedulerPluginTest
     private static final String STATUS = "status";
 
     private static final String CRON_FIELD = "cron";
+
+    /**
+     * A cron expression which doesn't fire during the tests.
+     */
+    private static final String FAR_CRON = "0 0 12 1 1 ? 2099";
+
+    private static final JobKey PROBE_JOB = new JobKey("probe");
+
+    private static final long TIMEOUT = 10;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -137,6 +163,8 @@ class SchedulerPluginTest
     @AfterEach
     void afterEach() throws Exception
     {
+        // Don't leave a running job behind.
+        BlockingJob.reset();
         this.scheduler.shutdown();
     }
 
@@ -325,6 +353,85 @@ class SchedulerPluginTest
         assertFalse(this.scheduler.checkExists(getJobKey(JOB_DOCUMENT)));
     }
 
+    @Test
+    void reloadJob() throws Exception
+    {
+        this.plugin.scheduleJob(createJob(JOB_DOCUMENT, ""), this.context);
+        BaseObject job = loadJob(JOB_DOCUMENT);
+        job.setStringValue(CRON_FIELD, OTHER_CRON);
+
+        this.plugin.reloadJob(job, this.context);
+
+        assertEquals(TriggerState.NORMAL, getTriggerState(JOB_DOCUMENT));
+        assertEquals(OTHER_CRON, getCronExpression(JOB_DOCUMENT));
+    }
+
+    @Test
+    void reloadJobUnknownToTheScheduler() throws Exception
+    {
+        createJob(JOB_DOCUMENT, "");
+
+        this.plugin.reloadJob(loadJob(JOB_DOCUMENT), this.context);
+
+        // Nothing is registered, and the job isn't even built (which saves the context in which it's executed).
+        assertFalse(this.scheduler.checkExists(getJobKey(JOB_DOCUMENT)));
+        verify(this.schedulersClassLoaderManager, never()).loadClassAndRegister(any(), any());
+        assertEquals("", loadJob(JOB_DOCUMENT).getStringValue("contextUser"));
+    }
+
+    @Test
+    void reloadJobWhileItIsRunning() throws Exception
+    {
+        BlockingJob.reset();
+        doReturn(BlockingJob.class).when(this.schedulersClassLoaderManager).loadClassAndRegister(any(), any());
+        scheduleJobWithFarCron();
+        this.scheduler.start();
+        this.plugin.triggerJob(loadJob(JOB_DOCUMENT), this.context);
+        assertTrue(BlockingJob.started.await(TIMEOUT, TimeUnit.SECONDS));
+        // The job doesn't allow concurrent executions.
+        assertEquals(TriggerState.BLOCKED, getTriggerState(JOB_DOCUMENT));
+
+        this.plugin.reloadJob(loadJob(JOB_DOCUMENT), this.context);
+
+        // The reloaded job waits for the end of the current execution.
+        assertEquals(TriggerState.BLOCKED, getTriggerState(JOB_DOCUMENT));
+
+        BlockingJob.release.countDown();
+        waitForPreviousExecutions();
+
+        assertEquals(TriggerState.NORMAL, getTriggerState(JOB_DOCUMENT));
+    }
+
+    @Test
+    void reloadJobInError() throws Exception
+    {
+        doReturn(FailingJob.class).when(this.schedulersClassLoaderManager).loadClassAndRegister(any(), any());
+        scheduleJobWithFarCron();
+        CountDownLatch schedulerError = new CountDownLatch(1);
+        this.scheduler.getListenerManager().addSchedulerListener(new SchedulerListenerSupport()
+        {
+            @Override
+            public void schedulerError(String msg, SchedulerException cause)
+            {
+                schedulerError.countDown();
+            }
+        });
+        this.scheduler.start();
+        this.plugin.triggerJob(loadJob(JOB_DOCUMENT), this.context);
+        assertTrue(schedulerError.await(TIMEOUT, TimeUnit.SECONDS));
+        waitForPreviousExecutions();
+        // The job could not be instantiated.
+        assertEquals(TriggerState.ERROR, getTriggerState(JOB_DOCUMENT));
+        assertEquals("An error occurred instantiating job to be executed. job= 'DEFAULT.xwiki:Scheduler.Job_0'",
+            this.logCapture.getMessage(0));
+
+        // The job class has been fixed, e.g. by reinstalling the extension providing it.
+        doReturn(NoopJob.class).when(this.schedulersClassLoaderManager).loadClassAndRegister(any(), any());
+        this.plugin.reloadJob(loadJob(JOB_DOCUMENT), this.context);
+
+        assertEquals(TriggerState.NORMAL, getTriggerState(JOB_DOCUMENT));
+    }
+
     @ParameterizedTest
     @CsvSource({
         "Normal, NORMAL",
@@ -433,6 +540,41 @@ class SchedulerPluginTest
         verify(this.schedulersClassLoaderManager).onClassLoaderReset("wiki:foo");
     }
 
+    private void scheduleJobWithFarCron() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(JOB_DOCUMENT);
+        addJobObject(document, "").setStringValue(CRON_FIELD, FAR_CRON);
+        this.oldcore.getSpyXWiki().saveDocument(document, this.context);
+        this.plugin.scheduleJob(loadJob(JOB_DOCUMENT), this.context);
+    }
+
+    /**
+     * Execute a probe job and wait for it to start. Since the scheduler has a single thread, this guarantees that the
+     * scheduler is done with the jobs triggered before, including updating the state of their triggers.
+     */
+    private void waitForPreviousExecutions() throws Exception
+    {
+        CountDownLatch probeStarted = new CountDownLatch(1);
+        this.scheduler.getListenerManager().addJobListener(new JobListenerSupport()
+        {
+            @Override
+            public String getName()
+            {
+                return PROBE_JOB.getName();
+            }
+
+            @Override
+            public void jobToBeExecuted(JobExecutionContext jobContext)
+            {
+                probeStarted.countDown();
+            }
+        }, KeyMatcher.keyEquals(PROBE_JOB));
+        this.scheduler.addJob(JobBuilder.newJob(NoopJob.class).withIdentity(PROBE_JOB).storeDurably().build(), true);
+        this.scheduler.triggerJob(PROBE_JOB);
+
+        assertTrue(probeStarted.await(TIMEOUT, TimeUnit.SECONDS));
+    }
+
     private void assertDisabled(Executable executable)
     {
         SchedulerPluginException exception = assertThrows(SchedulerPluginException.class, executable);
@@ -507,5 +649,63 @@ class SchedulerPluginTest
     private String getCronExpression(DocumentReference documentReference) throws Exception
     {
         return ((CronTrigger) this.scheduler.getTrigger(getTriggerKey(documentReference))).getCronExpression();
+    }
+
+    /**
+     * A job which does nothing.
+     */
+    public static class NoopJob implements Job
+    {
+        @Override
+        public void execute(JobExecutionContext jobContext)
+        {
+            // Nothing to do.
+        }
+    }
+
+    /**
+     * A job which cannot be instantiated.
+     */
+    public static class FailingJob extends NoopJob
+    {
+        /**
+         * Always fails.
+         */
+        public FailingJob()
+        {
+            throw new IllegalStateException("Cannot instantiate");
+        }
+    }
+
+    /**
+     * A job which doesn't allow concurrent executions and runs until it's released.
+     */
+    @DisallowConcurrentExecution
+    public static class BlockingJob implements Job
+    {
+        private static CountDownLatch started;
+
+        private static CountDownLatch release;
+
+        static void reset()
+        {
+            if (release != null) {
+                release.countDown();
+            }
+            started = new CountDownLatch(1);
+            release = new CountDownLatch(1);
+        }
+
+        @Override
+        public void execute(JobExecutionContext jobContext) throws JobExecutionException
+        {
+            started.countDown();
+            try {
+                release.await(TIMEOUT, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new JobExecutionException(e);
+            }
+        }
     }
 }

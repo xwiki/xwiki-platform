@@ -1,49 +1,33 @@
-/* Headers */
+/* Headings */
 
 /* Display flex can cause problems while editing in-place so we use it only when viewing the headings. */
-#xwikicontent:not([contenteditable]) > h1,
-#xwikicontent:not([contenteditable]) > h2,
-#xwikicontent:not([contenteditable]) > h3,
-#xwikicontent:not([contenteditable]) > h4,
-#xwikicontent:not([contenteditable]) > h5,
-#xwikicontent:not([contenteditable]) > h6 {
-  /* We use display flex because we want the section edit link to be displayed at the end of the heading row without
-    overflowing an existing floating box. */
+#xwikicontent:not([contenteditable]) > :is(h1, h2, h3, h4, h5, h6) {
+  /* Display the section edit link at the end of the heading row without overflowing an existing floating box. */
   display: flex;
   /* Make sure the heading text doesn't overflow a previous sibling that is floated with 100% width. */
   min-width: 1px;
 }
 
-#xwikicontent:not([contenteditable]) > h1 > span:first-child,
-#xwikicontent:not([contenteditable]) > h2 > span:first-child,
-#xwikicontent:not([contenteditable]) > h3 > span:first-child,
-#xwikicontent:not([contenteditable]) > h4 > span:first-child,
-#xwikicontent:not([contenteditable]) > h5 > span:first-child,
-#xwikicontent:not([contenteditable]) > h6 > span:first-child {
-  /* We want the heading text to take all the available space, while the section edit link takes only what is
-    needed. */
-  flex: 1 1 auto;
+#xwikicontent:not([contenteditable]) > :is(h1, h2, h3, h4, h5, h6) > span:first-child {
+  /* The heading text takes all the available space, while the section edit link takes only what it needs. */
+  flex: auto;
 }
 
 .edit_section {
-  /* The height of the section edit link relative to the height of the parent heading. */
-  --edit-section-relative-height: .7;
   color: inherit;
-  /* We decrease a bit the font size in case the section edit link uses a font icon. */
-  font-size: calc(var(--edit-section-relative-height) * 100%);
-  /* We increase the line height because we decreased the font size, so that the edit icon is aligned vertically.
-    1.1 is the line height of the headings. */
-  line-height: calc(1.1 / var(--edit-section-relative-height));
-  /* Leave some space on the left so that we distinguish the section edit link from the heading text. */
+  /* Slightly smaller than the heading text, in case the section edit link uses a font icon. */
+  font-size: 70%;
+  /* Use the line height of the parent heading, so that the edit icon is aligned vertically with the heading text. */
+  line-height: 1lh;
+  /* Distinguish the section edit link from the heading text. */
   margin-left: 1em;
   /* We can have many section edit links on a page so they should have a low profile.
-    We don't reduce the opacity too much in order to keep a correct contrast at least on the Iceberg colortheme. */
+    We don't reduce the opacity too much in order to keep a correct contrast at least on the Iceberg color theme. */
   opacity: .65;
-  /* Add some padding so that the focus border is displayed nicely and doesn't cramp down around the icon. */
-  padding-right: 4px;
-  padding-left: 4px;
+  /* Display the focus border nicely without cramping it around the icon. */
+  padding-inline: 4px;
 }
 
-.edit_section:not(.disabled):hover, .edit_section:not(.disabled):focus {
+.edit_section:not(.disabled):is(:hover, :focus) {
   opacity: 1;
 }

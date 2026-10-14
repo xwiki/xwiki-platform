@@ -37,7 +37,6 @@
 @import "forms";
 @import "general";
 @import "grid";
-@import "headers";
 @import "layout";
 @import "livetable";
 @import "messages";

@@ -172,7 +172,8 @@
     ## available in the platform without adding a dependency.
     &lt;div class="alert alert-info"&gt;$escapetool.xml($services.localization.render("platform.flamingo.themes.cssCode.description"))&lt;/div&gt;
   #elseif($varName == 'lessCode')
-    &lt;div class="alert alert-info"&gt;$escapetool.xml($services.localization.render("platform.flamingo.themes.lessCode.description.cssFirst"))&lt;/div&gt;
+    &lt;div class="alert alert-info"&gt;$escapetool.xml($services.localization.render("platform.flamingo.themes.lessCode.description"))&lt;/div&gt;
+    &lt;div class="alert alert-warning"&gt;$escapetool.xml($services.localization.render("platform.flamingo.themes.lessCode.status"))&lt;/div&gt;
   #end
   &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
     $!escapetool.xml($!doc.getValue($varName, $obj))

@@ -38,7 +38,7 @@ import org.xwiki.stability.Unstable;
 public interface CSRFToken
 {
     /**
-     * Returns the anti-CSRF token associated with the current user. Creates a fresh token on first call.
+     * Returns the anti-CSRF token associated with the current user.
      * 
      * @return the secret token
      * @see #isTokenValid(String)
@@ -46,9 +46,14 @@ public interface CSRFToken
     String getToken();
 
     /**
-     * Removes the anti-CSRF token associated with the current user. Current token is invalidated immediately, a
-     * subsequent call of {@link #getToken()} will generate a fresh token.
+     * Forgets the anti-CSRF token associated with the current user, if the implementation stores it. The default
+     * implementation does not store tokens: it derives them from the authentication validation key, the current user
+     * and the current time period, so that every node of a cluster computes the same token. For that implementation
+     * this method has no effect: the token rotates with the configured lifetime and changes with the validation key.
+     * 
+     * @deprecated tokens are derived and cannot be cleared, there is no replacement
      */
+    @Deprecated(since = "18.9.0RC1")
     void clearToken();
 
     /**

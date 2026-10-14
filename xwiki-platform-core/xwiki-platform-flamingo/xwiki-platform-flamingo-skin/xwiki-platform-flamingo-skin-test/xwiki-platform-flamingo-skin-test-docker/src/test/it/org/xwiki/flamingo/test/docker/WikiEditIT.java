@@ -328,22 +328,26 @@ class WikiEditIT
         assertEquals(setup.getURL(reference, "view", ""), setup.getDriver().getCurrentUrl() + "WebHome");
     }
 
+    /**
+     * Replace the CSRF token sent by the edit form with an invalid value, so that the server rejects the next request.
+     */
+    private void tamperCSRFToken(TestUtils setup)
+    {
+        setup.getDriver().executeJavascript(
+            "document.querySelectorAll('input[name=form_token]').forEach(input => input.value = 'invalid');");
+    }
+
     @Test
     @Order(7)
     void allowForceSaveWhenCSRFIssue(TestUtils setup, TestReference testReference)
     {
         try {
-            DocumentReference invalidateCSRF = new DocumentReference("InvalidateCSRF",
-                testReference.getLastSpaceReference());
-            String invalidateCSRFContent = "{{velocity}}$services.csrf.clearToken(){{/velocity}}";
-            setup.createPage(invalidateCSRF, invalidateCSRFContent, "InvalidateCSRF");
             setup.createPage(testReference, "", testReference.getLastSpaceReference().getName());
 
             WikiEditPage editWiki = setup.gotoPage(testReference).editWiki();
 
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
 
             editWiki.setContent("Some content 42");
             editWiki.clickSaveAndContinue(false);
@@ -364,9 +368,8 @@ class WikiEditIT
             editWiki = setup.gotoPage(testReference).editWiki();
             assertEquals("Another content 42", editWiki.getContent());
 
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
 
             editWiki.setContent("Foo bar");
 
@@ -381,9 +384,8 @@ class WikiEditIT
 
             // check with preview
             editWiki = setup.gotoPage(testReference).editWiki();
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
             editWiki.setContent("Preview test & cancel");
             editWiki.getPreviewButton().click();
             ResubmissionPage resubmissionPage = new ResubmissionPage();
@@ -397,9 +399,8 @@ class WikiEditIT
             assertEquals("Foo bar", viewPage.getContent());
 
             editWiki = setup.gotoPage(testReference).editWiki();
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
             editWiki.setContent("Preview test & back to editor");
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
@@ -417,9 +418,8 @@ class WikiEditIT
             assertEquals("Foo bar 2", viewPage.getContent());
 
             editWiki = setup.gotoPage(testReference).editWiki();
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
             editWiki.setContent("Preview test & save&continue");
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
@@ -438,9 +438,8 @@ class WikiEditIT
             assertEquals("Preview test & save&continue", viewPage.getContent());
 
             editWiki = setup.gotoPage(testReference).editWiki();
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
             editWiki.setContent("Preview test & save&view");
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();

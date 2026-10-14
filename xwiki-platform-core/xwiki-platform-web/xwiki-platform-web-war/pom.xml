@@ -270,6 +270,62 @@
           </licenseSets>
         </configuration>
       </plugin>
+      <plugin>
+        <!-- Run the JavaScript unit tests, located in src/test/node. The JavaScript code is not built with Node, so
+          contrary to the webjar-node packaging, only the tests and the linter are executed. -->
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <configuration>
+          <workingDirectory>${basedir}/src/test/node</workingDirectory>
+          <installDirectory>${basedir}/target</installDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install-node-and-pnpm</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>install-node-and-pnpm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>${node.version}</nodeVersion>
+              <pnpmVersion>${pnpm.version}</pnpmVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-install</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+              <environmentVariables>
+                <CI>true</CI>
+              </environmentVariables>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run test:unit</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-lint</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run lint</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <profiles>

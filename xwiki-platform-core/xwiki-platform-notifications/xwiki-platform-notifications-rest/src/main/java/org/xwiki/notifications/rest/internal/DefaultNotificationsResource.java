@@ -157,7 +157,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         return validateAndGetLimit(NumberUtils.toInt(maxCount, defaultMaxCount));
     }
 
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     private Object getCompositeEvents(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
@@ -262,7 +262,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             displayReadStatus, tags, currentWiki, async, asyncId, "alert");
     }
 
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,

@@ -54,6 +54,6 @@ public class TagConverter extends AbstractConverter<Tag>
             return null;
         }
 
-        return value.getName();
+        return value.name();
     }
 }

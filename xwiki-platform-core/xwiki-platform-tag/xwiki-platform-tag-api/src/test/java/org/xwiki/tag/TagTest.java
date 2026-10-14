@@ -44,10 +44,10 @@ class TagTest
     }
 
     @Test
-    void getNameAndToString()
+    void nameAndToString()
     {
         Tag tag = new Tag("foo");
-        assertEquals("foo", tag.getName());
+        assertEquals("foo", tag.name());
         assertEquals("foo", tag.toString());
     }
 }

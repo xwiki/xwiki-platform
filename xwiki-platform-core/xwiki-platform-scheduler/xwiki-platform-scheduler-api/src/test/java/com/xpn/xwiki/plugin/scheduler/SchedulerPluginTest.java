@@ -165,7 +165,9 @@ class SchedulerPluginTest
     {
         // Don't leave a running job behind.
         BlockingJob.reset();
-        this.scheduler.shutdown();
+        // Wait for the Quartz threads to stop, otherwise they log after the log capture is restored, i.e. on the
+        // console, which fails whichever test is running at that time.
+        this.scheduler.shutdown(true);
     }
 
     @Test

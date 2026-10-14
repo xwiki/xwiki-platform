@@ -31,6 +31,9 @@ import org.xwiki.model.reference.DocumentReference;
  * @deprecated Use {@link org.xwiki.model.reference.DocumentVersionReference} instead.
  */
 @Deprecated(since = "14.8RC1")
+// The shadowing is deliberate: this deprecated class exists only to keep the old name compiling against the
+// class that replaced it, so renaming it would defeat its only purpose.
+@SuppressWarnings("java:S2176")
 public class DocumentVersionReference extends org.xwiki.model.reference.DocumentVersionReference
 {
     /**

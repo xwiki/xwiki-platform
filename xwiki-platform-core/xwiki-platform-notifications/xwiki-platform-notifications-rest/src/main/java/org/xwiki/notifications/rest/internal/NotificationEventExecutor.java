@@ -142,6 +142,9 @@ public class NotificationEventExecutor implements Initializable, Disposable
         }
 
         @Override
+        // Catching Throwable is deliberate here: nothing is recovered from, the Throwable is logged and rethrown, and
+        // the catch only exists to record it as the result of this execution.
+        @SuppressWarnings("java:S1181")
         public Object call() throws Exception
         {
             logger.debug("Starting execution [{}]", this);

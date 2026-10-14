@@ -204,6 +204,8 @@ public class ExtensionIndexStore implements Initializable, Disposable
 
     private int documentsToStore;
 
+    private volatile boolean disposed;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -223,7 +225,17 @@ public class ExtensionIndexStore implements Initializable, Disposable
     @Override
     public void dispose() throws ComponentLifecycleException
     {
+        this.disposed = true;
+
         this.cache.dispose();
+    }
+
+    /**
+     * @return {@code true} if the store was disposed (e.g. because XWiki is stopping) and cannot be used anymore
+     */
+    public boolean isDisposed()
+    {
+        return this.disposed;
     }
 
     /**

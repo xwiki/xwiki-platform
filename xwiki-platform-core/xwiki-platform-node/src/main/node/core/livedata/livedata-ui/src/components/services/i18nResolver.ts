@@ -73,7 +73,7 @@ export async function i18nResolver(
       "panel.filter.delete",
       "panel.filter.deleteAll",
       "panel.properties.title",
-      "panel.properties.useCover",
+      "panel.properties.noCover",
       "panel.properties.cover",
       "panel.properties.cover.hint",
       "panel.sort.title",

@@ -36,7 +36,7 @@ public class PropertiesPanelElement extends AbstractLiveDataAdvancedPanelElement
 {
     private static final By PROPERTY_NAME = By.className("property-name");
 
-    private static final By USE_COVER = By.cssSelector(".use-cover input[type='checkbox']");
+    private static final By NO_COVER = By.cssSelector(".no-cover input[type='radio']");
 
     private static final By COVER_RADIO = By.cssSelector(".cover input[type='radio']");
 
@@ -98,30 +98,17 @@ public class PropertiesPanelElement extends AbstractLiveDataAdvancedPanelElement
      */
     public boolean hasCoverOption()
     {
-        return !getDriver().findElementsWithoutWaiting(this.container, USE_COVER).isEmpty();
+        return !getDriver().findElementsWithoutWaiting(this.container, NO_COVER).isEmpty();
     }
 
     /**
-     * @return {@code true} if the cards display a cover, {@code false} otherwise
-     * @since 18.10.0RC1
-     */
-    public boolean isCoverEnabled()
-    {
-        return this.container.findElement(USE_COVER).isSelected();
-    }
-
-    /**
-     * Displays or removes the card cover, the way ticking or unticking the "Use cover" checkbox does. Enabling the
-     * cover selects a default cover property.
+     * Removes the card cover, the way selecting the "No cover" option does.
      *
-     * @param enabled {@code true} to display a cover on the cards, {@code false} to remove it
      * @since 18.10.0RC1
      */
-    public void setCoverEnabled(boolean enabled)
+    public void removeCover()
     {
-        if (isCoverEnabled() != enabled) {
-            this.container.findElement(USE_COVER).click();
-        }
+        this.container.findElement(NO_COVER).click();
     }
 
     /**
@@ -139,7 +126,19 @@ public class PropertiesPanelElement extends AbstractLiveDataAdvancedPanelElement
     }
 
     /**
-     * Selects the property used as the card cover. The cover must be enabled.
+     * A hidden property can't be used as the card cover.
+     *
+     * @param propertyName the label of a property the panel offers
+     * @return {@code true} if the property can be selected as the card cover, {@code false} otherwise
+     * @since 18.10.0RC1
+     */
+    public boolean isCoverPropertyEnabled(String propertyName)
+    {
+        return getProperty(propertyName).findElement(COVER_RADIO).isEnabled();
+    }
+
+    /**
+     * Selects the property used as the card cover.
      *
      * @param propertyName the label of a property the panel offers
      * @since 18.10.0RC1

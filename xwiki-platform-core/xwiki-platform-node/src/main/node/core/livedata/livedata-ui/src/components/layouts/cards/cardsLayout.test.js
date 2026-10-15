@@ -22,7 +22,6 @@ import {
   getCoverImage,
   getCoverPropertyId,
   getCoverTextPropertyId,
-  getDefaultCoverPropertyId,
   setCoverPropertyId,
 } from "./cardsLayout.js";
 import { describe, expect, it } from "vitest";
@@ -49,6 +48,10 @@ function initLogic(
       layoutId === CARDS_LAYOUT_ID ? cardsDescriptor : undefined,
     getPropertyDescriptor: (propertyId) =>
       properties.find((property) => property.id === propertyId),
+    // The properties are visible unless they are explicitly hidden.
+    isPropertyVisible: (propertyId) =>
+      properties.find((property) => property.id === propertyId)?.visible !==
+      false,
   };
 }
 
@@ -74,7 +77,15 @@ describe("cardsLayout.js", () => {
       expect(getCoverPropertyId(logic)).toBeUndefined();
     });
 
-    it("Sets and removes the cover, and selects it again when enabled back", () => {
+    it("Ignores a hidden cover", () => {
+      const logic = initLogic([{ id: "a" }, { id: "b", visible: false }], [], {
+        id: CARDS_LAYOUT_ID,
+        coverProperty: "b",
+      });
+      expect(getCoverPropertyId(logic)).toBeUndefined();
+    });
+
+    it("Sets and removes the cover", () => {
       const logic = initLogic([{ id: "a", visible: true }, { id: "b" }]);
       setCoverPropertyId(logic, "b");
       expect(getCoverPropertyId(logic)).toBe("b");
@@ -82,7 +93,6 @@ describe("cardsLayout.js", () => {
       expect(getCoverPropertyId(logic)).toBe("b");
       setCoverPropertyId(logic, "");
       expect(getCoverPropertyId(logic)).toBeUndefined();
-      expect(getDefaultCoverPropertyId(logic)).toBe("b");
     });
 
     it("Does nothing when there is no cards layout", () => {
@@ -165,30 +175,6 @@ describe("cardsLayout.js", () => {
       expect(getCoverTextPropertyId(logic, entry, "cover", "title")).toBe(
         "title",
       );
-    });
-  });
-
-  describe("getDefaultCoverPropertyId", () => {
-    it("Selects the first property holding an image", () => {
-      const logic = initLogic(
-        [{ id: "a", visible: true }, { id: "b" }, { id: "c" }],
-        [
-          { a: "text", b: "", c: "" },
-          { a: "text", b: "", c: '<img src="/c.png">' },
-        ],
-      );
-      expect(getDefaultCoverPropertyId(logic)).toBe("c");
-    });
-
-    it("Falls back on the first visible property, then on the first property", () => {
-      expect(
-        getDefaultCoverPropertyId(
-          initLogic([{ id: "a" }, { id: "b", visible: true }]),
-        ),
-      ).toBe("b");
-      expect(
-        getDefaultCoverPropertyId(initLogic([{ id: "a" }, { id: "b" }])),
-      ).toBe("a");
     });
   });
 });

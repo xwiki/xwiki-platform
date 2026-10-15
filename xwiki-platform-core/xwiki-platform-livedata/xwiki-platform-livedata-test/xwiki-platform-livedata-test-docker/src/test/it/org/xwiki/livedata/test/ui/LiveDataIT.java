@@ -1075,8 +1075,8 @@ class LiveDataIT
     }
 
     /**
-     * Test the card cover, enabled from the properties panel: it displays the image held by the cover property, or some
-     * text when there is no image or when it fails to load.
+     * Test the card cover, selected from the properties panel: it displays the image held by the cover property, or
+     * some text when there is no image or when it fails to load.
      */
     @Test
     @Order(15)
@@ -1094,11 +1094,11 @@ class LiveDataIT
         cardLayout.waitUntilCovers(false);
         assertEquals(List.of(NAME_COLUMN, POSTER_COLUMN), cardLayout.getPropertyNames(1));
 
-        // Enabling the cover selects the first property holding an image.
+        // The "No cover" option is selected by default.
         PropertiesPanelElement propertiesPanel = liveData.openPropertiesPanel();
         assertTrue(propertiesPanel.hasCoverOption());
-        assertFalse(propertiesPanel.isCoverEnabled());
-        propertiesPanel.setCoverEnabled(true);
+        assertNull(propertiesPanel.getCoverPropertyName());
+        propertiesPanel.setCoverProperty(POSTER_COLUMN);
         assertEquals(POSTER_COLUMN, propertiesPanel.getCoverPropertyName());
         propertiesPanel.closePanel();
         assertPosterCovers(cardLayout);
@@ -1112,22 +1112,30 @@ class LiveDataIT
 
         // Any property can be used as the cover: its text is displayed when it doesn't hold an image.
         propertiesPanel = liveData.openPropertiesPanel();
-        assertTrue(propertiesPanel.isCoverEnabled());
+        assertEquals(POSTER_COLUMN, propertiesPanel.getCoverPropertyName());
         propertiesPanel.setCoverProperty(NAME_COLUMN);
         assertEquals(NAME_CHARLY, cardLayout.waitUntilCoverText(1));
         assertNull(cardLayout.getCoverImageSource(1));
         assertEquals(List.of(POSTER_COLUMN), cardLayout.getPropertyNames(1));
 
-        // Removing the cover displays all the properties again.
-        propertiesPanel.setCoverEnabled(false);
+        // Hiding the cover property removes the cover, and it can't be selected as the cover while it's hidden.
+        propertiesPanel.setPropertyDisplayed(NAME_COLUMN, false);
         cardLayout.waitUntilCovers(false);
-        assertEquals(List.of(NAME_COLUMN, POSTER_COLUMN), cardLayout.getPropertyNames(1));
+        assertNull(propertiesPanel.getCoverPropertyName());
+        assertFalse(propertiesPanel.isCoverPropertyEnabled(NAME_COLUMN));
+        assertTrue(propertiesPanel.isCoverPropertyEnabled(POSTER_COLUMN));
+        // Displaying it again doesn't restore the cover.
+        propertiesPanel.setPropertyDisplayed(NAME_COLUMN, true);
+        assertTrue(propertiesPanel.isCoverPropertyEnabled(NAME_COLUMN));
+        assertNull(propertiesPanel.getCoverPropertyName());
 
-        // Enabling the cover again selects the last cover.
-        propertiesPanel.setCoverEnabled(true);
-        assertEquals(NAME_COLUMN, propertiesPanel.getCoverPropertyName());
+        // Selecting "No cover" removes the cover and displays all the properties again.
+        propertiesPanel.setCoverProperty(POSTER_COLUMN);
         cardLayout.waitUntilCovers(true);
-        assertEquals(NAME_CHARLY, cardLayout.waitUntilCoverText(1));
+        propertiesPanel.removeCover();
+        cardLayout.waitUntilCovers(false);
+        assertNull(propertiesPanel.getCoverPropertyName());
+        assertEquals(List.of(NAME_COLUMN, POSTER_COLUMN), cardLayout.getPropertyNames(1));
     }
 
     /**
@@ -1150,7 +1158,6 @@ class LiveDataIT
         assertPosterCovers(cardLayout);
 
         PropertiesPanelElement propertiesPanel = liveData.openPropertiesPanel();
-        assertTrue(propertiesPanel.isCoverEnabled());
         assertEquals(POSTER_COLUMN, propertiesPanel.getCoverPropertyName());
     }
 

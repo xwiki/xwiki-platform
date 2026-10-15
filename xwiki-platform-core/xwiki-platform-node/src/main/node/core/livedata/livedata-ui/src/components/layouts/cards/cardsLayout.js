@@ -29,7 +29,8 @@ const IMAGE_URL_PATTERN =
 
 /**
  * The cover of the cards is stored on the descriptor of the Cards layout, in its `coverProperty` field: an empty value
- * means that the cards don't have a cover. Its default value can be set in the Live Data configuration.
+ * means that the cards don't have a cover. Its default value can be set in the Live Data configuration. A hidden
+ * property can't be used as the cover.
  *
  * @param logic - the Live Data logic
  * @returns the id of the property used as the card cover, or undefined when the cards don't have a cover
@@ -37,7 +38,9 @@ const IMAGE_URL_PATTERN =
 function getCoverPropertyId(logic) {
   const coverProperty =
     logic.getLayoutDescriptor(CARDS_LAYOUT_ID)?.coverProperty;
-  return coverProperty && logic.data.query.properties.includes(coverProperty)
+  return coverProperty &&
+    logic.data.query.properties.includes(coverProperty) &&
+    logic.isPropertyVisible(coverProperty)
     ? coverProperty
     : undefined;
 }
@@ -55,10 +58,6 @@ function setCoverPropertyId(logic, propertyId) {
     return;
   }
   if (!propertyId) {
-    // Remember the cover, to select it again if the cover is enabled back.
-    if (layoutDescriptor.coverProperty) {
-      layoutDescriptor.lastCoverProperty = layoutDescriptor.coverProperty;
-    }
     layoutDescriptor.coverProperty = "";
   } else if (logic.data.query.properties.includes(propertyId)) {
     layoutDescriptor.coverProperty = propertyId;
@@ -184,37 +183,10 @@ function getCoverTextPropertyId(
   );
 }
 
-/**
- * Return the property selected when enabling the card cover: the last property used as the card cover, otherwise the
- * first property holding an image in the displayed entries, otherwise the first visible property.
- *
- * @param logic - the Live Data logic
- * @returns the id of the property to use as the card cover
- */
-function getDefaultCoverPropertyId(logic) {
-  const propertyIds = logic.data.query.properties;
-  const lastCoverProperty =
-    logic.getLayoutDescriptor(CARDS_LAYOUT_ID)?.lastCoverProperty;
-  if (lastCoverProperty && propertyIds.includes(lastCoverProperty)) {
-    return lastCoverProperty;
-  }
-  const entries = logic.data.data?.entries ?? [];
-  return (
-    propertyIds.find((propertyId) =>
-      entries.some((entry) => getCoverImage(entry[propertyId])),
-    ) ??
-    propertyIds.find(
-      (propertyId) => logic.getPropertyDescriptor(propertyId)?.visible,
-    ) ??
-    propertyIds[0]
-  );
-}
-
 export {
   CARDS_LAYOUT_ID,
   getCoverImage,
   getCoverPropertyId,
   getCoverTextPropertyId,
-  getDefaultCoverPropertyId,
   setCoverPropertyId,
 };

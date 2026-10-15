@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { createReadOnlyLogic, getListPropertyId } from "./listLayout.js";
+import { getListPropertyId } from "./listLayout.js";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -60,36 +60,6 @@ describe("listLayout.js", () => {
 
     it("Returns undefined when there are no properties", () => {
       expect(getListPropertyId(initLogic([]))).toBeUndefined();
-    });
-  });
-
-  describe("createReadOnlyLogic", () => {
-    class Logic {
-      constructor() {
-        this.data = { id: "ld" };
-        this.editable = true;
-      }
-      isEditable() {
-        return this.editable;
-      }
-      getId() {
-        return this.data.id;
-      }
-    }
-
-    it("Makes nothing editable", () => {
-      const logic = new Logic();
-      const readOnlyLogic = createReadOnlyLogic(logic);
-      expect(logic.isEditable()).toBe(true);
-      expect(readOnlyLogic.isEditable({ propertyId: "a" })).toBe(false);
-    });
-
-    it("Delegates everything else to the logic", () => {
-      const readOnlyLogic = createReadOnlyLogic(new Logic());
-      expect(readOnlyLogic.data.id).toBe("ld");
-      // Detached methods are still called on the logic.
-      const { getId } = readOnlyLogic;
-      expect(getId()).toBe("ld");
     });
   });
 });

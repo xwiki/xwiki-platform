@@ -43,9 +43,9 @@
 </template>
 
 <script>
-import { createReadOnlyLogic } from "./listLayout.js";
 import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
+import { createReadOnlyLogic } from "../readOnlyLogic.js";
 
 export default {
   name: "LayoutListItem",

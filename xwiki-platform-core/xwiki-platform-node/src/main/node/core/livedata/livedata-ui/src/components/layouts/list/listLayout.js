@@ -38,24 +38,4 @@ function getListPropertyId(logic) {
   );
 }
 
-/**
- * Wrap the Live Data logic so that nothing can be edited through it. The List layout is read-only: its displayers use
- * this logic, which prevents them from offering the edit action or switching to their editor.
- *
- * @param logic - the Live Data logic
- * @returns a logic behaving like the given one, except that no entry or property is editable
- */
-function createReadOnlyLogic(logic) {
-  return new Proxy(logic, {
-    get(target, property) {
-      if (property === "isEditable") {
-        return () => false;
-      }
-      const value = Reflect.get(target, property, target);
-      // Call the methods on the actual logic, so that they keep working with its internal state.
-      return typeof value === "function" ? value.bind(target) : value;
-    },
-  });
-}
-
-export { createReadOnlyLogic, getListPropertyId };
+export { getListPropertyId };

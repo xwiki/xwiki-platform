@@ -40,6 +40,7 @@ import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.SpaceResourceReference;
+import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -73,10 +74,6 @@ class ResourceReferenceRenamerTest
     private EntityReferenceResolver<ResourceReference> entityReferenceResolver;
 
     @MockComponent
-    @Named("current")
-    private EntityReferenceResolver<String> currentEntityReferenceResolver;
-
-    @MockComponent
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
@@ -95,6 +92,12 @@ class ResourceReferenceRenamerTest
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
+
+    private static DocumentExistenceOverride beforeRename(DocumentReference oldReference,
+        DocumentReference newReference)
+    {
+        return new DocumentExistenceOverride(Map.of(oldReference, true, newReference, false));
+    }
 
     @BeforeEach
     void setup() throws XWikiException
@@ -171,9 +174,11 @@ class ResourceReferenceRenamerTest
         AttachmentReference oldAttachmentReference = new AttachmentReference("image.jpg", oldReference);
         AttachmentReference newAttachmentReference = new AttachmentReference("image.jpg", newReference);
 
-        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference,
+            beforeRename(oldReference, newReference)))
             .thenReturn(oldAttachmentReference);
-        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldAttachmentReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, null,
+            beforeRename(oldReference, newReference))).thenReturn(oldAttachmentReference);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldAttachmentReference)).thenReturn(oldReference);
         when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
             .thenReturn(new EntityReference("image.jpg", EntityType.ATTACHMENT,
@@ -202,9 +207,11 @@ class ResourceReferenceRenamerTest
         SpaceReference oldSpaceReference = oldReference.getLastSpaceReference();
         SpaceReference newSpaceReference = newReference.getLastSpaceReference();
 
-        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference,
+            beforeRename(oldReference, newReference)))
             .thenReturn(oldSpaceReference);
-        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldSpaceReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, null,
+            beforeRename(oldReference, newReference))).thenReturn(oldSpaceReference);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldSpaceReference)).thenReturn(oldReference);
         when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
             .thenReturn(new EntityReference("Green", EntityType.SPACE, new EntityReference("Red", EntityType.SPACE)));
@@ -245,27 +252,20 @@ class ResourceReferenceRenamerTest
     @Test
     void updateResourceReferenceNotRelativeWithImageOfRenamedTerminalDocument()
     {
-        // The image targets an attachment of a renamed terminal document: since that document doesn't exist anymore,
-        // the image reference is now resolved as targeting the space home page with the same name.
+        // The image targets an attachment of a renamed terminal document, which doesn't exist anymore: it's resolved
+        // as before the rename to find out it targets the renamed document.
         AttachmentResourceReference resourceReference = new AttachmentResourceReference("Space.Page@image.png");
         resourceReference.setTyped(false);
         DocumentReference oldReference = new DocumentReference("xwiki", "Space", "Page");
         DocumentReference newReference = new DocumentReference("xwiki", "NewSpace", "Page");
         DocumentReference currentDocumentReference = new DocumentReference("xwiki", "Other", "Page");
-        DocumentReference spaceHomeReference = new DocumentReference("xwiki", List.of("Space", "Page"), "WebHome");
-        AttachmentReference spaceHomeAttachmentReference = new AttachmentReference("image.png", spaceHomeReference);
         AttachmentReference oldAttachmentReference = new AttachmentReference("image.png", oldReference);
         AttachmentReference newAttachmentReference = new AttachmentReference("image.png", newReference);
 
-        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
-            .thenReturn(spaceHomeAttachmentReference);
-        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(spaceHomeAttachmentReference);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceHomeAttachmentReference))
-            .thenReturn(spaceHomeReference);
-        when(this.currentEntityReferenceResolver.resolve("Space.Page@image.png", EntityType.ATTACHMENT,
-            currentDocumentReference)).thenReturn(oldAttachmentReference);
-        when(this.currentEntityReferenceResolver.resolve("Space.Page@image.png", EntityType.ATTACHMENT))
-            .thenReturn(oldAttachmentReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference,
+            beforeRename(oldReference, newReference))).thenReturn(oldAttachmentReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, null,
+            beforeRename(oldReference, newReference))).thenReturn(oldAttachmentReference);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldAttachmentReference)).thenReturn(oldReference);
         when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
             .thenReturn(new EntityReference("image.png", EntityType.ATTACHMENT,
@@ -284,22 +284,18 @@ class ResourceReferenceRenamerTest
     @Test
     void updateResourceReferenceNotRelativeWithUntypedLinkToRenamedTerminalDocument()
     {
-        // The untyped link targets a renamed terminal document: since that document doesn't exist anymore, the link
-        // is now resolved as targeting the space home page with the same name.
+        // The untyped link targets a renamed terminal document, which doesn't exist anymore: it's resolved as before
+        // the rename to find out it targets the renamed document.
         DocumentResourceReference resourceReference = new DocumentResourceReference("Space.Page");
         resourceReference.setTyped(false);
         DocumentReference oldReference = new DocumentReference("xwiki", "Space", "Page");
         DocumentReference newReference = new DocumentReference("xwiki", "NewSpace", "Page");
         DocumentReference currentDocumentReference = new DocumentReference("xwiki", "Other", "Page");
-        DocumentReference spaceHomeReference = new DocumentReference("xwiki", List.of("Space", "Page"), "WebHome");
 
-        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
-            .thenReturn(spaceHomeReference);
-        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(spaceHomeReference);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceHomeReference)).thenReturn(spaceHomeReference);
-        when(this.currentEntityReferenceResolver.resolve("Space.Page", EntityType.DOCUMENT, currentDocumentReference))
-            .thenReturn(oldReference);
-        when(this.currentEntityReferenceResolver.resolve("Space.Page", EntityType.DOCUMENT)).thenReturn(oldReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference,
+            beforeRename(oldReference, newReference))).thenReturn(oldReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, null,
+            beforeRename(oldReference, newReference))).thenReturn(oldReference);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldReference)).thenReturn(oldReference);
         when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
             .thenReturn(
@@ -315,10 +311,39 @@ class ResourceReferenceRenamerTest
     }
 
     @Test
-    void updateResourceReferenceNotRelativeWithImageOfOtherTerminalDocument()
+    void updateResourceReferenceNotRelativeWithUntypedLinkToRenamedSiblingSpace()
     {
-        // The image targets an attachment of an existing space home page, whose name doesn't match the renamed
-        // terminal document.
+        // The untyped link targets a renamed top level space home page from another top level space home page, which
+        // the resolver only does when the targeted space home page exists: it's resolved as before the rename to find
+        // out it targets the renamed document.
+        DocumentResourceReference resourceReference = new DocumentResourceReference("PageA");
+        resourceReference.setTyped(false);
+        DocumentReference oldReference = new DocumentReference("xwiki", "PageA", "WebHome");
+        DocumentReference newReference = new DocumentReference("xwiki", "PageA1", "WebHome");
+        DocumentReference currentDocumentReference = new DocumentReference("xwiki", "PageB", "WebHome");
+
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference,
+            beforeRename(oldReference, newReference))).thenReturn(oldReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, null,
+            beforeRename(oldReference, newReference)))
+            .thenReturn(new DocumentReference("xwiki", List.of("Main", "PageA"), "WebHome"));
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldReference)).thenReturn(oldReference);
+        when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
+            .thenReturn(new EntityReference("PageA", EntityType.DOCUMENT));
+        when(this.compactEntityReferenceSerializer.serialize(newReference, currentDocumentReference))
+            .thenReturn("PageA1.WebHome");
+
+        assertTrue(this.renamer.updateResourceReference(resourceReference, oldReference, newReference,
+            currentDocumentReference, false, Map.of(oldReference, newReference)));
+        DocumentResourceReference expectedResourceReference = new DocumentResourceReference("PageA1.WebHome");
+        expectedResourceReference.setTyped(false);
+        assertEquals(expectedResourceReference, resourceReference);
+    }
+
+    @Test
+    void updateResourceReferenceNotRelativeWithImageOfOtherDocument()
+    {
+        // The image targets an attachment of another document, even when resolved as before the rename.
         AttachmentResourceReference resourceReference = new AttachmentResourceReference("Space.Other@image.png");
         resourceReference.setTyped(false);
         DocumentReference oldReference = new DocumentReference("xwiki", "Space", "Page");
@@ -326,18 +351,13 @@ class ResourceReferenceRenamerTest
         DocumentReference currentDocumentReference = new DocumentReference("xwiki", "Other", "Page");
         DocumentReference spaceHomeReference = new DocumentReference("xwiki", List.of("Space", "Other"), "WebHome");
         AttachmentReference spaceHomeAttachmentReference = new AttachmentReference("image.png", spaceHomeReference);
-        AttachmentReference terminalAttachmentReference =
-            new AttachmentReference("image.png", new DocumentReference("xwiki", "Space", "Other"));
 
-        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
-            .thenReturn(spaceHomeAttachmentReference);
-        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(spaceHomeAttachmentReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference,
+            beforeRename(oldReference, newReference))).thenReturn(spaceHomeAttachmentReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, null,
+            beforeRename(oldReference, newReference))).thenReturn(spaceHomeAttachmentReference);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceHomeAttachmentReference))
             .thenReturn(spaceHomeReference);
-        when(this.currentEntityReferenceResolver.resolve("Space.Other@image.png", EntityType.ATTACHMENT,
-            currentDocumentReference)).thenReturn(terminalAttachmentReference);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(terminalAttachmentReference))
-            .thenReturn(terminalAttachmentReference.getDocumentReference());
 
         assertFalse(this.renamer.updateResourceReference(resourceReference, oldReference, newReference,
             currentDocumentReference, false, Map.of(oldReference, newReference)));

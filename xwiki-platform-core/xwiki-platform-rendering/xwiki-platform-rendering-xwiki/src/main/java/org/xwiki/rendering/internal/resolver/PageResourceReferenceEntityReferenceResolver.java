@@ -28,6 +28,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 
 /**
  * Convert page resource reference into entity reference.
@@ -52,7 +53,8 @@ public class PageResourceReferenceEntityReferenceResolver extends AbstractResour
     }
 
     @Override
-    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
+    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
+        DocumentExistenceOverride existenceOverride)
     {
         return this.defaultPageReferenceResolver.resolve(resourceReference.getReference(), baseReference);
     }

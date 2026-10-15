@@ -2808,17 +2808,6 @@ $string##
 #end
 
 #**
- * Moves the 'freeText' option, if any, to the data attribute the picker widgets read it from. It has to be removed from
- * the parameters because everything left in there is displayed as an HTML attribute.
- *#
-#macro (_picker_freeText $parameters)
-  #set ($macro.freeText = "$!parameters.remove('freeText')")
-  #if ($macro.freeText != '')
-    #set ($discard = $parameters.put('data-freeText', $macro.freeText))
-  #end
-#end
-
-#**
  * Outputs a suggest input for picking one or more values listed by a REST resource, such as tags or wikis.
  *
  * @param $type the type of value, used to build the CSS class (suggest-${type}s) and the title translation keys
@@ -2837,7 +2826,6 @@ $string##
     #set ($macro.titleKey = "core.widgets.suggest.${type}Picker.single.title")
   #end
   #set ($discard = $parameters.putIfAbsent('title', $services.localization.render($macro.titleKey)))
-  #_picker_freeText($parameters)
   #suggestInput($parameters)
 #end
 

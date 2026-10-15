@@ -160,6 +160,8 @@ class TourApplicationIT
         // Step 1
         assertEquals("Tour", homePage.getStepTitle());
         assertEquals("Description", homePage.getStepDescription());
+        assertTrue(homePage.isStepModalDialog());
+        assertEquals("Tour", homePage.getStepDialogLabel());
         assertTrue(homePage.hasNextStep());
         assertFalse(homePage.hasPreviousStep());
         assertFalse(homePage.hasEndButton());
@@ -203,6 +205,8 @@ class TourApplicationIT
         assertTrue(secondPage.getUrl().endsWith("TourCode/TourClass"));
         assertEquals("Title 4", secondPage.getStepTitle());
         assertEquals("Step 4", secondPage.getStepDescription());
+        assertTrue(secondPage.isStepModalDialog());
+        assertEquals("Title 4", secondPage.getStepDialogLabel());
         assertFalse(secondPage.hasNextStep());
         assertTrue(secondPage.hasPreviousStep());
         assertTrue(secondPage.hasEndButton());

@@ -45,7 +45,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Compile a LESS resource in a particular context (@see org.xwiki.lesscss.compiler.IntegratedLESSCompiler}. To be used
+ * Compile a LESS resource in a particular context (@see org.xwiki.lesscss.compiler.IntegratedLESSCompiler}. To be used
  * with AbstractCachedCompiler.
  *
  * @since 6.4M2

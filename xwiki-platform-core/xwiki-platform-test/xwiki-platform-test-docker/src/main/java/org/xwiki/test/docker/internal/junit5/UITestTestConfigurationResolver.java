@@ -124,6 +124,8 @@ public class UITestTestConfigurationResolver
         configuration.setBrowserTag(resolveBrowserTag(uiTestAnnotation.browserTag()));
         configuration.setServletEngineTag(resolveServletEngineTag(uiTestAnnotation.servletEngineTag()));
         configuration.setJDBCDriverVersion(resolveJDBCDriverVersion(uiTestAnnotation.jdbcDriverVersion()));
+        configuration.setScreenWidth(uiTestAnnotation.screenWidth());
+        configuration.setScreenHeight(uiTestAnnotation.screenHeight());
         configuration.setVNC(resolveVNC(uiTestAnnotation.vnc()));
         configuration.setWCAG(resolveWCAG(uiTestAnnotation.wcag()));
         configuration.setWCAGStopOnError(resolveWCAGStopOnError(uiTestAnnotation.wcagStopOnError()));

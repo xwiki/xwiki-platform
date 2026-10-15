@@ -31,6 +31,7 @@ import org.xwiki.csrf.CSRFTokenConfiguration;
  * Get configuration data from the XWiki properties file. Supported options:
  * <ul>
  *   <li>"csrf.enabled", default = true</li>
+ *   <li>"csrf.tokenLifetime", in hours, default = 24</li>
  * </ul>
  * 
  * @version $Id$
@@ -40,10 +41,19 @@ import org.xwiki.csrf.CSRFTokenConfiguration;
 @Singleton
 public class DefaultCSRFTokenConfiguration implements CSRFTokenConfiguration
 {
-    /** Prefix for the configuration keys for the {@link org.xwiki.csrf.CSRFToken} component. */
+    /**
+     * Prefix for the configuration keys for the {@link org.xwiki.csrf.CSRFToken} component.
+     */
     private static final String PREFIX = "csrf.";
 
-    /** Main XWiki properties configuration source. */
+    /**
+     * Default lifetime of the tokens, in hours.
+     */
+    private static final int DEFAULT_TOKEN_LIFETIME = 24;
+
+    /**
+     * Main XWiki properties configuration source.
+     */
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource configuration;
@@ -53,5 +63,12 @@ public class DefaultCSRFTokenConfiguration implements CSRFTokenConfiguration
     {
         String key = PREFIX + "enabled";
         return this.configuration.getProperty(key, Boolean.TRUE);
+    }
+
+    @Override
+    public int getTokenLifetime()
+    {
+        String key = PREFIX + "tokenLifetime";
+        return this.configuration.getProperty(key, DEFAULT_TOKEN_LIFETIME);
     }
 }

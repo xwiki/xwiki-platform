@@ -107,6 +107,20 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
+     * Clicks in the middle of the specified block, e.g. to place the caret inside its text.
+     *
+     * @param index the index of the block to click, starting from 0
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea clickBlock(int index)
+    {
+        getBlock(index).click();
+        waitUntilFocused();
+        return this;
+    }
+
+    /**
      * Simulate typing in the rich text area.
      * 
      * @param keysToSend the sequence of keys to by typed
@@ -434,11 +448,16 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public SideMenu hoverBlock(int index)
     {
-        getDriver().createActions().moveToElement(getBlockContent(index)).perform();
+        getDriver().createActions().moveToElement(getBlock(index)).perform();
         return new SideMenu();
     }
 
-    private WebElement getBlockContent(int index)
+    /**
+     * @param index the index of the block, starting from 0
+     * @return the element holding the content of the specified block
+     * @since 18.9.0RC1
+     */
+    public WebElement getBlock(int index)
     {
         return this.container.findElements(By.className("bn-block-content")).get(index);
     }

@@ -61,6 +61,11 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     "xwikiReference",
     "xwikiFreestanding",
     "xwikiGeneratedLabel",
+    // Whether the verbatim content of a code block starts or ends with a new line that is hidden in the code block.
+    "xwikiLeadingNewLine",
+    "xwikiTrailingNewLine",
+    // Whether a code block was produced from a verbatim block (otherwise it is saved as a code macro call).
+    "xwikiVerbatim",
   ];
 
   public static bind(container: Container): void {

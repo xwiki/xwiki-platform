@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
@@ -71,9 +70,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
                 /* By deleting objects, some of them might become null, so we must check for this */
                 if (object != null) {
                     objects.getObjectSummaries().add(
-                        DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(),
-                            Utils.getXWikiContext(componentManager), doc, object, false,
-                            Utils.getXWikiApi(componentManager), withPrettyNames));
+                        this.factory.toRestObjectSummary(uriInfo.getBaseUri(), doc, object, false, withPrettyNames));
                 }
             }
 

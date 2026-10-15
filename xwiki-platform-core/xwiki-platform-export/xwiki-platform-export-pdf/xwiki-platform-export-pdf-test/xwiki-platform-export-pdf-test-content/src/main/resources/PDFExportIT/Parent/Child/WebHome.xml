@@ -40,7 +40,7 @@
 
 Content of first section.
 
-[[image:attach:xwiki-logo.png||width="100"]]
+[[image:attach:xwiki-logo.png||width="100" alt="XWiki logo resized client-side"]]
 
 [[image:attach:xwiki-logo.png||width="100" class="force-server-side-resize"]]
 

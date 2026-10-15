@@ -20,6 +20,8 @@
 package org.xwiki.security.authentication.internal;
 
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +33,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
 
 /**
@@ -43,6 +46,24 @@ import org.xwiki.security.authentication.AuthenticationConfiguration;
 @Singleton
 public class DefaultAuthenticationConfiguration implements AuthenticationConfiguration
 {
+    /**
+     * The example values of the keys documented in xwiki.cfg.vm, which must not be used in production.
+     */
+    private static final Set<String> EXAMPLE_KEYS =
+        Set.of("totototototototototototototototo", "titititititititititititititititi");
+
+    /**
+     * The prefix of the environment variables overwriting an xwiki.cfg property (the dots of the property name being
+     * replaced by underscores), as supported by the {@code xwikicfg} configuration source.
+     */
+    private static final String XCONF_ENV_PREFIX = "XCONF_xwikicfg_";
+
+    /**
+     * The prefix of the Java system properties overwriting an xwiki.cfg property, as supported by the {@code xwikicfg}
+     * configuration source.
+     */
+    private static final String XCONF_SYSTEM_PROPERTY_PREFIX = "xconf.xwikicfg.";
+
     /**
      * Defines from where to read the Resource configuration data.
      */
@@ -59,11 +80,26 @@ public class DefaultAuthenticationConfiguration implements AuthenticationConfigu
     private ConfigurationSource permanentConfiguration;
 
     @Inject
+    private RemoteObservationManagerConfiguration remoteObservationConfiguration;
+
+    @Inject
     private Logger logger;
 
     private String validationKey;
 
     private String encryptionKey;
+
+    /**
+     * The names of the keys for which the clustering misconfiguration has already been reported, so that the error is
+     * logged only once per key.
+     */
+    private final Set<String> reportedClusteringKeys = ConcurrentHashMap.newKeySet();
+
+    /**
+     * The names of the keys for which the use of an example value has already been reported, so that the warning is
+     * logged only once per key.
+     */
+    private final Set<String> reportedExampleKeys = ConcurrentHashMap.newKeySet();
 
     @Override
     public int getMaxAuthorizedAttempts()
@@ -123,24 +159,51 @@ public class DefaultAuthenticationConfiguration implements AuthenticationConfigu
 
     private synchronized String getGeneratedKey(String name)
     {
-        // Try xwiki.cfg
-        String generatedKey = this.xwikiCfgConfiguration.getProperty(name, String.class);
+        // Try xwiki.cfg (a blank value is considered as not set)
+        String key = this.xwikiCfgConfiguration.getProperty(name, String.class);
 
-        // Try the permanent configuration
-        if (generatedKey == null) {
-            generatedKey = this.permanentConfiguration.getProperty(name, String.class);
-        }
+        if (StringUtils.isBlank(key)) {
+            // Try the permanent configuration
+            key = this.permanentConfiguration.getProperty(name, String.class);
 
-        // If still not found, generate one and store it in the permanent configuration
-        if (generatedKey == null) {
-            generatedKey = RandomStringUtils.secure().next(32);
-            try {
-                this.permanentConfiguration.setProperty(name, generatedKey);
-            } catch (ConfigurationSaveException e) {
-                this.logger.error("Failed to store the key, it will be generated at each restart", e);
+            // If still not found, generate one and store it in the permanent configuration
+            if (StringUtils.isBlank(key)) {
+                key = RandomStringUtils.secure().next(32);
+                try {
+                    this.permanentConfiguration.setProperty(name, key);
+                } catch (ConfigurationSaveException e) {
+                    this.logger.error("Failed to store the key, it will be generated at each restart", e);
+                }
             }
+
+            // A key which is not shared through xwiki.cfg is a problem when several instances are clustered
+            checkClustering(name);
         }
 
-        return generatedKey;
+        checkExampleValue(name, key);
+
+        return key;
+    }
+
+    private void checkClustering(String name)
+    {
+        if (this.remoteObservationConfiguration.isEnabled() && this.reportedClusteringKeys.add(name)) {
+            this.logger.error("The authentication key [{}] is not configured but clustering is enabled "
+                + "(observation.remote.enabled=true). It comes from configuration.properties in the permanent "
+                + "directory (randomly generated at this node's first start unless it was put there), so it differs "
+                + "between nodes that do not share that file: users are logged out whenever the load balancer "
+                + "switches node. Set the same value on all nodes, in xwiki.cfg or, for example from a secret store, "
+                + "with the environment variable [{}] or the Java system property [{}].", name,
+                XCONF_ENV_PREFIX + name.replace('.', '_'), XCONF_SYSTEM_PROPERTY_PREFIX + name);
+        }
+    }
+
+    private void checkExampleValue(String name, String key)
+    {
+        if (EXAMPLE_KEYS.contains(key) && this.reportedExampleKeys.add(name)) {
+            this.logger.warn("The authentication key [{}] is set to one of the example values documented in "
+                + "xwiki.cfg. Such a well-known key weakens the protection of the authentication cookies: set a "
+                + "random value instead.", name);
+        }
     }
 }

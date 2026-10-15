@@ -83,6 +83,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.opentest4j.AssertionFailedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -3443,6 +3444,36 @@ public class TestUtils
         public <T> T get(EntityReference reference) throws Exception
         {
             return get(reference, true);
+        }
+
+        /**
+         * Wait for the version of the given document to differ from the given one, whatever changes it (e.g. a save
+         * made in the background by an editor, a rollback or the deletion of a version). The document is polled over
+         * REST, so this works whichever browser tab (if any) changes it.
+         *
+         * @param reference the reference of the document to watch
+         * @param fromVersion the version the document has before the change
+         * @param timeout how long to wait, in seconds
+         * @return the version of the document after the change
+         * @throws org.openqa.selenium.TimeoutException if the document still has the given version after the timeout
+         * @since 18.9.0RC1
+         */
+        public String waitForVersionChange(EntityReference reference, String fromVersion, int timeout)
+        {
+            return new FluentWait<>(reference).withTimeout(Duration.ofSeconds(timeout))
+                .pollingEvery(Duration.ofMillis(500)).until(documentReference -> {
+                    String currentVersion = getPage(documentReference).getVersion();
+                    return fromVersion.equals(currentVersion) ? null : currentVersion;
+                });
+        }
+
+        private Page getPage(EntityReference documentReference)
+        {
+            try {
+                return get(documentReference);
+            } catch (Exception e) {
+                throw new RuntimeException(String.format("Failed to get the document [%s].", documentReference), e);
+            }
         }
 
         /**

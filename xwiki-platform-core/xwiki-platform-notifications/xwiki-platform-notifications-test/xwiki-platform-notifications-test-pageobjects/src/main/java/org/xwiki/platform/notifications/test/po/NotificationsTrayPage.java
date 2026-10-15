@@ -211,6 +211,22 @@ public class NotificationsTrayPage extends ViewPage
     }
 
     /**
+     * @return {@code true} if the badge holding the number of unread notifications is displayed on the bell, without
+     *     opening the notification tray
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public boolean isCountBadgeDisplayed()
+    {
+        // The badge is added asynchronously, once the number of unread notifications is known, and removed when there
+        // is no unread notification.
+        List<WebElement> badges = getDriver().findElementsWithoutWaiting(
+            By.cssSelector(NOTIFICATION_BUTTON_CSS_SELECTOR + " .notifications-count"));
+        return !badges.isEmpty() && badges.getFirst().isDisplayed();
+    }
+
+    /**
      * Click the button «Clear All» in the notification tray.
      */
     public void clearAllNotifications()
@@ -410,6 +426,30 @@ public class NotificationsTrayPage extends ViewPage
     public String getNotificationRawContent(int notificationNumber)
     {
         return getNotificationsContainerElement().getNotificationRawContent(notificationNumber);
+    }
+
+    /**
+     * @return {@code true} if the "Load older notifications" button is displayed in the notification tray
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public boolean hasOlderNotifications()
+    {
+        return getNotificationsContainerElement().hasOlderNotifications();
+    }
+
+    /**
+     * Click the "Load older notifications" button of the notification tray and wait for the older notifications to be
+     * displayed.
+     *
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public void loadOlderNotifications()
+    {
+        getNotificationsContainerElement().loadOlderNotifications();
     }
 
     /**

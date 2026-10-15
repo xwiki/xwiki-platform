@@ -43,6 +43,9 @@ public interface NetworkChannel
     Collection<NetworkMember> getMembers();
 
     /**
+     * The leader is known as soon as the current instance knows the member, possibly before the identifier of that
+     * member is received: {@link NetworkMember#getId()} is {@code null} in this case.
+     *
      * @return the leader of the channel (dynamically changes when a leader becomes offline)
      */
     NetworkMember getLeader();

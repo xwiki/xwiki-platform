@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.objects;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
@@ -26,7 +27,7 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.resources.objects.ObjectAtPageVersionResource;
@@ -42,6 +43,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Named("org.xwiki.rest.internal.resources.objects.ObjectAtPageVersionResourceImpl")
 public class ObjectAtPageVersionResourceImpl extends XWikiResource implements ObjectAtPageVersionResource
 {
+    @Inject
+    private ModelFactory factory;
+
     @Override
     public Object getObject(String wikiName, String spaceName, String pageName, String version, String className,
             Integer objectNumber, Boolean withPrettyName) throws XWikiRestException
@@ -62,9 +66,7 @@ public class ObjectAtPageVersionResourceImpl extends XWikiResource implements Ob
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                    .getXWikiContext(componentManager), doc, baseObject, true, Utils.getXWikiApi(componentManager),
-                    withPrettyName);
+            return this.factory.toRestObject(uriInfo.getBaseUri(), doc, baseObject, true, withPrettyName);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

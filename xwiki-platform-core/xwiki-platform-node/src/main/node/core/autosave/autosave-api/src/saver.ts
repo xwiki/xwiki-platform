@@ -233,11 +233,22 @@ class Saver<C extends object = object> {
     // Cancel the scheduled save.
     clearTimeout(this.saveTimer);
 
-    // Push uncommitted changes to the server before disconnecting.
-    await this.transport.updateLocalState({}, { push: true, immediate: true });
-
-    await this.transport.dispose();
-    this.target.dispose();
+    try {
+      // Push uncommitted changes to the server before disconnecting.
+      await this.transport.updateLocalState(
+        {},
+        { push: true, immediate: true },
+      );
+    } catch (error) {
+      // Disconnect anyway, otherwise we would keep listening to a channel we're leaving.
+      this.logger?.warn(
+        "Failed to push the local state before stopping.",
+        error,
+      );
+    } finally {
+      await this.transport.dispose();
+      this.target.dispose();
+    }
   }
 
   private scheduleSave(): void {

@@ -319,8 +319,8 @@ class RenamePageIT
     void renamePageUsedInMacroContentAndParameters(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
-        // The image targets an attachment of a terminal page, to check that its reference is updated even though the
-        // renamed terminal page doesn't exist anymore when the backlinks are updated.
+        // The image and the untyped link target a terminal page, to check that their references are updated even
+        // though the renamed terminal page doesn't exist anymore when the backlinks are updated.
         // Fixture: we're creating 5 different pages to ensure that the backlinks, rename are working properly
         // and independently in different situations.
         String sourcePageName = "WebHome";
@@ -394,7 +394,8 @@ class RenamePageIT
         String testPageContent = "Check out this page: [[type the link label>>doc:%1$s]]%n" + "%n" + "{{warning}}%n"
             + "Withing a macro: Check out this page: [[type the link label>>doc:%2$s]]%n" + "%n" + "{{error}}%n"
             + "And in nested macro: Check out this page: [[type the link label>>doc:%3$s]]%n" + "{{/error}}%n" + "%n"
-            + " %n" + "{{/warning}}%n" + "%n" + "Picture: [[image:%4$s@image.gif]]%n" + "Include macro:%n" + "%n"
+            + " %n" + "{{/warning}}%n" + "%n" + "Picture: [[image:%4$s@image.gif]]%n" + "Untyped link: [[%4$s]]%n"
+            + "Include macro:%n" + "%n"
             + "{{include reference=\"%5$s\"/}}%n%n"
             + "== A section ==%n%n"
             + "First link again: [[type the link label>>doc:%1$s]]%n%n"

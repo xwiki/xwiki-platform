@@ -282,6 +282,39 @@ class ResourceReferenceRenamerTest
     }
 
     @Test
+    void updateResourceReferenceNotRelativeWithUntypedLinkToRenamedTerminalDocument()
+    {
+        // The untyped link targets a renamed terminal document: since that document doesn't exist anymore, the link
+        // is now resolved as targeting the space home page with the same name.
+        DocumentResourceReference resourceReference = new DocumentResourceReference("Space.Page");
+        resourceReference.setTyped(false);
+        DocumentReference oldReference = new DocumentReference("xwiki", "Space", "Page");
+        DocumentReference newReference = new DocumentReference("xwiki", "NewSpace", "Page");
+        DocumentReference currentDocumentReference = new DocumentReference("xwiki", "Other", "Page");
+        DocumentReference spaceHomeReference = new DocumentReference("xwiki", List.of("Space", "Page"), "WebHome");
+
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
+            .thenReturn(spaceHomeReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(spaceHomeReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceHomeReference)).thenReturn(spaceHomeReference);
+        when(this.currentEntityReferenceResolver.resolve("Space.Page", EntityType.DOCUMENT, currentDocumentReference))
+            .thenReturn(oldReference);
+        when(this.currentEntityReferenceResolver.resolve("Space.Page", EntityType.DOCUMENT)).thenReturn(oldReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldReference)).thenReturn(oldReference);
+        when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
+            .thenReturn(
+                new EntityReference("Page", EntityType.DOCUMENT, new EntityReference("Space", EntityType.SPACE)));
+        when(this.compactEntityReferenceSerializer.serialize(newReference, currentDocumentReference))
+            .thenReturn("NewSpace.Page");
+
+        assertTrue(this.renamer.updateResourceReference(resourceReference, oldReference, newReference,
+            currentDocumentReference, false, Map.of(oldReference, newReference)));
+        DocumentResourceReference expectedResourceReference = new DocumentResourceReference("NewSpace.Page");
+        expectedResourceReference.setTyped(false);
+        assertEquals(expectedResourceReference, resourceReference);
+    }
+
+    @Test
     void updateResourceReferenceNotRelativeWithImageOfOtherTerminalDocument()
     {
         // The image targets an attachment of an existing space home page, whose name doesn't match the renamed

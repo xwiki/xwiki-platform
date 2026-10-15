@@ -338,6 +338,19 @@ define('xwiki-selectize', [
     input.selectize = tomSelect;
     $(input).data('selectize', tomSelect);
 
+    // Tom Select hides the enhanced input visually but leaves it focusable, so code that focuses it (e.g. to focus the
+    // first field of a form, or the first invalid one) would leave the user without any visible focus. Move the focus
+    // to the Tom Select control instead.
+    // TODO: Remove this focus forwarding, and the matching 'focus.xwikiSelectize' unbinding in the 'destroy' listener
+    // below, once Tom Select is upgraded to a version that does it itself. See
+    // https://github.com/orchidjs/tom-select/issues/1099 ([Bug]: Focusing the original <select> / <input> leaves the
+    // page without a visible focus).
+    $(input).on('focus.xwikiSelectize', () => tomSelect.focus());
+    // The input may have received the focus before being enhanced.
+    if (document.activeElement === input) {
+      tomSelect.focus();
+    }
+
     $(input).on('change.xwikiSelectize', function(event) {
       // Check if the value of the selectize widget is synchronized with the value of the underlying input.
       if (isSelectizeValueUpToDate(input)) {
@@ -359,7 +372,9 @@ define('xwiki-selectize', [
       delete input.selectize;
       $(input).removeData('selectize');
 
-      $(input).off('change.xwikiSelectize');
+      // The 'focus' listener is the focus forwarding workaround for
+      // https://github.com/orchidjs/tom-select/issues/1099
+      $(input).off('change.xwikiSelectize focus.xwikiSelectize');
     });
 
     customize(input);

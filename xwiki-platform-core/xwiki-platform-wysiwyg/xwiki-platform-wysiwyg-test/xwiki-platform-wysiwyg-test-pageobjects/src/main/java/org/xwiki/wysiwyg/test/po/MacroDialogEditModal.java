@@ -39,6 +39,11 @@ public class MacroDialogEditModal extends BaseElement
      */
     private static final By MACRO_NAME = By.cssSelector("[class*=-editor-modal] .macro-name");
 
+    /**
+     * We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+     */
+    private static final By SUBMIT_BUTTON = By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary");
+
     private final Consumer<Runnable> submitHandler;
 
     /**
@@ -207,9 +212,27 @@ public class MacroDialogEditModal extends BaseElement
      */
     public void clickSubmit()
     {
-        this.submitHandler.accept(() -> getDriver().findElement(
-            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
-            By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click());
+        clickSubmit(true);
+    }
+
+    /**
+     * Click on the macro submission button.
+     *
+     * @param expectSuccess {@code true} to wait for the result of the submission when the editor that opened the modal
+     *            knows how to (see {@link #MacroDialogEditModal(Consumer)}), {@code false} when the submission is
+     *            expected to be refused (e.g. a required parameter has no value): the modal then stays open and there
+     *            is no submission result to wait for
+     * @since 18.4.8
+     * @since 18.9.0RC1
+     */
+    public void clickSubmit(boolean expectSuccess)
+    {
+        Runnable click = () -> getDriver().findElement(SUBMIT_BUTTON).click();
+        if (expectSuccess) {
+            this.submitHandler.accept(click);
+        } else {
+            click.run();
+        }
     }
 
     /**

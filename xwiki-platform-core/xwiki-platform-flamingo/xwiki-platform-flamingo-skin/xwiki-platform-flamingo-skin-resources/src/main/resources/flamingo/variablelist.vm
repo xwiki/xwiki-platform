@@ -235,7 +235,10 @@
     "navbar-height" : "50px",
     "padding-large-vertical": "10px",
     "table-bg-hover": "#f5f5f5",
-    "table-border-color": "#ddd"
+    "table-border-color": "#ddd",
+    "state-success-text": "#3c763d",
+    "state-warning-text": "#8a6d3b",
+    "state-danger-text": "#a94442"
 })
 
 ############################################

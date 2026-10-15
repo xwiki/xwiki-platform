@@ -39,7 +39,9 @@ import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingExcept
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ArrayNode;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ObjectNode;
+import org.xwiki.livedata.test.po.ListLayoutElement;
 import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.PropertiesPanelElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -84,6 +86,16 @@ class LiveDataIT
     private static final String NAME_COLUMN = "name";
 
     private static final String CHOICE_COLUMN = "choice";
+
+    private static final String CITY_COLUMN = "city";
+
+    private static final String CITY_PARIS = "Paris";
+
+    private static final String CITY_LISBON = "Lisbon";
+
+    private static final String EMPTY_VALUE = "-";
+
+    private static final String LIST_TRANSLATION_PREFIX = "listLayout.";
 
     private static final String NAME_LYNDA = "Lynda";
 
@@ -1061,6 +1073,95 @@ class LiveDataIT
 
         liveData.pressEscape();
         liveData.waitUntilMaximized(false);
+    }
+
+    /**
+     * Test the list layout: each entry is displayed on a compact, read-only line, made of its first visible property
+     * followed by its other visible properties that have a value.
+     */
+    @Test
+    @Order(14)
+    void listLayout(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
+        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
+        String content = """
+            {{liveData
+              id="test"
+              properties="%s,%s"
+              layouts="list,table"
+              sort="%s:asc"
+              source="liveTable"
+              sourceParameters="translationPrefix=%s&className=%s"
+            /}}
+            """.formatted(NAME_COLUMN, CITY_COLUMN, NAME_COLUMN, LIST_TRANSLATION_PREFIX, className);
+        testUtils.createPage(testReference, content, "Live Data with the list layout");
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        // Use a translation prefix of our own, so that the empty values are displayed the same way whatever the
+        // translations defined by the other tests.
+        DocumentReference translationReference = new DocumentReference("ListLayoutTranslations", testSpace);
+        testUtils.addObject(translationReference, "XWiki.TranslationDocumentClass", singletonMap("scope", "WIKI"));
+        testUtils.rest().savePage(translationReference, LIST_TRANSLATION_PREFIX + "emptyvalue=" + EMPTY_VALUE,
+            "translation");
+        testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
+        testUtils.addClassProperty(testReference, CITY_COLUMN, "String");
+        testUtils.addObject(new DocumentReference(NAME_LYNDA, testSpace), className,
+            Map.of(NAME_COLUMN, NAME_LYNDA, CITY_COLUMN, CITY_PARIS));
+        // Esther has no city: the liveTable source displays the empty values with the "emptyvalue" translation.
+        testUtils.addObject(new DocumentReference(NAME_ESTHER, testSpace), className,
+            Map.of(NAME_COLUMN, NAME_ESTHER));
+        testUtils.addObject(new DocumentReference(NAME_CHARLY, testSpace), className,
+            Map.of(NAME_COLUMN, NAME_CHARLY, CITY_COLUMN, CITY_LISBON));
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        assertEquals(List.of("List", "Table"), liveData.getLayoutNames());
+
+        // The first layout of the macro parameter is displayed initially.
+        ListLayoutElement listLayout = liveData.getListLayout();
+        listLayout.waitUntilItemCountEqualsTo(3);
+        assertEquals(List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA), listLayout.getMainValues());
+        assertEquals(List.of(CITY_LISBON), listLayout.getSecondaryValues(1));
+        assertEquals(List.of(EMPTY_VALUE), listLayout.getSecondaryValues(2));
+        assertEquals(List.of(CITY_PARIS), listLayout.getSecondaryValues(3));
+
+        // The values can't be edited from the list layout.
+        assertFalse(listLayout.hasEditableValues());
+
+        // Hiding a property removes its values from the list.
+        PropertiesPanelElement propertiesPanel = liveData.openPropertiesPanel();
+        propertiesPanel.setPropertyDisplayed(CITY_COLUMN, false);
+        propertiesPanel.closePanel();
+        listLayout.waitUntilReady();
+        assertEquals(List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA), listLayout.getMainValues());
+        assertEquals(List.of(), listLayout.getSecondaryValues(1));
+        assertEquals(List.of(), listLayout.getSecondaryValues(3));
+
+        // Hiding the first property makes the next visible one the main value.
+        propertiesPanel = liveData.openPropertiesPanel();
+        propertiesPanel.setPropertyDisplayed(CITY_COLUMN, true);
+        propertiesPanel.setPropertyDisplayed(NAME_COLUMN, false);
+        propertiesPanel.closePanel();
+        listLayout.waitUntilReady();
+        assertEquals(List.of(CITY_LISBON, EMPTY_VALUE, CITY_PARIS), listLayout.getMainValues());
+
+        // The other layouts are still available, and display the same entries.
+        propertiesPanel = liveData.openPropertiesPanel();
+        propertiesPanel.setPropertyDisplayed(NAME_COLUMN, true);
+        propertiesPanel.closePanel();
+        liveData.switchLayout("Table");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(3);
+        assertEquals(NAME_CHARLY, tableLayout.getCellText(NAME_COLUMN, 1));
+        assertEquals(CITY_LISBON, tableLayout.getCellText(CITY_COLUMN, 1));
+
+        liveData.switchLayout("List");
+        listLayout = liveData.getListLayout();
+        listLayout.waitUntilItemCountEqualsTo(3);
+        assertEquals(List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA), listLayout.getMainValues());
     }
 
     /**

@@ -222,7 +222,7 @@ public class MacroDialogEditModal extends BaseElement
      *            knows how to (see {@link #MacroDialogEditModal(Consumer)}), {@code false} when the submission is
      *            expected to be refused (e.g. a required parameter has no value): the modal then stays open and there
      *            is no submission result to wait for
-     * @since 18.4.7
+     * @since 18.4.8
      * @since 18.9.0RC1
      */
     public void clickSubmit(boolean expectSuccess)

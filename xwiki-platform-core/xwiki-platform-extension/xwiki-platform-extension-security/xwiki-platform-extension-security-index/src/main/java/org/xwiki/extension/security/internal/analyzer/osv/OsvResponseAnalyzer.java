@@ -155,18 +155,15 @@ public class OsvResponseAnalyzer
         boolean matchesOneRange = false;
         if (!affected.getRanges().isEmpty()) {
             List<RangeObject> ranges = affected.getRanges();
-            matchesOneRange = ranges.stream().anyMatch(range -> {
-                String start = range.getStart();
-                String end = range.getEnd();
-                return isInRange(start, end, version);
-            });
+            matchesOneRange = ranges.stream()
+                .anyMatch(range -> isInRange(range.getStart(), range.getEnd(), range.isEndInclusive(), version));
         }
         return matchesOneRange;
     }
 
-    private boolean isInRange(Object introduced, Object fixed, String version)
+    private boolean isInRange(String introduced, String end, boolean endInclusive, String version)
     {
-        String range = String.format("[%s,%s]", introduced, fixed == null ? "" : fixed);
+        String range = String.format("[%s,%s%s", introduced, end == null ? "" : end, endInclusive ? "]" : ")");
         try {
             return VersionRange.createFromVersionSpec(range).containsVersion(new DefaultArtifactVersion(version));
         } catch (InvalidVersionSpecificationException e) {

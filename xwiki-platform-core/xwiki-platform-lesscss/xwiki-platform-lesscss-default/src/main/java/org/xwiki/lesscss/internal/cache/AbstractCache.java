@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
 
@@ -94,7 +93,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
      * gives that directly, and it is never held during a computation. {@link #getVersion()} reads this field without
      * the lock, so that a compilation does not wait for a running clear before starting.
      */
-    private final AtomicLong version = new AtomicLong();
+    private volatile long version;
 
     @Override
     public T get(LESSResourceReference lessResourceReference, SkinReference skin, ColorThemeReference colorTheme)
@@ -107,7 +106,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
         ColorThemeReference colorTheme, T content, long expectedVersion)
     {
         // Do not store an object computed from content that was cleared during the computation
-        if (expectedVersion != this.version.get()) {
+        if (expectedVersion != this.version) {
             return;
         }
 
@@ -124,7 +123,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     @Override
     public long getVersion()
     {
-        return this.version.get();
+        return this.version;
     }
 
     /**
@@ -149,7 +148,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     @Override
     public synchronized void clear()
     {
-        this.version.incrementAndGet();
+        this.version++;
         cache.removeAll();
         cachedFilesKeysMapPerSkin.clear();
         cachedFilesKeysMapPerColorTheme.clear();
@@ -160,7 +159,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     {
         // Increment even when nothing is cached for the criteria: an object for it may be being computed from the
         // content that just changed.
-        this.version.incrementAndGet();
+        this.version++;
 
         // Get the list of cached files keys corresponding to the criteria
         List<String> cachedFilesKeys = cachedFilesKeysMap.get(criteria);

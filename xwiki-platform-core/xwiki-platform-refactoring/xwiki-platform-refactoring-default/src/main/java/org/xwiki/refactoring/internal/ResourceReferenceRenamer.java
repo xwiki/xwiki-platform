@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -62,6 +63,10 @@ public class ResourceReferenceRenamer
     @Inject
     @Named("relative")
     private EntityReferenceResolver<ResourceReference> relativeEntityReferenceResolver;
+
+    @Inject
+    @Named("current")
+    private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
     @Inject
     @Named("compact")
@@ -147,13 +152,12 @@ public class ResourceReferenceRenamer
     {
         boolean result = false;
 
-        // FIXME: the root cause of XWIKI-18634 is related to this call.
         EntityReference linkEntityReference =
-            this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
+            resolveBeforeRename(resourceReference, oldReference, currentDocumentReference);
 
         DocumentReference linkTargetDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
-        EntityReference absoluteResolvedEntityReference = this.entityReferenceResolver.resolve(resourceReference, null);
+        EntityReference absoluteResolvedEntityReference = resolveBeforeRename(resourceReference, oldReference);
 
         // If the link targets the old (renamed) document reference and it's an absolute reference
         // (i.e. its resolution without any given parameter gives same result than its resolution with the
@@ -173,6 +177,56 @@ public class ResourceReferenceRenamer
             result = true;
         }
         return result;
+    }
+
+    /**
+     * Resolve the given resource reference the way it was resolved before the old document was renamed.
+     * <p>
+     * The document and attachment resource references are resolved by default to the terminal document they name and
+     * only fall back on a space home page when that terminal document doesn't exist. The renamed document doesn't
+     * exist anymore when its backlinks are updated, so a reference such as {@code Space.Page@image.png}, which was
+     * targeting the renamed terminal document {@code Space.Page}, is now resolved as
+     * {@code Space.Page.WebHome@image.png}. Since that fallback is never used when the terminal document exists, the
+     * reference was targeting the old document whenever the terminal document it names is the old document.
+     *
+     * @param resourceReference the resource reference to resolve
+     * @param oldReference the reference of the renamed document
+     * @param parameters the parameters to pass to the resolvers, i.e. the optional base reference
+     * @return the entity the resource reference was targeting before the old document was renamed
+     */
+    private EntityReference resolveBeforeRename(ResourceReference resourceReference, DocumentReference oldReference,
+        Object... parameters)
+    {
+        EntityReference entityReference = this.entityReferenceResolver.resolve(resourceReference, null, parameters);
+
+        EntityType terminalEntityType = getTerminalEntityType(resourceReference);
+        if (terminalEntityType != null && entityReference != null
+            && !oldReference.equals(this.defaultReferenceDocumentReferenceResolver.resolve(entityReference))) {
+            EntityReference terminalEntityReference = this.currentEntityReferenceResolver
+                .resolve(resourceReference.getReference(), terminalEntityType, parameters);
+            if (oldReference.equals(this.defaultReferenceDocumentReferenceResolver.resolve(terminalEntityReference))) {
+                entityReference = terminalEntityReference;
+            }
+        }
+
+        return entityReference;
+    }
+
+    private EntityType getTerminalEntityType(ResourceReference resourceReference)
+    {
+        // The resolution of resource references having base references is not reproduced here, since they are not
+        // relative to the document holding them.
+        EntityType entityType = null;
+        if (StringUtils.isNotEmpty(resourceReference.getReference())
+            && resourceReference.getBaseReferences().isEmpty()) {
+            if (ResourceType.DOCUMENT.equals(resourceReference.getType())) {
+                entityType = EntityType.DOCUMENT;
+            } else if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
+                entityType = EntityType.ATTACHMENT;
+            }
+        }
+
+        return entityType;
     }
 
     /**
@@ -332,7 +386,6 @@ public class ResourceReferenceRenamer
     {
         boolean result = false;
 
-        // FIXME: the root cause of XWIKI-18634 is related to this call.
         EntityReference linkEntityReference =
             this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
 

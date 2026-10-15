@@ -34,5 +34,6 @@
   <modules>
     <module>xwiki-platform-flamingo-skin</module>
     <module>xwiki-platform-flamingo-theme</module>
+    <module>xwiki-platform-flamingo-visual</module>
   </modules>
 </project>

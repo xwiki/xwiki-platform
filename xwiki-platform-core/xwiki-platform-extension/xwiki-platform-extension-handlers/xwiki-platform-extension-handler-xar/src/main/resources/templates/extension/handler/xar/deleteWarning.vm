@@ -1,0 +1,60 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+##
+## Since 18.9.0RC1
+## Displays a warning when the document $deletedDocumentReference belongs to installed extensions and the current
+## user is about to delete it from a UI that doesn't go through the delete refactoring job (which asks its own
+## question). The texts are the ones of the question asked by the delete refactoring job, so that both UIs warn the
+## same way, except for the final confirmation question which is left to the calling UI. Nothing is displayed when the
+## deletion is either allowed without warning or denied.
+##
+#set ($protectionLevel = $services.extension.xar.getDeleteSecurityLevel($xcontext.userReference,
+  $deletedDocumentReference))
+#if ("$!protectionLevel" == 'WARNING')
+  #set ($extensions = [])
+  #foreach ($extension in $services.extension.xar.getInstalledExtensions($deletedDocumentReference))
+    #set ($discard = $extensions.add({'name': "$!extension.name", 'id': $extension.id.id}))
+  #end
+  #set ($extensions = $collectiontool.sort($extensions, 'name'))
+  #define ($warningMessageContent)
+    <p>$escapetool.xml($services.localization.render(
+      'job.question.ExtensionBreakingQuestion.refactoring/delete.explanation'))</p>
+    <ul class="deleteWarningExtensionsList">
+      #foreach ($extension in $extensions)
+        <li>#if ($extension.name != '')$escapetool.xml($extension.name)#{else}$escapetool.xml($extension.id)#{end}</li>
+      #end
+    </ul>
+    #set ($url = $xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin',
+      'section=XWiki.Extensions&search=&repo=installed'))
+    #set ($link = '<a href="' + $escapetool.xml($url) + '">')
+    ## We cannot escape the following line because it contains an HTML link.
+    <p>$services.localization.render('job.question.ExtensionBreakingQuestion.refactoring/delete.help',
+      [$link, '</a>'])</p>
+  #end
+  #_genericMessage({
+    'text': "$warningMessageContent",
+    'classAffix': 'warning',
+    'iconName': 'warning',
+    'prettyNameKey': 'warning',
+    'extraClass': 'deleteWarningExtensions',
+    'title': $escapetool.xml($services.localization.render(
+      'job.question.ExtensionBreakingQuestion.refactoring/delete.title'))
+  })
+#end

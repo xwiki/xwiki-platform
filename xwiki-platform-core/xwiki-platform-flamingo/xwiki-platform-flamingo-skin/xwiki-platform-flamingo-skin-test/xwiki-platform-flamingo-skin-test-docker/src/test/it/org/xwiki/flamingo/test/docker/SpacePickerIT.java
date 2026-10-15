@@ -185,8 +185,14 @@ class SpacePickerIT
 
         SuggestInputElement picker = displayPicker(setup, reference);
 
-        List<SuggestionElement> suggestions = picker.sendKeys(searchText).waitForNonTypedSuggestions().getSuggestions();
-        assertEquals(1, suggestions.size(), "Didn't find anything searching for %s".formatted(searchText));
+        // The picker suggests matching spaces from the whole wiki, including the ones created by other tests, so we
+        // ignore the suggestions located outside the test space.
+        String testSpacePrefix = setup.serializeLocalReference(reference.getLastSpaceReference()) + '.';
+        List<SuggestionElement> suggestions = picker.sendKeys(searchText).waitForNonTypedSuggestions().getSuggestions()
+            .stream().filter(suggestion -> suggestion.getValue().startsWith(testSpacePrefix)).toList();
+        assertEquals(List.of(setup.serializeLocalReference(spaceReference)),
+            suggestions.stream().map(SuggestionElement::getValue).toList(),
+            "Didn't find the space searching for %s".formatted(searchText));
         assertEquals(title, suggestions.get(0).getLabel());
     }
 

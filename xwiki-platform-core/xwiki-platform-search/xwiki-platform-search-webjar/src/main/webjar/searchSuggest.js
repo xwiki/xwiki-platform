@@ -101,7 +101,7 @@ var XWiki = (function (XWiki) {
       }
       // Keep the "Go to search page..." link in sync with the results it sits alongside, instead of the raw input
       // (which would update ahead of the results it belongs to).
-      this.updateAllResultsLink();
+      this._updateAllResultsLink();
     },
 
     /**
@@ -138,7 +138,7 @@ var XWiki = (function (XWiki) {
     /**
      * Keeps the href in sync with the text currently typed in the search field.
      */
-    updateAllResultsLink: function() {
+    _updateAllResultsLink: function() {
       const form = this.searchInput.up('form');
       const params = new URLSearchParams(new FormData(form));
       this.allResultsLink.href = `${form.action}?${params.toString()}`;
@@ -178,7 +178,7 @@ var XWiki = (function (XWiki) {
       });
       var allResults = allResultsNode.getElement();
       this.allResultsLink = allResults.down('a');
-      this.updateAllResultsLink();
+      this._updateAllResultsLink();
       allResultsNode.items[0].getElement().addEventListener('focusin',
         (event) => this.suggest.setHighlight($(event.currentTarget)));
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {

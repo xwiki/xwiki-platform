@@ -20,8 +20,9 @@
 
 import LivedataDropdownMenu from "./LivedataDropdownMenu.vue";
 import { mount } from "@vue/test-utils";
+import $ from "jquery";
 import { spy } from "sinon";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { ref } from "vue";
 
 /**
@@ -56,6 +57,7 @@ function initWrapper({ maximized = false } = {}) {
           isMaximized: () => isMaximized.value,
           toggleMaximized: toggleMaximized,
         },
+        jQuery: $,
       },
       mocks: {
         $t: (key) => key,
@@ -66,6 +68,39 @@ function initWrapper({ maximized = false } = {}) {
     },
   });
   return { wrapper, changeLayout, toggleMaximized };
+}
+
+/**
+ * Opens the dropdown of the given wrapper, with its button located at the given position in a
+ * viewport that is 1000 pixels wide and a menu that is 300 pixels high.
+ *
+ * @param wrapper - the wrapper of the `LivedataDropdownMenu` component
+ * @param buttonRect - the position of the dropdown button in the viewport
+ * @param viewportHeight - the height of the viewport, in pixels
+ */
+async function openMenu(wrapper, buttonRect, viewportHeight = 800) {
+  Object.defineProperty(document.documentElement, "clientWidth", {
+    configurable: true,
+    value: 1000,
+  });
+  Object.defineProperty(document.documentElement, "clientHeight", {
+    configurable: true,
+    value: viewportHeight,
+  });
+  wrapper.find(".dropdown-toggle").element.getBoundingClientRect = () =>
+    buttonRect;
+  Object.defineProperty(
+    wrapper.find(".dropdown-menu").element,
+    "offsetHeight",
+    {
+      configurable: true,
+      value: 300,
+    },
+  );
+  $(wrapper.find(".livedata-dropdown-menu").element).trigger(
+    "shown.bs.dropdown",
+  );
+  await wrapper.vm.$nextTick();
 }
 
 // Since the <li> elements does not have distinguishing attributes, we look for the layout items by
@@ -152,5 +187,73 @@ describe("LivedataDropdownMenu.vue", () => {
     expect(wrapper.find(".livedata-action-maximize").text()).toBe(
       "livedata.action.minimize",
     );
+  });
+
+  describe("Menu position", () => {
+    afterEach(() => {
+      delete document.documentElement.clientWidth;
+      delete document.documentElement.clientHeight;
+    });
+
+    it("Displays the menu below its button, outside of the clipping containers", async () => {
+      const { wrapper } = initWrapper();
+
+      await openMenu(wrapper, { top: 100, bottom: 130, right: 900 });
+
+      const menuStyle = wrapper.find(".dropdown-menu").element.style;
+      expect(menuStyle.position).toBe("fixed");
+      expect(menuStyle.top).toBe("130px");
+      expect(menuStyle.bottom).toBe("auto");
+      expect(menuStyle.right).toBe("100px");
+    });
+
+    it("Displays the menu above its button when there is no room below", async () => {
+      const { wrapper } = initWrapper();
+
+      await openMenu(wrapper, { top: 600, bottom: 630, right: 900 });
+
+      const menuStyle = wrapper.find(".dropdown-menu").element.style;
+      expect(menuStyle.position).toBe("fixed");
+      expect(menuStyle.top).toBe("auto");
+      expect(menuStyle.bottom).toBe("200px");
+    });
+
+    it("Limits the menu height to the room left in a viewport too small for it", async () => {
+      const { wrapper } = initWrapper();
+
+      await openMenu(wrapper, { top: 100, bottom: 130, right: 900 }, 330);
+
+      const menuStyle = wrapper.find(".dropdown-menu").element.style;
+      expect(menuStyle.top).toBe("130px");
+      expect(menuStyle.maxHeight).toBe("200px");
+      expect(menuStyle.overflowY).toBe("auto");
+    });
+
+    it("Moves the menu along with its button when scrolling", async () => {
+      const { wrapper } = initWrapper();
+      await openMenu(wrapper, { top: 100, bottom: 130, right: 900 });
+
+      wrapper.find(".dropdown-toggle").element.getBoundingClientRect = () => ({
+        top: 50,
+        bottom: 80,
+        right: 900,
+      });
+      document.body.dispatchEvent(new Event("scroll"));
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find(".dropdown-menu").element.style.top).toBe("80px");
+    });
+
+    it("Resets the menu position when it is closed", async () => {
+      const { wrapper } = initWrapper();
+      await openMenu(wrapper, { top: 100, bottom: 130, right: 900 });
+
+      $(wrapper.find(".livedata-dropdown-menu").element).trigger(
+        "hidden.bs.dropdown",
+      );
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find(".dropdown-menu").element.style.position).toBe("");
+    });
   });
 });

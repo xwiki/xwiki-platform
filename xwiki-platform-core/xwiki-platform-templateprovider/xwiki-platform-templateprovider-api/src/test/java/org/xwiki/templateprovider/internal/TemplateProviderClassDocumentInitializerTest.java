@@ -104,6 +104,14 @@ class TemplateProviderClassDocumentInitializerTest
         StaticListClass action = assertInstanceOf(StaticListClass.class, xclass.getField("action"));
         assertEquals("edit|saveandedit|saveandview", action.getValues());
         assertEquals("select", action.getDisplayType());
+    }
+
+    @Test
+    void createClassSpacesFields()
+    {
+        BaseClass xclass = new BaseClass();
+
+        this.initializer.createClass(xclass);
 
         DBListClass spaces = assertInstanceOf(DBListClass.class, xclass.getField("spaces"));
         assertTrue(spaces.isMultiSelect());

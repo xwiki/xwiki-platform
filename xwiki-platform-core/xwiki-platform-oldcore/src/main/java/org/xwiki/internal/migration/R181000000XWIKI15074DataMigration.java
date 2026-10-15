@@ -48,12 +48,12 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * translations displayed the same way.
  *
  * @version $Id$
- * @since 18.9.0RC1
+ * @since 18.10.0RC1
  */
 @Component
 @Singleton
-@Named("180900000XWIKI15074")
-public class R180900000XWIKI15074DataMigration extends AbstractHibernateDataMigration
+@Named("181000000XWIKI15074")
+public class R181000000XWIKI15074DataMigration extends AbstractHibernateDataMigration
 {
     private static final int BATCH_SIZE = 100;
 
@@ -81,7 +81,7 @@ public class R180900000XWIKI15074DataMigration extends AbstractHibernateDataMigr
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(180900000);
+        return new XWikiDBVersion(181000000);
     }
 
     @Override

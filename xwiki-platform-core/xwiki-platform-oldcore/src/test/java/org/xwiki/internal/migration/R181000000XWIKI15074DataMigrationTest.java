@@ -55,15 +55,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link R180900000XWIKI15074DataMigration}.
+ * Tests for {@link R181000000XWIKI15074DataMigration}.
  *
  * @version $Id$
  */
 @ComponentTest
-class R180900000XWIKI15074DataMigrationTest
+class R181000000XWIKI15074DataMigrationTest
 {
     @InjectMockComponents(role = HibernateDataMigration.class)
-    private R180900000XWIKI15074DataMigration dataMigration;
+    private R181000000XWIKI15074DataMigration dataMigration;
 
     @MockComponent
     private Execution execution;

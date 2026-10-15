@@ -19,6 +19,10 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
@@ -34,6 +38,11 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -100,15 +109,54 @@ class DefaultLESSResourcesCacheTest
     }
 
     @Test
-    void set()
+    void setWithVersion()
     {
-        // Test
-        this.defaultLESSResourcesCache.set(
-            new LESSSkinFileResourceReference("lessResource", null, null), new FSSkinReference("skin"),
-            new NamedColorThemeReference("colorTheme"), "css");
+        long version = this.defaultLESSResourcesCache.getVersion();
 
-        // Verify
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("lessResource"),
+            new FSSkinReference("skin"), new NamedColorThemeReference("colorTheme"), "css", version);
+
         verify(this.cache).set("12_lessResource_4_skin_10_colorTheme", "css");
+    }
+
+    @Test
+    void setWithVersionWhenClearedDuringComputation()
+    {
+        // A compilation reads the version, then the LESS resource is saved while it is compiled: the cache of the
+        // resource is cleared before the result, computed from the old content, is stored.
+        long version = this.defaultLESSResourcesCache.getVersion();
+        this.defaultLESSResourcesCache.clearFromLESSResource(createLESSSkinFileResourceReference("lessResource"));
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("lessResource"),
+            new FSSkinReference("skin"), new NamedColorThemeReference("colorTheme"), "old css", version);
+
+        verify(this.cache, never()).set(anyString(), any());
+
+        // A compilation started after the clear is cached.
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("lessResource"),
+            new FSSkinReference("skin"), new NamedColorThemeReference("colorTheme"), "new css",
+            this.defaultLESSResourcesCache.getVersion());
+
+        verify(this.cache).set("12_lessResource_4_skin_10_colorTheme", "new css");
+    }
+
+    @Test
+    void clearsChangeTheVersion()
+    {
+        long version = this.defaultLESSResourcesCache.getVersion();
+        this.defaultLESSResourcesCache.clear();
+        assertNotEquals(version, this.defaultLESSResourcesCache.getVersion());
+
+        version = this.defaultLESSResourcesCache.getVersion();
+        this.defaultLESSResourcesCache.clearFromSkin(new FSSkinReference("skin"));
+        assertNotEquals(version, this.defaultLESSResourcesCache.getVersion());
+
+        version = this.defaultLESSResourcesCache.getVersion();
+        this.defaultLESSResourcesCache.clearFromColorTheme(new NamedColorThemeReference("colorTheme"));
+        assertNotEquals(version, this.defaultLESSResourcesCache.getVersion());
+
+        version = this.defaultLESSResourcesCache.getVersion();
+        this.defaultLESSResourcesCache.clearFromLESSResource(createLESSSkinFileResourceReference("lessResource"));
+        assertNotEquals(version, this.defaultLESSResourcesCache.getVersion());
     }
 
     @Test
@@ -135,15 +183,15 @@ class DefaultLESSResourcesCacheTest
             new NamedColorThemeReference("colorTheme"), true)).thenReturn("k4");
 
         // Add the first one twice
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
             new NamedColorThemeReference("colorTheme"), "css1");
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
             new NamedColorThemeReference("colorTheme"), "css1");
 
         // Others
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin2"),
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin2"),
             new NamedColorThemeReference("colorTheme"), "css2");
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin1"),
+        store(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin1"),
             new NamedColorThemeReference("colorTheme"), "css3");
 
         // Test
@@ -169,15 +217,15 @@ class DefaultLESSResourcesCacheTest
         when(this.cacheKeyFactory.getCacheKey(file2, new FSSkinReference("skin2"),
             new NamedColorThemeReference("colorTheme1"), true)).thenReturn("k4");
         // Add the first one twice
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
             new NamedColorThemeReference("colorTheme1"), "css1");
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
             new NamedColorThemeReference("colorTheme1"), "css1");
 
         // Others
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
             new NamedColorThemeReference("colorTheme2"), "css2");
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin2"),
+        store(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin2"),
             new NamedColorThemeReference("colorTheme1"), "css3");
 
         // Test
@@ -204,15 +252,15 @@ class DefaultLESSResourcesCacheTest
             new NamedColorThemeReference("colorTheme1"), true)).thenReturn("k4");
 
         // Add the first one twice
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
             new NamedColorThemeReference("colorTheme1"), "css1");
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
             new NamedColorThemeReference("colorTheme1"), "css1");
 
         // Others
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin1"),
+        store(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin1"),
             new NamedColorThemeReference("colorTheme1"), "css");
-        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin2"),
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin2"),
             new NamedColorThemeReference("colorTheme1"), "css3");
 
         // Test
@@ -222,5 +270,63 @@ class DefaultLESSResourcesCacheTest
         verify(this.cache).remove("k1");
         verify(this.cache).remove("k4");
         verify(this.cache, never()).remove("k3");
+    }
+
+    @Test
+    void setDuringClearFromLESSResource() throws Exception
+    {
+        LESSSkinFileResourceReference file1 = createLESSSkinFileResourceReference("file1");
+        when(this.cacheKeyFactory.getCacheKey(file1, new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme"), true)).thenReturn("k1");
+        when(this.cacheKeyFactory.getCacheKey(file1, new FSSkinReference("skin2"),
+            new NamedColorThemeReference("colorTheme"), true)).thenReturn("k2");
+        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme"), "css1");
+
+        // Block the clear of the resource while it removes the first entry.
+        CountDownLatch removing = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            removing.countDown();
+            release.await(10, TimeUnit.SECONDS);
+            return null;
+        }).when(this.cache).remove("k1");
+        FutureTask<Void> clearTask = new FutureTask<>(() -> {
+            this.defaultLESSResourcesCache.clearFromLESSResource(createLESSSkinFileResourceReference("file1"));
+            return null;
+        });
+        new Thread(clearTask).start();
+        assertTrue(removing.await(10, TimeUnit.SECONDS));
+
+        // Store another entry of the same resource while the clear is blocked: it must wait for the end of the clear,
+        // otherwise its key is registered in the list of keys being cleared and is lost.
+        FutureTask<Void> setTask = new FutureTask<>(() -> {
+            store(createLESSSkinFileResourceReference("file1"),
+                new FSSkinReference("skin2"), new NamedColorThemeReference("colorTheme"), "css2");
+            return null;
+        });
+        Thread setThread = new Thread(setTask);
+        setThread.start();
+        long deadline = System.currentTimeMillis() + 10000;
+        while (setThread.getState() != Thread.State.BLOCKED && setThread.getState() != Thread.State.TERMINATED
+            && System.currentTimeMillis() < deadline) {
+            Thread.sleep(10);
+        }
+
+        release.countDown();
+        clearTask.get(10, TimeUnit.SECONDS);
+        setTask.get(10, TimeUnit.SECONDS);
+
+        // The next clear of the resource removes the entry stored during the previous clear.
+        this.defaultLESSResourcesCache.clearFromLESSResource(createLESSSkinFileResourceReference("file1"));
+
+        verify(this.cache).remove("k2");
+    }
+
+    private void store(LESSSkinFileResourceReference lessResourceReference, FSSkinReference skin,
+        NamedColorThemeReference colorTheme, String content)
+    {
+        this.defaultLESSResourcesCache.set(lessResourceReference, skin, colorTheme, content,
+            this.defaultLESSResourcesCache.getVersion());
     }
 }

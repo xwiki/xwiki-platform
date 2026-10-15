@@ -28,7 +28,7 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
         return source(params).then(function(response) {
           // Success.
           if (Array.isArray(response)) {
-            suggestions.push.apply(suggestions, response.slice(0, params.limit - suggestions.length));
+            suggestions.push(...response.slice(0, params.limit - suggestions.length));
             suggestions.sort(suggestionComparator);
           }
           return suggestions;
@@ -178,7 +178,7 @@ define('xwiki-suggestGroups', ['jquery', 'xwiki-selectize-utils', 'xwiki-selecti
 
 require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    const container = $(data?.elements || document);
     container.find('.suggest-users').suggestUsers();
     container.find('.suggest-groups').suggestGroups();
   };

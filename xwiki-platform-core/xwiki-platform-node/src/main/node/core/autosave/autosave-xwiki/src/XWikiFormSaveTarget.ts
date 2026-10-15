@@ -150,14 +150,17 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
    */
   private interceptSaveRequests(): void {
     const form = this.getForm();
-    const beforeSaveHandler = (event: JQuery.TriggeredEvent): void => {
+    const beforeSaveHandler = async (
+      event: JQuery.TriggeredEvent,
+    ): Promise<void> => {
       if (!this.saver.isSaving()) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        // The save failure is already logged by the saver and reported to the user by the save notification.
-        this.saver
-          .save({ button: event.target as HTMLInputElement })
-          .catch(() => {});
+        try {
+          await this.saver.save({ button: event.target as HTMLInputElement });
+        } catch {
+          // The save failure is already logged by the saver and reported to the user by the save notification.
+        }
       }
     };
     this.$(form).on(
@@ -291,24 +294,26 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     if (this.document.isNew) {
       return;
     }
-    this.loadInitialVersion().catch((error: unknown) => {
+    void this.loadInitialVersion();
+  }
+
+  private async loadInitialVersion(): Promise<void> {
+    try {
+      const revision = await this.document.getRevision(this.document.version!);
+      this.onCreateVersion({
+        number: revision.version,
+        date: new Date(revision.modified).getTime(),
+        author: {
+          reference: this.getAbsoluteUserReference(revision.author),
+          name: revision.authorName,
+        },
+      });
+    } catch (error: unknown) {
       this.logger?.debug(
         "Failed to retrieve information about the initial version.",
         error,
       );
-    });
-  }
-
-  private async loadInitialVersion(): Promise<void> {
-    const revision = await this.document.getRevision(this.document.version!);
-    this.onCreateVersion({
-      number: revision.version,
-      date: new Date(revision.modified).getTime(),
-      author: {
-        reference: this.getAbsoluteUserReference(revision.author),
-        name: revision.authorName,
-      },
-    });
+    }
   }
 
   /**
@@ -348,15 +353,17 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
         } else {
           // eslint-disable-next-line prefer-rest-params
           const args = arguments;
-          saver
-            .whenSettled()
-            .then(() => original.maybeRedirect.apply(this, args as never))
-            .catch((error: unknown) => {
+          void (async () => {
+            try {
+              await saver.whenSettled();
+              original.maybeRedirect.apply(this, args as never);
+            } catch (error) {
               logger?.debug(
                 "Failed to wait for the saver state to settle.",
                 error,
               );
-            });
+            }
+          })();
           return true;
         }
       },
@@ -456,9 +463,9 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
             this.logger?.debug("Save blocked by merge conflict");
             // Keep the saving flag while the user deals with the merge conflict modal (i.e. we don't want the merge
             // conflict to be handled by multiple users because this leads to more merge conflicts).
-            this.waitForMergeConflictResolution(form)
-              .then(resolve)
-              .catch(reject);
+            // The other listeners of the group are removed at this point, so the merge conflict resolution is the
+            // only thing left that can settle the save result.
+            resolve(this.waitForMergeConflictResolution(form));
           } else {
             reject(new Error("Failed to save."));
           }
@@ -473,11 +480,27 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     // There are multiple events that signal the merge conflict resolution. We want to wait for which one comes
     // first and then remove the other listeners. For this, we collect all the remove listener functions.
     const removeListeners: (() => void)[] = [];
-    return new Promise((resolve, reject) => {
+    return Promise.race([
       // Wait for the document to be saved (after the merge conflict is resolved) or for the save to fail (which is
       // triggered also when the merge conflict modal fails to be fetched from the server).
-      this.getSubmitResult(form, removeListeners).then(resolve).catch(reject);
-      // ... or for the editor to be reloaded, if the user decides to discard the local changes.
+      this.getSubmitResult(form, removeListeners),
+      // ... or for the user to give up on the merge conflict resolution.
+      this.waitForMergeConflictAbort(form, removeListeners),
+    ]);
+  }
+
+  /**
+   * Wait for the user to give up on the merge conflict resolution. The returned promise never resolves.
+   *
+   * @param form - the edit form
+   * @param removeListeners - the listeners of the event group this wait takes part in
+   */
+  private async waitForMergeConflictAbort(
+    form: HTMLFormElement,
+    removeListeners: (() => void)[],
+  ): Promise<never> {
+    return new Promise((_resolve, reject) => {
+      // Wait for the editor to be reloaded, if the user decides to discard the local changes.
       this.once(form, removeListeners, "xwiki:actions:reload", () => {
         reject(new Error("Discarding local changes by reloading the editor."));
       });

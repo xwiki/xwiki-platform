@@ -266,7 +266,7 @@ class Saver<C extends object = object> {
       this.saveTimer = setTimeout(this.maybeSave.bind(this), saveInterval);
     } else {
       // Save right away because too much time has passed since the last time the content became dirty.
-      this.maybeSave();
+      void this.maybeSave();
     }
   }
 
@@ -367,10 +367,13 @@ class Saver<C extends object = object> {
     }
   }
 
-  private maybeSave(): void {
+  private async maybeSave(): Promise<void> {
     if (!this.isSomeoneSaving() && this.isSomeoneDirty()) {
-      // The auto-save failure is already logged by the saver and a new save attempt is scheduled.
-      this.save().catch(() => {});
+      try {
+        await this.save();
+      } catch {
+        // The auto-save failure is already logged by the saver and a new save attempt is scheduled.
+      }
     }
   }
 

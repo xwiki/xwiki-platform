@@ -365,6 +365,7 @@ describe("XWikiFormSaveTarget", () => {
       const submitting = target.submit({});
       // Attach a handler right away, so that a rejection raised while this test drives the DOM synchronously is
       // never seen as unhandled. The assertions attach their own handler afterwards.
+      // eslint-disable-next-line promise/prefer-await-to-then -- Fire-and-forget: only marks the rejection as handled.
       submitting.catch(() => {});
       $("#edit").trigger("xwiki:document:saveFailed", [
         { response: { status: 409 } },

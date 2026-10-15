@@ -497,59 +497,54 @@ export class LiveDataLogic implements Logic {
     }
   }
 
-  updateEntries() {
-    return (
-      this.fetchEntries()
-        // eslint-disable-next-line promise/always-return
-        .then(async (data) => {
-          // We need to keep drafts to insert them back in the entries.
-          const drafts = this.data.data.entries.filter((entry) => entry._new);
-          // Refreeze the values (the restore operation might have unfrozen them).
-          this.freezeView(data.entries);
-          data.entries.push(...drafts);
+  // eslint-disable-next-line max-statements
+  async updateEntries() {
+    try {
+      const data = await this.fetchEntries();
+      // We need to keep drafts to insert them back in the entries.
+      const drafts = this.data.data.entries.filter((entry) => entry._new);
+      // Refreeze the values (the restore operation might have unfrozen them).
+      this.freezeView(data.entries);
+      data.entries.push(...drafts);
 
-          this.pruneEntryKeys(data.entries);
-          this.data.data = data;
-          // Remove the outdated footnotes, they will be recomputed by the new entries.
-          this.footnotes.reset();
-          // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated
-          // first.
-          // It turns out this is not enough when components are resolved asynchronously.
-          // Therefore, we preemptively resolve the components that are going to be displayed here. Since they are
-          // cached, the rendering of the displayers will not be delayed later on, and listeners of entriesUpdated
-          // have access to a fully rendered DOM. Note that this approach is not optimal, and we should aim for a
-          // mechanism that does not rely on direct DOM access. Instead, we should provide way to alter the data
-          // externally before starting the rendering. (see https://jira.xwiki.org/browse/XWIKI-23423)
-          const preloadDisplayer = this.getPropertyDescriptors()
-            .filter((it) => it != undefined && this.isPropertyVisible(it.id))
-            .map((it) =>
-              componentStore.load(
-                "displayer",
-                (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
-              ),
-            );
-          await Promise.all(preloadDisplayer);
-          await nextTick();
-          this.triggerEvent("entriesUpdated", {});
-        })
-        .catch((err) => {
-          // Prevent undesired notifications of the end user for non business related errors (for
-          // instance, the user left the page before the request was completed). See
-          // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
-          if (err.readyState === 4) {
-            // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
-            this.translate("livedata.error.updateEntriesFailed").then(
-              (value) => new XWiki.widgets.Notification(value, "error"),
-            );
-          }
+      this.pruneEntryKeys(data.entries);
+      this.data.data = data;
+      // Remove the outdated footnotes, they will be recomputed by the new entries.
+      this.footnotes.reset();
+      // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated
+      // first.
+      // It turns out this is not enough when components are resolved asynchronously.
+      // Therefore, we preemptively resolve the components that are going to be displayed here. Since they are
+      // cached, the rendering of the displayers will not be delayed later on, and listeners of entriesUpdated
+      // have access to a fully rendered DOM. Note that this approach is not optimal, and we should aim for a
+      // mechanism that does not rely on direct DOM access. Instead, we should provide way to alter the data
+      // externally before starting the rendering. (see https://jira.xwiki.org/browse/XWIKI-23423)
+      const preloadDisplayer = this.getPropertyDescriptors()
+        .filter((it) => it != undefined && this.isPropertyVisible(it.id))
+        .map((it) =>
+          componentStore.load(
+            "displayer",
+            (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
+          ),
+        );
+      await Promise.all(preloadDisplayer);
+      await nextTick();
+      this.triggerEvent("entriesUpdated", {});
+    } catch (err) {
+      // Prevent undesired notifications of the end user for non business related errors (for
+      // instance, the user left the page before the request was completed). See
+      // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
+      if ((err as { readyState?: number }).readyState === 4) {
+        // Fire-and-forget: the notification must not delay the caller.
+        void this.notifyError("livedata.error.updateEntriesFailed");
+      }
 
-          // Do not log if the request has been aborted (e.g., because a second request was started
-          // for the same LD with new criteria).
-          if (err.statusText !== "abort") {
-            console.error("Failed to fetch the entries", err);
-          }
-        })
-    );
+      // Do not log if the request has been aborted (e.g., because a second request was started
+      // for the same LD with new criteria).
+      if ((err as { statusText?: string }).statusText !== "abort") {
+        console.error("Failed to fetch the entries", err);
+      }
+    }
   }
 
   /**
@@ -726,7 +721,7 @@ export class LiveDataLogic implements Logic {
    * @param propertyId - The property id we want to modify in the entry
    * @param value - The new value of entry property
    */
-  setValue({
+  async setValue({
     entry,
     propertyId,
     value,
@@ -734,7 +729,7 @@ export class LiveDataLogic implements Logic {
     entry: Values;
     propertyId: string;
     value: string;
-  }): void {
+  }): Promise<void> {
     // TODO: Ensure entry is valid (need other current PR)
     // TODO: Ensure property is valid (need other current PR)
     if (!this.isEditable({ entry, propertyId })) {
@@ -746,10 +741,13 @@ export class LiveDataLogic implements Logic {
     // Once the entry updated, reload the whole livedata because changing a single entry can have
     // an impact on other properties of the entry, but also possibly on other entriers, or in the
     // way they are sorted.
-    // eslint-disable-next-line promise/catch-or-return
-    this.liveDataSource
-      .updateEntryProperty(source, entryId ?? "", propertyId, entry[propertyId])
-      .then(() => this.updateEntries());
+    await this.liveDataSource.updateEntryProperty(
+      source,
+      entryId ?? "",
+      propertyId,
+      entry[propertyId],
+    );
+    await this.updateEntries();
   }
 
   /**

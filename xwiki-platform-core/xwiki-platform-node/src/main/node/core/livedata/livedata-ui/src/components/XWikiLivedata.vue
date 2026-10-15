@@ -138,13 +138,14 @@ onMounted(async () => {
   logic.setElement(elementValue);
   // Register the logic on the parent of the root element to make its API accessible publicly.
   jQuery(elementValue).parent().data("liveData", logic);
-  // Waits for the layout to be (lazily) loaded before hiding the loader. The promise is rejected when no layout
-  // can be loaded at all, so that we never wait for one indefinitely.
-  const layoutReady = new Promise<void>((resolve, reject) => {
+  // Waits for the layout to be (lazily) loaded before hiding the loader. The promise resolves with the error when no
+  // layout can be loaded at all, so that we never wait for one indefinitely. It never rejects because it is awaited
+  // only at the end, after the translations and the entries, and a rejection would be reported as unhandled meanwhile.
+  const layoutReady = new Promise<unknown>((resolve) => {
     logic.onEvent("layoutLoaded", (event) => {
       const { error } = (event as CustomEvent).detail;
       if (error) {
-        reject(error);
+        resolve(error);
       } else {
         // Hide the loader and show the footnotes only when a layout was actually loaded. When none could be
         // loaded the loader keeps running: there is nothing to display in its place yet, and it is also what
@@ -152,13 +153,10 @@ onMounted(async () => {
         // TODO: XWIKI-24835: The Live Data displays an endless loading animation instead of an error when no
         // layout can be loaded
         layoutLoaded.value = true;
-        resolve();
+        resolve(undefined);
       }
     });
   });
-  // We await this promise only at the end, after the translations and the entries, so we register the rejection
-  // handler right away to keep the failure from being reported as unhandled meanwhile.
-  layoutReady.catch(() => {});
 
   let error: unknown;
   try {
@@ -219,7 +217,10 @@ onMounted(async () => {
 
     // The layout is loaded in parallel with the entries so we have to wait for it too, and for
     // the tick that renders it, before the live data can be considered fully displayed.
-    await layoutReady;
+    const layoutError = await layoutReady;
+    if (layoutError) {
+      throw layoutError;
+    }
     await nextTick();
   } catch (e) {
     error = e;

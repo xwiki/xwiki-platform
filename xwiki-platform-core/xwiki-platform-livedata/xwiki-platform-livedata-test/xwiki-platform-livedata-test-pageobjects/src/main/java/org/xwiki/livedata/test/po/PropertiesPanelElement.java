@@ -36,6 +36,10 @@ public class PropertiesPanelElement extends AbstractLiveDataAdvancedPanelElement
 {
     private static final By PROPERTY_NAME = By.className("property-name");
 
+    private static final By USE_COVER = By.cssSelector(".use-cover input[type='checkbox']");
+
+    private static final By COVER_RADIO = By.cssSelector(".cover input[type='radio']");
+
     /**
      * Default constructor.
      *
@@ -84,6 +88,65 @@ public class PropertiesPanelElement extends AbstractLiveDataAdvancedPanelElement
         if (isPropertyDisplayed(propertyName) != displayed) {
             getCheckbox(propertyName).click();
         }
+    }
+
+    /**
+     * The cover option is only offered by the card layout.
+     *
+     * @return {@code true} if the panel offers to display a cover on the cards, {@code false} otherwise
+     * @since 18.10.0RC1
+     */
+    public boolean hasCoverOption()
+    {
+        return !getDriver().findElementsWithoutWaiting(this.container, USE_COVER).isEmpty();
+    }
+
+    /**
+     * @return {@code true} if the cards display a cover, {@code false} otherwise
+     * @since 18.10.0RC1
+     */
+    public boolean isCoverEnabled()
+    {
+        return this.container.findElement(USE_COVER).isSelected();
+    }
+
+    /**
+     * Displays or removes the card cover, the way ticking or unticking the "Use cover" checkbox does. Enabling the
+     * cover selects a default cover property.
+     *
+     * @param enabled {@code true} to display a cover on the cards, {@code false} to remove it
+     * @since 18.10.0RC1
+     */
+    public void setCoverEnabled(boolean enabled)
+    {
+        if (isCoverEnabled() != enabled) {
+            this.container.findElement(USE_COVER).click();
+        }
+    }
+
+    /**
+     * @return the label of the property used as the card cover, or {@code null} when the cards don't have a cover
+     * @since 18.10.0RC1
+     */
+    public String getCoverPropertyName()
+    {
+        return getProperties().stream()
+            .filter(property -> getDriver().findElementsWithoutWaiting(property, COVER_RADIO).stream()
+                .anyMatch(WebElement::isSelected))
+            .map(property -> property.findElement(PROPERTY_NAME).getText())
+            .findFirst()
+            .orElse(null);
+    }
+
+    /**
+     * Selects the property used as the card cover. The cover must be enabled.
+     *
+     * @param propertyName the label of a property the panel offers
+     * @since 18.10.0RC1
+     */
+    public void setCoverProperty(String propertyName)
+    {
+        getProperty(propertyName).findElement(COVER_RADIO).click();
     }
 
     private WebElement getCheckbox(String propertyName)

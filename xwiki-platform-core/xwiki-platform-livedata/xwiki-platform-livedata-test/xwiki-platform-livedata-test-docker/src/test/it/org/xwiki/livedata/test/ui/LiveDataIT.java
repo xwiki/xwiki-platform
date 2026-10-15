@@ -39,7 +39,9 @@ import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingExcept
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ArrayNode;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ObjectNode;
+import org.xwiki.livedata.test.po.CardLayoutElement;
 import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.PropertiesPanelElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -66,6 +68,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.Keys.BACK_SPACE;
 import static org.openqa.selenium.Keys.CONTROL;
@@ -84,6 +87,14 @@ class LiveDataIT
     private static final String NAME_COLUMN = "name";
 
     private static final String CHOICE_COLUMN = "choice";
+
+    private static final String POSTER_COLUMN = "poster";
+
+    private static final String POSTER_IMAGE = "/xwiki/resources/icons/xwiki/noavatar.png";
+
+    private static final String POSTER_MISSING_IMAGE = "/xwiki/resources/icons/xwiki/missing.png";
+
+    private static final String COVER_TRANSLATION_PREFIX = "cardsCover.";
 
     private static final String NAME_LYNDA = "Lynda";
 
@@ -1061,6 +1072,140 @@ class LiveDataIT
 
         liveData.pressEscape();
         liveData.waitUntilMaximized(false);
+    }
+
+    /**
+     * Test the card cover, enabled from the properties panel: it displays the image held by the cover property, or some
+     * text when there is no image or when it fails to load.
+     */
+    @Test
+    @Order(15)
+    void cardsCover(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+        createCoverLiveDataPage(testUtils, testReference, "layouts=\"cards,table\"", "");
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        CardLayoutElement cardLayout = liveData.getCardLayout();
+        cardLayout.waitUntilCardCountEqualsTo(3);
+        // No cover by default.
+        cardLayout.waitUntilCovers(false);
+        assertEquals(List.of(NAME_COLUMN, POSTER_COLUMN), cardLayout.getPropertyNames(1));
+
+        // Enabling the cover selects the first property holding an image.
+        PropertiesPanelElement propertiesPanel = liveData.openPropertiesPanel();
+        assertTrue(propertiesPanel.hasCoverOption());
+        assertFalse(propertiesPanel.isCoverEnabled());
+        propertiesPanel.setCoverEnabled(true);
+        assertEquals(POSTER_COLUMN, propertiesPanel.getCoverPropertyName());
+        propertiesPanel.closePanel();
+        assertPosterCovers(cardLayout);
+
+        // The cover is kept when reloading the page.
+        testUtils.getDriver().navigate().refresh();
+        liveData = new LiveDataElement("test");
+        cardLayout = liveData.getCardLayout();
+        cardLayout.waitUntilCardCountEqualsTo(3);
+        assertPosterCovers(cardLayout);
+
+        // Any property can be used as the cover: its text is displayed when it doesn't hold an image.
+        propertiesPanel = liveData.openPropertiesPanel();
+        assertTrue(propertiesPanel.isCoverEnabled());
+        propertiesPanel.setCoverProperty(NAME_COLUMN);
+        assertEquals(NAME_CHARLY, cardLayout.waitUntilCoverText(1));
+        assertNull(cardLayout.getCoverImageSource(1));
+        assertEquals(List.of(POSTER_COLUMN), cardLayout.getPropertyNames(1));
+
+        // Removing the cover displays all the properties again.
+        propertiesPanel.setCoverEnabled(false);
+        cardLayout.waitUntilCovers(false);
+        assertEquals(List.of(NAME_COLUMN, POSTER_COLUMN), cardLayout.getPropertyNames(1));
+
+        // Enabling the cover again selects the last cover.
+        propertiesPanel.setCoverEnabled(true);
+        assertEquals(NAME_COLUMN, propertiesPanel.getCoverPropertyName());
+        cardLayout.waitUntilCovers(true);
+        assertEquals(NAME_CHARLY, cardLayout.waitUntilCoverText(1));
+    }
+
+    /**
+     * Test the card cover configured by the author of the Live Data, on the cards layout descriptor.
+     */
+    @Test
+    @Order(16)
+    void cardsCoverConfiguredByAuthor(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+        createCoverLiveDataPage(testUtils, testReference, "", """
+            {"meta": {"defaultLayout": "cards", "layouts": [{"id": "cards", "coverProperty": "%s"}, {"id": "table"}]}}
+            """.formatted(POSTER_COLUMN));
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        CardLayoutElement cardLayout = liveData.getCardLayout();
+        cardLayout.waitUntilCardCountEqualsTo(3);
+        assertPosterCovers(cardLayout);
+
+        PropertiesPanelElement propertiesPanel = liveData.openPropertiesPanel();
+        assertTrue(propertiesPanel.isCoverEnabled());
+        assertEquals(POSTER_COLUMN, propertiesPanel.getCoverPropertyName());
+    }
+
+    /**
+     * Creates a Live Data page on an XClass with a name and a poster, the URL of an image. Charly has a poster, Esther
+     * doesn't have one, and the poster of Lynda can't be loaded.
+     *
+     * @param macroParameters additional parameters of the Live Data macro
+     * @param macroContent the content of the Live Data macro, i.e. its advanced configuration
+     */
+    private void createCoverLiveDataPage(TestUtils testUtils, DocumentReference testReference,
+        String macroParameters, String macroContent) throws Exception
+    {
+        // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
+        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
+        String content = """
+            {{liveData
+              id="test"
+              properties="%s,%s"
+              %s
+              sort="%s:asc"
+              source="liveTable"
+              sourceParameters="translationPrefix=%s&className=%s"
+            }}%s{{/liveData}}
+            """.formatted(NAME_COLUMN, POSTER_COLUMN, macroParameters, NAME_COLUMN, COVER_TRANSLATION_PREFIX,
+            className, macroContent);
+        testUtils.createPage(testReference, content, "Live Data with a card cover");
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        // Display the empty values as empty, so that the cover of the entries without a poster displays their name.
+        DocumentReference translationReference = new DocumentReference("CoverTranslations", testSpace);
+        testUtils.addObject(translationReference, "XWiki.TranslationDocumentClass", singletonMap("scope", "WIKI"));
+        testUtils.rest().savePage(translationReference, COVER_TRANSLATION_PREFIX + "emptyvalue=", "translation");
+        testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
+        testUtils.addClassProperty(testReference, POSTER_COLUMN, "String");
+        testUtils.addObject(new DocumentReference(NAME_CHARLY, testSpace), className,
+            Map.of(NAME_COLUMN, NAME_CHARLY, POSTER_COLUMN, POSTER_IMAGE));
+        testUtils.addObject(new DocumentReference(NAME_ESTHER, testSpace), className,
+            Map.of(NAME_COLUMN, NAME_ESTHER));
+        testUtils.addObject(new DocumentReference(NAME_LYNDA, testSpace), className,
+            Map.of(NAME_COLUMN, NAME_LYNDA, POSTER_COLUMN, POSTER_MISSING_IMAGE));
+    }
+
+    /**
+     * Assert the covers of the cards created by {@link #createCoverLiveDataPage}, when the poster is the cover.
+     */
+    private void assertPosterCovers(CardLayoutElement cardLayout)
+    {
+        cardLayout.waitUntilCovers(true);
+        assertEquals(POSTER_IMAGE, cardLayout.getCoverImageSource(1));
+        // The cover property is not repeated in the card properties.
+        assertEquals(List.of(NAME_COLUMN), cardLayout.getPropertyNames(1));
+        // Without an image, the cover displays the first visible property.
+        assertEquals(NAME_ESTHER, cardLayout.waitUntilCoverText(2));
+        // Same when the image fails to load.
+        assertEquals(NAME_LYNDA, cardLayout.waitUntilCoverText(3));
     }
 
     /**

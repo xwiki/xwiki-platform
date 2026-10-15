@@ -573,6 +573,16 @@ public class ViewPage extends BasePage
     }
 
     /**
+     * @return {@code true} if the page displays the warning saying that the document is rendered in restricted mode
+     *     because it's not the current version, {@code false} otherwise
+     * @since 18.10.0RC1
+     */
+    public boolean hasRestrictedModeWarning()
+    {
+        return getDriver().hasElementWithoutWaiting(By.className("restricted-mode-warning"));
+    }
+
+    /**
      * Opens the required rights modal by clicking on the button in the required rights warning.
      *
      * @return the opened required rights modal

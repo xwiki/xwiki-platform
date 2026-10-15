@@ -637,4 +637,33 @@ class InplaceEditIT
 
         viewPage.cancel();
     }
+
+    @Test
+    @Order(13)
+    void editInplaceFromOldRevision(TestUtils setup, TestReference testReference)
+    {
+        // The restricted mode warning is displayed only to advanced users when there's no rendering error.
+        DocumentReference aliceProfile = new DocumentReference("xwiki", "XWiki", "alice");
+        setup.updateObject(aliceProfile, "XWiki.XWikiUsers", 0, "usertype", "Advanced");
+        try {
+            setup.createPage(testReference, "latest content", "latest title");
+
+            setup.gotoPage(testReference, "view", "rev=1.1");
+            InplaceEditablePage viewPage = new InplaceEditablePage();
+            assertEquals("test title", viewPage.getDocumentTitle());
+            assertTrue(viewPage.hasRestrictedModeWarning());
+
+            // The in-place editor edits the latest version so the restricted mode warning doesn't apply anymore.
+            viewPage.editInplace();
+            assertEquals("latest title", viewPage.getDocumentTitle());
+            assertFalse(viewPage.hasRestrictedModeWarning());
+
+            viewPage.setDocumentTitle("updated title");
+            viewPage.saveAndView();
+            assertEquals("updated title", viewPage.getDocumentTitle());
+            assertFalse(viewPage.hasRestrictedModeWarning());
+        } finally {
+            setup.updateObject(aliceProfile, "XWiki.XWikiUsers", 0, "usertype", "Simple");
+        }
+    }
 }

@@ -88,7 +88,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
     private static final EntityReference XWIKIPREFERENCES_REFERENCE = new EntityReference("XWikiPreferences",
         EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
-
     private static final List<String> ALLLEVELS = Arrays.asList(ADMIN, "view", "edit", COMMENT, DELETE,
         UNDELETE, REGISTER, PROGRAMMING);
 

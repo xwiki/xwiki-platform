@@ -250,10 +250,10 @@ public class UserIterator<T> implements Iterator<T>
 
         DocumentReference currentReference = currentIterator.next();
 
-        // If the reference is set and not in the excluded list (else skip it!)
-        if (currentReference != null && !this.excludedUserAndGroupReferences.contains(currentReference)) {
+        // If the reference is not in the excluded list (else skip it!)
+        if (!this.excludedUserAndGroupReferences.contains(currentReference)) {
             // If it's not a virtual user (guest or superadmin user), then load the document
-            if (isSuperAdmin(currentReference)) {
+            if (SuperAdminUserReference.isSuperAdminReference(currentReference)) {
                 currentValue = this.userDataExtractor.extractFromSuperadmin(currentReference);
             } else if (isGuest(currentReference)) {
                 currentValue = this.userDataExtractor.extractFromGuest(currentReference);
@@ -268,11 +268,6 @@ public class UserIterator<T> implements Iterator<T>
 
         cleanStackIfNeeded();
         return currentValue;
-    }
-
-    private boolean isSuperAdmin(DocumentReference reference)
-    {
-        return SuperAdminUserReference.isSuperAdminReference(reference);
     }
 
     private boolean isGuest(DocumentReference reference)

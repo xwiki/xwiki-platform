@@ -91,8 +91,7 @@ public class XarSecurityTool
 
         if (protection != DocumentProtection.NONE
             && !((XarInstalledExtensionRepository) this.installedXARs).isAllowed(documentReference, right)) {
-            if (protection.isDeny()
-                && !SuperAdminUserReference.isSuperAdmin(this.userReferenceResolver.resolve(userReference))) {
+            if (protection.isDeny() && !SuperAdminUserReference.isSuperAdminReference(userReference)) {
                 // Check access
                 if (!getAuthorization().hasAccess(right, userReference, documentReference)) {
                     return ProtectionLevel.DENY;

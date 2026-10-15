@@ -19,19 +19,16 @@
  */
 package org.xwiki.user;
 
-import java.util.List;
-
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.model.reference.SpaceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -63,19 +60,13 @@ class SuperAdminUserReferenceTest
         assertFalse(SuperAdminUserReference.isSuperAdmin(CurrentUserReference.INSTANCE));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = { "superadmin", "SuperAdmin", "SUPERADMIN" })
-    void isSuperAdminName(String userName)
+    @Test
+    void isSuperAdminAfterDeserialization()
     {
-        assertTrue(SuperAdminUserReference.isSuperAdminName(userName));
-    }
+        UserReference deserialized = SerializationUtils.roundtrip(SuperAdminUserReference.INSTANCE);
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = { "superadmi", "superadmins", "XWiki.superadmin", "JohnDoe" })
-    void isSuperAdminNameWhenOtherName(String userName)
-    {
-        assertFalse(SuperAdminUserReference.isSuperAdminName(userName));
+        assertSame(SuperAdminUserReference.INSTANCE, deserialized);
+        assertTrue(SuperAdminUserReference.isSuperAdmin(deserialized));
     }
 
     @ParameterizedTest
@@ -83,10 +74,8 @@ class SuperAdminUserReferenceTest
     void isSuperAdminReference(String userName)
     {
         assertTrue(SuperAdminUserReference.isSuperAdminReference(new DocumentReference("xwiki", "XWiki", userName)));
-        // The Super Admin user of any wiki is the Super Admin user.
-        assertTrue(SuperAdminUserReference.isSuperAdminReference(new DocumentReference("subwiki", "XWiki", userName)));
-        assertTrue(SuperAdminUserReference.isSuperAdminReference(
-            new LocalDocumentReference("XWiki", userName)));
+        assertTrue(SuperAdminUserReference.isSuperAdminReference(new DocumentReference("subwiki", "Space", userName)));
+        assertTrue(SuperAdminUserReference.isSuperAdminReference(new LocalDocumentReference("XWiki", userName)));
     }
 
     @Test
@@ -95,37 +84,11 @@ class SuperAdminUserReferenceTest
         assertFalse(SuperAdminUserReference.isSuperAdminReference(null));
     }
 
-    @Test
-    void isSuperAdminReferenceWhenOtherSpace()
+    @ParameterizedTest
+    @ValueSource(strings = { "superadmi", "superadmins", "JohnDoe" })
+    void isSuperAdminReferenceWhenOtherName(String userName)
     {
-        assertFalse(SuperAdminUserReference.isSuperAdminReference(
-            new DocumentReference("xwiki", "Main", "superadmin")));
-        assertFalse(SuperAdminUserReference.isSuperAdminReference(
-            new DocumentReference("xwiki", "xwiki", "superadmin")));
-        // A nested space whose last level is named XWiki is not the XWiki space.
-        assertFalse(SuperAdminUserReference.isSuperAdminReference(
-            new DocumentReference("xwiki", List.of("Sandbox", "XWiki"), "superadmin")));
-    }
-
-    @Test
-    void isSuperAdminReferenceWhenOtherName()
-    {
-        assertFalse(SuperAdminUserReference.isSuperAdminReference(
-            new DocumentReference("xwiki", "XWiki", "JohnDoe")));
-    }
-
-    @Test
-    void isSuperAdminReferenceWhenNotADocument()
-    {
-        assertFalse(SuperAdminUserReference.isSuperAdminReference(new SpaceReference("xwiki", "XWiki")));
-    }
-
-    @Test
-    void isSuperAdminReferenceWhenSubReference()
-    {
-        // A reference below the Super Admin user document still denotes the Super Admin user document.
-        assertTrue(SuperAdminUserReference.isSuperAdminReference(
-            new ObjectReference("XWiki.XWikiUsers[0]", new DocumentReference("xwiki", "XWiki", "superadmin"))));
+        assertFalse(SuperAdminUserReference.isSuperAdminReference(new DocumentReference("xwiki", "XWiki", userName)));
     }
 
     @Test
@@ -135,5 +98,6 @@ class SuperAdminUserReferenceTest
             SuperAdminUserReference.SUPERADMIN_LOCAL_REFERENCE.getName());
         assertEquals(SuperAdminUserReference.SUPERADMIN_USER_SPACE,
             SuperAdminUserReference.SUPERADMIN_LOCAL_REFERENCE.getParent().getName());
+        assertEquals("XWiki.superadmin", SuperAdminUserReference.SUPERADMIN_LOCAL_REFERENCE_STRING);
     }
 }

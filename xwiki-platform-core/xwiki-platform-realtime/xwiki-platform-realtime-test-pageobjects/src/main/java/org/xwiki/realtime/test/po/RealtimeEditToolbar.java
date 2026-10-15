@@ -46,6 +46,14 @@ public class RealtimeEditToolbar extends BaseElement
 
     private static final By DONE_ACTION = By.cssSelector(".realtime-edit-toolbar .realtime-action-done");
 
+    private static final String CONNECTION_STATUS_SELECTOR =
+        ".realtime-edit-toolbar realtime-status.realtime-connection-status";
+
+    /**
+     * The value of the connection status when connected.
+     */
+    private static final String CONNECTED = "clean";
+
     private static final By VISIBLE_COEDITORS =
         By.cssSelector(".realtime-edit-toolbar .realtime-users .realtime-user");
 
@@ -56,10 +64,47 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public RealtimeEditToolbar waitUntilConnected()
     {
-        getDriver().waitUntilCondition(ExpectedConditions.attributeToBe(
-            By.cssSelector(".realtime-edit-toolbar realtime-status.realtime-connection-status"), ATTRIBUTE_VALUE,
-            "clean"));
+        getDriver().waitUntilCondition(
+            ExpectedConditions.attributeToBe(By.cssSelector(CONNECTION_STATUS_SELECTOR), ATTRIBUTE_VALUE, CONNECTED));
         return this;
+    }
+
+    /**
+     * Simulates a temporary loss of the network connection, which closes the WebSocket connection used by the realtime
+     * editing session, and waits for the editor to reconnect. The browser stays online, so the connection is restored
+     * right away.
+     *
+     * @return this instance
+     * @since 18.9.0RC1
+     */
+    public RealtimeEditToolbar simulateConnectionLoss()
+    {
+        return simulateConnectionLoss(true);
+    }
+
+    /**
+     * Simulates a temporary loss of the network connection, which closes the WebSocket connection used by the realtime
+     * editing session. The browser stays online, so the editor tries to reconnect right away.
+     *
+     * @param waitForReconnect whether to wait for the editor to reconnect; pass {@code false} when the reconnection is
+     *            expected to fail
+     * @return this instance
+     * @since 18.9.0RC1
+     */
+    public RealtimeEditToolbar simulateConnectionLoss(boolean waitForReconnect)
+    {
+        waitUntilConnected();
+        // The realtime WebSocket client closes the connection when the browser goes offline (unless XWiki is accessed
+        // from localhost) and the editor shows that it's disconnected right away.
+        String connectionStatus = (String) getDriver().executeScript(
+            "window.dispatchEvent(new Event('offline'));"
+                + "return document.querySelector(arguments[0]).getAttribute('value');",
+            CONNECTION_STATUS_SELECTOR);
+        if (CONNECTED.equals(connectionStatus)) {
+            throw new IllegalStateException("The realtime editor didn't notice the connection loss. "
+                + "Note that the connection loss can't be simulated when XWiki is accessed from localhost.");
+        }
+        return waitForReconnect ? waitUntilConnected() : this;
     }
 
     /**

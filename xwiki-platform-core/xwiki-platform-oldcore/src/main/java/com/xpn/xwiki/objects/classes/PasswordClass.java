@@ -377,8 +377,9 @@ public class PasswordClass extends StringClass
         if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
             return null;
         } else if (password.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
-            warnAboutOutdatedAlgorithm(XWikiLegacyPasswordEncoder.ALGORITHM_ID);
-            return LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(password);
+            String legacyAlgorithm = LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(password);
+            warnAboutOutdatedAlgorithm(legacyAlgorithm);
+            return legacyAlgorithm;
         } else {
             Matcher hashMatcher = HASH_PATTERN.matcher(password);
             if (hashMatcher.matches()) {
@@ -410,11 +411,7 @@ public class PasswordClass extends StringClass
     private @NonNull PasswordEncoder getPasswordEncoder(String algorithmName)
     {
         if (ENCODERS_MAP.containsKey(algorithmName)) {
-            PasswordEncoder passwordEncoder = ENCODERS_MAP.get(algorithmName);
-            if (isDeprecatedEncoder(passwordEncoder.getClass())) {
-                warnAboutOutdatedAlgorithm(algorithmName);
-            }
-            return passwordEncoder;
+            return ENCODERS_MAP.get(algorithmName);
         } else {
             throw new IllegalArgumentException(String.format("The algorithm [%s] is not supported for password hash.",
                 algorithmName));
@@ -440,7 +437,9 @@ public class PasswordClass extends StringClass
         if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
             return Strings.CS.equals(rawPassword, encodedPassword);
         } else if (encodedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
-            warnAboutOutdatedAlgorithm(XWikiLegacyPasswordEncoder.ALGORITHM_ID);
+            // The password has not been re-encoded with XWikiLegacyPasswordEncoder: it's only protected by the
+            // legacy message digest algorithm it contains, which is the one to report.
+            warnAboutOutdatedAlgorithm(LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(encodedPassword));
             return LEGACY_PASSWORD_ENCODER.matchesLegacy(rawPassword, encodedPassword);
         } else {
             Matcher hashMatcher = HASH_PATTERN.matcher(encodedPassword);
@@ -448,7 +447,7 @@ public class PasswordClass extends StringClass
                 String algorithmId = hashMatcher.group(ALGORITHM_ID_PATTERN_GROUP);
                 String passwordHash = hashMatcher.group(PASSWORD_HASH_PATTERN_GROUP);
                 PasswordEncoder passwordEncoder = getPasswordEncoder(algorithmId);
-                if (passwordEncoder.upgradeEncoding(passwordHash)) {
+                if (passwordEncoder.upgradeEncoding(passwordHash) || isDeprecatedEncoder(passwordEncoder.getClass())) {
                     warnAboutOutdatedAlgorithm(algorithmId);
                 }
                 return passwordEncoder.matches(rawPassword, passwordHash);

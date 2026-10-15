@@ -84,20 +84,93 @@ interface LegacyAjaxSaveAndContinue {
 }
 
 /**
+ * The aspect of a notification, which sets its default icon, colors and timeout. An unknown type falls back to
+ * `plain`.
+ *
+ * @since 18.9.0RC1
+ * @beta
+ */
+type LegacyNotificationType =
+  | "plain"
+  | "info"
+  | "warning"
+  | "error"
+  | "inprogress"
+  | "done";
+
+/**
+ * A notification of the legacy `notification.js` script, displayed at the bottom of the screen as soon as it is
+ * created.
+ *
+ * @since 18.9.0RC1
+ * @beta
+ */
+interface LegacyNotification {
+  /**
+   * Hides this notification and displays the given one at its position.
+   *
+   * @param notification - the notification that takes the place of this one
+   */
+  replace(notification: LegacyNotification): void;
+}
+
+/**
+ * The callbacks of a confirmation box of the legacy `confirmationBox.js` script.
+ *
+ * @since 18.9.0RC1
+ * @beta
+ */
+interface LegacyConfirmationBoxBehavior {
+  /**
+   * Called when the user confirms.
+   */
+  onYes?: () => void;
+
+  /**
+   * Called when the user declines.
+   */
+  onNo?: () => void;
+}
+
+/**
+ * The configuration of a confirmation box of the legacy `confirmationBox.js` script.
+ *
+ * @since 18.9.0RC1
+ * @beta
+ */
+interface LegacyConfirmationBoxParameters {
+  /**
+   * The question asked to the user, displayed as plain text.
+   */
+  confirmationText?: string;
+}
+
+/**
  * The global `XWiki` object exposed by the XWiki web pages, contributed by the legacy `xwiki.js` and
- * `actionbuttons.js` scripts.
+ * `actionbuttons.js` scripts, and by the widget scripts that the skin loads on every page.
  *
  * The entity reference API that the web WebJar also assigns onto the global object is deliberately left out: import
  * it from `@xwiki/platform-xwiki-model-api` instead, which is the same code, without the load order dependency and
  * without needing a global to be stubbed in the tests.
  *
- * Declare the global in the modules that need it with:
+ * Only the members used from TypeScript are declared. Declare the global in the modules that need it by adding the
+ * following line to a declaration file of the module (e.g. `global.d.ts`, listed in the `include` of its
+ * `tsconfig.json`):
  *
  * ```ts
- * declare global {
- *   const XWiki: import("@xwiki/platform-xwiki-utils").XWikiGlobal;
+ * /// <reference types="@xwiki/platform-xwiki-utils/global" />
+ * ```
+ *
+ * A member contributed by an extension rather than by the core scripts must not be added here, since it is not
+ * available on every page. The extension's own package declares it instead, by merging it into this interface, so that
+ * it is only visible to the modules that depend on the extension:
+ *
+ * ```ts
+ * declare module "@xwiki/platform-xwiki-utils" {
+ *   interface XWikiGlobal {
+ *     myExtension: MyExtensionAPI;
+ *   }
  * }
- * export {};
  * ```
  *
  * @since 18.8.0RC1
@@ -134,11 +207,37 @@ interface XWikiGlobal {
   actionButtons?: {
     AjaxSaveAndContinue: { prototype: LegacyAjaxSaveAndContinue };
   };
+
+  /**
+   * The user interface widgets of the legacy `notification.js` and `confirmationBox.js` scripts.
+   *
+   * @since 18.9.0RC1
+   */
+  widgets: {
+    Notification: new (
+      text: string,
+      type?: LegacyNotificationType,
+    ) => LegacyNotification;
+
+    /**
+     * Displays a modal dialog asking the user to confirm, as soon as it is created.
+     */
+    ConfirmationBox: new (
+      behavior?: LegacyConfirmationBoxBehavior,
+      interactionParameters?: LegacyConfirmationBoxParameters,
+    ) => unknown;
+  };
 }
 
 export type {
   LegacyAjaxSaveAndContinue,
+  LegacyConfirmationBoxBehavior,
+  LegacyConfirmationBoxParameters,
+  LegacyNotification,
+  LegacyNotificationType,
   LegacyXWikiAttachment,
   LegacyXWikiDocument,
   XWikiGlobal,
 };
+
+export {};

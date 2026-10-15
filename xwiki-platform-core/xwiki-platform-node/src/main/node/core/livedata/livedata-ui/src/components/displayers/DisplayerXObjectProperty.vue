@@ -52,7 +52,6 @@
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin.js";
-import { XWiki } from "../../services/xwiki.js";
 import { edit } from "../displayerXObjectPropertyHelper.js";
 import { loadById } from "@xwiki/platform-xwiki-utils";
 
@@ -138,8 +137,15 @@ export default {
      * @returns a `Promise` with the content of the updated view
      */
     update(updateMethod) {
+      // A row that has no entry yet is displayed against the location it is created in.
+      // Without one there is no document to load the field from, nor to check the edit rights against.
+      if (this.entry._new && !this.entry._displayReference) {
+        throw new Error("Unknown location for the row that has no entry yet.");
+      }
       this.isLoading = true;
-      const documentName = this.logic.getEntryId(this.entry);
+      const documentName = this.entry._new
+        ? this.entry._displayReference
+        : this.logic.getEntryId(this.entry);
       const className = this.getClassName();
       const property = this.propertyId;
       return updateMethod(documentName, className, property);

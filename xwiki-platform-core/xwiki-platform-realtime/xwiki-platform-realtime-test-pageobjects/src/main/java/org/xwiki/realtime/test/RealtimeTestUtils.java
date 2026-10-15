@@ -48,6 +48,18 @@ public final class RealtimeTestUtils
     }
 
     /**
+     * Simulates the expiration of the user session by removing the browser cookies, without leaving the current page.
+     * Unlike {@link TestUtils#forceGuestUser()}, this doesn't load another page, so it can be used while editing.
+     *
+     * @param setup the test setup
+     * @since 18.9.0RC1
+     */
+    public static void simulateSessionExpiration(TestUtils setup)
+    {
+        setup.getDriver().manage().deleteAllCookies();
+    }
+
+    /**
      * Simulates a failed WebSocket connection by modifying the realtime configuration to use a non-existing Netflux
      * WebSocket, executing the provided callable, and then restoring the original configuration.
      *

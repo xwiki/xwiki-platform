@@ -67,7 +67,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       top += current.offsetTop || 0;
       current = current.offsetParent;
     } while (current && current !== document.body && window.getComputedStyle(current).position === 'static');
-    return top - (parseFloat(window.getComputedStyle(element).marginTop) || 0);
+    return top - (Number.parseFloat(window.getComputedStyle(element).marginTop) || 0);
   }
 
   function stopEvent(event) {

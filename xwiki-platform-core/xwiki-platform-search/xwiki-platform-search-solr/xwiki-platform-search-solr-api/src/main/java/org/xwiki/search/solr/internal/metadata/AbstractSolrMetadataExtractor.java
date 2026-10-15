@@ -527,8 +527,27 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 in.close();
             }
         } catch (Exception e) {
-            this.logger.error("Failed to retrieve the content of attachment [{}]", attachment.getReference(), e);
+            if (isDeleted(attachment)) {
+                // The attachment was deleted while being indexed (e.g. right after being added), and its deletion
+                // updates the index anyway.
+                this.logger.debug("Failed to retrieve the content of attachment [{}] which doesn't exist anymore",
+                    attachment.getReference(), e);
+            } else {
+                this.logger.error("Failed to retrieve the content of attachment [{}]", attachment.getReference(), e);
+            }
             return null;
+        }
+    }
+
+    private boolean isDeleted(XWikiAttachment attachment)
+    {
+        try {
+            // The document doesn't have the attachment anymore if the attachment or the document was deleted.
+            return getDocument(attachment.getReference().getDocumentReference())
+                .getAttachment(attachment.getFilename()) == null;
+        } catch (Exception e) {
+            // We can't know, so report the failure to retrieve the content.
+            return false;
         }
     }
 

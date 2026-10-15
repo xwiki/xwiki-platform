@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -108,10 +109,17 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     @Override
     public Optional<Map<String, Object>> get(Object entryId) throws LiveDataException
     {
+        return get(entryId, List.of());
+    }
+
+    @Override
+    public Optional<Map<String, Object>> get(Object entryId, List<String> properties) throws LiveDataException
+    {
         LiveDataQuery query = new LiveDataQuery();
         query.setSource(new Source(ROLE_HINT));
         String idProperty = this.liveDataConfigurationProvider.get().getMeta().getEntryDescriptor().getIdProperty();
-        query.setProperties(List.of(idProperty));
+        query.setProperties(Stream.concat(Stream.of(idProperty), properties.stream())
+            .filter(StringUtils::isNotEmpty).distinct().toList());
         query.setFilters(List.of(new LiveDataQuery.Filter(idProperty, entryId)));
         query.setLimit(1);
         return this.get(query).getEntries().stream().findFirst();
@@ -252,6 +260,21 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         }
 
         return Optional.of(this.stringEntityReferenceSerializer.serialize(documentReference));
+    }
+
+    @Override
+    public Optional<Map<String, Object>> remove(Object entryId) throws LiveDataException
+    {
+        Optional<Map<String, Object>> entry = get(entryId);
+        if (entry.isPresent()) {
+            try {
+                this.modelBridge.delete(this.currentDocumentReferenceResolver.resolve((String) entryId));
+            } catch (AccessDeniedException | XWikiException e) {
+                throw new LiveDataException(e);
+            }
+        }
+
+        return entry;
     }
 
     private void checkAllXObjectPropertiesHaveXClass(Map<String, Object> entry,

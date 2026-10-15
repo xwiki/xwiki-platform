@@ -33,6 +33,6 @@ public class ProjectImportFinishedEvent implements EndFoldEvent
     @Override
     public boolean matches(Object otherEvent)
     {
-        return otherEvent instanceof ExtensionImportStartingEvent;
+        return otherEvent instanceof ProjectImportStartingEvent;
     }
 }

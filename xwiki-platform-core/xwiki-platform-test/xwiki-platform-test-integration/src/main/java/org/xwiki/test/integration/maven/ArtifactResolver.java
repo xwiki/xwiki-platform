@@ -104,7 +104,10 @@ public class ArtifactResolver
             new ArtifactRequest(artifact, this.repositoryResolver.getRepositories(), null);
         ArtifactResult artifactResult = this.repositoryResolver.getSystem().resolveArtifact(
             this.repositoryResolver.getSession(), artifactRequest);
-        if (!artifactResult.getExceptions().isEmpty()) {
+        // Don't fail on the mere presence of exceptions: they are also recorded for the repositories which did not
+        // provide the artifact (e.g. the ones excluded by the Maven Resolver remote repository filters) even when
+        // another repository did.
+        if (!artifactResult.isResolved()) {
             sendError(artifact, artifactResult.getExceptions());
         }
         return artifactResult;

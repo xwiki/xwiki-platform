@@ -28,7 +28,6 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
@@ -69,8 +68,7 @@ public class ObjectPropertyResourceImpl extends BaseObjectsResource implements O
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            Object object = DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                    componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), withPrettyNames);
+            Object object = this.factory.toRestObject(uriInfo.getBaseUri(), doc, baseObject, false, withPrettyNames);
 
             for (Property property : object.getProperties()) {
                 if (property.getName().equals(propertyName)) {

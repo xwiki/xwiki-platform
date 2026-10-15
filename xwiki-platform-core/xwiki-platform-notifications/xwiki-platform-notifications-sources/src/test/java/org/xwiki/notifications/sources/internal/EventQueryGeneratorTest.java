@@ -54,6 +54,7 @@ import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
@@ -98,6 +99,17 @@ class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         List<SortClause> sortClause = query.getSorts();
 
         assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.getFirst());
+    }
+
+    @Test
+    void generateQueryWithoutPreference() throws Exception
+    {
+        // The guest user has no notification preference.
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.format = NotificationFormat.ALERT;
+        parameters.fromDate = this.startDate;
+
+        assertNull(this.generator.generateQuery(parameters));
     }
 
     @Test

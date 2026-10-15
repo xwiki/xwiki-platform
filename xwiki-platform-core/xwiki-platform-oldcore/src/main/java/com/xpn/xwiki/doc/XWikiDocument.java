@@ -9623,18 +9623,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         return null;
     }
 
-    /**
-     * Compute and return the maximum authorized length for the full name (i.e. the serialized reference of the
-     * document) based on the current store limitation.
-     *
-     * @return the maximum authorized length for a document full name.
-     * @since 11.4RC1
-     */
-    public int getLocalReferenceMaxLength()
-    {
-        return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");
-    }
-
     @Override
     public DocumentAuthors getAuthors()
     {

@@ -28,6 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.tag.test.po.AddTagsPane;
+import org.xwiki.tag.test.po.TagCloudPage;
 import org.xwiki.tag.test.po.TagPage;
 import org.xwiki.tag.test.po.TaggablePage;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -35,6 +36,8 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.apache.commons.lang3.RandomStringUtils.secure;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -309,5 +312,41 @@ class TagIT
             "{{velocity}}#set ($allTags = $xwiki.tag.getAllTags())"
             + "alpha=[$allTags.contains('AllTagsAlpha')] beta=[$allTags.contains('AllTagsBeta')] "
             + "missing=[$allTags.contains('NoSuchTag')]{{/velocity}}", Syntax.XWIKI_2_1));
+    }
+
+    /**
+     * Tags a nested page and a terminal page and checks that the tag cloud of {@code Main.Tags} lists all their tags,
+     * and that a tag shared by both pages lists both of them.
+     */
+    @Test
+    @Order(11)
+    void tagCloudListsNestedAndTerminalTags(TestUtils setup, TestReference testReference) throws Exception
+    {
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        String terminalPageTitle = "Terminal";
+        DocumentReference terminalPage = new DocumentReference(terminalPageTitle, testSpace);
+        setup.rest().savePage(terminalPage, "", terminalPageTitle);
+
+        String nestedTag = "Nested" + secure().nextAlphanumeric(4);
+        String terminalTag = "Terminal" + secure().nextAlphanumeric(4);
+        String sharedTag = "Shared" + secure().nextAlphanumeric(4);
+
+        // The test reference is a nested page (WebHome) while its sibling is a terminal page.
+        TaggablePage taggablePage = TaggablePage.gotoPage(testReference);
+        AddTagsPane addTagsPane = taggablePage.addTags();
+        addTagsPane.setTags(nestedTag + "," + sharedTag);
+        assertTrue(addTagsPane.add());
+
+        taggablePage = TaggablePage.gotoPage(terminalPage);
+        addTagsPane = taggablePage.addTags();
+        addTagsPane.setTags(terminalTag + "," + sharedTag);
+        assertTrue(addTagsPane.add());
+
+        TagCloudPage tagCloudPage = TagCloudPage.gotoPage();
+        assertThat(tagCloudPage.getTags(), hasItems(nestedTag, terminalTag, sharedTag));
+
+        TagPage sharedTagPage = tagCloudPage.clickTag(sharedTag);
+        assertEquals(List.of(terminalPageTitle, testSpace.getName()),
+            sharedTagPage.getTaggedPages().stream().sorted().toList());
     }
 }

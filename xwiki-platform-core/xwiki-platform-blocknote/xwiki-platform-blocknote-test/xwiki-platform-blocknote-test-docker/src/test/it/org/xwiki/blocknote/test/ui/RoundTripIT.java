@@ -325,6 +325,90 @@ class RoundTripIT extends AbstractBlockNoteIT
             after""");
     }
 
+    @Test
+    @Order(16)
+    void codeBlock(TestUtils setup, TestReference testReference)
+    {
+        roundTrip(setup, testReference, """
+            {{{
+            no language
+            }}}
+
+            (% data-xwiki-verbatim-language="java" %)
+            {{{
+            public class Test
+            {
+                /** **not bold** [[not a link]] {{not a macro}} ~escape */
+
+                private int count;
+            }
+            }}}
+
+            (% data-xwiki-verbatim-language="velocity" %)
+            {{{
+            #set ($unsupported = 'language')
+            }}}
+
+            (% data-xwiki-verbatim-language="text" %)
+            {{{
+            plain text
+            }}}
+
+            {{{no new lines}}}""",
+            // The content is modified on save:
+            // * "text" is the default code block language so it is not saved
+            """
+                {{{
+                no language
+                }}}
+
+                (% data-xwiki-verbatim-language="java" %)
+                {{{
+                public class Test
+                {
+                    /** **not bold** [[not a link]] {{not a macro}} ~escape */
+
+                    private int count;
+                }
+                }}}
+
+                (% data-xwiki-verbatim-language="velocity" %)
+                {{{
+                #set ($unsupported = 'language')
+                }}}
+
+                {{{
+                plain text
+                }}}
+
+                {{{no new lines}}}""");
+    }
+
+    @Test
+    @Order(17)
+    void codeMacro(TestUtils setup, TestReference testReference)
+    {
+        roundTrip(setup, testReference, """
+            {{code language="java" layout="linenumbers"}}
+            public class Test
+            {
+                private int count;
+            }
+            {{/code}}
+
+            {{code}}
+            no language
+            {{/code}}
+
+            {{code language="text"}}
+            plain text
+            {{/code}}
+
+            {{code language="java" source="string:int count = 0;"/}}
+
+            Inline {{code language="java"}}int count = 0;{{/code}} code.""");
+    }
+
     /**
      * Insert the provided content in the provided page (testReference), edit the page with blocknote, save it back, and
      * verify that the content is not altered. If you expect the content to be modified, see

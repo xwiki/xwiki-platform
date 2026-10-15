@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.openqa.selenium.By;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.security.test.po.ExtensionVulnerabilitiesAdminPage;
 import org.xwiki.extension.test.po.ExtensionAdministrationPage;
@@ -57,11 +56,12 @@ public class ExtensionSecurityTest extends AbstractTest
         new RestExtensionInstaller(componentManager).installExtensions(getUtil().getBaseURL(), List.of(extensionId),
             ADMIN_CREDENTIALS, ADMIN_CREDENTIALS.getUserName(), null, false);
 
-        ExtensionAdministrationPage.gotoPage().startIndex();
-        waitForSuccessMessage();
+        ExtensionAdministrationPage extensionAdministrationPage = ExtensionAdministrationPage.gotoPage();
+        extensionAdministrationPage.startIndex();
+        extensionAdministrationPage.waitUntilIndexIsDone(getJobTimeout());
 
         ExtensionVulnerabilitiesAdminPage extensionVulnerabilitiesAdminPage = goToExtensionVulnerabilitiesAdmin();
-        waitForSuccessMessage();
+        extensionVulnerabilitiesAdminPage.waitUntilScanIsDone(getJobTimeout());
 
         getDriver().navigate().refresh();
 
@@ -78,9 +78,9 @@ public class ExtensionSecurityTest extends AbstractTest
         });
     }
 
-    private static void waitForSuccessMessage()
+    private static int getJobTimeout()
     {
         // Sets a large timeout as indexing can take a lot of time.
-        getDriver().waitUntilElementIsVisible(By.cssSelector(".box.successmessage"), getDriver().getTimeout() * 100);
+        return getDriver().getTimeout() * 100;
     }
 }

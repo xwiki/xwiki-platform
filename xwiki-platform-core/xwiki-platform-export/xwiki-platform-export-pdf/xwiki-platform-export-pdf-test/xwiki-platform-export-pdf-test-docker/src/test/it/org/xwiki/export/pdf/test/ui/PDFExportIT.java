@@ -118,7 +118,7 @@ class PDFExportIT
 
         // Make sure we start with the default settings.
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage().reset();
-        adminSection.getTemplatesInput().sendKeys("custom").waitForSuggestions().selectByVisibleText("CustomTemplate");
+        adminSection.getTemplatesInput().sendKeys("custom").selectByVisibleText("CustomTemplate");
         adminSection.getGeneratorSelect().selectByVisibleText("Chrome Docker Container");
 
         if (!testConfiguration.getServletEngine().isOutsideDocker()) {
@@ -254,6 +254,11 @@ class PDFExportIT
             // For the second image we force the server-side resize.
             assertEquals(100, contentPageImages.get(1).getRawWidth());
             assertEquals(100, contentPageImages.get(1).getRawHeight());
+
+            // The images should keep their alternative text: the one specified in the wiki syntax, the default one
+            // generated from the image reference and the one specified in the HTML.
+            assertEquals(List.of("XWiki logo resized client-side", "xwiki-logo.png", "XWiki Logo"),
+                pdf.getImageAlternativeTextsFromPage(3));
         }
     }
 
@@ -324,7 +329,7 @@ class PDFExportIT
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
         SuggestInputElement templatesInput = adminSection.getTemplatesInput();
         if (!StringUtils.join(templatesInput.getValues(), ",").contains("My cool template")) {
-            templatesInput.sendKeys("my cool").waitForSuggestions().selectByVisibleText("My cool template");
+            templatesInput.sendKeys("my cool").selectByVisibleText("My cool template");
             adminSection.clickSave();
         }
 

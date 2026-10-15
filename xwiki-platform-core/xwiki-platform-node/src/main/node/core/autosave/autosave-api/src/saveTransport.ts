@@ -82,7 +82,9 @@ abstract class SaveTransport<C extends object = object> {
   }
 
   /**
-   * Apply the given changes to the local saver state and optionally propagate them to the other clients.
+   * Apply the given changes to the local saver state and optionally propagate them to the other clients. When asked
+   * to wait for the new state to reach the other clients, the returned promise must still resolve if the connection
+   * is lost or the acknowledgement never comes, see {@link SaveTransport.whenSettled}.
    *
    * @param patch - the state properties to modify
    * @param options - the options of this update
@@ -113,7 +115,12 @@ abstract class SaveTransport<C extends object = object> {
   }
 
   /**
-   * @returns a promise that resolves when the local state has been received by the other clients
+   * The saver waits for this before leaving the editing session, so implementations must not keep the returned
+   * promise pending forever: they should resolve it right away when they're not connected, and stop waiting when the
+   * connection is lost or when waiting takes too long.
+   *
+   * @returns a promise that resolves when the local state has been received by the other clients, or when waiting for
+   *   it doesn't make sense anymore
    */
   public whenSettled(): Promise<void> {
     return Promise.resolve();

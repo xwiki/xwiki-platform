@@ -151,16 +151,13 @@ public class OsvResponseAnalyzer
 
     private boolean checkRanges(String version, AffectObject affected)
     {
-        return affected.getRanges().stream().anyMatch(range -> {
-            String start = range.getStart();
-            String end = range.getEnd();
-            return isInRange(start, end, version);
-        });
+        return affected.getRanges().stream()
+            .anyMatch(range -> isInRange(range.getStart(), range.getEnd(), range.isEndInclusive(), version));
     }
 
-    private boolean isInRange(Object introduced, Object fixed, String version)
+    private boolean isInRange(String introduced, String end, boolean endInclusive, String version)
     {
-        String range = String.format("[%s,%s]", introduced, fixed == null ? "" : fixed);
+        String range = String.format("[%s,%s%s", introduced, end == null ? "" : end, endInclusive ? "]" : ")");
         try {
             return VersionRange.createFromVersionSpec(range).containsVersion(new DefaultArtifactVersion(version));
         } catch (InvalidVersionSpecificationException e) {

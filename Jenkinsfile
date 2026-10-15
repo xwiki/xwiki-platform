@@ -57,13 +57,15 @@ def builds = [
       buildInsideNode(functionalTestSpec(
         name: 'Flavor Test - POM',
         pom: 'pom.xml',
-        properties: '-N'
-      ) + [skipCheckout: true])
+        properties: '-N',
+        skipCheckout: true
+      ))
       // Build the Flavor Test PageObjects required by the functional tests that need an XWiki UI.
       buildInsideNode(functionalTestSpec(
         name: 'Flavor Test - PageObjects',
-        pom: 'xwiki-platform-distribution-flavor-test-pageobjects/pom.xml'
-      ) + [skipCheckout: true])
+        pom: 'xwiki-platform-distribution-flavor-test-pageobjects/pom.xml',
+        skipCheckout: true
+      ))
       // The flavor upgrade tests are heavy and run once per day in the environment test build rather than on every
       // commit (see JenkinsfileEnvironmentTests). Here we only build and *deploy* their modules, without executing
       // them (-DskipTests also skips the large distribution/data unpacks, since xwiki.test.skipUnpack defaults to
@@ -71,8 +73,9 @@ def builds = [
       buildInsideNode(functionalTestSpec(
         name: 'Flavor Test - Upgrade (deploy only)',
         pom: 'xwiki-platform-distribution-flavor-test-upgrade/pom.xml',
-        properties: '-DskipTests -DskipITs'
-      ) + [skipCheckout: true])
+        properties: '-DskipTests -DskipITs',
+        skipCheckout: true
+      ))
     }
   },
   'Flavor Test - UI' : {
@@ -313,16 +316,14 @@ private void buildFunctionalTest(map)
   build(functionalTestSpec(map))
 }
 
-// Build specification (profiles + shared-prefixed pom) shared by all the flavor functional-test builds. Kept separate
-// from buildFunctionalTest() so it can be reused to run several of these builds sequentially on a single node.
+// Build specification shared by all the flavor functional-test builds: the passed parameters (e.g. skipCheckout) with
+// the functional test profiles and the pom prefixed with the flavor test path. Kept separate from buildFunctionalTest()
+// so it can be reused to run several of these builds sequentially on a single node.
 private Map functionalTestSpec(map)
 {
-  return [
-    name      : map.name,
-    profiles  : 'legacy,integration-tests,jetty,hsqldb,firefox',
-    mavenOpts : map.mavenOpts,
-    pom       : "${getFlavorTestPrefix()}/${map.pom}",
-    properties: map.properties
+  return map + [
+    profiles: 'legacy,integration-tests,jetty,hsqldb,firefox',
+    pom     : "${getFlavorTestPrefix()}/${map.pom}"
   ]
 }
 

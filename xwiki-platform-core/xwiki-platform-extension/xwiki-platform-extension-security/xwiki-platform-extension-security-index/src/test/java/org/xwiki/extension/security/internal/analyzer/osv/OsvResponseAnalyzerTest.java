@@ -171,6 +171,33 @@ class OsvResponseAnalyzerTest
     }
 
     @Test
+    void analyzeOsvResponseRangesPlatformAtFixedVersion()
+    {
+        // The fixed version is not affected, while the last affected version is.
+        OsvResponse osvResponse = readJson("osvResponseRangesPlatform.json");
+
+        ExtensionSecurityAnalysisResult result =
+            this.analyzer.analyzeOsvResponse("org.xwiki.contrib.plantuml:macro-plantuml-macro", "2.4.1", osvResponse);
+
+        assertEquals(List.of("CVE-LAST-AFFECTED"), result.getSecurityVulnerabilities().stream()
+            .map(SecurityVulnerabilityDescriptor::getId)
+            .toList());
+    }
+
+    @Test
+    void analyzeOsvResponseRangesPlatformBeforeFixedVersion()
+    {
+        OsvResponse osvResponse = readJson("osvResponseRangesPlatform.json");
+
+        ExtensionSecurityAnalysisResult result =
+            this.analyzer.analyzeOsvResponse("org.xwiki.contrib.plantuml:macro-plantuml-macro", "2.4.0", osvResponse);
+
+        assertEquals(List.of("CVE-FIXED", "CVE-LAST-AFFECTED"), result.getSecurityVulnerabilities().stream()
+            .map(SecurityVulnerabilityDescriptor::getId)
+            .toList());
+    }
+
+    @Test
     void analyzeCommonsHttpclientOsvResponse()
     {
         OsvResponse osvResponse = readJson("commons-httpclient-commons-httpclient-3.1.json");

@@ -39,6 +39,7 @@
   </properties>
   <modules>
     <!-- Sorted alphabetically -->
+    <module>xwiki-platform-flamingo-skin-test-content</module>
     <module>xwiki-platform-flamingo-skin-test-pageobjects</module>
   </modules>
   <profiles>

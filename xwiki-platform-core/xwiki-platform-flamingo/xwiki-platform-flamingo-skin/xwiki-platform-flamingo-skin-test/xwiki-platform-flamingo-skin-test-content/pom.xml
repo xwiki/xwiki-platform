@@ -24,11 +24,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-flamingo-visual-test</artifactId>
+    <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
     <version>18.10.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-flamingo-visual-test-content</artifactId>
-  <name>XWiki Platform - Flamingo - Visual - Test - Content</name>
+  <artifactId>xwiki-platform-flamingo-skin-test-content</artifactId>
+  <name>XWiki Platform - Flamingo - Skin - Test - Content</name>
   <packaging>xar</packaging>
   <description>Pages displayed by the visual regression tests of the Flamingo skin.</description>
   <dependencies>

@@ -594,6 +594,21 @@ class XWikiServletURLFactoryTest
                 .toString());
     }
 
+    /**
+     * Verify that removing the jsessionid from the URL keeps the fragment, with or without a query string.
+     */
+    @Test
+    void normalizeURLWithAnchor() throws MalformedURLException
+    {
+        assertEquals("http://www.xwiki.org/xwiki/bin/view/Space/Page#HTest",
+            XWikiServletURLFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Space/Page"
+                + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F#HTest", this.oldcore.getXWikiContext()).toString());
+        assertEquals("http://www.xwiki.org/xwiki/bin/view/Space/Page?language=en#HTest",
+            XWikiServletURLFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Space/Page"
+                + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en#HTest", this.oldcore.getXWikiContext())
+                .toString());
+    }
+
     @Test
     void createURLWithNestedSpaces()
     {

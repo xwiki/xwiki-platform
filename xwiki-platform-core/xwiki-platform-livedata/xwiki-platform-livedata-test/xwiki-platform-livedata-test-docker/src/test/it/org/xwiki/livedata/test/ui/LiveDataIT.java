@@ -1139,17 +1139,26 @@ class LiveDataIT
     }
 
     /**
-     * Test the card cover configured by the author of the Live Data, on the cards layout descriptor.
+     * Test the card cover configured by the author of the Live Data, either with the {@code coverProperty} macro
+     * parameter, or on the cards layout descriptor of the advanced configuration.
      */
-    @Test
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
     @Order(16)
-    void cardsCoverConfiguredByAuthor(TestUtils testUtils, TestReference testReference) throws Exception
+    void cardsCoverConfiguredByAuthor(boolean fromMacroParameter, TestUtils testUtils, TestReference testReference)
+        throws Exception
     {
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
-        createCoverLiveDataPage(testUtils, testReference, "", """
-            {"meta": {"defaultLayout": "cards", "layouts": [{"id": "cards", "coverProperty": "%s"}, {"id": "table"}]}}
-            """.formatted(POSTER_COLUMN));
+        if (fromMacroParameter) {
+            createCoverLiveDataPage(testUtils, testReference,
+                "layouts=\"cards,table\" coverProperty=\"%s\"".formatted(POSTER_COLUMN), "");
+        } else {
+            createCoverLiveDataPage(testUtils, testReference, "", """
+                {"meta": {"defaultLayout": "cards",
+                  "layouts": [{"id": "cards", "coverProperty": "%s"}, {"id": "table"}]}}
+                """.formatted(POSTER_COLUMN));
+        }
 
         testUtils.gotoPage(testReference);
         LiveDataElement liveData = new LiveDataElement("test");

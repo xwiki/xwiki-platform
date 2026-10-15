@@ -588,7 +588,7 @@ public class SuggestInputElement extends BaseElement
 
     /**
      * @return {@code true} if the text input of this suggest input has the keyboard focus, {@code false} otherwise
-     * @since 18.4.7
+     * @since 18.4.8
      * @since 18.9.0RC1
      */
     public boolean hasFocus()

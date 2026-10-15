@@ -264,7 +264,7 @@ private void build(map)
 private void buildInsideNode(map)
 {
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${getOOMHeapDumpMavenOpts()}".trim()
+      mavenOpts = map.mavenOpts ?: '-Xmx2048m -Xms512m'
       javadoc = false
       if (map.goals != null) {
         goals = map.goals

@@ -107,7 +107,25 @@ export abstract class AbstractCollaborationManager
     console.debug("Joining realtime collaboration.");
     const collaborator = await this.getCollaborator();
     const provider = await this.createProvider(documentReference);
-    return await this.createCollaboration(provider, collaborator);
+    const collaboration = await this.createCollaboration(
+      provider,
+      collaborator,
+    );
+    this.publishCollaborator(collaboration);
+    return collaboration;
+  }
+
+  /**
+   * Tells the other collaborators who the current user is. The list of collaborators of each collaboration session is
+   * computed from this awareness field. This is done after the collaboration is created, so that the change is caught
+   * by the awareness listeners registered while creating it, and the current user is listed as well.
+   */
+  private publishCollaborator(collaboration: Collaboration): void {
+    const { user, color } = collaboration.collaborator;
+    collaboration.provider.awareness?.setLocalStateField("collaborator", {
+      user,
+      color,
+    });
   }
 
   private async getCollaborator(): Promise<Collaborator> {

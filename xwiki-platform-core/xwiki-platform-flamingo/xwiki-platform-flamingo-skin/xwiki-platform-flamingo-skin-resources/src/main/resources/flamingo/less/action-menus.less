@@ -184,22 +184,28 @@ li:has(+ li #tmRegister) #tmLogin {
 
 // Navbar avatar ==========================================================
 
-// #displayUser() wraps the avatar link in a span, so the navbar link styles don't reach it on their own.
-// One extend per rule, since the LESS compiler ignores all but the first selector of an extend list.
-.navbar-avatar a:extend(.nav > li > a all) {}
-.navbar-avatar a:extend(.navbar-nav > li > a all) {}
-
 .navbar-avatar {
+  // Take the span added by #displayUser() out of the layout, so that the avatar link fills the whole navbar item.
+  > .user {
+    display: contents;
+  }
+
   a {
-    max-height: @navbar-height;
+    align-items: center;
+    display: flex;
+    height: 100%;
+    padding: 0 @navbar-padding-horizontal;
+
+    &:hover,
+    &:focus {
+      background-color: @navbar-default-link-hover-bg;
+    }
 
     // Matching the avatar class is needed to take precedence over the generic user avatar style.
     img.user-avatar {
       @avatar-size: floor((ceil((@navbar-height / 2)) / 2)) * 2;
       border-radius: @thumbnail-border-radius;
       height: @avatar-size;
-      margin-top: -@navbar-padding-vertical + (@navbar-height / 2) - (@avatar-size / 2);
-      vertical-align: middle;
       width: @avatar-size;
     }
   }

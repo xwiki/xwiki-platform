@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
 
@@ -86,13 +87,14 @@ public abstract class AbstractCache<T> implements LESSCache<T>
      * cached and run again on the next request. Versions per criteria would need maps of versions that grow with
      * every resource ever compiled, for little gain.
      * <p>
-     * The key maps and this field are only accessed while holding the lock of this object, rather than through
-     * concurrent collections: setting and clearing run on different threads (requests and event listeners), storing
-     * must check the version and register the keys atomically with respect to clears, and a key registered in a list
-     * that a clear is processing would be lost, so that no later clear would remove its entry. A single lock gives
-     * that directly, and it is never held during a computation.
+     * The key maps are only accessed, and this field only changed, while holding the lock of this object, rather than
+     * through concurrent collections: setting and clearing run on different threads (requests and event listeners),
+     * storing must check the version and register the keys atomically with respect to clears, and a key registered in
+     * a list that a clear is processing would be lost, so that no later clear would remove its entry. A single lock
+     * gives that directly, and it is never held during a computation. {@link #getVersion()} reads this field without
+     * the lock, so that a compilation does not wait for a running clear before starting.
      */
-    private long version;
+    private final AtomicLong version = new AtomicLong();
 
     @Override
     public T get(LESSResourceReference lessResourceReference, SkinReference skin, ColorThemeReference colorTheme)
@@ -105,7 +107,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
         ColorThemeReference colorTheme, T content, long expectedVersion)
     {
         // Do not store an object computed from content that was cleared during the computation
-        if (expectedVersion != this.version) {
+        if (expectedVersion != this.version.get()) {
             return;
         }
 
@@ -120,9 +122,9 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     }
 
     @Override
-    public synchronized long getVersion()
+    public long getVersion()
     {
-        return this.version;
+        return this.version.get();
     }
 
     /**
@@ -147,7 +149,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     @Override
     public synchronized void clear()
     {
-        this.version++;
+        this.version.incrementAndGet();
         cache.removeAll();
         cachedFilesKeysMapPerSkin.clear();
         cachedFilesKeysMapPerColorTheme.clear();
@@ -158,7 +160,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     {
         // Increment even when nothing is cached for the criteria: an object for it may be being computed from the
         // content that just changed.
-        this.version++;
+        this.version.incrementAndGet();
 
         // Get the list of cached files keys corresponding to the criteria
         List<String> cachedFilesKeys = cachedFilesKeysMap.get(criteria);

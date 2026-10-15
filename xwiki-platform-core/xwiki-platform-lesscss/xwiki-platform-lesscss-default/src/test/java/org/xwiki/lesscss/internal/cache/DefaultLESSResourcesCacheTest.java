@@ -19,8 +19,11 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.FutureTask;
+import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +40,9 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -280,45 +285,44 @@ class DefaultLESSResourcesCacheTest
             new NamedColorThemeReference("colorTheme"), true)).thenReturn("k1");
         when(this.cacheKeyFactory.getCacheKey(file1, new FSSkinReference("skin2"),
             new NamedColorThemeReference("colorTheme"), true)).thenReturn("k2");
-        store(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
-            new NamedColorThemeReference("colorTheme"), "css1");
+        store(file1, new FSSkinReference("skin1"), new NamedColorThemeReference("colorTheme"), "css1");
 
         // Block the clear of the resource while it removes the first entry.
-        CountDownLatch removing = new CountDownLatch(1);
-        CountDownLatch release = new CountDownLatch(1);
+        CompletableFuture<Void> removing = new CompletableFuture<>();
+        CompletableFuture<Void> release = new CompletableFuture<>();
         doAnswer(invocation -> {
-            removing.countDown();
-            release.await(10, TimeUnit.SECONDS);
-            return null;
+            removing.complete(null);
+            return release.get(10, TimeUnit.SECONDS);
         }).when(this.cache).remove("k1");
-        FutureTask<Void> clearTask = new FutureTask<>(() -> {
-            this.defaultLESSResourcesCache.clearFromLESSResource(createLESSSkinFileResourceReference("file1"));
-            return null;
-        });
-        new Thread(clearTask).start();
-        assertTrue(removing.await(10, TimeUnit.SECONDS));
 
-        // Store another entry of the same resource while the clear is blocked: it must wait for the end of the clear,
-        // otherwise its key is registered in the list of keys being cleared and is lost.
-        FutureTask<Void> setTask = new FutureTask<>(() -> {
-            store(createLESSSkinFileResourceReference("file1"),
-                new FSSkinReference("skin2"), new NamedColorThemeReference("colorTheme"), "css2");
-            return null;
-        });
-        Thread setThread = new Thread(setTask);
-        setThread.start();
-        long deadline = System.currentTimeMillis() + 10000;
-        while (setThread.getState() != Thread.State.BLOCKED && setThread.getState() != Thread.State.TERMINATED
-            && System.currentTimeMillis() < deadline) {
-            Thread.sleep(10);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        try {
+            Future<?> clearFuture =
+                executorService.submit(() -> this.defaultLESSResourcesCache.clearFromLESSResource(file1));
+            removing.get(10, TimeUnit.SECONDS);
+
+            // Store another entry of the same resource while the clear is blocked: it must wait for the end of the
+            // clear, otherwise its key is registered in the list of keys being cleared and is lost.
+            CompletableFuture<Thread> setThread = new CompletableFuture<>();
+            Future<?> setFuture = executorService.submit(() -> {
+                setThread.complete(Thread.currentThread());
+                store(file1, new FSSkinReference("skin2"), new NamedColorThemeReference("colorTheme"), "css2");
+            });
+            Thread thread = setThread.get(10, TimeUnit.SECONDS);
+            await().atMost(Duration.ofSeconds(10)).pollInterval(Duration.ofMillis(10))
+                .until(() -> thread.getState() == Thread.State.BLOCKED || setFuture.isDone());
+            assertFalse(setFuture.isDone(), "The set didn't wait for the end of the clear");
+
+            release.complete(null);
+            clearFuture.get(10, TimeUnit.SECONDS);
+            setFuture.get(10, TimeUnit.SECONDS);
+        } finally {
+            executorService.shutdown();
         }
-
-        release.countDown();
-        clearTask.get(10, TimeUnit.SECONDS);
-        setTask.get(10, TimeUnit.SECONDS);
+        assertTrue(executorService.awaitTermination(10, TimeUnit.SECONDS));
 
         // The next clear of the resource removes the entry stored during the previous clear.
-        this.defaultLESSResourcesCache.clearFromLESSResource(createLESSSkinFileResourceReference("file1"));
+        this.defaultLESSResourcesCache.clearFromLESSResource(file1);
 
         verify(this.cache).remove("k2");
     }

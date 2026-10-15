@@ -267,10 +267,34 @@
             await editor._realtime.editor?._onAbort();
             onAfterLeaveCollaboration(editor);
           };
-          return editor._realtime.connect();
+          // We can't join the realtime session before knowing the editing mode (we join only in WYSIWYG mode).
+          return whenEditingModeIsSet(editor).then(() => editor._realtime.connect());
         }, resolve, reject), reject);
       });
     }
+  }
+
+  /**
+   * The editing mode is loaded after the editor plugins are initialized, so the editor mode is not set yet when this
+   * plugin is initialized. Waiting for it is required because otherwise we can't tell whether the user is editing in
+   * WYSIWYG mode, where the realtime collaboration is supported, or in Source mode, where it isn't, and thus we would
+   * silently skip joining the realtime session.
+   *
+   * @param {CKEDITOR.editor} editor the editor whose editing mode we're waiting for
+   * @returns {Promise} a promise that resolves as soon as the editing mode is set, or when the editor is destroyed
+   *   (because in this case there's no editing mode to wait for anymore)
+   */
+  function whenEditingModeIsSet(editor) {
+    if (editor.mode) {
+      return Promise.resolve();
+    }
+    return new Promise(resolve => {
+      const listeners = [editor.once('mode', onEditingModeSet), editor.once('destroy', onEditingModeSet)];
+      function onEditingModeSet() {
+        listeners.forEach(listener => listener.removeListener());
+        resolve();
+      }
+    });
   }
 
   function onAfterJoinCollaboration(editor) {

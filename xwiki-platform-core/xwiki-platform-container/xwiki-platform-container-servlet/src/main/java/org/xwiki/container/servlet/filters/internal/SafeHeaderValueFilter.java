@@ -39,8 +39,8 @@ import org.apache.commons.lang3.StringUtils;
  * 
  * @version $Id$
  * @since 18.9.0RC1
- * @since 18.4.7
- * @since 17.10.14
+ * @since 18.4.8
+ * @since 17.10.15
  */
 public class SafeHeaderValueFilter implements Filter
 {

@@ -19,6 +19,10 @@
  */
 package org.xwiki.livedata.test.ui;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +30,10 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+
+import javax.imageio.ImageIO;
 
 import org.apache.hc.core5.net.PercentCodec;
 import org.junit.jupiter.api.Order;
@@ -81,7 +88,17 @@ import static org.xwiki.livedata.test.po.TableLayoutElement.FILTER_COLUMN_SELECT
  * @version $Id$
  * @since 13.4RC1
  */
-@UITest
+@UITest(
+    // The image plugin that resizes the images of the card covers is not registered until the server is restarted, so
+    // we need to make it a core extension.
+    extraJARs = {
+        "org.xwiki.platform:xwiki-platform-image-processing-plugin"
+    },
+    resolveExtraJARs = true,
+    properties = {
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.image.ImagePlugin"
+    }
+)
 class LiveDataIT
 {
     private static final String NAME_COLUMN = "name";
@@ -89,8 +106,6 @@ class LiveDataIT
     private static final String CHOICE_COLUMN = "choice";
 
     private static final String POSTER_COLUMN = "poster";
-
-    private static final String POSTER_IMAGE = "/xwiki/resources/icons/xwiki/noavatar.png";
 
     private static final String POSTER_MISSING_IMAGE = "/xwiki/resources/icons/xwiki/missing.png";
 
@@ -1084,7 +1099,7 @@ class LiveDataIT
     {
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
-        createCoverLiveDataPage(testUtils, testReference, "layouts=\"cards,table\"", "");
+        String poster = createCoverLiveDataPage(testUtils, testReference, "layouts=\"cards,table\"", "");
 
         testUtils.gotoPage(testReference);
         LiveDataElement liveData = new LiveDataElement("test");
@@ -1101,14 +1116,14 @@ class LiveDataIT
         propertiesPanel.setCoverProperty(POSTER_COLUMN);
         assertEquals(POSTER_COLUMN, propertiesPanel.getCoverPropertyName());
         propertiesPanel.closePanel();
-        assertPosterCovers(cardLayout);
+        assertPosterCovers(cardLayout, poster);
 
         // The cover is kept when reloading the page.
         testUtils.getDriver().navigate().refresh();
         liveData = new LiveDataElement("test");
         cardLayout = liveData.getCardLayout();
         cardLayout.waitUntilCardCountEqualsTo(3);
-        assertPosterCovers(cardLayout);
+        assertPosterCovers(cardLayout, poster);
 
         // Any property can be used as the cover: its text is displayed when it doesn't hold an image.
         propertiesPanel = liveData.openPropertiesPanel();
@@ -1150,11 +1165,12 @@ class LiveDataIT
     {
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
+        String poster;
         if (fromMacroParameter) {
-            createCoverLiveDataPage(testUtils, testReference,
+            poster = createCoverLiveDataPage(testUtils, testReference,
                 "layouts=\"cards,table\" coverProperty=\"%s\"".formatted(POSTER_COLUMN), "");
         } else {
-            createCoverLiveDataPage(testUtils, testReference, "", """
+            poster = createCoverLiveDataPage(testUtils, testReference, "", """
                 {"meta": {"defaultLayout": "cards",
                   "layouts": [{"id": "cards", "coverProperty": "%s"}, {"id": "table"}]}}
                 """.formatted(POSTER_COLUMN));
@@ -1164,20 +1180,21 @@ class LiveDataIT
         LiveDataElement liveData = new LiveDataElement("test");
         CardLayoutElement cardLayout = liveData.getCardLayout();
         cardLayout.waitUntilCardCountEqualsTo(3);
-        assertPosterCovers(cardLayout);
+        assertPosterCovers(cardLayout, poster);
 
         PropertiesPanelElement propertiesPanel = liveData.openPropertiesPanel();
         assertEquals(POSTER_COLUMN, propertiesPanel.getCoverPropertyName());
     }
 
     /**
-     * Creates a Live Data page on an XClass with a name and a poster, the URL of an image. Charly has a poster, Esther
-     * doesn't have one, and the poster of Lynda can't be loaded.
+     * Creates a Live Data page on an XClass with a name and a poster, the URL of an image. Charly has a poster, an image
+     * attached to its page, Esther doesn't have one, and the poster of Lynda can't be loaded.
      *
      * @param macroParameters additional parameters of the Live Data macro
      * @param macroContent the content of the Live Data macro, i.e. its advanced configuration
+     * @return the path of the poster of Charly
      */
-    private void createCoverLiveDataPage(TestUtils testUtils, DocumentReference testReference,
+    private String createCoverLiveDataPage(TestUtils testUtils, DocumentReference testReference,
         String macroParameters, String macroContent) throws Exception
     {
         // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
@@ -1201,21 +1218,42 @@ class LiveDataIT
         testUtils.rest().savePage(translationReference, COVER_TRANSLATION_PREFIX + "emptyvalue=", "translation");
         testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
         testUtils.addClassProperty(testReference, POSTER_COLUMN, "String");
-        testUtils.addObject(new DocumentReference(NAME_CHARLY, testSpace), className,
-            Map.of(NAME_COLUMN, NAME_CHARLY, POSTER_COLUMN, POSTER_IMAGE));
+        // The poster of Charly is larger than the cards, so that it is resized by the server.
+        DocumentReference charlyReference = new DocumentReference(NAME_CHARLY, testSpace);
+        String poster = URI.create(testUtils.getURL(charlyReference, "download", "")).getRawPath() + "/poster.png";
+        testUtils.addObject(charlyReference, className, Map.of(NAME_COLUMN, NAME_CHARLY, POSTER_COLUMN, poster));
+        testUtils.attachFile(charlyReference, "poster.png", new ByteArrayInputStream(createImage(1200, 800)), true);
         testUtils.addObject(new DocumentReference(NAME_ESTHER, testSpace), className,
             Map.of(NAME_COLUMN, NAME_ESTHER));
         testUtils.addObject(new DocumentReference(NAME_LYNDA, testSpace), className,
             Map.of(NAME_COLUMN, NAME_LYNDA, POSTER_COLUMN, POSTER_MISSING_IMAGE));
+        return poster;
+    }
+
+    /**
+     * @return a PNG image of the given size
+     */
+    private static byte[] createImage(int width, int height) throws Exception
+    {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ImageIO.write(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB), "png", output);
+        return output.toByteArray();
     }
 
     /**
      * Assert the covers of the cards created by {@link #createCoverLiveDataPage}, when the poster is the cover.
+     *
+     * @param poster the path of the poster of Charly
      */
-    private void assertPosterCovers(CardLayoutElement cardLayout)
+    private void assertPosterCovers(CardLayoutElement cardLayout, String poster)
     {
         cardLayout.waitUntilCovers(true);
-        assertEquals(POSTER_IMAGE, cardLayout.getCoverImageSource(1));
+        // The poster is requested at the width of the cover, and resized by the server.
+        String coverImage = cardLayout.getCoverImageSource(1);
+        assertTrue(coverImage.matches(Pattern.quote(poster) + "\\?width=\\d+00"), coverImage);
+        long requestedWidth = Long.parseLong(StringUtils.substringAfter(coverImage, "width="));
+        assertTrue(requestedWidth < 1200, coverImage);
+        assertEquals(requestedWidth, cardLayout.waitUntilCoverImageLoaded(1));
         // The cover property is not repeated in the card properties.
         assertEquals(List.of(NAME_COLUMN), cardLayout.getPropertyNames(1));
         // Without an image, the cover displays the first visible property.

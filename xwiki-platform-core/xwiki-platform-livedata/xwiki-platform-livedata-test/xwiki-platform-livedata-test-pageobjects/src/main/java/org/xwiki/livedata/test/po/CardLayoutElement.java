@@ -141,6 +141,29 @@ public class CardLayoutElement extends BaseElement
     }
 
     /**
+     * Waits until the image of the cover of the card is loaded.
+     *
+     * @param cardNumber the number of the card, starting at 1
+     * @return the actual width of the loaded image, in pixels
+     * @since 18.10.0RC1
+     */
+    public long waitUntilCoverImageLoaded(int cardNumber)
+    {
+        By image = By.tagName("img");
+        String naturalWidth = "return arguments[0].complete ? arguments[0].naturalWidth : 0";
+        getDriver().waitUntilCondition(webDriver -> {
+            try {
+                WebElement coverImage = getCover(cardNumber).findElement(image);
+                return ((Number) getDriver().executeJavascript(naturalWidth, coverImage)).longValue() > 0;
+            } catch (StaleElementReferenceException e) {
+                return false;
+            }
+        });
+        return ((Number) getDriver().executeJavascript(naturalWidth, getCover(cardNumber).findElement(image)))
+            .longValue();
+    }
+
+    /**
      * Waits until the cover of the card displays some text, which happens when the cover property doesn't hold an
      * image, or when its image fails to load.
      *

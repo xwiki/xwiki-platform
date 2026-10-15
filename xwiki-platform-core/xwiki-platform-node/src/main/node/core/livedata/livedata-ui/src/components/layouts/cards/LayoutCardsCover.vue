@@ -25,9 +25,10 @@
 -->
 <template>
   <div class="card-cover" :class="{ 'card-cover-text': !image }">
+    <!-- The image is displayed once the size of the cover is known, to fetch it at the right size. -->
     <img
-      v-if="image"
-      :src="image.src"
+      v-if="image && isMeasured"
+      :src="imageSource"
       :alt="image.alt"
       loading="lazy"
       @error="$emit('imageError')"
@@ -39,6 +40,7 @@
 </template>
 
 <script>
+import { getResizedImageSource } from "./cardsLayout.js";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
 import { createReadOnlyLogic } from "../readOnlyLogic.js";
 
@@ -76,6 +78,28 @@ export default {
   },
 
   emits: ["imageError"],
+
+  data() {
+    return {
+      isMeasured: false,
+      // The width of the cover in device pixels, undefined when it can't be measured.
+      width: undefined,
+    };
+  },
+
+  computed: {
+    // The image fetched at the size of the cover, when the server can resize it.
+    imageSource() {
+      return getResizedImageSource(this.image.src, this.width);
+    },
+  },
+
+  mounted() {
+    // The cards all have the same width, so it is measured once, when the cover is displayed.
+    const width = this.$el.clientWidth * (window.devicePixelRatio || 1);
+    this.width = width > 0 ? width : undefined;
+    this.isMeasured = true;
+  },
 };
 </script>
 

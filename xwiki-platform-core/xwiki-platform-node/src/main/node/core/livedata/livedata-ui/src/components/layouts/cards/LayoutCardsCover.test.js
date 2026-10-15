@@ -21,6 +21,7 @@ import LayoutCardsCover from "./LayoutCardsCover.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
 import { shallowMount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
+import { nextTick } from "vue";
 
 /**
  * @param props - the props of the cover
@@ -38,8 +39,10 @@ function initWrapper(props) {
 }
 
 describe("LayoutCardsCover.vue", () => {
-  it("Displays the image", () => {
+  it("Displays the image", async () => {
     const wrapper = initWrapper({ image: { src: "/a.png", alt: "A" } });
+    // The image is displayed once the cover is measured.
+    await nextTick();
     const image = wrapper.find("img");
     expect(image.attributes("src")).toBe("/a.png");
     expect(image.attributes("alt")).toBe("A");
@@ -49,6 +52,7 @@ describe("LayoutCardsCover.vue", () => {
 
   it("Notifies when the image fails to load", async () => {
     const wrapper = initWrapper({ image: { src: "/a.png", alt: "" } });
+    await nextTick();
     await wrapper.find("img").trigger("error");
     expect(wrapper.emitted("imageError")).toHaveLength(1);
   });

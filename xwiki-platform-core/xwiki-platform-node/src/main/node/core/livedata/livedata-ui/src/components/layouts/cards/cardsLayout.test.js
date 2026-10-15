@@ -22,6 +22,7 @@ import {
   getCoverImage,
   getCoverPropertyId,
   getCoverTextPropertyId,
+  getResizedImageSource,
   setCoverPropertyId,
 } from "./cardsLayout.js";
 import { describe, expect, it } from "vitest";
@@ -174,6 +175,45 @@ describe("cardsLayout.js", () => {
       const entry = { cover: "/missing.png", title: "Title" };
       expect(getCoverTextPropertyId(logic, entry, "cover", "title")).toBe(
         "title",
+      );
+    });
+  });
+
+  describe("getResizedImageSource", () => {
+    const origin = window.location.origin;
+
+    it("Requests the attachments of the wiki at the given width, rounded up", () => {
+      expect(
+        getResizedImageSource("/xwiki/bin/download/A/B/photo.jpg?rev=1.1", 352),
+      ).toBe("/xwiki/bin/download/A/B/photo.jpg?rev=1.1&width=400");
+      expect(
+        getResizedImageSource(`${origin}/xwiki/bin/download/A/B/c.png`, 700),
+      ).toBe(`${origin}/xwiki/bin/download/A/B/c.png?width=700`);
+    });
+
+    it("Replaces the size of a thumbnail", () => {
+      expect(
+        getResizedImageSource(
+          "/xwiki/bin/download/XWiki/U/avatar.png?width=50&height=50",
+          704,
+        ),
+      ).toBe("/xwiki/bin/download/XWiki/U/avatar.png?width=800");
+    });
+
+    it("Leaves the other images untouched", () => {
+      const external = "https://example.org/download/a.png";
+      expect(getResizedImageSource(external, 352)).toBe(external);
+      expect(getResizedImageSource("/xwiki/resources/a.png", 352)).toBe(
+        "/xwiki/resources/a.png",
+      );
+      expect(getResizedImageSource("data:image/png;base64,AA", 352)).toBe(
+        "data:image/png;base64,AA",
+      );
+    });
+
+    it("Leaves the image untouched when the width is unknown", () => {
+      expect(getResizedImageSource("/xwiki/bin/download/A/B/c.png")).toBe(
+        "/xwiki/bin/download/A/B/c.png",
       );
     });
   });

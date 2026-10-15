@@ -23,6 +23,10 @@
  */
 const CARDS_LAYOUT_ID = "cards";
 
+// The requested image widths are rounded up to a multiple of this step, so that the cards share the same resized images
+// and the server only has a few sizes to generate and cache.
+const IMAGE_WIDTH_STEP = 100;
+
 // A value made only of a URL pointing to an image file.
 const IMAGE_URL_PATTERN =
   /^[^\s<>"']+\.(?:apng|avif|bmp|gif|jpe?g|png|svg|webp)(?:[?#][^\s<>"']*)?$/i;
@@ -83,6 +87,51 @@ function isSafeImageSource(src) {
   } catch {
     return false;
   }
+}
+
+/**
+ * @param src - the source of an image
+ * @returns the URL of the image when it is an attachment of the wiki, downloaded through the download action, which
+ *   the server can resize, undefined otherwise
+ */
+function getAttachmentURL(src) {
+  if (!src || src.startsWith("data:")) {
+    return undefined;
+  }
+  try {
+    const url = new URL(src, document.baseURI);
+    return url.origin === window.location.origin &&
+      url.pathname.includes("/download/")
+      ? url
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Return the URL to fetch the given image with the given width. The attachments of the wiki are resized by the server
+ * when their URL has a width parameter, so that the cards don't download large images to display them small. Other
+ * images are left untouched.
+ *
+ * @param src - the source of the image
+ * @param width - the width, in pixels, at which the image is displayed
+ * @returns the URL of the image resized to the given width (rounded up), or the given source when the image can't be
+ *   resized by the server
+ */
+function getResizedImageSource(src, width) {
+  const url = width > 0 ? getAttachmentURL(src) : undefined;
+  if (!url) {
+    return src;
+  }
+  url.searchParams.set(
+    "width",
+    String(Math.ceil(width / IMAGE_WIDTH_STEP) * IMAGE_WIDTH_STEP),
+  );
+  // The height is computed from the width, keeping the aspect ratio (it would be a small thumbnail size otherwise).
+  url.searchParams.delete("height");
+  const isAbsolute = /^([a-z][a-z\d+.-]*:)?\/\//i.test(src);
+  return isAbsolute ? url.href : url.pathname + url.search + url.hash;
 }
 
 /**
@@ -188,5 +237,6 @@ export {
   getCoverImage,
   getCoverPropertyId,
   getCoverTextPropertyId,
+  getResizedImageSource,
   setCoverPropertyId,
 };

@@ -292,8 +292,8 @@ catalogs:
       specifier: 10.4.1
       version: 10.4.1
     vue-i18n:
-      specifier: 11.4.12
-      version: 11.4.12
+      specifier: 11.4.14
+      version: 11.4.14
     vue-router:
       specifier: 5.3.1
       version: 5.3.1
@@ -452,7 +452,7 @@ importers:
         version: 19.3.0(react@19.3.0)
       vue-i18n:
         specifier: 'catalog:'
-        version: 11.4.12(vue@3.5.44(typescript@5.9.3))
+        version: 11.4.14(vue@3.5.44(typescript@5.9.3))
       xwiki-platform-localization-webjar:
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-localization/xwiki-platform-localization-webjar/src/main/node
@@ -724,7 +724,7 @@ importers:
         version: link:../../../../../xwiki-platform-node/src/main/node/core/localization/localization-api
       vue-i18n:
         specifier: 'catalog:'
-        version: 11.4.12(vue@3.5.44(typescript@5.9.3))
+        version: 11.4.14(vue@3.5.44(typescript@5.9.3))
       vue3-touch-events:
         specifier: 'catalog:'
         version: 5.0.15(vue@3.5.44(typescript@5.9.3))
@@ -2122,7 +2122,7 @@ importers:
         version: 4.18.1
       vue-i18n:
         specifier: 'catalog:'
-        version: 11.4.12(vue@3.5.44(typescript@5.9.3))
+        version: 11.4.14(vue@3.5.44(typescript@5.9.3))
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -2453,7 +2453,7 @@ importers:
         version: 3.5.44(typescript@5.9.3)
       vue-i18n:
         specifier: 'catalog:'
-        version: 11.4.12(vue@3.5.44(typescript@5.9.3))
+        version: 11.4.14(vue@3.5.44(typescript@5.9.3))
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.11(typescript@5.9.3)
@@ -2514,7 +2514,7 @@ importers:
         version: 5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
       vue-i18n:
         specifier: 'catalog:'
-        version: 11.4.12(vue@3.5.44(typescript@5.9.3))
+        version: 11.4.14(vue@3.5.44(typescript@5.9.3))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-adapters/localization-adapter-vue:
     dependencies:
@@ -2563,7 +2563,7 @@ importers:
         version: 3.5.44(typescript@5.9.3)
       vue-i18n:
         specifier: 'catalog:'
-        version: 11.4.12(vue@3.5.44(typescript@5.9.3))
+        version: 11.4.14(vue@3.5.44(typescript@5.9.3))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-api:
     devDependencies:
@@ -3725,7 +3725,7 @@ importers:
         version: 4.18.1
       vue-i18n:
         specifier: 'catalog:'
-        version: 11.4.12(vue@3.5.44(typescript@5.9.3))
+        version: 11.4.14(vue@3.5.44(typescript@5.9.3))
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -3946,7 +3946,7 @@ importers:
         version: 5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0)))
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.11(typescript@5.9.3)
@@ -4617,20 +4617,20 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@intlify/core-base@11.4.12':
-    resolution: {integrity: sha512-tvYUWgMJmk+UvLFa7ck8uRQ9m19tTI9B2e01KCAjBV7+HN2zFLnnORvMO85hM1P8DIw4MTvot1ZSBUdoR+F6jA==}
+  '@intlify/core-base@11.4.14':
+    resolution: {integrity: sha512-Lox+qRGBLnEYfNz4iajqKpw1zuvSAWl4PtzEk654bEM+0NT1GBy9AbOecxzSh7krsyqn9mGKhgmvtuyBsqS6oQ==}
     engines: {node: '>= 22'}
 
-  '@intlify/devtools-types@11.4.12':
-    resolution: {integrity: sha512-Ctkcs8DQItaEL9HHdkyasFFcZFP59iBvZmrjiA7b72JFq/JlI6c6GPQHN7oEwbYTo8rndPMqNY7SX71aPm4MkA==}
+  '@intlify/devtools-types@11.4.14':
+    resolution: {integrity: sha512-EQHRYveQg6yHQ51kePfsFyaW2WW+0hk3FdVxSpLDyuKtqFtsRFoyQR2QzASZPmY767ujs9ipuxc2DiGJARkuiQ==}
     engines: {node: '>= 22'}
 
-  '@intlify/message-compiler@11.4.12':
-    resolution: {integrity: sha512-kBczk9r44fdBYnkC5tXRWa/UaA+e9NglXE3cX7jPnDd2nHzoFHYrKGfIbn8JFZpMA9omexZZo2WxOpTvlHdjsw==}
+  '@intlify/message-compiler@11.4.14':
+    resolution: {integrity: sha512-y79GatHfMhN672Vooxw0v6mgX/vclFHggO1ENL6aH/QubLXiV529WXu/+FhVUbYF+HLTeDDkQpmnpfvSJddBCg==}
     engines: {node: '>= 22'}
 
-  '@intlify/shared@11.4.12':
-    resolution: {integrity: sha512-ojfehaXMFrGFcSnK3cJPaMxlrSXT8FwZUG9H4i+WKX4OFD4Yl1WKdTmfwoC0REnwIfTrnt1QhRtd8kwi/te6bQ==}
+  '@intlify/shared@11.4.14':
+    resolution: {integrity: sha512-f8zSlPs4+Yd9za3CPQfW9OHxAJBOeRQzB/hhOhkbGA7hlqWk0W0bUtSV/LmyrGNwdl8JriBnFtJqZyF140bjGg==}
     engines: {node: '>= 22'}
 
   '@inversifyjs/common@2.0.1':
@@ -8438,8 +8438,8 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
 
-  vue-i18n@11.4.12:
-    resolution: {integrity: sha512-yvArvvo3ErLKFNlQrZUGmRkxL/ctM5xFYtE9FxTKiE/PalWP1bnTopBgbSRGLluYEyYSNl1Pt8l2J7zVavbXww==}
+  vue-i18n@11.4.14:
+    resolution: {integrity: sha512-oRFZtQjRDRQtfxu7tFlsZlnCa5gPkg/KX89kJDKdC9bz4GIYgo3cAMaD0XFeUx/WHuKoVbDMRTIo9Hvg67HnPw==}
     engines: {node: '>= 22'}
     peerDependencies:
       vue: ^3.0.0
@@ -9037,23 +9037,23 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@intlify/core-base@11.4.12':
+  '@intlify/core-base@11.4.14':
     dependencies:
-      '@intlify/devtools-types': 11.4.12
-      '@intlify/message-compiler': 11.4.12
-      '@intlify/shared': 11.4.12
+      '@intlify/devtools-types': 11.4.14
+      '@intlify/message-compiler': 11.4.14
+      '@intlify/shared': 11.4.14
 
-  '@intlify/devtools-types@11.4.12':
+  '@intlify/devtools-types@11.4.14':
     dependencies:
-      '@intlify/core-base': 11.4.12
-      '@intlify/shared': 11.4.12
+      '@intlify/core-base': 11.4.14
+      '@intlify/shared': 11.4.14
 
-  '@intlify/message-compiler@11.4.12':
+  '@intlify/message-compiler@11.4.14':
     dependencies:
-      '@intlify/shared': 11.4.12
+      '@intlify/shared': 11.4.14
       source-map-js: 1.2.2
 
-  '@intlify/shared@11.4.12': {}
+  '@intlify/shared@11.4.14': {}
 
   '@inversifyjs/common@2.0.1': {}
 
@@ -9944,15 +9944,6 @@ snapshots:
       vitest: 5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
     transitivePeerDependencies:
       - supports-color
-
-  '@vitest/mocker@5.0.2(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))':
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      '@vitest/spy': 5.0.2
-      estree-walker: 3.0.3
-      magic-string: 1.2.3
-    optionalDependencies:
-      vite: 8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
 
   '@vitest/mocker@5.0.2(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))':
     dependencies:
@@ -13203,12 +13194,6 @@ snapshots:
       sugarss: 5.0.1(postcss@8.5.30)
       yaml: 2.9.0
 
-  vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))):
-    dependencies:
-      ts-essentials: 10.2.1(typescript@5.9.3)
-      typescript: 5.9.3
-      vitest: 5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
-
   vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))):
     dependencies:
       ts-essentials: 10.2.1(typescript@5.9.3)
@@ -13218,7 +13203,7 @@ snapshots:
   vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.2(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+      '@vitest/mocker': 5.0.2(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
       chai: 6.2.2
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -13277,11 +13262,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vue-i18n@11.4.12(vue@3.5.44(typescript@5.9.3)):
+  vue-i18n@11.4.14(vue@3.5.44(typescript@5.9.3)):
     dependencies:
-      '@intlify/core-base': 11.4.12
-      '@intlify/devtools-types': 11.4.12
-      '@intlify/shared': 11.4.12
+      '@intlify/core-base': 11.4.14
+      '@intlify/devtools-types': 11.4.14
+      '@intlify/shared': 11.4.14
       '@vue/devtools-api': 6.6.4
       vue: 3.5.44(typescript@5.9.3)
 

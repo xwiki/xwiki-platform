@@ -81,8 +81,8 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
     }
 
     @Override
-    public Response addObject(String wikiName, String spaceName, String pageName, Boolean minorRevision, Object object)
-        throws XWikiRestException
+    public Response addObject(String wikiName, String spaceName, String pageName, Boolean minorRevision,
+        String comment, Object object) throws XWikiRestException
     {
         if (object.getClassName() == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
@@ -106,7 +106,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 
             this.factory.toObject(xwikiObject, object);
 
-            doc.save("", Boolean.TRUE.equals(minorRevision));
+            saveDocument(doc, comment, minorRevision);
 
             BaseObject baseObject = getBaseObject(doc, object.getClassName(), xwikiObject.getNumber());
 

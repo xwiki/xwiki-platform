@@ -44,6 +44,9 @@
       "vue-i18n": "org.webjars.npm:vue-i18n/dist/vue-i18n.esm-browser.prod.js"
     }</xwiki.extension.javascript.modules.importmap>
   </properties>
+  <!-- This WebJar must not depend on any realtime synchronization engine (ChainPad / Netflux or Yjs), because the
+    realtime toolbar is shared by the editors using ChainPad / Netflux (CKEditor, wiki editor) and those using Yjs
+    (BlockNote). The realtime session is provided by the code creating the toolbar. -->
   <dependencies>
     <!-- Requires xwiki-platform-node to be built first to get access to the bundled javascript packages.  -->
     <dependency>
@@ -56,6 +59,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-javascript-importmap</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Used to load the toolbar icons from the current icon theme. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-webjar</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

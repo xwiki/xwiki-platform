@@ -21,6 +21,9 @@
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { loadById } from "@xwiki/platform-xwiki-utils";
 import type { ToolbarEnvironment } from "../ui/types";
+import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
+
+type Define = (id: string, definition: unknown) => void;
 
 /**
  * The subset of the jQuery API used to notify the edit form listeners.
@@ -35,42 +38,69 @@ type Moment = {
 type MomentFactory = (date?: number) => Moment;
 
 /**
- * The configuration of the realtime editing, see `XWiki.Realtime.Configuration`.
+ * The icons resolved by the `xwiki-icon!` RequireJS plugin, indexed by icon name. An icon is missing when it couldn't
+ * be loaded.
  */
-type RealtimeConfig = {
-  dateFormat?: string;
-  editComment?: { enabled?: boolean; mandatory?: boolean };
-  minorEdit?: boolean;
-  defaultAvatarURL?: string;
-  icons?: { check?: string; clock?: string };
-};
+type ResolvedIcons = Partial<Record<string, { render(): Element }>>;
 
 /**
- * Loads what the realtime toolbar needs from the XWiki edit page (configuration, libraries, etc.) so that realtime
- * toolbars can then be created synchronously.
+ * The icons used by the realtime toolbar, loaded from the current icon theme.
+ */
+const ICON_QUERY_ID = "xwiki-realtime-toolbar-icons";
+
+/**
+ * The date format used when the skin doesn't specify one, see `XWikiMeta.dateFormat`.
+ */
+const DEFAULT_DATE_FORMAT = "yyyy/MM/dd HH:mm";
+
+function renderIcon(icons: ResolvedIcons, name: string): string {
+  return icons[name]?.render().outerHTML ?? "";
+}
+
+/**
+ * Loads what the realtime toolbar needs from the XWiki edit page (libraries, icons, etc.) so that realtime toolbars can
+ * then be created synchronously.
  *
  * @returns the environment of the realtime toolbar on the XWiki edit page
  * @since 18.9.0RC1
  * @beta
  */
 async function createXWikiToolbarEnvironment(): Promise<ToolbarEnvironment> {
-  const [$, moment, , config] = await loadById<
-    [JQuery, MomentFactory, unknown, RealtimeConfig]
-  >("jquery", "moment", "moment-jdateformatparser", "xwiki-realtime-config");
+  (globalThis as unknown as { define: Define }).define(ICON_QUERY_ID, {
+    icons: ["check", "clock"],
+  });
+  const [$, moment, , xwikiMeta, icons] = await loadById<
+    [JQuery, MomentFactory, unknown, XWikiMeta, ResolvedIcons]
+  >(
+    "jquery",
+    "moment",
+    "moment-jdateformatparser",
+    "xwiki-meta",
+    `xwiki-icon!${ICON_QUERY_ID}`,
+  );
   const dateFormat = moment().toMomentFormatString(
-    config.dateFormat || "yyyy/MM/dd HH:mm",
+    xwikiMeta.dateFormat || DEFAULT_DATE_FORMAT,
   );
 
   return {
-    editComment: {
-      enabled: config.editComment?.enabled ?? false,
-      mandatory: config.editComment?.mandatory ?? false,
-    },
-    minorEdit: config.minorEdit ?? false,
-    defaultAvatarURL: config.defaultAvatarURL ?? "",
+    defaultAvatarURL: `${XWiki.contextPath}/bin/skin/resources/icons/xwiki/noavatar.png`,
     icons: {
-      check: config.icons?.check ?? "",
-      clock: config.icons?.clock ?? "",
+      check: renderIcon(icons, "check"),
+      clock: renderIcon(icons, "clock"),
+    },
+    getSaveOptions(form) {
+      // The version summary and minor edit fields are rendered (by editactions.vm) only when they are enabled in the
+      // wiki preferences. The minor edit field is also missing for new documents.
+      const commentInput = form.querySelector<HTMLInputElement>(
+        'input[name="comment"]',
+      );
+      return {
+        editComment: {
+          enabled: !!commentInput,
+          mandatory: commentInput?.dataset.xwikiEditCommentMandatory === "true",
+        },
+        minorEdit: !!form.querySelector('input[name="minorEdit"]'),
+      };
     },
     formatDate: (date) => moment(date).format(dateFormat),
     getUserURL: (reference) =>

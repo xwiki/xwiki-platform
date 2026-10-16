@@ -26,8 +26,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
+import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
-import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -86,9 +86,9 @@ class ImageIT extends AbstractBlockNoteIT
 
             after""");
         
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         AttachmentReference imageReference = new AttachmentReference("missing.png", testReference);
@@ -125,7 +125,7 @@ class ImageIT extends AbstractBlockNoteIT
         // Edit again, to verify that the image modal shows the correct with and alignment values.
         page.editInplace();
 
-        editor = new BlockNoteEditor("content");
+        editor = page.getContentEditor();
         textArea = editor.getRichTextArea();
 
         textArea.clickImage(0);
@@ -168,7 +168,7 @@ class ImageIT extends AbstractBlockNoteIT
         wikiEditor.clickSaveAndView();
         page.editInplace();
 
-        editor = new BlockNoteEditor("content");
+        editor = page.getContentEditor();
         textArea = editor.getRichTextArea();
 
         imageReference = new AttachmentReference("image.gif", testReference);

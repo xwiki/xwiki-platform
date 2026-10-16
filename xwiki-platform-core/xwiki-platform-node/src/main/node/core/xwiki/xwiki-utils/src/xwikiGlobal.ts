@@ -202,6 +202,14 @@ interface XWikiGlobal {
   docsyntax: string;
 
   /**
+   * The edit mode in use, e.g. `wysiwyg`, or an empty string when the page is not being edited. The in-place editor
+   * resets it when it switches back to view mode.
+   *
+   * @since 18.9.0RC1
+   */
+  editor?: string;
+
+  /**
    * The behaviour of the save buttons. Available only in edit mode.
    */
   actionButtons?: {

@@ -4,11 +4,18 @@
 
 ```ts
 
+import { Collaboration } from '@xwiki/platform-collaboration-api';
+import { DocumentVersion } from '@xwiki/platform-autosave-xwiki';
 import { I18n } from 'vue-i18n';
+import { Saver } from '@xwiki/platform-autosave-api';
 import { XWikiDocument } from '@xwiki/platform-document-xwiki';
+import { XWikiFormSaveContext } from '@xwiki/platform-autosave-xwiki';
 
 // @beta
 export function createXWikiToolbarEnvironment(): Promise<ToolbarEnvironment>;
+
+// @beta
+export function createYjsToolbar(options: YjsToolbarOptions): Promise<YjsToolbar>;
 
 // @beta
 export function findXWikiEditForm(): HTMLElement;
@@ -29,16 +36,12 @@ export class Toolbar {
 
 // @beta
 export type ToolbarEnvironment = {
-    editComment: {
-        enabled: boolean;
-        mandatory: boolean;
-    };
-    minorEdit: boolean;
     defaultAvatarURL: string;
     icons: {
         check: string;
         clock: string;
     };
+    getSaveOptions(form: HTMLElement): ToolbarSaveOptions;
     formatDate(date: number): string;
     getUserURL(reference: string): string;
     getVersionURL(document: XWikiDocument, version: string): string;
@@ -54,6 +57,15 @@ export type ToolbarOptions = {
     session: ToolbarSession;
     environment: ToolbarEnvironment;
     i18n: I18n;
+};
+
+// @beta
+export type ToolbarSaveOptions = {
+    editComment: {
+        enabled: boolean;
+        mandatory: boolean;
+    };
+    minorEdit: boolean;
 };
 
 // @beta
@@ -79,6 +91,21 @@ export type ToolbarVersion = {
     number: string;
     date: number;
     author: Partial<Omit<ToolbarUser, "id">> | string;
+};
+
+// @beta
+export type YjsToolbar = {
+    onCreateVersion(version: DocumentVersion): void;
+    destroy(): void;
+};
+
+// @beta
+export type YjsToolbarOptions = {
+    form: HTMLElement;
+    document: XWikiDocument;
+    collaboration: Collaboration;
+    saver: Saver<XWikiFormSaveContext>;
+    versions?: DocumentVersion[];
 };
 
 // (No @packageDocumentation comment for this package)

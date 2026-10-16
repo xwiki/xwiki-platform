@@ -50,6 +50,9 @@ const state = useState();
 const toolbar = useToolbarElement();
 const { t } = useI18n();
 
+// Read once because the edit form fields that determine the save options are not expected to change while editing.
+const saveOptions = environment.getSaveOptions(form);
+
 const selectedVersion = ref<ToolbarVersion>();
 const selectedVersionContentURL = computed(
   () =>
@@ -75,7 +78,7 @@ const selectUser = session.selectUser
 
 // The Done button opens the change summary modal, instead of saving directly, when the change summary is mandatory.
 const doneOpensModal = computed(
-  () => environment.editComment.enabled && environment.editComment.mandatory,
+  () => saveOptions.editComment.enabled && saveOptions.editComment.mandatory,
 );
 const savingOrDisconnected = computed(
   () => state.saveStatus === 1 || state.connectionStatus !== 2,
@@ -97,7 +100,7 @@ let reviewedVersion: string | undefined;
 function prepareChangeSummary(continueEditing: boolean) {
   summaryContinueEditing.value = continueEditing;
   // The minor change option is not available for new documents.
-  minorEditAllowed.value = environment.minorEdit && !xwikiDocument.isNew;
+  minorEditAllowed.value = saveOptions.minorEdit && !xwikiDocument.isNew;
   reviewedVersion = state.lastReviewedVersion;
 }
 
@@ -197,7 +200,7 @@ async function save(continueEditing?: boolean): Promise<boolean> {
       </button>
       <ul class="dropdown-menu">
         <!-- When the change summary is mandatory the Done button opens the change summary modal. -->
-        <li v-if="environment.editComment.enabled && !doneOpensModal">
+        <li v-if="saveOptions.editComment.enabled && !doneOpensModal">
           <a
             href="#"
             class="realtime-action-summarize"
@@ -310,7 +313,7 @@ async function save(continueEditing?: boolean): Promise<boolean> {
           </a>
         </li>
         <li role="separator" class="divider"></li>
-        <li v-if="environment.editComment.enabled">
+        <li v-if="saveOptions.editComment.enabled">
           <a
             href="#"
             class="realtime-action-summarize"
@@ -327,9 +330,9 @@ async function save(continueEditing?: boolean): Promise<boolean> {
   </div>
   <Teleport to="body">
     <ChangeSummaryModal
-      v-if="environment.editComment.enabled"
+      v-if="saveOptions.editComment.enabled"
       :continue-editing="summaryContinueEditing"
-      :summary-required="environment.editComment.mandatory"
+      :summary-required="saveOptions.editComment.mandatory"
       :minor-edit-allowed="minorEditAllowed"
       :disabled="savingOrDisconnected"
       :load-changes="loadChanges"

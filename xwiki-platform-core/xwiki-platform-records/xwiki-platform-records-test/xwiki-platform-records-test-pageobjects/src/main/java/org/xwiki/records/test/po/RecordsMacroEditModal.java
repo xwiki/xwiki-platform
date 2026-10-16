@@ -27,7 +27,7 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
  * The macro editor dialog of the Records macro, which spreads its optional parameters over tabs.
  *
  * @version $Id$
- * @since 18.9.0RC1
+ * @since 18.10.0RC1
  */
 public class RecordsMacroEditModal extends MacroDialogEditModal
 {

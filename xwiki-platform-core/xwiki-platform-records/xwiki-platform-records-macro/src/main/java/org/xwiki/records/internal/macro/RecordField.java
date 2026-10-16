@@ -28,7 +28,7 @@ import java.util.function.Predicate;
  * @param filterable whether the table can be filtered on the field
  * @param values whether a filter value fits the field's type
  * @version $Id$
- * @since 18.9.0RC1
+ * @since 18.10.0RC1
  */
 record RecordField(boolean sortable, boolean filterable, Predicate<String> values)
 {

@@ -77,6 +77,8 @@ public class RealtimeEditToolbar extends BaseElement
      * Simulates a temporary loss of the network connection, which closes the WebSocket connection used by the realtime
      * editing session, and waits for the editor to reconnect. The browser stays online, so the connection is restored
      * right away.
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
      *
      * @return this instance
      * @since 18.9.0RC1
@@ -89,6 +91,8 @@ public class RealtimeEditToolbar extends BaseElement
     /**
      * Simulates a temporary loss of the network connection, which closes the WebSocket connection used by the realtime
      * editing session. The browser stays online, so the editor tries to reconnect right away.
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
      *
      * @param waitForReconnect whether to wait for the editor to reconnect; pass {@code false} when the reconnection is
      *            expected to fail
@@ -125,6 +129,8 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
+     *
      * @return {code true} if it is possible to join the realtime editing session, {@code false} otherwise
      */
     public boolean canJoinCollaboration()
@@ -135,7 +141,9 @@ public class RealtimeEditToolbar extends BaseElement
 
     /**
      * Join the realtime editing session.
-     * 
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
+     *
      * @return this instance
      */
     public RealtimeEditToolbar joinCollaboration()
@@ -147,7 +155,9 @@ public class RealtimeEditToolbar extends BaseElement
 
     /**
      * Leave the realtime editing session.
-     * 
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
+     *
      * @return this instance
      */
     public RealtimeEditToolbar leaveCollaboration()
@@ -275,6 +285,19 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
+     * Waits until the current user is the only one editing the document in realtime, e.g. after the other coeditors
+     * left the realtime editing session.
+     *
+     * @return this instance
+     * @since 18.9.0RC1
+     */
+    public RealtimeEditToolbar waitUntilEditingAlone()
+    {
+        getDriver().waitUntilCondition(driver -> isEditingAlone());
+        return this;
+    }
+
+    /**
      * @return the dropdown listing all the users editing the current document in realtime
      */
     public CoeditorsDropdown getCoeditorsDropdown()
@@ -335,6 +358,8 @@ public class RealtimeEditToolbar extends BaseElement
     /**
      * Wait for the warning that informs the user that they, or some other user, are editing the same page outside the
      * realtime collaboration session, which may lead to merge conflicts on save.
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
      *
      * @return this instance
      * @since 17.8.0

@@ -25,8 +25,11 @@ export type DocumentVersionAuthor = {
 };
 
 // @beta
+export type XWikiFormSaveAction = "saveAndView" | "saveAndContinue" | "autoSave";
+
+// @beta
 export type XWikiFormSaveContext = {
-    button?: HTMLInputElement;
+    action: XWikiFormSaveAction;
 };
 
 // @beta
@@ -35,7 +38,7 @@ export class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     // (undocumented)
     dispose(): void;
     // (undocumented)
-    getSaveButton(continueEditing?: boolean): HTMLInputElement | null;
+    getAutoSaveContext(): XWikiFormSaveContext;
     // (undocumented)
     getSaveInterval(): number | undefined;
     // (undocumented)

@@ -311,17 +311,6 @@
   },
   'document': {
     'modified': $tdoc.date.time
-  },
-  'dateFormat': $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'),
-  'editComment': {
-    'enabled': $xwiki.hasEditComment(),
-    'mandatory': $xwiki.isEditCommentMandatory()
-  },
-  'minorEdit': $xwiki.hasMinorEdit(),
-  'defaultAvatarURL': $xwiki.getSkinFile('icons/xwiki/noavatar.png', true),
-  'icons': {
-    'check': $services.icon.renderHTML('check'),
-    'clock': $services.icon.renderHTML('clock')
   }
 })
 &lt;script id="realtime-config" type="application/json"&gt;$jsontool.serialize($config).replace(

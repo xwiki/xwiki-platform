@@ -22,11 +22,14 @@ export { Toolbar } from "./ui/Toolbar";
 export { createXWikiToolbarEnvironment } from "./xwiki/environment";
 export { findXWikiEditForm } from "./xwiki/form";
 export { loadXWikiToolbarTranslations } from "./xwiki/translations";
+export { createYjsToolbar } from "./xwiki/yjs";
 export type {
   ToolbarEnvironment,
   ToolbarOptions,
+  ToolbarSaveOptions,
   ToolbarSession,
   ToolbarStatus,
   ToolbarUser,
   ToolbarVersion,
 } from "./ui/types";
+export type { YjsToolbar, YjsToolbarOptions } from "./xwiki/yjs";

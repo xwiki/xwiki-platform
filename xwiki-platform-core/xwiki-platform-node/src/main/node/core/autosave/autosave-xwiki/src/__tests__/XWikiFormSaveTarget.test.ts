@@ -141,6 +141,29 @@ afterEach(() => {
   restoreGlobals();
 });
 
+/**
+ * Stand in for the in-place editor, which overrides the redirect after a save so that it doesn't redirect while it's
+ * editing.
+ */
+function installInplaceEditor() {
+  const xwiki = (globalThis as Record<string, unknown>).XWiki as {
+    editor?: string;
+    actionButtons: {
+      AjaxSaveAndContinue: {
+        prototype: { maybeRedirect: (continueEditing: boolean) => boolean };
+      };
+    };
+  };
+  const prototype = xwiki.actionButtons.AjaxSaveAndContinue.prototype;
+  const redirects: boolean[] = [];
+  prototype.maybeRedirect = (continueEditing) => {
+    redirects.push(!continueEditing && xwiki.editor !== "inplace");
+    return !continueEditing;
+  };
+  xwiki.editor = "inplace";
+  return { xwiki, prototype, redirects };
+}
+
 function installXWikiGlobal(): () => void {
   const globals = globalThis as Record<string, unknown>;
   const saved = globals.XWiki;
@@ -164,22 +187,9 @@ describe("XWikiFormSaveTarget", () => {
     it("ranks Save & View above Save & Continue, and both above auto-save", async () => {
       target = await createTarget();
 
-      expect(target.getSavePriority({ button: getButton("action_save") })).toBe(
-        3,
-      );
-      expect(
-        target.getSavePriority({ button: getButton("action_saveandcontinue") }),
-      ).toBe(2);
-      expect(target.getSavePriority({})).toBe(1);
-    });
-
-    it("resolves the button performing a given save", async () => {
-      target = await createTarget();
-
-      expect(target.getSaveButton(false)).toBe(getButton("action_save"));
-      expect(target.getSaveButton(true)).toBe(
-        getButton("action_saveandcontinue"),
-      );
+      expect(target.getSavePriority({ action: "saveAndView" })).toBe(3);
+      expect(target.getSavePriority({ action: "saveAndContinue" })).toBe(2);
+      expect(target.getSavePriority(target.getAutoSaveContext())).toBe(1);
     });
   });
 
@@ -248,11 +258,53 @@ describe("XWikiFormSaveTarget", () => {
     it("routes the save requests of the user through the saver", async () => {
       target = await createTarget();
 
-      $("#edit").trigger("xwiki:actions:beforeSave");
+      $(getButton("action_save")).trigger("xwiki:actions:beforeSave");
+      $(getButton("action_saveandcontinue")).trigger(
+        "xwiki:actions:beforeSave",
+      );
 
-      expect(saver.save).toHaveBeenCalledOnce();
+      // The clicked button tells what the user asked for.
+      expect(vi.mocked(saver.save).mock.calls).toEqual([
+        [{ action: "saveAndView" }],
+        [{ action: "saveAndContinue" }],
+      ]);
     });
   });
+  describe("redirect after a save", () => {
+    it("lets the in-place editor decide in the edit mode it was in, once the saver settled", async () => {
+      const { xwiki, prototype, redirects } = installInplaceEditor();
+      target = await createTarget();
+      let settle!: () => void;
+      vi.mocked(saver.whenSettled).mockReturnValue(
+        new Promise<void>((resolve) => {
+          settle = resolve;
+        }),
+      );
+
+      expect(prototype.maybeRedirect(false)).toBe(true);
+      // The in-place editor switches to view mode before the saver settles.
+      xwiki.editor = "";
+      settle();
+      await vi.waitFor(() => expect(redirects).toEqual([false]));
+
+      expect(xwiki.editor).toBe("");
+    });
+
+    it("keeps the edit mode set by the redirect", async () => {
+      const { xwiki, prototype } = installInplaceEditor();
+      // An override that leaves the edit mode itself.
+      const inplaceRedirect = prototype.maybeRedirect;
+      prototype.maybeRedirect = (continueEditing) => {
+        xwiki.editor = "view";
+        return inplaceRedirect(continueEditing);
+      };
+      target = await createTarget();
+
+      prototype.maybeRedirect(false);
+      await vi.waitFor(() => expect(xwiki.editor).toBe("view"));
+    });
+  });
+
   describe("submit", () => {
     it("records the auto-save version summary and restores the one the user typed", async () => {
       target = await createTarget();
@@ -264,7 +316,7 @@ describe("XWikiFormSaveTarget", () => {
         summaryWhileSaving = comment.value;
       });
 
-      const submitting = target.submit({});
+      const submitting = target.submit({ action: "autoSave" });
       $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.2" }]);
       await submitting;
 
@@ -282,27 +334,63 @@ describe("XWikiFormSaveTarget", () => {
         summaryWhileSaving = comment.value;
       });
 
-      const submitting = target.submit({ button: getButton("action_save") });
+      const submitting = target.submit({ action: "saveAndView" });
       $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.2" }]);
       await submitting;
 
       expect(summaryWhileSaving).toBe("user summary");
     });
 
+    it("clicks the save button matching a manual save", async () => {
+      target = await createTarget();
+      const comment = document.querySelector<HTMLInputElement>(
+        'input[name="comment"]',
+      )!;
+      const clicked: string[] = [];
+      $("#edit").on("xwiki:actions:save", (event) => {
+        clicked.push(
+          `${(event.target as HTMLInputElement).name}:${comment.value}`,
+        );
+      });
+
+      for (const action of ["saveAndView", "saveAndContinue"] as const) {
+        const submitting = target.submit({ action });
+        $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.2" }]);
+        await submitting;
+      }
+
+      // Both are manual saves, so they keep the version summary the user typed.
+      expect(clicked).toEqual([
+        "action_save:user summary",
+        "action_saveandcontinue:user summary",
+      ]);
+    });
+
     it("reports the created version", async () => {
       target = await createTarget();
 
-      const submitting = target.submit({});
+      const submitting = target.submit({ action: "autoSave" });
       $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.2" }]);
 
       await expect(submitting).resolves.toEqual({ version: "1.2" });
       expect(versions.at(-1)).toMatchObject({ number: "1.2", author: "alice" });
     });
 
+    it("reports the first version of a new document", async () => {
+      // A new document already has the version its first save creates.
+      target = await createTarget({ isNew: true });
+
+      const submitting = target.submit({ action: "autoSave" });
+      $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.1" }]);
+
+      await expect(submitting).resolves.toEqual({ version: "1.1" });
+      expect(versions.at(-1)).toMatchObject({ number: "1.1", author: "alice" });
+    });
+
     it("reports no version when the document was not modified", async () => {
       target = await createTarget();
 
-      const submitting = target.submit({});
+      const submitting = target.submit({ action: "autoSave" });
       $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.1" }]);
 
       await expect(submitting).resolves.toEqual({});
@@ -313,14 +401,16 @@ describe("XWikiFormSaveTarget", () => {
       // This is how the form validation refuses a save: actionButtons.js never fires the event.
       formIsValid = false;
 
-      await expect(target.submit({})).rejects.toThrow("Save prevented");
+      await expect(target.submit({ action: "autoSave" })).rejects.toThrow(
+        "Save prevented",
+      );
     });
 
     it("rejects when the save button is missing", async () => {
       target = await createTarget();
       getButton("action_saveandcontinue").remove();
 
-      await expect(target.submit({})).rejects.toThrow(
+      await expect(target.submit({ action: "autoSave" })).rejects.toThrow(
         "The save button is disabled or missing",
       );
     });
@@ -328,7 +418,7 @@ describe("XWikiFormSaveTarget", () => {
     it("rejects when the save fails", async () => {
       target = await createTarget();
 
-      const submitting = target.submit({});
+      const submitting = target.submit({ action: "autoSave" });
       $("#edit").trigger("xwiki:document:saveFailed", [
         { response: { status: 500 } },
       ]);
@@ -342,9 +432,9 @@ describe("XWikiFormSaveTarget", () => {
         target = await createTarget();
 
         // Assert on the rejection before advancing the timers, so that the handler is attached before it fires.
-        const submitting = expect(target.submit({})).rejects.toThrow(
-          "Timeout while waiting for the save result.",
-        );
+        const submitting = expect(
+          target.submit({ action: "autoSave" }),
+        ).rejects.toThrow("Timeout while waiting for the save result.");
         await vi.advanceTimersByTimeAsync(120000);
         await submitting;
       } finally {
@@ -362,7 +452,7 @@ describe("XWikiFormSaveTarget", () => {
       submitting: Promise<unknown>;
     }> {
       target = await createTarget();
-      const submitting = target.submit({});
+      const submitting = target.submit({ action: "autoSave" });
       // Attach a handler right away, so that a rejection raised while this test drives the DOM synchronously is
       // never seen as unhandled. The assertions attach their own handler afterwards.
       submitting.catch(() => {});
@@ -407,7 +497,7 @@ describe("XWikiFormSaveTarget", () => {
       globalThis.document.body.append(modal);
       makeVisible(modal);
 
-      await expect(target.submit({})).rejects.toThrow(
+      await expect(target.submit({ action: "autoSave" })).rejects.toThrow(
         "Merge conflict prevents save.",
       );
     });
@@ -425,6 +515,35 @@ describe("XWikiFormSaveTarget", () => {
       expect(document_.version).toBe("1.3");
       expect(document_.isNew).toBe(false);
       expect(versions.at(-1)).toMatchObject({ number: "1.3", author: "bob" });
+    });
+
+    it("takes into account the creation of a new document by another client", async () => {
+      target = await createTarget({ isNew: true });
+
+      target.onStatesChanged({ bob: { version: "1.1" } }, "alice");
+
+      expect(document_.version).toBe("1.1");
+      expect(document_.isNew).toBe(false);
+      expect(versions.at(-1)).toMatchObject({ number: "1.1", author: "bob" });
+    });
+
+    it("takes into account the creation of a new document by this client", async () => {
+      target = await createTarget({ isNew: true });
+
+      target.onStatesChanged({ alice: { version: "1.1" } }, "alice");
+
+      expect(document_.isNew).toBe(false);
+      // This client has already reported the version it created.
+      expect(versions).toHaveLength(0);
+    });
+
+    it("keeps a new document new while nobody saved it", async () => {
+      target = await createTarget({ isNew: true });
+
+      target.onStatesChanged({ alice: {}, bob: {} }, "alice");
+
+      expect(document_.isNew).toBe(true);
+      expect(versions).toHaveLength(0);
     });
 
     it("ignores a remote version that is not newer than the one we have", async () => {

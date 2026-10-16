@@ -23,14 +23,14 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
+import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
+import org.xwiki.blocknote.test.po.BlockNoteStandaloneEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteToolBar;
 import org.xwiki.blocknote.test.po.SlashMenu;
-import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
@@ -90,9 +90,9 @@ class MacroIT extends AbstractBlockNoteIT
 
             end""");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Verify the macro output is rendered.
@@ -174,7 +174,7 @@ class MacroIT extends AbstractBlockNoteIT
         wikiEditor.clickCancel();
         page.editInplace();
 
-        editor = new BlockNoteEditor("content");
+        editor = page.getContentEditor();
         textArea = editor.getRichTextArea();
 
         // Change the inline macro from success to error.
@@ -257,8 +257,8 @@ class MacroIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "", "");
 
-        WYSIWYGEditPage page = WYSIWYGEditPage.gotoPage(testReference);
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteStandaloneEditPage page = BlockNoteStandaloneEditPage.gotoPage(testReference);
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Insert a macro using the slash menu.
@@ -276,8 +276,7 @@ class MacroIT extends AbstractBlockNoteIT
         // show the macro placeholder.
         assertEquals("macro:info", textArea.getText());
 
-        page.clickSaveAndView();
-        WikiEditPage wikiEditor = page.editWiki();
+        WikiEditPage wikiEditor = page.clickDone().editWiki();
         assertEquals("""
             {{info title="bar"}}
             foo
@@ -292,8 +291,8 @@ class MacroIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "", "");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Insert a macro using the toolbar. We need to select some text in order to get the toolbar.
@@ -320,7 +319,7 @@ class MacroIT extends AbstractBlockNoteIT
         wikiEditor.clickCancel();
         page.editInplace();
 
-        editor = new BlockNoteEditor("content");
+        editor = page.getContentEditor();
         textArea = editor.getRichTextArea();
 
         textArea.selectMacro(0);
@@ -356,8 +355,8 @@ class MacroIT extends AbstractBlockNoteIT
             int count = 0;
             {{/code}}""", "");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // The code macro is edited as a code block, so its content can be modified directly.

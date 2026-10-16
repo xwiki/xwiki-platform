@@ -62,6 +62,7 @@ export abstract class AbstractCollaborationManager
     }
     const key = this.modelReferenceSerializer.serialize(documentReference)!;
     const collaboration = this.collaborations.get(key);
+    // Share the connection when this client is already in the session, e.g. with another editor on the page.
     if (collaboration) {
       collaboration.usageCount++;
       return collaboration.promise;
@@ -79,7 +80,7 @@ export abstract class AbstractCollaborationManager
   ): Promise<Collaboration> {
     const promise = this.connect(documentReference);
     this.collaborations.set(key, { promise, usageCount: 1 });
-    // The session was never joined, so leave() has nothing to disconnect and the next join() has to start over.
+    // Don't keep a failed connection: there is nothing for leave() to disconnect and the next join() must retry.
     promise.catch(() => this.collaborations.delete(key));
     return promise;
   }

@@ -72,6 +72,8 @@ export default {
       editField: undefined,
       // The rendered content of a row that has no entry yet, which no query result can hold.
       viewField: undefined,
+      // Counts the calls to updateViewField, so that only the last one changes what is displayed.
+      viewFieldRequest: 0,
     };
   },
 
@@ -183,6 +185,8 @@ export default {
      * rendered content for the entries of the store, so there is none for such a row.
      */
     async updateViewField() {
+      // An earlier call that finishes later must not replace the content of this one.
+      const request = ++this.viewFieldRequest;
       // Only a row that has no entry yet needs this: the query results already hold the rendered
       // content of the entries. Without a location, there is no document to render the content against.
       if (
@@ -196,16 +200,15 @@ export default {
       }
       const { documentName, className, property, pendingValues } =
         this.getFieldArguments();
-      try {
-        this.viewField = await view(
-          documentName,
-          className,
-          property,
-          pendingValues,
-        );
-      } catch {
-        // The value held on the row is displayed as it is, rather than nothing at all.
-        this.viewField = undefined;
+      // When the rendering fails, the value held on the row is displayed as it is.
+      const viewField = await view(
+        documentName,
+        className,
+        property,
+        pendingValues,
+      ).catch(() => undefined);
+      if (request === this.viewFieldRequest) {
+        this.viewField = viewField;
       }
     },
 

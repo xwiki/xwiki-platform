@@ -256,6 +256,48 @@ describe("DisplayerXObjectProperty.vue", () => {
       expect(vi.mocked(view)).not.toHaveBeenCalled();
       expect(wrapper.find(".html-wrapper").html()).toContain("red");
     });
+
+    it("drops a rendering that arrives after the row got its entry", async () => {
+      let resolveView;
+      vi.mocked(view).mockReturnValue(
+        new Promise((resolve) => {
+          resolveView = resolve;
+        }),
+      );
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: draftEntry },
+        logic: draftLogic,
+      });
+
+      // The entry is created before the content of the row comes back, and has its own content.
+      await wrapper.setProps({ entry: { color: "<em>red</em>" } });
+      resolveView("<strong>Red</strong>");
+      await flushPromises();
+
+      expect(wrapper.find(".html-wrapper").html()).toContain("<em>red</em>");
+      expect(wrapper.find(".html-wrapper").html()).not.toContain("<strong>");
+    });
+
+    it("displays the rendering of the latest value", async () => {
+      const resolvers = [];
+      vi.mocked(view).mockImplementation(
+        () => new Promise((resolve) => resolvers.push(resolve)),
+      );
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: draftEntry },
+        logic: draftLogic,
+      });
+      await wrapper.setProps({ entry: { ...draftEntry, color: "blue" } });
+
+      // The second content comes back before the first one.
+      resolvers[1]("<strong>Blue</strong>");
+      resolvers[0]("<strong>Red</strong>");
+      await flushPromises();
+
+      expect(wrapper.find(".html-wrapper").html()).toContain(
+        "<strong>Blue</strong>",
+      );
+    });
   });
 
   describe("Rendering an entry", () => {

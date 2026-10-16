@@ -17,40 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization;
+package org.xwiki.security.authorization.internal;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.security.authorization.Right;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.xwiki.security.authorization.AuthorizationManager.SUPERADMIN_USER;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Test of {@link DefaultAuthorizationManager}.
+ * Unit tests for {@link RightFactory}.
  *
  * @version $Id$
  */
-@ComponentTest
-class DefaultAuthorizationManagerTest
+class RightFactoryTest
 {
-    @InjectMockComponents
-    private DefaultAuthorizationManager defaultAuthorizationManager;
-
     @Test
-    void isSuperAdminExpectTrue()
+    void setCreatorWhenAlreadySet()
     {
-        assertTrue(
-            this.defaultAuthorizationManager.isSuperAdmin(
-                new DocumentReference("s1", "Space", SUPERADMIN_USER)));
-    }
+        // Make sure the creator is set by the static initialization of Right.
+        assertSame(Right.VIEW, Right.toRight("view"));
 
-    @Test
-    void isSuperAdminExpectFalse()
-    {
-        assertFalse(
-            this.defaultAuthorizationManager.isSuperAdmin(new DocumentReference("xwiki", "XWiki", "Admin")));
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> RightFactory.setCreator((description, impliedByRights) -> Right.ILLEGAL));
+        assertEquals("The right creator is already set.", exception.getMessage());
     }
 }

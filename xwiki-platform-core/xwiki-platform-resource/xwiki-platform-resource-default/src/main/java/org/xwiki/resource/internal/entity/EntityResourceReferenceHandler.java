@@ -27,6 +27,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
@@ -34,9 +36,16 @@ import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceReferenceHandlerManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceAction;
+import org.xwiki.resource.entity.EntityResourceReference;
 
 /**
- * Handles Entity Resource References.
+ * Handles Entity Resource References by calling the {@link org.xwiki.resource.ResourceReferenceHandler} registered for
+ * their {@link EntityResourceAction}.
+ * <p>
+ * The context is prepared by the {@link EntityResourceContextInitializer} (when there's one) before calling them,
+ * since these Handlers replace the legacy {@code XWikiAction}s which always had an initialized and authenticated XWiki
+ * Context. This is not done with {@link org.xwiki.resource.annotations.Authenticate} since it would wait for the
+ * targeted wiki to be initialized, instead of displaying the initialization progress.
  *
  * @version $Id$
  * @since 6.1M2
@@ -49,29 +58,44 @@ public class EntityResourceReferenceHandler extends AbstractResourceReferenceHan
     @Inject
     private ResourceReferenceHandlerManager<EntityResourceAction> entityResourceReferenceHandlerManager;
 
+    @Inject
+    private ComponentManager componentManager;
+
     @Override
     public List<ResourceType> getSupportedResourceReferences()
     {
-        // At this point in time we want that the "bin" type be handled by the legacy XWikiAction code and thus must
-        // not have any ResourceReferenceHandler that handles "bin" Resource Type ATM. This will cause the Routing
-        // Filter to bypass the new Resource Reference Handler Servlet and thus call the Struts Servlet (and thus call
-        // XWikiAction).
-        // Also note that since the StandardExtendedURLResourceTypeResolver returns a "bin" Resource Type for all
-        // resource types ATM (in order to handl short urls in the "standard" URL Scheme), we will need to find ways
-        // to handle all Resource Types properly once we start having this EntityResourceReferenceHandler handle "bin"
-        // Resource Types!
-        // In the future, modify this to return: Arrays.asList(EntityResourceReference.TYPE);
-        return Collections.emptyList();
+        return Collections.singletonList(EntityResourceReference.TYPE);
     }
 
     @Override
     public void handle(ResourceReference reference, ResourceReferenceHandlerChain chain)
         throws ResourceReferenceHandlerException
     {
+        if (!initializeContext(reference)) {
+            // The request has already been answered (e.g. with the initialization progress).
+            return;
+        }
+
         this.entityResourceReferenceHandlerManager.handle(reference);
 
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
         // Resource Reference.
         chain.handleNext(reference);
+    }
+
+    private boolean initializeContext(ResourceReference reference) throws ResourceReferenceHandlerException
+    {
+        // There's no initializer when there's no wiki (e.g. in some tests or standalone uses of the Resource API).
+        if (!(reference instanceof EntityResourceReference entityReference)
+            || !this.componentManager.hasComponent(EntityResourceContextInitializer.class)) {
+            return true;
+        }
+
+        try {
+            return this.componentManager.<EntityResourceContextInitializer>getInstance(
+                EntityResourceContextInitializer.class).initialize(entityReference);
+        } catch (ComponentLookupException e) {
+            throw new ResourceReferenceHandlerException("Failed to locate the Entity Resource Context Initializer", e);
+        }
     }
 }

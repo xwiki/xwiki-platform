@@ -36,8 +36,8 @@ import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-a
 import type { WebsocketProvider } from "y-websocket";
 
 /**
- * How long to wait for the initial synchronization before giving up, in milliseconds. The editor can't load while we
- * wait, so we don't wait forever for a server that accepts the connection but never synchronizes.
+ * How long to wait for the initial synchronization before giving up, in milliseconds. Joining a session blocks the
+ * caller until then, so a server that accepts the connection but never synchronizes must not block it forever.
  */
 const SYNC_TIMEOUT = 15000;
 
@@ -108,7 +108,7 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
     try {
       await this.sync(collaboration);
     } catch (error) {
-      // Nobody is going to use this session, so stop the provider from reconnecting in the background.
+      // Otherwise it keeps retrying the connection forever, for a session nobody joined.
       provider.destroy();
       throw error;
     }
@@ -153,9 +153,8 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
   }
 
   /**
-   * @returns a promise that is resolved once the initial synchronization is done, and rejected when the first
-   *   connection attempt fails or the synchronization doesn't happen in time, so that joining a session doesn't hang
-   *   while the server is unreachable or unresponsive
+   * @returns a promise resolved once the session is synchronized, and rejected if the connection fails or the
+   *   synchronization doesn't arrive in time
    */
   private sync(collaboration: Collaboration): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -175,8 +174,7 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
           new Error("Timed out waiting for the collaboration server to sync."),
         );
       }, SYNC_TIMEOUT);
-      // Stop listening as soon as we know, because the disconnections that follow a successful synchronization are
-      // transient and the provider recovers from them on its own.
+      // Stop listening once the outcome is known, so that a later disconnection isn't taken for a failed join.
       function stopListening() {
         clearTimeout(timeout);
         provider.off("sync", onSync);

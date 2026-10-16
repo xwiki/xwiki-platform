@@ -65,8 +65,9 @@ export abstract class AbstractCollaborationManager
     if (collaboration) {
       collaboration.usageCount++;
       return collaboration.promise;
+    } else {
+      return this.startCollaboration(key, documentReference);
     }
-    return this.startCollaboration(key, documentReference);
   }
 
   /**

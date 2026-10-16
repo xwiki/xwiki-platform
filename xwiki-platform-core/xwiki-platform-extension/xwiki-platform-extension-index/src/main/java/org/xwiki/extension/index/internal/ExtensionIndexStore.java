@@ -92,9 +92,9 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
-import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.search.solr.internal.LazySolrCore;
 
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_CORE_EXTENSION;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_REVIEWED_SAFE;
@@ -177,12 +177,16 @@ public class ExtensionIndexStore implements Initializable, Disposable
         + "^7.0 " + Extension.FIELD_CATEGORY + "^6.0 " + Extension.FIELD_TYPE + "^5.0 ";
 
     @Inject
-    private Solr solr;
-
-    @Inject
     private SolrUtils utils;
 
-    private SolrClient client;
+    /**
+     * The extension index core. It is requested during the initialization of this store. With a remote Solr server, a
+     * failure does not fail the initialization: the core is then requested again when needed, so that a Solr server
+     * which cannot be reached while XWiki starts does not make this store, and the components depending on it,
+     * unavailable until XWiki is restarted.
+     */
+    @Inject
+    private LazySolrCore core;
 
     @Inject
     private ExtensionManager extensionManager;
@@ -207,8 +211,10 @@ public class ExtensionIndexStore implements Initializable, Disposable
     @Override
     public void initialize() throws InitializationException
     {
+        // Get the extension index core now so that it is created, migrated and initialized during the startup. With a
+        // remote Solr server, a failure is not fatal: the core is requested again when needed.
         try {
-            this.client = this.solr.getClient(ExtensionIndexSolrCoreInitializer.NAME);
+            this.core.initialize(ExtensionIndexSolrCoreInitializer.NAME);
         } catch (SolrException e) {
             throw new InitializationException("Failed to get the extension index Solr core", e);
         }
@@ -239,13 +245,22 @@ public class ExtensionIndexStore implements Initializable, Disposable
 
         try {
             // Commit
-            this.client.commit();
+            getClient().commit();
 
             // Invalidate modified cached entries
             this.modifiedIds.forEach(this.cache::remove);
             this.modifiedIds.clear();
         } finally {
             this.lock.writeLock().unlock();
+        }
+    }
+
+    private SolrClient getClient() throws SolrServerException
+    {
+        try {
+            return this.core.get().getClient();
+        } catch (SolrException e) {
+            throw new SolrServerException(e.getMessage(), e);
         }
     }
 
@@ -270,7 +285,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
      */
     public boolean exists(ExtensionId extensionId) throws SolrServerException, IOException
     {
-        return this.client.getById(this.extensionIndexSolrUtil.toSolrId(extensionId),
+        return getClient().getById(this.extensionIndexSolrUtil.toSolrId(extensionId),
             new SolrQuery().setFields(AbstractSolrCoreInitializer.SOLR_FIELD_ID)) != null;
     }
 
@@ -627,7 +642,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     private boolean add(SolrInputDocument document) throws SolrServerException, IOException
     {
         // Add the document to the Solr queue
-        this.client.add(document);
+        getClient().add(document);
 
         return added(document);
     }
@@ -649,7 +664,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         request.setParam(CommonParams.FAIL_ON_VERSION_CONFLICTS, Boolean.FALSE.toString());
 
         // Add the document to the Solr queue
-        request.process(this.client);
+        request.process(getClient());
 
         return added(document);
     }
@@ -685,7 +700,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         SolrExtension solrExtension = this.cache.get(id);
 
         if (solrExtension == null) {
-            solrExtension = toSolrExtension(this.client.getById(id), extensionId);
+            solrExtension = toSolrExtension(getClient().getById(id), extensionId);
 
             this.cache.set(id, solrExtension);
         }
@@ -701,7 +716,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
      */
     public List<String> getCVEIDs(ExtensionId extensionId) throws SolrServerException, IOException
     {
-        SolrDocument byId = this.client.getById(this.extensionIndexSolrUtil.toSolrId(extensionId));
+        SolrDocument byId = getClient().getById(this.extensionIndexSolrUtil.toSolrId(extensionId));
         if (byId == null) {
             return List.of();
         }
@@ -1022,7 +1037,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
      */
     public QueryResponse search(SolrParams params) throws SolrServerException, IOException
     {
-        return this.client.query(params);
+        return getClient().query(params);
     }
 
     /**

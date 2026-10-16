@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!--
+  JGroups stack for XWiki instances running in Kubernetes.
+
+  TCP transport (no multicast) with DNS based discovery (DNS_PING): the members are found by resolving the A records of
+  a headless Service selecting the XWiki pods. The Service must have "publishNotReadyAddresses: true" (a pod must be
+  discoverable while it starts, i.e. before it is ready) and the pods must accept TCP connections on the JGroups port
+  (7800 by default) and on the failure detection port (FD_SOCK2, JGroups port + 50000 so 57800 by default).
+
+  Enable it with the following in xwiki.properties:
+
+    observation.remote.enabled = true
+    observation.remote.channels = kubernetes
+
+  System properties (-D on the Java command line):
+
+    jgroups.dns.dns_query   (required) DNS name of the headless Service, for example
+                            "xwiki-headless.mynamespace.svc.cluster.local". Starting without it fails on purpose,
+                            instead of silently running as a single member cluster.
+    jgroups.bind_addr       Address or interface to bind to. By default the "eth0" interface, then any site local
+                            address, then any non loopback address. See the JGroups documentation for the syntax.
+    jgroups.bind_port       TCP port to bind to and to probe on the other members, 7800 by default.
+    jgroups.port_range      Number of ports to try after jgroups.bind_port when it is in use. DNS_PING probes the same
+                            range on each address returned by the DNS query. 0 by default since each pod has its own IP.
+    jgroups.join_timeout    How long a starting member waits for an existing coordinator before forming its own
+                            cluster, 3 seconds by default. Increase it if members start at the same time and sometimes
+                            form several clusters (which MERGE3 fixes within max_interval).
+
+  Compared to the tcp.xml embedded in JGroups, the failure detection (FD_ALL3) is deliberately tighter (20s timeout
+  with 4s heartbeats instead of 40s/5s) so that a killed pod is noticed quickly, and the socket connection timeout is
+  longer (1s) since pods may run on different nodes or zones.
+
+  To use a different stack, drop a modified copy of this file as WEB-INF/observation/remote/jgroups/kubernetes.xml,
+  it takes precedence over this one.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:org:jgroups"
+        xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/jgroups.xsd">
+  <TCP bind_addr="${jgroups.bind_addr:match-interface:eth0,SITE_LOCAL,NON_LOOPBACK}"
+       bind_port="${jgroups.bind_port:7800}"
+       port_range="${jgroups.port_range:0}"
+       recv_buf_size="0"
+       send_buf_size="0"
+       sock_conn_timeout="1s"
+       thread_pool.min_threads="${jgroups.thread_pool.min_threads:0}"
+       thread_pool.max_threads="${jgroups.thread_pool.max_threads:200}"
+       thread_pool.keep_alive_time="60s"
+       diag.enabled="false"/>
+  <dns.DNS_PING dns_query="${jgroups.dns.dns_query}"
+                dns_record_type="A"
+                async_discovery="true"
+                num_discovery_runs="3"/>
+  <MERGE3 min_interval="10s"
+          max_interval="30s"/>
+  <FD_SOCK2 connect_timeout="1s"/>
+  <FD_ALL3 timeout="20s"
+           interval="4s"/>
+  <VERIFY_SUSPECT2 timeout="1.5s"/>
+  <pbcast.NAKACK2 use_mcast_xmit="false"
+                  xmit_interval="500ms"/>
+  <UNICAST3 xmit_interval="500ms"
+            conn_close_timeout="5s"/>
+  <pbcast.STABLE desired_avg_gossip="50s"
+                 max_bytes="4M"/>
+  <pbcast.GMS print_local_addr="true"
+              join_timeout="${jgroups.join_timeout:3s}"
+              leave_timeout="5s"/>
+  <MFC max_credits="2M"
+       min_threshold="0.4"/>
+  <UFC max_credits="2M"
+       min_threshold="0.4"/>
+  <FRAG4 frag_size="60K"/>
+</config>

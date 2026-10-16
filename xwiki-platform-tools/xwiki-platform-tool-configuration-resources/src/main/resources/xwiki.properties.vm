@@ -1417,6 +1417,18 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 # mail item in the send queue has been sent.
 # mail.sender.sendQueueCapacity = 1000
 
+#-# [Since 19.0.0RC1]
+#-# Comma-separated list of the media types of the images that can be embedded in the emails sent by the wiki.
+#-# It is currently used by the notification emails for the wiki logo: when the media type of the color theme logo is
+#-# not in this list, they embed the skin logo instead, or else the default logo. With an empty value, the notification
+#-# emails always embed the default logo.
+#-# SVG (see XWIKI-18299), TIFF, AVIF/HEIF and JPEG XL images are excluded by default because they are poorly supported
+#-# by mail clients.
+#-# Remove image/webp if many recipients use the classic Outlook for Windows, which doesn't display WebP images.
+#-#
+#-# The default is:
+# mail.sender.supportedImageMediaTypes = image/png,image/jpeg,image/gif,image/bmp,image/x-icon,image/vnd.microsoft.icon,image/webp
+
 #-------------------------------------------------------------------------------------
 # Debug
 #-------------------------------------------------------------------------------------

@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.configuration;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -51,6 +52,8 @@ import static org.mockito.Mockito.*;
 @ComponentTest
 class DefaultMailSenderConfigurationTest
 {
+    private static final String SUPPORTED_IMAGE_MEDIA_TYPES_PROPERTY = "mail.sender.supportedImageMediaTypes";
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
@@ -290,5 +293,34 @@ class DefaultMailSenderConfigurationTest
         when(this.xwikiPropertiesSource.getProperty("mail.sender.port", 25)).thenReturn(25);
 
         assertEquals(25, this.configuration.getPort());
+    }
+
+    @Test
+    void getSupportedImageMediaTypesWhenNotConfigured()
+    {
+        when(this.xwikiPropertiesSource.getProperty(eq(SUPPORTED_IMAGE_MEDIA_TYPES_PROPERTY), eq(List.class), any()))
+            .thenAnswer(invocation -> invocation.getArgument(2));
+
+        assertEquals(List.of("image/png", "image/jpeg", "image/gif", "image/bmp", "image/x-icon",
+            "image/vnd.microsoft.icon", "image/webp"), this.configuration.getSupportedImageMediaTypes());
+    }
+
+    @Test
+    void getSupportedImageMediaTypesWhenConfigured()
+    {
+        // The configured list replaces the default one, and its values are trimmed and put in lower case.
+        when(this.xwikiPropertiesSource.getProperty(eq(SUPPORTED_IMAGE_MEDIA_TYPES_PROPERTY), eq(List.class), any()))
+            .thenReturn(Arrays.asList(" Image/SVG+xml ", "", null, "image/png", "IMAGE/PNG"));
+
+        assertEquals(List.of("image/svg+xml", "image/png"), this.configuration.getSupportedImageMediaTypes());
+    }
+
+    @Test
+    void getSupportedImageMediaTypesWhenEmpty()
+    {
+        when(this.xwikiPropertiesSource.getProperty(eq(SUPPORTED_IMAGE_MEDIA_TYPES_PROPERTY), eq(List.class), any()))
+            .thenReturn(List.of());
+
+        assertEquals(List.of(), this.configuration.getSupportedImageMediaTypes());
     }
 }

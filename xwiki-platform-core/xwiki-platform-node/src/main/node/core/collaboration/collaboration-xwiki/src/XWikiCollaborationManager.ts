@@ -36,6 +36,12 @@ import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-a
 import type { WebsocketProvider } from "y-websocket";
 
 /**
+ * How long to wait for the initial synchronization before giving up, in milliseconds. The editor can't load while we
+ * wait, so we don't wait forever for a server that accepts the connection but never synchronizes.
+ */
+const SYNC_TIMEOUT = 15000;
+
+/**
  * A collaboration provider for the websocket endpoint provided by xwiki for realtime editing with yjs based editors.
  * Technically, this is a wrapper on top of y-websocket.
  * @since 18.4.0RC1
@@ -148,7 +154,8 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
 
   /**
    * @returns a promise that is resolved once the initial synchronization is done, and rejected when the first
-   *   connection attempt fails, so that joining a session doesn't hang while the server is unreachable
+   *   connection attempt fails or the synchronization doesn't happen in time, so that joining a session doesn't hang
+   *   while the server is unreachable or unresponsive
    */
   private sync(collaboration: Collaboration): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -162,9 +169,16 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
         stopListening();
         reject(new Error("Failed to connect to the collaboration server."));
       };
+      const timeout = setTimeout(() => {
+        stopListening();
+        reject(
+          new Error("Timed out waiting for the collaboration server to sync."),
+        );
+      }, SYNC_TIMEOUT);
       // Stop listening as soon as we know, because the disconnections that follow a successful synchronization are
       // transient and the provider recovers from them on its own.
       function stopListening() {
+        clearTimeout(timeout);
         provider.off("sync", onSync);
         provider.off("connection-close", onConnectionClose);
       }

@@ -149,4 +149,47 @@ describe("XWikiCollaborationManager", () => {
     expect(provider.listenerCount("sync")).toBe(0);
     expect(provider.listenerCount("connection-close")).toBe(0);
   });
+
+  it("rejects and destroys the provider when the synchronization doesn't happen in time", async () => {
+    vi.useFakeTimers();
+    try {
+      const provider = new FakeProvider();
+      const manager = new TestableCollaborationManager();
+
+      const promise = manager.createCollaborationForTest(
+        provider,
+        newCollaborator(),
+      );
+      // Asserted before the timers run, so that the rejection is never momentarily unhandled.
+      const rejection = expect(promise).rejects.toThrow(
+        "Timed out waiting for the collaboration server to sync.",
+      );
+      // The server accepted the connection but never sent the initial state.
+      await vi.advanceTimersByTimeAsync(15000);
+
+      await rejection;
+      expect(provider.destroy).toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("stops waiting for the synchronization once the session is synchronized", async () => {
+    vi.useFakeTimers();
+    try {
+      const provider = new FakeProvider();
+      const manager = new TestableCollaborationManager();
+
+      const promise = manager.createCollaborationForTest(
+        provider,
+        newCollaborator(),
+      );
+      provider.emit("sync");
+      await promise;
+
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

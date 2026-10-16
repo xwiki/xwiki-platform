@@ -341,6 +341,8 @@ const editorProps = shallowRef<
 const collaboration: Ref<Collaboration | undefined> = ref(undefined);
 let collaborationManager: CollaborationManager | undefined = undefined;
 const collaborationKey: Ref<string | undefined> = ref();
+// Set when the editor is destroyed, so that a session we're still joining at that point is left right away.
+let unmounted = false;
 
 // Resolved before the collaboration session is joined, so that creating the auto-saver doesn't have to wait for it.
 let autoSaveVersionSummary: string | undefined;
@@ -380,6 +382,11 @@ async function joinCollaborationSession(
     .get<CollaborationManagerProvider>(collaborationManagerProviderName)
     .get();
   collaboration.value = await manager.join(reference);
+  if (unmounted) {
+    // The editor is gone, so nothing is going to use the session we just joined.
+    manager.leave(reference);
+    return;
+  }
   // Remembered only now, so that leaving on unmount doesn't report a session we never got into.
   collaborationManager = manager;
   collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
@@ -400,8 +407,9 @@ async function onCollaborationUnavailable(error: unknown): Promise<void> {
 }
 
 onUnmounted(() => {
+  unmounted = true;
   // The collaboration manager stops the auto-saver when the last editor leaves the session.
-  collaborationManager?.leave();
+  collaborationManager?.leave(docRef);
 });
 
 /**

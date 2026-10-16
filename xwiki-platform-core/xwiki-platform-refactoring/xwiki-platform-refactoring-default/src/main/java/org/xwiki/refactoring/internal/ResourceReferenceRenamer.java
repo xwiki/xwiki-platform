@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -41,6 +41,7 @@ import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -63,10 +64,6 @@ public class ResourceReferenceRenamer
     @Inject
     @Named("relative")
     private EntityReferenceResolver<ResourceReference> relativeEntityReferenceResolver;
-
-    @Inject
-    @Named("current")
-    private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
     @Inject
     @Named("compact")
@@ -153,11 +150,12 @@ public class ResourceReferenceRenamer
         boolean result = false;
 
         EntityReference linkEntityReference =
-            resolveBeforeRename(resourceReference, oldReference, currentDocumentReference);
+            resolveBeforeRename(resourceReference, oldReference, newReference, currentDocumentReference);
 
         DocumentReference linkTargetDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
-        EntityReference absoluteResolvedEntityReference = resolveBeforeRename(resourceReference, oldReference);
+        EntityReference absoluteResolvedEntityReference =
+            resolveBeforeRename(resourceReference, oldReference, newReference, null);
 
         // If the link targets the old (renamed) document reference and it's an absolute reference
         // (i.e. its resolution without any given parameter gives same result than its resolution with the
@@ -182,51 +180,28 @@ public class ResourceReferenceRenamer
     /**
      * Resolve the given resource reference the way it was resolved before the old document was renamed.
      * <p>
-     * The document and attachment resource references are resolved by default to the terminal document they name and
-     * only fall back on a space home page when that terminal document doesn't exist. The renamed document doesn't
-     * exist anymore when its backlinks are updated, so a reference such as {@code Space.Page@image.png}, which was
-     * targeting the renamed terminal document {@code Space.Page}, is now resolved as
-     * {@code Space.Page.WebHome@image.png}. Since that fallback is never used when the terminal document exists, the
-     * reference was targeting the old document whenever the terminal document it names is the old document.
+     * The entity targeted by a document or attachment resource reference depends on the existence of documents: for
+     * example {@code Space.Page@image.png} targets the terminal document {@code Space.Page} when it exists, and the
+     * space home page {@code Space.Page.WebHome} otherwise. When the backlinks of the renamed document are updated,
+     * the old document doesn't exist anymore and the new one does, so the reference is resolved as if it was still
+     * the opposite.
      *
      * @param resourceReference the resource reference to resolve
      * @param oldReference the reference of the renamed document
-     * @param parameters the parameters to pass to the resolvers, i.e. the optional base reference
+     * @param newReference the new reference of the renamed document
+     * @param baseReference the reference relative to which the resource reference is resolved, or {@code null} to
+     *     use the current document
      * @return the entity the resource reference was targeting before the old document was renamed
      */
     private EntityReference resolveBeforeRename(ResourceReference resourceReference, DocumentReference oldReference,
-        Object... parameters)
+        DocumentReference newReference, EntityReference baseReference)
     {
-        EntityReference entityReference = this.entityReferenceResolver.resolve(resourceReference, null, parameters);
+        Map<DocumentReference, Boolean> existence = new HashMap<>();
+        existence.put(newReference, false);
+        existence.put(oldReference, true);
 
-        EntityType terminalEntityType = getTerminalEntityType(resourceReference);
-        if (terminalEntityType != null && entityReference != null
-            && !oldReference.equals(this.defaultReferenceDocumentReferenceResolver.resolve(entityReference))) {
-            EntityReference terminalEntityReference = this.currentEntityReferenceResolver
-                .resolve(resourceReference.getReference(), terminalEntityType, parameters);
-            if (oldReference.equals(this.defaultReferenceDocumentReferenceResolver.resolve(terminalEntityReference))) {
-                entityReference = terminalEntityReference;
-            }
-        }
-
-        return entityReference;
-    }
-
-    private EntityType getTerminalEntityType(ResourceReference resourceReference)
-    {
-        // The resolution of resource references having base references is not reproduced here, since they are not
-        // relative to the document holding them.
-        EntityType entityType = null;
-        if (StringUtils.isNotEmpty(resourceReference.getReference())
-            && resourceReference.getBaseReferences().isEmpty()) {
-            if (ResourceType.DOCUMENT.equals(resourceReference.getType())) {
-                entityType = EntityType.DOCUMENT;
-            } else if (ResourceType.ATTACHMENT.equals(resourceReference.getType())) {
-                entityType = EntityType.ATTACHMENT;
-            }
-        }
-
-        return entityType;
+        return this.entityReferenceResolver.resolve(resourceReference, null, baseReference,
+            new DocumentExistenceOverride(existence));
     }
 
     /**

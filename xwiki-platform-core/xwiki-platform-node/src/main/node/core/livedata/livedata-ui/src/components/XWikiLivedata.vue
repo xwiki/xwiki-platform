@@ -178,7 +178,7 @@ onMounted(async () => {
       id: "sortPanel",
       title: logic.t("livedata.panel.sort.title"),
       name: logic.t("livedata.dropdownMenu.panels.sort"),
-      icon: "table_sort",
+      icon: "table-sort",
       component: "LivedataAdvancedPanelSort",
       order: 2000,
     });

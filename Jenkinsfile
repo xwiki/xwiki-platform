@@ -267,20 +267,9 @@ private void build(map)
 
 private void buildInsideNode(map)
 {
-    // We want to get a memory dump on OOM errors.
-    // Make sure the memory dump directory exists (see below)
-    // Note that the user used to run the job on the agent must have the permission to create these directories
-    // Verify existence of /home/hudsonagent/jenkins_root so that we only set the oomPath if it does
-    def heapDumpPath = ''
-    def exists = fileExists '/home/hudsonagent/jenkins_root'
-    if (exists) {
-        def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
-        sh "mkdir -p \"${oomPath}\""
-        heapDumpPath = "-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
-    }
-
+    // Note: the heap dump of the Maven JVM on OOM errors is configured and archived by xwikiBuild.
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
+      mavenOpts = map.mavenOpts ?: '-Xmx2048m -Xms512m'
       javadoc = false
       if (map.goals != null) {
         goals = map.goals

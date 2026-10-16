@@ -33,6 +33,8 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
  */
 public class RecordsMacroEditModal extends MacroDialogEditModal
 {
+    private static final String DATA_TYPE_PARAMETER = "class";
+
     private static final String FILTERS_PARAMETER = "filters";
 
     /**
@@ -46,10 +48,19 @@ public class RecordsMacroEditModal extends MacroDialogEditModal
         super(submitHandler);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The dialog gives the focus to its first field, the object type picker, which opens its suggestions and covers
+     * the tabs. Waits for that focus and hides the suggestions, so that the dialog can be used.
+     */
     @Override
     public RecordsMacroEditModal waitUntilReady()
     {
         super.waitUntilReady();
+        SuggestInputElement dataTypePicker = getMacroParameterSuggestInput(DATA_TYPE_PARAMETER);
+        getDriver().waitUntilCondition(driver -> dataTypePicker.hasFocus());
+        dataTypePicker.hideSuggestions();
         return this;
     }
 

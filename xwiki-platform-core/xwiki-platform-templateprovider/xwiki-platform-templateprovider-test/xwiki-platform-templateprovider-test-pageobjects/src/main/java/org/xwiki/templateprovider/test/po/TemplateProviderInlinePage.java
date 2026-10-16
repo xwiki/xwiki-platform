@@ -62,14 +62,14 @@ public class TemplateProviderInlinePage extends InlinePage
     @FindBy(name = "XWiki.TemplateProviderClass_0_action")
     private WebElement templateActionSelect;
 
-    private LocationPicker creationRestrictionsPicker =
-        new LocationPicker("XWiki.TemplateProviderClass_0_creationRestrictions");
+    private TemplateProviderRestrictionsPicker creationRestrictionsPicker =
+        new TemplateProviderRestrictionsPicker("XWiki.TemplateProviderClass_0_creationRestrictions");
 
     @FindBy(name = "XWiki.TemplateProviderClass_0_creationRestrictionsAreSuggestions")
     private WebElement creationRestrictionsAreSuggestionsCheckbox;
 
-    private LocationPicker visibilityRestrictionsPicker =
-        new LocationPicker("XWiki.TemplateProviderClass_0_visibilityRestrictions");
+    private TemplateProviderRestrictionsPicker visibilityRestrictionsPicker =
+        new TemplateProviderRestrictionsPicker("XWiki.TemplateProviderClass_0_visibilityRestrictions");
 
     private SuggestInputElement templateSuggestInput;
 

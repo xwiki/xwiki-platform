@@ -88,10 +88,10 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - nx
 catalog:
-  "@blocknote/code-block": 0.55.0
-  "@blocknote/core": 0.55.0
-  "@blocknote/mantine": 0.55.0
-  "@blocknote/react": 0.55.0
+  "@blocknote/code-block": 0.56.0
+  "@blocknote/core": 0.56.0
+  "@blocknote/mantine": 0.56.0
+  "@blocknote/react": 0.56.0
   "@eslint/config-helpers": 0.7.0
   "@eslint/js": 10.0.1
   "@floating-ui/react": 0.27.20

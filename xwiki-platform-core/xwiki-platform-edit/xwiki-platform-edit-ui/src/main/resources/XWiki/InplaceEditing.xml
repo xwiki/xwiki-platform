@@ -1193,6 +1193,10 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
     // creating a new translation the meta shouldn't point to the default translation).
     updateMeta(xwikiDocument);
     previousPlainTitle = xwikiDocument.getPlainTitle();
+    // The in-place editor always edits the current version of the document, even when the user started from an older
+    // revision, so the warning saying that the document is displayed in restricted mode because it's not the current
+    // version doesn't apply anymore.
+    $('.restricted-mode-warning').remove();
   });
 
   // Update the UI after each editing session.

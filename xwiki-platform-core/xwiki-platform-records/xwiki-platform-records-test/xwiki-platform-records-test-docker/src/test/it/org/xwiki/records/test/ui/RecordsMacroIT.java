@@ -95,7 +95,6 @@ class RecordsMacroIT extends AbstractCKEditorIT
         filtersPicker.sendKeys("genre=fiction").selectTypedText().hideSuggestions();
         assertEquals("status=published&genre=fiction", macroEditModal.getFilters());
         macroEditModal.clickSubmit();
-        this.textArea.waitForContentRefresh();
         assertSourceContains("filters=\"status=published&genre=fiction\"");
 
         this.editPage.clickSaveAndView();
@@ -125,7 +124,6 @@ class RecordsMacroIT extends AbstractCKEditorIT
         filtersPicker.hideSuggestions();
         assertEquals("status=published", macroEditModal.getFilters());
         macroEditModal.clickSubmit();
-        this.textArea.waitForContentRefresh();
         assertSourceContains("filters=\"status=published\"");
     }
 
@@ -166,7 +164,17 @@ class RecordsMacroIT extends AbstractCKEditorIT
         this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
         this.textArea.waitUntilWidgetSelected();
         this.textArea.sendKeys(Keys.ENTER);
-        return new RecordsMacroEditModal().waitUntilReady().openTab(FILTER_SORT_TAB);
+        return new RecordsMacroEditModal(this::submitAndWaitForContentRefresh).waitUntilReady()
+            .openTab(FILTER_SORT_TAB);
+    }
+
+    /**
+     * Submits the macro dialog and waits for the editor to render the updated macro.
+     */
+    private void submitAndWaitForContentRefresh(Runnable submit)
+    {
+        submit.run();
+        this.textArea.waitForContentRefresh();
     }
 
     private List<String> getItems(SuggestInputElement picker)

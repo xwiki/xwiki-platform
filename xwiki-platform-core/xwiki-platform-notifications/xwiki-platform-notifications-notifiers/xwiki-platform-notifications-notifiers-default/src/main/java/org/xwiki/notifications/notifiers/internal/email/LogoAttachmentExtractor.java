@@ -19,11 +19,14 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.filter.input.InputSource;
@@ -32,7 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.skin.Resource;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -53,7 +55,13 @@ public class LogoAttachmentExtractor
 {
     private static final String LOGO = "logo";
 
-    private static final String SVG_EXTENSION = ".svg";
+    private static final String PNG_MEDIA_TYPE = "image/png";
+
+    /**
+     * The media types of the logos that can be embedded in the email, i.e. the image formats that most mail clients
+     * are able to display. A logo with another format (e.g. SVG or WebP) is skipped in favor of the next logo.
+     */
+    private static final Set<String> SUPPORTED_MEDIA_TYPES = Set.of(PNG_MEDIA_TYPE, "image/jpeg", "image/gif");
 
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
@@ -85,9 +93,8 @@ public class LogoAttachmentExtractor
             if (StringUtils.isBlank(logo)) {
                 logo = doc.getStringValue("logoImage");
             }
-            if (isLogoAttachementValid(doc, logo)) {
-                XWikiAttachment attachment = doc.getAttachment(logo);
-
+            XWikiAttachment attachment = getSupportedLogo(doc, logo, context);
+            if (attachment != null) {
                 return toLogoAttachment(attachment, context);
             }
         }
@@ -98,14 +105,13 @@ public class LogoAttachmentExtractor
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(skinRef, context);
             String logo = doc.getStringValue(LOGO);
-            if (isLogoAttachementValid(doc, logo)) {
-                XWikiAttachment attachment = doc.getAttachment(logo);
-
+            XWikiAttachment attachment = getSupportedLogo(doc, logo, context);
+            if (attachment != null) {
                 return toLogoAttachment(attachment, context);
             }
         }
 
-        return newLogoAttachment("image/png", this.internalSkinManager.getCurrentSkin(true).getResource("logo.png"),
+        return newLogoAttachment(PNG_MEDIA_TYPE, this.internalSkinManager.getCurrentSkin(true).getResource("logo.png"),
             context);
     }
 
@@ -149,8 +155,21 @@ public class LogoAttachmentExtractor
         throw new NotificationException("Unsupported logo input source [" + inputSource + "]");
     }
 
-    private boolean isLogoAttachementValid(XWikiDocument doc, String logo)
+    /**
+     * @return the logo attachment, or {@code null} if it doesn't exist or if its format is not supported
+     */
+    private XWikiAttachment getSupportedLogo(XWikiDocument doc, String logo, XWikiContext xcontext)
     {
-        return StringUtils.isNotBlank(logo) && !logo.endsWith(SVG_EXTENSION) && doc.getAttachment(logo) != null;
+        if (StringUtils.isNotBlank(logo)) {
+            XWikiAttachment attachment = doc.getAttachment(logo);
+            if (attachment != null) {
+                String mediaType = attachment.getMimeType(xcontext);
+                if (mediaType != null && SUPPORTED_MEDIA_TYPES.contains(mediaType)) {
+                    return attachment;
+                }
+            }
+        }
+
+        return null;
     }
 }

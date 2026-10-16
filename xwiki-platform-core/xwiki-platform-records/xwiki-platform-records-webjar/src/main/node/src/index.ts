@@ -393,14 +393,22 @@ let types: Promise<PropertyType[]> | null = null;
  * @returns the property types of the source, which say what a field of each type can be used for
  */
 function loadTypes(fetchJson: JsonFetcher): Promise<PropertyType[]> {
-  if (types === null) {
-    types = fetchJson(typesUrl(XWiki.contextPath)).then(asTypes);
-    // A failure is reported by the picker that asked, and the next load tries again.
-    types.catch(() => {
-      types = null;
-    });
-  }
+  types ??= fetchTypes(fetchJson);
   return types;
+}
+
+/**
+ * @param fetchJson - fetches and parses the types resource
+ * @returns the property types of the source
+ */
+async function fetchTypes(fetchJson: JsonFetcher): Promise<PropertyType[]> {
+  try {
+    return asTypes(await fetchJson(typesUrl(XWiki.contextPath)));
+  } catch (error) {
+    // A failure is reported by the picker that asked, and the next load tries again.
+    types = null;
+    throw error;
+  }
 }
 
 /**

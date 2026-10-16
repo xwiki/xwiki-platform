@@ -242,6 +242,25 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
+     * Get the list of the names of the available icons in the specified icon set.
+     *
+     * @param iconSetName name of the icon set
+     * @param includeDeprecated {@code true} to include the names of the deprecated icons, {@code false} to leave them
+     *     out
+     * @return the icon names
+     * @since 18.10.0RC1
+     */
+    public List<String> getIconNames(String iconSetName, boolean includeDeprecated)
+    {
+        try {
+            return iconManager.getIconNames(iconSetName, includeDeprecated);
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
      * Get the name of the current icon set.
      *
      * @return the name of the current icon set

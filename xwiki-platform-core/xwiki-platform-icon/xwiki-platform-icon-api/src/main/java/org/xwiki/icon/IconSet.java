@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.xwiki.model.reference.DocumentReference;
 
@@ -260,6 +261,23 @@ public class IconSet
     public List<String> getIconNames()
     {
         return new ArrayList<>(iconMap.keySet());
+    }
+
+    /**
+     * @param includeDeprecated {@code true} to include the names of the deprecated icons, {@code false} to leave them
+     *     out
+     * @return the list of names of the icons
+     * @since 18.10.0RC1
+     */
+    public List<String> getIconNames(boolean includeDeprecated)
+    {
+        if (includeDeprecated) {
+            return getIconNames();
+        }
+        return this.iconMap.entrySet().stream()
+            .filter(entry -> !entry.getValue().isDeprecated())
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
     }
 
     /**

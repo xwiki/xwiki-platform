@@ -11,3 +11,15 @@ xwiki.iconset.icon.cssClass = fa fa-$icon
 ## Icons
 transmit = anchor
 earth = globe
+
+#@deprecatedstart
+## Deprecated since 18.10.0RC1.
+old_earth = globe
+#@deprecatedend
+
+## Icons after a deprecated block
+satellite=signal
+
+#@deprecatedstart
+old_transmit:anchor
+#@deprecatedend

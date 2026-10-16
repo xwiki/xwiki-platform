@@ -74,11 +74,15 @@ public interface ObjectResource
      *  are 0-based and assigned in creation order, so a value that no object carries yields a {@code 404} response
      * @param minorRevision when {@code true}, saves the change as a minor version; when {@code null} (the default) or
      *  {@code false}, saves it as a normal (major) version
+     * @param comment (since 18.10.0RC1) the comment of the page version created by the change, shown in the page
+     *  history; when {@code null} (the default) the version has an empty comment
      * @param object the new state of the object; its property values replace those of the stored object
      * @return a response with status {@code 202} holding the updated object
      * @throws XWikiRestException if the object cannot be updated, for example the current user is not allowed to edit
      *  the page
      */
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @PUT Response updateObject(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -86,6 +90,7 @@ public interface ObjectResource
             @PathParam("className") String className,
             @PathParam("objectNumber") Integer objectNumber,
             @QueryParam("minorRevision") Boolean minorRevision,
+            @QueryParam("comment") String comment,
             Object object
     ) throws XWikiRestException;
 
@@ -99,6 +104,10 @@ public interface ObjectResource
      * @param className the reference of the XClass of the object to delete, for example {@code XWiki.XWikiUsers}
      * @param objectNumber the number identifying the object among those of the same class on the page; object numbers
      *  are 0-based and assigned in creation order, so a value that no object carries yields a {@code 404} response
+     * @param minorRevision (since 18.10.0RC1) when {@code true}, saves the change as a minor version; when
+     *  {@code null} (the default) or {@code false}, saves it as a normal (major) version
+     * @param comment (since 18.10.0RC1) the comment of the page version created by the change, shown in the page
+     *  history; when {@code null} (the default) the version has an empty comment
      * @throws XWikiRestException if the object cannot be deleted, for example the current user is not allowed to edit
      *  the page
      */
@@ -107,6 +116,8 @@ public interface ObjectResource
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("className") String className,
-            @PathParam("objectNumber") Integer objectNumber
+            @PathParam("objectNumber") Integer objectNumber,
+            @QueryParam("minorRevision") Boolean minorRevision,
+            @QueryParam("comment") String comment
     ) throws XWikiRestException;
 }

@@ -40,7 +40,7 @@ import org.xwiki.stability.Unstable;
  * read from the browser at query time for the reasons given there.
  *
  * @version $Id$
- * @since 18.9.0RC1
+ * @since 18.10.0RC1
  */
 @Unstable
 public interface RecordsFilters

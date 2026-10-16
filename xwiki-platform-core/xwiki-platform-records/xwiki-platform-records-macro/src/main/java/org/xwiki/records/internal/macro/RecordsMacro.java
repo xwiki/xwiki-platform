@@ -69,7 +69,7 @@ import org.xwiki.security.authorization.Right;
  * therefore sticks to what the parameters can express.
  *
  * @version $Id$
- * @since 18.9.0RC1
+ * @since 18.10.0RC1
  */
 @Component
 @Named(RecordsMacro.ID)

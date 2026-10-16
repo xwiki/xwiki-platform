@@ -41,7 +41,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  * Builds the messages the Records macro shows to authors and readers.
  *
  * @version $Id$
- * @since 18.9.0RC1
+ * @since 18.10.0RC1
  */
 @Component(roles = RecordsMessages.class)
 @Singleton

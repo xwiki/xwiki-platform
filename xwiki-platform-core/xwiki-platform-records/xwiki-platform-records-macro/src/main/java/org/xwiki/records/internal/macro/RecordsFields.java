@@ -49,7 +49,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
  * Data see them.
  *
  * @version $Id$
- * @since 18.9.0RC1
+ * @since 18.10.0RC1
  */
 @Component(roles = RecordsFields.class)
 @Singleton

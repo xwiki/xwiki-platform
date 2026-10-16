@@ -41,6 +41,7 @@ import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceReferenceHandlerManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
+import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.url.ExtendedURL;
 
 /**
@@ -53,6 +54,10 @@ import org.xwiki.url.ExtendedURL;
  * <li>If not, then continue executing the rest of the {@code web.xml} file, thus bridging to the old system, including
  * the existing Struts Action Servlet.</li>
  * </ul>
+ * Entity Resources (the {@code bin} Resource Type) are only routed to the {@code resourceReferenceHandler} Servlet when
+ * a {@link org.xwiki.resource.ResourceReferenceHandler} is registered for their
+ * {@link org.xwiki.resource.entity.EntityResourceAction}, since most actions are still implemented by the legacy
+ * {@code XWikiAction}s (see {@link EntityResourceRouter}).
  * As time progresses it is expected that more and more Resource Types will have registered
  * {@link org.xwiki.resource.ResourceReferenceHandler}.
  * <p>
@@ -72,6 +77,8 @@ public class RoutingFilter implements Filter
 
     private ServletContext servletContext;
 
+    private EntityResourceRouter entityResourceRouter;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
@@ -80,6 +87,7 @@ public class RoutingFilter implements Filter
             (ComponentManager) filterConfig.getServletContext().getAttribute(ComponentManager.class.getName());
         // Save the Servlet Context to be able to do forwards later on
         this.servletContext = filterConfig.getServletContext();
+        this.entityResourceRouter = new EntityResourceRouter(this.rootComponentManager);
     }
 
     @Override
@@ -125,12 +133,9 @@ public class RoutingFilter implements Filter
         // Step 4: Check if there's a Handler available for the Resource Type
         ResourceReferenceHandlerManager<ResourceType> resourceReferenceHandlerManager =
             getResourceReferenceHandlerManager();
-        // Note that ATM the EntityResourceReferenceHandler is configured to NOT handle "bin" Resource Types. See
-        // the comment in EntityResourceReferenceHandler#getSupportedResourceReferences() for more details. This allows
-        // to fallback on the Filter/Servlet chain as defined by the web.xml and have XWikiAction be called to handle
-        // "bin" Resource Types. It also allows other mappings to be used to handle other resource types such as
-        // "rest", "webdav" and "xmlrpc" Resource Types.
-        if (!resourceReferenceHandlerManager.canHandle(resourceType)) {
+        if (!resourceReferenceHandlerManager.canHandle(resourceType)
+            || (EntityResourceReference.TYPE.equals(resourceType) && !this.entityResourceRouter.isRouted(extendedURL)))
+        {
             // Let it go through so that the next Filter or Servlet from web.xml will handle it.
             chain.doFilter(request, response);
             return;
@@ -153,6 +158,7 @@ public class RoutingFilter implements Filter
     {
         this.rootComponentManager = null;
         this.servletContext = null;
+        this.entityResourceRouter = null;
     }
 
     private ResourceReferenceHandlerManager<ResourceType> getResourceReferenceHandlerManager() throws ServletException

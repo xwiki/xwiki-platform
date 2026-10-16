@@ -31,6 +31,7 @@ import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.annotations.Authenticate;
+import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.events.ResourceReferenceHandlingEvent;
 
 import com.xpn.xwiki.XWikiContext;
@@ -49,6 +50,14 @@ import com.xpn.xwiki.XWikiException;
 @Singleton
 public class ResourceReferenceHandlerAuthenticatorListener extends AbstractEventListener
 {
+    /**
+     * Marks the Execution Context in which the XWiki Context has already been initialized and authenticated, so that
+     * nested Handlers (e.g. the Entity Resource Action Handlers called by the Entity Resource Reference Handler) don't
+     * authenticate the request again: authenticating twice would, among others, record a failed login twice.
+     */
+    static final String AUTHENTICATED_PROPERTY =
+        ResourceReferenceHandlerAuthenticatorListener.class.getName() + ".authenticated";
+
     @Inject
     private Provider<XWikiContextInitializer> xcontextInitializeProvider;
 
@@ -66,17 +75,31 @@ public class ResourceReferenceHandlerAuthenticatorListener extends AbstractEvent
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (source.getClass().getAnnotation(Authenticate.class) != null) {
-            ExecutionContext econtext = this.execution.getContext();
-
+        ExecutionContext econtext = this.execution.getContext();
+        if (source.getClass().getAnnotation(Authenticate.class) != null
+            && (econtext == null || !econtext.hasProperty(AUTHENTICATED_PROPERTY)))
+        {
             // Initialize a new XWikiContext no matter one since the one in place is generally a stub context
             // (automatically initialized with the ExecutionContext)
             // TODO: find a way to avoid hacks like this one
+            XWikiContext xcontext;
             try {
                 // Initialize and authenticate the XWikiContext
-                this.xcontextInitializeProvider.get().authenticate().initialize(econtext);
+                xcontext = this.xcontextInitializeProvider.get().authenticate().initialize(econtext);
             } catch (XWikiException e) {
                 throw new RuntimeException("Failed to initialize and authenticate the XWiki context", e);
+            }
+
+            // The Handlers of Entity Resource Actions replace the legacy XWikiActions, which run with the action of
+            // the URL set in the XWiki Context: code relying on XWikiContext#getAction() must keep working for them.
+            if (((ResourceReferenceHandlingEvent) event)
+                .getResourceReference() instanceof EntityResourceReference entityReference)
+            {
+                xcontext.setAction(entityReference.getAction().getActionName());
+            }
+
+            if (econtext != null) {
+                econtext.setProperty(AUTHENTICATED_PROPERTY, true);
             }
         }
     }

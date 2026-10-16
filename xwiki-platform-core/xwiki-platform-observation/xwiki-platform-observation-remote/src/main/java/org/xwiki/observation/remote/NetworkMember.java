@@ -39,4 +39,34 @@ public interface NetworkMember
      * @return the identifier of the member, as provided by {@link RemoteObservationManagerConfiguration#getId()}
      */
     String getId();
+
+    /**
+     * Indicates if this member is the current instance. The comparison is not based on the {@link #getId() identifier}
+     * (which two misconfigured members could share) but on the network address of the member.
+     *
+     * @return {@code true} if this member is the current instance, {@code false} otherwise (or if the implementation
+     *         does not know)
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    default boolean isLocal()
+    {
+        return false;
+    }
+
+    /**
+     * Gives the priority of this member in the election of the cluster singleton node (see
+     * {@link ClusterSingletonManager}), as configured with
+     * {@link RemoteObservationManagerConfiguration#getSingletonPriority()} on that member.
+     *
+     * @return the singleton priority of this member: the member with the highest priority is the singleton node and a
+     *         negative priority means the member is never the singleton node; {@code 0} when the member did not
+     *         configure any (or runs a version which does not support it)
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    default int getSingletonPriority()
+    {
+        return 0;
+    }
 }

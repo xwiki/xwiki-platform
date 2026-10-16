@@ -1,0 +1,49 @@
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<!-- Test stack: the JGroups tcp.xml on dedicated ports -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:org:jgroups"
+        xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/jgroups.xsd">
+    <!-- Not the default ports, so that the members of other tests running in the same JVM (which might take some time
+         to leave) can't join -->
+    <TCP bind_addr="loopback"
+         bind_port="7900"
+         port_range="10"
+         sock_conn_timeout="300ms"
+         diag.enabled="false"/>
+    <TCPPING async_discovery="true"
+             initial_hosts="localhost[7900]"
+             port_range="3"/>
+    <MERGE3 min_interval="10s"
+            max_interval="30s"/>
+    <FD_SOCK2/>
+    <FD_ALL3 timeout="40s" interval="5s" />
+    <VERIFY_SUSPECT2 timeout="1.5s"  />
+    <BARRIER />
+    <pbcast.NAKACK2 use_mcast_xmit="false" />
+    <UNICAST3 />
+    <pbcast.STABLE desired_avg_gossip="50s"
+                   max_bytes="4M"/>
+    <pbcast.GMS print_local_addr="false" join_timeout="2s"/>
+    <MFC max_credits="2M"
+         min_threshold="0.4"/>
+    <UFC max_credits="2M"
+         min_threshold="0.4"/>
+    <FRAG2 frag_size="60K"  />
+</config>

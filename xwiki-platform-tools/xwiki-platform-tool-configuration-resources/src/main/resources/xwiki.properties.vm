@@ -529,6 +529,17 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 #-# observation.remote.networkadapter = jgroups
 
+#-# [Since 18.10.0RC1]
+#-# The priority of this instance when the members of the cluster elect the one which runs the tasks executed only once
+#-# in the cluster (for example the synchronization of a remote Solr index at startup). The member with the highest
+#-# priority is elected and, when several members have the highest priority, the oldest member of the cluster is
+#-# elected. A negative value means this instance is never elected. A typical setup gives a higher priority to a member
+#-# dedicated to background tasks (for example 10), the other members (0) taking over only while it is not part of the
+#-# cluster. The value must be an integer and is shared with the other members when this instance joins the cluster.
+#-#
+#-# The default is:
+# observation.remote.singletonPriority = 0
+
 #-------------------------------------------------------------------------------------
 # CSRF token component
 #-------------------------------------------------------------------------------------

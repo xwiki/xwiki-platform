@@ -65,6 +65,31 @@ function initEditModeWrapper({ props, logic, editBus } = {}) {
   });
 }
 
+/**
+ * Builds a row that has no entry yet. Creating its entry is what the row stops being new on, either
+ * right away through `createEntry`, or when `completeCreation` resolves the pending `whenSaved`.
+ *
+ * @returns the row, the creation of its entry, and the `whenSaved` of a save that is still running
+ */
+function initRowCreatingItsEntry() {
+  const entry = { color: "red", _new: true };
+  const createEntry = () => delete entry._new;
+  let completeCreation;
+  const whenSaved = () =>
+    new Promise((resolve) => {
+      completeCreation = () => {
+        createEntry();
+        resolve();
+      };
+    });
+  return {
+    entry,
+    createEntry,
+    whenSaved,
+    completeCreation: () => completeCreation(),
+  };
+}
+
 describe("BaseDisplayer.vue", () => {
   afterEach(function () {
     // completely restore all fakes created through the sandbox
@@ -259,6 +284,35 @@ describe("BaseDisplayer.vue", () => {
 
       expect(wrapper.emitted()["update:isView"]).toBeUndefined();
     });
+
+    it("Marks the editor of a mandatory property as required", async () => {
+      const wrapper = initWrapper(BaseDisplayer, {
+        props: {
+          isView: false,
+        },
+        logic: {
+          isEditMode: () => false,
+          getPropertyDescriptor: (id) => ({ id, mandatory: true }),
+        },
+      });
+      await nextTick();
+
+      expect(wrapper.find("input").attributes("aria-required")).toBe("true");
+    });
+
+    it("Does not mark the editor of an optional property as required", async () => {
+      const wrapper = initWrapper(BaseDisplayer, {
+        props: {
+          isView: false,
+        },
+        logic: {
+          isEditMode: () => false,
+        },
+      });
+      await nextTick();
+
+      expect(wrapper.find("input").attributes("aria-required")).toBeUndefined();
+    });
   });
 
   describe("Ending an edit", () => {
@@ -281,10 +335,12 @@ describe("BaseDisplayer.vue", () => {
     });
 
     it("Saves a new entry and starts another one on ctrl+enter", async () => {
+      const { entry, createEntry } = initRowCreatingItsEntry();
       const addEntry = fake.resolves(undefined);
       const wrapper = initEditModeWrapper({
-        props: { isView: false, entry: { color: "red", _new: true } },
+        props: { isView: false, entry },
         logic: { addEntry },
+        editBus: { whenSaved: async () => createEntry() },
       });
 
       await wrapper
@@ -297,11 +353,10 @@ describe("BaseDisplayer.vue", () => {
     });
 
     it("Waits for the entry to be created before starting another one", async () => {
-      let resolveSave;
-      const whenSaved = () => new Promise((resolve) => (resolveSave = resolve));
+      const { entry, whenSaved, completeCreation } = initRowCreatingItsEntry();
       const addEntry = fake.resolves(undefined);
       const wrapper = initEditModeWrapper({
-        props: { isView: false, entry: { color: "red", _new: true } },
+        props: { isView: false, entry },
         logic: { addEntry },
         editBus: { whenSaved },
       });
@@ -314,10 +369,28 @@ describe("BaseDisplayer.vue", () => {
       // The creation of the entry is still running, so no other row is started yet.
       expect(addEntry.called).toBe(false);
 
-      resolveSave();
+      completeCreation();
       await flushPromises();
 
       expect(addEntry.calledOnce).toBe(true);
+    });
+
+    it("Does not start another entry while the row waits for a mandatory value", async () => {
+      const addEntry = fake.resolves(undefined);
+      const wrapper = initEditModeWrapper({
+        // The row is still new after the save, so its entry has not been created.
+        props: { isView: false, entry: { color: "red", _new: true } },
+        logic: { addEntry },
+      });
+
+      await wrapper
+        .find(".edit > div")
+        .trigger("keydown.enter", { ctrlKey: true });
+      await flushPromises();
+
+      // The row waiting for its mandatory values stays the row to fill.
+      expect(wrapper.emitted().saveEdit).toHaveLength(1);
+      expect(addEntry.called).toBe(false);
     });
 
     it("Does not start another entry on enter when the row is not new", async () => {

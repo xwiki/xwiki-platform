@@ -145,6 +145,7 @@ interface PropertyDescriptor_2 {
     filter: Filter;
     filterable?: boolean;
     id: string;
+    mandatory?: boolean;
     sortable?: boolean;
     type: string;
     visible?: boolean;

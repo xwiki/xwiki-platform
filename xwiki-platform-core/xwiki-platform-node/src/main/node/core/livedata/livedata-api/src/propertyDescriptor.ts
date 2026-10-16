@@ -58,4 +58,9 @@ export interface PropertyDescriptor {
    * true when the property is filterable.
    */
   filterable?: boolean;
+  /**
+   * true when a new entry can only be created once this property holds a value.
+   * @since 18.10.0RC1
+   */
+  mandatory?: boolean;
 }

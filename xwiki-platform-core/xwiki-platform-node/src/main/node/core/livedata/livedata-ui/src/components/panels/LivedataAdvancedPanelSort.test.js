@@ -35,7 +35,7 @@ function initWrapper({ provide } = {}) {
         id: "sortPanel",
         title: "Sort",
         component: "LivedataAdvancedPanelSort",
-        icon: "table_sort",
+        icon: "table-sort",
       },
     },
     global: {
@@ -80,9 +80,9 @@ describe("LivedataAdvancedPanelSort.vue", () => {
   it("Displays the title and the icon", async () => {
     const wrapper = initWrapper();
     expect(wrapper.find(".panel-heading .title").text()).toBe(
-      "table_sort Sort",
+      "table-sort Sort",
     );
-    expect(wrapper.find("i").text()).toBe("table_sort");
+    expect(wrapper.find("i").text()).toBe("table-sort");
   });
 
   it("Displays no message when sortable properties exist", async () => {

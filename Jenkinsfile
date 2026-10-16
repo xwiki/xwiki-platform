@@ -249,7 +249,7 @@ private void runIntegrationTests()
   def itModuleList
   node() {
     // Checkout platform to find all IT modules so that we can then parallelize executions across Jenkins agents.
-    checkout skipChangeLog: true, scm: scm
+    checkout changelog: false, scm: scm
     itModuleList = itModules()
   }
 

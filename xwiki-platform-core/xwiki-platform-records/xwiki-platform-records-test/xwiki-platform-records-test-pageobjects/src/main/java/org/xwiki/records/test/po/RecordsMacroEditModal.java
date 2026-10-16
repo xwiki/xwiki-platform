@@ -19,6 +19,8 @@
  */
 package org.xwiki.records.test.po;
 
+import java.util.function.Consumer;
+
 import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
@@ -32,6 +34,17 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 public class RecordsMacroEditModal extends MacroDialogEditModal
 {
     private static final String FILTERS_PARAMETER = "filters";
+
+    /**
+     * Creates a page object whose {@link #clickSubmit()} lets the editor that opened the modal wait for the result of
+     * the submission, which only that editor knows (e.g. CKEditor refreshes its content to render the macro).
+     *
+     * @param submitHandler receives the action that clicks the submit button, runs it and waits for its result
+     */
+    public RecordsMacroEditModal(Consumer<Runnable> submitHandler)
+    {
+        super(submitHandler);
+    }
 
     @Override
     public RecordsMacroEditModal waitUntilReady()

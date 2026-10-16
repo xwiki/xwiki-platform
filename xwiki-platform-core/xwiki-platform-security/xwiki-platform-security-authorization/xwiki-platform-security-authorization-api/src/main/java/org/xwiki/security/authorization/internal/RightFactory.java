@@ -20,6 +20,7 @@
 package org.xwiki.security.authorization.internal;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -55,7 +56,7 @@ public final class RightFactory
         Right create(RightDescription description, Set<Right> impliedByRights);
     }
 
-    private static volatile Creator creator;
+    private static final AtomicReference<Creator> CREATOR = new AtomicReference<>();
 
     private RightFactory()
     {
@@ -68,12 +69,11 @@ public final class RightFactory
      * @param rightCreator the creator of rights
      * @throws IllegalStateException if a creator is already set
      */
-    public static synchronized void setCreator(Creator rightCreator)
+    public static void setCreator(Creator rightCreator)
     {
-        if (creator != null) {
+        if (!CREATOR.compareAndSet(null, rightCreator)) {
             throw new IllegalStateException("The right creator is already set.");
         }
-        creator = rightCreator;
     }
 
     /**
@@ -87,6 +87,6 @@ public final class RightFactory
     {
         // The creator is set by the static initialization of Right, which already happened since the implied by
         // rights are Right instances (the internal manager always passes at least the admin and programming rights).
-        return creator.create(description, impliedByRights);
+        return CREATOR.get().create(description, impliedByRights);
     }
 }

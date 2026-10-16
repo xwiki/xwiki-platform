@@ -172,8 +172,8 @@ catalogs:
       specifier: 30.1.1
       version: 30.1.1
     lib0:
-      specifier: 0.2.118
-      version: 0.2.118
+      specifier: 0.2.119
+      version: 0.2.119
     lodash-es:
       specifier: 4.18.1
       version: 4.18.1
@@ -440,7 +440,7 @@ importers:
         version: 8.2.3(reflect-metadata@0.2.2)
       lib0:
         specifier: 'catalog:'
-        version: 0.2.118
+        version: 0.2.119
       pinia:
         specifier: 'catalog:'
         version: 4.0.3(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
@@ -1453,7 +1453,7 @@ importers:
         version: link:../../model/model-reference/model-reference-api
       lib0:
         specifier: 'catalog:'
-        version: 0.2.118
+        version: 0.2.119
       y-protocols:
         specifier: 'catalog:'
         version: 1.0.7(yjs@13.6.33)
@@ -3946,7 +3946,7 @@ importers:
         version: 5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0)))
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.11(typescript@5.9.3)
@@ -6896,6 +6896,11 @@ packages:
 
   lib0@0.2.118:
     resolution: {integrity: sha512-Ip97lrGhycLAkNrC9/tkORm4yPei9pKuP/Ah1eqCdDx8jnKSs7wY2xvOSlvg/r5UqtgfaC4O3NsFdzwWDDs1Wg==}
+    engines: {node: '>=16'}
+    hasBin: true
+
+  lib0@0.2.119:
+    resolution: {integrity: sha512-vh+TiejVy8Xm+hCdnRfn9BthGNvNUZdEXltNjVZL3TzRIKP3s1lnQh8pWd/Q0wCgY0FPAGVVjFF4ZiHUV3LFgA==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -9945,15 +9950,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/mocker@5.0.2(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))':
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      '@vitest/spy': 5.0.2
-      estree-walker: 3.0.3
-      magic-string: 1.2.3
-    optionalDependencies:
-      vite: 8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
-
   '@vitest/mocker@5.0.2(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
@@ -11423,6 +11419,10 @@ snapshots:
       type-check: 0.4.0
 
   lib0@0.2.118:
+    dependencies:
+      isomorphic.js: 0.2.5
+
+  lib0@0.2.119:
     dependencies:
       isomorphic.js: 0.2.5
 
@@ -13203,12 +13203,6 @@ snapshots:
       sugarss: 5.0.1(postcss@8.5.30)
       yaml: 2.9.0
 
-  vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))):
-    dependencies:
-      ts-essentials: 10.2.1(typescript@5.9.3)
-      typescript: 5.9.3
-      vitest: 5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
-
   vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))):
     dependencies:
       ts-essentials: 10.2.1(typescript@5.9.3)
@@ -13218,7 +13212,7 @@ snapshots:
   vitest@5.0.2(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.2(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+      '@vitest/mocker': 5.0.2(vite@8.3.1(@types/node@24.13.6)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
       chai: 6.2.2
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -13475,7 +13469,7 @@ snapshots:
 
   y-websocket@3.1.0(yjs@13.6.33):
     dependencies:
-      lib0: 0.2.118
+      lib0: 0.2.119
       y-protocols: 1.0.7(yjs@13.6.33)
       yjs: 13.6.33
 

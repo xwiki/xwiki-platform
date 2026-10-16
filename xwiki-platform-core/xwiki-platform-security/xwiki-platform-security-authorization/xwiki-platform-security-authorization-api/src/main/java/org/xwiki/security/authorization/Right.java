@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
 
 import static org.xwiki.security.SecurityReference.FARM;
@@ -423,7 +422,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      *
      * @since 13.5RC1
      */
-    public void unregister()
+    void unregister()
     {
         Set<EntityType> entityTypes = this.getTargetedEntityType();
         synchronized (VALUES) {
@@ -532,48 +531,5 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     public int compareTo(Right other)
     {
         return Integer.compare(this.ordinal(), other.ordinal());
-    }
-
-    /**
-     * @param description a right description to compare this right to.
-     * @return true if the right is equivalent to the provided description.
-     */
-    public boolean like(RightDescription description)
-    {
-        return new EqualsBuilder()
-            .append(this.isReadOnly(), description.isReadOnly())
-            .append(this.getDefaultState(), description.getDefaultState())
-            .append(this.getTieResolutionPolicy(), description.getTieResolutionPolicy())
-            .append(this.getInheritanceOverridePolicy(), description.getInheritanceOverridePolicy())
-            .append(this.getTargetedEntityType(), description.getTargetedEntityType())
-            .isEquals() && this.likeImpliedRightsFrom(description);
-    }
-
-    /**
-     * Allow to verify that implied rights are equals.
-     * This method returns {@code true} even if the current instance returns an empty set and the description null,
-     * and vice versa. For other cases we rely on an usual EqualsBuilder check.
-     * This is a bulletproof method used in {@link #like(RightDescription)} since there's no guarantee that
-     * {@link #getImpliedRights()} returns an empty set or a null value.
-     *
-     * @param description the description for which to check implied rights.
-     * @return {@code true} if both the current instance implied right and the description's one are equals according to
-     *          {@link EqualsBuilder}, or if one is null and the other one is empty.
-     */
-    private boolean likeImpliedRightsFrom(RightDescription description)
-    {
-        Set<Right> localImpliedRights = getImpliedRights();
-        Set<Right> otherImpliedRights = description.getImpliedRights();
-        boolean result = new EqualsBuilder().append(localImpliedRights, otherImpliedRights).isEquals();
-        // If then result is false then we check it's not because of the special case where
-        // one value is null and the other empty.
-        // Note: we don't use single boolean operation to avoid checkstyle issue about complexity.
-        if (!result) {
-            // No risk of NPE on the isEmpty call since if the other variable would have been null, then
-            // the result would have been equal on the first place and we wouldn't be there.
-            result = (localImpliedRights == null && otherImpliedRights.isEmpty())
-                || (otherImpliedRights == null && localImpliedRights.isEmpty());
-        }
-        return result;
     }
 }

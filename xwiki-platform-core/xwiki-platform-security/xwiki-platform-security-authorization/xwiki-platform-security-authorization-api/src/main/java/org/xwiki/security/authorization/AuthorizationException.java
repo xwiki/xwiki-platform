@@ -31,10 +31,10 @@ import org.xwiki.model.reference.EntityReference;
 public class AuthorizationException extends Exception
 {
     /** Constant value displayed for null entityReference. */
-    public static final String NULL_ENTITY = "Main Wiki";
+    static final String NULL_ENTITY = "Main Wiki";
 
     /** Constant value displayed for null userReference. */
-    public static final String NULL_USER = "Public";
+    static final String NULL_USER = "Public";
 
     /** Serialization identifier. */
     private static final long serialVersionUID = 1L;

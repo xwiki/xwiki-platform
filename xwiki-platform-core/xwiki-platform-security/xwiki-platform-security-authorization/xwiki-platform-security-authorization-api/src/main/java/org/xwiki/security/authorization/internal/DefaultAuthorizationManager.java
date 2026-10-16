@@ -17,16 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.internal.authorization;
+package org.xwiki.security.authorization.internal;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.logging.LoggerConfiguration;
@@ -49,7 +51,6 @@ import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.UnableToRegisterRightException;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
-import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;
 import org.xwiki.security.internal.XWikiBridge;
 
 /**
@@ -68,6 +69,12 @@ public class DefaultAuthorizationManager implements AuthorizationManager
      * List of rights that should imply any newly registered right.
      */
     private static final List<Right> DEFAULT_IMPLIED_BY_RIGHTS = Arrays.asList(Right.ADMIN, Right.PROGRAM);
+
+    /** Value displayed in logs for a null entity reference. */
+    private static final String NULL_ENTITY = "Main Wiki";
+
+    /** Value displayed in logs for a null user reference. */
+    private static final String NULL_USER = "Public";
 
     /** Logger. **/
     @Inject
@@ -126,8 +133,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return hasSecurityAccess(right, userReference, entityReference, false);
         } catch (Exception e) {
             this.logger.error("Failed to load rights for user [{}] on [{}].",
-                (userReference == null) ? AuthorizationException.NULL_USER : userReference,
-                (entityReference == null) ? AuthorizationException.NULL_ENTITY : entityReference, e);
+                (userReference == null) ? NULL_USER : userReference,
+                (entityReference == null) ? NULL_ENTITY : entityReference, e);
             return false;
         }
     }
@@ -242,7 +249,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return newRight;
         } catch (Throwable e) {
             Right right = Right.toRight(rightDescription.getName());
-            if (right != Right.ILLEGAL && right.like(rightDescription)) {
+            if (right != Right.ILLEGAL && isLike(right, rightDescription)) {
                 return right;
             }
             throw new UnableToRegisterRightException(rightDescription, e);
@@ -257,6 +264,45 @@ public class DefaultAuthorizationManager implements AuthorizationManager
                 "Right unregistration is disabled on purpose as it's creating cache problems right now. In "
                     + "case of a need to debug this call was triggered for right [{}].", right);
         }
+    }
+
+    /**
+     * Check if an already registered right matches a right description, so that registering the same description
+     * again returns the existing right instead of failing.
+     *
+     * @param right the registered right
+     * @param description the description of the right to register
+     * @return {@code true} if all the properties of the right are equal to the ones of the description
+     */
+    private boolean isLike(Right right, RightDescription description)
+    {
+        return new EqualsBuilder()
+            .append(right.isReadOnly(), description.isReadOnly())
+            .append(right.getDefaultState(), description.getDefaultState())
+            .append(right.getTieResolutionPolicy(), description.getTieResolutionPolicy())
+            .append(right.getInheritanceOverridePolicy(), description.getInheritanceOverridePolicy())
+            .append(right.getTargetedEntityType(), description.getTargetedEntityType())
+            .isEquals() && isLikeImpliedRights(right.getImpliedRights(), description.getImpliedRights());
+    }
+
+    /**
+     * Check if two sets of implied rights are equal, considering a {@code null} set and an empty set as equal since
+     * there's no guarantee about which one {@link RightDescription#getImpliedRights()} returns when there's no implied
+     * right.
+     *
+     * @param rightImpliedRights the implied rights of the registered right
+     * @param descriptionImpliedRights the implied rights of the description
+     * @return {@code true} if both sets are equal, or if one is {@code null} and the other one empty
+     */
+    private boolean isLikeImpliedRights(Set<Right> rightImpliedRights, Set<Right> descriptionImpliedRights)
+    {
+        boolean result = Objects.equals(rightImpliedRights, descriptionImpliedRights);
+        // No risk of NPE on the isEmpty calls: if both sets were null they would have been equal.
+        if (!result) {
+            result = (rightImpliedRights == null && descriptionImpliedRights.isEmpty())
+                || (descriptionImpliedRights == null && rightImpliedRights.isEmpty());
+        }
+        return result;
     }
 
     /**
@@ -321,10 +367,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         boolean debugLevel)
     {
         if ((debugLevel && logger.isDebugEnabled()) || (!debugLevel && logger.isInfoEnabled())) {
-            String userName = (user != null) ? entityReferenceSerializer.serialize(user)
-                                             : AuthorizationException.NULL_USER;
-            String docName = (entity != null) ? entityReferenceSerializer.serialize(entity)
-                                              : AuthorizationException.NULL_USER;
+            String userName = (user != null) ? entityReferenceSerializer.serialize(user) : NULL_USER;
+            String docName = (entity != null) ? entityReferenceSerializer.serialize(entity) : NULL_ENTITY;
             String rightName = (right != null) ? right.getName() : "no right";
             String accessName = (access == RuleState.ALLOW) ? "granted" : "denied";
             String message = "[{}] access has been {} for user [{}] on [{}]: {}";

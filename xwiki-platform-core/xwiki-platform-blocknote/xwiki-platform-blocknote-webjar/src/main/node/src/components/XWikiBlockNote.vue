@@ -341,6 +341,8 @@ const editorProps = shallowRef<
 const collaboration: Ref<Collaboration | undefined> = ref(undefined);
 let collaborationManager: CollaborationManager | undefined = undefined;
 const collaborationKey: Ref<string | undefined> = ref();
+// Whether the editor was destroyed; a session joined after that is left right away.
+let unmounted = false;
 
 // Resolved before the collaboration session is joined, so that creating the auto-saver doesn't have to wait for it.
 let autoSaveVersionSummary: string | undefined;
@@ -353,7 +355,11 @@ onBeforeMount(async () => {
   autoSaveVersionSummary = await translate("autoSaveSummary");
 
   if (collaborationURL && docRef) {
-    await joinCollaborationSession(collaborationURL, docRef);
+    try {
+      await joinCollaborationSession(collaborationURL, docRef);
+    } catch (error) {
+      await onCollaborationUnavailable(error);
+    }
   }
 
   isLoading.value = false;
@@ -376,12 +382,34 @@ async function joinCollaborationSession(
     .get<CollaborationManagerProvider>(collaborationManagerProviderName)
     .get();
   collaboration.value = await collaborationManager.join(reference);
+  if (unmounted) {
+    // Nobody is left to use this session.
+    collaborationManager.leave(reference);
+    return;
+  }
   collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
 }
 
+/**
+ * Called when the collaboration session can't be joined. Realtime editing is disabled for the rest of the editing
+ * session: the editor still loads, but the changes are not shared with the other users.
+ *
+ * @param error - the reason the session couldn't be joined
+ */
+async function onCollaborationUnavailable(error: unknown): Promise<void> {
+  console.warn("Failed to join the realtime collaboration session.", error);
+  new XWiki.widgets.Notification(
+    await translate("collaboration.unavailable"),
+    "warning",
+  );
+}
+
 onUnmounted(() => {
+  unmounted = true;
   // The collaboration manager stops the auto-saver when the last editor leaves the session.
-  collaborationManager?.leave();
+  if (collaboration.value) {
+    collaborationManager?.leave(docRef);
+  }
 });
 
 /**

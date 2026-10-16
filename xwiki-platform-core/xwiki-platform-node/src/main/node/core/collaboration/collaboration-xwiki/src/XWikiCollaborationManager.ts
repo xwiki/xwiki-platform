@@ -36,6 +36,12 @@ import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-a
 import type { WebsocketProvider } from "y-websocket";
 
 /**
+ * How long to wait for the initial synchronization before giving up, in milliseconds. Joining a session blocks the
+ * caller until then, so a server that accepts the connection but never synchronizes must not block it forever.
+ */
+const SYNC_TIMEOUT = 15000;
+
+/**
  * A collaboration provider for the websocket endpoint provided by xwiki for realtime editing with yjs based editors.
  * Technically, this is a wrapper on top of y-websocket.
  * @since 18.4.0RC1
@@ -99,7 +105,13 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
     };
     this.watchAwarenessChange(collaboration);
     this.watchConnectionStatus(collaboration);
-    await this.sync(collaboration);
+    try {
+      await this.sync(collaboration);
+    } catch (error) {
+      // Otherwise it keeps retrying the connection forever, for a session nobody joined.
+      provider.destroy();
+      throw error;
+    }
     return collaboration;
   }
 
@@ -140,13 +152,37 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
     });
   }
 
+  /**
+   * @returns a promise resolved once the session is synchronized, and rejected if the connection fails or the
+   *   synchronization doesn't arrive in time
+   */
   private sync(collaboration: Collaboration): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const provider: WebsocketProvider = collaboration.provider;
-      provider.once("sync", () => {
+      const onSync = () => {
+        stopListening();
         console.debug("Collaboration synchronized.");
         resolve();
-      });
+      };
+      const onConnectionClose = () => {
+        stopListening();
+        reject(new Error("Failed to connect to the collaboration server."));
+      };
+      const timeout = setTimeout(() => {
+        stopListening();
+        reject(
+          new Error("Timed out waiting for the collaboration server to sync."),
+        );
+      }, SYNC_TIMEOUT);
+      // Stop listening once the outcome is known, so that a later disconnection isn't taken for a failed join.
+      function stopListening() {
+        clearTimeout(timeout);
+        provider.off("sync", onSync);
+        provider.off("connection-close", onConnectionClose);
+      }
+      // We can't use once() here: it registers a wrapper that off() doesn't remove.
+      provider.on("sync", onSync);
+      provider.on("connection-close", onConnectionClose);
     });
   }
 

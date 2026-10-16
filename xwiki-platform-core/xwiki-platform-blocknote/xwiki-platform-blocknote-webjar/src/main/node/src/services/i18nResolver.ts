@@ -28,7 +28,11 @@ declare global {
 /**
  * The translation keys the editor needs, without the prefix that the localization module adds back.
  */
-const TRANSLATION_KEYS = ["editor.label", "autoSaveSummary"];
+const TRANSLATION_KEYS = [
+  "editor.label",
+  "autoSaveSummary",
+  "collaboration.unavailable",
+];
 
 type Config = {
   locale: string;

@@ -60,18 +60,33 @@ export abstract class AbstractCollaborationManager
           "no document reference provided and the current document reference is undefined.",
       );
     }
-    const key = this.modelReferenceSerializer.serialize(documentReference);
-    let collaboration = this.collaborations.get(key!);
+    const key = this.modelReferenceSerializer.serialize(documentReference)!;
+    const collaboration = this.collaborations.get(key);
+    // Share the connection when this client is already in the session, e.g. with another editor on the page.
     if (collaboration) {
       collaboration.usageCount++;
+      return collaboration.promise;
     } else {
-      collaboration = {
-        promise: this.connect(documentReference),
-        usageCount: 1,
-      };
-      this.collaborations.set(key!, collaboration);
+      return this.startCollaboration(key, documentReference);
     }
-    return collaboration.promise;
+  }
+
+  /**
+   * Start a new collaboration session and cache it, so that the next join() for the same document reuses it.
+   */
+  private async startCollaboration(
+    key: string,
+    documentReference: DocumentReference,
+  ): Promise<Collaboration> {
+    const promise = this.connect(documentReference);
+    this.collaborations.set(key, { promise, usageCount: 1 });
+    try {
+      return await promise;
+    } catch (error) {
+      // Don't keep a failed connection: there is nothing for leave() to disconnect and the next join() must retry.
+      this.collaborations.delete(key);
+      throw error;
+    }
   }
 
   leave(documentReference?: DocumentReference): void {

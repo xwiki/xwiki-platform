@@ -96,7 +96,7 @@
         :title="$t('livedata.pagination.first')"
         @click.prevent="changePageIndex(!isFirstPage, 0)"
       >
-        <XWikiIcon :icon-descriptor="{ name: 'fast-backward' }" />
+        <XWikiIcon :icon-descriptor="{ name: 'fastbackward' }" />
       </button>
 
       <!--
@@ -159,7 +159,7 @@
         :title="$t('livedata.pagination.last')"
         @click.prevent="changePageIndex(!isLastPage, logic.getPageCount() - 1)"
       >
-        <XWikiIcon :icon-descriptor="{ name: 'fast-forward' }" />
+        <XWikiIcon :icon-descriptor="{ name: 'fastforward' }" />
       </button>
     </span>
 

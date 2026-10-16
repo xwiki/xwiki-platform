@@ -222,7 +222,6 @@ application_xp_terminal = terminal
 arrow_branch = code-fork
 arrow_divide = code-fork
 arrow_down = arrow-down
-arrow_in = window-minimize
 arrow_inout = arrows-alt
 arrow_left = arrow-left
 arrow_out = arrows-alt
@@ -372,7 +371,6 @@ sport_soccer = futbol-o
 star = star
 style = font
 table = table
-table_sort = sort
 tag = tag
 telephone = phone
 television=television
@@ -413,7 +411,8 @@ zoom_in = search-plus
 zoom_out = search-minus
 
 #@deprecatedstart
-## Deprecated since 18.10.0RC1 to conform to the new naming convention.
+## Deprecated since 18.10.0RC1, these names don't follow the icon naming convention.
+arrow_in = window-minimize
 bullet_black = circle
 credit-card = credit-card
 emoticon_smile=smile-o
@@ -424,6 +423,7 @@ heart_empty = heart-o
 log-in=sign-in
 log-out=sign-out
 shopping-cart = shopping-cart
+table_sort = sort
 #@deprecatedend
 
 </content>

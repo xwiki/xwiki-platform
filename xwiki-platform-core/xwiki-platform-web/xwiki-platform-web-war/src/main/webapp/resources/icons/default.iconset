@@ -216,7 +216,6 @@ application_xp_terminal = application_xp_terminal
 arrow_branch = arrow_branch
 arrow_divide = arrow_divide
 arrow_down = arrow_down
-arrow_in = arrow_in
 arrow_inout = arrow_inout
 arrow_join = arrow_join
 arrow_left = arrow_left
@@ -1044,7 +1043,6 @@ table_relationship = table_relationship
 table_row_delete = table_row_delete
 table_row_insert = table_row_insert
 table_save = table_save
-table_sort = table_sort
 tag = tag
 tag_blue = tag_blue
 tag_blue_add = tag_blue_add
@@ -1173,7 +1171,8 @@ zoom_in = zoom_in
 zoom_out = zoom_out
 
 #@deprecatedstart
-## Deprecated since 18.10.0RC1 to conform to the new naming convention.
+## Deprecated since 18.10.0RC1, these names don't follow the icon naming convention.
+arrow_in = arrow_in
 bullet_black = bullet_black
 credit-card = creditcards
 emoticon_smile = emoticon_smile
@@ -1184,4 +1183,5 @@ heart_empty = heart_empty
 log-in=user_go
 log-out=user_go
 shopping-cart = cart
+table_sort = table_sort
 #@deprecatedend

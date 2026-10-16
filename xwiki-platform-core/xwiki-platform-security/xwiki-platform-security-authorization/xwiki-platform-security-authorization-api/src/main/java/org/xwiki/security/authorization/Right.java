@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.xwiki.model.EntityType;
+import org.xwiki.security.authorization.internal.RightFactory;
 
 import static org.xwiki.security.SecurityReference.FARM;
 import static org.xwiki.security.authorization.RuleState.ALLOW;
@@ -153,6 +154,10 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         STANDARD_RIGHTS = Collections.unmodifiableList(Arrays.asList(
             LOGIN, VIEW, EDIT, DELETE, CREATOR, REGISTER, COMMENT, SCRIPT, ADMIN, CREATE_WIKI, PROGRAM, ILLEGAL
         ));
+
+        // Give the internal implementation of AuthorizationManager#register access to the package-private
+        // constructor, without making it part of the public API.
+        RightFactory.setCreator(Right::new);
     }
 
     /** The numeric value of this access right. */
@@ -205,7 +210,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @param impliedByRights the already existing rights that imply this new right.
      * @since 12.6
      */
-    public Right(RightDescription description, Set<Right> impliedByRights)
+    Right(RightDescription description, Set<Right> impliedByRights)
     {
         this(description.getName(), description.getDefaultState(), description.getTieResolutionPolicy(),
             description.getInheritanceOverridePolicy(),

@@ -243,7 +243,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             Set<Right> augmentedImpliedByRights = new HashSet<>(impliedByRights);
             augmentedImpliedByRights.addAll(DEFAULT_IMPLIED_BY_RIGHTS);
 
-            Right newRight = new Right(rightDescription, augmentedImpliedByRights);
+            Right newRight = RightFactory.createRight(rightDescription, augmentedImpliedByRights);
             // cleanup the cache since a new right scheme enter in action
             securityCache.remove(securityReferenceFactory.newEntityReference(xwikiBridge.getMainWikiReference()));
             return newRight;

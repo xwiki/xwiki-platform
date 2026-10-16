@@ -116,6 +116,14 @@
       <artifactId>xwiki-platform-administration-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Page Templates used to be part of this module: keep installing them when upgrading it. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-templateprovider-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- Test dependencies. -->
     <dependency>

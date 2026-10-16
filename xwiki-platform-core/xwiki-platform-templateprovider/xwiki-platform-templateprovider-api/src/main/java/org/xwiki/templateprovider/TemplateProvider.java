@@ -22,10 +22,10 @@ package org.xwiki.templateprovider;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * A template provider, which offers a page template when creating new pages, as defined by an
@@ -223,7 +223,7 @@ public class TemplateProvider
     @Override
     public String toString()
     {
-        return new ToStringBuilder(this)
+        return new XWikiToStringBuilder(this)
             .append("reference", this.reference)
             .append("name", this.name)
             .append("templateReference", this.templateReference)

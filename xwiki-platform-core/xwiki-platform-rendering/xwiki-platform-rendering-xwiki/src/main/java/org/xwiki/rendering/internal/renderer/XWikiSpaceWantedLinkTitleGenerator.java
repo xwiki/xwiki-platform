@@ -27,15 +27,15 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
+import org.xwiki.rendering.internal.renderer.reference.link.WantedLinkTitleGenerator;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
 
 /**
  * Generates a wanted link title for a space resource reference.
  * This implementation uses translations to generate localized titles.
  *
  * @version $Id$
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  */
 @Component
 @Named("space")

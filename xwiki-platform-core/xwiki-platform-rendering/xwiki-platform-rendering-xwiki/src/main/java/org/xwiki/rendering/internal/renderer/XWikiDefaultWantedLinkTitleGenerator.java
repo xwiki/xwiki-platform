@@ -24,8 +24,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.rendering.internal.renderer.reference.link.WantedLinkTitleGenerator;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
 
 /**
  * Fallback to generate a wanted link title for a resource which type doesn't have a specific implementation yet.
@@ -34,7 +34,7 @@ import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
  * human-readable name instead. E.g. {@link XWikiDocumentWantedLinkTitleGenerator}
  *
  * @version $Id$
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  */
 @Component
 @Singleton

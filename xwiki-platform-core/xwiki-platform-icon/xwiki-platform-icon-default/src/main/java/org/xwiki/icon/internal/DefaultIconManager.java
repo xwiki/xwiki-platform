@@ -137,6 +137,12 @@ public class DefaultIconManager implements IconManager
     }
 
     @Override
+    public List<String> getIconNames(String iconSetName, boolean includeDeprecated) throws IconException
+    {
+        return iconSetManager.getIconSet(iconSetName).getIconNames(includeDeprecated);
+    }
+
+    @Override
     public boolean hasIcon(String iconName) throws IconException
     {
         return this.iconSetManager.getCurrentIconSet().hasIcon(iconName);

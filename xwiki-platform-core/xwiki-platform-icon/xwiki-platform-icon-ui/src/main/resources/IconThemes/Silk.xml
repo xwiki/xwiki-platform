@@ -1210,6 +1210,7 @@ zoom = zoom
 zoom_in = zoom_in
 zoom_out = zoom_out
 
+#@deprecatedstart
 ## Deprecated since 18.10.0RC1 to conform to the new naming convention.
 bullet_black = bullet_black
 credit-card = creditcards
@@ -1220,7 +1221,8 @@ floppy-disk = disk
 heart_empty = heart_empty
 log-in=user_go
 log-out=user_go
-shopping-cart = cart</content>
+shopping-cart = cart
+#@deprecatedend</content>
   <object>
     <name>IconThemes.Silk</name>
     <number>0</number>

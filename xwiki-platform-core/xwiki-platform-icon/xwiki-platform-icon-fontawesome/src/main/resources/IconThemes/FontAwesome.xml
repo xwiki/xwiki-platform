@@ -412,6 +412,7 @@ zoom = search
 zoom_in = search-plus
 zoom_out = search-minus
 
+#@deprecatedstart
 ## Deprecated since 18.10.0RC1 to conform to the new naming convention.
 bullet_black = circle
 credit-card = credit-card
@@ -423,6 +424,7 @@ heart_empty = heart-o
 log-in=sign-in
 log-out=sign-out
 shopping-cart = shopping-cart
+#@deprecatedend
 
 </content>
   <object>

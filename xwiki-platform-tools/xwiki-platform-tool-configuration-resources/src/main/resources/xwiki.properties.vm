@@ -1512,6 +1512,17 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.emails.live.graceTime = 10
 
+#-# [Since 18.10.0RC1]
+#-# Comma-separated list of the media types of the color theme or skin logo that can be embedded in the notification
+#-# emails. When the media type of the logo is not in this list, the next logo is used instead (the skin logo, then the
+#-# default logo). With an empty value, the default logo is always used.
+#-# SVG (see XWIKI-18299), TIFF, AVIF/HEIF and JPEG XL logos are excluded by default because they are poorly supported
+#-# by mail clients.
+#-# Remove image/webp if many recipients use the classic Outlook for Windows, which doesn't display WebP images.
+#-#
+#-# The default is :
+# notifications.emails.logo.supportedMediaTypes = image/png,image/jpeg,image/gif,image/bmp,image/x-icon,image/vnd.microsoft.icon,image/webp
+
 #-# [Since 9.8RC1]
 #-# Indicate if the "watched entities" feature is enabled on the platform.
 #-# This feature mimics what the "Watchlist Application" does so it may not be a good idea to have both on the platform.

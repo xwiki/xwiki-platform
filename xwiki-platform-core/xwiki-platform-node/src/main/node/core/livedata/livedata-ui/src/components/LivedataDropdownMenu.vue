@@ -27,23 +27,20 @@
 <template>
   <!--
     The Livedata Dropdown
-    Uses the Bootstrap 3 dropdown syntax.
+    Opens as a popover, so that the containers of the Live Data can't clip it.
   -->
-  <div ref="dropdown" class="livedata-dropdown-menu btn-group">
+  <XWikiPopoverDropdown
+    class="livedata-dropdown-menu btn-group"
+    :toggle-title="$t('livedata.dropdownMenu.title')"
+    menu-class="dropdown-menu-right"
+  >
     <!-- Drowpdown open / close button-->
-    <button
-      ref="toggle"
-      class="btn btn-default dropdown-toggle"
-      :title="$t('livedata.dropdownMenu.title')"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
+    <template #toggle>
       <XWikiIcon :icon-descriptor="{ name: 'more-vertical' }" />
-    </button>
+    </template>
 
     <!-- Drowpdown body -->
-    <ul ref="menu" class="dropdown-menu dropdown-menu-right" :style="menuStyle">
+    <template #default>
       <!-- Actions -->
       <li>
         <span class="dropdown-header">{{
@@ -125,27 +122,23 @@
           </li>
         </ul>
       </li>
-    </ul>
-  </div>
+    </template>
+  </XWikiPopoverDropdown>
 </template>
 
 <script>
 import XWikiIcon from "./utilities/XWikiIcon.vue";
+import XWikiPopoverDropdown from "./utilities/XWikiPopoverDropdown.vue";
 
 export default {
   name: "LivedataDropdownMenu",
 
   components: {
     XWikiIcon,
+    XWikiPopoverDropdown,
   },
 
-  inject: ["logic", "jQuery"],
-
-  data() {
-    return {
-      menuStyle: {},
-    };
-  },
+  inject: ["logic"],
 
   computed: {
     data() {
@@ -165,57 +158,6 @@ export default {
         this.logic.changeLayout(layoutId);
       }
     },
-    /**
-     * The Live Data is often displayed inside an element that clips its overflowing content, such
-     * as the page content. A menu positioned relatively to its button would then be cut when the
-     * Live Data has only a few entries. The menu is thus positioned relatively to the viewport,
-     * below its button, or above it when there isn't enough room below. Its height is limited to
-     * the room left on that side, so that a small or zoomed in viewport makes the menu scroll
-     * instead of hiding its last actions.
-     */
-    placeMenu() {
-      const button = this.$refs.toggle.getBoundingClientRect();
-      const viewport = document.documentElement;
-      const roomBelow = viewport.clientHeight - button.bottom;
-      const roomAbove = button.top;
-      const placeAbove =
-        roomBelow < this.$refs.menu.offsetHeight && roomAbove > roomBelow;
-      this.menuStyle = {
-        position: "fixed",
-        top: placeAbove ? "auto" : `${button.bottom}px`,
-        bottom: placeAbove ? `${viewport.clientHeight - button.top}px` : "auto",
-        right: `${viewport.clientWidth - button.right}px`,
-        left: "auto",
-        maxHeight: `${placeAbove ? roomAbove : roomBelow}px`,
-        overflowY: "auto",
-      };
-    },
-    onMenuShown() {
-      this.placeMenu();
-      // Listen during the capture phase to also catch the scroll of the containers of the Live
-      // Data, which doesn't bubble.
-      window.addEventListener("scroll", this.placeMenu, true);
-      window.addEventListener("resize", this.placeMenu);
-    },
-    onMenuHidden() {
-      window.removeEventListener("scroll", this.placeMenu, true);
-      window.removeEventListener("resize", this.placeMenu);
-      this.menuStyle = {};
-    },
-  },
-
-  mounted() {
-    // Bootstrap triggers its dropdown events through jQuery, they can't be listened to with Vue.
-    this.jQuery(this.$refs.dropdown)
-      .on("shown.bs.dropdown", this.onMenuShown)
-      .on("hidden.bs.dropdown", this.onMenuHidden);
-  },
-
-  beforeUnmount() {
-    this.jQuery(this.$refs.dropdown)
-      .off("shown.bs.dropdown", this.onMenuShown)
-      .off("hidden.bs.dropdown", this.onMenuHidden);
-    this.onMenuHidden();
   },
 };
 </script>

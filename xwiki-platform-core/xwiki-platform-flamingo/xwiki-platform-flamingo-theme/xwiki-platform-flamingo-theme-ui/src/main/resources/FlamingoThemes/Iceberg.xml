@@ -378,6 +378,17 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </component-active-color>
+      <cssCode>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <name>cssCode</name>
+        <number>65</number>
+        <prettyName>cssCode</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </cssCode>
       <dropdown-bg>
         <customDisplay/>
         <disabled>0</disabled>
@@ -922,6 +933,9 @@
     </property>
     <property>
       <component-active-color>@list-group-link-hover-color</component-active-color>
+    </property>
+    <property>
+      <cssCode/>
     </property>
     <property>
       <dropdown-bg/>

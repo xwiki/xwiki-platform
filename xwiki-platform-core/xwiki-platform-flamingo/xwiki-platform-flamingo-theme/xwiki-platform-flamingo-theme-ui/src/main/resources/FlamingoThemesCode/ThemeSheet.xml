@@ -135,6 +135,7 @@
     "breadcrumb-separator": "escapedText"
   },
   "advanced": {
+    "cssCode": "textarea",
     "lessCode": "textarea"
   }
 })
@@ -166,8 +167,13 @@
 ## FIELD TEXTAREA
 ############################
 #macro(fieldTextarea $varName $obj)
-  #if($varName == 'lessCode')
-    &lt;div class="alert alert-info"&gt;$services.localization.render("platform.flamingo.themes.lessCode.description")&lt;/div&gt;
+  #if($varName == 'cssCode')
+    ## TODO: Replace this textarea with a code editor offering CSS syntax highlighting and linting, once one is
+    ## available in the platform without adding a dependency.
+    #info($escapetool.xml($services.localization.render("platform.flamingo.themes.cssCode.description")))
+  #elseif($varName == 'lessCode')
+    #info($escapetool.xml($services.localization.render("platform.flamingo.themes.lessCode.description")))
+    #warning($escapetool.xml($services.localization.render("platform.flamingo.themes.lessCode.status")))
   #end
   &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
     $!escapetool.xml($!doc.getValue($varName, $obj))
@@ -518,11 +524,26 @@ require(['jquery', 'xwiki-l10n!xwiki-flamingo-theme-messages', 'bootstrap'], fun
       var previewWindow = $('#iframe').prop('contentWindow');
       previewWindow.lessCodePlugin.contentToAdd = $('#var-lessCode').val();
 
+      // 'cssCode' doesn't need to be compiled, so we inject it directly in the preview.
+      updatePreviewCssCode(previewWindow.document);
+
       // We run LESS in a thread in order to not block the main thread.
       setTimeout(function() {
         previewWindow.lessJs.modifyVars(getLessVariables()).then(resolve, reject).finally(hidePreviewCurtain);
       }, 0);
     });
+  };
+
+  // Put the content of the 'cssCode' field in a style element at the end of the preview head. LESS.js inserts the
+  // styles it compiles right after the LESS link, so the 'cssCode' styles always come after them.
+  const updatePreviewCssCode = function(previewDocument) {
+    let style = previewDocument.getElementById('colorThemeCssCode');
+    if (!style) {
+      style = previewDocument.createElement('style');
+      style.id = 'colorThemeCssCode';
+      previewDocument.head.appendChild(style);
+    }
+    style.textContent = $('#var-cssCode').val();
   };
 
   // Show the curtain on top of the preview while the LESS code is recompiled.

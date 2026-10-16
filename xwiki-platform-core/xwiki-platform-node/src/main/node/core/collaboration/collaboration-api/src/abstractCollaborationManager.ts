@@ -74,15 +74,19 @@ export abstract class AbstractCollaborationManager
   /**
    * Start a new collaboration session and cache it, so that the next join() for the same document reuses it.
    */
-  private startCollaboration(
+  private async startCollaboration(
     key: string,
     documentReference: DocumentReference,
   ): Promise<Collaboration> {
     const promise = this.connect(documentReference);
     this.collaborations.set(key, { promise, usageCount: 1 });
-    // Don't keep a failed connection: there is nothing for leave() to disconnect and the next join() must retry.
-    promise.catch(() => this.collaborations.delete(key));
-    return promise;
+    try {
+      return await promise;
+    } catch (error) {
+      // Don't keep a failed connection: there is nothing for leave() to disconnect and the next join() must retry.
+      this.collaborations.delete(key);
+      throw error;
+    }
   }
 
   leave(documentReference?: DocumentReference): void {

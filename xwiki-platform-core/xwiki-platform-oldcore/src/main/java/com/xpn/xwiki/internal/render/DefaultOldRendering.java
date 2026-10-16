@@ -158,7 +158,8 @@ public class DefaultOldRendering implements OldRendering
     @Override
     public String renderText(String text, XWikiDocument doc, XWikiContext xcontext)
     {
-        return doc.getRenderedContent(text, doc.getSyntaxId(), xcontext);
+        // Keep executing the text with the rights of its caller, like Document#getRenderedContent does.
+        return doc.getRenderedContent(text, doc.getSyntaxId(), false, xcontext.getSecureDocument(), xcontext);
     }
 
     @Override

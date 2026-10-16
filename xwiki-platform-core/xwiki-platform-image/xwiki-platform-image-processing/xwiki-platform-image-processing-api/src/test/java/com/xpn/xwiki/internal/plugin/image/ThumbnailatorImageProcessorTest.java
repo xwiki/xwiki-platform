@@ -34,6 +34,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test for {@link ThumbnailatorImageProcessor}.
@@ -86,6 +88,23 @@ class ThumbnailatorImageProcessorTest
         RenderedImage scaledImage = this.imageProcessor.scaleImage(image, 2, 10);
         assertEquals(2, scaledImage.getWidth());
         assertEquals(10, scaledImage.getHeight());
+    }
+
+    @Test
+    void isMimeTypeSupported()
+    {
+        assertTrue(this.imageProcessor.isMimeTypeSupported("image/jpeg"));
+        assertTrue(this.imageProcessor.isMimeTypeSupported("image/png"));
+
+        // The scaled image is written in the format of the original image, so a format that can only be read is not
+        // supported.
+        ReaderOnlyImageReaderSpi readerOnlyImageReaderSpi = new ReaderOnlyImageReaderSpi();
+        readerOnlyImageReaderSpi.register();
+        try {
+            assertFalse(this.imageProcessor.isMimeTypeSupported(ReaderOnlyImageReaderSpi.MIME_TYPE));
+        } finally {
+            readerOnlyImageReaderSpi.deregister();
+        }
     }
 
     private static BufferedImage createImage(int width, int height, Color color)

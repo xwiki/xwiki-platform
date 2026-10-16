@@ -24,6 +24,7 @@
 import { createXWikiToolbarEnvironment } from "../environment";
 import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import type { RequireJSMock } from "@xwiki/platform-test-requirejs";
@@ -54,6 +55,16 @@ function createJQuery() {
   return { $, calls };
 }
 
+function createIcon(name: string) {
+  return {
+    render() {
+      const icon = document.createElement("span");
+      icon.className = `icon-${name}`;
+      return icon;
+    },
+  };
+}
+
 function createMoment() {
   return (date?: number) => ({
     format: (format: string) => `${date} as ${format}`,
@@ -73,16 +84,15 @@ describe("createXWikiToolbarEnvironment", () => {
       jquery: jQuery.$,
       moment: createMoment(),
       "moment-jdateformatparser": {},
-      "xwiki-realtime-config": {
-        dateFormat: "dd/MM/yyyy",
-        editComment: { enabled: true, mandatory: true },
-        minorEdit: true,
-        defaultAvatarURL: "noavatar.png",
-        icons: { check: "check-icon", clock: "clock-icon" },
+      "xwiki-meta": { dateFormat: "dd/MM/yyyy" },
+      "xwiki-icon!xwiki-realtime-toolbar-icons": {
+        check: createIcon("check"),
+        clock: createIcon("clock"),
       },
     });
     documentReferences = [];
     vi.stubGlobal("XWiki", {
+      contextPath: "/xwiki",
       Document: class {
         constructor(private readonly reference: EntityReference) {
           documentReferences.push(reference);
@@ -96,7 +106,7 @@ describe("createXWikiToolbarEnvironment", () => {
       <form id="edit" action="/save">
         <input name="title" value="Title" />
         <div class="buttons">
-          <input name="comment" value="" />
+          <input name="comment" value="" data-xwiki-edit-comment-mandatory="true" />
           <input type="checkbox" name="minorEdit" />
           <div class="realtime-edit-toolbar"></div>
         </div>
@@ -116,28 +126,54 @@ describe("createXWikiToolbarEnvironment", () => {
     return document.querySelector(".realtime-edit-toolbar")!;
   }
 
-  it("uses the realtime configuration", async () => {
+  it("loads the icons, the default avatar and the date format", async () => {
     const environment = await createXWikiToolbarEnvironment();
-    expect(environment.editComment).toEqual({ enabled: true, mandatory: true });
-    expect(environment.minorEdit).toBe(true);
-    expect(environment.defaultAvatarURL).toBe("noavatar.png");
+    const iconQuery = await loadById<{ icons: string[] }>(
+      "xwiki-realtime-toolbar-icons",
+    );
+    expect(iconQuery.icons).toEqual(["check", "clock"]);
     expect(environment.icons).toEqual({
-      check: "check-icon",
-      clock: "clock-icon",
+      check: '<span class="icon-check"></span>',
+      clock: '<span class="icon-clock"></span>',
     });
+    expect(environment.defaultAvatarURL).toBe(
+      "/xwiki/bin/skin/resources/icons/xwiki/noavatar.png",
+    );
     expect(environment.formatDate(123)).toBe("123 as moment(dd/MM/yyyy)");
   });
 
-  it("falls back on default configuration values", async () => {
-    requireJS.set("xwiki-realtime-config", {});
+  it("falls back on defaults when the icons and the date format are missing", async () => {
+    requireJS.set("xwiki-meta", {});
+    requireJS.set("xwiki-icon!xwiki-realtime-toolbar-icons", {});
     const environment = await createXWikiToolbarEnvironment();
-    expect(environment.editComment).toEqual({
-      enabled: false,
-      mandatory: false,
-    });
-    expect(environment.minorEdit).toBe(false);
     expect(environment.icons).toEqual({ check: "", clock: "" });
     expect(environment.formatDate(1)).toBe("1 as moment(yyyy/MM/dd HH:mm)");
+  });
+
+  it("reads the save options from the edit form", async () => {
+    const environment = await createXWikiToolbarEnvironment();
+    expect(environment.getSaveOptions(getForm())).toEqual({
+      editComment: { enabled: true, mandatory: true },
+      minorEdit: true,
+    });
+
+    // The version summary is optional.
+    getForm()
+      .querySelector("input[name=comment]")!
+      .removeAttribute("data-xwiki-edit-comment-mandatory");
+    expect(environment.getSaveOptions(getForm())).toEqual({
+      editComment: { enabled: true, mandatory: false },
+      minorEdit: true,
+    });
+
+    // The version summary and the minor edit fields are disabled.
+    getForm()
+      .querySelectorAll("input[name=comment], input[name=minorEdit]")
+      .forEach((input) => input.remove());
+    expect(environment.getSaveOptions(getForm())).toEqual({
+      editComment: { enabled: false, mandatory: false },
+      minorEdit: false,
+    });
   });
 
   it("computes the URLs", async () => {

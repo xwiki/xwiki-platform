@@ -49,6 +49,15 @@ type XWikiMeta = {
 
   action: string;
 
+  /**
+   * The format used to display dates, in the Java `SimpleDateFormat` syntax (e.g. `yyyy/MM/dd HH:mm`), as configured
+   * in the wiki preferences. It is missing when the skin doesn't provide it.
+   *
+   * @since 18.9.0RC1
+   * @beta
+   */
+  dateFormat?: string;
+
   setVersion: (version: string) => void;
 
   /**

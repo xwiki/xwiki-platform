@@ -21,7 +21,11 @@
 import { SaveTarget } from "@xwiki/platform-autosave-api";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { loadById } from "@xwiki/platform-xwiki-utils";
-import type { DocumentVersion, XWikiFormSaveContext } from "./types";
+import type {
+  DocumentVersion,
+  XWikiFormSaveAction,
+  XWikiFormSaveContext,
+} from "./types";
 import type { Logger } from "@xwiki/platform-api";
 import type {
   SaveResult,
@@ -37,6 +41,37 @@ import type { XWikiDocument } from "@xwiki/platform-document-xwiki";
  * again, so a shorter value would risk saving twice (creating an extra version) when the request is only slow.
  */
 const SUBMIT_TIMEOUT = 120000;
+
+/**
+ * Calls the given function as if the given edit mode was still in use.
+ *
+ * @param editor - the edit mode to use during the call
+ * @param callback - the function to call
+ * @returns what the function returns
+ */
+function inEditMode<T>(editor: string | undefined, callback: () => T): T {
+  const currentEditor = XWiki.editor;
+  XWiki.editor = editor;
+  try {
+    return callback();
+  } finally {
+    // Restore the edit mode only if the callback didn't change it.
+    if (XWiki.editor === editor) {
+      XWiki.editor = currentEditor;
+    }
+  }
+}
+
+/**
+ * The priority of each save in the save election. The manual saves come first. Save & View comes before Save &
+ * Continue because it leaves the edit mode, so we want to make sure we don't lose unsaved changes, while the latter
+ * keeps the user in the edit mode where the auto-save continues.
+ */
+const SAVE_PRIORITY: Record<XWikiFormSaveAction, number> = {
+  saveAndView: 3,
+  saveAndContinue: 2,
+  autoSave: 1,
+};
 
 /**
  * How to save an XWiki document by submitting its edit form.
@@ -156,8 +191,14 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
       if (!this.saver.isSaving()) {
         event.preventDefault();
         event.stopImmediatePropagation();
+        const button = event.target as HTMLInputElement;
         try {
-          await this.saver.save({ button: event.target as HTMLInputElement });
+          await this.saver.save({
+            action:
+              button.name === "action_saveandcontinue"
+                ? "saveAndContinue"
+                : "saveAndView",
+          });
         } catch {
           // The save failure is already logged by the saver and reported to the user by the save notification.
         }
@@ -175,23 +216,18 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     });
   }
 
-  public override getSavePriority({ button }: XWikiFormSaveContext): number {
-    // Give higher priority to manual saves (when the user clicks on the save button). Also give higher priority to
-    // Save & View over Save & Continue. The former leaves the edit mode so we want to make sure we don't lose
-    // unsaved changes, while the latter keeps the user in the edit mode where we have auto-save.
-    if (button) {
-      // Manual save
-      return button.getAttribute("name") === "action_save" ? 3 : 2;
-    } else {
-      // Auto-save
-      return super.getSavePriority({});
-    }
+  public override getAutoSaveContext(): XWikiFormSaveContext {
+    return { action: "autoSave" };
+  }
+
+  public override getSavePriority({ action }: XWikiFormSaveContext): number {
+    return SAVE_PRIORITY[action];
   }
 
   public override async submit({
-    button,
+    action,
   }: XWikiFormSaveContext): Promise<SaveResult> {
-    const saveButton = this.resolveSaveButton(button);
+    const saveButton = this.resolveSaveButton(action);
     const form = this.getForm();
     const removeListeners: (() => void)[] = [];
     const submitResultPromise = this.getSubmitResult(
@@ -200,7 +236,7 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
       SUBMIT_TIMEOUT,
     );
 
-    if (this.clickSaveButton(saveButton, !button)) {
+    if (this.clickSaveButton(saveButton, action === "autoSave")) {
       // The save is prevented if the form has invalid data (e.g. missing mandatory title). In this case the
       // xwiki:document:saved and xwiki:document:saveFailed events are not triggered, so we need to remove the
       // corresponding event listeners and reject the save.
@@ -214,10 +250,10 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
   /**
    * Refuse the save when it cannot go through, and pick the button performing it otherwise.
    *
-   * @param button - the save button the user clicked, left unset by an auto-save
+   * @param action - what the save does
    * @returns the button to click
    */
-  private resolveSaveButton(button?: HTMLInputElement): HTMLInputElement {
+  private resolveSaveButton(action: XWikiFormSaveAction): HTMLInputElement {
     // The merge conflict modal is already displayed (from a previous save attempt). Clicking the save button again
     // would reopen the same modal and reset the fields the user did not submit yet. We don't want that.
     if (this.$("#previewDiffModal").is(":visible")) {
@@ -225,7 +261,7 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     }
 
     // An auto-save keeps the user in the edit mode, so it goes through the save and continue button.
-    const saveButton = button ?? this.getSaveButton(true);
+    const saveButton = this.getSaveButton(action !== "saveAndView");
     if (!saveButton?.matches(":enabled")) {
       throw new Error("The save button is disabled or missing.");
     }
@@ -236,15 +272,8 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     states: Record<string, SaverState>,
     localClientId: string,
   ): void {
-    let latestVersion = "0.0";
-    let savedBy: string | undefined;
-    for (const [clientId, state] of Object.entries(states)) {
-      if (this.compareVersions(state.version ?? "0.0", latestVersion) > 0) {
-        latestVersion = state.version!;
-        savedBy = clientId;
-      }
-    }
-    if (this.compareVersions(latestVersion, this.document.version!) > 0) {
+    const { latestVersion, savedBy } = this.getLatestVersion(states);
+    if (savedBy && this.isNewVersion(latestVersion)) {
       this.document.update({
         version: latestVersion,
         modified: Date.now(),
@@ -260,6 +289,36 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
     }
   }
 
+  /**
+   * @param states - the saver states of the clients
+   * @returns the latest version saved by the clients, and the client that saved it (undefined when no client saved)
+   */
+  private getLatestVersion(states: Record<string, SaverState>): {
+    latestVersion: string;
+    savedBy?: string;
+  } {
+    let latestVersion = "0.0";
+    let savedBy: string | undefined;
+    for (const [clientId, state] of Object.entries(states)) {
+      if (this.compareVersions(state.version ?? "0.0", latestVersion) > 0) {
+        latestVersion = state.version!;
+        savedBy = clientId;
+      }
+    }
+    return { latestVersion, savedBy };
+  }
+
+  /**
+   * @param version - a version saved by one of the clients
+   * @returns whether the given version is a version of the edited document that we don't know about
+   */
+  private isNewVersion(version: string): boolean {
+    const comparison = this.compareVersions(version, this.document.version!);
+    // A new document already has the version its first save creates (1.1), so for a new document the same version
+    // means that it was created.
+    return comparison > 0 || (comparison === 0 && this.document.isNew === true);
+  }
+
   public override dispose(): void {
     // Remove the event listeners and restore the action buttons behaviour.
     this.revertList.forEach((revert) => revert());
@@ -269,7 +328,7 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
    * @param continueEditing - whether the save should keep the user in the edit mode
    * @returns the button that performs that save
    */
-  public getSaveButton(continueEditing?: boolean): HTMLInputElement | null {
+  private getSaveButton(continueEditing: boolean): HTMLInputElement | null {
     return this.getForm().querySelector(
       `input[name="action_save${continueEditing ? "andcontinue" : ""}"]`,
     );
@@ -353,10 +412,16 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
         } else {
           // eslint-disable-next-line prefer-rest-params
           const args = arguments;
+          // The in-place editor overrides this method in order to stay on the page, but only while it is in edit mode,
+          // which it leaves right after the save, without waiting for the saver state to settle. Let it decide based on
+          // the edit mode this method is called in, otherwise it would reload the page it already switched to view.
+          const editor = XWiki.editor;
           void (async () => {
             try {
               await saver.whenSettled();
-              original.maybeRedirect.apply(this, args as never);
+              inEditMode(editor, () =>
+                original.maybeRedirect.apply(this, args as never),
+              );
             } catch (error) {
               logger?.debug(
                 "Failed to wait for the saver state to settle.",
@@ -556,8 +621,9 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
   }
 
   private afterSave({ newVersion }: { newVersion?: string }): SaveResult {
-    if (newVersion === this.document.version) {
-      // The version didn't change because the document hasn't been modified.
+    if (newVersion === this.document.version && !this.document.isNew) {
+      // The version didn't change because the document hasn't been modified. Note that a new document already has the
+      // version its first save creates (1.1).
       return {};
     } else if (newVersion === "1.1") {
       this.logger?.debug("Created document version 1.1");

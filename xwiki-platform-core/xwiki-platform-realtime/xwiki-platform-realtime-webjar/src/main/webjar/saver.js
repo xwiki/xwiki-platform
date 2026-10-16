@@ -287,14 +287,13 @@ define('xwiki-realtime-saver', [
       };
       this._saver = new Saver({logger},
         saver => new ChainPadSaveTransport(config, saver),
-        // Keep the target, because it is the one that knows which button performs the save we are asked for.
-        saver => (this._target = new XWikiFormSaveTarget(saver, {
+        saver => new XWikiFormSaveTarget(saver, {
           document: xwikiDocument,
           formId: config.formId,
           autoSaveVersionSummary: Messages.autoSaveSummary,
           onCreateVersion: config.onCreateVersion,
           logger
-        }))
+        })
       );
       // The saver states are delivered asynchronously, so no save status is reported before we start listening.
       this._saver.addLocalStatusListener(config.onLocalStatusChange);
@@ -315,7 +314,7 @@ define('xwiki-realtime-saver', [
     }
 
     save(continueEditing) {
-      return this._saver.save({button: this._target.getSaveButton(continueEditing)});
+      return this._saver.save({action: continueEditing ? 'saveAndContinue' : 'saveAndView'});
     }
 
     stop() {

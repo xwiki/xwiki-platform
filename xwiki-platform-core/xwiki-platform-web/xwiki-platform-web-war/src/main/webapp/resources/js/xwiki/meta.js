@@ -78,6 +78,9 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
           }
         });
       }
+      // The format (Java SimpleDateFormat syntax) used to display dates. It doesn't depend on the current document.
+      // Since 18.9.0RC1
+      this.dateFormat = html.dataset.xwikiDateFormat;
     }
 
     setVersion(newVersion) {

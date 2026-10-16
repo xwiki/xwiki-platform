@@ -351,12 +351,6 @@ importers:
       '@xwiki/platform-authentication-xwiki':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/authentication/authentication-xwiki
-      '@xwiki/platform-autosave-api':
-        specifier: workspace:*
-        version: link:../../../../../xwiki-platform-node/src/main/node/core/autosave/autosave-api
-      '@xwiki/platform-autosave-xwiki':
-        specifier: workspace:*
-        version: link:../../../../../xwiki-platform-node/src/main/node/core/autosave/autosave-xwiki
       '@xwiki/platform-backend-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/backends/backend-api
@@ -402,9 +396,6 @@ importers:
       '@xwiki/platform-minimal-syntax-config':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/minimal
-      '@xwiki/platform-model-api':
-        specifier: workspace:*
-        version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-api
       '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
@@ -1433,6 +1424,15 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-toolbar:
     dependencies:
+      '@xwiki/platform-autosave-api':
+        specifier: workspace:*
+        version: link:../../autosave/autosave-api
+      '@xwiki/platform-autosave-xwiki':
+        specifier: workspace:*
+        version: link:../../autosave/autosave-xwiki
+      '@xwiki/platform-collaboration-api':
+        specifier: workspace:*
+        version: link:../collaboration-api
       '@xwiki/platform-document-xwiki':
         specifier: workspace:*
         version: link:../../document/document-xwiki
@@ -1497,18 +1497,33 @@ importers:
       '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
+      '@xwiki/platform-autosave-api':
+        specifier: workspace:*
+        version: link:../../autosave/autosave-api
+      '@xwiki/platform-autosave-xwiki':
+        specifier: workspace:*
+        version: link:../../autosave/autosave-xwiki
       '@xwiki/platform-collaboration-api':
         specifier: workspace:*
         version: link:../collaboration-api
+      '@xwiki/platform-collaboration-toolbar':
+        specifier: workspace:*
+        version: link:../collaboration-toolbar
       '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../document/document-api
+      '@xwiki/platform-document-xwiki':
+        specifier: workspace:*
+        version: link:../../document/document-xwiki
       '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
       '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api
+      '@xwiki/platform-model-xwiki':
+        specifier: workspace:*
+        version: link:../../model/model-xwiki
       lib0:
         specifier: 'catalog:'
         version: 0.2.118
@@ -1540,6 +1555,9 @@ importers:
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-viteconfig
+      '@xwiki/platform-xwiki-model-api':
+        specifier: workspace:*
+        version: link:../../xwiki/xwiki-model-api
       eslint:
         specifier: 'catalog:'
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)

@@ -77,6 +77,11 @@ class Saver<C extends object = object> {
 
   private saveTimer?: ReturnType<typeof setTimeout>;
 
+  /**
+   * The last save that was started, settled (never rejected) once its result has been published to the other clients.
+   */
+  private lastSave?: Promise<void>;
+
   private dirtyTimestamp?: number;
 
   private previousLocalStatus?: SaveStatus;
@@ -193,10 +198,16 @@ class Saver<C extends object = object> {
   }
 
   /**
-   * @returns a promise that resolves when the local state has been received by the other clients
+   * @returns a promise that resolves when the local state has been received by the other clients, including the
+   *   result of the save in progress, if any
    */
-  public whenSettled(): Promise<void> {
-    return this.transport.whenSettled();
+  public async whenSettled(): Promise<void> {
+    // A save publishes its result (e.g. the version it created) only once the save target reports it, and the save
+    // target may need to know when the result was received before that (e.g. to leave the edit mode right after the
+    // document is saved). Leaving before the save result is published would prevent the other clients from learning
+    // about the new version, leading to merge conflicts on their next save.
+    await this.lastSave;
+    await this.transport.whenSettled();
   }
 
   /**
@@ -209,12 +220,24 @@ class Saver<C extends object = object> {
   /**
    * Save the edited content, provided that this client wins the save election.
    *
-   * @param context - the save context, e.g. holding the save button in case of a manual save
+   * @param context - the save context, e.g. telling whether the user asked for the save; defaults to the context the
+   *   target gives to the auto-saves
    * @returns a promise that rejects if the content could not be saved
    */
-  public async save(context?: C): Promise<void> {
-    // An auto-save has no context of its own: it is the save the target gives the lowest priority to.
-    const saveContext = context ?? ({} as C);
+  public save(context?: C): Promise<void> {
+    const saving = this.saveAndPublish(context);
+    this.lastSave = (async () => {
+      try {
+        await saving;
+      } catch {
+        // The callers waiting for the save result to be published don't care whether the save succeeded.
+      }
+    })();
+    return saving;
+  }
+
+  private async saveAndPublish(context?: C): Promise<void> {
+    const saveContext = context ?? this.target.getAutoSaveContext();
 
     // Let the others know immediately that we are saving, in order to reduce concurrent saves.
     this.updateState(

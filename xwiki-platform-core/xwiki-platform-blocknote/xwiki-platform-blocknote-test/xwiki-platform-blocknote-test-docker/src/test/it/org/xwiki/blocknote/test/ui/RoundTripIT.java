@@ -23,8 +23,8 @@ import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
+import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
-import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -439,13 +439,13 @@ class RoundTripIT extends AbstractBlockNoteIT
     private void roundTrip(TestUtils setup, TestReference testReference, String contentBefore, String contentAfter)
     {
         setup.createPage(testReference, contentBefore, "");
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
         textArea.appendParagraph("end").waitUntilTextContains("end");
 
-        page = page.save();
+        page.save();
         WikiEditPage wikiEditor = page.editWiki();
         String ending = """
 

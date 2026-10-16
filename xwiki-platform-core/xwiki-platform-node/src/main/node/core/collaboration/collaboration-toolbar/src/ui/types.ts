@@ -65,7 +65,10 @@ type ToolbarUser = {
 };
 
 /**
- * A document version created during the realtime collaboration session.
+ * A document version created during the realtime collaboration session. Unlike the versions reported by the save
+ * target (`DocumentVersion` from `@xwiki/platform-autosave-xwiki`), whose author can be a client identifier left for
+ * the caller to resolve, the author of a toolbar version is meant to be displayed as is: the realtime editor resolves
+ * it against the users of the collaboration session before passing the version to the toolbar.
  *
  * @since 18.9.0RC1
  * @beta
@@ -182,6 +185,23 @@ type ToolbarSession = {
 };
 
 /**
+ * What the user can specify when saving, besides the edited data.
+ *
+ * @since 18.9.0RC1
+ * @beta
+ */
+type ToolbarSaveOptions = {
+  /**
+   * Whether the user can enter a change summary (version comment) when saving, and whether it is mandatory.
+   */
+  editComment: { enabled: boolean; mandatory: boolean };
+  /**
+   * Whether the user can mark the changes as minor.
+   */
+  minorEdit: boolean;
+};
+
+/**
  * Everything the realtime toolbar needs from the page it is displayed on: configuration, URLs, access to the edit form,
  * etc. It doesn't depend on the edited document, field nor on the realtime synchronization, so it is shared by all
  * the realtime toolbars of the page.
@@ -191,14 +211,6 @@ type ToolbarSession = {
  */
 type ToolbarEnvironment = {
   /**
-   * Whether the user can enter a change summary (version comment) when saving, and whether it is mandatory.
-   */
-  editComment: { enabled: boolean; mandatory: boolean };
-  /**
-   * Whether the user can mark the changes as minor.
-   */
-  minorEdit: boolean;
-  /**
    * The URL of the avatar displayed for the users that don't have one.
    */
   defaultAvatarURL: string;
@@ -206,6 +218,11 @@ type ToolbarEnvironment = {
    * The HTML of the icons used by the toolbar.
    */
   icons: { check: string; clock: string };
+  /**
+   * @param form - the edit form
+   * @returns what the user can specify when saving with the given edit form
+   */
+  getSaveOptions(form: HTMLElement): ToolbarSaveOptions;
   /**
    * @param date - a timestamp
    * @returns the given date formatted for display
@@ -296,6 +313,7 @@ export type {
   Changes,
   ToolbarEnvironment,
   ToolbarOptions,
+  ToolbarSaveOptions,
   ToolbarSession,
   ToolbarState,
   ToolbarStatus,

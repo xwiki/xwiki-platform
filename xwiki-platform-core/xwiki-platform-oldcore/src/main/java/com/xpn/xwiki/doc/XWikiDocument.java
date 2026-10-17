@@ -7770,9 +7770,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             XWikiContext xcontext = getXWikiContext();
             if (xcontext != null && xcontext.getWiki() != null) {
                 try {
-                    XWikiDocument originalDocument = xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
-                    if (!originalDocument.isNew()) {
-                        return originalDocument.getSyntax();
+                    XWikiDocument defaultLocaleDocument =
+                        xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
+                    if (!defaultLocaleDocument.isNew()) {
+                        return defaultLocaleDocument.getSyntax();
                     }
                 } catch (XWikiException e) {
                     LOGGER.warn("Failed to load the original document of the new translation [{}] to get its syntax,"

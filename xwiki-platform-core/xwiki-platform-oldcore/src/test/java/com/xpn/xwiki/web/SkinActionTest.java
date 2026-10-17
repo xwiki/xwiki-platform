@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.AttachmentReference;
@@ -106,6 +108,9 @@ class SkinActionTest
     @Named("document")
     private UserReferenceSerializer<DocumentReference> documentUserSerializer;
 
+    @MockComponent
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
+
     @Mock
     private XWikiContext context;
 
@@ -169,6 +174,12 @@ class SkinActionTest
         verify(this.outputStream).write(expected.getBytes(StandardCharsets.UTF_8));
     }
 
+    private void assertResponseHeaders(String expectedContentType)
+    {
+        verify(this.response).setContentType(expectedContentType);
+        verify(this.response).setHeader("X-Content-Type-Options", "nosniff");
+    }
+
     @Test
     void renderFileFromObjectFieldWithScriptRight() throws Exception
     {
@@ -179,6 +190,7 @@ class SkinActionTest
 
         verify(this.authorExecutor).call(any(), eq(DOCUMENT_AUTHOR), eq(DOCUMENT_REFERENCE));
         assertWrittenContent(EVALUATED_CODE);
+        assertResponseHeaders("text/css");
     }
 
     @Test
@@ -221,6 +233,27 @@ class SkinActionTest
         // The content is evaluated with the rights of the user who uploaded the attachment.
         verify(this.authorExecutor).call(any(), eq(ATTACHMENT_AUTHOR), eq(DOCUMENT_REFERENCE));
         assertWrittenContent(EVALUATED_CODE);
+        assertResponseHeaders("text/css");
+    }
+
+    @Test
+    void renderFileFromAttachmentWithRawContent() throws Exception
+    {
+        String imageName = "image.png";
+        when(this.context.getWiki().getEngineContext().getMimeType(imageName)).thenReturn("image/png");
+        when(this.document.getAttachment(imageName)).thenReturn(this.attachment);
+        when(this.attachment.getFilename()).thenReturn(imageName);
+        when(this.attachment.getContentLongSize(this.context)).thenReturn(3L);
+        when(this.attachment.getContentInputStream(this.context)).thenReturn(new ByteArrayInputStream(new byte[3]));
+        when(this.attachmentSecurityManager.shouldBeDownloaded(this.attachment)).thenReturn(false);
+        when(this.attachmentSecurityManager.getContentDispositionHeader(imageName, false))
+            .thenReturn("inline; filename*=utf-8''image.png");
+
+        assertTrue(this.action.renderFileFromAttachment(imageName, this.document, this.context));
+
+        verify(this.authorExecutor, never()).call(any(), any(), any());
+        assertResponseHeaders("image/png");
+        verify(this.response).setHeader("Content-Disposition", "inline; filename*=utf-8''image.png");
     }
 
     @Test

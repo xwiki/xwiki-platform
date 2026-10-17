@@ -210,6 +210,7 @@ class DownloadActionTest
         verify(this.response).setContentType(mime);
         verify(this.response).setHeader("Accept-Ranges", "bytes");
         verify(this.response).addHeader("Content-disposition", disposition);
+        verify(this.response).setHeader("X-Content-Type-Options", "nosniff");
         verify(this.response).setDateHeader("Last-Modified", modified);
         if (length > -1) {
             verify(this.response).setContentLengthLong(length);

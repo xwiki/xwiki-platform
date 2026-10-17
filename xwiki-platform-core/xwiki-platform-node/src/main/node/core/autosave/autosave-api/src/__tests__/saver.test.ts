@@ -146,14 +146,14 @@ let localStatuses: SaveStatus[];
 let globalStatuses: SaveStatus[];
 
 function createSaver(clientId: string = "alice"): Saver<TestContext> {
-  return new Saver<TestContext>(
-    {
-      onLocalStatusChange: (status) => localStatuses.push(status),
-      onStatusChange: (status) => globalStatuses.push(status),
-    },
+  const saver = new Saver<TestContext>(
+    {},
     (saver) => (transport = new FakeTransport(saver, clientId)),
     (saver) => (target = new FakeTarget(saver)),
   );
+  saver.addLocalStatusListener((status) => localStatuses.push(status));
+  saver.addStatusListener((status) => globalStatuses.push(status));
+  return saver;
 }
 
 describe("Saver", () => {
@@ -470,6 +470,96 @@ describe("Saver", () => {
       transport.receive("bob", { dirty: true });
 
       expect(globalStatuses).toEqual([SaveStatus.Clean]);
+    });
+  });
+
+  describe("status listeners", () => {
+    async function saveNow(saver: Saver<TestContext>) {
+      const saving = saver.save();
+      await vi.advanceTimersByTimeAsync(SAVE_DELAY);
+      await saving;
+    }
+
+    it("exposes the save status once it is known", async () => {
+      const saver = createSaver();
+      expect(saver.getLocalStatus()).toBeUndefined();
+      expect(saver.getStatus()).toBeUndefined();
+
+      await saver.toBeReady();
+
+      expect(saver.getLocalStatus()).toBe(SaveStatus.Clean);
+      expect(saver.getStatus()).toBe(SaveStatus.Clean);
+    });
+
+    it("exposes the local status separately from the global one", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+
+      // Another client has unsaved changes, even though we have none.
+      transport.receive("bob", { dirty: true });
+      expect(saver.getLocalStatus()).toBe(SaveStatus.Clean);
+      expect(saver.getStatus()).toBe(SaveStatus.Dirty);
+
+      saver.contentModifiedLocally();
+      expect(saver.getLocalStatus()).toBe(SaveStatus.Dirty);
+    });
+
+    it("stops notifying a local status listener once it is removed", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      const statuses: SaveStatus[] = [];
+      const removeListener = saver.addLocalStatusListener((status) =>
+        statuses.push(status),
+      );
+      saver.contentModifiedLocally();
+
+      removeListener();
+      await saveNow(saver);
+
+      expect(statuses).toEqual([SaveStatus.Dirty]);
+      expect(localStatuses).toEqual([
+        SaveStatus.Clean,
+        SaveStatus.Dirty,
+        SaveStatus.Saving,
+        SaveStatus.Clean,
+      ]);
+    });
+
+    it("stops notifying a status listener once it is removed", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      const statuses: SaveStatus[] = [];
+      const removeListener = saver.addStatusListener((status) =>
+        statuses.push(status),
+      );
+      saver.contentModifiedLocally();
+
+      removeListener();
+      await saveNow(saver);
+
+      expect(statuses).toEqual([SaveStatus.Dirty]);
+      expect(globalStatuses).toEqual([
+        SaveStatus.Clean,
+        SaveStatus.Dirty,
+        SaveStatus.Saving,
+        SaveStatus.Clean,
+      ]);
+    });
+
+    it("keeps notifying the other listeners when one fails", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      saver.addLocalStatusListener(() => {
+        throw new Error("Listener failure");
+      });
+      saver.addStatusListener(() => {
+        throw new Error("Listener failure");
+      });
+
+      saver.contentModifiedLocally();
+
+      expect(localStatuses).toEqual([SaveStatus.Clean, SaveStatus.Dirty]);
+      expect(globalStatuses).toEqual([SaveStatus.Clean, SaveStatus.Dirty]);
     });
   });
 

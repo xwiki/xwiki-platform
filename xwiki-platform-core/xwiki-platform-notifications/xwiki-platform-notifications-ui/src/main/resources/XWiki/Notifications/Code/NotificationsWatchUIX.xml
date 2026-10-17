@@ -159,41 +159,39 @@
       var url = restUrl.replace(/\/spaces.*/, "");
       queryParams.append("ignore", "true");
     } else {
-      console.error("Option " + chosenOption + " is not yet supported!");
+      return Promise.reject(new Error("Option " + chosenOption + " is not yet supported!"));
     }
-    if (url) {
-      var ajaxUrl = url + "/notificationsWatches?" + queryParams.toString();
-      return $.ajax(ajaxUrl, {
-          method: method
-      });
-    }
+    var ajaxUrl = url + "/notificationsWatches?" + queryParams.toString();
+    return $.ajax(ajaxUrl, {
+      method: method
+    });
   };
   
+  // Applies the specified changes one after another: the next change is sent only once the previous one has succeeded,
+  // so that the changes are not sent concurrently and the page is not reloaded before the last one is done.
+  async function performChainedChanges(...changes) {
+    for (const change of changes) {
+      await performChange(change);
+    }
+  }
+
   var handleSubmit = function () {
     var chosenOption = $('#watchModal input[type="radio"]:checked').val();
     var promise;
-    if (chosenOption == 'unwatchPageWatchSpace') {
-      var firstPromise = performChange('unwatchPage');
-      if (firstPromise !== 'undefined') {
-        promise = firstPromise.pipe(performChange('watchSpace'))
-      }
-    } else if (chosenOption == 'unblockPageBlockSpace') {
-      var firstPromise = performChange('unblockPage');
-      if (firstPromise !== 'undefined') {
-        promise = firstPromise.pipe(performChange('blockSpace'))
-      }
+    if (chosenOption === 'unwatchPageWatchSpace') {
+      promise = performChainedChanges('unwatchPage', 'watchSpace');
+    } else if (chosenOption === 'unblockPageBlockSpace') {
+      promise = performChainedChanges('unblockPage', 'blockSpace');
     } else {
       promise = performChange(chosenOption);
     }
-    if (promise !== 'undefined') {
-      promise.done(function () {
-        removeAnySelection();
-        window.location.reload();
-      }).error(function (data) {
-        removeAnySelection();
-        console.error("Error when processing the request: " + data);
-      });
-    }
+    promise.then(function () {
+      removeAnySelection();
+      window.location.reload();
+    }).catch(function (data) {
+      removeAnySelection();
+      console.error("Error when processing the request: " + data);
+    });
   };
   
   var removeAnySelection = function() {

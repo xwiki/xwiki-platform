@@ -80,8 +80,10 @@ function createEnvironment(
   overrides: Partial<ToolbarEnvironment> = {},
 ): ToolbarEnvironment {
   return {
-    editComment: { enabled: true, mandatory: false },
-    minorEdit: true,
+    getSaveOptions: () => ({
+      editComment: { enabled: true, mandatory: false },
+      minorEdit: true,
+    }),
     defaultAvatarURL: "noavatar.png",
     icons: { check: '<span class="icon-check"></span>', clock: "" },
     formatDate: (date) => `date-${date}`,
@@ -93,6 +95,21 @@ function createEnvironment(
     fetchChanges: vi.fn(async () => '<div class="diff-group">diff</div>'),
     setChangeSummary: vi.fn(),
     ...overrides,
+  };
+}
+
+/**
+ * @returns the environment overrides that configure the version summary (edit comment)
+ */
+function editComment(
+  enabled: boolean,
+  mandatory: boolean,
+): Partial<ToolbarEnvironment> {
+  return {
+    getSaveOptions: () => ({
+      editComment: { enabled, mandatory },
+      minorEdit: true,
+    }),
   };
 }
 
@@ -449,7 +466,7 @@ describe("Toolbar", () => {
   it("doesn't offer to summarize when edit comments are disabled", async () => {
     await createToolbar(
       createSession(),
-      createEnvironment({ editComment: { enabled: false, mandatory: false } }),
+      createEnvironment(editComment(false, false)),
     );
     expect(queryAll(".realtime-action-summarize")).toHaveLength(0);
     expect(document.querySelector("#realtime-changeSummaryModal")).toBeNull();
@@ -463,7 +480,7 @@ describe("Toolbar", () => {
     const session = createSession();
     const realtimeToolbar = await createToolbar(
       session,
-      createEnvironment({ editComment: { enabled: true, mandatory: true } }),
+      createEnvironment(editComment(true, true)),
     );
     realtimeToolbar.onConnectionStatusChange(1);
     await flushPromises();
@@ -580,9 +597,7 @@ describe("Toolbar", () => {
 
     it("requires a summary when mandatory", async () => {
       const session = createSession();
-      const environment = createEnvironment({
-        editComment: { enabled: true, mandatory: true },
-      });
+      const environment = createEnvironment(editComment(true, true));
       const realtimeToolbar = await createToolbar(session, environment);
       realtimeToolbar.onConnectionStatusChange(2);
       await flushPromises();

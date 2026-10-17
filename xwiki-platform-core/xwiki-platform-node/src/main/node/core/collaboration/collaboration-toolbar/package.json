@@ -44,6 +44,9 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "@xwiki/platform-autosave-api": "workspace:*",
+    "@xwiki/platform-autosave-xwiki": "workspace:*",
+    "@xwiki/platform-collaboration-api": "workspace:*",
     "@xwiki/platform-document-xwiki": "workspace:*",
     "@xwiki/platform-xwiki-model-api": "workspace:*",
     "@xwiki/platform-xwiki-utils": "workspace:*"

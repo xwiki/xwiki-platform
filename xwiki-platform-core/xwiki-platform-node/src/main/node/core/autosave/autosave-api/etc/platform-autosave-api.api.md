@@ -60,6 +60,8 @@ export abstract class SaveTarget<C extends object = object> {
     constructor(saver: Saver<C>);
     abstract dispose(): void;
     // (undocumented)
+    getAutoSaveContext(): C;
+    // (undocumented)
     getSaveInterval(): number | undefined;
     // (undocumented)
     getSavePriority(context: C): number;

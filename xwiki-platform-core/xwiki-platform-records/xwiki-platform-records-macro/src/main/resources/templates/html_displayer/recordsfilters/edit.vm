@@ -1,0 +1,47 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Displays the filter picker of a Records table: one item per field=value constraint.
+##
+## Like the columns and sort pickers, this one gets its candidates from the browser, because they depend on the
+## sibling class parameter and no displayer can be told about it. The element carries a class of ours rather than
+## xwiki-selectize, so that this module owns the enhancement, and the bundle is loaded as a module script, which
+## runs once however many displayers load it. templates/html_displayer/recordscolumns/edit.vm explains each
+## of these in full.
+##
+## Unlike those two pickers, this one is a text input rather than a multiple select. The parameter separates its
+## constraints with &, but when the macro editor finds a field holding several values it joins them with a comma.
+## With a single text input, the suggest widget writes the &-separated string itself, so the editor reads one
+## value back and stores it unchanged. Reopening works the same way in reverse: the editor sets the stored string
+## as the input value and the widget splits it on &. The widget learns its delimiter in JavaScript.
+##
+## An empty input submits an empty value, so removing every filter clears the parameter. That is why the hidden
+## input #suggestInput adds after a multiple select is not needed here.
+#set ($parameters = {})
+#set ($discard = $parameters.putAll($displayer.parameters))
+#set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-records-filters"))
+#set ($discard = $parameters.putIfAbsent('placeholder',
+  $services.localization.render('rendering.macro.records.parameter.filters.placeholder')))
+<script type="module" src="$escapetool.xml($services.webjars.url(
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
+<input type="text" value="$!escapetool.xml($displayer.value)"
+  #foreach ($parameter in $parameters.entrySet())
+    $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+  #end
+/>

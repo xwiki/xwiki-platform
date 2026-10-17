@@ -52,10 +52,6 @@ public class ColorThemePropertyDisplayerPage extends ViewPage
         return iconThemeInput.findElements(By.tagName("option"));
     }
 
-    private List<WebElement> getColibriThemeOptions()
-    {
-        return iconThemeInput.findElements(By.xpath("//optgroup[@label='Colibri Themes']//option"));
-    }
     private List<WebElement> getFlamingoThemeOptions()
     {
         return iconThemeInput.findElements(By.xpath("//optgroup[@label='Flamingo Themes']//option"));
@@ -73,17 +69,6 @@ public class ColorThemePropertyDisplayerPage extends ViewPage
         return results;
     }
 
-    /**
-     * @return the list of colibri themes
-     */
-    public List<String> getColibriColorThemes()
-    {
-        List<String> results = new ArrayList<>();
-        for (WebElement option : getColibriThemeOptions()) {
-            results.add(option.getText());
-        }
-        return results;
-    }
 
     /**
      * @return the list of flamingo themes

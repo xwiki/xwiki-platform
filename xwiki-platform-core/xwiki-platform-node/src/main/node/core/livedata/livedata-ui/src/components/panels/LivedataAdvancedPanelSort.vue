@@ -194,10 +194,7 @@ export default {
     // Event handler called when sort entries are dragged and dropped
     async reorderSorts(e) {
       try {
-        this.logic.reorderSort(
-            e.moved.element.property,
-            e.moved.newIndex,
-        );
+        this.logic.reorderSort(e.moved.element.property, e.moved.newIndex);
       } catch (err) {
         console.warn(err);
       }

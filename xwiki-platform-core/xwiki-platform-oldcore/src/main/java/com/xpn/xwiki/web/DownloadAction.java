@@ -481,6 +481,9 @@ public class DownloadAction extends XWikiAction
         boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(attachment);
         response.addHeader("Content-disposition",
             attachmentSecurityManager.getContentDispositionHeader(attachment.getFilename(), shouldBeDownloaded));
+        // Make sure browsers honor the declared content type, from which the content disposition is also computed.
+        response.setHeader(XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_HEADER,
+            XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_NOSNIFF);
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Advertise that downloads can be resumed

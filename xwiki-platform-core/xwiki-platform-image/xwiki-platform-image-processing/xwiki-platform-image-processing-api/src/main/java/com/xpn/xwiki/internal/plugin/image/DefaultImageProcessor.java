@@ -104,11 +104,21 @@ public class DefaultImageProcessor implements ImageProcessor
         return bufferedImage;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * A media type is supported when ImageIO can both read and write it, so that a scaled image can be written in the
+     * format of the original image. Images of other media types (e.g. formats that ImageIO can only read) are served
+     * as is by the image plugin, without being decoded.
+     */
     @Override
     public boolean isMimeTypeSupported(String mimeType)
     {
         try {
-            return Arrays.asList(ImageIO.getReaderMIMETypes()).contains(mimeType);
+            // This processor writes non-JPEG images as PNG, but the image plugin serves the scaled image with the
+            // media type of the original image, so serving the original image is better when it can't be written.
+            return Arrays.asList(ImageIO.getReaderMIMETypes()).contains(mimeType)
+                && ImageIO.getImageWritersByMIMEType(mimeType).hasNext();
         } catch (NoClassDefFoundError e) {
             // Happens on certain systems where the javax.imageio package is not available.
             return false;

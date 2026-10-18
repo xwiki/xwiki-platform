@@ -666,6 +666,10 @@ class LiveDataIT
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
 
+        // The live table source displays empty values using the "emptyvalue" translation key (we don't set a
+        // translation prefix), which these translations define as an empty string.
+        initLocalization(testUtils, testReference);
+
         // Custom page content that sets the class on the individual properties. We filter the documents based on the
         // space.
         List<String> properties = List.of(DOC_TITLE_COLUMN, NAME_COLUMN, CHOICE_COLUMN);
@@ -726,8 +730,9 @@ class LiveDataIT
         tableLayout.filterColumn(DOC_TITLE_COLUMN, "O1", true);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.editCell(CHOICE_COLUMN, 1, CHOICE_COLUMN, CHOICE_C);
-        tableLayout.waitUntilRowCountEqualsTo(1);
-        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_C);
+        // The edited value is saved and then the Live Data is refreshed asynchronously.
+        tableLayout.waitUntilCellText(CHOICE_COLUMN, 1, CHOICE_C);
+        assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
 
         // Edit the choice column of the "No XObject" page.
@@ -735,17 +740,17 @@ class LiveDataIT
         tableLayout.filterColumn(DOC_TITLE_COLUMN, "No XObject", true);
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.editCell(CHOICE_COLUMN, 1, CHOICE_COLUMN, CHOICE_D);
-        tableLayout.waitUntilRowCountEqualsTo(1);
-        tableLayout.assertRow(CHOICE_COLUMN, CHOICE_D);
+        tableLayout.waitUntilCellText(CHOICE_COLUMN, 1, CHOICE_D);
+        assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(DOC_TITLE_COLUMN, "No XObject");
-        // The name should still be empty.
+        // Setting the choice created the object, but the name should still be empty.
         tableLayout.assertRow(NAME_COLUMN, "");
 
         // Edit the name column of the "No XObject" page.
         String newName = "New Name";
         tableLayout.editCell(NAME_COLUMN, 1, NAME_COLUMN, newName);
-        tableLayout.waitUntilRowCountEqualsTo(1);
-        tableLayout.assertRow(NAME_COLUMN, newName);
+        tableLayout.waitUntilCellText(NAME_COLUMN, 1, newName);
+        assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(DOC_TITLE_COLUMN, "No XObject");
     }
 

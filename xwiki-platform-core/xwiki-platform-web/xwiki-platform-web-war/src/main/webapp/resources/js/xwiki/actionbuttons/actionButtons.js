@@ -104,9 +104,16 @@ var XWiki = (function(XWiki) {
       for (var key in shortcuts) {
         var targetButtons = $$("input[name=" + key + "]");
         if (targetButtons.length) {
-          shortcut.add(shortcuts[key], function() {
-            this.click();
-          }.bind(targetButtons.first()));
+          var targetButton = targetButtons.first();
+          // The buttons displayed by the edit actions hold the shortcut defined in the user preferences, which is empty
+          // when the user unbinds it.
+          var buttonShortcut = targetButton.hasAttribute('data-shortcut') ? targetButton.dataset.shortcut
+            : shortcuts[key];
+          if (buttonShortcut) {
+            shortcut.add(buttonShortcut, function() {
+              this.click();
+            }.bind(targetButton));
+          }
         }
       }
     },

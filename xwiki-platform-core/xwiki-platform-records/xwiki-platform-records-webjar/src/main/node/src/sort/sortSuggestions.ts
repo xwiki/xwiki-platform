@@ -25,7 +25,7 @@ import { loadTypes } from "../common/remote";
 import { reload } from "../common/suggester";
 import { metadataLabels, translate, withProblem } from "../common/translations";
 import type { DirectionLabels } from "./sortPicker";
-import type { Suggestions } from "../common/suggester";
+import type { Suggester, Suggestions } from "../common/suggester";
 
 /**
  * @returns the translated labels a sort criterion is offered under
@@ -83,10 +83,10 @@ const sortSuggestions: Suggestions = {
     // A field that has just been used, or has just been freed, changes what should be offered. The widget caches
     // what it has loaded per query and keeps the options it has already seen, so both are dropped here, and loaded
     // again right away since the dropdown stays open for the next criterion.
-    onItemAdd() {
+    onItemAdd(this: Suggester) {
       reload(this);
     },
-    onItemRemove() {
+    onItemRemove(this: Suggester) {
       reload(this);
     },
   },

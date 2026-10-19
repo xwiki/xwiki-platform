@@ -86,8 +86,17 @@ describe("sortSuggestions", () => {
       inputValue: () => "",
     } as unknown as Suggester;
 
-    sort.sortSuggestions.settings!.onItemAdd!.call(suggester, "count:asc");
-    sort.sortSuggestions.settings!.onItemRemove!.call(suggester, "count:asc");
+    const item = document.createElement("div");
+    sort.sortSuggestions.settings!.onItemAdd!.call(
+      suggester,
+      "count:asc",
+      item,
+    );
+    sort.sortSuggestions.settings!.onItemRemove!.call(
+      suggester,
+      "count:asc",
+      item,
+    );
 
     expect(suggester.clearOptions).toHaveBeenCalledTimes(2);
     expect(suggester.load).toHaveBeenCalledTimes(2);

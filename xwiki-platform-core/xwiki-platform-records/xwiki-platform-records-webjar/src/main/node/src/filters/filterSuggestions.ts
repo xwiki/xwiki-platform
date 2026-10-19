@@ -39,7 +39,7 @@ import type {
   JsonFetcher,
   PropertyDescriptor,
 } from "../common/fields";
-import type { Suggestions } from "../common/suggester";
+import type { Suggester, Suggestions } from "../common/suggester";
 
 /**
  * The filters picker: one item per `field=value` constraint.
@@ -87,7 +87,11 @@ const filterSuggestions: Suggestions = {
     // the macro editor would join the options of a select with a comma.
     delimiter: FILTER_SEPARATOR,
     // Most properties have no value suggester, so a value has to be typeable, and it is encoded like a suggested one.
-    create: createFilterOption,
+    create(input, callback) {
+      const option = createFilterOption(input);
+      callback(option ?? undefined);
+      return option !== null;
+    },
     // Filters apply together, so unlike columns and sort criteria their order carries no meaning.
     plugins: ["remove_button"],
     // Picking a field is picking half a constraint. Rather than leaving `status=` behind as an item that filters
@@ -100,13 +104,14 @@ const filterSuggestions: Suggestions = {
     //
     // A typed constraint is resolved like a stored one, so that a value its field cannot take, or a field that cannot
     // be filtered on, is pointed at as soon as it is added.
-    onItemAdd(value) {
-      if (isIncomplete(value)) {
-        this.removeItem(value, true);
-        this.setTextboxValue(value);
+    onItemAdd(this: Suggester, value) {
+      const constraint = String(value);
+      if (isIncomplete(constraint)) {
+        this.removeItem(constraint, true);
+        this.setTextboxValue(constraint);
       } else {
         this.setTextboxValue("");
-        resolveAgain(this, value);
+        resolveAgain(this, constraint);
       }
       this.refreshOptions(true);
     },

@@ -82,7 +82,11 @@ describe("filterSuggestions", () => {
       refreshOptions: vi.fn(),
     } as unknown as Suggester;
 
-    filters.filterSuggestions.settings!.onItemAdd!.call(suggester, "status=");
+    filters.filterSuggestions.settings!.onItemAdd!.call(
+      suggester,
+      "status=",
+      document.createElement("div"),
+    );
 
     expect(suggester.removeItem).toHaveBeenCalledWith("status=", true);
     expect(suggester.setTextboxValue).toHaveBeenCalledWith("status=");
@@ -101,6 +105,7 @@ describe("filterSuggestions", () => {
     filters.filterSuggestions.settings!.onItemAdd!.call(
       suggester,
       "status=Active",
+      document.createElement("div"),
     );
 
     expect(suggester.removeItem).not.toHaveBeenCalled();

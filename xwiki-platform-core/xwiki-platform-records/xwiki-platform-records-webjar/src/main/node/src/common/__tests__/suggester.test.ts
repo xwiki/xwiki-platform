@@ -86,7 +86,7 @@ beforeEach(() => {
     setTextboxValue: vi.fn(),
     refreshOptions: vi.fn(),
     clearOptions: vi.fn(),
-  };
+  } as unknown as Suggester;
 });
 
 /**
@@ -125,7 +125,7 @@ describe("createSettings", () => {
   it("resolves a stored value through the suggestions", async () => {
     const callback = vi.fn();
     suggester.settings.loadSelected.call(suggester, "status", callback);
-    await vi.waitFor(() => expect(callback).toHaveBeenCalledWith([STATUS]));
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledWith([STATUS], []));
     expect(suggestions.resolve).toHaveBeenCalledWith(
       element,
       "status",
@@ -179,7 +179,7 @@ describe("createSettings", () => {
     const callback = vi.fn();
 
     suggester.settings.load.call(undefined, "", callback);
-    await vi.waitFor(() => expect(callback).toHaveBeenCalledWith([]));
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledWith([], []));
 
     const message = element.nextElementSibling!;
     expect(message.classList).toContain("errormessage");

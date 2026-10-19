@@ -25,66 +25,30 @@ import {
 } from "./dialog";
 import { translate } from "./translations";
 import type { FieldOption, JsonFetcher } from "./fields";
+import type TomSelect from "tom-select";
 
 /**
- * The suggest widget settings this picker needs.
+ * The suggest widget settings this picker needs: Tom Select's, with the `load` every picker has, and the
+ * `loadSelected` the suggest widget adds to them.
+ *
+ * Tom Select's settings type alone is not enough. `loadSelected` is not one of its settings, yet
+ * {@link resolveAgain} reads it back from the widget, and a type alias cannot be augmented from outside, so it is
+ * added here. `load` is picked out of the partial settings because every picker sets it, which spares its callers a
+ * non-null assertion. `TomSelect["settings"]` names the settings type through the package's main entry point rather
+ * than a path inside its `dist` directory.
  */
-interface PickerSettings {
-  load: (query: string, callback: (options: FieldOption[]) => void) => void;
-  loadSelected: (
-    value: string,
-    callback: (options: FieldOption[]) => void,
-  ) => void;
-  optgroups: { value: string; label: string }[];
-  optgroupField: string;
-  labelField: string;
-  valueField: string;
-  searchField: string[];
-  plugins: string[];
-  persist: boolean;
-  create: boolean | ((input: string) => FieldOption | null);
-  hidePlaceholder: boolean;
-  delimiter?: string;
-  onItemAdd?: (this: Suggester, value: string) => void;
-  onItemRemove?: (this: Suggester, value: string) => void;
-  onFocus?: (this: Suggester) => void;
-}
+type PickerSettings = Partial<TomSelect["settings"]> &
+  Pick<TomSelect["settings"], "load"> & {
+    /**
+     * Resolves a stored value into the option that shows it.
+     */
+    loadSelected: TomSelect["settings"]["load"];
+  };
 
 /**
- * The part of the suggest widget's API this module drives.
+ * A suggest widget built from {@link PickerSettings}.
  */
-interface Suggester {
-  /**
-   * The values currently selected.
-   */
-  items: string[];
-  /**
-   * The options the widget knows, by value.
-   */
-  options: Record<string, FieldOption>;
-  settings: PickerSettings;
-  /**
-   * The element the widget is rendered in, which replaces the enhanced field on screen.
-   */
-  wrapper: HTMLElement;
-  addOption: (option: FieldOption) => void;
-  updateOption: (value: string, option: FieldOption) => void;
-  /**
-   * Asks the `load` setting for the options matching a query, unless that query has already been loaded.
-   */
-  load: (query: string) => void;
-  /**
-   * @returns the text the author has typed in the widget
-   */
-  inputValue: () => string;
-  removeItem: (value: string, silent?: boolean) => void;
-  setTextboxValue: (value: string) => void;
-  refreshOptions: (triggerDropdown?: boolean) => void;
-  /**
-   * Drops every option that is not backing a selected item, and clears the search cache with them.
-   */
-  clearOptions: () => void;
-}
+type Suggester = TomSelect & { settings: PickerSettings };
 
 /**
  * What one picker suggests: the options for a query, and the option that shows a stored value back.
@@ -139,18 +103,18 @@ function createSettings(
     function (
       this: Suggester | undefined,
       query: string,
-      callback: (options: FieldOption[]) => void,
+      callback: TomSelect["loadCallback"],
     ) {
       const selected = this?.items ?? [];
       void (async () => {
         try {
-          callback(await produce(query, selected));
+          callback(await produce(query, selected), []);
           clearMessage(this?.wrapper ?? element, "error");
           if (this) {
             refreshProblems(this);
           }
         } catch {
-          callback([]);
+          callback([], []);
           reportLoadFailure(element, this);
         }
       })();
@@ -185,7 +149,7 @@ function createSettings(
     // types. A picker created before the data type was picked, or whose options were dropped since, would otherwise
     // open empty until something is typed. Asking costs nothing when the query is already loaded: the widget
     // remembers what it has asked for.
-    onFocus() {
+    onFocus(this: Suggester) {
       this.load(this.inputValue());
     },
     ...suggestions.settings,
@@ -247,15 +211,19 @@ function retry(suggester: Suggester): void {
  * @param value - the selected value
  */
 function resolveAgain(suggester: Suggester, value: string): void {
-  suggester.settings.loadSelected.call(suggester, value, (options) => {
-    options.forEach((option) => {
-      if (Object.hasOwn(suggester.options, option.value)) {
-        suggester.updateOption(option.value, option);
-      } else {
-        suggester.addOption(option);
-      }
-    });
-  });
+  suggester.settings.loadSelected.call(
+    suggester,
+    value,
+    (options: FieldOption[]) => {
+      options.forEach((option) => {
+        if (Object.hasOwn(suggester.options, option.value)) {
+          suggester.updateOption(option.value, option);
+        } else {
+          suggester.addOption(option);
+        }
+      });
+    },
+  );
 }
 
 /**

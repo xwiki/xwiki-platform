@@ -44,8 +44,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * Tests the {@code attachment_macros.vm} template.
  *
  * @version $Id$
- * @since 18.9.0RC1
- * @since 18.4.7
+ * @since 18.10.0RC1
+ * @since 18.4.8
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList

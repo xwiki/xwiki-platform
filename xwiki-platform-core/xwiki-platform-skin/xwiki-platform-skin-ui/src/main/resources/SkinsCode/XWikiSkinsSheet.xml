@@ -94,7 +94,7 @@
           {{translation key="skin.sheet.properties.logo.warning" /}}
         {{/warning}}
         
-        {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}} 
+        {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,jpeg,gif,svg,webp,avif,jxl" displayImage="true"/}} 
       #else 
         $doc.display($prop.name)
       #end

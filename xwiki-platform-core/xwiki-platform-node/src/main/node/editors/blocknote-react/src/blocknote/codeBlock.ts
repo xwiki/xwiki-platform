@@ -39,7 +39,7 @@ const HIGHLIGHTED_LANGUAGES = new Map(
 );
 
 type CodeBlockSpec = ReturnType<typeof createCodeBlockSpec>;
-type CodeBlockRender = CodeBlockSpec["implementation"]["render"];
+type CodeBlockRender = NonNullable<CodeBlockSpec["implementation"]["render"]>;
 
 /**
  * @returns true if the language selector supports the given language, false otherwise
@@ -160,12 +160,14 @@ function XWikiCodeBlock(options?: {
   };
 
   const render = spec.implementation.render;
-  spec.implementation.render = function (block, editor) {
-    return addClassName(
-      renderCodeBlock.call(this, render, block, editor),
-      options?.className,
-    );
-  };
+  if (render) {
+    spec.implementation.render = function (block, editor) {
+      return addClassName(
+        renderCodeBlock.call(this, render, block, editor),
+        options?.className,
+      );
+    };
+  }
 
   return spec;
 }

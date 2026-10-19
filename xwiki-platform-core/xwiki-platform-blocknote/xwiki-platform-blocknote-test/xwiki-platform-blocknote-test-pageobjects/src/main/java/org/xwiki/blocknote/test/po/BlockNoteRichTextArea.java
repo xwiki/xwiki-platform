@@ -154,7 +154,10 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         By trailingBlock = By.cssSelector(".bn-trailing-block");
         getDriver().waitUntilCondition(visibilityOfNestedElementsLocatedBy(this.container, trailingBlock));
-        getDriver().createActions().click(this.container.findElement(trailingBlock)).perform();
+        // When the trailing block is below the content (i.e., outside the viewport when the content is long) we need
+        // to scroll first.
+        WebElement trailingBlockElement = getDriver().scrollTo(this.container.findElement(trailingBlock));
+        getDriver().createActions().click(trailingBlockElement).perform();
         return sendKeys(keysToSend);
     }
 

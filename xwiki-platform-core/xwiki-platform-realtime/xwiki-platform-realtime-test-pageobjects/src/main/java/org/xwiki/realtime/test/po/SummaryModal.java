@@ -169,7 +169,7 @@ public class SummaryModal extends BaseModal
         clickTab("changes");
         // Wait for the changes to be fetched.
         WebElement spinner = getDriver().findElementWithoutWaiting(this.container,
-            By.cssSelector("#realtime-changeSummaryModal-changesTab > realtime-spinner"));
+            By.cssSelector("#realtime-changeSummaryModal-changesTab > .realtime-spinner"));
         getDriver().waitUntilCondition(ExpectedConditions.invisibilityOf(spinner));
     }
 

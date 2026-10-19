@@ -518,12 +518,17 @@ public class SuggestInputElement extends BaseElement
     }
 
     /**
-     * Selects and creates an element with the input text.
+     * Selects and creates an element with the input text, after waiting for the suggestions matching the typed text.
      *
      * @return the current suggest input element
      */
     public SuggestInputElement selectTypedText()
     {
+        // The widget refreshes the suggestions a while after each typed key, and the option matching the typed text may
+        // already be selected by the refresh done for the text typed so far. We wait for the refresh done for the full
+        // text, otherwise it happens after we pick the option and it opens the suggestions again, over the elements
+        // below the input, once we're done with the input.
+        maybeWaitForSuggestions(false);
         WebElement textInput = getTextInput();
         String typedText = StringUtils.defaultString(textInput.getAttribute(ATTRIBUTE_VALUE));
         getDriver().waitUntilElementsAreVisible(new By[] {
@@ -584,6 +589,16 @@ public class SuggestInputElement extends BaseElement
             return !isDropDownOpened();
         });
         return this;
+    }
+
+    /**
+     * @return {@code true} if the text input of this suggest input has the keyboard focus, {@code false} otherwise
+     * @since 18.4.8
+     * @since 18.9.0RC1
+     */
+    public boolean hasFocus()
+    {
+        return getTextInput().equals(getDriver().switchTo().activeElement());
     }
 
     /**

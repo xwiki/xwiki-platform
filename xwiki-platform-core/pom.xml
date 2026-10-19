@@ -168,6 +168,55 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                Modifying xobjects through REST needs a way to set the version comment, and deleting an xobject needs
+                a way to create a minor version. The REST API shouldn't be called directly from Java but through HTTP
+                requests. Adding a new query string parameter to an existing REST resource doesn't break existing code
+                that calls this resource through HTTP.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, java.lang.String, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.rest.resources.objects.ObjectResource::deleteObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method void org.xwiki.rest.resources.objects.ObjectResource::deleteObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.String, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, java.lang.String, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+                <item>
+                  <code>java.annotation.added</code>
+                  <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, ===org.xwiki.rest.model.jaxb.Object===) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, ===java.lang.String===, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.QueryParam("comment")</annotation>
+                </item>
+                <item>
+                  <code>java.annotation.added</code>
+                  <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, ===org.xwiki.rest.model.jaxb.Object===) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, ===java.lang.String===, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.QueryParam("comment")</annotation>
+                </item>
+                <item>
+                  <code>java.annotation.added</code>
+                  <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, ===org.xwiki.rest.model.jaxb.Property===) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, ===java.lang.String===, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.QueryParam("comment")</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -254,6 +303,7 @@
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-ratings</module>
     <module>xwiki-platform-realtime</module>
+    <module>xwiki-platform-records</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>

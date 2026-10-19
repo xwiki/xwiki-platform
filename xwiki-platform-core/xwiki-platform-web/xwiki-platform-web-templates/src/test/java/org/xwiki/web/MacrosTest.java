@@ -457,6 +457,20 @@ class MacrosTest extends PageTest
     }
 
     @Test
+    void displayUserDoesNotSetGlobalType() throws Exception
+    {
+        StringWriter writer = new StringWriter();
+        this.velocityManager.evaluate(writer, "displayUser", new StringReader("""
+            #displayUser('XWiki.Alice' {'useInlineHTML': true})"""));
+
+        assertTrue(writer.toString().contains("<span class=\"user\" data-reference=\"xwiki:XWiki.Alice\">"),
+            writer.toString());
+        assertTrue(writer.toString().contains("class=\"user-avatar\""), writer.toString());
+        // The page content rendered after the skin's call to this macro must not see a $type variable.
+        assertNull(this.velocityManager.getVelocityContext().get("type"));
+    }
+
+    @Test
     void wikiTranslation() throws XWikiVelocityException
     {
         StringWriter writer = new StringWriter();

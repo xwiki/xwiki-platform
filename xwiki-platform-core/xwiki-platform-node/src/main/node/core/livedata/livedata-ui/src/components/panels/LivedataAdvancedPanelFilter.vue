@@ -217,31 +217,32 @@ export default {
     // it dispatches two event:
     // - a "remove" event for the property that had the moved property
     // - a "added" event for the property that receive the moved property
-    reorderFilter(e, filterGroup) {
-      // Filter entry reordered in the same property
-      if (e.moved) {
-        this.logic
-          .filter(filterGroup.property, e.moved.oldIndex, {
+    async reorderFilter(e, filterGroup) {
+      try {
+        // Filter entry reordered in the same property
+        if (e.moved) {
+          await this.logic.filter(filterGroup.property, e.moved.oldIndex, {
             index: e.moved.newIndex,
-          })
-          .catch((err) => void console.warn(err));
-      }
-      // Filter entry moved to another property (add handler)
-      else if (e.added) {
-        this.logic
-          .addFilter(
+          });
+        }
+        // Filter entry moved to another property (add handler)
+        else if (e.added) {
+          await this.logic.addFilter(
             filterGroup.property,
             e.added.element.operator,
             e.added.element.value,
             e.added.newIndex,
-          )
-          .catch((err) => void console.warn(err));
-      }
-      // Filter entry moved to another property (remove handler)
-      else if (e.removed) {
-        this.logic
-          .removeFilter(filterGroup.property, e.removed.oldIndex)
-          .catch((err) => void console.warn(err));
+          );
+        }
+        // Filter entry moved to another property (remove handler)
+        else if (e.removed) {
+          await this.logic.removeFilter(
+            filterGroup.property,
+            e.removed.oldIndex,
+          );
+        }
+      } catch (err) {
+        console.warn(err);
       }
     },
   },

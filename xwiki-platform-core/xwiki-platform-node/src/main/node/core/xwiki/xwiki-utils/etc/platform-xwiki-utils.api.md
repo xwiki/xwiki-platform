@@ -69,6 +69,7 @@ export interface XWikiGlobal {
     docsyntax: string;
     // (undocumented)
     Document: new (reference: EntityReference) => LegacyXWikiDocument;
+    editor?: string;
     widgets: {
         Notification: new (text: string, type?: LegacyNotificationType) => LegacyNotification;
         ConfirmationBox: new (behavior?: LegacyConfirmationBoxBehavior, interactionParameters?: LegacyConfirmationBoxParameters) => unknown;
@@ -86,6 +87,7 @@ export type XWikiMeta = {
     locale: string;
     realLocale: string;
     action: string;
+    dateFormat?: string;
     setVersion: (version: string) => void;
     refreshVersion: (handle404: (response: Response) => void) => Promise<void>;
 };

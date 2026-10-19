@@ -25,6 +25,7 @@
 @import "before-bootstrap"; // Fixes that must be included BEFORE bootstrap
 @import "bootstrap/bootstrap.less"; // Bootstrap
 @import "variables"; // Bootstrap variables overrided by flamingo
+@import "mixins"; // Mixins defined by flamingo
 @import "accordion";
 @import "action-menus";
 @import "admin";
@@ -44,7 +45,6 @@
 @import "misc";
 @import "panels";
 @import "tables";
-@import "type";
 @import "vertical-menus";
 @import "xlist";
 // In order to let custom skins easily override styling, we import a custom.less that is empty by default.

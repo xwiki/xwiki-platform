@@ -164,10 +164,12 @@ export default {
       return this.firstSortLevel.property === property.id;
     },
 
-    sort(property) {
-      this.logic.sort(property.id, 0).catch((err) => {
+    async sort(property) {
+      try {
+        await this.logic.sort(property.id, 0);
+      } catch (err) {
         console.warn(err);
-      });
+      }
     },
 
     reorderProperty(e) {

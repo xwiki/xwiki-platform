@@ -43,7 +43,6 @@ import {
   blockTypeSelectItems,
   useBlockNoteEditor,
   useComponentsContext,
-  useDictionary,
   useEditorState,
 } from "@blocknote/react";
 import { useTranslation } from "react-i18next";
@@ -117,7 +116,6 @@ export const CustomFormattingToolbar: React.FC<
   linkEditionHandler,
 }) => {
   const Components = useComponentsContext()!;
-  const dict = useDictionary();
   const { t } = useTranslation();
 
   const editor = useEditor();
@@ -126,7 +124,7 @@ export const CustomFormattingToolbar: React.FC<
   const currentBlock = editor.getTextCursorPosition().block;
 
   const combinedBlockTypeSelectItems = (
-    formattingToolbarProps.blockTypeSelectItems ?? blockTypeSelectItems(dict)
+    formattingToolbarProps.blockTypeSelectItems ?? blockTypeSelectItems(editor)
   ).concat(additionalBlockTypes);
 
   return (

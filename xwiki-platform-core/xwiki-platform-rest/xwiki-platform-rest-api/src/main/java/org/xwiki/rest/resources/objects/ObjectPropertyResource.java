@@ -79,6 +79,8 @@ public interface ObjectPropertyResource
      * @param propertyName the name of the property to update, for example {@code email}
      * @param minorRevision when {@code true}, saves the change as a minor version; when {@code null} (the default) or
      *  {@code false}, saves it as a normal (major) version
+     * @param comment (since 18.10.0RC1) the comment of the page version created by the change, shown in the page
+     *  history; when {@code null} (the default) the version has an empty comment
      * @param property the new state of the property; only its {@code value} is applied to the object
      * @return a response with status {@code 202} holding the object's updated property
      * @throws XWikiRestException if the property cannot be updated, for example the current user is not allowed to edit
@@ -94,6 +96,7 @@ public interface ObjectPropertyResource
             @PathParam("objectNumber") Integer objectNumber,
             @PathParam("propertyName") String propertyName,
             @QueryParam("minorRevision") Boolean minorRevision,
+            @QueryParam("comment") String comment,
             Property property
     ) throws XWikiRestException;
 }

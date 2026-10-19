@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
@@ -399,6 +401,41 @@ class DownloadActionTest
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
             "inline; filename*=utf-8''file.png");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "file.webp, image/webp",
+        "file.avif, image/avif",
+        "file.jxl, image/jxl",
+        "file.png, image/png"
+    })
+    void downloadWhenRasterImageDisplayedInline(String fileName, String mimeType) throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, fileName);
+        setRequestExpectations("/xwiki/bin/download/space/page/" + fileName, null, null, null, -1l, fileName);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, mimeType,
+            "inline; filename*=utf-8''" + fileName);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenSVGImage() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, "file.svg");
+        setRequestExpectations("/xwiki/bin/download/space/page/file.svg", null, null, null, -1l, "file.svg");
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        // SVG images can contain scripts so they are never displayed inline by default.
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/svg+xml",
+            "attachment; filename*=utf-8''file.svg");
         verifyOutputExpectations(0, this.fileContent.length);
     }
 

@@ -19,7 +19,10 @@
  */
 package org.xwiki.user.profile;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jsoup.Jsoup;
@@ -27,6 +30,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponentManagerEventListener;
@@ -34,6 +38,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -73,6 +81,9 @@ class UserProfilePageTest extends PageTest
 
     private static final DocumentReference ALICE_REFERENCE = new DocumentReference("xwiki", "XWiki", "alice");
 
+    @Mock
+    private Macro<Object> attachmentSelectorMacro;
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -98,6 +109,27 @@ class UserProfilePageTest extends PageTest
         Document dom = renderSheet(USER_SHEET);
         Element timeZone = dom.selectFirst(".userPreferences dd[data-user-property='timezone']");
         assertEquals(userProperties.get("timezone"), timeZone.text());
+    }
+
+    @Test
+    void avatarAttachmentSelectorFilter() throws Exception
+    {
+        // Collect the file extensions accepted by the attachment selectors displayed by the sheet.
+        List<String> filters = new ArrayList<>();
+        when(this.attachmentSelectorMacro.supportsInlineMode()).thenReturn(true);
+        when(this.attachmentSelectorMacro.getDescriptor()).thenReturn(
+            new DefaultMacroDescriptor(new MacroId("attachmentSelector"), "Attachment Selector Macro"));
+        when(this.attachmentSelectorMacro.execute(any(), any(), any())).then(invocation -> {
+            filters.add(invocation.getArgument(2, MacroTransformationContext.class).getCurrentMacroBlock()
+                .getParameter("filter"));
+            return Collections.emptyList();
+        });
+        this.componentManager.registerComponent(Macro.class, "attachmentSelector", this.attachmentSelectorMacro);
+
+        createUser(new HashMap<>());
+        renderSheet(USER_SHEET);
+
+        assertEquals(List.of("png,jpg,jpeg,gif,webp,avif,jxl"), filters);
     }
 
     private void registerUIX(DocumentReference documentReference) throws Exception

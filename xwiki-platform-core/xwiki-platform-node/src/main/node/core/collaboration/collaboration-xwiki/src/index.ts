@@ -18,4 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 export { ComponentInit } from "./componentInit";
+export { joinFormCollaboration } from "./formCollaboration";
 export { createXWikiWebSocketProvider } from "./xwikiProviderWebSocket";
+export type {
+  FormCollaboration,
+  FormCollaborationOptions,
+} from "./formCollaboration";

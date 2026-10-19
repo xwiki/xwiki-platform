@@ -1,9 +1,9 @@
 /* XWiki item lists */
 
 ul.xlist {
-  margin: 0 0 0 .5em !important;
+  margin: 0 0 0 .5em;
   overflow: hidden;
-  padding: 0 !important;
+  padding: 0;
 }
 
 ul.xlist li {
@@ -11,11 +11,11 @@ ul.xlist li {
   height: 100%;
   list-style-type: none;
   padding: .1em 0;
-  width: 100% !important;
+  width: 100%;
 }
 
 ul.xlist li.xunderline {
-  border-bottom: solid 1px #E8E8E8 !important;
+  border-bottom: solid 1px #E8E8E8;
 }
 
 ul.xlist li.xhighlight:hover {

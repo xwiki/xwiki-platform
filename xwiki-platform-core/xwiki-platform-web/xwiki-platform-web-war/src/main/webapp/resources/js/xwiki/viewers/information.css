@@ -1,7 +1,7 @@
 #template('colorThemeInit.vm')
 
 #informationcontent ul.xlist {
-  margin: 0 !important;
+  margin: 0;
 }
 
 #informationcontent dl {

@@ -101,6 +101,8 @@ function splitTyped(text: string): Constraint | null {
  * @returns the two halves, or null when the constraint has no value separator
  */
 function splitConstraint(text: string): Constraint | null {
+  // TODO: Deduplicate with Live Data, whose LiveDataRendererConfiguration#getFilters parses the same filters syntax
+  // on the server. Live Data has no client-side parser of its macro parameters to reuse yet.
   const constraint = splitTyped(text);
   return constraint === null
     ? null
@@ -206,6 +208,9 @@ function isIncomplete(value: string): boolean {
  * @returns the URL to fetch the candidate values from
  */
 function valuesUrl(searchURL: string, query: string, base: string): string {
+  // TODO: Deduplicate with Live Data, whose FilterList component fills the same placeholder and reads the same
+  // responses (see also asValues). That logic lives inside the Vue component, so Live Data would need to move it to
+  // a module the Records webjar can import first.
   const url = searchURL
     .split(QUERY_PLACEHOLDER)
     .join(encodeURIComponent(query));

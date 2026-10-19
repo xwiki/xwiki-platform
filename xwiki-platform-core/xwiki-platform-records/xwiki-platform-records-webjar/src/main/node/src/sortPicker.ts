@@ -77,6 +77,8 @@ function directionsOf(
  * @returns the field it sorts on
  */
 function fieldOf(criterion: string): string {
+  // TODO: Deduplicate with Live Data, whose LiveDataRendererConfiguration#getSortEntry parses the same sort syntax
+  // on the server. Live Data has no client-side parser of its macro parameters to reuse yet.
   const separator = criterion.indexOf(DIRECTION_SEPARATOR);
   return separator === -1 ? criterion : criterion.slice(0, separator);
 }

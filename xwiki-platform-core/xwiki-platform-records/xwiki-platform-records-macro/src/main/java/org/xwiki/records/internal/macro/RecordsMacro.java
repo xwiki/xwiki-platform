@@ -514,6 +514,9 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      */
     private String getDefaultSort(String properties, Map<String, RecordField> fields)
     {
+        // TODO: Deduplicate with Live Data, which picks the same default in
+        // DefaultLiveDataConfigurationResolver#setDefaultSort. That method is private, so Live Data would need to
+        // expose it first.
         return Stream.of(properties.split(LIST_SEPARATOR)).map(String::trim)
             .filter(property -> !property.startsWith(INTERNAL_PREFIX)).findFirst()
             .filter(property -> fields.containsKey(property) && fields.get(property).sortable())
@@ -522,6 +525,9 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
 
     private String getSortField(String item)
     {
+        // TODO: Deduplicate with Live Data, which parses the same sort syntax in
+        // LiveDataRendererConfiguration#getSortEntry. That class is internal, so Live Data would need to expose the
+        // parsing of its renderer parameters into a LiveDataQuery first.
         String trimmed = item.trim();
         return SORT_DIRECTIONS.stream().filter(trimmed::endsWith).findFirst()
             .map(direction -> trimmed.substring(0, trimmed.length() - direction.length())).orElse(trimmed);
@@ -529,6 +535,8 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
 
     private String getFilterField(String item)
     {
+        // TODO: Deduplicate with Live Data, which parses the same filters syntax in
+        // LiveDataRendererConfiguration#getFilters. Like the sort parsing, this needs Live Data to expose that parsing.
         return URLDecoder.decode(StringUtils.substringBefore(item, FILTER_VALUE_SEPARATOR), StandardCharsets.UTF_8)
             .trim();
     }

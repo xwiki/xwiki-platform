@@ -109,6 +109,11 @@ function typeOf(
   descriptor: PropertyDescriptor,
   types: PropertyType[],
 ): PropertyType | undefined {
+  // TODO: Deduplicate with Live Data, whose LiveDataLogic resolves a property against its type the same way in
+  // getPropertyTypeDescriptor, isPropertySortable, isPropertyFilterable and getFilterDescriptor, which canSort,
+  // canFilter and fits mirror. Those methods belong to the Live Data Vue app, so Live Data would need to move them to
+  // a module the Records webjar can import first. canSort and canFilter ignore the descriptor's own flag, because the
+  // REST properties resource serializes an unset one as false; the shared helpers would need to handle that.
   return types.find((type) => type.id === descriptor.type);
 }
 

@@ -149,6 +149,9 @@ public class RecordsFields
      */
     private RecordField getField(LiveDataPropertyDescriptor descriptor, LiveDataPropertyDescriptor type)
     {
+        // TODO: Deduplicate with Live Data, which resolves sortable the same way in
+        // DefaultLiveDataConfigurationResolver#isPropertySortable. That method is private and has no filterable or
+        // filter counterpart, so Live Data would need a public helper resolving a descriptor against its type first.
         boolean sortable = isEnabled(descriptor.isSortable(), type == null ? null : type.isSortable());
         boolean filterable = isEnabled(descriptor.isFilterable(), type == null ? null : type.isFilterable());
         FilterDescriptor filter = descriptor.getFilter() != null || type == null ? descriptor.getFilter()

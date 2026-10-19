@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -103,6 +104,8 @@ public class DocumentContentAsyncExecutor
 
     private DocumentModelBridge contentDocument;
 
+    private DocumentModelBridge asyncDocument;
+
     private Syntax syntax;
 
     private String transformationId;
@@ -111,9 +114,10 @@ public class DocumentContentAsyncExecutor
      * @param transformationId the transformation identifier
      * @param document the document to execute
      * @param parameters display parameters
+     * @param asyncAllowed {@code true} if the document might be executed asynchronously
      */
     public void initialize(String transformationId, DocumentModelBridge document,
-        DocumentDisplayerParameters parameters)
+        DocumentDisplayerParameters parameters, boolean asyncAllowed)
     {
         this.parameters = parameters;
 
@@ -124,6 +128,13 @@ public class DocumentContentAsyncExecutor
         this.documentReference = document.getDocumentReference();
         this.syntax = this.contentDocument.getSyntax();
         this.document = document;
+
+        // The asynchronous execution sets the displayed document as context document, and thus as secure document, in
+        // another thread. Copy it now so that the content is executed with the author of this version of the document
+        // even if the document instance is modified in the meantime.
+        if (asyncAllowed && parameters.isExecutionContextIsolated()) {
+            this.asyncDocument = ObjectUtils.cloneIfPossible(document);
+        }
     }
 
     /**
@@ -297,12 +308,10 @@ public class DocumentContentAsyncExecutor
         Map<String, Object> backupObjects = new HashMap<>();
         EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
-            // The following method call also clones the execution context.
-            if (async || this.document == null) {
-                this.documentAccessBridge.pushDocumentInContext(backupObjects, this.documentReference);
-            } else {
-                this.documentAccessBridge.pushDocumentInContext(backupObjects, this.document);
-            }
+            // Execute the content in the context of the document it comes from, so that it's executed with the rights
+            // of the author of that content. The following method call also clones the execution context.
+            this.documentAccessBridge.pushDocumentInContext(backupObjects,
+                async && this.asyncDocument != null ? this.asyncDocument : this.document);
 
             // Make sure to synchronize the context wiki with the context document's wiki.
             this.modelContext.setCurrentEntityReference(this.documentReference.getWikiReference());

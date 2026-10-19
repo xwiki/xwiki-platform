@@ -892,7 +892,7 @@ window.shortcut = new Object({
      * The opt parameter should be a map of optional parameters used while registering the shortcut.
      * <ul>
      *     <li>target: A DOM element in which the shortcut should be listened (defaults to the whole document)</li>
-     *     <li>disable_in_input: If true, the shortcut will not be listened when an input
+     *     <li>disable_in_input: If true, the shortcut will not be listened when an input, select
      *     or textarea field is selected (default: false)</li>
      *     <li>type: The type (shortcut.type) that should be used (default: SIMPLE)</li>
      * </ul>
@@ -1035,8 +1035,9 @@ window.shortcut = new Object({
 
             if (group === this._listeners.disabled_in_inputs) {
                 // Disable the created listener when focus goes on an input, a textarea field, an editable element or on
-                // the CodeMirror div (syntax highlighting).
-                const editableSelector = 'input, textarea, [contenteditable=true], .CodeMirror-code';
+                // the CodeMirror div (syntax highlighting), but also on a select (drop-down list) because typing in a
+                // select selects the option that starts with the typed letters.
+                const editableSelector = 'input, select, textarea, [contenteditable=true], .CodeMirror-code';
                 jQuery(document)
                     .on('focus', editableSelector, function() { newListener.stop_listening(); })
                     .on('blur', editableSelector, function() { newListener.listen(); });

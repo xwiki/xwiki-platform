@@ -20,8 +20,10 @@
 package com.xpn.xwiki.plugin.mailsender;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Named;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -32,18 +34,25 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,8 +61,22 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 public class MailSenderApiTest
 {
+    private static final String DENIED_ERROR =
+        "The author of the script needs admin right on the wiki to send mails. No mail has been sent.";
+
+    private static final WikiReference WIKI = new WikiReference("xwiki");
+
+    private static final DocumentReference SCRIPT_AUTHOR = new DocumentReference("xwiki", "XWiki", "ScriptAuthor");
+
+    private static final DocumentReference CURRENT_USER = new DocumentReference("xwiki", "XWiki", "CurrentUser");
+
     @MockComponent
     private MailSenderConfiguration mockConfiguration;
+
+    // Needed to set the current user in the context.
+    @MockComponent
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactWikiSerializer;
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -85,6 +108,15 @@ public class MailSenderApiTest
         when(this.mockConfiguration.getHost()).thenReturn(mailserver.getSmtp().getBindTo());
         when(this.mockConfiguration.getPort()).thenReturn(mailserver.getSmtp().getPort());
         when(this.mockConfiguration.getAdditionalProperties()).thenReturn(new Properties());
+
+        // The script is written by a wiki admin and executed by a user who is not admin (the default answer of the
+        // mocked authorization manager): only the rights of the script author matter.
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        XWikiDocument scriptDocument = mock();
+        when(scriptDocument.getContentAuthorReference()).thenReturn(SCRIPT_AUTHOR);
+        xcontext.put(XWikiDocument.CKEY_SDOC, scriptDocument);
+        xcontext.setUserReference(CURRENT_USER);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.ADMIN, SCRIPT_AUTHOR, WIKI)).thenReturn(true);
 
         MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy", this.oldcore.getXWikiContext());
         this.api = new MailSenderPluginApi(plugin, this.oldcore.getXWikiContext());
@@ -157,5 +189,45 @@ public class MailSenderApiTest
         assertEquals("steve@acme.org", peterMessage.getFrom()[0].toString());
         assertEquals("Test content", peterMessage.getContent());
         assertEquals("value", peterMessage.getHeader("header")[0]);
+    }
+
+    @Test
+    void sendMailWhenScriptAuthorIsNotAdmin()
+    {
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.ADMIN, SCRIPT_AUTHOR, WIKI)).thenReturn(false);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.ADMIN, CURRENT_USER, WIKI)).thenReturn(true);
+
+        assertEquals(-1, this.api.sendMail(createTestMail()));
+        assertEquals(-1, this.api.sendTextMessage("john@acme.org", "peter@acme.org", "Test subject", "Text content"));
+        assertEquals(-1, this.api.sendRawMessage("john@acme.org", "peter@acme.org", "Subject:Test\n\nTest content"));
+        MailConfiguration config = this.api.createMailConfiguration(
+            new com.xpn.xwiki.api.XWiki(this.oldcore.getSpyXWiki(), this.oldcore.getXWikiContext()));
+        assertEquals(-1, this.api.sendMail(createTestMail(), config));
+        assertEquals(-1, this.api.sendMessageFromTemplate("john@acme.org", "peter@acme.org", null, null, "en",
+            "XWiki.MailTemplate", Map.of()));
+
+        assertEquals(DENIED_ERROR, this.oldcore.getXWikiContext().get("error"));
+        assertEquals(0, mailserver.getReceivedMessages().length);
+    }
+
+    @Test
+    void sendMailWhenPermissionsAreDropped()
+    {
+        this.oldcore.getXWikiContext().dropPermissions();
+
+        assertEquals(-1, this.api.sendMail(createTestMail()));
+
+        assertEquals(DENIED_ERROR, this.oldcore.getXWikiContext().get("error"));
+        assertEquals(0, mailserver.getReceivedMessages().length);
+    }
+
+    private Mail createTestMail()
+    {
+        Mail mail = this.api.createMail();
+        mail.setFrom("john@acme.org");
+        mail.setTo("peter@acme.org");
+        mail.setSubject("Test subject");
+        mail.setTextPart("Text content");
+        return mail;
     }
 }

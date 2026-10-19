@@ -79,6 +79,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-realtime/xwiki-platform-realtime-wysiwyg/xwiki-platform-realtime-wysiwyg-webjar/src/test/node
+  - xwiki-platform-core/xwiki-platform-records/xwiki-platform-records-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/test/node
   - xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-webjar/src/main/node
 
@@ -173,6 +174,7 @@ catalog:
   rimraf: 6.1.3
   sinon: 22.1.0
   tippy.js: 6.3.7
+  tom-select: 2.6.2
   typescript: 5.9.3
   typescript-eslint: 8.70.1
   u-node: 0.0.8

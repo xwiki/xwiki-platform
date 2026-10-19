@@ -221,6 +221,7 @@ interface Suggester {
  *
  * @param element - the field input being enhanced
  * @param fetchJson - fetches and parses the Live Data properties resource
+ * @param offer - what the picker offers, the columns picker's offer when omitted
  * @returns the settings to hand to the suggest widget
  */
 function createSettings(

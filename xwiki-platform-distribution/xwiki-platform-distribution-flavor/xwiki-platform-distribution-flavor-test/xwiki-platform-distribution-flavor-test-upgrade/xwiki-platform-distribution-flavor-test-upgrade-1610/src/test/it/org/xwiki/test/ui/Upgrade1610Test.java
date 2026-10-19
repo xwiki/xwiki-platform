@@ -58,7 +58,14 @@ public class Upgrade1610Test extends UpgradeTest
             // We don't ignore anymore property values related to missing xclass fields when reading a XAR file,
             // so when reading the XAR file of AdminSection we find configureGlobally property which is not present
             // in DB since when we imported the file back then we were ignoring those values, hence the warning.
-            "Object property [Home » CKEditor » AdminSection] already removed"
+            "Object property [Home » CKEditor » AdminSection] already removed",
+            // The Netflux API installed by the previous version uses the javax.websocket API without declaring it as a
+            // dependency: it gets it only when the javax.websocket-api extension (installed as a dependency of other
+            // extensions) is initialized before it, which depends on the initialization order of the installed
+            // extensions. Otherwise, it and the realtime extensions depending on it cannot be initialized until they
+            // are upgraded.
+            "Failed to initialize local extension [org.xwiki.platform:xwiki-platform-realtime-",
+            "Failed to initialize local extension [org.xwiki.platform:xwiki-platform-netflux-api/16.10.0]"
         );
     }
 }

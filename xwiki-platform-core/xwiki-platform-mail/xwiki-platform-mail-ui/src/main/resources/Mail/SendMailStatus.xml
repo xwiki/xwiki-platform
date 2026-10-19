@@ -48,10 +48,10 @@
 
     {{html}}
       &lt;div class="xwikirenderingerror" title="Click to get more details about the error" style="cursor: pointer;"&gt;
-        $services.localization.render('mailSender.admin.resendFailure')
+        $escapetool.xml($services.localization.render('mailSender.admin.resendFailure'))
       &lt;/div&gt;
       &lt;div class="xwikirenderingerrordescription hidden"&gt;
-        &lt;pre&gt;${description}&lt;/pre&gt;
+        &lt;pre&gt;$escapetool.xml($description)&lt;/pre&gt;
       &lt;/div&gt;
     {{/html}}
 
@@ -79,10 +79,10 @@
 
     {{html}}
       &lt;div class="xwikirenderingerror" title="Click to get more details about the error" style="cursor: pointer;"&gt;
-        $services.localization.render('mailSender.admin.deleteFailure')
+        $escapetool.xml($services.localization.render('mailSender.admin.deleteFailure'))
       &lt;/div&gt;
       &lt;div class="xwikirenderingerrordescription hidden"&gt;
-        &lt;pre&gt;${description}&lt;/pre&gt;
+        &lt;pre&gt;$escapetool.xml($description)&lt;/pre&gt;
       &lt;/div&gt;
     {{/html}}
 

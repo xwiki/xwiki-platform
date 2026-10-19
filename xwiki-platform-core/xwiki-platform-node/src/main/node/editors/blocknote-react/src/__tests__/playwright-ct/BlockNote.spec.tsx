@@ -348,6 +348,30 @@ test("Code blocks created by typing ``` use the typed language or Plain Text", a
   await expect(codeBlocks.nth(1).locator("select")).toHaveValue("python");
 });
 
+test("Ctrl+Alt+C turns the current block into a code block", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={buildParagraphs(["foo"])}
+      macros={false}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  await component.locator("p.bn-inline-content").click();
+  await pressKeySettled(page, "ControlOrMeta+Alt+c");
+
+  const codeBlock = component.locator(
+    '.bn-block-content[data-content-type="codeBlock"]',
+  );
+  await expect(codeBlock).toHaveCount(1);
+  await expect(codeBlock.locator("code")).toHaveText("foo");
+  await expect(codeBlock.locator("select")).toHaveValue("text");
+  await expect(component.locator("p.bn-inline-content")).toHaveCount(0);
+});
+
 function buildParagraphs(blocks: string[]): BlockType[] {
   return blocks.map((blockText) => ({
     id: Math.random().toString(),

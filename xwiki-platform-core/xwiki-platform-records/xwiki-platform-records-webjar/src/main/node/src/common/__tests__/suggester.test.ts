@@ -26,7 +26,7 @@ import {
 } from "../suggester";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { FieldOption, JsonFetcher } from "../fieldPicker";
-import type { Offer, Suggester } from "../suggester";
+import type { Suggester, Suggestions } from "../suggester";
 
 const STATUS: FieldOption = {
   value: "status",
@@ -52,9 +52,9 @@ let element: Element;
 let suggester: Suggester;
 
 /**
- * What the picker offers, answering with {@link STATUS} unless a test says otherwise.
+ * What the picker suggests, answering with {@link STATUS} unless a test says otherwise.
  */
-let offer: {
+let suggestions: {
   load: ReturnType<typeof vi.fn>;
   resolve: ReturnType<typeof vi.fn>;
 };
@@ -69,14 +69,14 @@ beforeEach(() => {
       <div class="ts-wrapper"><div class="ts-control"></div></div>
     </form>`;
   element = document.querySelector(".picker")!;
-  offer = {
+  suggestions = {
     load: vi.fn().mockResolvedValue([STATUS]),
     resolve: vi.fn().mockResolvedValue([STATUS]),
   };
   suggester = {
     items: ["status"],
     options: {},
-    settings: createSettings(element, fetchJson, offer as Offer),
+    settings: createSettings(element, fetchJson, suggestions as Suggestions),
     wrapper: document.querySelector<HTMLElement>(".ts-wrapper")!,
     addOption: vi.fn(),
     updateOption: vi.fn(),
@@ -115,18 +115,22 @@ function showItems(...values: string[]): void {
 }
 
 describe("createSettings", () => {
-  it("asks the offer for the query, telling it what is already selected", async () => {
+  it("asks the suggestions for the query, telling it what is already selected", async () => {
     await expect(load("sta")).resolves.toEqual([STATUS]);
-    expect(offer.load).toHaveBeenCalledWith(element, "sta", fetchJson, [
+    expect(suggestions.load).toHaveBeenCalledWith(element, "sta", fetchJson, [
       "status",
     ]);
   });
 
-  it("resolves a stored value through the offer", async () => {
+  it("resolves a stored value through the suggestions", async () => {
     const callback = vi.fn();
     suggester.settings.loadSelected.call(suggester, "status", callback);
     await vi.waitFor(() => expect(callback).toHaveBeenCalledWith([STATUS]));
-    expect(offer.resolve).toHaveBeenCalledWith(element, "status", fetchJson);
+    expect(suggestions.resolve).toHaveBeenCalledWith(
+      element,
+      "status",
+      fetchJson,
+    );
   });
 
   it("clears an earlier failure once a load succeeds", async () => {
@@ -145,7 +149,7 @@ describe("createSettings", () => {
   });
 
   it("offers nothing on a failure, and says why under the widget with a way to try again", async () => {
-    offer.load.mockRejectedValue(new Error("HTTP 500"));
+    suggestions.load.mockRejectedValue(new Error("HTTP 500"));
 
     await expect(load("sta")).resolves.toEqual([]);
 
@@ -156,18 +160,22 @@ describe("createSettings", () => {
   });
 
   it("tries again from the message: forgets what was loaded, resolves the selection again and loads", async () => {
-    offer.load.mockRejectedValue(new Error("HTTP 500"));
+    suggestions.load.mockRejectedValue(new Error("HTTP 500"));
     await load("sta");
 
     suggester.wrapper.nextElementSibling!.querySelector("button")!.click();
 
     expect(suggester.clearOptions).toHaveBeenCalled();
-    expect(offer.resolve).toHaveBeenCalledWith(element, "status", fetchJson);
+    expect(suggestions.resolve).toHaveBeenCalledWith(
+      element,
+      "status",
+      fetchJson,
+    );
     expect(suggester.load).toHaveBeenCalledWith("sta");
   });
 
   it("reports a failure after the field itself, without a retry, before the widget exists", async () => {
-    offer.load.mockRejectedValue(new Error("HTTP 500"));
+    suggestions.load.mockRejectedValue(new Error("HTTP 500"));
     const callback = vi.fn();
 
     suggester.settings.load.call(undefined, "", callback);
@@ -183,9 +191,9 @@ describe("createSettings", () => {
     expect(suggester.load).toHaveBeenCalledWith("sta");
   });
 
-  it("lets the offer override the shared settings", () => {
+  it("lets the suggestions override the shared settings", () => {
     const settings = createSettings(element, fetchJson, {
-      ...(offer as Offer),
+      ...(suggestions as Suggestions),
       settings: { plugins: ["remove_button"] },
     });
     expect(settings.plugins).toEqual(["remove_button"]);

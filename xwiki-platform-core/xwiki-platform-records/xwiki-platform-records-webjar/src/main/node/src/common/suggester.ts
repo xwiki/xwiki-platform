@@ -87,9 +87,9 @@ interface Suggester {
 }
 
 /**
- * What one picker offers: the options for a query, and the option that shows a stored value back.
+ * What one picker suggests: the options for a query, and the option that shows a stored value back.
  */
-interface Offer {
+interface Suggestions {
   load: (
     element: Element,
     query: string,
@@ -120,13 +120,13 @@ interface Offer {
  *
  * @param element - the field input being enhanced
  * @param fetchJson - fetches and parses the Live Data properties resource
- * @param offer - what the picker offers
+ * @param suggestions - what the picker suggests
  * @returns the settings to hand to the suggest widget
  */
 function createSettings(
   element: Element,
   fetchJson: JsonFetcher,
-  offer: Offer,
+  suggestions: Suggestions,
 ): PickerSettings {
   // A failure to reach the properties resource must not break the keystroke handler, and must not pass for "this
   // object type has no fields" either: the dropdown has nothing to offer, and a message under the widget says why
@@ -157,9 +157,11 @@ function createSettings(
     };
   return {
     load: guard((query, selected) =>
-      offer.load(element, query, fetchJson, selected),
+      suggestions.load(element, query, fetchJson, selected),
     ),
-    loadSelected: guard((value) => offer.resolve(element, value, fetchJson)),
+    loadSelected: guard((value) =>
+      suggestions.resolve(element, value, fetchJson),
+    ),
     optgroups: [
       { value: "fields", label: translate("picker.group.fields") },
       { value: "metadata", label: translate("picker.group.metadata") },
@@ -186,7 +188,7 @@ function createSettings(
     onFocus() {
       this.load(this.inputValue());
     },
-    ...offer.settings,
+    ...suggestions.settings,
   };
 }
 
@@ -283,4 +285,4 @@ function watchProblems(suggester: Suggester): void {
 }
 
 export { createSettings, reload, resolveAgain, watchProblems };
-export type { Offer, PickerSettings, Suggester };
+export type { PickerSettings, Suggester, Suggestions };

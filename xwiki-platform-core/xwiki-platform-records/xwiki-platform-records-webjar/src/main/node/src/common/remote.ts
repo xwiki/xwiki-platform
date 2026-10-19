@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { asTypes, typesUrl } from "./fieldUse";
-import { asValues, valuesUrl } from "./filterPicker";
 import type { JsonFetcher } from "./fieldPicker";
 import type { PropertyType } from "./fieldUse";
 
@@ -66,29 +65,4 @@ async function fetchTypes(fetchJson: JsonFetcher): Promise<PropertyType[]> {
   }
 }
 
-/**
- * Loads the values a field suggests for what the author typed after the value separator.
- *
- * A failure yields no suggestion rather than an error: the fields did load, and a value can always be typed, so the
- * author is left as with a field that has no suggester rather than told that the fields could not be loaded.
- *
- * @param searchURL - the field's value suggestion URL, as its descriptor reports it
- * @param query - the typed value
- * @param fetchJson - fetches and parses the suggestions
- * @returns the suggested values, empty when they could not be loaded
- */
-async function loadValues(
-  searchURL: string,
-  query: string,
-  fetchJson: JsonFetcher,
-): Promise<ReturnType<typeof asValues>> {
-  try {
-    return asValues(
-      await fetchJson(valuesUrl(searchURL, query, window.location.href)),
-    );
-  } catch {
-    return [];
-  }
-}
-
-export { fetchJson, loadTypes, loadValues };
+export { fetchJson, loadTypes };

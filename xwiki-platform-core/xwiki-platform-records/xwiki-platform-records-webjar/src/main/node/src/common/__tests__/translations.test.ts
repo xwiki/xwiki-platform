@@ -21,7 +21,6 @@ import { METADATA_COLUMNS } from "../fieldPicker";
 import {
   TRANSLATION_KEYS_MODULE,
   defineTranslationKeys,
-  directionLabels,
   metadataLabels,
   setMessages,
   translate,
@@ -53,17 +52,6 @@ describe("translate", () => {
 
   it("returns the key when the bundle does not have it, so a missing translation still shows up", () => {
     expect(translate("picker.retry")).toBe("picker.retry");
-  });
-});
-
-describe("directionLabels", () => {
-  it("translates the three labels a sort criterion is offered under", () => {
-    givenEchoMessages();
-    expect(directionLabels()).toEqual({
-      ascending: "[picker.sort.ascending]",
-      descending: "[picker.sort.descending]",
-      defaultOrder: "[picker.sort.default]",
-    });
   });
 });
 

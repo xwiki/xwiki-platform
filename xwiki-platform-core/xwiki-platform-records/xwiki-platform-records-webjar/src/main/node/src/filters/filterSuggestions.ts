@@ -17,92 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { dataTypeName } from "./dialog";
-import { loadDescriptors, loadOptions } from "./fieldPicker";
-import { canFilter, canSort, filterProblem, sortProblem } from "./fieldUse";
 import {
   FILTER_SEPARATOR,
+  asValues,
   createFilterOption,
   isIncomplete,
   resolveFilterOption,
   splitTyped,
   toFieldOptions,
   toValueOptions,
+  valuesUrl,
 } from "./filterPicker";
-import { loadTypes, loadValues } from "./remote";
-import { fieldOf, resolveSortOption, toSortOptions } from "./sortPicker";
-import { reload, resolveAgain } from "./suggester";
-import { directionLabels, metadataLabels, withProblem } from "./translations";
+import { dataTypeName } from "../common/dialog";
+import { loadDescriptors } from "../common/fieldPicker";
+import { canFilter, filterProblem } from "../common/fieldUse";
+import { loadTypes } from "../common/remote";
+import { resolveAgain } from "../common/suggester";
+import { metadataLabels, withProblem } from "../common/translations";
 import type {
   FieldOption,
   JsonFetcher,
   PropertyDescriptor,
-} from "./fieldPicker";
-import type { Offer } from "./suggester";
-
-/**
- * The columns picker: one option per field, and a stored value is an identifier the same request resolves.
- */
-const columnsOffer: Offer = {
-  load: (element, query, fetchJson) =>
-    loadOptions(element, query, XWiki.contextPath, fetchJson, metadataLabels()),
-  resolve: (element, value, fetchJson) =>
-    loadOptions(element, value, XWiki.contextPath, fetchJson, metadataLabels()),
-};
-
-/**
- * The sort picker: two options per field, one per direction, minus the fields already sorted on, since sorting a
- * field twice adds nothing. A stored criterion is resolved exactly rather than searched, for the reason given on
- * {@link resolveSortOption}.
- */
-const sortOffer: Offer = {
-  load: async (element, query, fetchJson, selected) => {
-    const sourceTypes = await loadTypes(fetchJson);
-    return toSortOptions(
-      await loadDescriptors(
-        element,
-        XWiki.contextPath,
-        fetchJson,
-        metadataLabels(),
-      ),
-      query,
-      selected,
-      directionLabels(),
-      (descriptor) => canSort(descriptor, sourceTypes),
-    );
-  },
-  resolve: async (element, value, fetchJson) => {
-    const sourceTypes = await loadTypes(fetchJson);
-    const descriptors = await loadDescriptors(
-      element,
-      XWiki.contextPath,
-      fetchJson,
-      metadataLabels(),
-    );
-    return [
-      withProblem(
-        resolveSortOption(descriptors, value, directionLabels()),
-        sortProblem(
-          descriptors,
-          sourceTypes,
-          fieldOf(value),
-          dataTypeName(element),
-        ),
-      ),
-    ];
-  },
-  settings: {
-    // A field that has just been used, or has just been freed, changes what should be offered. The widget caches
-    // what it has loaded per query and keeps the options it has already seen, so both are dropped here, and loaded
-    // again right away since the dropdown stays open for the next criterion.
-    onItemAdd() {
-      reload(this);
-    },
-    onItemRemove() {
-      reload(this);
-    },
-  },
-};
+} from "../common/fieldPicker";
+import type { Suggestions } from "../common/suggester";
 
 /**
  * The filters picker: one item per `field=value` constraint.
@@ -112,7 +49,7 @@ const sortOffer: Offer = {
  * values when the source reports a way to suggest them, and otherwise stays out of the way so the author can type
  * a value freely. That is also why this is the one picker accepting free text.
  */
-const filtersOffer: Offer = {
+const filterSuggestions: Suggestions = {
   load: async (element, query, fetchJson) => {
     const sourceTypes = await loadTypes(fetchJson);
     const descriptors = await loadDescriptors(
@@ -203,4 +140,29 @@ async function loadValueOptions(
   );
 }
 
-export { columnsOffer, filtersOffer, sortOffer };
+/**
+ * Loads the values a field suggests for what the author typed after the value separator.
+ *
+ * A failure yields no suggestion rather than an error: the fields did load, and a value can always be typed, so the
+ * author is left as with a field that has no suggester rather than told that the fields could not be loaded.
+ *
+ * @param searchURL - the field's value suggestion URL, as its descriptor reports it
+ * @param query - the typed value
+ * @param fetchJson - fetches and parses the suggestions
+ * @returns the suggested values, empty when they could not be loaded
+ */
+async function loadValues(
+  searchURL: string,
+  query: string,
+  fetchJson: JsonFetcher,
+): Promise<string[]> {
+  try {
+    return asValues(
+      await fetchJson(valuesUrl(searchURL, query, window.location.href)),
+    );
+  } catch {
+    return [];
+  }
+}
+
+export { filterSuggestions, loadValues };

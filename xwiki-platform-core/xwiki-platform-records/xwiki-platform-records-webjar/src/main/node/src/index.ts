@@ -21,6 +21,7 @@
 // The build writes the imported styles to index.css rather than into the bundle. The displayer templates load that
 // file through the link skin extension.
 import "./records.css";
+import { columnSuggestions } from "./columns/columnSuggestions";
 import {
   clearMessages,
   findDataTypeInput,
@@ -29,20 +30,21 @@ import {
   resetDerivedParameters,
   setTabsVisible,
   showMessage,
-} from "./dialog";
-import { hasDataTypeFields, loadDescriptors } from "./fieldPicker";
-import { columnsOffer, filtersOffer, sortOffer } from "./offers";
-import { fetchJson } from "./remote";
-import { createSettings, watchProblems } from "./suggester";
+} from "./common/dialog";
+import { hasDataTypeFields, loadDescriptors } from "./common/fieldPicker";
+import { fetchJson } from "./common/remote";
+import { createSettings, watchProblems } from "./common/suggester";
 import {
   TRANSLATION_KEYS_MODULE,
   defineTranslationKeys,
   setMessages,
   translate,
-} from "./translations";
+} from "./common/translations";
+import { filterSuggestions } from "./filters/filterSuggestions";
+import { sortSuggestions } from "./sort/sortSuggestions";
 import { loadById } from "@xwiki/platform-xwiki-utils";
-import type { Offer, Suggester } from "./suggester";
-import type { Messages } from "./translations";
+import type { Suggester, Suggestions } from "./common/suggester";
+import type { Messages } from "./common/translations";
 
 /**
  * Wires the Records macro dialog: the field picker, and the two behaviours that depend on the data type.
@@ -110,8 +112,8 @@ async function warnIfDataTypeMissing(
 /**
  * Enhances the three pickers of one dialog.
  *
- * They differ only in what they offer, which is what {@link Offer} carries: the settings they share — the widget,
- * the failure handling, the placeholder behaviour — are built once in {@link createSettings}.
+ * They differ only in what they suggest, which is what {@link Suggestions} carries. The settings they share, such as
+ * the widget, the failure handling and the placeholder behaviour, are built once in {@link createSettings}.
  *
  * @param $ - the page's jQuery instance
  * @param picker - the columns picker element
@@ -122,14 +124,18 @@ function enhancePickers(
   picker: Element,
   scope: ParentNode,
 ): void {
-  $(picker).xwikiSelectize(createSettings(picker, fetchJson, columnsOffer));
-  const others: [string, Offer][] = [
-    [SORT_SELECTOR, sortOffer],
-    [FILTERS_SELECTOR, filtersOffer],
+  $(picker).xwikiSelectize(
+    createSettings(picker, fetchJson, columnSuggestions),
+  );
+  const others: [string, Suggestions][] = [
+    [SORT_SELECTOR, sortSuggestions],
+    [FILTERS_SELECTOR, filterSuggestions],
   ];
-  others.forEach(([selector, offer]) => {
+  others.forEach(([selector, suggestions]) => {
     scope.querySelectorAll(selector).forEach((element) => {
-      $(element).xwikiSelectize(createSettings(element, fetchJson, offer));
+      $(element).xwikiSelectize(
+        createSettings(element, fetchJson, suggestions),
+      );
       const suggester = element.selectize as Suggester | undefined;
       if (suggester) {
         watchProblems(suggester);

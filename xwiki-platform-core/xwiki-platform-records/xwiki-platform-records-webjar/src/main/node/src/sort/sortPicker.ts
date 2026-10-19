@@ -33,8 +33,13 @@
  * directions of a field that is already sorted invites reading the pair as a choice when it is not one.
  */
 
-import { groupOf, isCandidate, isOffered, matches } from "./fieldPicker";
-import type { FieldOption, PropertyDescriptor } from "./fieldPicker";
+import {
+  groupOf,
+  isCandidate,
+  isOffered,
+  matches,
+} from "../common/fieldPicker";
+import type { FieldOption, PropertyDescriptor } from "../common/fieldPicker";
 
 /**
  * Separates a field from its direction in one criterion.

@@ -82,30 +82,3 @@ describe("loadTypes", () => {
     expect(fetchJson).toHaveBeenCalledTimes(2);
   });
 });
-
-describe("loadValues", () => {
-  it("fills the typed text into the field's suggestion URL", async () => {
-    const fetchJson = vi
-      .fn<JsonFetcher>()
-      .mockResolvedValue({ propertyValues: [{ value: "Active" }] });
-
-    await expect(
-      remote.loadValues(
-        "/xwiki/values?fp={encodedQuery}",
-        "on hold",
-        fetchJson,
-      ),
-    ).resolves.toEqual(["Active"]);
-    expect(fetchJson.mock.calls[0][0]).toContain("/xwiki/values?fp=on%20hold");
-  });
-
-  it("suggests nothing when the values cannot be loaded, since a value can still be typed", async () => {
-    const fetchJson = vi
-      .fn<JsonFetcher>()
-      .mockRejectedValue(new Error("HTTP 500"));
-
-    await expect(
-      remote.loadValues("/xwiki/values?fp={encodedQuery}", "a", fetchJson),
-    ).resolves.toEqual([]);
-  });
-});

@@ -20,7 +20,6 @@
 import { METADATA_COLUMNS } from "./fieldPicker";
 import type { FieldOption } from "./fieldPicker";
 import type { Problem } from "./fieldUse";
-import type { DirectionLabels } from "./sortPicker";
 
 /**
  * The module holding the translation keys the dialog needs, which the `xwiki-l10n` loader plugin resolves into the
@@ -90,17 +89,6 @@ function translate(key: string, ...args: string[]): string {
 }
 
 /**
- * @returns the translated labels a sort criterion is offered under
- */
-function directionLabels(): DirectionLabels {
-  return {
-    ascending: translate("picker.sort.ascending"),
-    descending: translate("picker.sort.descending"),
-    defaultOrder: translate("picker.sort.default"),
-  };
-}
-
-/**
  * @returns the translated labels the page metadata is offered under, by identifier
  */
 function metadataLabels(): Record<string, string> {
@@ -126,7 +114,6 @@ function withProblem(
 export {
   TRANSLATION_KEYS_MODULE,
   defineTranslationKeys,
-  directionLabels,
   metadataLabels,
   setMessages,
   translate,

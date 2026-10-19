@@ -22,15 +22,21 @@ package org.xwiki.display.internal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -39,7 +45,10 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,8 +69,17 @@ class DocumentContentAsyncExecutorTest
     @MockComponent
     private VelocityManager velocityManager;
 
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private TransformationManager transformationManager;
+
     @Mock
     private DocumentModelBridge document;
+
+    @Mock
+    private DocumentModelBridge translatedDocument;
 
     private Map<Object, Object> xcontext = new HashMap<>();
 
@@ -100,5 +118,53 @@ class DocumentContentAsyncExecutorTest
 
         // Verify the image id has been adapted.
         assertEquals("Ilogo-1", image.getId());
+    }
+
+    @Test
+    void executeIsolatedWithTranslatedContent() throws Exception
+    {
+        XDOM translatedXDOM = mockTranslation();
+        this.parameters.setExecutionContextIsolated(true);
+        this.parameters.setContentTranslated(true);
+
+        AtomicReference<Object> secureDocument = new AtomicReference<>();
+        doAnswer(invocation -> secureDocument.getAndSet(this.xcontext.get("sdoc"))).when(this.transformationManager)
+            .performTransformations(any(XDOM.class), any(TransformationContext.class));
+
+        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters);
+
+        assertSame(translatedXDOM, this.documentContentAsyncExecutor.execute(false));
+        // The translated content is executed with the translation as secure document.
+        assertSame(this.translatedDocument, secureDocument.get());
+    }
+
+    @Test
+    void executeIsolatedWithoutTranslatedContent() throws Exception
+    {
+        mockTranslation();
+        this.parameters.setExecutionContextIsolated(true);
+
+        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters);
+
+        this.documentContentAsyncExecutor.execute(false);
+
+        assertFalse(this.xcontext.containsKey("sdoc"));
+    }
+
+    private XDOM mockTranslation() throws Exception
+    {
+        when(this.document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.document.getRealLanguage()).thenReturn("");
+        when(this.document.getPreparedXDOM()).thenReturn(new XDOM(List.of()));
+
+        XDOM translatedXDOM = new XDOM(List.of());
+        when(this.translatedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.translatedDocument.getRealLanguage()).thenReturn("fr");
+        when(this.translatedDocument.getPreparedXDOM()).thenReturn(translatedXDOM);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(this.document))
+            .thenReturn(this.translatedDocument);
+
+        return translatedXDOM;
     }
 }

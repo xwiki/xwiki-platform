@@ -67,6 +67,12 @@ public class DocumentContentAsyncExecutor
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
 
+    /**
+     * The context property holding the document whose content author is used to check the script and programming
+     * rights.
+     */
+    private static final String SECURE_DOCUMENT = "sdoc";
+
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
@@ -99,6 +105,8 @@ public class DocumentContentAsyncExecutor
 
     private DocumentModelBridge document;
 
+    private DocumentModelBridge contentDocument;
+
     private Syntax syntax;
 
     private String transformationId;
@@ -114,6 +122,7 @@ public class DocumentContentAsyncExecutor
         this.parameters = parameters;
 
         this.transformationId = transformationId;
+        this.contentDocument = document;
         this.xdom = getPreparedContent(document, parameters);
         this.documentReference = document.getDocumentReference();
         this.syntax = document.getSyntax();
@@ -173,15 +182,18 @@ public class DocumentContentAsyncExecutor
             // returned by the document access bridge can have "" or "default" language set.
             if (!document.getRealLanguage().equals(translatedDocument.getRealLanguage())) {
                 // The language of the given document doesn't match the context language. Use the translated content.
+                XDOM translatedContent;
                 if (document.getSyntax().equals(translatedDocument.getSyntax())) {
                     // Use getXDOM() because it caches the XDOM.
-                    return translatedDocument.getPreparedXDOM();
+                    translatedContent = translatedDocument.getPreparedXDOM();
                 } else {
                     // If the translated document has a different syntax then we have to parse its content using the
                     // syntax of the given document.
-                    return parseContent(translatedDocument.getContent(), document.getSyntax(),
+                    translatedContent = parseContent(translatedDocument.getContent(), document.getSyntax(),
                         document.getDocumentReference());
                 }
+                this.contentDocument = translatedDocument;
+                return translatedContent;
             }
         } catch (Exception e) {
             // Use the content of the given document.
@@ -320,6 +332,13 @@ public class DocumentContentAsyncExecutor
 
             // Make sure to synchronize the context wiki with the context document's wiki.
             this.modelContext.setCurrentEntityReference(this.documentReference.getWikiReference());
+
+            // Changing the context document also resets the secure document to the context document. Make sure that
+            // translated content is executed with the rights of its own author and not with the rights of the author
+            // of the default translation.
+            if (this.contentDocument != this.document) {
+                getXWikiContextMap().put(SECURE_DOCUMENT, this.contentDocument);
+            }
 
             executeInCurrentExecutionContext(async);
         } catch (Exception e) {

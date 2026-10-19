@@ -64,6 +64,80 @@ class ContentAuthorIT
         displayTranslatedContent(setup, reference, "displayTranslatedAsynchronousContent", true);
     }
 
+    @Test
+    @Order(3)
+    void renderAsynchronousContent(TestUtils setup, TestReference reference) throws Exception
+    {
+        String userName = "renderAsynchronousContent";
+        setup.loginAsSuperAdmin();
+        setup.createUser(userName, userName, null);
+
+        boolean homeCreated = createHomePage(setup);
+
+        try {
+            // A page the user is not allowed to view.
+            DocumentReference hiddenReference = new DocumentReference("Hidden", reference.getLastSpaceReference());
+            setup.rest().savePage(hiddenReference, "Hidden content", "");
+            setup.setRights(hiddenReference, null, "XWiki." + userName, "view", false);
+
+            // Content with asynchronous rendering written by a user without script right.
+            setup.login(userName, userName);
+            DocumentReference userReference = new DocumentReference("UserContent", reference.getLastSpaceReference());
+            setup.rest().savePage(userReference, String.format("User content\n\n%s\n\n{{display reference=\"%s\"/}}",
+                SCRIPT, setup.serializeReference(hiddenReference)), "");
+            setup.rest().addObject(userReference, ASYNC_CLASS, "async_enabled", 1, "async_context", "wiki");
+
+            // Content with asynchronous rendering written by a user with script right.
+            setup.loginAsSuperAdmin();
+            DocumentReference adminReference =
+                new DocumentReference("AdminContent", reference.getLastSpaceReference());
+            setup.rest().savePage(adminReference, "Admin content\n\n" + SCRIPT, "");
+            setup.rest().addObject(adminReference, ASYNC_CLASS, "async_enabled", 1, "async_context", "wiki");
+
+            String content = setup.gotoPage(userReference).getContent();
+            assertTrue(content.contains("User content"), content);
+            assertFalse(content.contains(EXECUTED), content);
+            assertFalse(content.contains("Hidden content"), content);
+
+            content = setup.gotoPage(adminReference).getContent();
+            assertTrue(content.contains("Admin content"), content);
+            assertTrue(content.contains(EXECUTED), content);
+        } finally {
+            setup.loginAsSuperAdmin();
+            deleteHomePage(setup, homeCreated);
+        }
+    }
+
+    @Test
+    @Order(4)
+    void displayModifiedAsynchronousContent(TestUtils setup, TestReference reference) throws Exception
+    {
+        // A page written by a user with programming right.
+        setup.loginAsSuperAdmin();
+        setup.rest().savePage(reference, "Saved content", "");
+
+        // A script without programming right which modifies that page and makes it asynchronous, without saving it.
+        String userName = "displayModifiedAsynchronousContent";
+        setup.createUser(userName, userName, null);
+        setup.setGlobalRights(null, userName, "script", true);
+        setup.login(userName, userName);
+        DocumentReference scriptReference = new DocumentReference("Script", reference.getLastSpaceReference());
+        StringBuilder source = new StringBuilder();
+        source.append("{{velocity}}\n");
+        source.append("#set ($modified = $xwiki.getDocument('" + setup.serializeReference(reference) + "'))\n");
+        source.append("$modified.setContent('Modified content {{groovy}}print(\"EXEC\" + \"UTED\"){{/groovy}}')\n");
+        source.append("#set ($asyncObject = $modified.newObject('" + ASYNC_CLASS + "'))\n");
+        source.append("$asyncObject.set('async_enabled', 1)\n");
+        source.append("{{html clean=\"false\"}}$services.display.content($modified){{/html}}\n");
+        source.append("{{/velocity}}");
+        setup.rest().savePage(scriptReference, source.toString(), "");
+
+        ViewPage viewPage = setup.gotoPage(scriptReference);
+        viewPage.waitUntilContent("Modified content");
+        String content = viewPage.getContent();
+        assertFalse(content.contains(EXECUTED), content);
+    }
+
     private void displayTranslatedContent(TestUtils setup, TestReference reference, String userName, boolean async)
         throws Exception
     {

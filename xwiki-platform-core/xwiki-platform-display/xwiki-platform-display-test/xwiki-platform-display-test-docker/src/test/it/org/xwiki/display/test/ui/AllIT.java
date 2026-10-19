@@ -34,4 +34,9 @@ class AllIT
     class NestedContentAuthorIT extends ContentAuthorIT
     {
     }
+
+    @Nested
+    class NestedIncludeCachedContentIT extends IncludeCachedContentIT
+    {
+    }
 }

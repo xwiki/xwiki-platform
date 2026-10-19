@@ -19,7 +19,7 @@
  */
 
 import { codeBlockOptions } from "@blocknote/code-block";
-import { createCodeBlockSpec } from "@blocknote/core";
+import { createCodeBlockSpec, createExtension } from "@blocknote/core";
 
 /**
  * The language of the code blocks that don't specify one. We don't use the default language from `codeBlockOptions`
@@ -166,6 +166,27 @@ function renderCodeBlock(
 }
 
 /**
+ * Turns the block at the caret into a code block when pressing Ctrl+Alt+C (Cmd+Alt+C on macOS). The slash menu displays
+ * this shortcut for code blocks, but BlockNote doesn't register it (unlike the shortcuts it displays for the other
+ * block types, e.g. Ctrl+Alt+Q for quotes). Only the blocks with inline content are converted, like BlockNote does for
+ * quotes. See https://github.com/TypeCellOS/BlockNote/issues/3211 (Slash menu shows Ctrl+Alt+C (Mod-Alt-c) for "Code
+ * Block", but the shortcut is not registered).
+ */
+const CodeBlockShortcutExtension = createExtension({
+  key: "xwiki-code-block-shortcuts",
+  keyboardShortcuts: {
+    "Mod-Alt-c": ({ editor }) => {
+      const { block } = editor.getTextCursorPosition();
+      if (editor.schema.blockSchema[block.type]?.content !== "inline") {
+        return false;
+      }
+      editor.updateBlock(block, { type: "codeBlock", props: {} });
+      return true;
+    },
+  },
+});
+
+/**
  * Creates the code block spec, with a language selector and syntax highlighting support, that doesn't fail when the
  * code block language is not supported.
  *
@@ -199,6 +220,8 @@ function XWikiCodeBlock(options?: {
       options?.className,
     );
   };
+
+  spec.extensions = [...(spec.extensions ?? []), CodeBlockShortcutExtension];
 
   return spec;
 }

@@ -45,9 +45,7 @@
 
 Vous permet d'avoir un contenu qui ne sera pas formaté . En d'autres termes, la syntaxe wiki ne sera pas prise en compte.
 
-{{info}}
-En syntaxe XWiki 1.0 la [[macro Pre&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]] préserve seulement la syntaxe wiki et les macros Radeox. Cependant, les fragments HTML et les scripts Groovy/Velocity sont toujours exécutés.
-{{/info}}
+{{info}}En syntaxe XWiki 1.0 la [[macro Pre&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]] préserve seulement la syntaxe wiki et les macros Radeox. Cependant, les fragments HTML et les scripts Groovy/Velocity sont toujours exécutés.{{/info}}
 
 |=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
 |Verbatim en-ligne|{{{Du contenu verbatim {pre}*[non rendu]*{/pre}}}}|Du contenu verbatim {{{*[non rendu]*}}}

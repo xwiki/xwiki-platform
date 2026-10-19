@@ -68,10 +68,11 @@ interface Problem {
 const INTERNAL_PREFIX = "_";
 
 /**
- * What a number is, for the `liveTable` source: it parses the value of a number filter, and matches no entry at all
- * with a value that is not one.
+ * What a number is, for the `liveTable` source. It parses the value of a number filter with the locale's
+ * NumberFormat, which reads the number the value starts with and ignores the rest. A value that does not start with a
+ * number matches no entry at all. The decimal separator depends on the locale, so both a dot and a comma are accepted.
  */
-const NUMBER = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/;
+const NUMBER = /^-?[.,]?\d/;
 
 /**
  * Builds the URL of the Live Data types resource of the `liveTable` source.

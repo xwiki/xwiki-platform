@@ -112,7 +112,12 @@ describe("fits", () => {
   it("takes only numbers for a number field", () => {
     expect(fits(field("count"), TYPES, " 12.5 ")).toBe(true);
     expect(fits(field("count"), TYPES, "-3e2")).toBe(true);
+    expect(fits(field("count"), TYPES, "1,5")).toBe(true);
+    expect(fits(field("count"), TYPES, ".5")).toBe(true);
+    expect(fits(field("count"), TYPES, "12abc")).toBe(true);
     expect(fits(field("count"), TYPES, "cheap")).toBe(false);
+    expect(fits(field("count"), TYPES, "+5")).toBe(false);
+    expect(fits(field("count"), TYPES, "-")).toBe(false);
   });
 
   it("takes the values of the field's own boolean filter, which differ between fields and page metadata", () => {

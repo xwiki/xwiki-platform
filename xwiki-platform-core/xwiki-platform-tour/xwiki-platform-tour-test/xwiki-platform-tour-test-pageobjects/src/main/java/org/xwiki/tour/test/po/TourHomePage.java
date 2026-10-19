@@ -101,7 +101,9 @@ public class TourHomePage extends ViewPage
             if (tourName.equals(tour.getName())) {
                 WebElement launch =
                     row.findElement(By.xpath("//td[contains(@class, 'actions')]/a[contains(@class, 'actionLaunch')]"));
+                String tourHomeURL = getDriver().getCurrentUrl();
                 launch.click();
+                waitUntilTourPageIsLoaded(tourHomeURL);
                 return new PageWithTour();
             }
         }
@@ -109,4 +111,20 @@ public class TourHomePage extends ViewPage
         return null;
     }
 
+    /**
+     * The launch link opens the target page of the tour with {@code startTour=true} in the query string, and then the
+     * tour's JavaScript redirects to the same page without that parameter, since that's the URL recorded in the tour.
+     * Wait until the current URL is the one of this second page load, so that the page object we return looks for its
+     * elements in the final document. Otherwise a lookup can run against a document that is being replaced and fail
+     * (e.g. with "Node with given id does not belong to the document" on Chrome).
+     *
+     * @param tourHomeURL the URL of the tour home page, from which the tour is launched
+     */
+    private void waitUntilTourPageIsLoaded(String tourHomeURL)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            String currentURL = driver.getCurrentUrl();
+            return !tourHomeURL.equals(currentURL) && !currentURL.contains("startTour=true");
+        });
+    }
 }

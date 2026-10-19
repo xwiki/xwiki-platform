@@ -271,6 +271,49 @@ test("Code blocks with supported and unsupported languages", async ({
   expect(errors).toEqual([]);
 });
 
+test("Code block languages use ids known by the code macro", async ({
+  mount,
+  // eslint-disable-next-line max-statements
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[
+        buildCodeBlock("bash", "echo 'foo'"),
+        buildCodeBlock("md", "**foo**"),
+        buildCodeBlock("text", "foo"),
+      ]}
+      macros={false}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  const codeBlocks = component.locator(
+    '.bn-block-content[data-content-type="codeBlock"]',
+  );
+  await expect(codeBlocks).toHaveCount(3);
+
+  // The code macro languages are selectable, and highlighted.
+  const highlightedTokens = 'code span[style*="--shiki-light"]';
+  for (const [index, [language, name]] of [
+    ["bash", "Shell"],
+    ["md", "Markdown"],
+  ].entries()) {
+    const select = codeBlocks.nth(index).locator("select");
+    await expect(select).toHaveValue(language);
+    await expect(select.locator("option:checked")).toHaveText(name);
+    await expect(
+      codeBlocks.nth(index).locator(highlightedTokens).first(),
+    ).toBeAttached();
+  }
+
+  // Selecting a language sets the id known by the code macro.
+  const codeBlock = codeBlocks.nth(2);
+  await codeBlock.locator("select").selectOption({ label: "Shell" });
+  await expect(codeBlock).toHaveAttribute("data-language", "bash");
+  await codeBlock.locator("select").selectOption({ label: "Markdown" });
+  await expect(codeBlock).toHaveAttribute("data-language", "md");
+});
+
 function buildParagraphs(blocks: string[]): BlockType[] {
   return blocks.map((blockText) => ({
     id: Math.random().toString(),

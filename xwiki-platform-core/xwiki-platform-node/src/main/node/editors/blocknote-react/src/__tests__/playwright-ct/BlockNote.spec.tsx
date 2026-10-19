@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { BlockNoteForTest } from "./BlockNote.story";
+import { pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockOfType, BlockType } from "../../blocknote";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
@@ -312,6 +313,39 @@ test("Code block languages use ids known by the code macro", async ({
   await expect(codeBlock).toHaveAttribute("data-language", "bash");
   await codeBlock.locator("select").selectOption({ label: "Markdown" });
   await expect(codeBlock).toHaveAttribute("data-language", "md");
+});
+
+test("Code blocks created by typing ``` use the typed language or Plain Text", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={buildParagraphs(["", ""])}
+      macros={false}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  // Each paragraph becomes a code block, so the next one to type in is always the first remaining paragraph.
+  const paragraph = component.locator("p.bn-inline-content").first();
+  for (const text of ["``` ", "```py "]) {
+    await paragraph.click();
+    for (const key of text) {
+      await pressKeySettled(page, key === " " ? "Space" : key);
+    }
+  }
+
+  const codeBlocks = component.locator(
+    '.bn-block-content[data-content-type="codeBlock"]',
+  );
+  await expect(codeBlocks).toHaveCount(2);
+  // Plain Text is the default language, which is not exposed as a data attribute.
+  await expect(codeBlocks.nth(0)).not.toHaveAttribute("data-language");
+  await expect(codeBlocks.nth(0).locator("select")).toHaveValue("text");
+  await expect(codeBlocks.nth(1)).toHaveAttribute("data-language", "python");
+  await expect(codeBlocks.nth(1).locator("select")).toHaveValue("python");
 });
 
 function buildParagraphs(blocks: string[]): BlockType[] {

@@ -51,11 +51,22 @@ const LANGUAGE_IDS: Record<string, string> = {
 /**
  * The languages supported by the language selector, keyed by the id saved in the code block. The syntax highlighter
  * still finds them because their aliases include the original id (see {@link HIGHLIGHTED_LANGUAGES}).
+ *
+ * The default language has the empty alias because typing three backticks followed by a space creates a code block
+ * whose language is looked up by the typed language name among the aliases, and is set to the typed name itself (i.e.
+ * the empty string) when no language matches.
  */
 const SUPPORTED_LANGUAGES = Object.fromEntries(
   Object.entries(codeBlockOptions.supportedLanguages).map(([id, language]) => [
     LANGUAGE_IDS[id] ?? id,
-    { ...language, aliases: [id, ...(language.aliases ?? [])] },
+    {
+      ...language,
+      aliases: [
+        id,
+        ...(language.aliases ?? []),
+        ...(id === DEFAULT_LANGUAGE ? [""] : []),
+      ],
+    },
   ]),
 );
 

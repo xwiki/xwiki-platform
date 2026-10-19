@@ -38,6 +38,27 @@ const HIGHLIGHTED_LANGUAGES = new Map(
   ),
 );
 
+/**
+ * The language selected in a code block is saved as the language parameter of the code macro, which is highlighted
+ * server side by Pygments. Maps the id of the languages that Pygments doesn't recognize to one of their aliases that
+ * Pygments recognizes (e.g. Pygments knows "bash" but not "shellscript").
+ */
+const LANGUAGE_IDS: Record<string, string> = {
+  shellscript: "bash",
+  markdown: "md",
+};
+
+/**
+ * The languages supported by the language selector, keyed by the id saved in the code block. The syntax highlighter
+ * still finds them because their aliases include the original id (see {@link HIGHLIGHTED_LANGUAGES}).
+ */
+const SUPPORTED_LANGUAGES = Object.fromEntries(
+  Object.entries(codeBlockOptions.supportedLanguages).map(([id, language]) => [
+    LANGUAGE_IDS[id] ?? id,
+    { ...language, aliases: [id, ...(language.aliases ?? [])] },
+  ]),
+);
+
 type CodeBlockSpec = ReturnType<typeof createCodeBlockSpec>;
 type CodeBlockRender = CodeBlockSpec["implementation"]["render"];
 
@@ -45,7 +66,7 @@ type CodeBlockRender = CodeBlockSpec["implementation"]["render"];
  * @returns true if the language selector supports the given language, false otherwise
  */
 function isSelectable(language: string): boolean {
-  return language in codeBlockOptions.supportedLanguages;
+  return language in SUPPORTED_LANGUAGES;
 }
 
 /**
@@ -149,6 +170,7 @@ function XWikiCodeBlock(options?: {
 }): CodeBlockSpec {
   const spec = createCodeBlockSpec({
     ...codeBlockOptions,
+    supportedLanguages: SUPPORTED_LANGUAGES,
     defaultLanguage: DEFAULT_LANGUAGE,
   });
   spec.implementation.meta = {

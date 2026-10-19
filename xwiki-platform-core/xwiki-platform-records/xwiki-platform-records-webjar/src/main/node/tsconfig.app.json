@@ -1,0 +1,12 @@
+{
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "requirejs",
+      "jquery"
+    ],
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["**/__tests__/*"]
+}

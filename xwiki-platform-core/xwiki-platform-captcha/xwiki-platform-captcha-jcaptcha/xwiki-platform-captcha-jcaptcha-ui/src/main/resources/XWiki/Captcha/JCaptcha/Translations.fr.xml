@@ -61,5 +61,6 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptch
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Liste simple
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Opération simple
 captcha.jcaptcha.engine.custom=Personnalisé :
+captcha.jcaptcha.engine.custom.input=Solution personnalisée
 </content>
 </xwikidoc>

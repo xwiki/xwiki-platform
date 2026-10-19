@@ -42,6 +42,8 @@ export default defineConfig({
         "vue-i18n",
         "xwiki-platform-localization-webjar",
         "@xwiki/platform-component-manager-default",
+        // Shared with the other realtime editors through the import map.
+        "@xwiki/platform-collaboration-toolbar",
       ],
     },
     sourcemap: true,

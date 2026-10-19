@@ -119,33 +119,34 @@ export class DefaultImageWizard implements ImageWizard {
   ) {}
 
   public insert(callback: ImageWizardCallback): void {
-    this.showWizard(callback);
+    void this.showWizard(callback);
   }
 
   public edit(image: ImageWithReference, callback: ImageWizardCallback): void {
-    this.showWizard(callback, image);
+    void this.showWizard(callback, image);
   }
 
-  private showWizard(
+  private async showWizard(
     callback: ImageWizardCallback,
     image?: ImageWithReference,
-  ): void {
-    loadById<XWikiWYSIWYGImageWizard>("xwiki-wysiwyg-image-wizard")
-      .then((imageWizard) =>
-        imageWizard({
-          captionAllowed: true,
-          currentDocument: XWiki.currentDocument.documentReference,
-          getImageResourceURL: this.getResourceURL.bind(this),
-          imageData: image ? this.getImageData(image) : {},
-          isHTML5: true,
-          isInsert: !image,
-          upload: this.upload.bind(this),
-        }),
-      )
-      .then((imageData) =>
-        callback.submit(this.getImageProperties(imageData, image?.reference)),
-      )
-      .catch(callback.cancel);
+  ): Promise<void> {
+    try {
+      const imageWizard = await loadById<XWikiWYSIWYGImageWizard>(
+        "xwiki-wysiwyg-image-wizard",
+      );
+      const imageData = await imageWizard({
+        captionAllowed: true,
+        currentDocument: XWiki.currentDocument.documentReference,
+        getImageResourceURL: this.getResourceURL.bind(this),
+        imageData: image ? this.getImageData(image) : {},
+        isHTML5: true,
+        isInsert: !image,
+        upload: this.upload.bind(this),
+      });
+      callback.submit(this.getImageProperties(imageData, image?.reference));
+    } catch {
+      callback.cancel();
+    }
   }
 
   private getResourceURL(

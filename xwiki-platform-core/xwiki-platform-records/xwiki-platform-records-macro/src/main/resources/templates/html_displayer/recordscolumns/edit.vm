@@ -40,6 +40,11 @@
 #end
 #set ($discard = $parameters.putIfAbsent('placeholder',
   $services.localization.render('rendering.macro.records.parameter.properties.placeholder')))
+## Loads the picker styles. The macro service records the skin extensions used while it renders the displayers and
+## sends them in the X-XWIKI-HTML-HEAD header of its response, which xwiki.js adds to the page head once, however many
+## displayers ask for the same stylesheet.
+#set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-records-webjar',
+  'index.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 ## Loads the picker. The macro editor injects this template with jQuery, which hands a type="module" script to the
 ## browser, so the bundle is only fetched once the dialog is displayed. The browser runs a module once, however many
 ## of the Records displayers load it. The bundle loads jquery and xwiki-selectize through RequireJS, so that it

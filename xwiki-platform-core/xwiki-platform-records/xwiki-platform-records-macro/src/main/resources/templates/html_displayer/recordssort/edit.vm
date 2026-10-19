@@ -33,6 +33,8 @@
 #end
 #set ($discard = $parameters.putIfAbsent('placeholder',
   $services.localization.render('rendering.macro.records.parameter.sort.placeholder')))
+#set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-records-webjar',
+  'index.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 <script type="module" src="$escapetool.xml($services.webjars.url(
   'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
 #suggestInput($parameters)

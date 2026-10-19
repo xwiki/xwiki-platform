@@ -291,16 +291,18 @@ describe("showProblems", () => {
     const wrapper = givenItems();
     showProblems(wrapper, (value) => PROBLEMS[value]);
     const items = [...wrapper.querySelectorAll<HTMLElement>(".item")];
-    // The label is struck through rather than the whole item, which also holds the remove button.
+    // The label is marked rather than the whole item, which also holds the remove button.
     expect(
-      wrapper.querySelector<HTMLElement>(".xwiki-selectize-option-label")!.style
-        .textDecoration,
-    ).toBe("line-through");
-    expect(items[0].style.textDecoration).toBe("");
-    expect(items.slice(1).map((item) => item.style.textDecoration)).toEqual([
-      "line-through",
-      "",
-    ]);
+      wrapper
+        .querySelector<HTMLElement>(".xwiki-selectize-option-label")!
+        .classList.contains("records-picker-problem"),
+    ).toBe(true);
+    expect(items[0].classList).not.toContain("records-picker-problem");
+    expect(
+      items
+        .slice(1)
+        .map((item) => item.classList.contains("records-picker-problem")),
+    ).toEqual([true, false]);
     expect(items[0].title).toBe("code cannot be used.");
     const box = wrapper.nextElementSibling!;
     expect(box.classList).toContain("warningmessage");
@@ -329,9 +331,10 @@ describe("showProblems", () => {
     showProblems(wrapper, () => undefined);
     expect(wrapper.nextElementSibling).toBeNull();
     expect(
-      wrapper.querySelector<HTMLElement>(".xwiki-selectize-option-label")!.style
-        .textDecoration,
-    ).toBe("");
+      wrapper
+        .querySelector<HTMLElement>(".xwiki-selectize-option-label")!
+        .classList.contains("records-picker-problem"),
+    ).toBe(false);
   });
 
   it("leaves an error alone, since the items could not be checked", () => {

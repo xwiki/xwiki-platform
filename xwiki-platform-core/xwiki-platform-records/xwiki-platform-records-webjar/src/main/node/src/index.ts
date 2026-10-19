@@ -18,6 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+// The build writes the imported styles to index.css rather than into the bundle. The displayer templates load that
+// file through the link skin extension.
+import "./records.css";
 import {
   clearMessage,
   clearMessages,

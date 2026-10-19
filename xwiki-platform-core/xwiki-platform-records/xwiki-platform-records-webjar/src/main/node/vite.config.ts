@@ -19,8 +19,11 @@
  */
 
 import { generateWebjarNodeConfig } from "@xwiki/platform-tool-viteconfig";
+import { mergeConfig } from "vite";
 
-// @xwiki/platform-xwiki-utils is bundled because it is not distributed as a webjar, so no import map resolves it.
-export default generateWebjarNodeConfig(import.meta.url, [
-  "@xwiki/platform-xwiki-utils",
-]);
+export default mergeConfig(
+  // @xwiki/platform-xwiki-utils is bundled because it is not distributed as a webjar, so no import map resolves it.
+  generateWebjarNodeConfig(import.meta.url, ["@xwiki/platform-xwiki-utils"]),
+  // The bundle loads its stylesheet by this name, which is otherwise derived from the package name.
+  { build: { lib: { cssFileName: "index" } } },
+);

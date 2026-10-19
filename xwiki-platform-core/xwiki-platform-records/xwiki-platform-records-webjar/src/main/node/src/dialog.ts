@@ -150,6 +150,11 @@ function hasValue(element: Element): boolean {
 const MESSAGE_CLASS = "records-picker-message";
 
 /**
+ * The CSS class marking the label of a picker item that the table ignores. The stylesheet strikes it through.
+ */
+const PROBLEM_CLASS = "records-picker-problem";
+
+/**
  * The style of a message box: `error` for something that failed, `warning` for something the author should fix.
  */
 type MessageKind = "error" | "warning";
@@ -203,8 +208,6 @@ function showMessage(
   const box = anchor.ownerDocument.createElement("div");
   box.className = `box ${kind}message ${MESSAGE_CLASS}`;
   box.setAttribute("role", "alert");
-  // Keep the box apart from the field it follows.
-  box.style.marginTop = "0.75em";
   box.append(createMessageText(anchor.ownerDocument, text));
   if (action) {
     box.append(" ", createActionButton(anchor, action));
@@ -285,8 +288,8 @@ function findMessage(anchor: Element, kind?: MessageKind): Element | null {
 /**
  * Points at the selected items of a picker that the table ignores, and says why under the picker.
  *
- * An item is struck through, with the reason as its tooltip, and the reasons are listed in a warning box, which is
- * what a screen reader announces. The box is left as it is when it already says the same thing, so that it is not
+ * An item's label gets the problem class, which strikes it through, and the item gets the reason as its tooltip. The
+ * reasons are listed in a warning box, which is what a screen reader announces. The box is left as it is when it already says the same thing, so that it is not
  * announced again on every keystroke, and an error box is left alone, since it says the items could not be checked.
  *
  * @param wrapper - the element the widget is rendered in
@@ -305,7 +308,7 @@ function showProblems(
     // The label only: the item also holds its remove button.
     const label =
       item.querySelector<HTMLElement>(".xwiki-selectize-option-label") ?? item;
-    label.style.textDecoration = problem === undefined ? "" : "line-through";
+    label.classList.toggle(PROBLEM_CLASS, problem !== undefined);
     if (problem !== undefined) {
       item.title = problem;
       problems.add(problem);

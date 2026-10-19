@@ -22,6 +22,7 @@ import {
   DERIVED_PARAMETERS,
   clearMessage,
   clearMessages,
+  dataTypeName,
   findDataTypeInput,
   findDataTypeLabel,
   findScope,
@@ -193,6 +194,24 @@ describe("findDataTypeLabel", () => {
     expect(findDataTypeLabel(document.querySelector("input")!)).toBe(
       "Acme.ClientClass",
     );
+  });
+});
+
+describe("dataTypeName", () => {
+  it("names the data type of the dialog a picker is in", () => {
+    document.body.innerHTML = `
+      <form>
+        <select name="class"><option value="Acme.ClientClass" selected>Client project</option></select>
+        <input class="picker" />
+      </form>`;
+    expect(dataTypeName(document.querySelector(".picker")!)).toBe(
+      "Client project",
+    );
+  });
+
+  it("is empty when the dialog has no data type field", () => {
+    document.body.innerHTML = `<form><input class="picker" /></form>`;
+    expect(dataTypeName(document.querySelector(".picker")!)).toBe("");
   });
 });
 

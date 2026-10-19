@@ -187,6 +187,15 @@ function findDataTypeLabel(
 }
 
 /**
+ * @param element - a picker element
+ * @returns the name the author knows the selected data type under
+ */
+function dataTypeName(element: Element): string {
+  const dataTypeInput = findDataTypeInput(findScope(element));
+  return dataTypeInput ? findDataTypeLabel(dataTypeInput) : "";
+}
+
+/**
  * Shows a message right after a field, replacing the one already there.
  *
  * The message is plain text, since it carries names the author or the wiki chose. The box is an alert so that a
@@ -338,6 +347,7 @@ export {
   DERIVED_PARAMETERS,
   clearMessage,
   clearMessages,
+  dataTypeName,
   findDataTypeInput,
   findDataTypeLabel,
   findScope,

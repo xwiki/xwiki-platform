@@ -312,8 +312,7 @@ function reportLoadFailure(
   element: Element,
   suggester: Suggester | undefined,
 ): void {
-  const dataTypeInput = findDataTypeInput(findScope(element));
-  const dataType = dataTypeInput ? findDataTypeLabel(dataTypeInput) : "";
+  const dataType = dataTypeName(element);
   showMessage(
     suggester?.wrapper ?? element,
     "error",

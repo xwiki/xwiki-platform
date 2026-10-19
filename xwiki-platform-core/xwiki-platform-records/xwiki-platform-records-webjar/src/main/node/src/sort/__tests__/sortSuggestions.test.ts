@@ -22,7 +22,7 @@ import {
   values,
 } from "../../common/__tests__/suggestions.mock";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { JsonFetcher } from "../../common/fieldPicker";
+import type { JsonFetcher } from "../../common/fields";
 import type { Suggester } from "../../common/suggester";
 import type { Mock } from "vitest";
 

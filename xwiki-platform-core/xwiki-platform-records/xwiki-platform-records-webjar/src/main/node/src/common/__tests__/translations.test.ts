@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { METADATA_COLUMNS } from "../fieldPicker";
+import { METADATA_COLUMNS } from "../fields";
 import {
   TRANSLATION_KEYS_MODULE,
   defineTranslationKeys,

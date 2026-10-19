@@ -28,8 +28,8 @@ import {
   typesUrl,
 } from "../fieldUse";
 import { describe, expect, it } from "vitest";
-import type { PropertyDescriptor } from "../fieldPicker";
 import type { PropertyType } from "../fieldUse";
+import type { PropertyDescriptor } from "../fields";
 
 /**
  * The defaults of the types the tests use, as the types resource reports them.

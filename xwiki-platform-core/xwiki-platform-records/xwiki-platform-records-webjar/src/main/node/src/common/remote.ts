@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { asTypes, typesUrl } from "./fieldUse";
-import type { JsonFetcher } from "./fieldPicker";
 import type { PropertyType } from "./fieldUse";
+import type { JsonFetcher } from "./fields";
 
 /**
  * Fetches and parses a JSON document.

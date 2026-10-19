@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { FIELDS_GROUP, METADATA_GROUP } from "../../common/fieldPicker";
+import { FIELDS_GROUP, METADATA_GROUP } from "../../common/fields";
 import {
   asValues,
   createFilterOption,
@@ -32,7 +32,7 @@ import {
   valuesUrl,
 } from "../filterPicker";
 import { describe, expect, it } from "vitest";
-import type { PropertyDescriptor } from "../../common/fieldPicker";
+import type { PropertyDescriptor } from "../../common/fields";
 
 const STATUS: PropertyDescriptor = {
   id: "status",

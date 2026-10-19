@@ -32,8 +32,8 @@
  * therefore not seen here, and the table still warns about it when it is rendered.
  */
 
-import { hasDataTypeFields } from "./fieldPicker";
-import type { FilterDescriptor, PropertyDescriptor } from "./fieldPicker";
+import { hasDataTypeFields } from "./fields";
+import type { FilterDescriptor, PropertyDescriptor } from "./fields";
 
 /**
  * The defaults of one property type, as the Live Data types resource reports them.

@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { FIELDS_GROUP, METADATA_GROUP } from "../../common/fieldPicker";
+import { FIELDS_GROUP, METADATA_GROUP } from "../../common/fields";
 import { resolveSortOption, toSortOptions } from "../sortPicker";
 import { describe, expect, it } from "vitest";
-import type { PropertyDescriptor } from "../../common/fieldPicker";
+import type { PropertyDescriptor } from "../../common/fields";
 import type { DirectionLabels } from "../sortPicker";
 
 const DESCRIPTORS: PropertyDescriptor[] = [

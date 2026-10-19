@@ -28,9 +28,9 @@ import {
   propertiesUrl,
   toOptions,
   withMetadataLabels,
-} from "../fieldPicker";
+} from "../fields";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { JsonFetcher, PropertyDescriptor } from "../fieldPicker";
+import type { JsonFetcher, PropertyDescriptor } from "../fields";
 import type { Mock } from "vitest";
 
 /**

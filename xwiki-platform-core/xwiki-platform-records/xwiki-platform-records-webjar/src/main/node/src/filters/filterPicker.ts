@@ -43,8 +43,8 @@ import {
   isCandidate,
   isOffered,
   matches,
-} from "../common/fieldPicker";
-import type { FieldOption, PropertyDescriptor } from "../common/fieldPicker";
+} from "../common/fields";
+import type { FieldOption, PropertyDescriptor } from "../common/fields";
 
 /**
  * Separates a field from its value in one constraint.

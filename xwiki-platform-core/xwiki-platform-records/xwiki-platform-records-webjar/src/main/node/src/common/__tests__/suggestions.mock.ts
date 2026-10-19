@@ -19,8 +19,8 @@
  */
 import { typesUrl } from "../fieldUse";
 import { vi } from "vitest";
-import type { JsonFetcher, PropertyDescriptor } from "../fieldPicker";
 import type { PropertyType } from "../fieldUse";
+import type { JsonFetcher, PropertyDescriptor } from "../fields";
 import type { Mock } from "vitest";
 
 /**

@@ -19,7 +19,7 @@
  */
 import { typesUrl } from "../fieldUse";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { JsonFetcher } from "../fieldPicker";
+import type { JsonFetcher } from "../fields";
 
 /**
  * The module under test, imported again for each test, since it caches the property types per page.

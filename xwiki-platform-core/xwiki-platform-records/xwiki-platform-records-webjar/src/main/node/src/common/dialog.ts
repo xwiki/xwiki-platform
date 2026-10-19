@@ -28,7 +28,7 @@
  * after its parameter.
  */
 
-import { DATA_TYPE_PARAMETER } from "./fieldPicker";
+import { DATA_TYPE_PARAMETER } from "./fields";
 
 /**
  * The parameters whose value is derived from the data type.

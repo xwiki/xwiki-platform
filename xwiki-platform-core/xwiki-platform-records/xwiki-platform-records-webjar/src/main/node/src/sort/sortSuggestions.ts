@@ -19,8 +19,8 @@
  */
 import { fieldOf, resolveSortOption, toSortOptions } from "./sortPicker";
 import { dataTypeName } from "../common/dialog";
-import { loadDescriptors } from "../common/fieldPicker";
 import { canSort, sortProblem } from "../common/fieldUse";
+import { loadDescriptors } from "../common/fields";
 import { loadTypes } from "../common/remote";
 import { reload } from "../common/suggester";
 import { metadataLabels, translate, withProblem } from "../common/translations";

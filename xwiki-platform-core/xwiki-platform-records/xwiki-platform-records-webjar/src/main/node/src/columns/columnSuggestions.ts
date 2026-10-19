@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { loadOptions } from "../common/fieldPicker";
+import { loadOptions } from "../common/fields";
 import { metadataLabels } from "../common/translations";
 import type { Suggestions } from "../common/suggester";
 

@@ -31,7 +31,7 @@ import {
   setTabsVisible,
   showMessage,
 } from "./common/dialog";
-import { hasDataTypeFields, loadDescriptors } from "./common/fieldPicker";
+import { hasDataTypeFields, loadDescriptors } from "./common/fields";
 import { fetchJson } from "./common/remote";
 import { createSettings, watchProblems } from "./common/suggester";
 import {

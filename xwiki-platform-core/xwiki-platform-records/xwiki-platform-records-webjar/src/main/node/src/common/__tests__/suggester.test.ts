@@ -25,7 +25,7 @@ import {
   watchProblems,
 } from "../suggester";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { FieldOption, JsonFetcher } from "../fieldPicker";
+import type { FieldOption, JsonFetcher } from "../fields";
 import type { Suggester, Suggestions } from "../suggester";
 
 const STATUS: FieldOption = {

@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { METADATA_COLUMNS } from "./fieldPicker";
-import type { FieldOption } from "./fieldPicker";
+import { METADATA_COLUMNS } from "./fields";
 import type { Problem } from "./fieldUse";
+import type { FieldOption } from "./fields";
 
 /**
  * The module holding the translation keys the dialog needs, which the `xwiki-l10n` loader plugin resolves into the

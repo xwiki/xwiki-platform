@@ -24,7 +24,7 @@ import {
   showProblems,
 } from "./dialog";
 import { translate } from "./translations";
-import type { FieldOption, JsonFetcher } from "./fieldPicker";
+import type { FieldOption, JsonFetcher } from "./fields";
 
 /**
  * The suggest widget settings this picker needs.

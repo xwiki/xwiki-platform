@@ -29,8 +29,8 @@ import {
   valuesUrl,
 } from "./filterPicker";
 import { dataTypeName } from "../common/dialog";
-import { loadDescriptors } from "../common/fieldPicker";
 import { canFilter, filterProblem } from "../common/fieldUse";
+import { loadDescriptors } from "../common/fields";
 import { loadTypes } from "../common/remote";
 import { resolveAgain } from "../common/suggester";
 import { metadataLabels, withProblem } from "../common/translations";
@@ -38,7 +38,7 @@ import type {
   FieldOption,
   JsonFetcher,
   PropertyDescriptor,
-} from "../common/fieldPicker";
+} from "../common/fields";
 import type { Suggestions } from "../common/suggester";
 
 /**

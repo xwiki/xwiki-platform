@@ -49,7 +49,7 @@
          depend on. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-templateprovider-ui</artifactId>
+      <artifactId>xwiki-platform-pagetemplate-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
@@ -101,7 +101,7 @@
          the Page Templates administration section. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-templateprovider-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-pagetemplate-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

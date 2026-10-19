@@ -335,6 +335,7 @@
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
     <module>xwiki-platform-oldcore</module>
+    <module>xwiki-platform-pagetemplate</module>
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-ratings</module>
@@ -357,7 +358,6 @@
     <module>xwiki-platform-store</module>
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-template</module>
-    <module>xwiki-platform-templateprovider</module>
     <module>xwiki-platform-test</module>
     <module>xwiki-platform-tika</module>
     <module>xwiki-platform-tour</module>

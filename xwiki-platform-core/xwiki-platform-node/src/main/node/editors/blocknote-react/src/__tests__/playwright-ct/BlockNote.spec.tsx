@@ -372,6 +372,33 @@ test("Ctrl+Alt+C turns the current block into a code block", async ({
   await expect(component.locator("p.bn-inline-content")).toHaveCount(0);
 });
 
+test("The language selector keeps the focus when changing the language", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[buildCodeBlock("java", "int count = 0;")]}
+      macros={false}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  const codeBlock = component.locator(
+    '.bn-block-content[data-content-type="codeBlock"]',
+  );
+  // Changing the language renders the code block again, which replaces the language selector.
+  await codeBlock.locator("select").focus();
+  await pressKeySettled(page, "s");
+  await expect(codeBlock).toHaveAttribute("data-language", "sass");
+  await expect(codeBlock.locator("select")).toBeFocused();
+
+  // The next keys are still handled by the language selector.
+  await pressKeySettled(page, "ArrowDown");
+  await expect(codeBlock).toHaveAttribute("data-language", "scss");
+  await expect(codeBlock.locator("select")).toBeFocused();
+});
+
 function buildParagraphs(blocks: string[]): BlockType[] {
   return blocks.map((blockText) => ({
     id: Math.random().toString(),

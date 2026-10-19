@@ -108,6 +108,43 @@ function addClassName(
 }
 
 /**
+ * The code blocks whose language selector should be focused when they are rendered again, per editor.
+ */
+const LANGUAGE_SELECTORS_TO_FOCUS = new WeakMap<object, string>();
+
+/**
+ * Keeps the keyboard focus on the language selector of a code block when its language is changed from the language
+ * selector. Changing the language renders the code block again, which replaces the focused language selector, so the
+ * focus would otherwise move to the page body: the keys typed next would then trigger the page keyboard shortcuts
+ * instead of being handled by the language selector (or the editor).
+ */
+function keepLanguageSelectorFocus(
+  nodeView: ReturnType<CodeBlockRender>,
+  ...[block, editor]: Parameters<CodeBlockRender>
+): ReturnType<CodeBlockRender> {
+  const select = nodeView.dom.querySelector("select");
+  if (select?.parentElement) {
+    // Listen in the capture phase, on the parent, in order to be notified before the language selector handles the
+    // change (and renders the code block again).
+    select.parentElement.addEventListener(
+      "change",
+      () => {
+        if (document.activeElement === select) {
+          LANGUAGE_SELECTORS_TO_FOCUS.set(editor, block.id);
+        }
+      },
+      true,
+    );
+    if (LANGUAGE_SELECTORS_TO_FOCUS.get(editor) === block.id) {
+      LANGUAGE_SELECTORS_TO_FOCUS.delete(editor);
+      // Wait for the rendered code block to be added to the page.
+      queueMicrotask(() => select.focus());
+    }
+  }
+  return nodeView;
+}
+
+/**
  * Renders a code block whose language is not supported by the language selector (which throws an exception in this
  * case). The block is rendered as if it had the default language, and its actual language is added to the language
  * selector. The block itself is not modified, so its language is preserved on save. Syntax highlighting falls back to
@@ -216,9 +253,13 @@ function XWikiCodeBlock(options?: {
   const render = spec.implementation.render;
   if (render) {
     spec.implementation.render = function (block, editor) {
-      return addClassName(
-        renderCodeBlock.call(this, render, block, editor),
-        options?.className,
+      return keepLanguageSelectorFocus(
+        addClassName(
+          renderCodeBlock.call(this, render, block, editor),
+          options?.className,
+        ),
+        block,
+        editor,
       );
     };
   }

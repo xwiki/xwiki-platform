@@ -66,6 +66,12 @@ public class DocumentContentAsyncExecutor
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
 
+    /**
+     * The context property holding the document whose content author is used to check the script and programming
+     * rights.
+     */
+    private static final String SECURE_DOCUMENT = "sdoc";
+
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
@@ -95,6 +101,8 @@ public class DocumentContentAsyncExecutor
 
     private DocumentModelBridge document;
 
+    private DocumentModelBridge contentDocument;
+
     private Syntax syntax;
 
     private String transformationId;
@@ -111,10 +119,10 @@ public class DocumentContentAsyncExecutor
 
         this.transformationId = transformationId;
         // The executed content can be the one of a translation, which can have a syntax of its own.
-        DocumentModelBridge contentSource = getContentSource(document, parameters);
-        this.xdom = getPreparedContent(contentSource, parameters);
+        this.contentDocument = getContentSource(document, parameters);
+        this.xdom = getPreparedContent(this.contentDocument, parameters);
         this.documentReference = document.getDocumentReference();
-        this.syntax = contentSource.getSyntax();
+        this.syntax = this.contentDocument.getSyntax();
         this.document = document;
     }
 
@@ -298,6 +306,13 @@ public class DocumentContentAsyncExecutor
 
             // Make sure to synchronize the context wiki with the context document's wiki.
             this.modelContext.setCurrentEntityReference(this.documentReference.getWikiReference());
+
+            // Changing the context document also resets the secure document to the context document. Make sure that
+            // translated content is executed with the rights of its own author and not with the rights of the author
+            // of the default translation.
+            if (this.contentDocument != this.document) {
+                getXWikiContextMap().put(SECURE_DOCUMENT, this.contentDocument);
+            }
 
             executeInCurrentExecutionContext(async);
         } catch (Exception e) {

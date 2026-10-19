@@ -25,6 +25,7 @@
     "eslint": "catalog:",
     "jsdom": "catalog:",
     "npm-run-all": "catalog:",
+    "tom-select": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

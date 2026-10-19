@@ -19,7 +19,7 @@
  */
 /// <reference types="@xwiki/platform-xwiki-utils/global" />
 
-export {};
+import type TomSelect from "tom-select";
 
 declare global {
   /**
@@ -34,14 +34,6 @@ declare global {
    * The Tom Select instance the suggest widget stores on the element it enhances; absent on a plain field.
    */
   interface Element {
-    selectize?: {
-      clear: (silent?: boolean) => void;
-      clearOptions: () => void;
-      setValue: (value: string, silent?: boolean) => void;
-      /**
-       * The element the widget is rendered in, which replaces the enhanced field on screen.
-       */
-      wrapper: HTMLElement;
-    };
+    selectize?: TomSelect;
   }
 }

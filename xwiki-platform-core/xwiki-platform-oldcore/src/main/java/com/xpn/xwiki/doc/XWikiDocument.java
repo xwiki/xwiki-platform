@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9229,8 +9230,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             xdom = currentContent.xdom.clone();
         }
 
-        // Prepare the content
-        LocalDateTime xdomPrepareDate = LocalDateTime.now();
+        // Prepare the content, recording the date in the time zone the cache control compares it in
+        LocalDateTime xdomPrepareDate = LocalDateTime.now(ZoneId.systemDefault());
         getMacroTransformation().prepare(xdom);
 
         // Update the cached XDOM

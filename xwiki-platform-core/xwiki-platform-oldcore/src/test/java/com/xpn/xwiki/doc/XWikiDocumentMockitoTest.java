@@ -22,6 +22,7 @@ package com.xpn.xwiki.doc;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -97,6 +98,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.web.EditForm;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -105,7 +107,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -2063,18 +2064,21 @@ class XWikiDocumentMockitoTest
         }).when(macroTransformation).prepare(any());
         this.document.setContent("content");
 
-        List<Thread> threads = new CopyOnWriteArrayList<>();
-        ExecutorService executor = Executors.newFixedThreadPool(2, runnable -> {
-            Thread thread = new Thread(runnable);
-            threads.add(thread);
-            return thread;
-        });
+        ExecutorService executor = Executors.newFixedThreadPool(2);
         try {
             Future<XDOM> first = executor.submit(this.document::getPreparedXDOM);
             assertTrue(preparing.await(10, TimeUnit.SECONDS));
 
-            Future<XDOM> second = executor.submit(this.document::getPreparedXDOM);
-            waitUntilWaitingInGetPreparedXDOM(threads, 1);
+            CompletableFuture<Thread> secondThread = new CompletableFuture<>();
+            Future<XDOM> second = executor.submit(() -> {
+                secondThread.complete(Thread.currentThread());
+                return this.document.getPreparedXDOM();
+            });
+            Thread thread = secondThread.get(10, TimeUnit.SECONDS);
+            // Wait until the second thread is blocked in getPreparedXDOM, waiting for the first preparation or
+            // preparing the content too.
+            await().atMost(Duration.ofSeconds(10)).pollInterval(Duration.ofMillis(10))
+                .until(() -> isWaitingInGetPreparedXDOM(thread));
             finishPreparation.countDown();
 
             assertEquals(parsedXDOM, first.get(10, TimeUnit.SECONDS));
@@ -2084,18 +2088,6 @@ class XWikiDocumentMockitoTest
             finishPreparation.countDown();
             executor.shutdownNow();
         }
-    }
-
-    private void waitUntilWaitingInGetPreparedXDOM(List<Thread> threads, int index) throws InterruptedException
-    {
-        long timeout = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-        while (System.nanoTime() < timeout) {
-            if (threads.size() > index && isWaitingInGetPreparedXDOM(threads.get(index))) {
-                return;
-            }
-            Thread.sleep(10);
-        }
-        fail("The thread didn't wait in getPreparedXDOM");
     }
 
     private boolean isWaitingInGetPreparedXDOM(Thread thread)

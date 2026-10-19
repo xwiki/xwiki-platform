@@ -40,4 +40,13 @@
   <scm>
     <tag>stable-17.10.x</tag>
   </scm>
+
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-display-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

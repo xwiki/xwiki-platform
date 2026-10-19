@@ -59,7 +59,7 @@
     <!-- We publish a template provider. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-templateprovider-ui</artifactId>
+      <artifactId>xwiki-platform-pagetemplate-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

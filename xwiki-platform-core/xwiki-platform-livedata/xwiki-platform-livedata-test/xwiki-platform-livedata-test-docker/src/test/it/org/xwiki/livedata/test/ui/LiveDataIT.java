@@ -170,7 +170,8 @@ class LiveDataIT
         // Wipes the test space.
         testUtils.deletePage(testReference, true);
 
-        initLocalization(testUtils, testReference);
+        initLocalization(testUtils, testReference,
+            new DocumentReference("Translation", testReference.getLastSpaceReference()));
 
         // Initializes the page content.
         List<String> properties =
@@ -667,8 +668,14 @@ class LiveDataIT
         testUtils.deletePage(testReference, true);
 
         // The live table source displays empty values using the "emptyvalue" translation key (we don't set a
-        // translation prefix), which these translations define as an empty string.
-        initLocalization(testUtils, testReference);
+        // translation prefix), which these translations define as an empty string. They are stored outside the test
+        // space because the Live Data lists all the documents of that space, 5 per page, and the assertions below
+        // expect exactly the 5 documents created by this test.
+        DocumentReference translationDocumentReference =
+            new DocumentReference("CustomClassTranslation", (SpaceReference) testReference.getLastSpaceReference()
+                .getParent());
+        testUtils.deletePage(translationDocumentReference);
+        initLocalization(testUtils, testReference, translationDocumentReference);
 
         // Custom page content that sets the class on the individual properties. We filter the documents based on the
         // space.
@@ -1105,10 +1112,9 @@ class LiveDataIT
         }
     }
 
-    private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception
+    private void initLocalization(TestUtils testUtils, DocumentReference testReference,
+        DocumentReference translationDocumentReference) throws Exception
     {
-        DocumentReference translationDocumentReference =
-            new DocumentReference("Translation", testReference.getLastSpaceReference());
         testUtils.addObject(translationDocumentReference, "XWiki.TranslationDocumentClass",
             singletonMap("scope", "WIKI"));
         String choiceTTranslationKey =

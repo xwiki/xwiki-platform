@@ -21,7 +21,9 @@
 <!--
   LayoutListItem is an item component for the List Layout.
   It displays an entry on a compact line: its main property, in semibold, followed
-  by its secondary properties, all separated by a small circle.
+  by its secondary properties, all separated by a small circle. The secondary
+  properties are labelled for screen readers, and the values cut off by the end of
+  the line display their full text as a tooltip.
   The values are read-only: they cannot be edited from the List layout.
 -->
 <template>
@@ -37,7 +39,11 @@
       :entry="entry"
     />
     <!-- Main property value -->
-    <div v-if="propertyId" class="layout-list-item-value layout-list-item-main">
+    <div
+      v-if="propertyId"
+      class="layout-list-item-value layout-list-item-main"
+      @mouseenter="updateTooltip"
+    >
       <LivedataDisplayer :property-id="propertyId" :entry="entry" />
     </div>
     <!-- Secondary property values, right after the main one -->
@@ -50,7 +56,16 @@
         :key="secondaryPropertyId"
       >
         <span class="layout-list-item-separator" aria-hidden="true">•</span>
-        <span class="layout-list-item-value layout-list-item-secondary-value">
+        <span
+          class="layout-list-item-value layout-list-item-secondary-value"
+          @mouseenter="updateTooltip"
+        >
+          <!-- The property names are not displayed, but they are read by screen readers. -->
+          <span class="layout-list-item-label">{{
+            $t("livedata.list.property.label", [
+              getPropertyName(secondaryPropertyId),
+            ])
+          }}</span>
           <LivedataDisplayer
             :property-id="secondaryPropertyId"
             :entry="entry"
@@ -123,6 +138,22 @@ export default {
 
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
+    },
+  },
+
+  methods: {
+    getPropertyName(propertyId) {
+      return this.logic.getPropertyDescriptor(propertyId)?.name ?? propertyId;
+    },
+
+    // Display the full text of a value as a tooltip, only when it is cut off by the end of the line.
+    updateTooltip(event) {
+      const value = event.currentTarget;
+      if (value.scrollWidth > value.clientWidth) {
+        value.title = value.textContent.replace(/\s+/g, " ").trim();
+      } else {
+        value.removeAttribute("title");
+      }
     },
   },
 };
@@ -211,5 +242,18 @@ export default {
   width: auto;
   height: auto;
   text-align: inherit;
+}
+
+/* The labels of the secondary properties are hidden, but read by screen readers. */
+.layout-list .layout-list-item-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 </style>

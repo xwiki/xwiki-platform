@@ -1132,6 +1132,9 @@ class LiveDataIT
         assertEquals(List.of(CITY_LISBON), listLayout.getSecondaryValues(1));
         assertEquals(List.of(EMPTY_VALUE), listLayout.getSecondaryValues(2));
         assertEquals(List.of(CITY_PARIS), listLayout.getSecondaryValues(3));
+        // The secondary values are labelled for screen readers, and the entries have no marker.
+        assertEquals(List.of(CITY_COLUMN + ":"), listLayout.getSecondaryLabels(1));
+        assertFalse(listLayout.hasItemMarkers());
 
         // The values can't be edited from the list layout.
         assertFalse(listLayout.hasEditableValues());
@@ -1144,6 +1147,8 @@ class LiveDataIT
         assertEquals(List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA), listLayout.getMainValues());
         assertEquals(List.of(), listLayout.getSecondaryValues(1));
         assertEquals(List.of(), listLayout.getSecondaryValues(3));
+        // A marker is displayed before each entry, since they display a single property.
+        assertTrue(listLayout.hasItemMarkers());
 
         // Hiding the first property makes the next visible one the main value.
         propertiesPanel = liveData.openPropertiesPanel();

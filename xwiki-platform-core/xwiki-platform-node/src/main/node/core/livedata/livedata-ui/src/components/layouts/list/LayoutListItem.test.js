@@ -47,13 +47,40 @@ function initWrapper(options = {}, props = {}) {
             logic: {
               getEntryId: (e) => e.id,
               isSelectionEnabled: () => false,
+              getPropertyDescriptor: (id) =>
+                id === "director" ? { id, name: "Director" } : undefined,
             },
+          },
+          mocks: {
+            $t: (key, args) =>
+              key === "livedata.list.property.label" ? `${args[0]}:` : key,
           },
         },
       },
       options,
     ),
   );
+}
+
+/**
+ * Hover a value whose content has the given width, while its visible width is the given one.
+ *
+ * @param value - the wrapper of the value
+ * @param scrollWidth - the width of the content of the value
+ * @param clientWidth - the visible width of the value
+ * @returns the tooltip of the value after hovering it
+ */
+async function hover(value, scrollWidth, clientWidth) {
+  Object.defineProperty(value.element, "scrollWidth", {
+    configurable: true,
+    value: scrollWidth,
+  });
+  Object.defineProperty(value.element, "clientWidth", {
+    configurable: true,
+    value: clientWidth,
+  });
+  await value.trigger("mouseenter");
+  return value.attributes("title");
 }
 
 describe("LayoutListItem.vue", () => {
@@ -131,6 +158,40 @@ describe("LayoutListItem.vue", () => {
       "layout-list-item-separator",
       "layout-list-item-value",
     ]);
+  });
+
+  it("Labels the secondary properties for screen readers", () => {
+    const wrapper = initWrapper(
+      {},
+      {
+        entry: { id: "idA", title: "Title A", year: 2001, director: "D" },
+        secondaryPropertyIds: ["year", "director"],
+      },
+    );
+    // The property name is used when known, otherwise its id.
+    expect(
+      wrapper
+        .findAll(".layout-list-item-secondary-value .layout-list-item-label")
+        .map((label) => label.text()),
+    ).toStrictEqual(["year:", "Director:"]);
+    // The main property is not labelled, so that a list displaying a single property reads like a regular list.
+    expect(
+      wrapper.find(".layout-list-item-main .layout-list-item-label").exists(),
+    ).toBe(false);
+  });
+
+  it("Displays the full text of the values cut off by the end of the line as a tooltip", async () => {
+    const wrapper = initWrapper(
+      {},
+      {
+        entry: { id: "idA", title: "Title A", year: 2001 },
+        secondaryPropertyIds: ["year"],
+      },
+    );
+    const value = wrapper.find(".layout-list-item-secondary-value");
+    expect(await hover(value, 100, 100)).toBeUndefined();
+    expect(await hover(value, 300, 100)).toBe("year:");
+    expect(await hover(value, 100, 100)).toBeUndefined();
   });
 
   it("Skips the secondary properties without a value", () => {

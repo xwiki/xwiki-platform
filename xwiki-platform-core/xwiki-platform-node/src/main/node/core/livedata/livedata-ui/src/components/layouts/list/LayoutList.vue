@@ -22,7 +22,7 @@
   LayoutList.vue is the main file for the List layout component.
   It displays the entries as a compact, read-only list. Each entry shows its first
   visible property, in the order of the Livedata properties, as its main property,
-  and its other visible properties on the right of the line.
+  followed by its other visible properties.
 -->
 <template>
   <div class="layout-list">
@@ -50,7 +50,11 @@
     <LayoutLoader />
 
     <!-- List layout root -->
-    <ul class="layout-list-root">
+    <!-- A marker is displayed before each entry when they only display one property. -->
+    <ul
+      class="layout-list-root"
+      :class="{ 'layout-list-single': secondaryPropertyIds.length === 0 }"
+    >
       <!--
         We include the entry index in the key in case of inconsistent data, in this case duplicated entry IDs.
         That way even if two entries have the same id, the keys will not be equals.
@@ -115,7 +119,7 @@ export default {
     propertyId() {
       return getListPropertyId(this.logic);
     },
-    // The ids of the other visible properties, displayed on the right of each entry
+    // The ids of the other visible properties, displayed after the main property of each entry
     secondaryPropertyIds() {
       return getListSecondaryPropertyIds(this.logic);
     },
@@ -137,6 +141,18 @@ export default {
   margin: 0 0 0.5rem;
   padding: 0;
   list-style: none;
+}
+
+/*
+  The entries are flex containers, which don't display the list markers, so the marker is displayed as their first
+  child. It is decorative: the list semantics already tell the screen readers where each entry starts.
+*/
+.layout-list .layout-list-single > .layout-list-item::before {
+  content: "\2022";
+  /* Not read by the screen readers, where supported. */
+  content: "\2022" / "";
+  flex: none;
+  color: var(--text-muted);
 }
 
 .layout-list .layout-loader {

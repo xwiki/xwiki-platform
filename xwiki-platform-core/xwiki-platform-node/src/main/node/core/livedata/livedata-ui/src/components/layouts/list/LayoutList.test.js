@@ -152,6 +152,31 @@ describe("LayoutList.vue", () => {
     });
   });
 
+  it("Displays a marker before the entries only when they display a single property", () => {
+    const initList = (properties) =>
+      initWrapper({
+        options: {
+          global: {
+            provide: {
+              logic: {
+                getPropertyDescriptor: (propertyId) => ({
+                  id: propertyId,
+                  visible: true,
+                }),
+                data: { query: { properties }, data: { entries: [{ id: 1 }] } },
+              },
+            },
+          },
+        },
+      });
+    expect(initList(["title"]).find(".layout-list-root").classes()).toContain(
+      "layout-list-single",
+    );
+    expect(
+      initList(["title", "year"]).find(".layout-list-root").classes(),
+    ).not.toContain("layout-list-single");
+  });
+
   it("Has pagination at the top and at the bottom", () => {
     const wrapper = initWrapper();
     // Left and right of the top bar, and the bottom bar.

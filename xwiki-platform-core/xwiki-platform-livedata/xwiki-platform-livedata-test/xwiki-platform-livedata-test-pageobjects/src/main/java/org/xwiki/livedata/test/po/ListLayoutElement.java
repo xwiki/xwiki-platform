@@ -40,7 +40,12 @@ public class ListLayoutElement extends BaseElement
 
     private static final By MAIN_VALUE = By.cssSelector(".layout-list-item-main");
 
-    private static final By SECONDARY_VALUES = By.cssSelector(".layout-list-item-secondary-value");
+    // The displayed part of the secondary values, without their label for screen readers.
+    private static final By SECONDARY_DISPLAYED_VALUES =
+        By.cssSelector(".layout-list-item-secondary-value > .livedata-displayer");
+
+    private static final By SECONDARY_LABELS =
+        By.cssSelector(".layout-list-item-secondary-value > .layout-list-item-label");
 
     private final LiveDataElement liveData;
 
@@ -114,8 +119,31 @@ public class ListLayoutElement extends BaseElement
      */
     public List<String> getSecondaryValues(int itemNumber)
     {
-        return getDriver().findElementsWithoutWaiting(getItems().get(itemNumber - 1), SECONDARY_VALUES).stream()
-            .map(WebElement::getText).toList();
+        return getDriver().findElementsWithoutWaiting(getItems().get(itemNumber - 1), SECONDARY_DISPLAYED_VALUES)
+            .stream().map(WebElement::getText).toList();
+    }
+
+    /**
+     * The secondary values are labelled with their property name, for screen readers only.
+     *
+     * @param itemNumber the number of the entry, starting at 1
+     * @return the labels of the secondary values of the entry, in the order they are displayed
+     * @since 18.10.0RC1
+     */
+    public List<String> getSecondaryLabels(int itemNumber)
+    {
+        return getDriver().findElementsWithoutWaiting(getItems().get(itemNumber - 1), SECONDARY_LABELS).stream()
+            .map(label -> label.getDomProperty("textContent").trim()).toList();
+    }
+
+    /**
+     * @return {@code true} if a marker is displayed before each entry, which happens when the entries display a
+     *     single property, {@code false} otherwise
+     * @since 18.10.0RC1
+     */
+    public boolean hasItemMarkers()
+    {
+        return getDriver().findElementsWithoutWaiting(getLayout(), By.cssSelector(".layout-list-single")).size() == 1;
     }
 
     /**

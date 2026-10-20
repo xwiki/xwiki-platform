@@ -160,7 +160,7 @@ class DefaultParametrizedNotificationManagerTest
 
     @ParameterizedTest
     @ValueSource(ints = { 0, -1 })
-    void getEventsWhenExpectedCountIsNotPositive(int expectedCount) throws Exception
+    void getEventsWhenExpectedCountIsNotPositive(int expectedCount)
     {
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = this.userReference;

@@ -19,6 +19,9 @@
  */
 package org.xwiki.test.docker.internal.junit5.blobstore;
 
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +81,10 @@ public class BlobStoreContainerExecutor extends AbstractContainerExecutor
 
         switch (blobStore) {
             case FILESYSTEM:
-                // No container needed for filesystem blob store
+                // No container needed for filesystem blob store, but the instances of a cluster must share it
+                if (SharedFileSystemBlobStore.isShared(testConfiguration)) {
+                    createSharedFileSystemBlobStore(testConfiguration);
+                }
                 break;
             case S3:
                 startSiloContainer(testConfiguration);
@@ -94,7 +100,24 @@ public class BlobStoreContainerExecutor extends AbstractContainerExecutor
      */
     public void stop(TestConfiguration testConfiguration)
     {
-        // Note that we don't need to stop the container as this is taken care of by TestContainers
+        // Note that we don't need to stop the container as this is taken care of by TestContainers. Same for the volume
+        // shared by the instances of a cluster.
+        SharedFileSystemBlobStore.forgetVolume(testConfiguration);
+    }
+
+    private void createSharedFileSystemBlobStore(TestConfiguration testConfiguration) throws Exception
+    {
+        if (testConfiguration.getServletEngine().isOutsideDocker()) {
+            // The instances run on the host: start from an empty directory, like the database.
+            File directory = SharedFileSystemBlobStore.getDirectory(testConfiguration);
+            FileUtils.deleteDirectory(directory);
+            FileUtils.forceMkdir(directory);
+            LOGGER.info("Sharing the filesystem blob store directory [{}] between the XWiki instances", directory);
+        } else {
+            // The instances run in containers: share a Docker volume.
+            String volumeName = SharedFileSystemBlobStore.createVolume(testConfiguration);
+            LOGGER.info("Sharing the filesystem blob store volume [{}] between the XWiki instances", volumeName);
+        }
     }
 
     private void startSiloContainer(TestConfiguration testConfiguration) throws Exception

@@ -63,6 +63,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
+import org.xwiki.search.solr.internal.LazySolrCore;
 import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -91,7 +92,8 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ComponentList({EventsSolrCoreInitializer.class, WikiDeletedListener.class, WikiReferenceConverter.class,
-    SpaceReferenceConverter.class, DocumentReferenceConverter.class, EntityReferenceConverter.class})
+    SpaceReferenceConverter.class, DocumentReferenceConverter.class, EntityReferenceConverter.class,
+    LazySolrCore.class})
 @ReferenceComponentList
 @EmbeddedSolrComponentList
 class EventStoreTest

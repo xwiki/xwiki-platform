@@ -117,7 +117,7 @@ public class WCAGUtils
         WCAGContext.writeWCAGReportToFile(overviewFile, this.wcagContext.buildOverview());
 
         if (this.wcagContext.hasWCAGIncomplete()) {
-            LOGGER.error(
+            LOGGER.info(
                 "There are [{}] incomplete accessibility checks in the test suite. See [{}/{}] for more details.",
                 this.wcagContext.getWCAGIncompleteCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_INCOMPLETE);
             File incompleteFile = new File(wcagDir, WCAGUtils.FILENAME_INCOMPLETE);

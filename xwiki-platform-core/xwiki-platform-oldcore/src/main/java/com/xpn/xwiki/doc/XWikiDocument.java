@@ -52,7 +52,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -499,12 +498,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         XDOM xdom;
 
         volatile LocalDateTime prepareDate;
-
-        /**
-         * Held while preparing the content, so that the threads needing the prepared content at the same time wait for
-         * a single preparation instead of each running it, which can be expensive (e.g. syntax highlighting).
-         */
-        final ReentrantLock prepareLock = new ReentrantLock();
 
         Content(String content, Syntax syntax)
         {
@@ -9188,16 +9181,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         XDOM xdom = getCachedPreparedXDOM(currentContent);
 
         if (xdom == null) {
-            currentContent.prepareLock.lock();
-            try {
+            // Synchronize on the content, so that the threads needing the prepared content at the same time wait for
+            // a single preparation instead of each running it, which can be expensive (e.g. syntax highlighting).
+            // The macros prepared while holding the lock must not need the prepared content of another document, as
+            // two threads preparing two documents that need each other's prepared content would block each other
+            // forever.
+            synchronized (currentContent) {
                 // Another thread might have prepared the content while this one was waiting.
                 xdom = getCachedPreparedXDOM(currentContent);
 
                 if (xdom == null) {
                     xdom = prepareXDOM(currentContent);
                 }
-            } finally {
-                currentContent.prepareLock.unlock();
             }
         }
 

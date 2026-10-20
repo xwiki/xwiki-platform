@@ -2092,7 +2092,10 @@ class XWikiDocumentMockitoTest
 
     private boolean isWaitingInGetPreparedXDOM(Thread thread)
     {
-        return thread.getState() == Thread.State.WAITING && Arrays.stream(thread.getStackTrace())
-            .anyMatch(element -> element.getMethodName().equals("getPreparedXDOM"));
+        // Blocked when waiting for the lock of the preparation, waiting when preparing the content too.
+        Thread.State state = thread.getState();
+        return (state == Thread.State.BLOCKED || state == Thread.State.WAITING)
+            && Arrays.stream(thread.getStackTrace())
+                .anyMatch(element -> element.getMethodName().equals("getPreparedXDOM"));
     }
 }

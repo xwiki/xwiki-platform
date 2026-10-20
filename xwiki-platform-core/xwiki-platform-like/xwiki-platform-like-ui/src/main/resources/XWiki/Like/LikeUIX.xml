@@ -370,6 +370,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       outline-offset: 0.2em;
     }
 
+    /* Keep Bootstrap's pressed state from repainting the button when the pointer leaves it. */
+    &amp;:active, &amp;:active:focus {
+      background-color: transparent;
+      box-shadow: none;
+    }
+
     &amp;.btn-primary {
       color: @link-color;
 

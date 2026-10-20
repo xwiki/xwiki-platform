@@ -19,6 +19,8 @@
  */
 package org.xwiki.blocknote.test.po;
 
+import java.util.Base64;
+
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -464,4 +466,94 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         return this.container.findElements(By.className("bn-block-content")).get(index);
     }
+
+    /**
+     * Pastes the specified file over the rich text area, as if the user copied it from their file manager.
+     *
+     * @param fileName the name of the pasted file
+     * @param mediaType the media type of the pasted file, e.g. {@code image/png}
+     * @param content the content of the pasted file
+     * @return this rich text area instance
+     * @since 18.10.0RC1
+     */
+    public BlockNoteRichTextArea pasteFile(String fileName, String mediaType, byte[] content)
+    {
+        return insertFile("paste", fileName, mediaType, content);
+    }
+
+    /**
+     * Drops the specified file over the rich text area, as if the user dragged it from their file manager.
+     *
+     * @param fileName the name of the dropped file
+     * @param mediaType the media type of the dropped file, e.g. {@code application/pdf}
+     * @param content the content of the dropped file
+     * @return this rich text area instance
+     * @since 18.10.0RC1
+     */
+    public BlockNoteRichTextArea dropFile(String fileName, String mediaType, byte[] content)
+    {
+        return insertFile("drop", fileName, mediaType, content);
+    }
+
+    /**
+     * Fires the clipboard or drag and drop event that makes the editor insert the specified file. We can't use the
+     * native clipboard or drag and drop support because the file would have to exist on the machine running the
+     * browser, which is a different container when the tests run with Docker.
+     *
+     * @param eventType either {@code paste} or {@code drop}
+     * @param fileName the name of the file to insert
+     * @param mediaType the media type of the file to insert
+     * @param content the content of the file to insert
+     * @return this rich text area instance
+     */
+    private BlockNoteRichTextArea insertFile(String eventType, String fileName, String mediaType, byte[] content)
+    {
+        String script = """
+            const [editor, eventType, fileName, mediaType, base64] = arguments;
+            const bytes = Uint8Array.from(atob(base64), character => character.charCodeAt(0));
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(new File([bytes], fileName, {type: mediaType}));
+            const {left, top, width, height} = editor.getBoundingClientRect();
+            const eventInit = {bubbles: true, cancelable: true, clientX: left + width / 2, clientY: top + height / 2};
+            // Firefox ignores the clipboardData passed to the ClipboardEvent constructor (the event ends up with no
+            // types), so we define it as an own property, which shadows the prototype getter in both browsers.
+            const paste = new ClipboardEvent('paste', eventInit);
+            Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
+            editor.dispatchEvent(eventType === 'paste'
+                ? paste
+                : new DragEvent('drop', {...eventInit, dataTransfer}));
+            """;
+        getDriver().executeScript(script, this.container, eventType, fileName, mediaType,
+            Base64.getEncoder().encodeToString(content));
+        return this;
+    }
+
+    /**
+     * Waits until the rich text area holds a link with the specified label. Note that this can't be replaced by waiting
+     * for the label text alone: while a file is being uploaded, the block BlockNote inserted for it already shows the
+     * file name, so the text would match before the upload completes.
+     *
+     * @param label the expected link label
+     * @return the link element
+     * @since 18.10.0RC1
+     */
+    public WebElement waitUntilLinkIsPresent(String label)
+    {
+        By locator = By.xpath(".//a[normalize-space(.) = " + escapeXPathValue(label) + "]");
+        getDriver().waitUntilCondition(driver -> !this.container.findElements(locator).isEmpty());
+        return this.container.findElement(locator);
+    }
+
+    /**
+     * @param value the value to use inside an XPath expression
+     * @return the given value as an XPath string literal, which has no escape syntax of its own
+     */
+    private String escapeXPathValue(String value)
+    {
+        if (!value.contains("'")) {
+            return "'" + value + "'";
+        }
+        return "concat('" + value.replace("'", "', \"'\", '") + "')";
+    }
+
 }

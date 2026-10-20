@@ -38,5 +38,6 @@ export const FilePanel: React.FC<FilePanelProps> = ({ blockId, editor }) => {
     return <ImageFilePanel currentBlock={block} />;
   }
 
-  throw new Error(`Assertion failed: unknown block type: ${block.type}`);
+  // The other file blocks (file, video, audio) have no XWiki counterpart, so there is nothing to show for them.
+  return null;
 };

@@ -20,6 +20,7 @@
 package org.xwiki.blocknote.test.ui;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
@@ -42,6 +43,7 @@ import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogAdvancedEditForm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -203,5 +205,63 @@ class ImageIT extends AbstractBlockNoteIT
         byte[] uploadedAttachmentContent = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
         assertTrue(Arrays.equals(FileUtils.readFileToByteArray(file), uploadedAttachmentContent));
+    }
+
+    @Test
+    @Order(2)
+    void pasteImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
+        textArea.click().pasteFile("image.gif", "image/gif", content);
+        // The image is shown only once it has been uploaded, since that's when its URL is known.
+        textArea.waitUntilImageIsLoaded(0);
+
+        page.save();
+        String savedContent = page.editWiki().getContent();
+
+        // The image is saved as an untyped attachment reference, which is what the CKEditor integration produces. The
+        // pasted file was renamed, because the browser names a file pasted from the clipboard after its media type and
+        // pasting a second one would otherwise overwrite the first attachment.
+        assertThat(savedContent, matchesPattern("(?s).*\\[\\[image:\\d+-\\d+\\.gif\\]\\].*"));
+
+        String attachmentName = savedContent.replaceAll("(?s).*\\[\\[image:([^\\]]+)\\]\\].*", "$1");
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference(attachmentName, EntityType.ATTACHMENT, testReference));
+        assertTrue(Arrays.equals(content, uploaded));
+    }
+
+    @Test
+    @Order(3)
+    void dropFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] content = "Hello, world!".getBytes(StandardCharsets.UTF_8);
+        // Unlike a pasted file, a dropped file keeps the name the user gave it.
+        textArea.click().dropFile("notes.txt", "text/plain", content);
+        // The link replaces the block BlockNote inserted only once the file has been uploaded.
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // A file that is not an image has no XWiki counterpart, so it is inserted as a free-standing attachment link,
+        // which is exactly what the CKEditor integration produces.
+        assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
+
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
+        assertTrue(Arrays.equals(content, uploaded));
     }
 }

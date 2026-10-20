@@ -78,7 +78,9 @@
 </template>
 
 <script setup lang="ts">
+import { trackPaste } from "../services/attachments/pasteTracker";
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
+import { createUploadFile } from "../services/blocknote/createUploadFile";
 import {
   extractLinkId,
   injectLinkId,
@@ -107,6 +109,7 @@ import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcesso
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { CristalApp } from "@xwiki/platform-api";
+import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type {
   Collaboration,
   CollaborationManagerProvider,
@@ -119,6 +122,8 @@ import type {
   ImageEditionOverrideFn,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
@@ -279,6 +284,37 @@ function isSameResourceReference(
   return alice?.type === bob?.type && alice?.reference === bob?.reference;
 }
 
+// Pasted files are renamed before being uploaded, so we need to know how the files reached the editor.
+const pasteTracker = trackPaste(document);
+
+// Called by BlockNote to upload the files that are pasted or dropped over the editor.
+const uploadFile = createUploadFile({
+  storageProvider: container.get<StorageProvider>("StorageProvider"),
+  modelReferenceParser: container
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!,
+  remoteURLSerializer: container
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!,
+  getDocumentReference: () => documentReference,
+  getBlockNoteDocument: () => blockNoteDocument,
+  isPaste: pasteTracker.isPaste,
+  notifyUploadFailed: async (fileName, error) => {
+    console.error(`Failed to upload [${fileName}].`, error);
+    try {
+      const message = await logic.translate(
+        "blocknote.upload.failed",
+        fileName,
+      );
+      new XWiki.widgets.Notification(message, "error");
+    } catch (notificationError) {
+      // The notification is the last resort to report the failure, so there's nothing else to do if it fails. We catch
+      // it nonetheless, because nobody awaits this callback.
+      console.error("Failed to notify the user.", notificationError);
+    }
+  },
+});
+
 const syntaxes = container.getAll<SyntaxConfig>(
   SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
 );
@@ -310,6 +346,7 @@ const editorProps = shallowRef<
     // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
     // consistency between edit and view modes.
     defaultStyles: false,
+    uploadFile,
   },
   theme: "light",
   lang: (actualLocale || "en") as EditorLanguage,
@@ -368,6 +405,7 @@ async function joinCollaborationSession(): Promise<void> {
 }
 
 onUnmounted(async () => {
+  pasteTracker.dispose();
   // The realtime toolbar is removed and the auto-saver is stopped when the last editor leaves the session.
   try {
     (await formCollaboration)?.leave();

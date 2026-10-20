@@ -19,6 +19,7 @@
  */
 import LayoutList from "./LayoutList.vue";
 import LayoutListItem from "./LayoutListItem.vue";
+import LivedataActions from "../../LivedataActions.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
 import { shallowMount } from "@vue/test-utils";
 import _ from "lodash-es";
@@ -43,6 +44,10 @@ function initWrapper({ options, afterEntryFetchWrapper } = {}) {
           provide: {
             logic: {
               getEntryId: (e) => e.id,
+              getEntryKeys: (entries) =>
+                entries.map((entry, idx) => `key-${entry.id}-${idx}`),
+              canAddEntry: () => false,
+              addEntry: () => {},
               isSelectionEnabled: () => false,
               // Only the second property is visible.
               getPropertyDescriptor: (propertyId) => ({
@@ -175,6 +180,35 @@ describe("LayoutList.vue", () => {
     expect(
       initList(["title", "year"]).find(".layout-list-root").classes(),
     ).not.toContain("layout-list-single");
+  });
+
+  it("Displays the actions of the Live Data in the top bar, like the other layouts", () => {
+    // They include the edit mode button, and the dropdown menu, with the same spacing as in the other layouts.
+    expect(initWrapper().findComponent(LivedataActions).exists()).toBe(true);
+  });
+
+  it("Offers to add an entry only when it is possible", async () => {
+    expect(initWrapper().find(".layout-list-new-item").exists()).toBe(false);
+
+    let added = 0;
+    const wrapper = initWrapper({
+      options: {
+        global: {
+          provide: {
+            logic: {
+              canAddEntry: () => true,
+              addEntry: () => {
+                added++;
+              },
+            },
+          },
+        },
+      },
+    });
+    const newItem = wrapper.find(".layout-list-new-item");
+    expect(newItem.text()).toContain("livedata.action.addEntry");
+    await newItem.find("a").trigger("click");
+    expect(added).toBe(1);
   });
 
   it("Has pagination at the top and at the bottom", () => {

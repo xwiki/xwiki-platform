@@ -20,9 +20,10 @@
 
 <!--
   LayoutList.vue is the main file for the List layout component.
-  It displays the entries as a compact, read-only list. Each entry shows its first
-  visible property, in the order of the Livedata properties, as its main property,
-  followed by its other visible properties.
+  It displays the entries as a compact list. Each entry shows its first visible
+  property, in the order of the Livedata properties, as its main property, followed
+  by its other visible properties. In edit mode, the entries can be deleted and new
+  entries added, like in the other layouts.
 -->
 <template>
   <div class="layout-list">
@@ -39,7 +40,7 @@
       <template #right>
         <LivedataPagination side="right" />
         <LivedataEntrySelectorAll v-if="isSelectionEnabled" />
-        <LivedataDropdownMenu />
+        <LivedataActions />
       </template>
     </LivedataTopbar>
 
@@ -56,17 +57,24 @@
       :class="{ 'layout-list-single': secondaryPropertyIds.length === 0 }"
     >
       <!--
-        We include the entry index in the key in case of inconsistent data, in this case duplicated entry IDs.
-        That way even if two entries have the same id, the keys will not be equals.
+        The keys stay the same when the entries are refreshed or reordered, and when the entry of a new item is created.
+        They are made unique in case of inconsistent data, in this case duplicated entry IDs.
       -->
       <LayoutListItem
         v-for="(entry, idx) in entries"
-        :key="`list-item-${logic.getEntryId(entry)}-${idx}`"
+        :key="entryKeys[idx]"
         :entry="entry"
         :entry-idx="idx"
         :property-id="propertyId"
         :secondary-property-ids="secondaryPropertyIds"
       />
+      <!-- Item to create a new entry, only available in edit mode. -->
+      <li v-if="canAddEntry" class="layout-list-new-item">
+        <a href="#" @click.prevent="logic.addEntry()">
+          <XWikiIcon :icon-descriptor="{ name: 'add' }" />
+          {{ $t("livedata.action.addEntry") }}
+        </a>
+      </li>
     </ul>
     <LivedataBottombar>
       <div v-if="entriesFetched && entries.length === 0" class="noentries-list">
@@ -83,12 +91,13 @@ import {
   getListPropertyId,
   getListSecondaryPropertyIds,
 } from "./listLayout.js";
+import LivedataActions from "../../LivedataActions.vue";
 import LivedataBottombar from "../../LivedataBottombar.vue";
-import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
 import LivedataTopbar from "../../LivedataTopbar.vue";
+import XWikiIcon from "../../utilities/XWikiIcon.vue";
 import LayoutLoader from "../LayoutLoader.vue";
 
 export default {
@@ -97,12 +106,13 @@ export default {
   components: {
     LivedataBottombar,
     LivedataTopbar,
-    LivedataDropdownMenu,
+    LivedataActions,
     LivedataEntrySelectorAll,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
     LayoutListItem,
     LayoutLoader,
+    XWikiIcon,
   },
 
   inject: ["logic"],
@@ -114,6 +124,12 @@ export default {
   computed: {
     entries() {
       return this.logic.data.data.entries;
+    },
+    entryKeys() {
+      return this.logic.getEntryKeys(this.entries);
+    },
+    canAddEntry() {
+      return this.logic.canAddEntry();
     },
     // The id of the main property displayed for each entry
     propertyId() {
@@ -153,6 +169,10 @@ export default {
   content: "\2022" / "";
   flex: none;
   color: var(--text-muted);
+}
+
+.layout-list .layout-list-new-item {
+  padding: 0.125em 0;
 }
 
 .layout-list .layout-loader {

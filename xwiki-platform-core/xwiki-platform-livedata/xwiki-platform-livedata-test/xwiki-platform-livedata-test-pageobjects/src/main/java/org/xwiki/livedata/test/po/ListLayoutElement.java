@@ -23,9 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.ConfirmationBox;
+import org.xwiki.test.ui.po.FormContainerElement;
 
 /**
  * Provides the operations to interact with a Live Data when displayed with the list layout. Each entry is displayed on
@@ -39,6 +42,12 @@ public class ListLayoutElement extends BaseElement
     private static final By ITEMS = By.cssSelector(".layout-list-root > .layout-list-item");
 
     private static final By MAIN_VALUE = By.cssSelector(".layout-list-item-main");
+
+    private static final By DELETE_ACTION = By.cssSelector(".layout-list-item-delete");
+
+    private static final By NEW_ITEM = By.cssSelector(".layout-list-new-item");
+
+    private static final By EDITOR_INPUT = By.cssSelector(".livedata-displayer .edit input");
 
     // The displayed part of the secondary values, without their label for screen readers.
     private static final By SECONDARY_DISPLAYED_VALUES =
@@ -153,6 +162,78 @@ public class ListLayoutElement extends BaseElement
     {
         return !getDriver().findElementsWithoutWaiting(getLayout(),
             By.cssSelector(".layout-list-item .livedata-displayer .editable")).isEmpty();
+    }
+
+    /**
+     * @return {@code true} if the list offers to add an entry, which happens in edit mode, {@code false} otherwise
+     * @since 18.10.0RC1
+     */
+    public boolean canAddEntry()
+    {
+        return !getDriver().findElementsWithoutWaiting(getLayout(), NEW_ITEM).isEmpty();
+    }
+
+    /**
+     * @return {@code true} if the entries offer to be deleted, which happens in edit mode, {@code false} otherwise
+     * @since 18.10.0RC1
+     */
+    public boolean hasDeleteActions()
+    {
+        return !getDriver().findElementsWithoutWaiting(getLayout(), DELETE_ACTION).isEmpty();
+    }
+
+    /**
+     * Add an item to the list. The entry itself is only created once a first value is set on that item, see
+     * {@link #createNewEntry(String, String)}. The first editable value of the new item is edited right away.
+     *
+     * @since 18.10.0RC1
+     */
+    public void startNewEntry()
+    {
+        getLayout().findElement(NEW_ITEM).findElement(By.tagName("a")).click();
+        getDriver().waitUntilElementIsVisible(getLayout(), EDITOR_INPUT);
+    }
+
+    /**
+     * Fill a field of the new item and validate it, which creates the entry, then wait for the entry to be saved.
+     *
+     * @param fieldName the name of the field to fill (i.e., the corresponding XClass property)
+     * @param value the value to set
+     * @since 18.10.0RC1
+     */
+    public void createNewEntry(String fieldName, String value)
+    {
+        List<WebElement> items = getItems();
+        WebElement newItem = items.get(items.size() - 1);
+        WebElement input = newItem.findElement(By.cssSelector(String.format("[name$='_%s']", fieldName)));
+        new FormContainerElement(By.cssSelector(".livedata-displayer .edit")).setFieldValue(input, value);
+        input.sendKeys(Keys.ENTER);
+        // Once saved, the new entry offers to be deleted instead of canceled.
+        int itemNumber = items.size();
+        getDriver().waitUntilCondition(webDriver -> {
+            try {
+                return "Delete".equals(getItems().get(itemNumber - 1).findElement(DELETE_ACTION)
+                    .getDomAttribute("title"));
+            } catch (StaleElementReferenceException | IndexOutOfBoundsException e) {
+                return false;
+            }
+        });
+        waitUntilReady();
+    }
+
+    /**
+     * Delete an entry, from its delete action, then confirm the deletion and wait for the entry to be removed.
+     *
+     * @param itemNumber the number of the entry, starting at 1
+     * @since 18.10.0RC1
+     */
+    public void deleteEntry(int itemNumber)
+    {
+        int itemCount = countItems();
+        getItems().get(itemNumber - 1).findElement(DELETE_ACTION).click();
+        new ConfirmationBox().clickYes();
+        waitUntilItemCountEqualsTo(itemCount - 1);
+        waitUntilReady();
     }
 
     private List<WebElement> getItems()

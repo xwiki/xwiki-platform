@@ -47,6 +47,8 @@ function initWrapper(options = {}, props = {}) {
             logic: {
               getEntryId: (e) => e.id,
               isSelectionEnabled: () => false,
+              isEditMode: () => false,
+              deleteEntry: () => {},
               getPropertyDescriptor: (id) =>
                 id === "director" ? { id, name: "Director" } : undefined,
             },
@@ -101,15 +103,13 @@ describe("LayoutListItem.vue", () => {
     });
   });
 
-  it("Provides a read-only logic to the displayer", () => {
-    const wrapper = initWrapper({
-      global: { provide: { logic: { isEditable: () => true } } },
-    });
-    const providedLogic = wrapper.vm.$.provides.logic;
-    expect(providedLogic.isEditable({ entry: {}, propertyId: "title" })).toBe(
-      false,
-    );
-    expect(providedLogic.getEntryId({ id: "idB" })).toBe("idB");
+  it("Lets the displayers use the Live Data logic, so that the values can be edited", () => {
+    const logic = { isEditable: () => true };
+    const wrapper = initWrapper({ global: { provide: { logic } } });
+    // No other logic is provided to the displayers.
+    expect(wrapper.vm.$.provides.logic.isEditable()).toBe(true);
+    expect(wrapper.find(".layout-list-item-delete").exists()).toBe(false);
+    expect(wrapper.classes()).not.toContain("layout-list-item-edit-mode");
   });
 
   it("Displays the secondary properties after the main one, separated by a circle", () => {
@@ -230,5 +230,55 @@ describe("LayoutListItem.vue", () => {
       global: { provide: { logic: { isSelectionEnabled: () => true } } },
     });
     expect(wrapper.findComponent(LivedataEntrySelector).exists()).toBe(true);
+  });
+});
+
+describe("LayoutListItem.vue in edit mode", () => {
+  /**
+   * @param entry - the entry of the item
+   * @param deleted - the entries deleted by the item
+   * @returns a wrapper for an item in edit mode, with a secondary property without value
+   */
+  function initEditModeWrapper(entry, deleted = []) {
+    return initWrapper(
+      {
+        global: {
+          provide: {
+            logic: {
+              isEditMode: () => true,
+              deleteEntry: (e) => deleted.push(e),
+            },
+          },
+        },
+      },
+      { entry, secondaryPropertyIds: ["year", "genre"] },
+    );
+  }
+
+  it("Displays the secondary properties without a value, so that they can be filled", () => {
+    const wrapper = initEditModeWrapper({ id: "idA", title: "A", year: 1 });
+    expect(wrapper.classes()).toContain("layout-list-item-edit-mode");
+    expect(
+      wrapper
+        .findAllComponents(LivedataDisplayer)
+        .map((displayer) => displayer.props("propertyId")),
+    ).toStrictEqual(["title", "year", "genre"]);
+  });
+
+  it("Deletes a saved entry", async () => {
+    const deleted = [];
+    const entry = { id: "idA", title: "A" };
+    const wrapper = initEditModeWrapper(entry, deleted);
+    const button = wrapper.find(".layout-list-item-delete");
+    expect(button.attributes("title")).toBe("livedata.table.action.delete");
+    await button.trigger("click");
+    expect(deleted).toStrictEqual([entry]);
+  });
+
+  it("Cancels a new entry", () => {
+    const wrapper = initEditModeWrapper({ title: "", _new: "true" });
+    expect(wrapper.find(".layout-list-item-delete").attributes("title")).toBe(
+      "livedata.table.action.cancel",
+    );
   });
 });

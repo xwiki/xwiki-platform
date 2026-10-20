@@ -1136,8 +1136,8 @@ class LiveDataIT
         assertEquals(List.of(CITY_COLUMN + ":"), listLayout.getSecondaryLabels(1));
         assertFalse(listLayout.hasItemMarkers());
 
-        // The values can't be edited from the list layout.
-        assertFalse(listLayout.hasEditableValues());
+        // The values can be edited from the list layout, like in the other layouts.
+        assertTrue(listLayout.hasEditableValues());
 
         // Hiding a property removes its values from the list.
         PropertiesPanelElement propertiesPanel = liveData.openPropertiesPanel();
@@ -1172,6 +1172,53 @@ class LiveDataIT
         listLayout = liveData.getListLayout();
         listLayout.waitUntilItemCountEqualsTo(3);
         assertEquals(List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA), listLayout.getMainValues());
+    }
+
+    /**
+     * Test the edit mode of the list layout: the entries can be added and deleted, like in the other layouts.
+     */
+    @Test
+    @Order(17)
+    void listLayoutEditMode(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+        createEditableLiveDataPage(testUtils, testReference, "layouts=\"list,table\"", NAME_LYNDA);
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        ListLayoutElement listLayout = liveData.getListLayout();
+        listLayout.waitUntilItemCountEqualsTo(1);
+        assertEquals(List.of(NAME_LYNDA), listLayout.getMainValues());
+
+        // The list layout offers the edit mode, like the other layouts, but not its actions outside of it.
+        assertTrue(liveData.hasEditModeAction());
+        assertFalse(liveData.isEditMode());
+        assertFalse(listLayout.canAddEntry());
+        assertFalse(listLayout.hasDeleteActions());
+
+        liveData.toggleEditMode();
+        listLayout.waitUntilReady();
+        assertTrue(liveData.isEditMode());
+        assertTrue(listLayout.canAddEntry());
+        assertTrue(listLayout.hasDeleteActions());
+
+        // Setting a first value on the new item creates the entry.
+        listLayout.startNewEntry();
+        listLayout.createNewEntry(NAME_COLUMN, NAME_ESTHER);
+        assertEquals(List.of(NAME_LYNDA, NAME_ESTHER), listLayout.getMainValues());
+
+        // Deleting the entry removes it for good.
+        listLayout.deleteEntry(2);
+        assertEquals(List.of(NAME_LYNDA), listLayout.getMainValues());
+
+        // Leaving the edit mode hides its actions again.
+        liveData.toggleEditMode();
+        listLayout.waitUntilReady();
+        assertFalse(liveData.isEditMode());
+        assertFalse(listLayout.canAddEntry());
+        assertFalse(listLayout.hasDeleteActions());
+        assertEquals(List.of(NAME_LYNDA), listLayout.getMainValues());
     }
 
     /**

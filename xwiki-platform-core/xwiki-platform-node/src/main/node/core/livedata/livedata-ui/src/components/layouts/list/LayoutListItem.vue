@@ -24,11 +24,14 @@
   by its secondary properties, all separated by a small circle. The secondary
   properties are labelled for screen readers, and the values cut off by the end of
   the line display their full text as a tooltip.
-  The values are read-only: they cannot be edited from the List layout.
+  The values can be edited like in the other layouts. In edit mode, the line wraps
+  so that the editors are not cut off, the secondary properties are displayed even
+  when they are empty, so that they can be filled, and the entry can be deleted.
 -->
 <template>
   <li
     class="layout-list-item"
+    :class="{ 'layout-list-item-edit-mode': isEditMode }"
     :data-livedata-entry-index="entryIdx"
     :data-livedata-entry-id="logic.getEntryId(entry)"
   >
@@ -73,13 +76,31 @@
         </span>
       </template>
     </div>
+    <!-- Entry actions, only available in edit mode. -->
+    <button
+      v-if="isEditMode"
+      type="button"
+      class="btn btn-default btn-xs layout-list-item-delete"
+      :title="
+        $t(
+          isEntrySaved
+            ? 'livedata.table.action.delete'
+            : 'livedata.table.action.cancel',
+        )
+      "
+      @click="logic.deleteEntry(entry)"
+    >
+      <XWikiIcon
+        :icon-descriptor="{ name: isEntrySaved ? 'trash' : 'cross' }"
+      />
+    </button>
   </li>
 </template>
 
 <script>
 import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
-import { createReadOnlyLogic } from "../readOnlyLogic.js";
+import XWikiIcon from "../../utilities/XWikiIcon.vue";
 
 export default {
   name: "LayoutListItem",
@@ -87,16 +108,10 @@ export default {
   components: {
     LivedataEntrySelector,
     LivedataDisplayer,
+    XWikiIcon,
   },
 
   inject: ["logic"],
-
-  // Provide a read-only logic to the displayers, so that they don't offer to edit the value.
-  provide() {
-    return {
-      logic: createReadOnlyLogic(this.logic),
-    };
-  },
 
   props: {
     entry: {
@@ -122,8 +137,11 @@ export default {
 
   computed: {
     // The secondary properties without a value for this entry are skipped, to avoid displaying separators with
-    // nothing between them.
+    // nothing between them, except in edit mode, where they are displayed so that they can be filled.
     displayedSecondaryPropertyIds() {
+      if (this.isEditMode) {
+        return this.secondaryPropertyIds;
+      }
       return this.secondaryPropertyIds.filter((propertyId) => {
         const value = this.entry[propertyId];
         return (
@@ -139,6 +157,31 @@ export default {
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
     },
+
+    isEditMode() {
+      return this.logic.isEditMode();
+    },
+
+    isEntrySaved() {
+      return this.logic.getEntryId(this.entry) !== undefined;
+    },
+  },
+
+  mounted() {
+    // Focus the first editable value of a new entry, so that it can be filled right away, like in the other layouts.
+    if (this.entry?._new) {
+      const tryFocus = (attempt = 0) => {
+        const value = this.$el
+          .querySelector(".editable")
+          ?.closest("[tabindex]");
+        if (value) {
+          value.focus();
+        } else if (attempt < 20) {
+          requestAnimationFrame(() => tryFocus(attempt + 1));
+        }
+      };
+      tryFocus();
+    }
   },
 
   methods: {
@@ -244,6 +287,30 @@ export default {
   text-align: inherit;
 }
 
+/*
+  The editors don't fit on a compact line: in edit mode, and while a value is edited, the line wraps and the values are
+  no longer cut off.
+*/
+.layout-list .layout-list-item-edit-mode,
+.layout-list .layout-list-item:has(.livedata-displayer .edit),
+.layout-list .layout-list-item-edit-mode .layout-list-item-secondary,
+.layout-list
+  .layout-list-item:has(.livedata-displayer .edit)
+  .layout-list-item-secondary {
+  flex-wrap: wrap;
+}
+
+.layout-list .layout-list-item-edit-mode .layout-list-item-value,
+.layout-list .layout-list-item-edit-mode .layout-list-item-secondary,
+.layout-list .layout-list-item-value:has(.livedata-displayer .edit),
+.layout-list
+  .layout-list-item:has(.livedata-displayer .edit)
+  .layout-list-item-secondary {
+  max-width: none;
+  overflow: visible;
+  white-space: normal;
+}
+
 /* The labels of the secondary properties are hidden, but read by screen readers. */
 .layout-list .layout-list-item-label {
   position: absolute;
@@ -255,5 +322,11 @@ export default {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* The delete action is displayed at the end of the line. */
+.layout-list .layout-list-item-delete {
+  flex: none;
+  margin-left: auto;
 }
 </style>

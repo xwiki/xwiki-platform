@@ -36,7 +36,7 @@
     </XWikiPopoverDropdown>
 -->
 <script setup lang="ts">
-import { ref, useTemplateRef } from "vue";
+import { ref, useId, useTemplateRef } from "vue";
 
 const {
   toggleClass = "btn btn-default",
@@ -55,7 +55,7 @@ const {
   closeOnClick?: boolean;
 }>();
 
-const menuId = `xwiki-popover-dropdown-${nextMenuNumber()}`;
+const menuId = useId();
 const isOpen = ref(false);
 const menu = useTemplateRef<HTMLElement>("menu");
 
@@ -68,15 +68,14 @@ function onMenuClick() {
 function onMenuToggle(event: ToggleEvent) {
   isOpen.value = event.newState === "open";
 }
-</script>
 
-<script lang="ts">
-// The menu identifiers must be unique in the page, across Vue applications, since there is for
-// instance one application per Live Data, which rules out useId.
-let menuCount = 0;
-
-function nextMenuNumber() {
-  return ++menuCount;
+// Like the Bootstrap dropdown script does for its toggles, the arrow keys open the menu and move
+// the focus to its first item.
+function onToggleArrowKey() {
+  if (!isOpen.value) {
+    menu.value?.showPopover();
+  }
+  menu.value?.querySelector<HTMLElement>("li:not(.disabled) a")?.focus();
 }
 </script>
 
@@ -94,12 +93,13 @@ function nextMenuNumber() {
       :popovertarget="menuId"
       aria-haspopup="true"
       :aria-expanded="String(isOpen)"
+      @keydown.up.down.prevent="onToggleArrowKey"
     >
       <slot name="toggle" />
     </button>
     <!--
-      The keys handled by the Bootstrap dropdown script are kept from it: that script would prevent
-      Escape from closing the popover, and would close the menu on the arrow and space keys.
+      The Bootstrap dropdown script moves the focus between the menu items with the arrow keys, but
+      Escape is kept from it since that script would prevent it from closing the popover.
     -->
     <ul
       :id="menuId"
@@ -108,7 +108,7 @@ function nextMenuNumber() {
       class="dropdown-menu"
       :class="menuClass"
       @click="onMenuClick"
-      @keydown.esc.up.down.space.stop
+      @keydown.esc.stop
       @toggle="onMenuToggle"
     >
       <slot />

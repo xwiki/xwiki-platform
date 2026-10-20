@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.parser.pygments;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -94,7 +93,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
      */
     private static final String ENGINE_ID = "python";
 
-    private static final String SCRIPT_RESOURCE = "/pygments/code.py";
+    private static final String SCRIPT_RESOURCE = "pygments/code.py";
 
     /**
      * The syntax identifier.
@@ -125,11 +124,9 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     {
         // Get the script
         String scriptSource;
-        try (InputStream is = getClass().getResourceAsStream(SCRIPT_RESOURCE)) {
-            if (is == null) {
-                throw new InitializationException("Failed to find resource " + SCRIPT_RESOURCE);
-            }
-            scriptSource = IOUtils.toString(is, StandardCharsets.UTF_8);
+        try {
+            scriptSource =
+                IOUtils.resourceToString(SCRIPT_RESOURCE, StandardCharsets.UTF_8, getClass().getClassLoader());
         } catch (IOException e) {
             throw new InitializationException("Failed to read resource " + SCRIPT_RESOURCE, e);
         }

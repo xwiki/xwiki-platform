@@ -20,14 +20,19 @@
 package org.xwiki.officeimporter.test.ui;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
+import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.docker.junit5.ScreenshotComparator;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -39,6 +44,9 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the {@code office} macro.
@@ -76,6 +84,10 @@ class OfficeMacroIT
 
     private static final String PASSWORD = "password";
 
+    private static final String REFERENCE = "reference";
+
+    private static final String ATTACHMENT = "attachment";
+
     @BeforeEach
     void setUp(TestUtils setup)
     {
@@ -91,12 +103,13 @@ class OfficeMacroIT
     }
 
     /**
-     * The office macro, inserted with CKEditor, displays the content of the office attachment to a user allowed to view
-     * it.
+     * The office macro, inserted with CKEditor, requires an office file and displays the content of the office
+     * attachment to a user allowed to view it.
      */
     @Test
     @Order(1)
-    void viewAttachment(TestUtils setup, TestReference testReference) throws Exception
+    void viewAttachment(TestUtils setup, TestReference testReference, ScreenshotComparator screenshots)
+        throws Exception
     {
         DocumentReference sourceReference = getSourceReference(testReference);
         attachOfficeFile(setup, testReference, sourceReference);
@@ -106,9 +119,20 @@ class OfficeMacroIT
         CKEditor editor = new CKEditor("content").waitToLoad();
         MacroDialogEditModal macroEditModal =
             editor.getToolBar().insertOtherMacro().filterByText("Office Document Viewer", 1).clickSelect();
+
+        // The deprecated attachment parameter is hidden, so the reference parameter is displayed alone, as required.
+        assertTrue(macroEditModal.isMacroParameterRequired(REFERENCE));
+        assertFalse(macroEditModal.isMacroParameterDisplayed(ATTACHMENT));
+        assertEquals(List.of(), macroEditModal.getMacroParameterChoices(REFERENCE));
+        screenshots.assertMatches(REFERENCE, macroEditModal.clearFocus().getMacroParameterElement(REFERENCE));
+
+        // Submitting without an office file keeps the modal open and gives the focus to the reference picker.
+        macroEditModal.clickSubmit(false);
+        assertTrue(macroEditModal.getMacroParameterSuggestInput(REFERENCE).hasFocus());
+
         // Pick the office attachment of the source page among the attachments with the same name. The picker values are
         // attachment references relative to the wiki, the "attach:" prefix being added on submit.
-        macroEditModal.getMacroParameterSuggestInput("reference").sendKeys(ATTACHMENT_NAME)
+        macroEditModal.getMacroParameterSuggestInput(REFERENCE).sendKeys(ATTACHMENT_NAME)
             .waitForNonTypedSuggestions()
             .selectByValue(String.format("%s@%s", setup.serializeLocalReference(sourceReference), ATTACHMENT_NAME));
         macroEditModal.clickSubmit();
@@ -151,6 +175,44 @@ class OfficeMacroIT
             content, not(containsString(DOCUMENT_CONTENT)));
         assertThat("The office macro should fail for a user who cannot view the attachment.", content,
             containsString("Failed to execute the [office] macro"));
+    }
+
+    /**
+     * An office macro using the deprecated attachment parameter can still be edited with CKEditor: the editor offers
+     * the choice between the reference and the attachment parameters, with the attachment one selected, and keeps it
+     * on submit.
+     */
+    @Test
+    @Order(3)
+    void editDeprecatedAttachmentParameter(TestUtils setup, TestReference testReference,
+        ScreenshotComparator screenshots) throws Exception
+    {
+        DocumentReference sourceReference = getSourceReference(testReference);
+        attachOfficeFile(setup, testReference, sourceReference);
+        String attachment = String.format("%s@%s", setup.serializeLocalReference(sourceReference), ATTACHMENT_NAME);
+        setup.rest().savePage(testReference, String.format("before\n\n{{office attachment=\"%s\"/}}", attachment),
+            "Viewer");
+
+        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
+        CKEditor editor = new CKEditor("content").waitToLoad();
+        RichTextAreaElement textArea = editor.getRichTextArea();
+        assertThat(textArea.getText(), containsString(DOCUMENT_CONTENT));
+        // Select the macro, which is right after the first paragraph.
+        textArea.sendKeys(Keys.END, Keys.RIGHT);
+        MacroDialogEditModal macroEditModal = textArea.editSelectedMacro();
+
+        assertEquals(List.of(REFERENCE, ATTACHMENT), macroEditModal.getMacroParameterChoices(REFERENCE));
+        assertEquals(ATTACHMENT, macroEditModal.getSelectedMacroParameterChoice(REFERENCE));
+        assertEquals(attachment, macroEditModal.getMacroParameter(ATTACHMENT));
+        screenshots.assertMatches("choices", macroEditModal.clearFocus().getMacroParameterChoicesElement(REFERENCE));
+
+        macroEditModal.clickSubmit();
+        assertThat(textArea.getText(), containsString(DOCUMENT_CONTENT));
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertThat(viewPage.getContent(), containsString(DOCUMENT_CONTENT));
+        assertThat(setup.rest().<Page>get(testReference).getContent(),
+            containsString(String.format("{{office attachment=\"%s\"", attachment)));
     }
 
     /**

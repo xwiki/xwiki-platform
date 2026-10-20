@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { BlockNoteForTest } from "./BlockNote.story";
+import { pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockOfType, BlockType } from "../../blocknote";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
@@ -269,6 +270,133 @@ test("Code blocks with supported and unsupported languages", async ({
   await expect(codeBlocks.nth(0).locator(highlightedTokens)).toHaveCount(0);
 
   expect(errors).toEqual([]);
+});
+
+test("Code block languages use ids known by the code macro", async ({
+  mount,
+  // eslint-disable-next-line max-statements
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[
+        buildCodeBlock("bash", "echo 'foo'"),
+        buildCodeBlock("md", "**foo**"),
+        buildCodeBlock("text", "foo"),
+      ]}
+      macros={false}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  const codeBlocks = component.locator(
+    '.bn-block-content[data-content-type="codeBlock"]',
+  );
+  await expect(codeBlocks).toHaveCount(3);
+
+  // The code macro languages are selectable, and highlighted.
+  const highlightedTokens = 'code span[style*="--shiki-light"]';
+  for (const [index, [language, name]] of [
+    ["bash", "Shell"],
+    ["md", "Markdown"],
+  ].entries()) {
+    const select = codeBlocks.nth(index).locator("select");
+    await expect(select).toHaveValue(language);
+    await expect(select.locator("option:checked")).toHaveText(name);
+    await expect(
+      codeBlocks.nth(index).locator(highlightedTokens).first(),
+    ).toBeAttached();
+  }
+
+  // Selecting a language sets the id known by the code macro.
+  const codeBlock = codeBlocks.nth(2);
+  await codeBlock.locator("select").selectOption({ label: "Shell" });
+  await expect(codeBlock).toHaveAttribute("data-language", "bash");
+  await codeBlock.locator("select").selectOption({ label: "Markdown" });
+  await expect(codeBlock).toHaveAttribute("data-language", "md");
+});
+
+test("Code blocks created by typing ``` use the typed language or Plain Text", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={buildParagraphs(["", ""])}
+      macros={false}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  // Each paragraph becomes a code block, so the next one to type in is always the first remaining paragraph.
+  const paragraph = component.locator("p.bn-inline-content").first();
+  for (const text of ["``` ", "```py "]) {
+    await paragraph.click();
+    for (const key of text) {
+      await pressKeySettled(page, key === " " ? "Space" : key);
+    }
+  }
+
+  const codeBlocks = component.locator(
+    '.bn-block-content[data-content-type="codeBlock"]',
+  );
+  await expect(codeBlocks).toHaveCount(2);
+  // Plain Text is the default language, which is not exposed as a data attribute.
+  await expect(codeBlocks.nth(0)).not.toHaveAttribute("data-language");
+  await expect(codeBlocks.nth(0).locator("select")).toHaveValue("text");
+  await expect(codeBlocks.nth(1)).toHaveAttribute("data-language", "python");
+  await expect(codeBlocks.nth(1).locator("select")).toHaveValue("python");
+});
+
+test("Ctrl+Alt+C turns the current block into a code block", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={buildParagraphs(["foo"])}
+      macros={false}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  await component.locator("p.bn-inline-content").click();
+  await pressKeySettled(page, "ControlOrMeta+Alt+c");
+
+  const codeBlock = component.locator(
+    '.bn-block-content[data-content-type="codeBlock"]',
+  );
+  await expect(codeBlock).toHaveCount(1);
+  await expect(codeBlock.locator("code")).toHaveText("foo");
+  await expect(codeBlock.locator("select")).toHaveValue("text");
+  await expect(component.locator("p.bn-inline-content")).toHaveCount(0);
+});
+
+test("The language selector keeps the focus when changing the language", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[buildCodeBlock("java", "int count = 0;")]}
+      macros={false}
+      syntax={FULL_SYNTAX}
+    />,
+  );
+
+  const codeBlock = component.locator(
+    '.bn-block-content[data-content-type="codeBlock"]',
+  );
+  // Changing the language renders the code block again, which replaces the language selector.
+  await codeBlock.locator("select").focus();
+  await pressKeySettled(page, "s");
+  await expect(codeBlock).toHaveAttribute("data-language", "sass");
+  await expect(codeBlock.locator("select")).toBeFocused();
+
+  // The next keys are still handled by the language selector.
+  await pressKeySettled(page, "ArrowDown");
+  await expect(codeBlock).toHaveAttribute("data-language", "scss");
+  await expect(codeBlock.locator("select")).toBeFocused();
 });
 
 function buildParagraphs(blocks: string[]): BlockType[] {

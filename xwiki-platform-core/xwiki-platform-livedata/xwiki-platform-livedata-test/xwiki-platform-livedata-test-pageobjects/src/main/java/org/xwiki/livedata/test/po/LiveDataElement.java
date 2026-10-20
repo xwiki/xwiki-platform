@@ -186,13 +186,17 @@ public class LiveDataElement extends BaseElement
     }
 
     /**
-     * Toggle edit mode.
+     * Toggle edit mode, and wait for the entries to be reloaded.
      *
      * @since 18.7.0RC1
      */
     public void toggleEditMode()
     {
+        boolean editMode = isEditMode();
         getRootElement().findElement(By.cssSelector(".livedata-edit-button")).click();
+        // Toggling the edit mode reloads the entries, since it changes the displayed properties.
+        getDriver().waitUntilCondition(driver -> isEditMode() != editMode);
+        getTableLayout().waitUntilReady();
     }
 
     /**

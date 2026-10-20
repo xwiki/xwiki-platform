@@ -61,6 +61,7 @@ export async function i18nResolver(
       "action.maximize",
       "action.minimize",
       "action.resizeColumn.hint",
+      "property.mandatory",
       "table.entrySelector.hint",
       "list.property.label",
       "panel.heading.actions.collapse.hint",

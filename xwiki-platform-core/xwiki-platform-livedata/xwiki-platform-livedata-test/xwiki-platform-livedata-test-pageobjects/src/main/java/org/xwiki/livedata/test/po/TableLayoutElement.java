@@ -219,6 +219,11 @@ public class TableLayoutElement extends BaseElement
 
     private static final String SELECT_CELLS_BY_COLUMN_INDEX = "tr td:nth-child(%d)";
 
+    /**
+     * The editor the Live Data displays itself, for the properties the wiki renders no edit field for.
+     */
+    private static final By DEFAULT_EDITOR_SELECTOR = By.cssSelector("input.default-input");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TableLayoutElement.class);
 
     /**
@@ -909,8 +914,9 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Add a row to the table. The entry itself is only created once a first value is set on that row, see
-     * {@link #createNewEntry(String, String, String)}.
+     * Add a row to the table. The entry itself is only created once the row holds every value it cannot be created
+     * without, see {@link #createNewEntry(String, String, String)} and
+     * {@link #setNewEntryCell(String, String, String)}.
      *
      * @since 18.7.0RC1
      */
@@ -937,8 +943,44 @@ public class TableLayoutElement extends BaseElement
      */
     public void createNewEntry(String columnLabel, String fieldName, String value)
     {
+        createNewEntry(columnLabel, getClassFieldSelector(fieldName), value);
+    }
+
+    /**
+     * Fill the cell of a document property of the new row and validate it, which creates the entry, then wait for the
+     * Live Data to be reloaded. Document properties are edited in the default editor of the Live Data, instead of a
+     * field rendered by the wiki.
+     *
+     * @param columnLabel the label of the column to fill
+     * @param value the value to set
+     * @since 18.10.0RC1
+     */
+    public void createNewEntryFromDocumentProperty(String columnLabel, String value)
+    {
+        createNewEntry(columnLabel, DEFAULT_EDITOR_SELECTOR, value);
+    }
+
+    /**
+     * Fill a field of the new row and validate it, without the entry being created. Used when the row is still
+     * waiting for a value it cannot be created without.
+     *
+     * @param columnLabel the label of the column to fill
+     * @param fieldName the XClass property whose field to fill
+     * @param value the value to set
+     * @since 18.10.0RC1
+     */
+    public void setNewEntryCell(String columnLabel, String fieldName, String value)
+    {
+        WebElement input = setNewEntryCell(countRows(), columnLabel, getClassFieldSelector(fieldName), value);
+        input.sendKeys(Keys.ENTER);
+        // Nothing else changes, since no entry is created, so we only wait for the editor to be closed.
+        getDriver().waitUntilCondition(ExpectedConditions.invisibilityOf(input));
+    }
+
+    private void createNewEntry(String columnLabel, By fieldSelector, String value)
+    {
         long entriesBeforeCreation = getTotalEntries();
-        WebElement input = setNewEntryCell(countRows(), columnLabel, fieldName, value);
+        WebElement input = setNewEntryCell(countRows(), columnLabel, fieldSelector, value);
         input.sendKeys(Keys.ENTER);
         // Validating the cell closes the editor right away, while the entry is created and the Live Data refreshed
         // asynchronously. So we wait for the new entry to be counted rather than for the editor to be gone.
@@ -1019,16 +1061,24 @@ public class TableLayoutElement extends BaseElement
         return row.findElement(By.cssSelector(String.format("td.actions-column button[title='%s']", title)));
     }
 
-    private WebElement setNewEntryCell(int rowNumber, String columnLabel, String fieldName, String value)
+    private WebElement setNewEntryCell(int rowNumber, String columnLabel, By fieldSelector, String value)
     {
         int columnIndex = getColumnIndex(columnLabel);
         WebElement cell = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
         cell.click();
-        By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
-        getDriver().waitUntilElementIsVisible(cell, selector);
-        WebElement input = cell.findElement(selector);
+        getDriver().waitUntilElementIsVisible(cell, fieldSelector);
+        WebElement input = cell.findElement(fieldSelector);
         new FormContainerElement(By.cssSelector(".livedata-displayer .edit")).setFieldValue(input, value);
         return input;
+    }
+
+    /**
+     * @param fieldName the name of an XClass property
+     * @return the selector of the field the wiki renders to edit that property
+     */
+    private static By getClassFieldSelector(String fieldName)
+    {
+        return By.cssSelector(String.format("[name$='_%s']", fieldName));
     }
 
     /**
@@ -1084,7 +1134,7 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
         // This is called to observe the editor closing as well as opening, so it must not wait for the editor.
-        return getDriver().hasElementWithoutWaiting(element, By.cssSelector(String.format("[name$='_%s']", fieldName)));
+        return getDriver().hasElementWithoutWaiting(element, getClassFieldSelector(fieldName));
     }
 
     /**
@@ -1310,7 +1360,7 @@ public class TableLayoutElement extends BaseElement
             // name attribute.
             selector = By.cssSelector("input");
         } else {
-            selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
+            selector = getClassFieldSelector(fieldName);
         }
 
         // Waits for the text input to be displayed.

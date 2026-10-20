@@ -56,6 +56,7 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.WCAGContext;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
@@ -812,7 +813,7 @@ class PDFExportIT
     @Order(12)
     void codeMacro(TestUtils setup) throws Exception
     {
-        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "CodeMacro"));
+        ViewPage viewPage = gotoPageWithoutWCAG(setup, new LocalDocumentReference("PDFExportIT", "CodeMacro"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
         try (PDFDocument pdf = export(exportOptions)) {
@@ -1652,7 +1653,7 @@ class PDFExportIT
     @Order(34)
     void autoScaleTable(TestUtils setup) throws Exception
     {
-        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "AutoScaleTable"));
+        ViewPage viewPage = gotoPageWithoutWCAG(setup, new LocalDocumentReference("PDFExportIT", "AutoScaleTable"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
         try (PDFDocument pdf = export(exportOptions)) {
@@ -1808,6 +1809,24 @@ class PDFExportIT
             String childLocation = setup.serializeLocalReference(childReference).replace(".", "");
             assertTrue(contentWithoutWhitespace.contains(/* Title */ "Child" + /* Location */ childLocation),
                 "Unexpected content: " + content);
+        }
+    }
+
+    private ViewPage gotoPageWithoutWCAG(TestUtils setup, LocalDocumentReference reference)
+    {
+        WCAGContext wcagContext = setup.getWCAGUtils().getWCAGContext();
+        boolean wcagEnabled = wcagContext.isWCAGEnabled();
+        // The page has a scrollable region without focusable content, which fails the axe-core rule
+        // `scrollable-region-focusable`. Chrome and Firefox make such regions keyboard focusable on their own, only
+        // Safari doesn't, and the rule only targets Safari since axe-core 4.11.2. The tests don't run on Safari, so
+        // we disable the WCAG validation for this page load. This workaround can be removed once Safari makes
+        // scrollable regions focusable, see https://bugs.webkit.org/show_bug.cgi?id=190870 .
+        wcagContext.setWCAGEnabled(false);
+        try {
+            return setup.gotoPage(reference);
+        } finally {
+            // We set back the WCAG validation in the state it was in before this page load.
+            wcagContext.setWCAGEnabled(wcagEnabled);
         }
     }
 

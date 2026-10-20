@@ -47,7 +47,7 @@
       </dt>
       <dd>
         <input type="text" id="$escapetool.xml($!{options.id})Title" name="$escapetool.xml($titleField.name)" value="$!escapedValue"
-          class="location-title-field" placeholder="$!escapetool.xml($services.localization.render($titleField.placeholder))" />
+          class="location-title-field" placeholder="$!escapetool.xml($services.localization.render($titleField.placeholder))" autofocus />
       </dd>
     #elseif ($titleField)
       <dt class="hidden"></dt>

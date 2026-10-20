@@ -40,11 +40,14 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -801,6 +804,19 @@ class RenamePageIT
         String p2Reference = testUtils.serializeReference(p2);
         testUtils.createPage(p2, "Some P2 content", "titleP2");
 
+        // Add to P4 an object holding the reference of P1 in a database list property. The content of P4 doesn't link
+        // to P1, so the object is the only reason for P4 to be a backlink of P1.
+        DocumentReference dbListClassReference = new DocumentReference("DBListClass", testSpaceReference);
+        testUtils.createPage(dbListClassReference, "", "DBListClass");
+        testUtils.addClassProperty(dbListClassReference, "page", "DBList");
+        testUtils.updateClassProperty(dbListClassReference, "page_idField", "doc.fullName");
+        String dbListClassName = testUtils.serializeLocalReference(dbListClassReference);
+        DocumentReference p4 = new DocumentReference("P4", testSpaceReference);
+        testUtils.rest().savePage(p4, "Some P4 content", "titleP4");
+        Object dbListObject = testUtils.rest().object(p4, dbListClassName);
+        dbListObject.getProperties().add(testUtils.rest().property("page", testUtils.serializeLocalReference(p1)));
+        testUtils.rest().add(dbListObject);
+
         DocumentReference p3 = new DocumentReference("P3", testSpaceReference);
         String script = String.format("{{velocity}}\n"
             + "#set ($p2Doc = $xwiki.getDocument('%s'))\n"
@@ -837,6 +853,12 @@ class RenamePageIT
         testUtils.gotoPage(p2, "edit", "editor=wiki");
         WikiEditPage wikiEditPage = new WikiEditPage();
         assertEquals(String.format("[[P1 link>>doc:%s]]", p1Reference.replace("P1", "P43")), wikiEditPage.getContent());
+
+        // The database list property of P4 now holds the reference of the renamed page.
+        Property dbListProperty = testUtils.rest()
+            .get(new ObjectPropertyReference("page", new ObjectReference(dbListClassName + "[0]", p4)));
+        assertEquals(testUtils.serializeLocalReference(new DocumentReference("P43", testSpaceReference)),
+            dbListProperty.getValue());
 
         p3Content = testUtils.gotoPage(p3).getContent();
         assertEquals(String.format(displayedContent, "xwiki:XWiki." + userLogin, "XWiki.superadmin",

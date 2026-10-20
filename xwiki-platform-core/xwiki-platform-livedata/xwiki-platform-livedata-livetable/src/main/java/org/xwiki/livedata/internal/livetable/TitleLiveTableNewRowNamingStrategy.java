@@ -79,6 +79,8 @@ public class TitleLiveTableNewRowNamingStrategy extends AbstractLocationLiveTabl
         for (int suffix = 1; this.modelBridge.exists(candidate); suffix++) {
             candidate = new DocumentReference(String.format("%s-%d", name, suffix), location);
         }
+        // Known limitation: if another user creates a page with the same name before this entry is saved, the save
+        // fails. This is very unlikely, and saving the row again then picks the next free name.
         return candidate;
     }
 

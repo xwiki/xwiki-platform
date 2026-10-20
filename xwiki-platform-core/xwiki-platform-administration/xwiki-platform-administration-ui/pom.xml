@@ -85,6 +85,13 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed to warn before deleting users and groups that belong to installed extensions. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Needed to display nicer input for the languages -->
     <dependency>
       <groupId>org.webjars</groupId>

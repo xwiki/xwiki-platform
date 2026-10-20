@@ -116,10 +116,7 @@
             $escapetool.xml($services.localization.render('xe.admin.groups.deleteGroup'))
           &lt;/div&gt;
         &lt;/div&gt;
-        &lt;div class="modal-body"&gt;
-          #set ($message = $escapetool.xml($services.localization.render('rightsmanager.confirmdeletegroup')))
-          &lt;p&gt;$message.replace('__name__', '&lt;span class="groupName"&gt;&lt;/span&gt;')&lt;/p&gt;
-        &lt;/div&gt;
+        &lt;div class="modal-body loading"&gt;&lt;/div&gt;
         &lt;div class="modal-footer"&gt;
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
             $escapetool.xml($services.localization.render('cancel'))
@@ -132,9 +129,23 @@
     &lt;/div&gt;
   &lt;/div&gt;
 #end
+
+#macro (deleteGroupModalContent $groupReference)
+  {{html clean="false"}}
+  #set ($message = $escapetool.xml($services.localization.render('rightsmanager.confirmdeletegroup')))
+  #set ($groupName = "&lt;span class='groupName'&gt;$escapetool.xml($groupReference)&lt;/span&gt;")
+  &lt;p&gt;$message.replace('__name__', $groupName)&lt;/p&gt;
+  ## Warn when the group belongs to an installed extension, like the standard delete UI does.
+  #set ($deletedDocumentReference = $services.model.resolveDocument($groupReference))
+  #template('extension/handler/xar/deleteWarning.vm')
+  {{/html}}
+#end
 {{/velocity}}
 
 {{velocity}}
+#if ($request.data == 'deleteGroupModalContent' &amp;&amp; "$!request.groupReference" != '')
+  #deleteGroupModalContent($request.groupReference)
+#else
 {{html clean="false"}}
 #set ($discard = $xwiki.ssx.use('XWiki.AdminGroupsSheet'))
 #set ($discard = $xwiki.jsx.use('XWiki.AdminGroupsSheet'))
@@ -221,6 +232,7 @@
 #editGroupModal()
 #deleteGroupModal()
 {{/html}}
+#end
 {{/velocity}}</content>
   <object>
     <name>XWiki.AdminGroupsSheet</name>
@@ -469,6 +481,31 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal'], function ($, xm) {
   // Group Deletion
   //
   var deleteGroupModal = $('#deleteGroupModal');
+  var deleteGroupModalBody = deleteGroupModal.find('.modal-body');
+  var deleteGroupButton = deleteGroupModal.find('.btn-danger');
+
+  var deleteGroupModalContentRequest;
+  var deleteGroupModalContentURL = new XWiki.Document('AdminGroupsSheet', 'XWiki').getURL('get',
+    'data=deleteGroupModalContent');
+
+  var loadDeleteGroupModalContent = function(groupReference) {
+    // Abort any pending request (the user can close the modal before the response is received).
+    if (deleteGroupModalContentRequest) {
+      deleteGroupModalContentRequest.abort();
+    }
+    deleteGroupButton.prop('disabled', true);
+    deleteGroupModalBody.empty().addClass('loading');
+    deleteGroupModalContentRequest = $.get(deleteGroupModalContentURL, {
+      'groupReference': groupReference
+    }, function(html) {
+      deleteGroupModalBody.html(html);
+      $(document).trigger('xwiki:dom:updated', {'elements': deleteGroupModalBody.toArray()});
+    }, 'html').always(function() {
+      deleteGroupModalBody.removeClass('loading');
+      deleteGroupButton.prop('disabled', false);
+    });
+  };
+
   deleteGroupModal.on('show.bs.modal', function() {
     var rowData = deleteGroupModal.data('rowData');
     var groupReference = rowData['doc.fullName'];
@@ -476,15 +513,20 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal'], function ($, xm) {
       groupReference = XWiki.Model.resolve(groupReference, XWiki.EntityType.DOCUMENT, [rowData['doc.wiki']]);
       groupReference = XWiki.Model.serialize(groupReference);
     }
-    deleteGroupModal.find('.groupName').text(groupReference);
-  }).find('.btn-danger').on('click', function() {
+    deleteGroupModal.data('groupReference', groupReference);
+    loadDeleteGroupModalContent(groupReference);
+  });
+
+  deleteGroupButton.on('click', function() {
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.groups.delete.inProgress')),
       'inprogress'
     );
     $.post('', {
       xpage: 'deleteuorg',
-      docname: deleteGroupModal.find('.groupName').text(),
+      docname: deleteGroupModal.data('groupReference'),
+      // Confirm the deletion of a group belonging to an installed extension once the user has been warned about it.
+      force: deleteGroupModalBody.find('.deleteWarningExtensions').length &gt; 0,
       form_token: xm.form_token
     }).then(() =&gt; {
       deleteGroupModal.data('liveDataElement').data('liveData').updateEntries();

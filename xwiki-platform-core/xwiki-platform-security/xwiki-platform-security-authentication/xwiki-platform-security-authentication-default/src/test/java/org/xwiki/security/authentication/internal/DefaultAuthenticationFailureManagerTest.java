@@ -22,6 +22,14 @@ package org.xwiki.security.authentication.internal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -60,8 +68,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -119,6 +129,8 @@ class DefaultAuthenticationFailureManagerTest
 
     private Cache<Instant> sessionFailing;
 
+    private ComponentManager contextComponentManager;
+
     private String failingLogin = "foobar";
 
     private DocumentReference userFailingDocumentReference = new DocumentReference("xwiki", "XWiki", failingLogin);
@@ -127,7 +139,9 @@ class DefaultAuthenticationFailureManagerTest
     public void configure(MockitoComponentManager componentManager) throws Exception
     {
         Utils.setComponentManager(componentManager);
-        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+        // Delegate to the test component manager so that tests can intercept the lookup of the strategies.
+        this.contextComponentManager = mock(ComponentManager.class, delegatesTo(componentManager));
+        componentManager.registerComponent(ComponentManager.class, "context", this.contextComponentManager);
 
         sessionFailing = mock(Cache.class);
         when(cacheManager.createNewCache(any())).then(invocationOnMock -> {
@@ -604,16 +618,13 @@ class DefaultAuthenticationFailureManagerTest
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy1" });
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(1);
         this.defaultAuthenticationFailureManager.recordAuthenticationFailure("foo", request);
-        verify(configuration, times(3)).getFailureStrategies();
         verify(strategy1).notify("foo");
         verify(strategy2, never()).notify(any());
 
-        // we change the configuration strategy, but we don't reset the list
+        // The next failure uses the strategy of the new configuration.
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy2" });
         this.defaultAuthenticationFailureManager.recordAuthenticationFailure("foo", request);
 
-        // the list is already existing, we still call the old strategy
-        verify(configuration, times(6)).getFailureStrategies();
         verify(strategy1).notify("foo");
         verify(strategy2).notify(any());
     }
@@ -626,5 +637,76 @@ class DefaultAuthenticationFailureManagerTest
         this.defaultAuthenticationFailureManager.getForm("foo", request);
         verify(sessionFailing).removeAll();
 
+    }
+
+    @Test
+    void failureStrategiesPerWiki() throws Exception
+    {
+        AtomicReference<String> currentWiki = new AtomicReference<>("wiki1");
+        Map<String, String[]> wikiStrategies =
+            Map.of("wiki1", new String[] { "strategy1" }, "wiki2", new String[] { "strategy2" });
+        when(this.context.getWikiId()).thenAnswer(invocation -> currentWiki.get());
+        when(this.configuration.getFailureStrategies())
+            .thenAnswer(invocation -> wikiStrategies.get(currentWiki.get()));
+        when(this.strategy1.getErrorMessage(this.failingLogin)).thenReturn("error1");
+        when(this.strategy2.getErrorMessage(this.failingLogin)).thenReturn("error2");
+
+        HttpServletRequest request = getRequest("session");
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+        verify(this.strategy1).notify(this.failingLogin);
+        verify(this.strategy2, never()).notify(this.failingLogin);
+
+        for (int i = 0; i < 3; i++) {
+            currentWiki.set("wiki1");
+            assertEquals("error1\n", this.defaultAuthenticationFailureManager.getErrorMessage(this.failingLogin));
+            currentWiki.set("wiki2");
+            assertEquals("error2\n", this.defaultAuthenticationFailureManager.getErrorMessage(this.failingLogin));
+        }
+
+        // Switching between the wikis doesn't look up the strategies again.
+        verify(this.contextComponentManager).getInstance(AuthenticationFailureStrategy.class, "strategy1");
+        verify(this.contextComponentManager).getInstance(AuthenticationFailureStrategy.class, "strategy2");
+    }
+
+    @Test
+    void concurrentRequestDoesNotSeeIncompleteStrategies() throws Exception
+    {
+        when(this.strategy1.getErrorMessage(this.failingLogin)).thenReturn("error1");
+        when(this.strategy2.getErrorMessage(this.failingLogin)).thenReturn("error2");
+        HttpServletRequest request = getRequest("session");
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request);
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
+
+        // Change the configuration and block the first request computing the new strategies before it found them all.
+        when(this.configuration.getFailureStrategies()).thenReturn(new String[] { "strategy2", "strategy1" });
+        CountDownLatch lookupStarted = new CountDownLatch(1);
+        CountDownLatch releaseLookup = new CountDownLatch(1);
+        AtomicBoolean firstLookup = new AtomicBoolean(true);
+        doAnswer(invocation -> {
+            if (firstLookup.compareAndSet(true, false)) {
+                lookupStarted.countDown();
+                assertTrue(releaseLookup.await(10, TimeUnit.SECONDS));
+            }
+            return this.strategy1;
+        }).when(this.contextComponentManager).getInstance(AuthenticationFailureStrategy.class, "strategy1");
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try {
+            Future<String> blockedRequest =
+                executor.submit(() -> this.defaultAuthenticationFailureManager.getErrorMessage(this.failingLogin));
+            assertTrue(lookupStarted.await(10, TimeUnit.SECONDS));
+
+            assertEquals("error2\nerror1\n",
+                this.defaultAuthenticationFailureManager.getErrorMessage(this.failingLogin));
+
+            releaseLookup.countDown();
+            assertEquals("error2\nerror1\n", blockedRequest.get(10, TimeUnit.SECONDS));
+        } finally {
+            releaseLookup.countDown();
+            executor.shutdownNow();
+        }
     }
 }

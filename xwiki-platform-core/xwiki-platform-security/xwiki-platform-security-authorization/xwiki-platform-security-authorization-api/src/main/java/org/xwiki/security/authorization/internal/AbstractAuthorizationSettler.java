@@ -213,8 +213,9 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
             }
         }
 
-        // Apply defaults and return the resulting access entry
-        return new InternalSecurityAccessEntry(user, reference, applyDefaults(user, reference, access));
+        // Apply defaults and needed rights and return the resulting access entry
+        return new InternalSecurityAccessEntry(user, reference,
+            applyNeededRights(applyDefaults(user, reference, access)));
     }
 
     /**
@@ -241,6 +242,37 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
                 }
             }
         }
+
+        return access;
+    }
+
+    /**
+     * Deny all rights that are lacking needed rights.
+     *
+     * @param access the accumulated access result (modified and returned)
+     * @return the accumulated access result
+     * @since 15.10.2
+     */
+    protected XWikiSecurityAccess applyNeededRights(XWikiSecurityAccess access)
+    {
+        // Check needed rights.
+        boolean rightsModified;
+        do {
+            rightsModified = false;
+            for (Right right : Right.values()) {
+                // For every right that is allowed, check if all needed rights are allowed.
+                if (access.get(right) == RuleState.ALLOW) {
+                    for (Right neededRight : right.getNeededRights()) {
+                        if (access.get(neededRight) != RuleState.ALLOW) {
+                            access.set(right, RuleState.DENY);
+                            rightsModified = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            // Repeat until no more rights are modified.
+        } while (rightsModified);
 
         return access;
     }

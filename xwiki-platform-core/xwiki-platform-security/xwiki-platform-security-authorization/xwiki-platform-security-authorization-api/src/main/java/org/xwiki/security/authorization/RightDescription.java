@@ -22,6 +22,7 @@ package org.xwiki.security.authorization;
 import java.util.Set;
 
 import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
 /**
  * Describe a {@link Right}, allow adding new Rights, also implemented by the {@link Right} class.
@@ -60,6 +61,16 @@ public interface RightDescription
      * return {@code null} instead of an empty set.
      */
     Set<Right> getImpliedRights();
+
+    /**
+     * @return a set of rights that are needed for this right to be granted
+     * @since 15.10.2
+     */
+    @Unstable
+    default Set<Right> getNeededRights()
+    {
+        return Set.of();
+    }
 
     /**
      * @return a set of entity type for which this right should be enabled. Special type Right.FARM (==null) could

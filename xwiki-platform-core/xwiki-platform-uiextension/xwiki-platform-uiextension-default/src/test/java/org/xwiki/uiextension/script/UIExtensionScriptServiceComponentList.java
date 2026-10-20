@@ -41,6 +41,8 @@ import org.xwiki.uiextension.internal.filter.SelectFilter;
 import org.xwiki.uiextension.internal.filter.SortByCustomOrderFilter;
 import org.xwiki.uiextension.internal.filter.SortByIdFilter;
 import org.xwiki.uiextension.internal.filter.SortByParameterFilter;
+import org.xwiki.uiextension.internal.parameters.UIXParameterValueFactory;
+import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -63,6 +65,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     UIExtensionRenderer.class,
     WikiUIExtensionComponentBuilder.class,
     WikiUIExtension.class,
+    UIXParameterValueFactory.class,
+    VelocityDetector.class,
     // Filters
     ExcludeFilter.class,
     SelectFilter.class,

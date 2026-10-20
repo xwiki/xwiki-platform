@@ -156,7 +156,7 @@ public class ExpressionNodeToHQLConverter
                 returnValue = StringUtils.EMPTY;
             }
         } else if (value instanceof StringValueNode valueNode) {
-            // If we’re dealing with raw values, we have to put them in the queryParameters map
+            // If we’re dealing with raw values, we have to put them in the queryParameters map
             String nodeContent = (escape) ? escape(valueNode.getContent()) : valueNode.getContent();
 
             // In order to lower the probability of having collisions in the query parameters provided by other

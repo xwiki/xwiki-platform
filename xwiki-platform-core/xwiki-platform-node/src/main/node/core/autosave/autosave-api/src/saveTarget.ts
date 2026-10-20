@@ -59,7 +59,18 @@ abstract class SaveTarget<C extends object = object> {
   public abstract initialize(): Promise<void>;
 
   /**
-   * @param context - the save context, e.g. holding the save button in case of a manual save
+   * @returns the context of the saves that the saver performs on its own (auto-saves), which are the ones started
+   *   without a context
+   * @since 18.9.0RC1
+   */
+  public getAutoSaveContext(): C {
+    // By default the saves have no context. Subclasses that tell the auto-saves apart from the manual saves through
+    // their context override this method.
+    return {} as C;
+  }
+
+  /**
+   * @param context - the save context, e.g. telling whether the user asked for the save
    * @returns the priority of this save; the client with the highest priority wins the save election
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,7 +92,7 @@ abstract class SaveTarget<C extends object = object> {
   /**
    * Save the edited content.
    *
-   * @param context - the save context, e.g. holding the save button in case of a manual save
+   * @param context - the save context, e.g. telling whether the user asked for the save
    * @returns a promise that resolves with the save result, holding the created version, if any
    */
   public abstract submit(context: C): Promise<SaveResult>;

@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { XWikiCodeBlock } from "./codeBlock";
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
 import { XWikiInlineMacro, XWikiMacroBlock } from "./macro";
@@ -58,7 +59,10 @@ import type { useTranslation } from "react-i18next";
  *
  * @returns The created schema
  */
-function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
+function createBlockNoteSchema(
+  macros: BlockNoteConcreteMacro[],
+  options?: { codeBlockClassName?: string },
+) {
   macros = [
     ...macros.sort((a, b) =>
       a.macro.infos.name.localeCompare(b.macro.infos.name),
@@ -68,6 +72,7 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
       ...defaultBlockSpecs,
+      codeBlock: XWikiCodeBlock({ className: options?.codeBlockClassName }),
       xwikiDefinitionListItem: DefinitionListItemBlock(),
       xwikiGroup: XWikiGroupBlock(),
       xwikiMacroBlock: XWikiMacroBlock(),

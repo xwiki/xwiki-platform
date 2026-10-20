@@ -26,23 +26,13 @@ import type { SaverState } from "./saverState";
 import type { Logger } from "@xwiki/platform-api";
 
 /**
- * How the saver reports its progress.
+ * How the saver reports what it is doing. Its save status is reported to the listeners added with
+ * {@link Saver.addLocalStatusListener} and {@link Saver.addStatusListener}.
  *
  * @since 18.8.0RC1
  * @beta
  */
 type SaverConfig = {
-  /**
-   * Called when the save status of the local client changes.
-   */
-  onLocalStatusChange?: (status: SaveStatus) => void;
-
-  /**
-   * Called when the save status of the editing session as a whole changes, i.e. taking every connected client into
-   * account.
-   */
-  onStatusChange?: (status: SaveStatus) => void;
-
   /**
    * Where to report what the saver is doing. The caller passes the logger it resolved from the component manager,
    * with the module name it wants the messages attributed to.
@@ -60,9 +50,11 @@ type SaverConfig = {
  * @beta
  */
 class Saver<C extends object = object> {
-  private readonly onLocalStatusChange: (status: SaveStatus) => void;
+  private readonly localStatusListeners: Set<(status: SaveStatus) => void> =
+    new Set();
 
-  private readonly onStatusChange: (status: SaveStatus) => void;
+  private readonly statusListeners: Set<(status: SaveStatus) => void> =
+    new Set();
 
   private readonly logger?: Logger;
 
@@ -85,6 +77,11 @@ class Saver<C extends object = object> {
 
   private saveTimer?: ReturnType<typeof setTimeout>;
 
+  /**
+   * The last save that was started, settled (never rejected) once its result has been published to the other clients.
+   */
+  private lastSave?: Promise<void>;
+
   private dirtyTimestamp?: number;
 
   private previousLocalStatus?: SaveStatus;
@@ -92,7 +89,7 @@ class Saver<C extends object = object> {
   private previousGlobalStatus?: SaveStatus;
 
   /**
-   * @param config - how the saver reports its progress
+   * @param config - how the saver reports what it is doing
    * @param createTransport - creates the transport used to synchronize the saver states, called with this saver
    * @param createTarget - creates the target used to save the edited content, called with this saver
    */
@@ -101,8 +98,6 @@ class Saver<C extends object = object> {
     createTransport: (saver: Saver<C>) => SaveTransport<C>,
     createTarget: (saver: Saver<C>) => SaveTarget<C>,
   ) {
-    this.onLocalStatusChange = config.onLocalStatusChange ?? ((): void => {});
-    this.onStatusChange = config.onStatusChange ?? ((): void => {});
     this.logger = config.logger;
 
     this.transport = createTransport(this);
@@ -111,6 +106,56 @@ class Saver<C extends object = object> {
     // Connect only after both the transport and the target have been created, because the transport starts notifying
     // us as soon as it is initialized.
     this.transport.initialize();
+  }
+
+  /**
+   * Gets the current save status of the local client.
+   *
+   * @returns the save status of the local client, or undefined if it is not known yet
+   * @since 18.9.0RC1
+   */
+  public getLocalStatus(): SaveStatus | undefined {
+    return this.previousLocalStatus;
+  }
+
+  /**
+   * Adds a listener notified when the save status of the local client changes. The transports deliver the saver
+   * states asynchronously, so a listener added right after the saver is created misses no change.
+   *
+   * @param listener - called with the new save status
+   * @returns a function that removes the listener
+   * @since 18.9.0RC1
+   */
+  public addLocalStatusListener(
+    listener: (status: SaveStatus) => void,
+  ): () => void {
+    this.localStatusListeners.add(listener);
+    return () => this.localStatusListeners.delete(listener);
+  }
+
+  /**
+   * Gets the current save status of the editing session as a whole.
+   *
+   * @returns the save status of the editing session, i.e. taking every connected client into account, or undefined
+   *   if it is not known yet
+   * @since 18.9.0RC1
+   */
+  public getStatus(): SaveStatus | undefined {
+    return this.previousGlobalStatus;
+  }
+
+  /**
+   * Adds a listener notified when the save status of the editing session as a whole changes, i.e. taking every
+   * connected client into account. The transports deliver the saver states asynchronously, so a listener added
+   * right after the saver is created misses no change.
+   *
+   * @param listener - called with the new save status
+   * @returns a function that removes the listener
+   * @since 18.9.0RC1
+   */
+  public addStatusListener(listener: (status: SaveStatus) => void): () => void {
+    this.statusListeners.add(listener);
+    return () => this.statusListeners.delete(listener);
   }
 
   /**
@@ -153,10 +198,16 @@ class Saver<C extends object = object> {
   }
 
   /**
-   * @returns a promise that resolves when the local state has been received by the other clients
+   * @returns a promise that resolves when the local state has been received by the other clients, including the
+   *   result of the save in progress, if any
    */
-  public whenSettled(): Promise<void> {
-    return this.transport.whenSettled();
+  public async whenSettled(): Promise<void> {
+    // A save publishes its result (e.g. the version it created) only once the save target reports it, and the save
+    // target may need to know when the result was received before that (e.g. to leave the edit mode right after the
+    // document is saved). Leaving before the save result is published would prevent the other clients from learning
+    // about the new version, leading to merge conflicts on their next save.
+    await this.lastSave;
+    await this.transport.whenSettled();
   }
 
   /**
@@ -169,12 +220,24 @@ class Saver<C extends object = object> {
   /**
    * Save the edited content, provided that this client wins the save election.
    *
-   * @param context - the save context, e.g. holding the save button in case of a manual save
+   * @param context - the save context, e.g. telling whether the user asked for the save; defaults to the context the
+   *   target gives to the auto-saves
    * @returns a promise that rejects if the content could not be saved
    */
-  public async save(context?: C): Promise<void> {
-    // An auto-save has no context of its own: it is the save the target gives the lowest priority to.
-    const saveContext = context ?? ({} as C);
+  public save(context?: C): Promise<void> {
+    const saving = this.saveAndPublish(context);
+    this.lastSave = (async () => {
+      try {
+        await saving;
+      } catch {
+        // The callers waiting for the save result to be published don't care whether the save succeeded.
+      }
+    })();
+    return saving;
+  }
+
+  private async saveAndPublish(context?: C): Promise<void> {
+    const saveContext = context ?? this.target.getAutoSaveContext();
 
     // Let the others know immediately that we are saving, in order to reduce concurrent saves.
     this.updateState(
@@ -233,11 +296,22 @@ class Saver<C extends object = object> {
     // Cancel the scheduled save.
     clearTimeout(this.saveTimer);
 
-    // Push uncommitted changes to the server before disconnecting.
-    await this.transport.updateLocalState({}, { push: true, immediate: true });
-
-    await this.transport.dispose();
-    this.target.dispose();
+    try {
+      // Push uncommitted changes to the server before disconnecting.
+      await this.transport.updateLocalState(
+        {},
+        { push: true, immediate: true },
+      );
+    } catch (error) {
+      // Disconnect anyway, otherwise we would keep listening to a channel we're leaving.
+      this.logger?.warn(
+        "Failed to push the local state before stopping.",
+        error,
+      );
+    } finally {
+      await this.transport.dispose();
+      this.target.dispose();
+    }
   }
 
   private scheduleSave(): void {
@@ -255,7 +329,7 @@ class Saver<C extends object = object> {
       this.saveTimer = setTimeout(this.maybeSave.bind(this), saveInterval);
     } else {
       // Save right away because too much time has passed since the last time the content became dirty.
-      this.maybeSave();
+      void this.maybeSave();
     }
   }
 
@@ -342,7 +416,7 @@ class Saver<C extends object = object> {
         : SaveStatus.Clean;
     if (this.previousLocalStatus !== localStatus) {
       this.previousLocalStatus = localStatus;
-      this.onLocalStatusChange(localStatus);
+      this.notifyListeners(this.localStatusListeners, localStatus);
     }
 
     const globalStatus = this.isSomeoneSaving()
@@ -352,14 +426,31 @@ class Saver<C extends object = object> {
         : SaveStatus.Clean;
     if (this.previousGlobalStatus !== globalStatus) {
       this.previousGlobalStatus = globalStatus;
-      this.onStatusChange(globalStatus);
+      this.notifyListeners(this.statusListeners, globalStatus);
     }
   }
 
-  private maybeSave(): void {
+  /**
+   * Call the given listeners, making sure that a failing listener doesn't prevent the others from being called, nor
+   * breaks the saver.
+   */
+  private notifyListeners<T>(listeners: Set<(value: T) => void>, value: T) {
+    for (const listener of listeners) {
+      try {
+        listener(value);
+      } catch (error) {
+        this.logger?.warn("A saver listener failed.", error);
+      }
+    }
+  }
+
+  private async maybeSave(): Promise<void> {
     if (!this.isSomeoneSaving() && this.isSomeoneDirty()) {
-      // The auto-save failure is already logged by the saver and a new save attempt is scheduled.
-      this.save().catch(() => {});
+      try {
+        await this.save();
+      } catch {
+        // The auto-save failure is already logged by the saver and a new save attempt is scheduled.
+      }
     }
   }
 

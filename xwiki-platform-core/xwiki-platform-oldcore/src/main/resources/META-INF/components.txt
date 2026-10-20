@@ -214,6 +214,7 @@ com.xpn.xwiki.store.migration.hibernate.R1138000XWIKI16709DataMigration
 com.xpn.xwiki.store.migration.hibernate.R130200000XWIKI17200DataMigration
 com.xpn.xwiki.store.migration.hibernate.R140000000XWIKI19125DataMigration
 com.xpn.xwiki.store.migration.hibernate.R140200010XWIKI19207DataMigration
+com.xpn.xwiki.store.migration.hibernate.R180900001XWIKI25211DataMigration
 com.xpn.xwiki.store.migration.hibernate.R140200000XWIKI19352DataMigration
 com.xpn.xwiki.store.migration.hibernate.R140600000XWIKI19869DataMigration
 com.xpn.xwiki.store.VoidAttachmentVersioningStore
@@ -268,6 +269,8 @@ org.xwiki.internal.template.ActionTemplateRequirement
 org.xwiki.internal.migration.R150000000XWIKI20285DataMigration
 org.xwiki.internal.migration.R180100000XWIKI23827DataMigration
 org.xwiki.internal.migration.R180800000XWIKI24357DataMigration
+org.xwiki.internal.migration.R180900000XWIKI25199DataMigration
+org.xwiki.internal.migration.R181000000XWIKI15074DataMigration
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingFixer
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingTaskConsumer
 org.xwiki.internal.objects.DatePropertyParser

@@ -72,7 +72,7 @@ public class BaseSearchResult extends XWikiResource
      *         {@code rest.allowedQueryTypes} configuration property
      */
     // Legacy code.
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     protected List<SearchResult> searchQuery(String query, String queryTypeString, String wikiName, String wikis,
         boolean hasProgrammingRights, String orderField, String order, boolean distinct, int number, int start,
         Boolean withPrettyNames, String className) throws Exception

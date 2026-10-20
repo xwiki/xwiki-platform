@@ -30,7 +30,8 @@ import org.xwiki.rest.resources.objects.ObjectPropertyResource;
 import org.xwiki.test.ui.TestUtils;
 
 /**
- * Utility class for Realtime tests.
+ * Utility class for Realtime tests. Note that it applies only to the editors using ChainPad / Netflux for realtime
+ * synchronization (CKEditor, wiki editor).
  *
  * @version $Id$
  * @since 17.7.0RC1
@@ -45,6 +46,18 @@ public final class RealtimeTestUtils
 
     private RealtimeTestUtils()
     {
+    }
+
+    /**
+     * Simulates the expiration of the user session by removing the browser cookies, without leaving the current page.
+     * Unlike {@link TestUtils#forceGuestUser()}, this doesn't load another page, so it can be used while editing.
+     *
+     * @param setup the test setup
+     * @since 18.9.0RC1
+     */
+    public static void simulateSessionExpiration(TestUtils setup)
+    {
+        setup.getDriver().manage().deleteAllCookies();
     }
 
     /**

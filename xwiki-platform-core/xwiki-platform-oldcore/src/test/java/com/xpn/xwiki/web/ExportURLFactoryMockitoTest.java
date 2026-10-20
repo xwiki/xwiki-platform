@@ -25,11 +25,13 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.stubbing.Answer;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
@@ -55,6 +57,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -211,5 +216,117 @@ class ExportURLFactoryMockitoTest
 
         assertEquals("User [xwiki:XWiki.Alice] doesn't have access to attachment "
                 + "[Attachment xwiki:space.document@test.txt] so it won't be exported", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void createResourceURL(@TempDir File tmpDir) throws Exception
+    {
+        Environment environment = this.componentManager.registerMockComponent(Environment.class);
+        when(environment.getResourceAsStream("/resources/", "js/test.js"))
+            .thenReturn(new ByteArrayInputStream("content".getBytes(StandardCharsets.UTF_8)));
+
+        File exportDir = new File(tmpDir, "export");
+        FilesystemExportContext exportContext = new FilesystemExportContext();
+        exportContext.setExportDir(exportDir);
+
+        ExportURLFactory resourceFactory = new ExportURLFactory();
+        resourceFactory.init(Arrays.asList(DOCUMENT_REFERENCE), null, exportContext, this.oldCore.getXWikiContext());
+
+        URL url = resourceFactory.createResourceURL("js/test.js", false, this.oldCore.getXWikiContext());
+
+        assertEquals("file://resources/js/test.js", url.toString());
+        assertEquals("content",
+            FileUtils.readFileToString(new File(exportDir, "resources/js/test.js"), StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void createResourceURLWhenResourceDoesNotExist(@TempDir File tmpDir) throws Exception
+    {
+        // The environment does not return resources which don't exist or are located outside of the requested prefix.
+        Environment environment = this.componentManager.registerMockComponent(Environment.class);
+
+        File exportDir = new File(tmpDir, "export");
+        FilesystemExportContext exportContext = new FilesystemExportContext();
+        exportContext.setExportDir(exportDir);
+
+        ExportURLFactory resourceFactory = new ExportURLFactory();
+        resourceFactory.init(Arrays.asList(DOCUMENT_REFERENCE), null, exportContext, this.oldCore.getXWikiContext());
+
+        URL url = resourceFactory.createResourceURL("js/missing.js", false, this.oldCore.getXWikiContext());
+
+        // Fallback on the standard URL instead of exporting the file.
+        assertEquals("http://localhost:8080/xwiki/resources/js/missing.js", url.toString());
+        // Make sure nothing was written.
+        assertFalse(exportDir.exists());
+
+        verify(environment).getResourceAsStream("/resources/", "js/missing.js");
+        verify(environment, never()).getResourceAsStream(anyString());
+    }
+
+    @Test
+    void createResourceURLWithPathTraversal(@TempDir File tmpDir) throws Exception
+    {
+        Environment environment = this.componentManager.registerMockComponent(Environment.class);
+
+        File exportDir = new File(tmpDir, "export");
+        FilesystemExportContext exportContext = new FilesystemExportContext();
+        exportContext.setExportDir(exportDir);
+
+        ExportURLFactory resourceFactory = new ExportURLFactory();
+        resourceFactory.init(Arrays.asList(DOCUMENT_REFERENCE), null, exportContext, this.oldCore.getXWikiContext());
+
+        URL url = resourceFactory.createResourceURL("../../WEB-INF/xwiki.cfg", false, this.oldCore.getXWikiContext());
+
+        // Fallback on the standard URL instead of exporting the file.
+        assertEquals("http://localhost:8080/xwiki/resources/../../WEB-INF/xwiki.cfg", url.toString());
+        // Make sure nothing was written, especially not outside of the export directory.
+        assertFalse(new File(tmpDir, "WEB-INF").exists());
+        assertFalse(exportDir.exists());
+        assertEquals("Failed to create skin URL", this.logCapture.getMessage(0));
+        assertEquals("The path [resources/../../WEB-INF/xwiki.cfg] is located outside of the export directory",
+            this.logCapture.getLogEvent(0).getThrowableProxy().getMessage());
+
+        verifyNoInteractions(environment);
+    }
+
+    @Test
+    void createSkinURLWithPathTraversal(@TempDir File tmpDir)
+    {
+        File exportDir = new File(tmpDir, "export");
+        FilesystemExportContext exportContext = new FilesystemExportContext();
+        exportContext.setExportDir(exportDir);
+
+        this.factory.init(Arrays.asList(DOCUMENT_REFERENCE), null, exportContext, this.oldCore.getXWikiContext());
+
+        URL url = this.factory.createSkinURL("../../../outside.txt", "skins", "flamingo",
+            this.oldCore.getXWikiContext());
+
+        // Fallback on the standard URL instead of exporting the file.
+        assertEquals("http", url.getProtocol());
+        assertFalse(new File(tmpDir, "outside.txt").exists());
+        assertEquals("Failed to create skin URL", this.logCapture.getMessage(0));
+        assertEquals("The path [skins/flamingo/../../../outside.txt] is located outside of the export "
+            + "directory", this.logCapture.getLogEvent(0).getThrowableProxy().getMessage());
+        // The standard skin URL creation calls back the export one.
+        assertEquals("Failed to create skin URL", this.logCapture.getMessage(1));
+    }
+
+    @Test
+    void createResourceURLWithSkinActionAndPathTraversal(@TempDir File tmpDir)
+    {
+        File exportDir = new File(tmpDir, "export");
+        FilesystemExportContext exportContext = new FilesystemExportContext();
+        exportContext.setExportDir(exportDir);
+
+        this.factory.init(Arrays.asList(DOCUMENT_REFERENCE), null, exportContext, this.oldCore.getXWikiContext());
+
+        URL url = this.factory.createResourceURL("js/../../../outside.txt", true, this.oldCore.getXWikiContext());
+
+        // Fallback on the standard URL instead of exporting the file.
+        assertEquals("http", url.getProtocol());
+        assertFalse(new File(tmpDir, "outside.txt").exists());
+        assertEquals("Failed to create skin URL", this.logCapture.getMessage(0));
+        assertEquals("The path [resources/js/../../../outside.txt] is located outside of the export "
+            + "directory", this.logCapture.getLogEvent(0).getThrowableProxy().getMessage());
     }
 }

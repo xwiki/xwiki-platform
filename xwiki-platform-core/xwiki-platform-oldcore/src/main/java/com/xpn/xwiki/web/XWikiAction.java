@@ -167,7 +167,7 @@ public abstract class XWikiAction implements LegacyAction
 
     @Inject
     @Named("context")
-    private ComponentManager componentManager;
+    protected ComponentManager componentManager;
 
     /**
      * Indicate if the action allow asynchronous display (among which the XWiki initialization).

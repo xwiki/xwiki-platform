@@ -301,4 +301,39 @@ describe("XWikiBlockNoteProcessor", () => {
       expect(savedMacro.props.output).toEqual(inlineMacro.props.output);
     });
   });
+
+  describe("code block", () => {
+    function codeBlock(props) {
+      return {
+        id: "c1",
+        type: "codeBlock",
+        props,
+        content: [{ type: "text", text: "test", styles: {} }],
+        children: [],
+      };
+    }
+
+    it("backs up the verbatim and new line flags on load and restores them on save", () => {
+      const props = {
+        language: "java",
+        xwikiLeadingNewLine: false,
+        xwikiTrailingNewLine: false,
+        xwikiVerbatim: true,
+      };
+      const document = processor.load(JSON.stringify([codeBlock(props)]));
+      // The BlockNote code block schema doesn't support these props.
+      expect(document.content[0].props).toEqual({ language: "java" });
+
+      const saved = JSON.parse(processor.save(document));
+      expect(saved[0].props).toEqual(props);
+    });
+
+    it("doesn't add the verbatim and new line flags on save when they are missing", () => {
+      const document = processor.load(
+        JSON.stringify([codeBlock({ language: "text" })]),
+      );
+      const saved = JSON.parse(processor.save(document));
+      expect(saved[0].props).toEqual({});
+    });
+  });
 });

@@ -17,6 +17,25 @@ export interface LegacyAjaxSaveAndContinue {
 }
 
 // @beta
+export interface LegacyConfirmationBoxBehavior {
+    onNo?: () => void;
+    onYes?: () => void;
+}
+
+// @beta
+export interface LegacyConfirmationBoxParameters {
+    confirmationText?: string;
+}
+
+// @beta
+export interface LegacyNotification {
+    replace(notification: LegacyNotification): void;
+}
+
+// @beta
+export type LegacyNotificationType = "plain" | "info" | "warning" | "error" | "inprogress" | "done";
+
+// @beta
 export interface LegacyXWikiAttachment {
     // (undocumented)
     getURL(): string;
@@ -50,6 +69,11 @@ export interface XWikiGlobal {
     docsyntax: string;
     // (undocumented)
     Document: new (reference: EntityReference) => LegacyXWikiDocument;
+    editor?: string;
+    widgets: {
+        Notification: new (text: string, type?: LegacyNotificationType) => LegacyNotification;
+        ConfirmationBox: new (behavior?: LegacyConfirmationBoxBehavior, interactionParameters?: LegacyConfirmationBoxParameters) => unknown;
+    };
 }
 
 // @beta
@@ -63,6 +87,7 @@ export type XWikiMeta = {
     locale: string;
     realLocale: string;
     action: string;
+    dateFormat?: string;
     setVersion: (version: string) => void;
     refreshVersion: (handle404: (response: Response) => void) => Promise<void>;
 };

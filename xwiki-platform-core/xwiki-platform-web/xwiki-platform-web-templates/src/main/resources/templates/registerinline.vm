@@ -125,7 +125,7 @@
     ##
     ## To disable the CAPTCHA on this page, comment out the next entry.
     ## The CAPTCHA, not really an input field but still defined the same way.
-    #if($services.captcha && !$invited && $xcontext.getUser() == "XWiki.XWikiGuest" && $registrationConfig.requireCaptcha)
+    #if($services.captcha && $xcontext.getUser() == "XWiki.XWikiGuest" && $registrationConfig.requireCaptcha)
       ## The CAPTCHA field, programmatically checked to make sure the CAPTCHA is right.
       ## Not checked by javascript because javascript can't check the CAPTCHA and the Ok message because it passes the
       ## mandatory test is misleading.

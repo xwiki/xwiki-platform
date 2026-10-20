@@ -9,9 +9,13 @@ import { Logger } from '@xwiki/platform-api';
 // @beta
 export class Saver<C extends object = object> {
     constructor(config: SaverConfig, createTransport: (saver: Saver<C>) => SaveTransport<C>, createTarget: (saver: Saver<C>) => SaveTarget<C>);
+    addLocalStatusListener(listener: (status: SaveStatus) => void): () => void;
+    addStatusListener(listener: (status: SaveStatus) => void): () => void;
     contentModifiedLocally(): void;
     // (undocumented)
     getClientId(): string;
+    getLocalStatus(): SaveStatus | undefined;
+    getStatus(): SaveStatus | undefined;
     // (undocumented)
     isDirty(): boolean;
     // (undocumented)
@@ -27,8 +31,6 @@ export class Saver<C extends object = object> {
 
 // @beta
 export type SaverConfig = {
-    onLocalStatusChange?: (status: SaveStatus) => void;
-    onStatusChange?: (status: SaveStatus) => void;
     logger?: Logger;
 };
 
@@ -57,6 +59,8 @@ export enum SaveStatus {
 export abstract class SaveTarget<C extends object = object> {
     constructor(saver: Saver<C>);
     abstract dispose(): void;
+    // (undocumented)
+    getAutoSaveContext(): C;
     // (undocumented)
     getSaveInterval(): number | undefined;
     // (undocumented)
@@ -89,7 +93,6 @@ export abstract class SaveTransport<C extends object = object> {
         push?: boolean;
         immediate?: boolean;
     }): Promise<void>;
-    // (undocumented)
     whenSettled(): Promise<void>;
 }
 

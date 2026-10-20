@@ -18,6 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+// Test suites and test scenarios are naturally made of many statements.
+/* eslint-disable max-statements */
+
 import { SAVE_DELAY, SAVE_INTERVAL } from "../constants";
 import { SaveStatus } from "../saveStatus";
 import { SaveTarget } from "../saveTarget";
@@ -27,7 +30,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SaveResult } from "../saveTarget";
 import type { SaverState } from "../saverState";
 
-type TestContext = { priority?: number };
+type TestContext = { priority?: number; auto?: boolean };
 
 /**
  * A transport that keeps the states in memory, so that the tests can inject the states of the other clients and
@@ -41,6 +44,11 @@ class FakeTransport extends SaveTransport<TestContext> {
   public disposed: boolean = false;
 
   public pushCount: number = 0;
+
+  /**
+   * When set, waiting for the local state to reach the other clients fails with this error.
+   */
+  public settleFailure?: Error;
 
   public constructor(
     saver: Saver<TestContext>,
@@ -70,6 +78,9 @@ class FakeTransport extends SaveTransport<TestContext> {
     this.states[this.clientId] = this.state;
     if (options?.push) {
       this.pushCount++;
+    }
+    if (options?.immediate && this.settleFailure) {
+      throw this.settleFailure;
     }
   }
 
@@ -113,6 +124,10 @@ class FakeTarget extends SaveTarget<TestContext> {
     return this.saveInterval;
   }
 
+  public override getAutoSaveContext(): TestContext {
+    return { auto: true };
+  }
+
   public override getSavePriority(context: TestContext): number {
     return context.priority ?? 1;
   }
@@ -138,14 +153,14 @@ let localStatuses: SaveStatus[];
 let globalStatuses: SaveStatus[];
 
 function createSaver(clientId: string = "alice"): Saver<TestContext> {
-  return new Saver<TestContext>(
-    {
-      onLocalStatusChange: (status) => localStatuses.push(status),
-      onStatusChange: (status) => globalStatuses.push(status),
-    },
+  const saver = new Saver<TestContext>(
+    {},
     (saver) => (transport = new FakeTransport(saver, clientId)),
     (saver) => (target = new FakeTarget(saver)),
   );
+  saver.addLocalStatusListener((status) => localStatuses.push(status));
+  saver.addStatusListener((status) => globalStatuses.push(status));
+  return saver;
 }
 
 describe("Saver", () => {
@@ -221,7 +236,8 @@ describe("Saver", () => {
       expect(target.submitted).toHaveLength(0);
 
       await vi.advanceTimersByTimeAsync(1 + SAVE_DELAY);
-      expect(target.submitted).toHaveLength(1);
+      // The auto-save uses the context the target gives to the auto-saves.
+      expect(target.submitted).toEqual([{ auto: true }]);
     });
 
     it("saves right away when the content has been dirty for longer than the save interval", async () => {
@@ -413,6 +429,60 @@ describe("Saver", () => {
     });
   });
 
+  describe("whenSettled", () => {
+    it("waits for the result of the save in progress to be published", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      saver.contentModifiedLocally();
+      let submitted: (result: SaveResult) => void = () => {};
+      target.submit = vi.fn(
+        () => new Promise<SaveResult>((resolve) => (submitted = resolve)),
+      );
+
+      const saving = saver.save({ priority: 3 });
+      await vi.advanceTimersByTimeAsync(SAVE_DELAY);
+      expect(target.submit).toHaveBeenCalled();
+
+      // E.g. the edit form leaves the edit mode as soon as the document is saved, before the saver gets the result.
+      let settled = false;
+      const settling = (async () => {
+        await saver.whenSettled();
+        settled = true;
+      })();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(settled).toBe(false);
+
+      submitted({ version: "1.3" });
+      await settling;
+      await saving;
+      // The created version was published before settling.
+      expect(transport.getLocalState().version).toBe("1.3");
+      expect(transport.getLocalState().saving).toBe(0);
+    });
+
+    it("settles even when the save in progress fails", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      saver.contentModifiedLocally();
+      target.failure = new Error("Save failed.");
+
+      const saving = expect(saver.save({ priority: 3 })).rejects.toThrow(
+        "Save failed.",
+      );
+      await vi.advanceTimersByTimeAsync(SAVE_DELAY);
+      await saving;
+
+      await expect(saver.whenSettled()).resolves.toBeUndefined();
+    });
+
+    it("settles right away when nothing was saved", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+
+      await expect(saver.whenSettled()).resolves.toBeUndefined();
+    });
+  });
+
   describe("status reporting", () => {
     it("reports becoming dirty only once, however many changes are made", async () => {
       const saver = createSaver();
@@ -465,6 +535,96 @@ describe("Saver", () => {
     });
   });
 
+  describe("status listeners", () => {
+    async function saveNow(saver: Saver<TestContext>) {
+      const saving = saver.save();
+      await vi.advanceTimersByTimeAsync(SAVE_DELAY);
+      await saving;
+    }
+
+    it("exposes the save status once it is known", async () => {
+      const saver = createSaver();
+      expect(saver.getLocalStatus()).toBeUndefined();
+      expect(saver.getStatus()).toBeUndefined();
+
+      await saver.toBeReady();
+
+      expect(saver.getLocalStatus()).toBe(SaveStatus.Clean);
+      expect(saver.getStatus()).toBe(SaveStatus.Clean);
+    });
+
+    it("exposes the local status separately from the global one", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+
+      // Another client has unsaved changes, even though we have none.
+      transport.receive("bob", { dirty: true });
+      expect(saver.getLocalStatus()).toBe(SaveStatus.Clean);
+      expect(saver.getStatus()).toBe(SaveStatus.Dirty);
+
+      saver.contentModifiedLocally();
+      expect(saver.getLocalStatus()).toBe(SaveStatus.Dirty);
+    });
+
+    it("stops notifying a local status listener once it is removed", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      const statuses: SaveStatus[] = [];
+      const removeListener = saver.addLocalStatusListener((status) =>
+        statuses.push(status),
+      );
+      saver.contentModifiedLocally();
+
+      removeListener();
+      await saveNow(saver);
+
+      expect(statuses).toEqual([SaveStatus.Dirty]);
+      expect(localStatuses).toEqual([
+        SaveStatus.Clean,
+        SaveStatus.Dirty,
+        SaveStatus.Saving,
+        SaveStatus.Clean,
+      ]);
+    });
+
+    it("stops notifying a status listener once it is removed", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      const statuses: SaveStatus[] = [];
+      const removeListener = saver.addStatusListener((status) =>
+        statuses.push(status),
+      );
+      saver.contentModifiedLocally();
+
+      removeListener();
+      await saveNow(saver);
+
+      expect(statuses).toEqual([SaveStatus.Dirty]);
+      expect(globalStatuses).toEqual([
+        SaveStatus.Clean,
+        SaveStatus.Dirty,
+        SaveStatus.Saving,
+        SaveStatus.Clean,
+      ]);
+    });
+
+    it("keeps notifying the other listeners when one fails", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      saver.addLocalStatusListener(() => {
+        throw new Error("Listener failure");
+      });
+      saver.addStatusListener(() => {
+        throw new Error("Listener failure");
+      });
+
+      saver.contentModifiedLocally();
+
+      expect(localStatuses).toEqual([SaveStatus.Clean, SaveStatus.Dirty]);
+      expect(globalStatuses).toEqual([SaveStatus.Clean, SaveStatus.Dirty]);
+    });
+  });
+
   describe("stop", () => {
     it("pushes the pending state and disposes the transport and the target", async () => {
       const saver = createSaver();
@@ -474,6 +634,17 @@ describe("Saver", () => {
       await saver.stop();
 
       expect(transport.pushCount).toBe(pushCount + 1);
+      expect(transport.disposed).toBe(true);
+      expect(target.disposed).toBe(true);
+    });
+
+    it("disposes the transport and the target even when the final push fails", async () => {
+      const saver = createSaver();
+      await saver.toBeReady();
+      transport.settleFailure = new Error("Connection lost");
+
+      await saver.stop();
+
       expect(transport.disposed).toBe(true);
       expect(target.disposed).toBe(true);
     });

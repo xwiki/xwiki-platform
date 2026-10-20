@@ -61,6 +61,20 @@ type DocumentVersion = {
 };
 
 /**
+ * What a save does: whether the user asked for it, and whether the user stays in the edit mode afterwards. It decides
+ * which client performs the save (Save & View first, then Save & Continue, then the auto-saves), the save button
+ * that is clicked and the version summary.
+ *
+ * - `saveAndView`: the user saves and leaves the edit mode (Save & View, Done)
+ * - `saveAndContinue`: the user saves and stays in the edit mode (Save & Continue)
+ * - `autoSave`: the saver saves on its own, through the Save & Continue button, with the auto-save version summary
+ *
+ * @since 18.9.0RC1
+ * @beta
+ */
+type XWikiFormSaveAction = "saveAndView" | "saveAndContinue" | "autoSave";
+
+/**
  * The save context of {@link XWikiFormSaveTarget}.
  *
  * @since 18.8.0RC1
@@ -68,9 +82,16 @@ type DocumentVersion = {
  */
 type XWikiFormSaveContext = {
   /**
-   * The save button the user clicked, left unset by an auto-save, which uses the save and continue button.
+   * What the save does.
+   *
+   * @since 18.9.0RC1
    */
-  button?: HTMLInputElement;
+  action: XWikiFormSaveAction;
 };
 
-export type { DocumentVersion, DocumentVersionAuthor, XWikiFormSaveContext };
+export type {
+  DocumentVersion,
+  DocumentVersionAuthor,
+  XWikiFormSaveAction,
+  XWikiFormSaveContext,
+};

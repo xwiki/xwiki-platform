@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
@@ -42,7 +43,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
-import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.rendering.async.AsyncContextHandler;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutor;
@@ -146,9 +146,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         Response response = this.container.getResponse();
         response.setContentType("application/json; charset=utf-8");
 
-        if (response instanceof ServletResponse servletResponse) {
-            servletResponse.getResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
-        }
+        response.setStatus(HttpServletResponse.SC_ACCEPTED);
 
         // TODO: Send back a REST version of the job status
     }
@@ -178,7 +176,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     private void addUse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status, Response response)
     {
         Map<String, Collection<Object>> uses = status.getUses();
-        if (uses != null && response instanceof ServletResponse servletResponse) {
+        if (uses != null) {
             // Create the asynchronous HTML meta
             StringBuilder head = new StringBuilder();
             StringBuilder scripts = new StringBuilder();
@@ -197,13 +195,20 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
                 }
             }
             if (!head.isEmpty()) {
-                servletResponse.getResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
+                response.addHeader("X-XWIKI-HTML-HEAD", toHeaderValue(head));
             }
             if (!scripts.isEmpty()) {
-                servletResponse.getResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
-                    scripts.toString());
+                response.addHeader("X-XWIKI-HTML-SCRIPTS", toHeaderValue(scripts));
             }
         }
+    }
+
+    private String toHeaderValue(StringBuilder html)
+    {
+        // The skin extension import strings end with line breaks, but line breaks are forbidden in header values
+        // (browsers reject the whole response over HTTP/2). The client parses the value as an HTML fragment, so a space
+        // is an equivalent separator between the tags.
+        return StringUtils.replaceChars(html.toString(), "\r\n", "  ");
     }
 
     private String toHTML(Throwable t)

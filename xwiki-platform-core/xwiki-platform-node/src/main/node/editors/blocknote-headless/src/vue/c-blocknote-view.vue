@@ -339,9 +339,20 @@ onUnmounted(() => {
     font-family: var(--cr-font-mono);
     color: var(--cr-base-text-color);
 
+    /* Keep the padding from BlockNote because the language selector is displayed in the top padding. */
     & pre {
       margin: 0;
-      padding: 0;
+    }
+
+    /* BlockNote uses the dark syntax highlighting theme because its code blocks have a dark background, but ours have
+      a light background. */
+    & .shiki {
+      color: var(--shiki-light);
+    }
+
+    /* BlockNote displays the language selector in white, which is not visible on our light background. */
+    & > div > select {
+      color: inherit;
     }
   }
 

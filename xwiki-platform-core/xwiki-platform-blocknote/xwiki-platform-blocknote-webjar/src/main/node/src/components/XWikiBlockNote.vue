@@ -78,7 +78,6 @@
 </template>
 
 <script setup lang="ts">
-import { createAutoSaver } from "../services/autosave";
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import {
   extractLinkId,
@@ -86,6 +85,7 @@ import {
   stripLinkId,
 } from "../services/blocknote/linkId";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
+import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
@@ -109,9 +109,9 @@ import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
-  CollaborationManager,
   CollaborationManagerProvider,
 } from "@xwiki/platform-collaboration-api";
+import type { FormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import type {
   BlockNoteViewWrapperProps,
   BlockType,
@@ -119,8 +119,6 @@ import type {
   ImageEditionOverrideFn,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { DocumentReference } from "@xwiki/platform-model-api";
-import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
@@ -138,9 +136,6 @@ const blockNoteProcessor: BlockNoteProcessor = container.get(
   },
 );
 const xwikiMeta: XWikiMeta = container.get("XWikiMeta");
-const modelReferenceParser = container
-  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-  .get();
 
 //
 // Props
@@ -204,15 +199,6 @@ let blockNoteDocument: BlockNoteDocument | undefined;
 const editorContent = ref();
 
 const defaultLabel = "Editor";
-
-const docRef = documentReference
-  ? (modelReferenceParser?.parse(
-      `doc:${documentReference}`,
-    ) as DocumentReference)
-  : undefined;
-if (docRef && docRef.locale === undefined) {
-  docRef.locale = actualLocale;
-}
 
 const imageEdition: ImageEditionOverrideFn = (block, update) => {
   const imageWizard: ImageWizard = container.get("ImageWizard");
@@ -327,6 +313,8 @@ const editorProps = shallowRef<
   },
   theme: "light",
   lang: (actualLocale || "en") as EditorLanguage,
+  // Style the code blocks like the code macro output in view mode.
+  codeBlockClassName: "box code",
   label: defaultLabel,
   overrides: {
     imageEdition,
@@ -337,49 +325,55 @@ const editorProps = shallowRef<
 
 // This is passed to the BlockNote editor component.
 const collaboration: Ref<Collaboration | undefined> = ref(undefined);
-let collaborationManager: CollaborationManager | undefined = undefined;
+// Set as soon as we start joining, so that we can leave even if the editor is unmounted before the join completes.
+let formCollaboration: Promise<FormCollaboration> | undefined;
+// Set once the join completes, together with the collaboration passed to the BlockNote editor component.
+let joinedCollaboration: FormCollaboration | undefined;
 const collaborationKey: Ref<string | undefined> = ref();
-
-// Resolved before the collaboration session is joined, so that creating the auto-saver doesn't have to wait for it.
-let autoSaveVersionSummary: string | undefined;
 
 onBeforeMount(async () => {
   blockNoteDocument = blockNoteProcessor.load(initialValue);
   editorContent.value = blockNoteDocument.content;
 
   editorProps.value.label = await translate("editor.label", defaultLabel);
-  autoSaveVersionSummary = await translate("autoSaveSummary");
 
-  if (collaborationURL && docRef) {
-    await joinCollaborationSession(collaborationURL, docRef);
+  if (collaborationURL && documentReference) {
+    await joinCollaborationSession();
   }
 
   isLoading.value = false;
 });
 
 /**
- * Join the realtime collaboration session for the edited XWiki document.
- *
- * @param url - the URL of the collaboration server
- * @param reference - the reference of the document to collaborate on
+ * Join the realtime collaboration session for the edited XWiki document, using the collaboration server URL.
  */
-async function joinCollaborationSession(
-  url: string,
-  reference: DocumentReference,
-): Promise<void> {
+async function joinCollaborationSession(): Promise<void> {
   const cristalApp = container.get<CristalApp>("CristalApp");
-  cristalApp.getWikiConfig().realtimeURL = url;
+  cristalApp.getWikiConfig().realtimeURL = collaborationURL;
 
-  collaborationManager = container
-    .get<CollaborationManagerProvider>(collaborationManagerProviderName)
-    .get();
-  collaboration.value = await collaborationManager.join(reference);
+  // Resolved before joining the collaboration session, so that starting the auto-save doesn't have to wait for it.
+  const autoSaveVersionSummary = await translate("autoSaveSummary");
+  formCollaboration = joinFormCollaboration({
+    collaborationManager: container
+      .get<CollaborationManagerProvider>(collaborationManagerProviderName)
+      .get(),
+    // The collaboration session is identified by the reference and the locale of the edited document.
+    document: getEditedDocument(),
+    formId: form,
+    autoSaveVersionSummary,
+  });
+  joinedCollaboration = await formCollaboration;
+  collaboration.value = joinedCollaboration.collaboration;
   collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
 }
 
-onUnmounted(() => {
-  // The collaboration manager stops the auto-saver when the last editor leaves the session.
-  collaborationManager?.leave();
+onUnmounted(async () => {
+  // The realtime toolbar is removed and the auto-saver is stopped when the last editor leaves the session.
+  try {
+    (await formCollaboration)?.leave();
+  } catch (error) {
+    console.debug("Failed to join the collaboration session.", error);
+  }
 });
 
 /**
@@ -469,26 +463,15 @@ const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
 const editorInstance =
   useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
 
-// Create the auto-saver only once the editor is there, because the first client joining a session loads the initial
-// content into the shared document, and that is a local Yjs change: counting it would make the session dirty and
-// trigger an auto-save before anyone typed anything.
+// Start the auto-save (and show the realtime toolbar) only once the editor is there, because the first client joining
+// a session loads the initial content into the shared document, and that is a local Yjs change: counting it would
+// make the session dirty and trigger an auto-save before anyone typed anything.
 watch(editorInstance, (editor) => {
-  const session = collaboration.value;
-  if (!editor || !session || session.saver) {
-    return;
+  if (editor) {
+    // The auto-saver belongs to the collaboration session, shared by every editor taking part in it, so only the first
+    // editor to get here starts it.
+    joinedCollaboration?.startAutoSave();
   }
-  // The auto-saver belongs to the collaboration session, shared by every editor taking part in it, so the first one
-  // to get here creates it. Nothing is awaited between the test above and this assignment, which is what makes it
-  // safe against a second editor initializing at the same time.
-  session.saver = createAutoSaver({
-    collaboration: session,
-    document: getEditedDocument(),
-    formId: form,
-    autoSaveVersionSummary,
-  });
-  session.saver.toBeReady().catch((error: unknown) => {
-    console.error("Failed to start the auto-save.", error);
-  });
 });
 
 //
@@ -554,6 +537,40 @@ defineExpose({
     [data-content-type="bulletListItem"] > p.bn-inline-content,
     [data-content-type="numberedListItem"] > p.bn-inline-content {
       margin: 0;
+    }
+
+    .bn-block-content[data-content-type="codeBlock"] {
+      /* The code block is styled by the XWiki skin, like the code macro output in view mode, through the CSS classes
+        added to its pre element (see codeBlockClassName). */
+      background: transparent;
+      border-radius: 0;
+
+      /* Use the same spacing as the code macro output in view mode. */
+      > pre {
+        padding: 19px; /* .well */
+        margin: 0 0 20px; /* @line-height-computed */
+      }
+
+      /* The XWiki skin styles select elements as form fields, but the language selector should look like plain
+        text. */
+      > div > select {
+        width: auto;
+        height: auto;
+        padding: 0;
+        border: 0 none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        font-size: 0.8em;
+        /* Display the language selector in the top padding of the code block, aligned with the code. */
+        line-height: 1;
+        top: 4px;
+        left: 20px; /* border width + padding */
+
+        &:focus {
+          box-shadow: none;
+        }
+      }
     }
 
     [data-content-type="table"] {

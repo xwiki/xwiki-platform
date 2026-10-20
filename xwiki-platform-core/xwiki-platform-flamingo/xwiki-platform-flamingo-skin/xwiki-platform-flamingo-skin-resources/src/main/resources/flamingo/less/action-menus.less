@@ -185,15 +185,27 @@ li:has(+ li #tmRegister) #tmLogin {
 // Navbar avatar ==========================================================
 
 .navbar-avatar {
-  > a {
-    max-height: @navbar-height;
+  // Take the span added by #displayUser() out of the layout, so that the avatar link fills the whole navbar item.
+  > .user {
+    display: contents;
+  }
 
-    > img {
+  a {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    padding: 0 @navbar-padding-horizontal;
+
+    &:hover,
+    &:focus {
+      background-color: @navbar-default-link-hover-bg;
+    }
+
+    // Matching the avatar class is needed to take precedence over the generic user avatar style.
+    img.user-avatar {
       @avatar-size: floor((ceil((@navbar-height / 2)) / 2)) * 2;
       border-radius: @thumbnail-border-radius;
       height: @avatar-size;
-      margin-top: -@navbar-padding-vertical + (@navbar-height / 2) - (@avatar-size / 2);
-      vertical-align: middle;
       width: @avatar-size;
     }
   }
@@ -201,7 +213,8 @@ li:has(+ li #tmRegister) #tmLogin {
 
 // Icon in a navbar  ======================================================
 
-.icon-navbar {
+.icon-navbar,
+.navbar-avatar a {
   cursor: pointer;
 }
 
@@ -323,6 +336,9 @@ li:has(+ li #tmRegister) #tmLogin {
 #contentmenu {
   .text-right();
   .flat-buttons();
+  // Remove default list style so that the menu box fits its buttons.
+  list-style: none;
+  padding-left: 0;
 
   .dropdown {
     display: inline-block;

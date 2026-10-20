@@ -19,7 +19,7 @@
  */
 package org.xwiki.uiextension.internal.parameters;
 
-import org.apache.commons.lang3.function.FailableSupplier;
+import java.util.function.Supplier;
 
 /**
  * A parameter value consisting of literal text around a single call that is executed directly in Java instead of
@@ -32,11 +32,11 @@ import org.apache.commons.lang3.function.FailableSupplier;
  * @version $Id$
  * @since 18.10.0RC1
  */
-record ShortcutParameterValue(String raw, String prefix, FailableSupplier<String, Exception> call, String suffix)
+record ShortcutParameterValue(String raw, String prefix, Supplier<String> call, String suffix)
     implements UIXParameterValue
 {
     @Override
-    public String evaluate(VelocityParameterSession session) throws Exception
+    public String evaluate(VelocityParameterSession session)
     {
         String result = this.call.get();
 

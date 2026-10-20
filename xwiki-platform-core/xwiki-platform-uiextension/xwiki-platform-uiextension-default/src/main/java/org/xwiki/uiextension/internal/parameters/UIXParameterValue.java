@@ -19,6 +19,8 @@
  */
 package org.xwiki.uiextension.internal.parameters;
 
+import org.xwiki.velocity.XWikiVelocityException;
+
 /**
  * The value of a single UI extension parameter, prepared once so that it can be evaluated cheaply on each request.
  * <p>
@@ -60,7 +62,7 @@ public sealed interface UIXParameterValue permits StaticParameterValue, Shortcut
      * @param session the Velocity session to use, only required (and then not {@code null}) when
      *     {@link #requiresVelocity()} returns {@code true}
      * @return the evaluated value
-     * @throws Exception when the evaluation fails
+     * @throws XWikiVelocityException when the Velocity evaluation fails
      */
-    String evaluate(VelocityParameterSession session) throws Exception;
+    String evaluate(VelocityParameterSession session) throws XWikiVelocityException;
 }

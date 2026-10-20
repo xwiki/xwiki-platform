@@ -103,7 +103,7 @@ class UIXParameterValueFactoryTest
     }
 
     @Test
-    void createWithoutVelocity() throws Exception
+    void createWithoutVelocity()
     {
         UIXParameterValue value = this.factory.create(NAMESPACE, "Some value, (with) 'quotes'!");
 
@@ -226,7 +226,7 @@ class UIXParameterValueFactoryTest
         "$services.icon.render('my.key')",
         "$xwiki.getURL('Main.WebHome')"
     })
-    void createWithOtherVelocity(String raw) throws Exception
+    void createWithOtherVelocity(String raw)
     {
         UIXParameterValue value = this.factory.create(NAMESPACE, raw);
 

@@ -22,6 +22,7 @@ package org.xwiki.uiextension.internal.parameters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +31,6 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.FailableSupplier;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.velocity.VelocityManager;
@@ -134,7 +134,7 @@ public class UIXParameterValueFactory
             return null;
         }
 
-        FailableSupplier<String, Exception> call = switch (matcher.group(2)) {
+        Supplier<String> call = switch (matcher.group(2)) {
             case LOCALIZATION_RENDER -> getLocalizationCall(arguments);
             case WEBJARS_URL -> getWebJarCall(arguments);
             default -> getSkinFileCall(arguments);
@@ -150,7 +150,8 @@ public class UIXParameterValueFactory
         Matcher matcher = ARGUMENT_PATTERN.matcher(arguments);
         boolean expectingArgument = true;
         while (expectingArgument && matcher.find()) {
-            result.add(matcher.group(1) != null ? matcher.group(1) : matcher.group(2));
+            // One of the two alternatives (single or double quoted) always matches.
+            result.add(Objects.requireNonNullElse(matcher.group(1), matcher.group(2)));
             expectingArgument = COMMA.equals(matcher.group(3));
         }
 
@@ -158,7 +159,7 @@ public class UIXParameterValueFactory
         return expectingArgument ? null : result;
     }
 
-    private FailableSupplier<String, Exception> getLocalizationCall(List<String> arguments)
+    private Supplier<String> getLocalizationCall(List<String> arguments)
     {
         if (arguments.size() != 1) {
             return null;
@@ -170,7 +171,7 @@ public class UIXParameterValueFactory
         return () -> Objects.requireNonNullElse(this.localizationManagerProvider.get().getTranslationPlain(key), key);
     }
 
-    private FailableSupplier<String, Exception> getWebJarCall(List<String> arguments)
+    private Supplier<String> getWebJarCall(List<String> arguments)
     {
         // Same as the WebJarsScriptService#url methods with string parameters.
         return switch (arguments.size()) {
@@ -182,7 +183,7 @@ public class UIXParameterValueFactory
         };
     }
 
-    private FailableSupplier<String, Exception> getSkinFileCall(List<String> arguments)
+    private Supplier<String> getSkinFileCall(List<String> arguments)
     {
         if (arguments.size() != 1) {
             return null;

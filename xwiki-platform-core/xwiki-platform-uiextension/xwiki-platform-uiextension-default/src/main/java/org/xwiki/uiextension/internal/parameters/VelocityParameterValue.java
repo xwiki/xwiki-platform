@@ -43,8 +43,10 @@ final class VelocityParameterValue implements UIXParameterValue
 
     /**
      * Compiling the same value twice when two threads evaluate it concurrently for the first time is harmless, so the
-     * compilation result is only published through a volatile field instead of synchronizing.
+     * compilation result is only published through a volatile field instead of synchronizing. The immutable result is
+     * only ever replaced as a whole, never modified, so volatile is exactly what is needed to publish it safely.
      */
+    @SuppressWarnings("java:S3077")
     private volatile CompilationResult compilationResult;
 
     private record CompilationResult(VelocityTemplate template, XWikiVelocityException error)

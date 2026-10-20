@@ -376,6 +376,20 @@ export default {
   display: none;
 }
 
+/*
+  The text editors are as large as what they hold, so that it can be read while editing without pushing the other values
+  away. The browsers not supporting field-sizing keep the default size of the editors.
+*/
+.layout-list
+  .layout-list-item-value
+  .edit
+  :is(input:not([type]), input[type="text"], textarea) {
+  field-sizing: content;
+  width: auto;
+  min-width: 4ch;
+  max-width: 100%;
+}
+
 /* The delete action is displayed at the end of the line. */
 .layout-list .layout-list-item-delete {
   flex: none;

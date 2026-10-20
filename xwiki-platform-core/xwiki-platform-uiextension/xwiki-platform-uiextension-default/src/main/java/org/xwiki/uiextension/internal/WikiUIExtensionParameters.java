@@ -82,8 +82,10 @@ public class WikiUIExtensionParameters
      * <p>
      * All the cache data is held by a single immutable object so that concurrent requests can't mix the evaluated
      * parameters of one request with the context of another one. The execution context is only weakly referenced to
-     * avoid keeping it in memory after the request.
+     * avoid keeping it in memory after the request. This object is only ever replaced as a whole, never modified,
+     * so volatile is exactly what is needed to publish it safely.
      */
+    @SuppressWarnings("java:S3077")
     private volatile EvaluatedParameters evaluatedParameters;
 
     /**

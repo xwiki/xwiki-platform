@@ -71,4 +71,21 @@ public interface Solr
     {
         return -1;
     }
+
+    /**
+     * Delete the whole index of the passed core: all its documents, but also everything the index remembers about the
+     * fields of those documents. The core itself and its configuration are kept.
+     * <p>
+     * This is needed for example after a change of the core schema which is incompatible with the data already
+     * indexed (like enabling docValues on an existing field), since deleting all the documents is not enough for Solr
+     * to accept documents following the new schema.
+     *
+     * @param core the core for which to delete the index
+     * @throws SolrException when failing to delete the index
+     * @since 18.10.0RC1
+     */
+    default void deleteIndex(XWikiSolrCore core) throws SolrException
+    {
+        throw new UnsupportedOperationException("This Solr implementation does not support deleting an index");
+    }
 }

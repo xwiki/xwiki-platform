@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.StreamingResponseCallback;
+import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
@@ -50,6 +51,7 @@ import org.xwiki.properties.internal.converter.LocaleConverter;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
@@ -62,6 +64,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -195,6 +198,45 @@ class DefaultSolrTest
         assertEquals(Arrays.asList("0", "1"), ids);
         assertEquals(Arrays.asList(null, date), dates);
         assertEquals(Arrays.asList(null, List.of("link1", "link2")), links);
+    }
+
+    @Test
+    void deleteIndex() throws Exception
+    {
+        Solr solr = this.componentManager.getInstance(Solr.class);
+        XWikiSolrCore core = solr.getCore("test");
+        SolrClient client = core.getClient();
+
+        // Index data in a boolean field without docValues
+        Map<String, Object> typeAttributes = new HashMap<>();
+        typeAttributes.put("name", "testboolean");
+        typeAttributes.put("class", "solr.BoolField");
+        typeAttributes.put("docValues", false);
+        FieldTypeDefinition typeDefinition = new FieldTypeDefinition();
+        typeDefinition.setAttributes(typeAttributes);
+        new SchemaRequest.AddFieldType(typeDefinition).process(client);
+        new SchemaRequest.AddField(Map.of("name", "testflag", "type", "testboolean", "stored", true)).process(client);
+        client.add(new SolrInputDocument("id", "1", "testflag", "true"));
+        client.commit();
+
+        // Enable docValues on the field type, which is incompatible with the indexed data
+        typeAttributes.put("docValues", true);
+        new SchemaRequest.ReplaceFieldType(typeDefinition).process(client);
+        SolrInputDocument newDocument = new SolrInputDocument("id", "2", "testflag", "true");
+        assertThrows(Exception.class, () -> client.add(newDocument));
+
+        solr.deleteIndex(core);
+
+        assertEquals(0, client.query(new SolrQuery("*:*")).getResults().getNumFound());
+
+        // Documents following the new schema can be indexed and sorted on the field (which requires docValues)
+        client.add(newDocument);
+        client.commit();
+        SolrQuery query = new SolrQuery("*:*");
+        query.addSort("testflag", SolrQuery.ORDER.asc);
+        SolrDocumentList results = client.query(query).getResults();
+        assertEquals(1, results.getNumFound());
+        assertEquals("2", results.get(0).getFieldValue("id"));
     }
 
     @Test

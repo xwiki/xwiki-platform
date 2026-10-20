@@ -108,12 +108,13 @@ public class AddTagsPane extends BaseElement
     /**
      * Closes the tag suggestions, which are displayed below the tags input, over the add button. The suggestions are
      * requested with a delay after each key stroke, so they can still show up after the tags have been typed. Leaving
-     * the tags input makes the suggestion widget drop the suggestions it is still waiting for, then Escape closes the
-     * suggestions that are already displayed.
+     * the tags input with Tab makes the suggestion widget drop the suggestions it is still waiting for, then Escape
+     * closes the suggestions that are already displayed (Tab only moves the focus to the first of them, without
+     * selecting it).
      */
     private void closeSuggestions()
     {
-        getDriver().executeScript("arguments[0].blur()", this.tagsInput);
+        this.tagsInput.sendKeys(Keys.TAB);
         this.tagsInput.sendKeys(Keys.ESCAPE);
         getDriver().waitUntilElementDisappears(this.addTagsForm, SUGGESTIONS_LOCATOR);
     }

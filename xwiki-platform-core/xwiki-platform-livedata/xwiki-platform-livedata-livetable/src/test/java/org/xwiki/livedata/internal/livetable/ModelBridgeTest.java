@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.model.document.DocumentAuthors;
@@ -66,6 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -169,6 +171,67 @@ class ModelBridgeTest
         // Without the object the new page would not be an entry of the live data at all.
         verify(this.document).newXObject(classReference, this.xcontext);
         verify(this.document).setTitle("Some title");
+    }
+
+    @Test
+    void updateAllCreateFromTemplate() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "newdoc");
+        DocumentReference classReference = new DocumentReference("xwiki", "MyApp", "MyClass");
+        DocumentReference templateReference = new DocumentReference("xwiki", "MyApp", "MyTemplate");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(true);
+        when(this.document.getAuthors()).thenReturn(this.documentAuthors);
+        // The template holds the object of the entry.
+        when(this.document.getXObject(classReference, 0)).thenReturn(this.baseObject);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("doc.title", "Some title");
+
+        this.modelBridge.updateAll(properties, documentReference, classReference, Map.of(), 0, true,
+            templateReference);
+
+        // The values given by the user replace the ones of the template.
+        InOrder inOrder = inOrder(this.document);
+        inOrder.verify(this.document).readFromTemplate(templateReference, this.xcontext);
+        inOrder.verify(this.document).setTitle("Some title");
+        verify(this.document, never()).newXObject(any(DocumentReference.class), any(XWikiContext.class));
+    }
+
+    @Test
+    void updateAllCreateFromTemplateWithoutTheObject() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "newdoc");
+        DocumentReference classReference = new DocumentReference("xwiki", "MyApp", "MyClass");
+        DocumentReference templateReference = new DocumentReference("xwiki", "MyApp", "MyTemplate");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(true);
+        when(this.document.getAuthors()).thenReturn(this.documentAuthors);
+        when(this.document.getXObject(classReference, 0)).thenReturn(null);
+
+        this.modelBridge.updateAll(new HashMap<>(), documentReference, classReference, Map.of(), 0, true,
+            templateReference);
+
+        // A template that is not an entry itself still gives an entry.
+        InOrder inOrder = inOrder(this.document);
+        inOrder.verify(this.document).readFromTemplate(templateReference, this.xcontext);
+        inOrder.verify(this.document).newXObject(classReference, this.xcontext);
+    }
+
+    @Test
+    void updateAllDoesNotApplyTheTemplateWhenUpdatingAnExistingEntry() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(false);
+
+        this.modelBridge.updateAll(new HashMap<>(), documentReference, null, Map.of(), 0, false,
+            new DocumentReference("xwiki", "MyApp", "MyTemplate"));
+
+        verify(this.document, never()).readFromTemplate(any(DocumentReference.class), any(XWikiContext.class));
     }
 
     @Test

@@ -204,9 +204,67 @@ describe("DisplayerXObjectProperty.vue", () => {
         "XWiki.TestClass",
         "color",
         { color: "red" },
+        undefined,
       );
       expect(wrapper.find(".html-wrapper").html()).toContain(
         "<strong>Red</strong>",
+      );
+    });
+
+    it("renders the value its template gives to an empty cell", async () => {
+      vi.mocked(view).mockResolvedValue("<strong>Blue</strong>");
+
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: {
+          entry: { _new: true, _displayReference: "NewRows.placeholder" },
+        },
+        logic: {
+          ...draftLogic,
+          getActionDescriptor: (id) =>
+            id === "addEntry"
+              ? { id, template: "Code.ColorTemplate" }
+              : undefined,
+        },
+      });
+      await flushPromises();
+
+      expect(vi.mocked(view)).toHaveBeenCalledWith(
+        "NewRows.placeholder",
+        "XWiki.TestClass",
+        "color",
+        {},
+        "Code.ColorTemplate",
+      );
+      expect(wrapper.find(".html-wrapper").html()).toContain(
+        "<strong>Blue</strong>",
+      );
+    });
+
+    it("loads its edit field from its template", async () => {
+      vi.mocked(edit).mockResolvedValue(EDIT_FORM);
+      vi.mocked(view).mockResolvedValue("<strong>Red</strong>");
+
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: draftEntry },
+        logic: {
+          ...draftLogic,
+          getActionDescriptor: (id) =>
+            id === "addEntry"
+              ? { id, template: "Code.ColorTemplate" }
+              : undefined,
+        },
+      });
+      await wrapper.setProps({ isView: false });
+      await wrapper.setData({ isView: false });
+      await flushPromises();
+
+      expect(vi.mocked(edit)).toHaveBeenCalledWith(
+        "NewRows.placeholder",
+        "XWiki.TestClass",
+        "color",
+        undefined,
+        { color: "red" },
+        "Code.ColorTemplate",
       );
     });
 
@@ -230,6 +288,7 @@ describe("DisplayerXObjectProperty.vue", () => {
         "color",
         undefined,
         { color: "red" },
+        undefined,
       );
     });
 
@@ -329,6 +388,7 @@ describe("DisplayerXObjectProperty.vue", () => {
         "NewRows.My first entry",
         "XWiki.TestClass",
         "color",
+        undefined,
         undefined,
         undefined,
       );

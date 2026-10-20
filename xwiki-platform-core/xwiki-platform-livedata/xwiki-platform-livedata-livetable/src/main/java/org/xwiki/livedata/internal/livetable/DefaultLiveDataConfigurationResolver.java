@@ -52,6 +52,10 @@ import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Adds missing live data configuration values specific to the live table source.
@@ -91,6 +95,12 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
 
     @Inject
+    private NewRowTemplateProviderResolver templateProviderResolver;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
     private Logger logger;
 
     @Override
@@ -108,12 +118,13 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         // has the rights to create a page.
         Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
         String namingStrategy = (String) sourceParams.get("newRowNamingStrategy");
+        setHostDocument(namingStrategy, sourceParams);
         if (namingStrategy != null
             && this.componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
             try {
                 LiveTableNewRowNamingStrategy strategy =
                     this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
-                if (strategy.isCreationAllowed(sourceParams)) {
+                if (isCreationAllowed(strategy, sourceParams)) {
                     List<String> undescribedProperties =
                         setMandatory(mergedConfig.getMeta(), strategy.getMandatoryProperties(sourceParams));
                     if (undescribedProperties.isEmpty()) {
@@ -121,6 +132,9 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
                         addEntry.setId("addEntry");
                         strategy.getNewEntryLocation(sourceParams).ifPresent(location -> addEntry.getParameters()
                             .put("location", this.stringEntityReferenceSerializer.serialize(location)));
+                        // The rows that have no entry yet are displayed from the template their entry is created from.
+                        this.templateProviderResolver.getTemplate(sourceParams).ifPresent(template -> addEntry
+                            .getParameters().put("template", this.stringEntityReferenceSerializer.serialize(template)));
                         mergedConfig.getMeta().getActions().add(addEntry);
                     } else {
                         // No entry could be created, since the user has no cell to give those values in.
@@ -136,6 +150,41 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
 
         // Translate using the context locale.
         return translate(mergedConfig, config);
+    }
+
+    /**
+     * Checks whether the current user can create new entries.
+     *
+     * @param strategy the naming strategy of the new entries
+     * @param sourceParams the live data source parameters
+     * @return {@code true} if the current user can create entries
+     * @throws LiveDataException if the template provider cannot be loaded
+     */
+    private boolean isCreationAllowed(LiveTableNewRowNamingStrategy strategy, Map<String, Object> sourceParams)
+        throws LiveDataException
+    {
+        if (!strategy.isCreationAllowed(sourceParams)) {
+            return false;
+        }
+        Optional<SpaceReference> location = strategy.getNewEntryLocation(sourceParams);
+        return location.isEmpty() || this.templateProviderResolver.hasRequiredRights(sourceParams, location.get());
+    }
+
+    /**
+     * Records the page containing the Live Data.
+     *
+     * @param namingStrategy the naming strategy of the new entries
+     * @param sourceParams the live data source parameters
+     */
+    private void setHostDocument(String namingStrategy, Map<String, Object> sourceParams)
+    {
+        if (namingStrategy != null && !sourceParams.containsKey(LiveTableRequestHandler.HOST_DOCUMENT)) {
+            XWikiDocument hostDocument = this.xcontextProvider.get().getDoc();
+            if (hostDocument != null) {
+                sourceParams.put(LiveTableRequestHandler.HOST_DOCUMENT,
+                    this.stringEntityReferenceSerializer.serialize(hostDocument.getDocumentReference()));
+            }
+        }
     }
 
     /**

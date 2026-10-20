@@ -1196,12 +1196,15 @@ class LiveDataIT
         assertFalse(liveData.isEditMode());
         assertFalse(listLayout.canAddEntry());
         assertFalse(listLayout.hasDeleteActions());
+        // The labels of the properties are only displayed while editing.
+        assertEquals(List.of(), listLayout.getDisplayedLabels(1));
 
         liveData.toggleEditMode();
         listLayout.waitUntilReady();
         assertTrue(liveData.isEditMode());
         assertTrue(listLayout.canAddEntry());
         assertTrue(listLayout.hasDeleteActions());
+        assertEquals(List.of(NAME_COLUMN + ":"), listLayout.getDisplayedLabels(1));
 
         // Setting a first value on the new item creates the entry.
         listLayout.startNewEntry();

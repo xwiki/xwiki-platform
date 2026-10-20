@@ -24,9 +24,10 @@
   by its secondary properties, all separated by a small circle. The secondary
   properties are labelled for screen readers, and the values cut off by the end of
   the line display their full text as a tooltip.
-  The values can be edited like in the other layouts. In edit mode, the line wraps
-  so that the editors are not cut off, the secondary properties are displayed even
-  when they are empty, so that they can be filled, and the entry can be deleted.
+  The values can be edited like in the other layouts. While editing, the label of
+  each property is displayed above its value. In edit mode, the line wraps so that
+  the editors are not cut off, the secondary properties are displayed even when they
+  are empty, so that they can be filled, and the entry can be deleted.
 -->
 <template>
   <li
@@ -47,6 +48,10 @@
       class="layout-list-item-value layout-list-item-main"
       @mouseenter="updateTooltip"
     >
+      <!-- The label of the main property is only displayed while editing. -->
+      <span class="layout-list-item-label layout-list-item-main-label">{{
+        $t("livedata.list.property.label", [getPropertyName(propertyId)])
+      }}</span>
       <LivedataDisplayer :property-id="propertyId" :entry="entry" />
     </div>
     <!-- Secondary property values, right after the main one -->
@@ -63,7 +68,7 @@
           class="layout-list-item-value layout-list-item-secondary-value"
           @mouseenter="updateTooltip"
         >
-          <!-- The property names are not displayed, but they are read by screen readers. -->
+          <!-- The property names are read by screen readers, and only displayed while editing. -->
           <span class="layout-list-item-label">{{
             $t("livedata.list.property.label", [
               getPropertyName(secondaryPropertyId),
@@ -311,7 +316,10 @@ export default {
   white-space: normal;
 }
 
-/* The labels of the secondary properties are hidden, but read by screen readers. */
+/*
+  The labels of the secondary properties are hidden but read by screen readers, while the label of the main property is
+  hidden for everyone, so that a list displaying a single property reads like a regular list.
+*/
 .layout-list .layout-list-item-label {
   position: absolute;
   width: 1px;
@@ -322,6 +330,50 @@ export default {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.layout-list .layout-list-item-main-label {
+  display: none;
+}
+
+/*
+  While editing, the label of each property is displayed above its value, whatever the editor (inline like a text input,
+  or a block like a date picker), so that the labels are always at the same place.
+*/
+.layout-list .layout-list-item-edit-mode .layout-list-item-value,
+.layout-list .layout-list-item-value:has(.livedata-displayer .edit) {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.layout-list .layout-list-item-edit-mode .layout-list-item-label,
+.layout-list
+  .layout-list-item-value:has(.livedata-displayer .edit)
+  .layout-list-item-label {
+  display: block;
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  color: var(--text-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+/*
+  In edit mode, the values are aligned by their top, so that their labels are on the same line, and the separators are
+  hidden since the labels already tell the values apart.
+*/
+.layout-list .layout-list-item-edit-mode,
+.layout-list .layout-list-item-edit-mode .layout-list-item-secondary {
+  align-items: flex-start;
+  gap: 0.5em 1em;
+}
+
+.layout-list .layout-list-item-edit-mode .layout-list-item-separator {
+  display: none;
 }
 
 /* The delete action is displayed at the end of the line. */

@@ -41,7 +41,8 @@ public class ListLayoutElement extends BaseElement
 {
     private static final By ITEMS = By.cssSelector(".layout-list-root > .layout-list-item");
 
-    private static final By MAIN_VALUE = By.cssSelector(".layout-list-item-main");
+    // The displayed part of the main values, without their label (displayed while editing).
+    private static final By MAIN_VALUE = By.cssSelector(".layout-list-item-main > .livedata-displayer");
 
     private static final By DELETE_ACTION = By.cssSelector(".layout-list-item-delete");
 
@@ -55,6 +56,8 @@ public class ListLayoutElement extends BaseElement
 
     private static final By SECONDARY_LABELS =
         By.cssSelector(".layout-list-item-secondary-value > .layout-list-item-label");
+
+    private static final By LABELS = By.className("layout-list-item-label");
 
     private final LiveDataElement liveData;
 
@@ -143,6 +146,19 @@ public class ListLayoutElement extends BaseElement
     {
         return getDriver().findElementsWithoutWaiting(getItems().get(itemNumber - 1), SECONDARY_LABELS).stream()
             .map(label -> label.getDomProperty("textContent").trim()).toList();
+    }
+
+    /**
+     * The labels of the properties are only displayed while editing, in edit mode or when editing a value.
+     *
+     * @param itemNumber the number of the entry, starting at 1
+     * @return the labels of the values of the entry that are displayed, in the order they are displayed
+     * @since 18.10.0RC1
+     */
+    public List<String> getDisplayedLabels(int itemNumber)
+    {
+        return getDriver().findElementsWithoutWaiting(getItems().get(itemNumber - 1), LABELS).stream()
+            .filter(WebElement::isDisplayed).map(WebElement::getText).toList();
     }
 
     /**

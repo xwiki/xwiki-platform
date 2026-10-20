@@ -174,10 +174,16 @@ describe("LayoutListItem.vue", () => {
         .findAll(".layout-list-item-secondary-value .layout-list-item-label")
         .map((label) => label.text()),
     ).toStrictEqual(["year:", "Director:"]);
-    // The main property is not labelled, so that a list displaying a single property reads like a regular list.
+    // The label of the main property is hidden for everyone (displayed only while editing), so that a list displaying
+    // a single property reads like a regular list.
     expect(
-      wrapper.find(".layout-list-item-main .layout-list-item-label").exists(),
-    ).toBe(false);
+      wrapper.find(".layout-list-item-main .layout-list-item-label").classes(),
+    ).toContain("layout-list-item-main-label");
+    expect(
+      wrapper
+        .find(".layout-list-item-secondary-value .layout-list-item-label")
+        .classes(),
+    ).not.toContain("layout-list-item-main-label");
   });
 
   it("Displays the full text of the values cut off by the end of the line as a tooltip", async () => {

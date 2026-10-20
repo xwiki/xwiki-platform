@@ -1,0 +1,2 @@
+org.xwiki.resource.test.internal.TestEntityResourceScriptService
+org.xwiki.resource.test.internal.TestFarmEntityResourceActionHandler

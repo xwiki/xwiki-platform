@@ -41,16 +41,51 @@
          ================================ -->
     <!-- The Resource feature implementation under test. These are already bundled in the minimal test WAR (via
          xwiki-platform-oldcore for resource-default and directly for resource-servlet), so the Docker test framework
-         skips re-installing them as extensions. They are declared here to document what the test exercises. -->
+         skips re-installing them as extensions. They are declared here to document what the test exercises, and
+         resource-default is also needed to compile the test Entity Resource Action Handlers. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-resource-default</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-resource-servlet</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Needed by the test components (Entity Resource Action Handlers and the script service registering them),
+         and already part of the minimal test WAR. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-container-servlet</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Used by the tests to call the script service registering a wiki-level Entity Resource Action Handler. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

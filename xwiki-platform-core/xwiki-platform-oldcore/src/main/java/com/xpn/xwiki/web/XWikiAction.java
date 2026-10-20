@@ -80,11 +80,10 @@ import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.NotFoundResourceHandlerException;
-import org.xwiki.resource.ResourceReferenceHandler;
+import org.xwiki.resource.ResourceReferenceHandlerManager;
 import org.xwiki.resource.ResourceReferenceManager;
-import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -594,31 +593,29 @@ public abstract class XWikiAction implements LegacyAction
 
                 getProgress().startStep(this, "Search and execute entity resource handler");
 
-                // Call the new Entity Resource Reference Handler.
-                ResourceReferenceHandler<ResourceType> entityResourceReferenceHandler = Utils.getComponent(
-                    new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class), "bin");
+                // Call the Handler of the Entity Resource Action, if any. The RoutingFilter already sends the requests
+                // whose action has a Handler registered for the whole farm to the Entity Resource Reference Handler,
+                // but it cannot see the Handlers registered for a wiki or a user (it executes before any XWiki Context
+                // exists), nor the ones targeted by path-based wiki URLs (whose Resource Type is not "bin"): those are
+                // called from here, directly since the XWiki Context is already initialized.
+                ResourceReferenceHandlerManager<EntityResourceAction> entityResourceActionHandlerManager =
+                    Utils.getComponent(new DefaultParameterizedType(null, ResourceReferenceHandlerManager.class,
+                        EntityResourceAction.class));
                 EntityResourceReference entityResourceReference =
                     (EntityResourceReference) Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
 
-                // We save the current action set since:
-                // - by default the action is set to "view" for Extensions not installed as root and contributing some
-                // new Entity Action (see https://jira.xwiki.org/browse/XWIKI-15182).
-                // - we want to set back the action in case no ResourceReferenceHandler was found to handle the URL
-                // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-14947 is fixed
+                // The action in the context is "view" for an Entity Action contributed by an Extension not installed
+                // at root: put the action of the URL in the context while the Handler executes, and restore the
+                // original one if no Handler is found so that the legacy action executes unchanged.
                 String originalAction = context.getAction();
                 try {
-                    // Force the action in the context because of https://jira.xwiki.org/browse/XWIKI-15182.
-                    // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-14947 is fixed
                     context.setAction(entityResourceReference.getAction().getActionName());
-                    entityResourceReferenceHandler.handle(entityResourceReference,
-                        DefaultResourceReferenceHandlerChain.EMPTY);
+                    entityResourceActionHandlerManager.handle(entityResourceReference);
                     // Don't let the old actions kick in!
                     return;
                 } catch (NotFoundResourceHandlerException e) {
                     // No Entity Resource Action has been found. Don't do anything and let it go through
                     // so that the old Action system kicks in...
-                    // Put back the action, because of https://jira.xwiki.org/browse/XWIKI-15182
-                    // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-14947 is fixed
                     context.setAction(originalAction);
                 }
 

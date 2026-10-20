@@ -29,11 +29,19 @@ import org.xwiki.test.docker.junit5.UITest;
  * @version $Id$
  * @since 18.6.0RC1
  */
-@UITest
+@UITest(properties = {
+    // The tests register an Entity Resource Action Handler from a script page, which requires programming right.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.Execute\\..*"
+})
 class AllIT
 {
     @Nested
     class NestedResourceIT extends ResourceIT
+    {
+    }
+
+    @Nested
+    class NestedEntityResourceActionIT extends EntityResourceActionIT
     {
     }
 }

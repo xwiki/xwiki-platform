@@ -128,6 +128,7 @@ com.xpn.xwiki.internal.parentchild.DefaultParentChildConfiguration
 com.xpn.xwiki.internal.pdf.FOPXSLFORenderer
 com.xpn.xwiki.internal.resource.DefaultEntityResourceActionLister
 com.xpn.xwiki.internal.resource.ResourceReferenceHandlerAuthenticatorListener
+com.xpn.xwiki.internal.resource.XWikiEntityResourceContextInitializer
 com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor
 com.xpn.xwiki.internal.skin.DefaultSkinManager
 com.xpn.xwiki.internal.skin.InternalSkinConfiguration

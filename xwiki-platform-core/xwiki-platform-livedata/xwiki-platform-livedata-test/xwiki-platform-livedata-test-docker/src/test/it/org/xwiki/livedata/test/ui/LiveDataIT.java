@@ -1118,8 +1118,8 @@ class LiveDataIT
     }
 
     /**
-     * Test the list layout: each entry is displayed on a compact, read-only line, made of its first visible property
-     * followed by its other visible properties that have a value.
+     * Test the list layout: each entry is displayed on a compact line, made of its first visible property followed by
+     * its other visible properties that have a value. See {@link #listLayoutEditMode} for the edit mode.
      */
     @Test
     @Order(17)

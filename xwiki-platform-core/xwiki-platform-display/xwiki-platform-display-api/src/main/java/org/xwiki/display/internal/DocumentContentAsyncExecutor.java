@@ -106,6 +106,14 @@ public class DocumentContentAsyncExecutor
 
     private DocumentModelBridge document;
 
+    /**
+     * The document the executed content is taken from: either {@link #document} or one of its translations. It's
+     * remembered so that the content is executed with the author of this document, which can differ from the author
+     * of the displayed document. Like the other fields, it's set once in
+     * {@link #initialize(String, DocumentModelBridge, DocumentDisplayerParameters, boolean)} and only read afterwards,
+     * possibly from another thread when the execution is asynchronous; this component is instantiated per lookup, so
+     * the field isn't shared between displays.
+     */
     private DocumentModelBridge contentDocument;
 
     private DocumentModelBridge asyncDocument;

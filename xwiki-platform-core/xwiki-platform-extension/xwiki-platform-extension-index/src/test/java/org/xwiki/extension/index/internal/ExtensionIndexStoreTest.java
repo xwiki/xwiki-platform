@@ -60,6 +60,7 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrCoreInitializer;
+import org.xwiki.search.solr.internal.LazySolrCore;
 import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -89,7 +90,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ComponentList({ ExtensionIndexStore.class, ExtensionIndexSolrCoreInitializer.class, ExtensionIdConverter.class,
-    ExtensionAuthorConverter.class, ExtensionFactory.class, ExtensionComponentConverter.class })
+    ExtensionAuthorConverter.class, ExtensionFactory.class, ExtensionComponentConverter.class, LazySolrCore.class })
 @ReferenceComponentList
 @EmbeddedSolrComponentList
 class ExtensionIndexStoreTest

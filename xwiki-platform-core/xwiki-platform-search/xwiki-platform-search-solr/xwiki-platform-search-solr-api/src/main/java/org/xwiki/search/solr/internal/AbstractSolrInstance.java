@@ -47,7 +47,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     /**
      * Solr server instance corresponding, depending on the subclass.
      */
-    protected XWikiSolrCore server;
+    protected volatile XWikiSolrCore server;
 
     /**
      * Logging framework.
@@ -60,7 +60,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Add Solr document [{}] to index", solrDocument);
 
-        this.server.getClient().add(solrDocument);
+        getClient().add(solrDocument);
     }
 
     @Override
@@ -74,13 +74,13 @@ public abstract class AbstractSolrInstance implements SolrInstance
 
         this.logger.debug("Add Solr documents [{}] to index", solrDocuments);
 
-        this.server.getClient().add(solrDocuments);
+        getClient().add(solrDocuments);
     }
 
     @Override
     public SolrDocument get(String id) throws IOException, SolrServerException
     {
-        return server.getClient().getById(id);
+        return getClient().getById(id);
     }
 
     @Override
@@ -88,7 +88,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Delete Solr document [{}] from index", id);
 
-        this.server.getClient().deleteById(id);
+        getClient().deleteById(id);
     }
 
     @Override
@@ -96,7 +96,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Delete Solr documents [{}] from index", ids);
 
-        this.server.getClient().deleteById(ids);
+        getClient().deleteById(ids);
     }
 
     @Override
@@ -104,7 +104,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Delete Solr documents from index based on query [{}]", query);
 
-        this.server.getClient().deleteByQuery(query);
+        getClient().deleteByQuery(query);
     }
 
     @Override
@@ -112,7 +112,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Commit changes to Solr");
 
-        this.server.getClient().commit();
+        getClient().commit();
     }
 
     @Override
@@ -120,7 +120,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Rollback changes to Solr");
 
-        this.server.getClient().rollback();
+        getClient().rollback();
     }
 
     @Override
@@ -128,7 +128,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Execute Solr query [{}]", solrParams);
 
-        return this.server.getClient().query(solrParams);
+        return getClient().query(solrParams);
     }
 
     @Override
@@ -137,15 +137,34 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Execute Solr query and stream response [{}]", params);
 
-        return this.server.getClient().queryAndStreamResponse(params, callback);
+        return getClient().queryAndStreamResponse(params, callback);
     }
 
     /**
      * Useful when testing.
+     * <p>
+     * With a remote Solr server, {@link #server} is {@code null} until the Solr core is resolved, so this method
+     * returns {@code null} until then: operations should use {@link #getClient()}, which resolves the core when
+     * needed.
      * 
-     * @return the server
+     * @return the client of {@link #server}, or {@code null} if the Solr core is not resolved yet
      */
     protected SolrClient getServer()
+    {
+        XWikiSolrCore solrCore = this.server;
+
+        return solrCore != null ? solrCore.getClient() : null;
+    }
+
+    /**
+     * Gets the client of the Solr core used by this instance. The default implementation returns the client of
+     * {@link #server}.
+     *
+     * @return the client of the Solr core
+     * @throws SolrServerException when the Solr core is not available
+     * @since 18.10.0RC1
+     */
+    protected SolrClient getClient() throws SolrServerException
     {
         return this.server.getClient();
     }

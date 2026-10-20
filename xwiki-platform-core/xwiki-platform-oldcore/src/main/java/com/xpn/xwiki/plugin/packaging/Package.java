@@ -535,7 +535,7 @@ public class Package
                     XWikiDocument doc = null;
                     try {
                         doc = readFromXML(new CloseShieldInputStream(zis));
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         LOGGER.warn("Failed to parse document [{}] from XML during import, thus it will not be "
                             + "installed. Root cause is [{}]", entry.getName(),
                             ExceptionUtils.getRootCauseMessage(e));

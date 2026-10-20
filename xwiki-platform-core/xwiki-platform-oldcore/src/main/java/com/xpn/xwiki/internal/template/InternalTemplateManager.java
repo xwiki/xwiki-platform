@@ -691,7 +691,9 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         try {
             xdom = getXDOM(templateName);
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
+            // A template dispatches to components and scripts, so a broken one can fail with a LinkageError; as the
+            // method name says, the error is rendered instead of being thrown.
             this.logger.error("Error while getting template [{}] XDOM", templateName, e);
 
             xdom = (XDOM) generateError(e, false);
@@ -711,7 +713,9 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         try {
             xdom = getXDOM(template);
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
+            // A template dispatches to components and scripts, so a broken one can fail with a LinkageError; as the
+            // method name says, the error is rendered instead of being thrown.
             this.logger.error("Error while getting template [{}] XDOM", template.getId(), e);
 
             xdom = (XDOM) generateError(e, false);
@@ -899,7 +903,9 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         try {
             block = execute(templateName, inline);
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
+            // A template dispatches to components and scripts, so a broken one can fail with a LinkageError; as the
+            // method name says, the error is rendered instead of being thrown.
             this.logger.error("Error while executing template [{}]", templateName, e);
 
             block = generateError(e, inline);
@@ -917,7 +923,9 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         try {
             block = execute(template, inline);
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
+            // A template dispatches to components and scripts, so a broken one can fail with a LinkageError; as the
+            // method name says, the error is rendered instead of being thrown.
             this.logger.error("Error while executing template [{}]", template.getId(), e);
 
             block = generateError(e, inline);

@@ -1465,7 +1465,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
 
             return validObject.validateObject(obj, context);
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
+            // The validation script is user-provided wiki content parsed as Groovy, so it can fail with a
+            // LinkageError. It must not break the object it validates, and the failure is reported through the
+            // validation status instead.
             XWikiValidationStatus.addExceptionToContext(getName(), "", e, context);
             return false;
         }

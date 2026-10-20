@@ -78,7 +78,7 @@ public class XWikiActionRule implements XWikiNotificationRule
             return;
         try {
             getTarget().notify(this, doc, action, context);
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
             // protect from bad listeners
             LOGGER.error("Failed to notify target [{}] for event [{}], doc = [{}], action = [{}]",
                 getTarget(), this, doc, action, e);
@@ -91,7 +91,7 @@ public class XWikiActionRule implements XWikiNotificationRule
             return;
         try {
             getTarget().notify(this, doc, action, context);
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
             // protect from bad listeners
             LOGGER.error("Failed to notify target [{}] for pre event [{}], doc = [{}], action = [{}]",
                 getTarget(), this, doc, action, e);

@@ -283,7 +283,7 @@ public class IncludeMacroRefactoring implements MacroRefactoring
         IncludeMacroParameters macroParameters = new IncludeMacroParameters();
         try {
             this.beanManager.populate(macroParameters, macroBlock.getParameters());
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
             // One macro parameter was invalid, don't perform the refactoring but raise an exception to be on the safe
             // side.
             throw new MacroRefactoringException(String.format("There's one or several invalid "

@@ -185,7 +185,9 @@ public class User extends Api
                 }
 
                 return result;
-            } catch (Throwable e) {
+            } catch (Exception e) {
+                // Checking a password must fail closed: any failure of the password check has to answer false rather
+                // than propagate to the caller.
                 LOGGER.error("Failed to check password", e);
                 return false;
             }

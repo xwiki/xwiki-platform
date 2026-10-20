@@ -230,7 +230,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             // cleanup the cache since a new right scheme enter in action
             securityCache.remove(securityReferenceFactory.newEntityReference(xwikiBridge.getMainWikiReference()));
             return newRight;
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            // The right is already registered: fall back to the equivalent one when there is one, and report the
+            // failure otherwise.
             Right right = Right.toRight(rightDescription.getName());
             if (right != Right.ILLEGAL && right.like(rightDescription)) {
                 return right;

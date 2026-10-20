@@ -48,7 +48,9 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface
             if ((xnotif != null) && (!"".equals(xnotif))) {
                 notifyPage(xnotif, rule, doc, action, context);
             }
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
+            // The notification is a wiki page executed as Groovy, i.e. code compiled at runtime: it must not be able to
+            // break the action it is notified about, and a broken one usually fails with a LinkageError.
             XWikiException e2 =
                 new XWikiException(XWikiException.MODULE_XWIKI_NOTIFICATION, XWikiException.ERROR_XWIKI_NOTIFICATION,
                     "Error executing notifications", e);
@@ -69,7 +71,9 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface
                 notif = (XWikiActionNotificationInterface) xwiki.parseGroovyFromString(pagedoc.getContent(), context);
                 notif.notify(rule, doc, action, context);
             }
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
+            // The notification is a wiki page executed as Groovy, i.e. code compiled at runtime: it must not be able to
+            // break the action it is notified about, and a broken one usually fails with a LinkageError.
             Object[] args = {page};
             XWikiException e2 =
                 new XWikiException(XWikiException.MODULE_XWIKI_GROOVY,

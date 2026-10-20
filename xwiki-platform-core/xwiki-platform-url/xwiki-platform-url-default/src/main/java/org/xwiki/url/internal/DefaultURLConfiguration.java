@@ -98,7 +98,8 @@ public class DefaultURLConfiguration implements URLConfiguration
             String propertyString = configurationSource.getProperty(newProperty);
             try {
                 result = FrontendURLCheckPolicy.valueOf(propertyString.toUpperCase());
-            } catch (Throwable e) {
+            } catch (Exception e) {
+                // The configured value is not one of the policies: fall back on the default one
                 result = FrontendURLCheckPolicy.COMMENTS;
             }
         } else if (configurationSource.containsKey(deprecatedProperty)) {

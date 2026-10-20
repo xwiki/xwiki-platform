@@ -859,15 +859,16 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 try {
                     ctor = sesc.getConstructor(Map.class);
                     return ctor.newInstance(params);
-                } catch (Throwable t) {
-                    // TODO: log a warning instead of ignoring this exception: catching Throwable here also
+                } catch (Exception t) {
+                    // TODO: log a warning instead of ignoring this exception: catching Exception here also
                     // hides a failure of the constructor that was found.
                     // The default constructor is used below.
                 }
             }
             ctor = sesc.getConstructor();
             return ctor.newInstance();
-        } catch (Throwable t) {
+        } catch (Exception | LinkageError t) {
+            // The source class is looked up by name, so a missing or broken one fails with a LinkageError
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "", t);
         }
     }
@@ -909,8 +910,9 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             try {
                 source.source(entry, list.get(i), sourceParams, context);
                 entries.add(entry);
-            } catch (Throwable t) {
-                // skip this entry
+            } catch (Exception | LinkageError t) {
+                // skip this entry: the source is an implementation looked up by name, so a broken one fails with a
+                // LinkageError
             }
         }
         feed.setEntries(entries);

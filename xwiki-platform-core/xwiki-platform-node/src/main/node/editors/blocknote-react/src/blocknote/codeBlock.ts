@@ -19,7 +19,7 @@
  */
 
 import { codeBlockOptions } from "@blocknote/code-block";
-import { createCodeBlockSpec } from "@blocknote/core";
+import { createCodeBlockSpec, createExtension } from "@blocknote/core";
 
 /**
  * The language of the code blocks that don't specify one. We don't use the default language from `codeBlockOptions`
@@ -38,6 +38,38 @@ const HIGHLIGHTED_LANGUAGES = new Map(
   ),
 );
 
+/**
+ * The language selected in a code block is saved as the language parameter of the code macro, which is highlighted
+ * server side by Pygments. Maps the id of the languages that Pygments doesn't recognize to one of their aliases that
+ * Pygments recognizes (e.g. Pygments knows "bash" but not "shellscript").
+ */
+const LANGUAGE_IDS: Record<string, string> = {
+  shellscript: "bash",
+  markdown: "md",
+};
+
+/**
+ * The languages supported by the language selector, keyed by the id saved in the code block. The syntax highlighter
+ * still finds them because their aliases include the original id (see {@link HIGHLIGHTED_LANGUAGES}).
+ *
+ * The default language has the empty alias because typing three backticks followed by a space creates a code block
+ * whose language is looked up by the typed language name among the aliases, and is set to the typed name itself (i.e.
+ * the empty string) when no language matches.
+ */
+const SUPPORTED_LANGUAGES = Object.fromEntries(
+  Object.entries(codeBlockOptions.supportedLanguages).map(([id, language]) => [
+    LANGUAGE_IDS[id] ?? id,
+    {
+      ...language,
+      aliases: [
+        id,
+        ...(language.aliases ?? []),
+        ...(id === DEFAULT_LANGUAGE ? [""] : []),
+      ],
+    },
+  ]),
+);
+
 type CodeBlockSpec = ReturnType<typeof createCodeBlockSpec>;
 type CodeBlockRender = NonNullable<CodeBlockSpec["implementation"]["render"]>;
 
@@ -45,7 +77,7 @@ type CodeBlockRender = NonNullable<CodeBlockSpec["implementation"]["render"]>;
  * @returns true if the language selector supports the given language, false otherwise
  */
 function isSelectable(language: string): boolean {
-  return language in codeBlockOptions.supportedLanguages;
+  return language in SUPPORTED_LANGUAGES;
 }
 
 /**
@@ -71,6 +103,43 @@ function addClassName(
   const classes = className?.split(/\s+/).filter((name) => name.length > 0);
   if (classes?.length) {
     nodeView.dom.querySelector("pre")?.classList.add(...classes);
+  }
+  return nodeView;
+}
+
+/**
+ * The code blocks whose language selector should be focused when they are rendered again, per editor.
+ */
+const LANGUAGE_SELECTORS_TO_FOCUS = new WeakMap<object, string>();
+
+/**
+ * Keeps the keyboard focus on the language selector of a code block when its language is changed from the language
+ * selector. Changing the language renders the code block again, which replaces the focused language selector, so the
+ * focus would otherwise move to the page body: the keys typed next would then trigger the page keyboard shortcuts
+ * instead of being handled by the language selector (or the editor).
+ */
+function keepLanguageSelectorFocus(
+  nodeView: ReturnType<CodeBlockRender>,
+  ...[block, editor]: Parameters<CodeBlockRender>
+): ReturnType<CodeBlockRender> {
+  const select = nodeView.dom.querySelector("select");
+  if (select?.parentElement) {
+    // Listen in the capture phase, on the parent, in order to be notified before the language selector handles the
+    // change (and renders the code block again).
+    select.parentElement.addEventListener(
+      "change",
+      () => {
+        if (document.activeElement === select) {
+          LANGUAGE_SELECTORS_TO_FOCUS.set(editor, block.id);
+        }
+      },
+      true,
+    );
+    if (LANGUAGE_SELECTORS_TO_FOCUS.get(editor) === block.id) {
+      LANGUAGE_SELECTORS_TO_FOCUS.delete(editor);
+      // Wait for the rendered code block to be added to the page.
+      queueMicrotask(() => select.focus());
+    }
   }
   return nodeView;
 }
@@ -134,6 +203,27 @@ function renderCodeBlock(
 }
 
 /**
+ * Turns the block at the caret into a code block when pressing Ctrl+Alt+C (Cmd+Alt+C on macOS). The slash menu displays
+ * this shortcut for code blocks, but BlockNote doesn't register it (unlike the shortcuts it displays for the other
+ * block types, e.g. Ctrl+Alt+Q for quotes). Only the blocks with inline content are converted, like BlockNote does for
+ * quotes. See https://github.com/TypeCellOS/BlockNote/issues/3211 (Slash menu shows Ctrl+Alt+C (Mod-Alt-c) for "Code
+ * Block", but the shortcut is not registered).
+ */
+const CodeBlockShortcutExtension = createExtension({
+  key: "xwiki-code-block-shortcuts",
+  keyboardShortcuts: {
+    "Mod-Alt-c": ({ editor }) => {
+      const { block } = editor.getTextCursorPosition();
+      if (editor.schema.blockSchema[block.type]?.content !== "inline") {
+        return false;
+      }
+      editor.updateBlock(block, { type: "codeBlock", props: {} });
+      return true;
+    },
+  },
+});
+
+/**
  * Creates the code block spec, with a language selector and syntax highlighting support, that doesn't fail when the
  * code block language is not supported.
  *
@@ -149,6 +239,7 @@ function XWikiCodeBlock(options?: {
 }): CodeBlockSpec {
   const spec = createCodeBlockSpec({
     ...codeBlockOptions,
+    supportedLanguages: SUPPORTED_LANGUAGES,
     defaultLanguage: DEFAULT_LANGUAGE,
   });
   spec.implementation.meta = {
@@ -162,12 +253,18 @@ function XWikiCodeBlock(options?: {
   const render = spec.implementation.render;
   if (render) {
     spec.implementation.render = function (block, editor) {
-      return addClassName(
-        renderCodeBlock.call(this, render, block, editor),
-        options?.className,
+      return keepLanguageSelectorFocus(
+        addClassName(
+          renderCodeBlock.call(this, render, block, editor),
+          options?.className,
+        ),
+        block,
+        editor,
       );
     };
   }
+
+  spec.extensions = [...(spec.extensions ?? []), CodeBlockShortcutExtension];
 
   return spec;
 }

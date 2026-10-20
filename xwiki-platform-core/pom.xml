@@ -155,6 +155,21 @@
             -->
             <revapi.differences>
               <justification>
+                The live table new row naming strategies now receive the values the entry is created with, so that a
+                strategy can name the entry after one of them. This API is still @Unstable.
+              </justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method org.xwiki.model.reference.DocumentReference org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy::generate(java.util.Map&lt;java.lang.String, java.lang.Object&gt;) throws org.xwiki.livedata.LiveDataException, com.xpn.xwiki.XWikiException</old>
+                  <new>method org.xwiki.model.reference.DocumentReference org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy::generate(java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;) throws org.xwiki.livedata.LiveDataException, com.xpn.xwiki.XWikiException</new>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
                 Fetching a live data entry might require an optional list of properties to fetch, which was missing.
                 The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
                 parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.
@@ -214,6 +229,27 @@
                   <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, ===org.xwiki.rest.model.jaxb.Property===) throws org.xwiki.rest.XWikiRestException</old>
                   <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, ===java.lang.String===, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException</new>
                   <annotation>@javax.ws.rs.QueryParam("comment")</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>No retro compatibility impact, only makes the macro parameter mandatory in the macro
+                parameter descriptor.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setAttachment(java.lang.String)</old>
+                  <new>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setAttachment(java.lang.String)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setReference(org.xwiki.rendering.listener.reference.ResourceReference)</old>
+                  <new>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setReference(org.xwiki.rendering.listener.reference.ResourceReference)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
                 </item>
               </differences>
             </revapi.differences>

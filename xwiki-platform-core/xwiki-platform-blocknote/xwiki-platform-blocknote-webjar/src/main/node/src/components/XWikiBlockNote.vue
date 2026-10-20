@@ -634,4 +634,15 @@ form#edit .bottom-editor > .sticky-buttons {
 #xwikieditcontent > .xwiki-blocknote-wrapper {
   margin-bottom: calc(var(--grid-gutter-width) / 2);
 }
+
+/**
+ * In-place edit mode
+ */
+
+/* The editor is created inside #xwikicontent, which the skin makes a scroll container in order to handle wide content
+  in view mode. The floating UI of the editor (e.g. the slash menu) is positioned and clipped based on its scroll
+  containers, so on a page with little content it would be squeezed to the small height of #xwikicontent. */
+#xwikicontent.xwiki-blocknote-wrapper {
+  overflow: visible;
+}
 </style>

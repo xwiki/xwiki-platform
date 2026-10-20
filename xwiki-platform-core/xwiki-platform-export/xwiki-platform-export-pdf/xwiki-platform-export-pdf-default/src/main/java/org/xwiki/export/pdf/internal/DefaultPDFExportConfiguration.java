@@ -71,6 +71,7 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     {
         // We use a fixed version of Chrome, instead of latest, for which we know the tests are passing (reproducible
         // builds), because Chrome changes often lead to changes in the PDF export output.
+        // Keep in sync with the documented default of export.pdf.chromeDockerImage in xwiki.properties.vm.
         return getProperty("chromeDockerImage", "femtopixel/google-chrome-headless:144.0.7524.3");
     }
 

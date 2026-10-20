@@ -153,7 +153,7 @@ public class ModelBridge
      * @param documentReference the document to update
      * @param classReference the default type of XObject to update
      * @param propertyClassReferences optional mapping that specifies the XClass for each property
-     * @throws AccessDeniedException in case the current user is not allow to edit the document
+     * @throws AccessDeniedException in case the current user is not allowed to edit the document
      * @throws XWikiException in case of error when loading or saving the updated document
      * @throws LiveDataException in case of error when validating the document
      * @see #updateAll(Map, DocumentReference, DocumentReference, Map, int)
@@ -176,7 +176,7 @@ public class ModelBridge
      * @param propertyClassReferences optional mapping that specifies the XClass for each property
      * @param objectNumber the index of the XObject to update
      * @param create specifies if a new document needs to be created
-     * @throws AccessDeniedException in case the current user is not allow to edit the document
+     * @throws AccessDeniedException in case the current user is not allowed to edit the document
      * @throws XWikiException in case of error when loading or saving the updated document
      * @throws LiveDataException in case of error when validating the document
      * @see #updateAll(Map, DocumentReference, DocumentReference, Map, int)
@@ -184,6 +184,32 @@ public class ModelBridge
     public void updateAll(Map<String, Object> properties, DocumentReference documentReference,
         DocumentReference classReference, Map<String, DocumentReference> propertyClassReferences, int objectNumber,
         boolean create)
+        throws AccessDeniedException, XWikiException, LiveDataException
+    {
+        updateAll(properties, documentReference, classReference, propertyClassReferences, objectNumber, create, null);
+    }
+
+    /**
+     * Update all the provided properties of the document, like
+     * {@link #updateAll(Map, DocumentReference, DocumentReference, Map, int, boolean)}, starting a created document
+     * from a template.
+     *
+     * @param properties the properties to update
+     * @param documentReference the document to update
+     * @param classReference the default type of XObject to update
+     * @param propertyClassReferences optional mapping that specifies the XClass for each property
+     * @param objectNumber the index of the XObject to update
+     * @param create specifies if a new document needs to be created
+     * @param templateReference the template a created document starts from, before the properties are applied, or
+     *     {@code null} to start from an empty document
+     * @throws AccessDeniedException in case the current user is not allowed to edit the document
+     * @throws XWikiException in case of error when loading or saving the updated document
+     * @throws LiveDataException in case of error when validating the document
+     * @since 18.10.0RC1
+     */
+    public void updateAll(Map<String, Object> properties, DocumentReference documentReference,
+        DocumentReference classReference, Map<String, DocumentReference> propertyClassReferences, int objectNumber,
+        boolean create, DocumentReference templateReference)
         throws AccessDeniedException, XWikiException, LiveDataException
     {
         this.authorization.checkAccess(Right.EDIT, documentReference);
@@ -204,9 +230,8 @@ public class ModelBridge
         // Avoid modifying the cache document
         document = document.clone();
 
-        // The object is what makes the document an entry, so it is created even without object properties.
-        if (create && classReference != null && document.getXObject(classReference, objectNumber) == null) {
-            document.newXObject(classReference, xcontext);
+        if (create) {
+            initializeCreatedDocument(document, classReference, objectNumber, templateReference);
         }
 
         convertPropertiesFromHtml(properties, classReference, propertyClassReferences, objectNumber);
@@ -219,6 +244,20 @@ public class ModelBridge
         }
 
         saveDocument(document);
+    }
+
+    private void initializeCreatedDocument(XWikiDocument document, DocumentReference classReference,
+        int objectNumber, DocumentReference templateReference) throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (templateReference != null) {
+            document.readFromTemplate(templateReference, xcontext);
+        }
+
+        // The object is what makes the document an entry, so it is created even without object properties.
+        if (classReference != null && document.getXObject(classReference, objectNumber) == null) {
+            document.newXObject(classReference, xcontext);
+        }
     }
 
     private void convertPropertiesFromHtml(Map<String, Object> properties, DocumentReference defaultClassReference,

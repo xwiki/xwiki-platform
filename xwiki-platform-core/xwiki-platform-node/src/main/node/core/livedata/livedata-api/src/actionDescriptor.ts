@@ -37,4 +37,9 @@ export interface ActionDescriptor {
    * @since 18.9.0RC1
    */
   location?: string;
+  /**
+   * For the `addEntry` action, the reference of the template page the new entries are created from.
+   * @since 18.10.0RC1
+   */
+  template?: string;
 }

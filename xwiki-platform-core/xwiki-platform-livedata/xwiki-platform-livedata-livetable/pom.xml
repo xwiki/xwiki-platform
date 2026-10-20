@@ -47,6 +47,12 @@
       <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed to name a new entry after the title given by the user, following the wiki's naming strategy. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-model-validation-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>

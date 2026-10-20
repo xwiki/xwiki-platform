@@ -1012,8 +1012,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // cannot be used with browsers which do not support cookies.
         String encodedURLAsString = context.getResponse().encodeURL(url);
 
-        // Remove a potential jsessionid in the URL
-        encodedURLAsString = encodedURLAsString.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
+        // Remove a potential jsessionid in the URL, keeping the query string and the fragment that may follow it
+        encodedURLAsString = encodedURLAsString.replaceAll(";jsessionid=[^?#]*", "");
 
         return new URL(encodedURLAsString);
     }

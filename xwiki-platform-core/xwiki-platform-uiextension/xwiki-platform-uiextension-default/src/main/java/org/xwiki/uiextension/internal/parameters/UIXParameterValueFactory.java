@@ -30,7 +30,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.velocity.VelocityManager;
@@ -125,7 +125,7 @@ public class UIXParameterValueFactory
         String prefix = matcher.group(1);
         String suffix = matcher.group(4);
         // A backslash escapes the reference, and a dot or square bracket would continue it.
-        if (prefix.endsWith("\\") || StringUtils.startsWithAny(suffix, ".", "[")) {
+        if (prefix.endsWith("\\") || Strings.CS.startsWithAny(suffix, ".", "[")) {
             return null;
         }
 

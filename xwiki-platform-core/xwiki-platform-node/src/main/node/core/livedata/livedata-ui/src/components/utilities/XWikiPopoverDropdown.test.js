@@ -22,6 +22,7 @@ import XWikiPopoverDropdown from "./XWikiPopoverDropdown.vue";
 import { mount } from "@vue/test-utils";
 import { spy } from "sinon";
 import { describe, expect, it } from "vitest";
+import { h } from "vue";
 
 /**
  * Mounts a `XWikiPopoverDropdown` component with a toggle label and two menu items.
@@ -37,6 +38,20 @@ function initWrapper(props = {}) {
       default: '<li><a href="#" class="first">First</a></li><li>Second</li>',
     },
   });
+}
+
+/**
+ * Mounts a `XWikiPopoverDropdown` component in the document, so that its elements can get the focus,
+ * and records the calls to the showPopover method of its menu, which the test DOM doesn't implement.
+ *
+ * @returns a map containing the wrapper of the component and a spy of the showPopover method
+ */
+function initAttachedWrapper() {
+  const wrapper = initWrapper();
+  document.body.appendChild(wrapper.element);
+  const showPopover = spy();
+  wrapper.find(".dropdown-menu").element.showPopover = showPopover;
+  return { wrapper, showPopover };
 }
 
 /**
@@ -87,11 +102,13 @@ describe("XWikiPopoverDropdown.vue", () => {
   });
 
   it("Gives a distinct menu to each dropdown", () => {
-    const first = initWrapper();
-    const second = initWrapper();
+    const wrapper = mount({
+      render: () => [h(XWikiPopoverDropdown), h(XWikiPopoverDropdown)],
+    });
+    const [first, second] = wrapper.findAll(".dropdown-toggle");
 
-    expect(first.find(".dropdown-menu").attributes("id")).not.toBe(
-      second.find(".dropdown-menu").attributes("id"),
+    expect(first.attributes("popovertarget")).not.toBe(
+      second.attributes("popovertarget"),
     );
   });
 
@@ -129,18 +146,46 @@ describe("XWikiPopoverDropdown.vue", () => {
     expect(hidePopover.callCount).toBe(0);
   });
 
-  it("Keeps the Bootstrap dropdown script from handling its keys", async () => {
+  it("Keeps only Escape from the Bootstrap dropdown script", async () => {
     const wrapper = initWrapper();
     // The Bootstrap dropdown script listens to the keys reaching the document.
     const parentKeydown = spy();
     wrapper.element.addEventListener("keydown", parentKeydown);
     const menu = wrapper.find(".dropdown-menu");
 
-    for (const key of ["Escape", "ArrowUp", "ArrowDown", " ", "Tab"]) {
+    for (const key of ["Escape", "ArrowUp", "ArrowDown", " "]) {
       await menu.trigger("keydown", { key });
     }
 
-    expect(parentKeydown.callCount).toBe(1);
-    expect(parentKeydown.firstCall.args[0].key).toBe("Tab");
+    expect(parentKeydown.args.map(([event]) => event.key)).toEqual([
+      "ArrowUp",
+      "ArrowDown",
+      " ",
+    ]);
+  });
+
+  it("Opens the menu and focuses its first item on the arrow keys", async () => {
+    const { wrapper, showPopover } = initAttachedWrapper();
+
+    await wrapper
+      .find(".dropdown-toggle")
+      .trigger("keydown", { key: "ArrowDown" });
+
+    expect(showPopover.callCount).toBe(1);
+    expect(document.activeElement).toBe(wrapper.find(".first").element);
+    wrapper.unmount();
+  });
+
+  it("Only focuses the first item of an open menu on the arrow keys", async () => {
+    const { wrapper, showPopover } = initAttachedWrapper();
+    await toggleMenu(wrapper, "open");
+
+    await wrapper
+      .find(".dropdown-toggle")
+      .trigger("keydown", { key: "ArrowUp" });
+
+    expect(showPopover.callCount).toBe(0);
+    expect(document.activeElement).toBe(wrapper.find(".first").element);
+    wrapper.unmount();
   });
 });

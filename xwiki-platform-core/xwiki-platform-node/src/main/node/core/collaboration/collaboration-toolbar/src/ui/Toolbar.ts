@@ -155,7 +155,8 @@ class Toolbar {
   }
 
   /**
-   * Updates the displayed connection status. Saving is not possible and the user list is cleared while not connected.
+   * Updates the displayed connection status. The user list is cleared while not connected, and saving is not
+   * possible, unless the session can save while disconnected.
    *
    * @param status - the new connection status
    * @param userId - the identifier of the current user in the realtime session, once known

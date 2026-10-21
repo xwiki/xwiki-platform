@@ -1002,6 +1002,87 @@ class CollaborationIT extends AbstractBlockNoteIT
         }
     }
 
+    @Test
+    @Order(12)
+    void editWhileCollaborationServerIsUnreachable(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "one", "");
+
+        // The editor is loaded even if it can't connect to the collaboration server.
+        BlockNoteInplaceEditPage firstEditPage = new BlockNoteInplaceEditPage();
+        firstEditPage.simulateUnreachableCollaborationServer().edit();
+        firstEditPage.waitForInplaceEditor(false);
+        RealtimeEditToolbar firstToolbar = firstEditPage.getToolbar();
+        assertFalse(firstToolbar.isConnected());
+        // The auto-save is started even if we're disconnected.
+        firstToolbar.waitForSaveStatus(SaveStatus.SAVED);
+        // We're identified in the realtime editing session even before we connect to it.
+        String firstCoeditorId = firstToolbar.getUserId();
+
+        // The user can edit and save while disconnected.
+        BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
+        firstTextArea.appendParagraph("two").waitUntilTextContains("two");
+        firstToolbar.waitForSaveStatus(SaveStatus.UNSAVED);
+        firstEditPage.save();
+        assertEquals(SaveStatus.SAVED, firstToolbar.getSaveStatus());
+        assertFalse(firstToolbar.isConnected());
+
+        // The created version is listed in the history dropdown.
+        List<VersionElement> versions =
+            firstToolbar.getHistoryDropdown().waitForVersion("1.2").open().getVersions();
+        assertEquals(2, versions.size());
+        assertEquals("1.2", versions.get(1).getNumber());
+        firstToolbar.getHistoryDropdown().close();
+
+        // The editor connects to the realtime editing session as soon as the collaboration server is reachable, and
+        // the changes made while disconnected are shared.
+        firstEditPage.restoreCollaborationServer();
+        firstToolbar.waitUntilEditingAlone();
+        firstTextArea.appendParagraph("three").waitUntilTextContains("three");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsAlice(setup);
+        BlockNoteInplaceEditPage secondEditPage = BlockNoteInplaceEditPage.gotoPage(testReference);
+        joinSession(secondEditPage, setup);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        secondTextArea.waitUntilTextContains("three");
+        RealtimeEditToolbar secondToolbar = secondEditPage.getToolbar();
+        String secondCoeditorId = secondToolbar.getUserId();
+        // The user who edited while disconnected is listed among the coeditors.
+        secondToolbar.waitForCoeditor(firstCoeditorId);
+        assertEquals(2, secondToolbar.getVisibleCoeditorCount());
+        secondTextArea.appendParagraph("four").waitUntilTextContains("four");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("four");
+        firstToolbar.waitForCoeditor(secondCoeditorId);
+        assertEquals(2, firstToolbar.getVisibleCoeditorCount());
+        assertEquals("one\ntwo\nthree\nfour", firstEditPage.done().getContent());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondToolbar.waitUntilEditingAlone();
+        assertEquals("one\ntwo\nthree\nfour", secondEditPage.done().getContent());
+    }
+
     /**
      * Joins an existing collaboration session, checking that the user is not asked to confirm that they want to take
      * over the edit lock held by the users that are already in the session.

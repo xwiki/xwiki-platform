@@ -198,6 +198,14 @@ type ToolbarSession = {
   save(continueEditing?: boolean): Promise<void> | void;
 
   /**
+   * Whether the session can save while disconnected from the collaboration server, when saving doesn't depend on the
+   * connection. The save actions are disabled while disconnected when missing or false.
+   *
+   * @since 18.9.0
+   */
+  canSaveWhileDisconnected?: boolean;
+
+  /**
    * Leaves the realtime collaboration session. The "Leave Collaboration" action is not available when missing.
    */
   leave?(): void;

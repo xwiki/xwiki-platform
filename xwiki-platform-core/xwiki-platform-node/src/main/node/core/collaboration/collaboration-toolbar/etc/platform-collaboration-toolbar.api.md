@@ -74,6 +74,7 @@ export type ToolbarSaveOptions = {
 // @beta
 export type ToolbarSession = {
     save(continueEditing?: boolean): Promise<void> | void;
+    canSaveWhileDisconnected?: boolean;
     leave?(): void;
     selectUser?(userId: string): void;
 };

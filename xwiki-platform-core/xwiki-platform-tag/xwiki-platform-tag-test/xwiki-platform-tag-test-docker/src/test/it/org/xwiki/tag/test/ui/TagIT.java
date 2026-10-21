@@ -20,6 +20,7 @@
 package org.xwiki.tag.test.ui;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -37,6 +38,7 @@ import org.xwiki.test.ui.TestUtils;
 
 import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -298,7 +300,9 @@ class TagIT
 
     /**
      * Checks the tags returned by the default (exhaustive) right check strategy, which orders them by tag so that the
-     * pages of an already returned tag don't need to be checked for the view right.
+     * pages of an already returned tag don't need to be checked for the view right. Also checks that the
+     * {@code suggest} template suggests these tags when called on a document that doesn't exist, since the template
+     * queries the database with its own rights and not those of the context document.
      */
     @Test
     @Order(10)
@@ -312,6 +316,15 @@ class TagIT
             "{{velocity}}#set ($allTags = $xwiki.tag.getAllTags())"
             + "alpha=[$allTags.contains('AllTagsAlpha')] beta=[$allTags.contains('AllTagsBeta')] "
             + "missing=[$allTags.contains('NoSuchTag')]{{/velocity}}", Syntax.XWIKI_2_1));
+
+        DocumentReference nonExistingPage = new DocumentReference("xwiki", List.of("TagITAllTags"), "NonExisting");
+        String suggestions = setup.getString(setup.getPath(nonExistingPage, "view", null),
+            Map.of("xpage", "suggest", "classname", "XWiki.TagClass", "fieldname", "tags", "firCol", "-",
+                "secCol", "-", "input", "alltags"));
+        // Type 3 is the result type of the suggestions for a property stored in a relational way, as the tags are.
+        assertThat(suggestions, containsString("<results type=\"3\">"));
+        assertThat(suggestions, containsString(">AllTagsAlpha</rs>"));
+        assertThat(suggestions, containsString(">AllTagsBeta</rs>"));
     }
 
     /**

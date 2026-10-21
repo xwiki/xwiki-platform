@@ -207,39 +207,33 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                 visibility = WikiMacroVisibility.WIKI;
             }
 
-            // Verify that the user has the right to unregister this wiki macro for the chosen visibility
-            if (this.wikiMacroFactory.isAllowed(documentReference, visibility)) {
-                String currentUser = this.bridge.getCurrentUser();
-                EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
-                try {
-                    // Put the proper context information to let components manager use the proper keys to find
-                    // components to unregister
-                    this.bridge
-                        .setCurrentUser(this.serializer.serialize(macroData.getWikiMacro().getAuthorReference()));
-                    this.modelContext.setCurrentEntityReference(documentReference);
+            // No right is checked here: unregistering never grants anything, and it's needed precisely when the
+            // macro document stopped granting the right required by the visibility (deleted document, author without
+            // that right, or enforced required rights below it). Refusing it would keep the old macro registered.
+            String currentUser = this.bridge.getCurrentUser();
+            EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
+            try {
+                // Put the proper context information to let components manager use the proper keys to find
+                // components to unregister
+                this.bridge.setCurrentUser(this.serializer.serialize(macroData.getWikiMacro().getAuthorReference()));
+                this.modelContext.setCurrentEntityReference(documentReference);
 
-                    ComponentManager componentManager = findComponentManager(visibility);
+                ComponentManager componentManager = findComponentManager(visibility);
 
-                    // Remove the currently registered component only if it's really the same (might have been
-                    // overwritten but another component)
-                    if (isRegistered(macroData, componentManager)) {
-                        componentManager.unregisterComponent(Macro.class, macroData.getHint());
-                    }
-                    this.wikiMacroMap.remove(documentReference);
-                } catch (Exception e) {
-                    throw new WikiMacroException(
-                        String.format("Failed to unregister macro [%s] in [%s] for visibility [%s]",
-                            macroData.getHint(), documentReference, visibility),
-                        e);
-                } finally {
-                    this.bridge.setCurrentUser(currentUser);
-                    this.modelContext.setCurrentEntityReference(currentEntityReference);
+                // Remove the currently registered component only if it's really the same (might have been
+                // overwritten but another component)
+                if (isRegistered(macroData, componentManager)) {
+                    componentManager.unregisterComponent(Macro.class, macroData.getHint());
                 }
-            } else {
-                throw new WikiMacroException(String.format(
-                    "Unable to unregister macro [%s] in [%s] for visibility [%s] due to insufficient privileges",
-                    macroData.getWikiMacro().getDescriptor().getId().getId(), documentReference,
-                    macroDescriptor.getVisibility()));
+                this.wikiMacroMap.remove(documentReference);
+            } catch (Exception e) {
+                throw new WikiMacroException(
+                    String.format("Failed to unregister macro [%s] in [%s] for visibility [%s]", macroData.getHint(),
+                        documentReference, visibility),
+                    e);
+            } finally {
+                this.bridge.setCurrentUser(currentUser);
+                this.modelContext.setCurrentEntityReference(currentEntityReference);
             }
         } else {
             throw new WikiMacroException(String.format("Macro in [%s] isn't registered", documentReference));

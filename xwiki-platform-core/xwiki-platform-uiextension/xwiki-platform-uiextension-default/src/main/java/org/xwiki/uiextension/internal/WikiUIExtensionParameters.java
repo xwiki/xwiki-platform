@@ -22,6 +22,7 @@ package org.xwiki.uiextension.internal;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
@@ -36,6 +37,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
@@ -77,18 +79,14 @@ public class WikiUIExtensionParameters
      * Parameters are evaluated through the velocity engine, to improve performance this variable is used as a cache,
      * it's emptied for each new request (because of the dynamic vars like: language, user, etc), or if the context
      * database has changed.
+     * <p>
+     * All the cache data is held by a single immutable object so that concurrent requests can't mix the evaluated
+     * parameters of one request with the context of another one. The execution context is only weakly referenced to
+     * avoid keeping it in memory after the request. This object is only ever replaced as a whole, never modified,
+     * so volatile is exactly what is needed to publish it safely.
      */
-    private Map<String, String> evaluatedParameters;
-
-    /**
-     * HashCode of the previous execution context during the last parameters evaluation.
-     */
-    private int previousContextId;
-
-    /**
-     * Context database during the last parameters evaluation.
-     */
-    private String previousWiki;
+    @SuppressWarnings("java:S3077")
+    private volatile EvaluatedParameters evaluatedParameters;
 
     /**
      * @see #WikiUIExtensionParameters(String, String, ComponentManager)
@@ -114,6 +112,15 @@ public class WikiUIExtensionParameters
     private final DocumentReference authorReference;
 
     private final DocumentAuthorizationManager authorizationManager;
+
+    private record EvaluatedParameters(WeakReference<ExecutionContext> executionContext, String wiki,
+        Map<String, String> values)
+    {
+        boolean isValid(ExecutionContext currentExecutionContext, String currentWiki)
+        {
+            return this.executionContext.get() == currentExecutionContext && this.wiki.equals(currentWiki);
+        }
+    }
 
     /**
      * Default constructor.
@@ -175,12 +182,11 @@ public class WikiUIExtensionParameters
         // Even though the parameters are dynamic, we cache a rendered version of them in order to improve performance.
         // This cache has a short lifespan, it gets discarded for each new request, or if the database has been switched
         // during a request.
-        int currentContextId = this.execution.getContext().hashCode();
+        ExecutionContext currentExecutionContext = this.execution.getContext();
         String currentWiki = modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
-        if (currentContextId == this.previousContextId
-                && currentWiki.equals(previousWiki) && this.evaluatedParameters != null)
-        {
-            result = this.evaluatedParameters;
+        EvaluatedParameters cached = this.evaluatedParameters;
+        if (cached != null && cached.isValid(currentExecutionContext, currentWiki)) {
+            result = cached.values();
         } else {
             result = this.parameters.stringPropertyNames().stream()
                 .filter(StringUtils::isNotBlank)
@@ -220,9 +226,8 @@ public class WikiUIExtensionParameters
                 }
             }
 
-            this.evaluatedParameters = result;
-            this.previousContextId = currentContextId;
-            this.previousWiki = currentWiki;
+            this.evaluatedParameters =
+                new EvaluatedParameters(new WeakReference<>(currentExecutionContext), currentWiki, result);
         }
 
         return result;

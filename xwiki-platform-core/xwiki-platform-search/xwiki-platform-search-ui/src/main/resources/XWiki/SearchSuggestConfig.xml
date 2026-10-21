@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.7" reference="XWiki.SearchSuggestConfig" locale="">
+<xwikidoc version="1.4" reference="XWiki.SearchSuggestConfig" locale="">
   <web>XWiki</web>
   <name>SearchSuggestConfig</name>
   <language/>

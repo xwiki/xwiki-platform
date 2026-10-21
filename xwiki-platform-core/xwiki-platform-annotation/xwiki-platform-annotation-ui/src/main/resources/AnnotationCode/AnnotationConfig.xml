@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.7" reference="AnnotationCode.AnnotationConfig" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.AnnotationConfig" locale="">
   <web>AnnotationCode</web>
   <name>AnnotationConfig</name>
   <language/>
@@ -559,7 +559,7 @@
       <heading/>
     </property>
     <property>
-      <iconAttachment>AnnotationsSectionIcon.png</iconAttachment>
+      <iconAttachment>AnnotationsSectionIcon.svg</iconAttachment>
     </property>
     <property>
       <linkPrefix/>

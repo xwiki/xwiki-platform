@@ -204,10 +204,10 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     @Override
     protected XWikiSolrCore createCore(String xwikiCoreName, boolean isCache) throws SolrException
     {
-        int solrMajorVersion = getSolrMajorVersion();
+        int coreMajorVersion = getCoreMajorVersion();
 
         // Resolve the real Solr core name
-        String solrCoreName = toSolrCoreName(xwikiCoreName, solrMajorVersion);
+        String solrCoreName = toSolrCoreName(xwikiCoreName, coreMajorVersion);
 
         // Prepare the filesystem
         // TODO: get rid of that when we find out how to have Solr fully create the core as it should...
@@ -232,7 +232,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         SolrCore core = this.container.create(solrCoreName, parameters);
 
         // Return a usable SolrClient instance
-        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, new EmbeddedClient(core), solrMajorVersion);
+        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, new EmbeddedClient(core), coreMajorVersion);
     }
 
     private Path prepareCore(String solrCoreName) throws IOException

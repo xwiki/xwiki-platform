@@ -26,14 +26,13 @@ import org.xwiki.component.annotation.Role;
 /**
  * Handles a given {@link ResourceReference}.
  *
- * @param <T> the qualifying element to specify what Resource Reference are handled by thus Handler (e.g. Resource Type,
- *            Entity Resource Action)
- * @param <T> the type of supported items
+ * @param <T> the type of supported items, used as the qualifying element to specify which Resource References are
+ *            handled by this Handler (e.g. Resource Type, Entity Resource Action)
  * @version $Id$
  * @since 6.1M2
  */
 @Role
-public interface ResourceReferenceHandler<T> extends Comparable<ResourceReferenceHandler>
+public interface ResourceReferenceHandler<T> extends Comparable<ResourceReferenceHandler<?>>
 {
     /**
      * The priority of execution relative to the other Handlers. The lowest values have the highest priorities and

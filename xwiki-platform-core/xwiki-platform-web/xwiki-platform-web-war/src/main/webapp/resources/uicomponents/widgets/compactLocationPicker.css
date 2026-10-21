@@ -1,0 +1,42 @@
+/**
+ * CSS for the compact location picker: a space suggestion input plus a document tree to browse for locations.
+ */
+#template('colorThemeInit.vm')
+
+.location-picker-compact {
+  /* Lay the suggestion input and the browse button out in a row, like an input group. */
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.location-picker-compact > .ts-wrapper,
+.location-picker-compact > select.suggest-spaces {
+  flex-grow: 1;
+}
+
+.location-picker-compact > .ts-wrapper > .ts-control,
+.location-picker-compact > select.suggest-spaces {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.location-picker-compact > .location-picker-dropdown > .dropdown-toggle {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none;
+  border-color: var(--input-border);
+}
+
+.location-picker-compact > .location-picker-dropdown > .dropdown-menu {
+  /* Leave enough room for a deep hierarchy, but keep the drop down short enough to fit below the button in most cases. */
+  min-width: 20em;
+  max-width: calc(100vw - 2em);
+  max-height: 20em;
+  overflow: auto;
+  padding: .5em;
+}
+
+.location-picker-compact > .location-picker-dropdown > .dropdown-menu > .location-tree {
+  margin: 0;
+}

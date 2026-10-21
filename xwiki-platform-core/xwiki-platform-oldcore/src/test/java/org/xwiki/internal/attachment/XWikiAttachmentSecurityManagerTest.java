@@ -26,8 +26,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -39,16 +44,12 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.DownloadAction;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -97,7 +98,7 @@ class XWikiAttachmentSecurityManagerTest
     }
 
     @Test
-    void downloadWhenForce() throws XWikiException, IOException
+    void downloadWhenForce() throws IOException
     {
         XWikiAttachment attachment = createAttachment();
         when(this.request.getParameter("force-download")).thenReturn("1");
@@ -174,5 +175,23 @@ class XWikiAttachmentSecurityManagerTest
         // Consider PR rights
         when(this.authorizationManager.hasAccess(Right.PROGRAM, prUser, wikiReference)).thenReturn(true);
         assertFalse(this.securityManager.shouldBeDownloaded(attachment));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "image/avif", "image/gif", "image/jpeg", "image/jxl", "image/png", "image/webp" })
+    void displayInlineWhenRasterImageWithDefaultWhitelist(String mimeType) throws Exception
+    {
+        XWikiAttachment attachment = createAttachment();
+        attachment.setMimeType(mimeType);
+        assertFalse(this.securityManager.shouldBeDownloaded(attachment));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "image/svg+xml", "text/html", "text/javascript", "application/octet-stream" })
+    void downloadWhenNotInDefaultWhitelist(String mimeType) throws Exception
+    {
+        XWikiAttachment attachment = createAttachment();
+        attachment.setMimeType(mimeType);
+        assertTrue(this.securityManager.shouldBeDownloaded(attachment));
     }
 }

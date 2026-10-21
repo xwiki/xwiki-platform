@@ -94,7 +94,7 @@ public class DatabaseDocumentRevisionProvider implements DocumentRevisionProvide
 
             return xcontext.getWiki().getVersioningStore().loadXWikiDoc(document, revision, xcontext);
         } catch (XWikiException e) {
-            // If the errot is that the version does not exist return null
+            // If the error is that the version does not exist return null
             if (e.getCode() != XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION) {
                 throw e;
             }

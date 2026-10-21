@@ -20,12 +20,12 @@
 package org.xwiki.store.locks.dummy.internal;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 /**
  * A fake lock.
- * Used for cases when a lock is demanded by the code but the perticular operation does not require one.
+ * Used for cases when a lock is demanded by the code but the particular operation does not require one.
  * Also useful for disabling locking.
  *
  * @version $Id$

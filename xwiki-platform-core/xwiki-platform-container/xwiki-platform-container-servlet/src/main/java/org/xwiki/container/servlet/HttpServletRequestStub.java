@@ -91,6 +91,7 @@ public class HttpServletRequestStub implements HttpServletRequest
          */
         public Builder()
         {
+            // Nothing to do, the builder starts from an empty request stub.
         }
 
         /**
@@ -279,7 +280,7 @@ public class HttpServletRequestStub implements HttpServletRequest
     {
         Map<String, String[]> clone;
         if (map != null) {
-            clone = new LinkedHashMap<>(map.size());
+            clone = LinkedHashMap.newLinkedHashMap(map.size());
             for (Map.Entry<String, String[]> entry : map.entrySet()) {
                 clone.put(entry.getKey(), entry.getValue().clone());
             }
@@ -297,7 +298,7 @@ public class HttpServletRequestStub implements HttpServletRequest
         }
 
         return headers.entrySet().stream().filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
-            .map(entry -> Map.entry(entry.getKey(), entry.getValue().stream().collect(Collectors.toList())))
+            .map(entry -> Map.entry(entry.getKey(), entry.getValue().stream().toList()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (left, right) -> right,
                 () -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER)));
     }
@@ -569,7 +570,7 @@ public class HttpServletRequestStub implements HttpServletRequest
     @Override
     public void setCharacterEncoding(String s) throws UnsupportedEncodingException
     {
-
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override
@@ -679,13 +680,13 @@ public class HttpServletRequestStub implements HttpServletRequest
     @Override
     public void setAttribute(String s, Object o)
     {
-
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override
     public void removeAttribute(String s)
     {
-
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override
@@ -755,12 +756,13 @@ public class HttpServletRequestStub implements HttpServletRequest
     @Override
     public void login(String s, String s1) throws ServletException
     {
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override
     public void logout() throws ServletException
     {
-
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override

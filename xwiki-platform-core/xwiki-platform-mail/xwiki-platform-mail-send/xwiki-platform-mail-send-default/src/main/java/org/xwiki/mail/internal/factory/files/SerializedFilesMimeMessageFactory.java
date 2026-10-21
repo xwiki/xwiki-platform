@@ -47,8 +47,7 @@ public class SerializedFilesMimeMessageFactory extends AbstractIteratorMimeMessa
         throws MessagingException
     {
         String batchId = getTypedSource(batchIdObject, String.class);
-        SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(batchId, parameters,
+        return new SerializedFilesMimeMessageIterator(batchId, parameters,
             this.componentManagerProvider.get());
-        return iterator;
     }
 }

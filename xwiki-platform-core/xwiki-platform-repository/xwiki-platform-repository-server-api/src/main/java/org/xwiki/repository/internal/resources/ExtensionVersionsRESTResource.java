@@ -77,7 +77,7 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
                 IterableResult<Version> versions = repository.resolveVersions(extensionId, 0, -1);
 
                 String extensionName = this.extensionStore.getExtensionName(extensionDocument);
-                String extensionType = this.extensionStore.getExtensionType(extensionDocument);;
+                String extensionType = this.extensionStore.getExtensionType(extensionDocument);
 
                 for (Version version : versions) {
                     extensions.getExtensionVersionSummaries()

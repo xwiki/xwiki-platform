@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -35,7 +35,7 @@
     <xwiki.extension.features>${xwiki.platform.oldcore.extension.features}</xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.45</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
@@ -136,7 +136,7 @@
     </dependency>
 
     <!-- Used by parse groovy from page -->
-    <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
+    <!-- Note: We only depend on the minimum required to compile oldcore since the distributions will depend on
          xwiki-commons-groovy which has dependencies on all the various groovy jars and thus they'll be bundled -->
     <dependency>
       <groupId>org.apache.groovy</groupId>
@@ -209,7 +209,7 @@
     <dependency>
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
-      <version>13.0</version>
+      <version>13.1</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -479,11 +479,33 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed to test the detection of the client closing the connection on Jetty -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-io</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Used in to prioritize MandatoryDocumentInitializers -->
     <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
+    </dependency>
+
+    <!-- Used for PasswordClass -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-aop</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Test dependencies -->
@@ -756,7 +778,6 @@
                 **/monitor/api/MonitorPlugin.java,
                 **/monitor/api/MonitorTimer.java,
                 **/monitor/api/MonitorTimerSummary.java,
-                **/objects/BaseCollection.java,
                 **/objects/BaseElement.java,
                 **/objects/BaseProperty.java,
                 **/objects/BaseStringProperty.java,

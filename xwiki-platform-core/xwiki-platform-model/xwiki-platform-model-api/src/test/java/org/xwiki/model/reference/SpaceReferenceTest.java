@@ -32,19 +32,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 2.2M1
  */
-public class SpaceReferenceTest
+class SpaceReferenceTest
 {
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new SpaceReference(new EntityReference("space", EntityType.WIKI)));
+        EntityReference reference = new EntityReference("space", EntityType.WIKI);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new SpaceReference(reference));
 
         assertEquals("Invalid type [WIKI] for a space reference", e.getMessage());
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
         IllegalArgumentException e =
             assertThrows(IllegalArgumentException.class, () -> new SpaceReference("page", (WikiReference) null));
@@ -53,16 +53,17 @@ public class SpaceReferenceTest
     }
 
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new SpaceReference(
-            new EntityReference("space", EntityType.SPACE, new EntityReference("whatever", EntityType.DOCUMENT))));
+        EntityReference reference = new EntityReference("space", EntityType.SPACE,
+            new EntityReference("whatever", EntityType.DOCUMENT));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new SpaceReference(reference));
 
         assertEquals("Invalid parent reference [Document whatever] in a space reference", e.getMessage());
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         SpaceReference reference = new SpaceReference("wiki", "space", "page").replaceParent(
             new EntityReference("space2", EntityType.SPACE, new EntityReference("wiki2", EntityType.WIKI)));

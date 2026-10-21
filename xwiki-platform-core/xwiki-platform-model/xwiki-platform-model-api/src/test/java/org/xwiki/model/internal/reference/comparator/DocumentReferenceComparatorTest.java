@@ -36,12 +36,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.4.2
  * @since 14.5
  */
-public class DocumentReferenceComparatorTest
+class DocumentReferenceComparatorTest
 {
     private DocumentReferenceComparator comparator = new DocumentReferenceComparator();
 
     @Test
-    public void compare()
+    void compare()
     {
         DocumentReference reference = new DocumentReference("wiki", "Space", "Page");
         assertEquals(0, comparator.compare(reference, new DocumentReference(reference)));
@@ -62,7 +62,7 @@ public class DocumentReferenceComparatorTest
     }
 
     @Test
-    public void compareNestedSpaces()
+    void compareNestedSpaces()
     {
         assertTrue(compare(Arrays.asList("math", "Path", "To", "Page"), Arrays.asList("math", "Path", "Page")) > 0);
         assertTrue(compare(Arrays.asList("math", "Path", "Alice"), Arrays.asList("math", "Path", "To", "Bob")) < 0);
@@ -75,7 +75,7 @@ public class DocumentReferenceComparatorTest
     }
 
     @Test
-    public void compareNestedPages()
+    void compareNestedPages()
     {
         this.comparator = new DocumentReferenceComparator(true);
 

@@ -1,0 +1,91 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+import { EntityType } from "@xwiki/platform-model-api";
+import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
+import {
+  EntityType as XWikiEntityType,
+  Model,
+} from "@xwiki/platform-xwiki-model-api";
+import { inject, injectable } from "inversify";
+import type { EntityReference } from "@xwiki/platform-model-api";
+import type {
+  ModelReferenceParser,
+  ModelReferenceParserOptions,
+} from "@xwiki/platform-model-reference-api";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "@xwiki/platform-rendering-api";
+
+@injectable()
+class XWikiModelReferenceParser implements ModelReferenceParser {
+  constructor(
+    @inject("ResourceReferenceParser")
+    private readonly resourceReferenceParser: ResourceReferenceParser,
+  ) {}
+
+  public parse(
+    reference: string,
+    options?: ModelReferenceParserOptions,
+  ): EntityReference {
+    const defaultType =
+      options?.type === EntityType.ATTACHMENT ? "attach" : "doc";
+    const resourceReference = this.resourceReferenceParser.parse(reference, {
+      type: defaultType,
+    });
+    const entityType = this.getEntityType(resourceReference);
+    if (entityType) {
+      return this.parseEntityReference(resourceReference.reference, entityType);
+    } else {
+      throw new Error(`[${reference}] is not an entity reference.`);
+    }
+  }
+
+  public async parseAsync(
+    reference: string,
+    options?: ModelReferenceParserOptions,
+  ): Promise<EntityReference> {
+    return this.parse(reference, options);
+  }
+
+  private getEntityType(
+    resourceReference: ResourceReference,
+  ): number | undefined {
+    switch (resourceReference.type) {
+      case "space":
+        return XWikiEntityType.SPACE;
+      case "doc":
+        return XWikiEntityType.DOCUMENT;
+      case "attach":
+        return XWikiEntityType.ATTACHMENT;
+      default:
+        return undefined;
+    }
+  }
+
+  private parseEntityReference(
+    reference: string,
+    type: number,
+  ): EntityReference {
+    return toCristalEntityReference(Model.resolve(reference, type))!;
+  }
+}
+
+export { XWikiModelReferenceParser };

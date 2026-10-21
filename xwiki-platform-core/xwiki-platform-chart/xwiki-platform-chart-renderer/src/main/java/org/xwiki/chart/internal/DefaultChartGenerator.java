@@ -122,8 +122,6 @@ public class DefaultChartGenerator implements ChartGenerator
      */
     private static void setParam(String key, String value, Map<String, String> map)
     {
-        if (!map.containsKey(key)) {
-            map.put(key, value);
-        }
+        map.putIfAbsent(key, value);
     }
 }

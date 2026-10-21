@@ -19,6 +19,7 @@
  */
 package org.xwiki.livedata.internal.rest;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,7 +51,7 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
     private LiveDataResourceContextInitializer contextInitializer;
 
     @Override
-    public Entry getEntry(String sourceId, String namespace, String entryId) throws Exception
+    public Entry getEntry(String sourceId, String namespace, String entryId, List<String> properties) throws Exception
     {
         this.contextInitializer.initialize(namespace);
 
@@ -58,7 +59,7 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
             LiveDataEntryStore entryStore = source.get().getEntries();
-            Optional<Map<String, Object>> values = entryStore.get(entryId);
+            Optional<Map<String, Object>> values = entryStore.get(entryId, properties);
             if (values.isPresent()) {
                 return createEntry(values.get(), entryId, querySource, namespace);
             }
@@ -85,7 +86,7 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
                     values = entryStore.get(updatedEntryId.get());
                 } catch (UnsupportedOperationException e) {
                     // Returns a success response without an entity when the entry store does not implement the get
-                    // operation (for instance the liveTable source).
+                    // operation.
                     return Response.status(Status.ACCEPTED).build();
                 }
                 if (values.isPresent()) {

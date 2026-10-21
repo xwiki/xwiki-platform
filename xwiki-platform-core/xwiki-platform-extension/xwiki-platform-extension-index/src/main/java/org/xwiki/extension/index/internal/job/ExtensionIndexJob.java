@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -200,7 +199,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         // 1: Add local extensions
         this.progress.startStep(this);
         if (getRequest().isLocalExtensionsEnabled()) {
-            //addLocalExtensions(indexedExtensions);
+            addLocalExtensions(indexedExtensions);
         }
 
         // 2: Gather all extensions from searchable repositories
@@ -257,7 +256,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     {
         SolrQuery solrQuery = new SolrQuery();
         Set<ExtensionId> extensionIds = this.indexStore.searchExtensionIds(solrQuery);
-        Map<String, SortedSet<Version>> extensions = new HashMap<>(extensionIds.size());
+        Map<String, SortedSet<Version>> extensions = HashMap.newHashMap(extensionIds.size());
         for (ExtensionId extensionId : extensionIds) {
             add(extensionId, extensions);
         }
@@ -411,9 +410,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         }
 
         // Need to invert the list
-        for (ListIterator<Version> it = versionList.listIterator(versionList.size()); it.hasPrevious();) {
-            Version version = it.previous();
-
+        for (Version version : versionList.reversed()) {
             // Don't try lower than the stop version
             if (stopVersion != null && stopVersion.compareTo(version) >= 0) {
                 break;
@@ -576,17 +573,16 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
         // Add the extensions
         for (Extension extension : extensions) {
-            if (!this.invalidFlavors.contains(extension.getId().getId())) {
-                // TODO: support beta and snapshots versions too ?
-                if (extension.getId().getVersion().getType() == Type.STABLE
-                    && !this.indexStore.exists(extension.getId(), true)) {
-                    this.indexStore.add(extension, true);
+            // TODO: support beta and snapshots versions too ?
+            if (!this.invalidFlavors.contains(extension.getId().getId())
+                && extension.getId().getVersion().getType() == Type.STABLE
+                && !this.indexStore.exists(extension.getId())) {
+                this.indexStore.add(extension, true);
 
-                    updated = true;
-                    getStatus().setExtensionAdded(true);
+                updated = true;
+                getStatus().setExtensionAdded(true);
 
-                    add(extension.getId(), indexedExtensions);
-                }
+                add(extension.getId(), indexedExtensions);
             }
         }
 
@@ -608,7 +604,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                 try {
                     updated |= addRemoteExtensions(searchableRepository, indexedExtensions);
                 } catch (Exception e) {
-                    this.logger.warn("Failed to get remote extension from repository [{}]: {}",
+                    this.logger.warn("Failed to get remote extension from repository [{}]: [{}]",
                         repository.getDescriptor(), ExceptionUtils.getRootCauseMessage(e));
                 }
             }

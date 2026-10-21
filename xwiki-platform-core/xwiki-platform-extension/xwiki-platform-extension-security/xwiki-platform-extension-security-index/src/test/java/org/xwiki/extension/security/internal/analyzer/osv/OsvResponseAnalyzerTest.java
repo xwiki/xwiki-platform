@@ -171,6 +171,65 @@ class OsvResponseAnalyzerTest
     }
 
     @Test
+    void analyzeOsvResponseWithoutRanges()
+    {
+        // An affected entry can enumerate the affected versions instead of declaring ranges, in which case no fix
+        // version can be computed.
+        OsvResponse osvResponse = readJson("osvResponseWithoutRanges.json");
+
+        ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
+        SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor = new SecurityVulnerabilityDescriptor();
+        securityVulnerabilityDescriptor.setId("CVE-1");
+        securityVulnerabilityDescriptor.setAliases(Set.of("VULN_ID"));
+        securityVulnerabilityDescriptor.setURL("https://main.ref/");
+        securityVulnerabilityDescriptor.setScore(7.5);
+        expected.setResults(List.of(securityVulnerabilityDescriptor));
+
+        assertEquals(expected, this.analyzer.analyzeOsvResponse("org.test:my-ext", "7.5", osvResponse));
+    }
+
+    @Test
+    void analyzeOsvResponseWithoutRangesPlatform()
+    {
+        // Extensions which are not on Maven Central are filtered by range, so an affected entry without ranges cannot
+        // match.
+        OsvResponse osvResponse = readJson("osvResponseWithoutRangesPlatform.json");
+
+        ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
+        expected.setResults(List.of());
+
+        assertEquals(expected,
+            this.analyzer.analyzeOsvResponse("org.xwiki.platform:xwiki-platform-my-ext", "7.5", osvResponse));
+    }
+
+    @Test
+    void analyzeOsvResponseRangesPlatformAtFixedVersion()
+    {
+        // The fixed version is not affected, while the last affected version is.
+        OsvResponse osvResponse = readJson("osvResponseRangesPlatform.json");
+
+        ExtensionSecurityAnalysisResult result =
+            this.analyzer.analyzeOsvResponse("org.xwiki.contrib.plantuml:macro-plantuml-macro", "2.4.1", osvResponse);
+
+        assertEquals(List.of("CVE-LAST-AFFECTED"), result.getSecurityVulnerabilities().stream()
+            .map(SecurityVulnerabilityDescriptor::getId)
+            .toList());
+    }
+
+    @Test
+    void analyzeOsvResponseRangesPlatformBeforeFixedVersion()
+    {
+        OsvResponse osvResponse = readJson("osvResponseRangesPlatform.json");
+
+        ExtensionSecurityAnalysisResult result =
+            this.analyzer.analyzeOsvResponse("org.xwiki.contrib.plantuml:macro-plantuml-macro", "2.4.0", osvResponse);
+
+        assertEquals(List.of("CVE-FIXED", "CVE-LAST-AFFECTED"), result.getSecurityVulnerabilities().stream()
+            .map(SecurityVulnerabilityDescriptor::getId)
+            .toList());
+    }
+
+    @Test
     void analyzeCommonsHttpclientOsvResponse()
     {
         OsvResponse osvResponse = readJson("commons-httpclient-commons-httpclient-3.1.json");

@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -64,9 +66,17 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     /** Segment separator used in the collision-free key generation. */
     private static final char SEPARATOR = '/';
 
+    /** Context key under which the resource-key-to-temporary-file mapping is stored during the export. */
+    private static final String FILE_MAPPING_KEY = "pdfexport-file-mapping";
+
+    /** Logged when an attachment cannot be copied to the temporary export folder. */
+    private static final String SAVE_IMAGE_ERROR = "Failed to save image for PDF export";
+
     private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
 
     private ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+
+    private Environment environment = Utils.getComponent(Environment.class);
 
     private boolean checkAccess;
 
@@ -95,7 +105,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             return getURL(wiki, spaces, name, filename, null, context);
         } catch (Exception ex) {
-            LOGGER.warn("Failed to save image for PDF export", ex);
+            LOGGER.warn(SAVE_IMAGE_ERROR, ex);
             return super.createAttachmentURL(filename, spaces, name, action, null, wiki, context);
         }
     }
@@ -107,7 +117,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             return getURL(wiki, spaces, name, filename, revision, context);
         } catch (Exception ex) {
-            LOGGER.warn("Failed to save image for PDF export: " + ex.getMessage());
+            LOGGER.warn(SAVE_IMAGE_ERROR, ex);
             return super.createAttachmentRevisionURL(filename, spaces, name, revision, wiki, context);
         }
     }
@@ -118,11 +128,10 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             Map<String, File> usedFiles = getFileMapping(context);
             String key = getSkinfileKey(filename, skin);
-            if (!usedFiles.containsKey(key)) {
-                if (!copyResource("/skins/" + skin + '/' + filename, key, usedFiles, context)) {
-                    // The resource does not exist, just return a http:// URL
-                    return super.createSkinURL(filename, skin, context);
-                }
+            if (!usedFiles.containsKey(key)
+                && !copyResource("/skins/", skin + '/' + filename, key, usedFiles, context)) {
+                // The resource does not exist, just return a http:// URL
+                return super.createSkinURL(filename, skin, context);
             }
             return usedFiles.get(key).toURI().toURL();
         } catch (Exception ex) {
@@ -137,10 +146,8 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             Map<String, File> usedFiles = getFileMapping(context);
             String key = getResourceKey(filename);
-            if (!usedFiles.containsKey(key)) {
-                if (!copyResource("/resources/" + filename, key, usedFiles, context)) {
-                    return super.createResourceURL(filename, forceSkinAction, context);
-                }
+            if (!usedFiles.containsKey(key) && !copyResource("/resources/", filename, key, usedFiles, context)) {
+                return super.createResourceURL(filename, forceSkinAction, context);
             }
             return usedFiles.get(key).toURI().toURL();
         } catch (Exception ex) {
@@ -197,7 +204,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
                 }
 
                 File file = getTemporaryFile(key, context);
-                LOGGER.debug("Temporary PDF export file [{}]", file.toString());
+                LOGGER.debug("Temporary PDF export file [{}]", file);
 
                 if (StringUtils.isNotEmpty(revision)) {
                     attachment = attachment.getAttachmentRevision(revision, context);
@@ -225,18 +232,20 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
      * Copy a resource from the filesystem into a temporary file and map this resulting file to the requested resource
      * location.
      *
-     * @param resourceName the name of the file to copy, possibly including a path to it, for example
-     *            {@code icons/silk/add.png}
+     * @param prefix the folder containing the resource, outside of which the resource name is not allowed to point
+     * @param resourceName the name of the file to copy relative to the prefix, possibly including a path to it, for
+     *            example {@code icons/silk/add.png}
      * @param key the collision-free identifier of the resource
      * @param usedFiles the mapping of resource keys to temporary files where to put the resulting temporary file
      * @param context the current request context
      * @return {@code true} if copying the resource succeeded and the new temporary file was mapped to the resource key,
      *         {@code false} otherwise
      */
-    private boolean copyResource(String resourceName, String key, Map<String, File> usedFiles, XWikiContext context)
+    private boolean copyResource(String prefix, String resourceName, String key, Map<String, File> usedFiles,
+        XWikiContext context)
     {
         try {
-            try (InputStream data = context.getWiki().getResourceAsStream(resourceName)) {
+            try (InputStream data = this.environment.getResourceAsStream(prefix, resourceName)) {
                 if (data != null) {
                     // Copy the resource to a temporary file
                     File file = getTemporaryFile(key, context);
@@ -320,15 +329,18 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     }
 
     /**
-     * Retrieve the Map that relates resource keys to their corresponding temporary file.
+     * Retrieve the Map that relates resource keys to their corresponding temporary file, creating and storing it in the
+     * context when it's not there yet so that callers can always rely on a non-null, mutable mapping whose entries
+     * persist in the context.
      *
      * @param context the current request context
-     * @return the mapping as it was found in the context (read-write)
+     * @return the mapping stored in the context (read-write)
      */
     private Map<String, File> getFileMapping(XWikiContext context)
     {
         @SuppressWarnings("unchecked")
-        Map<String, File> usedFiles = (Map<String, File>) context.get("pdfexport-file-mapping");
+        Map<String, File> usedFiles =
+            (Map<String, File>) context.computeIfAbsent(FILE_MAPPING_KEY, key -> new HashMap<String, File>());
         return usedFiles;
     }
 

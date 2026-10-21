@@ -89,8 +89,8 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent) {
-            this.users.invalidateWiki(((WikiDeletedEvent) event).getWikiId());
+        if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            this.users.invalidateWiki(wikiDeletedEvent.getWikiId());
         } else {
             XWikiDocument document = (XWikiDocument) source;
 

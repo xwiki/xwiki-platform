@@ -115,17 +115,12 @@ public class DeleteJob extends AbstractEntityJobWithChecks<DeleteRequest, Entity
 
     private void process(SpaceReference spaceReference)
     {
-        visitDocuments(spaceReference, new Visitor<DocumentReference>()
-        {
-            @Override
-            public void visit(DocumentReference documentReference)
-            {
-                try {
-                    maybeDelete(documentReference);
-                } catch (Exception e) {
-                    logger.error("Failed to delete document [{}] from space [{}]", documentReference, spaceReference,
-                        e);
-                }
+        visitDocuments(spaceReference, documentReference -> {
+            try {
+                maybeDelete(documentReference);
+            } catch (Exception e) {
+                logger.error("Failed to delete document [{}] from space [{}]", documentReference, spaceReference,
+                    e);
             }
         });
     }
@@ -156,7 +151,7 @@ public class DeleteJob extends AbstractEntityJobWithChecks<DeleteRequest, Entity
     private void delete(DocumentReference documentReference, boolean skipRecycleBin, String logMessage)
     {
         // Delete the document
-        this.modelBridge.delete(documentReference, skipRecycleBin);
+        this.modelBridge.delete(documentReference, skipRecycleBin, this.request.isCheckRights());
         this.logger.debug(logMessage, documentReference);
 
         DocumentReference backlinkDocumentReference = documentReference;

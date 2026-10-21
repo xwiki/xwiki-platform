@@ -19,6 +19,7 @@
  */
 import * as decoding from "lib0/decoding";
 import * as encoding from "lib0/encoding";
+import { removeAwarenessStates } from "y-protocols/awareness";
 import { WebsocketProvider } from "y-websocket";
 import { Doc } from "yjs";
 
@@ -41,15 +42,54 @@ function registerClient(websocketProvider: WebsocketProvider) {
 }
 
 /**
+ * Ask the other clients for their awareness state. The server relays the query to them, and their replies to us. They
+ * send their awareness state only when it changes or when it is renewed (every 15 seconds) otherwise, so we wouldn't
+ * know right away who is already there.
+ *
+ * @param websocketProvider - the websocket provider used to send the query
+ */
+function queryAwareness(websocketProvider: WebsocketProvider) {
+  const encoder = encoding.createEncoder();
+  encoding.writeVarUint(encoder, 3);
+  websocketProvider.ws?.send(encoding.toUint8Array(encoder));
+}
+
+/**
  * Decode the client id from a message handler of index 4.
  *
- * @param handlerDecoder - the decoder, usually provided by the hander
+ * @param handlerDecoder - the decoder, usually provided by the handler
  */
 function readClientId(handlerDecoder: decoding.Decoder) {
   const decoder = decoding.createDecoder(handlerDecoder.arr);
   // Read and ignore the first uint value (message type).
   decoding.readVarUint(decoder);
   return decoding.readVarUint(decoder);
+}
+
+/**
+ * Remove our awareness state when the page is hidden (closed, reloaded or left), so that the other clients see us
+ * leave right away. Browser tabs of the same origin also exchange awareness updates directly, through a
+ * BroadcastChannel, so the updates we send while leaving can reach them after the server announced our departure, and
+ * bring us back to their list of collaborators until our awareness times out (30 seconds). The removal has a higher
+ * clock than any of these updates, and it's the last message we send on both channels, so it wins whatever order the
+ * messages arrive in.
+ *
+ * @param websocketProvider - the websocket provider whose local awareness state is removed
+ */
+function removeAwarenessOnPageHide(websocketProvider: WebsocketProvider) {
+  const onPageHide = () => {
+    removeAwarenessStates(
+      websocketProvider.awareness,
+      [websocketProvider.doc.clientID],
+      "page hide",
+    );
+  };
+  window.addEventListener("pagehide", onPageHide);
+  const destroy = websocketProvider.destroy.bind(websocketProvider);
+  websocketProvider.destroy = () => {
+    window.removeEventListener("pagehide", onPageHide);
+    destroy();
+  };
 }
 
 /**
@@ -79,6 +119,7 @@ export function createXWikiWebSocketProvider(
       params: { room, locale },
     },
   );
+  removeAwarenessOnPageHide(websocketProvider);
 
   websocketProvider.messageHandlers[4] = (
     encoder,
@@ -86,12 +127,20 @@ export function createXWikiWebSocketProvider(
     provider: WebsocketProvider,
   ): void => {
     const disconnectedClientId = readClientId(decoder);
-    provider.awareness.getStates().delete(disconnectedClientId);
+    // Go through the awareness protocol rather than dropping the entry from the map, so that the local listeners
+    // are notified that the client left and the awareness meta data stays consistent.
+    removeAwarenessStates(
+      provider.awareness,
+      [disconnectedClientId],
+      "disconnected",
+    );
   };
-  // Send the client id to the server once on connect.
-  websocketProvider.once("status", ({ status }) => {
+  // Each time we (re)connect, which is a new connection for the server: send our client id, so that the server can
+  // notify the others when we leave, and ask the others who they are.
+  websocketProvider.on("status", ({ status }) => {
     if (status == "connected") {
       registerClient(websocketProvider);
+      queryAwareness(websocketProvider);
     }
   });
   return websocketProvider;

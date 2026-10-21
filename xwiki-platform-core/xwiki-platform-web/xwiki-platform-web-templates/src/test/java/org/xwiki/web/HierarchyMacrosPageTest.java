@@ -104,12 +104,13 @@ class HierarchyMacrosPageTest extends PageTest
     {
         XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Test", "Page"), this.context);
         document.setSyntax(XWIKI_2_1);
-        document.setContent("{{template name='hierarchy_macros.vm' output='false'/}}\n"
-            + "{{velocity}}\n"
-            + "#set ($entityReference = $services.model.resolveDocument('xwiki:Tour.WebHome'))\n"
-            + "#getHierarchyPathData_url($entityReference)\n"
-            + "$url\n"
-            + "{{/velocity}}");
+        document.setContent("""
+            {{template name='hierarchy_macros.vm' output='false'/}}
+            {{velocity}}
+            #set ($entityReference = $services.model.resolveDocument('xwiki:Tour.WebHome'))
+            #getHierarchyPathData_url($entityReference)
+            $url
+            {{/velocity}}""");
         assertEquals("/xwiki/bin/view/Tour/", document.getRenderedContent(PLAIN_1_0, this.context).trim());
     }
 }

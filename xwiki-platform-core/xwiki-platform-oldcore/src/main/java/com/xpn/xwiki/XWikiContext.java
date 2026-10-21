@@ -71,6 +71,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 public class XWikiContext extends Hashtable<Object, Object>
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Type instance for {@code Provider<XWikiContext>}.
      *
@@ -148,7 +150,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private XWiki wiki;
 
-    private XWikiEngineContext engine_context;
+    private XWikiEngineContext engineContext;
 
     private XWikiRequest request;
 
@@ -158,7 +160,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private String action;
 
-    private String orig_wikiId;
+    private String origWikiId;
 
     private WikiReference wikiReference;
 
@@ -178,7 +180,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private URL url;
 
-    private XWikiURLFactory URLFactory;
+    private XWikiURLFactory urlFactory;
 
     private int cacheDuration = 0;
 
@@ -194,6 +196,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiContext()
     {
+        // Nothing to do, the context is populated through its setters.
     }
 
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
@@ -266,12 +269,12 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiEngineContext getEngineContext()
     {
-        return this.engine_context;
+        return this.engineContext;
     }
 
-    public void setEngineContext(XWikiEngineContext engine_context)
+    public void setEngineContext(XWikiEngineContext engineContext)
     {
-        this.engine_context = engine_context;
+        this.engineContext = engineContext;
     }
 
     /**
@@ -325,9 +328,9 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 6.1M1, use {@link #getWikiId()} instead
+     * @deprecated use {@link #getWikiId()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public String getDatabase()
     {
         return getWikiId();
@@ -353,9 +356,9 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     /**
      * @param wikiId the current wiki id
-     * @deprecated since 6.1M1, use {@link #setWikiId(String)} instead
+     * @deprecated use {@link #setWikiId(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public void setDatabase(String wikiId)
     {
         setWikiId(wikiId);
@@ -383,8 +386,8 @@ public class XWikiContext extends Hashtable<Object, Object>
         } else {
             super.put(WIKI_KEY, this.wikiReference.getName());
 
-            if (this.orig_wikiId == null) {
-                this.orig_wikiId = this.wikiReference.getName();
+            if (this.origWikiId == null) {
+                this.origWikiId = this.wikiReference.getName();
                 super.put(ORIGINAL_WIKI_KEY, this.wikiReference.getName());
             }
         }
@@ -482,9 +485,9 @@ public class XWikiContext extends Hashtable<Object, Object>
      * switched to load some piece of data, this will remember what it should be switched back to.
      *
      * @return the wiki id originally requested by the user.
-     * @deprecated since 6.1M1, use {@link #getOriginalWikiId()} instead
+     * @deprecated use {@link #getOriginalWikiId()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public String getOriginalDatabase()
     {
         return getOriginalWikiId();
@@ -499,16 +502,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public String getOriginalWikiId()
     {
-        return this.orig_wikiId;
-    }
-
-    /**
-     * @deprecated since 6.1M1, use {@link #setOriginalWikiId(String)} instead
-     */
-    @Deprecated
-    public void setOriginalDatabase(String wikiId)
-    {
-        setOriginalWikiId(wikiId);
+        return this.origWikiId;
     }
 
     /**
@@ -520,7 +514,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public void setOriginalWikiId(String wikiId)
     {
-        this.orig_wikiId = wikiId;
+        this.origWikiId = wikiId;
         if (wikiId == null) {
             remove(ORIGINAL_WIKI_KEY);
         } else {
@@ -594,7 +588,7 @@ public class XWikiContext extends Hashtable<Object, Object>
             setUserReference(null);
         } else if (user.endsWith(XWikiRightService.GUEST_USER_FULLNAME) || user.equals(XWikiRightService.GUEST_USER)) {
             setUserReference(null);
-            // retro-compatibilty hack: some code does not give the same meaning to null XWikiUser and XWikiUser
+            // retro-compatibility hack: some code does not give the same meaning to null XWikiUser and XWikiUser
             // containing guest user
             put(USER_KEY, new XWikiUser(user, main));
         } else {
@@ -612,18 +606,18 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 3.1M1 use {@link #setUserReference(DocumentReference)} instead
+     * @deprecated use {@link #setUserReference(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.1M1")
     public void setUser(String user)
     {
         setUserInternal(user, false);
     }
 
     /**
-     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
+     * @deprecated use {@link #getUserReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.1M1")
     public String getUser()
     {
         if (this.userReference != null) {
@@ -639,9 +633,9 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
+     * @deprecated use {@link #getUserReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.1M1")
     public String getLocalUser()
     {
         if (this.userReference != null) {
@@ -652,9 +646,9 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
+     * @deprecated use {@link #getUserReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.1M1")
     public XWikiUser getXWikiUser()
     {
         if (this.userReference != null) {
@@ -666,18 +660,18 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 4.3M1 use {@link #getLocale()} instead
+     * @deprecated use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M1")
     public String getLanguage()
     {
         return this.locale != null ? this.locale.toString() : null;
     }
 
     /**
-     * @deprecated since 4.3M1 use {@link #setLocale(Locale)} instead
+     * @deprecated use {@link #setLocale(Locale)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M1")
     public void setLanguage(String language)
     {
         setLocale(LocaleUtils.toLocale(Util.normalizeLanguage(language)));
@@ -709,9 +703,9 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 6.0M1, use {@link #getInterfaceLocale()} instead
+     * @deprecated use {@link #getInterfaceLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.0M1")
     public String getInterfaceLanguage()
     {
         return this.interfaceLocale != null ? this.interfaceLocale.toString() : null;
@@ -757,12 +751,12 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiURLFactory getURLFactory()
     {
-        return this.URLFactory;
+        return this.urlFactory;
     }
 
-    public void setURLFactory(XWikiURLFactory URLFactory)
+    public void setURLFactory(XWikiURLFactory urlFactory)
     {
-        this.URLFactory = URLFactory;
+        this.urlFactory = urlFactory;
     }
 
     public XWikiForm getForm()
@@ -779,7 +773,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Define if a response has been already sent or not.
      * Note that contrary to {@link #isResponseSent()} this method will ensure that the template is executed even if the
      * result of the execution is not sent. See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
-     * @return {@code true} if the response has been sent and no new reponse should be sent anymore.
+     * @return {@code true} if the response has been sent and no new response should be sent anymore.
      */
     public boolean isFinished()
     {
@@ -799,7 +793,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Define if a response has been already sent or not and if the template parsing should be done.
      * Note that contrary to {@link #isFinished()} this method will always prevent the execution of the template.
      * See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
-     * @return {@code true} if the response has been sent, no new reponse should be sent anymore
+     * @return {@code true} if the response has been sent, no new response should be sent anymore
      *          and the template should not be parsed.
      * @since 13.3RC1
      */
@@ -926,9 +920,9 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 4.3M2 use {@link org.xwiki.localization.ContextualLocalizationManager} component instead
+     * @deprecated use {@link org.xwiki.localization.ContextualLocalizationManager} component instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public XWikiMessageTool getMessageTool()
     {
         XWikiMessageTool msg = ((XWikiMessageTool) get("msg"));
@@ -964,11 +958,11 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Returns the list of TextArea fields that use the WYSIWYG editor. This list is automatically built when displaying
      * TextArea properties.
      *
-     * @deprecated since 8.2RC1 when we started using the Edit Module to load the configured WYSIWYG editor
+     * @deprecated when we started using the Edit Module to load the configured WYSIWYG editor
      * @return a string containing a comma-separated list of TextArea field names for which the WYSIWYG editor should be
      *         enabled
      */
-    @Deprecated
+    @Deprecated(since = "8.2RC1")
     public String getEditorWysiwyg()
     {
         return (String) get("editor_wysiwyg");
@@ -994,7 +988,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * <p>
      * Once dropped, permissions cannot be regained for the duration of the request.
      * <p>
-     * If you are interested in a more flexable sandboxing method which sandboxed code only for the remainder of the
+     * If you are interested in a more flexible sandboxing method which sandboxed code only for the remainder of the
      * rendering cycle, consider using {@link com.xpn.xwiki.api.Document#dropPermissions()}.
      *
      * @since 3.0M3

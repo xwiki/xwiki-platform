@@ -93,6 +93,11 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
      */
     private static final String KEYWORDS = "keywords";
 
+    /**
+     * The format used to surround the keywords with SQL {@code LIKE} wildcards.
+     */
+    private static final String KEYWORD_LIKE_FORMAT = "%%%s%%";
+
     @Inject
     protected ContextualAuthorizationManager authorizationManager;
 
@@ -272,7 +277,7 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             String queryString = f.toString();
 
             Query query = finalQueryManager.createQuery(queryString, Query.HQL)
-                .bindValue(KEYWORDS, String.format("%%%s%%", keywords.toUpperCase()))
+                .bindValue(KEYWORDS, String.format(KEYWORD_LIKE_FORMAT, keywords.toUpperCase()))
                 .addFilter(this.hiddenDocumentFilterProvider.get()).setOffset(options.start())
                 // Worst case scenario when making the locale aware query:
                 // e.g.: Search matches a document translated in fr_CA and fr
@@ -414,7 +419,7 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             + " order by lower(space.reference), space.reference";
 
         List<Object> queryResult = this.queryManager.createQuery(query, Query.HQL)
-            .bindValue(KEYWORDS, String.format("%%%s%%", escapedKeywords))
+            .bindValue(KEYWORDS, String.format(KEYWORD_LIKE_FORMAT, escapedKeywords))
             .bindValue("prefix", String.format("%s%%", escapedKeywords))
             .setWiki(wikiName).setLimit(number).setOffset(start)
             .addFilter(this.hiddenSpaceFilterProvider.get()).execute();
@@ -538,12 +543,12 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             if (options.space() != null) {
                 queryResult =
                     finalQueryManager.createQuery(query, Query.XWQL)
-                        .bindValue(KEYWORDS, String.format("%%%s%%", keywords.toUpperCase()))
+                        .bindValue(KEYWORDS, String.format(KEYWORD_LIKE_FORMAT, keywords.toUpperCase()))
                         .bindValue(SPACE, options.space()).setLimit(options.number()).execute();
             } else {
                 queryResult =
                     finalQueryManager.createQuery(query, Query.XWQL)
-                        .bindValue(KEYWORDS, String.format("%%%s%%", keywords.toUpperCase()))
+                        .bindValue(KEYWORDS, String.format(KEYWORD_LIKE_FORMAT, keywords.toUpperCase()))
                         .setLimit(options.number())
                         .execute();
             }

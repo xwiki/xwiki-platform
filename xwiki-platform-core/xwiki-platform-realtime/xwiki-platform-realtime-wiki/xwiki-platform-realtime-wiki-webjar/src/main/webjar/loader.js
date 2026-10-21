@@ -51,7 +51,7 @@ define('xwiki-realtime-wikiEditor-loader', [
       });
     }
   }).catch(error => {
-    new XWiki.widgets.Notification(Messages['join.error'], 'error');
+    XWiki.widgets.Notification.show(Messages['join.error'], 'error');
     // Provide more details in the console for debugging.
     console.error(Messages['join.error'], error);
   });

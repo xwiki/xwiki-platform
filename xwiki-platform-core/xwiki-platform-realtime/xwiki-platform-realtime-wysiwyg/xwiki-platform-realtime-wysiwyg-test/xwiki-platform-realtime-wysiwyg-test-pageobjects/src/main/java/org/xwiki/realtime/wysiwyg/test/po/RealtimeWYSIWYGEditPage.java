@@ -20,8 +20,7 @@
 package org.xwiki.realtime.wysiwyg.test.po;
 
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.realtime.test.po.RealtimeEditToolbar;
-import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.realtime.test.po.RealtimeEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
@@ -31,10 +30,8 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  * @since 15.5.4
  * @since 15.9
  */
-public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
+public class RealtimeWYSIWYGEditPage extends RealtimeEditPage
 {
-    private RealtimeEditToolbar toolbar;
-
     /**
      * Open the specified page in realtime WYSIWYG edit mode.
      * 
@@ -48,43 +45,10 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
     }
 
     /**
-     * Default constructor. Waits for the realtime connection to be established.
-     */
-    public RealtimeWYSIWYGEditPage()
-    {
-        this.toolbar = new RealtimeEditToolbar().waitUntilConnected();
-    }
-
-    /**
      * @return the editor used to edit the content of the page
      */
     public RealtimeCKEditor getContenEditor()
     {
         return new RealtimeCKEditor();
-    }
-
-    /**
-     * @return the edit mode toolbar (holding the button to save the changes)
-     * @since 16.10.6
-     * @since 17.3.0RC1
-     */
-    public RealtimeEditToolbar getToolbar()
-    {
-        return this.toolbar;
-    }
-
-    /**
-     * Clicks on the Done button to leave the edit mode and waits for the page to be loaded in view mode.
-     * 
-     * @return the view page
-     */
-    public ViewPage clickDone()
-    {
-        getDriver().addPageNotYetReloadedMarker();
-
-        this.toolbar.clickDone();
-
-        getDriver().waitUntilPageIsReloaded();
-        return new ViewPage();
     }
 }

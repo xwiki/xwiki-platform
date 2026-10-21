@@ -1,0 +1,89 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.livedata.livetable;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.livedata.LiveDataException;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.stability.Unstable;
+
+import com.xpn.xwiki.XWikiException;
+
+/**
+ * Strategy to generate the document reference of a new livetable entry.
+ *
+ * @version $Id$
+ * @since 18.7.0RC1
+ */
+@Role
+@Unstable
+public interface LiveTableNewRowNamingStrategy
+{
+    /**
+     * Generates a document reference for a new livetable entry.
+     *
+     * @param parameters the livedata source parameters
+     * @param entryValues the values the entry is created with, by live data property id
+     * @return the generated document reference
+     * @throws LiveDataException if the reference cannot be generated
+     * @throws XWikiException if there is a wiki-level error
+     * @since 18.10.0RC1
+     */
+    DocumentReference generate(Map<String, Object> parameters, Map<String, Object> entryValues)
+        throws LiveDataException, XWikiException;
+
+    /**
+     * Checks if the current user is allowed to create a new entry based on the provided source parameters.
+     *
+     * @param parameters the live data source parameters
+     * @return whether the current user is allowed to create a new entry with this strategy
+     */
+    boolean isCreationAllowed(Map<String, Object> parameters);
+
+    /**
+     * Returns where this strategy puts new entries.
+     *
+     * @param parameters the live data source parameters
+     * @return the space new entries are created in, or {@link Optional#empty()} when this strategy has no single
+     *         location
+     * @since 18.9.0RC1
+     */
+    default Optional<SpaceReference> getNewEntryLocation(Map<String, Object> parameters)
+    {
+        return Optional.empty();
+    }
+
+    /**
+     * Returns the properties this strategy needs a value for, which no entry can be created without.
+     *
+     * @param parameters the live data source parameters
+     * @return the live data ids of the properties that must hold a value, empty when the strategy needs none
+     * @since 18.10.0RC1
+     */
+    default Set<String> getMandatoryProperties(Map<String, Object> parameters)
+    {
+        return Set.of();
+    }
+}

@@ -49,7 +49,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -128,7 +127,7 @@ class WikiCreationJobScriptServicesTest
         Exception lastError = this.wikiCreationJobScriptServices.getLastError();
         assertNotNull(lastError);
         assertEquals("The extension [badExtension/version] is not authorized.", lastError.getMessage());
-        verify(this.logger).warn("Failed to create a new wiki.", lastError);
+        verify(this.logger).error("Failed to create a new wiki.", lastError);
     }
 
     @Test
@@ -138,8 +137,8 @@ class WikiCreationJobScriptServicesTest
         when(this.xcontext.getUserReference()).thenReturn(currentUser);
         AccessDeniedException exception =
             new AccessDeniedException(Right.CREATE_WIKI, currentUser, new WikiReference("mainWikiId"));
-        doThrow(exception).when(this.authorizationManager).checkAccess(eq(Right.CREATE_WIKI), eq(currentUser),
-            eq(new WikiReference("mainWikiId")));
+        doThrow(exception).when(this.authorizationManager).checkAccess(Right.CREATE_WIKI, currentUser,
+            new WikiReference("mainWikiId"));
 
         WikiCreationRequest wikiCreationRequest = new WikiCreationRequest();
         wikiCreationRequest.setExtensionId("authorized-extension", "1.0");

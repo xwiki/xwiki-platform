@@ -101,7 +101,7 @@ public class DefaultOldRendering implements OldRendering
 
         if (this.contextComponentManagerProvider.get().hasComponent(BlockRenderer.class,
             backlinkDocument.getSyntax().toIdString())) {
-            refactorDocumentLinks(backlinkDocument, oldReference, newReference, context);
+            refactorDocumentLinks(backlinkDocument, oldReference, newReference);
         }
     }
 
@@ -115,7 +115,7 @@ public class DefaultOldRendering implements OldRendering
      * @since 2.2M1
      */
     private void refactorDocumentLinks(XWikiDocument document, DocumentReference oldDocumentReference,
-        DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
+        DocumentReference newDocumentReference)
     {
         this.referenceRenamer.renameReferences(document.getXDOM(), document.getDocumentReference(),
             oldDocumentReference, newDocumentReference, false,
@@ -137,7 +137,7 @@ public class DefaultOldRendering implements OldRendering
                 return writer.toString();
             }
         } catch (XWikiVelocityException e) {
-            this.logger.error("Faield to parse content [" + content + "]", e);
+            this.logger.error("Failed to parse content [{}]", content, e);
         }
 
         return "";
@@ -158,7 +158,8 @@ public class DefaultOldRendering implements OldRendering
     @Override
     public String renderText(String text, XWikiDocument doc, XWikiContext xcontext)
     {
-        return doc.getRenderedContent(text, doc.getSyntaxId(), xcontext);
+        // Keep executing the text with the rights of its caller, like Document#getRenderedContent does.
+        return doc.getRenderedContent(text, doc.getSyntaxId(), false, xcontext.getSecureDocument(), xcontext);
     }
 
     @Override

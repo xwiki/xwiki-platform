@@ -25,7 +25,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -39,10 +41,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.event.model.WikiAttachmentFilter;
+import org.xwiki.filter.event.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.filter.input.AbstractInputStreamInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.xar.internal.model.XarAttachmentModel;
 import org.xwiki.xml.stax.StAXUtils;
@@ -55,6 +58,23 @@ import org.xwiki.xml.stax.StAXUtils;
 @Singleton
 public class AttachmentReader extends AbstractReader implements XARXMLReader<AttachmentReader.WikiAttachmentInputSource>
 {
+    /**
+     * The map of parameters to be used when reading attachments.
+     */
+    private static final Map<String, EventParameter> ATTACHMENT_PARAMETERS = Map.of(
+        XarAttachmentModel.ELEMENT_MIMETYPE, new EventParameter(WikiAttachmentFilter.PARAMETER_MIMETYPE),
+        XarAttachmentModel.ELEMENT_CHARSET, new EventParameter(WikiAttachmentFilter.PARAMETER_CHARSET),
+        XarAttachmentModel.ELEMENT_VERSION, new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION),
+        XarAttachmentModel.ELEMENT_REVISION_AUTHOR,
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR),
+        XarAttachmentModel.ELEMENT_REVISION_DATE,
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_DATE, Date.class),
+        XarAttachmentModel.ELEMENT_REVISION_COMMENT,
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT),
+        XarAttachmentModel.ELEMENT_REVISION_CONTENT_ALIAS,
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_CONTENT_ALIAS),
+        XarAttachmentModel.ELEMENT_JRCSVERSIONS, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+
     /**
      * Represents an abstract attachment content, be it an attachment or an attachment revision.
      */
@@ -232,7 +252,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
     {
         String elementName = xmlReader.getLocalName();
 
-        EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
+        EventParameter parameter = ATTACHMENT_PARAMETERS.get(elementName);
 
         if (parameter != null) {
             Object wsValue = convert(parameter.type, xmlReader.getElementText());
@@ -277,7 +297,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
                 String elementName = xmlReader.getLocalName();
 
-                EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
+                EventParameter parameter = ATTACHMENT_PARAMETERS.get(elementName);
 
                 if (parameter != null) {
                     Object wsValue = convert(parameter.type, xmlReader.getElementText());

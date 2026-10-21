@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 
 /**
- * Update XWiki.XWikiPreferences document with all required informations.
+ * Update XWiki.XWikiPreferences document with all required information.
  *
  * @version $Id$
  * @since 4.3M1
@@ -197,7 +197,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         // Only used by LDAP authentication service
 
         xclass.addBooleanField("ldap", "Ldap", YESNO);
-        xclass.addTextField("ldap_server", "Ldap server adress", 60);
+        xclass.addTextField("ldap_server", "Ldap server address", 60);
         xclass.addTextField("ldap_port", "Ldap server port", 60);
         xclass.addTextField("ldap_bind_DN", "Ldap login matching", 60);
         xclass.addPasswordField("ldap_bind_pass", "Ldap password matching", 60, PasswordMetaClass.CLEAR);

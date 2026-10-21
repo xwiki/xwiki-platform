@@ -75,7 +75,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     private XWikiSecurityAccess denyAllAccess;
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure()
     {
         defaultAccess = XWikiSecurityAccess.getDefaultAccess();
         denyAllAccess = new XWikiSecurityAccess();
@@ -163,7 +163,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     }
 
     @Test
-    void testSettleNoRulesOnMainWiki() throws Exception
+    void testSettleNoRulesOnMainWiki()
     {
         Deque<SecurityRuleEntry> emptyXdocRules
             = getMockedSecurityRuleEntries("emptyXdocRules", xdocRef, Collections.<List<SecurityRule>>emptyList());
@@ -184,7 +184,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     }
 
     @Test
-    void testSettleNoRulesOnLocalWiki() throws Exception
+    void testSettleNoRulesOnLocalWiki()
     {
         Deque<SecurityRuleEntry> emptydocRules
             = getMockedSecurityRuleEntries("emptydocRules", docRef, Collections.<List<SecurityRule>>emptyList());
@@ -204,7 +204,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     }
 
     @Test
-    void testSettleInheritancePolicy() throws Exception
+    void testSettleInheritancePolicy()
     {
         SecurityRule allowAllTestRightsRulesToXuser = getMockedSecurityRule("allowAllTestRightsRulesToXuser",
             Arrays.asList(xuserRef), Collections.<GroupSecurityReference>emptyList(), allTestRights, ALLOW);
@@ -630,8 +630,6 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
                 getMockedSecurityRuleEntries("denyAccessDAF", docRef,
                     Arrays.asList(Arrays.asList(denyImpliedDAF)))));
 
-        SecurityRule allowAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("allowAllTestRightsUserAndAnotherGroup",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, ALLOW);
         SecurityRule denyAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("denyAllTestRightsUserAndAnotherGroup",
             Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, DENY);
         SecurityRule denyAllTestRightsAnotherUserAndGroup = getMockedSecurityRule("denyAllTestRightsAnotherUserAndGroup",
@@ -713,7 +711,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     }
 
     @Test
-    void testSettleEntityTypeWithoutAnyEnabledRight() throws Exception
+    void testSettleEntityTypeWithoutAnyEnabledRight()
     {
         SecurityRule allowAllTestRightsRulesToXuser = getMockedSecurityRule("allowAllTestRightsRulesToXuser",
             Collections.singletonList(xuserRef), Collections.<GroupSecurityReference>emptyList(), allTestRights, ALLOW);

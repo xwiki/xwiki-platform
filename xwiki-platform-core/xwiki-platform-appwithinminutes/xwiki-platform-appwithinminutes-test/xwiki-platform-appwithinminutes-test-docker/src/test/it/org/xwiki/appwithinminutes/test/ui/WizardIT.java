@@ -19,7 +19,9 @@
  */
 package org.xwiki.appwithinminutes.test.ui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,6 +40,8 @@ import org.xwiki.appwithinminutes.test.po.EntryNamePane;
 import org.xwiki.flamingo.skin.test.po.ChildrenPage;
 import org.xwiki.index.tree.test.po.DocumentPickerModal;
 import org.xwiki.livedata.test.po.TableLayoutElement;
+import org.xwiki.panels.test.po.ApplicationsPanel;
+import org.xwiki.panels.test.po.NavigationPanel;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -46,6 +50,8 @@ import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -346,6 +352,137 @@ class WizardIT
         classEditPage = classEditPage.clickNextStep().clickNextStep().clickPreviousStep().clickPreviousStep();
         assertFalse(classEditPage.getContent().contains(EMPTY_CANVAS_HINT));
         assertFalse(classEditPage.hasPreviousStep());
+    }
+
+    /**
+     * Creates an application in a nested location from the Applications panel, renames and moves it, then opens it
+     * from the Applications and Navigation panels and deletes it.
+     */
+    @Test
+    @Order(4)
+    void createApplicationFromApplicationsPanel(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        // The Applications panel entry of an application is a wiki UI extension, which is registered only when the
+        // application is created by a wiki administrator. The user is also an advanced user, so that the location of
+        // the application can be typed instead of being picked from the tree.
+        testUtils.loginAsSuperAdmin();
+        testUtils.setGlobalRights("", "XWiki.WizardAdmin", "admin", true);
+        testUtils.createUser("WizardAdmin", PASSWORD, "", "usertype", "Advanced");
+        testUtils.login("WizardAdmin", PASSWORD);
+
+        // Create the nested location of the application (three nested pages) and the page it is moved under later.
+        List<String> location =
+            List.of(getClass().getSimpleName(), testReference.getLastSpaceReference().getName(), "Level2", "Level3");
+        for (int i = 1; i <= location.size(); i++) {
+            testUtils.createPage(location.subList(0, i), "WebHome", null, null);
+        }
+        List<String> newParent = append(location.subList(0, 3), "NewParent");
+        testUtils.createPage(newParent, "WebHome", null, null);
+
+        // Start the wizard from the Applications panel.
+        ApplicationsPanel.gotoPage().clickMoreApplications().clickApplication("Create your own!");
+        ApplicationCreatePage appCreatePage = new AppWithinMinutesHomePage().clickCreateApplication();
+
+        // Step 1: type the application location instead of picking it from the tree.
+        String appName = "PanelApp";
+        appCreatePage.setApplicationName(appName);
+        appCreatePage.setLocation(String.join(".", location));
+
+        // Step 2
+        ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
+        classEditPage.addField("Short Text").setPrettyName("Color");
+
+        // Step 3
+        ApplicationHomeEditPage homeEditPage = classEditPage.clickNextStep().clickNextStep();
+
+        // Step 4: description, live table column, icon and title.
+        String appDescription = "Simple application to manage colors";
+        homeEditPage.setDescription(appDescription);
+        homeEditPage.addLiveTableColumn("Color");
+        homeEditPage.setIcon("icon:bell");
+        String appTitle = "Applications Panel Wizard Test";
+        homeEditPage.setTitle(appTitle);
+        ApplicationHomePage homePage = homeEditPage.clickFinish();
+
+        // The application home page is created at the chosen location.
+        List<String> appSpace = append(location, appName);
+        assertEquals(String.join(".", appSpace), homePage.getMetaDataValue("space"));
+        assertEquals(appTitle, homePage.getDocumentTitle());
+        assertThat(homePage.getContent(), containsString(appDescription));
+
+        // Entries can be added.
+        homePage = addEntry(homePage, appTitle, "Red", "red");
+        LiveTableElement entriesLiveTable = homePage.getEntriesLiveTable();
+        entriesLiveTable.waitUntilReady();
+        assertTrue(entriesLiveTable.hasRow("Color", "red"));
+
+        // Rename the application and move it under another page.
+        String newAppName = "RenamedApp";
+        homePage = homePage.clickRenameApplication().setName(newAppName).setParent(String.join(".", newParent))
+            .clickRename();
+
+        // The application home page is at the new location and keeps its title.
+        List<String> newAppSpace = append(newParent, newAppName);
+        assertEquals(String.join(".", newAppSpace), homePage.getMetaDataValue("space"));
+        assertEquals(appTitle, homePage.getDocumentTitle());
+
+        // The application code pages have been renamed and moved with it.
+        assertFalse(testUtils.pageExists(appSpace, "WebHome"));
+        for (String suffix : List.of("Class", "Sheet", "Template", "TemplateProvider", "Translations")) {
+            assertTrue(testUtils.pageExists(append(newAppSpace, "Code"), newAppName + suffix),
+                "Missing application code page: " + newAppName + suffix);
+            assertFalse(testUtils.pageExists(append(appSpace, "Code"), appName + suffix),
+                "Application code page not renamed: " + appName + suffix);
+        }
+
+        // The existing entry is still displayed and a new entry can be added.
+        entriesLiveTable = homePage.getEntriesLiveTable();
+        entriesLiveTable.waitUntilReady();
+        assertTrue(entriesLiveTable.hasRow("Color", "red"));
+        entriesLiveTable = addEntry(homePage, appTitle, "Blue", "blue").getEntriesLiveTable();
+        entriesLiveTable.waitUntilReady();
+        assertEquals(2, entriesLiveTable.getRowCount());
+        assertTrue(entriesLiveTable.hasRow("Color", "blue"));
+
+        // The application is listed under its new location in the applications live table.
+        ApplicationsLiveTableElement appsLiveTable = AppWithinMinutesHomePage.gotoPage().getAppsLiveTable();
+        assertTrue(appsLiveTable.isApplicationListed(appTitle));
+        assertEquals(String.join(".", newAppSpace), appsLiveTable.viewApplication(appTitle).getMetaDataValue("space"));
+
+        // The application is listed in the Applications panel, with its title and icon.
+        ApplicationsPanel applicationsPanel = ApplicationsPanel.gotoPage();
+        assertTrue(applicationsPanel.containsApplication(appTitle));
+        assertThat(applicationsPanel.getApplicationIcon(appTitle), containsString("bell"));
+
+        // The application is listed in the Navigation panel, under its new location.
+        String[] appHomePath = append(newAppSpace, "WebHome").toArray(String[]::new);
+        assertTrue(NavigationPanel.gotoPage().getNavigationTree().openToDocument(appHomePath).hasDocument(appHomePath));
+
+        // Open the application from the Applications panel and delete it.
+        ApplicationsPanel.gotoPage().clickApplication(appTitle);
+        homePage = new ApplicationHomePage();
+        assertEquals(String.join(".", newAppSpace), homePage.getMetaDataValue("space"));
+        homePage.clickDeleteApplication().clickYes();
+
+        // The application is not listed in the Applications panel anymore.
+        assertFalse(ApplicationsPanel.gotoPage().containsApplication(appTitle));
+    }
+
+    private ApplicationHomePage addEntry(ApplicationHomePage homePage, String appTitle, String name, String color)
+    {
+        EntryNamePane entryNamePane = homePage.clickAddNewEntry();
+        entryNamePane.setName(name);
+        EntryEditPage entryEditPage = entryNamePane.clickAdd();
+        entryEditPage.setValue("shortText1", color);
+        entryEditPage.clickSaveAndView().clickBreadcrumbLink(appTitle);
+        return new ApplicationHomePage();
+    }
+
+    private static List<String> append(List<String> spaces, String space)
+    {
+        List<String> result = new ArrayList<>(spaces);
+        result.add(space);
+        return result;
     }
 
     private ApplicationCreatePage goToAppCreatePage(TestUtils testUtils, TestReference testReference)

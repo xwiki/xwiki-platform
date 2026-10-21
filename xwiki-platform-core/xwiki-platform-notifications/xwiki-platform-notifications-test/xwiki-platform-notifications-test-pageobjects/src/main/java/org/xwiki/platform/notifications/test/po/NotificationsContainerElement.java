@@ -20,6 +20,7 @@
 package org.xwiki.platform.notifications.test.po;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -38,6 +39,10 @@ import org.xwiki.test.ui.po.BaseElement;
 public class NotificationsContainerElement extends BaseElement
 {
     private static final String NOTIFICATION_MACRO_CONTAINER_CLASS = "notifications-macro";
+
+    private static final By LOAD_OLDER_BUTTON = By.cssSelector(".notifications-macro-load-more button");
+
+    private static final By LOADING_OLDER = By.cssSelector(".notifications-macro-load-more.loading");
 
     /**
      * Maximum number of page reloads performed while waiting for the expected number of notifications. Events are
@@ -76,15 +81,34 @@ public class NotificationsContainerElement extends BaseElement
      *
      * @param expectedCount the minimum number of notifications to wait for
      * @return an instance of {@link NotificationsContainerElement} located on the up-to-date page
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.6.0RC1
      */
     public static NotificationsContainerElement waitUntilNotificationCount(int expectedCount)
+    {
+        return waitUntilNotifications(element -> element.getNotificationsListCount() >= expectedCount);
+    }
+
+    /**
+     * Wait for the notification macro of the current page to display notifications matching the given condition,
+     * reloading the page between attempts, for the same reasons as {@link #waitUntilNotificationCount(int)}. Use it
+     * when the number of notifications is not known in advance, for instance because some events may be grouped.
+     *
+     * @param condition the condition that the displayed notifications must match
+     * @return an instance of {@link NotificationsContainerElement} located on the up-to-date page
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public static NotificationsContainerElement waitUntilNotifications(
+        Predicate<NotificationsContainerElement> condition)
     {
         NotificationsContainerElement element = getElementForMacroInPage();
         // Wait for the asynchronous REST request performed by the macro to complete before counting the events.
         element.waitUntilPageIsReady();
         int attempts = 0;
-        while (element.getNotificationsListCount() < expectedCount && attempts < MAX_RELOAD_ATTEMPTS) {
+        while (!condition.test(element) && attempts < MAX_RELOAD_ATTEMPTS) {
             getUtil().getDriver().navigate().refresh();
             element = getElementForMacroInPage();
             element.waitUntilPageIsReady();
@@ -136,6 +160,27 @@ public class NotificationsContainerElement extends BaseElement
         checkNotificationNumber(notificationNumber);
 
         return this.getNotifications().get(notificationNumber).getAttribute("data-eventtype");
+    }
+
+    /**
+     * Get the index of the first notification of a given type. Useful when several notifications share the same date,
+     * since their order in the list is then not deterministic.
+     *
+     * @param type the type of the notification to find, for instance {@code update} or {@code addComment}
+     * @return the index of the first notification of that type in the list, or {@code -1} if there is none
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public int getNotificationIndex(String type)
+    {
+        int count = getNotificationsListCount();
+        for (int i = 0; i < count; i++) {
+            if (type.equals(getNotificationType(i))) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -205,6 +250,47 @@ public class NotificationsContainerElement extends BaseElement
         checkNotificationNumber(notificationNumber);
 
         return this.getNotifications().get(notificationNumber).getText();
+    }
+
+    /**
+     * @return {@code true} if the "Load older notifications" button is displayed, i.e. if there might be older
+     *     notifications to load
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public boolean hasOlderNotifications()
+    {
+        return getDriver().hasElementWithoutWaiting(this.container, LOAD_OLDER_BUTTON);
+    }
+
+    /**
+     * Click the "Load older notifications" button and wait for the older notifications to be displayed.
+     *
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public void loadOlderNotifications()
+    {
+        getDriver().findElementWithoutWaiting(this.container, LOAD_OLDER_BUTTON).click();
+        // The button is replaced by a loading indicator until the older notifications are displayed.
+        getDriver().waitUntilCondition(driver -> !getDriver().hasElementWithoutWaiting(this.container, LOADING_OLDER));
+    }
+
+    /**
+     * @param notificationNumber index of the notification in the list
+     * @return {@code true} if the notification is displayed as unread
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public boolean isNotificationUnread(int notificationNumber)
+    {
+        checkNotificationNumber(notificationNumber);
+
+        return this.getNotifications().get(notificationNumber).getAttribute("class")
+            .contains("notification-event-unread");
     }
 
     /**

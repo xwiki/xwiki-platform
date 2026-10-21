@@ -19,9 +19,6 @@
  */
 package com.xpn.xwiki.internal.sheet;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +33,8 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link ClassSheetBinder}.

@@ -205,12 +205,8 @@ public class DocumentsModifiedDuringDistributionListener extends AbstractEventLi
     private void addDocument(String distributionWiki, XWikiDocument document, Action action,
         LocalExtension previousExtension, LocalExtension nextExtension)
     {
-        Map<DocumentReference, DocumentStatus> wikiDocuments = this.documents.get(distributionWiki);
-
-        if (wikiDocuments == null) {
-            wikiDocuments = new HashMap<>();
-            this.documents.put(distributionWiki, wikiDocuments);
-        }
+        Map<DocumentReference, DocumentStatus> wikiDocuments =
+            this.documents.computeIfAbsent(distributionWiki, wiki -> new HashMap<>());
 
         DocumentReference reference = document.getDocumentReferenceWithLocale();
 

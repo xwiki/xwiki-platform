@@ -41,7 +41,7 @@ public class TidyMessageLogger implements TidyMessageListener
         // All JTidy messages should be considered as DEBUG messages since they're not causing any problem with XWiki
         // per see. However if the code calling Tidy need to do something different based on the fact that the
         // tidying generated errors or warnings, it should act on tidy.getParseErrors() or tidy.getParseWarnings().
-        this.logger.debug("[JTidy] line {} column {} - {}", message.getLine(), message.getColumn(),
+        this.logger.debug("[JTidy] line [{}] column [{}] - [{}]", message.getLine(), message.getColumn(),
             message.getMessage());
     }
 }

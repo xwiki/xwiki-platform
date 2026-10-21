@@ -76,7 +76,7 @@ class UsersMimeMessageIteratorTest
             "jannie@doe.com");
 
         ComponentManager componentManager = mock(ComponentManager.class);
-        when(componentManager.getInstance(eq(DocumentAccessBridge.class))).thenReturn(accessBridge);
+        when(componentManager.getInstance(DocumentAccessBridge.class)).thenReturn(accessBridge);
 
         UsersMimeMessageIterator iterator =
             new UsersMimeMessageIterator(userReferences, factory, parameters, componentManager);

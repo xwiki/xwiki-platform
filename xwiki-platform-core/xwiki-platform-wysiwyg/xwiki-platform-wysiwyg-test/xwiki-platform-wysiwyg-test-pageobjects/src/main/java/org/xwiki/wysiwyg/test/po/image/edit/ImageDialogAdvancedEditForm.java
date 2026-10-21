@@ -54,6 +54,17 @@ public class ImageDialogAdvancedEditForm extends BaseElement
     }
 
     /**
+     * Remove the alignment by selecting the "none" option.
+     *
+     * @return the current page object
+     * @since 18.6.0
+     */
+    public ImageDialogAdvancedEditForm removeAlignment()
+    {
+        return selectAlignment("none");
+    }
+
+    /**
      * Select the centered alignment.
      *
      * @return the current page object

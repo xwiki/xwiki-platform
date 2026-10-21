@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class HTMLDisplayerScriptServiceTest
+class HTMLDisplayerScriptServiceTest
 {
     @MockComponent
     private HTMLDisplayerManager htmlDisplayerManager;
@@ -51,7 +51,7 @@ public class HTMLDisplayerScriptServiceTest
     private HTMLDisplayerScriptService htmlDisplayerScriptService;
 
     @Test
-    public void HTMLDisplayerScriptServiceTest() throws Exception
+    void HTMLDisplayerScriptServiceTest() throws Exception
     {
         Answer answer = i -> {
             String attributes = "";

@@ -51,7 +51,5 @@ public class IntegrationTests extends RenderingTest
         EventListener nestedValidator = cm.registerMockComponent(EventListener.class, "nestedscriptmacrovalidator");
         when(nestedValidator.getName()).thenReturn("nestedscriptmacrovalidator");
         when(nestedValidator.getEvents()).thenReturn(Collections.singletonList(new ScriptEvaluatingEvent()));
-        //verify(nestedValidator, atLeastOnce()).onEvent(any(), any(MacroTransformationContext.class),
-        //    any(ScriptMacroParameters.class));
     }
 }

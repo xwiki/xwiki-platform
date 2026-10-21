@@ -40,6 +40,6 @@ public class WikiObjectPropertyReader extends AbstractWikiObjectPropertyReader
     public WikiObjectProperty read(XMLStreamReader xmlReader, XARInputProperties properties)
         throws XMLStreamException, FilterException
     {
-        return readObjectProperty(xmlReader, properties, null);
+        return readObjectProperty(xmlReader, properties, null, null);
     }
 }

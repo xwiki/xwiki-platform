@@ -57,12 +57,10 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
         String normalizedWikiId = alias;
         String mainWiki = getMainWikiId();
         if (!mainWiki.equals(normalizedWikiId)
-            && this.configuration.getWikiNotFoundBehavior() == WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI)
-        {
-            if (getWikiDescriptorById(normalizedWikiId) == null) {
-                // Fallback on main wiki
-                normalizedWikiId = mainWiki;
-            }
+            && this.configuration.getWikiNotFoundBehavior() == WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI
+            && getWikiDescriptorById(normalizedWikiId) == null) {
+            // Fallback on main wiki
+            normalizedWikiId = mainWiki;
         }
         return normalizedWikiId;
     }

@@ -26,6 +26,7 @@ import java.util.Properties;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.mapping.Column;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -33,6 +34,7 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
+import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -105,11 +107,21 @@ class HibernateStoreTest
     {
         Field field = ReflectionUtils.getField(this.store.getClass(), "configuration");
         field.setAccessible(true);
-        Configuration configuration = (Configuration) field.get(this.store);
+        Configuration storeConfiguration = (Configuration) field.get(this.store);
         Properties properties = new Properties();
         properties.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/xwiki?useSSL=false");
-        configuration.addProperties(properties);
+        storeConfiguration.addProperties(properties);
 
         assertEquals(DatabaseProduct.MYSQL, this.store.getDatabaseProductName());
+    }
+
+    @Test
+    void getConfiguredColumnNameUsesTheCaseOfTheDatabase()
+    {
+        HibernateAdapter adapter = mock(HibernateAdapter.class);
+        when(adapter.getColumnName("ase_page")).thenReturn("ASE_PAGE");
+        ReflectionUtils.setFieldValue(this.store, "adapter", adapter);
+
+        assertEquals("ASE_PAGE", this.store.getConfiguredColumnName(new Column("ase_page")));
     }
 }

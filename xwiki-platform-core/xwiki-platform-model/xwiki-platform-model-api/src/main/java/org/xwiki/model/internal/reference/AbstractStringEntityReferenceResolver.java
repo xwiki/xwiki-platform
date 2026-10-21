@@ -63,7 +63,7 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
     /**
      * Empty constructor, to be used by the Component Manager, which will also inject the Symbol Scheme.
      */
-    public AbstractStringEntityReferenceResolver()
+    protected AbstractStringEntityReferenceResolver()
     {
         // Empty constructor, to be used by the Component Manager, which will also inject the Symbol Scheme
     }
@@ -74,7 +74,7 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
      * @param symbolScheme the scheme to use for serializing the passed references (i.e. defines the separators to use
      *            between the Entity types, and the characters to escape and how to escape them)
      */
-    public AbstractStringEntityReferenceResolver(SymbolScheme symbolScheme)
+    protected AbstractStringEntityReferenceResolver(SymbolScheme symbolScheme)
     {
         this.symbolScheme = symbolScheme;
         initialize();
@@ -298,7 +298,7 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
         Object... parameters)
     {
         EntityReference newReference;
-        if (representation.length() > 0) {
+        if (!representation.isEmpty()) {
             String name = representation.toString();
             if (unescape) {
                 name = unescape(name);

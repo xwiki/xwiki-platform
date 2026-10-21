@@ -89,7 +89,6 @@ public class SkinListener implements EventListener
         List<BaseObject> skinObjects = document.getXObjects(SKIN_CLASS);
         if (skinObjects != null && !skinObjects.isEmpty()) {
             clearCacheFromSkin(document);
-            return;
         }
     }
 

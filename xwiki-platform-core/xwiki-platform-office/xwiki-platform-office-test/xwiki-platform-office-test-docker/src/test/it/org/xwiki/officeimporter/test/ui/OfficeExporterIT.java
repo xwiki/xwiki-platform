@@ -19,22 +19,39 @@
  */
 package org.xwiki.officeimporter.test.ui;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.flamingo.skin.test.po.ExportModal;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tika.internal.TikaUtils;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -51,6 +68,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
     })
 class OfficeExporterIT
 {
+    private static final String DOCUMENT_CONTENT = "This is a test document.";
+
+    private static final String IMAGE_NAME = "image.png";
+
     @BeforeEach
     public void setUp(TestUtils setup)
     {
@@ -65,26 +86,76 @@ class OfficeExporterIT
         }
     }
 
+    /**
+     * Export to ODT, from the Export modal, a page holding some text and an image.
+     */
     @Test
-    void exportODT(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference) throws Exception
+    @Order(1)
+    void exportODT(TestUtils setup, TestReference testReference) throws Exception
     {
-        export(setup, testConfiguration, testReference, "odt", "application/vnd.oasis.opendocument.text");
+        setup.rest().delete(testReference);
+        setup.rest().savePage(testReference, String.format("%s%n%n[[image:%s]]", DOCUMENT_CONTENT, IMAGE_NAME),
+            "Export");
+        setup.attachFile(testReference, IMAGE_NAME, new ByteArrayInputStream(createImage()), true);
+        ViewPage viewPage = setup.gotoPage(testReference);
+
+        // Selecting ODT in the Export modal makes the browser download the file, so we fetch it ourselves.
+        ExportModal exportModal = ExportModal.open(viewPage);
+        String exportURL = exportModal.getExportURL("ODT");
+        exportModal.close();
+
+        String mimeType = null;
+        String content = null;
+        List<String> pictures = new ArrayList<>();
+        try (ZipInputStream odt = new ZipInputStream(postExport(setup.toHttpClientUri(exportURL)))) {
+            for (ZipEntry entry = odt.getNextEntry(); entry != null; entry = odt.getNextEntry()) {
+                if ("mimetype".equals(entry.getName())) {
+                    mimeType = new String(odt.readAllBytes(), StandardCharsets.UTF_8);
+                } else if ("content.xml".equals(entry.getName())) {
+                    content = new String(odt.readAllBytes(), StandardCharsets.UTF_8);
+                } else if (entry.getName().startsWith("Pictures/")) {
+                    pictures.add(entry.getName());
+                }
+            }
+        }
+        assertEquals("application/vnd.oasis.opendocument.text", mimeType);
+        assertThat("The exported file has no content.xml", content, notNullValue());
+        assertThat(content, containsString(DOCUMENT_CONTENT));
+        // The image displayed by the page is embedded in the export.
+        assertThat("The exported file has no picture", pictures, not(empty()));
     }
 
     @Test
-    void exportRTF(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference) throws Exception
-    {
-        export(setup, testConfiguration, testReference, "rtf", "application/rtf");
-    }
-
-    private static void export(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference,
-        String format, String expectedTikaDetect)
-        throws IOException, URISyntaxException
+    @Order(2)
+    void exportRTF(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.createPage(testReference, "content", "title");
-        String exportURL = setup.toHttpClientUri(setup.getURL(testReference, "export", "format=" + format));
-        try (InputStream inputStream = new URL(exportURL).openStream()) {
-            assertEquals(expectedTikaDetect, TikaUtils.detect(inputStream));
+        String exportURL = setup.toHttpClientUri(setup.getURL(testReference, "export", "format=rtf"));
+        try (InputStream inputStream = postExport(exportURL)) {
+            assertEquals("application/rtf", TikaUtils.detect(inputStream));
         }
+    }
+
+    /**
+     * @param exportURL the export URL
+     * @return the exported file
+     */
+    private static InputStream postExport(String exportURL) throws IOException
+    {
+        HttpURLConnection connection = (HttpURLConnection) URI.create(exportURL).toURL().openConnection();
+        // The export action only performs an export on POST requests.
+        connection.setRequestMethod("POST");
+        return connection.getInputStream();
+    }
+
+    /**
+     * @return a small PNG image
+     */
+    private static byte[] createImage() throws IOException
+    {
+        BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", output);
+        return output.toByteArray();
     }
 }

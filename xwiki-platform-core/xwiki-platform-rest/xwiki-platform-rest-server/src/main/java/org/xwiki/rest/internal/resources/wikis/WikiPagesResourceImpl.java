@@ -107,6 +107,11 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 stringBuilder.append(")");
             }
 
+            // Always order by a unique key (document full name + locale) so that pagination via limit/offset returns a
+            // stable, deterministic order. Without it, the database is free to return rows in an arbitrary order that
+            // can differ between queries (observed on Oracle), breaking paginated retrieval.
+            stringBuilder.append(" order by doc.fullName asc, doc.language asc");
+
             String queryString = stringBuilder.toString();
 
             /* Execute the query by filling the parameters */

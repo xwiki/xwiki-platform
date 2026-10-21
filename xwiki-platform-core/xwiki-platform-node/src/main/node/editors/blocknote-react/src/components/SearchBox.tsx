@@ -18,17 +18,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DepsContainerContext } from "../contexts";
+import { LinkType } from "../misc/linkEditionCtx";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
+import { ResourceType } from "@xwiki/platform-rendering-api";
 import { t } from "i18next";
 import { debounce } from "lodash-es";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { RiLink } from "react-icons/ri";
-import type { LinkSuggestion } from "../misc/linkSuggest";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "@xwiki/platform-rendering-api";
 import type { ReactElement } from "react";
 
-export type SearchBoxProps = {
+/**
+ * Map a link suggestion type to the XWiki resource type used to build its resource reference.
+ */
+function linkTypeToResourceType(type: LinkType): string {
+  return type === LinkType.ATTACHMENT
+    ? ResourceType.ATTACHMENT
+    : ResourceType.DOCUMENT;
+}
+
+type SearchBoxProps = {
   /**
    * The search box's initial value
    */
@@ -59,15 +73,33 @@ export type SearchBoxProps = {
 
   /**
    * Triggered when a result is selected in the list of suggestions
+   *
+   * @param url - the URL of the selected result
+   * @param reference - the XWiki resource reference of the selected result
    */
-  onSelect: (url: string) => void;
+  onSelect: (url: string, reference: ResourceReference) => void;
 
   /**
    * Triggered when a result is submitted by the user
    *
    * e.g. when the user uses the `<Enter>` key on an URL
+   *
+   * @param url - the submitted URL
+   * @param reference - the XWiki resource reference matching the submitted value
    */
-  onSubmit: (url: string) => void;
+  onSubmit: (url: string, reference: ResourceReference) => void;
+};
+
+/**
+ * @since 18.4.0RC-1
+ * @beta
+ */
+type LinkSuggestion = {
+  title: string;
+  segments: string[];
+  reference: string;
+  url: string;
+  type: LinkType;
 };
 
 /**
@@ -77,7 +109,6 @@ export type SearchBoxProps = {
  *
  * @see SearchBoxProps
  */
-// eslint-disable-next-line max-statements
 export const SearchBox: React.FC<SearchBoxProps> = ({
   initialValue,
   placeholder,
@@ -85,6 +116,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   renderSuggestion,
   onSelect,
   onSubmit,
+  // eslint-disable-next-line max-statements
 }) => {
   const depsContainer = useContext(DepsContainerContext);
 
@@ -99,6 +131,10 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   const remoteURLSerializer = depsContainer
     .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
     .get()!;
+
+  const resourceReferenceParser = depsContainer.get<ResourceReferenceParser>(
+    "ResourceReferenceParser",
+  );
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -120,7 +156,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     value.startsWith("http://") || value.startsWith("https://");
 
   const performSearch = useCallback(
-    debounce((search: string) => {
+    debounce(async (search: string) => {
       if (isUrl(search)) {
         setSuggestions({ status: "resolved", suggestions: [] });
         return;
@@ -128,15 +164,12 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
       setSuggestions({ status: "loading" });
 
-      // eslint-disable-next-line promise/catch-or-return
-      getSuggestions(search).then((suggestions) => {
-        setSuggestions(
-          // eslint-disable-next-line promise/always-return
-          suggestions !== false
-            ? { status: "resolved", suggestions }
-            : { status: "backendSearchUnsupported" },
-        );
-      });
+      const suggestions = await getSuggestions(search);
+      setSuggestions(
+        suggestions !== false
+          ? { status: "resolved", suggestions }
+          : { status: "backendSearchUnsupported" },
+      );
     }),
     [setSuggestions, getSuggestions],
   );
@@ -145,7 +178,12 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     // eslint-disable-next-line max-statements
     async (value: string) => {
       if (isUrl(value)) {
-        onSubmit(value);
+        onSubmit(value, {
+          type: ResourceType.URL,
+          typed: false,
+          reference: value,
+          parameters: {},
+        });
         return;
       }
 
@@ -167,16 +205,30 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         throw new Error("Failed to serialize entity reference: " + value);
       }
 
-      onSubmit(url);
+      // Build the resource reference directly from the typed entity reference, rather than parsing it
+      // back from the URL we just serialized.
+      onSubmit(
+        url,
+        resourceReferenceParser.parse(value, { type: ResourceType.DOCUMENT }),
+      );
     },
-    [onSubmit, modelReferenceParser, remoteURLSerializer],
+    [
+      onSubmit,
+      modelReferenceParser,
+      remoteURLSerializer,
+      resourceReferenceParser,
+    ],
   );
 
   // Automatically perform a search when the query changes
-  useEffect(() => performSearch(query), [query, performSearch]);
+  useEffect(() => {
+    void performSearch(query);
+  }, [query, performSearch]);
 
   // Perform a search at the opening
-  useEffect(() => performSearch(""), []);
+  useEffect(() => {
+    void performSearch("");
+  }, []);
 
   return (
     <Combobox
@@ -199,7 +251,14 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
         combobox.closeDropdown();
         setQuery(result.title);
-        onSelect(url);
+        // Build the resource reference from the suggestion's entity reference (with the right default
+        // type), rather than parsing it back from the URL.
+        onSelect(
+          url,
+          resourceReferenceParser.parse(result.reference, {
+            type: linkTypeToResourceType(result.type),
+          }),
+        );
       }}
     >
       <Combobox.Target>
@@ -276,3 +335,5 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     </Combobox>
   );
 };
+
+export type { LinkSuggestion, SearchBoxProps };

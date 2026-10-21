@@ -26,9 +26,9 @@ import org.xwiki.job.Job;
  * 
  * @since 5.3M2
  * @version $Id$
- * @deprecated since 7.0M2
+ * @deprecated
  */
-@Deprecated
+@Deprecated(since = "7.0M2")
 public interface WikiProvisioningJob extends Job
 {
 }

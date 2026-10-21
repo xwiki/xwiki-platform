@@ -40,6 +40,7 @@ function initWrapper(options = {}) {
           provide: {
             logic: {
               getEntryId: (e) => e.id,
+              isEditMode: () => false,
               isSelectionEnabled: () => false,
               getLayoutDescriptor: () => {
                 return { titleProperty: "title" };

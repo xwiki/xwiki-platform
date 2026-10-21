@@ -10,6 +10,11 @@
   #if ($services.wysiwyg.isSyntaxSupported($syntaxId))
     #set ($discard = $textArea.attributes.put('data-source-document-reference',
       $edit.parameters.sourceDocumentReference))
+    ## The source property reference (when the edited content is an object property) is used server-side only, to
+    ## render the content with the rights of the document author. It's removed from the attributes by #blocknote so that
+    ## it's not output as an HTML attribute.
+    #set ($discard = $textArea.attributes.put('data-source-property-reference',
+      $edit.parameters.sourcePropertyReference))
     #blocknote($textArea)
   #else
     ## Fall back on a plain text area.

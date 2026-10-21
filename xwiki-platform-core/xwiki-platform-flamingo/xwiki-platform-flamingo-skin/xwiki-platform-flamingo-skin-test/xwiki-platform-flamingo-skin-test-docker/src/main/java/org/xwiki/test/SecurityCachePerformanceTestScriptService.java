@@ -110,7 +110,7 @@ public class SecurityCachePerformanceTestScriptService implements ScriptService
 
         // Perform two runs to have some warm-up for the caches.
         for (Integer i : List.of(100, 200)) {
-            this.logger.warn("Test run with {} pages.", i);
+            this.logger.warn("Test run with [{}] pages.", i);
             logResults(performTest(i, allPages, userReferences, errorOutput));
         }
 
@@ -193,7 +193,7 @@ public class SecurityCachePerformanceTestScriptService implements ScriptService
         throws XWikiException
     {
         List<Double> saveTimes = new ArrayList<>();
-        this.logger.warn("Starting {} updates of rights.", pagesToUpdate.size());
+        this.logger.warn("Starting [{}] updates of rights.", pagesToUpdate.size());
         XWikiContext context = this.contextProvider.get();
         XWiki apiWiki = new XWiki(context.getWiki(), context);
 
@@ -319,7 +319,7 @@ public class SecurityCachePerformanceTestScriptService implements ScriptService
     private void logResults(Map<String, Double> results)
     {
         for (Map.Entry<String, Double> result : results.entrySet()) {
-            this.logger.warn("\t{}: {}", result.getKey(), result.getValue());
+            this.logger.warn("\t[{}]: [{}]", result.getKey(), result.getValue());
         }
     }
 }

@@ -70,7 +70,7 @@ class XWikiDocumentConverterTest
     private DocumentReference documentReference;
 
     @BeforeEach
-    void setup(MockitoOldcore mockitoOldcore) throws Exception
+    void setup(MockitoOldcore mockitoOldcore)
     {
         this.documentReference = new DocumentReference("xwiki", "Foo", "WebHome");
         when(xWikiDocument.getDocumentReference()).thenReturn(this.documentReference);

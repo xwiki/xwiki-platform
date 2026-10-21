@@ -23,20 +23,17 @@ import java.util.Objects;
 
 import javax.inject.Provider;
 
-import org.xwiki.user.GuestUserReference;
+import jakarta.inject.Inject;
+
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.rest.model.jaxb.ObjectFactory;
-import org.xwiki.user.rest.model.jaxb.User;
 import org.xwiki.user.rest.model.jaxb.UserPreferences;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.user.api.XWikiRightService;
-
-import jakarta.inject.Inject;
 
 /**
- * Abstract implementation of {@link UserReferenceModelSerializer} to handle pseudo-users, like Guest.
+ * Abstract implementation of {@link UserReferenceModelSerializer}, providing some common helpers.
  *
  * @since 18.2.0RC1
  * @version $Id$
@@ -73,29 +70,5 @@ public abstract class AbstractUserReferenceModelSerializer implements UserRefere
         userPreferences.setAdvanced("Advanced".equals(userProperties.getProperty("usertype")));
 
         return userPreferences;
-    }
-
-    protected User guestToRestUser(boolean preferences)
-    {
-        User user = this.userObjectFactory.createUser();
-
-        UserProperties userProperties = this.userPropertiesResolver.resolve(GuestUserReference.INSTANCE);
-
-        user.setId(XWikiRightService.GUEST_USER_FULLNAME);
-        user.setGlobal(GuestUserReference.INSTANCE.isGlobal());
-        user.setFirstName(userProperties.getFirstName());
-        user.setLastName(userProperties.getLastName());
-        user.setDisplayName("Guest");
-
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        String defaultAvatarUrl = xcontext.getWiki().getSkinFile("icons/xwiki/noavatar.png", xcontext);
-        user.setAvatarUrl(defaultAvatarUrl);
-
-        if (preferences) {
-            user.setPreferences(toRestUserPreferences(userProperties, xcontext));
-        }
-
-        return user;
     }
 }

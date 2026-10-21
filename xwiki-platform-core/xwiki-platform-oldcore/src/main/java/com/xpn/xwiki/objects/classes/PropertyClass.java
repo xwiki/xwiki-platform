@@ -38,6 +38,7 @@ import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -275,7 +276,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            buffer.append(prop.toText());
+            buffer.append(XMLUtils.escapeElementText(prop.toText()));
         }
     }
 
@@ -532,11 +533,11 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * Render content in the current document's context with the rights of the given user.
      *
      * @since 8.3M2
-     * @deprecated since 10.11RC1, use
+     * @deprecated use
      *             {@link #renderContentInContext(String, String, DocumentReference, DocumentReference, XWikiContext)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "10.11RC1")
     protected String renderContentInContext(final String content, final String syntax,
         DocumentReference authorReference, final XWikiContext context) throws Exception
     {
@@ -760,9 +761,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * Sets the property class type.
      *
      * @param type the class type
-     * @deprecated since 4.3M1, the property class type cannot be modified
+     * @deprecated the property class type cannot be modified
      */
-    @Deprecated
+    @Deprecated(since = "4.3M1")
     public void setClassType(String type)
     {
         LOGGER.warn("The property class type cannot be modified!");

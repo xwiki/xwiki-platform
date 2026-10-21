@@ -4,10 +4,93 @@
 
 ```ts
 
+import { EntityReference } from '@xwiki/platform-xwiki-model-api';
 import { WikiConfig } from '@xwiki/platform-api';
 
 // @beta
 export function getRestSpacesApiUrl(wikiConfig: WikiConfig, documentId: string): string;
+
+// @beta
+export interface LegacyAjaxSaveAndContinue {
+    maybeRedirect(continueEditing: boolean): boolean;
+    reloadEditor(): void;
+}
+
+// @beta
+export interface LegacyConfirmationBoxBehavior {
+    onNo?: () => void;
+    onYes?: () => void;
+}
+
+// @beta
+export interface LegacyConfirmationBoxParameters {
+    confirmationText?: string;
+}
+
+// @beta
+export interface LegacyNotification {
+    replace(notification: LegacyNotification): void;
+}
+
+// @beta
+export type LegacyNotificationType = "plain" | "info" | "warning" | "error" | "inprogress" | "done";
+
+// @beta
+export interface LegacyXWikiAttachment {
+    // (undocumented)
+    getURL(): string;
+}
+
+// @beta
+export interface LegacyXWikiDocument {
+    // (undocumented)
+    getRestURL(entity?: string, parameters?: URLSearchParams): string;
+    // (undocumented)
+    getURL(action?: string, parameters?: URLSearchParams, fragment?: string): string;
+}
+
+// @public
+export function loadById<T = unknown>(...ids: string[]): Promise<T>;
+
+// @beta
+export interface XWikiGlobal {
+    actionButtons?: {
+        AjaxSaveAndContinue: {
+            prototype: LegacyAjaxSaveAndContinue;
+        };
+    };
+    // (undocumented)
+    Attachment: new (reference: EntityReference) => LegacyXWikiAttachment;
+    contextPath: string;
+    currentDocument: LegacyXWikiDocument & {
+        documentReference: EntityReference;
+    };
+    currentWiki: string;
+    docsyntax: string;
+    // (undocumented)
+    Document: new (reference: EntityReference) => LegacyXWikiDocument;
+    editor?: string;
+    widgets: {
+        Notification: new (text: string, type?: LegacyNotificationType) => LegacyNotification;
+        ConfirmationBox: new (behavior?: LegacyConfirmationBoxBehavior, interactionParameters?: LegacyConfirmationBoxParameters) => unknown;
+    };
+}
+
+// @beta
+export type XWikiMeta = {
+    documentReference: EntityReference;
+    version: string;
+    restURL: string;
+    form_token: string;
+    userReference?: EntityReference | null;
+    isNew: boolean;
+    locale: string;
+    realLocale: string;
+    action: string;
+    dateFormat?: string;
+    setVersion: (version: string) => void;
+    refreshVersion: (handle404: (response: Response) => void) => Promise<void>;
+};
 
 // (No @packageDocumentation comment for this package)
 

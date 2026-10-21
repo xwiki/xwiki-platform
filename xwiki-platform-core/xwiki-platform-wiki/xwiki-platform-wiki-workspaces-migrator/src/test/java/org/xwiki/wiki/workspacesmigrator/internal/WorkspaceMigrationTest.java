@@ -95,7 +95,7 @@ class WorkspaceMigrationTest
         // Mocks about the old workspace object
         BaseObject oldWorkspaceObject = mock(BaseObject.class);
         when(oldDescriptorDocument.getXObject(
-            eq(new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass"))))
+            new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass")))
             .thenReturn(oldWorkspaceObject);
 
         // Mocks about the old document to restore form the main wiki
@@ -118,9 +118,7 @@ class WorkspaceMigrationTest
             eq(new DocumentReference("workspace", "XWiki", "RegistrationConfig")), any(XWikiContext.class));
 
         // Verify that the log contains a warning about the documents that the migration failed to restore
-        verify(this.logger).warn("Failed to restore some documents: [{}]. You should import manually "
-            + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
-            + " wiki, to restore these documents.", "workspace:XWiki.AdminRegistrationSheet, "
+        verifyDocumentsToRestoreLogged("workspace:XWiki.AdminRegistrationSheet, "
             + "workspace:XWiki.RegistrationHelp, workspace:XWiki.AdminUsersSheet");
     }
 
@@ -143,9 +141,7 @@ class WorkspaceMigrationTest
         this.workspacesMigration.hibernateMigrate();
 
         // Verify that the log contains a warning about the documents that the migration failed to restore
-        verify(this.logger).warn("Failed to restore some documents: [{}]. You should import manually "
-            + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
-            + " wiki, to restore these documents.", "workspacetemplate:XWiki.AdminRegistrationSheet, "
+        verifyDocumentsToRestoreLogged("workspacetemplate:XWiki.AdminRegistrationSheet, "
             + "workspacetemplate:XWiki.RegistrationConfig, workspacetemplate:XWiki.RegistrationHelp, "
             + "workspacetemplate:XWiki.AdminUsersSheet");
     }
@@ -180,7 +176,7 @@ class WorkspaceMigrationTest
         // Mocks about the old workspace object
         BaseObject oldWorkspaceObject = mock(BaseObject.class);
         when(oldDescriptorDocument.getXObject(
-            eq(new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass"))))
+            new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass")))
             .thenReturn(oldWorkspaceObject);
 
         doThrow(new XWikiException()).when(this.documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(
@@ -191,5 +187,12 @@ class WorkspaceMigrationTest
         // Verify
         verify(this.logger).error(eq("Error while restoring documents from the Workspace XAR"),
             any(XWikiException.class));
+    }
+
+    private void verifyDocumentsToRestoreLogged(String expectedDocuments)
+    {
+        verify(this.logger).warn("Failed to restore some documents: [{}]. You should import manually "
+            + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
+            + " wiki, to restore these documents.", expectedDocuments);
     }
 }

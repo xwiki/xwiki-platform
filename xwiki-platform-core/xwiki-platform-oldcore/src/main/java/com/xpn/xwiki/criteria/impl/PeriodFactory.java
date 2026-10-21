@@ -49,6 +49,7 @@ public class PeriodFactory
 
     public PeriodFactory()
     {
+        // Nothing to do, this public constructor is only needed to instantiate the factory from Velocity.
     }
 
     /**
@@ -124,7 +125,7 @@ public class PeriodFactory
      * Creates a new Period instance that matches all the instants between N hours before the instantiation and the
      * instantiation.
      *
-     * @param numberOfHours number of hours to substract from current date
+     * @param numberOfHours number of hours to subtract from current date
      * @return The corresponding period object
      */
     public static Period createSinceHoursPeriod(int numberOfHours)
@@ -137,7 +138,7 @@ public class PeriodFactory
      * Creates a new Period instance that matches all the instants between N days before the instantiation and the
      * instantiation.
      *
-     * @param numberOfDays number of days to substract from current date
+     * @param numberOfDays number of days to subtract from current date
      * @return The corresponding period object
      */
     public static Period createSinceDaysPeriod(int numberOfDays)
@@ -150,7 +151,7 @@ public class PeriodFactory
      * Creates a new Period instance that matches all the instants between N weeks before the instantiation and the
      * instantiation.
      *
-     * @param numberOfWeeks number of weeks to substract from current date
+     * @param numberOfWeeks number of weeks to subtract from current date
      * @return The corresponding period object
      */
     public static Period createSinceWeeksPeriod(int numberOfWeeks)
@@ -163,7 +164,7 @@ public class PeriodFactory
      * Creates a new Period instance that matches all the instants between N months before the instantiation and the
      * instantiation.
      *
-     * @param numberOfMonths number of months to substract from current date
+     * @param numberOfMonths number of months to subtract from current date
      * @return The corresponding period object
      */
     public static Period createSinceMonthsPeriod(int numberOfMonths)
@@ -176,7 +177,7 @@ public class PeriodFactory
      * Creates a new Period instance that matches all the instants between N years before the instantiation and the
      * instantiation.
      *
-     * @param numberOfYears number of years to substract from current date
+     * @param numberOfYears number of years to subtract from current date
      * @return The corresponding period object
      */
     public static Period createSinceYearsPeriod(int numberOfYears)

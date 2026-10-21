@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -248,15 +248,11 @@ class PDFExportJobTest
         this.request.getContext().put("request.cookies", "cookies");
         this.request.getContext().put("request.foo", "bar");
         this.pdfExportJob.initialize(this.request);
-        try {
-            this.pdfExportJob.runInternal();
-            fail();
-        } catch (Exception e) {
-            assertEquals(
-                "The content size exceeds the configured 1KB limit. Wiki administrators can increase"
-                    + " or disable this limit from the PDF Export administration section or from XWiki properties.",
-                e.getMessage());
-        }
+        Exception e = assertThrows(Exception.class, () -> this.pdfExportJob.runInternal());
+        assertEquals(
+            "The content size exceeds the configured 1KB limit. Wiki administrators can increase"
+                + " or disable this limit from the PDF Export administration section or from XWiki properties.",
+            e.getMessage());
 
         assertFalse(this.request.getContext().containsKey("request.cookies"));
         assertEquals("bar", this.request.getContext().get("request.foo"));

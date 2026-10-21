@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.stability.Unstable;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -179,12 +180,7 @@ public class DBTreeListClass extends DBListClass
 
     protected void addToList(Map<String, List<ListItem>> map, String key, ListItem item)
     {
-        List<ListItem> list = map.get(key);
-        if (list == null) {
-            list = new ArrayList<>();
-            map.put(key, list);
-        }
-        list.add(item);
+        map.computeIfAbsent(key, k -> new ArrayList<>()).add(item);
     }
 
     @Override
@@ -195,8 +191,8 @@ public class DBTreeListClass extends DBListClass
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
             selectlist = new ArrayList<>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+        } else if (prop instanceof ListProperty listProperty) {
+            selectlist = listProperty.getList();
         } else {
             selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));
@@ -252,7 +248,7 @@ public class DBTreeListClass extends DBListClass
             List<ListItem> items = resList.get(i);
             for (int j = 0; j < items.size(); j++) {
                 ListItem item = items.get(j);
-                buff.append(item.getValue());
+                buff.append(XMLUtils.escapeElementText(item.getValue()));
                 if (j < items.size() - 1) {
                     buff.append(" &gt; ");
                 }
@@ -294,7 +290,7 @@ public class DBTreeListClass extends DBListClass
     {
         for (ListItem tmpItem : treeList) {
             if (item.equals(tmpItem.getId())) {
-                if (tmpItem.getParent().length() > 0) {
+                if (!tmpItem.getParent().isEmpty()) {
                     getItemPath(tmpItem.getParent(), treeList, resList);
                 }
                 resList.add(tmpItem);
@@ -330,7 +326,8 @@ public class DBTreeListClass extends DBListClass
             for (ListItem item : list) {
                 String display = level + getDisplayValue(item.getId(), "", map, context);
                 option option = new option(display, item.getId());
-                option.addElement(display);
+                option.setAttributeFilter(new XMLAttributeValueFilter());
+                option.addElement(XMLUtils.escape(display));
                 if (selectlist.contains(item.getId())) {
                     option.setSelected(true);
                 }
@@ -358,8 +355,8 @@ public class DBTreeListClass extends DBListClass
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
             selectlist = new ArrayList<>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+        } else if (prop instanceof ListProperty listProperty) {
+            selectlist = listProperty.getList();
         } else {
             selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));
@@ -543,7 +540,7 @@ public class DBTreeListClass extends DBListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOGGER.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
+            LOGGER.error("Failed to parse SQL script [{}]. Continuing with non-rendered script.", sql, e);
         }
         return sql;
     }

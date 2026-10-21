@@ -78,9 +78,9 @@ public class UnboundedEntityCacheInvalidatorListener extends AbstractEventListen
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent) {
+        if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
             // It's hard to find which cache entry is coming from wiki wiki so we remove them all
-            this.caches.remove(((WikiDeletedEvent) event).getWikiId());
+            this.caches.remove(wikiDeletedEvent.getWikiId());
         } else if (event instanceof DocumentDeletedEvent) {
             this.caches.remove(((XWikiDocument) source).getDocumentReference());
         } else {

@@ -22,18 +22,20 @@ package org.xwiki.model.validation.edit.internal;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.Container;
+import org.xwiki.container.Session;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
@@ -72,21 +74,30 @@ public class DefaultEditConfirmationCheckersManager implements EditConfirmationC
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    @Inject
+    private Container container;
+
     @Override
-    public EditConfirmationCheckerResults check()
+    public EditConfirmationCheckerResults check(Set<String> skipHints)
     {
         EditConfirmationCheckerResults result = new EditConfirmationCheckerResults();
         XWikiDocument xWikiDocument = this.xcontextProvider.get().getDoc();
         String cachedKeyPrefix = computePrefix(xWikiDocument, CACHED_QUALIFIER);
         String forcedKeyPrefix = computePrefix(xWikiDocument, FORCED_QUALIFIER);
 
-        HttpSession session = getSession();
+        Session session = getSession();
 
         // The list is ordered by the priority of the components.
         confirmationCheckersStream()
             .flatMap(entry -> {
-                String forcedKey = computeKey(entry, forcedKeyPrefix);
                 String cachedKey = computeKey(entry, cachedKeyPrefix);
+                if (skipHints.contains(entry.getKey())) {
+                    // If the check is skipped, remove a potentially stored cached value from the session to avoid
+                    // forcing the check when the force method is called.
+                    session.removeAttribute(cachedKey);
+                    return Stream.empty();
+                }
+                String forcedKey = computeKey(entry, forcedKeyPrefix);
                 Object forcedValue = session.getAttribute(forcedKey);
                 EditConfirmationChecker checker = entry.getValue();
                 Optional<EditConfirmationCheckerResult> check = checker.check();
@@ -118,7 +129,7 @@ public class DefaultEditConfirmationCheckersManager implements EditConfirmationC
         XWikiDocument xWikiDocument = this.xcontextProvider.get().getDoc();
         String cachedKeyPrefix = computePrefix(xWikiDocument, CACHED_QUALIFIER);
         String forcedKeyPrefix = computePrefix(xWikiDocument, FORCED_QUALIFIER);
-        HttpSession session = getSession();
+        Session session = getSession();
         confirmationCheckersStream().forEach(entry -> {
             String cachedKey = computeKey(entry, cachedKeyPrefix);
             String forcedKey = computeKey(entry, forcedKeyPrefix);
@@ -152,8 +163,8 @@ public class DefaultEditConfirmationCheckersManager implements EditConfirmationC
         }
     }
 
-    private HttpSession getSession()
+    private Session getSession()
     {
-        return this.xcontextProvider.get().getRequest().getSession();
+        return this.container.getSession();
     }
 }

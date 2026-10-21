@@ -195,9 +195,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
        likersLink.text(getLikersLinkText(data.counter));
        likersLink.attr('title', l10n.get('likers.link.title', data.counter));
        $('#is-liked').val('true');
-       new XWiki.widgets.Notification(l10n.get('newlike.success'), 'done');
+       XWiki.widgets.Notification.show(l10n.get('newlike.success'), 'done');
      }).catch(() =&gt; {
-       new XWiki.widgets.Notification(l10n.get('newlike.error'), 'error');
+       XWiki.widgets.Notification.show(l10n.get('newlike.error'), 'error');
      });
   };
 
@@ -217,9 +217,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       likersLink.text(getLikersLinkText(data.counter));
       likersLink.attr('title', l10n.get('likers.link.title', data.counter));
       $('#is-liked').val('false');
-      new XWiki.widgets.Notification(l10n.get('unlike.success'), 'done');
+      XWiki.widgets.Notification.show(l10n.get('unlike.success'), 'done');
     }).catch(() =&gt; {
-      new XWiki.widgets.Notification(l10n.get('unlike.error'), 'error');
+      XWiki.widgets.Notification.show(l10n.get('unlike.error'), 'error');
     });
   };
   $('.like-button').on('click', likeClick);

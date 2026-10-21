@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -201,7 +200,7 @@ public class SolrRatingsManager implements RatingsManager
     private List<Rating> getRatingsFromQueryResult(SolrDocumentList documents)
     {
         if (documents != null) {
-            return documents.stream().map(this::getRatingFromSolrDocument).collect(Collectors.toList());
+            return documents.stream().map(this::getRatingFromSolrDocument).toList();
         } else {
             return Collections.emptyList();
         }
@@ -341,7 +340,7 @@ public class SolrRatingsManager implements RatingsManager
                 // Send the appropriate notification
                 this.observationManager.notify(event, this.getIdentifier(), result);
 
-                // If we store the average, we also compute the new informations for it.
+                // If we store the average, we also compute the new information for it.
                 if (storeAverage) {
                     if (oldRating == null) {
                         this.getAverageRatingManager().addVote(reference, vote);
@@ -584,8 +583,8 @@ public class SolrRatingsManager implements RatingsManager
                 throw new RatingsException(String.format("The reference [%s] is not an existing page.", reference));
             }
         } catch (Exception e) {
-            if (e instanceof RatingsException) {
-                throw (RatingsException) e;
+            if (e instanceof RatingsException ratingsException) {
+                throw ratingsException;
             } else {
                 throw new RatingsException(String.format("An error occurred while checking of [%s] exists", reference),
                     e);

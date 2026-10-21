@@ -82,7 +82,7 @@ public class XWikiPatchUtils
         Object[] lines = ToString.stringToArray(diff);
         for (int it = 0; it < lines.length; it++) {
             String cmd = lines[it].toString();
-            if (cmd.length() == 0) {
+            if (cmd.isEmpty()) {
                 break;
             }
 

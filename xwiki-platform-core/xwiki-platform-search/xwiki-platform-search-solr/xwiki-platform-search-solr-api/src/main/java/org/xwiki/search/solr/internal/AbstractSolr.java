@@ -29,8 +29,8 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.solr.client.api.util.SolrVersion;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.slf4j.Logger;
@@ -106,14 +106,14 @@ public abstract class AbstractSolr implements Solr, Disposable
     }
 
     private synchronized XWikiSolrCore getCoreInternal(String xwikiCoreName)
-        throws SolrServerException, IOException, SolrException
+        throws IOException, SolrException
     {
         // Get the existing client designed for the current Solr version
-        XWikiSolrCore solrCore = getCore(xwikiCoreName, getSolrMajorVersion());
+        XWikiSolrCore solrCore = getCore(xwikiCoreName, getCoreMajorVersion());
 
         // If we cannot create a core, try to find one designed for the previous major version of Solr
         if (solrCore == null && !canCreateCore()) {
-            solrCore = getCore(xwikiCoreName, getSolrMajorVersion() - 1);
+            solrCore = getCore(xwikiCoreName, getCoreMajorVersion() - 1);
 
             if (solrCore == null) {
                 // No core exist for the current Solr version and we cannot create a new one
@@ -152,18 +152,18 @@ public abstract class AbstractSolr implements Solr, Disposable
     protected void migrateCore(String xwikiCoreName, XWikiSolrCore newCore, SolrCoreInitializer initializer)
         throws SolrException, IOException
     {
-        // Get current server version
-        int solrMajorVersion = getSolrMajorVersion();
+        // Get the version of Solr the cores are currently designed for
+        int coreMajorVersion = getCoreMajorVersion();
 
         // There is nothing to migrate if the only core found is designed from the previous version of Solr
-        if (newCore.getSolrMajorVersion() < solrMajorVersion) {
+        if (newCore.getSolrMajorVersion() < coreMajorVersion) {
             return;
         }
 
         // Migrate the core, if needed
         Integer sVersion = getSVersion(newCore);
-        if (sVersion == null || sVersion < solrMajorVersion) {
-            for (int previousVersion = solrMajorVersion - 1; previousVersion >= 8; --previousVersion) {
+        if (sVersion == null || sVersion < coreMajorVersion) {
+            for (int previousVersion = coreMajorVersion - 1; previousVersion >= 8; --previousVersion) {
                 // Check if a core for previous version of Solr exist
                 XWikiSolrCore previousCore = getCore(xwikiCoreName, previousVersion);
 
@@ -184,7 +184,7 @@ public abstract class AbstractSolr implements Solr, Disposable
             }
 
             // Mark the core as fully migrated
-            setSVersion(newCore, solrMajorVersion, sVersion == null);
+            setSVersion(newCore, coreMajorVersion, sVersion == null);
         }
     }
 
@@ -220,9 +220,19 @@ public abstract class AbstractSolr implements Solr, Disposable
         this.solrSchemaUtils.commit(core);
     }
 
+    /**
+     * @return the major version of Solr the cores are designed for, which is the version of Solr bundled with XWiki
+     *         (it can be different from the version of the Solr server they are running on)
+     * @since 18.10.0RC1
+     */
+    protected int getCoreMajorVersion()
+    {
+        return SolrVersion.LATEST.getMajorVersion();
+    }
+
     protected String getSolrCoreSuffix()
     {
-        int majorVersion = getSolrMajorVersion();
+        int majorVersion = getCoreMajorVersion();
 
         return getSolrCoreSuffix(majorVersion);
     }
@@ -234,12 +244,12 @@ public abstract class AbstractSolr implements Solr, Disposable
             return "";
         }
 
-        return "_" + getSolrMajorVersion();
+        return "_" + majorVersion;
     }
 
     protected String toSolrCoreName(String xwikiCoreName)
     {
-        return toSolrCoreName(xwikiCoreName, getSolrMajorVersion());
+        return toSolrCoreName(xwikiCoreName, getCoreMajorVersion());
     }
 
     protected String toSolrCoreName(String xwikiCoreName, int majorVersion)

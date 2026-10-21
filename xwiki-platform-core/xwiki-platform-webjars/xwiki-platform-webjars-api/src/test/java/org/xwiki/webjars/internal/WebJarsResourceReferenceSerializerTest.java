@@ -52,7 +52,7 @@ class WebJarsResourceReferenceSerializerTest
     private URLNormalizer<ExtendedURL> normalizer;
 
     @Test
-    void serialize() throws Exception
+    void serialize()
     {
         Map<String, List<String>> parameters = new HashMap<>();
         parameters.put("key1", List.of("value1"));

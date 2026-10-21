@@ -145,7 +145,7 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
         } catch (Exception e) {
             // Save caught exception.
             this.execution.getContext().setProperty(OFFICE_VIEW_EXCEPTION, e);
-            this.logger.error("Failed to view office document: " + attachmentReference, e);
+            this.logger.error("Failed to view office document [{}]", attachmentReference, e);
             return null;
         }
     }

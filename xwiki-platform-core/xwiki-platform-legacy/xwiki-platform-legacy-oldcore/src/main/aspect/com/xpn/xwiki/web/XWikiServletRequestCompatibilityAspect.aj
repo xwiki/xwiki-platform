@@ -46,7 +46,7 @@ public privileged aspect XWikiServletRequestCompatibilityAspect
         // This happens for example using MySQL both with tomcat and Jetty
         // See bug : http://jira.xwiki.org/jira/browse/XWIKI-2422
         // Source : http://www.microsoft.com/typography/unicode/1252.htm
-        if (this.request.getCharacterEncoding().startsWith("ISO-8859")) {
+        if (this.getCharacterEncoding().startsWith("ISO-8859")) {
             // EURO SIGN
             text = text.replaceAll("\u0080", "&euro;");
             // SINGLE LOW-9 QUOTATION MARK

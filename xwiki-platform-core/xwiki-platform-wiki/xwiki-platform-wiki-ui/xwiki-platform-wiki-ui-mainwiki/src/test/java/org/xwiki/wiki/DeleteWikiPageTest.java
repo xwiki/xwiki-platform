@@ -21,7 +21,6 @@ package org.xwiki.wiki;
 
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;

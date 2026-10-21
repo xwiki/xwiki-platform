@@ -102,10 +102,7 @@ public class ObjectRemoveAction extends XWikiAction
 
         String comment = localizePlainOrKey("core.comment.deleteObject");
 
-        // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(userReference, doc, comment, true, context);
-
-        xwiki.saveDocument(doc, comment, true, context);
+        xwiki.saveDocument(doc, comment, true, true, context);
 
         if (Utils.isAjaxRequest(context)) {
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -129,6 +126,8 @@ public class ObjectRemoveAction extends XWikiAction
                 response.getWriter().write("failed");
                 response.setContentLength(6);
             } catch (IOException e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // There is nothing else we can do if the response cannot be written.
             }
             return null;
         } else {

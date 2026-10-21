@@ -52,9 +52,9 @@ class PanelIT
 {
 
     // TODO: The backslash character is removed from SPECIAL_CONTENT and SPECIAL_TITLE until XWIKI-18653 is fixed.
-    private static final String SPECIAL_CONTENT = "Is # & \\u0163 triky\\\"? c:windows /root $util";
+    private static final String SPECIAL_CONTENT = "Is # & \\u0163 tricky\\\"? c:windows /root $util";
 
-    private static final String SPECIAL_TITLE = "Is # & \u0163 triky\"? c:windows /root $util";
+    private static final String SPECIAL_TITLE = "Is # & \u0163 tricky\"? c:windows /root $util";
 
     private static final String PANELSIZE_SMALL = "Small";
     private static final String PANELSIZE_MEDIUM = "Medium";

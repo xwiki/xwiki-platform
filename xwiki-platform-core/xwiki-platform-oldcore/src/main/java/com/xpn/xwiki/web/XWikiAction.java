@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.inject.Inject;
@@ -147,6 +148,25 @@ public abstract class XWikiAction implements LegacyAction
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAction.class);
 
     /**
+     * The exceptions thrown by the servlet containers when the client closed the connection while the response was
+     * being sent. Their names are used rather than the classes since XWiki doesn't depend on a servlet container.
+     */
+    private static final Set<String> CLIENT_ABORT_EXCEPTIONS = Set.of(
+        // Jetty
+        "org.eclipse.jetty.io.EofException",
+        // Tomcat
+        "org.apache.catalina.connector.ClientAbortException");
+
+    /**
+     * The root causes of the exceptions thrown when the client closed the connection while the response was being
+     * sent, for the servlet containers that don't wrap them in a dedicated exception: depending on how the connection
+     * was closed, writing to it fails with a broken pipe or a connection reset. The messages come from the operating
+     * system, so they can be different on another one.
+     */
+    private static final Set<String> CLIENT_ABORT_ROOT_CAUSES =
+        Set.of("IOException: Broken pipe", "IOException: Connection reset by peer");
+
+    /**
      * Actions that need to be resolved on the main wiki instead of the current non-existing wiki. This is used to be
      * able to render the skin even on a wiki that doesn't exist.
      */
@@ -167,7 +187,7 @@ public abstract class XWikiAction implements LegacyAction
 
     @Inject
     @Named("context")
-    private ComponentManager componentManager;
+    protected ComponentManager componentManager;
 
     /**
      * Indicate if the action allow asynchronous display (among which the XWiki initialization).
@@ -355,20 +375,36 @@ public abstract class XWikiAction implements LegacyAction
     protected boolean isEntityReferenceNameValid(EntityReference entityReference)
     {
         if (this.getEntityNameValidationManager().getEntityReferenceNameStrategy() != null
-            && this.getEntityNameValidationConfiguration().useValidation()) {
-            if (!this.getEntityNameValidationManager().getEntityReferenceNameStrategy().isValid(entityReference)) {
-                Object[] args = {getLocalSerializer().serialize(entityReference)};
-                XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID,
-                    "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
-                    args);
-                ScriptContext scontext = getCurrentScriptContext();
-                scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
-                scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
-                return false;
-            }
+            && this.getEntityNameValidationConfiguration().useValidation()
+            && !this.getEntityNameValidationManager().getEntityReferenceNameStrategy().isValid(entityReference)) {
+            Object[] args = {getLocalSerializer().serialize(entityReference)};
+            XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID,
+                "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
+                args);
+            ScriptContext scontext = getCurrentScriptContext();
+            scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
+            return false;
         }
         return true;
+    }
+
+    /**
+     * @param e the exception to check
+     * @return {@code true} if the exception was caused by the client closing the connection
+     */
+    private static boolean isClientAbort(Throwable e)
+    {
+        for (Throwable cause : ExceptionUtils.getThrowableList(e)) {
+            for (Class<?> type = cause.getClass(); type != null; type = type.getSuperclass()) {
+                if (CLIENT_ABORT_EXCEPTIONS.contains(type.getName())) {
+                    return true;
+                }
+            }
+        }
+
+        return CLIENT_ABORT_ROOT_CAUSES.contains(ExceptionUtils.getRootCauseMessage(e));
     }
 
     /**
@@ -450,13 +486,13 @@ public abstract class XWikiAction implements LegacyAction
                     // that we
                     // are parsing below.
                     VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-                    VelocityContext vcontext = velocityManager.getVelocityContext();
+                    velocityManager.getVelocityContext();
 
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.
                         if (!StringUtils.isEmpty(context.getWiki().Param("xwiki.virtual.redirect"))) {
-                            LOGGER.warn(String.format("%s %s", "'xwiki.virtual.redirect' is no longer supported.",
-                                "Please update your configuration and/or see XWIKI-8914 for more details."));
+                            LOGGER.warn("'xwiki.virtual.redirect' is no longer supported. Please update your "
+                                + "configuration and/or see XWIKI-8914 for more details.");
                         }
 
                         // Display the error template only for actions that are not ignored
@@ -583,8 +619,8 @@ public abstract class XWikiAction implements LegacyAction
                         return;
                     }
                 } catch (Throwable ex) {
-                    LOGGER.error("Cannot send action notifications for document [" + context.getDoc()
-                        + " using action [" + context.getAction() + "]", ex);
+                    LOGGER.error("Cannot send action notifications for document [{}] using action [{}]",
+                        context.getDoc(), context.getAction(), ex);
                 }
 
                 if (monitor != null) {
@@ -702,13 +738,13 @@ public abstract class XWikiAction implements LegacyAction
                     // right one.
                     velocityManager.getVelocityContext().put("exp", e);
                     if (LOGGER.isWarnEnabled()) {
-                        // Don't log "Broken Pipe" exceptions since they're not real errors and we don't want to pollute
-                        // the logs with unnecessary stack traces. It just means the client side has cancelled the
-                        // connection.
-                        if ("IOException: Broken pipe".equals(ExceptionUtils.getRootCauseMessage(e))) {
+                        // Don't log the exceptions caused by the client closing the connection since they're not real
+                        // errors and we don't want to pollute the logs with unnecessary stack traces. It just means the
+                        // client side has cancelled the connection.
+                        if (isClientAbort(e)) {
                             return;
                         }
-                        LOGGER.warn("Uncaught exception: " + e.getMessage(), e);
+                        LOGGER.warn("Uncaught exception", e);
                     }
                     // If the request is an AJAX request, we don't return a whole HTML page, but just the exception
                     // inline.
@@ -717,12 +753,15 @@ public abstract class XWikiAction implements LegacyAction
                     return;
                 } catch (XWikiException ex) {
                     if (ex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
-                        LOGGER.error("Connection aborted");
+                        // The client closed the connection while the error page was being sent (e.g. the browser
+                        // cancelled the request): there's not much we can do on the server side, and it's not an error
+                        // of the server.
+                        LOGGER.debug("Connection aborted", ex);
                     }
                 } catch (Exception e2) {
                     // I hope this never happens
-                    LOGGER.error("Uncaught exceptions (inner): ", e);
-                    LOGGER.error("Uncaught exceptions (outer): ", e2);
+                    LOGGER.error("Uncaught exceptions (inner):", e);
+                    LOGGER.error("Uncaught exceptions (outer):", e2);
                 }
                 return;
             } finally {
@@ -746,8 +785,8 @@ public abstract class XWikiAction implements LegacyAction
                     try {
                         this.observation.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
                     } catch (Throwable ex) {
-                        LOGGER.error("Cannot send action notifications for document [" + docName + " using action ["
-                            + context.getAction() + "]", ex);
+                        LOGGER.error("Cannot send action notifications for document [{}] using action [{}]", docName,
+                            context.getAction(), ex);
                     }
                 }
 
@@ -808,7 +847,7 @@ public abstract class XWikiAction implements LegacyAction
     {
         RenderingContext renderingContext = Utils.getComponent(RenderingContext.class);
         MutableRenderingContext mutableRenderingContext =
-            renderingContext instanceof MutableRenderingContext ? (MutableRenderingContext) renderingContext : null;
+            renderingContext instanceof MutableRenderingContext mutableContext ? mutableContext : null;
 
         if (mutableRenderingContext != null) {
             mutableRenderingContext.push(renderingContext.getTransformation(), renderingContext.getXDOM(),
@@ -1321,8 +1360,8 @@ public abstract class XWikiAction implements LegacyAction
                 LOGGER.error(logMessage, exception);
             }
         } else {
-            if (exception instanceof XWikiException) {
-                throw (XWikiException) exception;
+            if (exception instanceof XWikiException xwikiException) {
+                throw xwikiException;
             } else {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
                     "Uncaught exception", exception);

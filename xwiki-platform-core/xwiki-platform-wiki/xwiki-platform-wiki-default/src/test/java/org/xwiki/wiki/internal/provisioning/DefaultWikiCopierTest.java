@@ -40,7 +40,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -102,9 +101,9 @@ class DefaultWikiCopierTest
         DocumentReference copydocRef1 = new DocumentReference("wikiB", "Space", "Doc1");
         DocumentReference copydocRef2 = new DocumentReference("wikiB", "Space", "Doc2");
         DocumentReference copydocRef3 = new DocumentReference("wikiB", "Space", "Doc3");
-        when(this.documentReferenceResolver.resolve(eq("Space.Doc1"), eq(fromWikiReference))).thenReturn(docRef1);
-        when(this.documentReferenceResolver.resolve(eq("Space.Doc2"), eq(fromWikiReference))).thenReturn(docRef2);
-        when(this.documentReferenceResolver.resolve(eq("Space.Doc3"), eq(fromWikiReference))).thenReturn(docRef3);
+        when(this.documentReferenceResolver.resolve("Space.Doc1", fromWikiReference)).thenReturn(docRef1);
+        when(this.documentReferenceResolver.resolve("Space.Doc2", fromWikiReference)).thenReturn(docRef2);
+        when(this.documentReferenceResolver.resolve("Space.Doc3", fromWikiReference)).thenReturn(docRef3);
 
         // Test
         this.defaultWikiCopier.copyDocuments("wikiA", "wikiB", false);

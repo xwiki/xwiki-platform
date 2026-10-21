@@ -39,6 +39,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
@@ -59,7 +60,9 @@ import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -106,6 +109,9 @@ class DocumentSolrMetadataExtractorTest
 {
     @InjectMockComponents
     private DocumentSolrMetadataExtractor metadataExtractor;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
@@ -415,10 +421,13 @@ class DocumentSolrMetadataExtractorTest
         StringClass stringClass = mock(StringClass.class);
         when(stringClass.getClassType()).thenReturn("String");
 
-        when(xclass.get("comment")).thenReturn(mock(TextAreaClass.class));
+        TextAreaClass textAreaClassMock = mock();
+        when(xclass.get("comment")).thenReturn(textAreaClassMock);
         when(xclass.get("summary")).thenReturn(stringClass);
-        when(xclass.get("password")).thenReturn(mock(PasswordClass.class));
-        when(xclass.get("enabled")).thenReturn(mock(BooleanClass.class));
+        PasswordClass passwordClassMock = mock();
+        when(xclass.get("password")).thenReturn(passwordClassMock);
+        BooleanClass booleanClassMock = mock();
+        when(xclass.get("enabled")).thenReturn(booleanClassMock);
 
         //
         // Call
@@ -509,7 +518,8 @@ class DocumentSolrMetadataExtractorTest
         when(userObject.getRelativeXClassReference())
             .thenReturn(userClassRef.removeParent(userClassRef.getWikiReference()));
 
-        when(xclass.get("email")).thenReturn(mock(EmailClass.class));
+        EmailClass emailClassMock = mock();
+        when(xclass.get("email")).thenReturn(emailClassMock);
 
         //
         // Call
@@ -660,6 +670,40 @@ class DocumentSolrMetadataExtractorTest
     }
 
     @Test
+    void getDocumentWithAttachmentDeletedWhileIndexing() throws Exception
+    {
+        XWikiAttachment attachment = createMockAttachment("deleted.txt", "text/plain", new Date(), "", "Alice",
+            "Shy Alice");
+        when(attachment.getContentInputStream(this.xcontext)).thenThrow(new XWikiException());
+        when(this.document.getAttachmentList()).thenReturn(List.of(attachment));
+        // The stored document doesn't have the attachment anymore.
+        when(this.document.getAttachment("deleted.txt")).thenReturn(null);
+
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
+
+        assertNull(solrDocument.getFieldValue("attcontent_en_US"));
+        // Nothing is reported since the deletion of the attachment updates the index anyway.
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void getDocumentWithMissingAttachmentContent() throws Exception
+    {
+        XWikiAttachment attachment = createMockAttachment("missing.txt", "text/plain", new Date(), "", "Alice",
+            "Shy Alice");
+        when(attachment.getContentInputStream(this.xcontext)).thenThrow(new XWikiException());
+        when(this.document.getAttachmentList()).thenReturn(List.of(attachment));
+        when(this.document.getAttachment("missing.txt")).thenReturn(attachment);
+
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
+
+        assertNull(solrDocument.getFieldValue("attcontent_en_US"));
+        // The attachment still exists, so its content is really missing.
+        assertEquals("Failed to retrieve the content of attachment [Attachment wiki:Path.To.Page.WebHome@missing.txt]",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
     void testAttachmentExtractFromTxt() throws Exception
     {
         assertAttachmentExtract("text content\n", "txt.txt");
@@ -670,6 +714,9 @@ class DocumentSolrMetadataExtractorTest
     {
         assertAttachmentExtract("MS Office 97 content\n\n", "msoffice97.doc");
 
+        // Apache POI warns about the format of the test file.
+        assertEquals("Since FIB.nFib == 0x0101 value of FIB.cswNew MUST be 0x0002, not 0x0",
+            this.logCapture.getMessage(0));
     }
 
     @Test

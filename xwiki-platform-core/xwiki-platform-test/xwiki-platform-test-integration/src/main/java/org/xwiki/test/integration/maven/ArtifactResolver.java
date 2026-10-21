@@ -104,7 +104,10 @@ public class ArtifactResolver
             new ArtifactRequest(artifact, this.repositoryResolver.getRepositories(), null);
         ArtifactResult artifactResult = this.repositoryResolver.getSystem().resolveArtifact(
             this.repositoryResolver.getSession(), artifactRequest);
-        if (!artifactResult.getExceptions().isEmpty()) {
+        // Don't fail on the mere presence of exceptions: they are also recorded for the repositories which did not
+        // provide the artifact (e.g. the ones excluded by the Maven Resolver remote repository filters) even when
+        // another repository did.
+        if (!artifactResult.isResolved()) {
             sendError(artifact, artifactResult.getExceptions());
         }
         return artifactResult;
@@ -159,7 +162,7 @@ public class ArtifactResolver
             DependencyNode node = collectResult.getRoot();
 
             if (this.isVerbose) {
-                LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
+                LOGGER.info("collect = [{}] ms", (System.currentTimeMillis() - t1));
                 node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
             }
 
@@ -168,7 +171,7 @@ public class ArtifactResolver
             DependencyResult dependencyResult = this.repositoryResolver.getSystem().resolveDependencies(
                 this.repositoryResolver.getSession(), request);
             if (this.isVerbose) {
-                LOGGER.info("resolve = {} ms", (System.currentTimeMillis() - t1));
+                LOGGER.info("resolve = [{}] ms", (System.currentTimeMillis() - t1));
             }
 
             if (!dependencyResult.getCollectExceptions().isEmpty()) {

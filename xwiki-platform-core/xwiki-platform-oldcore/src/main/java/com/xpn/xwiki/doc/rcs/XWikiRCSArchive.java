@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.PatchFailedException;
@@ -158,8 +159,8 @@ public class XWikiRCSArchive extends Archive
         {
             boolean isdiff = !sfullVersion.equals(getState());
             if (getTextString() != null && isdiff != !getTextString().startsWith("<")) {
-                LOGGER.warn("isDiff: Archive is inconsistent. Text and diff field are contradicting. version="
-                    + getVersion());
+                LOGGER.warn("isDiff: Archive is inconsistent. Text and diff field are contradicting. Version is [{}]",
+                    getVersion());
                 isdiff = !isdiff;
             }
             return isdiff;
@@ -171,8 +172,8 @@ public class XWikiRCSArchive extends Archive
         public void setDiff(boolean isdiff)
         {
             if (getTextString() != null && isdiff != !getTextString().startsWith("<")) {
-                LOGGER.warn("setDiff: Archive is inconsistent. Text and diff field are contradicting. version="
-                    + getVersion());
+                LOGGER.warn("setDiff: Archive is inconsistent. Text and diff field are contradicting. Version is [{}]",
+                    getVersion());
                 isdiff = !isdiff;
             }
             setState(isdiff ? sdiffVersion : sfullVersion);
@@ -273,8 +274,8 @@ public class XWikiRCSArchive extends Archive
                     //    See https://jira.xwiki.org/browse/XWIKI-1855
                     // 3) Cannot get the revision as a string from a node version. Not sure why this
                     //    is happening though... See https://jira.xwiki.org/browse/XWIKI-2076
-                    LOGGER.warn("Error in revision [" + node.getVersion().toString() + "]: [" + e.getMessage()
-                        + "]. Ignoring non-fatal error, the Author, Comment and Date are not set.");
+                    LOGGER.warn("Error in revision [{}]: [{}]. Ignoring non-fatal error, the Author, Comment and Date "
+                        + "are not set.", node.getVersion().toString(), ExceptionUtils.getRootCauseMessage(e));
                 }
             }
 

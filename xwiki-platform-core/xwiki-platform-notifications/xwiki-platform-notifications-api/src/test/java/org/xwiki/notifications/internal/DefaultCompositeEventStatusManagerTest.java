@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultCompositeEventStatusManagerTest
+class DefaultCompositeEventStatusManagerTest
 {
     @InjectMockComponents
     private DefaultCompositeEventStatusManager eventStatusManager;

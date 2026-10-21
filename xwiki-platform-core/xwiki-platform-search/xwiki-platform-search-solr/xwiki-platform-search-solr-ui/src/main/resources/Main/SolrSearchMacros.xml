@@ -634,7 +634,7 @@
     #end
     #set ($discard = $matchesByLanguage.put($language, $entry.value))
   #end
-  ## Keep only the matches correspoding to the search result locale.
+  ## Keep only the matches corresponding to the search result locale.
   #set ($highlighting = [])
   ## Fields with a higher index will be displayed first. Fields that are not included will be displayed at the end.
   #set ($fieldPriority = ['filename', 'attcontent', 'objcontent', 'comment', 'propertyname', 'propertyvalue', 'title', 'doccontent'])

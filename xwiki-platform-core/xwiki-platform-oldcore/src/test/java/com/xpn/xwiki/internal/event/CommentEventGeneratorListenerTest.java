@@ -23,7 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.Event;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -87,14 +86,12 @@ class CommentEventGeneratorListenerTest
     {
         this.document.addXObject(this.commentXObject);
 
-        final Event event = new CommentAddedEvent("wiki:space.page", "0");
-
         this.listener.onEvent(new XObjectAddedEvent(this.commentXObject.getReference()), this.document,
             this.oldcore.getXWikiContext());
 
         // Make sure the listener generated a comment added event
         verify(this.observationManager)
-            .notify(any(event.getClass()), same(this.document), same(this.oldcore.getXWikiContext()));
+            .notify(any(CommentAddedEvent.class), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -102,14 +99,12 @@ class CommentEventGeneratorListenerTest
     {
         this.documentOrigin.addXObject(this.commentXObject);
 
-        final Event event = new CommentDeletedEvent("wiki:space.page", "0");
-
         this.listener.onEvent(new XObjectDeletedEvent(this.commentXObject.getReference()), this.document,
             this.oldcore.getXWikiContext());
 
         // Make sure the listener generated a comment deleted event
         verify(this.observationManager)
-            .notify(any(event.getClass()), same(this.document), same(this.oldcore.getXWikiContext()));
+            .notify(any(CommentDeletedEvent.class), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -120,13 +115,11 @@ class CommentEventGeneratorListenerTest
 
         this.commentXObject.setStringValue("comment", "comment");
 
-        final Event event = new CommentUpdatedEvent("wiki:space.page", "0");
-
         this.listener.onEvent(new XObjectUpdatedEvent(this.commentXObject.getReference()), this.document,
             this.oldcore.getXWikiContext());
 
         // Make sure the listener generated a comment updated event
         verify(this.observationManager)
-            .notify(any(event.getClass()), same(this.document), same(this.oldcore.getXWikiContext()));
+            .notify(any(CommentUpdatedEvent.class), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 }

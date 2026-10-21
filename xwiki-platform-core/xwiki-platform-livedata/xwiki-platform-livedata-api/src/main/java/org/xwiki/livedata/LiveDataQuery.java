@@ -532,7 +532,7 @@ public class LiveDataQuery implements InitializableLiveDataElement
      */
     public void setProperties(List<String> properties)
     {
-        this.properties = properties;
+        this.properties = properties == null ? null : new ArrayList<>(properties);
     }
 
     /**
@@ -568,7 +568,7 @@ public class LiveDataQuery implements InitializableLiveDataElement
      */
     public void setFilters(List<Filter> filters)
     {
-        this.filters = filters;
+        this.filters = filters == null ? null : new ArrayList<>(filters);
     }
 
     /**
@@ -586,7 +586,7 @@ public class LiveDataQuery implements InitializableLiveDataElement
      */
     public void setSort(List<SortEntry> sort)
     {
-        this.sort = sort;
+        this.sort = sort == null ? null : new ArrayList<>(sort);
     }
 
     @Override

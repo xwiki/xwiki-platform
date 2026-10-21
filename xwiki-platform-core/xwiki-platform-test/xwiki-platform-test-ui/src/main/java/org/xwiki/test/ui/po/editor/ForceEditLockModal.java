@@ -33,11 +33,16 @@ import org.xwiki.test.ui.po.ConfirmationModal;
 public class ForceEditLockModal extends ConfirmationModal
 {
     /**
-     * Default constructor.
+     * Default constructor. In contrast to other modals, it waits until the modal is displayed. The reason is that this
+     * modal is always displayed asynchronously, after the server has been asked if a confirmation is required, so it
+     * is never displayed right after the action that triggers it. Further, the modal element is re-used, so waiting
+     * for the element to be present isn't enough as it stays in the DOM after having been closed.
      */
     public ForceEditLockModal()
     {
         super(By.className("force-edit-lock-modal"));
+
+        waitUntilDisplayed();
     }
 
     @Override

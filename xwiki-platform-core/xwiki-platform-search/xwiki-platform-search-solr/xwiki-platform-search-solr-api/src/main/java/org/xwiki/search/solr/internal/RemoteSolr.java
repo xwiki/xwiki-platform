@@ -128,6 +128,12 @@ public class RemoteSolr extends AbstractSolr implements Initializable
             String version = (String) systemInfo.findRecursive("lucene", "solr-impl-version");
             if (version != null) {
                 this.solrMajorVersion = Integer.parseInt(StringUtils.substringBefore(version, '.'));
+
+                if (this.solrMajorVersion < getCoreMajorVersion()) {
+                    this.logger.error("The version of the Solr server [{}] is older than the version of Solr the XWiki"
+                        + " cores are designed for ([{}]), the Solr server needs to be upgraded.", version,
+                        getCoreMajorVersion());
+                }
             } else {
                 throw new InitializationException(
                     "The Solr server does not give any information about its version in lucene -> solr-impl-version."
@@ -190,7 +196,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
 
         // Create the client core handler
         SolrClient solrClient = new HttpSolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
-        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, solrClient, getSolrMajorVersion());
+        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, solrClient, solrMajorVersion);
     }
 
     private String getCorePrefix()

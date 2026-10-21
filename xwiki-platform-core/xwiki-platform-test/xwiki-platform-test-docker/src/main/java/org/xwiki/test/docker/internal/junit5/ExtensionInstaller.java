@@ -24,8 +24,9 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
@@ -33,6 +34,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.extension.RestExtensionInstaller;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
@@ -59,6 +61,31 @@ public class ExtensionInstaller
     private static final String PLATFORM_GROUPID = "org.xwiki.platform";
 
     private static final String DEPENDENCIES_SYSTEM_PROPERTY = System.getProperty("xwiki.test.ui.dependencies");
+
+    /**
+     * Matches the Extension Manager error raised when a provisioned extension resolves a dependency whose version
+     * differs from the one bundled in the test WAR as a core extension. The two capturing groups are the resolved
+     * dependency (e.g. {@code org.bouncycastle:bcpkix-jdk18on-1.85}) and the conflicting core extension feature
+     * (e.g. {@code org.bouncycastle:bcpkix-jdk18on/1.84}).
+     */
+    private static final Pattern CORE_EXTENSION_CONFLICT_PATTERN = Pattern.compile(
+        "Dependency \\[([^\\]]+)] is not compatible with core extension feature \\[([^\\]]+)]");
+
+    /**
+     * Turns the opaque core extension version conflict into an actionable explanation. The raw failure is a job status
+     * code with a deeply-nested reason and gives no hint that the cause is a version mismatch between the WAR (built
+     * from the local Maven repository) and the extensions resolved by the running server (which also resolves from the
+     * remote repositories). The two placeholders are the resolved dependency and the conflicting core extension.
+     */
+    private static final String CORE_EXTENSION_CONFLICT_DIAGNOSTIC =
+        "A provisioned extension requires dependency [%s], which is incompatible with the core extension [%s] bundled "
+            + "in the test WAR. In the Docker test framework the WAR is built from your local Maven repository while "
+            + "the running server also resolves extensions from the remote repositories, so a version available on "
+            + "one side but not the other triggers this conflict. To fix it, use any of: (1) run the test offline by "
+            + "adding [-o] to the Maven command so the server resolves extensions only from your local repository, "
+            + "matching the WAR; (2) refresh your local SNAPSHOTs with [mvn -U] on XWiki Commons and Platform then "
+            + "rebuild; (3) if the newer version is a legitimate release, wait for it to be adopted everywhere so all "
+            + "versions realign.";
 
     private final ExtensionContext context;
 
@@ -103,7 +130,7 @@ public class ExtensionInstaller
      */
     public void installExtensions(String username, String password, String installUserReference) throws Exception
     {
-        installExtensions(new UsernamePasswordCredentials(username, password), installUserReference, null);
+        installExtensions(new XWikiCredentials(username, password), installUserReference, null);
     }
 
     /**
@@ -119,7 +146,7 @@ public class ExtensionInstaller
      * null they'll be installed in the main wiki
      * @throws Exception if there's a failure to install the extensions in the running XWiki instance
      */
-    public void installExtensions(UsernamePasswordCredentials credentials, String installUserReference,
+    public void installExtensions(XWikiCredentials credentials, String installUserReference,
         List<String> namespaces) throws Exception
     {
         Set<ExtensionId> extensions = new LinkedHashSet<>();
@@ -159,7 +186,7 @@ public class ExtensionInstaller
         // System properties by the Maven Surefire or Failsafe plugins. If not defined, then read the dependencies from
         // the current POM and only take the ones not having a "test" scope and being of type "xar" or "jar".
         // Note that the use case for defining the system property is for the cases when you don't want to draw
-        // dependencies in your POM (can be useful when you want to test your extension on a vesion of XWiki for which
+        // dependencies in your POM (can be useful when you want to test your extension on a version of XWiki for which
         // it wasn't developed for).
         extensions.addAll(getProjectExtensionIds(distributionExtensionIds));
 
@@ -232,11 +259,41 @@ public class ExtensionInstaller
      *            namespaces
      * @throws Exception if there's a failure to install the extensions in the running XWiki instance
      */
-    public void installExtensions(Collection<ExtensionId> extensions, UsernamePasswordCredentials credentials,
+    public void installExtensions(Collection<ExtensionId> extensions, XWikiCredentials credentials,
         String installUserReference, List<String> namespaces, boolean failOnExist) throws Exception
     {
-        this.restExtensionInstaller.installExtensions(
-            DockerTestUtils.getCurrentXWikiExecutor(this.context).getHttpClientBaseURL(), extensions, credentials,
-            installUserReference, namespaces, failOnExist);
+        try {
+            this.restExtensionInstaller.installExtensions(
+                DockerTestUtils.getCurrentXWikiExecutor(this.context).getHttpClientBaseURL(), extensions, credentials,
+                installUserReference, namespaces, failOnExist);
+        } catch (Exception e) {
+            // Translate the opaque core extension version conflict into an actionable explanation.
+            String diagnostic = getCoreExtensionConflictDiagnostic(e);
+            if (diagnostic != null) {
+                throw new Exception(diagnostic, e);
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * Detects the "not compatible with core extension feature" failure anywhere in the exception chain and turns it
+     * into an actionable explanation (see {@link #CORE_EXTENSION_CONFLICT_DIAGNOSTIC}).
+     *
+     * @param throwable the failure raised while provisioning the extensions
+     * @return the actionable explanation, or {@code null} if the failure is not a core extension version conflict
+     */
+    static String getCoreExtensionConflictDiagnostic(Throwable throwable)
+    {
+        for (Throwable current = throwable; current != null; current = current.getCause()) {
+            String message = current.getMessage();
+            if (message != null) {
+                Matcher matcher = CORE_EXTENSION_CONFLICT_PATTERN.matcher(message);
+                if (matcher.find()) {
+                    return String.format(CORE_EXTENSION_CONFLICT_DIAGNOSTIC, matcher.group(1), matcher.group(2));
+                }
+            }
+        }
+        return null;
     }
 }

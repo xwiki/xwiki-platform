@@ -19,6 +19,7 @@
  */
 import type { Collaborator } from "./collaborator";
 import type { ConnectionStatus } from "./connectionStatus";
+import type { Saver } from "@xwiki/platform-autosave-api";
 import type { Ref } from "vue";
 import type { Doc } from "yjs";
 
@@ -59,4 +60,12 @@ export type Collaboration = {
    * The shared Yjs document that is synchronized by the collaboration provider between the collaborators.
    */
   doc: Doc;
+
+  /**
+   * The auto-saver shared by every editor taking part in this collaboration session. Building one requires knowing
+   * how the edited content is saved, which the collaboration manager has no way of telling, so the first editor
+   * that joins creates it and the manager only stops it when the session is left.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  saver?: Saver<any>;
 };

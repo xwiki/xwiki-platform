@@ -99,7 +99,7 @@
          It's recommended to use migrations when possible (so only when the required changes can be fully done using SolrJ API):
            * it avoid starting from scratch re-indexing sometimes huge instances
            * it makes the upgrade of Solr standalone setups much easier
-           * it better support customizations of the Solr configuration (i.e. they are not reseted)
+           * it better support customizations of the Solr configuration (i.e. they are not reset)
     -->
     <fieldType name="__cversion" class="solr.TextField"  positionIncrementGap="160600000"/>
     <fieldType name="__cmversion" class="solr.TextField" positionIncrementGap="171009000"/>
@@ -543,7 +543,7 @@
     <!-- A text field with defaults appropriate for English: it tokenizes with StandardTokenizer,
          removes English stop words (lang/stopwords_en.txt), down cases, protects words from protwords.txt, and
          finally applies Porter's stemming.  The query time analyzer also applies synonyms from synonyms.txt. -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_en" type="text_en"  indexed="true"  stored="true" multiValued="true"/>
     <dynamicField name="*_en_GB" type="text_en"  indexed="true"  stored="true" multiValued="true"/>
     <dynamicField name="*_en_US" type="text_en"  indexed="true"  stored="true" multiValued="true"/>

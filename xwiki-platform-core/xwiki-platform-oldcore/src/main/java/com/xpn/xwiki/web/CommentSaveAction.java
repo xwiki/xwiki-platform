@@ -138,11 +138,8 @@ public class CommentSaveAction extends CommentAddAction
         // upload an image to be inserted in the comment).
         handleTemporaryUploadedFiles(doc, context.getRequest());
 
-        // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
-
         // Save it
-        xwiki.saveDocument(doc, comment, true, context);
+        xwiki.saveDocument(doc, comment, true, true, context);
 
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {

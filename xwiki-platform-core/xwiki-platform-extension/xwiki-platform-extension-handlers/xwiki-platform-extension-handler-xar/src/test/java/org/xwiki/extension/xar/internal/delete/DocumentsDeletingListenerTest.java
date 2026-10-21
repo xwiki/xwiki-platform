@@ -205,7 +205,7 @@ class DocumentsDeletingListenerTest
 
         // Check
         verify(status).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
-        verify(event).cancel(eq("Question has been interrupted."));
+        verify(event).cancel("Question has been interrupted.");
         assertEquals(1, this.logCapture.size());
         assertEquals("Confirm question has been interrupted.", this.logCapture.getMessage(0));
     }

@@ -74,7 +74,8 @@ class WikiAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         Query query = mock(Query.class);
         when(this.queryManager.createQuery("select doc.space, doc.name, doc.version, attachment"
             + " from XWikiDocument as doc, XWikiAttachment as attachment"
-            + " where attachment.docId = doc.id and upper(doc.space) like :space", Query.HQL)).thenReturn(query);
+            + " where attachment.docId = doc.id and upper(doc.space) like :space"
+            + " order by doc.fullName asc, doc.language asc, attachment.filename asc", Query.HQL)).thenReturn(query);
         mockContainsQueryParam(query, "space", "ABC");
         when(query.setOffset(0)).thenReturn(query);
         when(query.setLimit(10)).thenReturn(query);

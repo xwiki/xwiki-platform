@@ -200,12 +200,12 @@ async function codifyMacros(
  *
  * Converts all macro invocations, with nesting support
  */
-// eslint-disable-next-line max-statements
 const eatMacro: MacroHandler = async (
   content,
   mdParser,
   macrosService,
   previousChars,
+  // eslint-disable-next-line max-statements
 ): ReturnType<MacroHandler> => {
   // Find the macro's name
   const macroIdMatch = content.match(

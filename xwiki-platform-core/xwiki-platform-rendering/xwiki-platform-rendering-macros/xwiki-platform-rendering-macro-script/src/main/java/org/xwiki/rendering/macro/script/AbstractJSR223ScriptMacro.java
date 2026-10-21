@@ -65,9 +65,9 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     /**
      * The name of the "out" binding..
      * 
-     * @deprecated not used since 10.1RC1 because the bug has been fixed in Groovy
+     * @deprecated not used because the bug has been fixed in Groovy
      */
-    @Deprecated
+    @Deprecated(since = "10.1RC1")
     public static final String BINDING_OUT = "out";
 
     /**
@@ -92,7 +92,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     /**
      * @param macroName the name of the macro (eg "groovy")
      */
-    public AbstractJSR223ScriptMacro(String macroName)
+    protected AbstractJSR223ScriptMacro(String macroName)
     {
         super(macroName, null, JSR223ScriptMacroParameters.class);
     }
@@ -101,7 +101,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param macroName the name of the macro (eg "groovy")
      * @param macroDescription the text description of the macro.
      */
-    public AbstractJSR223ScriptMacro(String macroName, String macroDescription)
+    protected AbstractJSR223ScriptMacro(String macroName, String macroDescription)
     {
         super(macroName, macroDescription, JSR223ScriptMacroParameters.class);
     }
@@ -111,7 +111,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param macroDescription the text description of the macro.
      * @param contentDescriptor the description of the macro content.
      */
-    public AbstractJSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor)
+    protected AbstractJSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor)
     {
         super(macroName, macroDescription, contentDescriptor, JSR223ScriptMacroParameters.class);
     }
@@ -121,7 +121,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param macroDescription the text description of the macro.
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
-    public AbstractJSR223ScriptMacro(String macroName, String macroDescription,
+    protected AbstractJSR223ScriptMacro(String macroName, String macroDescription,
         Class<? extends JSR223ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, parametersBeanClass);
@@ -133,7 +133,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param contentDescriptor the description of the macro content.
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
-    public AbstractJSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor,
+    protected AbstractJSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor,
         Class<? extends JSR223ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
@@ -265,10 +265,10 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     {
         List<Block> result;
 
-        if (scriptResult instanceof XDOM) {
-            result = ((XDOM) scriptResult).getChildren();
-        } else if (scriptResult instanceof Block) {
-            result = Collections.singletonList((Block) scriptResult);
+        if (scriptResult instanceof XDOM xdom) {
+            result = xdom.getChildren();
+        } else if (scriptResult instanceof Block block) {
+            result = Collections.singletonList(block);
         } else if (scriptResult instanceof List && !((List<?>) scriptResult).isEmpty()
             && ((List<?>) scriptResult).get(0) instanceof Block) {
             result = (List<Block>) scriptResult;
@@ -329,7 +329,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param engine the script engine
      * @param scriptContext the script context
      * @return The value returned from the execution of the script.
-     * @throws ScriptException if an error occurrs in script. ScriptEngines should create and throw
+     * @throws ScriptException if an error occurs in script. ScriptEngines should create and throw
      *             <code>ScriptException</code> wrappers for checked Exceptions thrown by underlying scripting
      *             implementations.
      */

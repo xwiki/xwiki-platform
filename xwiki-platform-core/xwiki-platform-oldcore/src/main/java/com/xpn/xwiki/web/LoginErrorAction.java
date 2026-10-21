@@ -45,7 +45,7 @@ public class LoginErrorAction extends XWikiAction
         // Disallow template override with xpage parameter.
         if (!LOGIN.equals(Utils.getPage(context.getRequest(), LOGIN))) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                String.format("Template may not be overriden with 'xpage' in [%s] action.", LOGIN));
+                String.format("Template may not be overridden with 'xpage' in [%s] action.", LOGIN));
         }
 
         return super.action(context);

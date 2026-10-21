@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -113,7 +112,7 @@ public abstract class AbstractReplaceUserJob
         try {
             this.logger.info("Updating documents from [{}].", entityReference);
             return getDocumentsToUpdateQuery(entityReference).<Object[]>execute().stream()
-                .map(this.resolveDocumentReferenceWithLocale(entityReference)).collect(Collectors.toList());
+                .map(this.resolveDocumentReferenceWithLocale(entityReference)).toList();
         } catch (QueryException e) {
             this.logger.error("Failed to retrieve the list of documents to update from [{}]. Root cause is [{}].",
                 entityReference, ExceptionUtils.getRootCauseMessage(e));

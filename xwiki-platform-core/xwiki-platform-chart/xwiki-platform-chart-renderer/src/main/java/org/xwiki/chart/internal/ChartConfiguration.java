@@ -19,12 +19,12 @@
  */
 package org.xwiki.chart.internal;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
  * Component in charge of loading configuration information for the chart module.

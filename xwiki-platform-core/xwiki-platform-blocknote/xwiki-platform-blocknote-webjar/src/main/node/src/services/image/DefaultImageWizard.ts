@@ -17,15 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import {
+  EntityType as XWikiEntityType,
+  Model,
+} from "@xwiki/platform-xwiki-model-api";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 import { Container, inject, injectable } from "inversify";
-import type { ImageWizard, ImageWizardCallback } from "./ImageWizard";
+import type {
+  ImageWithReference,
+  ImageWizard,
+  ImageWizardCallback,
+} from "./ImageWizard";
+import type { StorageProvider } from "@xwiki/platform-backend-api";
+import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
 import type {
   ResourceReference,
   ResourceReferenceParser,
-} from "../model/reference/ResourceReferenceParser";
-import type { XWikiEntityReference } from "../model/reference/XWikiEntityReference";
-import type { StorageProvider } from "@xwiki/platform-backend-api";
-import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
+} from "@xwiki/platform-rendering-api";
+import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xwiki-model-api";
 
 // The image alignment options supported by the Image Wizard.
 type ImageAlignment = "none" | "start" | "center" | "end";
@@ -110,22 +119,22 @@ export class DefaultImageWizard implements ImageWizard {
   ) {}
 
   public insert(callback: ImageWizardCallback): void {
-    this.showWizard(callback);
+    void this.showWizard(callback);
   }
 
-  public edit(
-    image: BlockOfType<"image">["props"],
-    callback: ImageWizardCallback,
-  ): void {
-    this.showWizard(callback, image);
+  public edit(image: ImageWithReference, callback: ImageWizardCallback): void {
+    void this.showWizard(callback, image);
   }
 
-  private showWizard(
+  private async showWizard(
     callback: ImageWizardCallback,
-    image?: BlockOfType<"image">["props"],
-  ): void {
-    requirejs(["xwiki-wysiwyg-image-wizard"], (imageWizard) => {
-      (imageWizard as XWikiWYSIWYGImageWizard)({
+    image?: ImageWithReference,
+  ): Promise<void> {
+    try {
+      const imageWizard = await loadById<XWikiWYSIWYGImageWizard>(
+        "xwiki-wysiwyg-image-wizard",
+      );
+      const imageData = await imageWizard({
         captionAllowed: true,
         currentDocument: XWiki.currentDocument.documentReference,
         getImageResourceURL: this.getResourceURL.bind(this),
@@ -133,11 +142,11 @@ export class DefaultImageWizard implements ImageWizard {
         isHTML5: true,
         isInsert: !image,
         upload: this.upload.bind(this),
-      })
-        .then(this.getImageProperties.bind(this))
-        .then(callback.submit)
-        .catch(callback.cancel);
-    });
+      });
+      callback.submit(this.getImageProperties(imageData, image?.reference));
+    } catch {
+      callback.cancel();
+    }
   }
 
   private getResourceURL(
@@ -168,13 +177,12 @@ export class DefaultImageWizard implements ImageWizard {
    * @param image - image properties supported by BlockNote
    * @returns image data expected by the Image Wizard
    */
-  private getImageData(
-    image: BlockOfType<"image">["props"],
-  ): Partial<ImageData> {
+  private getImageData(image: ImageWithReference): Partial<ImageData> {
     return {
       alignment: editAlignment[image.textAlignment],
       hasCaption: !!image.caption,
-      resourceReference: this.getImageResourceReference(image),
+      resourceReference:
+        image.reference ?? this.getImageResourceReference(image),
       src: image.url,
       width: image.previewWidth === undefined ? "" : `${image.previewWidth}px`,
     };
@@ -194,12 +202,26 @@ export class DefaultImageWizard implements ImageWizard {
    */
   private getImageProperties(
     imageData: ImageData,
-  ): Partial<BlockOfType<"image">["props"]> {
+    oldReference?: ResourceReference,
+  ): Partial<ImageWithReference> {
+    const newReference = imageData.resourceReference;
     return {
       previewWidth: Number.parseInt(imageData.width),
       textAlignment: saveAlignment[imageData.alignment],
-      url: `${imageData.resourceReference.type}:${imageData.resourceReference.reference}`,
+      url: imageData.src,
+      // Preserve the old reference (with its parameters) when the image itself doesn't change, otherwise report
+      // the new reference so that the edited image points to the newly selected resource.
+      reference: this.isSameResourceReference(oldReference, newReference)
+        ? oldReference
+        : newReference,
     };
+  }
+
+  private isSameResourceReference(
+    alice?: ResourceReference,
+    bob?: ResourceReference,
+  ): boolean {
+    return alice?.type === bob?.type && alice?.reference === bob?.reference;
   }
 
   /**
@@ -211,7 +233,7 @@ export class DefaultImageWizard implements ImageWizard {
    */
   private async upload(file: File, callback: UploadCallback): Promise<void> {
     // For now, we assume the current document is being edited.
-    const currentDocumentReference = XWiki.Model.serialize(
+    const currentDocumentReference = Model.serialize(
       XWiki.currentDocument.documentReference,
     );
     try {
@@ -220,7 +242,8 @@ export class DefaultImageWizard implements ImageWizard {
         .saveAttachments(currentDocumentReference, [file]);
       if (result?.[0]) {
         callback.onSuccess(
-          XWiki.Model.resolve(result[0], XWiki.EntityType.ATTACHMENT),
+          // The upload result is a non empty attachment reference string, so it always resolves.
+          Model.resolve(result[0], XWikiEntityType.ATTACHMENT)!,
         );
       } else {
         callback.onAbort();

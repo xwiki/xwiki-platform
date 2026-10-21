@@ -19,13 +19,14 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.grouping;
 
+import java.util.List;
+
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
-
-import javax.inject.Singleton;
-import java.util.List;
 
 /**
  * Default implementation of {@link NotificationEmailGroupingStrategy}.

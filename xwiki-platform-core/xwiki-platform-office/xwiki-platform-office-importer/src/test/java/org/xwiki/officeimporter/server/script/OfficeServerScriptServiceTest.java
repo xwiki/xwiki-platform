@@ -126,7 +126,7 @@ class OfficeServerScriptServiceTest
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
             "Error while starting");
 
-        assertEquals("Error while starting", this.logCapture.getMessage(0));
+        assertEquals("Failed to start the office server", this.logCapture.getMessage(0));
     }
 
     @Test
@@ -171,6 +171,6 @@ class OfficeServerScriptServiceTest
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
             "Error while stopping");
 
-        assertEquals("Error while stopping", this.logCapture.getMessage(0));
+        assertEquals("Failed to stop the office server", this.logCapture.getMessage(0));
     }
 }

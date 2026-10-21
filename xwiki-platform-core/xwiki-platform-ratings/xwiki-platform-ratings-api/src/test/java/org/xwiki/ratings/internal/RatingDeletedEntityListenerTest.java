@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class RatingDeletedEntityListenerTest
+class RatingDeletedEntityListenerTest
 {
     @InjectMockComponents
     private RatingDeletedEntityListener listener;

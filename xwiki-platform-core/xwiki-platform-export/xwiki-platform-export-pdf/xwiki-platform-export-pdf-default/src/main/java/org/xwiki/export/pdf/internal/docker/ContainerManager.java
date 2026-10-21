@@ -119,9 +119,8 @@ public class ContainerManager implements Initializable
         List<Container> containers =
             exec(this.client.listContainersCmd().withNameFilter(Arrays.asList(containerName)).withShowAll(true));
         // The previous name filtering doesn't perform exact matching (it's more of a partial / contains search).
-        containers = containers.stream().filter(container -> {
-            return Arrays.asList(container.getNames()).contains("/" + containerName);
-        }).toList();
+        containers = containers.stream()
+            .filter(container -> Arrays.asList(container.getNames()).contains("/" + containerName)).toList();
         if (containers.isEmpty()) {
             this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.

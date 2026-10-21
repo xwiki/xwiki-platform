@@ -376,9 +376,9 @@ class XarExtensionHandlerTest
             this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
         assertNotNull(translated,
-            "Document wiki:translated.translated in langauge tr has not been saved in the database");
+            "Document wiki:translated.translated in language tr has not been saved in the database");
         assertFalse(translated.isNew(),
-            "Document wiki:translated.translated in langauge tr has not been saved in the database");
+            "Document wiki:translated.translated in language tr has not been saved in the database");
 
         assertEquals("tr content", translated.getContent(), "Wrong content");
         assertEquals(this.contextUser, translated.getCreatorReference(), "Wrong creator");
@@ -396,7 +396,7 @@ class XarExtensionHandlerTest
         assertNotNull(translated2,
             "Document wiki:translated.translated in language fr has not been saved in the database");
         assertFalse(translated2.isNew(),
-            "Document wiki:translated.translated in langauge fr has not been saved in the database");
+            "Document wiki:translated.translated in language fr has not been saved in the database");
 
         assertEquals("fr content", translated2.getContent(), "Wrong content");
         assertEquals(this.contextUser, translated2.getCreatorReference(), "Wrong creator");
@@ -542,9 +542,9 @@ class XarExtensionHandlerTest
             this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
         assertNotNull(translated,
-            "Document wiki:translated.translated in langauge tr has not been saved in the database");
+            "Document wiki:translated.translated in language tr has not been saved in the database");
         assertFalse(translated.isNew(),
-            "Document wiki:translated.translated in langauge tr has not been saved in the database");
+            "Document wiki:translated.translated in language tr has not been saved in the database");
 
         assertEquals("tr content", translated.getContent(), "Wrong content");
         assertEquals(xarCreatorReference, translated.getCreatorReference(), "Wrong creator");
@@ -559,7 +559,7 @@ class XarExtensionHandlerTest
         assertNotNull(translated2,
             "Document wiki:translated.translated in language fr has not been saved in the database");
         assertFalse(translated2.isNew(),
-            "Document wiki:translated.translated in langauge fr has not been saved in the database");
+            "Document wiki:translated.translated in language fr has not been saved in the database");
 
         assertEquals("fr content", translated2.getContent(), "Wrong content");
         assertEquals(xarCreatorReference, translated2.getCreatorReference(), "Wrong creator");

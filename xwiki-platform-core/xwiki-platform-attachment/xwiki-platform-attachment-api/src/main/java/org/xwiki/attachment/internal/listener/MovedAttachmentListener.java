@@ -107,7 +107,10 @@ public class MovedAttachmentListener implements EventListener
             try {
                 updateBackLinks(attachmentMovedEvent, canEdit);
             } catch (RefactoringException e) {
-                this.logger.error("Failed to update backlinks targetting attachment [{}] for request [{}]",
+                // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+                // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons). A Request is
+                // Serializable, so the move job would end up with a copy of its own request in its own log.
+                this.logger.error("Failed to update backlinks targeting attachment [{}] for request [{}]",
                     attachmentMovedEvent.getSourceReference(), moveAttachmentRequest.toString(), e);
             }
         }

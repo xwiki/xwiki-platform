@@ -32,7 +32,17 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
+    class NestedHomepageTourIT extends HomepageTourIT
+    {
+    }
+
+    @Nested
     class NestedNameStrategiesDefaultConfigurationIT extends NameStrategiesDefaultConfigurationIT
+    {
+    }
+
+    @Nested
+    class NestedSyntaxHighlightingIT extends SyntaxHighlightingIT
     {
     }
 }

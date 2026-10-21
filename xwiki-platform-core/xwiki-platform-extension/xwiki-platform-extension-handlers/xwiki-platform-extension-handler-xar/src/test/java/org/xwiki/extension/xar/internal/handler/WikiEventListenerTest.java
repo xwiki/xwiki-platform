@@ -61,8 +61,6 @@ class WikiEventListenerTest
 
     private InstalledExtensionRepository installedExtensionRepository;
 
-    private WikiDescriptorManager wikiDescriptorManager;
-
     private ObservationManager observation;
 
     private LocalExtension localExtension1;
@@ -72,7 +70,7 @@ class WikiEventListenerTest
     @AfterComponent
     void afterComponent() throws Exception
     {
-        this.wikiDescriptorManager = this.componentManager.registerMockComponent(WikiDescriptorManager.class);
+        this.componentManager.registerMockComponent(WikiDescriptorManager.class);
     }
 
     @AfterComponent

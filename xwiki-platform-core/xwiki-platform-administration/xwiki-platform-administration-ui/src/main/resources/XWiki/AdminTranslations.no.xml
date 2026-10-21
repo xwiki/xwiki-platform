@@ -147,6 +147,12 @@ admin.usersgroups.extensionrights=Utvidelsesrettigheter
 ### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
 ### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
 
+# Rights for page section
+### Missing: administration.section.pagerights.hint=These rights apply on this page only. They do not affect the {0}children{1}.
+
+# Rights for page and children section
+### Missing: administration.section.pageandchildrenrights.hint=These rights apply on this page and {0}all its children{1}.
+
 # Other Category
 admin.other=Annet
 admin.other.description=Ulike konfigurasjoner for utvidelser.

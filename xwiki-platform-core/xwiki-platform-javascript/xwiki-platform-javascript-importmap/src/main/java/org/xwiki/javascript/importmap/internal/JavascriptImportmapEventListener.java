@@ -74,14 +74,13 @@ public class JavascriptImportmapEventListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof AbstractExtensionEvent extensionInstalledEvent) {
-            if (!extensionInstalledEvent.hasNamespace() || Objects.equals(extensionInstalledEvent.getNamespace(),
-                new WikiNamespace(this.wikiDescriptorManager.getCurrentWikiId()).serialize()))
-            {
-                // Only clear the cache for events related to the current wiki (i.e., local to the wiki or global to
-                // the whole farm).
-                this.javascriptImportmapResolver.clearCache();
-            }
+        if (event instanceof AbstractExtensionEvent extensionInstalledEvent
+            && (!extensionInstalledEvent.hasNamespace() || Objects.equals(extensionInstalledEvent.getNamespace(),
+                new WikiNamespace(this.wikiDescriptorManager.getCurrentWikiId()).serialize())))
+        {
+            // Only clear the cache for events related to the current wiki (i.e., local to the wiki or global to
+            // the whole farm).
+            this.javascriptImportmapResolver.clearCache();
         }
     }
 }

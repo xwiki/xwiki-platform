@@ -40,9 +40,9 @@ import com.xpn.xwiki.web.XWikiRequest;
  * 
  * @version $Id$
  * @since 8.3RC1
- * @deprecated since 10.9RC1, use {@link ContextStore} instead
+ * @deprecated use {@link ContextStore} instead
  */
-@Deprecated
+@Deprecated(since = "10.9RC1")
 public class JobRequestContext implements Serializable
 {
     /**
@@ -88,7 +88,7 @@ public class JobRequestContext implements Serializable
     }
 
     /**
-     * @param xcontext the XWiki context to extract informations from
+     * @param xcontext the XWiki context to extract information from
      */
     public JobRequestContext(XWikiContext xcontext)
     {
@@ -276,7 +276,7 @@ public class JobRequestContext implements Serializable
     }
 
     /**
-     * @return true if the request informations have been set
+     * @return true if the request information has been set
      * @since 8.4RC1
      */
     public boolean isRequestSet()

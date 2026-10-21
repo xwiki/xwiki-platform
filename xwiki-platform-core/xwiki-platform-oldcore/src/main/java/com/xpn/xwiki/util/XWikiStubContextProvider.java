@@ -27,7 +27,7 @@ import com.xpn.xwiki.XWikiContext;
  * Tool to make easier to generate stub XWikiContext. It's supposed to be initialized once with the first request and it
  * can be called to get a stub context generated from this initial XWikiContext.
  * <p>
- * The reason to initialize it based on first request is to get some informations we could not know otherwise like a
+ * The reason to initialize it based on first request is to get some information we could not know otherwise like a
  * default scheme/host/port.
  *
  * @version $Id$

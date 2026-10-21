@@ -36,7 +36,6 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.test.ui.po.BasePage;
 
 import com.deque.html.axecore.results.Results;
 import com.deque.html.axecore.results.Rule;
@@ -151,7 +150,7 @@ public class WCAGContext
      */
     private static final List<String> DISABLED_RULES = List.of();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WCAGContext.class);
 
     /**
      * Stores the result of an axe-core validity scan.

@@ -29,7 +29,7 @@ import org.xwiki.security.authorization.RuleState;
 /**
  * A programmatic right for Like feature.
  *
- * This right is allowed by default and implies Login and View rights.
+ * This right is allowed by default, targets wikis, spaces and documents, and implies no other right.
  *
  * @version $Id$
  * @since 12.7RC1

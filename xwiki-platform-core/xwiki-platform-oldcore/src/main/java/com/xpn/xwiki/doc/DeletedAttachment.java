@@ -340,11 +340,11 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param attachment the deleted attachment
      * @param context the current context, used in the XML export
      * @throws XWikiException if an exception occurs during the XML export
-     * @deprecated since 9.9RC1, use
+     * @deprecated use
      *             {@link #DeletedAttachment(long, String, String, String, String, Date, DeletedAttachmentContent)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     protected void setAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         this.content = new HibernateDeletedAttachmentContent(attachment);
@@ -360,9 +360,9 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @return restored attachment
      * @throws XWikiException If an exception occurs while the Attachment is restored from the XML. See
      *             {@link XWikiAttachment#fromXML(String)}.
-     * @deprecated since 9.9RC1, use {@link #restoreAttachment(XWikiAttachment)} instead
+     * @deprecated use {@link #restoreAttachment(XWikiAttachment)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public XWikiAttachment restoreAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         return restoreAttachment(attachment);

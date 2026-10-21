@@ -27,10 +27,10 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -46,6 +46,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.objects.meta.TextAreaMetaClass;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -139,8 +140,8 @@ class PropertyClassTest
             two.setNumber(n2);
 
             if (n1 == n2) {
-                assertEquals(Math.signum(one.compareTo(two)), -1.0);
-                assertEquals(Math.signum(two.compareTo(one)), 1.0);
+                assertEquals(-1.0, Math.signum(one.compareTo(two)));
+                assertEquals(1.0, Math.signum(two.compareTo(one)));
             } else {
                 assertEquals(0, Float.compare(Math.signum(one.compareTo(two)), Math.signum(n1 - n2)));
                 assertEquals(0, Float.compare(Math.signum(two.compareTo(one)), Math.signum(n2 - n1)));
@@ -150,8 +151,8 @@ class PropertyClassTest
         // Also test that the comparison takes into account the name in case the two numbers are identical
         one.setNumber(42);
         two.setNumber(42);
-        assertEquals(Math.signum(one.compareTo(two)), -1.0);
-        assertEquals(Math.signum(two.compareTo(one)), 1.0);
+        assertEquals(-1.0, Math.signum(one.compareTo(two)));
+        assertEquals(1.0, Math.signum(two.compareTo(one)));
     }
 
     @Test
@@ -359,5 +360,24 @@ class PropertyClassTest
         newClass.setOwnerDocument(new XWikiDocument(newClassReference));
         propertyClass.setObject(newClass);
         assertEquals(new ClassPropertyReference("users", newClass.getReference()), propertyClass.getReference());
+    }
+
+    @Test
+    void displayViewEscapesValue()
+    {
+        // The base displayer is used by the property classes that don't override it (NumberClass, DateClass), whose
+        // values can't hold markup. Escape anyway so that it stays correct for any other subclass.
+        PropertyClass propertyClass = new PropertyClass();
+        propertyClass.setName("prop");
+
+        StringProperty property = new StringProperty();
+        property.setValue("value & <b>{{macro}}");
+        BaseObject object = new BaseObject();
+        object.safeput("prop", property);
+
+        StringBuffer buffer = new StringBuffer();
+        propertyClass.displayView(buffer, "prop", "", object, this.oldCore.getXWikiContext());
+
+        assertEquals("value &#38; &#60;b>&#123;&#123;macro}}", buffer.toString());
     }
 }

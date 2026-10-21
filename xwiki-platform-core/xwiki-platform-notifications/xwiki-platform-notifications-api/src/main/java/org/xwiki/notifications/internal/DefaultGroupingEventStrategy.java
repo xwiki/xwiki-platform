@@ -140,7 +140,7 @@ public class DefaultGroupingEventStrategy implements GroupingEventStrategy
             for (Event existingEvent : existingCompositeEvent.getEvents()) {
                 int similarity = similarityCalculator.computeSimilarity(event, existingEvent);
                 if (similarity < existingCompositeEvent.getSimilarityBetweenEvents()) {
-                    // Penality
+                    // Penalty
                     similarity -= 5;
                 }
                 if (similarity > bestSimilarity.value) {

@@ -223,8 +223,8 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     public List<String> getListValues()
     {
         com.xpn.xwiki.objects.classes.PropertyClass pclass = getBasePropertyClass();
-        if (pclass instanceof ListClass) {
-            return ((ListClass) pclass).getList(this.context);
+        if (pclass instanceof ListClass listClass) {
+            return listClass.getList(this.context);
         } else {
             // Although we prefer to return empty lists from API methods, here returning any kind of list doesn't make
             // sense, since the property does not have a list of possible values at all (like, a number property).
@@ -242,8 +242,8 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     public Map<String, ListItem> getMapValues()
     {
         com.xpn.xwiki.objects.classes.PropertyClass pclass = getBasePropertyClass();
-        if (pclass instanceof ListClass) {
-            return ((ListClass) pclass).getMap(this.context);
+        if (pclass instanceof ListClass listClass) {
+            return listClass.getMap(this.context);
         } else {
             // Although we prefer to return empty maps from API methods, here returning any kind of map doesn't make
             // sense, since the property does not have a list of possible values at all (like, a number property).

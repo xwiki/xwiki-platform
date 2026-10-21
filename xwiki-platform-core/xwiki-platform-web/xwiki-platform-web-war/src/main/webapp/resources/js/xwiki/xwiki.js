@@ -199,6 +199,13 @@ Object.extend(XWiki, {
         document.fire("xwiki:docextra:activated", {"id": extraID});
      };
 
+     // Remember which pane was requested last. Since the panes are loaded asynchronously and their responses can
+     // arrive in any order, a pane must only be displayed if it's still the one requested last, otherwise a pane
+     // that is slow to load steals the display from a pane requested after it. This happens for instance when the
+     // first pane, which is loaded automatically when the page is loaded, is still loading when the user clicks on
+     // another pane.
+     window.lastRequestedDocExtra = extraID;
+
      // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
      // On complete :
      //   1. Call dhtmlSwitch()
@@ -289,22 +296,30 @@ Object.extend(XWiki, {
 
                       $("docextrapanes").className="";
 
+                      // The content is in the pane, so it must not be fetched again, even when the pane is not
+                      // displayed below because another pane has been requested in the meantime. Note that the pane
+                      // keeps its "hidden" class in that case, and that dhtmlSwitch() is what drops it.
+                      $(extraID + "pane").removeClassName("empty");
+
                       // Let other know new content has been loaded
                       document.fire("xwiki:docextra:loaded", {
                         "id" : extraID,
                         "element": $(extraID + "pane")
                       });
 
-                      // switch tab
-                      dhtmlSwitch(extraID);
+                      // Switch tab, but only if this pane is still the one requested last, so that a pane that is
+                      // slow to load doesn't replace a pane the user has requested after it.
+                      if (window.lastRequestedDocExtra === extraID) {
+                        dhtmlSwitch(extraID);
 
-                      if (scrollToAnchor) {
-                        // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
-                        // prevents the anchor 'jump' after a click event but enable it
-                        // when the user is arriving from a direct /Space/Page#Section URL
-                        $(extraID + 'anchor').id = extraID;
-                        location.href='#' + extraID;
-                        $(extraID).id = extraID + 'anchor';
+                        if (scrollToAnchor) {
+                          // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
+                          // prevents the anchor 'jump' after a click event but enable it
+                          // when the user is arriving from a direct /Space/Page#Section URL
+                          $(extraID + 'anchor').id = extraID;
+                          location.href='#' + extraID;
+                          $(extraID).id = extraID + 'anchor';
+                        }
                       }
                     }
                 });
@@ -319,8 +334,8 @@ Object.extend(XWiki, {
   },
 
   /**
-   * Add click listeners on all rendereing error messages to let the user read the detailed error description.
-   * If a content is passed, add click listener for errors reported in this content (usefull for AJAX requests response)
+   * Add click listeners on all rendering error messages to let the user read the detailed error description.
+   * If a content is passed, add click listener for errors reported in this content (useful for AJAX requests response)
    * Otherwise make all the document's body errors expandable.
    */
   makeRenderingErrorsExpandable: function(content) {
@@ -358,7 +373,7 @@ Object.extend(XWiki, {
               // starting with "_"
               var values = anchor.getAttribute("rel").split(" ");
               for (var j = 0; j < values.length; j++) {
-                  if (values[j].charAt(0) == "_") {
+                  if (values[j].startsWith("_")) {
                       anchor.target = values[j].substring(1);
                       break;
                   } else if (values[j] == "external") {
@@ -484,10 +499,10 @@ Object.extend(XWiki, {
         var ca = document.cookie.split(';');
         for(var i=0;i < ca.length;i++) {
             var c = ca[i];
-            while (c.charAt(0)==' ') {
+            while (c.startsWith(' ')) {
                 c = c.substring(1,c.length);
             }
-            if (c.indexOf(nameEQ) == 0) {
+            if (c.startsWith(nameEQ)) {
                 return decodeURIComponent(c.substring(nameEQ.length,c.length));
             }
         }
@@ -528,7 +543,7 @@ Object.extend(XWiki, {
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
    */
   initialize: function() {
-    // Extra security to make sure we do not get initalized twice.
+    // Extra security to make sure we do not get initialized twice.
     // It would fire the custom xwiki:dom:loaded event twice, which could make their observers misbehave.
     if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
       // This variable is set when the marker script is executed, which should always be the last script to execute.
@@ -761,10 +776,10 @@ function noaccent(txt) {
     temp = temp.replace(/[\u0125\u0127\u021f]/g,"h");
     temp = temp.replace(/[\u00cc\u00cd\u00ce\u00cf\u0128\u012a\u012c\u012e\u0130\u01cf\u0208\u020a]/g,"I");
     temp = temp.replace(/[\u00ec\u00ed\u00ee\u00ef\u0129\u012b\u012d\u012f\u0131\u01d0\u0209\u020b]/g,"i");
-    temp = temp.replace(/[\u0132]/g,"IJ");
-    temp = temp.replace(/[\u0133]/g,"ij");
-    temp = temp.replace(/[\u0134]/g,"J");
-    temp = temp.replace(/[\u0135]/g,"j");
+    temp = temp.replaceAll("\u0132","IJ");
+    temp = temp.replaceAll("\u0133","ij");
+    temp = temp.replaceAll("\u0134","J");
+    temp = temp.replaceAll("\u0135","j");
     temp = temp.replace(/[\u0136\u01e8]/g,"K");
     temp = temp.replace(/[\u0137\u0138\u01e9]/g,"k");
     temp = temp.replace(/[\u0139\u013b\u013d\u013f\u0141]/g,"L");
@@ -781,14 +796,14 @@ function noaccent(txt) {
     temp = temp.replace(/[\u00fe\u0163\u0165\u0167\u021b\u0236]/g,"t");
     temp = temp.replace(/[\u00d9\u00da\u00db\u00dc\u0168\u016a\u016c\u016e\u0170\u0172\u01d3\u01d5\u01d7\u01d9\u01db\u0214\u0216]/g,"U");
     temp = temp.replace(/[\u00f9\u00fa\u00fb\u00fc\u0169\u016b\u016d\u016f\u0171\u0173\u01d4\u01d6\u01d8\u01da\u01dc\u0215\u0217]/g,"u");
-    temp = temp.replace(/[\u0174]/g,"W");
-    temp = temp.replace(/[\u0175]/g,"w");
+    temp = temp.replaceAll("\u0174","W");
+    temp = temp.replaceAll("\u0175","w");
     temp = temp.replace(/[\u00dd\u0176\u0178\u0232]/g,"Y");
     temp = temp.replace(/[\u00fd\u00ff\u0177\u0233]/g,"y");
     temp = temp.replace(/[\u0179\u017b\u017d]/g,"Z");
     temp = temp.replace(/[\u017a\u017c\u017e]/g,"z");
-    temp = temp.replace(/[\u00df]/g,"SS");
-    temp = temp.replace(/[^a-zA-Z0-9_]/g,"");
+    temp = temp.replaceAll("\u00df","SS");
+    temp = temp.replace(/\W/g,"");
     return temp;
 }
 
@@ -877,7 +892,7 @@ window.shortcut = new Object({
      * The opt parameter should be a map of optional parameters used while registering the shortcut.
      * <ul>
      *     <li>target: A DOM element in which the shortcut should be listened (defaults to the whole document)</li>
-     *     <li>disable_in_input: If true, the shortcut will not be listened when an input
+     *     <li>disable_in_input: If true, the shortcut will not be listened when an input, select
      *     or textarea field is selected (default: false)</li>
      *     <li>type: The type (shortcut.type) that should be used (default: SIMPLE)</li>
      * </ul>
@@ -891,7 +906,7 @@ window.shortcut = new Object({
         require(["$services.webjars.url('org.webjars:Keypress', 'keypress.min.js')", 'jquery'], function(keypress) {
 
             // If no options are defined, create a blank map
-            opt = (opt) ? opt : {};
+            opt = opt || {};
 
             var shortcut_descriptor = {
                 "keys": shortcut._format_shortcut_combination(shortcut_combination),
@@ -984,7 +999,7 @@ window.shortcut = new Object({
      *
      * @param callback the callback used for the shortcut
      * @param shortcut_type the shortcut type
-     * @retun {*} The new callback to be used for defining the shortcut against Keypress JS libray
+     * @return {*} The new callback to be used for defining the shortcut against Keypress JS library
      * @private
      */
     _wrap_shortcut_call: function(callback, shortcut_type) {
@@ -1020,12 +1035,17 @@ window.shortcut = new Object({
 
             if (group === this._listeners.disabled_in_inputs) {
                 // Disable the created listener when focus goes on an input, a textarea field, an editable element or on
-                // the CodeMirror div (syntax highlighting).
+                // the CodeMirror div (syntax highlighting), but also on a select (drop-down list) because typing in a
+                // select selects the option that starts with the typed letters.
+                const editableSelector = 'input, select, textarea, [contenteditable=true], .CodeMirror-code';
                 jQuery(document)
-                    .on('focus', 'input, textarea, [contenteditable=true], .CodeMirror-code',
-                        function() { newListener.stop_listening(); })
-                    .on('blur', 'input, textarea, [contenteditable=true], .CodeMirror-code',
-                        function() { newListener.listen(); });
+                    .on('focus', editableSelector, function() { newListener.stop_listening(); })
+                    .on('blur', editableSelector, function() { newListener.listen(); });
+                // The listener is created asynchronously, after Keypress JS is loaded, so the focus may already be in
+                // an editable element (e.g. one with the autofocus attribute) and the focus event above was missed.
+                if (document.activeElement?.matches(editableSelector)) {
+                    newListener.stop_listening();
+                }
             }
 
             group[target] = newListener;
@@ -1041,7 +1061,7 @@ window.shortcut = new Object({
      * @private
      */
     _format_shortcut_combination: function(combination) {
-        return combination.toLowerCase().replace(/\+/g, ' ');
+        return combination.toLowerCase().replaceAll('+', ' ');
     }
 });
 
@@ -1077,39 +1097,39 @@ function BrowserDetect() {
 
     // rendering engine versions
     this.geckoVersion = ( (this.isGecko) ? ua.substring( (ua.lastIndexOf('gecko/') + 6), (ua.lastIndexOf('gecko/') + 14) ) : -1 );
-    this.equivalentMozilla = ( (this.isGecko) ? parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) ) : -1 );
-    this.appleWebKitVersion = ( (this.isAppleWebKit) ? parseFloat( ua.substring( ua.indexOf('applewebkit/') + 12) ) : -1 );
+    this.equivalentMozilla = ( (this.isGecko) ? Number.parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) ) : -1 );
+    this.appleWebKitVersion = ( (this.isAppleWebKit) ? Number.parseFloat( ua.substring( ua.indexOf('applewebkit/') + 12) ) : -1 );
 
     // browser version
-    this.versionMinor = parseFloat(navigator.appVersion);
+    this.versionMinor = Number.parseFloat(navigator.appVersion);
 
     // correct version number
     if (this.isGecko && !this.isMozilla) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('/', ua.indexOf('gecko/') + 6) + 1 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('/', ua.indexOf('gecko/') + 6) + 1 ) );
     }
     else if (this.isMozilla) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) );
     }
     else if (this.isIE && this.versionMinor >= 4) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('msie ') + 5 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('msie ') + 5 ) );
     }
     else if (this.isKonqueror) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('konqueror/') + 10 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('konqueror/') + 10 ) );
     }
     else if (this.isSafari) {
-        this.versionMinor = parseFloat( ua.substring( ua.lastIndexOf('safari/') + 7 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.lastIndexOf('safari/') + 7 ) );
     }
     else if (this.isOmniweb) {
-        this.versionMinor = parseFloat( ua.substring( ua.lastIndexOf('omniweb/') + 8 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.lastIndexOf('omniweb/') + 8 ) );
     }
     else if (this.isOpera) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('opera') + 6 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('opera') + 6 ) );
     }
     else if (this.isIcab) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('icab') + 5 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('icab') + 5 ) );
     }
 
-    this.versionMajor = parseInt(this.versionMinor);
+    this.versionMajor = Number.parseInt(this.versionMinor);
 
     // dom support
     this.isDOM1 = (document.getElementById);
@@ -1146,7 +1166,7 @@ function BrowserDetect() {
     this.isIE4xMac = (this.isIE4x && this.isMac);
 
     var trident = /trident\/(\d+)/.exec(ua);
-    this.isIE11up = trident && parseInt(trident[1]) >= 7;
+    this.isIE11up = trident && Number.parseInt(trident[1]) >= 7;
 }
 var browser = new BrowserDetect();
 
@@ -1631,10 +1651,10 @@ document.observe("xwiki:dom:loaded", function() {
       makeFixed(menu, 0, menuLeft, menuWidth);
       if (menu.__fm_extra) {
         makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth -
-          menu.__fm_extra.getStyle('border-left-width').replace(/[^0-9]/g,'') -
-          menu.__fm_extra.getStyle('border-right-width').replace(/[^0-9]/g,'') -
-          menu.__fm_extra.getStyle('padding-right').replace(/[^0-9]/g,'') -
-          menu.__fm_extra.getStyle('padding-left').replace(/[^0-9]/g,'')));
+          menu.__fm_extra.getStyle('border-left-width').replace(/\D/g,'') -
+          menu.__fm_extra.getStyle('border-right-width').replace(/\D/g,'') -
+          menu.__fm_extra.getStyle('padding-right').replace(/\D/g,'') -
+          menu.__fm_extra.getStyle('padding-left').replace(/\D/g,'')));
       }
     } else {
       makeScrollable(menu);
@@ -1648,7 +1668,7 @@ document.observe("xwiki:dom:loaded", function() {
    * The clone will be stored in the __fm_ghost property of the element and is inserted
    * after the element in the DOM. The clone is not visible initially.
    *
-   * @param element the element whose position and dimesions should be cloned
+   * @param element the element whose position and dimensions should be cloned
    */
   function createGhost(element) {
     if (typeof(element.__fm_ghost) == 'undefined') {
@@ -1708,7 +1728,7 @@ document.observe("xwiki:dom:loaded", function() {
 
   /**
    * Injects the given HTML into the page head after removing the stylesheets and JavaScript files that are already
-   * present in the page head (othewise they may be loaded again).
+   * present in the page head (otherwise they may be loaded again).
    *
    * @param {String} html the HTML to extend the page head with
    */

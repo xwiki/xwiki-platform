@@ -44,6 +44,7 @@ import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -87,20 +88,22 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     private ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
 
+    private Environment environment = Utils.getComponent(Environment.class);
+
     /**
      * Pages for which to convert URL to local.
      *
-     * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
+     * @deprecated use {link #getExportURLFactoryContext} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     protected Set<String> exportedPages = new HashSet<>();
 
     /**
      * Directory where to export attachment.
      *
-     * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
+     * @deprecated use {link #getExportURLFactoryContext} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     protected File exportDir;
 
     private boolean checkAccess;
@@ -135,9 +138,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     /**
      * @return the list skins names used.
-     * @deprecated since 6.2RC1, use {@link #getFilesystemExportContext()}
+     * @deprecated use {@link #getFilesystemExportContext()}
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     public Collection<String> getNeededSkins()
     {
         return getFilesystemExportContext().getNeededSkins();
@@ -145,9 +148,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     /**
      * @return the list of custom skin files.
-     * @deprecated since 6.2RC1, use {@link #getFilesystemExportContext()}
+     * @deprecated use {@link #getFilesystemExportContext()}
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     public Collection<String> getExportedSkinFiles()
     {
         return getFilesystemExportContext().getExportedSkinFiles();
@@ -196,9 +199,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * @param exportedPages the pages that will be exported.
      * @param exportDir the directory where to copy exported objects (attachments).
      * @param context the XWiki context.
-     * @deprecated starting with 8.4.5/9.0, use {@link #init(Collection, File, FilesystemExportContext, XWikiContext)}
+     * @deprecated use {@link #init(Collection, File, FilesystemExportContext, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "8.4.5,9.0")
     public void init(Collection<String> exportedPages, File exportDir, XWikiContext context)
     {
         Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
@@ -299,11 +302,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
             filePathBuffer.append(fileName);
 
             String filePath = filePathBuffer.toString();
+            File file = getExportFile(filePath);
 
             if (!getFilesystemExportContext().hasExportedSkinFile(filePath)) {
                 getFilesystemExportContext().addExportedSkinFile(filePath);
 
-                File file = new File(getFilesystemExportContext().getExportDir(), filePath);
                 if (!file.exists()) {
                     // Make sure the folder exists
                     File folder = file.getParentFile();
@@ -330,6 +333,25 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
 
         return skinURL;
+    }
+
+    /**
+     * @param path the path of the file relative to the export directory
+     * @return the file in the export directory
+     * @throws IOException if the path is pointing outside of the export directory
+     */
+    private File getExportFile(String path) throws IOException
+    {
+        File exportDir = getFilesystemExportContext().getExportDir();
+        File file = new File(exportDir, path);
+
+        // The path is built from file names coming from the exported content (skin files, resources, CSS imports,
+        // etc.) so make sure it cannot be used to write outside of the export directory.
+        if (!file.toPath().toAbsolutePath().normalize().startsWith(exportDir.toPath().toAbsolutePath().normalize())) {
+            throw new IOException(String.format("The path [%s] is located outside of the export directory", path));
+        }
+
+        return file;
     }
 
     /**
@@ -431,24 +453,29 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
         try {
-            File targetFile = new File(getFilesystemExportContext().getExportDir(), "resources/" + filename);
+            File targetFile = getExportFile("resources/" + filename);
             if (!targetFile.exists()) {
-                if (!targetFile.getParentFile().exists()) {
-                    targetFile.getParentFile().mkdirs();
-                }
-
                 // Step 1: Copy the resource
                 // If forceSkinAction is false then there's no velocity in the resource and we can just copy it simply.
                 // Otherwise we need to go through the Skin Action to perform the rendering.
                 if (forceSkinAction) {
+                    if (!targetFile.getParentFile().exists()) {
+                        targetFile.getParentFile().mkdirs();
+                    }
+
                     // Extract the first path as the wiki page
                     int pos = filename.indexOf('/', 0);
                     String page = filename.substring(0, pos);
                     renderSkinFile("resource/" + filename, "resources", page, context.getWikiId(), targetFile,
                         StringUtils.countMatches(filename, "/") + 1, context);
                 } else {
-                    try (
-                        InputStream source = context.getEngineContext().getResourceAsStream("/resources/" + filename)) {
+                    // The prefix makes sure the file name cannot escape the resources folder. Nothing is written when
+                    // the resource cannot be found, since the target file could be outside of the export directory.
+                    try (InputStream source = this.environment.getResourceAsStream("/resources/", filename)) {
+                        if (source == null) {
+                            return super.createResourceURL(filename, forceSkinAction, context, Collections.emptyMap());
+                        }
+
                         FileUtils.copyInputStreamToFile(source, targetFile);
                     }
                 }
@@ -468,7 +495,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             LOGGER.error(FAILED_TO_CREATE_SKIN_URL, e);
         }
 
-        return super.createResourceURL(filename, forceSkinAction, context);
+        return super.createResourceURL(filename, forceSkinAction, context, Collections.emptyMap());
     }
 
     @Override
@@ -565,7 +592,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
         // Copy the attachment file in the package only if the target user is allowed to access the attachment
         if (!this.checkAccess || this.authorization.hasAccess(Right.VIEW, attachmentReference)) {
-            File file = new File(getFilesystemExportContext().getExportDir(), path);
+            File file = getExportFile(path);
             if (!file.exists()) {
                 XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
                 XWikiAttachment attachment = doc.getAttachment(filename);

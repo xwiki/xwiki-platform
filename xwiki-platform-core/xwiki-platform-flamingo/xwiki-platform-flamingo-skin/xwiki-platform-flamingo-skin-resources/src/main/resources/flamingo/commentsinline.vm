@@ -202,7 +202,7 @@ $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.rend
 #end
 #if ($hasAdmin || ($hasEdit && $isUserComment))
 ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
-## By providing an anchor this behavior is stoped, without altering the URL functionality.
+## By providing an anchor this behavior is stopped, without altering the URL functionality.
 #set ($queryString = $escapetool.url({
   'form_token': $services.csrf.token,
   'classname': $xCommentClass,
@@ -336,13 +336,24 @@ $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.rend
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
+          <button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('core.modal.close'))">
+              $services.icon.renderHTML('cross')
+          </button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.permalink')</div>
         </div>
         <div class="modal-body">
           <div class="input-group">
             <div class="input-group-addon">$services.icon.renderHTML('link')</div>
             <input type="text" class="form-control" title="$services.localization.render('core.viewers.comments.permalink')"/>
+            <span class="input-group-btn">
+              <button type="button" id="permalink-copy-button" class="btn btn-default"
+                title="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copyButton'))"
+                data-copied-message="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copied'))"
+                data-copy-failed-message="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copyFailed'))">
+                $services.icon.renderHTML('paste')
+              </button>
+            </span>
           </div>
         </div>
         <div class="modal-footer">
@@ -363,7 +374,10 @@ $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.rend
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
+          <button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('core.modal.close'))">
+              $services.icon.renderHTML('cross')
+          </button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.delete')</div>
         </div>
         <div class="modal-body">

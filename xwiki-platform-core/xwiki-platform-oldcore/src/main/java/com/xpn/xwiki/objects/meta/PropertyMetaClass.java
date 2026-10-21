@@ -147,6 +147,7 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
     @Override
     public void setObject(BaseCollection object)
     {
+        // Nothing to do, a property meta class is not attached to an object.
     }
 
     @Override
@@ -185,7 +186,7 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
         } catch (Exception e) {
             // Fail silently.
         }
-        return instance != null && instance instanceof BaseCollection ? (BaseCollection) instance : super
+        return instance != null && instance instanceof BaseCollection baseCollection ? baseCollection : super
             .newObject(context);
     }
 

@@ -303,8 +303,8 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
                 () -> contextualLocalizationManager.getTranslationPlain(key)
             );
         } catch (Exception e) {
-            LOGGER.warn("Failed to render the translation key [{}] in the namespace [{}] for the event "
-                    + "descriptor of [{}].", key, namespaceOfTheDescriptor, getEventType(), e);
+            LOGGER.warn("Failed to render the translation key [{}] in the namespace [{}] for the event descriptor of "
+                + "[{}]", key, namespaceOfTheDescriptor, getEventType(), e);
             return contextualLocalizationManager.getTranslationPlain(key);
         }
     }

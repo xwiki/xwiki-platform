@@ -27,7 +27,6 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -131,26 +130,26 @@ public class XWikiAttachmentArchive implements Cloneable
                 }
             })
             .filter(Objects::nonNull)
-            .collect(Collectors.toList()));
+            .toList());
         newArchive.setAttachment(attachment);
         return newArchive;
     }
 
     /**
-     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     * @deprecated please do not use this, it is bound to a jrcs based implementation.
      * @return a JRCS archive.
      */
-    @Deprecated
+    @Deprecated(since = "2.6M1")
     public Archive getRCSArchive()
     {
         return this.archive;
     }
 
     /**
-     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     * @deprecated please do not use this, it is bound to a jrcs based implementation.
      * @param archive a JRCS archive.
      */
-    @Deprecated
+    @Deprecated(since = "2.6M1")
     public void setRCSArchive(final Archive archive)
     {
         this.archive = archive;
@@ -182,10 +181,8 @@ public class XWikiAttachmentArchive implements Cloneable
      */
     public String getArchiveAsString(final XWikiContext context) throws XWikiException
     {
-        if (this.archive == null) {
-            if (context != null) {
-                updateArchive(context);
-            }
+        if (this.archive == null && context != null) {
+            updateArchive(context);
         }
 
         return getArchiveAsString();
@@ -216,10 +213,8 @@ public class XWikiAttachmentArchive implements Cloneable
      */
     public byte[] getArchive(final XWikiContext context) throws XWikiException
     {
-        if (this.archive == null) {
-            if (context != null) {
-                updateArchive(context);
-            }
+        if (this.archive == null && context != null) {
+            updateArchive(context);
         }
 
         return getArchive();
@@ -275,9 +270,9 @@ public class XWikiAttachmentArchive implements Cloneable
      * @param data not used for anything, the data is loaded from the attachment included with this archive.
      * @param context the XWikiContext for the request used to load the correct attachment content from the database.
      * @throws XWikiException if anything goes wrong.
-     * @deprecated since 7.1M1, use {@link #updateArchive(XWikiContext)} instead
+     * @deprecated use {@link #updateArchive(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.1M1")
     public void updateArchive(final byte[] data, final XWikiContext context) throws XWikiException
     {
         updateArchive(context);

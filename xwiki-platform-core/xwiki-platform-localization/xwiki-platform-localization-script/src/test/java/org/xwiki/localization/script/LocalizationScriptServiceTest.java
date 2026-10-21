@@ -115,7 +115,7 @@ class LocalizationScriptServiceTest
     @Test
     void getAvailableLocales()
     {
-        when(this.environment.getResourceAsStream(eq("/WEB-INF/xwiki-locales.txt")))
+        when(this.environment.getResourceAsStream("/WEB-INF/xwiki-locales.txt"))
             .thenReturn(getClass().getResourceAsStream("/xwiki-locales.txt"));
         Set<Locale> locales = this.localizationScriptService.getAvailableLocales();
         assertNotNull(locales);

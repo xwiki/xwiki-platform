@@ -234,10 +234,8 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
                 if (fieldName.startsWith(fieldNamePattern.substring(0, fieldNamePattern.length() - 1))) {
                     return true;
                 }
-            } else if (fieldNamePattern.startsWith(WILDCARD)) {
-                if (fieldName.endsWith(fieldNamePattern.substring(1))) {
-                    return true;
-                }
+            } else if (fieldNamePattern.startsWith(WILDCARD) && fieldName.endsWith(fieldNamePattern.substring(1))) {
+                return true;
             }
         }
         return false;

@@ -98,7 +98,7 @@ public class AttachmentValidationException extends Exception
     }
 
     /**
-     * Contruct a new exception with a message and a cause, plus an http status and a translation key.
+     * Construct a new exception with a message and a cause, plus an http status and a translation key.
      *
      * @param message the error message
      * @param cause the exception cause

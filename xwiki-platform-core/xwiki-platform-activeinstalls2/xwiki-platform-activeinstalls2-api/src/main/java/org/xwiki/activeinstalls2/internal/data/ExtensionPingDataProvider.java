@@ -47,13 +47,29 @@ import co.elastic.clients.elasticsearch._types.mapping.Property;
 @Singleton
 public class ExtensionPingDataProvider extends AbstractPingDataProvider
 {
-    private static final String PROPERTY_ID = "id";
+    /**
+     * The name of the mapping property holding the installed extensions, mapped as a nested type so that each
+     * entry's id, version and features stay indexed together. Being a root property, this is also the path of the
+     * field to be used when querying the index, for example as the path of a nested aggregation.
+     */
+    public static final String PROPERTY_EXTENSIONS = "extensions";
+
+    /**
+     * The name of the mapping property holding an extension's id, and thus the last segment of
+     * {@link #FIELD_EXTENSION_ID}.
+     */
+    public static final String PROPERTY_ID = "id";
+
+    /**
+     * The path of the field holding an extension's id, to be used when querying the index, for example to group the
+     * pings per extension. Assembled from the mapping property names above so that it cannot drift from the mapping
+     * declared in {@link #provideMapping()}.
+     */
+    public static final String FIELD_EXTENSION_ID = PROPERTY_EXTENSIONS + "." + PROPERTY_ID;
 
     private static final String PROPERTY_VERSION = "version";
 
     private static final String PROPERTY_FEATURES = "features";
-
-    private static final String PROPERTY_EXTENSIONS = "extensions";
 
     @Inject
     private InstalledExtensionRepository extensionRepository;

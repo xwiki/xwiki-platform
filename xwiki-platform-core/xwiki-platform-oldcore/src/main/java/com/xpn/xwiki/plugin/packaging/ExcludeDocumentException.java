@@ -21,9 +21,9 @@ package com.xpn.xwiki.plugin.packaging;
 
 /**
  * @version $Id$
- * @deprecated since 5.2, use Filter framework instead
+ * @deprecated use Filter framework instead
  */
-@Deprecated
+@Deprecated(since = "5.2")
 public class ExcludeDocumentException extends Exception
 {
 

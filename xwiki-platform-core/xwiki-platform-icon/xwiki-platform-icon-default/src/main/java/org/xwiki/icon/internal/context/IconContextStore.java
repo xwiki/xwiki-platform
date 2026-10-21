@@ -78,7 +78,7 @@ public class IconContextStore extends AbstractContextStore
                     contextStore.put(PROP_ICON_THEME, currentIconSet.getName());
                 }
             } catch (IconException e) {
-                this.logger.error("Unexcepted error when getting current icon set", e);
+                this.logger.error("Unexpected error when getting current icon set", e);
             }
         }
     }
@@ -92,7 +92,7 @@ public class IconContextStore extends AbstractContextStore
             try {
                 this.iconSetContext.setIconSet(this.iconSetManager.getIconSet(iconSetName));
             } catch (IconException e) {
-                this.logger.error("Unexcepted error when getting icon set with name [{}]", e);
+                this.logger.error("Unexpected error when getting icon set with name [{}]", iconSetName, e);
             }
         }
     }

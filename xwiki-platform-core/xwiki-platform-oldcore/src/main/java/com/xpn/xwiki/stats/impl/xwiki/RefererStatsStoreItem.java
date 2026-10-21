@@ -90,9 +90,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
             // TODO Fix use of deprecated call.
             store.loadXWikiCollection(refererStat, this.context, true);
         } catch (XWikiException e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Failed to load referer statictics object [" + getId() + "]");
-            }
+            LOGGER.debug("Failed to load referer statistics object [{}]", getId(), e);
         }
 
         // Increment counters
@@ -103,7 +101,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
             // TODO Fix use of deprecated call.
             store.saveXWikiCollection(refererStat, this.context, true);
         } catch (XWikiException e) {
-            LOGGER.error("Failed to save referer statictics object [" + getId() + "]");
+            LOGGER.error("Failed to save referer statistics object [{}]", getId());
         }
     }
 }

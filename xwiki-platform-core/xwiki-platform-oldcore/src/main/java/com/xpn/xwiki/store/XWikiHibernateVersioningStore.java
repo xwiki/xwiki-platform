@@ -27,15 +27,13 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.Session;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.user.UserReferenceSerializer;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
@@ -59,51 +57,12 @@ import com.xpn.xwiki.web.Utils;
 @Singleton
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface
 {
-    /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
-
-    /**
-     * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
-     * in the WEB-INF directory.
-     *
-     * @param xwiki The xwiki object
-     * @param context The current context
-     * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateVersioningStore(XWiki xwiki, XWikiContext context)
-    {
-        super(xwiki, context);
-    }
-
-    /**
-     * Initialize the storage engine with a specific path This is used for tests.
-     *
-     * @param hibpath path to hibernate.hbm.xml file
-     * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateVersioningStore(String hibpath)
-    {
-        super(hibpath);
-    }
-
-    /**
-     * @see #XWikiHibernateVersioningStore(XWiki, XWikiContext)
-     * @param context The current context
-     * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateVersioningStore(XWikiContext context)
-    {
-        this(context.getWiki(), context);
-    }
-
     /**
      * Empty constructor needed for component manager.
      */
     public XWikiHibernateVersioningStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     @Override
@@ -289,6 +248,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         try {
             executeWrite(context, session -> {
                 XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
+                // The existing nodes are removed below with a bulk delete query, which Hibernate does not apply to the
+                // entities already loaded in the session. Detach them explicitly: the archive is then rebuilt with a
+                // node reusing the identifier of one of the deleted ones (the reset archive gets a single node, at the
+                // current version of the document), and saving it would otherwise fail with a NonUniqueObjectException.
+                detachArchiveNodes(session, archive);
                 archive.resetArchive();
                 archive.getDeletedNodeInfo().clear();
                 doc.setMinorEdit(false);
@@ -298,6 +262,27 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             });
         } finally {
             restoreExecutionXContext();
+        }
+    }
+
+    /**
+     * Remove the nodes of the passed archive from the Hibernate session, so that saving new nodes with the same
+     * identifiers does not clash with them. Nodes that are not in the session are left untouched.
+     *
+     * @param session the Hibernate session holding the nodes
+     * @param archive the archive whose nodes must be detached
+     * @throws XWikiException if the content of a node cannot be accessed
+     */
+    private void detachArchiveNodes(Session session, XWikiDocumentArchive archive) throws XWikiException
+    {
+        for (XWikiRCSNodeInfo node : archive.getNodes()) {
+            session.evict(node);
+            // Both the node information and the node content are mapped on the same table row, so the content must be
+            // detached too. Pass a null context to only get the content when it has already been loaded.
+            XWikiRCSNodeContent content = node.getContent(null);
+            if (content != null) {
+                session.evict(content);
+            }
         }
     }
 

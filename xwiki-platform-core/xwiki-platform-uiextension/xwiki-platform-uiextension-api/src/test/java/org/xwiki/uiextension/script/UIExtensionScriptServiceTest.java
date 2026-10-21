@@ -27,19 +27,28 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionFilter;
 import org.xwiki.uiextension.UIExtensionManager;
+import org.xwiki.uiextension.internal.UIExtensionRenderer;
 import org.xwiki.uiextension.internal.filter.SortByIdFilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
@@ -51,6 +60,9 @@ class UIExtensionScriptServiceTest
     @MockComponent
     private UIExtensionManager uiExtensionManager;
 
+    @MockComponent
+    private UIExtensionRenderer uiExtensionRenderer;
+
     @Mock
     private ComponentManager contextComponentManager;
 
@@ -60,6 +72,9 @@ class UIExtensionScriptServiceTest
 
     @Mock
     private ComponentManager componentManager;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void verifyExtensionsAreSortedAlphabeticallyById() throws Exception
@@ -94,5 +109,117 @@ class UIExtensionScriptServiceTest
         assertEquals("id1", extensions.get(0).getId());
         assertEquals("id2", extensions.get(1).getId());
         assertEquals("id3", extensions.get(2).getId());
+    }
+
+    @Test
+    void getExtensionsWhenUnknownFilterHint() throws Exception
+    {
+        UIExtension uix = mock(UIExtension.class, "uix1");
+        List<UIExtension> epExtensions = List.of(uix);
+
+        when(this.uiExtensionManager.get("epId")).thenReturn(epExtensions);
+        when(this.contextComponentManagerProvider.get()).thenReturn(this.contextComponentManager);
+        when(this.contextComponentManager.getInstance(UIExtensionFilter.class, "unknownFilter"))
+            .thenThrow(new ComponentLookupException("error!"));
+
+        // The unknown filter is skipped and the extensions are returned unfiltered.
+        assertEquals(epExtensions,
+            this.uiExtensionScriptService.getExtensions("epId", Map.of("unknownFilter", "id1")));
+
+        assertEquals("Unable to find a UIExtensionFilter for hint [unknownFilter] while getting UIExtensions for "
+            + "extension point [epId]. Root cause is [ComponentLookupException: error!]",
+            this.logCapture.getMessage(0));
+    }
+
+
+    @Test
+    void render() throws Exception
+    {
+        UIExtension uix = mock(UIExtension.class);
+        when(this.uiExtensionRenderer.render(List.of(uix), Syntax.HTML_5_0, false)).thenReturn("rendered");
+
+        assertEquals("rendered", this.uiExtensionScriptService.render(uix, Syntax.HTML_5_0));
+    }
+
+    @Test
+    void renderWhenNullExtension()
+    {
+        assertNull(this.uiExtensionScriptService.render(null, Syntax.HTML_5_0));
+
+        assertEquals("Can't render a null UI extension.", this.logCapture.getMessage(0));
+        verifyNoInteractions(this.uiExtensionRenderer);
+    }
+
+    @Test
+    void renderWhenNullOutputSyntax()
+    {
+        assertNull(this.uiExtensionScriptService.render(mock(UIExtension.class), null));
+
+        assertEquals("Can't render the UI extensions without an output syntax.", this.logCapture.getMessage(0));
+        verifyNoInteractions(this.uiExtensionRenderer);
+    }
+
+    @Test
+    void renderExtensions() throws Exception
+    {
+        UIExtension uix = mock(UIExtension.class);
+        when(this.uiExtensionManager.get("epId")).thenReturn(List.of(uix));
+        when(this.uiExtensionRenderer.render(List.of(uix), Syntax.HTML_5_0, false)).thenReturn("rendered");
+
+        assertEquals("rendered", this.uiExtensionScriptService.renderExtensions("epId", Syntax.HTML_5_0));
+    }
+
+    @Test
+    void renderExtensionsWithFilters() throws Exception
+    {
+        UIExtension uix2 = mock(UIExtension.class, "uix2");
+        when(uix2.getId()).thenReturn("id2");
+        UIExtension uix1 = mock(UIExtension.class, "uix1");
+        when(uix1.getId()).thenReturn("id1");
+
+        when(this.uiExtensionManager.get("epId")).thenReturn(new ArrayList<>(List.of(uix2, uix1)));
+        when(this.contextComponentManagerProvider.get()).thenReturn(this.contextComponentManager);
+        when(this.contextComponentManager.getInstance(UIExtensionFilter.class, "sortById"))
+            .thenReturn(new SortByIdFilter());
+        // The filters must be applied before rendering.
+        when(this.uiExtensionRenderer.render(List.of(uix1, uix2), Syntax.HTML_5_0, false)).thenReturn("rendered");
+
+        assertEquals("rendered",
+            this.uiExtensionScriptService.renderExtensions("epId", Syntax.HTML_5_0, Map.of("sortById", "")));
+    }
+
+    @Test
+    void renderExtensionsWithNullFilters() throws Exception
+    {
+        UIExtension uix = mock(UIExtension.class);
+        when(this.uiExtensionManager.get("epId")).thenReturn(List.of(uix));
+        when(this.uiExtensionRenderer.render(List.of(uix), Syntax.HTML_5_0, false)).thenReturn("rendered");
+
+        assertEquals("rendered", this.uiExtensionScriptService.renderExtensions("epId", Syntax.HTML_5_0, null));
+    }
+
+    @Test
+    void renderExtensionsWhenNullOutputSyntax()
+    {
+        assertNull(this.uiExtensionScriptService.renderExtensions("epId", null));
+
+        assertEquals("Can't render the UI extensions of the extension point [epId] without an output syntax.",
+            this.logCapture.getMessage(0));
+        verifyNoInteractions(this.uiExtensionRenderer);
+    }
+
+    @Test
+    void renderExtensionsWhenRenderingFails() throws Exception
+    {
+        UIExtension uix = mock(UIExtension.class);
+        when(this.uiExtensionManager.get("epId")).thenReturn(List.of(uix));
+        when(this.uiExtensionRenderer.render(List.of(uix), Syntax.HTML_5_0, false))
+            .thenThrow(new RenderingException("Boom!"));
+
+        assertNull(this.uiExtensionScriptService.renderExtensions("epId", Syntax.HTML_5_0));
+
+        assertEquals("Failed to render the UI extensions of the extension point [epId] in syntax [html/5.0]. "
+            + "Root cause is [RenderingException: Boom!]", this.logCapture.getMessage(0));
+        verify(this.uiExtensionRenderer).render(List.of(uix), Syntax.HTML_5_0, false);
     }
 }

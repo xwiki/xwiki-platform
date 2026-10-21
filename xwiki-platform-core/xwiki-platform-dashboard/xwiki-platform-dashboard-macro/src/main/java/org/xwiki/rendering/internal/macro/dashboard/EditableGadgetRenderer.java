@@ -26,6 +26,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -99,7 +100,8 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
         try {
             return componentManager.getInstance(BlockRenderer.class, annotatedTargetSyntax);
         } catch (ComponentLookupException e) {
-            logger.warn("Failed to load the syntax [{}].", annotatedTargetSyntax);
+            logger.warn("Failed to load the syntax [{}]. Root cause is [{}].", annotatedTargetSyntax,
+                ExceptionUtils.getRootCauseMessage(e));
             // Failback to the default renderer
             return defaultGadgetContentRenderer;
         }

@@ -39,7 +39,7 @@
         // If the image URL is relative to the current page or is absolute (HTTP) then we can pass the icon width as a
         // query string parameter to allow the image to be resized on the server side.
         if (url.substring(0, 1) === '/' || url.substring(0, 7) === 'http://') {
-          url += (url.indexOf('?') < 0 ? '?' : '&') + 'width=48';
+          url += (url.includes('?') ? '&' : '?') + 'width=48';
         }
         var icon = {
           iconSetType: 'IMAGE',

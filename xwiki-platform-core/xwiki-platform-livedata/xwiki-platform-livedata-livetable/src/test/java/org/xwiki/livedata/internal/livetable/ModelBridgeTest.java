@@ -34,6 +34,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -44,6 +45,9 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.XWiki;
@@ -59,8 +63,10 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -93,6 +99,9 @@ class ModelBridgeTest
     private EntityReferenceSerializer<String> localSerializer;
 
     @MockComponent
+    private UserReferenceResolver<CurrentUserReference> userReferenceResolver;
+
+    @MockComponent
     private HTMLConverter htmlConverter;
 
     @Mock
@@ -113,12 +122,122 @@ class ModelBridgeTest
     @Mock
     private BaseClass baseClass;
 
+    @Mock
+    private DocumentAuthors documentAuthors;
+
     @BeforeEach
     void setUp()
     {
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
         when(this.document.clone()).thenReturn(this.document);
+    }
+
+    @Test
+    void updateAllCreate() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "newdoc");
+        UserReference author = mock(UserReference.class);
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(true);
+        when(this.document.getAuthors()).thenReturn(this.documentAuthors);
+        when(this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(author);
+
+        this.modelBridge.updateAll(new HashMap<>(), documentReference, null, Map.of(), 0, true);
+
+        verify(this.documentAuthors).setCreator(author);
+        verify(this.authorization).checkAccess(Right.EDIT, documentReference);
+    }
+
+    @Test
+    void updateAllCreateAddsTheObjectWhenOnlyDocumentFieldsAreSet() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "newdoc");
+        DocumentReference classReference = new DocumentReference("xwiki", "MyApp", "MyClass");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(true);
+        when(this.document.getAuthors()).thenReturn(this.documentAuthors);
+        when(this.document.getXObject(classReference, 0)).thenReturn(null);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("doc.title", "Some title");
+
+        this.modelBridge.updateAll(properties, documentReference, classReference, Map.of(), 0, true);
+
+        // Without the object the new page would not be an entry of the live data at all.
+        verify(this.document).newXObject(classReference, this.xcontext);
+        verify(this.document).setTitle("Some title");
+    }
+
+    @Test
+    void updateAllDoesNotAddTheObjectWhenUpdatingAnExistingEntry() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+        DocumentReference classReference = new DocumentReference("xwiki", "MyApp", "MyClass");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(false);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("doc.title", "Some title");
+
+        this.modelBridge.updateAll(properties, documentReference, classReference, Map.of(), 0, false);
+
+        verify(this.document, never()).newXObject(any(DocumentReference.class), any(XWikiContext.class));
+    }
+
+    @Test
+    void updateAllCreateWhenDocumentAlreadyExists() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "newdoc");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(false);
+
+        LiveDataException liveDataException = assertThrows(LiveDataException.class,
+            () -> this.modelBridge.updateAll(new HashMap<>(), documentReference, null, Map.of(), 0, true));
+        assertEquals(String.format("Cannot create the page [%s] because it already exists.", documentReference),
+            liveDataException.getMessage());
+    }
+
+    @Test
+    void delete() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(false);
+
+        this.modelBridge.delete(documentReference);
+
+        verify(this.authorization).checkAccess(Right.DELETE, documentReference);
+        verify(this.xwiki).deleteDocument(this.document, this.xcontext);
+    }
+
+    @Test
+    void deleteNewDocument() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(true);
+
+        this.modelBridge.delete(documentReference);
+
+        verify(this.xwiki, never()).deleteDocument(any(XWikiDocument.class), any(XWikiContext.class));
+    }
+
+    @Test
+    void deleteWhenDeleteIsDisallowed() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+
+        doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.DELETE, documentReference);
+
+        assertThrows(AccessDeniedException.class, () -> this.modelBridge.delete(documentReference));
+        verifyNoInteractions(this.xcontextProvider);
     }
 
     @Test
@@ -176,7 +295,7 @@ class ModelBridgeTest
         assertEquals("updatedValue", update.get());
         
         verify(this.baseClass).fromMap(Collections.singletonMap("propertyName", "value"), this.baseObject);
-        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, this.xcontext);
+        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, true, this.xcontext);
     }
 
     @Test
@@ -209,7 +328,7 @@ class ModelBridgeTest
         assertTrue(properties.containsKey(property));
         assertArrayEquals(new String[] { "a", "b" }, (String[]) properties.get(property));
 
-        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, this.xcontext);
+        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, true, this.xcontext);
     }
 
     @Test
@@ -248,7 +367,7 @@ class ModelBridgeTest
         assertEquals(false, update.get());
 
         verify(this.document).setEnforceRequiredRights(true);
-        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, this.xcontext);
+        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, true, this.xcontext);
     }
 
     @Test
@@ -288,7 +407,7 @@ class ModelBridgeTest
         Optional<Object> update = this.modelBridge.update(property, value, documentReference, null);
         assertEquals("oldContent", update.get());
         verify(this.document).setContent("newContent");
-        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, this.xcontext);
+        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, true, this.xcontext);
     }
 
     @Test
@@ -324,7 +443,7 @@ class ModelBridgeTest
         when(this.baseObject.getPropertyNames()).thenReturn(new String[] { "field" });
         when(this.baseObject.get("field")).thenReturn(this.propertyInterface);
 
-        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0);
+        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0, false);
         verify(this.baseClass).fromMap(Collections.singletonMap("field", 55), this.baseObject);
         verify(this.document).setHidden(false);
 
@@ -342,7 +461,7 @@ class ModelBridgeTest
 
         LiveDataException liveDataException = assertThrows(LiveDataException.class,
             () -> this.modelBridge.updateAll((Map<String, Object>) new HashMap<String, Object>(), documentReference,
-                classReference, Map.of(), 0));
+                classReference, Map.of(), 0, false));
 
         assertEquals("We do not support updating new documents.", liveDataException.getMessage());
 
@@ -381,7 +500,7 @@ class ModelBridgeTest
         when(this.localSerializer.serialize(classReference)).thenReturn("MyTest.MyClass");
         when(this.htmlConverter.fromHTML("to convert", "xwiki/2.0")).thenReturn("converted value");
 
-        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0);
+        this.modelBridge.updateAll(entry, documentReference, classReference, Map.of(), 0, false);
         verify(this.baseClass).fromMap(Collections.singletonMap("field_known", "converted value"), this.baseObject);
         verify(this.document).setHidden(false);
 
@@ -406,7 +525,7 @@ class ModelBridgeTest
 
         Map<String, DocumentReference> propertyClasses = Map.of("customField", customClassReference);
 
-        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0);
+        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0, false);
 
         verify(this.baseClass).fromMap(Map.of("customField", "value"), this.baseObject);
         verify(this.authorization).checkAccess(Right.EDIT, documentReference);
@@ -435,7 +554,7 @@ class ModelBridgeTest
 
         Map<String, DocumentReference> propertyClasses = Map.of("customField", customClassReference);
 
-        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0);
+        this.modelBridge.updateAll(entry, documentReference, defaultClassReference, propertyClasses, 0, false);
         verify(this.baseClass)
             .fromMap(Map.of("customField", "converted value"), this.baseObject);
         verify(this.document).setHidden(false);

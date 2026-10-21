@@ -86,8 +86,8 @@ public class ExpandedMacroBlock extends MacroBlock
         WikiPrinter printer = new DefaultWikiPrinter();
         XDOM xdom;
         // We need the begin/endDocument events so we wrap the child blocks in a XDOM block.
-        if (getChildren().size() == 1 && getChildren().get(0) instanceof XDOM) {
-            xdom = (XDOM) getChildren().get(0);
+        if (getChildren().size() == 1 && getChildren().get(0) instanceof XDOM childXdom) {
+            xdom = childXdom;
         } else {
             xdom = new XDOM(getChildren());
         }

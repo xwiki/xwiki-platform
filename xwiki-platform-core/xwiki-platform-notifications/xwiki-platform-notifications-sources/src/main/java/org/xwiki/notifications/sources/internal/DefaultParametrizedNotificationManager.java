@@ -121,13 +121,13 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     private List<Event> getRawEvents(NotificationParameters parameters, List<CompositeEvent> compositeEvents)
         throws NotificationException
     {
-        if (Boolean.TRUE.equals(parameters.onlyUnread) && !parameters.filters.contains(eventReadAlertFilter)) {
-            parameters.filters.add(eventReadAlertFilter);
-        }
-        if (Boolean.TRUE.equals(parameters.onlyUnread) && !parameters.filters.contains(eventReadEmailFilter)) {
-            parameters.filters.add(eventReadEmailFilter);
-        }
+        addOnlyUnreadFilters(parameters);
         List<Event> results = new ArrayList<>();
+
+        // A batch size that is not strictly positive would never grow and the loop below would never end.
+        if (parameters.expectedCount <= 0) {
+            return results;
+        }
 
         // Because the user might not be able to see all notifications because of the rights, we take from the database
         // more events than expected and we will filter afterwards.
@@ -157,6 +157,16 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
             return results;
         } catch (Exception e) {
             throw new NotificationException("Fail to get the list of notifications.", e);
+        }
+    }
+
+    private void addOnlyUnreadFilters(NotificationParameters parameters)
+    {
+        if (Boolean.TRUE.equals(parameters.onlyUnread) && !parameters.filters.contains(eventReadAlertFilter)) {
+            parameters.filters.add(eventReadAlertFilter);
+        }
+        if (Boolean.TRUE.equals(parameters.onlyUnread) && !parameters.filters.contains(eventReadEmailFilter)) {
+            parameters.filters.add(eventReadEmailFilter);
         }
     }
 
@@ -217,7 +227,7 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
      * 
      * @param event the event that is tested
      * @param userReference the user reference given by the parameters
-     * @return {@code true} iff the user is explicitely target, or through a group.
+     * @return {@code true} iff the user is explicitly target, or through a group.
      */
     private boolean eventTargetUser(Event event, DocumentReference userReference)
     {
@@ -225,7 +235,7 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
         if (event.getTarget() != null && !event.getTarget().isEmpty() && userReference != null) {
             String serializedUserReference = this.serializer.serialize(userReference);
 
-            // if the target explicitely contains the user reference we're good
+            // if the target explicitly contains the user reference we're good
             if (event.getTarget().contains(serializedUserReference)) {
                 result = true;
                 // else we need to check that the targets does not contain any group the user belongs to

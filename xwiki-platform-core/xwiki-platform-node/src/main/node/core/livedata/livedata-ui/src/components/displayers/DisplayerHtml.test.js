@@ -38,6 +38,7 @@ describe("DisplayerHtml.vue", () => {
       },
       logic: {
         isContentTrusted: () => true,
+        isEditMode: () => false,
       },
     });
 
@@ -57,6 +58,7 @@ describe("DisplayerHtml.vue", () => {
       },
       logic: {
         isContentTrusted: () => false,
+        isEditMode: () => false,
       },
     });
     expect(wrapper.find(".html-wrapper > *").html()).toBe(

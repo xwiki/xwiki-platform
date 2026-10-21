@@ -126,11 +126,11 @@ class XWikiRightServiceImplTest
         when(this.groupService.getAllGroupsReferencesForMember(eq(this.user.getDocumentReference()), anyInt(), 
             anyInt(), eq(this.context)))
             .thenAnswer(invocationOnMock -> {
-            XWikiContext context = invocationOnMock.getArgument(3);
+            XWikiContext invocationContext = invocationOnMock.getArgument(3);
 
-            if (context.getWikiId().equals(group.getWikiName())) {
+            if (invocationContext.getWikiId().equals(group.getWikiName())) {
                 return Collections.singleton(group.getDocumentReference());
-            } else if (context.getWikiId().equals(group2.getWikiName())) {
+            } else if (invocationContext.getWikiId().equals(group2.getWikiName())) {
                 return Collections.singleton(group2.getDocumentReference());
             } else {
                 return Collections.emptyList();
@@ -408,7 +408,7 @@ class XWikiRightServiceImplTest
 
         assertFalse(this.rightService.hasAccessLevel("view",
             XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), true, this.context),
-            "Guest has wiew right on the document");
+            "Guest has view right on the document");
 
         // direct user rights
 
@@ -455,14 +455,10 @@ class XWikiRightServiceImplTest
      */
     @Test
     void programmingRightsAfterDropPermissionsForRenderingCycle(MockitoComponentManager componentManager)
-        throws Exception
     {
         final Document doc =
             new Document(new XWikiDocument(new DocumentReference("XWiki", "Test", "Permissions")), this.context);
 
-       // doc.setContentAuthor(XWikiRightService.SUPERADMIN_USER_FULLNAME);
-
-        //this.context.setDoc(doc);
         this.context.setUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
 
         assertTrue(this.rightService.hasProgrammingRights(this.context),

@@ -19,8 +19,8 @@
  */
 package org.xwiki.chart.model;
 
-import org.jfree.data.general.Dataset;
 import org.jfree.chart.axis.Axis;
+import org.jfree.data.general.Dataset;
 
 /**
  * Interface defining the input for the chart generator.

@@ -43,12 +43,32 @@
     >
       <LivedataDisplayer :property-id="property.id" :entry="entry" />
     </td>
+
+    <td v-if="logic.isEditMode()" class="actions-column">
+      <button
+        type="button"
+        class="btn btn-default"
+        :title="
+          $t(
+            isEntrySaved
+              ? 'livedata.table.action.delete'
+              : 'livedata.table.action.cancel',
+          )
+        "
+        @click="logic.deleteEntry(entry)"
+      >
+        <XWikiIcon
+          :icon-descriptor="{ name: isEntrySaved ? 'trash' : 'cross' }"
+        />
+      </button>
+    </td>
   </tr>
 </template>
 
 <script>
 import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
+import XWikiIcon from "../../utilities/XWikiIcon.vue";
 
 export default {
   name: "LayoutTableRow",
@@ -56,6 +76,7 @@ export default {
   components: {
     LivedataEntrySelector,
     LivedataDisplayer,
+    XWikiIcon,
   },
 
   inject: ["logic"],
@@ -85,6 +106,25 @@ export default {
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
     },
+    isEntrySaved() {
+      return this.logic.getEntryId(this.entry) !== undefined;
+    },
+  },
+
+  mounted() {
+    // Autofocus the first editable cell of a new row.
+    // This makes new row creation smoother by making it directly editable.
+    if (this.entry?._new) {
+      const tryFocus = (attempt = 0) => {
+        const cell = this.$el.querySelector(".editable")?.closest("[tabindex]");
+        if (cell) {
+          cell.focus();
+        } else if (attempt < 20) {
+          requestAnimationFrame(() => tryFocus(attempt + 1));
+        }
+      };
+      tryFocus();
+    }
   },
 };
 </script>
@@ -107,8 +147,17 @@ export default {
   height: 100%;
 }
 
-.layout-table tbody tr:first-child td.cell {
-  /* Removes the top border on the first line of the table, it's unecessary since the header itself has a background color */
-  border-top: 0;
+.layout-table tbody {
+  tr:first-child td.cell,
+  tr:first-child td.actions-column {
+    /* Removes the top border on the first line of the table, it's unnecessary since the header itself has a background color */
+    border-top: 0;
+  }
+
+  td.actions-column {
+    /* Ensures the actions column has a fixed width as long as its content does not change. */
+    width: 1%;
+    white-space: nowrap;
+  }
 }
 </style>

@@ -66,8 +66,8 @@ public class LegacyParentFieldUpdaterListener extends AbstractLocalEventListener
     public void processLocalEvent(Event event, Object source, Object data)
     {
         boolean updateParentField = true;
-        if (data instanceof MoveRequest) {
-            updateParentField = ((MoveRequest) data).isUpdateParentField();
+        if (data instanceof MoveRequest moveRequest) {
+            updateParentField = moveRequest.isUpdateParentField();
         }
         if (updateParentField) {
             DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;

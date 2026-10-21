@@ -134,6 +134,25 @@ class FilesystemResourceReferenceCopierTest
         assertThat(this.logCapture.getMessage(0), containsString("Skipping copying of resource"));
     }
 
+    @Test
+    void copyResourceFromJARWithSiblingPrefixPathTraversalAttack() throws Exception
+    {
+        // A sibling of the export directory whose name merely starts with the export directory's name is outside
+        // the export directory, so the resource must not be copied there.
+        String resourcePath = "../../export-evil/file.txt";
+        createTestJarWithResources(resourcePath);
+        // Make the intermediate directory real so that the operating system can resolve the ".." segments, which is
+        // what lets an unprotected copy actually reach outside the export directory.
+        new File(this.exportDir, "webjars").mkdirs();
+
+        FilesystemResourceReferenceCopier copier = new FilesystemResourceReferenceCopier();
+        // "webjars" is the target prefix used when exporting, see FilesystemResourceReferenceSerializer.
+        copier.copyResourceFromJAR(RESOURCE_PREFIX, resourcePath, "webjars", this.exportContext);
+
+        assertFalse(new File(this.tmpDir, "export-evil/file.txt").exists());
+        assertThat(this.logCapture.getMessage(0), containsString("Skipping copying of resource"));
+    }
+
     @ParameterizedTest
     @CsvSource({
         ".icon { background: url(\"../images/icon.png\"); }, css/style.css, images/icon.png",

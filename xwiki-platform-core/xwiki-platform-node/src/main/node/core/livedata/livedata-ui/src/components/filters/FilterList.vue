@@ -20,8 +20,8 @@
 
 <script>
 import filterMixin from "./filterMixin.js";
-import { loadById } from "../../services/require.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 
 export default {
   name: "filter-list",
@@ -132,18 +132,18 @@ export default {
   methods: {
     // Creates the function to fetch the suggestions using the given parameters.
     getLoader(searchParams) {
-      return (text, callback) => {
+      return async (text, callback) => {
         // TODO: Support multiple search URLs (sources). See suggestUsersAndGroups.js for an example.
         const searchURL = this.config.searchURL.replace(
           "{encodedQuery}",
           encodeURIComponent(text),
         );
-        this.jQuery
-          .getJSON(searchURL, searchParams)
-          // eslint-disable-next-line promise/no-callback-in-promise
-          .then((results) => callback(this.getResultsAdapter(results)))
-          // eslint-disable-next-line promise/no-callback-in-promise
-          .catch(() => callback(this.getResultsAdapter()));
+        try {
+          const results = await this.jQuery.getJSON(searchURL, searchParams);
+          callback(this.getResultsAdapter(results));
+        } catch {
+          callback(this.getResultsAdapter());
+        }
       };
     },
 

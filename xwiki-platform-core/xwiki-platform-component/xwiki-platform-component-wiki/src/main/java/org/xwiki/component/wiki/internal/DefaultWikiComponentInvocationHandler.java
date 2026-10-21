@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.descriptor.ComponentDescriptor;
@@ -54,7 +55,7 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
     /**
      * The logger to log.
      */
-    private final Logger logger = LoggerFactory.getLogger(DefaultWikiComponentInvocationHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultWikiComponentInvocationHandler.class);
 
     /**
      * Our component manager.
@@ -122,9 +123,13 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
                     componentDependency = componentManager.getInstance(cd.getRoleType(), cd.getRoleHint());
                 }
             } catch (ComponentLookupException e) {
-                this.logger.warn(String.format(
-                    "No component found for role [%s] with hint [%s], declared as dependency for wiki component [%s]",
-                    cd.getRoleType().toString(), cd.getRoleHint(), this.wikiComponent.getDocumentReference()));
+                // Pass the role type name rather than the Type: log arguments are kept as objects in the captured
+                // LogEvent and XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and
+                // a Type is backed by a Class that cannot always be resolved when that log is read back. The
+                // document reference stays an object on purpose, since the log displayers render it as a link.
+                LOGGER.warn("No component found for role [{}] with hint [{}], declared as dependency for wiki "
+                    + "component [{}]. Root cause is [{}]", cd.getRoleType().getTypeName(), cd.getRoleHint(),
+                    this.wikiComponent.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
             }
             methodContext.put(dependency.getKey(), componentDependency);
         }
@@ -136,7 +141,6 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
         // We look for the method in the XObjects.
         if (!this.wikiComponent.getHandledMethods().containsKey(method.getName())) {
             if (method.getDeclaringClass() == Object.class || method.getDeclaringClass() == WikiComponent.class) {
-                // return ObjectMethodsProxy.invoke(proxy, method, args);
                 return method.invoke(wikiComponent, args);
             } else {
                 // Note: We throw a runtime exception so that our exception doesn't get wrapped by a generic

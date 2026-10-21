@@ -48,7 +48,7 @@ import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
  * @since 14.5
  */
 @Component
-@Named(PDFExportJob.JOB_TYPE)
+@Named(AbstractPDFExportJob.JOB_TYPE)
 public class PDFExportJob extends AbstractPDFExportJob
 {
     @Inject

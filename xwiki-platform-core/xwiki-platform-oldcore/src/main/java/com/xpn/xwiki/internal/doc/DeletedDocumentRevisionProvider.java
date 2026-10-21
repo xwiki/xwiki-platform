@@ -26,12 +26,12 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.AuthorizationException;
-import org.xwiki.security.authorization.Right;
-import org.xwiki.user.UserReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.PageReferenceResolver;
+import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

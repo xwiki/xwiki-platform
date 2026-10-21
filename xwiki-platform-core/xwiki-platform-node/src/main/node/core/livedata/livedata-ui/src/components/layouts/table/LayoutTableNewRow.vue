@@ -33,7 +33,7 @@
       so that it align well with the entries selectors of the rows
       and the select-all entries in the header
     -->
-    <td class="entry-selector"></td>
+    <td v-if="logic.isSelectionEnabled()" class="entry-selector"></td>
 
     <!--
       The cell to add a new entry
@@ -45,6 +45,9 @@
         {{ $t("livedata.action.addEntry") }}
       </a>
     </td>
+
+    <!-- Spacer for the actions column in edit mode -->
+    <td v-if="logic.isEditMode()"></td>
   </tr>
 </template>
 

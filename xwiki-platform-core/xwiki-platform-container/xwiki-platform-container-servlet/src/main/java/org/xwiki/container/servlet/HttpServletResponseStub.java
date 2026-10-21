@@ -75,11 +75,13 @@ public class HttpServletResponseStub implements HttpServletResponse
     @Override
     public void setCharacterEncoding(String s)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void addCookie(Cookie cookie)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
@@ -115,56 +117,67 @@ public class HttpServletResponseStub implements HttpServletResponse
     @Override
     public void sendError(int sc, String msg) throws IOException
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void sendError(int sc) throws IOException
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void sendRedirect(String location) throws IOException
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void setDateHeader(String name, long date)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void addDateHeader(String name, long date)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void setHeader(String name, String value)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void addHeader(String name, String value)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void setIntHeader(String name, int value)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void addIntHeader(String name, int value)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void setStatus(int sc)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void setStatus(int sc, String sm)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
@@ -194,21 +207,25 @@ public class HttpServletResponseStub implements HttpServletResponse
     @Override
     public void setContentLength(int len)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void setContentLengthLong(long len)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void setContentType(String type)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void setBufferSize(int size)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
@@ -220,11 +237,13 @@ public class HttpServletResponseStub implements HttpServletResponse
     @Override
     public void flushBuffer() throws IOException
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void resetBuffer()
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
@@ -236,11 +255,13 @@ public class HttpServletResponseStub implements HttpServletResponse
     @Override
     public void reset()
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override
     public void setLocale(Locale loc)
     {
+        // Nothing to do, this stub does not send any response.
     }
 
     @Override

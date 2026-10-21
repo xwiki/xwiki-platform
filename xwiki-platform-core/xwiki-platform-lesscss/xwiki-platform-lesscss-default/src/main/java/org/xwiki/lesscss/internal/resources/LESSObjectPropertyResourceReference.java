@@ -64,9 +64,7 @@ public class LESSObjectPropertyResourceReference implements WikiLESSResourceRefe
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof LESSObjectPropertyResourceReference) {
-            LESSObjectPropertyResourceReference lessObjectPropertyResourceReference =
-                (LESSObjectPropertyResourceReference) o;
+        if (o instanceof LESSObjectPropertyResourceReference lessObjectPropertyResourceReference) {
             return objectPropertyReference.equals(lessObjectPropertyResourceReference.objectPropertyReference);
         }
 

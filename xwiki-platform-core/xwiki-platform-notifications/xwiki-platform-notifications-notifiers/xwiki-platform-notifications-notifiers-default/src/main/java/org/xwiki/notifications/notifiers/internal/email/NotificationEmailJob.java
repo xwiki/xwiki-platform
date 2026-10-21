@@ -123,7 +123,7 @@ public class NotificationEmailJob extends AbstractJob implements Job
             getModelBridge().savePropertyInHiddenDocument(emailJobObject, LAST_FIRE_TIME, new Date());
         } catch (Exception e) {
             throw new JobExecutionException(
-                    String.format("Failed to update the last fire time property of [{}].", emailJobObject), e);
+                    String.format("Failed to update the last fire time property of [%s].", emailJobObject), e);
         }
     }
 

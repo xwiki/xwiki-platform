@@ -36,12 +36,14 @@ import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.rendering.converter.ConversionException;
 import org.xwiki.rendering.converter.Converter;
@@ -100,44 +102,45 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     private static final String FULL_CONTENT = "fullContent";
 
+    private static final String DATE = "date";
+
+    /**
+     * Orders feed entries by published date, most recent first, entries without a date coming last.
+     */
     public static class SyndEntryComparator implements Comparator<SyndEntry>
     {
+        private static final Comparator<SyndEntry> ORDER =
+            Comparator.comparing(SyndEntry::getPublishedDate, Comparator.nullsLast(Comparator.reverseOrder()));
+
         @Override
         public int compare(SyndEntry entry1, SyndEntry entry2)
         {
-            if ((entry1.getPublishedDate() == null) && (entry2.getPublishedDate() == null)) {
-                return 0;
-            }
-            if (entry1.getPublishedDate() == null) {
-                return 1;
-            }
-            if (entry2.getPublishedDate() == null) {
-                return -1;
-            }
-
-            return (-entry1.getPublishedDate().compareTo(entry2.getPublishedDate()));
+            return ORDER.compare(entry1, entry2);
         }
     }
 
+    /**
+     * Orders {@code XWiki.FeedEntryClass} objects by their {@code date} property, most recent first, entries without
+     * a date coming last.
+     */
     public static class EntriesComparator implements Comparator<com.xpn.xwiki.api.Object>
     {
+        private static final Comparator<com.xpn.xwiki.api.Object> ORDER =
+            Comparator.comparing(EntriesComparator::getDate, Comparator.nullsLast(Comparator.reverseOrder()));
+
         @Override
         public int compare(com.xpn.xwiki.api.Object entry1, com.xpn.xwiki.api.Object entry2)
         {
-            BaseObject bobj1 = entry1.getXWikiObject();
-            BaseObject bobj2 = entry1.getXWikiObject();
+            return ORDER.compare(entry1, entry2);
+        }
 
-            if ((bobj1.getDateValue("date") == null) && (bobj2.getDateValue("date") == null)) {
-                return 0;
-            }
-            if (bobj1.getDateValue("date") == null) {
-                return 1;
-            }
-            if (bobj2.getDateValue("date") == null) {
-                return -1;
-            }
+        private static Date getDate(com.xpn.xwiki.api.Object entry)
+        {
+            // Read the property through the API object instead of through getXWikiObject(), which returns null
+            // whenever the caller doesn't have programming rights and would thus fail the whole comparison.
+            java.lang.Object value = entry.getValue(DATE);
 
-            return (-bobj1.getDateValue("date").compareTo(bobj2.getDateValue("date")));
+            return value instanceof Date date ? date : null;
         }
     }
 
@@ -187,6 +190,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 iCapacity = Integer.parseInt(capacity);
             }
         } catch (Exception e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The default capacity is then used.
         }
 
         initCache(iCapacity, context);
@@ -200,7 +205,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(iCapacity);
             lru.setMaxIdle(this.refreshPeriod);
-            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+            configuration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
             CacheManager cacheManager = Utils.getComponent(CacheManager.class);
             this.feedCache = cacheManager.createNewLocalCache(configuration);
@@ -217,6 +222,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 initCache(context);
             }
         } catch (XWikiException e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The cache initialization is retried the next time the cache is needed.
         }
     }
 
@@ -300,12 +307,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             XWikiFeedFetcher feedFetcher = new XWikiFeedFetcher();
             feedFetcher.setUserAgent(context.getWiki().Param("xwiki.plugins.feed.useragent",
                 context.getWiki().getHttpUserAgent(context)));
-            SyndFeed feed =
-                feedFetcher.retrieveFeed(
-                    feedURL,
-                    (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.timeout",
-                        context.getWiki().getHttpTimeout(context)));
-            return feed;
+            return feedFetcher.retrieveFeed(
+                feedURL,
+                (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.timeout",
+                    context.getWiki().getHttpTimeout(context)));
         } catch (Exception ex) {
             if (ignoreInvalidFeeds) {
                 @SuppressWarnings("unchecked")
@@ -384,7 +389,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     context.remove(FEEDIMGURL);
                 }
                 obj.set("nb", nb, context);
-                obj.set("date", new Date(), context);
+                obj.set(DATE, new Date(), context);
 
                 // Update original document
                 context.getWiki().saveDocument(doc, context);
@@ -417,7 +422,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     }
                     map.put(feedDocName, e);
                     // and log it
-                    LOGGER.error("Failed to update feeds in document " + feedDocName, e);
+                    LOGGER.error("Failed to update feeds in document [{}]", feedDocName, e);
                 }
             }
         }
@@ -638,9 +643,9 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      * @param context the XWiki context
      * @return the definition of the {@code AggregatorURLClass}
      * @throws XWikiException if loading the class definition fails
-     * @deprecated since 11.10RC1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "11.10RC1")
     public BaseClass getAggregatorURLClass(XWikiContext context) throws XWikiException
     {
         return context.getWiki().getDocument(AggregatorURLClassDocumentInitializer.REFERENCE, context).getXClass();
@@ -653,9 +658,9 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      * @param context the XWiki context
      * @return the definition of the {@code FeedEntryClass}
      * @throws XWikiException if loading the class definition fails
-     * @deprecated since 11.10RC1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "11.10RC1")
     public BaseClass getFeedEntryClass(XWikiContext context) throws XWikiException
     {
         return context.getWiki().getDocument(FeedEntryClassDocumentInitializer.REFERENCE, context).getXClass();
@@ -682,7 +687,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             // If some day wiki syntax is supported in document titles, we might want to convert to wiki syntax instead.
             title = this.stripHtmlTags(entry.getTitle());
         } catch (ConversionException e) {
-            LOGGER.warn("Failed to strip HTML tags from entry title : " + e.getMessage());
+            LOGGER.warn("Failed to strip HTML tags from entry title: [{}]", ExceptionUtils.getRootCauseMessage(e));
             // Nevermind, we will use the original title
             title = entry.getTitle();
         }
@@ -693,7 +698,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         StringBuffer categs = new StringBuffer("");
         if (categList != null) {
             for (SyndCategory categ : categList) {
-                if (categs.length() != 0) {
+                if (!categs.isEmpty()) {
                     categs.append(", ");
                 }
                 categs.append(categ.getName());
@@ -708,7 +713,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         List<SyndContent> contentList = entry.getContents();
         if (contentList != null && !contentList.isEmpty()) {
             for (SyndContent content : contentList) {
-                if (contents.length() != 0) {
+                if (!contents.isEmpty()) {
                     contents.append("\n");
                 }
                 contents.append(content.getValue());
@@ -727,7 +732,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             edate = new Date();
         }
 
-        obj.setDateValue("date", edate);
+        obj.setDateValue(DATE, edate);
         obj.setStringValue("url", entry.getLink());
         obj.setStringValue(AUTHOR, entry.getAuthor());
         obj.setStringValue("feedurl", feedurl);
@@ -784,9 +789,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 "select distinct obj.number, obj.name from BaseObject as obj, StringProperty as prop , LargeStringProperty as lprop "
                     + "where obj.className='XWiki.FeedEntryClass' and obj.id=prop.id.id and obj.id=lprop.id.id ";
 
+            StringBuilder sqlBuilder = new StringBuilder(sql);
             for (int i = 0; i < queryTab.length; i++) {
-                sql += " and (prop.value LIKE '%" + queryTab[i] + "%' or lprop.value LIKE '%" + queryTab[i] + "%')";
+                sqlBuilder.append(" and (prop.value LIKE '%").append(queryTab[i])
+                    .append("%' or lprop.value LIKE '%").append(queryTab[i]).append("%')");
             }
+            sql = sqlBuilder.toString();
             List<Object[]> res = context.getWiki().search(sql, context);
 
             if (res == null) {
@@ -794,7 +802,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             }
 
             List<com.xpn.xwiki.api.Object> apiObjs = new ArrayList<>();
-            for (Object obj[] : res) {
+            for (Object[] obj : res) {
                 try {
                     XWikiDocument doc = context.getWiki().getDocument((String) obj[1], context);
                     if (context.getWiki().getRightService().checkAccess("view", doc, context)) {
@@ -849,13 +857,16 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             Constructor< ? extends SyndEntrySource> ctor = null;
             if (params != null) {
                 try {
-                    ctor = sesc.getConstructor(new Class[] {Map.class});
-                    return ctor.newInstance(new Object[] {params});
+                    ctor = sesc.getConstructor(Map.class);
+                    return ctor.newInstance(params);
                 } catch (Throwable t) {
+                    // TODO: log a warning instead of ignoring this exception: catching Throwable here also
+                    // hides a failure of the constructor that was found.
+                    // The default constructor is used below.
                 }
             }
-            ctor = sesc.getConstructor(new Class[] {});
-            return ctor.newInstance(new Object[] {});
+            ctor = sesc.getConstructor();
+            return ctor.newInstance();
         } catch (Throwable t) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "", t);
         }
@@ -997,7 +1008,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             writer.close();
             return writer.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to serialize the feed to the [{}] format", type, e);
             return "";
         }
     }

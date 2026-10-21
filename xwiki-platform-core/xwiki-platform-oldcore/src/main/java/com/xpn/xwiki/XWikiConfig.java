@@ -30,9 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 
 /**
- * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource} component instead
+ * @deprecated use {@link XWikiCfgConfigurationSource} component instead
  */
-@Deprecated
+@Deprecated(since = "6.1M2")
 public class XWikiConfig extends Properties
 {
     public XWikiConfig()
@@ -75,7 +75,7 @@ public class XWikiConfig extends Properties
     }
 
     /**
-     * @return array of string splited from property.
+     * @return array of string split from property.
      * @param param - name of property
      */
     public String[] getPropertyAsList(String param)

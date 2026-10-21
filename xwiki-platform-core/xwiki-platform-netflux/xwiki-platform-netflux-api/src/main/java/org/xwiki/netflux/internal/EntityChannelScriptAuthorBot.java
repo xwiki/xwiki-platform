@@ -36,7 +36,7 @@ import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.websocket.WebSocketContext;
 
 /**
- * A bot that protects entity channels, that are used to sychronize content that may contain scripts, by forcing a
+ * A bot that protects entity channels, that are used to synchronize content that may contain scripts, by forcing a
  * content author (i.e. a script author) with minimum script access rights (between all the users that have ever pushed
  * changes to the channel).
  *
@@ -70,7 +70,7 @@ public class EntityChannelScriptAuthorBot extends AbstractBot
     @Override
     public boolean onJoinChannel(Channel channel)
     {
-        // We want to protect only entity channels that are used to sychronize content that may contain scripts.
+        // We want to protect only entity channels that are used to synchronize content that may contain scripts.
         Optional<EntityChannel> entityChannel = this.entityChannels.getChannel(channel.getKey());
         boolean accept = entityChannel.map(this::needsProtection).orElse(false);
         if (accept) {
@@ -95,7 +95,7 @@ public class EntityChannelScriptAuthorBot extends AbstractBot
 
     private boolean needsProtection(EntityChannel entityChannel)
     {
-        // Protect only entity channels that are used to sychronize content that may contain scripts.
+        // Protect only entity channels that are used to synchronize content that may contain scripts.
         List<String> path = entityChannel.getPath();
         return !path.isEmpty() && PROTECTED_CHANNELS.contains(path.get(path.size() - 1));
     }

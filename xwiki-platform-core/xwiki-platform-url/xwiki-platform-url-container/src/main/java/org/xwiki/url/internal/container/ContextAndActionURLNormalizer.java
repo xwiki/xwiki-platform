@@ -27,7 +27,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -78,8 +79,8 @@ public class ContextAndActionURLNormalizer implements URLNormalizer<ExtendedURL>
     @Override
     public void initialize()
     {
-        if (this.environment instanceof ServletEnvironment) {
-            for (String mapping : ((ServletEnvironment) this.environment).getServletContext()
+        if (this.environment instanceof ServletEnvironment servletEnvironment) {
+            for (String mapping : servletEnvironment.getJakartaServletContext()
                 .getServletRegistration("action").getMappings()) {
                 this.validServletMappings.add(StringUtils.strip(mapping, IGNORED_MAPPING_CHARACTERS));
             }
@@ -114,8 +115,8 @@ public class ContextAndActionURLNormalizer implements URLNormalizer<ExtendedURL>
 
     protected String getContextPath()
     {
-        if (this.environment instanceof ServletEnvironment) {
-            return ((ServletEnvironment) this.environment).getServletContext().getContextPath();
+        if (this.environment instanceof ServletEnvironment servletEnvironment) {
+            return servletEnvironment.getJakartaServletContext().getContextPath();
         }
         return null;
     }
@@ -129,8 +130,8 @@ public class ContextAndActionURLNormalizer implements URLNormalizer<ExtendedURL>
     protected String getActionServletMapping()
     {
         String result = this.defaultServletMapping;
-        if (this.container.getRequest() instanceof ServletRequest) {
-            HttpServletRequest hsRequest = ((ServletRequest) this.container.getRequest()).getHttpServletRequest();
+        if (this.container.getRequest() instanceof ServletRequest servletRequest) {
+            HttpServletRequest hsRequest = servletRequest.getRequest();
             result = StringUtils.strip(hsRequest.getServletPath(), IGNORED_MAPPING_CHARACTERS);
 
             if (!this.validServletMappings.contains(result)) {

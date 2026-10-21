@@ -136,12 +136,7 @@ public class EventsSorter
 
     private List<SortedEvent> getList(Map<String, List<SortedEvent>> sortedEventsByWikis, String wiki)
     {
-        List<SortedEvent> list = sortedEventsByWikis.get(wiki);
-        if (list == null) {
-            list = new ArrayList<>();
-            sortedEventsByWikis.put(wiki, list);
-        }
-        return list;
+        return sortedEventsByWikis.computeIfAbsent(wiki, key -> new ArrayList<>());
     }
 
     private void groupEventsWithSameDocument()

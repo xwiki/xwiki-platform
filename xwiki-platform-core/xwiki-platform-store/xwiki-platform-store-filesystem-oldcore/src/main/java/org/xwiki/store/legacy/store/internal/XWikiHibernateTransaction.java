@@ -19,10 +19,11 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import com.xpn.xwiki.store.XWikiHibernateBaseStore;
+import org.xwiki.store.RootTransactionRunnable;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import org.xwiki.store.RootTransactionRunnable;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 
 /**
  * A Transaction based on XWikiHibernateStore.
@@ -32,7 +33,8 @@ import org.xwiki.store.RootTransactionRunnable;
  * @version $Id$
  * @since 3.0M2
  */
-public class XWikiHibernateTransaction extends RootTransactionRunnable implements HibernateTransaction
+public class XWikiHibernateTransaction extends RootTransactionRunnable<XWikiHibernateTransaction>
+    implements HibernateTransaction
 {
     /**
      * The storage engine.

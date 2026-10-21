@@ -162,7 +162,7 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
             throw new DataMigrationException("Error while extracting metadata", e);
         }
 
-        if (builder.length() > 0) {
+        if (!builder.isEmpty()) {
             return String.format("<changeSet author=\"xwiki\" id=\"R%s\">%s</changeSet>", getVersion().getVersion(),
                 builder.toString());
         }

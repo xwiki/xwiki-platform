@@ -24,12 +24,11 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.ratings.internal.averagerating.AverageRatingManager.AverageRatingQueryField;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
-
-import org.xwiki.ratings.internal.averagerating.AverageRatingManager.AverageRatingQueryField;
 
 /**
  * Initialize average rating class.

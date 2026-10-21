@@ -215,8 +215,7 @@ public class DefaultWebSocketContext implements WebSocketContext
                     xcontext.setUserReference(xwikiUser.getUserReference());
                 }
             } catch (Exception e) {
-                this.logger.warn("Failed to authenticate the user for [{}]. Root cause is:", request.getRequestURI(),
-                    e);
+                this.logger.warn("Failed to authenticate the user for [{}]", request.getRequestURI(), e);
             }
         }
     }

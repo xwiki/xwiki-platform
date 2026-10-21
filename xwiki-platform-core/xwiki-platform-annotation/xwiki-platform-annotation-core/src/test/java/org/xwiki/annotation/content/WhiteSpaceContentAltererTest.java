@@ -39,7 +39,7 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  */
 @ComponentTest
 @ComponentList({ WhiteSpaceFilter.class })
-public class WhiteSpaceContentAltererTest
+class WhiteSpaceContentAltererTest
 {
     /**
      * The content alterer to test.
@@ -71,7 +71,7 @@ public class WhiteSpaceContentAltererTest
      */
     @ParameterizedTest
     @MethodSource("filteringSource")
-    public void filtering(String initial, String altered)
+    void filtering(String initial, String altered)
     {
         AlteredContent alteredContent = this.alterer.alter(initial);
         assertEquals(altered, alteredContent.getContent().toString());

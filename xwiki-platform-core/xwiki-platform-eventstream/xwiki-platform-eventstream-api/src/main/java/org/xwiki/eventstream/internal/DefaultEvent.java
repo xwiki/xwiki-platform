@@ -344,7 +344,7 @@ public class DefaultEvent implements Event
             if (MapUtils.isEmpty(this.custom)) {
                 parameters = Collections.emptyMap();
             } else {
-                parameters = new HashMap<>(this.custom.size());
+                parameters = HashMap.newHashMap(this.custom.size());
                 this.custom.forEach((k, v) -> parameters.put(k, v != null ? v.toString() : null));
             }
 
@@ -454,9 +454,7 @@ public class DefaultEvent implements Event
             return true;
         }
 
-        if (obj instanceof Event) {
-            Event otherEvent = (Event) obj;
-
+        if (obj instanceof Event otherEvent) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.append(getApplication(), otherEvent.getApplication());

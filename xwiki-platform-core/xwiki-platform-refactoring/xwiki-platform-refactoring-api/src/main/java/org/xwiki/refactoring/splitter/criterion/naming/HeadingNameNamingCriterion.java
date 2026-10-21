@@ -35,7 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.BlockFilter;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
@@ -85,10 +84,10 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
      * @param plainTextRenderer the renderer to convert to plain text
      * @param prependBasePageName a flag indicating if each generated page name should be prepended with base page name.
-     * @deprecated since 14.10.2, 15.0RC1 inject this as a component instead and set the base reference through
+     * @deprecated inject this as a component instead and set the base reference through
      *             {@link #getParameters()}
      */
-    @Deprecated
+    @Deprecated(since = "14.10.2,15.0RC1")
     public HeadingNameNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge,
         BlockRenderer plainTextRenderer, boolean prependBasePageName)
     {
@@ -136,17 +135,13 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
             Block firstChild = xdom.getChildren().get(0);
             if (firstChild instanceof HeaderBlock) {
                 // Clone the header block and remove any unwanted stuff.
-                Block clonedHeaderBlock = firstChild.clone(new BlockFilter()
-                {
-                    public List<Block> filter(Block block)
-                    {
-                        List<Block> blocks = new ArrayList<>();
-                        if (block instanceof WordBlock || block instanceof SpaceBlock
-                            || block instanceof SpecialSymbolBlock) {
-                            blocks.add(block);
-                        }
-                        return blocks;
+                Block clonedHeaderBlock = firstChild.clone(block -> {
+                    List<Block> blocks = new ArrayList<>();
+                    if (block instanceof WordBlock || block instanceof SpaceBlock
+                        || block instanceof SpecialSymbolBlock) {
+                        blocks.add(block);
                     }
+                    return blocks;
                 });
                 XDOM heading = new XDOM(clonedHeaderBlock.getChildren());
 

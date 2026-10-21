@@ -40,4 +40,9 @@ public class AllIT
     class NestedForgotUsernameIT extends ForgotUsernameIT
     {
     }
+
+    @Nested
+    class NestedAuthenticateIT extends AuthenticateIT
+    {
+    }
 }

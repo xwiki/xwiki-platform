@@ -110,7 +110,7 @@ export default {
     },
 
     // Load the filter component corresponding to the given filterId
-    // On success, set `this.filterComponent` to the retreived component,
+    // On success, set `this.filterComponent` to the retrieved component,
     // which automatically insert the component in the html
     async loadFilter(filterId) {
       const component = await componentStore.load(
@@ -127,16 +127,19 @@ export default {
 
   // On mounted, try to load the Filter corresponding to the passed props,
   // or the default one as fallback
-  mounted() {
-    // Try to load Filter
-    this.loadFilter().catch((err) => {
+  async mounted() {
+    try {
+      // Try to load Filter
+      await this.loadFilter();
+    } catch (err) {
       // Try to load default Filter
       console.warn(err);
-      // eslint-disable-next-line promise/no-nesting
-      this.loadFilter(this.data.meta.defaultFilter).catch((err) => {
-        console.error(err);
-      });
-    });
+      try {
+        await this.loadFilter(this.data.meta.defaultFilter);
+      } catch (defaultFilterErr) {
+        console.error(defaultFilterErr);
+      }
+    }
   },
 };
 </script>

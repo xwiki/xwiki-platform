@@ -68,7 +68,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -132,7 +132,7 @@ class PDFTocMacroTest
     private DocumentReference aliceReference = new DocumentReference("test", "Users", "Alice");
 
     @BeforeComponent
-    void setup() throws Exception
+    void setup()
     {
         when(this.contextComponentManager.get()).thenReturn(this.componentManager);
     }
@@ -159,12 +159,9 @@ class PDFTocMacroTest
     @Test
     void executeWithoutJobId()
     {
-        try {
-            this.pdfTocMacro.execute(new PDFTocMacroParameters(), null, null);
-            fail();
-        } catch (MacroExecutionException e) {
-            assertEquals("The mandatory job id parameter is missing.", e.getMessage());
-        }
+        MacroExecutionException e = assertThrows(MacroExecutionException.class,
+            () -> this.pdfTocMacro.execute(new PDFTocMacroParameters(), null, null));
+        assertEquals("The mandatory job id parameter is missing.", e.getMessage());
     }
 
     @Test

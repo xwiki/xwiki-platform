@@ -104,8 +104,8 @@ public class ObjectSolrReferenceResolver extends AbstractSolrReferenceResolver
                     this.objectPropertyResolverProvider.get().getReferences(objectPropertyReference)
                         .forEach(result::add);
                 } catch (Exception e) {
-                    this.logger.error("Failed to resolve references for object property [" + objectPropertyReference
-                        + "]", e);
+                    this.logger.error("Failed to resolve references for object property [{}]", objectPropertyReference,
+                        e);
                 }
             }
         }

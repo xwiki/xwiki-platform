@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -62,8 +64,13 @@ import com.xpn.xwiki.web.Utils;
  * <li>an XWikiStats object (composed of stats properties)</li>
  * </ul>
  *
+ * @param <R> the type of reference identifying this collection
  * @version $Id$
  */
+// We cannot change the class name as it's an API and it's also very difficult to fix the ClassFanOutComplexity for
+// the same reason.
+// FIXME: an hashcode method should be provided but it might be too dangerous for a LTS change.
+@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:AbstractClassName", "checkstyle:EqualsHashCode"})
 public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R>
     implements ObjectInterface, Cloneable
 {
@@ -72,22 +79,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
-
-    /**
-     * The meaning of this reference fields depends on the element represented. Examples:
-     * <ul>
-     * <li>If this BaseCollection instance represents an XObject then refers to the document where the XObject's XClass
-     * is defined.</li>
-     * <li>If this BaseCollection instance represents an XClass then it's not used.</li>
-     * </ul>
-     */
-    private EntityReference xClassReference;
-
-    /**
-     * Cache the XClass reference resolved as an absolute reference for improved performance (so that we don't have to
-     * resolve the relative reference every time getXClassReference() is called.
-     */
-    private DocumentReference xClassReferenceCache;
 
     /**
      * List of properties (eg XClass properties, XObject properties, etc).
@@ -118,6 +109,22 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver;
 
     /**
+     * The meaning of this reference fields depends on the element represented. Examples:
+     * <ul>
+     * <li>If this BaseCollection instance represents an XObject then refers to the document where the XObject's XClass
+     * is defined.</li>
+     * <li>If this BaseCollection instance represents an XClass then it's not used.</li>
+     * </ul>
+     */
+    private EntityReference xClassReference;
+
+    /**
+     * Cache the XClass reference resolved as an absolute reference for improved performance (so that we don't have to
+     * resolve the relative reference every time getXClassReference() is called.
+     */
+    private DocumentReference xClassReferenceCache;
+
+    /**
      * @return the component used to resolve XClass references in the way they are stored externally (database, xml,
      *         etc), ie relative or absolute
      */
@@ -143,11 +150,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return this.currentReferenceDocumentReferenceResolver;
     }
 
+    /**
+     * @return the number of this object in the document, see {@link #number}
+     */
     public int getNumber()
     {
         return this.number;
     }
 
+    /**
+     * @param number the number of this object in the document, see {@link #number}
+     */
     public void setNumber(int number)
     {
         this.number = number;
@@ -168,6 +181,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Get the absolute reference of the XClass.
      *
+     * @return the absolute reference of the XClass
      * @since 2.2M2
      */
     public DocumentReference getXClassReference()
@@ -183,6 +197,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Get the actual reference to the XClass as stored in this instance.
      *
+     * @return the actual reference to the XClass as stored in this instance
      * @since 4.0M2
      */
     public EntityReference getRelativeXClassReference()
@@ -193,9 +208,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving an XObject.
      *
-     * @deprecated since 2.2M2 use {@link #getXClassReference()} instead
+     * @return the string serialized version of the XClass reference, or an empty string if there's none
+     * @deprecated use {@link #getXClassReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public String getClassName()
     {
         String xClassAsString;
@@ -239,21 +255,20 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading an XObject.
      *
-     * @deprecated since 2.2.3 use {@link #setXClassReference(EntityReference)} ()} instead
+     * @param name the string serialized version of the XClass reference
+     * @deprecated use {@link #setXClassReference(EntityReference)} ()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2.3")
     public void setClassName(String name)
     {
-        EntityReference xClassReference = null;
-        if (!StringUtils.isEmpty(name)) {
-            // Handle backward compatibility: In the past, for statistics objects we used to use a special class name
-            // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
-            // "internal".
-            if (!"internal".equals(name)) {
-                xClassReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
-            }
+        EntityReference resolvedXClassReference = null;
+        // Handle backward compatibility: In the past, for statistics objects we used to use a special class name
+        // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
+        // "internal".
+        if (!StringUtils.isEmpty(name) && !"internal".equals(name)) {
+            resolvedXClassReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
         }
-        setXClassReference(xClassReference);
+        setXClassReference(resolvedXClassReference);
     }
 
     @Override
@@ -272,8 +287,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     public void safeput(String name, PropertyInterface property)
     {
         addField(name, property);
-        if (property instanceof BaseProperty) {
-            ((BaseProperty) property).setName(name);
+        if (property instanceof BaseProperty baseProperty) {
+            baseProperty.setName(name);
         }
     }
 
@@ -301,13 +316,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             try {
                 baseClass = context.getWiki().getXClass(classReference, context);
             } catch (Exception e) {
-                LOGGER.error("Failed to get class [" + classReference + "]", e);
+                LOGGER.error("Failed to get class [{}]", classReference, e);
             }
         }
 
         return baseClass;
     }
 
+    /**
+     * @param name the name of the property
+     * @return the string value of the property, or an empty string if the property doesn't exist or has no value
+     */
     public String getStringValue(String name)
     {
         BaseProperty prop = (BaseProperty) safeget(name);
@@ -318,11 +337,19 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
+    /**
+     * @param name the name of the property
+     * @return the string value of the property, or an empty string if the property doesn't exist or has no value
+     */
     public String getLargeStringValue(String name)
     {
         return getStringValue(name);
     }
 
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setStringValue(String name, String value)
     {
         BaseStringProperty property = (BaseStringProperty) safeget(name);
@@ -342,6 +369,40 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * Utility method to retrieve the password property of the given name and set its value.
+     * @param name the name of the password property for which to set a value
+     * @param value the value of the property to set
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public void setPasswordValue(String name, String value)
+    {
+        PropertyInterface property = safeget(name);
+        PasswordProperty passwordProperty;
+
+        if (!(property instanceof PasswordProperty)) {
+            if (property != null) {
+                // Make sure to delete the property if it's not the right type
+                removeField(name);
+            }
+
+            passwordProperty = new PasswordProperty();
+        } else {
+            passwordProperty = (PasswordProperty) property;
+        }
+
+        passwordProperty.setName(name);
+        passwordProperty.setValue(new PasswordClass().getPasswordHash(value));
+
+        safeput(name, passwordProperty);
+    }
+
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setLargeStringValue(String name, String value)
     {
         BaseStringProperty property = (BaseStringProperty) safeget(name);
@@ -361,25 +422,38 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * @param name the name of the property
+     * @return the integer value of the property, or 0 if the property doesn't exist or cannot be read as an integer
+     */
     public int getIntValue(String name)
     {
         return getIntValue(name, 0);
     }
 
-    public int getIntValue(String name, int default_value)
+    /**
+     * @param name the name of the property
+     * @param defaultValue the value to return if the property doesn't exist or cannot be read as an integer
+     * @return the integer value of the property, or {@code defaultValue}
+     */
+    public int getIntValue(String name, int defaultValue)
     {
         try {
             NumberProperty prop = (NumberProperty) safeget(name);
             if (prop == null) {
-                return default_value;
+                return defaultValue;
             } else {
                 return ((Number) prop.getValue()).intValue();
             }
         } catch (Exception e) {
-            return default_value;
+            return defaultValue;
         }
     }
 
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setIntValue(String name, int value)
     {
         NumberProperty property = new IntegerProperty();
@@ -388,6 +462,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * @param name the name of the property
+     * @return the long value of the property, or 0 if the property doesn't exist or cannot be read as a long
+     */
     public long getLongValue(String name)
     {
         try {
@@ -402,6 +480,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setLongValue(String name, long value)
     {
         NumberProperty property = new LongProperty();
@@ -410,6 +492,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * @param name the name of the property
+     * @return the float value of the property, or 0 if the property doesn't exist or cannot be read as a float
+     */
     public float getFloatValue(String name)
     {
         try {
@@ -424,6 +510,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setFloatValue(String name, float value)
     {
         NumberProperty property = new FloatProperty();
@@ -432,6 +522,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * @param name the name of the property
+     * @return the double value of the property, or 0 if the property doesn't exist or cannot be read as a double
+     */
     public double getDoubleValue(String name)
     {
         try {
@@ -446,6 +540,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setDoubleValue(String name, double value)
     {
         NumberProperty property = new DoubleProperty();
@@ -454,6 +552,11 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * @param name the name of the property
+     * @return the date value of the property, or {@code null} if the property doesn't exist or cannot be read as a
+     *         date
+     */
     public Date getDateValue(String name)
     {
         try {
@@ -468,6 +571,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setDateValue(String name, Date value)
     {
         DateProperty property = new DateProperty();
@@ -476,6 +583,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * @param name the name of the property
+     * @return the set value of the property, or an empty set if the property doesn't exist
+     */
     public Set<?> getSetValue(String name)
     {
         ListProperty prop = (ListProperty) safeget(name);
@@ -486,6 +597,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setSetValue(String name, Set<?> value)
     {
         ListProperty property = new ListProperty();
@@ -493,6 +608,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * @param name the name of the property
+     * @return the list value of the property, or an empty list if the property doesn't exist
+     */
     public List getListValue(String name)
     {
         ListProperty prop = (ListProperty) safeget(name);
@@ -503,6 +622,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setStringListValue(String name, List value)
     {
         ListProperty property = (ListProperty) safeget(name);
@@ -513,6 +636,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * @param name the name of the property
+     * @param value the value to set
+     */
     public void setDBStringListValue(String name, List value)
     {
         ListProperty property = (ListProperty) safeget(name);
@@ -523,6 +650,47 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
+    /**
+     * Utility method to check if the given raw password matches the password value set in the given property name.
+     * Note that the method returns false if there's no password property for the given name. The algorithm for
+     * checking the password is delegated to {@link PasswordClass#arePasswordsMatching}.
+     * @param passwordFieldName the name of the password property
+     * @param rawPassword the password to check
+     * @return {@code true} if the password matches the password value set in the given password property. Always
+     * returns {@code false} if the given raw password is empty without any check.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public boolean isPasswordValueMatching(String passwordFieldName, String rawPassword)
+    {
+        PropertyInterface property = safeget(passwordFieldName);
+        boolean result = false;
+        if (StringUtils.isNotEmpty(rawPassword)) {
+            if (property instanceof PasswordProperty passwordProperty) {
+                PropertyClass propertyClass = passwordProperty.getPropertyClass(getXWikiContext());
+                if (propertyClass == null) {
+                    propertyClass = new PasswordClass();
+                }
+                if (propertyClass instanceof PasswordClass passwordClass) {
+                    result = passwordClass.arePasswordsMatching(rawPassword, passwordProperty.getValue());
+                }
+            } else if (property instanceof StringProperty stringProperty) {
+                // Legacy fallback if the property is a StringProperty,
+                // in such case we check if the value matches a hash password or not to know if the perform was stored
+                // in clear or not and how we should compare it.
+                String passwordValue = stringProperty.getValue();
+                if (PasswordClass.isPasswordHashed(passwordValue)) {
+                    result = new PasswordClass().arePasswordsMatching(rawPassword, passwordValue);
+                } else {
+                    result = Strings.CS.equals(passwordValue, rawPassword);
+                }
+            }
+        }
+
+        return result;
+    }
+
     // These functions should not be used
     // but instead our own implementation
     private Map<String, Object> getFields()
@@ -530,16 +698,27 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return this.fields;
     }
 
+    /**
+     * @param fields the properties of this collection
+     */
     public void setFields(Map fields)
     {
         this.fields = fields;
     }
 
+    /**
+     * @param name the name of the property
+     * @return the property, or {@code null} if it doesn't exist
+     */
     public PropertyInterface getField(String name)
     {
         return (PropertyInterface) this.fields.get(name);
     }
 
+    /**
+     * @param name the name of the property
+     * @param element the property to add
+     */
     public void addField(String name, PropertyInterface element)
     {
         this.fields.put(name, element);
@@ -555,6 +734,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         setDirty(true);
     }
 
+    /**
+     * @param name the name of the property to remove
+     */
     public void removeField(String name)
     {
         Object field = safeget(name);
@@ -566,21 +748,33 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
+    /**
+     * @return the properties of this collection
+     */
     public Collection getFieldList()
     {
         return this.fields.values();
     }
 
+    /**
+     * @return the names of the properties of this collection
+     */
     public Set<String> getPropertyList()
     {
         return this.fields.keySet();
     }
 
+    /**
+     * @return the properties of this collection
+     */
     public Object[] getProperties()
     {
         return getFields().values().toArray();
     }
 
+    /**
+     * @return the names of the properties of this collection
+     */
     public String[] getPropertyNames()
     {
         return getFields().keySet().toArray(new String[0]);
@@ -589,6 +783,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Return an iterator that will operate on a collection of values (as would be returned by getProperties or
      * getFieldList) sorted by their name (ElementInterface.getName()).
+     *
+     * @return the sorted iterator
      */
     public Iterator getSortedIterator()
     {
@@ -661,9 +857,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
         collection.setXClassReference(getRelativeXClassReference());
         collection.setNumber(getNumber());
-        Map<String, Object> fields = getFields();
+        Map<String, Object> sourceFields = getFields();
         Map<String, Object> cfields = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> objEntry : fields.entrySet()) {
+        for (Map.Entry<String, Object> objEntry : sourceFields.entrySet()) {
             PropertyInterface prop = (PropertyInterface) ((BaseElement) objEntry.getValue()).clone(true);
             prop.setObject(collection);
             cfields.put(objEntry.getKey(), prop);
@@ -671,6 +867,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         collection.setFields(cfields);
     }
 
+    /**
+     * @param object the object to merge properties from
+     */
     public void merge(BaseObject object)
     {
         Iterator itfields = object.getPropertyList().iterator();
@@ -682,103 +881,148 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
     }
 
+    /**
+     * @param oldObject the previous version of this collection to compare with
+     * @param context the current request context
+     * @return the list of differences between this collection and the old one
+     */
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
         // FIXME: this whole code should be refactored and factorized: some parts are also duplicated in BaseObject.
         ArrayList<ObjectDiff> difflist = new ArrayList<>();
-        BaseCollection oldCollection = (BaseCollection) oldObject;
-        // Iterate over the new properties first, to handle changed and added objects
-        for (Object key : this.getFields().keySet()) {
-            String propertyName = (String) key;
-            BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
-            BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
-            BaseClass bclass = getXClass(context);
-            PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : pclass.getClassType();
-            boolean isSensitive = false;
-            if (newProperty != null) {
-                isSensitive = newProperty.isSensitive(context);
-            }
-            if (!isSensitive && oldProperty != null) {
-                isSensitive = oldProperty.isSensitive(context);
-            }
+        BaseCollection<?> oldCollection = (BaseCollection<?>) oldObject;
 
-            if (oldProperty == null) {
-                // The property exist in the new object, but not in the old one
-                if ((newProperty != null) && (!"".equals(newProperty.toText()))) {
-                    if (pclass != null) {
-                        String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
-                            : pclass.displayView(propertyName, this, context);
-                        difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue,
-                            isSensitive));
-                    }
-                }
-            } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
-                // The property exists in both objects and is different
-                if (pclass != null) {
-                    // Put the values as they would be displayed in the interface
-                    String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
-                        : pclass.displayView(propertyName, this, context);
-                    String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                        : pclass.displayView(propertyName, oldCollection, context);
-                    difflist
-                        .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-                            propertyName, propertyType, oldPropertyValue, newPropertyValue,
-                            isSensitive));
-                } else {
-                    // Cannot get property definition, so use the plain value
-                    difflist
-                        .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-                            propertyName, propertyType, oldProperty.toText(), newProperty.toText(),
-                            isSensitive));
-                }
-            }
+        // Iterate over the new properties first, to handle changed and added objects
+        for (String key : this.getFields().keySet()) {
+            addOrChangePropertyDiff(key, oldCollection, context, difflist);
         }
 
         // Iterate over the old properties, in case there are some removed properties
-        for (Object key : oldCollection.getFields().keySet()) {
-            String propertyName = (String) key;
-            BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
-            BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
-            BaseClass bclass = getXClass(context);
-            PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
-            String propertyType = (pclass == null) ? "" : pclass.getClassType();
-            boolean isSensitive = false;
-            if (newProperty != null) {
-                isSensitive = newProperty.isSensitive(context);
-            }
-            if (!isSensitive && oldProperty != null) {
-                isSensitive = oldProperty.isSensitive(context);
-            }
-            if (newProperty == null) {
-                // The property exists in the old object, but not in the new one
-                if ((oldProperty != null) && (!"".equals(oldProperty.toText()))) {
-                    if (pclass != null) {
-                        // Put the values as they would be displayed in the interface
-                        String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                            : pclass.displayView(propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, "",
-                            isSensitive));
-                    } else {
-                        // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), "",
-                            isSensitive));
-                    }
-                }
-            }
+        for (String key : oldCollection.getFields().keySet()) {
+            removedPropertyDiff(key, oldCollection, context, difflist);
         }
 
         return difflist;
     }
 
+    private void addOrChangePropertyDiff(String propertyName, BaseCollection oldCollection, XWikiContext context,
+        List<ObjectDiff> difflist)
+    {
+        BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
+        BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
+        BaseClass bclass = getXClass(context);
+        PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+        String propertyType = (pclass == null) ? "" : pclass.getClassType();
+        boolean isSensitive = isSensitive(newProperty, oldProperty, context);
+
+        if (oldProperty == null) {
+            // The property exist in the new object, but not in the old one
+            addPropertyAddedDiff(propertyName, newProperty, pclass, propertyType, isSensitive, context, difflist);
+        } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
+            // The property exists in both objects and is different
+            addPropertyChangedDiff(propertyName, oldProperty, newProperty, oldCollection, pclass, context, difflist);
+        }
+    }
+
+    private void addPropertyAddedDiff(String propertyName, BaseProperty newProperty, PropertyClass pclass,
+        String propertyType, boolean isSensitive, XWikiContext context, List<ObjectDiff> difflist)
+    {
+        if (newProperty == null || "".equals(newProperty.toText()) || pclass == null) {
+            return;
+        }
+
+        String newPropertyValue = getPropertyDisplayValue(newProperty, pclass, this, propertyName, context);
+        difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYADDED,
+            propertyName, propertyType, "", newPropertyValue, isSensitive));
+    }
+
+    private void addPropertyChangedDiff(String propertyName, BaseProperty oldProperty, BaseProperty newProperty,
+        BaseCollection oldCollection, PropertyClass pclass, XWikiContext context, List<ObjectDiff> difflist)
+    {
+        String propertyType = (pclass == null) ? "" : pclass.getClassType();
+        boolean isSensitive = isSensitive(newProperty, oldProperty, context);
+
+        String oldPropertyValue;
+        String newPropertyValue;
+        if (pclass != null) {
+            // Put the values as they would be displayed in the interface
+            newPropertyValue = getPropertyDisplayValue(newProperty, pclass, this, propertyName, context);
+            oldPropertyValue = getPropertyDisplayValue(oldProperty, pclass, oldCollection, propertyName, context);
+        } else {
+            // Cannot get property definition, so use the plain value
+            newPropertyValue = (newProperty == null) ? "" : newProperty.toText();
+            oldPropertyValue = oldProperty.toText();
+        }
+        difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
+            propertyName, propertyType, oldPropertyValue, newPropertyValue, isSensitive));
+    }
+
+    /**
+     * @return the value of the property as it would be displayed in the interface, or the empty string when the
+     *         property is not set in the collection, matching how addOrChangePropertyDiff() compares the two sides
+     */
+    private String getPropertyDisplayValue(BaseProperty property, PropertyClass pclass, BaseCollection collection,
+        String propertyName, XWikiContext context)
+    {
+        if (property == null) {
+            return "";
+        }
+
+        return (property.getValue() instanceof String) ? property.toText()
+            : pclass.displayView(propertyName, collection, context);
+    }
+
+    private void removedPropertyDiff(String propertyName, BaseCollection oldCollection, XWikiContext context,
+        List<ObjectDiff> difflist)
+    {
+        BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
+        BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
+        BaseClass bclass = getXClass(context);
+        PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+        String propertyType = (pclass == null) ? "" : pclass.getClassType();
+        boolean isSensitive = isSensitive(newProperty, oldProperty, context);
+
+        // The property exists in the old object, but not in the new one
+        if (newProperty == null && (oldProperty != null) && (!"".equals(oldProperty.toText()))) {
+            if (pclass != null) {
+                // Put the values as they would be displayed in the interface
+                String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                    : pclass.displayView(propertyName, oldCollection, context);
+                difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                    ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, "",
+                    isSensitive));
+            } else {
+                // Cannot get property definition, so use the plain value
+                difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                    ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), "",
+                    isSensitive));
+            }
+        }
+    }
+
+    private boolean isSensitive(BaseProperty newProperty, BaseProperty oldProperty, XWikiContext context)
+    {
+        boolean isSensitive = false;
+        if (newProperty != null) {
+            isSensitive = newProperty.isSensitive(context);
+        }
+        if (!isSensitive && oldProperty != null) {
+            isSensitive = oldProperty.isSensitive(context);
+        }
+        return isSensitive;
+    }
+
+    /**
+     * @return the properties scheduled for removal when saving this entity
+     */
     public List getFieldsToRemove()
     {
         return this.fieldsToRemove;
     }
 
+    /**
+     * @param fieldsToRemove the properties scheduled for removal when saving this entity
+     */
     public void setFieldsToRemove(List fieldsToRemove)
     {
         this.fieldsToRemove = fieldsToRemove;
@@ -791,10 +1035,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     /**
-     * @deprecated since 9.0RC1, use {@link #toXML()} instead
+     * @deprecated use {@link #toXML()} instead
      */
     @Override
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public Element toXML(BaseClass bclass)
     {
         // Set passed class in the context so that the input event generator finds it
@@ -827,7 +1071,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Return a XML version of this collection.
      * <p>
-     * The XML is not formated. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
+     * The XML is not formatted. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
      * 
      * @return the XML as a String
      */
@@ -837,6 +1081,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     /**
+     * @return the custom mapping of this collection, indexed by property name, plus the {@code id} entry
+     * @throws XWikiException if a property's custom mapping value cannot be computed
      * @since 2.4M2
      */
     public Map<String, Object> getCustomMappingMap() throws XWikiException
@@ -871,83 +1117,141 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         BaseCollection<R> newCollection = (BaseCollection<R>) newElement;
 
         BaseCollection<R> modifiableResult = (BaseCollection<R>) mergeResult.getMergeResult();
+        MergeStepContext mergeContext = new MergeStepContext(configuration, context, mergeResult);
         List<ObjectDiff> classDiff = newCollection.getDiff(previousCollection, context);
         for (ObjectDiff diff : classDiff) {
-            PropertyInterface propertyResult = getField(diff.getPropName());
-            PropertyInterface previousProperty = previousCollection.getField(diff.getPropName());
-            PropertyInterface newProperty = newCollection.getField(diff.getPropName());
-
-            if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
-                if (propertyResult == null) {
-                    // Add if none has been added by user already
-                    modifiableResult.safeput(diff.getPropName(),
-                        configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
-                    mergeResult.setModified(true);
-                } else if (!propertyResult.equals(newProperty)) {
-                    // collision between DB and new: property to add but already exists in the DB
-                    // If we need to fallback on next version, set next version.
-                    if (configuration.getConflictFallbackVersion() == MergeConfiguration.ConflictFallbackVersion.NEXT) {
-                        modifiableResult.safeput(diff.getPropName(),
-                            configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
-                        mergeResult.setModified(true);
-                    }
-                    mergeResult.getLog().error(COLLISION_ON_PROPERTY_MESSAGE, newProperty.getReference());
-                }
-            } else if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
-                if (propertyResult != null) {
-                    if (propertyResult.equals(previousProperty)) {
-                        // Delete if it's the same as previous one
-                        modifiableResult.removeField(diff.getPropName());
-                        mergeResult.setModified(true);
-                    } else {
-                        // collision between DB and new: property to remove but not the same as previous
-                        // version
-                        // We don't remove the field in case of fallback.
-                        mergeResult.getLog().error(COLLISION_ON_PROPERTY_MESSAGE, previousProperty.getReference());
-                    }
-                } else {
-                    // Already removed from DB, lets assume the user is prescient
-                    mergeResult.getLog().warn("Property [{}] already removed", previousProperty.getReference());
-                }
-            } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
-                if (propertyResult != null) {
-                    if (propertyResult.equals(previousProperty)) {
-                        // Let some automatic migration take care of that modification between DB and new
-                        modifiableResult.safeput(diff.getPropName(),
-                            configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
-                        mergeResult.setModified(true);
-                    } else if (!propertyResult.equals(newProperty)) {
-                        // Try to apply 3 ways merge on the property
-                        // FIXME: we should deprecate mergeField and rewrite it properly, but it's a lot of work
-                        // as it involves to also rewrite PropertyClass#mergeProperty
-                        // right now we still use it, but we ensure that the configuration is used to modify the
-                        // actual values, and not clones as it was the behaviour
-                        MergeResult propertyMergeResult = new MergeResult();
-                        MergeConfiguration propertyMergeConfiguration = new MergeConfiguration();
-                        propertyMergeConfiguration.setConcernedDocument(configuration.getConcernedDocument());
-                        propertyMergeConfiguration.setUserReference(configuration.getUserReference());
-                        propertyMergeConfiguration.setProvidedVersionsModifiables(true);
-                        propertyMergeConfiguration.setConflictFallbackVersion(
-                            configuration.getConflictFallbackVersion());
-                        mergeField(propertyResult, previousProperty, newProperty, propertyMergeConfiguration, context,
-                            propertyMergeResult);
-                        mergeResult.getLog().addAll(propertyMergeResult.getLog());
-                        if (propertyMergeResult.isModified()) {
-                            mergeResult.setModified(true);
-                        }
-                    }
-                } else {
-                    // collision between DB and new: property to modify but does not exist in DB
-                    // Lets assume it's a mistake to fix
-                    mergeResult.getLog().warn(COLLISION_ON_PROPERTY_MESSAGE, newProperty.getReference());
-
-                    modifiableResult.safeput(diff.getPropName(),
-                        configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
-                    mergeResult.setModified(true);
-                }
-            }
+            mergeProperty(diff, previousCollection, newCollection, modifiableResult, mergeContext);
         }
         return mergeResult;
+    }
+
+    private void mergeProperty(ObjectDiff diff, BaseCollection<R> previousCollection,
+        BaseCollection<R> newCollection, BaseCollection<R> modifiableResult, MergeStepContext mergeContext)
+    {
+        PropertyInterface propertyResult = getField(diff.getPropName());
+        PropertyInterface previousProperty = previousCollection.getField(diff.getPropName());
+        PropertyInterface newProperty = newCollection.getField(diff.getPropName());
+
+        if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
+            mergePropertyAdded(diff, propertyResult, newProperty, modifiableResult, mergeContext);
+        } else if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
+            mergePropertyRemoved(diff, propertyResult, previousProperty, modifiableResult, mergeContext);
+        } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
+            mergePropertyChanged(diff, propertyResult, previousProperty, newProperty, modifiableResult, mergeContext);
+        }
+    }
+
+    private void mergePropertyAdded(ObjectDiff diff, PropertyInterface propertyResult, PropertyInterface newProperty,
+        BaseCollection<R> modifiableResult, MergeStepContext mergeContext)
+    {
+        MergeConfiguration configuration = mergeContext.configuration;
+        MergeManagerResult<ElementInterface, Object> mergeResult = mergeContext.mergeResult;
+
+        if (propertyResult == null) {
+            // Add if none has been added by user already
+            modifiableResult.safeput(diff.getPropName(),
+                configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
+            mergeResult.setModified(true);
+        } else if (!propertyResult.equals(newProperty)) {
+            // collision between DB and new: property to add but already exists in the DB
+            // If we need to fallback on next version, set next version.
+            if (configuration.getConflictFallbackVersion() == MergeConfiguration.ConflictFallbackVersion.NEXT) {
+                modifiableResult.safeput(diff.getPropName(),
+                    configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
+                mergeResult.setModified(true);
+            }
+            mergeResult.getLog().error(COLLISION_ON_PROPERTY_MESSAGE, newProperty.getReference());
+        }
+    }
+
+    private void mergePropertyRemoved(ObjectDiff diff, PropertyInterface propertyResult,
+        PropertyInterface previousProperty, BaseCollection<R> modifiableResult, MergeStepContext mergeContext)
+    {
+        MergeManagerResult<ElementInterface, Object> mergeResult = mergeContext.mergeResult;
+
+        if (propertyResult == null) {
+            // Already removed from DB, lets assume the user is prescient
+            mergeResult.getLog().warn("Property [{}] already removed", previousProperty.getReference());
+        } else if (propertyResult.equals(previousProperty)) {
+            // Delete if it's the same as previous one
+            modifiableResult.removeField(diff.getPropName());
+            mergeResult.setModified(true);
+        } else {
+            // collision between DB and new: property to remove but not the same as previous version
+            // We don't remove the field in case of fallback.
+            mergeResult.getLog().error(COLLISION_ON_PROPERTY_MESSAGE, previousProperty.getReference());
+        }
+    }
+
+    private void mergePropertyChanged(ObjectDiff diff, PropertyInterface propertyResult,
+        PropertyInterface previousProperty, PropertyInterface newProperty, BaseCollection<R> modifiableResult,
+        MergeStepContext mergeContext)
+    {
+        MergeConfiguration configuration = mergeContext.configuration;
+        MergeManagerResult<ElementInterface, Object> mergeResult = mergeContext.mergeResult;
+
+        if (propertyResult == null) {
+            // collision between DB and new: property to modify but does not exist in DB
+            // Lets assume it's a mistake to fix
+            mergeResult.getLog().warn(COLLISION_ON_PROPERTY_MESSAGE, newProperty.getReference());
+
+            modifiableResult.safeput(diff.getPropName(),
+                configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
+            mergeResult.setModified(true);
+        } else if (propertyResult.equals(previousProperty)) {
+            // Let some automatic migration take care of that modification between DB and new
+            modifiableResult.safeput(diff.getPropName(),
+                configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
+            mergeResult.setModified(true);
+        } else if (!propertyResult.equals(newProperty)) {
+            mergeChangedProperty(propertyResult, previousProperty, newProperty, mergeContext);
+        }
+    }
+
+    private void mergeChangedProperty(PropertyInterface propertyResult, PropertyInterface previousProperty,
+        PropertyInterface newProperty, MergeStepContext mergeContext)
+    {
+        MergeConfiguration configuration = mergeContext.configuration;
+        MergeManagerResult<ElementInterface, Object> mergeResult = mergeContext.mergeResult;
+
+        // Try to apply 3 ways merge on the property
+        // FIXME: we should deprecate mergeField and rewrite it properly, but it's a lot of work
+        // as it involves to also rewrite PropertyClass#mergeProperty
+        // right now we still use it, but we ensure that the configuration is used to modify the
+        // actual values, and not clones as it was the behaviour
+        MergeResult propertyMergeResult = new MergeResult();
+        MergeConfiguration propertyMergeConfiguration = new MergeConfiguration();
+        propertyMergeConfiguration.setConcernedDocument(configuration.getConcernedDocument());
+        propertyMergeConfiguration.setUserReference(configuration.getUserReference());
+        propertyMergeConfiguration.setProvidedVersionsModifiables(true);
+        propertyMergeConfiguration.setConflictFallbackVersion(configuration.getConflictFallbackVersion());
+        mergeField(propertyResult, previousProperty, newProperty, propertyMergeConfiguration, mergeContext.context,
+            propertyMergeResult);
+        mergeResult.getLog().addAll(propertyMergeResult.getLog());
+        if (propertyMergeResult.isModified()) {
+            mergeResult.setModified(true);
+        }
+    }
+
+    /**
+     * Bundles the parameters shared by the {@link #merge(ElementInterface, ElementInterface, MergeConfiguration,
+     * XWikiContext)} helper methods, to keep their parameter count low.
+     */
+    private static final class MergeStepContext
+    {
+        private final MergeConfiguration configuration;
+
+        private final XWikiContext context;
+
+        private final MergeManagerResult<ElementInterface, Object> mergeResult;
+
+        MergeStepContext(MergeConfiguration configuration, XWikiContext context,
+            MergeManagerResult<ElementInterface, Object> mergeResult)
+        {
+            this.configuration = configuration;
+            this.context = context;
+            this.mergeResult = mergeResult;
+        }
     }
 
     protected void mergeField(PropertyInterface currentElement, ElementInterface previousElement,
@@ -1015,8 +1319,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
             for (String propertyName : getPropertyList()) {
                 PropertyInterface property = getField(propertyName);
-                if (property instanceof BaseElement) {
-                    ((BaseElement) property).setOwnerDocument(ownerDocument);
+                if (property instanceof BaseElement baseElement) {
+                    baseElement.setOwnerDocument(ownerDocument);
                 }
             }
         }

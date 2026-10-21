@@ -54,7 +54,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ImportTest extends AbstractPackageTest
+class ImportTest extends AbstractPackageTest
 {
     LocalizationContext localizationContext;
 
@@ -90,7 +90,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportDocument() throws Exception
+    void testImportDocument() throws Exception
     {
         XWikiDocument doc1 =
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "DocImport"));
@@ -132,7 +132,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportExtension() throws Exception
+    void testImportExtension() throws Exception
     {
         ExtensionId extensionId = new ExtensionId("test", "1.0");
 
@@ -201,7 +201,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportDocumentNonAsciiTitle() throws Exception
+    void testImportDocumentNonAsciiTitle() throws Exception
     {
         XWikiDocument doc1 = new XWikiDocument(
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "\u60A8\u597D\u4E16\u754C"));
@@ -243,7 +243,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportDocumentNonAsciiTitleNonUtf8PlatformEncoding() throws Exception
+    void testImportDocumentNonAsciiTitleNonUtf8PlatformEncoding() throws Exception
     {
         String oldEncoding = System.getProperty("file.encoding");
         System.setProperty("file.encoding", "ISO-8859-1");
@@ -292,7 +292,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportDocumentXarCreatedByCommonsCompress() throws Exception
+    void testImportDocumentXarCreatedByCommonsCompress() throws Exception
     {
         XWikiDocument doc1 =
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "DocImport"));
@@ -335,7 +335,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportOverwriteDocument() throws Exception
+    void testImportOverwriteDocument() throws Exception
     {
         XWikiDocument doc1 = new XWikiDocument(
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "DocImportOverwrite"));
@@ -382,7 +382,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportTranslationsOverwrite() throws Exception
+    void testImportTranslationsOverwrite() throws Exception
     {
         XWikiDocument original = new XWikiDocument(
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "DocTranslation"));

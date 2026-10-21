@@ -221,7 +221,7 @@ public class UserEventManager implements Initializable
             }
             return allPreferences.isEmpty();
         } catch (NotificationException e) {
-            this.logger.warn("Unable to retrieve the notifications preferences of [{}]: {}", user,
+            this.logger.warn("Unable to retrieve the notifications preferences of [{}]: [{}]", user,
                 ExceptionUtils.getRootCauseMessage(e));
         }
 

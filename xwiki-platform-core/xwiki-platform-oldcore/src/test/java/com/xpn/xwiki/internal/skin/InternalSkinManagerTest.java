@@ -128,7 +128,7 @@ class InternalSkinManagerTest
     }
 
     @Test
-    void getSkinCreateClassLoaderWiki() throws Exception
+    void getSkinCreateClassLoaderWiki()
     {
         when(this.wikiSkinUtils.isWikiSkin("test")).thenReturn(false);
         when(this.environment.getResource("/skins/test/", "skin.properties")).thenReturn(null);

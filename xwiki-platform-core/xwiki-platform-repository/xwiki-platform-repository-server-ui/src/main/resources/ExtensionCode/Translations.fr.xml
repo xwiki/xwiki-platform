@@ -82,6 +82,7 @@ ExtensionCode.ExtensionSupportPlanClass_paying=Paiement
 
 ## Extension sheet
 repository.extension.sheet.name=Nom
+### Missing: repository.extension.sheet.project=Project
 repository.extension.sheet.type=Type
 repository.extension.sheet.category=Catégorie
 repository.extension.sheet.summary=Résumé
@@ -104,8 +105,8 @@ repository.extension.sheet.toc=Table des matières
 repository.extension.sheet.documentationHelp=Documentation d'aide
 ### Missing: repository.extension.sheet.rulesIntro=Here are some rules to follow when contributing an extension:
 ### Missing: repository.extension.sheet.ruleSummary=Use a short summary. It's going to be displayed in the Extension livetable and ideally shouldn't take more than 1 line in that table.
-### Missing: repository.extension.sheet.ruleImported=When an extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported informations
-### Missing: repository.extension.sheet.autoSync=Automatically synchronize the extension informations
+repository.extension.sheet.ruleImported=When an extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported informations
+repository.extension.sheet.autoSync=Automatically synchronize the extension informations
 repository.extension.sheet.source=Source
 ### Missing: repository.extension.sheet.iconLocation=Display Icon Location
 repository.extension.sheet.iconLocationSyntax=Syntaxe :
@@ -136,7 +137,7 @@ repository.extension.sheet.dependencies=Dépendances
 repository.extension.sheet.addDependencies=Ajouter des dépendances
 ### Missing: repository.extension.sheet.addDependenciesIntro=You can also associate dependencies to each version by filing in the following information in a new {0}Dependency{1}:
 ### Missing: repository.extension.sheet.addDependenciesVersion=Extension version is the version on which this dependency is assigned
-### Missing: repository.extension.sheet.addDependenciesId=Dependency id is the identifier of the dependency extension on the repository where it is localed
+repository.extension.sheet.addDependenciesId=Dependency id is the identifier of the dependency extension on the repository where it is localed
 ### Missing: repository.extension.sheet.addDependenciesConstraint=Dependency version constraint is the version related information of the dependency. Can be a version (e.g. 1.0) or one or several ranges of versions based on Maven standard syntax (e.g. [1.0,) which mean at least 1.0)
 ### Missing: repository.extension.sheet.wrongObject=This class sheet must be applied on a document containing an ExtensionCode.ExtensionClass object
 </content>

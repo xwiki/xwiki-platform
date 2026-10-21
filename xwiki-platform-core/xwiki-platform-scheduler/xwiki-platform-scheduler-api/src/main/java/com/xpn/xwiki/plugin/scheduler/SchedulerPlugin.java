@@ -22,7 +22,9 @@ package com.xpn.xwiki.plugin.scheduler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Provider;
@@ -65,6 +67,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitializer;
@@ -150,14 +154,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         this.schedulersClassLoaderManager.setSchedulerPlugin(this);
 
         if (this.enabled) {
-            Thread thread = new Thread(new ExecutionContextRunnable(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    initAsync();
-                }
-            }, Utils.getComponentManager()));
+            Thread thread = new Thread(new ExecutionContextRunnable(this::initAsync,
+                Utils.getComponentManager()));
             thread.setName("XWiki Scheduler initialization");
             thread.setDaemon(true);
 
@@ -176,6 +174,18 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     public boolean isEnabled()
     {
         return this.enabled;
+    }
+
+    /**
+     * Enable or disable the plugin without starting the default Quartz scheduler, so that the jobs are handled by the
+     * scheduler set with {@link #setScheduler(Scheduler)}. {@link #init(XWikiContext)} starts the default scheduler in
+     * a separate thread when the plugin is enabled, which would replace the scheduler set by a test.
+     *
+     * @param enabled {@code true} to enable the plugin
+     */
+    void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
     }
 
     private void checkEnabled() throws SchedulerPluginException
@@ -373,6 +383,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
     private void register(BaseObject jobObj, XWikiContext context) throws SchedulerPluginException
     {
+        if (jobObj == null) {
+            return;
+        }
+
         String status = jobObj.getStringValue(STATUS);
         if (status.equals(JobState.STATE_NORMAL) || status.equals(JobState.STATE_PAUSED)) {
             scheduleJob(jobObj, context);
@@ -552,10 +566,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             saveStatus(PAUSED, object, context);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to pause job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to pause job " + object.getStringValue(JOB_NAME), e);
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to save status of job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to save status of job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -575,10 +589,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             saveStatus(NORMAL, object, context);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
-                "Error occured while trying to resume job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to resume job " + object.getStringValue(JOB_NAME), e);
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
-                "Error occured while trying to save status of job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to save status of job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -597,7 +611,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             getScheduler().triggerJob(new JobKey(job));
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_TRIGGER_JOB,
-                "Error occured while trying to trigger job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to trigger job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -627,14 +641,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             getScheduler().deleteJob(new JobKey(job));
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to pause job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to pause job " + object.getStringValue(JOB_NAME), e);
         }
         this.schedulersClassLoaderManager.removeScheduler(object.getReference());
     }
 
 
     /**
-     * Re-create the job and put it back in the same state as now. Usefull when something change in the database or the
+     * Re-create the job and put it back in the same state as now. Useful when something change in the database or the
      * indicated class.
      * 
      * @param jobObject the xobject holder the job metadata
@@ -655,8 +669,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         // Get current state of the job
         JobState currentState = getCurrentJobState(jobID);
 
-        // If no job exist in the scheduler by this id, there is nothing to do
-        if (currentState != null) {
+        // If no job exist in the scheduler by this id, there is nothing to do (Quartz returns NONE for an unknown
+        // trigger)
+        if (currentState != null && currentState.getQuartzState() != TriggerState.NONE) {
             // Rebuild the job
             JobDetail job = buildJobDetails(jobObject, context);
 
@@ -667,7 +682,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                 getScheduler().addJob(job, true);
             } catch (SchedulerException e) {
                 throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                    "Error occured while trying to unregistere the job [" + jobObject.getReference() + "]", e);
+                    "Error occurred while trying to unregister the job [" + jobObject.getReference() + "]", e);
             }
 
             // Put back the scheduler in the same state as before
@@ -679,16 +694,18 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                         // Pause it
                         getScheduler().pauseJob(new JobKey(jobID));
                         break;
-                    case NORMAL:
-                        // Scheduler the job
+                    case NORMAL, BLOCKED, ERROR:
+                        // A blocked job is currently running and does not allow concurrent executions: Quartz keeps
+                        // the new trigger blocked until the end of the current execution. A job in error could not be
+                        // instantiated: the reloaded job gets a new chance.
                         getScheduler().scheduleJob(buildTrigger(jobObject));
                         break;
                     default:
-                        // do nothing
+                        // A complete trigger won't fire anymore, so there is nothing to schedule
                 }
             } catch (SchedulerException e) {
                 throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB,
-                    "Error occured while trying to put the job [" + jobObject.getReference()
+                    "Error occurred while trying to put the job [" + jobObject.getReference()
                         + "] in the same state as before",
                     e);
             }
@@ -787,14 +804,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     private synchronized Scheduler getDefaultSchedulerInstance() throws SchedulerPluginException
     {
-        Scheduler scheduler;
+        Scheduler defaultScheduler;
         try {
-            scheduler = StdSchedulerFactory.getDefaultScheduler();
+            defaultScheduler = StdSchedulerFactory.getDefaultScheduler();
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_GET_SCHEDULER,
                 "Error getting default Scheduler instance", e);
         }
-        return scheduler;
+        return defaultScheduler;
     }
 
     /**
@@ -910,7 +927,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                 try {
                     unregister(originalJobObj);
                 } catch (SchedulerPluginException e) {
-                    LOGGER.warn("Failed to register job in document [{}]: {}", document.getDocumentReference(),
+                    LOGGER.warn("Failed to unregister job in document [{}]: [{}]", document.getDocumentReference(),
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -924,10 +941,57 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
                     register(jobObject, xcontext);
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to register job in document [{}]: {}", document.getDocumentReference(),
+                    LOGGER.warn("Failed to register job in document [{}]: [{}]", document.getDocumentReference(),
                         ExceptionUtils.getRootCauseMessage(e));
                 }
+            } else if (isJobDefinitionModified(originalJobObj, jobObj)) {
+                // Modified job
+                onJobModified(jobObj, document, xcontext);
             }
         }
+    }
+
+    private void onJobModified(BaseObject jobObj, XWikiDocument document, XWikiContext xcontext)
+    {
+        // The scheduler holds the job xobject that was passed to it when the job was registered, so the new definition
+        // is only taken into account once the job has been registered again.
+        try {
+            // Leave alone a job the scheduler doesn't know about: it gets registered with its new definition when it's
+            // scheduled.
+            JobState state = getCurrentJobState(jobObj);
+            if (state != null && !JobState.STATE_NONE.equals(state.getValue())) {
+                // We get the document from the store as we don't want to corrupt the document instance associated
+                // with the event
+                BaseObject jobObject = getModifiableObject(document.getDocumentReference(), xcontext);
+
+                reloadJob(jobObject, xcontext);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Failed to reload job in document [{}]: [{}]", document.getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
+
+    /**
+     * @param previousJobObject the job xobject as it was before the modification
+     * @param jobObject the job xobject as it is after the modification
+     * @return {@code true} when the modification affects the definition of the job, i.e. anything but its status,
+     *         which the scheduler itself saves whenever it registers or unregisters a job
+     */
+    private boolean isJobDefinitionModified(BaseObject previousJobObject, BaseObject jobObject)
+    {
+        Set<String> properties = new HashSet<>(previousJobObject.getPropertyList());
+        properties.addAll(jobObject.getPropertyList());
+        properties.remove(STATUS);
+
+        return properties.stream().anyMatch(property -> !Objects.equals(getPropertyValue(previousJobObject, property),
+            getPropertyValue(jobObject, property)));
+    }
+
+    private Object getPropertyValue(BaseObject object, String property)
+    {
+        PropertyInterface value = object.safeget(property);
+
+        return value instanceof BaseProperty<?> baseProperty ? baseProperty.getValue() : null;
     }
 }

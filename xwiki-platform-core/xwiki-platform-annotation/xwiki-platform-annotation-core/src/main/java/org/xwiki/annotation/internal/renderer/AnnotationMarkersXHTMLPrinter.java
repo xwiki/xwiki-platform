@@ -102,10 +102,10 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
         int annIndex = renderedAnnotations.indexOf(annotation);
         // close all annotations opened after this one, in reverse order
         for (int i = renderedAnnotations.size() - 1; i > annIndex; i--) {
-            printAnnotationEndMarker(renderedAnnotations.get(i));
+            printAnnotationEndMarker();
         }
         // close this annotation
-        printAnnotationEndMarker(annotation);
+        printAnnotationEndMarker();
         // open all previously closed annotations in the order they were initially opened
         for (int i = annIndex + 1; i < renderedAnnotations.size(); i++) {
             printAnnotationStartMarker(renderedAnnotations.get(i));
@@ -130,9 +130,8 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
     /**
      * Prints the end marker for the passed annotation.
      *
-     * @param annotation the annotation to print end marker for
      */
-    private void printAnnotationEndMarker(Annotation annotation)
+    private void printAnnotationEndMarker()
     {
         printXMLEndElement(ANNOTATION_MARKER);
     }
@@ -149,7 +148,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
             // for each annotation from the last opened to the first opened
             for (int i = renderedAnnotations.size() - 1; i >= 0; i--) {
                 // close it
-                printAnnotationEndMarker(renderedAnnotations.get(i));
+                printAnnotationEndMarker();
             }
             // set the flag so that next end event doesn't close them as well
             open = false;
@@ -186,15 +185,16 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
         // iterate through the indexes of annotations events, print the chunks in between and then handle the annotation
         // events
         int previous = 0;
-        for (int index : annotations.keySet()) {
+        for (Map.Entry<Integer, List<AnnotationEvent>> entry : annotations.entrySet()) {
+            int index = entry.getKey();
             // create the current chunk
             String currentChunk = text.substring(previous, index);
             // print the current chunk
-            if (currentChunk.length() > 0) {
+            if (!currentChunk.isEmpty()) {
                 printXML(currentChunk);
             }
             // handle all annotations at this position
-            for (AnnotationEvent evt : annotations.get(index)) {
+            for (AnnotationEvent evt : entry.getValue()) {
                 switch (evt.getType()) {
                     case START:
                         beginAnnotation(evt.getAnnotation());
@@ -212,7 +212,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
         }
         // print the last chunk of text
         String chunk = text.substring(previous);
-        if (chunk.length() > 0) {
+        if (!chunk.isEmpty()) {
             printXML(chunk);
         }
     }

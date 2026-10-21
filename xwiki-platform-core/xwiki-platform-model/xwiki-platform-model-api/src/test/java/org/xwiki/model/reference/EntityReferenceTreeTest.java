@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * 
  * @version $Id$
  */
-public class EntityReferenceTreeTest
+class EntityReferenceTreeTest
 {
     @Test
-    public void testOneReference()
+    void testOneReference()
     {
         EntityReferenceTreeNode treeNode = new EntityReferenceTree(new DocumentReference("wiki", "space", "page"));
 
@@ -64,7 +64,7 @@ public class EntityReferenceTreeTest
     }
 
     @Test
-    public void testSeveralReferences()
+    void testSeveralReferences()
     {
         EntityReferenceTreeNode tree = new EntityReferenceTree(new DocumentReference("wiki", "space", "page"),
             new DocumentReference("wiki", "space2", "page2"), new DocumentReference("wiki", "space", "page2"),
@@ -115,7 +115,7 @@ public class EntityReferenceTreeTest
     }
 
     @Test
-    public void getDescendantByReference()
+    void getDescendantByReference()
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         EntityReferenceTree tree = new EntityReferenceTree(documentReference);
@@ -139,7 +139,7 @@ public class EntityReferenceTreeTest
     }
 
     @Test
-    public void testSiblingWithDifferentType()
+    void testSiblingWithDifferentType()
     {
         DocumentReference document = new DocumentReference("wiki", "space", "entity");
         SpaceReference space = new SpaceReference("wiki", "space", "entity");
@@ -182,7 +182,7 @@ public class EntityReferenceTreeTest
     }
 
     @Test
-    public void testToString()
+    void testToString()
     {
         EntityReferenceTreeNode tree = new EntityReferenceTree(new DocumentReference("wiki", "space", "page"),
             new DocumentReference("wiki", "space2", "page2"), new DocumentReference("wiki", "space", "page2"),

@@ -31,9 +31,9 @@ import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.WikiCreator;
-import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 
 /**
  * Default implementation for {@link org.xwiki.platform.wiki.creationjob.WikiCreator}.

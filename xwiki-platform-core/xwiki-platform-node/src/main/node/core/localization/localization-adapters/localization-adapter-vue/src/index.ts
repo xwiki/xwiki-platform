@@ -49,8 +49,13 @@ export function useI18nAdapter(
   async function load(lang: string) {
     isLoading.value = true;
 
+    // The query is resolved in the locale of the composer, unless it pins a locale of its own.
+    const localizedQuery: Query = Array.isArray(query)
+      ? { keys: query, locale: lang }
+      : { ...query, locale: query.locale ?? lang };
+
     try {
-      const res = await resolver.resolve(query);
+      const res = await resolver.resolve(localizedQuery);
       mergeLocaleMessage(lang, res.translations);
     } catch (e) {
       console.error(e);

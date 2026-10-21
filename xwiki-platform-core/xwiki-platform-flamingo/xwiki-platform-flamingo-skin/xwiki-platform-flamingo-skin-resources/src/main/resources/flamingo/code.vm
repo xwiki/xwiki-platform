@@ -51,7 +51,7 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
     </thead>
     <tbody class="group">
 #if ($showLastAuthors)
-  ## Initialiaze the annotated content with the latest content of the document
+  ## Initialize the annotated content with the latest content of the document
   #set ($annotatedContent = $services.blame.blame(null, $doc.getRevisionInfo($doc.version), $content))
   ## Retrieve the previous version of the document
   #set ($previous = $doc.previousVersion)

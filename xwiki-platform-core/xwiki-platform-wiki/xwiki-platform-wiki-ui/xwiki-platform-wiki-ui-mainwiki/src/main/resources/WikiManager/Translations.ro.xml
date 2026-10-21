@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Listează toate wiki-urile
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Spații de lucru (versiune veche)
 rendering.macro.workspaces.description=Macro-ul este învechit și nu ar trebui utilizat aici din motive de compatibilitate. Te rugăm să folosești în schimb macro-ul "wikis".
-
-## Browse
-platform.wiki.browse=Explorează wiki-urile
 platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=Nume
 platform.wiki.browse.description=Descriere
@@ -300,6 +297,9 @@ platform.wiki.sheet.aliases=Un alias este un alt nume pentru wiki. Poți adăuga
 #######################################
 platform.wiki.delete.confirmation.yes=Da
 platform.wiki.delete.confirmation.no=Nu
+
+## Browse
+platform.wiki.browse=Explorează wiki-urile
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

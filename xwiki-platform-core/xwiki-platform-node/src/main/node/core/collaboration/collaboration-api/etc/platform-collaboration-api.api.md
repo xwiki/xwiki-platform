@@ -9,8 +9,12 @@ import { Container } from 'inversify';
 import { Doc } from 'yjs';
 import { DocumentReference } from '@xwiki/platform-model-api';
 import { DocumentService } from '@xwiki/platform-document-api';
+import { Logger } from '@xwiki/platform-api';
 import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
 import { Ref } from 'vue';
+import { Saver } from '@xwiki/platform-autosave-api';
+import { SaverState } from '@xwiki/platform-autosave-api';
+import { SaveTransport } from '@xwiki/platform-autosave-api';
 import { UserDetails } from '@xwiki/platform-authentication-api';
 
 // @beta
@@ -45,6 +49,7 @@ export type Collaboration = {
     collaborator: Collaborator;
     provider: any;
     doc: Doc;
+    saver?: Saver<any>;
 };
 
 // @beta
@@ -86,6 +91,33 @@ export enum ConnectionStatus {
     // (undocumented)
     Disconnected = 0
 }
+
+// @beta
+export class YjsAwarenessSaveTransport<C extends object = object> extends SaveTransport<C> {
+    constructor(saver: Saver<C>, config: YjsAwarenessSaveTransportConfig);
+    // (undocumented)
+    dispose(): Promise<void>;
+    // (undocumented)
+    getClientId(): string;
+    // (undocumented)
+    getStates(): Record<string, SaverState>;
+    // (undocumented)
+    initialize(): void;
+    // (undocumented)
+    toBeReady(): Promise<void>;
+    // (undocumented)
+    updateLocalState(patch: Partial<SaverState>, input?: {
+        push?: boolean;
+        immediate?: boolean;
+    }): Promise<void>;
+    whenSettled(): Promise<void>;
+}
+
+// @beta
+export type YjsAwarenessSaveTransportConfig = {
+    collaboration: Collaboration;
+    logger?: Logger;
+};
 
 // (No @packageDocumentation comment for this package)
 

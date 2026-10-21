@@ -66,7 +66,7 @@ public class DefaultApplicationContextListenerManager implements ApplicationCont
                 initializer.initializeApplicationContext(applicationContext);
             }
         } catch (ComponentLookupException ex) {
-            this.logger.error(ex.getMessage(), ex);
+            this.logger.error("Failed to look up the Application Context listeners to initialize", ex);
         }
     }
 
@@ -80,7 +80,7 @@ public class DefaultApplicationContextListenerManager implements ApplicationCont
                 initializer.destroyApplicationContext(applicationContext);
             }
         } catch (ComponentLookupException ex) {
-            this.logger.error(ex.getMessage(), ex);
+            this.logger.error("Failed to look up the Application Context listeners to destroy", ex);
         }
-    }       
+    }
 }

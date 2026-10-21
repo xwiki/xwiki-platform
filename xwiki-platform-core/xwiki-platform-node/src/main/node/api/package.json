@@ -1,7 +1,7 @@
 {
   "name": "@xwiki/platform-api",
-  "version": "18.6.0-SNAPSHOT",
-  "license": "LGPL 2.1",
+  "version": "18.10.0-SNAPSHOT",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -39,8 +39,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-authentication-api": "workspace:*",
-    "@xwiki/platform-configuration-api": "workspace:*",
-    "vue-router": "catalog:"
+    "@xwiki/platform-configuration-api": "workspace:*"
   },
   "peerDependencies": {
     "inversify": "8.x",

@@ -32,6 +32,8 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.UseWikiDescriptorTarget;
+import org.xwiki.test.docker.junit5.WikiDescriptorTarget;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ComparePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -68,6 +70,11 @@ class CompareIT
 
     @Test
     @Order(1)
+    // The images compared below are referenced by the URL through which the HTTP client accesses XWiki, and the
+    // rendered diff only downloads an image whose domain is trusted, which the domain of the wiki descriptor is. So
+    // make the descriptor point to the HTTP client rather than to the browser, otherwise the images aren't downloaded
+    // and the diff compares their URLs, which differ on purpose here.
+    @UseWikiDescriptorTarget(WikiDescriptorTarget.HTTP_CLIENT)
     void compareRenderedImageChanges(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {

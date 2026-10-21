@@ -35,6 +35,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class CoeditorsDropdown extends BaseElement
 {
+    private static final By COEDITORS = By.cssSelector(".realtime-users-dropdown .realtime-user");
+
     /**
      * The dropdown is displayed only when there are more than N (4 by default) users connected to the editing session.
      * 
@@ -87,8 +89,11 @@ public class CoeditorsDropdown extends BaseElement
      */
     public List<CoeditorElement> getCoeditors()
     {
-        return getDriver().findElements(By.cssSelector(".realtime-users-dropdown .realtime-user")).stream()
-            .map(CoeditorElement::new).toList();
+        // The coeditors are identified by their id, rather than kept or looked up by position, because the list is
+        // updated whenever someone joins or leaves the realtime editing session, which both invalidates the elements
+        // we found and shifts the position of the remaining ones.
+        return CoeditorElement.readCoeditors(getDriver(), COEDITORS, CoeditorElement::getId).stream()
+            .map(this::getCoeditor).toList();
     }
 
     /**
@@ -97,7 +102,7 @@ public class CoeditorsDropdown extends BaseElement
      */
     public CoeditorElement getCoeditor(String coeditorId)
     {
-        return new CoeditorElement(
-            getDriver().findElement(By.cssSelector(".realtime-users-dropdown[data-id='" + coeditorId + "']")));
+        By coeditorSelector = By.cssSelector(".realtime-users-dropdown .realtime-user[data-id='" + coeditorId + "']");
+        return new CoeditorElement(() -> getDriver().findElement(coeditorSelector));
     }
 }

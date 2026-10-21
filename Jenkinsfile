@@ -248,7 +248,7 @@ private void runIntegrationTests()
   def itModuleList
   node() {
     // Checkout platform to find all IT modules so that we can then parallelize executions across Jenkins agents.
-    checkout skipChangeLog: true, scm: scm
+    checkout changelog: false, scm: scm
     itModuleList = itModules()
   }
 
@@ -266,6 +266,7 @@ private void build(map)
 
 private void buildInsideNode(map)
 {
+    // Note: the heap dump of the Maven JVM on OOM errors is configured and archived by xwikiBuild.
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: '-Xmx2048m -Xms512m'
       javadoc = false

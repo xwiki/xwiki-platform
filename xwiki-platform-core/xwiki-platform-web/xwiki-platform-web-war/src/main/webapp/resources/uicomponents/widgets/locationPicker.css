@@ -17,31 +17,25 @@
   padding-right: 0;
 }
 
-.breadcrumb-container {
+.location-picker .breadcrumb-container {
   /* Sets up a flex display for breadcrumbs and location actions. */
   display: flex;
   flex-wrap: nowrap;
+  background-color: var(--breadcrumb-bg);
+  border-radius: var(--border-radius-base);
 }
 
 .location-picker > dd > .breadcrumb-container > .location-actions {
-  margin-bottom: 0;
-  /* Keeps all actions on one line. */
-  white-space: nowrap;
+  /* Lay the action buttons out in a row. */
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
   /* Remove rounded corners on the left so that the transition is seamless. */
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  /* Combine with .breadcrumb. */
-  border-left: none;
-  padding-left: 3px;
-}
-
-.location-action {
-  /* Leave some space between the actions. */
-  margin-left: 3px;
-}
-
-.location-action:first-of-type {
-  margin-left: 0;
+  /* Horizontal breathing room, plus just enough top offset to center the buttons on the
+     breadcrumb's first line (matches the breadcrumb's own vertical padding/line-height). */
+  padding: 4px .5em 0;
 }
 
 .location-edit {

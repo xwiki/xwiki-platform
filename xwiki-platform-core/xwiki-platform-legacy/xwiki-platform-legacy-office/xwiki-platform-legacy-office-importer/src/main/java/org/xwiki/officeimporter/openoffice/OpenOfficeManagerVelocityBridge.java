@@ -29,9 +29,9 @@ import org.xwiki.script.service.ScriptService;
  * 
  * @version $Id$
  * @since 1.8RC3
- * @deprecated since 4.1M1 use the {@link ScriptService} with hint "officemanager" instead
+ * @deprecated use the {@link ScriptService} with hint "officemanager" instead
  */
-@Deprecated
+@Deprecated(since = "4.1M1")
 public class OpenOfficeManagerVelocityBridge
 {
     /**

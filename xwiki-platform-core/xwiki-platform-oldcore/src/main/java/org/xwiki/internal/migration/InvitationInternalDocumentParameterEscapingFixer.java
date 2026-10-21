@@ -32,7 +32,7 @@ import static java.util.regex.Matcher.quoteReplacement;
 
 /**
  * Fix a content by looking for localization of {@code xe.invitation.internalDocument} and escaping its parameter. The
- * translation fixed by this method is initially introduced by the invitation application but the fix is localed in
+ * translation fixed by this method is initially introduced by the invitation application but the fix is located in
  * oldcore so that the fix is applied on pages even if the invitation application has been uninstalled.
  *
  * @version $Id$

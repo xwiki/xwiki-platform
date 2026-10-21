@@ -24,9 +24,9 @@ import java.net.URI;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BoundedInputStream;
@@ -39,11 +39,11 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.Request;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.diff.xml.XMLDiffDataURIConverterConfiguration;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Component for downloading images from a URL with the given cookies.
@@ -65,7 +65,7 @@ public class ImageDownloader
     private HttpClientBuilderFactory httpClientBuilderFactory;
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private Container container;
 
     @Inject
     private XMLDiffDataURIConverterConfiguration configuration;
@@ -148,9 +148,8 @@ public class ImageDownloader
             if (maximumSize > 0) {
                 // The content length is not always available (then it is negative), so we need to use a bounded
                 // input stream to make sure we don't read more than the maximum size.
-                try (BoundedInputStream boundedInputStream = new BoundedInputStream(entity.getContent(),
-                    maximumSize))
-                {
+                try (BoundedInputStream boundedInputStream =
+                    BoundedInputStream.builder().setInputStream(entity.getContent()).setMaxCount(maximumSize).get()) {
                     content = IOUtils.toByteArray(boundedInputStream);
                 }
 
@@ -171,10 +170,14 @@ public class ImageDownloader
     {
         HttpGet getMethod = new HttpGet(uri);
 
-        XWikiRequest request = this.xcontextProvider.get().getRequest();
-        if (request != null && matchesCookieDomain(uri.getHost(), request)) {
-            // Copy the cookie header from the current request.
-            getMethod.setHeader(HEADER_COOKIE, request.getHeader(HEADER_COOKIE));
+        Request request = this.container.getRequest();
+        if (request instanceof ServletRequest servletRequest) {
+            HttpServletRequest httpRequest = servletRequest.getRequest();
+
+            if (matchesCookieDomain(uri.getHost(), httpRequest)) {
+                // Copy the cookie header from the current request.
+                getMethod.setHeader(HEADER_COOKIE, httpRequest.getHeader(HEADER_COOKIE));
+            }
         }
 
         return getMethod;

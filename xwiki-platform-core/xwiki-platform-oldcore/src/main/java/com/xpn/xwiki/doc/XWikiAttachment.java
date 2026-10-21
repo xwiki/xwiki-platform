@@ -146,7 +146,7 @@ public class XWikiAttachment implements Cloneable
 
     private XWikiAttachmentContent content;
 
-    private XWikiAttachmentArchive attachment_archive;
+    private XWikiAttachmentArchive attachmentArchive;
 
     private boolean isMetaDataDirty = false;
 
@@ -202,6 +202,7 @@ public class XWikiAttachment implements Cloneable
 
     public void setDocId(long id)
     {
+        // Nothing to do, the document identifier is derived from the document itself.
     }
 
     public long getDocId()
@@ -211,6 +212,7 @@ public class XWikiAttachment implements Cloneable
 
     public void setId(long id)
     {
+        // Nothing to do, the identifier is computed from the document and the file name.
     }
 
     @Override
@@ -263,9 +265,9 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @return the number of bytes in this attachment content
-     * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
+     * @deprecated use {@link #getLongSize()} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public int getFilesize()
     {
         long longSize = getLongSize();
@@ -277,9 +279,9 @@ public class XWikiAttachment implements Cloneable
      * Set cached filesize of the attachment that will be stored as metadata.
      *
      * @param filesize the number of bytes in this attachment content
-     * @deprecated since 9.0RC1, use {@link #setLongSize(long)} instead
+     * @deprecated use {@link #setLongSize(long)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public void setFilesize(int filesize)
     {
         // There is no way to tell Hibernate to not call #setFilesize and we don't want to break the size if it's bigger
@@ -320,21 +322,6 @@ public class XWikiAttachment implements Cloneable
         }
 
         this.size = size;
-    }
-
-    /**
-     * @param context current XWikiContext
-     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
-     * @throws XWikiException
-     * @since 2.3M2
-     * @deprecated since 9.0RC1, use {@link #getContentLongSize(XWikiContext)} instead
-     */
-    @Deprecated
-    public int getContentSize(XWikiContext context) throws XWikiException
-    {
-        long longSize = getContentLongSize(context);
-
-        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
     }
 
     /**
@@ -412,9 +399,9 @@ public class XWikiAttachment implements Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 6.4M1 use {@link #getAuthorReference()} instead
+     * @deprecated use {@link #getAuthorReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.4M1")
     public String getAuthor()
     {
         if (this.author == null) {
@@ -427,9 +414,9 @@ public class XWikiAttachment implements Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
-     * @deprecated since 6.4M1 use {@link #setAuthorReference} instead
+     * @deprecated use {@link #setAuthorReference} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.4M1")
     public void setAuthor(String author)
     {
         if (!Objects.equals(getAuthor(), author)) {
@@ -507,10 +494,8 @@ public class XWikiAttachment implements Cloneable
             this.doc = doc;
             this.reference = null;
 
-            if (updateDirty) {
-                if (isMetaDataDirty() && doc != null) {
-                    doc.setMetaDataDirty(true);
-                }
+            if (updateDirty && isMetaDataDirty() && doc != null) {
+                doc.setMetaDataDirty(true);
             }
         }
     }
@@ -572,10 +557,8 @@ public class XWikiAttachment implements Cloneable
     {
         setMetaDataDirty(dirty);
 
-        if (deep) {
-            if (this.content != null) {
-                this.content.setContentDirty(dirty);
-            }
+        if (deep && this.content != null) {
+            this.content.setContentDirty(dirty);
         }
     }
 
@@ -659,7 +642,7 @@ public class XWikiAttachment implements Cloneable
      * @param out the output where to write the XML
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
      * @param bWithVersions if true, all archive version is also included
-     * @param format true if the XML should be formated
+     * @param format true if the XML should be formatted
      * @param context current XWikiContext
      * @throws IOException when an error occurs during streaming operation
      * @throws XWikiException when an error occurs during xwiki operation
@@ -677,7 +660,7 @@ public class XWikiAttachment implements Cloneable
      * @param out the output where to write the XML
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
      * @param bWithVersions if true, all archive version is also included
-     * @param format true if the XML should be formated
+     * @param format true if the XML should be formatted
      * @param encoding the encoding to use when serializing XML
      * @throws XWikiException when an error occurs during xwiki operation
      * @since 9.10RC1
@@ -839,9 +822,9 @@ public class XWikiAttachment implements Cloneable
         return this.content;
     }
 
-    public void setAttachment_content(XWikiAttachmentContent attachment_content)
+    public void setAttachment_content(XWikiAttachmentContent attachmentContent)
     {
-        this.content = attachment_content;
+        this.content = attachmentContent;
 
         if (this.content != null) {
             this.content.setAttachment(this);
@@ -889,12 +872,12 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachmentArchive getAttachment_archive()
     {
-        return this.attachment_archive;
+        return this.attachmentArchive;
     }
 
-    public void setAttachment_archive(XWikiAttachmentArchive attachment_archive)
+    public void setAttachment_archive(XWikiAttachmentArchive attachmentArchive)
     {
-        this.attachment_archive = attachment_archive;
+        this.attachmentArchive = attachmentArchive;
     }
 
     /**
@@ -919,7 +902,7 @@ public class XWikiAttachment implements Cloneable
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    LOGGER.warn("Failed to close attachment content input stream: {}",
+                    LOGGER.warn("Failed to close attachment content input stream: [{}]",
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -993,46 +976,48 @@ public class XWikiAttachment implements Cloneable
 
             return latestStoredVersion != null ? latestStoredVersion.getVersion() : null;
         } catch (XWikiException e) {
-            LOGGER.warn(ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to get the latest stored version of attachment [{}] of document [{}]. "
+                + "Root cause is [{}]", this.filename, this.doc.getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }
 
     /**
-     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     * @deprecated please do not use this, it is bound to a jrcs based implementation.
      */
-    @Deprecated
+    @Deprecated(since = "2.6M1")
     public Archive getArchive()
     {
-        if (this.attachment_archive == null) {
+        if (this.attachmentArchive == null) {
             return null;
         } else {
-            return this.attachment_archive.getRCSArchive();
+            return this.attachmentArchive.getRCSArchive();
         }
     }
 
     /**
-     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     * @deprecated please do not use this, it is bound to a jrcs based implementation.
      */
-    @Deprecated
+    @Deprecated(since = "2.6M1")
     public void setArchive(Archive archive)
     {
-        if (this.attachment_archive == null) {
-            this.attachment_archive = new XWikiAttachmentArchive();
-            this.attachment_archive.setAttachment(this);
+        if (this.attachmentArchive == null) {
+            this.attachmentArchive = new XWikiAttachmentArchive();
+            this.attachmentArchive.setAttachment(this);
         }
 
-        this.attachment_archive.setRCSArchive(archive);
+        this.attachmentArchive.setRCSArchive(archive);
     }
 
     public void setArchive(String data) throws XWikiException
     {
-        if (this.attachment_archive == null) {
-            this.attachment_archive = new XWikiAttachmentArchive();
-            this.attachment_archive.setAttachment(this);
+        if (this.attachmentArchive == null) {
+            this.attachmentArchive = new XWikiAttachmentArchive();
+            this.attachmentArchive.setAttachment(this);
         }
 
-        this.attachment_archive.setArchive(data);
+        this.attachmentArchive.setArchive(data);
     }
 
     public synchronized Version[] getVersions()
@@ -1040,8 +1025,8 @@ public class XWikiAttachment implements Cloneable
         try {
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
-            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}",
-                new Object[] {getFilename(), getDoc().getDocumentReference(), ex.getMessage()});
+            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: [{}]",
+                getFilename(), getDoc().getDocumentReference(), ExceptionUtils.getRootCauseMessage(ex));
             return new Version[] {new Version(this.getVersion())};
         }
     }
@@ -1147,9 +1132,9 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @deprecated since 9.11RC1, use {@link #loadAttachmentContent(XWikiContext)} instead
+     * @deprecated use {@link #loadAttachmentContent(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.11RC1")
     public void loadContent(XWikiContext xcontext)
     {
         try {
@@ -1164,7 +1149,7 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachmentArchive loadArchive(XWikiContext xcontext)
     {
-        if (this.attachment_archive == null) {
+        if (this.attachmentArchive == null) {
             WikiReference currentWiki = xcontext.getWikiReference();
 
             try {
@@ -1177,11 +1162,10 @@ public class XWikiAttachment implements Cloneable
                 try {
                     AttachmentVersioningStore store = getAttachmentVersioningStore(xcontext);
 
-                    this.attachment_archive = store.loadArchive(this, xcontext, true);
+                    this.attachmentArchive = store.loadArchive(this, xcontext, true);
                 } catch (Exception e) {
-                    LOGGER.warn(
-                        "Failed to load archive for attachment [{}@{}]. "
-                            + "This attachment is broken, please consider re-uploading it",
+                    LOGGER.warn("Failed to load archive for attachment [{}@{}]. This attachment is broken, please "
+                        + "consider re-uploading it",
                         this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
                 }
             } finally {
@@ -1191,7 +1175,7 @@ public class XWikiAttachment implements Cloneable
             }
         }
 
-        return this.attachment_archive;
+        return this.attachmentArchive;
     }
 
     public void updateContentArchive(XWikiContext context) throws XWikiException
@@ -1308,11 +1292,7 @@ public class XWikiAttachment implements Cloneable
     public boolean isImage(XWikiContext context)
     {
         String contenttype = getMimeType(context);
-        if (contenttype.startsWith("image/")) {
-            return true;
-        } else {
-            return false;
-        }
+        return contenttype.startsWith("image/");
     }
 
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException
@@ -1325,7 +1305,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Apply the provided attachment so that the current one contains the same informations and indicate if it was
+     * Apply the provided attachment so that the current one contains the same information and indicate if it was
      * necessary to modify it in any way.
      *
      * @param attachment the attachment to apply
@@ -1341,7 +1321,7 @@ public class XWikiAttachment implements Cloneable
             modified = true;
         }
 
-        if (Strings.CS.equals(getMimeType(), attachment.getMimeType())) {
+        if (!Strings.CS.equals(getMimeType(), attachment.getMimeType())) {
             setMimeType(attachment.getMimeType());
             modified = true;
         }
@@ -1349,10 +1329,10 @@ public class XWikiAttachment implements Cloneable
         try {
             // Note: If the attachment from which to copy data from has a null content, don't copy the content.
             if (isContentDifferentButNotNull(attachment)) {
-				try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
-					setContent(attachmentIs);
-					modified = true;
-				}
+                try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
+                    setContent(attachmentIs);
+                    modified = true;
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Failed to set content of attachment [{}] onto [{}]", this, attachment, e);
@@ -1365,20 +1345,19 @@ public class XWikiAttachment implements Cloneable
     {
         boolean isDifferent = false;
 
-		try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
-			if (attachmentIs != null) {
-				if (this.content == null) {
-					isDifferent = true;
-				} else {
-					try (InputStream is = getContentInputStream(null)) {
-						if (is != null && !IOUtils.contentEquals(is, attachmentIs)) {
-							isDifferent = true;
-						}
-					}
-				}
-
-			}
-		}
+        try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
+            if (attachmentIs != null) {
+                if (this.content == null) {
+                    isDifferent = true;
+                } else {
+                    try (InputStream is = getContentInputStream(null)) {
+                        if (is != null && !IOUtils.contentEquals(is, attachmentIs)) {
+                            isDifferent = true;
+                        }
+                    }
+                }
+            }
+        }
 
         return isDifferent;
     }

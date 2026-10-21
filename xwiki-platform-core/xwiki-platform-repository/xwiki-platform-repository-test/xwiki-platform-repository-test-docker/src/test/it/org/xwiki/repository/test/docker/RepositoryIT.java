@@ -128,7 +128,7 @@ class RepositoryIT
         setup.recacheSecretToken();
         setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
 
-        // base extension informations
+        // base extension information
 
         this.baseExtension =
             repositoryTestUtils.getTestExtension(new ExtensionId(IDPREFIX + "macro-jar-extension", "1.0"), "jar");

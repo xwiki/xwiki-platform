@@ -122,7 +122,7 @@ class WebJarsResourceReferenceHandlerTest
         when(this.request.getRequest()).thenReturn(httpRequest);
         when(this.container.getRequest()).thenReturn(this.request);
 
-        when(this.classLoaderManager.getURLClassLoader("wiki:wiki", true)).thenReturn(this.classLoader);
+        when(this.classLoaderManager.getURLClassLoader("wiki:wiki", false)).thenReturn(this.classLoader);
     }
 
     @Test
@@ -239,8 +239,7 @@ class WebJarsResourceReferenceHandlerTest
         // Verify the exception is logged.
         assertEquals(1, this.logCapture.size());
         assertEquals(ERROR, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Failed to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]",
-            this.logCapture.getMessage(0));
+        assertEquals("Failed to serve the resource [angular/2.1.11/angular.js]", this.logCapture.getMessage(0));
 
         // Verify that the client is properly notified about the failure.
         verify(this.response.getResponse()).sendError(500,
@@ -304,15 +303,33 @@ class WebJarsResourceReferenceHandlerTest
     @Test
     void handleVerifyResourceIsClosed() throws Exception
     {
-        NamespaceURLClassLoader classLoader = mock(NamespaceURLClassLoader.class);
+        NamespaceURLClassLoader classLoaderMock = mock(NamespaceURLClassLoader.class);
         InputStream inputStream = mock(InputStream.class);
 
-        when(this.classLoaderManager.getURLClassLoader("nsTest", true)).thenReturn(classLoader);
-        when(classLoader.getResourceAsStream("META-INF/resources/webjars/seg1/seg2")).thenReturn(inputStream);
+        when(this.classLoaderManager.getURLClassLoader("nsTest", false)).thenReturn(classLoaderMock);
+        when(classLoaderMock.getResourceAsStream("META-INF/resources/webjars/seg1/seg2")).thenReturn(inputStream);
 
         this.handler.handle(new WebJarsResourceReference("nsTest", asList("seg1", "seg2")),
             mock(ResourceReferenceHandlerChain.class));
 
         verify(inputStream, times(2)).close();
+    }
+
+    @Test
+    void handleDoesNotCreateClassLoaderForUnknownNamespace() throws Exception
+    {
+        // The namespace is taken verbatim from the URL, so the handler must only ever look up an existing class
+        // loader and never ask for one to be created, otherwise any caller could grow the class loader map at will.
+        NamespaceURLClassLoader rootClassLoader = mock(NamespaceURLClassLoader.class);
+        when(this.classLoaderManager.getURLClassLoader("unknown", false)).thenReturn(rootClassLoader);
+
+        WebJarsResourceReference reference = new WebJarsResourceReference("unknown", asList("angular", "angular.js"));
+
+        this.handler.handle(reference, this.chain);
+
+        verify(this.classLoaderManager).getURLClassLoader("unknown", false);
+        verify(this.classLoaderManager, never()).getURLClassLoader(any(), eq(true));
+        // The lookup still happens, on the class loader the manager returned as a fallback.
+        verify(rootClassLoader).getResourceAsStream("META-INF/resources/webjars/angular/angular.js");
     }
 }

@@ -125,7 +125,8 @@ public class StaticListClass extends ListClass
 
                 String classname = this.getObject().getName();
                 String fieldname = this.getName();
-                String secondCol = "-", firstCol = "-";
+                String secondCol = "-";
+                String firstCol = "-";
 
                 String script =
                     "\"" + path + "?xpage=suggest&classname=" + classname + "&fieldname=" + fieldname + "&firCol="

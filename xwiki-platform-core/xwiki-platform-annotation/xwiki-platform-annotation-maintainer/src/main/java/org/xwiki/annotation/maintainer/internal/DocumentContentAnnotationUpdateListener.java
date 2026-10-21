@@ -97,7 +97,8 @@ public class DocumentContentAnnotationUpdateListener extends AbstractLocalEventL
                 maintainer.updateAnnotations(this.serializer.serialize(currentDocument.getDocumentReference()),
                     previousContent, content);
             } catch (MaintainerServiceException e) {
-                this.logger.warn(e.getMessage(), e);
+                this.logger.warn("Failed to maintain the annotations of document [{}]",
+                    currentDocument.getDocumentReference(), e);
                 // nothing else, just go further
             }
             isUpdating = false;

@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#userDenyCommentAtDocumentLevel() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" alt="Main Wiki without any rule">
+    <user name="userA" alt="the user the comment right is denied to on the document below" />
+    <user name="userB" alt="a user no rule is targeting" />
+
+    <space name="space" alt="a space without any rule">
+      <document name="any document" />
+
+      <document name="docDenyCommentToUserA" alt="a document denying the comment right to userA">
+        <denyUser name="userA" type="comment" />
+      </document>
+    </space>
+  </wiki>
+</wikis>

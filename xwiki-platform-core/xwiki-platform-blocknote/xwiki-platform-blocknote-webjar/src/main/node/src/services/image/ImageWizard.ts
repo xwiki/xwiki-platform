@@ -18,6 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
+
+/**
+ * The image block properties augmented with the full-fidelity XWiki resource reference. The plain BlockNote image URL
+ * doesn't capture the resource reference (it is kept as block metadata, outside the BlockNote schema), but the image
+ * wizard needs it in order to edit the image and to report a new reference when the user selects a different image.
+ *
+ * @since 18.6.0RC1
+ * @beta
+ */
+type ImageWithReference = BlockOfType<"image">["props"] & {
+  reference?: ResourceReference;
+};
 
 /**
  * The interface used by the image wizard to submit the image properties or to notify that the image insertion / edition
@@ -27,7 +40,7 @@ import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
  * @beta
  */
 interface ImageWizardCallback {
-  submit(image: Partial<BlockOfType<"image">["props"]>): void;
+  submit(image: Partial<ImageWithReference>): void;
   cancel(): void;
 }
 
@@ -50,13 +63,10 @@ interface ImageWizard {
    * Shows the UI to edit the image properties and uses the provided callback to update the image block with the new
    * property values or to cancel the image edition.
    *
-   * @param image - the image block properties to edit
+   * @param image - the image block properties to edit, including the current XWiki resource reference
    * @param callback - the callback used to either update the image block or to cancel the image edition
    */
-  edit(
-    image: BlockOfType<"image">["props"],
-    callback: ImageWizardCallback,
-  ): void;
+  edit(image: ImageWithReference, callback: ImageWizardCallback): void;
 }
 
-export type { ImageWizard, ImageWizardCallback };
+export type { ImageWithReference, ImageWizard, ImageWizardCallback };

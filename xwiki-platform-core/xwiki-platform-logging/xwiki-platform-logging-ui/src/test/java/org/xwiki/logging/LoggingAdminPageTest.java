@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.icon.IconManager;
 import org.xwiki.livedata.internal.macro.LiveDataMacroComponentList;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.internal.converter.EnumConverter;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
@@ -79,8 +78,9 @@ class LoggingAdminPageTest extends PageTest
     void setUp() throws Exception
     {
         // Spy the jsfx plugin used during the macro rendering to return a mock of its API when required. 
+        SkinExtensionPluginApi skinExtensionPluginApiMock = mock();
         when(this.oldcore.getSpyXWiki().getPluginApi("jsfx", this.context))
-            .thenReturn(mock(SkinExtensionPluginApi.class));
+            .thenReturn(skinExtensionPluginApiMock);
         // Return minimal icons metadata since this is not what we want to test here.
         IconManager iconManager = this.componentManager.registerMockComponent(IconManager.class);
         doReturn(new HashMap<>()).when(iconManager).getMetaData(anyString());

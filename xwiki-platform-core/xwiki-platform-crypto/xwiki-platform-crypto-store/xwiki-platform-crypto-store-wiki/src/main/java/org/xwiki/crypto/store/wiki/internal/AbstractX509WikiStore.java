@@ -308,8 +308,8 @@ public abstract class AbstractX509WikiStore
 
     private EntityReference getStoreReference(StoreReference store)
     {
-        if (store instanceof WikiStoreReference) {
-            return ((WikiStoreReference) store).getReference();
+        if (store instanceof WikiStoreReference wikiStoreReference) {
+            return wikiStoreReference.getReference();
         }
         throw new IllegalArgumentException("Unsupported store reference [" + store.getClass().getName()
             + "] for this implementation.");

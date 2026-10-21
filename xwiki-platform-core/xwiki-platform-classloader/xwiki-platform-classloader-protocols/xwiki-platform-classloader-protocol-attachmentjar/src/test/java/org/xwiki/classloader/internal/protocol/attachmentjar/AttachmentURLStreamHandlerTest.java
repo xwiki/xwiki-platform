@@ -37,7 +37,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class AttachmentURLStreamHandlerTest
+class AttachmentURLStreamHandlerTest
 {
     @InjectMockComponents
     private AttachmentURLStreamHandler handler;
@@ -64,13 +64,9 @@ public class AttachmentURLStreamHandlerTest
     {
         URL url = new URL(null, "http://invalid/url", this.handler);
 
-        try {
-            url.openConnection();
-            fail("Should have thrown an exception here");
-        } catch (RuntimeException expected) {
-            assertEquals("An attachment JAR URL should start with [attachmentjar://], got [http://invalid/url]",
-                expected.getMessage());
-        }
+        RuntimeException expected = assertThrows(RuntimeException.class, url::openConnection);
+        assertEquals("An attachment JAR URL should start with [attachmentjar://], got [http://invalid/url]",
+            expected.getMessage());
     }
 
     @Test

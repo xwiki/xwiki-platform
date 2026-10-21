@@ -45,8 +45,6 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
 
     private static final String RESULT = "result";
 
-    private static final String DOCUMENT = "doc";
-
     private static final String CONTEXT = "context";
 
     /**

@@ -90,8 +90,7 @@ public class CacheHandlingLikeEventsListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (data instanceof EntityReference) {
-            EntityReference target = (EntityReference) data;
+        if (data instanceof EntityReference target) {
             this.likeManagerProvider.get().clearCache(target);
             this.cleanCacheUIX((WikiReference) target.extractReference(EntityType.WIKI));
         }

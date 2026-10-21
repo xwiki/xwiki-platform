@@ -31,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * 
  * @version $Id$
  */
-public class PageObjectPropertyReferenceTest
+class PageObjectPropertyReferenceTest
 {
     /**
      * Test equivalence of constructors.
      */
     @Test
-    public void testConstructors()
+    void testConstructors()
     {
         PageObjectPropertyReference reference = new PageObjectPropertyReference(new EntityReference("property",
             EntityType.PAGE_OBJECT_PROPERTY, new EntityReference("Object", EntityType.PAGE_OBJECT,
@@ -47,19 +47,21 @@ public class PageObjectPropertyReferenceTest
     }
 
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
+        EntityReference reference = new EntityReference("page", EntityType.PAGE);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new PageObjectPropertyReference(new EntityReference("page", EntityType.PAGE)));
+            () -> new PageObjectPropertyReference(reference));
 
         assertEquals("Invalid type [PAGE] for an object property reference", e.getMessage());
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
+        EntityReference reference = new EntityReference("property", EntityType.PAGE_OBJECT_PROPERTY);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new PageObjectPropertyReference(new EntityReference("property", EntityType.PAGE_OBJECT_PROPERTY)));
+            () -> new PageObjectPropertyReference(reference));
 
         assertEquals("Invalid parent reference [null] in an object property reference", e.getMessage());
     }
@@ -68,17 +70,18 @@ public class PageObjectPropertyReferenceTest
      * Tests that an object reference throws exception if it doesn't have a page as a parent.
      */
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
+        EntityReference reference = new EntityReference("property", EntityType.PAGE_OBJECT_PROPERTY,
+            new EntityReference("wiki", EntityType.WIKI));
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new PageObjectPropertyReference(new EntityReference("property", EntityType.PAGE_OBJECT_PROPERTY,
-                new EntityReference("wiki", EntityType.WIKI))));
+            () -> new PageObjectPropertyReference(reference));
 
         assertEquals("Invalid parent reference [Wiki wiki] in an object property reference", e.getMessage());
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         PageObjectPropertyReference reference = new PageObjectPropertyReference("prop",
             new PageObjectReference("object", new PageReference("wiki", "space", "page")))

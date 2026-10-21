@@ -21,12 +21,12 @@ import { depsContainerMock } from "./depsContainer.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { useMemo } from "react";
 import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
-import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { LinkEditionHandler } from "../../components/links/linkEdition";
 
 export type BlockNoteForTestProps = Omit<
   BlockNoteViewWrapperProps,
-  "lang" | "label" | "depsContainer"
-> & { syntax?: SyntaxConfig };
+  "lang" | "label" | "depsContainer" | "linkEditionHandler"
+> & { linkEditionHandler?: LinkEditionHandler };
 
 export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = (props) => {
   const depsContainer = useMemo(depsContainerMock, []);
@@ -36,6 +36,12 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = (props) => {
       lang="en"
       label="Some Label"
       depsContainer={depsContainer}
+      linkEditionHandler={
+        props.linkEditionHandler ??
+        (() => {
+          throw new Error("Link editor should not open for this test");
+        })
+      }
       {...props}
     />
   );

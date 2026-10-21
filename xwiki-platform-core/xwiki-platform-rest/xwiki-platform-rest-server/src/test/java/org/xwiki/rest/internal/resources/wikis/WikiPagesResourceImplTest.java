@@ -220,7 +220,8 @@ class WikiPagesResourceImplTest
         assertEquals(doc3RelativeURL, doc3Summary.getXwikiRelativeUrl());
 
         verify(this.queryManager).createQuery("select doc from XWikiDocument as doc where (upper(doc.contentAuthor) "
-            + "like :author and upper(doc.fullName) like :name )", Query.XWQL);
+            + "like :author and upper(doc.fullName) like :name )"
+            + " order by doc.fullName asc, doc.language asc", Query.XWQL);
         verify(mockQuery).setWiki(wikiName);
         verify(mockQuery).setOffset(start);
         verify(mockQuery).setLimit(number);

@@ -65,8 +65,7 @@ public class TreePrinter extends DepthFirstAdapter
     @Override
     public void defaultCase(Node node)
     {
-        if (node instanceof Token) {
-            Token token = (Token) node;
+        if (node instanceof Token token) {
             builder.append(' ')
                 .append(token.getText());
         }
@@ -79,7 +78,7 @@ public class TreePrinter extends DepthFirstAdapter
         if (node.getWhereClause() == null) {
             // needed for #outAWhereClause
             node.setWhereClause(new AWhereClause());
-        } else if (printer.where.length() > 0) {
+        } else if (!printer.where.isEmpty()) {
             AWhereClause where = (AWhereClause) node.getWhereClause();
             // where := ( where )
             where.setConditionalExpression(
@@ -113,7 +112,7 @@ public class TreePrinter extends DepthFirstAdapter
     public void outAFromClause(AFromClause node)
     {
         String from = getPrinter().from.toString();
-        if (from.length() > 0) {
+        if (!from.isEmpty()) {
             builder.append(' ').append(from);
         }
     }
@@ -121,7 +120,7 @@ public class TreePrinter extends DepthFirstAdapter
     @Override
     public void outAWhereClause(AWhereClause node)
     {
-        if (getPrinter().where.length() > 0) {
+        if (!getPrinter().where.isEmpty()) {
             if (node.getWhere() == null) {
                 builder.append(" WHERE 1=1 ");
             }

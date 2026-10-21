@@ -80,7 +80,7 @@ import static org.mockito.Mockito.when;
     SVGDefinitions.class,
     DefaultExecution.class
 })
-public class InternalHtmlNotificationRendererTest
+class InternalHtmlNotificationRendererTest
 {
     @InjectMockComponents
     private InternalHtmlNotificationRenderer notificationRenderer;
@@ -92,14 +92,14 @@ public class InternalHtmlNotificationRendererTest
     private ContextualLocalizationManager localizationManager;
 
     @Test
-    public void renderCount()
+    void renderCount()
     {
         String renderedCount = this.notificationRenderer.render(42);
         assertEquals("<span class=\"notifications-count badge\">42</span>", renderedCount);
     }
 
     @Test
-    public void renderSingleEvent() throws Exception
+    void renderSingleEvent() throws Exception
     {
         CompositeEvent compositeEvent = mock(CompositeEvent.class);
         CompositeEventStatus eventStatus = mock(CompositeEventStatus.class);
@@ -135,7 +135,7 @@ public class InternalHtmlNotificationRendererTest
     }
 
     @Test
-    public void renderMany() throws NotificationException
+    void renderMany() throws NotificationException
     {
         WordBlock wordBlock = new WordBlock("Nothing");
         Translation translation = mock(Translation.class);

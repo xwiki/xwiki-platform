@@ -30,6 +30,7 @@ import org.xwiki.display.internal.DocumentContentAsyncParser;
 import org.xwiki.rendering.async.internal.AsyncProperties;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.AbstractAsyncClassDocumentInitializer;
 import com.xpn.xwiki.internal.mandatory.DocumentAsyncClassDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -46,20 +47,18 @@ public class XWikiDocumentContentAsyncParser implements DocumentContentAsyncPars
     @Override
     public AsyncProperties getAsyncProperties(DocumentModelBridge document)
     {
-        if (document instanceof XWikiDocument) {
-            XWikiDocument xdocument = (XWikiDocument) document;
-
+        if (document instanceof XWikiDocument xdocument) {
             BaseObject asyncObject = xdocument.getXObject(DocumentAsyncClassDocumentInitializer.CLASS_REFERENCE);
             if (asyncObject != null) {
                 boolean asyncAllowed =
-                    asyncObject.getIntValue(DocumentAsyncClassDocumentInitializer.XPROPERTY_ASYNC_ENABLED) == 1;
+                    asyncObject.getIntValue(AbstractAsyncClassDocumentInitializer.XPROPERTY_ASYNC_ENABLED) == 1;
                 boolean cacheAllowed =
-                    asyncObject.getIntValue(DocumentAsyncClassDocumentInitializer.XPROPERTY_ASYNC_CACHED) == 1;
+                    asyncObject.getIntValue(AbstractAsyncClassDocumentInitializer.XPROPERTY_ASYNC_CACHED) == 1;
 
                 Set<String> contextElements;
                 if (asyncAllowed || cacheAllowed) {
                     contextElements = new HashSet<>(
-                        asyncObject.getListValue(DocumentAsyncClassDocumentInitializer.XPROPERTY_ASYNC_CONTEXT));
+                        asyncObject.getListValue(AbstractAsyncClassDocumentInitializer.XPROPERTY_ASYNC_CONTEXT));
                 } else {
                     contextElements = null;
                 }

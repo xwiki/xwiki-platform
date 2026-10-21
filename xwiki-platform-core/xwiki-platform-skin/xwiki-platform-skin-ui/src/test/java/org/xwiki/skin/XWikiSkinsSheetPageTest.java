@@ -19,6 +19,7 @@
  */
 package org.xwiki.skin;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +36,6 @@ import org.xwiki.edit.internal.DefaultEditorDescriptorBuilder;
 import org.xwiki.edit.internal.DefaultEditorManager;
 import org.xwiki.edit.internal.PureTextSyntaxContentEditor;
 import org.xwiki.icon.IconManagerScriptService;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
@@ -51,6 +51,7 @@ import org.xwiki.rendering.internal.wiki.XWikiWikiModel;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
@@ -226,6 +227,32 @@ class XWikiSkinsSheetPageTest extends PageTest
             assertNotNull(input);
             assertEquals(id, input.attr("name"));
         }
+    }
+
+    @Test
+    void logoAttachmentSelectorFilter() throws Exception
+    {
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Skin"), this.context);
+        BaseObject baseObject = new BaseObject();
+        baseObject.setXClassReference(XWIKI_SKINS);
+        xwikiDocument.addXObject(baseObject);
+
+        // Collect the file extensions accepted by the attachment selectors displayed by the sheet.
+        List<String> filters = new ArrayList<>();
+        when(this.attachmentSelectorMacro.execute(any(), any(), any())).then(invocation -> {
+            filters.add(invocation.getArgument(2, MacroTransformationContext.class).getCurrentMacroBlock()
+                .getParameter("filter"));
+            return Collections.emptyList();
+        });
+
+        this.context.setDoc(xwikiDocument);
+        this.context.setAction("edit");
+        this.context.put("display", "edit");
+
+        verifyNoErrors(render(loadPage(XWIKI_SKINS_SHEET)));
+
+        assertEquals(List.of("png,jpg,jpeg,gif,svg,webp,avif,jxl"), filters);
     }
 
     @Test

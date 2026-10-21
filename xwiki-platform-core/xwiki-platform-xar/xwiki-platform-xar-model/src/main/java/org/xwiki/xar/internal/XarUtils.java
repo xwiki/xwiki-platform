@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.util.Locale;
 
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -106,7 +107,7 @@ public final class XarUtils
 
             xmlReader.nextTag();
 
-            xmlReader.require(XMLStreamReader.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
+            xmlReader.require(XMLStreamConstants.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
 
             // Reference
             String referenceString = xmlReader.getAttributeValue(null, XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
@@ -152,7 +153,7 @@ public final class XarUtils
                     } else if (XarDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
                         if (locale == null) {
                             String value = xmlReader.getElementText();
-                            if (value.length() == 0) {
+                            if (value.isEmpty()) {
                                 locale = Locale.ROOT;
                             } else {
                                 locale = LocaleUtils.toLocale(value);

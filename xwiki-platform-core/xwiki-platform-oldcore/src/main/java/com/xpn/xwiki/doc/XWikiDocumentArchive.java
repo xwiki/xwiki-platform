@@ -413,7 +413,7 @@ public class XWikiDocumentArchive
      * @param version The version to retrieve.
      * @param context The {@link com.xpn.xwiki.XWikiContext context}.
      * @return The XML corresponding to the version.
-     * @throws XWikiException If any exception occured.
+     * @throws XWikiException If any exception occurred.
      */
     public String getVersionXml(Version version, XWikiContext context) throws XWikiException
     {

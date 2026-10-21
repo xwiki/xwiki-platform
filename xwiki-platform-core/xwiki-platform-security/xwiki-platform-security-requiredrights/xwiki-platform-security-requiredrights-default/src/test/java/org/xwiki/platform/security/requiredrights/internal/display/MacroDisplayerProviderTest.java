@@ -135,61 +135,63 @@ class MacroDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(resultBlock, printer);
 
-        String expectedOutput = "beginDefinitionList [[class]=[xform]]\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [Name]\n"
-            + "onSpace\n"
-            + "onWord [from]\n"
-            + "onSpace\n"
-            + "onWord [Macro]\n"
-            + "onSpace\n"
-            + "onWord [Descriptor]\n"
-            + "beginFormat [NONE] [[class]=[xHint]]\n"
-            + "onWord [Parameter]\n"
-            + "onSpace\n"
-            + "onWord [description]\n"
-            + "onSpace\n"
-            + "onWord [from]\n"
-            + "onSpace\n"
-            + "onWord [Macro]\n"
-            + "onSpace\n"
-            + "onWord [Descriptor]\n"
-            + "endFormat [NONE] [[class]=[xHint]]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "beginGroup [[class]=[code box]]\n"
-            + "onWord [existingValue]\n"
-            + "endGroup [[class]=[code box]]\n"
-            + "endDefinitionDescription\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [nonExistingParameterName]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "beginGroup [[class]=[code box]]\n"
-            + "onWord [nonExistingValue]\n"
-            + "endGroup [[class]=[code box]]\n"
-            + "endDefinitionDescription\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [Content]\n"
-            + "beginFormat [NONE] [[class]=[xHint]]\n"
-            + "onWord [Content]\n"
-            + "onSpace\n"
-            + "onWord [description]\n"
-            + "onSpace\n"
-            + "onWord [from]\n"
-            + "onSpace\n"
-            + "onWord [Macro]\n"
-            + "onSpace\n"
-            + "onWord [Descriptor]\n"
-            + "endFormat [NONE] [[class]=[xHint]]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "beginGroup [[class]=[code box]]\n"
-            + "onSpecialSymbol [#]\n"
-            + "onWord [TestMacro]\n"
-            + "endGroup [[class]=[code box]]\n"
-            + "endDefinitionDescription\n"
-            + "endDefinitionList [[class]=[xform]]\n";
+        String expectedOutput = """
+            beginDefinitionList [[class]=[xform]]
+            beginDefinitionTerm
+            onWord [Name]
+            onSpace
+            onWord [from]
+            onSpace
+            onWord [Macro]
+            onSpace
+            onWord [Descriptor]
+            beginFormat [NONE] [[class]=[xHint]]
+            onWord [Parameter]
+            onSpace
+            onWord [description]
+            onSpace
+            onWord [from]
+            onSpace
+            onWord [Macro]
+            onSpace
+            onWord [Descriptor]
+            endFormat [NONE] [[class]=[xHint]]
+            endDefinitionTerm
+            beginDefinitionDescription
+            beginGroup [[class]=[code box]]
+            onWord [existingValue]
+            endGroup [[class]=[code box]]
+            endDefinitionDescription
+            beginDefinitionTerm
+            onWord [nonExistingParameterName]
+            endDefinitionTerm
+            beginDefinitionDescription
+            beginGroup [[class]=[code box]]
+            onWord [nonExistingValue]
+            endGroup [[class]=[code box]]
+            endDefinitionDescription
+            beginDefinitionTerm
+            onWord [Content]
+            beginFormat [NONE] [[class]=[xHint]]
+            onWord [Content]
+            onSpace
+            onWord [description]
+            onSpace
+            onWord [from]
+            onSpace
+            onWord [Macro]
+            onSpace
+            onWord [Descriptor]
+            endFormat [NONE] [[class]=[xHint]]
+            endDefinitionTerm
+            beginDefinitionDescription
+            beginGroup [[class]=[code box]]
+            onSpecialSymbol [#]
+            onWord [TestMacro]
+            endGroup [[class]=[code box]]
+            endDefinitionDescription
+            endDefinitionList [[class]=[xform]]
+            """;
         assertEquals(expectedOutput, printer.toString());
     }
 
@@ -211,25 +213,27 @@ class MacroDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(resultBlock, printer);
 
-        String expectedOutput = "beginDefinitionList [[class]=[xform]]\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [parameterName]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "beginGroup [[class]=[code box]]\n"
-            + "onWord [parameterValue]\n"
-            + "endGroup [[class]=[code box]]\n"
-            + "endDefinitionDescription\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [Content]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "beginGroup [[class]=[code box]]\n"
-            + "onSpecialSymbol [#]\n"
-            + "onWord [TestMacro]\n"
-            + "endGroup [[class]=[code box]]\n"
-            + "endDefinitionDescription\n"
-            + "endDefinitionList [[class]=[xform]]\n";
+        String expectedOutput = """
+            beginDefinitionList [[class]=[xform]]
+            beginDefinitionTerm
+            onWord [parameterName]
+            endDefinitionTerm
+            beginDefinitionDescription
+            beginGroup [[class]=[code box]]
+            onWord [parameterValue]
+            endGroup [[class]=[code box]]
+            endDefinitionDescription
+            beginDefinitionTerm
+            onWord [Content]
+            endDefinitionTerm
+            beginDefinitionDescription
+            beginGroup [[class]=[code box]]
+            onSpecialSymbol [#]
+            onWord [TestMacro]
+            endGroup [[class]=[code box]]
+            endDefinitionDescription
+            endDefinitionList [[class]=[xform]]
+            """;
 
         assertEquals(expectedOutput, printer.toString());
     }
@@ -260,41 +264,43 @@ class MacroDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(resultBlock, printer);
 
-        String expectedOutput = "beginDefinitionList [[class]=[xform]]\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [TranslatedParameter]\n"
-            + "beginFormat [NONE] [[class]=[xHint]]\n"
-            + "onWord [Translated]\n"
-            + "onSpace\n"
-            + "onWord [parameter]\n"
-            + "onSpace\n"
-            + "onWord [description]\n"
-            + "onSpecialSymbol [.]\n"
-            + "endFormat [NONE] [[class]=[xHint]]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "beginGroup [[class]=[code box]]\n"
-            + "onWord [parameterValue]\n"
-            + "endGroup [[class]=[code box]]\n"
-            + "endDefinitionDescription\n"
-            + "beginDefinitionTerm\n"
-            + "onWord [TranslatedContent]\n"
-            + "beginFormat [NONE] [[class]=[xHint]]\n"
-            + "onWord [Translated]\n"
-            + "onSpace\n"
-            + "onWord [content]\n"
-            + "onSpace\n"
-            + "onWord [description]\n"
-            + "onSpecialSymbol [.]\n"
-            + "endFormat [NONE] [[class]=[xHint]]\n"
-            + "endDefinitionTerm\n"
-            + "beginDefinitionDescription\n"
-            + "beginGroup [[class]=[code box]]\n"
-            + "onSpecialSymbol [#]\n"
-            + "onWord [TestMacro]\n"
-            + "endGroup [[class]=[code box]]\n"
-            + "endDefinitionDescription\n"
-            + "endDefinitionList [[class]=[xform]]\n";
+        String expectedOutput = """
+            beginDefinitionList [[class]=[xform]]
+            beginDefinitionTerm
+            onWord [TranslatedParameter]
+            beginFormat [NONE] [[class]=[xHint]]
+            onWord [Translated]
+            onSpace
+            onWord [parameter]
+            onSpace
+            onWord [description]
+            onSpecialSymbol [.]
+            endFormat [NONE] [[class]=[xHint]]
+            endDefinitionTerm
+            beginDefinitionDescription
+            beginGroup [[class]=[code box]]
+            onWord [parameterValue]
+            endGroup [[class]=[code box]]
+            endDefinitionDescription
+            beginDefinitionTerm
+            onWord [TranslatedContent]
+            beginFormat [NONE] [[class]=[xHint]]
+            onWord [Translated]
+            onSpace
+            onWord [content]
+            onSpace
+            onWord [description]
+            onSpecialSymbol [.]
+            endFormat [NONE] [[class]=[xHint]]
+            endDefinitionTerm
+            beginDefinitionDescription
+            beginGroup [[class]=[code box]]
+            onSpecialSymbol [#]
+            onWord [TestMacro]
+            endGroup [[class]=[code box]]
+            endDefinitionDescription
+            endDefinitionList [[class]=[xform]]
+            """;
 
         assertEquals(expectedOutput, printer.toString());
     }

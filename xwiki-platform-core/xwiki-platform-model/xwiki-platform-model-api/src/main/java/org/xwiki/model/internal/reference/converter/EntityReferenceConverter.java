@@ -26,6 +26,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.Namespace;
@@ -78,18 +79,19 @@ public class EntityReferenceConverter extends AbstractConverter<EntityReference>
                     result = converter.convert(EntityReference.class, value);
                 } catch (ConversionException e) {
                     logger.warn("The type [{}] cannot be converted natively to EntityReference, "
-                        + "falling back on using toString to convert it.", value.getClass().getName());
-                    result = convertToType(type, value.toString());
+                        + "falling back on using toString to convert it. Root cause is [{}].",
+                        value.getClass().getName(), ExceptionUtils.getRootCauseMessage(e));
+                    result = convertToType(value.toString());
                 }
             } else {
-                result = convertToType(type, value.toString());
+                result = convertToType(value.toString());
             }
         }
 
         return result;
     }
 
-    private EntityReference convertToType(Type type, String value)
+    private EntityReference convertToType(String value)
     {
         Namespace namespace = NamespaceUtils.toNamespace(value);
 

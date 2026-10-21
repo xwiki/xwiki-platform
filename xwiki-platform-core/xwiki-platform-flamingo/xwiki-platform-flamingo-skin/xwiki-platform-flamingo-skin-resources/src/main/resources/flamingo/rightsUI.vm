@@ -40,7 +40,7 @@ $xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
 $xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css', true)
 $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
 $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
-## for admin, register, programming and createwiki, allow preceedes over deny
+## for admin, register, programming and createwiki, allow precedes over deny
 #set ($standardRights = ['view', 'comment', 'edit', 'script', 'delete', 'admin', 'register', 'programming', 'login',
   'createwiki', 'creator'])
 #set ($sectionWikiRights = 'wikis.rights')

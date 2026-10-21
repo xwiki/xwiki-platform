@@ -52,7 +52,7 @@ public class DeletedDocumentCleanUpFilterListener extends AbstractLocalEventList
 {
     static final String NAME = "org.xwiki.notifications.notifiers.internal.DeletedDocumentCleanUpFilterListener";
 
-    private static final BeginFoldEvent FOLDED_EVENTS = otherEvent -> otherEvent instanceof BeginFoldEvent;
+    private static final BeginFoldEvent FOLDED_EVENTS = BeginFoldEvent.class::isInstance;
     private static final DocumentRenamingEvent DOCUMENT_RENAMING_EVENT = new DocumentRenamingEvent();
 
     @Inject

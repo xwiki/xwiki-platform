@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -218,7 +217,7 @@ class DefaultPeriodicMimeMessageIteratorTest
 
         when(this.notificationEmailGroupingStrategy.groupEventsPerMail(any())).then(invocationOnMock -> {
             List<CompositeEvent> compositeEvents = invocationOnMock.getArgument(0);
-            return compositeEvents.stream().map(List::of).collect(Collectors.toList());
+            return compositeEvents.stream().map(List::of).toList();
         });
 
         when(compositeEvent1UserA.getUsers()).thenReturn(Sets.newSet(userB));

@@ -30,6 +30,7 @@
         :collaboration
         @instant-change="dirty = true"
         @debounced-change="updateValue"
+        @local-instant-change="onLocalInstantChange"
       ></BlocknoteEditor>
     </suspense>
     <input
@@ -77,12 +78,21 @@
 </template>
 
 <script setup lang="ts">
-import { MACRO_UI_PLACEHOLDER } from "../services/macros/placeholderUi";
+import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
+import {
+  extractLinkId,
+  injectLinkId,
+  stripLinkId,
+} from "../services/blocknote/linkId";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
+import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
+import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
 import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
+import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
+import { uuidv4 } from "lib0/random";
 import {
   inject,
   onBeforeMount,
@@ -90,48 +100,42 @@ import {
   ref,
   shallowRef,
   useTemplateRef,
+  watch,
 } from "vue";
-import { resolver } from "xwiki-platform-localization-webjar";
+import type { Logic } from "../services/Logic";
+import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
-import type { XWikiMeta } from "../services/meta/XWikiMeta";
-import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
-  CollaborationManager,
   CollaborationManagerProvider,
 } from "@xwiki/platform-collaboration-api";
+import type { FormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import type {
   BlockNoteViewWrapperProps,
-  BlockOfType,
+  BlockType,
   EditorLanguage,
-  ImageUpdateResult,
-  InlineMacroInvocation,
-  MacroBlockInvocation,
-  MacroInsertionEditorPrefillData,
+  ImageEditionOverrideFn,
+  LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
-import type {
-  MacroWithUnknownParamsType,
-  UnknownMacroParamsType,
-} from "@xwiki/platform-macros-api";
-import type { DocumentReference } from "@xwiki/platform-model-api";
-import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
-import type { UniAst } from "@xwiki/platform-uniast-api";
+import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 import type { Ref } from "vue";
 
 //
 // Injected
 //
 const container = inject<Container>("container")!;
-const uniAstProcessor: UniAstProcessor = container.get("UniAstProcessor", {
-  name: "XWiki",
-});
+const logic = inject<Logic>("logic")!;
+const blockNoteProcessor: BlockNoteProcessor = container.get(
+  "BlockNoteProcessor",
+  {
+    name: "XWiki",
+  },
+);
 const xwikiMeta: XWikiMeta = container.get("XWikiMeta");
-const modelReferenceParser = container
-  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-  .get();
 
 //
 // Props
@@ -141,12 +145,10 @@ const {
   initialValue = "",
   form = undefined,
   disabled = false,
-  inputSyntax = "uniast/1.0",
+  inputSyntax = "blocknote/1.0",
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
-  documentReference = XWiki.Model.serialize(
-    XWiki.currentDocument.documentReference,
-  ),
+  documentReference = Model.serialize(XWiki.currentDocument.documentReference),
   locale,
 } = defineProps<{
   // The key used to submit the edited content.
@@ -191,39 +193,108 @@ const value = ref(initialValue);
 const dirty = ref(false);
 const isLoading = ref(true);
 
+let blockNoteDocument: BlockNoteDocument | undefined;
+
 // This is passed to the BlockNote editor component.
 const editorContent = ref();
 
 const defaultLabel = "Editor";
 
-const docRef = documentReference
-  ? (modelReferenceParser?.parse(
-      `doc:${documentReference}`,
-    ) as DocumentReference)
-  : undefined;
-if (docRef && docRef.locale === undefined) {
-  docRef.locale = actualLocale;
-}
-
-const imageEdition = (
-  image: BlockOfType<"image">["props"],
-  update: (updateResult: ImageUpdateResult) => void,
-) => {
+const imageEdition: ImageEditionOverrideFn = (block, update) => {
   const imageWizard: ImageWizard = container.get("ImageWizard");
-  imageWizard.edit(image, {
-    submit: (updatedProps: Partial<BlockOfType<"image">["props"]>) =>
-      update({ type: "update", updatedProps }),
-    cancel: () => update({ type: "aborted" }),
-  });
+  // The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so we pass it to the image
+  // wizard and update it on submit, because the user may have selected a different image.
+  const reference = blockNoteDocument?.getMetadata(block.id)?.xwikiReference as
+    | ResourceReference
+    | undefined;
+  imageWizard.edit(
+    { ...block.props, reference },
+    {
+      submit: ({ reference: newReference, ...updatedProps }) => {
+        if (newReference) {
+          blockNoteDocument!.getMetadata(block.id, true)!.xwikiReference =
+            newReference;
+        }
+        update({ type: "update", updatedProps });
+      },
+      cancel: () => update({ type: "aborted" }),
+    },
+  );
 };
+
+const linkEdition: LinkEditionHooks = {
+  // Runs before the link editor is opened on an existing link. The reference of the linked resource is kept as link
+  // metadata (outside the BlockNote schema), mapped to a synthetic id stored in the link url, so we resolve it here
+  // and inject it into the link data to pre-fill the link editor. The synthetic id is stripped from the url passed to
+  // the link editor; beforeUpdate recovers it from the previous link data.
+  beforeEdit: (linkData) => {
+    const id = extractLinkId(linkData.url);
+    if (!id) {
+      // The link doesn't have associated metadata (e.g. a resource reference) so we return the link data as-is. Calling
+      // stripLinkId when the ID is missing is safe but the URL gets normalized by the URL constructor (e.g. a trailing
+      // slash is added). We prefer to avoid that in order to keep the link URL exactly as the user entered it.
+      return linkData;
+    }
+    return {
+      ...linkData,
+      url: stripLinkId(linkData.url),
+      reference: blockNoteDocument?.getMetadata(id)?.xwikiReference as
+        | ResourceReference
+        | undefined,
+    };
+  },
+
+  // Runs right before the link is written into the content (i.e. before createLink / editLink). We store the (possibly
+  // updated) resource reference as link metadata, mapped to a synthetic id that we carry in the link url. When editing,
+  // we reuse the id of the edited link (taken from the previous link data) so that the other link metadata (parameters,
+  // freestanding flag) is preserved even when the target changes; when creating, we mint a new id.
+  beforeUpdate: (linkData, previous) => {
+    if (!linkData.reference) {
+      // Without a reference the link is saved from its url, so leave that url exactly as the link editor produced it:
+      // storing a synthetic id in it would round-trip it through the URL constructor, normalizing it (e.g. adding a
+      // trailing slash).
+      return linkData;
+    }
+    const id = extractLinkId(previous?.url ?? "") ?? uuidv4();
+    const metadata = blockNoteDocument!.getMetadata(id, true)!;
+    const previousReference = metadata.xwikiReference as
+      | ResourceReference
+      | undefined;
+    // Preserve the previous reference (with its parameters) when the link still points to the same resource, otherwise
+    // report the new one, so that the edited link points to the newly selected resource.
+    metadata.xwikiReference = isSameResourceReference(
+      previousReference,
+      linkData.reference,
+    )
+      ? previousReference
+      : linkData.reference;
+    return { ...linkData, url: injectLinkId(stripLinkId(linkData.url), id) };
+  },
+};
+
+function isSameResourceReference(
+  alice?: ResourceReference,
+  bob?: ResourceReference,
+): boolean {
+  return alice?.type === bob?.type && alice?.reference === bob?.reference;
+}
 
 const syntaxes = container.getAll<SyntaxConfig>(
   SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
 );
 
-const syntax =
-  syntaxes.find((conf) => conf.id === outputSyntax) ??
-  syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
+let syntax = syntaxes.find((conf) => conf.id === outputSyntax);
+
+if (!syntax) {
+  // Falling back to the minimal syntax disables most editor features (headings, tables, images,
+  // lists, macros, ...). Warn so that a missing / mismatched syntax config doesn't silently cripple
+  // the editor.
+  console.warn(
+    `No syntax configuration registered for '${outputSyntax}', falling back to the minimal ` +
+      "syntax: most editor features will be disabled.",
+  );
+  syntax = syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
+}
 
 if (!syntax) {
   throw new Error(
@@ -242,102 +313,145 @@ const editorProps = shallowRef<
   },
   theme: "light",
   lang: (actualLocale || "en") as EditorLanguage,
+  // Style the code blocks like the code macro output in view mode.
+  codeBlockClassName: "box code",
   label: defaultLabel,
   overrides: {
     imageEdition,
+    linkEdition,
   },
   syntax,
 });
 
 // This is passed to the BlockNote editor component.
 const collaboration: Ref<Collaboration | undefined> = ref(undefined);
-let collaborationManager: CollaborationManager | undefined = undefined;
+// Set as soon as we start joining, so that we can leave even if the editor is unmounted before the join completes.
+let formCollaboration: Promise<FormCollaboration> | undefined;
+// Set once the join completes, together with the collaboration passed to the BlockNote editor component.
+let joinedCollaboration: FormCollaboration | undefined;
 const collaborationKey: Ref<string | undefined> = ref();
 
 onBeforeMount(async () => {
-  editorContent.value = uniAstProcessor.load(initialValue);
+  blockNoteDocument = blockNoteProcessor.load(initialValue);
+  editorContent.value = blockNoteDocument.content;
 
-  editorProps.value.label =
-    (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
-      "platform.blocknote.editor.label"
-    ] ?? defaultLabel;
+  editorProps.value.label = await translate("editor.label", defaultLabel);
 
-  if (collaborationURL && docRef) {
-    const cristalApp = container.get<CristalApp>("CristalApp");
-    cristalApp.getWikiConfig().realtimeURL = collaborationURL;
-
-    collaborationManager = container
-      .get<CollaborationManagerProvider>(collaborationManagerProviderName)
-      .get();
-    // Join the realtime collaboration session for the specified XWiki document.
-    collaboration.value = await collaborationManager.join(docRef);
-    collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
+  if (collaborationURL && documentReference) {
+    await joinCollaborationSession();
   }
 
   isLoading.value = false;
 });
 
-onUnmounted(() => {
-  collaborationManager?.leave();
+/**
+ * Join the realtime collaboration session for the edited XWiki document, using the collaboration server URL.
+ */
+async function joinCollaborationSession(): Promise<void> {
+  const cristalApp = container.get<CristalApp>("CristalApp");
+  cristalApp.getWikiConfig().realtimeURL = collaborationURL;
+
+  // Resolved before joining the collaboration session, so that starting the auto-save doesn't have to wait for it.
+  const autoSaveVersionSummary = await translate("autoSaveSummary");
+  formCollaboration = joinFormCollaboration({
+    collaborationManager: container
+      .get<CollaborationManagerProvider>(collaborationManagerProviderName)
+      .get(),
+    // The collaboration session is identified by the reference and the locale of the edited document.
+    document: getEditedDocument(),
+    formId: form,
+    autoSaveVersionSummary,
+  });
+  joinedCollaboration = await formCollaboration;
+  collaboration.value = joinedCollaboration.collaboration;
+  collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
+}
+
+onUnmounted(async () => {
+  // The realtime toolbar is removed and the auto-saver is stopped when the last editor leaves the session.
+  try {
+    (await formCollaboration)?.leave();
+  } catch (error) {
+    console.debug("Failed to join the collaboration session.", error);
+  }
 });
 
-// This is passed to the BlockNote editor component.
+/**
+ * Tell the auto-saver that the local user changed the content. The editor reports only the local changes here, so
+ * neither the initial content load nor the updates received from the other collaborators are counted.
+ */
+function onLocalInstantChange(): void {
+  collaboration.value?.saver?.contentModifiedLocally();
+}
+
+/**
+ * @param key - the translation key, without the prefix the localization module adds back
+ * @param fallback - what to return when the key has no translation
+ * @returns the translated message
+ */
+async function translate(key: string, fallback?: string): Promise<string> {
+  const fullKey = `blocknote.${key}`;
+  const translation = await logic.translate(fullKey);
+  // vue-i18n echoes the key back when it has no translation for it.
+  return translation === fullKey ? (fallback ?? translation) : translation;
+}
+
+/**
+ * @returns the document being edited, which the auto-saver keeps up to date with the versions the other clients
+ *   create, so that the next save doesn't run into a merge conflict
+ */
+function getEditedDocument(): XWikiDocument {
+  if (
+    Model.serialize(xwikiMeta.documentReference) === documentReference &&
+    actualLocale === xwikiMeta.locale
+  ) {
+    // The page displays the very document we're editing, so use the factory that also keeps the page meta data and
+    // the hidden fields of the edit form in sync after each save.
+    return XWikiDocument.currentDocument(xwikiMeta);
+  }
+  return new XWikiDocument({
+    documentReference:
+      Model.resolve(documentReference, EntityType.DOCUMENT) ?? undefined,
+    language: actualLocale,
+  });
+}
+
+// This is passed to the BlockNote editor component. Macros are inserted / edited directly as the server-rendered
+// xwikiMacroBlock / xwikiInlineMacro blocks: the wizard operates on macro invocations, and the editor stores the
+// resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
 const macros: BlockNoteViewWrapperProps["macros"] = {
-  list: container.getAll<MacroWithUnknownParamsType>("Macro"),
   ctx: {
-    openParamsEditor: async (
-      macro: MacroWithUnknownParamsType,
-      parameters: UnknownMacroParamsType,
-      update: (newProps: UnknownMacroParamsType) => void,
-    ) => {
+    openParamsEditor: async (invocation, update) => {
       try {
         const macroWizard: BlockNoteMacroWizard = container.get(
           "BlockNoteMacroWizard",
         );
         update(
-          await macroWizard.insertOrUpdate(macro, parameters, {
+          await macroWizard.insertOrUpdate(invocation, {
             syntax: outputSyntax,
             inlineParametersSyntax: inputSyntax,
           }),
         );
       } catch (error) {
-        console.error("Failed to edit the macro", error);
+        if (error) {
+          console.error("Failed to edit the macro", error);
+        }
       }
     },
 
-    openInsertionEditor: async (
-      prefill: MacroInsertionEditorPrefillData,
-      insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
-    ) => {
-      const macroWizard: BlockNoteMacroWizard = container.get(
-        "BlockNoteMacroWizard",
-      );
-
-      const call = await macroWizard.insert(prefill.kind, prefill.params);
-
-      const invocation: MacroBlockInvocation | InlineMacroInvocation = {
-        kind: call.inline ? "inline" : "block",
-        id: call.name,
-        body: call.content
-          ? { type: "raw", content: call.content }
-          : { type: "none" },
-        params: Object.fromEntries(
-          Object.entries(call.parameters).map(([key, value]) => [
-            key,
-            typeof value === "string" ? value : value.value,
-          ]),
-        ),
-      };
-
-      insert({
-        kind: call.inline ? "inline" : "block",
-        id: call.inline ? "xwikiInlineMacro" : "xwikiMacroBlock",
-        params: {
-          call: JSON.stringify(invocation),
-          output: JSON.stringify(MACRO_UI_PLACEHOLDER),
-        },
-        body: { type: "none" },
-      });
+    openInsertionEditor: async (prefill, insert) => {
+      try {
+        const macroWizard: BlockNoteMacroWizard = container.get(
+          "BlockNoteMacroWizard",
+        );
+        insert(
+          await macroWizard.insert(prefill.kind, prefill.params, prefill.body),
+        );
+      } catch (error) {
+        if (error) {
+          console.error("Failed to insert the macro", error);
+        }
+      }
     },
   },
 };
@@ -349,11 +463,22 @@ const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
 const editorInstance =
   useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
 
+// Start the auto-save (and show the realtime toolbar) only once the editor is there, because the first client joining
+// a session loads the initial content into the shared document, and that is a local Yjs change: counting it would
+// make the session dirty and trigger an auto-save before anyone typed anything.
+watch(editorInstance, (editor) => {
+  if (editor) {
+    // The auto-saver belongs to the collaboration session, shared by every editor taking part in it, so only the first
+    // editor to get here starts it.
+    joinedCollaboration?.startAutoSave();
+  }
+});
+
 //
 // Methods
 //
 // eslint-disable-next-line max-statements
-async function updateValue(editorContent?: UniAst | Error): Promise<string> {
+function updateValue(editorContent?: BlockType[]): string {
   if (!dirty.value) {
     // The value is already up-to-date.
     return value.value;
@@ -361,11 +486,12 @@ async function updateValue(editorContent?: UniAst | Error): Promise<string> {
 
   const instantUpdate = !editorContent;
   editorContent = editorContent || editorInstance.value?.getContent();
-  if (!editorContent || editorContent instanceof Error) {
-    throw editorContent || new Error("Could not get the editor content.");
+  if (!editorContent) {
+    throw new Error("Could not get the editor content.");
   }
 
-  const newValue = uniAstProcessor.save(editorContent);
+  blockNoteDocument!.content = editorContent;
+  const newValue = blockNoteProcessor.save(blockNoteDocument!);
 
   value.value = newValue;
   dirty.value = false;
@@ -387,15 +513,6 @@ defineExpose({
 
 <style>
 .xwiki-blocknote {
-  --cr-base-font-size: unset;
-  --cr-base-text-color: unset;
-  --cr-font-sans: unset;
-  --cr-font-size-x-large: 24px; /* --font-size-h2 */
-  --cr-font-size-large: 20px; /* --font-size-h3 */
-  --cr-font-size-medium: 17px; /* --font-size-h4 */
-  --cr-font-weight-normal: var(--font-weight-regular);
-  --cr-line-height-normal: unset;
-
   .bn-container {
     --bn-font-family: unset;
     --mantine-font-size-md: inherit;
@@ -420,6 +537,40 @@ defineExpose({
     [data-content-type="bulletListItem"] > p.bn-inline-content,
     [data-content-type="numberedListItem"] > p.bn-inline-content {
       margin: 0;
+    }
+
+    .bn-block-content[data-content-type="codeBlock"] {
+      /* The code block is styled by the XWiki skin, like the code macro output in view mode, through the CSS classes
+        added to its pre element (see codeBlockClassName). */
+      background: transparent;
+      border-radius: 0;
+
+      /* Use the same spacing as the code macro output in view mode. */
+      > pre {
+        padding: 19px; /* .well */
+        margin: 0 0 20px; /* @line-height-computed */
+      }
+
+      /* The XWiki skin styles select elements as form fields, but the language selector should look like plain
+        text. */
+      > div > select {
+        width: auto;
+        height: auto;
+        padding: 0;
+        border: 0 none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        font-size: 0.8em;
+        /* Display the language selector in the top padding of the code block, aligned with the code. */
+        line-height: 1;
+        top: 4px;
+        left: 20px; /* border width + padding */
+
+        &:focus {
+          box-shadow: none;
+        }
+      }
     }
 
     [data-content-type="table"] {
@@ -482,5 +633,16 @@ form#edit .bottom-editor > .sticky-buttons {
 /* There's no border around the content editor so we need to leave some space before the action toolbar. */
 #xwikieditcontent > .xwiki-blocknote-wrapper {
   margin-bottom: calc(var(--grid-gutter-width) / 2);
+}
+
+/**
+ * In-place edit mode
+ */
+
+/* The editor is created inside #xwikicontent, which the skin makes a scroll container in order to handle wide content
+  in view mode. The floating UI of the editor (e.g. the slash menu) is positioned and clipped based on its scroll
+  containers, so on a page with little content it would be squeezed to the small height of #xwikicontent. */
+#xwikicontent.xwiki-blocknote-wrapper {
+  overflow: visible;
 }
 </style>

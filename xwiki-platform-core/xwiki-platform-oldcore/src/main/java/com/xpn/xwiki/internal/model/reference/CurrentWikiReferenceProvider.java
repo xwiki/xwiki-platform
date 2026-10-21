@@ -50,7 +50,6 @@ public class CurrentWikiReferenceProvider implements Provider<WikiReference>
     {
         EntityReference wikiReference = this.provider.getDefaultReference(EntityType.WIKI);
 
-        return wikiReference instanceof WikiReference ? (WikiReference) wikiReference
-            : new WikiReference(wikiReference);
+        return wikiReference instanceof WikiReference wikiRef ? wikiRef : new WikiReference(wikiReference);
     }
 }

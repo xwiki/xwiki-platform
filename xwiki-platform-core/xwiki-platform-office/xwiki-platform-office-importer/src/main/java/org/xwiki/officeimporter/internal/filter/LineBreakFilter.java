@@ -31,7 +31,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
-import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * Replaces {@code<br/>} elements placed in between block elements with {@code<div class="wikikmodel-emptyline"/>}.
@@ -59,15 +58,10 @@ public class LineBreakFilter extends AbstractHTMLFilter
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         List<Element> lineBreaksToReplace =
-            filterDescendants(document.getDocumentElement(), new String[] {TAG_BR}, new ElementSelector()
-            {
-                @Override
-                public boolean isSelected(Element element)
-                {
-                    Node prev = findPreviousNode(element);
-                    Node next = findNextNode(element);
-                    return !(null == prev && null == next) && (isBlockElement(prev) || isBlockElement(next));
-                }
+            filterDescendants(document.getDocumentElement(), new String[] {TAG_BR}, element -> {
+                Node prev = findPreviousNode(element);
+                Node next = findNextNode(element);
+                return !(null == prev && null == next) && (isBlockElement(prev) || isBlockElement(next));
             });
         for (Element lineBreak : lineBreaksToReplace) {
             Node parent = lineBreak.getParentNode();
@@ -121,7 +115,7 @@ public class LineBreakFilter extends AbstractHTMLFilter
         boolean isBlockElement = false;
         if (null != node) {
             for (String blockElement : BLOCK_ELEMENT_TAGS) {
-                isBlockElement = blockElement.equals(node.getNodeName()) ? true : isBlockElement;
+                isBlockElement = blockElement.equals(node.getNodeName()) || isBlockElement;
             }
         }
         return isBlockElement;

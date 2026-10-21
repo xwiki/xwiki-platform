@@ -78,8 +78,8 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         this.asyncContext.setEnabled(!renderer.isCacheAllowed());
 
         // Prepare to catch stuff to invalidate the cache
-        if (this.asyncContext instanceof DefaultAsyncContext) {
-            ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+        if (this.asyncContext instanceof DefaultAsyncContext defaultAsyncContext) {
+            defaultAsyncContext.pushContextUse();
         }
 
         // Many UI elements expect xwikivars.vm result to be in the context so we execute it
@@ -102,9 +102,9 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
         getStatus().setResult(result);
 
-        if (this.asyncContext instanceof DefaultAsyncContext) {
+        if (this.asyncContext instanceof DefaultAsyncContext defaultAsyncContext) {
             // Remember various elements used during the execution (to invalidate the cache or restore them when needed)
-            ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
+            ContextUse contextUse = defaultAsyncContext.popContextUse();
             getStatus().setReferences(contextUse.getReferences());
             getStatus().setRoles(contextUse.getRoles());
             getStatus().setRoleTypes(contextUse.getRoleTypes());

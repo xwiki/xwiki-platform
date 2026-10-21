@@ -87,12 +87,8 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             // remove the annotation
             annotationService.removeAnnotation(documentName, id);
             // and then return the annotated content, as specified by the annotation request
-            AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
-            return response;
-        } catch (XWikiException e) {
-            getLogger().error(e.getMessage(), e);
-            return getErrorResponse(e);
-        } catch (AnnotationServiceException e) {
+            return getSuccessResponseWithAnnotatedContent(documentName, request);
+        } catch (XWikiException | AnnotationServiceException e) {
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }
@@ -144,9 +140,9 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             // skip these fields as we don't want to overwrite them with whatever is in this map. Setters should be used
             // for these values or constructor
             Collection<String> skippedFields =
-                Arrays.asList(new String[] {Annotation.SELECTION_FIELD, Annotation.SELECTION_LEFT_CONTEXT_FIELD,
+                Arrays.asList(Annotation.SELECTION_FIELD, Annotation.SELECTION_LEFT_CONTEXT_FIELD,
                     Annotation.SELECTION_RIGHT_CONTEXT_FIELD, Annotation.ORIGINAL_SELECTION_FIELD,
-                    Annotation.AUTHOR_FIELD, Annotation.STATE_FIELD});
+                    Annotation.AUTHOR_FIELD, Annotation.STATE_FIELD);
 
             for (Map.Entry<String, Object> field : annotationMetaData.entrySet()) {
                 if (!skippedFields.contains(field.getKey())) {
@@ -160,12 +156,8 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             annotationService.updateAnnotation(documentName, newAnnotation);
             this.cleanTemporaryUploadedFiles(documentReference);
             // and then return the annotated content, as specified by the annotation request
-            AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
-            return response;
-        } catch (XWikiException e) {
-            getLogger().error(e.getMessage(), e);
-            return getErrorResponse(e);
-        } catch (AnnotationServiceException e) {
+            return getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
+        } catch (XWikiException | AnnotationServiceException e) {
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }

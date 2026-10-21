@@ -48,9 +48,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.index.IndexException;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
@@ -67,6 +65,7 @@ import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 import org.xwiki.search.solr.internal.metadata.XWikiSolrInputDocument;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.store.ReadyIndicator;
+import org.xwiki.store.StoreStoppedException;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.xpn.xwiki.XWikiContext;
@@ -241,8 +240,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 try {
                     dispatchQueueEntry(queueEntry);
                 } catch (Throwable e) {
-                    logger.warn("Failed to apply operation [{}] on root reference [{}]", queueEntry.operation,
-                        queueEntry.reference, e);
+                    logger.warn("Failed to apply operation [{}] on root reference [{}]",
+                        queueEntry.operation, queueEntry.reference, e);
                 } finally {
                     // Decrement only for entries submitted via addToQueue(); READY_MARKER entries come from
                     // waitReady() which does not increment pendingResolveItems.
@@ -487,7 +486,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         // queue will remain empty after the clear call because we set the disposed flag above.
         for (ResolveQueueEntry entry = this.resolveQueue.poll(); entry != null; entry = this.resolveQueue.poll()) {
             if (entry.operation == IndexOperation.READY_MARKER && entry.readyIndicator != null) {
-                entry.readyIndicator.completeExceptionally(new IndexException("Indexing stopped."));
+                entry.readyIndicator.completeExceptionally(new StoreStoppedException("Indexing stopped."));
             } else if (entry.operation != IndexOperation.READY_MARKER) {
                 this.pendingResolveItems.decrementAndGet();
             }
@@ -505,7 +504,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     {
         for (IndexQueueEntry entry = this.indexQueue.poll(); entry != null; entry = this.indexQueue.poll()) {
             if (entry.operation == IndexOperation.READY_MARKER && entry.readyIndicator != null) {
-                entry.readyIndicator.completeExceptionally(new IndexException("Indexing stopped."));
+                entry.readyIndicator.completeExceptionally(new StoreStoppedException("Indexing stopped."));
             }
         }
         this.indexQueue.offer(INDEX_QUEUE_ENTRY_STOP);
@@ -631,6 +630,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
     private void flushDocuments(List<SolrInputDocument> documents)
     {
+        // An update request without any document has no body, which a remote Solr rejects with a
+        // "missing content stream" error. There is also nothing to send, so skip the request entirely.
+        if (documents.isEmpty()) {
+            return;
+        }
+
         try {
             // Copy the documents to flush to a new list so that we can clear the original list without affecting the
             // documents that are being added to the Solr server.
@@ -712,10 +717,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      *         the reference type is not supported.
      * @throws SolrIndexerException if problems occur.
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
-     * @throws ExecutionContextException
      */
     private XWikiSolrInputDocument getSolrDocument(EntityReference reference)
-        throws SolrIndexerException, IllegalArgumentException, ExecutionContextException
+        throws SolrIndexerException, IllegalArgumentException
     {
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
 
@@ -750,7 +754,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         try {
             result = this.componentManager.getInstance(SolrMetadataExtractor.class, entityType.name().toLowerCase());
         } catch (ComponentLookupException e) {
-            this.logger.warn("Unsupported entity type: [{}]", entityType.toString(), e);
+            this.logger.warn("Unsupported entity type: [{}]", entityType, e);
         }
 
         return result;
@@ -826,7 +830,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             }
         } else {
             // The indexer has been stopped and won't become ready again.
-            readyIndicator.completeExceptionally(new SolrIndexerException("The indexer has been disposed"));
+            readyIndicator.completeExceptionally(new StoreStoppedException("The indexer has been disposed"));
         }
 
         return readyIndicator;

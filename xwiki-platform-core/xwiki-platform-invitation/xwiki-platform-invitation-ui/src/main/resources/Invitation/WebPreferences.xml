@@ -744,7 +744,7 @@
         <name>ldap_server</name>
         <number>51</number>
         <picker>0</picker>
-        <prettyName>Ldap server adress</prettyName>
+        <prettyName>Ldap server address</prettyName>
         <size>60</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>

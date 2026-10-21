@@ -61,8 +61,12 @@ public class JGroupsNetworkAdapter implements NetworkAdapter, Disposable
     private Logger logger;
 
     @Override
+    @SuppressWarnings("java:S2629")
     public void send(RemoteEventData remoteEvent)
     {
+        // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+        // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and a RemoteEventData
+        // is Serializable by design since it is the replicated payload, so it would be written out in full.
         this.logger.debug("Send JGroups remote event [{}]", remoteEvent.toString());
 
         // Send the message to the whole group
@@ -75,6 +79,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter, Disposable
             try {
                 entry.getValue().send(message);
             } catch (Exception e) {
+                // See the comment above about building the String rather than passing the event.
                 this.logger.error("Failed to send message [{}] to the channel [{}]", remoteEvent.toString(),
                     entry.getKey(), e);
             }

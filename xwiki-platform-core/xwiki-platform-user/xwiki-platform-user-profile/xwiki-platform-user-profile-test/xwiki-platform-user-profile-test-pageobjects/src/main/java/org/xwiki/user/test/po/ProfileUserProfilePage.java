@@ -65,7 +65,7 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     @FindBy(xpath = "//dd[preceding-sibling::dt[1]/label[. = 'Blog Feed']]//a")
     private WebElement userBlogFeed;
 
-    @FindBy(xpath = "//div[@id='avatar']//a")
+    @FindBy(xpath = "//div[@id='avatar']//button[contains(@class, 'attachment-picker-start')]")
     private WebElement changeAvatar;
 
     @FindBy(css = ".activity-follow .notificationWatchUserFollowing")
@@ -183,6 +183,8 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
      * while the page is still reloading.
      *
      * @param imageName the expected avatar image file name (for example {@code avatar.png})
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.6.0RC1
      */
     public void waitUntilAvatarImageName(String imageName)

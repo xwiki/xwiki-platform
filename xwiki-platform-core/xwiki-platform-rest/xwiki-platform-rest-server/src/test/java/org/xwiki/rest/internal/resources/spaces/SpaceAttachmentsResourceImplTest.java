@@ -75,7 +75,8 @@ class SpaceAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         when(this.queryManager.createQuery("select doc.space, doc.name, doc.version, attachment"
             + " from XWikiDocument as doc, XWikiAttachment as attachment where attachment.docId = doc.id and "
             + "(doc.space = :localSpaceReference or doc.space like :localSpaceReferencePrefix) and "
-            + "upper(doc.fullName) like :page", Query.HQL)).thenReturn(query);
+            + "upper(doc.fullName) like :page"
+            + " order by doc.fullName asc, doc.language asc, attachment.filename asc", Query.HQL)).thenReturn(query);
         mockPreifxQueryParam(query, "localSpaceReferencePrefix", "Path.To.");
         mockContainsQueryParam(query, "page", "XYZ");
         when(query.setOffset(10)).thenReturn(query);

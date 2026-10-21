@@ -19,17 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +29,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
@@ -53,6 +43,7 @@ import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.refactoring.script.RequestFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -75,6 +66,17 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link SaveAction}.
@@ -194,7 +196,8 @@ class SaveActionTest
     {
         when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.2"));
         when(mockClonedDocument.getComment()).thenReturn("My Changes");
-        when(mockClonedDocument.getLock(this.context)).thenReturn(mock(XWikiLock.class));
+        XWikiLock xWikiLockMock = mock(XWikiLock.class);
+        when(mockClonedDocument.getLock(this.context)).thenReturn(xWikiLockMock);
         when(mockForm.getTemplate()).thenReturn("");
 
         assertFalse(saveAction.save(this.context));
@@ -213,8 +216,14 @@ class SaveActionTest
     {
         when(mockForm.getLanguage()).thenReturn("fr");
         when(mockClonedDocument.getTranslatedDocument("fr", this.context)).thenReturn(mockClonedDocument);
-        when(mockClonedDocument.getDocumentReference()).thenReturn(new DocumentReference("xwiki", "My", "Page"));
+        DocumentReference documentReference = new DocumentReference("xwiki", "My", "Page");
+        when(mockClonedDocument.getDocumentReference()).thenReturn(documentReference);
         when(mockClonedDocument.getStore()).thenReturn(this.oldcore.getMockStore());
+        // The form doesn't submit the syntax, as with in-place editing: the new translation gets the syntax of the
+        // original document.
+        XWikiDocument originalDocument = mock(XWikiDocument.class);
+        when(originalDocument.getSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
+        when(xWiki.getDocument(documentReference, this.context)).thenReturn(originalDocument);
         when(xWiki.getStore()).thenReturn(this.oldcore.getMockStore());
         context.put("ajax", true);
         when(xWiki.isMultiLingual(this.context)).thenReturn(true);
@@ -224,7 +233,9 @@ class SaveActionTest
         assertEquals(Map.of("newVersion", "1.1"), saveAction.getJSONAnswer(context));
         verify(this.xWiki).checkSavingDocument(eq(USER_REFERENCE), any(XWikiDocument.class), eq(""), eq(false),
             eq(this.context));
-        verify(this.xWiki).saveDocument(any(XWikiDocument.class), eq(""), eq(false), eq(this.context));
+        ArgumentCaptor<XWikiDocument> savedDocument = ArgumentCaptor.forClass(XWikiDocument.class);
+        verify(this.xWiki).saveDocument(savedDocument.capture(), eq(""), eq(false), eq(this.context));
+        assertEquals(Syntax.MARKDOWN_1_1, savedDocument.getValue().getSyntax());
     }
 
     @Test
@@ -260,7 +271,8 @@ class SaveActionTest
         when(mockDocument.getRCSVersion()).thenReturn(new Version("1.2"));
         when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.2"));
         when(mockClonedDocument.getComment()).thenReturn("My Changes");
-        when(mockClonedDocument.getLock(this.context)).thenReturn(mock(XWikiLock.class));
+        XWikiLock xWikiLockMock2 = mock(XWikiLock.class);
+        when(mockClonedDocument.getLock(this.context)).thenReturn(xWikiLockMock2);
         when(mockForm.getTemplate()).thenReturn("");
         when(this.propertiesConf.getProperty("edit.conflictChecking.enabled")).thenReturn(true);
         when(mockRequest.getParameter("previousVersion")).thenReturn("1.1");
@@ -270,7 +282,8 @@ class SaveActionTest
 
         when(mockDocument.getDate()).thenReturn(new Date(42));
         when(mockRequest.getParameter("editingVersionDate")).thenReturn("43");
-        when(this.documentRevisionProvider.getRevision(mockDocument, "1.1")).thenReturn(mock(XWikiDocument.class));
+        XWikiDocument xWikiDocumentMock = mock(XWikiDocument.class);
+        when(this.documentRevisionProvider.getRevision(mockDocument, "1.1")).thenReturn(xWikiDocumentMock);
         when(mockDocument.getContentDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
         when(mockDocument.getMetaDataDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
         when(mockDocument.getObjectDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());

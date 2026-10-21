@@ -21,7 +21,6 @@ package org.xwiki.notifications.sources.internal;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -90,12 +89,16 @@ public class EventSearcher
     {
         // Create the query
         SimpleEventQuery query = this.eventQueryGenerator.generateQuery(parameters);
+        if (query == null) {
+            // No event can match the parameters.
+            return List.of();
+        }
 
         query.setLimit(limit).setOffset(offset);
 
         // Get a batch of events
         try (EventSearchResult result = this.eventStore.search(query)) {
-            return result.stream().collect(Collectors.toList());
+            return result.stream().toList();
         } catch (Exception e) {
             throw new EventStreamException("Failed to close the event search result", e);
         }

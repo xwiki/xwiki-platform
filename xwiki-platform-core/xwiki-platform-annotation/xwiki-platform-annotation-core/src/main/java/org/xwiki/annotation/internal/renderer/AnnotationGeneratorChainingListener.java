@@ -238,13 +238,11 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
                 } else {
                     // cannot find the events for the start and / or end of annotation, ignore it
                     // TODO: mark it somehow...
-                    continue;
                 }
             } else {
                 // cannot find the context of the annotation or the annotation selection cannot be found in the
                 // annotation context, ignore it
                 // TODO: mark it somehow...
-                continue;
             }
         }
     }

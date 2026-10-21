@@ -173,6 +173,16 @@ public class AllIT
     }
 
     @Nested
+    class NestedSpacePickerIT extends SpacePickerIT
+    {
+    }
+
+    @Nested
+    class NestedCompactLocationPickerIT extends CompactLocationPickerIT
+    {
+    }
+
+    @Nested
     class NestedCompareIT extends CompareIT
     {
     }
@@ -229,6 +239,11 @@ public class AllIT
 
     @Nested
     class NestedNameStrategiesReplaceCharacterIT extends NameStrategiesReplaceCharacterIT
+    {
+    }
+
+    @Nested
+    class NestedViewPageIT extends ViewPageIT
     {
     }
 }

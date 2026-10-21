@@ -179,7 +179,7 @@ class EditTranslationIT
         // Switch to en by switching language in the Drawer to test the feature
         viewPage.clickLocale(Locale.ENGLISH);
 
-        // Verify edit mode informations in edit page
+        // Verify edit mode information in edit page
         setup.gotoPage(referenceDEFAULT, "edit", "language=");
         editPage = new WikiEditPage();
 

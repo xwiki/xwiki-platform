@@ -100,7 +100,7 @@ class GroupMimeMessageIteratorTest
         when(xwikiContext.getWiki()).thenReturn(xwiki);
 
         XWikiDocument document = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(groupReference), eq(xwikiContext))).thenReturn(document);
+        when(xwiki.getDocument(groupReference, xwikiContext)).thenReturn(document);
 
         BaseObject object = mock(BaseObject.class);
 
@@ -113,9 +113,9 @@ class GroupMimeMessageIteratorTest
 
         ComponentManager componentManager = mock(ComponentManager.class);
 
-        when(componentManager.getInstance(eq(DocumentAccessBridge.class))).thenReturn(accessBridge);
-        when(componentManager.getInstance(eq(Execution.class))).thenReturn(execution);
-        when(componentManager.getInstance(eq(DocumentReferenceResolver.TYPE_STRING), eq("current")))
+        when(componentManager.getInstance(DocumentAccessBridge.class)).thenReturn(accessBridge);
+        when(componentManager.getInstance(Execution.class)).thenReturn(execution);
+        when(componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "current"))
             .thenReturn(resolver);
 
         GroupMimeMessageIterator iterator =

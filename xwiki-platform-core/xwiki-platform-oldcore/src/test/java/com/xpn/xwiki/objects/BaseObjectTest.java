@@ -47,11 +47,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -72,7 +75,7 @@ class BaseObjectTest
     private MergeManager mergeManager;
     
     @Test
-    void testSetDocumentReference() throws Exception
+    void testSetDocumentReference()
     {
         BaseObject baseObject = new BaseObject();
 
@@ -83,7 +86,7 @@ class BaseObjectTest
     }
 
     @Test
-    void testSetName() throws Exception
+    void testSetName()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseObject baseObject = new BaseObject();
@@ -96,7 +99,7 @@ class BaseObjectTest
     }
 
     @Test
-    void testSetNameAloneWithChangingContext() throws Exception
+    void testSetNameAloneWithChangingContext()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseObject baseObject = new BaseObject();
@@ -246,7 +249,7 @@ class BaseObjectTest
         object.setXClassReference(classReference);
         object.setOwnerDocument(ownerDocument);
 
-        XWikiContext context = this.oldcore.getXWikiContext();;
+        XWikiContext context = this.oldcore.getXWikiContext();
         String fieldName = "myField";
         String value = "myValue";
 
@@ -287,6 +290,47 @@ class BaseObjectTest
     }
 
     @Test
+    void setStringWhenParsedPropertyIsNull() throws XWikiException
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "document");
+        DocumentReference classReference = new DocumentReference("wiki", "space", "class");
+        XWikiDocument classDocument = new XWikiDocument(classReference);
+        XWikiDocument ownerDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        BaseObject object = new BaseObject();
+        object.setDocumentReference(documentReference);
+        object.setXClassReference(classReference);
+        object.setOwnerDocument(ownerDocument);
+
+        XWikiContext context = this.oldcore.getXWikiContext();
+        String fieldName = "password";
+        String placeholder = "********";
+
+        BaseClass baseClass = mock(BaseClass.class);
+        classDocument.setXClass(baseClass);
+        when(this.oldcore.getSpyXWiki().getDocument(classReference, context)).thenReturn(classDocument);
+
+        PropertyClass propertyClass = mock(PropertyClass.class);
+        when(baseClass.get(fieldName)).thenReturn(propertyClass);
+        when(propertyClass.fromString(placeholder)).thenReturn(null);
+
+        // No property yet: nothing is created.
+        object.set(fieldName, placeholder, context);
+        assertNull(object.safeget(fieldName));
+
+        // Existing property: its value is kept.
+        BaseProperty existingProp = mock(BaseProperty.class);
+        object.safeput(fieldName, existingProp);
+        ownerDocument.setMetaDataDirty(false);
+        object.setDirty(false);
+
+        object.set(fieldName, placeholder, context);
+        assertSame(existingProp, object.safeget(fieldName));
+        verify(existingProp, never()).setValue(any());
+        assertFalse(object.isDirty());
+        assertFalse(ownerDocument.isMetaDataDirty());
+    }
+
+    @Test
     void setObject() throws XWikiException
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "document");
@@ -298,7 +342,7 @@ class BaseObjectTest
         object.setXClassReference(classReference);
         object.setOwnerDocument(ownerDocument);
 
-        XWikiContext context = this.oldcore.getXWikiContext();;
+        XWikiContext context = this.oldcore.getXWikiContext();
         String fieldName = "myField";
         Object value = 4545;
 

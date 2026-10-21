@@ -47,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -75,6 +74,14 @@ public class Utils
      * for any non component code that need to initialize/access components.
      */
     private static ComponentManager rootComponentManager;
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private Utils()
+    {
+        // Utility class
+    }
 
     /**
      * Generate the response by parsing a velocity template and printing the result to the {@link XWikiResponse
@@ -131,42 +138,38 @@ public class Utils
         if (cacheSetting == -1) {
             cacheSetting = 1;
         }
-        if ((!"download".equals(action)) && (!"skin".equals(action))) {
-            if (context.getResponse() instanceof XWikiServletResponse) {
-                // Add a last modified to tell when the page was last updated
-                if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0) {
-                    if (context.getDoc() != null) {
-                        response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
-                    }
-                }
-                // Set a nocache to make sure the page is reloaded after an edit
-                if (cacheSetting == 1) {
-                    response.setHeader("Pragma", NO_CACHE);
-                    response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
-                } else if (cacheSetting == 2) {
-                    response.setHeader("Pragma", NO_CACHE);
-                    response.setHeader(CACHE_CONTROL_HEADER, "max-age=0, no-cache, no-store");
-                } else if (cacheSetting == 3) {
-                    response.setHeader(CACHE_CONTROL_HEADER, "private");
-                } else if (cacheSetting == 4) {
-                    response.setHeader(CACHE_CONTROL_HEADER, "public");
-                }
+        if ((!"download".equals(action)) && (!"skin".equals(action))
+            && context.getResponse() instanceof XWikiServletResponse) {
+            // Add a last modified to tell when the page was last updated
+            if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0
+                && context.getDoc() != null) {
+                response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
+            }
+            // Set a nocache to make sure the page is reloaded after an edit
+            if (cacheSetting == 1) {
+                response.setHeader("Pragma", NO_CACHE);
+                response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
+            } else if (cacheSetting == 2) {
+                response.setHeader("Pragma", NO_CACHE);
+                response.setHeader(CACHE_CONTROL_HEADER, "max-age=0, no-cache, no-store");
+            } else if (cacheSetting == 3) {
+                response.setHeader(CACHE_CONTROL_HEADER, "private");
+            } else if (cacheSetting == 4) {
+                response.setHeader(CACHE_CONTROL_HEADER, "public");
+            }
 
-                // Set an expires in one month
-                long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
-                if (expires == -1) {
-                    response.setDateHeader("Expires", -1);
-                } else if (expires != 0) {
-                    response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
-                }
+            // Set an expires in one month
+            long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
+            if (expires == -1) {
+                response.setDateHeader("Expires", -1);
+            } else if (expires != 0) {
+                response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
             }
         }
 
-        if (("download".equals(action)) || ("skin".equals(action))) {
-            // Set a nocache to make sure these files are not cached by proxies
-            if (cacheSetting == 1 || cacheSetting == 2) {
-                response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
-            }
+        // Set a nocache to make sure these files are not cached by proxies
+        if ((("download".equals(action)) || ("skin".equals(action))) && (cacheSetting == 1 || cacheSetting == 2)) {
+            response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
         }
 
         context.getWiki().getPluginManager().beginParsing(context);
@@ -205,7 +208,8 @@ public class Utils
                 try {
                     response.setContentLength(content.getBytes(context.getWiki().getEncoding()).length);
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Failed to compute the content length using encoding [{}]",
+                        context.getWiki().getEncoding(), e);
                 }
             }
 
@@ -233,6 +237,8 @@ public class Utils
             try {
                 response.getWriter().flush();
             } catch (Throwable ex2) {
+                // TODO: log a warning instead of ignoring this exception.
+                // There is nothing else we can do to flush the response.
             }
         }
     }
@@ -397,14 +403,14 @@ public class Utils
 
     @Deprecated(since = "17.0.0RC1")
     public static XWikiContext prepareContext(String action, XWikiRequest request, XWikiResponse response,
-        XWikiEngineContext engine_context) throws XWikiException
+        XWikiEngineContext engineContext) throws XWikiException
     {
         XWikiContext context = new XWikiContext();
         String dbname = "xwiki";
         URL url = XWiki.getRequestURL(request);
         context.setURL(url);
 
-        context.setEngineContext(engine_context);
+        context.setEngineContext(engineContext);
         context.setRequest(request);
         context.setResponse(response);
         context.setAction(action);
@@ -446,6 +452,8 @@ public class Utils
                     bytes = data.getBytes(encoding);
                 }
             } catch (UnsupportedEncodingException uee) {
+                // TODO: log a warning instead of ignoring this exception.
+                // The bytes are then left null and no parameter is parsed.
             }
 
             return parseParameters(bytes, encoding);
@@ -518,7 +526,7 @@ public class Utils
     }
 
     /**
-     * Convert a byte character value to the corresponding hexidecimal digit value.
+     * Convert a byte character value to the corresponding hexadecimal digit value.
      * <p>
      * Code borrowed from Apache Tomcat 5.0
      * </p>
@@ -565,19 +573,6 @@ public class Utils
         map.put(name, newValues);
     }
 
-    /**
-     * Escapes the XML special characters in a <code>String</code> using numerical XML entities.
-     *
-     * @param value the text to escape, may be null
-     * @return a new escaped <code>String</code>, <code>null</code> if null input
-     * @deprecated starting with 2.7 use {@link XMLUtils#escape(Object) $services.xml.escape(content)}
-     */
-    @Deprecated
-    public static String formEncode(String value)
-    {
-        return XMLUtils.escape(value);
-    }
-
     public static String SQLFilter(String text)
     {
         try {
@@ -588,18 +583,18 @@ public class Utils
     }
 
     /**
-     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#encodeURI(String, XWikiContext)} since 1.3M2
+     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#encodeURI(String, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "1.3M2")
     public static String encode(String text, XWikiContext context)
     {
         return Util.encodeURI(text, context);
     }
 
     /**
-     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#decodeURI(String, XWikiContext)} since 1.3M2
+     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#decodeURI(String, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "1.3M2")
     public static String decode(String text, XWikiContext context)
     {
         return Util.decodeURI(text, context);
@@ -652,9 +647,9 @@ public class Utils
     /**
      * @return the contextual component manager used by {@link #getComponent(Class)} and
      *         {@link #getComponent(Class, String)}
-     * @deprecated since 6.1M1, use {@link #getContextComponentManager()} instead
+     * @deprecated use {@link #getContextComponentManager()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public static ComponentManager getComponentManager()
     {
         ComponentManager contextComponentManager;
@@ -703,9 +698,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
-     * @deprecated since 4.0M1 use {@link #getComponent(Type, String)} instead
+     * @deprecated use {@link #getComponent(Type, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public static <T> T getComponent(Class<T> role, String hint)
     {
         return getComponent((Type) role, hint);
@@ -718,9 +713,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
-     * @deprecated since 4.0M1 use {@link #getComponent(Type)} instead
+     * @deprecated use {@link #getComponent(Type)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public static <T> T getComponent(Class<T> role)
     {
         return getComponent((Type) role);
@@ -734,9 +729,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
-     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     * @deprecated use the Component Script Service instead
      */
-    @Deprecated
+    @Deprecated(since = "4.1M2")
     public static <T> T getComponent(Type roleType, String roleHint)
     {
         T component;
@@ -765,9 +760,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
-     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     * @deprecated use the Component Script Service instead
      */
-    @Deprecated
+    @Deprecated(since = "4.1M2")
     public static <T> T getComponent(Type roleType)
     {
         return getComponent(roleType, "default");
@@ -780,9 +775,9 @@ public class Utils
      * @throws RuntimeException if some of the components cannot be found/initialized, or if the component manager is
      *             not initialized
      * @since 2.0M3
-     * @deprecated since 4.0M1 use {@link #getComponentManager()} instead
+     * @deprecated use {@link #getComponentManager()} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;
@@ -842,7 +837,7 @@ public class Utils
     public static void enablePlaceholders(XWikiContext context)
     {
         context.put(PLACEHOLDERS_CONTEXT_KEY, new HashMap<String, String>());
-        context.put(PLACEHOLDERS_ENABLED_CONTEXT_KEY, new Boolean(true));
+        context.put(PLACEHOLDERS_ENABLED_CONTEXT_KEY, Boolean.TRUE);
     }
 
     /**

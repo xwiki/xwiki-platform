@@ -21,6 +21,7 @@ package org.xwiki.wysiwyg.script;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -42,8 +44,6 @@ import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorExecutor;
@@ -51,7 +51,9 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
@@ -62,7 +64,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.edit.EditModeResolver;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * The WYSIWYG editor API exposed to server-side scripts like Velocity.
@@ -83,6 +88,16 @@ public class WysiwygEditorScriptService implements ScriptService
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
 
+    /**
+     * The user whose rights are used to execute the converted content and whether the execution is restricted.
+     *
+     * @param author the user whose rights are used to execute the content
+     * @param restricted {@code true} if the content is executed in a restricted context
+     */
+    private record ContentExecution(DocumentReference author, boolean restricted)
+    {
+    }
+
     @Inject
     private Logger logger;
 
@@ -95,6 +110,9 @@ public class WysiwygEditorScriptService implements ScriptService
 
     @Inject
     private ContextualAuthorizationManager authorization;
+
+    @Inject
+    private EditModeResolver editModeResolver;
 
     /**
      * The component used to convert HTML to wiki syntax.
@@ -131,6 +149,9 @@ public class WysiwygEditorScriptService implements ScriptService
     @Named("document")
     private UserReferenceSerializer<DocumentReference> userDocumentReferenceSerializer;
 
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
+
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
      * <p>
@@ -141,20 +162,7 @@ public class WysiwygEditorScriptService implements ScriptService
      */
     public boolean isSyntaxSupported(String syntaxId)
     {
-        // Special handling for XHTML since right the XHTML renderer doesn't produce valid XHTML. Thus if, for example,
-        // you the WYSIWYG editor and add 2 paragraphs, it'll generate {@code <p>a</p><p>b</p>} which is invalid XHTML
-        // and the page will fail to render.
-        if (syntaxId.equals(Syntax.XHTML_1_0.toIdString())) {
-            return false;
-        }
-
-        try {
-            this.contextComponentManager.getInstance(Parser.class, syntaxId);
-            this.contextComponentManager.getInstance(PrintRendererFactory.class, syntaxId);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return this.editModeResolver.isSyntaxWYSIWYGEditable(syntaxId);
     }
 
     /**
@@ -175,9 +183,9 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param html the HTML fragment to be rendered
      * @param syntaxId the storage syntax identifier
      * @return the XHTML result of rendering the given HTML fragment
-     * @deprecated since 11.9RC1, use {@link #parseAndRender(String, Syntax, EntityReference)} instead
+     * @deprecated use {@link #parseAndRender(String, Syntax, EntityReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     public String parseAndRender(String html, String syntaxId)
     {
         return parseAndRender(html, getSyntax(syntaxId), null);
@@ -236,7 +244,7 @@ public class WysiwygEditorScriptService implements ScriptService
             // results. We do this because the main caller of this method is the CKEditor extension and it needs to
             // work with several version of XWiki (including versions older than 11.9RC1 - in which this new method
             // signature was added) and for simplicity reasons is currently passing null.
-            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and reomve this
+            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and remove this
             // fallback.
             EntityReference resolvedSourceReference = sourceReference;
             if (resolvedSourceReference == null) {
@@ -295,13 +303,16 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param source the text to be converted
      * @param syntaxId the syntax identifier
      * @return the annotated XHTML result of the conversion
-     * @deprecated since 11.9RC1 use
+     * @deprecated use
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
-        XWikiContext xwikiContext = this.xcontextProvider.get();
-        return toAnnotatedXHTML(source, getSyntax(syntaxId), xwikiContext.getDoc().getDocumentReference());
+        XWikiDocument currentDocument = this.xcontextProvider.get().getDoc();
+        // Pass a null source reference when there's no current document and let the overload below handle it, so that
+        // the null case is handled in a single place.
+        EntityReference sourceReference = currentDocument == null ? null : currentDocument.getDocumentReference();
+        return toAnnotatedXHTML(source, getSyntax(syntaxId), sourceReference);
     }
 
     /**
@@ -335,6 +346,12 @@ public class WysiwygEditorScriptService implements ScriptService
      */
     public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference, boolean restricted)
     {
+        if (sourceReference == null) {
+            // Without a source reference, we can't resolve either the author to execute as, or the document to convert
+            // against. Thus we return the source unchanged, as is also done when the conversion fails below.
+            return source;
+        }
+
         XWikiDocument securityDocument = createSecurityDocument();
         XWikiDocument originalSecurityDocument = setSecurityDocument(securityDocument);
 
@@ -347,11 +364,17 @@ public class WysiwygEditorScriptService implements ScriptService
             // templates using only Velocity for example).
             this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, true);
 
-            DocumentReference userAuthorReference = getAuthorExecutor(source, sourceReference);
+            ContentExecution contentExecution = getContentExecution(source, syntax, sourceReference, restricted);
+            // The source reference can be an object property reference (e.g. when editing a TextArea property),
+            // but the converter and the author executor work at the document level, so we resolve the document
+            // reference from the source reference.
+            DocumentReference sourceDocumentReference =
+                new DocumentReference(sourceReference.extractReference(EntityType.DOCUMENT));
             return this.authorExecutor.call(
-                () -> this.htmlConverter.toHTML(source, syntax, sourceReference, restricted),
-                userAuthorReference,
-                new DocumentReference(sourceReference));
+                () -> this.htmlConverter.toHTML(source, syntax, sourceDocumentReference,
+                    contentExecution.restricted()),
+                contentExecution.author(),
+                sourceDocumentReference);
         } catch (Exception e) {
             // Return the source text in case of an exception.
             return source;
@@ -367,25 +390,73 @@ public class WysiwygEditorScriptService implements ScriptService
         }
     }
 
-    private DocumentReference getAuthorExecutor(String source, EntityReference sourceReference) throws XWikiException
+    /**
+     * Determines how the given source is executed. The source is executed with the rights of the author of the
+     * stored content it comes from only when it is executed the same way as the stored content is when viewed: same
+     * text, same syntax and at least the same restrictions. Otherwise, the source is executed with the rights of the
+     * current user.
+     *
+     * @param source the text to be converted
+     * @param syntax the syntax the source is parsed with
+     * @param sourceReference the reference of the stored content the source comes from
+     * @param restricted {@code true} if the caller requested a restricted execution
+     * @return the author to execute the source with and whether the execution is restricted
+     */
+    private ContentExecution getContentExecution(String source, Syntax syntax, EntityReference sourceReference,
+        boolean restricted) throws XWikiException
+    {
+        ContentExecution storedContentExecution = null;
+        if (sourceReference instanceof DocumentReference documentReference) {
+            storedContentExecution = getDocumentContentExecution(source, syntax, documentReference, restricted);
+        } else if (sourceReference instanceof ObjectPropertyReference objectPropertyReference) {
+            storedContentExecution =
+                getObjectPropertyContentExecution(source, syntax, objectPropertyReference, restricted);
+        }
+        if (storedContentExecution != null) {
+            return storedContentExecution;
+        }
+        return new ContentExecution(this.xcontextProvider.get().getUserReference(), restricted);
+    }
+
+    private ContentExecution getDocumentContentExecution(String source, Syntax syntax,
+        DocumentReference documentReference, boolean restricted) throws XWikiException
     {
         XWikiContext context = this.xcontextProvider.get();
-        DocumentReference result = context.getUserReference();
-        if (sourceReference instanceof DocumentReference documentReference) {
-            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-            if (document.getContent().equals(source)) {
-                UserReference contentAuthor = document.getAuthors().getContentAuthor();
-                result = this.userDocumentReferenceSerializer.serialize(contentAuthor);
-            }
-        } else if (sourceReference instanceof ObjectPropertyReference objectPropertyReference) {
-            XWikiDocument document = context.getWiki().getDocument(objectPropertyReference, context);
-            BaseObject object = document.getXObject(objectPropertyReference);
-            if (object != null && source.equals(object.getStringValue(objectPropertyReference.getName()))) {
-                UserReference author = document.getAuthors().getEffectiveMetadataAuthor();
-                result = this.userDocumentReferenceSerializer.serialize(author);
-            }
+        XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+        if (document.getContent().equals(source) && Objects.equals(document.getSyntax(), syntax)) {
+            UserReference contentAuthor = document.getAuthors().getContentAuthor();
+            return new ContentExecution(this.userDocumentReferenceSerializer.serialize(contentAuthor),
+                restricted || document.isRestricted());
         }
-        return result;
+        return null;
+    }
+
+    private ContentExecution getObjectPropertyContentExecution(String source, Syntax syntax,
+        ObjectPropertyReference objectPropertyReference, boolean restricted) throws XWikiException
+    {
+        XWikiContext context = this.xcontextProvider.get();
+        XWikiDocument document = context.getWiki().getDocument(objectPropertyReference, context);
+        // getXObject() doesn't accept an object property reference, so we extract the object reference from it.
+        BaseObject object = document.getXObject(objectPropertyReference.extractReference(EntityType.OBJECT));
+        String propertyName = objectPropertyReference.getName();
+        // TextArea properties holding wiki content are parsed with the syntax of their document.
+        if (object != null && source.equals(object.getStringValue(propertyName))
+            && Objects.equals(document.getSyntax(), syntax))
+        {
+            UserReference author = document.getAuthors().getEffectiveMetadataAuthor();
+            return new ContentExecution(this.userDocumentReferenceSerializer.serialize(author),
+                restricted || document.isRestricted() || isRestrictedProperty(object, propertyName, context));
+        }
+        return null;
+    }
+
+    private boolean isRestrictedProperty(BaseObject object, String propertyName, XWikiContext context)
+    {
+        // The class is null when it couldn't be loaded, in which case we can't tell if the property is restricted, so
+        // we consider it restricted to be safe.
+        BaseClass xclass = object.getXClass(context);
+        return xclass == null
+            || xclass.get(propertyName) instanceof TextAreaClass textAreaClass && textAreaClass.isRestricted();
     }
 
     /**
@@ -436,7 +507,10 @@ public class WysiwygEditorScriptService implements ScriptService
         XWikiContext xwikiContext = this.xcontextProvider.get();
         // We clone the document in order to not impact the environment (the document cache for example).
         XWikiDocument clonedDocument = xwikiContext.getDoc().clone();
-        xwikiContext.getRequest().getEffectiveAuthor().ifPresent(clonedDocument.getAuthors()::setContentAuthor);
+        // In cases where there is no effective author (e.g., a REST request), fallback to the current user
+        UserReference contentAuthor = xwikiContext.getRequest().getEffectiveAuthor()
+            .orElseGet(() -> this.currentUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
+        clonedDocument.getAuthors().setContentAuthor(contentAuthor);
         this.injectTemoraryAttachments(clonedDocument);
         return clonedDocument;
     }
@@ -477,7 +551,7 @@ public class WysiwygEditorScriptService implements ScriptService
         try {
             return this.officeAttachmentImporter.toHTML(attachmentReference, parameters);
         } catch (Exception e) {
-            this.logger.warn("Failed to import office attachment [{}]. Root cause is: {}",
+            this.logger.warn("Failed to import office attachment [{}]. Root cause is [{}]",
                 this.entityReferenceSerializer.serialize(attachmentReference), ExceptionUtils.getRootCauseMessage(e));
             return null;
         }

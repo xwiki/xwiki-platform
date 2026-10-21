@@ -73,7 +73,7 @@ public class DefaultStringEntityReferenceSerializer extends AbstractStringEntity
         // Since the representation is being built from the root reference (i.e. from left to right), we need to add a
         // separator if some content has already been added to the representation string (i.e. if a higher level entity
         // type has already been processed).
-        if (parentReference != null && representation.length() > 0) {
+        if (parentReference != null && !representation.isEmpty()) {
             // Get the separator to use between the previous type and the current type
             Character separator =
                 getSymbolScheme().getSeparatorSymbols().get(currentType).get(parentReference.getType());

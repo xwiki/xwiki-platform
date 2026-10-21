@@ -60,7 +60,7 @@ class LinkCheckerEventListenerTest
     private LinkStateManager linkStateManager;
 
     @Test
-    void testOnEvent() throws Exception
+    void testOnEvent()
     {
         final DocumentReference reference = new DocumentReference("wiki", "space", "page");
 

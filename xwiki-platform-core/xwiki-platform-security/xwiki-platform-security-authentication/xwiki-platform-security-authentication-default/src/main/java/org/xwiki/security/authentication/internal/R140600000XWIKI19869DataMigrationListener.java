@@ -170,7 +170,7 @@ public class R140600000XWIKI19869DataMigrationListener extends AbstractEventList
             this.logger.warn("Error when handling user [{}] for sending security and/or reset password email: [{}]",
                 userReference,
                 ExceptionUtils.getRootCauseMessage(e));
-            this.logger.debug("Full stack trace for the reset password request: ", e);
+            this.logger.debug("Full stack trace for the reset password request:", e);
         }
     }
 

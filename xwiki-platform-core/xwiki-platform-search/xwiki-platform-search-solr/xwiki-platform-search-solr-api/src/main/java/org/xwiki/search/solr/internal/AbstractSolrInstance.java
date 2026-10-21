@@ -66,6 +66,12 @@ public abstract class AbstractSolrInstance implements SolrInstance
     @Override
     public void add(List<SolrInputDocument> solrDocuments) throws SolrServerException, IOException
     {
+        // An update request without any document has no body, which a remote Solr rejects with a
+        // "missing content stream" error. There is also nothing to send, so skip the request entirely.
+        if (solrDocuments.isEmpty()) {
+            return;
+        }
+
         this.logger.debug("Add Solr documents [{}] to index", solrDocuments);
 
         this.server.getClient().add(solrDocuments);

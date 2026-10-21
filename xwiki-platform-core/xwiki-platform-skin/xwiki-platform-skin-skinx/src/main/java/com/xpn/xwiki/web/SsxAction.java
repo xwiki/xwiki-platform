@@ -22,8 +22,9 @@ package com.xpn.xwiki.web;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.web.sx.AbstractSxAction;
@@ -47,7 +48,8 @@ public class SsxAction extends AbstractSxAction
     public static final CssExtension CSSX = new CssExtension();
 
     /** Logging helper. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SsxAction.class);
+    @Inject
+    private Logger logger;
 
     @Override
     public Extension getExtensionType()
@@ -58,6 +60,6 @@ public class SsxAction extends AbstractSxAction
     @Override
     protected Logger getLogger()
     {
-        return LOGGER;
+        return this.logger;
     }
 }

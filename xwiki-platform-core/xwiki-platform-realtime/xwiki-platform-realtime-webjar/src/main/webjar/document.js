@@ -20,9 +20,14 @@
 define('xwiki-realtime-document', [
   'jquery',
   'xwiki-meta',
-  'xwiki-realtime-config'
-], function($, meta, realtimeConfig) {
+  'xwiki-realtime-config',
+  'xwiki-document'
+], function($, meta, realtimeConfig, documentAPI) {
   'use strict';
+
+  // Destructured here rather than in the parameter list, because a non-simple parameter list would make the
+  // 'use strict' directive above illegal.
+  const {XWikiDocument} = documentAPI;
 
   const channelListAPI = {
     getByPath: function(path) {
@@ -34,87 +39,26 @@ define('xwiki-realtime-document', [
     }
   };
 
-  class XWikiDocument {
-    constructor() {
-      // Initialize with document fields coming from the real-time configuration.
-      $.extend(this, realtimeConfig.document);
-      this.update();
-    }
-
-    reload() {
-      return $.getJSON(meta.restURL, {
-        // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
-        timestamp: Date.now()
-      }).then(updatedDocument => {
-        // Reload succeeded.
-        // We were able to load the document so it's not new.
-        this.isNew = false;
-        return $.extend(this, updatedDocument, {
-          // We need the real locale.
-          language: updatedDocument.language || updatedDocument.translations['default']
-        });
-      }, error => {
-        if (error.status === 404) {
-          // The document doesn't exist anymore. Maybe it was deleted?
-          return $.extend(this, {
-            version: '1.1',
-            modified: 0,
-            content: '',
-            isNew: true
-          });
-        } else {
-          // Reload failed. Continue using the current data.
-          return this;
-        }
-      }).then(this.update.bind(this));
-    }
-
-    update(data) {
-      data = data || {
-        documentReference: meta.documentReference,
-        // We need the real locale.
-        language: meta.locale || realtimeConfig.document.language,
-        version: meta.version,
-        // The timestamp of the last modification is needed to be able to properly merge on save.
-        modified: meta.modified || realtimeConfig.document.modified,
-        isNew: meta.isNew
-      };
-      $.extend(this, data);
-      if (this.documentReference === meta.documentReference && this.version !== meta.version) {
-        // Update the meta and the hidden fields used by the edit form in order to ensure proper merge on save.
-        meta.setVersion(this.version);
-        $('#editingVersionDate').val(this.modified);
-        $('#isNew').val(this.isNew);
-      }
-      return this;
-    }
-
-    save(data) {
-      return $.post(globalThis.docsaveurl, $.param($.extend({
-        /* jshint camelcase:false */
-        form_token: meta.form_token,
-        xredirect: '',
-        language: this.language,
-        xaction: ['save', 'saveandcontinue', 'preview', 'cancel'],
-        action_saveandcontinue: 'Save',
-        xeditaction: 'edit',
-        previousVersion: this.version,
-        isNew: this.isNew,
-        editingVersionDate: this.modified,
-        minorEdit: 1,
-        ajax: true
-      }, data), true)).then(this.reload.bind(this));
+  // Adds the real-time channels API on top of the generic XWiki document API.
+  class RealtimeXWikiDocument extends XWikiDocument {
+    static currentDocument() {
+      // Don't call super.currentDocument() here: the Closure Compiler, which minifies this code, compiles a super
+      // call made from a static method into a plain call on the parent class (XWikiDocument.currentDocument()),
+      // dropping the "this" binding that the parent factory needs in order to instantiate this class rather than the
+      // parent one. The minified code would then return a document without the real-time channels API.
+      const currentDocument = XWikiDocument.currentDocument.call(this, meta);
+      const config = realtimeConfig.document || {};
+      // The meta information doesn't expose the date of the last modification, which is needed to properly merge on
+      // save. We keep it up to date on the edit form ourselves, see syncCurrentDocumentState().
+      currentDocument.modified = Number(XWikiDocument.getFieldValue('editingVersionDate')) || config.modified;
+      return currentDocument;
     }
 
     getChannels(params) {
-      const url = new XWiki.Document(this.documentReference).getRestURL('channels');
-      params = $.extend({
-        // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
-        timestamp: Date.now()
-      }, params);
-      return $.getJSON(url, $.param(params, true)).then(function(data) {
+      const url = this.getPageRestURL('channels', params);
+      return this.getJSON(url).then(function(data) {
         if (Array.isArray(data)) {
-          return $.extend(data, channelListAPI);
+          return Object.assign(data, channelListAPI);
         } else {
           throw new TypeError('Invalid response from the server when requesting the list of document channels.',
             {cause: data});
@@ -123,24 +67,15 @@ define('xwiki-realtime-document', [
         throw new Error('Failed to retrieve the list of document channels.', {cause: error});
       });
     }
-
-    getURL(...args) {
-      return new XWiki.Document(this.documentReference).getURL(...args);
-    }
-
-    getRevision(version) {
-      return $.getJSON(meta.restURL + '/history/' + encodeURIComponent(version), $.param({
-        prettyNames: true
-      }, true));
-    }
   }
 
-  // Initialize the document fields based on the meta information available on page load.
-  const xwikiDocument = new XWikiDocument();
+  // The document currently displayed by the web page.
+  const xwikiDocument = RealtimeXWikiDocument.currentDocument();
 
   // Update the document fields before and after the document is edited inplace (without reloading the web page).
+  // We need jQuery here because these events are triggered with jQuery.
   $(document).on('xwiki:actions:edit xwiki:actions:view', function(event, data) {
-    xwikiDocument.update();
+    xwikiDocument.update(RealtimeXWikiDocument.currentDocument());
   });
 
   return xwikiDocument;

@@ -57,8 +57,6 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class NormalUserConfigurationSourceAuthorizationTest
 {
-    private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
-
     @InjectMockComponents
     private NormalUserConfigurationSourceAuthorization authorization;
 

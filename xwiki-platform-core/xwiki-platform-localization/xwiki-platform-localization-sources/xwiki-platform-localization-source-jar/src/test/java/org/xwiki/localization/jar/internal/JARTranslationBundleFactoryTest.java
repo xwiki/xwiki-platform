@@ -30,7 +30,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.internal.embed.EmbeddableComponentManagerFactory;
 import org.xwiki.component.internal.multi.DefaultComponentManagerManager;
@@ -67,6 +66,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 
 @ComponentList({JARTranslationBundleFactory.class, MessageToolTranslationMessageParser.class,
     PlainTextBlockParser.class, ContextComponentManagerProvider.class, DefaultLocalizationManager.class,
@@ -93,7 +93,7 @@ class JARTranslationBundleFactoryTest
     private ExtensionPackager extensionPackager;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.extensionPackager = new ExtensionPackager(null, new File("target/test-" + new Date().getTime()));
         this.extensionPackager.generateExtensions();
@@ -236,7 +236,7 @@ class JARTranslationBundleFactoryTest
     {
         ExtensionId extensionId = new ExtensionId("jar", "1.0");
 
-        Mockito.when(mockInstalledExtensionRepository.getInstalledExtensions())
+        when(mockInstalledExtensionRepository.getInstalledExtensions())
             .thenReturn(Arrays.<InstalledExtension>asList(mockInstalledExtension(extensionId, null)));
 
         // Trigger initialization

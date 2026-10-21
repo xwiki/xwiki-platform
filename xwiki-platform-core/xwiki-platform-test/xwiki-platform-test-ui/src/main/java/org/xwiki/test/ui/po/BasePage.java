@@ -66,6 +66,14 @@ public class BasePage extends BaseElement
     private static final int WCAG_ANALYZE_ATTEMPTS = 3;
 
     /**
+     * Message fragments identifying a JavaScript error raised because axe-core was not present in the frame when the
+     * analysis probed it. Browsers word it differently: Chrome reports the failing property read on the axe object
+     * ({@code runPartial} is the axe entry point the analysis calls), while Firefox reports the missing binding itself.
+     */
+    private static final List<String> AXE_NOT_READY_ERRORS =
+        List.of("runPartial", "window.axe", "axe is not defined", "axe is undefined");
+
+    /**
      * Used for sending keyboard shortcuts to.
      */
     @FindBy(id = "xwikimaincontainer")
@@ -117,7 +125,8 @@ public class BasePage extends BaseElement
     private WebElement notificationsMenu;
 
     /**
-     * Used to scroll the page to the top before accessing the floating menu.
+     * The wiki logo displayed in the page header. Also used to scroll the page to the top before accessing the
+     * floating menu.
      */
     @FindBy(id = "companylogo")
     protected WebElement logo;
@@ -268,7 +277,7 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Performs a click on the "edit acces rights" entry of the content menu.
+     * Performs a click on the "edit access rights" entry of the content menu.
      */
     public RightsEditPage editRights()
     {
@@ -542,6 +551,17 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * @return the URL of the image displayed as the wiki logo in the page header
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public String getLogoImageURL()
+    {
+        return this.logo.findElement(By.tagName("img")).getAttribute("src");
+    }
+
+    /**
      * @since 4.5M1
      */
     public void watchSpace()
@@ -727,7 +747,7 @@ public class BasePage extends BaseElement
             if (wcagContext.shouldWCAGStopOnError()) {
                 throw e;
             } else {
-                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag:", e);
             }
         }
     }
@@ -743,7 +763,7 @@ public class BasePage extends BaseElement
             try {
                 return axeBuilder.analyze(driver);
             } catch (JavascriptException e) {
-                if (e.getMessage() == null || !e.getMessage().contains("window.axe")) {
+                if (!isAxeNotReadyError(e)) {
                     throw e;
                 }
                 lastError = e;
@@ -751,6 +771,12 @@ public class BasePage extends BaseElement
             }
         }
         throw lastError;
+    }
+
+    static boolean isAxeNotReadyError(JavascriptException error)
+    {
+        String message = error.getMessage();
+        return message != null && AXE_NOT_READY_ERRORS.stream().anyMatch(message::contains);
     }
 
     /**

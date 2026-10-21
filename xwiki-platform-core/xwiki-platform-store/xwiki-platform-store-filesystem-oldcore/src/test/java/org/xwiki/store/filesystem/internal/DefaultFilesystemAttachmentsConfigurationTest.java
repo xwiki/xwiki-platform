@@ -19,7 +19,6 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import javax.inject.Named;
@@ -60,7 +59,7 @@ class DefaultFilesystemAttachmentsConfigurationTest
     }
 
     @Test
-    void getDirectory() throws IOException
+    void getDirectory()
     {
         assertNull(configuration.getDirectory());
 

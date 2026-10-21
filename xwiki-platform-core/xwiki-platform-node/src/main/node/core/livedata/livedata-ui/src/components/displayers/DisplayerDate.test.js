@@ -20,38 +20,47 @@
 
 import DisplayerDate from "./DisplayerDate.vue";
 import { initWrapper } from "./displayerTestsHelper";
+import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import flushPromises from "flush-promises";
 import { restore } from "sinon";
-import { afterEach, describe, expect, it, vi } from "vitest";
-
-vi.mock("../../services/require.js", function () {
-  return {
-    async loadById() {
-      return () => {
-        return {
-          format() {
-            return "formatted date";
-          },
-        };
-      };
-    },
-  };
-});
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("DisplayerDate.vue", () => {
+  let requireJS;
+
+  beforeEach(() => {
+    requireJS = mockRequireJS({
+      moment: () => ({
+        format() {
+          return "formatted date";
+        },
+      }),
+      daterangepicker: {},
+    });
+  });
+
   afterEach(function () {
+    requireJS.restore();
     // completely restore all fakes created through the sandbox
     restore();
   });
 
   it("Renders an entry in view mode", async () => {
-    const wrapper = initWrapper(DisplayerDate, {});
+    const wrapper = initWrapper(DisplayerDate, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
     await flushPromises();
     expect(wrapper.text()).toMatch("formatted date");
   });
 
   it("Switch to edit mode", async () => {
-    const wrapper = initWrapper(DisplayerDate, {});
+    const wrapper = initWrapper(DisplayerDate, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
     await flushPromises();
     await wrapper.setProps({ isView: false });
 

@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.objects;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
@@ -26,7 +27,7 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Object;
@@ -45,6 +46,9 @@ import com.xpn.xwiki.api.Document;
 
 public class ObjectPropertiesResourceImpl extends BaseObjectsResource implements ObjectPropertiesResource
 {
+    @Inject
+    private ModelFactory factory;
+
     @Override
     public Properties getObjectProperties(String wikiName, String spaceName, String pageName, String className,
             Integer objectNumber, Boolean withPrettyNames) throws XWikiRestException
@@ -59,8 +63,7 @@ public class ObjectPropertiesResourceImpl extends BaseObjectsResource implements
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            Object object = DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                    componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), withPrettyNames);
+            Object object = this.factory.toRestObject(uriInfo.getBaseUri(), doc, baseObject, false, withPrettyNames);
 
             Properties properties = objectFactory.createProperties();
             properties.getProperties().addAll(object.getProperties());

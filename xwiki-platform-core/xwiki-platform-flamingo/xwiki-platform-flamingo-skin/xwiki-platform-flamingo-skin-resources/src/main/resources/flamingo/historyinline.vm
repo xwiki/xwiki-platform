@@ -20,7 +20,7 @@
 ###
 ### Document history table
 ###
-### Displays a paged list of document versions, with the possiblity to view a version, compare two
+### Displays a paged list of document versions, with the possibility to view a version, compare two
 ### versions, delete one or a range of versions, restore a version as the current document.
 ###
 ##

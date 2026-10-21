@@ -43,6 +43,7 @@ public class XWikiValidationStatus
 
     public XWikiValidationStatus()
     {
+        // Nothing to do, the error lists are initialized with their declaration.
     }
 
     public static void addErrorToContext(String className, String propName, String propPrettyName,

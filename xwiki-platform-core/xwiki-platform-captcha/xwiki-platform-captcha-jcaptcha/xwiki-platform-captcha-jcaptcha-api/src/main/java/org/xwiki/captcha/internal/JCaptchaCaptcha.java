@@ -94,7 +94,8 @@ public class JCaptchaCaptcha extends AbstractCaptcha
         new LocalDocumentReference(JCAPTCHA_SPACE_LIST, "Displayer");
 
     private static final Map<String, Object> DEFAULT_PARAMETERS = new HashMap<>();
-    {
+
+    static {
         DEFAULT_PARAMETERS.put("type", "image");
         DEFAULT_PARAMETERS.put(ENGINE, DEFAULT_ENGINE);
     }
@@ -140,7 +141,6 @@ public class JCaptchaCaptcha extends AbstractCaptcha
 
         String answer = request.getParameter("captchaAnswer");
 
-        boolean result = captchaService.validateResponseForID(id, answer);
-        return result;
+        return captchaService.validateResponseForID(id, answer);
     }
 }

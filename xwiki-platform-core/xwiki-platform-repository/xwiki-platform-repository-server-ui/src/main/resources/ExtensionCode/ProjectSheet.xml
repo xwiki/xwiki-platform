@@ -144,11 +144,11 @@
     Here are some rules to follow when contributing an extension:
     * Use a short summary. It's going to be displayed in the Project livetable and ideally shouldn't take more than 1 line in that table.
     #if($proxyExtensionObject)
-      * When en extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported informations
+      * When an extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported information
     #end
 
     #if($proxyExtensionObject)
-      ; Automatically synchronize the extension informations
+      ; Automatically synchronize the extension information
       : $proxyExtensionObject.autoUpdate
     #end
 

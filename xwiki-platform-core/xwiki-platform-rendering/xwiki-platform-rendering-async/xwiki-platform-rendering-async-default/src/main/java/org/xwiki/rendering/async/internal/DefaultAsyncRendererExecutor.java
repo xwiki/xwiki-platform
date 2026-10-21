@@ -53,8 +53,11 @@ import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.AsyncContextHandler;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.security.authorization.AuthorExecutor;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.context.XWikiContextContextStore;
 
 /**
@@ -99,6 +102,13 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
+    @Named("readonly")
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private RenderingContext renderingContext;
+
+    @Inject
     private Logger logger;
 
     private AtomicLong clientIdCount = new AtomicLong();
@@ -112,7 +122,6 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     @Override
     public AsyncRendererJobStatus getAsyncStatus(List<String> id, String clientId)
     {
-        //////////////////////////////////////////////
         // Try running job
 
         Job job = this.executor.getJob(id);
@@ -125,7 +134,6 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             }
         }
 
-        //////////////////////////////////////////////
         // Try cache
 
         AsyncRendererJobStatus status = this.cache.getAsync(clientId);
@@ -160,8 +168,8 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         throws JobException, RenderingException
     {
         // if placeholder is forced, then we always consider it as async.
-        boolean asyncAllowed = configuration.isPlaceHolderForced()
-                                || (renderer.isAsyncAllowed() && this.asyncContext.isEnabled());
+        boolean asyncAllowed = (configuration.isPlaceHolderForced()
+            || (renderer.isAsyncAllowed() && this.asyncContext.isEnabled())) && isAsyncSupported(configuration);
         boolean cacheAllowed = renderer.isCacheAllowed();
 
         // Get context and job id
@@ -194,7 +202,6 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             }
         }
 
-        ////////////////////////////////
         // Execute the renderer
 
         AsyncRendererExecutorResponse response;
@@ -232,10 +239,10 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             AsyncRendererJobStatus status;
 
             // If async is disabled run the renderer in the current thread
-            if (renderer.isCacheAllowed()) {
+            if (renderer.isCacheAllowed() || configuration.isPlaceHolderForced()) {
                 // Prepare to catch stuff to invalidate the cache
-                if (this.asyncContext instanceof DefaultAsyncContext) {
-                    ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+                if (this.asyncContext instanceof DefaultAsyncContext defaultAsyncContext) {
+                    defaultAsyncContext.pushContextUse();
                 }
 
                 // Mark the context document as used if it was explicitly set in the context, unless the context 
@@ -250,11 +257,11 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                     }
                 }
 
-                AsyncRendererResult result = syncRender(renderer, true, configuration);
+                AsyncRendererResult result = syncRender(renderer, renderer.isCacheAllowed(), configuration);
 
                 // Get suff to invalidate the cache
-                if (this.asyncContext instanceof DefaultAsyncContext) {
-                    ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
+                if (this.asyncContext instanceof DefaultAsyncContext defaultAsyncContext) {
+                    ContextUse contextUse = defaultAsyncContext.popContextUse();
 
                     // Create a pseudo job status
                     status = new AsyncRendererJobStatus(request, result, contextUse.getReferences(),
@@ -262,6 +269,22 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                 } else {
                     // Create a pseudo job status
                     status = new AsyncRendererJobStatus(request, result, null, null, null, null, null);
+                }
+
+                if (configuration.isPlaceHolderForced()) {
+                    // The caller expects a placeholder, so make the result available to the client resolving it, as
+                    // for an asynchronous execution
+                    String asyncClientId = newClientId();
+
+                    // If cache is disabled make sure the id is unique
+                    if (!renderer.isCacheAllowed()) {
+                        jobId = new ArrayList<>(jobId);
+                        jobId.add(asyncClientId);
+                    }
+
+                    response = new AsyncRendererExecutorResponse(status, asyncClientId);
+                } else {
+                    response = new AsyncRendererExecutorResponse(status);
                 }
 
                 request.setId(jobId);
@@ -272,9 +295,9 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
                 // Create a pseudo job status
                 status = new AsyncRendererJobStatus(request, result);
-            }
 
-            response = new AsyncRendererExecutorResponse(status);
+                response = new AsyncRendererExecutorResponse(status);
+            }
         }
 
         return response;
@@ -329,22 +352,65 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                 }
             }
 
-            // If async inject the configured author
-            if (asyncAllowed && configuration.isSecureReferenceSet()) {
-                if (savedContext == null) {
-                    savedContext = new HashMap<>();
-                } else {
-                    // The map generated by #save might not be modifiable
-                    savedContext = new HashMap<>(savedContext);
-                }
-
-                savedContext.put(XWikiContextContextStore.PROP_SECURE_AUTHOR, configuration.getSecureAuthorReference());
-                savedContext.put(XWikiContextContextStore.PROP_SECURE_DOCUMENT,
-                    configuration.getSecureDocumentReference());
-            }
+            // Inject the configured author, or the current one, so that the asynchronous execution is done with the same
+            // rights as a synchronous execution. The result depends on the rights of that author on both paths, so the
+            // author and its document are also part of the identifier of a cached result.
+            savedContext = saveSecureContext(savedContext, configuration);
         }
 
         return savedContext;
+    }
+
+    /**
+     * Without an explicit secure reference, the asynchronous execution reproduces the current secure context, which is
+     * not possible when the current context is restricted or has dropped permissions.
+     */
+    private boolean isAsyncSupported(AsyncRendererConfiguration configuration)
+    {
+        if (configuration.isSecureReferenceSet()) {
+            return true;
+        }
+
+        if (this.renderingContext.isRestricted()) {
+            return false;
+        }
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (xcontext != null) {
+            XWikiDocument secureDocument = xcontext.getSecureDocument();
+
+            return !xcontext.hasDroppedPermissions() && (secureDocument == null || !secureDocument.isRestricted());
+        }
+
+        return true;
+    }
+
+    private Map<String, Serializable> saveSecureContext(Map<String, Serializable> savedContext,
+        AsyncRendererConfiguration configuration)
+    {
+        DocumentReference authorReference;
+        DocumentReference documentReference;
+        if (configuration.isSecureReferenceSet()) {
+            authorReference = configuration.getSecureAuthorReference();
+            documentReference = configuration.getSecureDocumentReference();
+        } else {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext == null) {
+                return savedContext;
+            }
+
+            authorReference = xcontext.getAuthorReference();
+            XWikiDocument secureDocument = xcontext.getSecureDocument();
+            documentReference = secureDocument != null ? secureDocument.getDocumentReference() : null;
+        }
+
+        // The map generated by #save might not be modifiable
+        Map<String, Serializable> result = savedContext != null ? new HashMap<>(savedContext) : new HashMap<>();
+
+        result.put(XWikiContextContextStore.PROP_SECURE_AUTHOR, authorReference);
+        result.put(XWikiContextContextStore.PROP_SECURE_DOCUMENT, documentReference);
+
+        return result;
     }
 
     private AsyncRendererJobStatus getCurrent(List<String> jobId)

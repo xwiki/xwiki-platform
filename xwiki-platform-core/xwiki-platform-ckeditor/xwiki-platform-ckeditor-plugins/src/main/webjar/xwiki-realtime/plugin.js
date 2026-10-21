@@ -55,7 +55,7 @@
         const rejectWithNotification = (reason, ...args) => {
           if (reason) {
             const message = reason.message || reason;
-            new XWiki.widgets.Notification(message, 'error');
+            XWiki.widgets.Notification.show(message, 'error');
           }
           reject(reason, ...args);
         };
@@ -154,7 +154,7 @@
           await editor._realtime.disconnect();
         }
       } else if (previousMode === 'source' && editor.mode === 'wysiwyg' && editor._realtime.rejoin) {
-        // Swithing from Source back to WYSIWYG mode, which had realtime enabled before the switch.
+        // Switching from Source back to WYSIWYG mode, which had realtime enabled before the switch.
         editor.showNotification(editor.localization.get('xwiki-realtime.joiningCollaboration'));
         editor._realtime.context.realtimeEnabled = true;
         await editor._realtime.connect();
@@ -267,10 +267,34 @@
             await editor._realtime.editor?._onAbort();
             onAfterLeaveCollaboration(editor);
           };
-          return editor._realtime.connect();
+          // We can't join the realtime session before knowing the editing mode (we join only in WYSIWYG mode).
+          return whenEditingModeIsSet(editor).then(() => editor._realtime.connect());
         }, resolve, reject), reject);
       });
     }
+  }
+
+  /**
+   * The editing mode is loaded after the editor plugins are initialized, so the editor mode is not set yet when this
+   * plugin is initialized. Waiting for it is required because otherwise we can't tell whether the user is editing in
+   * WYSIWYG mode, where the realtime collaboration is supported, or in Source mode, where it isn't, and thus we would
+   * silently skip joining the realtime session.
+   *
+   * @param {CKEDITOR.editor} editor the editor whose editing mode we're waiting for
+   * @returns {Promise} a promise that resolves as soon as the editing mode is set, or when the editor is destroyed
+   *   (because in this case there's no editing mode to wait for anymore)
+   */
+  function whenEditingModeIsSet(editor) {
+    if (editor.mode) {
+      return Promise.resolve();
+    }
+    return new Promise(resolve => {
+      const listeners = [editor.once('mode', onEditingModeSet), editor.once('destroy', onEditingModeSet)];
+      function onEditingModeSet() {
+        listeners.forEach(listener => listener.removeListener());
+        resolve();
+      }
+    });
   }
 
   function onAfterJoinCollaboration(editor) {
@@ -320,7 +344,16 @@
              *   widget
              */
             upcast: function(element) {
-              return element.hasClass?.('xwiki-widget-placeholder-' + this.name);
+              const placeholderClass = 'xwiki-widget-placeholder-' + this.name;
+              if (element.hasClass?.(placeholderClass)) {
+                // Remove the placeholder class, otherwise CKEditor stores it in the widget data (as widget classes),
+                // making the placeholder widget data different from the data of the upload widget it stands for. The
+                // realtime editor would then see a widget data change whenever it compares the local content, where
+                // the user has an upload in progress, with the remote content, where the upload is represented by a
+                // placeholder. Applying this change invalidates the local selection and modifies the upload widget.
+                element.removeClass(placeholderClass);
+                return true;
+              }
             },
 
             init: function(...args) {

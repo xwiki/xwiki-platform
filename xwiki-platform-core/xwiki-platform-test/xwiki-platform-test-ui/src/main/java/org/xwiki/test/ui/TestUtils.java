@@ -30,7 +30,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,33 +58,39 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.http.internal.XWikiCredentials;
+import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 import org.xwiki.model.reference.AttachmentReference;
@@ -127,14 +135,12 @@ public class TestUtils
     /**
      * @since 5.0M2
      */
-    public static final UsernamePasswordCredentials ADMIN_CREDENTIALS =
-        new UsernamePasswordCredentials("Admin", "admin");
+    public static final XWikiCredentials ADMIN_CREDENTIALS = new XWikiCredentials("Admin", "admin");
 
     /**
      * @since 5.1M1
      */
-    public static final UsernamePasswordCredentials SUPER_ADMIN_CREDENTIALS =
-        new UsernamePasswordCredentials("superadmin", "pass");
+    public static final XWikiCredentials SUPER_ADMIN_CREDENTIALS = new XWikiCredentials("superadmin", "pass");
 
     /**
      * @since 5.0M2
@@ -196,7 +202,21 @@ public class TestUtils
      */
     public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestUtils.class);
+
     private static final String MAIN_WIKI_NAME = "xwiki";
+
+    private static final String USER_CLASS_NAME = "XWiki.XWikiUsers";
+
+    private static final String GROUP_CLASS_NAME = "XWiki.XWikiGroups";
+
+    private static final LocalDocumentReference ALL_GROUP_REFERENCE =
+        new LocalDocumentReference("XWiki", "XWikiAllGroup");
+
+    private static final String SERVER_CLASS_NAME = "XWiki.XWikiServerClass";
+
+    private static final DocumentReference MAIN_WIKI_DESCRIPTOR =
+        new DocumentReference(MAIN_WIKI_NAME, "XWiki", "XWikiServerXwiki");
 
     private static PersistentTestContext context;
 
@@ -225,7 +245,7 @@ public class TestUtils
      */
     private String secretToken = null;
 
-    private HttpClient httpClient;
+    private XWikiHTTPClient httpClient;
 
     /**
      * @since 15.2RC1
@@ -249,9 +269,23 @@ public class TestUtils
 
     private RestTestUtils rest;
 
+    /**
+     * The credentials of a user that has full rights on the wiki under test, used for the REST calls that the test
+     * framework performs on behalf of the tests. Defaults to the superadmin, but not every wiki under test has one:
+     * the distribution enables it only when {@code xwiki.superadminpassword} is set in {@code xwiki.cfg}, which the
+     * shipped configuration doesn't do.
+     */
+    private XWikiCredentials privilegedCredentials = SUPER_ADMIN_CREDENTIALS;
+
+    /**
+     * The host/port the main wiki descriptor currently points to, to avoid updating it when it's already the expected
+     * one.
+     */
+    private String mainWikiDescriptorTarget;
+
     public TestUtils()
     {
-        this.httpClient = new HttpClient();
+        this.httpClient = new XWikiHTTPClient();
 
         setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
 
@@ -355,30 +389,46 @@ public class TestUtils
      */
     public void setDefaultCredentials(String username, String password)
     {
-        setDefaultCredentials(new UsernamePasswordCredentials(username, password));
+        setDefaultCredentials(new XWikiCredentials(username, password));
     }
 
     /**
      * @since 7.0RC1
      */
-    public UsernamePasswordCredentials setDefaultCredentials(UsernamePasswordCredentials defaultCredentials)
+    public XWikiCredentials setDefaultCredentials(XWikiCredentials defaultCredentials)
     {
-        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+        XWikiCredentials currentCredentials = getDefaultCredentials();
 
-        if (defaultCredentials != null) {
-            this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
-            this.httpClient.getParams().setAuthenticationPreemptive(true);
-        } else {
-            this.httpClient.getState().clear();
-            this.httpClient.getParams().setAuthenticationPreemptive(false);
-        }
+        this.httpClient.setDefaultCredentials(defaultCredentials);
 
         return currentCredentials;
     }
 
-    public UsernamePasswordCredentials getDefaultCredentials()
+    public XWikiCredentials getDefaultCredentials()
     {
-        return (UsernamePasswordCredentials) this.httpClient.getState().getCredentials(AuthScope.ANY);
+        return this.httpClient.getDefaultCredentials();
+    }
+
+    /**
+     * @return the credentials of a user that has full rights on the wiki under test
+     * @since 18.8.0RC1
+     */
+    public XWikiCredentials getPrivilegedCredentials()
+    {
+        return this.privilegedCredentials;
+    }
+
+    /**
+     * Declare which user the test framework has to authenticate as for the REST calls it performs on behalf of the
+     * tests when they need full rights on the wiki, typically to save a page whose content is executed as a script.
+     * The superadmin is used by default, so this only needs to be called for a wiki that doesn't have one.
+     *
+     * @param privilegedCredentials the credentials of a user that has full rights on the wiki under test
+     * @since 18.8.0RC1
+     */
+    public void setPrivilegedCredentials(XWikiCredentials privilegedCredentials)
+    {
+        this.privilegedCredentials = privilegedCredentials;
     }
 
     public void loginAsSuperAdmin()
@@ -416,32 +466,120 @@ public class TestUtils
      */
     public void loginAndGotoPage(String username, String password, String pageURL, boolean checkLoginSuccess)
     {
-        // ensure to be on a wiki page before performing check on the username.
-        getDriver().get(getURL("XWiki", "Register", "register", "_=" + new Date().getTime()));
+        // Check on the currently displayed page whether the requested user is already logged in, so that the common
+        // case of a fixture defensively logging in as a user that is already logged in costs no page load at all.
+        // A page showing the requested user as logged in is a definitive answer, since only a page that the server
+        // rendered for that user can show them as logged in. The opposite is not definitive, because the displayed
+        // page may not be a wiki page (or not be skinned) and thus not show any login state at all, so it only means
+        // that we have to load a wiki page and ask again, which is what the block below does.
         if (!username.equals(getLoggedInUserName())) {
-            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
-            // going to the home page for example.
-            // Also recache the CSRF token
-            String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
-            getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
+            // Get rid of the currently displayed page before switching the user, see unloadCurrentPage().
+            unloadCurrentPage();
 
-            if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
-                throw new RuntimeException(
-                    String.format("Login failed with credentials: [%s] / [%s]. Was expecting to be on URL [%s] but "
-                        + "was on [%s]. Page source is [%s]", username, password, destUrl,
-                        getDriver().getCurrentUrl(), getDriver().getPageSource()));
+            // ensure to be on a wiki page before performing check on the username.
+            getDriver().get(getURL("XWiki", "Register", "register", "_=" + new Date().getTime()));
+            if (!username.equals(getLoggedInUserName())) {
+                // The Register page loaded above is now the page we're leaving behind, so unload it in turn before
+                // actually switching the user.
+                unloadCurrentPage();
 
+                // Log in and direct to the Register page again, so that we can check below that the login succeeded
+                // and re-cache the CSRF token without any extra page load.
+                String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
+                getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
+
+                if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
+                    throw new RuntimeException(
+                        String.format("Login failed with credentials: [%s] / [%s]. Was expecting to be on URL [%s] but "
+                            + "was on [%s]. Page source is [%s]", username, password, destUrl,
+                            getDriver().getCurrentUrl(), getDriver().getPageSource()));
+
+                }
             }
-            recacheSecretTokenWhenOnRegisterPage();
-            if (pageURL != null) {
-                // Go to the page asked
-                getDriver().get(pageURL);
-            } else {
-                getDriver().get(getURLToNonExistentPage());
-            }
-
-            setDefaultCredentials(username, password);
         }
+
+        // Whether we logged in or not, a fully skinned wiki page is displayed (the page that was already displayed
+        // when the requested user was already logged in, otherwise the Register page loaded above or the one the login
+        // redirected to), so re-cache the CSRF token for the current user without any extra page load. Doing this also
+        // when no login was performed is important because the cached token may belong to a different user, in which
+        // case the server rejects it: e.g. createUserAndLogin() caches the token of the user it creates, so a
+        // subsequent login as the user that was logged in before it would otherwise keep using that token.
+        recacheSecretTokenFromDisplayedPage();
+
+        if (pageURL != null) {
+            // Go to the page asked, whether a login was needed or not: callers of this method expect to end up on that
+            // page in both cases.
+            getDriver().get(pageURL);
+        }
+
+        // When no page is asked we stay on the page that is already displayed: either the one the caller was on when
+        // the requested user turned out to be already logged in, or the Register page. Both are fully skinned, so they
+        // show the login state on screenshots and screen recordings, unlike a blank xpage=plain page.
+
+        // Always synchronize the REST client credentials with the requested user, even when the browser was already
+        // logged in as that user and thus skipped the browser login above. The browser session and the REST client
+        // credentials are independent states, so if the synchronization were done only inside the branch above the
+        // REST client could stay authenticated as a different user than the browser: e.g. createUserAndLogin() can
+        // leave the browser logged in as the previous user (typically superadmin) while switching the REST user, and a
+        // subsequent login as that same browser user would then skip the branch and keep the wrong REST credentials.
+        setDefaultCredentials(username, password);
+    }
+
+    /**
+     * Unload the currently displayed page, making sure that none of the requests it triggered can still be in flight
+     * when the authenticated user changes.
+     * <p>
+     * Such a request reaches the server carrying the cookies of the previous user. If it arrives after the login
+     * invalidated that user's session (which XWiki does whenever the user changes), it gets a brand new session, is
+     * re-authenticated as the previous user from the persistent login cookies it carries, and the session cookie sent
+     * back with its response silently reverts the whole browser to the previous user. The symptoms are then confusing
+     * and unrelated: the CSRF token cached for the new user no longer matches, and modifications performed through the
+     * browser are silently dropped.
+     * <p>
+     * Navigating away cancels the pending requests of the unloaded page, but the requests that the page sends
+     * <em>because</em> it is being left (XWiki releases the document lock and restores the UI locale that way) are sent
+     * through {@code navigator.sendBeacon()}, i.e. as requests that are designed to outlive the page that sent them.
+     * Those requests must still reach the server, otherwise stale document locks and locales are left behind and later
+     * tests fail on a page that is "currently locked by" the previous user or that is displayed in the wrong language.
+     * So instead of letting the navigation below trigger them, we send them ourselves and wait for them while the page
+     * is still alive, which guarantees both that they reach the server and that they do so before the authenticated
+     * user changes.
+     */
+    private void unloadCurrentPage()
+    {
+        try {
+            // Replace the beacons, which we cannot wait for, by regular requests that we can wait for, then fire the
+            // events that the page-leave handlers listen to (see lock.js and XWiki.InplaceEditing) ourselves. The page
+            // is still alive at this point, so this is an ordinary request context: nothing is cut short and the
+            // browser doesn't block us like it does for requests sent while a page is being dismissed.
+            Object sentRequests = getDriver().executeAsyncScript("""
+                const done = arguments[arguments.length - 1];
+                const requests = [];
+                navigator.sendBeacon = (url, data) => {
+                  requests.push(fetch(url, {method: 'POST', body: data, credentials: 'same-origin', keepalive: true})
+                    .then(response => url + ' -> ' + response.status, error => url + ' -> ' + error));
+                  return true;
+                };
+                // Only 'pagehide' is fired, not 'unload': Firefox destroys the execution context of this script when
+                // an 'unload' event is dispatched, and all the page-leave handlers listen to both events anyway.
+                window.dispatchEvent(new Event('pagehide'));
+                // Never wait longer than the script timeout, a beacon request isn't worth failing a test for.
+                const timeout = new Promise(resolve => setTimeout(() => resolve(['<timeout>']), 10000));
+                Promise.race([Promise.all(requests), timeout]).then(results => {
+                  // The page is really unloaded below, and beacons sent from that point on cannot be waited for
+                  // anymore, so drop them rather than leaving a request in flight while the user changes.
+                  navigator.sendBeacon = () => true;
+                  done(results);
+                });
+                """);
+            LOGGER.debug("Sent the requests of the page being unloaded: {}", sentRequests);
+        } catch (WebDriverException e) {
+            // Not a reason to fail the test: unloading the page below still cancels all the other pending requests.
+            LOGGER.warn("Failed to send the requests of the page being unloaded, some tests might be flaky.", e);
+        }
+
+        // Navigating to a blank page unloads the current page without triggering any request of its own.
+        getDriver().get("about:blank");
     }
 
     /**
@@ -551,18 +689,74 @@ public class TestUtils
 
     public void createUserAndLogin(final String username, final String password, Object... properties)
     {
-        createUserAndLoginWithRedirect(username, password, getURLToNonExistentPage(), properties);
+        // Don't navigate to any page after logging in: the login redirect already lands on the Register page (see
+        // createUserAndLoginWithRedirect) which is a fully-skinned, meaningful page for screenshots and screen
+        // recordings, and callers navigate to the page they actually want to test right afterwards anyway. Loading a
+        // throw-away page here would only add a page load and, being a blank xpage=plain page, would hide the login
+        // state from screen recordings.
+        createUserAndLoginWithRedirect(username, password, null, properties);
     }
 
     public void createUserAndLoginWithRedirect(final String username, final String password, String url,
         Object... properties)
     {
-        createUser(username, password, getURLToLoginAndGotoPage(username, password, url), properties);
+        // Get rid of the currently displayed page before switching the user below, see unloadCurrentPage().
+        unloadCurrentPage();
+
+        // Register the user and, in the same server-side redirect chain (register -> loginsubmit -> destination), log
+        // in. We land on the Register page rather than on a throw-away page for two reasons: it lets us verify below
+        // that the login actually succeeded (loginsubmit only redirects to its destination on success) and it lets us
+        // re-cache the CSRF token for the new user's session in place, without any extra page load.
+        String loginDestURL = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
+        registerUser(username, password, getURLToLoginAndGotoPage(username, password, loginDestURL));
+
+        // On a failed login, loginsubmit responds with 401 and does not redirect, so the browser stays on the
+        // loginsubmit URL instead of reaching loginDestURL. Fail fast with a helpful message rather than silently
+        // continuing as guest, which would otherwise surface as a confusing, unrelated failure later in the test.
+        if (!Strings.CS.startsWith(getDriver().getCurrentUrl(), loginDestURL)) {
+            throw new IllegalStateException(String.format(
+                "Failed to create and log in user [%s]. Was expecting to be on URL [%s] but was on [%s]. Page source "
+                    + "is [%s].", username, loginDestURL, getDriver().getCurrentUrl(), getDriver().getPageSource()));
+        }
+
+        // We're on the Register page: re-cache the CSRF token for the new user's session (the token cached for the
+        // previous user is no longer valid) before it's used e.g. by updateObject below.
+        recacheSecretTokenFromDisplayedPage();
+
+        if (properties.length > 0) {
+            updateObject("XWiki", username, USER_CLASS_NAME, 0, properties);
+
+            // The properties are applied through the browser, using the CSRF token cached above, and a failed CSRF
+            // check isn't reported as an error: the save action just redirects to the resubmit template and the
+            // properties are silently not applied. Fail fast rather than letting the test run with a user that lacks
+            // the properties it asked for, which would surface as a confusing, unrelated failure later on.
+            String currentURL = getDriver().getCurrentUrl();
+            if (Strings.CS.contains(currentURL, "xpage=resubmit")) {
+                throw new IllegalStateException(String.format(
+                    "Failed to set the properties %s of the user [%s]: the CSRF check of the save request failed and "
+                        + "the browser was redirected to [%s]. This usually means that the browser isn't authenticated "
+                        + "as [%s] anymore, in which case the CSRF token cached for that user is rejected.",
+                    Arrays.toString(properties), username, currentURL, username));
+            }
+        }
 
         setDefaultCredentials(username, password);
+
+        if (url != null) {
+            getDriver().get(url);
+        }
     }
 
     public void createUser(final String username, final String password, String redirectURL, Object... properties)
+    {
+        registerUser(username, password, redirectURL);
+        recacheSecretToken();
+        if (properties.length > 0) {
+            updateObject("XWiki", username, USER_CLASS_NAME, 0, properties);
+        }
+    }
+
+    private void registerUser(final String username, final String password, String redirectURL)
     {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("register", "1");
@@ -575,10 +769,6 @@ public class TestUtils
         }
         parameters.put("form_token", getSecretToken());
         getDriver().get(getURL("XWiki", "Register", "register", parameters));
-        recacheSecretToken();
-        if (properties.length > 0) {
-            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
-        }
     }
 
     /**
@@ -607,7 +797,7 @@ public class TestUtils
         LocalDocumentReference userReference = new LocalDocumentReference("XWiki", username);
         Page userPage = rest().page(userReference);
         userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
-        org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object("XWiki.XWikiUsers");
+        org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object(USER_CLASS_NAME);
 
         // Set password and mark the user active (a real Admin user is active), so that queries filtering
         // on active users (e.g. the user suggestion query) return this user.
@@ -624,14 +814,16 @@ public class TestUtils
 
         // Add the user to XWikiAllGroup
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAllGroup group", e);
         }
 
         // Add the user to XWikiAdminGroup group (before we login as the user does not have admin right at first)
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAdminGroup group", e);
         }
@@ -996,7 +1188,7 @@ public class TestUtils
      */
     public ViewPage createPageWithAttachment(String space, String page, String content, String title, String syntaxId,
         String parentFullPageName, String attachmentName, InputStream attachmentData,
-        UsernamePasswordCredentials credentials) throws Exception
+        XWikiCredentials credentials) throws Exception
     {
         return createPageWithAttachment(Collections.singletonList(space), page, content, title, syntaxId,
             parentFullPageName, attachmentName, attachmentData, credentials);
@@ -1007,7 +1199,7 @@ public class TestUtils
      */
     public ViewPage createPageWithAttachment(List<String> spaces, String page, String content, String title,
         String syntaxId, String parentFullPageName, String attachmentName, InputStream attachmentData,
-        UsernamePasswordCredentials credentials) throws Exception
+        XWikiCredentials credentials) throws Exception
     {
         ViewPage vp = createPage(spaces, page, content, title, syntaxId, parentFullPageName);
         attachFile(spaces, page, attachmentName, attachmentData, false, credentials);
@@ -1027,7 +1219,7 @@ public class TestUtils
      * @since 5.1M2
      */
     public ViewPage createPageWithAttachment(String space, String page, String content, String title,
-        String attachmentName, InputStream attachmentData, UsernamePasswordCredentials credentials) throws Exception
+        String attachmentName, InputStream attachmentData, XWikiCredentials credentials) throws Exception
     {
         ViewPage vp = createPage(space, page, content, title);
         attachFile(space, page, attachmentName, attachmentData, false, credentials);
@@ -1038,7 +1230,7 @@ public class TestUtils
      * @since 12.2
      */
     public ViewPage createPageWithAttachment(EntityReference reference, String content, String title,
-        String attachmentName, InputStream attachmentData, UsernamePasswordCredentials credentials) throws Exception
+        String attachmentName, InputStream attachmentData, XWikiCredentials credentials) throws Exception
     {
         ViewPage vp = createPage(reference, content, title);
         attachFile(reference, attachmentName, attachmentData, false, credentials);
@@ -1347,7 +1539,8 @@ public class TestUtils
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        rest().savePageAs(SUPER_ADMIN_CREDENTIALS, reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
+        rest().savePageAs(getPrivilegedCredentials(), reference, wikiContent, wikiSyntax.toIdString(), null, null,
+            false);
 
         // Execute the content and return the result
         return executeAndGetBodyAsString(reference, queryParameters);
@@ -1516,20 +1709,19 @@ public class TestUtils
         String previousURL = getDriver().getCurrentUrl();
         // Go to the registration page because the registration form uses secret token.
         gotoPage(getCurrentWiki(), "Register", "register");
-        recacheSecretTokenWhenOnRegisterPage();
+        recacheSecretTokenFromDisplayedPage();
         // Return to the previous page.
         getDriver().get(previousURL);
     }
 
-    private void recacheSecretTokenWhenOnRegisterPage()
+    private void recacheSecretTokenFromDisplayedPage()
     {
         try {
             WebElement htmlElement = getDriver().findElement(By.tagName("html"));
             this.secretToken = htmlElement.getDomAttribute("data-xwiki-form-token");
         } catch (NoSuchElementException exception) {
             // Something is really wrong if this happens.
-            System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
-            exception.printStackTrace();
+            LOGGER.warn("Failed to cache anti-CSRF secret token, some tests might fail!", exception);
         }
     }
 
@@ -1542,8 +1734,8 @@ public class TestUtils
     public String getSecretToken()
     {
         if (this.secretToken == null) {
-            System.out.println("Warning: No cached anti-CSRF token found. "
-                + "Make sure to call recacheSecretToken() before getSecretToken(), otherwise this test might fail.");
+            LOGGER.warn("No cached anti-CSRF token found. Make sure to call recacheSecretToken() before "
+                + "getSecretToken(), otherwise this test might fail.");
             return "";
         }
         return this.secretToken;
@@ -1724,7 +1916,8 @@ public class TestUtils
     }
 
     /**
-     * Forces the current user to be the Guest user by clearing all coookies.
+     * Forces the current user to be the Guest user by clearing all the cookies, both in the browser and in the HTTP
+     * client used for REST calls.
      */
     public void forceGuestUser()
     {
@@ -2000,7 +2193,7 @@ public class TestUtils
      * @since 5.1M2
      */
     public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists,
-        UsernamePasswordCredentials credentials) throws Exception
+        XWikiCredentials credentials) throws Exception
     {
         attachFile(Collections.singletonList(space), page, name, is, failIfExists, credentials);
     }
@@ -2009,9 +2202,9 @@ public class TestUtils
      * @since 7.2M2
      */
     public void attachFile(List<String> spaces, String page, String name, InputStream is, boolean failIfExists,
-        UsernamePasswordCredentials credentials) throws Exception
+        XWikiCredentials credentials) throws Exception
     {
-        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+        XWikiCredentials currentCredentials = getDefaultCredentials();
 
         try {
             if (credentials != null) {
@@ -2064,9 +2257,9 @@ public class TestUtils
      * @since 12.2
      */
     public void attachFile(EntityReference pageReference, String name, InputStream is, boolean failIfExists,
-        UsernamePasswordCredentials credentials) throws Exception
+        XWikiCredentials credentials) throws Exception
     {
-        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+        XWikiCredentials currentCredentials = getDefaultCredentials();
         EntityReference reference = new EntityReference(name, EntityType.ATTACHMENT, pageReference);
 
         try {
@@ -2182,6 +2375,10 @@ public class TestUtils
 
     /**
      * Add and set a property into XWiki.XWikiPreferences. Create XWiki.XWikiPreferences if it does not exist.
+     * <p>
+     * The property value is set over REST, and thus with the REST credentials rather than as the user currently logged
+     * in the browser. Adding the property to the class still goes through the browser, which is therefore left on
+     * another page: a page chosen to load fast, since no caller has any use for it.
      *
      * @param propertyName name of the property to set
      * @param propertyType the type of the property to add
@@ -2190,13 +2387,20 @@ public class TestUtils
      */
     public void setPropertyInXWikiPreferences(String propertyName, String propertyType, Object value)
     {
-        addClassProperty("XWiki", "XWikiPreferences", propertyName, propertyType);
-        gotoPage("XWiki", "XWikiPreferences", "edit", "editor", "object");
-        ObjectEditPage objectEditPage = new ObjectEditPage();
-        if (objectEditPage.hasObject("XWiki.XWikiPreferences")) {
-            updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, propertyName, value);
-        } else {
-            addObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", propertyName, value);
+        // The property may not be defined in the XWiki.XWikiPreferences class (e.g. "core.hierarchyMode"), in which
+        // case it must be added to the class before it can be set on the object.
+        //
+        // The "propadd" action redirects to the class editor of the document it modified, and loading that editor for
+        // XWiki.XWikiPreferences (a class with dozens of properties) is by far the most expensive part of setting a
+        // preference: more than 3 seconds, against about 200 ms for everything else this method does. No caller has
+        // any use for that editor, so send the browser to a page that loads fast instead.
+        gotoPage("XWiki", "XWikiPreferences", "propadd", "propname", propertyName, "proptype", propertyType,
+            "xredirect", getURLToNonExistentPage());
+        try {
+            setWikiPreference(propertyName, Objects.toString(value, null));
+        } catch (Exception e) {
+            throw new RuntimeException(
+                String.format("Failed to set property [%s] in [XWiki.XWikiPreferences]", propertyName), e);
         }
     }
 
@@ -2276,6 +2480,44 @@ public class TestUtils
     }
 
     /**
+     * Makes the main wiki descriptor point to the passed host/port, which is what drives the URLs generated by
+     * background threads, that is when no request is available to get the host/port from. Nothing is done when the
+     * descriptor already points to them.
+     * <p>
+     * The descriptor is updated as superadmin and over REST, so that the browser state and the credentials used by
+     * the test are left untouched.
+     *
+     * @param host the host the descriptor should point to
+     * @param port the port the descriptor should point to
+     * @param secure true to generate HTTPS URLs, false to generate HTTP ones
+     * @throws Exception when the descriptor cannot be updated
+     * @since 18.8.0RC1
+     */
+    public void setMainWikiDescriptorTarget(String host, int port, boolean secure) throws Exception
+    {
+        String target = String.format("%s:%s:%s", host, port, secure);
+        if (target.equals(this.mainWikiDescriptorTarget)) {
+            return;
+        }
+
+        LOGGER.info("(*) Making the main wiki descriptor target [{}:{}] (secure: [{}])...", host, port, secure);
+
+        // Note: the test may have logged in as another user, and thus have changed the credentials used for REST
+        // calls.
+        XWikiCredentials previousCredentials = setDefaultCredentials(getPrivilegedCredentials());
+        try {
+            org.xwiki.rest.model.jaxb.Object descriptorObject = rest().object(MAIN_WIKI_DESCRIPTOR, SERVER_CLASS_NAME);
+            descriptorObject.withProperties(RestTestUtils.property("server", host),
+                RestTestUtils.property("port", port), RestTestUtils.property("secure", secure ? 1 : 0));
+            rest().update(descriptorObject);
+        } finally {
+            setDefaultCredentials(previousCredentials);
+        }
+
+        this.mainWikiDescriptorTarget = target;
+    }
+
+    /**
      * @since 7.3M1
      */
     public static void assertStatuses(int actualCode, int... expectedCodes)
@@ -2289,35 +2531,34 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    public static <M extends HttpMethod> M assertStatusCodes(M method, boolean release, int... expectedCodes)
-        throws Exception
+    public static CloseableHttpResponse assertStatusCodes(CloseableHttpResponse response, boolean release,
+        int... expectedCodes) throws Exception
     {
         if (expectedCodes.length > 0) {
-            int actualCode = method.getStatusCode();
+            int actualCode = response.getCode();
 
             if (!ArrayUtils.contains(expectedCodes, actualCode)) {
                 if (actualCode == Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
                     String message;
                     try {
-                        message = method.getResponseBodyAsString();
+                        message = EntityUtils.toString(response.getEntity());
                     } catch (IOException e) {
                         message = "";
                     }
 
-                    fail(String.format("Unexpected internal server error with message [%s] for [%s]",
-                        message, method.getURI()));
+                    fail(String.format("Unexpected internal server error with message [%s]", message));
                 } else {
-                    fail(String.format("Unexpected code [%s], was expecting one of [%s] for [%s]",
-                        actualCode, Arrays.toString(expectedCodes), method.getURI()));
+                    fail(String.format("Unexpected code [%s], was expecting one of [%s]", actualCode,
+                        Arrays.toString(expectedCodes)));
                 }
             }
         }
 
         if (release) {
-            method.releaseConnection();
+            response.close();
         }
 
-        return method;
+        return response;
     }
 
     // HTTP
@@ -2375,6 +2616,25 @@ public class TestUtils
     }
 
     /**
+     * Same as {@link #getString(String, Map)} but waits for the response at most the given time instead of the default
+     * socket timeout of the HTTP client (3 minutes), for requests that take long to be processed on the server.
+     *
+     * @param path the path to request, relative to the base URL of the HTTP client
+     * @param queryParams additional query parameters added to the computed URL
+     * @param timeout how long to wait for the response
+     * @return the content of the computed URL
+     * @throws Exception in case of error when executing the request
+     * @since 18.8.0
+     */
+    public String getString(String path, Map<String, ?> queryParams, Duration timeout) throws Exception
+    {
+        String url = getURL(getCurrentExecutor().getHttpClientBaseURL(), path, queryParams);
+        try (InputStream inputStream = executeGet(url, timeout, Status.OK.getStatusCode()).getEntity().getContent()) {
+            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
      * Extended version to work in a docker context.
      *
      * @param baseURL the base url
@@ -2392,6 +2652,13 @@ public class TestUtils
 
     public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
         throws Exception
+    {
+        String url = getURL(prefix, path, queryParams, elements);
+
+        return executeGet(url, Status.OK.getStatusCode()).getEntity().getContent();
+    }
+
+    private String getURL(String prefix, String path, Map<String, ?> queryParams, Object... elements)
     {
         String cleanPrefix = Strings.CS.removeEnd(prefix, "/");
         if (path.startsWith(cleanPrefix)) {
@@ -2411,21 +2678,15 @@ public class TestUtils
             }
         }
 
-        String url = builder.build(elements).toString();
-
-        return executeGet(url, Status.OK.getStatusCode()).getResponseBodyAsStream();
+        return builder.build(elements).toString();
     }
 
-    protected GetMethod executeGet(String uri) throws Exception
+    protected CloseableHttpResponse executeGet(String uri) throws Exception
     {
-        GetMethod getMethod = new GetMethod(uri);
-
-        this.httpClient.executeMethod(getMethod);
-
-        return getMethod;
+        return execute(new HttpGet(uri));
     }
 
-    protected GetMethod executeGet(String uri, int... expectedCodes) throws Exception
+    protected CloseableHttpResponse executeGet(String uri, int... expectedCodes) throws Exception
     {
         return executeGet(uri, false, expectedCodes);
     }
@@ -2433,27 +2694,44 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected GetMethod executeGet(String uri, boolean release, int... expectedCodes) throws Exception
+    protected CloseableHttpResponse executeGet(String uri, boolean release, int... expectedCodes) throws Exception
     {
         return assertStatusCodes(executeGet(uri), release, expectedCodes);
     }
 
     /**
-     * @since 7.3M1
+     * Execute a GET request, waiting for the response at most the given time instead of the default socket timeout of
+     * the HTTP client (3 minutes).
+     *
+     * @param uri the URI to request
+     * @param timeout how long to wait for the response
+     * @param expectedCodes the accepted status codes of the response
+     * @return the response, which the caller is responsible for closing
+     * @throws Exception when failing to execute the request or when the response has an unexpected status code
+     * @since 18.8.0
      */
-    protected PostMethod executePost(String uri, InputStream content, String mediaType) throws Exception
+    protected CloseableHttpResponse executeGet(String uri, Duration timeout, int... expectedCodes) throws Exception
     {
-        PostMethod postMethod = new PostMethod(uri);
-        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
-        postMethod.setRequestEntity(entity);
+        HttpGet request = new HttpGet(uri);
+        // The response timeout replaces the socket timeout of the connection for this request.
+        request.setConfig(RequestConfig.custom().setResponseTimeout(Timeout.of(timeout)).build());
 
-        this.httpClient.executeMethod(postMethod);
-
-        return postMethod;
+        return assertStatusCodes(execute(request), false, expectedCodes);
     }
 
-    protected PostMethod executePost(String uri, InputStream content, String mediaType, int... expectedCodes)
-        throws Exception
+    /**
+     * @since 7.3M1
+     */
+    protected CloseableHttpResponse executePost(String uri, InputStream content, String mediaType) throws Exception
+    {
+        HttpPost postMethod = new HttpPost(uri);
+        postMethod.setEntity(new InputStreamEntity(content, ContentType.parse(mediaType)));
+
+        return execute(postMethod);
+    }
+
+    protected CloseableHttpResponse executePost(String uri, InputStream content, String mediaType,
+        int... expectedCodes) throws Exception
     {
         return executePost(uri, content, mediaType, true, expectedCodes);
     }
@@ -2461,7 +2739,7 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected PostMethod executePost(String uri, InputStream content, String mediaType, boolean release,
+    protected CloseableHttpResponse executePost(String uri, InputStream content, String mediaType, boolean release,
         int... expectedCodes) throws Exception
     {
         return assertStatusCodes(executePost(uri, content, mediaType), false, expectedCodes);
@@ -2470,13 +2748,9 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected DeleteMethod executeDelete(String uri) throws Exception
+    protected CloseableHttpResponse executeDelete(String uri) throws Exception
     {
-        DeleteMethod postMethod = new DeleteMethod(uri);
-
-        this.httpClient.executeMethod(postMethod);
-
-        return postMethod;
+        return execute(new HttpDelete(uri));
     }
 
     /**
@@ -2490,15 +2764,12 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected PutMethod executePut(String uri, InputStream content, String mediaType) throws Exception
+    protected CloseableHttpResponse executePut(String uri, InputStream content, String mediaType) throws Exception
     {
-        PutMethod putMethod = new PutMethod(uri);
-        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
-        putMethod.setRequestEntity(entity);
+        HttpPut putMethod = new HttpPut(uri);
+        putMethod.setEntity(new InputStreamEntity(content, ContentType.parse(mediaType)));
 
-        this.httpClient.executeMethod(putMethod);
-
-        return putMethod;
+        return execute(putMethod);
     }
 
     protected void executePut(String uri, InputStream content, String mediaType, int... expectedCodes) throws Exception
@@ -2506,10 +2777,24 @@ public class TestUtils
         executePut(uri, content, mediaType, true, expectedCodes);
     }
 
-    protected PutMethod executePut(String uri, InputStream content, String mediaType, boolean release,
+    protected CloseableHttpResponse executePut(String uri, InputStream content, String mediaType, boolean release,
         int... expectedCodes) throws Exception
     {
         return assertStatusCodes(executePut(uri, content, mediaType), release, expectedCodes);
+    }
+
+    /**
+     * Execute the passed request, using the default credentials.
+     *
+     * @param request the request to execute
+     * @return the response, which the caller is responsible for closing
+     * @throws IOException when failing to execute the request
+     * @since 18.8.0RC1
+     */
+    public CloseableHttpResponse execute(ClassicHttpRequest request) throws IOException
+    {
+        return this.httpClient.getClient().execute(request,
+            this.httpClient.getHttpClientContext(request, getDefaultCredentials()));
     }
 
     // REST
@@ -2540,6 +2825,21 @@ public class TestUtils
                 this.api = api;
                 this.localeAPI = localeAPI;
             }
+        }
+
+        /**
+         * Some actions to perform on the REST API, which can throw a checked {@link Exception}.
+         *
+         * @since 18.8.0RC1
+         */
+        @FunctionalInterface
+        public interface RestActions
+        {
+            /**
+             * @param rest the REST API to perform the actions on
+             * @throws Exception in case of error while performing the actions
+             */
+            void run(RestTestUtils rest) throws Exception;
         }
 
         /**
@@ -2767,7 +3067,7 @@ public class TestUtils
             save(page, true, expectedCodes);
         }
 
-        public EntityEnclosingMethod save(Page page, boolean release, int... expectedCodes) throws Exception
+        public CloseableHttpResponse save(Page page, boolean release, int... expectedCodes) throws Exception
         {
             if (expectedCodes.length == 0) {
                 // Allow create or modify by default
@@ -2910,16 +3210,32 @@ public class TestUtils
          * @since 18.2.0RC1
          * @since 17.10.4
          */
-        public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
+        public void savePageAs(XWikiCredentials credentials, EntityReference reference, String content,
             String syntaxId, String title, String parentFullPageName, boolean isHidden) throws Exception
         {
+            runAs(credentials,
+                rest -> rest.savePage(reference, content, syntaxId, title, parentFullPageName, isHidden));
+        }
+
+        /**
+         * Perform some actions on the REST API using the provided credentials and restore the previous credentials
+         * afterward. Only the credentials of the REST client are changed: the user the browser is logged in as, if
+         * any, is left untouched.
+         *
+         * @param credentials the credentials of the user to perform the actions as
+         * @param actions the actions to perform
+         * @throws Exception if an error occurs while performing the actions
+         * @since 18.8.0RC1
+         */
+        public void runAs(XWikiCredentials credentials, RestActions actions) throws Exception
+        {
             // Remember the current credentials
-            UsernamePasswordCredentials currentCredentials = this.testUtils.getDefaultCredentials();
+            XWikiCredentials currentCredentials = this.testUtils.getDefaultCredentials();
 
             try {
                 this.testUtils.setDefaultCredentials(credentials);
 
-                savePage(reference, content, syntaxId, title, parentFullPageName, isHidden);
+                actions.run(this);
             } finally {
                 // Restore initial credentials
                 this.testUtils.setDefaultCredentials(currentCredentials);
@@ -2937,7 +3253,7 @@ public class TestUtils
          * @since 18.2.0RC1
          * @since 17.10.4
          */
-        public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
+        public void savePageAs(XWikiCredentials credentials, EntityReference reference, String content,
             String title) throws Exception
         {
             savePageAs(credentials, reference, content, null, title, null, false);
@@ -2954,7 +3270,7 @@ public class TestUtils
         /**
          * Add a new object.
          */
-        public EntityEnclosingMethod add(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
+        public CloseableHttpResponse add(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
         {
             return TestUtils.assertStatusCodes(executePost(ObjectsResource.class, obj, toElements(obj, true)), release,
                 STATUS_CREATED);
@@ -2993,6 +3309,53 @@ public class TestUtils
         }
 
         /**
+         * Create a user, without going through the browser as {@link TestUtils#createUser(String, String, String,
+         * Object...)} does. The user is created active, and its password is hashed by the class' password property
+         * when it is set, so that the user can log in with it. It is added to {@code XWiki.XWikiAllGroup}, like the
+         * registration does, so that it gets the rights that are granted to that group.
+         * <p>
+         * The user must not exist yet: this adds a new user object, it does not update an existing one.
+         *
+         * @param credentials the login, taken as the name of the user in the {@code XWiki} space, and the password of
+         *            the user to create
+         * @param properties the extra properties of the user to create (name1, value1, name2, value2, ...), which
+         *            take precedence over the properties set by this method
+         * @throws Exception if an error occurs while creating the user
+         * @since 18.8.0RC1
+         */
+        public void createUser(XWikiCredentials credentials, Object... properties) throws Exception
+        {
+            String userName = credentials.getUserName();
+
+            addObject(new LocalDocumentReference("XWiki", userName), USER_CLASS_NAME,
+                ArrayUtils.addAll(new Object[] {"password", credentials.getPassword(), "active", "1"}, properties));
+
+            // The registration adds the new user to XWikiAllGroup, see XWiki#setUserDefaultGroup(). A lot of rights
+            // are usually granted to that group, so a user created here would otherwise be less privileged than a
+            // registered one.
+            addUserToAllGroup(userName);
+        }
+
+        private void addUserToAllGroup(String userName) throws Exception
+        {
+            String member = "XWiki." + userName;
+
+            // Don't add the user twice, like XWiki#addUserToGroup() does: the group document outlives the user
+            // documents, so the membership can still be there when a user of the same name is created again.
+            org.xwiki.rest.model.jaxb.Objects objects = get(ObjectsResource.class, ALL_GROUP_REFERENCE, false);
+            // The headline of an object summary is the value of the first property of the object, which is the
+            // member for XWiki.XWikiGroups as that's the only property of that class.
+            boolean isMember = objects != null
+                && objects.getObjectSummaries().stream()
+                    .anyMatch(object -> GROUP_CLASS_NAME.equals(object.getClassName())
+                        && member.equals(object.getHeadline()));
+
+            if (!isMember) {
+                addObject(ALL_GROUP_REFERENCE, GROUP_CLASS_NAME, "member", member);
+            }
+        }
+
+        /**
          * Fail if the object does not exist.
          */
         public void update(org.xwiki.rest.model.jaxb.Object obj) throws Exception
@@ -3003,7 +3366,7 @@ public class TestUtils
         /**
          * Fail if the object does not exist.
          */
-        public EntityEnclosingMethod update(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
+        public CloseableHttpResponse update(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
         {
             return TestUtils.assertStatusCodes(executePut(ObjectResource.class, obj, toElements(obj, false)), release,
                 STATUS_CREATED_ACCEPTED);
@@ -3066,11 +3429,11 @@ public class TestUtils
 
         public boolean exists(EntityReference reference) throws Exception
         {
-            GetMethod getMethod = executeGet(reference);
+            CloseableHttpResponse response = executeGet(reference);
 
-            getMethod.releaseConnection();
+            response.close();
 
-            return getMethod.getStatusCode() == Status.OK.getStatusCode();
+            return response.getCode() == Status.OK.getStatusCode();
         }
 
         /**
@@ -3081,6 +3444,36 @@ public class TestUtils
         public <T> T get(EntityReference reference) throws Exception
         {
             return get(reference, true);
+        }
+
+        /**
+         * Wait for the version of the given document to differ from the given one, whatever changes it (e.g. a save
+         * made in the background by an editor, a rollback or the deletion of a version). The document is polled over
+         * REST, so this works whichever browser tab (if any) changes it.
+         *
+         * @param reference the reference of the document to watch
+         * @param fromVersion the version the document has before the change
+         * @param timeout how long to wait, in seconds
+         * @return the version of the document after the change
+         * @throws org.openqa.selenium.TimeoutException if the document still has the given version after the timeout
+         * @since 18.9.0RC1
+         */
+        public String waitForVersionChange(EntityReference reference, String fromVersion, int timeout)
+        {
+            return new FluentWait<>(reference).withTimeout(Duration.ofSeconds(timeout))
+                .pollingEvery(Duration.ofMillis(500)).until(documentReference -> {
+                    String currentVersion = getPage(documentReference).getVersion();
+                    return fromVersion.equals(currentVersion) ? null : currentVersion;
+                });
+        }
+
+        private Page getPage(EntityReference documentReference)
+        {
+            try {
+                return get(documentReference);
+            } catch (Exception e) {
+                throw new RuntimeException(String.format("Failed to get the document [%s].", documentReference), e);
+            }
         }
 
         /**
@@ -3122,7 +3515,7 @@ public class TestUtils
             ResourceAPI resource = RESOURCES_MAP.get(reference.getType());
 
             if (resource == null) {
-                throw new Exception("Unsuported type [" + reference.getType() + "]");
+                throw new Exception("Unsupported type [" + reference.getType() + "]");
             }
 
             return getLocale(reference) != null ? resource.localeAPI : resource.api;
@@ -3164,22 +3557,22 @@ public class TestUtils
         public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference,
             boolean failIfNotFound) throws Exception
         {
-            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, queryParams, reference), false,
+            CloseableHttpResponse response = assertStatusCodes(executeGet(resourceURI, queryParams, reference), false,
                 failIfNotFound ? STATUS_OK : STATUS_OK_NOT_FOUND);
 
-            if (getMethod.getStatusCode() == Status.NOT_FOUND.getStatusCode()) {
+            if (response.getCode() == Status.NOT_FOUND.getStatusCode()) {
                 return null;
             }
 
             if (reference != null && reference.getType() == EntityType.ATTACHMENT) {
-                return (T) getMethod.getResponseBodyAsStream();
+                return (T) response.getEntity().getContent();
             } else {
                 try {
-                    try (InputStream stream = getMethod.getResponseBodyAsStream()) {
+                    try (InputStream stream = response.getEntity().getContent()) {
                         return toResource(stream);
                     }
                 } finally {
-                    getMethod.releaseConnection();
+                    response.close();
                 }
             }
         }
@@ -3217,7 +3610,7 @@ public class TestUtils
         public InputStream postInputStream(Object resourceUri, Object restObject, Map<String, Object[]> queryParams,
             Object... elements) throws Exception
         {
-            return executePost(resourceUri, restObject, queryParams, elements).getResponseBodyAsStream();
+            return executePost(resourceUri, restObject, queryParams, elements).getEntity().getContent();
         }
 
         public <T> T toResource(InputStream is) throws JAXBException
@@ -3244,7 +3637,7 @@ public class TestUtils
         /**
          * @since 7.3
          */
-        public GetMethod executeGet(EntityReference reference) throws Exception
+        public CloseableHttpResponse executeGet(EntityReference reference) throws Exception
         {
             Class<?> resource = getResourceAPI(reference);
 
@@ -3254,7 +3647,7 @@ public class TestUtils
         /**
          * @since 8.0M1
          */
-        public GetMethod executeGet(Object resourceURI, EntityReference reference) throws Exception
+        public CloseableHttpResponse executeGet(Object resourceURI, EntityReference reference) throws Exception
         {
             return executeGet(resourceURI, toElements(reference));
         }
@@ -3263,19 +3656,19 @@ public class TestUtils
          * @since 16.2.0RC1
          * @since 15.10.8
          */
-        public GetMethod executeGet(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference)
-            throws Exception
+        public CloseableHttpResponse executeGet(Object resourceURI, Map<String, Object[]> queryParams,
+            EntityReference reference) throws Exception
         {
             return executeGet(resourceURI, queryParams, toElements(reference));
         }
 
-        public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception
+        public CloseableHttpResponse executeGet(Object resourceUri, Object... elements) throws Exception
         {
             return executeGet(resourceUri, Collections.<String, Object[]>emptyMap(), elements);
         }
 
-        public GetMethod executeGet(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
-            throws Exception
+        public CloseableHttpResponse executeGet(Object resourceUri, Map<String, Object[]> queryParams,
+            Object... elements) throws Exception
         {
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();
@@ -3283,13 +3676,37 @@ public class TestUtils
             return this.testUtils.executeGet(uri);
         }
 
-        public PostMethod executePost(Object resourceUri, Object restObject, Object... elements) throws Exception
+        /**
+         * @return the body of the response as a string, failing if the resource cannot be retrieved
+         * @since 18.8.0RC1
+         */
+        public String getString(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
+            throws Exception
+        {
+            try (CloseableHttpResponse response = executeGet(resourceUri, queryParams, elements)) {
+                assertStatusCodes(response, false, STATUS_OK);
+
+                return EntityUtils.toString(response.getEntity());
+            }
+        }
+
+        /**
+         * @return the body of the response as a string, failing if the resource cannot be retrieved
+         * @since 18.8.0RC1
+         */
+        public String getString(Object resourceUri, Object... elements) throws Exception
+        {
+            return getString(resourceUri, Collections.<String, Object[]>emptyMap(), elements);
+        }
+
+        public CloseableHttpResponse executePost(Object resourceUri, Object restObject, Object... elements)
+            throws Exception
         {
             return executePost(resourceUri, restObject, Collections.<String, Object[]>emptyMap(), elements);
         }
 
-        public PostMethod executePost(Object resourceUri, Object restObject, Map<String, Object[]> queryParams,
-            Object... elements) throws Exception
+        public CloseableHttpResponse executePost(Object resourceUri, Object restObject,
+            Map<String, Object[]> queryParams, Object... elements) throws Exception
         {
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();
@@ -3299,13 +3716,14 @@ public class TestUtils
             }
         }
 
-        public PutMethod executePut(Object resourceUri, Object restObject, Object... elements) throws Exception
+        public CloseableHttpResponse executePut(Object resourceUri, Object restObject, Object... elements)
+            throws Exception
         {
             return executePut(resourceUri, restObject, Collections.<String, Object[]>emptyMap(), elements);
         }
 
-        public PutMethod executePut(Object resourceUri, Object restObject, Map<String, Object[]> queryParams,
-            Object... elements) throws Exception
+        public CloseableHttpResponse executePut(Object resourceUri, Object restObject,
+            Map<String, Object[]> queryParams, Object... elements) throws Exception
         {
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();
@@ -3315,13 +3733,13 @@ public class TestUtils
             }
         }
 
-        public DeleteMethod executeDelete(Object resourceUri, Object... elements) throws Exception
+        public CloseableHttpResponse executeDelete(Object resourceUri, Object... elements) throws Exception
         {
             return executeDelete(resourceUri, Collections.<String, Object[]>emptyMap(), elements);
         }
 
-        public DeleteMethod executeDelete(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
-            throws Exception
+        public CloseableHttpResponse executeDelete(Object resourceUri, Map<String, Object[]> queryParams,
+            Object... elements) throws Exception
         {
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();

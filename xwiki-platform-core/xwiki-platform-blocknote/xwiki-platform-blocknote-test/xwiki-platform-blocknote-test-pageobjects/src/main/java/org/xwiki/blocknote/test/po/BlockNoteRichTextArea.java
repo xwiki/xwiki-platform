@@ -21,6 +21,8 @@ package org.xwiki.blocknote.test.po;
 
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
@@ -100,6 +102,21 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         // Click on the top left corner of the rich text area to place the caret at the beginning of the content.
         getDriver().createActions().moveToElement(this.container, 0, 0).click().perform();
+        waitUntilFocused();
+        return this;
+    }
+
+    /**
+     * Clicks in the middle of the specified block, e.g. to place the caret inside its text.
+     *
+     * @param index the index of the block to click, starting from 0
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea clickBlock(int index)
+    {
+        getBlock(index).click();
+        waitUntilFocused();
         return this;
     }
 
@@ -137,7 +154,10 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         By trailingBlock = By.cssSelector(".bn-trailing-block");
         getDriver().waitUntilCondition(visibilityOfNestedElementsLocatedBy(this.container, trailingBlock));
-        getDriver().createActions().click(this.container.findElement(trailingBlock)).perform();
+        // When the trailing block is below the content (i.e., outside the viewport when the content is long) we need
+        // to scroll first.
+        WebElement trailingBlockElement = getDriver().scrollTo(this.container.findElement(trailingBlock));
+        getDriver().createActions().click(trailingBlockElement).perform();
         return sendKeys(keysToSend);
     }
 
@@ -174,10 +194,62 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea clickImage(int index)
     {
-        // The image might not be loaded yet, so wait until it's clickable before clicking on it.
-        WebElement image = this.container.findElements(By.tagName("img")).get(index);
+        // Note that this doesn't wait for the image to be loaded: an image that is still being fetched (or that failed
+        // to load, which some tests do on purpose) is already clickable, with the height of a single text line.
+        WebElement image = getImage(index);
         getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(image));
         image.click();
+        return this;
+    }
+
+    /**
+     * Returns the image with the specified index in the rich text area.
+     *
+     * @param index the index of the image to return, starting from 0
+     * @return the image element
+     * @since 18.6.0
+     */
+    public WebElement getImage(int index)
+    {
+        return this.container.findElements(By.tagName("img")).get(index);
+    }
+
+    /**
+     * Waits until the image with the specified index has been loaded successfully, i.e. until its size reflects the
+     * image content rather than the size of a not yet loaded image. Don't call this for an image that is expected to
+     * fail to load, e.g. one pointing to a missing attachment.
+     *
+     * @param index the index of the image to wait for, starting from 0
+     * @return the image element
+     * @since 18.7.0RC1
+     */
+    public WebElement waitUntilImageIsLoaded(int index)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return (Boolean) getDriver()
+                    .executeScript("return arguments[0].complete && arguments[0].naturalWidth > 0", getImage(index));
+            } catch (StaleElementReferenceException | IndexOutOfBoundsException e) {
+                // The editor is re-rendering the image, e.g. because its source has just been changed.
+                return false;
+            }
+        });
+        return getImage(index);
+    }
+
+    /**
+     * Waits until all the images in the rich text area have been loaded successfully, including the ones that are part
+     * of a macro output, such as the icon of an info box. Don't call this when an image is expected to fail to load.
+     *
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilImagesAreLoaded()
+    {
+        int imageCount = this.container.findElements(By.tagName("img")).size();
+        for (int i = 0; i < imageCount; i++) {
+            waitUntilImageIsLoaded(i);
+        }
         return this;
     }
 
@@ -190,14 +262,32 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public MacroDialogEditModal doubleClickMacro(int index)
     {
-        // The double click event listener is registered on the macro output wrapper which is the first child of the
-        // block content.
-        WebElement macro = this.container.findElements(By.cssSelector("""
-            .bn-block-content[data-content-type="Macro_xwikiMacroBlock"] > :first-child,
-            .bn-inline-content-section[data-inline-content-type="Macro_xwikiInlineMacro"] > :first-child"""))
-            .get(index);
+        WebElement macro = getMacro(index);
         getDriver().createActions().doubleClick(macro).perform();
         return new MacroDialogEditModal().waitUntilReady();
+    }
+
+    /**
+     * Single clicks on the macro with the specified index in the rich text area to select it (node selection). This is
+     * what makes the macro toolbar (e.g. the edit macro button) show up.
+     *
+     * @param index the index of the macro to select, starting from 0
+     * @return this rich text area instance
+     * @since 18.6.0
+     */
+    public BlockNoteRichTextArea selectMacro(int index)
+    {
+        getMacro(index).click();
+        return this;
+    }
+
+    private WebElement getMacro(int index)
+    {
+        // The double click event listener is registered on the macro output wrapper which is the first child of the
+        // block content.
+        return this.container.findElements(By.cssSelector("""
+            .bn-block-content[data-content-type="xwikiMacroBlock"] > :first-child,
+            .bn-inline-content-section[data-inline-content-type="xwikiInlineMacro"] > :first-child""")).get(index);
     }
 
     /**
@@ -296,5 +386,82 @@ public class BlockNoteRichTextArea extends BaseElement
             """;
         getDriver().waitUntilCondition(driver -> (boolean) getDriver().executeScript(script, this.container));
         return this;
+    }
+
+    /**
+     * Selects content with the keyboard. The specified range is relative to the start of the current line.
+     *
+     * @param offset how far from the start of the current line to move the caret (the selection start)
+     * @param length the selection length (the distance from the selection start to the selection end)
+     * @return this rich text area instance
+     * @since 18.7.0RC1
+     */
+    public BlockNoteRichTextArea select(int offset, int length)
+    {
+        moveCaretTo(offset);
+        if (length > 0) {
+            sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_RIGHT.toString().repeat(length)));
+        }
+        return this;
+    }
+
+    /**
+     * Moves the caret with the keyboard at the specified offset from the start of the current line.
+     *
+     * @param offset how far from the start of the current line to move the caret
+     * @return this rich text area instance
+     * @since 18.8.0RC1
+     */
+    public BlockNoteRichTextArea moveCaretTo(int offset)
+    {
+        // The browser moves the caret on its own for the keys the editor doesn't handle, and the editor only learns
+        // about it when the asynchronous selectionchange event fires. Keys sent in the same batch are processed before
+        // that, against an outdated selection, which makes the editor swallow them (e.g. it discards an arrow key
+        // because it still believes the caret is at the end of the line). So send HOME on its own and wait for the
+        // editor to see the caret at the start of the line, before asking it to move further.
+        sendKeys(Keys.HOME);
+        waitUntilCaretIsAt(0);
+        if (offset > 0) {
+            sendKeys(Keys.ARROW_RIGHT.toString().repeat(offset));
+            waitUntilCaretIsAt(offset);
+        }
+        return this;
+    }
+
+    /**
+     * Waits until the editor sees the caret at the specified offset from the start of the line it is on.
+     *
+     * @param offset the expected offset of the caret from the start of its line
+     */
+    private void waitUntilCaretIsAt(int offset)
+    {
+        // Read the offset from the editor rather than from the DOM selection: the editor is the one lagging behind,
+        // and thus the one we need to be in sync. Tiptap exposes its editor on the root editable element.
+        String script = "return arguments[0].editor.view.state.selection.$from.parentOffset";
+        getDriver().waitUntilCondition(
+            driver -> ((Number) getDriver().executeScript(script, this.container)).intValue() == offset);
+    }
+
+    /**
+     * Hovers the block with the specified index, in order to show its side menu.
+     *
+     * @param index the index of the block to hover, starting from 0
+     * @return the side menu of the hovered block
+     * @since 18.9.0RC1
+     */
+    public SideMenu hoverBlock(int index)
+    {
+        getDriver().createActions().moveToElement(getBlock(index)).perform();
+        return new SideMenu();
+    }
+
+    /**
+     * @param index the index of the block, starting from 0
+     * @return the element holding the content of the specified block
+     * @since 18.9.0RC1
+     */
+    public WebElement getBlock(int index)
+    {
+        return this.container.findElements(By.className("bn-block-content")).get(index);
     }
 }

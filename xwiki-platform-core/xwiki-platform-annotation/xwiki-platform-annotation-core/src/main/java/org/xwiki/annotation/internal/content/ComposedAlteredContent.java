@@ -59,8 +59,7 @@ public class ComposedAlteredContent implements AlteredContent
     public int getInitialOffset(int i)
     {
         int tmp = altered.getInitialOffset(i);
-        int rez = initial.getInitialOffset(tmp);
-        return rez;
+        return initial.getInitialOffset(tmp);
     }
 
     @Override
@@ -79,7 +78,6 @@ public class ComposedAlteredContent implements AlteredContent
     public int getAlteredOffset(int i)
     {
         int tmp = initial.getAlteredOffset(i);
-        int rez = altered.getAlteredOffset(tmp);
-        return rez;
+        return altered.getAlteredOffset(tmp);
     }
 }

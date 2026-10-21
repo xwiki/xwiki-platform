@@ -94,9 +94,9 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public DefaultNotificationFilterPreference(NotificationFilterPreference notificationFilterPreference,
         boolean keepId)
     {
-        if (keepId && notificationFilterPreference instanceof DefaultNotificationFilterPreference) {
-            this.internalId = ((DefaultNotificationFilterPreference) notificationFilterPreference).internalId;
-            this.owner = ((DefaultNotificationFilterPreference) notificationFilterPreference).owner;
+        if (keepId && notificationFilterPreference instanceof DefaultNotificationFilterPreference defaultPreference) {
+            this.internalId = defaultPreference.internalId;
+            this.owner = defaultPreference.owner;
         }
 
         this.id = notificationFilterPreference.getId();
@@ -179,6 +179,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     @Deprecated(since = "16.5.0RC1")
     public void setActive(boolean active)
     {
+        // Nothing to do, this deprecated setter is kept for backward compatibility only.
     }
 
     /**

@@ -119,7 +119,8 @@ public class LegacyEventMigrationJob
                 events = this.eventStream.searchEvents(query);
 
                 if (getRequest().isVerbose()) {
-                    this.logger.info("Synchronizing legacy events from index {} to {}", offset, offset + events.size());
+                    this.logger.info("Synchronizing legacy events from index [{}] to [{}]", offset,
+                        offset + events.size());
                 }
 
                 if (!events.isEmpty()) {
@@ -154,7 +155,7 @@ public class LegacyEventMigrationJob
         }
 
         if (getRequest().isVerbose()) {
-            this.logger.info("{} events were saved in the new store because they did not already exist",
+            this.logger.info("[{}] events were saved in the new store because they did not already exist",
                 eventsToSave.size());
         }
     }

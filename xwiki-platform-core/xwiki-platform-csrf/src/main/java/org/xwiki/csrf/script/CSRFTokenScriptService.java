@@ -39,7 +39,9 @@ import org.xwiki.stability.Unstable;
 @Singleton
 public class CSRFTokenScriptService implements CSRFToken, ScriptService
 {
-    /** Wrapped CSRF token component. */
+    /**
+     * Wrapped CSRF token component.
+     */
     @Inject
     private CSRFToken csrf;
 
@@ -49,7 +51,14 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
         return this.csrf.getToken();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @deprecated tokens are derived from the authentication validation key, the current user and the current time
+     *             period and cannot be cleared, there is no replacement
+     */
     @Override
+    @Deprecated(since = "18.9.0RC1")
     public void clearToken()
     {
         this.csrf.clearToken();
@@ -75,6 +84,7 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
      * @since 17.10.10
      */
     @Unstable
+    @Override
     public boolean isResubmitAllowedForRequestId(String srid)
     {
         return this.csrf.isResubmitAllowedForRequestId(srid);

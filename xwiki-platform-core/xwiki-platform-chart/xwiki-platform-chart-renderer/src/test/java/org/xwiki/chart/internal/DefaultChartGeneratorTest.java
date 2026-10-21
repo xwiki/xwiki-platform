@@ -21,8 +21,9 @@ package org.xwiki.chart.internal;
 
 import java.util.Map;
 
+import jakarta.inject.Named;
+
 import org.jfree.chart.plot.Plot;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.chart.ChartGenerator;
@@ -34,8 +35,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import jakarta.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -72,7 +71,6 @@ class DefaultChartGeneratorTest
         ChartModel model = mock(ChartModel.class);
         String type = "fooType";
         String title = "some title";
-
         when(componentManager.getInstance(PlotGenerator.class, type)).thenReturn(this.plotGenerator);
         Plot plot = mock(Plot.class);
         when(plotGenerator.generate(eq(model), anyMap())).thenReturn(plot);

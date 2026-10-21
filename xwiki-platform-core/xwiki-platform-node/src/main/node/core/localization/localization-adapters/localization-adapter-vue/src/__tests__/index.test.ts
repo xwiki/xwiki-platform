@@ -81,7 +81,10 @@ describe("useI18nAdapter", () => {
     await flushPromises();
 
     expect(resolver.resolve).toHaveBeenCalledOnce();
-    expect(resolver.resolve).toHaveBeenCalledWith(query);
+    expect(resolver.resolve).toHaveBeenCalledWith({
+      keys: query,
+      locale: "en",
+    });
   });
 
   it("merges translations into the current locale", async () => {
@@ -160,5 +163,38 @@ describe("useI18nAdapter", () => {
     await flushPromises();
 
     expect(resolver.resolve).toHaveBeenCalledTimes(2);
+    expect(resolver.resolve).toHaveBeenLastCalledWith({
+      keys: ["key1", "key2"],
+      locale: "fr",
+    });
+  });
+
+  it("keeps the prefix and resolves an object query in the current locale", async () => {
+    const resolver = buildResolver({});
+    const i18n = buildI18n("en");
+
+    mountWithComposable(resolver, { prefix: "ns.", keys: ["hello"] }, i18n);
+
+    await flushPromises();
+
+    expect(resolver.resolve).toHaveBeenCalledWith({
+      prefix: "ns.",
+      keys: ["hello"],
+      locale: "en",
+    });
+  });
+
+  it("does not override the locale pinned by the query", async () => {
+    const resolver = buildResolver({});
+    const i18n = buildI18n("en");
+
+    mountWithComposable(resolver, { keys: ["hello"], locale: "de" }, i18n);
+
+    await flushPromises();
+
+    expect(resolver.resolve).toHaveBeenCalledWith({
+      keys: ["hello"],
+      locale: "de",
+    });
   });
 });

@@ -83,7 +83,7 @@ class ExtensionInstallerTest
     }
 
     @Test
-    void installExtensionWithException() throws Exception
+    void installExtensionWithException()
     {
         // Test and verify
         WikiCreationException caughtException = assertThrows(WikiCreationException.class,

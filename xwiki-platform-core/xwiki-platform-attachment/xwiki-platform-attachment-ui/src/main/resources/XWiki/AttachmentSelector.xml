@@ -72,7 +72,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
 #**
  * Displays the attachment gallery as a list of attachment boxes, starting with special boxes for uploading a new attachment and for setting a default value.
  *
- * @param $targetDocument the document to recieve the field value being modified
+ * @param $targetDocument the document to receive the field value being modified
  * @param $targetAttachDocument the document to list/save attachments to
  * @param $options generic picker options
  *#
@@ -213,8 +213,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
     (% class="gallery_actions" %)(((
       #foreach ($action in $actions)
         #set( $actionname = $services.localization.render("${translationPrefix}.actions.${action.name}") )
+        ## Escape the URL so that it cannot break out of the link syntax, whatever its origin.
+        #set ($actionURL = $services.rendering.escape($action.url, 'xwiki/2.1'))
         [[${services.icon.render($action.icon)}(% class="sr-only"%)${actionname}(%%)&gt;&gt;##
-          path:${action.url}||class="tool ${action.name} $!{action.extraCssClass}"##
+          path:${actionURL}||class="tool ${action.name} $!{action.extraCssClass}"##
           title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
       #end
       $!additionalContent
@@ -306,7 +308,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #_attachmentPicker_displayStartFrame({'cssClass' : "gallery_emptyChoice $!{dcssClass}", 'text' : $services.localization.render("${translationPrefix}.default"), 'value' : "${options.defaultValue}"} $currentValue)
   #_attachmentPicker_displayAttachmentDetails($defaultAttachment $options)
   #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
-  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=&amp;form_token=$!{services.csrf.getToken()}"))
+  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, $escapetool.url({
+    "${options.get('classname')}_${options.get('object')}_${options.get('property')}": '',
+    'form_token': $!{services.csrf.getToken()}
+  })))
   #_attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL, 'icon' : 'check', 'extraCssClass' : 'btn btn-xs btn-success'}])
 #end
 {{/velocity}}
@@ -525,7 +530,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     // this.property.down('input').value = uploadForm.down('input[type="file"]').value;
     // uploadForm.xredirect.value = window.location.pathname;
     document.observe('xwiki:document:saved', function () {
-      new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')",
+      XWiki.widgets.Notification.show("$services.localization.render('xe.attachmentSelector.upload.inProgress')",
         'inprogress');
       uploadForm.submit();
     })
@@ -587,10 +592,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
         var hasErrors = false;
         uploadForm.select('input[type="file"]').each(function(fileInput) {
           if (fileInput.value == '') {
-            new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.noFile')", 'error');
+            XWiki.widgets.Notification.show("$services.localization.render('xe.attachmentSelector.upload.error.noFile')", 'error');
             hasErrors = true;
           } else if (fileInput.__allowedExtensions &amp;&amp; fileInput.__allowedExtensions.indexOf(this.getFileExtension(fileInput.value)) == -1) {
-            new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.badExtension')", 'error');
+            XWiki.widgets.Notification.show("$services.localization.render('xe.attachmentSelector.upload.error.badExtension')", 'error');
             hasErrors = true;
           }
           const beforeUploadEvent = Event.fire(document, 'xwiki:actions:beforeUpload', {
@@ -712,7 +717,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
               if (targetElement._x_notif) {
                 targetElement._x_notif.replace(new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.failed')" + failureReason, "error"));
               } else {
-                new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error");
+                XWiki.widgets.Notification.show(this.interactionParameters.failureMessageText + failureReason, "error");
               }
             },
             on0 : function(response) {
@@ -789,8 +794,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
   document.observe('xwiki:dom:loaded', function() {
     $$('.attachment-picker-start').invoke('observe', 'click', function(event) {
       event.stop();
-      var targetElement = event.element();
-      var url = targetElement.href;
+      const targetElement = event.target.closest('.attachment-picker-start');
+      let url = targetElement.dataset.modalUrl;
       if (url.indexOf('?') &lt; 0) {
         url += '?';
       }
@@ -1612,9 +1617,17 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #if ($hasTargetDoc)
       #set ($queryString.targetdocname = $targetdoc.fullName)
     #end
-    #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
-    (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
-      class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
+    #set ($linkLabel = $escapetool.xml($buttontext))
+    #set ($modalUrl = $escapetool.xml("$xcontext.macro.doc.URL?$escapetool.url($queryString)"))
+    {{html clean="false"}}
+      &lt;p&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;button type="button" class="attachment-picker-start button"
+            title="$!{linkLabel}"
+            data-modal-url="${modalUrl}"&gt;$!linkLabel&lt;/button&gt;
+        &lt;/span&gt;
+      &lt;/p&gt;
+    {{/html}}##
   #end
 #end
 {{/velocity}}

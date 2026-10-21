@@ -29,7 +29,6 @@ import javax.script.ScriptContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.component.annotation.Component;
@@ -66,7 +65,8 @@ public class CommentAddAction extends XWikiAction
     /** The name of the space where user profiles are kept. */
     private static final String USER_SPACE_PREFIX = "XWiki.";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommentAddAction.class);
+    @Inject
+    private Logger logger;
 
     @Inject
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
@@ -137,11 +137,8 @@ public class CommentAddAction extends XWikiAction
             // upload an image to be inserted in the comment).
             handleTemporaryUploadedFiles(doc, context.getRequest());
 
-            // Make sure the user is allowed to make this modification
-            context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
-
             // Save the new comment.
-            xwiki.saveDocument(doc, comment, true, context);
+            xwiki.saveDocument(doc, comment, true, true, context);
         }
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {
@@ -169,10 +166,9 @@ public class CommentAddAction extends XWikiAction
      *
      * @param context The XWikiContext for getting the request and whether guest comment requires a CAPTCHA
      * @return true if the CAPTCHA answer is correct or if CAPTCHA is not required
-     * @throws XWikiException if something goes wrong in the CAPTCHA module
      * @since 2.3M1
      */
-    private boolean checkCaptcha(XWikiContext context) throws XWikiException
+    private boolean checkCaptcha(XWikiContext context)
     {
         if (context.getWiki().getSpacePreferenceAsInt("guest_comment_requires_captcha", 0, context) == 1) {
             CaptchaConfiguration captchaConfiguration =
@@ -183,7 +179,8 @@ public class CommentAddAction extends XWikiAction
 
                 return captcha.isValid();
             } catch (Exception e) {
-                LOGGER.error("Failed to verify CAPTCHA of type [{}]. Assuming wrong answer.", defaultCaptchaName, e);
+                this.logger.error("Failed to verify CAPTCHA of type [{}]. Assuming wrong answer.",
+                    defaultCaptchaName, e);
                 return false;
             }
         } else {

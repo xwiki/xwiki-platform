@@ -108,9 +108,9 @@ public final class XARFilterUtils
 
     /**
      * @since 6.2M1
-     * @deprecated 7.2M1
+     * @deprecated use {@link #ROLEHINT_CURRENT} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public static final String ROLEHINT = ROLEHINT_11;
 
     private XARFilterUtils()

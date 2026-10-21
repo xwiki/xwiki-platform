@@ -21,12 +21,16 @@ package org.xwiki.repository.internal;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -42,7 +46,7 @@ import org.xwiki.model.reference.RegexEntityReference;
 
 import com.xpn.xwiki.objects.BaseObjectReference;
 
-public class XWikiRepositoryModel
+public final class XWikiRepositoryModel
 {
     // References
 
@@ -161,6 +165,12 @@ public class XWikiRepositoryModel
     // Properties
 
     public static final String PROP_EXTENSION_ID = "id";
+
+    /**
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public static final String PROP_PROJECT_ID = PROP_EXTENSION_ID;
 
     /**
      * @since 15.0RC1
@@ -349,20 +359,24 @@ public class XWikiRepositoryModel
 
     // Consolidation
 
-    public static final String PROP_EXTENSION_LASTVERSION = "lastVersion";
+    /**
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public static final String PROP_LASTVERSION = "lastVersion";
 
     public static final String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
 
     // Solr
-
-    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
-        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, "boolean");
 
     public static final String SOLR_STRING = "string";
 
     public static final String SOLR_INTEGER = "int";
 
     public static final String SOLR_BOOLEAN = "boolean";
+
+    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
+        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, SOLR_BOOLEAN);
 
     public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
 
@@ -429,7 +443,7 @@ public class XWikiRepositoryModel
         // Not very interesting for fulltext search
         SOLR_FIELDS.put(Extension.FIELD_AUTHOR, new ExtensionSolrField(PROP_EXTENSION_AUTHORS, null));
         SOLR_FIELDS.put(Extension.FIELD_AUTHORS, SOLR_FIELDS.get(Extension.FIELD_AUTHOR));
-        SOLR_FIELDS.put(Extension.FIELD_VERSION, new ExtensionSolrField(PROP_EXTENSION_LASTVERSION, null));
+        SOLR_FIELDS.put(Extension.FIELD_VERSION, new ExtensionSolrField(PROP_LASTVERSION, null));
         SOLR_FIELDS.put(Extension.FIELD_LICENSE, new ExtensionSolrField(PROP_EXTENSION_LICENSENAME, null));
         SOLR_FIELDS.put(Extension.FIELD_LICENSES, SOLR_FIELDS.get(Extension.FIELD_LICENSE));
         SOLR_FIELDS.put(Extension.FIELD_SCM, new ExtensionSolrField(PROP_EXTENSION_SCMURL, null));
@@ -468,6 +482,13 @@ public class XWikiRepositoryModel
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRepositoryModel.class);
+
+    private static final String REPOSITORY_PROPERTY_SEPARATOR = ";";
+
+    private XWikiRepositoryModel()
+    {
+        // Utility class, no instantiation.
+    }
 
     public static String toExtensionClassSolrPropertyName(String propertyName)
     {
@@ -537,7 +558,7 @@ public class XWikiRepositoryModel
             try {
                 reposiories.add(toRepositoryDescriptor(stringRepository, factory));
             } catch (URISyntaxException e) {
-                LOGGER.warn("Failed to parse repository descriptor [{}]", stringRepository,
+                LOGGER.warn("Failed to parse repository descriptor [{}]. Root cause is [{}]", stringRepository,
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -546,23 +567,37 @@ public class XWikiRepositoryModel
     }
 
     /**
+     * Parse a repository serialized with {@link #toString(ExtensionRepositoryDescriptor)}.
+     * <p>
+     * The format is {@code <id>:<type>[;<key>=<value>]*:<uri>} where property keys and values are URL encoded.
+     *
      * @since 8.4
      */
     public static ExtensionRepositoryDescriptor toRepositoryDescriptor(String repository, ExtensionFactory factory)
         throws URISyntaxException
     {
-        int index;
-
         // Id
-        String id = repository.substring(0, index = repository.indexOf(':'));
+        int idIndex = repository.indexOf(':');
+        String id = repository.substring(0, idIndex);
 
-        // Type
-        String type = repository.substring(index + 1, index = repository.indexOf(':', index + 1));
+        // Type and properties
+        int typeIndex = repository.indexOf(':', idIndex + 1);
+        String[] typeElements = repository.substring(idIndex + 1, typeIndex).split(REPOSITORY_PROPERTY_SEPARATOR);
+        String type = typeElements[0];
+        Map<String, String> properties = new HashMap<>();
+        for (int i = 1; i < typeElements.length; ++i) {
+            String property = typeElements[i];
+            int equalIndex = property.indexOf('=');
+            if (equalIndex > 0) {
+                properties.put(URLDecoder.decode(property.substring(0, equalIndex), StandardCharsets.UTF_8),
+                    URLDecoder.decode(property.substring(equalIndex + 1), StandardCharsets.UTF_8));
+            }
+        }
 
         // URI
-        URI uri = new URI(repository.substring(index + 1, repository.length()));
+        URI uri = new URI(repository.substring(typeIndex + 1, repository.length()));
 
-        return factory.getExtensionRepositoryDescriptor(id, type, uri, null);
+        return factory.getExtensionRepositoryDescriptor(id, type, uri, properties);
     }
 
     /**
@@ -580,11 +615,35 @@ public class XWikiRepositoryModel
     }
 
     /**
+     * Serialize a repository as {@code <id>:<type>[;<key>=<value>]*:<uri>}.
+     * <p>
+     * The properties are stored between the type and the URI because the URI can contain almost anything. Keys and
+     * values are URL encoded so that they can't contain the separators of the format or the ones of the list xproperty
+     * ({@code |}, {@code ,} and space) in which the result is stored.
+     *
      * @since 7.3M1
      */
     public static String toString(ExtensionRepositoryDescriptor repository)
     {
-        return repository != null ? StringUtils.defaultString(repository.getId()) + ':' + repository.getType() + ':'
-            + repository.getURI().toString() : null;
+        if (repository == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(StringUtils.defaultString(repository.getId()));
+        builder.append(':');
+        builder.append(repository.getType());
+        // Sort the properties to get a stable result
+        for (Map.Entry<String, String> property : new TreeMap<>(repository.getProperties()).entrySet()) {
+            builder.append(REPOSITORY_PROPERTY_SEPARATOR);
+            builder.append(URLEncoder.encode(property.getKey(), StandardCharsets.UTF_8));
+            builder.append('=');
+            builder.append(URLEncoder.encode(StringUtils.defaultString(property.getValue()), StandardCharsets.UTF_8));
+        }
+        builder.append(':');
+        builder.append(repository.getURI().toString());
+
+        return builder.toString();
     }
 }

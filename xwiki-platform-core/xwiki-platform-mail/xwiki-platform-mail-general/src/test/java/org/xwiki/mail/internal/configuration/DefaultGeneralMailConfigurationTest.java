@@ -40,7 +40,7 @@ import static org.mockito.Mockito.*;
  * @since 12.4RC1
  */
 @ComponentTest
-public class DefaultGeneralMailConfigurationTest
+class DefaultGeneralMailConfigurationTest
 {
     @InjectMockComponents
     private DefaultGeneralMailConfiguration configuration;
@@ -61,14 +61,14 @@ public class DefaultGeneralMailConfigurationTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @BeforeEach
-    public void setUp()
+    void setUp()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainwiki");
         when(this.wikiDescriptorManager.isMainWiki("mainwiki")).thenReturn(true);
     }
 
     @Test
-    public void shouldObfuscateWhenNotConfigured()
+    void shouldObfuscateWhenNotConfigured()
     {
         // Simulate the default value returned by the call to getProperty() and not the value of the
         // "mail.general.obfuscateEmailAddresses" property which is supposed to be null here...
@@ -77,7 +77,7 @@ public class DefaultGeneralMailConfigurationTest
     }
 
     @Test
-    public void shouldObfuscateWhenDefinedInXWikiProperties()
+    void shouldObfuscateWhenDefinedInXWikiProperties()
     {
         when(this.xwikiPropertiesSource.getProperty("mail.general.obfuscate", false)).thenReturn(true);
 
@@ -85,7 +85,7 @@ public class DefaultGeneralMailConfigurationTest
     }
 
     @Test
-    public void shouldObfuscateFromMailConfigDocumentInMainWiki()
+    void shouldObfuscateFromMailConfigDocumentInMainWiki()
     {
         when(this.currentWikiMailConfigDocumentSource.getProperty("obfuscate", Boolean.class))
             .thenReturn(true);
@@ -94,7 +94,7 @@ public class DefaultGeneralMailConfigurationTest
     }
 
     @Test
-    public void shouldObfuscateFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
+    void shouldObfuscateFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);

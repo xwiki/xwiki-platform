@@ -204,10 +204,10 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     @Override
     protected XWikiSolrCore createCore(String xwikiCoreName, boolean isCache) throws SolrException
     {
-        int solrMajorVersion = getSolrMajorVersion();
+        int coreMajorVersion = getCoreMajorVersion();
 
         // Resolve the real Solr core name
-        String solrCoreName = toSolrCoreName(xwikiCoreName, solrMajorVersion);
+        String solrCoreName = toSolrCoreName(xwikiCoreName, coreMajorVersion);
 
         // Prepare the filesystem
         // TODO: get rid of that when we find out how to have Solr fully create the core as it should...
@@ -232,7 +232,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         SolrCore core = this.container.create(solrCoreName, parameters);
 
         // Return a usable SolrClient instance
-        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, new EmbeddedClient(core), solrMajorVersion);
+        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, new EmbeddedClient(core), coreMajorVersion);
     }
 
     private Path prepareCore(String solrCoreName) throws IOException
@@ -294,7 +294,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                 }
             }
         } catch (Exception e) {
-            this.logger.warn("Failed to parse Solr configuration at [{}]: {}", solrconfigFile,
+            this.logger.warn("Failed to parse Solr configuration at [{}]: [{}]", solrconfigFile,
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
@@ -329,7 +329,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                 }
             }
         } catch (Exception e) {
-            this.logger.warn("Failed to parse Solr configuration at [{}]: {}", schemaFile,
+            this.logger.warn("Failed to parse Solr configuration at [{}]: [{}]", schemaFile,
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
@@ -381,12 +381,9 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
         // Check the version of the schema
         File schemaFile = this.solrSearchCorePath.resolve(SCHEMA_PATH).toFile();
-        if (!schemaFile.exists() || SEARCH_CORE_MAJOR_VERSION > getCoreVersion(schemaFile)) {
-            return false;
-        }
 
         // Everything seems to have as expected
-        return true;
+        return schemaFile.exists() && SEARCH_CORE_MAJOR_VERSION <= getCoreVersion(schemaFile);
     }
 
     private void recreateSearchCore() throws IOException
@@ -518,8 +515,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
     private File getCacheCorePropertiesFile(Path corePath)
     {
-        File corePropertiesFile = corePath.resolve(CORE_PROPERTIES_FILENAME).toFile();
-        return corePropertiesFile;
+        return corePath.resolve(CORE_PROPERTIES_FILENAME).toFile();
     }
 
     private void createCacheCore(Path corePath, String solrCoreName) throws IOException

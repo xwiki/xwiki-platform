@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Izlistaj sve wikije
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Radni prostor (naslijeđeno)
 rendering.macro.workspaces.description=Precrtani makro koji ne bi trebao biti korišten, ovdje radi kompatibilnosti. Molim umjesto njega upotrijebite "wikis" makro.
-
-## Browse
-platform.wiki.browse=Razgledaj wikije
 platform.wiki.browse.emptyvalue=-
 platform.wiki.browse.wikiprettyname=Ime
 platform.wiki.browse.description=Opis
@@ -226,7 +223,6 @@ platform.wiki.create.wizard.step.dw=Nakon klikanja na gumb "Izradi" bit će izra
 platform.wiki.create.wizard.step.previous=Prethodni korak
 platform.wiki.create.wizard.step.next=Idi na sljedeći korak
 platform.wiki.create.wizard.step.create=Izradi
-
 platform.wiki.create.wizard.step.creation=Izrada wikija
 platform.wiki.create.wizard.step.creation.wait=Molim pričekajte dok wiki ne bude izrađen.
 platform.wiki.create.wizard.step.creation.complete=Wiki {0} je uspješno izrađen. Sada mu možete pristupiti.
@@ -302,6 +298,10 @@ platform.wiki.create.wizard.step.provisioning.finalize=Završi
 platform.wiki.delete.confirmation.yes=Da, molim obriši ovaj wiki\!
 platform.wiki.delete.confirmation.no=Ne, vrati me natrag\!
 
+## Browse
+platform.wiki.browse=Razgledaj wikije
+
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

@@ -138,8 +138,8 @@ public class NotificationNotifiersScriptService implements ScriptService
     }
 
     /**
-     * Compute the HTML fragment for the async placehoder.
-     * @param response the async response containing ID informations for the placeholder
+     * Compute the HTML fragment for the async placeholder.
+     * @param response the async response containing ID information for the placeholder
      * @param inline if {@code true} returns a span else a div.
      * @return a string containing the HTML for the placeholder.
      */

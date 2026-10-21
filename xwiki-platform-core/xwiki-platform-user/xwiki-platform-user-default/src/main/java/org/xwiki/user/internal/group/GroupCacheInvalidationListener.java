@@ -85,8 +85,8 @@ public class GroupCacheInvalidationListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent) {
-            WikiReference wikiReference = new WikiReference(((WikiDeletedEvent) event).getWikiId());
+        if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            WikiReference wikiReference = new WikiReference(wikiDeletedEvent.getWikiId());
             this.groupsCache.cleanCache(wikiReference.getName());
             this.membersCache.cleanCache(wikiReference.getName());
             this.wikiGroupCache.invalidate(wikiReference.getName());
@@ -136,7 +136,7 @@ public class GroupCacheInvalidationListener extends AbstractEventListener
             return Set.of();
         }
 
-        Set<DocumentReference> members = new HashSet<>(memberObjects.size());
+        Set<DocumentReference> members = HashSet.newHashSet(memberObjects.size());
         for (BaseObject memberObject : memberObjects) {
             if (memberObject != null) {
                 String memberString = memberObject.getStringValue("member");

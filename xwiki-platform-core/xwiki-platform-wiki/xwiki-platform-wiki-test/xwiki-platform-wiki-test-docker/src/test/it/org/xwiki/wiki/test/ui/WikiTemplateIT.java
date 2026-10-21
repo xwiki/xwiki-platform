@@ -21,7 +21,13 @@ package org.xwiki.wiki.test.ui;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.test.junit5.ExtensionTestUtils;
 import org.xwiki.livedata.test.po.TableLayoutElement;
+import org.xwiki.model.namespace.WikiNamespace;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -50,12 +56,18 @@ import static org.xwiki.wiki.test.po.WikiIndexPage.WIKI_NAME_COLUMN_LABEL;
  * @version $Id$
  */
 @UITest(
+    // Make the extensions declared in src/test/resources available to the instance, so that the test can install one
+    // of them on the template wiki.
+    testExtensionRepository = true,
     properties = {
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
         // Deleting a wiki through a script service currently requires that the document hold the script
         // has programming rights, see https://tinyurl.com/2p8u5mhu
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:WikiManager\\.DeleteWiki"
+        // The page used by ExtensionTestUtils to query the installed extensions executes a script which needs
+        // programming right too.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
+            + ".*:(WikiManager\\.DeleteWiki|ExtensionTest\\.Service)"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
@@ -91,21 +103,42 @@ class WikiTemplateIT
 {
     private static final String TEMPLATE_WIKI_ID = "mynewtemplate";
 
+    private static final String WIKI_ID = "mynewwiki";
+
     private static final String TEMPLATE_CONTENT = "Content of the template";
+
+    /**
+     * Extension generated from the {@code packagefile/templateextension} test resources and made available to XWiki
+     * through the test extension repository.
+     */
+    private static final ExtensionId EXTENSION_ID = new ExtensionId("maven:templateextension", "1.0");
+
+    /**
+     * The page brought by {@link #EXTENSION_ID}.
+     */
+    private static final LocalDocumentReference EXTENSION_PAGE =
+        new LocalDocumentReference("TemplateExtension", "TestPage");
 
     @Test
     @Order(1)
-    void createWikiFromTemplateTest(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
+    void createWikiFromTemplateTest(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration,
+        ExtensionTestUtils extensionUtils) throws Exception
     {
         setup.loginAsSuperAdmin();
 
         // Create the template.
         createTemplateWiki(setup);
 
+        // Install an extension on the template wiki, so that we also verify that the extensions installed on a
+        // template are installed on the wikis created from that template.
+        extensionUtils.install(EXTENSION_ID, new WikiNamespace(TEMPLATE_WIKI_ID));
+        assertTrue(extensionUtils.isInstalled(EXTENSION_ID, new WikiNamespace(TEMPLATE_WIKI_ID)),
+            "The extension was not installed on the template wiki.");
+
         // Create the wiki from the template
-        createWikiFromTemplate();
+        createWikiFromTemplate(setup, extensionUtils);
         // Do it twice to check if we can create a wiki with the name of a deleted one.
-        createWikiFromTemplate();
+        createWikiFromTemplate(setup, extensionUtils);
 
         // Delete the template wiki.
         deleteTemplateWiki();
@@ -176,7 +209,7 @@ class WikiTemplateIT
         assertNull(wikiIndexPage.getWikiLink("My new template", false));
     }
 
-    private void createWikiFromTemplate()
+    private void createWikiFromTemplate(TestUtils setup, ExtensionTestUtils extensionUtils) throws Exception
     {
         // Go to the wiki creation wizard.
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
@@ -185,7 +218,7 @@ class WikiTemplateIT
         // First step.
         createWikiPage.setPrettyName("My new wiki");
         String wikiName = createWikiPage.getComputedName();
-        assertEquals("mynewwiki", wikiName);
+        assertEquals(WIKI_ID, wikiName);
         createWikiPage.setTemplate(TEMPLATE_WIKI_ID);
         createWikiPage.setIsTemplate(false);
         createWikiPage.setDescription("My first wiki");
@@ -199,8 +232,17 @@ class WikiTemplateIT
         // Go the created subwiki and verify the content of the main page is the same than in the template.
         assertEquals(TEMPLATE_CONTENT, wikiHomePage.getContent());
 
-        // Delete the wiki
-        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki("My new wiki");
+        // Verify that the extension installed on the template wiki is also installed on the wiki created from it,
+        // and that the page it brings has been copied.
+        assertTrue(extensionUtils.isInstalled(EXTENSION_ID, new WikiNamespace(WIKI_ID)),
+            "The extension installed on the template wiki was not installed on the wiki created from that template.");
+        assertTrue(setup.rest().exists(new DocumentReference(EXTENSION_PAGE, new WikiReference(WIKI_ID))),
+            "The page brought by the extension was not copied to the wiki created from the template.");
+
+        // Delete the wiki. Note that we go to the wiki index explicitly rather than through the home page of the new
+        // wiki, because querying the installed extensions above navigated the browser to the ExtensionTestUtils
+        // service page.
+        DeleteWikiPage deleteWikiPage = WikiIndexPage.gotoPage().deleteWiki("My new wiki");
         deleteWikiPage = deleteWikiPage.confirm("");
         assertTrue(deleteWikiPage.hasUserErrorMessage());
         assertTrue(deleteWikiPage.hasWikiDeleteConfirmationInput(""));
@@ -209,7 +251,7 @@ class WikiTemplateIT
         assertTrue(deleteWikiPage.hasUserErrorMessage());
         assertTrue(deleteWikiPage.hasWikiDeleteConfirmationInput("My new wiki"));
 
-        deleteWikiPage = deleteWikiPage.confirm("mynewwiki");
+        deleteWikiPage = deleteWikiPage.confirm(WIKI_ID);
         assertTrue(deleteWikiPage.hasSuccessMessage());
 
         // Verify the wiki has been deleted.

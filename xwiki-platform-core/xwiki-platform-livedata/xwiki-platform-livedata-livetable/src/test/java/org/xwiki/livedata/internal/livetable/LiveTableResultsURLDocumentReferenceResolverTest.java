@@ -116,7 +116,7 @@ class LiveTableResultsURLDocumentReferenceResolverTest
     }
 
     @Test
-    void resolveNonDocumentURL() throws Exception
+    void resolveNonDocumentURL()
     {
         assertNull(this.urlDocumentReferenceResolver.resolve("/xwiki/rest/wikis"));
     }

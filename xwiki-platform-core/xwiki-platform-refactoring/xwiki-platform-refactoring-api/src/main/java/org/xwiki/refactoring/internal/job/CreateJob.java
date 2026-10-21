@@ -118,19 +118,14 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
 
         if (templateSpaceReference != null) {
             // Space from template space.
-            visitDocuments(templateSpaceReference, new Visitor<DocumentReference>()
-            {
-                @Override
-                public void visit(final DocumentReference templateDocumentReference)
-                {
-                    DocumentReference newDocumentReference =
-                        templateDocumentReference.replaceParent(templateSpaceReference, newSpaceReference);
-                    try {
-                        maybeCreate(newDocumentReference, templateDocumentReference);
-                    } catch (Exception e) {
-                        logger.error("Failed to create document with reference [{}] and template [{}]",
-                            newDocumentReference, templateDocumentReference, e);
-                    }
+            visitDocuments(templateSpaceReference, templateDocumentReference -> {
+                DocumentReference newDocumentReference =
+                    templateDocumentReference.replaceParent(templateSpaceReference, newSpaceReference);
+                try {
+                    maybeCreate(newDocumentReference, templateDocumentReference);
+                } catch (Exception e) {
+                    logger.error("Failed to create document with reference [{}] and template [{}]",
+                        newDocumentReference, templateDocumentReference, e);
                 }
             });
         } else {
@@ -164,7 +159,7 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
             // Should generally not happen, but you never know.
             this.logger.error("Template document [{}] does not exist.", templateDocumentReference);
         } else {
-            this.modelBridge.copy(templateDocumentReference, newDocumentReference);
+            this.modelBridge.copy(templateDocumentReference, newDocumentReference, this.request.isCheckRights());
         }
     }
 }

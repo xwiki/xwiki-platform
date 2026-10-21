@@ -43,6 +43,7 @@ import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
@@ -283,6 +284,32 @@ class XWikiAttachmentTest
     }
 
     @Test
+    void applyMimeType()
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+        attachment.setMimeType("text/plain");
+        XWikiAttachment newAttachment = new XWikiAttachment();
+        newAttachment.setMimeType("text/html");
+
+        assertTrue(attachment.apply(newAttachment));
+
+        assertEquals("text/html", attachment.getMimeType());
+    }
+
+    @Test
+    void applyIdenticalAttachment() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+        attachment.setMimeType("text/plain");
+        attachment.setContent(new ByteArrayInputStream("content".getBytes()));
+        XWikiAttachment newAttachment = new XWikiAttachment();
+        newAttachment.setMimeType("text/plain");
+        newAttachment.setContent(new ByteArrayInputStream("content".getBytes()));
+
+        assertFalse(attachment.apply(newAttachment));
+    }
+
+    @Test
     void resetMimeType()
     {
         XWikiAttachment attachment = new XWikiAttachment();
@@ -396,8 +423,8 @@ class XWikiAttachmentTest
 
         // Expected because the attachment content is not set. The attachment content is normally set by the
         // loadAttachmentContent call we verify below.
-        assertThrows(NullPointerException.class,
-            () -> attachment.getContentInputStream(this.oldCore.getXWikiContext()));
+        XWikiContext context = this.oldCore.getXWikiContext();
+        assertThrows(NullPointerException.class, () -> attachment.getContentInputStream(context));
     }
 
     @Test
@@ -417,7 +444,8 @@ class XWikiAttachmentTest
         when(document.getAttachment(attachment.getFilename())).thenReturn(newAttachment);
 
         XWikiAttachmentContent content = mock(XWikiAttachmentContent.class);
-        when(content.getContentInputStream()).thenReturn(mock(InputStream.class));
+        InputStream inputStreamMock = mock(InputStream.class);
+        when(content.getContentInputStream()).thenReturn(inputStreamMock);
 
         XWikiAttachment archivedAttachment = new XWikiAttachment(document, attachment.getFilename());
         archivedAttachment.setAttachment_content(content);

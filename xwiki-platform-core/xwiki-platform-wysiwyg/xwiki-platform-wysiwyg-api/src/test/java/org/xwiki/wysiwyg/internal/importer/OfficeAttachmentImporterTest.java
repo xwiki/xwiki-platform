@@ -93,7 +93,7 @@ class OfficeAttachmentImporterTest
     private XWikiContext context;
 
     @BeforeEach
-    void configure() throws Exception
+    void configure()
     {
         when(this.entityReferenceSerializer.serialize(ATTACHMENT_REFERENCE)).thenReturn("Some.Page@my.doc");
         this.context = mock(XWikiContext.class);
@@ -112,7 +112,7 @@ class OfficeAttachmentImporterTest
     }
 
     @Test
-    void toHTMLRequiresEditRight() throws Exception
+    void toHTMLRequiresEditRight()
     {
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
             officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Map.of());
@@ -121,7 +121,7 @@ class OfficeAttachmentImporterTest
     }
 
     @Test
-    void toHTMLAttachmentNotFound() throws Exception
+    void toHTMLAttachmentNotFound()
     {
         when(this.authorization.hasAccess(Right.EDIT, ATTACHMENT_REFERENCE)).thenReturn(true);
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {

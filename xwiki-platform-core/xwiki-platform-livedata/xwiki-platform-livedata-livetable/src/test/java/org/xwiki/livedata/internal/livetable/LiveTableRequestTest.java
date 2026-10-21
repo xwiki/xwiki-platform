@@ -28,7 +28,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -57,12 +57,8 @@ class LiveTableRequestTest
         assertEquals("one", this.liveTableRequest.getParameter("alice"));
         assertEquals("one", this.liveTableRequest.get("alice"));
 
-        try {
-            this.liveTableRequest.getParameter("bob");
-            fail();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // This is expected, because the parameters map should either don't have an entry or have an entry with at
-            // least one value.
-        }
+        // An exception is expected, because the parameters map should either don't have an entry or have an entry
+        // with at least one value.
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> this.liveTableRequest.getParameter("bob"));
     }
 }

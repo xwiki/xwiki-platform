@@ -29,11 +29,12 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
- * @deprecated since 13.0, it's redundant with {@link ViewAction} which should be preferred
+ * @deprecated it's redundant with {@link ViewAction} which should be preferred
  */
 @Component
 @Named("viewrev")
 @Singleton
+@Deprecated(since = "13.0")
 public class ViewrevAction extends XWikiAction
 {
     /**

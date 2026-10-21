@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -93,7 +92,7 @@ public class ReviewMapFilter
                         .anyMatch(it -> pattern.matcher(it).matches());
                 }
                 return match;
-            }).collect(Collectors.toList()));
+            }).toList());
         }
 
         // Replace the content with the filtered content.

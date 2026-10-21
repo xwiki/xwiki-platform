@@ -67,12 +67,6 @@ public class UsersClass extends ListClass
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(UsersClass.class);
 
-    /**
-     * The meta property that specifies if the list box that is used to select the users should be filled with all the
-     * available users. This property should not be set when the number of users is very large.
-     */
-    private static final String META_PROPERTY_USES_LIST = "usesList";
-
     private static final String COMMA = ",";
 
     /**
@@ -112,7 +106,7 @@ public class UsersClass extends ListClass
             return (List<String>) context.getWiki().getGroupService(context)
                 .getAllMatchedUsers(null, false, 0, 0, null, context);
         } catch (XWikiException e) {
-            LOGGER.warn("Failed to retrieve the list of users.", e);
+            LOGGER.warn("Failed to retrieve the list of users", e);
             return Collections.emptyList();
         }
     }
@@ -135,31 +129,6 @@ public class UsersClass extends ListClass
             result = Collections.emptyMap();
         }
         return result;
-    }
-
-    /**
-     * @return {@code true} if the list box that is used to select the users should be filled with all the available
-     *         users, {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
-     */
-    @Deprecated
-    public boolean isUsesList()
-    {
-        return getIntValue(META_PROPERTY_USES_LIST) == 1;
-    }
-
-    /**
-     * Sets whether to list all the available users in the list box used to select the users. This property should not
-     * be set when the number of users is very large.
-     *
-     * @param usesList {@code true} to fill the list box that is used to select the users with all the available users,
-     *            {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
-     */
-    @Deprecated
-    public void setUsesList(boolean usesList)
-    {
-        setIntValue(META_PROPERTY_USES_LIST, usesList ? 1 : 0);
     }
 
     /**

@@ -24,7 +24,7 @@ import org.openqa.selenium.By;
 import org.xwiki.index.tree.test.po.DocumentPickerModal;
 
 /**
- * Represents the tree modal opened when chosing a link.
+ * Represents the tree modal opened when choosing a link.
  *
  * @version $Id$
  * @since 16.8.0RC1

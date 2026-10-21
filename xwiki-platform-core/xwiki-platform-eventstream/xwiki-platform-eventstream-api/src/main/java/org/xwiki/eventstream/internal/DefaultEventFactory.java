@@ -32,8 +32,8 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 
 /**
  * Default implementation of the {@link EventFactory}, creating {@link DefaultEvent} objects as {@link Event events}.

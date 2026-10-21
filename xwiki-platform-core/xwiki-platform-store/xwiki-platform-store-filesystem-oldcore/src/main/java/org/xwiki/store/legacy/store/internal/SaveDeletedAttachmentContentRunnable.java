@@ -64,14 +64,12 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
         final Serializer<List<XWikiAttachment>, List<XWikiAttachment>> versionSerializer, final XWikiContext context)
         throws XWikiException, BlobStoreException
     {
-        //////////////////////////////////////////////
         // Save metadata about the deleted attachment.
 
         final StreamProvider metaProvider =
             new SerializationStreamProvider<XWikiAttachment>(metaSerializer, attachment);
         addSaver(metaProvider, fileTools, provider.getDeletedAttachmentMetaBlob());
 
-        //////////////////////////////////////////////
         // Save the archive for the deleted attachment.
 
         final XWikiAttachmentArchive archive = attachment.loadArchive(context);
@@ -80,7 +78,6 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
         }
         new AttachmentArchiveSaveRunnable(archive, fileTools, provider, versionSerializer, context).runIn(this);
 
-        //////////////////////////////////////////////
         // Save the attachment's content.
 
         Blob attachBlob = provider.getAttachmentContentBlob();

@@ -21,8 +21,9 @@ package org.xwiki.flamingo.test.docker;
 
 import java.net.URI;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.Strings;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.test.docker.junit5.UITest;
@@ -46,13 +47,13 @@ class SkinActionIT
         URI uri = new URI(
             Strings.CS.removeEnd(setup.rest().getBaseURL(), "rest") + "bin/skin/" + resource);
 
-        GetMethod response = setup.rest().executeGet(uri);
+        CloseableHttpResponse response = setup.rest().executeGet(uri);
 
         try {
-            assertEquals(200, response.getStatusCode(), "Failed to retrieve resource: " + resource);
-            assertEquals("parent=\noutputSyntax=html/5.0\n", response.getResponseBodyAsString());
+            assertEquals(200, response.getCode(), "Failed to retrieve resource: " + resource);
+            assertEquals("parent=\noutputSyntax=html/5.0\n", EntityUtils.toString(response.getEntity()));
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
 
@@ -63,12 +64,12 @@ class SkinActionIT
         URI uri = new URI(
             Strings.CS.removeEnd(setup.rest().getBaseURL(), "rest") + "bin/skin/" + resource);
 
-        GetMethod response = setup.rest().executeGet(uri);
+        CloseableHttpResponse response = setup.rest().executeGet(uri);
 
         try {
-            assertNotEquals(200, response.getStatusCode(), "Unexpectedly found resource: " + resource);
+            assertNotEquals(200, response.getCode(), "Unexpectedly found resource: " + resource);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
 }

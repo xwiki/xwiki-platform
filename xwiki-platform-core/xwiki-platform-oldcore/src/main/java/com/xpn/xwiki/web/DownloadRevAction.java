@@ -24,6 +24,9 @@ import java.io.IOException;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -42,6 +45,9 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
 @Singleton
 public class DownloadRevAction extends DownloadAction
 {
+    @Inject
+    private Logger logger;
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -49,7 +55,7 @@ public class DownloadRevAction extends DownloadAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         String rev = request.getParameter("rev");
-        String filename = getFileName();
+        String filename = getAttachmentFileName();
         XWikiAttachment attachment;
 
         // Compute a XWikiAttachment object from the filename passed in the request
@@ -101,7 +107,7 @@ public class DownloadRevAction extends DownloadAction
                     context.getResponse().sendRedirect(url);
                     return null;
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                    this.logger.error("Failed to redirect to [{}]", url, ioe);
                 }
             }
         }
@@ -116,7 +122,7 @@ public class DownloadRevAction extends DownloadAction
     /**
      * @return the filename of the attachment.
      */
-    private String getFileName()
+    private String getAttachmentFileName()
     {
         // Extract the Attachment file name from the parsed request URL that was done before this Action is called
         ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();

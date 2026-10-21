@@ -35,7 +35,7 @@ import org.xwiki.observation.event.Event;
  */
 @Component
 @Singleton
-@Named(LegacyPrefilteringLiveNotificationEmailListener.NAME)
+@Named(PrefilteringLiveNotificationEmailListener.NAME)
 public class LegacyPrefilteringLiveNotificationEmailListener extends PrefilteringLiveNotificationEmailListener
 {
     @Inject

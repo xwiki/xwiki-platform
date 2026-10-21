@@ -119,7 +119,7 @@ public class DefaultWikiCopier implements WikiCopier
             throw thrownException;
         } catch (XWikiException e) {
             WikiManagerException thrownException = new WikiManagerException("Failed to copy documents.", e);
-            logger.error(thrownException.getMessage(), thrownException);
+            logger.error("Failed to copy documents", thrownException);
             throw thrownException;
         } finally {
             this.progress.popLevelProgress(this);

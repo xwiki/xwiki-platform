@@ -19,13 +19,13 @@
  */
 package org.xwiki.internal.objects;
 
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.classes.DateClass;
-
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 /**
  * Component implementation for a Date property.

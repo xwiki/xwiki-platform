@@ -19,12 +19,12 @@
  */
 package org.xwiki.mail.internal.configuration;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * Provides configuration from the {@code Mail.MailConfig} document in the main wiki.

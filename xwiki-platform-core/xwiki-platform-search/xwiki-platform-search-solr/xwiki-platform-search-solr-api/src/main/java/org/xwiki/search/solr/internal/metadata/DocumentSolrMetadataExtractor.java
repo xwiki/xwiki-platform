@@ -187,8 +187,8 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         Set<EntityReference> references = translatedDocument.getUniqueLinkedEntities(xcontext);
 
         if (!references.isEmpty()) {
-            Set<String> links = new HashSet<>(references.size());
-            Set<String> linksExtended = new HashSet<>(references.size() * 2);
+            Set<String> links = HashSet.newHashSet(references.size());
+            Set<String> linksExtended = HashSet.newHashSet(references.size() * 2);
 
             // Serialize the links and resolve the extended links
             for (EntityReference reference : references) {

@@ -120,7 +120,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         TableBlock result = null;
         this.logger.debug("Table id is [{}], there are [{}] tables in the document [{}]",
-            new Object[]{this.tableId, tableBlocks.size(), this.documentReference});
+            this.tableId, tableBlocks.size(), this.documentReference);
         if (null != tableId) {
             for (TableBlock tableBlock : tableBlocks) {
                 String id = tableBlock.getParameter("id");
@@ -159,15 +159,20 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         } else {
             try {
                 DocumentModelBridge document = this.docBridge.getDocumentInstance(this.documentReference);
+                // Display the content of the charted document in an isolated execution and transformation context,
+                // like the display macro does, so that it is executed with the rights of its own content author and
+                // in its own Velocity macro name-space instead of those of the document holding the chart macro.
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+                parameters.setContentTransformed(true);
+                parameters.setExecutionContextIsolated(true);
+                parameters.setTransformationContextIsolated(true);
                 parameters.setContentTranslated(true);
                 parameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
-                parameters.setContentTranslated(true);
 
                 xdom = this.documentDisplayer.display(document, parameters);
             } catch (Exception e) {
                 throw new MacroExecutionException(String.format("Error getting Chart table from document [%s]",
-                    this.documentReference, e));
+                    this.documentReference), e);
             }
         }
         return xdom;

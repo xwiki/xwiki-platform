@@ -45,6 +45,12 @@ public class LoginPage extends ViewPage
     @FindBy(xpath = "//input[@type='submit' and @value='Log-in']")
     private WebElement submitButton;
 
+    @FindBy(xpath = "//form[@id='loginForm']//a[. = 'Forgot your username?']")
+    private WebElement forgotUsernameLink;
+
+    @FindBy(xpath = "//form[@id='loginForm']//a[. = 'Forgot your password?']")
+    private WebElement forgotPasswordLink;
+
     private static final LocalDocumentReference LOCAL_DOCUMENT_REFERENCE =
         new LocalDocumentReference("XWiki", "XWikiLogin");
 
@@ -80,11 +86,36 @@ public class LoginPage extends ViewPage
             this.submitButton.click();
             getDriver().waitUntilPageIsReloaded();
         }
+
+        synchronizeRESTCredentials(username, password);
     }
 
     public void loginAs(String username, String password)
     {
         loginAs(username, password, false);
+    }
+
+    /**
+     * Make the REST client authenticate as the user the browser was just logged in as, so that the two don't drift
+     * apart. The browser session and the credentials used for REST calls are independent states, and a test that logs
+     * in through this page object would otherwise keep performing its REST calls as whoever was set before, typically
+     * the superadmin the {@link TestUtils} constructor defaults to.
+     * <p>
+     * This method is only ever called with a displayed page, so the login state it reads is the one the server just
+     * rendered. A page that shows the requested user as logged in is a definitive answer: only a page the server
+     * rendered for that user can show them as logged in. The opposite isn't definitive, since the displayed page may
+     * not show any login state at all (the login may have failed, but the redirect may also have landed on a page
+     * that isn't skinned), so the credentials are left untouched in that case rather than guessed. Leaving them
+     * untouched is also what the tests that log in with wrong credentials on purpose need.
+     *
+     * @param username the user the browser was asked to log in as
+     * @param password the password the browser was asked to log in with
+     */
+    private void synchronizeRESTCredentials(String username, String password)
+    {
+        if (username.equals(getUtil().getLoggedInUserName())) {
+            getUtil().setDefaultCredentials(username, password);
+        }
     }
 
     public boolean hasInvalidCredentialsErrorMessage()
@@ -115,5 +146,54 @@ public class LoginPage extends ViewPage
     public boolean hasCaptchaChallenge()
     {
         return getDriver().hasElementWithoutWaiting(By.className("captcha-challenge"));
+    }
+
+    /**
+     * Click the "Forgot your username?" link and wait for the page it leads to. The page object of that page is not
+     * returned because it is not part of this module.
+     *
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void clickForgotUsername()
+    {
+        clickAndWaitForPageLoad(this.forgotUsernameLink);
+    }
+
+    /**
+     * Click the "Forgot your password?" link and wait for the page it leads to. The page object of that page is not
+     * returned because it is not part of this module.
+     *
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void clickForgotPassword()
+    {
+        clickAndWaitForPageLoad(this.forgotPasswordLink);
+    }
+
+    private void clickAndWaitForPageLoad(WebElement link)
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        link.click();
+        getDriver().waitUntilPageIsReloaded();
+    }
+
+    /**
+     * Fill the answer to the CAPTCHA challenge displayed in the login form, to be submitted with the next
+     * {@link #loginAs(String, String)}.
+     *
+     * @param answer the answer to the CAPTCHA challenge
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void setCaptchaAnswer(String answer)
+    {
+        WebElement answerInput = getDriver().findElement(By.name("captchaAnswer"));
+        answerInput.clear();
+        answerInput.sendKeys(answer);
     }
 }

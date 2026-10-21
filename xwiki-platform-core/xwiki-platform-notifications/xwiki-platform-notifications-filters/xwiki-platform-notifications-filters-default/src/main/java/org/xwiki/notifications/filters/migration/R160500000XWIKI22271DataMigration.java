@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,6 +75,8 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
         + "where internalId in (:filterIds)";
 
     private static final int BATCH_SIZE = 100;
+
+    private static final Pattern LIKE_SPECIAL_CHARS = Pattern.compile("([%_!])");
 
     @Inject
     private QueryManager queryManager;
@@ -127,7 +130,7 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
                     // Same escaping logic as documented in EscapeLikeParametersQuery
                     // Note that we can't rely on using a DefaultQueryParameter here because of the nested query...
                     // See XWIKI-22279
-                    .bindValue("wikiPrefix", currentWikiId.replaceAll("([%_!])", "!$1") + ":%")
+                    .bindValue("wikiPrefix", LIKE_SPECIAL_CHARS.matcher(currentWikiId).replaceAll("!$1") + ":%")
                     .bindValue("wikiId", currentWikiId)
                     .setOffset(offset)
                     .setLimit(BATCH_SIZE)
@@ -172,10 +175,6 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
     private boolean isFilterAboutExistingWiki(DefaultNotificationFilterPreference filterPreference,
         Collection<String> wikiIds)
     {
-        if (filterPreference.getWikiId().isPresent()) {
-            return wikiIds.contains(filterPreference.getWikiId().get());
-        } else {
-            return false;
-        }
+        return filterPreference.getWikiId().map(wikiIds::contains).orElse(false);
     }
 }

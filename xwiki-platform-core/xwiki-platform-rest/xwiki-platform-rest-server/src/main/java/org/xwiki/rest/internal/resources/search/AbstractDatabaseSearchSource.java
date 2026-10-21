@@ -81,7 +81,7 @@ public abstract class AbstractDatabaseSearchSource extends AbstractSearchSource
 
     protected final String queryLanguage;
 
-    public AbstractDatabaseSearchSource(String queryLanguage)
+    protected AbstractDatabaseSearchSource(String queryLanguage)
     {
         this.queryLanguage = queryLanguage;
     }

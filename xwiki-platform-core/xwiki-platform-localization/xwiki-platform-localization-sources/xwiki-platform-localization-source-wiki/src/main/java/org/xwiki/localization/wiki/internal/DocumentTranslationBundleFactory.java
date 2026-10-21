@@ -89,7 +89,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     /**
      * The identifier of this {@link TranslationBundleFactory}.
      */
-    public final static String ID = "document";
+    public static final String ID = "document";
 
     /**
      * The prefix to use in all wiki document based translations.

@@ -40,7 +40,7 @@ import {
 import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
-import type { LinkSuggestion } from "../../misc/linkSuggest";
+import type { LinkSuggestion } from "../SearchBox";
 import type { AttachmentsService } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
@@ -58,10 +58,10 @@ export type ImageSelectorProps = {
   onSelected: (url: string) => void;
 };
 
-// eslint-disable-next-line max-statements
 export const ImageSelector: React.FC<ImageSelectorProps> = ({
   currentSelection,
   onSelected,
+  // eslint-disable-next-line max-statements
 }) => {
   const depsContainer = useContext(DepsContainerContext)!;
 

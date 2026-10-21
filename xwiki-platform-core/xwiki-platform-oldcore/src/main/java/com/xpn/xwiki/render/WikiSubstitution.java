@@ -105,6 +105,7 @@ public class WikiSubstitution extends Perl5Substitution
 
     public void prepareSubstitution(MatchResult matchResult)
     {
+        // Nothing to do by default, meant to be overridden by subclasses.
     }
 
     public com.xpn.xwiki.util.Util getUtil()

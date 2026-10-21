@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.factory.text;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -88,7 +89,8 @@ public class TextMimeMessageFactory extends AbstractMimeMessageFactory<MimeMessa
 
         // Handle the subject. Get it from the parameters.
         String subject = (String) parameters.get("subject");
-        message.setSubject(subject);
+        // Set the subject with an explicit UTF-8 charset (otherwise the JVM default charset is used)
+        message.setSubject(subject, StandardCharsets.UTF_8.name());
 
         // Add a default body part taken from the template.
         Multipart multipart = new MimeMultipart("mixed");

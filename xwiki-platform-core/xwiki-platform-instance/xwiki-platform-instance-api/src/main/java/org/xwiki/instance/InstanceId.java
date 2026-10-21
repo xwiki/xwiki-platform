@@ -86,7 +86,7 @@ public class InstanceId
             return true;
         }
 
-        if (o == null || !(o instanceof InstanceId)) {
+        if (!(o instanceof InstanceId)) {
             return false;
         }
 

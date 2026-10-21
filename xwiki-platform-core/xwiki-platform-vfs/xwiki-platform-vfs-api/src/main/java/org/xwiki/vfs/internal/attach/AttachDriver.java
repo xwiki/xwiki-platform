@@ -48,6 +48,6 @@ public class AttachDriver extends FsDriver
     @Override
     public FsController newController(FsManager manager, FsModel model, FsController parent)
     {
-        return new AttachController(this, model, this.componentManager);
+        return new AttachController(model, this.componentManager);
     }
 }

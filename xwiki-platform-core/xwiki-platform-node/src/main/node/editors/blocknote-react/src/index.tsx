@@ -88,5 +88,15 @@ export type {
   ContextForMacros,
   InlineMacroInvocation,
   MacroBlockInvocation,
+  MacroCall,
+  MacroCallParams,
   MacroInsertionEditorPrefillData,
 } from "./blocknote/utils";
+
+export type {
+  LinkEditionData,
+  LinkEditionHandler,
+  LinkEditionHandlerProps,
+} from "./components/links/linkEdition";
+
+export type { LinkEditionHooks } from "./components/links/linkEditionHooks";

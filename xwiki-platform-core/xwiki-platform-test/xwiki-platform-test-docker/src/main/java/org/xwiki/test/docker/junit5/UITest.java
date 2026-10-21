@@ -28,6 +28,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.test.docker.internal.junit5.MultiUserTestUtilsParameterResolver;
+import org.xwiki.test.docker.internal.junit5.ScreenshotComparatorParameterResolver;
+import org.xwiki.test.docker.internal.junit5.SubWikiTestUtilsParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestLocalReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
@@ -35,6 +37,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -56,6 +59,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(TestReferenceParameterResolver.class)
 @ExtendWith(TestLocalReferenceParameterResolver.class)
 @ExtendWith(MultiUserTestUtilsParameterResolver.class)
+@ExtendWith(SubWikiTestUtilsParameterResolver.class)
+@ExtendWith(ScreenshotComparatorParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public @interface UITest
@@ -69,7 +74,7 @@ public @interface UITest
      * @return the database to use, see {@link Database}
      * @since 10.9
      */
-    Database database() default Database.HSQLDB_EMBEDDED;
+    Database database() default Database.HSQLDB;
 
     /**
      * @return the Servlet Engine to use, see {@link ServletEngine}
@@ -121,6 +126,21 @@ public @interface UITest
      * @since 16.3.0RC1
      */
     String browserTag() default "";
+
+    /**
+     * @return the width, in pixels, of the screen of the browser container, which the browser window is sized to
+     *         (0 means the default of {@value TestConfiguration#DEFAULT_SCREEN_WIDTH})
+     * @since 18.9.0RC1
+     */
+    int screenWidth() default 0;
+
+    /**
+     * @return the height, in pixels, of the screen of the browser container, which the browser window is sized to.
+     *         A taller screen means a taller viewport, and thus fewer tests that have to scroll
+     *         (0 means the default of {@value TestConfiguration#DEFAULT_SCREEN_HEIGHT})
+     * @since 18.9.0RC1
+     */
+    int screenHeight() default 0;
 
     /**
      * @return true if VNC container is started and recording is done and saved on test exit
@@ -230,6 +250,16 @@ public @interface UITest
     boolean saveDatabaseData() default false;
 
     /**
+     * @return true if the extensions declared in the resources of the module executing the test must be made available
+     *     to the XWiki instances as an extension repository, so that the test can ask XWiki to install them (see
+     *     {@code src/test/resources/packagefile} and {@code src/test/resources/repository})
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    boolean testExtensionRepository() default false;
+
+    /**
      * @return true if the XWiki permanent directory should be preserved after the test is finished and the XWiki
      *         container stopped (doesn't make sense for Servlet containers running outside of Docker). Can be useful
      *         for debugging purposes
@@ -278,8 +308,17 @@ public @interface UITest
     String remoteSolrTag() default "";
 
     /**
-     * @return the number of instances to run during tests.
+     * @return the instances to run during tests.
      * @since 18.3.0RC1
      */
     XWikiInstances xwikiInstances() default @XWikiInstances;
+
+    /**
+     * @return the host/port to set as the default one in the wiki descriptor, and which is thus used to generate
+     *         external URLs from background threads, that is when no request is available to get the host/port from.
+     *         This is the value used by all the tests of the XWiki instance, unless they override it with
+     *         {@link UseWikiDescriptorTarget}.
+     * @since 18.8.0RC1
+     */
+    WikiDescriptorTarget wikiDescriptorTarget() default WikiDescriptorTarget.BROWSER;
 }

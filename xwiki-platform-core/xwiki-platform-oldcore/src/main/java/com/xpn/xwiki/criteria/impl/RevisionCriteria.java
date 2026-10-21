@@ -22,7 +22,7 @@ package com.xpn.xwiki.criteria.impl;
 import java.util.Date;
 
 /**
- * information about document versions used to retreive a set of document versions.
+ * information about document versions used to retrieve a set of document versions.
  *
  * @version $Id$
  * @see com.xpn.xwiki.doc.XWikiDocument#getRevisions(RevisionCriteria, com.xpn.xwiki.XWikiContext)

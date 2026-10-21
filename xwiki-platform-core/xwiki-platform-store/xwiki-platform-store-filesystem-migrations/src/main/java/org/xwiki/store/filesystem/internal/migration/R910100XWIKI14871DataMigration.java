@@ -217,7 +217,7 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
     }
 
     private void storeDeletedAttachment(File directory, DocumentReference documentReference, Session session)
-        throws ParserConfigurationException, SAXException, IOException, DataMigrationException
+        throws ParserConfigurationException, SAXException, IOException
     {
         this.logger.info("Storing attachment metadata [{}] in the database", directory);
 

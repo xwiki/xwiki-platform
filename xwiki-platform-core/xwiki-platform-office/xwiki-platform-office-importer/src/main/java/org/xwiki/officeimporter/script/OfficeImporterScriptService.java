@@ -143,7 +143,8 @@ public class OfficeImporterScriptService implements ScriptService
             return this.xhtmlBuilder.build(officeFileStream, officeFileName, targetDocumentReference, filterStyles);
         } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            logger.error("Failed to import the office file [{}] into XHTML for document [{}]", officeFileName,
+                targetDocumentReference, ex);
         }
         return null;
     }
@@ -161,7 +162,7 @@ public class OfficeImporterScriptService implements ScriptService
             return this.xdomBuilder.build(xhtmlOfficeDocument);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            logger.error("Failed to convert the XHTML office document into an XDOM office document", ex);
         }
         return null;
     }
@@ -192,7 +193,8 @@ public class OfficeImporterScriptService implements ScriptService
             }
         } catch (Exception ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            logger.error("Failed to import the office file [{}] into an XDOM for document [{}]", officeFileName,
+                targetDocumentReference, ex);
         }
         return null;
     }
@@ -257,7 +259,7 @@ public class OfficeImporterScriptService implements ScriptService
             return this.xdomSplitter.split(xdomDocument, parameters);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            logger.error("Failed to split the XDOM office document based at [{}]", rootDocumentReference, ex);
         }
         return null;
     }
@@ -318,12 +320,10 @@ public class OfficeImporterScriptService implements ScriptService
             return true;
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
-            logger.error(ex.getMessage(), ex);
+            logger.error("Failed to save the office document into the wiki page [{}]", documentReference, ex);
         } catch (Exception ex) {
-            String message = "Error while saving document [%s].";
-            message = String.format(message, documentReference);
-            setErrorMessage(message);
-            logger.error(message, ex);
+            setErrorMessage(String.format("Error while saving document [%s].", documentReference));
+            logger.error("Error while saving document [{}].", documentReference, ex);
         }
         return false;
     }

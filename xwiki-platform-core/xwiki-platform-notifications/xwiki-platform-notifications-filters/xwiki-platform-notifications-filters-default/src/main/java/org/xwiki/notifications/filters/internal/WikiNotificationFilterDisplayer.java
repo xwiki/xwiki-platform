@@ -50,7 +50,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
 
 /**
- * This class is meant to be instanciated and then registered against the Component Manager by the
+ * This class is meant to be instantiated and then registered against the Component Manager by the
  * {@link WikiNotificationFilterDisplayerComponentBuilder}.
  *
  * @version $Id$

@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class XWikiTest
+class XWikiTest
 {
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "MilkyWay", "Fidis");
 
@@ -77,7 +77,7 @@ public class XWikiTest
     private XWiki apiXWiki;
 
     @BeforeEach
-    public void setup(MockitoOldcore mockitoOldcore) throws XWikiException
+    void setup(MockitoOldcore mockitoOldcore) throws XWikiException
     {
         XWikiContext xWikiContext = mockitoOldcore.getXWikiContext();
         this.apiXWiki = new XWiki(mockitoOldcore.getSpyXWiki(), xWikiContext);
@@ -98,7 +98,7 @@ public class XWikiTest
     }
 
     @Test
-    public void authorIsntChangedAfterDocumentCopy() throws XWikiException
+    void authorIsntChangedAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Lyre";
         this.apiXWiki.copyDocument("MilkyWay.Fidis", copyName);
@@ -108,7 +108,7 @@ public class XWikiTest
     }
 
     @Test
-    public void creatorIsntChangedAfterDocumentCopy() throws XWikiException
+    void creatorIsntChangedAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Sirius";
         this.apiXWiki.copyDocument("MilkyWay.Fidis", copyName);
@@ -118,7 +118,7 @@ public class XWikiTest
     }
 
     @Test
-    public void creationDateAfterDocumentCopy() throws XWikiException
+    void creationDateAfterDocumentCopy() throws XWikiException
     {
         String copyName = this.apiDocument.getDocumentReference().getName() + "Copy";
         long startTime = (Calendar.getInstance().getTimeInMillis() / 1000) * 1000;
@@ -130,7 +130,7 @@ public class XWikiTest
     }
 
     @Test
-    public void getAvailableRendererSyntax(MockitoComponentManager componentManager) throws Exception
+    void getAvailableRendererSyntax(MockitoComponentManager componentManager) throws Exception
     {
         PrintRendererFactory factory1 = componentManager.registerMockComponent(PrintRendererFactory.class,
             Syntax.PLAIN_1_0.toIdString());
@@ -174,5 +174,23 @@ public class XWikiTest
         verify(revisionProvider, times(allowAccess ? 1 : 0)).getRevision(DOCUMENT_REFERENCE, revision);
         verify(revisionProvider).checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, DOCUMENT_REFERENCE, revision);
         verify(contextualAuthorizationManager).hasAccess(Right.VIEW, DOCUMENT_REFERENCE);
+    }
+
+    @Test
+    void getDocumentTitleMaxLength(MockitoOldcore mockitoOldcore)
+    {
+        when(mockitoOldcore.getMockStore().getLimitSize(mockitoOldcore.getXWikiContext(), XWikiDocument.class,
+            "title")).thenReturn(768);
+
+        assertEquals(768, this.apiXWiki.getDocumentTitleMaxLength());
+    }
+
+    @Test
+    void getDocumentLocalReferenceMaxLength(MockitoOldcore mockitoOldcore)
+    {
+        when(mockitoOldcore.getMockStore().getLimitSize(mockitoOldcore.getXWikiContext(), XWikiDocument.class,
+            "fullName")).thenReturn(255);
+
+        assertEquals(255, this.apiXWiki.getDocumentLocalReferenceMaxLength());
     }
 }

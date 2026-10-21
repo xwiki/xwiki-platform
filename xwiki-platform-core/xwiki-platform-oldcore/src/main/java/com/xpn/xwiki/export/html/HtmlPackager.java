@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,6 +59,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.ExportURLFactory;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 /**
@@ -83,6 +86,11 @@ public class HtmlPackager
      * The separator in an internal zip path.
      */
     private static final String ZIPPATH_SEPARATOR = "/";
+
+    /**
+     * The path of the skins folder in the web application.
+     */
+    private static final String SKINS_PATH = "/skins/";
 
     /**
      * The name of the package for which packager append ".zip".
@@ -147,9 +155,9 @@ public class HtmlPackager
      * Add a page to export.
      *
      * @param page the name of the page to export.
-     * @deprecated since 8.4.5/9.0, use {@link #addPageReference(DocumentReference)} instead
+     * @deprecated use {@link #addPageReference(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.4.5,9.0")
     public void addPage(String page)
     {
         this.pageReferences.add(resolvePage(page));
@@ -159,9 +167,9 @@ public class HtmlPackager
      * Add a range of pages to export.
      *
      * @param pages a range of pages to export.
-     * @deprecated since 8.4.5/9.0, use {@link #addPageReferences(Collection)} instead
+     * @deprecated use {@link #addPageReferences(Collection)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.4.5,9.0")
     public void addPages(Collection<String> pages)
     {
         for (String page : pages) {
@@ -224,7 +232,7 @@ public class HtmlPackager
         // otherwise on some OS we wouldn't be able to unzip if there are pages having a path longer than 255 chars...
         String zipname = "pages/" + this.pathEntityReferenceSerializer.serialize(pageReference);
         String language = doc.getLanguage();
-        if (language != null && language.length() != 0) {
+        if (language != null && !language.isEmpty()) {
             zipname += POINT + language;
         }
         zipname += ".html";
@@ -474,17 +482,29 @@ public class HtmlPackager
         XWikiContext context) throws IOException
     {
         // Protect against non-existing skins.
-        String realPath = context.getWiki().getEngineContext().getRealPath("/skins/" + skinName);
-        if (realPath != null) {
+        XWikiEngineContext engineContext = context.getWiki().getEngineContext();
+        String skinsPath = engineContext.getRealPath(SKINS_PATH);
+        String realPath = engineContext.getRealPath(SKINS_PATH + skinName);
+        // Make sure the skin name cannot be used to package a folder outside of the skins folder.
+        if (skinsPath != null && realPath != null && isSkinDirectory(Paths.get(skinsPath), Paths.get(realPath))) {
             File file = new File(realPath);
 
             // Don't include vm and LESS files by default
             FileFilter filter =
-                new NotFileFilter(new SuffixFileFilter(new String[]{ ".vm", ".less", "skin.properties" }));
+                new NotFileFilter(new SuffixFileFilter(".vm", ".less", "skin.properties"));
 
             addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR,
                 exportedSkinFiles);
         }
+    }
+
+    private static boolean isSkinDirectory(Path skinsDirectory, Path skinDirectory)
+    {
+        Path normalizedSkinsDirectory = skinsDirectory.toAbsolutePath().normalize();
+        Path normalizedSkinDirectory = skinDirectory.toAbsolutePath().normalize();
+
+        return normalizedSkinDirectory.startsWith(normalizedSkinsDirectory)
+            && !normalizedSkinDirectory.equals(normalizedSkinsDirectory);
     }
 
     /**
@@ -499,9 +519,7 @@ public class HtmlPackager
     private static void addDirToZip(File directory, FileFilter filter, ZipOutputStream out, String basePath,
         Collection<String> exportedSkinFiles) throws IOException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
-        }
+        LOGGER.debug("Adding dir [{}] to the Zip file being generated.", directory.getPath());
 
         if (!directory.isDirectory()) {
             return;

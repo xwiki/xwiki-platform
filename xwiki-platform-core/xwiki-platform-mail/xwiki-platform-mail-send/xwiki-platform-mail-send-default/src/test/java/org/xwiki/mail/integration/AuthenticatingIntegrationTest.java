@@ -36,7 +36,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mockito;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -78,6 +77,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -147,7 +147,8 @@ class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
 
         Provider<XWikiContext> xwikiContextProvider =
             this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+        XWikiContext xWikiContextMock = mock(XWikiContext.class);
+        when(xwikiContextProvider.get()).thenReturn(xWikiContextMock);
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
         this.componentManager.registerMockComponent(Execution.class);

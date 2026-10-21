@@ -52,7 +52,7 @@ public abstract class AbstractXWIKI15249DataMigration extends AbstractStoreTypeD
      * @param tableName the name of the table linked to the attachment table
      * @param fieldName the name of the field containing the store id
      */
-    public AbstractXWIKI15249DataMigration(String tableName, String fieldName)
+    protected AbstractXWIKI15249DataMigration(String tableName, String fieldName)
     {
         super(tableName, fieldName);
     }

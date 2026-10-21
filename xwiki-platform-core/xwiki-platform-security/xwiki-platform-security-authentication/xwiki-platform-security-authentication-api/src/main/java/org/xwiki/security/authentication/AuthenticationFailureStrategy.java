@@ -62,6 +62,9 @@ public interface AuthenticationFailureStrategy
      * @deprecated use {@link #validateForm(String, HttpServletRequest)} instead
      */
     @Deprecated(since = "17.0.0RC1")
+    // Intentional bridge with #validateForm(String, HttpServletRequest): every implementation overrides at least
+    // one of the two.
+    @SuppressWarnings("javabugs:S2190")
     default boolean validateForm(String username, javax.servlet.http.HttpServletRequest request)
     {
         return validateForm(username, JakartaServletBridge.toJakarta(request));

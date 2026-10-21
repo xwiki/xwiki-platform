@@ -72,7 +72,7 @@ class EventAndFactoryTest
     private Event rawEvent;
 
     @BeforeEach
-    void configure() throws Exception
+    void configure()
     {
         when(this.documentAccessBridge.getCurrentUser()).thenReturn("XWiki.Admin");
 

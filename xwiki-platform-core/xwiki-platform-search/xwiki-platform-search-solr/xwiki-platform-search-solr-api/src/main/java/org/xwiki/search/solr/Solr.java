@@ -22,6 +22,7 @@ package org.xwiki.search.solr;
 import org.apache.solr.client.solrj.SolrClient;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
+import org.xwiki.stability.Unstable;
 
 /**
  * The central entry point to access a Solr core.
@@ -84,8 +85,6 @@ public interface Solr
      * @throws SolrException when failing to delete the index
      * @since 18.10.0RC1
      */
-    default void deleteIndex(XWikiSolrCore core) throws SolrException
-    {
-        throw new UnsupportedOperationException("This Solr implementation does not support deleting an index");
-    }
+    @Unstable
+    void deleteIndex(XWikiSolrCore core) throws SolrException;
 }

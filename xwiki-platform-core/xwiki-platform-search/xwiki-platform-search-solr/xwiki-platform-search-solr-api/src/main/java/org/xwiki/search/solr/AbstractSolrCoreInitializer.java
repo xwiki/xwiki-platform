@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
+import org.xwiki.stability.Unstable;
 
 /**
  * Base helper class to implement {@link SolrCoreInitializer}.
@@ -163,6 +164,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      *
      * @since 18.10.0RC1
      */
+    @Unstable
     public static final long SCHEMA_VERSION_18_10 = 181000000;
 
     /**

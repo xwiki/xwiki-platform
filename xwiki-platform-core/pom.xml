@@ -253,6 +253,20 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                It's very unlikely for the Solr role to be implemented outside of XWiki Platform, and there is no way to
+                provide an accurate default implementation of deleting the whole index of a core.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method void org.xwiki.search.solr.Solr::deleteIndex(org.xwiki.search.solr.XWikiSolrCore) throws org.xwiki.search.solr.SolrException</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

@@ -48,6 +48,7 @@ import com.github.dockerjava.api.model.MountType;
  *
  * @version $Id$
  * @since 18.10.0RC1
+ * @since 18.4.8
  */
 public final class SharedFileSystemBlobStore
 {

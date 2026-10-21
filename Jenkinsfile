@@ -68,12 +68,6 @@ def builds = [
       pom: 'xwiki-platform-distribution-flavor-test-ui/pom.xml',
     )
   },
-  'Flavor Test - Misc' : {
-    buildFunctionalTest(
-      name: 'Flavor Test - Misc',
-      pom: 'xwiki-platform-distribution-flavor-test-misc/pom.xml'
-    )
-  },
   'Flavor Test - Storage': {
     buildFunctionalTest(
       name: 'Flavor Test - Storage',
@@ -202,10 +196,6 @@ private void buildStandardAll(builds)
             'flavor-test-ui': {
               // Run the Flavor UI tests
               builds['Flavor Test - UI'].call()
-            },
-            'flavor-test-misc': {
-              // Run the Flavor Misc tests
-              builds['Flavor Test - Misc'].call()
             },
             'flavor-test-storage': {
               // Run the Flavor Storage tests

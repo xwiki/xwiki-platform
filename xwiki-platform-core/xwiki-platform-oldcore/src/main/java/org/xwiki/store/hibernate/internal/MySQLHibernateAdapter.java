@@ -501,7 +501,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
                 this.logger.warn(
                     "Index [{}] (key length of [{}] bytes after the conversion) exceeds the maximum key length of [{}]"
                         + " bytes and will be dropped. It can be re-created with a shorter prefix using [{}].",
-                    index.name, index.length, MAX_KEY_LENGTH, index.getDefinition());
+                    index.name, index.length, MAX_KEY_LENGTH, getIndexDefinition(index));
 
                 statements.add(ALTER_TABLE + getQualifiedTableName(index.tableName) + " DROP INDEX "
                     + quote(index.name));
@@ -513,6 +513,13 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     {
         // Escaping a database name is actually quoting it as any other identifier
         return escapeDatabaseName(identifier);
+    }
+
+    private String getIndexDefinition(Index index)
+    {
+        return (index.unique ? "CREATE UNIQUE INDEX " : "CREATE INDEX ") + quote(index.name) + " ON "
+            + quote(getDatabaseFromWikiName()) + '.' + quote(index.tableName) + " (" + String.join(", ", index.columns)
+            + ")";
     }
 
     private Object[] getDatabaseDefaults(String databaseName, Session session)
@@ -533,7 +540,12 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             "SELECT MAXLEN FROM INFORMATION_SCHEMA.CHARACTER_SETS WHERE CHARACTER_SET_NAME = :characterSet");
         query.setParameter(CHARACTER_SET_PARAMETER, characterSet);
 
-        return query.uniqueResult().intValue();
+        Number maxLength = query.uniqueResult();
+        if (maxLength == null) {
+            throw new IllegalStateException(String.format("Unknown character set [%s]", characterSet));
+        }
+
+        return maxLength.intValue();
     }
 
     private Set<String> getTablesToConvert(Metadata metadata, String databaseName, String collation, Session session)
@@ -591,7 +603,8 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
                 Index index = indexes.computeIfAbsent(List.of(tableName, (String) part[1]),
                     key -> new Index(key.get(0), key.get(1), ((Number) part[10]).intValue() == 0));
 
-                index.columns.add(part[3] != null ? part[2] + "(" + part[3] + ')' : (String) part[2]);
+                String column = quote((String) part[2]);
+                index.columns.add(part[3] != null ? column + "(" + part[3] + ')' : column);
                 index.length += getKeyPartLength(part, maxCharacterLength);
             }
         }
@@ -652,12 +665,6 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             this.tableName = tableName;
             this.name = name;
             this.unique = unique;
-        }
-
-        String getDefinition()
-        {
-            return (this.unique ? "CREATE UNIQUE INDEX " : "CREATE INDEX ") + this.name + " ON " + this.tableName
-                + " (" + String.join(", ", this.columns) + ")";
         }
     }
 }

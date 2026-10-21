@@ -100,6 +100,8 @@ class MySQLHibernateAdapterTest
 
     private NativeQuery<String> tablesQuery;
 
+    private NativeQuery<Number> maxLengthQuery;
+
     private NativeQuery<?> alterStatement;
 
     @BeforeEach
@@ -147,9 +149,10 @@ class MySQLHibernateAdapterTest
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.SCHEMATA"))).thenReturn(this.defaultsQuery);
         when(this.defaultsQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "utf8mb4", "utf8mb4_bin" }));
 
-        NativeQuery<Number> maxLengthQuery = mock(NativeQuery.class);
-        when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.CHARACTER_SETS"))).thenReturn(maxLengthQuery);
-        when(maxLengthQuery.uniqueResult()).thenReturn(4L);
+        this.maxLengthQuery = mock(NativeQuery.class);
+        when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.CHARACTER_SETS")))
+            .thenReturn(this.maxLengthQuery);
+        when(this.maxLengthQuery.uniqueResult()).thenReturn(4L);
 
         this.tablesQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.TABLES"))).thenReturn(this.tablesQuery);
@@ -213,11 +216,11 @@ class MySQLHibernateAdapterTest
 
         assertEquals("Index [ase_page_date] (key length of [3077] bytes after the conversion) exceeds the maximum key"
             + " length of [3072] bytes and will be dropped. It can be re-created with a shorter prefix using"
-            + " [CREATE INDEX ase_page_date ON activitystream_events (ase_page, ase_date)].",
+            + " [CREATE INDEX `ase_page_date` ON `xwiki`.`activitystream_events` (`ase_page`, `ase_date`)].",
             this.logCapture.getMessage(0));
         assertEquals("Index [custom_unique] (key length of [3080] bytes after the conversion) exceeds the maximum key"
             + " length of [3072] bytes and will be dropped. It can be re-created with a shorter prefix using"
-            + " [CREATE UNIQUE INDEX custom_unique ON xwikistrings (XWS_VALUE, XWS_ID)].",
+            + " [CREATE UNIQUE INDEX `custom_unique` ON `xwiki`.`xwikistrings` (`XWS_VALUE`, `XWS_ID`)].",
             this.logCapture.getMessage(1));
     }
 
@@ -235,9 +238,21 @@ class MySQLHibernateAdapterTest
 
         assertEquals("Index [ase_page_date] (key length of [3077] bytes after the conversion) exceeds the maximum key"
             + " length of [3072] bytes and will be dropped. It can be re-created with a shorter prefix using"
-            + " [CREATE INDEX ase_page_date ON activitystream_events (ase_page, ase_date)].",
+            + " [CREATE INDEX `ase_page_date` ON `xwiki`.`activitystream_events` (`ase_page`, `ase_date`)].",
             this.logCapture.getMessage(0));
         assertEquals(1, this.logCapture.size());
+    }
+
+    @Test
+    void getConvertToDatabaseCollationStatementsWhenUnknownCharacterSet()
+    {
+        mockCollationQueries();
+        when(this.maxLengthQuery.uniqueResult()).thenReturn(null);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+
+        assertEquals("Unknown character set [utf8mb4]", exception.getMessage());
     }
 
     @Test

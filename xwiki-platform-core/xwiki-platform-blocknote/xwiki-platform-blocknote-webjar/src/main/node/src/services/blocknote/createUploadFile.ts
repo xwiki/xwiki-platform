@@ -45,7 +45,6 @@ type UploadFileDependencies = {
 
 const EMPTY_PARAGRAPH: UploadResult = { type: "paragraph", content: [] };
 
-// Untyped for images, typed for links: an untyped `[[name.pdf]]` is parsed back as a document link.
 function attachmentReference(
   reference: string,
   typed: boolean,

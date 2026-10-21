@@ -222,7 +222,7 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
         byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
-        textArea.click().pasteFile("image.gif", "image/gif", content);
+        textArea.click().pasteFile("/image.gif");
         // Shown only once uploaded, since that's when the URL is known.
         textArea.waitUntilImageIsLoaded(0);
 
@@ -249,9 +249,9 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
-        byte[] content = "Hello, world!".getBytes(StandardCharsets.UTF_8);
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
         // Unlike a pasted file, a dropped file keeps the name the user gave it.
-        textArea.click().dropFile("notes.txt", "text/plain", content);
+        textArea.click().dropFile("/notes.txt");
         // The link replaces the inserted block only once uploaded.
         textArea.waitUntilLinkIsPresent("notes.txt");
 
@@ -279,14 +279,13 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
-        byte[] after = "after".getBytes(StandardCharsets.UTF_8);
-        textArea.click().dropFile("notes.txt", "text/plain", after);
+        byte[] after = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        textArea.click().dropFile("/notes.txt");
         textArea.waitUntilLinkIsPresent("notes.txt");
 
         page.save();
 
-        // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do. Documented here
-        // rather than endorsed.
+        // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do.
         assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
 
         Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);

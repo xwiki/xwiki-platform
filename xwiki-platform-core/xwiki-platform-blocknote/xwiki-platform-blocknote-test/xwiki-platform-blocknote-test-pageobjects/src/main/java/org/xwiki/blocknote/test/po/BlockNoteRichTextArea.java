@@ -19,13 +19,16 @@
  */
 package org.xwiki.blocknote.test.po;
 
-import java.util.Base64;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.FileDetector;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
@@ -470,52 +473,72 @@ public class BlockNoteRichTextArea extends BaseElement
     /**
      * Pastes a file over the rich text area.
      *
-     * @param fileName the name of the pasted file
-     * @param mediaType the media type of the pasted file, e.g. {@code image/png}
-     * @param content the content of the pasted file
+     * @param filePath the path of the file to paste, relative to the test resources
      * @return this rich text area instance
+     * @throws URISyntaxException if the given file can't be located
      * @since 18.10.0RC1
      */
-    public BlockNoteRichTextArea pasteFile(String fileName, String mediaType, byte[] content)
+    public BlockNoteRichTextArea pasteFile(String filePath) throws URISyntaxException
     {
-        return insertFile("paste", fileName, mediaType, content);
+        return insertFile("paste", filePath);
     }
 
     /**
      * Drops a file over the rich text area.
      *
-     * @param fileName the name of the dropped file
-     * @param mediaType the media type of the dropped file, e.g. {@code application/pdf}
-     * @param content the content of the dropped file
+     * @param filePath the path of the file to drop, relative to the test resources
      * @return this rich text area instance
+     * @throws URISyntaxException if the given file can't be located
      * @since 18.10.0RC1
      */
-    public BlockNoteRichTextArea dropFile(String fileName, String mediaType, byte[] content)
+    public BlockNoteRichTextArea dropFile(String filePath) throws URISyntaxException
     {
-        return insertFile("drop", fileName, mediaType, content);
+        return insertFile("drop", filePath);
     }
 
-    // Synthetic events, because native clipboard and drag and drop would need the file on the machine running the
-    // browser, which is a different container under Docker.
-    private BlockNoteRichTextArea insertFile(String eventType, String fileName, String mediaType, byte[] content)
+    // Synthetic events, because WebDriver can drag and drop DOM elements but not files, and can't put one on the
+    // clipboard at all.
+    private BlockNoteRichTextArea insertFile(String eventType, String filePath) throws URISyntaxException
     {
+        WebElement fileInput = loadFile(filePath);
         String script = """
-            const [editor, eventType, fileName, mediaType, base64] = arguments;
-            const bytes = Uint8Array.from(atob(base64), character => character.charCodeAt(0));
+            const [editor, fileInput, eventType] = arguments;
             const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(new File([bytes], fileName, {type: mediaType}));
+            dataTransfer.items.add(fileInput.files[0]);
             const {left, top, width, height} = editor.getBoundingClientRect();
             const eventInit = {bubbles: true, cancelable: true, clientX: left + width / 2, clientY: top + height / 2};
-            // Firefox ignores clipboardData passed to the constructor, so define it as an own property instead.
-            const paste = new ClipboardEvent('paste', eventInit);
-            Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
-            editor.dispatchEvent(eventType === 'paste'
-                ? paste
-                : new DragEvent('drop', {...eventInit, dataTransfer}));
+            if (eventType === 'paste') {
+                const paste = new ClipboardEvent('paste', eventInit);
+                // Firefox ignores clipboardData passed to the constructor, so define it as an own property instead.
+                Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
+                editor.dispatchEvent(paste);
+            } else {
+                editor.dispatchEvent(new DragEvent('drop', {...eventInit, dataTransfer}));
+            }
+            fileInput.remove();
             """;
-        getDriver().executeScript(script, this.container, eventType, fileName, mediaType,
-            Base64.getEncoder().encodeToString(content));
+        getDriver().executeScript(script, this.container, fileInput, eventType);
         return this;
+    }
+
+    // Gets the file into the browser, which runs in a different container than the test, through a throwaway file
+    // input. Same approach as the CKEditor page objects.
+    private WebElement loadFile(String filePath) throws URISyntaxException
+    {
+        FileDetector originalFileDetector = getDriver().getFileDetector();
+        try {
+            getDriver().setFileDetector(new LocalFileDetector());
+            WebElement fileInput = (WebElement) getDriver().executeScript("""
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                document.body.append(fileInput);
+                return fileInput;
+                """);
+            fileInput.sendKeys(Paths.get(getClass().getResource(filePath).toURI()).toFile().getAbsolutePath());
+            return fileInput;
+        } finally {
+            getDriver().setFileDetector(originalFileDetector);
+        }
     }
 
     /**

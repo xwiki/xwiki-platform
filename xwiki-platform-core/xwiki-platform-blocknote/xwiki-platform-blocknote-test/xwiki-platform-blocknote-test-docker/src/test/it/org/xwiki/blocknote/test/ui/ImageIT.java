@@ -84,7 +84,6 @@ class ImageIT extends AbstractBlockNoteIT
     @Order(1)
     void editImage(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference, """
             before
@@ -216,7 +215,6 @@ class ImageIT extends AbstractBlockNoteIT
     @Order(2)
     void pasteImage(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference, "before");
 
@@ -225,15 +223,14 @@ class ImageIT extends AbstractBlockNoteIT
 
         byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
         textArea.click().pasteFile("image.gif", "image/gif", content);
-        // The image is shown only once it has been uploaded, since that's when its URL is known.
+        // Shown only once uploaded, since that's when the URL is known.
         textArea.waitUntilImageIsLoaded(0);
 
         page.save();
         String savedContent = page.editWiki().getContent();
 
-        // The image is saved as an untyped attachment reference, which is what the CKEditor integration produces. The
-        // pasted file was renamed, because the browser names a file pasted from the clipboard after its media type and
-        // pasting a second one would otherwise overwrite the first attachment.
+        // Untyped reference, and renamed: browsers name a pasted file after its media type, so a second paste would
+        // otherwise overwrite this attachment.
         assertThat(savedContent, matchesPattern("(?s).*\\[\\[image:\\d+-\\d+\\.gif\\]\\].*"));
 
         String attachmentName = savedContent.replaceAll("(?s).*\\[\\[image:([^\\]]+)\\]\\].*", "$1");
@@ -246,7 +243,6 @@ class ImageIT extends AbstractBlockNoteIT
     @Order(3)
     void dropFile(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference, "before");
 
@@ -256,13 +252,12 @@ class ImageIT extends AbstractBlockNoteIT
         byte[] content = "Hello, world!".getBytes(StandardCharsets.UTF_8);
         // Unlike a pasted file, a dropped file keeps the name the user gave it.
         textArea.click().dropFile("notes.txt", "text/plain", content);
-        // The link replaces the block BlockNote inserted only once the file has been uploaded.
+        // The link replaces the inserted block only once uploaded.
         textArea.waitUntilLinkIsPresent("notes.txt");
 
         page.save();
 
-        // A file that is not an image has no XWiki counterpart, so it is inserted as a free-standing attachment link,
-        // which is exactly what the CKEditor integration produces.
+        // A non-image has no XWiki counterpart, so it becomes an attachment link.
         assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
 
         byte[] uploaded = setup.rest()
@@ -274,7 +269,7 @@ class ImageIT extends AbstractBlockNoteIT
     @Order(4)
     void dropFileWithExistingName(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Start fresh, with an attachment the dropped file is going to collide with.
+        // An attachment the dropped file is going to collide with.
         setup.deletePage(testReference);
         setup.createPage(testReference, "before");
         byte[] before = "before".getBytes(StandardCharsets.UTF_8);
@@ -290,17 +285,14 @@ class ImageIT extends AbstractBlockNoteIT
 
         page.save();
 
-        // Dropping a file whose name is already taken overwrites the existing attachment, which is what the CKEditor
-        // integration and the attachment upload UI do as well: a new version of the same attachment, with no warning.
-        // This test documents that behaviour rather than endorsing it.
+        // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do. Documented here
+        // rather than endorsed.
         assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
 
         Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
         List<Attachment> notes = attachments.getAttachments().stream()
             .filter(attachment -> "notes.txt".equals(attachment.getName())).toList();
-        // The dropped file didn't create a second attachment.
         assertEquals(1, notes.size());
-        // It created a new version of the existing one instead.
         assertEquals("1.2", notes.get(0).getVersion());
 
         byte[] uploaded = setup.rest()

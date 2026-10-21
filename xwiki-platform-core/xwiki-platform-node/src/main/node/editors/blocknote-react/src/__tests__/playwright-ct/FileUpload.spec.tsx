@@ -28,16 +28,7 @@ const PNG_BASE64 =
 
 const UPLOADED_URL = "/xwiki/bin/download/Space/Page/uploaded.png";
 
-/**
- * Pastes or drops a file over the editor, the way a user would, so that BlockNote runs its file insertion handler.
- * This is also how the functional tests drive the editor, so it covers that mechanism too.
- *
- * @param page - the page holding the mounted editor
- * @param eventType - whether the file is pasted or dropped
- * @param name - the name of the inserted file
- * @param type - the media type of the inserted file
- * @param base64 - the content of the inserted file
- */
+// Synthetic events, so BlockNote runs its real file insertion handler. The functional tests drive it the same way.
 async function insertFile(
   page: Page,
   eventType: "paste" | "drop",
@@ -58,8 +49,7 @@ async function insertFile(
         clientX: left + width / 2,
         clientY: top + height / 2,
       };
-      // Firefox ignores the clipboardData passed to the ClipboardEvent constructor (the event ends up with no types),
-      // so we define it as an own property, which shadows the prototype getter in both browsers.
+      // Firefox ignores clipboardData passed to the constructor, so define it as an own property instead.
       const paste = new ClipboardEvent("paste", eventInit);
       Object.defineProperty(paste, "clipboardData", {
         value: dataTransfer,
@@ -75,14 +65,6 @@ async function insertFile(
   );
 }
 
-/**
- * Drops a file over the editor, the way a user would.
- *
- * @param page - the page holding the mounted editor
- * @param name - the name of the dropped file
- * @param type - the media type of the dropped file
- * @param base64 - the content of the dropped file
- */
 function dropFile(
   page: Page,
   name: string,
@@ -126,8 +108,7 @@ test("A failed upload leaves no block behind", async ({ mount, page }) => {
   const component = await mount(
     <BlockNoteForTest
       blockNoteOptions={{
-        // What the XWiki integration returns when the upload fails: the inserted block collapses into an empty
-        // paragraph instead of the promise being rejected, which BlockNote doesn't handle.
+        // What the XWiki integration returns on failure: BlockNote doesn't handle a rejection.
         uploadFile: async () => ({ type: "paragraph", content: [] }),
       }}
       content={[]}
@@ -151,8 +132,7 @@ test("A dropped non-image file can be replaced by a link", async ({
   const component = await mount(
     <BlockNoteForTest
       blockNoteOptions={{
-        // What the XWiki integration returns for a file that has no XWiki counterpart: a free-standing attachment
-        // link, like the CKEditor integration produces.
+        // What the XWiki integration returns for a file with no XWiki counterpart.
         uploadFile: async () => ({
           type: "paragraph",
           content: [

@@ -21,7 +21,7 @@ import { withUniqueName } from "./uniqueFileName";
 import { describe, expect, it } from "vitest";
 
 describe("withUniqueName", () => {
-  // <timestamp>-<random between 100 and 999>, plus the original extension.
+  // <timestamp>-<random 100..999>.
   const generatedName = /^\d+-[1-9]\d\d/;
 
   function file(name, type = "image/png") {
@@ -66,7 +66,7 @@ describe("withUniqueName", () => {
       Array.from({ length: 50 }, () => withUniqueName(file("image.png")).name),
     );
 
-    // The timestamp alone doesn't change fast enough, so this also covers the random suffix.
+    // The timestamp alone doesn't change fast enough, so this covers the random suffix too.
     expect(names.size).toBeGreaterThan(1);
   });
 });

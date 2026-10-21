@@ -27,55 +27,25 @@ import type { ModelReferenceParser } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
-/**
- * What BlockNote applies to the block it inserted for the uploaded file. It accepts a whole partial block, not just
- * properties, which is how we can replace the file block BlockNote guessed with something else.
- */
+// A whole partial block, not just props, which is what lets us replace the block BlockNote guessed.
 type UploadResult = Record<string, unknown>;
 
-/**
- * The services the upload callback needs.
- */
 type UploadFileDependencies = {
   storageProvider: StorageProvider;
   modelReferenceParser: ModelReferenceParser;
   remoteURLSerializer: RemoteURLSerializer;
 
-  /**
-   * The reference of the document being edited, which is where the files are attached. It is a function because the
-   * editor is created before this is known.
-   */
+  // Functions because neither is known yet when the editor is created.
   getDocumentReference: () => string;
-
-  /**
-   * The document holding the metadata that the BlockNote schema can't store, such as the resource reference of the
-   * uploaded attachment. It is a function because the document is loaded after the editor is created.
-   */
   getBlockNoteDocument: () => BlockNoteDocument | undefined;
 
-  /**
-   * Whether the files being uploaded were pasted rather than dropped.
-   */
   isPaste: () => boolean;
-
-  /**
-   * Called when the upload fails, to tell the user about it.
-   */
   notifyUploadFailed: (fileName: string, error: unknown) => void;
 };
 
-// Collapses the block BlockNote inserted for the file into an empty paragraph, leaving no trace of a failed upload.
 const EMPTY_PARAGRAPH: UploadResult = { type: "paragraph", content: [] };
 
-/**
- * The resource reference saved for an uploaded attachment. Images are untyped and links are typed, like the CKEditor
- * integration does, so that an image is saved as `image:name.png` and a link as `[[attach:name.pdf]]` rather than as
- * `[[name.pdf]]`, which would be a document link.
- *
- * @param reference - the reference of an attachment of the edited document
- * @param typed - whether the reference keeps its `attach:` prefix when saved
- * @returns the resource reference to store as block metadata
- */
+// Untyped for images, typed for links: an untyped `[[name.pdf]]` is parsed back as a document link.
 function attachmentReference(
   reference: string,
   typed: boolean,
@@ -84,14 +54,8 @@ function attachmentReference(
 }
 
 /**
- * Creates the callback BlockNote uses to upload the files that are pasted or dropped over the editor.
- *
- * The uploaded file becomes an attachment of the edited document and the block BlockNote inserted for it is updated to
- * reference that attachment, matching what the CKEditor integration produces: an image block for an image and a
- * free-standing attachment link for anything else.
- *
- * @param dependencies - the services the upload callback needs
- * @returns the callback to pass to BlockNote as the uploadFile option
+ * The BlockNote `uploadFile` option: attaches the pasted and dropped files to the edited document, producing the same
+ * wiki syntax as the CKEditor integration.
  */
 function createUploadFile(
   dependencies: UploadFileDependencies,
@@ -106,10 +70,6 @@ function createUploadFile(
     notifyUploadFailed,
   } = dependencies;
 
-  /**
-   * @param file - the file to attach to the edited document
-   * @returns the reference of the created attachment, relative to the edited document
-   */
   async function upload(file: File): Promise<string> {
     const result = await storageProvider
       .get()
@@ -121,10 +81,6 @@ function createUploadFile(
     return reference;
   }
 
-  /**
-   * @param reference - the reference of an attachment of the edited document
-   * @returns the URL the browser can use to download that attachment
-   */
   function getDownloadURL(reference: string): string {
     return (
       remoteURLSerializer.serialize(
@@ -133,39 +89,23 @@ function createUploadFile(
     );
   }
 
-  /**
-   * Points the image block BlockNote inserted at the uploaded attachment.
-   *
-   * @param reference - the reference of the created attachment
-   * @param blockId - the id of the block BlockNote inserted for the file
-   * @returns the properties to apply to that block
-   */
   function toImageBlock(reference: string, blockId?: string): UploadResult {
     if (blockId) {
       getBlockNoteDocument()!.getMetadata(blockId, true)!.xwikiReference =
         attachmentReference(reference, false);
     }
-    // The empty name drops the alt text BlockNote defaults to the file name, which the CKEditor integration doesn't
-    // set either.
+    // Empty name, otherwise BlockNote defaults the alt text to the file name.
     return { props: { url: getDownloadURL(reference), name: "" } };
   }
 
-  /**
-   * Replaces the file, video or audio block BlockNote inserted with a free-standing attachment link, because those
-   * blocks have no XWiki counterpart. The link metadata is bound to a synthetic id carried in the link URL, because
-   * links have no id of their own.
-   *
-   * @param reference - the reference of the created attachment
-   * @param label - the link label, which is the name the attachment was created with
-   * @returns the paragraph that replaces the block BlockNote inserted
-   */
+  // BlockNote's file, video and audio blocks have no XWiki counterpart, so they become a link instead. Its metadata
+  // hangs off a synthetic id carried in the href, because links have no id of their own.
   function toAttachmentLink(reference: string, label: string): UploadResult {
     const linkId = uuidv4();
     const metadata = getBlockNoteDocument()!.getMetadata(linkId, true)!;
     metadata.xwikiReference = attachmentReference(reference, true);
-    // Saved without a label, since the label is just the attachment name. Editing the label brings it back. Note that
-    // the link must not be marked as free-standing: that would save it as `attach:name.pdf`, without the surrounding
-    // brackets, and a bare `attach:` reference is not parsed back as a link.
+    // Drops the label, which is just the attachment name. Not `xwikiFreestanding`: that saves a bare
+    // `attach:name.pdf` without the brackets, which isn't parsed back as a link.
     metadata.xwikiGeneratedLabel = label;
     return {
       type: "paragraph",
@@ -183,8 +123,8 @@ function createUploadFile(
     file: File,
     blockId?: string,
   ): Promise<UploadResult> {
-    // Pasted files are named after their media type by the browser, so they need a unique name. Dropped files keep
-    // the name the user gave them, unless they have none, in which case we need to generate one to upload them.
+    // Browsers name a pasted file after its media type, so the next paste would overwrite this attachment. A file
+    // with no name can't be attached at all.
     const toUpload = isPaste() || !file.name ? withUniqueName(file) : file;
     try {
       const reference = await upload(toUpload);
@@ -192,8 +132,8 @@ function createUploadFile(
         ? toImageBlock(reference, blockId)
         : toAttachmentLink(reference, toUpload.name);
     } catch (error) {
-      // BlockNote doesn't catch the errors of this callback and updates the block it inserted as soon as we return, so
-      // rejecting would leave an unhandled rejection and an orphan block behind.
+      // BlockNote doesn't catch our errors and updates the inserted block as soon as we return, so rejecting would
+      // leave an unhandled rejection and an orphan block.
       notifyUploadFailed(toUpload.name, error);
       return EMPTY_PARAGRAPH;
     }

@@ -284,10 +284,9 @@ function isSameResourceReference(
   return alice?.type === bob?.type && alice?.reference === bob?.reference;
 }
 
-// Pasted files are renamed before being uploaded, so we need to know how the files reached the editor.
+// Pasted files are renamed, so we need to know how the file reached the editor.
 const pasteTracker = trackPaste(document);
 
-// Called by BlockNote to upload the files that are pasted or dropped over the editor.
 const uploadFile = createUploadFile({
   storageProvider: container.get<StorageProvider>("StorageProvider"),
   modelReferenceParser: container
@@ -308,8 +307,7 @@ const uploadFile = createUploadFile({
       );
       new XWiki.widgets.Notification(message, "error");
     } catch (notificationError) {
-      // The notification is the last resort to report the failure, so there's nothing else to do if it fails. We catch
-      // it nonetheless, because nobody awaits this callback.
+      // Nobody awaits this callback, so an error here would go unhandled.
       console.error("Failed to notify the user.", notificationError);
     }
   },

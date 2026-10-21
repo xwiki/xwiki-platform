@@ -18,27 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-// The lower and upper bounds of the random suffix added to a generated file name, matching the CKEditor integration.
+// Bounds of the random suffix, matching the CKEditor integration.
 const RANDOM_MIN = 100;
 const RANDOM_MAX = 999;
 
-/**
- * @param fileName - the name of the file about to be uploaded
- * @returns the extension of the given file name, including the leading dot, or an empty string when it has none
- */
 function getExtension(fileName: string): string {
-  // Everything after the first dot, so that "archive.tar.gz" keeps both extensions.
+  // From the first dot, so that "archive.tar.gz" keeps both extensions.
   const dotIndex = fileName.indexOf(".");
   return dotIndex < 0 ? "" : fileName.substring(dotIndex);
 }
 
 /**
- * Renames a file pasted from the clipboard, which the browser names after its media type rather than its content (e.g.
- * "image.png", or a localized form such as "graphik.png" in German Firefox). Without this, every pasted screenshot
- * would be uploaded under the same name and overwrite the previous one.
- *
- * @param file - the file about to be uploaded
- * @returns a copy of the given file named after the current timestamp, keeping the original extension
+ * Renames a file after the current timestamp. Browsers name a pasted file after its media type ("image.png", or a
+ * localized form such as "graphik.png" in German Firefox), so every pasted screenshot would otherwise overwrite the
+ * previous one.
  */
 function withUniqueName(file: File): File {
   const random =

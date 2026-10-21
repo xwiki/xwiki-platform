@@ -18,23 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/**
- * Tells whether the files currently being uploaded were pasted or dropped, and stops tracking.
- */
 type PasteTracker = {
   isPaste(): boolean;
   dispose(): void;
 };
 
 /**
- * Remembers whether the last clipboard or drag and drop interaction was a paste, because BlockNote doesn't pass the
- * originating event to its upload callback and we rename pasted files only (dropped files have a meaningful name).
- *
- * Both listeners are registered in the capture phase, so they run before BlockNote handles the event and starts the
- * uploads it triggers.
- *
- * @param target - the event target to listen on, typically the document
- * @returns the tracker, which must be disposed of when the editor is destroyed
+ * Remembers whether the last interaction was a paste, because BlockNote doesn't pass the originating event to its
+ * upload callback. Capture phase, so both listeners run before BlockNote starts the upload. Dispose with the editor.
  */
 function trackPaste(target: EventTarget): PasteTracker {
   let paste = false;

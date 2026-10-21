@@ -468,7 +468,7 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Pastes the specified file over the rich text area, as if the user copied it from their file manager.
+     * Pastes a file over the rich text area.
      *
      * @param fileName the name of the pasted file
      * @param mediaType the media type of the pasted file, e.g. {@code image/png}
@@ -482,7 +482,7 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Drops the specified file over the rich text area, as if the user dragged it from their file manager.
+     * Drops a file over the rich text area.
      *
      * @param fileName the name of the dropped file
      * @param mediaType the media type of the dropped file, e.g. {@code application/pdf}
@@ -495,17 +495,8 @@ public class BlockNoteRichTextArea extends BaseElement
         return insertFile("drop", fileName, mediaType, content);
     }
 
-    /**
-     * Fires the clipboard or drag and drop event that makes the editor insert the specified file. We can't use the
-     * native clipboard or drag and drop support because the file would have to exist on the machine running the
-     * browser, which is a different container when the tests run with Docker.
-     *
-     * @param eventType either {@code paste} or {@code drop}
-     * @param fileName the name of the file to insert
-     * @param mediaType the media type of the file to insert
-     * @param content the content of the file to insert
-     * @return this rich text area instance
-     */
+    // Synthetic events, because native clipboard and drag and drop would need the file on the machine running the
+    // browser, which is a different container under Docker.
     private BlockNoteRichTextArea insertFile(String eventType, String fileName, String mediaType, byte[] content)
     {
         String script = """
@@ -515,8 +506,7 @@ public class BlockNoteRichTextArea extends BaseElement
             dataTransfer.items.add(new File([bytes], fileName, {type: mediaType}));
             const {left, top, width, height} = editor.getBoundingClientRect();
             const eventInit = {bubbles: true, cancelable: true, clientX: left + width / 2, clientY: top + height / 2};
-            // Firefox ignores the clipboardData passed to the ClipboardEvent constructor (the event ends up with no
-            // types), so we define it as an own property, which shadows the prototype getter in both browsers.
+            // Firefox ignores clipboardData passed to the constructor, so define it as an own property instead.
             const paste = new ClipboardEvent('paste', eventInit);
             Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
             editor.dispatchEvent(eventType === 'paste'
@@ -529,9 +519,8 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Waits until the rich text area holds a link with the specified label. Note that this can't be replaced by waiting
-     * for the label text alone: while a file is being uploaded, the block BlockNote inserted for it already shows the
-     * file name, so the text would match before the upload completes.
+     * Waits for a link with the given label. Waiting for the text alone wouldn't do: the block BlockNote inserts
+     * while uploading already shows the file name.
      *
      * @param label the expected link label
      * @return the link element
@@ -544,10 +533,7 @@ public class BlockNoteRichTextArea extends BaseElement
         return this.container.findElement(locator);
     }
 
-    /**
-     * @param value the value to use inside an XPath expression
-     * @return the given value as an XPath string literal, which has no escape syntax of its own
-     */
+    // XPath string literals have no escape syntax of their own.
     private String escapeXPathValue(String value)
     {
         if (!value.contains("'")) {

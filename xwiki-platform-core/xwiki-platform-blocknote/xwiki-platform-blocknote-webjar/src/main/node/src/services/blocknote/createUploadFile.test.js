@@ -52,7 +52,7 @@ describe("createUploadFile", () => {
     blockNoteDocument = new BlockNoteDocument([]);
     paste = false;
     notifyUploadFailed = vi.fn();
-    // The storage returns the reference of the created attachment, relative to the edited document.
+    // The storage returns the reference of the created attachment.
     saveAttachments = vi.fn(async (page, files) => [files[0].name]);
     uploadFile = createUploadFile(dependencies());
   });
@@ -72,7 +72,7 @@ describe("createUploadFile", () => {
       await uploadFile(file("photo.png", "image/png"), blockId);
 
       expect(blockNoteDocument.getMetadata(blockId)).toEqual({
-        // Untyped, so that the image is saved as image:photo.png, like the CKEditor integration does.
+        // Untyped, so it is saved as image:photo.png.
         xwikiReference: {
           type: "attach",
           typed: false,
@@ -118,7 +118,7 @@ describe("createUploadFile", () => {
 
       const linkId = extractLinkId(result.content[0].href);
       expect(blockNoteDocument.getMetadata(linkId)).toEqual({
-        // Typed, otherwise the link would be saved as [[report.pdf]], which is a document link.
+        // Typed, otherwise it would be saved as [[report.pdf]], a document link.
         xwikiReference: {
           type: "attach",
           typed: true,
@@ -187,7 +187,7 @@ describe("createUploadFile", () => {
     });
   });
 
-  // What the server receives, which is where the resource reference stored as metadata actually matters.
+  // What the server receives, which is where the metadata actually matters.
   describe("saved content", () => {
     let processor;
 
@@ -196,7 +196,7 @@ describe("createUploadFile", () => {
       blockNoteDocument = processor.load("[]");
     });
 
-    // Applies to the document what BlockNote does with the result of the upload, then saves it.
+    // Applies the upload result the way BlockNote does, then saves.
     function save(blockId, uploadResult) {
       blockNoteDocument.content = [
         {
@@ -235,7 +235,7 @@ describe("createUploadFile", () => {
       expect(paragraph.type).toBe("paragraph");
 
       const [link] = paragraph.content;
-      // The synthetic id is stripped from the href once the metadata has been restored as link props.
+      // The synthetic id is stripped once the metadata is restored as link props.
       expect(link.href).toBe("/xwiki/bin/download/Space/Page/report.pdf");
       expect(link.props).toEqual({
         xwikiReference: {
@@ -244,7 +244,7 @@ describe("createUploadFile", () => {
           reference: "report.pdf",
           parameters: {},
         },
-        // Kept, so that the link is saved as [[attach:report.pdf]] rather than [[report.pdf>>attach:report.pdf]].
+        // Saves as [[attach:report.pdf]] rather than [[report.pdf>>attach:report.pdf]].
         xwikiGeneratedLabel: "report.pdf",
       });
     });
@@ -267,7 +267,7 @@ describe("createUploadFile", () => {
         it("collapses the inserted block into an empty paragraph", async () => {
           const result = await uploadFile(file("photo.png", "image/png"), "id");
 
-          // BlockNote doesn't catch our errors and updates the block it inserted with whatever we return.
+          // BlockNote updates the inserted block with whatever we return.
           expect(result).toEqual({ type: "paragraph", content: [] });
         });
 

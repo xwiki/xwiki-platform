@@ -103,8 +103,6 @@ function createUploadFile(
     const linkId = uuidv4();
     const metadata = getBlockNoteDocument()!.getMetadata(linkId, true)!;
     metadata.xwikiReference = attachmentReference(reference, true);
-    // Drops the label, which is just the attachment name. Not `xwikiFreestanding`: that saves a bare
-    // `attach:name.pdf` without the brackets, which isn't parsed back as a link.
     metadata.xwikiGeneratedLabel = label;
     return {
       type: "paragraph",
@@ -122,8 +120,6 @@ function createUploadFile(
     file: File,
     blockId?: string,
   ): Promise<UploadResult> {
-    // Browsers name a pasted file after its media type, so the next paste would overwrite this attachment. A file
-    // with no name can't be attached at all.
     const toUpload = isPaste() || !file.name ? withUniqueName(file) : file;
     try {
       const reference = await upload(toUpload);

@@ -189,6 +189,33 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     @Override
     protected void runInternal() throws Exception
     {
+        try {
+            updateIndex();
+        } catch (Exception e) {
+            if (!this.indexStore.isDisposed()) {
+                throw e;
+            }
+
+            // The store cannot be used anymore (e.g. XWiki is stopping): the index is updated again at the next start.
+            this.logger.info("The update of the extension index was interrupted because the index was stopped.");
+        }
+    }
+
+    /**
+     * Stop the update of the index when the failure comes from the store being disposed (e.g. XWiki is stopping)
+     * instead of reporting it for each extension.
+     *
+     * @param e the failure
+     */
+    private void checkDisposed(Exception e)
+    {
+        if (this.indexStore.isDisposed()) {
+            throw new IndexStoppedException(e);
+        }
+    }
+
+    private void updateIndex() throws SearchException, SolrServerException, IOException
+    {
         // Gather known invalid flavor so that we skip them
         this.invalidFlavors = this.flavors.getKnownInvalidFlavors();
 
@@ -290,6 +317,8 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                     }
                 }
             } catch (Exception e) {
+                checkDisposed(e);
+
                 this.logger.error("Failed to validate extensions [{}] on namespace [{}]", extensionId, namespace, e);
             }
         }
@@ -559,6 +588,8 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                     this.indexStore.commit();
                 }
             } catch (Exception e) {
+                checkDisposed(e);
+
                 this.logger.error("Failed to validate extension with if [{}] on namespace [{}]", extensionId, namespace,
                     e);
             }
@@ -608,6 +639,8 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                 try {
                     updated |= addRemoteExtensions(searchableRepository, indexedExtensions);
                 } catch (Exception e) {
+                    checkDisposed(e);
+
                     this.logger.warn("Failed to get remote extension from repository [{}]: {}",
                         repository.getDescriptor(), ExceptionUtils.getRootCauseMessage(e));
                 }

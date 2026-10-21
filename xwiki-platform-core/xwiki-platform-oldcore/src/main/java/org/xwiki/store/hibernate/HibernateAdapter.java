@@ -155,6 +155,21 @@ public interface HibernateAdapter
     void updateDatabase(Metadata metadata) throws HibernateStoreException;
 
     /**
+     * Repair the inconsistencies of the current database which are not covered by {@link #updateDatabase(Metadata)}
+     * (for example tables which don't use the collation configured on the database). Called for each wiki when the
+     * data migration system starts, right before the database schema update.
+     *
+     * @param metadata the metadata we want the current database to follow
+     * @throws HibernateStoreException when failing to repair the database
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    default void repairDatabase(Metadata metadata) throws HibernateStoreException
+    {
+        // Nothing to repair by default
+    }
+
+    /**
      * @return true if the current database product is catalog based, false for a schema based databases
      */
     boolean isCatalog();

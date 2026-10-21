@@ -46,4 +46,11 @@ public class MariaDBHibernateAdapter extends MySQLHibernateAdapter
     {
         return "information_schema.INNODB_SYS_TABLES";
     }
+
+    @Override
+    protected boolean isLongUniqueIndexSupported()
+    {
+        // MariaDB transparently switches a too long unique index to a hash based one
+        return true;
+    }
 }

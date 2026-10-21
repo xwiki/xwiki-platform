@@ -52,10 +52,28 @@ function hideModal(modal: Element) {
 }
 
 /**
+ * The actions performed on the Bootstrap popovers (which are a jQuery plugin), in order.
+ */
+const popoverActions: [Element, string][] = [];
+
+/**
  * Simulates the Bootstrap modals (which are a jQuery plugin) by toggling the "in" CSS class and notifying listeners.
  */
 function jQuery(element: Element) {
   return {
+    popover(action = "init") {
+      popoverActions.push([element, action]);
+      if (action === "hide") {
+        notify(element, "hide.bs.popover");
+      }
+    },
+    one(eventName: string, listener: () => void) {
+      const onceListener = () => {
+        this.off(eventName, onceListener);
+        listener();
+      };
+      this.on(eventName, onceListener);
+    },
     modal(action: "show" | "hide") {
       if (action === "show") {
         showModal(element);
@@ -85,7 +103,11 @@ function createEnvironment(
       minorEdit: true,
     }),
     defaultAvatarURL: "noavatar.png",
-    icons: { check: '<span class="icon-check"></span>', clock: "" },
+    icons: {
+      check: '<span class="icon-check"></span>',
+      clock: "",
+      warning: '<span class="icon-warning"></span>',
+    },
     formatDate: (date) => `date-${date}`,
     getUserURL: (reference) => `/profile/${reference}`,
     getVersionURL: (xwikiDocument, version) =>
@@ -209,6 +231,7 @@ describe("Toolbar", () => {
     toolbar?.destroy();
     toolbar = undefined;
     modalListeners.clear();
+    popoverActions.length = 0;
     requireJS.restore();
   });
 
@@ -280,6 +303,60 @@ describe("Toolbar", () => {
     );
     // The user list is cleared when disconnected.
     expect(queryAll(".realtime-users .realtime-user")).toHaveLength(0);
+  });
+
+  it("shows the warnings", async () => {
+    vi.useFakeTimers();
+    try {
+      const realtimeToolbar = await createToolbar();
+      expect(queryAll(".realtime-warning")).toHaveLength(0);
+
+      realtimeToolbar.addWarning({ id: "first", title: "One", message: "1" });
+      realtimeToolbar.addWarning({ id: "second", title: "Two", message: "2" });
+      await flushPromises();
+      const [first, second] = queryAll(".realtime-warning");
+      expect(first.dataset.warning).toBe("first");
+      expect(first.title).toBe("One");
+      expect(first.dataset.content).toBe("1");
+      expect(first.querySelector(".icon-warning")).not.toBeNull();
+      expect(second.dataset.warning).toBe("second");
+      expect(popoverActions).toEqual([
+        [first, "init"],
+        [second, "init"],
+      ]);
+
+      // The warning messages are shown once, a bit later, and then hidden automatically after a while, unless the user
+      // hides them before.
+      vi.advanceTimersByTime(1000);
+      expect(popoverActions.slice(2)).toEqual([
+        [first, "show"],
+        [second, "show"],
+      ]);
+      jQuery(first).popover("hide");
+      vi.advanceTimersByTime(9000);
+      expect(popoverActions.slice(4)).toEqual([
+        [first, "hide"],
+        [second, "hide"],
+      ]);
+
+      // Replace the first warning.
+      realtimeToolbar.addWarning({ id: "first", title: "Uno", message: "1" });
+      await flushPromises();
+      expect(
+        queryAll(".realtime-warning").map(({ dataset }) => dataset.warning),
+      ).toEqual(["second", "first"]);
+      expect(query(".realtime-warning[data-warning=first]").title).toBe("Uno");
+      expect(popoverActions).toContainEqual([first, "destroy"]);
+
+      realtimeToolbar.removeWarning("second");
+      await flushPromises();
+      expect(
+        queryAll(".realtime-warning").map(({ dataset }) => dataset.warning),
+      ).toEqual(["first"]);
+      expect(popoverActions).toContainEqual([second, "destroy"]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("updates the save status", async () => {

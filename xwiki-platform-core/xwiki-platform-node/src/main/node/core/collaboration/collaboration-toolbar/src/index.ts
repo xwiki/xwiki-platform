@@ -31,5 +31,6 @@ export type {
   ToolbarStatus,
   ToolbarUser,
   ToolbarVersion,
+  ToolbarWarning,
 } from "./ui/types";
 export type { YjsToolbar, YjsToolbarOptions } from "./xwiki/yjs";

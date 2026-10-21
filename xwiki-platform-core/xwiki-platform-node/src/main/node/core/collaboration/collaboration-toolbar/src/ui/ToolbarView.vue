@@ -23,6 +23,7 @@ import LeaveModal from "./LeaveModal.vue";
 import StatusLabel from "./StatusLabel.vue";
 import UserAvatar from "./UserAvatar.vue";
 import VersionModal from "./VersionModal.vue";
+import WarningPopover from "./WarningPopover.vue";
 import {
   useDocument,
   useEnvironment,
@@ -255,6 +256,12 @@ async function save(continueEditing?: boolean): Promise<boolean> {
         </li>
       </ul>
     </div>
+    <!-- The warning is re-created when its content changes, in order to update and show again the popover. -->
+    <WarningPopover
+      v-for="warning in state.warnings"
+      :key="JSON.stringify(warning)"
+      :warning="warning"
+    />
     <!-- Other modules can append elements here (e.g. the concurrent editing warning). -->
   </div>
   <div class="realtime-edit-toolbar-right">

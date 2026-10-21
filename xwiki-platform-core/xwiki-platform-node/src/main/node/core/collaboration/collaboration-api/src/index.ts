@@ -23,7 +23,7 @@ export { collaborationManagerProviderName } from "./collaborationManagerProvider
 export { ComponentInit } from "./componentInit";
 export { ConnectionStatus } from "./connectionStatus";
 export { YjsAwarenessSaveTransport } from "./yjsAwarenessSaveTransport";
-export type { Collaboration } from "./collaboration";
+export type { Collaboration, CollaborationWarning } from "./collaboration";
 export type { CollaborationManager } from "./collaborationManager";
 export type { CollaborationManagerProvider } from "./collaborationManagerProvider";
 export type { Collaborator } from "./collaborator";

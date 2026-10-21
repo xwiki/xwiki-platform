@@ -191,6 +191,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Logging script service -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-logging-script</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <scm>

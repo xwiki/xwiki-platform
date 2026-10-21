@@ -27,7 +27,9 @@ import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
+import org.xwiki.bridge.event.WikiDeleteFailedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.bridge.event.WikiDeletingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.wiki.configuration.WikiConfiguration;
@@ -143,11 +145,22 @@ public class DefaultWikiManager implements WikiManager
     @Override
     public void delete(String wikiId) throws WikiManagerException
     {
-        // Delete the wiki
-        this.wikiDeleter.delete(wikiId);
+        try {
+            // Send the begin event
+            this.observationManager.notify(new WikiDeletingEvent(wikiId), wikiId);
 
-        // Send an event
-        this.observationManager.notify(new WikiDeletedEvent(wikiId), wikiId);
+            // Delete the wiki
+            this.wikiDeleter.delete(wikiId);
+
+            // Send the end event
+            this.observationManager.notify(new WikiDeletedEvent(wikiId), wikiId);
+        } catch (WikiManagerException e) {
+            // Send the failed event
+            this.observationManager.notify(new WikiDeleteFailedEvent(wikiId), wikiId);
+
+            // Throw the exception
+            throw e;
+        }
     }
 
     @Override

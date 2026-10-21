@@ -23,11 +23,14 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
+import org.xwiki.bridge.event.WikiDeleteFailedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.bridge.event.WikiDeletingEvent;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -50,7 +53,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -222,8 +228,27 @@ class DefaultWikiManagerTest
     void deleteWiki() throws Exception
     {
         this.wikiManager.delete("wikiid");
-        verify(this.wikiDeleter).delete("wikiid");
-        verify(this.observationManager).notify(new WikiDeletedEvent("wikiid"), "wikiid");
+
+        InOrder inOrder = inOrder(this.observationManager, this.wikiDeleter);
+        inOrder.verify(this.observationManager).notify(new WikiDeletingEvent("wikiid"), "wikiid");
+        inOrder.verify(this.wikiDeleter).delete("wikiid");
+        inOrder.verify(this.observationManager).notify(new WikiDeletedEvent("wikiid"), "wikiid");
+        verify(this.observationManager, never()).notify(any(WikiDeleteFailedEvent.class), any());
+    }
+
+    @Test
+    void deleteWikiWhenFail() throws Exception
+    {
+        doThrow(new WikiManagerException("error")).when(this.wikiDeleter).delete("wikiid");
+
+        Throwable exception = assertThrows(WikiManagerException.class, () -> this.wikiManager.delete("wikiid"));
+        assertEquals("error", exception.getMessage());
+
+        InOrder inOrder = inOrder(this.observationManager, this.wikiDeleter);
+        inOrder.verify(this.observationManager).notify(new WikiDeletingEvent("wikiid"), "wikiid");
+        inOrder.verify(this.wikiDeleter).delete("wikiid");
+        inOrder.verify(this.observationManager).notify(new WikiDeleteFailedEvent("wikiid"), "wikiid");
+        verify(this.observationManager, never()).notify(any(WikiDeletedEvent.class), any());
     }
 
     @Test

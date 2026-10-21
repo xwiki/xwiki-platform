@@ -35,9 +35,21 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Core (shaded)</xwiki.extension.name>
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
-    <!-- Make sure the Extension Manager does not install the standard solr-core next to this one. The embedded Jersey
-         and HK2 are not listed since they are relocated: this module does not provide their packages. -->
-    <xwiki.extension.features>org.apache.solr:solr-core/${solr.version}</xwiki.extension.features>
+    <!-- The artifacts embedded in this module -->
+    <xwiki.extension.features>
+      org.apache.solr:solr-core/${solr.version},
+      org.glassfish.jersey.core:jersey-common/${solr.jersey.version},
+      org.glassfish.jersey.core:jersey-server/${solr.jersey.version},
+      org.glassfish.jersey.core:jersey-client/${solr.jersey.version},
+      org.glassfish.jersey.inject:jersey-hk2/${solr.jersey.version},
+      org.glassfish.jersey.media:jersey-media-json-jackson/${solr.jersey.version},
+      org.glassfish.jersey.ext:jersey-entity-filtering/${solr.jersey.version},
+      org.glassfish.hk2:hk2-api/${solr.hk2.version},
+      org.glassfish.hk2:hk2-utils/${solr.hk2.version},
+      org.glassfish.hk2:hk2-locator/${solr.hk2.version},
+      org.glassfish.hk2.external:aopalliance-repackaged/${solr.hk2.version},
+      org.glassfish.hk2:osgi-resource-locator/${solr.osgi-resource-locator.version}
+    </xwiki.extension.features>
     <!-- Nothing to check: no source -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.skip>true</xwiki.jacoco.skip>
@@ -45,6 +57,7 @@
     <!-- The versions used by Solr, which are different from the ones managed by XWiki (Jersey 2) -->
     <solr.jersey.version>3.1.12</solr.jersey.version>
     <solr.hk2.version>3.1.1</solr.hk2.version>
+    <solr.osgi-resource-locator.version>1.0.3</solr.osgi-resource-locator.version>
   </properties>
   <dependencies>
     <!-- The solr-core jar itself, only used as an input of the shading (optional so that it's never visible to the
@@ -120,7 +133,7 @@
     <dependency>
       <groupId>org.glassfish.hk2</groupId>
       <artifactId>osgi-resource-locator</artifactId>
-      <version>1.0.3</version>
+      <version>${solr.osgi-resource-locator.version}</version>
       <optional>true</optional>
     </dependency>
     <!-- The dependencies of the embedded Jersey which are not embedded themselves -->

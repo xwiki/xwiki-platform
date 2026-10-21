@@ -103,12 +103,6 @@ def builds = [
       mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
     )
   },
-  'Flavor Test - Security' : {
-    buildFunctionalTest(
-      name: 'Flavor Test - Security',
-      pom: 'xwiki-platform-distribution-flavor-test-security/pom.xml'
-    )
-  },
   'TestRelease': {
     build(
       name: 'TestRelease',
@@ -213,10 +207,6 @@ private void buildStandardAll(builds)
               // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu
               // Validator (see https://bitbucket.org/sideshowbarker/vnu/issues/4/stackoverflowerror-error-when-running)
               builds['Flavor Test - Webstandards'].call()
-            },
-            'flavor-test-security': {
-              // Run the Flavor Security tests
-              builds['Flavor Test - Security'].call()
             }
           )
         }

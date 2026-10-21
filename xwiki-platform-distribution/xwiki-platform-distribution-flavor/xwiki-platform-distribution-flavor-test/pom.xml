@@ -507,7 +507,6 @@
   </profiles>
   <modules>
     <module>xwiki-platform-distribution-flavor-test-pageobjects</module>
-    <module>xwiki-platform-distribution-flavor-test-security</module>
     <module>xwiki-platform-distribution-flavor-test-ui</module>
     <module>xwiki-platform-distribution-flavor-test-webstandards</module>
     <module>xwiki-platform-distribution-flavor-test-escaping</module>

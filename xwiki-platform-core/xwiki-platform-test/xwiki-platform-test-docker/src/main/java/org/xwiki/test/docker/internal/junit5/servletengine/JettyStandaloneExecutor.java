@@ -146,7 +146,7 @@ public class JettyStandaloneExecutor
         FileUtils.deleteDirectory(dataDirectory);
 
         // Step: The instances of a cluster share the filesystem blob store, like they share the database.
-        if (SharedFileSystemBlobStore.isShared(this.testConfiguration)) {
+        if (this.testConfiguration.isSharedFileSystemBlobStore()) {
             Path storeDirectory = dataDirectory.toPath().resolve(SharedFileSystemBlobStore.STORE_PATH);
             Files.createDirectories(storeDirectory.getParent());
             Files.createSymbolicLink(storeDirectory,

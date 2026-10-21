@@ -25,10 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.DockerClientFactory;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -47,33 +45,6 @@ class SharedFileSystemBlobStoreTest
     void beforeEach()
     {
         this.testConfiguration = mock(TestConfiguration.class);
-    }
-
-    @Test
-    void isSharedForClusterWithFileSystemBlobStore()
-    {
-        when(this.testConfiguration.isCluster()).thenReturn(true);
-        when(this.testConfiguration.getBlobStore()).thenReturn(BlobStore.FILESYSTEM);
-
-        assertTrue(SharedFileSystemBlobStore.isShared(this.testConfiguration));
-    }
-
-    @Test
-    void isNotSharedForClusterWithS3BlobStore()
-    {
-        when(this.testConfiguration.isCluster()).thenReturn(true);
-        when(this.testConfiguration.getBlobStore()).thenReturn(BlobStore.S3);
-
-        assertFalse(SharedFileSystemBlobStore.isShared(this.testConfiguration));
-    }
-
-    @Test
-    void isNotSharedForSingleInstance()
-    {
-        when(this.testConfiguration.isCluster()).thenReturn(false);
-        when(this.testConfiguration.getBlobStore()).thenReturn(BlobStore.FILESYSTEM);
-
-        assertFalse(SharedFileSystemBlobStore.isShared(this.testConfiguration));
     }
 
     @Test

@@ -82,7 +82,7 @@ public class BlobStoreContainerExecutor extends AbstractContainerExecutor
         switch (blobStore) {
             case FILESYSTEM:
                 // No container needed for filesystem blob store, but the instances of a cluster must share it
-                if (SharedFileSystemBlobStore.isShared(testConfiguration)) {
+                if (testConfiguration.isSharedFileSystemBlobStore()) {
                     createSharedFileSystemBlobStore(testConfiguration);
                 }
                 break;

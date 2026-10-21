@@ -435,7 +435,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
 
         // The instances of a cluster share the filesystem blob store, like they share the database.
-        if (SharedFileSystemBlobStore.isShared(this.testConfiguration)) {
+        if (this.testConfiguration.isSharedFileSystemBlobStore()) {
             SharedFileSystemBlobStore.mountVolume(this.servletContainer, this.testConfiguration);
         }
 

@@ -31,7 +31,6 @@ import java.util.UUID;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Mount;
@@ -66,16 +65,6 @@ public final class SharedFileSystemBlobStore
     private SharedFileSystemBlobStore()
     {
         // Utility class
-    }
-
-    /**
-     * @param testConfiguration the configuration of the test
-     * @return {@code true} if the XWiki instances of the test share a filesystem blob store, i.e. when they form a
-     *     cluster using the filesystem blob store
-     */
-    public static boolean isShared(TestConfiguration testConfiguration)
-    {
-        return testConfiguration.isCluster() && testConfiguration.getBlobStore() == BlobStore.FILESYSTEM;
     }
 
     /**

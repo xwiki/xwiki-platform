@@ -3023,8 +3023,16 @@ Recursive title display detected!##
   #set ($discard = $response.writer.print($data))
   ## The content length is measured in bytes and one character can use more than one byte.
   #set ($discard = $response.setContentLength($data.getBytes($characterEncoding).size()))
-  ## Make sure the entire content is sent back to the client.
-  #set ($discard = $response.flushBuffer())
+  ## Make sure the entire content is sent back to the client. This fails when the client closed the connection in the
+  ## meantime (e.g. the user left the page, cancelling the request): there's nothing more to do then, and it's not an
+  ## error of the server.
+  #try ('rawResponseException')
+    #set ($discard = $response.flushBuffer())
+  #end
+  #if ($rawResponseException)
+    #set ($discard = $services.logging.getLogger('macros.vm').debug(
+      'Failed to send the response, the connection was probably closed by the client.', $rawResponseException))
+  #end
   ## Make sure XWiki doesn't write any more content to the response.
   #set ($discard = $xcontext.setFinished(true))
 #end

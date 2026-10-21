@@ -19,6 +19,8 @@
  */
 package org.xwiki.web;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
@@ -30,9 +32,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.slf4j.Logger;
+import org.xwiki.logging.script.LoggingScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.script.service.ScriptService;
@@ -45,6 +51,8 @@ import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.xml.html.script.HTMLScriptService;
 
+import com.xpn.xwiki.web.XWikiResponse;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,9 +60,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -470,5 +482,59 @@ class MacrosTest extends PageTest
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
         assertEquals(List.of("string1"), velocityContext.get(parameters1));
         assertEquals(List.of("string2", 42), velocityContext.get(parameters2));
+    }
+
+    @Test
+    void rawResponse() throws Exception
+    {
+        LoggingScriptService loggingScriptService = mock(LoggingScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "logging", loggingScriptService);
+        Logger logger = mock(Logger.class);
+        when(loggingScriptService.getLogger("macros.vm")).thenReturn(logger);
+
+        XWikiResponse rawResponse = mock(XWikiResponse.class);
+        StringWriter responseContent = new StringWriter();
+        when(rawResponse.getWriter()).thenReturn(new PrintWriter(responseContent));
+        this.context.setResponse(rawResponse);
+
+        this.velocityManager.evaluate(new StringWriter(), "rawResponse",
+            new StringReader("#rawResponse('{\"name\": \"\u00e9t\u00e9\"}' 'application/json')"));
+
+        assertEquals("{\"name\": \"\u00e9t\u00e9\"}", responseContent.toString());
+        verify(rawResponse).setContentType("application/json");
+        verify(rawResponse).setCharacterEncoding("utf-8");
+        verify(rawResponse).setContentLength(17);
+        verify(rawResponse).flushBuffer();
+        assertTrue(this.context.isFinished());
+        verifyNoInteractions(logger);
+    }
+
+    @Test
+    void rawResponseWhenTheClientClosedTheConnection() throws Exception
+    {
+        LoggingScriptService loggingScriptService = mock(LoggingScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "logging", loggingScriptService);
+        Logger logger = mock(Logger.class);
+        when(loggingScriptService.getLogger("macros.vm")).thenReturn(logger);
+
+        XWikiResponse rawResponse = mock(XWikiResponse.class);
+        when(rawResponse.getWriter()).thenReturn(new PrintWriter(new StringWriter()));
+        IOException exception = new IOException("Broken pipe");
+        doThrow(exception).doNothing().when(rawResponse).flushBuffer();
+        this.context.setResponse(rawResponse);
+
+        // The failure to send the response must neither fail the macro nor be logged as an error, and must not leak
+        // to a later call.
+        this.velocityManager.evaluate(new StringWriter(), "rawResponse", new StringReader("""
+            #rawResponse('first')
+            #rawResponse('second')"""));
+
+        assertTrue(this.context.isFinished());
+        verify(rawResponse, times(2)).flushBuffer();
+        ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
+        verify(logger).debug(eq("Failed to send the response, the connection was probably closed by the client."),
+            throwableCaptor.capture());
+        assertSame(exception, ExceptionUtils.getRootCause(throwableCaptor.getValue()));
+        verifyNoMoreInteractions(logger);
     }
 }

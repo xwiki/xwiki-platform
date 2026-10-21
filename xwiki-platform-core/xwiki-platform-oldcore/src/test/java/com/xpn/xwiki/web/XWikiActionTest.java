@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import jakarta.inject.Named;
 
 import org.apache.velocity.VelocityContext;
+import org.eclipse.jetty.io.EofException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -195,6 +196,21 @@ class XWikiActionTest
     {
         this.action.exception = new XWikiException(XWikiException.MODULE_XWIKI_APP,
             XWikiException.ERROR_XWIKI_UNKNOWN, "Failed to send the attachment", new IOException(rootCause));
+
+        this.action.execute(this.oldcore.getXWikiContext());
+
+        // Nothing is logged and no error page is sent since the client closed the connection.
+        assertEquals(0, this.logCapture.size());
+        verify(this.out, never()).write(any(byte[].class));
+    }
+
+    @Test
+    void executeWhenTheActionFailsBecauseTheClientClosedTheConnectionOnJetty() throws Exception
+    {
+        // The message of the root cause depends on the operating system, so it's not used to detect the client abort.
+        this.action.exception = new XWikiException(XWikiException.MODULE_XWIKI_APP,
+            XWikiException.ERROR_XWIKI_UNKNOWN, "Failed to send the attachment",
+            new EofException(new IOException("An established connection was aborted by the software in your host")));
 
         this.action.execute(this.oldcore.getXWikiContext());
 

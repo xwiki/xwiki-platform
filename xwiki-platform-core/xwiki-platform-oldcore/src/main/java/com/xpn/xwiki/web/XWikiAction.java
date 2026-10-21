@@ -148,8 +148,20 @@ public abstract class XWikiAction implements LegacyAction
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAction.class);
 
     /**
+     * The exceptions thrown by the servlet containers when the client closed the connection while the response was
+     * being sent. Their names are used rather than the classes since XWiki doesn't depend on a servlet container.
+     */
+    private static final Set<String> CLIENT_ABORT_EXCEPTIONS = Set.of(
+        // Jetty
+        "org.eclipse.jetty.io.EofException",
+        // Tomcat
+        "org.apache.catalina.connector.ClientAbortException");
+
+    /**
      * The root causes of the exceptions thrown when the client closed the connection while the response was being
-     * sent: depending on how the connection was closed, writing to it fails with a broken pipe or a connection reset.
+     * sent, for the servlet containers that don't wrap them in a dedicated exception: depending on how the connection
+     * was closed, writing to it fails with a broken pipe or a connection reset. The messages come from the operating
+     * system, so they can be different on another one.
      */
     private static final Set<String> CLIENT_ABORT_ROOT_CAUSES =
         Set.of("IOException: Broken pipe", "IOException: Connection reset by peer");
@@ -376,6 +388,23 @@ public abstract class XWikiAction implements LegacyAction
             return false;
         }
         return true;
+    }
+
+    /**
+     * @param e the exception to check
+     * @return {@code true} if the exception was caused by the client closing the connection
+     */
+    private static boolean isClientAbort(Throwable e)
+    {
+        for (Throwable cause : ExceptionUtils.getThrowableList(e)) {
+            for (Class<?> type = cause.getClass(); type != null; type = type.getSuperclass()) {
+                if (CLIENT_ABORT_EXCEPTIONS.contains(type.getName())) {
+                    return true;
+                }
+            }
+        }
+
+        return CLIENT_ABORT_ROOT_CAUSES.contains(ExceptionUtils.getRootCauseMessage(e));
     }
 
     /**
@@ -712,7 +741,7 @@ public abstract class XWikiAction implements LegacyAction
                         // Don't log the exceptions caused by the client closing the connection since they're not real
                         // errors and we don't want to pollute the logs with unnecessary stack traces. It just means the
                         // client side has cancelled the connection.
-                        if (CLIENT_ABORT_ROOT_CAUSES.contains(ExceptionUtils.getRootCauseMessage(e))) {
+                        if (isClientAbort(e)) {
                             return;
                         }
                         LOGGER.warn("Uncaught exception", e);

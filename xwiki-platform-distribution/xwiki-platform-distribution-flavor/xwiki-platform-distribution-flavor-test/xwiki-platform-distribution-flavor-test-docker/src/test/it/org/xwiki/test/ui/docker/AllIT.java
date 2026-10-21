@@ -45,4 +45,9 @@ public class AllIT
     class NestedSyntaxHighlightingIT extends SyntaxHighlightingIT
     {
     }
+
+    @Nested
+    class NestedExtensionSecurityScanIT extends ExtensionSecurityScanIT
+    {
+    }
 }

@@ -145,21 +145,22 @@ public class DefaultWikiManager implements WikiManager
     @Override
     public void delete(String wikiId) throws WikiManagerException
     {
-        try {
-            // Send the begin event
-            this.observationManager.notify(new WikiDeletingEvent(wikiId), wikiId);
+        // Send the begin event
+        this.observationManager.notify(new WikiDeletingEvent(wikiId), wikiId);
 
+        boolean deleted = false;
+        try {
             // Delete the wiki
             this.wikiDeleter.delete(wikiId);
 
-            // Send the end event
-            this.observationManager.notify(new WikiDeletedEvent(wikiId), wikiId);
-        } catch (WikiManagerException e) {
-            // Send the failed event
-            this.observationManager.notify(new WikiDeleteFailedEvent(wikiId), wikiId);
-
-            // Throw the exception
-            throw e;
+            deleted = true;
+        } finally {
+            // Always send an end event, whatever the failure, so that the deletion fold is closed
+            if (deleted) {
+                this.observationManager.notify(new WikiDeletedEvent(wikiId), wikiId);
+            } else {
+                this.observationManager.notify(new WikiDeleteFailedEvent(wikiId), wikiId);
+            }
         }
     }
 

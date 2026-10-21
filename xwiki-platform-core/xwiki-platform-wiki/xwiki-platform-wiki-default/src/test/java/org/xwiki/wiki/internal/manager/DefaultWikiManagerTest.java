@@ -252,6 +252,21 @@ class DefaultWikiManagerTest
     }
 
     @Test
+    void deleteWikiWhenUnexpectedFailure() throws Exception
+    {
+        doThrow(new RuntimeException("error")).when(this.wikiDeleter).delete("wikiid");
+
+        Throwable exception = assertThrows(RuntimeException.class, () -> this.wikiManager.delete("wikiid"));
+        assertEquals("error", exception.getMessage());
+
+        InOrder inOrder = inOrder(this.observationManager, this.wikiDeleter);
+        inOrder.verify(this.observationManager).notify(new WikiDeletingEvent("wikiid"), "wikiid");
+        inOrder.verify(this.wikiDeleter).delete("wikiid");
+        inOrder.verify(this.observationManager).notify(new WikiDeleteFailedEvent("wikiid"), "wikiid");
+        verify(this.observationManager, never()).notify(any(WikiDeletedEvent.class), any());
+    }
+
+    @Test
     void copyWhenWikiAlreadyExists() throws Exception
     {
         when(this.store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);

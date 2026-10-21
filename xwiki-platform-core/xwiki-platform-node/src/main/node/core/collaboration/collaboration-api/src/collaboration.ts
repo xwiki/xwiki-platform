@@ -24,12 +24,25 @@ import type { Ref } from "vue";
 import type { Doc } from "yjs";
 
 /**
+ * A problem with the collaboration session that the user should be warned about:
+ *
+ * - `sessionReplaced`: the collaboration session was replaced, while we were disconnected, by a new session that doesn't
+ *   share its history with ours (e.g. all the other participants left and someone started a new session from the saved
+ *   document). The synchronization is stopped, in order to avoid duplicating the content, so the local changes are kept
+ *   but not shared anymore.
+ *
+ * @since 18.9.0
+ * @beta
+ */
+type CollaborationWarning = "sessionReplaced";
+
+/**
  * Holds information about a collaboration session.
  *
  * @since 18.4.0RC1
  * @beta
  */
-export type Collaboration = {
+type Collaboration = {
   /**
    * Specifies whether the current user is connected, connecting or disconnected from this collaboration. The connection
    * status is reactive and will be updated when the connection status changes. Note that the collaboration provider
@@ -42,6 +55,14 @@ export type Collaboration = {
    * leave the collaboration.
    */
   collaborators: Ref<Collaborator[]>;
+
+  /**
+   * The problems the user should be warned about. The list is reactive and will be updated when problems occur or are
+   * resolved. Undefined when the collaboration provider doesn't report any problems.
+   *
+   * @since 18.9.0
+   */
+  warnings?: Ref<CollaborationWarning[]>;
 
   /**
    * Information on how the current user has presented itself to the other collaborators. This information doesn't
@@ -69,3 +90,5 @@ export type Collaboration = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   saver?: Saver<any>;
 };
+
+export type { Collaboration, CollaborationWarning };

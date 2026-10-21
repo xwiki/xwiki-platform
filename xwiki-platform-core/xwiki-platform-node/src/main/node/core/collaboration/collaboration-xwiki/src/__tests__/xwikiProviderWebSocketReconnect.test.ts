@@ -42,6 +42,11 @@ const { FakeRoom, FakeWebSocket } = vi.hoisted(() => {
 
     history: Uint8Array[] = [];
 
+    /**
+     * When true, the connection attempts fail, as if the server couldn't be reached.
+     */
+    unreachable = false;
+
     sockets = new Set<FakeWebSocket>();
 
     /**
@@ -108,6 +113,11 @@ const { FakeRoom, FakeWebSocket } = vi.hoisted(() => {
 
     constructor() {
       queue.push(() => {
+        if (FakeRoom.current.unreachable) {
+          this.readyState = 3;
+          this.onclose?.({ code: 1006 });
+          return;
+        }
         this.readyState = this.OPEN;
         FakeRoom.current.sockets.add(this);
         this.onopen?.();
@@ -307,5 +317,56 @@ describe("createXWikiWebSocketProvider (reconnect)", () => {
     expect(text(alice).toString()).toBe("Hello world");
     expect(text(carol).toString()).toBe("Hello");
     expect(text(connect()).toString()).toBe("Hello");
+  });
+
+  it("starts the session with the local content when the server becomes reachable", () => {
+    FakeRoom.current.unreachable = true;
+    const alice = connect();
+    expect(alice.wsconnected).toBe(false);
+    // The content is initialized locally, because we gave up waiting for the server.
+    text(alice).insert(0, "Hello");
+
+    FakeRoom.current.unreachable = false;
+    reconnect(alice);
+
+    expect(text(connect()).toString()).toBe("Hello");
+  });
+
+  it("joins the session started while the server was unreachable, if we didn't initialize the content yet", () => {
+    FakeRoom.current.unreachable = true;
+    const alice = connect();
+    expect(alice.wsconnected).toBe(false);
+
+    FakeRoom.current.unreachable = false;
+    const bob = connect();
+    text(bob).insert(0, "Hello");
+    FakeRoom.flush();
+
+    reconnect(alice);
+    expect(text(alice).toString()).toBe("Hello");
+  });
+
+  it("stops synchronizing when the session was started by someone else while the server was unreachable", () => {
+    FakeRoom.current.unreachable = true;
+    const alice = connect();
+    text(alice).insert(0, "Hello");
+
+    FakeRoom.current.unreachable = false;
+    const bob = connect();
+    text(bob).insert(0, "Hi");
+    FakeRoom.flush();
+    const onSessionReplaced = vi.fn();
+    // @ts-expect-error The provider doesn't declare our custom event.
+    alice.on(SESSION_REPLACED_EVENT, onSessionReplaced);
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    vi.advanceTimersByTime(3000);
+    FakeRoom.flush();
+
+    expect(onSessionReplaced).toHaveBeenCalledOnce();
+    expect(alice.shouldConnect).toBe(false);
+    // Neither the local document nor the session are affected.
+    expect(text(alice).toString()).toBe("Hello");
+    expect(text(bob).toString()).toBe("Hi");
   });
 });

@@ -145,6 +145,8 @@ describe("createYjsToolbar", () => {
     // Leaving the collaboration session and selecting a user are not supported.
     expect(toolbarOptions.session.leave).toBeUndefined();
     expect(toolbarOptions.session.selectUser).toBeUndefined();
+    // The document is saved independently of the collaboration server.
+    expect(toolbarOptions.session.canSaveWhileDisconnected).toBe(true);
 
     // Saving tells the save target whether to leave the edit mode, so that it clicks the right save button.
     await toolbarOptions.session.save(true);

@@ -43,6 +43,7 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -74,6 +75,8 @@ public class IntegrationTests extends RenderingTest
         componentManager.registerMockComponent(ReferenceUpdater.class);
         componentManager.registerMockComponent(AuthorizationManager.class);
         componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        // Used by AsyncRendererCache from xwiki-platform-rendering-async-default.
+        componentManager.registerMockComponent(WikiDescriptorManager.class);
 
         // Used by EffectiveAuthorSetterListener from oldcore.
         DefaultParameterizedType currentUserReferenceResolverType =

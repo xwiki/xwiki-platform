@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { SESSION_REPLACED_EVENT } from "./events";
 import {
   AbstractCollaborationManager,
   ConnectionStatus,
@@ -93,6 +94,7 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
     const collaboration: Collaboration = {
       connectionStatus: ref(ConnectionStatus.Connecting),
       collaborators: ref([]),
+      warnings: ref([]),
       collaborator,
       provider,
       doc: provider.doc,
@@ -137,6 +139,14 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
           collaboration.connectionStatus.value = ConnectionStatus.Disconnected;
           break;
       }
+    });
+    // The provider stops synchronizing (so we are disconnected) when the session is replaced.
+    // @ts-expect-error The provider doesn't declare our custom event.
+    provider.on(SESSION_REPLACED_EVENT, () => {
+      collaboration.warnings!.value = [
+        ...collaboration.warnings!.value,
+        "sessionReplaced",
+      ];
     });
   }
 

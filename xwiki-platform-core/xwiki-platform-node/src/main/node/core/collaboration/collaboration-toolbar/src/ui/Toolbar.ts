@@ -35,6 +35,7 @@ import type {
   ToolbarStatus,
   ToolbarUser,
   ToolbarVersion,
+  ToolbarWarning,
 } from "./types";
 import type { App } from "vue";
 
@@ -130,6 +131,7 @@ class Toolbar {
       connectionStatus: 1,
       users: [],
       versions: [],
+      warnings: [],
     });
 
     this.app = createApp(ToolbarView)
@@ -207,6 +209,32 @@ class Toolbar {
     }
     versions.push(version);
     this.state.versions = versions;
+  }
+
+  /**
+   * Displays a warning on the toolbar, replacing the warning with the same identifier, if any. The warning message is
+   * shown once, right after the warning is displayed, and then each time the user clicks the warning icon.
+   *
+   * @param warning - the warning to display
+   * @since 18.9.0
+   */
+  addWarning(warning: ToolbarWarning): void {
+    this.state.warnings = [
+      ...this.state.warnings.filter(({ id }) => id !== warning.id),
+      warning,
+    ];
+  }
+
+  /**
+   * Removes a warning from the toolbar.
+   *
+   * @param id - the identifier of the warning to remove
+   * @since 18.9.0
+   */
+  removeWarning(id: string): void {
+    this.state.warnings = this.state.warnings.filter(
+      (warning) => warning.id !== id,
+    );
   }
 
   /**

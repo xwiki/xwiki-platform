@@ -46,6 +46,7 @@ export abstract class AbstractCollaborationManager implements CollaborationManag
 export type Collaboration = {
     connectionStatus: Ref<ConnectionStatus>;
     collaborators: Ref<Collaborator[]>;
+    warnings?: Ref<CollaborationWarning[]>;
     collaborator: Collaborator;
     provider: any;
     doc: Doc;
@@ -69,6 +70,9 @@ export interface CollaborationManagerProvider {
 
 // @beta
 export const collaborationManagerProviderName: string;
+
+// @beta
+export type CollaborationWarning = "sessionReplaced";
 
 // @beta
 export type Collaborator = {

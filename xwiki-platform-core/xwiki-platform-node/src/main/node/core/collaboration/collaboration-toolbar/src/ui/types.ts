@@ -92,6 +92,30 @@ type ToolbarVersion = {
 };
 
 /**
+ * A warning displayed on the realtime toolbar (e.g. when the realtime session can't share the changes anymore), as an
+ * icon that shows the warning message in a popover.
+ *
+ * @since 18.9.0
+ * @beta
+ */
+type ToolbarWarning = {
+  /**
+   * Identifies the warning, in order to replace or remove it.
+   */
+  id: string;
+
+  /**
+   * The warning title, displayed as plain text.
+   */
+  title: string;
+
+  /**
+   * The warning message, displayed as plain text.
+   */
+  message: string;
+};
+
+/**
  * The state displayed by the realtime toolbar.
  */
 type ToolbarState = {
@@ -107,6 +131,10 @@ type ToolbarState = {
    * The list of users connected to the realtime collaboration session.
    */
   users: ToolbarUser[];
+  /**
+   * The warnings to display.
+   */
+  warnings: ToolbarWarning[];
   /**
    * The most recent versions (revisions) of the edited document, created during the realtime collaboration session.
    */
@@ -217,7 +245,7 @@ type ToolbarEnvironment = {
   /**
    * The HTML of the icons used by the toolbar.
    */
-  icons: { check: string; clock: string };
+  icons: { check: string; clock: string; warning: string };
   /**
    * @param form - the edit form
    * @returns what the user can specify when saving with the given edit form
@@ -319,4 +347,5 @@ export type {
   ToolbarStatus,
   ToolbarUser,
   ToolbarVersion,
+  ToolbarWarning,
 };

@@ -43,6 +43,8 @@ vi.mock("../../ui/Toolbar", () => ({
       onUserListChange = vi.fn();
       onSaveStatusChange = vi.fn();
       onCreateVersion = vi.fn();
+      addWarning = vi.fn();
+      removeWarning = vi.fn();
       destroy = vi.fn();
     },
   ),
@@ -53,7 +55,10 @@ vi.mock("../environment", () => ({
 }));
 
 vi.mock("../translations", () => ({
-  loadXWikiToolbarTranslations: vi.fn(async () => ({ name: "i18n" })),
+  loadXWikiToolbarTranslations: vi.fn(async () => ({
+    name: "i18n",
+    global: { t: (key: string) => `translated(${key})` },
+  })),
 }));
 
 type ToolbarMock = {
@@ -61,6 +66,8 @@ type ToolbarMock = {
   onUserListChange: ReturnType<typeof vi.fn>;
   onSaveStatusChange: ReturnType<typeof vi.fn>;
   onCreateVersion: ReturnType<typeof vi.fn>;
+  addWarning: ReturnType<typeof vi.fn>;
+  removeWarning: ReturnType<typeof vi.fn>;
   destroy: ReturnType<typeof vi.fn>;
 };
 
@@ -134,7 +141,7 @@ describe("createYjsToolbar", () => {
     expect(toolbarOptions.form).toBe(form);
     expect(toolbarOptions.document).toBe(options.document);
     expect(toolbarOptions.environment).toEqual({ name: "environment" });
-    expect(toolbarOptions.i18n).toEqual({ name: "i18n" });
+    expect(toolbarOptions.i18n).toMatchObject({ name: "i18n" });
     // Leaving the collaboration session and selecting a user are not supported.
     expect(toolbarOptions.session.leave).toBeUndefined();
     expect(toolbarOptions.session.selectUser).toBeUndefined();
@@ -174,6 +181,27 @@ describe("createYjsToolbar", () => {
         avatar: undefined,
       },
     ]);
+  });
+
+  it("follows the warnings", async () => {
+    collaboration.warnings = ref([]);
+    await createYjsToolbar(options);
+    const toolbar = getToolbarMock();
+    expect(toolbar.addWarning).not.toHaveBeenCalled();
+
+    collaboration.warnings.value = ["sessionReplaced"];
+    await nextTick();
+    expect(toolbar.addWarning).toHaveBeenCalledExactlyOnceWith({
+      id: "sessionReplaced",
+      title: "translated(realtime.sessionReplacedWarning)",
+      message: "translated(realtime.sessionReplacedWarning.message)",
+    });
+
+    collaboration.warnings.value = [];
+    await nextTick();
+    expect(toolbar.removeWarning).toHaveBeenCalledExactlyOnceWith(
+      "sessionReplaced",
+    );
   });
 
   it("follows the save status", async () => {

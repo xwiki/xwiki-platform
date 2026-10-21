@@ -109,6 +109,9 @@ public abstract class AbstractRoom implements Room
                         clientsToDisconnect.add(fromClient);
                         break;
                     case SYNC_STEP_1:
+                        // We don't hold a Yjs document so we can't send back our own SYNC_STEP_1 to ask the client for
+                        // the updates we miss (e.g. the changes it made while disconnected). The client computes them
+                        // from the stored updates we replay, and sends them back as a SYNC_UPDATE.
                         if (!sendStoredUpdates(fromClient)) {
                             // Failed to send the stored updates to the client.
                             clientsToDisconnect.add(fromClient);

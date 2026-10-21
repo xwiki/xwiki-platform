@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.XWikiInstances;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -33,6 +35,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -87,6 +90,11 @@ class TestConfigurationTest
     {
     }
 
+    @UITest(xwikiInstances = @XWikiInstances(2))
+    class ClusterAnnotation
+    {
+    }
+
     @BeforeEach
     void setUp()
     {
@@ -107,6 +115,23 @@ class TestConfigurationTest
         assertEquals(Database.HSQLDB_EMBEDDED, configuration.getDatabase());
         assertNull(configuration.getServletEngineTag());
         assertNull(configuration.getDatabaseTag());
+    }
+
+    @Test
+    void isSharedFileSystemBlobStore()
+    {
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+
+        // A cluster uses the S3 blob store by default...
+        TestConfiguration cluster = resolver.resolve(ClusterAnnotation.class.getAnnotation(UITest.class));
+        assertFalse(cluster.isSharedFileSystemBlobStore());
+        // ... and its instances share the filesystem blob store when it's asked for.
+        cluster.setBlobStore(BlobStore.FILESYSTEM);
+        assertTrue(cluster.isSharedFileSystemBlobStore());
+        // A single instance has nothing to share.
+        TestConfiguration single = resolver.resolve(EmptyAnnotation.class.getAnnotation(UITest.class));
+        single.setBlobStore(BlobStore.FILESYSTEM);
+        assertFalse(single.isSharedFileSystemBlobStore());
     }
 
     @Test

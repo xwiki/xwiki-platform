@@ -37,7 +37,6 @@ import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.apache.solr.common.util.NamedList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.XWikiSolrCore;
@@ -817,10 +816,11 @@ public class SolrSchemaUtils
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("fieldInfo", true);
 
-        NamedList<Object> response;
+        Map<?, ?> response;
         try {
+            // Convert the whole response to standard maps
             response = new GenericSolrRequest(SolrRequest.METHOD.GET, "/admin/segments", params)
-                .process(core.getClient()).getResponse();
+                .process(core.getClient()).getResponse().asMap(Integer.MAX_VALUE);
         } catch (Exception e) {
             throw new SolrException("Failed to get the segments of the Solr core [" + core.getSolrName() + "]", e);
         }
@@ -840,12 +840,6 @@ public class SolrSchemaUtils
 
     private static Map<?, ?> toMap(Object value)
     {
-        if (value instanceof NamedList<?> namedList) {
-            return namedList.asShallowMap();
-        } else if (value instanceof Map<?, ?> map) {
-            return map;
-        }
-
-        return Map.of();
+        return value instanceof Map<?, ?> map ? map : Map.of();
     }
 }

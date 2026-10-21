@@ -50,10 +50,10 @@ import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
-import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
+import org.xwiki.test.ui.internal.TestFrameworkInitializer;
 
 import com.google.common.primitives.Ints;
 
@@ -474,7 +474,7 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         LOGGER.info("(*) Initialize Test Context...");
         PersistentTestContext testContext =
             new PersistentTestContext(DockerTestUtils.getXWikiExecutors(extensionContext), xwikiWebDriver);
-        AbstractTest.initializeSystem(testContext);
+        TestFrameworkInitializer.initialize(testContext);
         savePersistentTestContext(extensionContext, testContext);
 
         // Setup the wcag validation context.

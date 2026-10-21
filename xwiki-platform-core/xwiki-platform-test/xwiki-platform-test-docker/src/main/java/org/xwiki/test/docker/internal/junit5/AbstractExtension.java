@@ -39,9 +39,9 @@ import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecu
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
-import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.XWikiWebDriver;
+import org.xwiki.test.ui.internal.TestFrameworkInitializer;
 
 /**
  * Provides methods to save/store objects from the JUnit5 store.
@@ -174,7 +174,7 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
             PersistentTestContext initialTestContext =
                 new PersistentTestContext(Arrays.asList(new XWikiExecutor(0)), driver);
             testContext = initialTestContext.getUnstoppable();
-            AbstractTest.initializeSystem(testContext);
+            TestFrameworkInitializer.initialize(testContext);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize PersistentTestContext", e);
         }

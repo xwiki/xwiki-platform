@@ -103,6 +103,8 @@ function createUploadFile(
     const linkId = uuidv4();
     const metadata = getBlockNoteDocument()!.getMetadata(linkId, true)!;
     metadata.xwikiReference = attachmentReference(reference, true);
+    // Don't add xwikiFreestanding here: it saves the link without its [[ ]], and then it stops being a link
+    // the next time the page is edited.
     metadata.xwikiGeneratedLabel = label;
     return {
       type: "paragraph",

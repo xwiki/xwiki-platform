@@ -46,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Functional tests for the image lightbox.
@@ -98,6 +99,10 @@ class LightboxIT
 
         // Make sure that the images are displayed.
         lightboxPage.reloadPage();
+
+        // Not finding a popover below only means that the lightbox is disabled if the page was rendered with the
+        // lightbox disabled in the first place.
+        assertFalse(LightboxPage.isLightboxEnabled(), "The page was rendered with the lightbox enabled");
 
         ImagePopover imagePopover = lightboxPage.hoverImage(0);
         assertThrows(TimeoutException.class, imagePopover::waitUntilReady);
@@ -477,10 +482,26 @@ class LightboxIT
         testUtils.rest().update(userObject);
     }
 
+    /**
+     * Set the lightbox configuration, and make sure that pages are then rendered with it.
+     * <p>
+     * The lightbox is added to a page by a UI extension that reads the configuration document on every render, so
+     * every assertion of these tests depends on the new value being the one those renders see. A copy of the
+     * configuration document read while it is being saved can outlive the save in the document cache and keep the
+     * previous value in effect for the rest of the test; saving the document again is what drops that copy. So save
+     * until the page the save action lands on is itself rendered with the expected configuration.
+     */
     private void enableLightbox(TestUtils testUtils, boolean enable)
     {
-        testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
-            "isLightboxEnabled", enable ? "1" : "0");
+        for (int attempt = 0; attempt < 3; attempt++) {
+            testUtils.updateObject(LIGHTBOX_CONFIGURATION_REFERENCE, LIGHTBOX_CONFIGURATION_CLASSNAME, 0,
+                "isLightboxEnabled", enable ? "1" : "0");
+            if (LightboxPage.isLightboxEnabled() == enable) {
+                return;
+            }
+        }
+        fail(String.format("Failed to %s the lightbox: pages are still rendered with the lightbox %s.",
+            enable ? "enable" : "disable", enable ? "disabled" : "enabled"));
     }
 
     private String getSimpleImage(String image)

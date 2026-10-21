@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -36,8 +37,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Table;
 import org.hibernate.query.NativeQuery;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.store.hibernate.AbstractHibernateAdapter;
 import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.store.hibernate.HibernateStoreException;
@@ -58,9 +61,21 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      */
     public static final String HINT = "mysql";
 
+    /**
+     * The xwiki.properties property controlling the conversion of the tables to the database collation at startup.
+     */
+    private static final String PROPERTY_FIX_TABLE_COLLATION = "store.hibernate.mysql.fixTableCollation";
+
     private static final String SCHEMA_PARAMETER = "schema";
 
     private static final String ALTER_TABLE = "ALTER TABLE ";
+
+    private static final String CHARACTER_SET_PARAMETER = "characterSet";
+
+    /**
+     * The character set able to store any character of any other character set.
+     */
+    private static final String UTF8MB4 = "utf8mb4";
 
     /**
      * The maximum length of an InnoDB index key with the DYNAMIC and COMPRESSED row formats (the ones used by XWiki).
@@ -89,14 +104,53 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
 
     private static final Set<String> FRACTIONAL_TYPES = Set.of(TYPE_TIME, TYPE_TIMESTAMP, TYPE_DATETIME);
 
+    /**
+     * The row formats which limit the index keys to 767 bytes.
+     */
+    private static final Set<String> LEGACY_ROW_FORMATS = Set.of("compact", "redundant");
+
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiProperties;
+
     @Override
     public void repairDatabase(Metadata metadata) throws HibernateStoreException
     {
         try (Session session = getSessionFactory().openSession()) {
-            convertToDatabaseCollation(metadata, session);
+            // The conversion expects the maximum key length of the DYNAMIC and COMPRESSED row formats
+            updateLegacyRowFormats(metadata, session);
+
+            if (this.xwikiProperties.getProperty(PROPERTY_FIX_TABLE_COLLATION, true)) {
+                convertToDatabaseCollation(metadata, session);
+            } else {
+                this.logger.debug("Skipping the conversion of the tables to the database collation since [{}] is"
+                    + " disabled", PROPERTY_FIX_TABLE_COLLATION);
+            }
         } catch (Exception e) {
-            throw new HibernateStoreException(
-                "Failed to convert the tables to the collation configured on the database", e);
+            throw new HibernateStoreException("Failed to repair the database", e);
+        }
+    }
+
+    /**
+     * Make sure the existing tables of the mapping (including the collection ones) don't use a legacy row format
+     * (COMPACT or REDUNDANT), which limits the index keys to 767 bytes.
+     *
+     * @param metadata the configuration of the database
+     * @param session the session in which to execute the update
+     * @throws HibernateStoreException when failing to update the row formats
+     */
+    private void updateLegacyRowFormats(Metadata metadata, Session session) throws HibernateStoreException
+    {
+        Map<String, String> rowFormats = getRowFormats(session);
+
+        for (Table table : metadata.collectTableMappings()) {
+            String tableName = getTableName(table);
+            String rowFormat = rowFormats.get(tableName);
+
+            if (rowFormat != null && LEGACY_ROW_FORMATS.contains(rowFormat.toLowerCase())) {
+                executeRowFormatStatement(getAlterRowFormatString(tableName, false, rowFormats, session), rowFormat,
+                    session);
+            }
         }
     }
 
@@ -124,17 +178,21 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             // Compute the query statement
             String statement = getAlterRowFormatString(tableName, compressed, rowFormats, session);
             if (statement != null) {
-                // Create the query
-                NativeQuery<?> query = session.createNativeQuery(statement);
-
-                // Execute the query
-                this.logger.info("Changing the table row type (currently [{}]) with [{}]", rowFormats.get(tableName),
-                    statement);
-                session.getTransaction().begin();
-                query.executeUpdate();
-                session.getTransaction().commit();
+                executeRowFormatStatement(statement, rowFormats.get(tableName), session);
             }
         }
+    }
+
+    private void executeRowFormatStatement(String statement, String currentRowFormat, Session session)
+    {
+        // Create the query
+        NativeQuery<?> query = session.createNativeQuery(statement);
+
+        // Execute the query
+        this.logger.info("Changing the table row type (currently [{}]) with [{}]", currentRowFormat, statement);
+        session.getTransaction().begin();
+        query.executeUpdate();
+        session.getTransaction().commit();
     }
 
     /**
@@ -261,13 +319,34 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      */
     public void convertToDatabaseCollation(Metadata metadata, Session session)
     {
-        for (String statement : getConvertToDatabaseCollationStatements(metadata, session)) {
-            this.logger.info("Executing [{}]", statement);
+        List<String> statements = getConvertToDatabaseCollationStatements(metadata, session);
+        if (statements.isEmpty()) {
+            return;
+        }
 
+        this.logger.info("Converting the tables of database [{}] to its collation ([{}] statements to execute). Each"
+            + " converted table is rebuilt, which can take a long time for big tables: don't stop XWiki in the"
+            + " meantime (a restart would resume the conversion anyway). The conversion at startup can be disabled by"
+            + " setting [{}] to false in xwiki.properties.", getDatabaseFromWikiName(), statements.size(),
+            PROPERTY_FIX_TABLE_COLLATION);
+
+        long conversionStart = System.currentTimeMillis();
+        for (int i = 0; i < statements.size(); ++i) {
+            String statement = statements.get(i);
+
+            this.logger.info("Executing statement [{}/{}]: [{}]", i + 1, statements.size(), statement);
+
+            long statementStart = System.currentTimeMillis();
             session.getTransaction().begin();
             session.createNativeQuery(statement).executeUpdate();
             session.getTransaction().commit();
+
+            this.logger.info("Statement [{}/{}] executed in [{}] ms", i + 1, statements.size(),
+                System.currentTimeMillis() - statementStart);
         }
+
+        this.logger.info("Tables of database [{}] converted to its collation in [{}] ms", getDatabaseFromWikiName(),
+            System.currentTimeMillis() - conversionStart);
     }
 
     /**
@@ -282,6 +361,16 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      * <li>drop their indexes which would exceed the maximum key length with the new character set (typically custom
      * indexes, since the ones of the Hibernate mapping are designed to fit), since they would make the conversion
      * fail; a warning gives the definition of each of them, so that it can be re-created with a shorter prefix</li>
+     * </ul>
+     * <p>
+     * Only the conversions which cannot lose or break anything are done, the others are only reported with a warning:
+     * <ul>
+     * <li>nothing is converted when the database collation is not case sensitive, since XWiki requires one (e.g.
+     * {@code utf8mb4_bin})</li>
+     * <li>unless the database character set is {@code utf8mb4}, a table containing a column using another character
+     * set is not converted, since some of its characters might not be supported by the database character set (and
+     * neither are the tables linked to it by a foreign key on string columns, since that foreign key could not be
+     * re-created)</li>
      * </ul>
      * <p>
      * <strong>WARNING: the dropped foreign keys are only re-created by the Hibernate schema update, so XWiki must be
@@ -305,9 +394,26 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         String characterSet = (String) databaseDefaults[0];
         String collation = (String) databaseDefaults[1];
 
+        if (!isCaseSensitive(collation)) {
+            this.logger.warn("The collation [{}] configured on database [{}] is not case sensitive, its tables won't be"
+                + " converted to it. XWiki requires a case sensitive collation (e.g. utf8mb4_bin).", collation,
+                databaseName);
+
+            return List.of();
+        }
+
         Set<String> tables = getTablesToConvert(metadata, databaseName, collation, session);
         if (tables.isEmpty()) {
             return List.of();
+        }
+
+        List<Object[]> foreignKeys = getStringForeignKeys(databaseName, session);
+
+        if (!UTF8MB4.equalsIgnoreCase(characterSet)) {
+            removeLossyTables(databaseName, characterSet, tables, foreignKeys, session);
+            if (tables.isEmpty()) {
+                return List.of();
+            }
         }
 
         this.logger.info("Tables {} of database [{}] need to be converted to character set [{}] and collation [{}]",
@@ -317,7 +423,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
 
         // Drop the foreign keys involving string columns of the tables to convert since MySQL/MariaDB refuse to convert
         // those columns
-        addDropForeignKeyStatements(databaseName, tables, session, statements);
+        addDropForeignKeyStatements(tables, foreignKeys, statements);
 
         // Drop the indexes which would exceed the maximum key length with the new character set
         addDropIndexStatements(databaseName, tables, getMaxCharacterLength(characterSet, session), session,
@@ -330,10 +436,54 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         return statements;
     }
 
-    private void addDropForeignKeyStatements(String databaseName, Set<String> tables, Session session,
-        List<String> statements)
+    private boolean isCaseSensitive(String collation)
     {
-        for (Object[] foreignKey : getStringForeignKeys(databaseName, session)) {
+        String lowerCollation = collation.toLowerCase();
+
+        return lowerCollation.endsWith("_bin") || lowerCollation.endsWith("_cs");
+    }
+
+    private void removeLossyTables(String databaseName, String characterSet, Set<String> tables,
+        List<Object[]> foreignKeys, Session session)
+    {
+        NativeQuery<String> query = session.createNativeQuery("SELECT DISTINCT TABLE_NAME "
+            + "FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = :schema AND CHARACTER_SET_NAME <> :characterSet");
+        query.setParameter(SCHEMA_PARAMETER, databaseName);
+        query.setParameter(CHARACTER_SET_PARAMETER, characterSet);
+
+        Set<String> lossyTables =
+            query.list().stream().filter(tables::contains).collect(Collectors.toCollection(TreeSet::new));
+
+        // A string foreign key between a converted table and a non converted one could not be re-created since the
+        // columns would not use the same character set anymore
+        boolean changed = !lossyTables.isEmpty();
+        while (changed) {
+            changed = false;
+            for (Object[] foreignKey : foreignKeys) {
+                changed |= addLinkedTable((String) foreignKey[0], (String) foreignKey[2], tables, lossyTables);
+                changed |= addLinkedTable((String) foreignKey[2], (String) foreignKey[0], tables, lossyTables);
+            }
+        }
+
+        if (!lossyTables.isEmpty()) {
+            this.logger.warn("Tables {} of database [{}] won't be converted to character set [{}] since they (or a"
+                + " table linked to them by a foreign key) contain columns using another character set, some"
+                + " characters of which might be lost. Converting the database to utf8mb4 is recommended.",
+                lossyTables, databaseName, characterSet);
+
+            tables.removeAll(lossyTables);
+        }
+    }
+
+    private boolean addLinkedTable(String tableName, String linkedTableName, Set<String> tables,
+        Set<String> lossyTables)
+    {
+        return lossyTables.contains(tableName) && tables.contains(linkedTableName) && lossyTables.add(linkedTableName);
+    }
+
+    private void addDropForeignKeyStatements(Set<String> tables, List<Object[]> foreignKeys, List<String> statements)
+    {
+        for (Object[] foreignKey : foreignKeys) {
             String tableName = (String) foreignKey[0];
 
             if (tables.contains(tableName) || tables.contains(foreignKey[2])) {
@@ -381,7 +531,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     {
         NativeQuery<Number> query = session.createNativeQuery(
             "SELECT MAXLEN FROM INFORMATION_SCHEMA.CHARACTER_SETS WHERE CHARACTER_SET_NAME = :characterSet");
-        query.setParameter("characterSet", characterSet);
+        query.setParameter(CHARACTER_SET_PARAMETER, characterSet);
 
         return query.uniqueResult().intValue();
     }
@@ -428,6 +578,8 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
                 + "ON c.TABLE_SCHEMA = s.TABLE_SCHEMA AND c.TABLE_NAME = s.TABLE_NAME "
                 + "AND c.COLUMN_NAME = s.COLUMN_NAME "
                 + "WHERE s.TABLE_SCHEMA = :schema AND s.INDEX_NAME <> 'PRIMARY' "
+                // Only B-tree indexes are subject to the maximum key length (not FULLTEXT or SPATIAL ones)
+                + "AND s.INDEX_TYPE = 'BTREE' "
                 + "ORDER BY s.TABLE_NAME, s.INDEX_NAME, s.SEQ_IN_INDEX");
         query.setParameter(SCHEMA_PARAMETER, databaseName);
 

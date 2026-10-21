@@ -22,6 +22,8 @@ package org.xwiki.store.hibernate.internal;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -33,6 +35,7 @@ import org.hibernate.query.NativeQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.store.hibernate.HibernateStoreException;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -50,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,6 +67,8 @@ import static org.mockito.Mockito.when;
 class MySQLHibernateAdapterTest
 {
     private static final String CONVERT = " CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin";
+
+    private static final String FIX_TABLE_COLLATION_PROPERTY = "store.hibernate.mysql.fixTableCollation";
 
     @InjectMockComponents
     private MySQLHibernateAdapter adapter;
@@ -79,6 +85,10 @@ class MySQLHibernateAdapterTest
     @MockComponent
     private HibernateConfiguration hibernateConfiguration;
 
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiProperties;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
@@ -90,12 +100,15 @@ class MySQLHibernateAdapterTest
 
     private NativeQuery<String> tablesQuery;
 
+    private NativeQuery<?> alterStatement;
+
     @BeforeEach
     void beforeEach()
     {
         when(this.hibernateStore.getDialect()).thenReturn(new MySQLDialect());
         when(this.hibernateConfiguration.getDBPrefix()).thenReturn("");
         when(this.wikis.getMainWikiId()).thenReturn("xwiki");
+        when(this.xwikiProperties.getProperty(FIX_TABLE_COLLATION_PROPERTY, true)).thenReturn(true);
     }
 
     @Test
@@ -146,8 +159,9 @@ class MySQLHibernateAdapterTest
         NativeQuery<Object[]> foreignKeysQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.KEY_COLUMN_USAGE")))
             .thenReturn(foreignKeysQuery);
-        when(foreignKeysQuery.list()).thenReturn(List.of(new Object[] { "xwikistrings", "FKstrings", "xwikiproperties" },
-            new Object[] { "custom_table", "FKcustom", "xwikidoc" }));
+        when(foreignKeysQuery.list()).thenReturn(
+            List.of(new Object[] { "xwikistrings", "FKstrings", "xwikiproperties" },
+                new Object[] { "custom_table", "FKcustom", "xwikidoc" }));
 
         // table, index, column, sub part, type, collation, max length, octet length, precision, datetime precision,
         // non unique
@@ -245,6 +259,43 @@ class MySQLHibernateAdapterTest
     }
 
     @Test
+    void getConvertToDatabaseCollationStatementsWhenCaseInsensitiveCollation()
+    {
+        mockCollationQueries();
+        when(this.defaultsQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "utf8mb4", "utf8mb4_0900_ai_ci" }));
+
+        assertEquals(List.of(), this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+
+        assertEquals("The collation [utf8mb4_0900_ai_ci] configured on database [xwiki] is not case sensitive, its"
+            + " tables won't be converted to it. XWiki requires a case sensitive collation (e.g. utf8mb4_bin).",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void getConvertToDatabaseCollationStatementsWhenLossyCharacterSet()
+    {
+        mockCollationQueries();
+        when(this.defaultsQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "utf8mb3", "utf8mb3_bin" }));
+        when(this.tablesQuery.list()).thenReturn(List.of("xwikistrings", "xwikiproperties", "xwikidoc"));
+
+        NativeQuery<String> lossyQuery = mock(NativeQuery.class);
+        when(this.session.createNativeQuery(contains("CHARACTER_SET_NAME <> :characterSet"))).thenReturn(lossyQuery);
+        when(lossyQuery.list()).thenReturn(List.of("custom_table", "xwikistrings"));
+
+        // xwikiproperties is linked to xwikistrings by a foreign key, so it's not converted either
+        assertEquals(List.of("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.xwikidoc CONVERT TO CHARACTER SET utf8mb3 COLLATE utf8mb3_bin"),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+
+        assertEquals("Tables [xwikiproperties, xwikistrings] of database [xwiki] won't be converted to character set"
+            + " [utf8mb3] since they (or a table linked to them by a foreign key) contain columns using another"
+            + " character set, some characters of which might be lost. Converting the database to utf8mb4 is"
+            + " recommended.", this.logCapture.getMessage(0));
+        assertEquals(1, this.logCapture.size());
+    }
+
+    @Test
     void convertToDatabaseCollation()
     {
         mockCollationQueries();
@@ -274,36 +325,71 @@ class MySQLHibernateAdapterTest
         assertEquals("Cannot get the tables row formats without a current wiki database", exception.getMessage());
     }
 
-    @Test
-    void repairDatabase() throws Exception
+    private void mockRepairDatabase()
     {
         mockCollationQueries();
-        when(this.tablesQuery.list()).thenReturn(List.of());
+
         SessionFactory sessionFactory = mock(SessionFactory.class);
         when(this.hibernateStore.getSessionFactory()).thenReturn(sessionFactory);
         when(sessionFactory.openSession()).thenReturn(this.session);
 
+        NativeQuery<Object[]> rowFormatsQuery = mock(NativeQuery.class);
+        when(this.session.createNativeQuery(contains("INNODB_SYS_TABLES"))).thenReturn(rowFormatsQuery);
+        when(rowFormatsQuery.list()).thenReturn(List.of(new Object[] { "xwiki/xwikidoc", "Compact" },
+            new Object[] { "xwiki/xwikilistitems", "Redundant" }, new Object[] { "xwiki/xwikistrings", "Dynamic" },
+            new Object[] { "xwiki/xwikircs", "Compressed" }));
+
+        this.alterStatement = mock(NativeQuery.class);
+        when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(this.alterStatement);
+        when(this.session.getTransaction()).thenReturn(mock(Transaction.class));
+    }
+
+    @Test
+    void repairDatabase() throws Exception
+    {
+        mockRepairDatabase();
+        when(this.tablesQuery.list()).thenReturn(List.of());
+
+        // xwikilistitems is a collection table and xwikiproperties does not exist yet
+        when(this.metadata.collectTableMappings()).thenReturn(List.of(new Table("xwikidoc"),
+            new Table("xwikilistitems"), new Table("xwikiproperties"), new Table("xwikistrings"),
+            new Table("xwikircs")));
+
         this.adapter.repairDatabase(this.metadata);
 
+        // Only the legacy row formats are changed
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic");
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikilistitems ROW_FORMAT=Dynamic");
+        verify(this.alterStatement, times(2)).executeUpdate();
         verify(this.tablesQuery).list();
+        verify(this.session).close();
+    }
+
+    @Test
+    void repairDatabaseWhenFixTableCollationDisabled() throws Exception
+    {
+        mockRepairDatabase();
+        when(this.xwikiProperties.getProperty(FIX_TABLE_COLLATION_PROPERTY, true)).thenReturn(false);
+
+        this.adapter.repairDatabase(this.metadata);
+
+        // The legacy row formats are still fixed
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic");
+        verify(this.tablesQuery, never()).list();
         verify(this.session).close();
     }
 
     @Test
     void repairDatabaseWhenFailing()
     {
-        mockCollationQueries();
+        mockRepairDatabase();
         HibernateException failure = new HibernateException("failure");
         when(this.tablesQuery.list()).thenThrow(failure);
-        SessionFactory sessionFactory = mock(SessionFactory.class);
-        when(this.hibernateStore.getSessionFactory()).thenReturn(sessionFactory);
-        when(sessionFactory.openSession()).thenReturn(this.session);
 
         HibernateStoreException exception =
             assertThrows(HibernateStoreException.class, () -> this.adapter.repairDatabase(this.metadata));
 
-        assertEquals("Failed to convert the tables to the collation configured on the database",
-            exception.getMessage());
+        assertEquals("Failed to repair the database", exception.getMessage());
         assertSame(failure, exception.getCause());
         verify(this.session).close();
     }

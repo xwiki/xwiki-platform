@@ -36,10 +36,9 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.MACRO_VISIBILITY_PROPERTY;
 
@@ -89,8 +88,8 @@ class WikiMacroObjectRequiredRightAnalyzerTest
         when(this.objectPropertyRequiredRightAnalyzer.analyzeAllProperties(object)).thenReturn(results);
 
         assertSame(results, this.analyzer.analyze(object));
-        verify(this.objectPropertyRequiredRightAnalyzer, never()).analyzeAllPropertiesAndAddObjectResult(any(),
-            any(), any(), any());
+        verify(this.objectPropertyRequiredRightAnalyzer).analyzeAllProperties(object);
+        verifyNoMoreInteractions(this.objectPropertyRequiredRightAnalyzer);
     }
 
     private static List<RequiredRightAnalysisResult> mockResults()

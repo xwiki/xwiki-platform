@@ -19,7 +19,7 @@
  */
 package org.xwiki.extension.test;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.test.ui.TestUtils;
 
@@ -44,6 +44,6 @@ public class ExtensionTestUtils extends AbstractExtensionTestUtils
     @Override
     protected void assertEquals(String expect, String actual)
     {
-        Assert.assertEquals(expect, actual);
+        Assertions.assertEquals(expect, actual);
     }
 }

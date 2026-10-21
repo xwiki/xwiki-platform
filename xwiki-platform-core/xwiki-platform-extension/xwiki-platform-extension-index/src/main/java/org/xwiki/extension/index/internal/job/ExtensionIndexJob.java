@@ -66,6 +66,7 @@ import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.repository.search.Searchable;
 import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.Version.Type;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.internal.VersionUtils;
 import org.xwiki.job.AbstractJob;
@@ -198,7 +199,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         // 1: Add local extensions
         this.progress.startStep(this);
         if (getRequest().isLocalExtensionsEnabled()) {
-            //addLocalExtensions(indexedExtensions);
+            addLocalExtensions(indexedExtensions);
         }
 
         // 2: Gather all extensions from searchable repositories
@@ -561,6 +562,33 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         }
 
         this.progress.popLevelProgress(indexedExtensions);
+    }
+
+    private void addLocalExtensions(Map<String, SortedSet<Version>> indexedExtensions)
+        throws SearchException, SolrServerException, IOException
+    {
+        boolean updated = false;
+
+        IterableResult<Extension> extensions = this.localExtensions.search("", 0, -1);
+
+        // Add the extensions
+        for (Extension extension : extensions) {
+            // TODO: support beta and snapshots versions too ?
+            if (!this.invalidFlavors.contains(extension.getId().getId())
+                && extension.getId().getVersion().getType() == Type.STABLE
+                && !this.indexStore.exists(extension.getId())) {
+                this.indexStore.add(extension, true);
+
+                updated = true;
+                getStatus().setExtensionAdded(true);
+
+                add(extension.getId(), indexedExtensions);
+            }
+        }
+
+        if (updated) {
+            this.indexStore.commit();
+        }
     }
 
     private void addRemoteExtensions(Map<String, SortedSet<Version>> indexedExtensions)

@@ -229,7 +229,7 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
     }
 
     @Test
-    void isCreationAllowed() throws Exception
+    void isCreationAllowed()
     {
         when(this.authorization.hasAccess(Right.EDIT, PROVIDER_LOCATION)).thenReturn(true);
 

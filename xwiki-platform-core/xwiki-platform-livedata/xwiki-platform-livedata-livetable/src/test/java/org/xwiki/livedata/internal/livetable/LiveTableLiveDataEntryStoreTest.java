@@ -112,7 +112,7 @@ class LiveTableLiveDataEntryStoreTest
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void before() throws Exception
+    void before()
     {
         when(this.liveDataConfigurationProvider.get()).thenReturn(this.liveDataConfiguration);
         when(this.liveDataConfiguration.getMeta()).thenReturn(this.liveDataMeta);

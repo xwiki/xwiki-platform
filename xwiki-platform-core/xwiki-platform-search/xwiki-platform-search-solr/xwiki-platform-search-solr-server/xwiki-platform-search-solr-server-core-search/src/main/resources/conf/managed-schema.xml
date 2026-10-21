@@ -91,7 +91,7 @@
 
         18.10.0 (181000000):
           * upgraded to the Solr 9.11 default configuration, including schema version 1.7 (docValues enabled by default, uninverting disabled by default), which is not compatible with data indexed with the previous configuration
-          * the version of the configuration for which the data was indexed is stored in the "__cversion" document, and the index is deleted (and filled again by the synchronization with the database) when it does not match "__cversion"
+          * at startup, the index is deleted (and filled again by the synchronization with the database) when it contains fields which are not compliant with their definition in the schema
     -->
     <!-- XWIKI: the versions of the schema from XWiki point of view.
     

@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -198,12 +199,17 @@ class DefaultSolrTest
         assertEquals(Arrays.asList("0", "1"), ids);
         assertEquals(Arrays.asList(null, date), dates);
         assertEquals(Arrays.asList(null, List.of("link1", "link2")), links);
+
+        // The data indexed with the search core configuration is compliant with its schema
+        SolrSchemaUtils solrSchema = this.componentManager.getInstance(SolrSchemaUtils.class);
+        assertEquals(Set.of(), solrSchema.getNonCompliantFields(instance.getCore("search")));
     }
 
     @Test
     void deleteIndex() throws Exception
     {
         Solr solr = this.componentManager.getInstance(Solr.class);
+        SolrSchemaUtils solrSchema = this.componentManager.getInstance(SolrSchemaUtils.class);
         XWikiSolrCore core = solr.getCore("test");
         SolrClient client = core.getClient();
 
@@ -219,15 +225,19 @@ class DefaultSolrTest
         client.add(new SolrInputDocument("id", "1", "testflag", "true"));
         client.commit();
 
+        assertEquals(Set.of(), solrSchema.getNonCompliantFields(core));
+
         // Enable docValues on the field type, which is incompatible with the indexed data
         typeAttributes.put("docValues", true);
         new SchemaRequest.ReplaceFieldType(typeDefinition).process(client);
         SolrInputDocument newDocument = new SolrInputDocument("id", "2", "testflag", "true");
         assertThrows(Exception.class, () -> client.add(newDocument));
+        assertEquals(Set.of("testflag"), solrSchema.getNonCompliantFields(core));
 
         solr.deleteIndex(core);
 
         assertEquals(0, client.query(new SolrQuery("*:*")).getResults().getNumFound());
+        assertEquals(Set.of(), solrSchema.getNonCompliantFields(core));
 
         // Documents following the new schema can be indexed and sorted on the field (which requires docValues)
         client.add(newDocument);

@@ -19,21 +19,13 @@
  */
 package org.xwiki.search.solr.internal.search;
 
-import java.util.Map;
+import java.util.Set;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.util.NamedList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
@@ -45,6 +37,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,10 +50,6 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class SearchCoreInitializerTest
 {
-    private static final long OLD_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_16_6;
-
-    private static final long NEW_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_18_10;
-
     @InjectMockComponents
     private SearchCoreInitializer initializer;
 
@@ -79,118 +68,40 @@ class SearchCoreInitializerTest
     @Mock
     private XWikiSolrCore core;
 
-    @Mock
-    private SolrClient client;
-
     @BeforeEach
     void beforeEach()
     {
-        when(this.core.getClient()).thenReturn(this.client);
         when(this.core.getSolrName()).thenReturn("xwiki_search_9");
     }
 
-    private void setConfigurationVersion(long version) throws Exception
-    {
-        when(this.solrSchema.getVersion(this.core, SolrSchemaUtils.SOLR_TYPENAME_CVERSION)).thenReturn(version);
-    }
-
-    private void setIndexVersion(long version) throws Exception
-    {
-        SolrDocument document = new SolrDocument();
-        document.setField(SearchCoreInitializer.INDEX_VERSION_FIELD, version);
-        when(this.client.getById(SearchCoreInitializer.INDEX_VERSION_ID)).thenReturn(document);
-    }
-
-    private void setDocumentCount(long count) throws Exception
-    {
-        SolrDocumentList results = new SolrDocumentList();
-        results.setNumFound(count);
-        QueryResponse response = new QueryResponse();
-        response.setResponse(new NamedList<>(Map.of("response", results)));
-        when(this.client.query(any(SolrQuery.class))).thenReturn(response);
-    }
-
-    private void assertIndexVersionSet(long version) throws Exception
-    {
-        ArgumentCaptor<SolrInputDocument> captor = ArgumentCaptor.forClass(SolrInputDocument.class);
-        verify(this.client).add(captor.capture());
-        assertEquals(SearchCoreInitializer.INDEX_VERSION_ID, captor.getValue().getFieldValue("id"));
-        assertEquals(version, captor.getValue().getFieldValue(SearchCoreInitializer.INDEX_VERSION_FIELD));
-        verify(this.client).commit();
-    }
-
     @Test
-    void initializeWithOldConfigurationAndNoIndexVersion() throws Exception
+    void initializeWithCompliantIndex() throws Exception
     {
-        setConfigurationVersion(OLD_VERSION);
+        when(this.solrSchema.getNonCompliantFields(this.core)).thenReturn(Set.of());
 
         this.initializer.initialize(this.core);
 
+        verify(this.migrations).update(this.core);
         verify(this.solr, never()).deleteIndex(any());
-        verify(this.client, never()).add(any(SolrInputDocument.class));
-        verify(this.migrations).update(this.core);
     }
 
     @Test
-    void initializeWithMatchingIndexVersion() throws Exception
+    void initializeWithNonCompliantIndex() throws Exception
     {
-        setConfigurationVersion(NEW_VERSION);
-        setIndexVersion(NEW_VERSION);
+        when(this.solrSchema.getNonCompliantFields(this.core)).thenReturn(Set.of("hidden"));
 
         this.initializer.initialize(this.core);
 
-        verify(this.solr, never()).deleteIndex(any());
-        verify(this.client, never()).add(any(SolrInputDocument.class));
-        verify(this.migrations).update(this.core);
-    }
+        // The compliance is checked against the schema resulting from the migrations
+        InOrder order = inOrder(this.migrations, this.solrSchema, this.solr);
+        order.verify(this.migrations).update(this.core);
+        order.verify(this.solrSchema).getNonCompliantFields(this.core);
+        order.verify(this.solr).deleteIndex(this.core);
 
-    @Test
-    void initializeWithNewConfigurationAndOldData() throws Exception
-    {
-        setConfigurationVersion(NEW_VERSION);
-        setDocumentCount(42);
-
-        this.initializer.initialize(this.core);
-
-        verify(this.solr).deleteIndex(this.core);
-        assertIndexVersionSet(NEW_VERSION);
-        verify(this.migrations).update(this.core);
-
-        assertEquals("The data of the Solr core [xwiki_search_9] was produced for a different version of its"
-            + " configuration ([null] instead of [181000000]), deleting its index. The index will be filled again by"
-            + " the synchronization with the database (if solr.synchronizeAtStartup is enabled, which is the default,"
-            + " otherwise it needs to be triggered manually).", this.logCapture.getMessage(0));
-    }
-
-    @Test
-    void initializeWithNewConfigurationAndEmptyIndex() throws Exception
-    {
-        setConfigurationVersion(NEW_VERSION);
-        setDocumentCount(0);
-
-        this.initializer.initialize(this.core);
-
-        verify(this.solr, never()).deleteIndex(any());
-        assertIndexVersionSet(NEW_VERSION);
-        verify(this.migrations).update(this.core);
-    }
-
-    @Test
-    void initializeWithOldConfigurationAndNewData() throws Exception
-    {
-        setConfigurationVersion(OLD_VERSION);
-        setIndexVersion(NEW_VERSION);
-        setDocumentCount(42);
-
-        this.initializer.initialize(this.core);
-
-        verify(this.solr).deleteIndex(this.core);
-        verify(this.client, never()).add(any(SolrInputDocument.class));
-        verify(this.migrations).update(this.core);
-
-        assertEquals("The data of the Solr core [xwiki_search_9] was produced for a different version of its"
-            + " configuration ([181000000] instead of [null]), deleting its index. The index will be filled again by"
-            + " the synchronization with the database (if solr.synchronizeAtStartup is enabled, which is the default,"
-            + " otherwise it needs to be triggered manually).", this.logCapture.getMessage(0));
+        assertEquals("The index of the Solr core [xwiki_search_9] contains fields which are not compatible with their"
+            + " definition in the schema [hidden] (usually because the configuration of the core was upgraded),"
+            + " deleting its index. The index will be filled again by the synchronization with the database (if"
+            + " solr.synchronizeAtStartup is enabled, which is the default, otherwise it needs to be triggered"
+            + " manually).", this.logCapture.getMessage(0));
     }
 }

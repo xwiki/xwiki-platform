@@ -23,16 +23,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.util.NamedList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.XWikiSolrCore;
@@ -794,5 +799,53 @@ public class SolrSchemaUtils
     {
         setFieldType(core, name, SOLR_VERSIONFIELDTYPE_CLASS, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE,
             String.valueOf(version), add);
+    }
+
+    /**
+     * Find the fields which are indexed with a structure (docValues, indexed, norms, term vectors, offsets) different
+     * from the one of their current definition in the schema. Lucene refuses to index a field with a structure
+     * different from the one it already has in the index, so indexing any of those fields will fail until the index is
+     * deleted.
+     *
+     * @param core the core to check
+     * @return the names of the fields not compliant with the schema, empty if the index matches the schema
+     * @throws SolrException when failing to get the information about the index
+     * @since 18.10.0RC1
+     */
+    public Set<String> getNonCompliantFields(XWikiSolrCore core) throws SolrException
+    {
+        ModifiableSolrParams params = new ModifiableSolrParams();
+        params.set("fieldInfo", true);
+
+        NamedList<Object> response;
+        try {
+            response = new GenericSolrRequest(SolrRequest.METHOD.GET, "/admin/segments", params)
+                .process(core.getClient()).getResponse();
+        } catch (Exception e) {
+            throw new SolrException("Failed to get the segments of the Solr core [" + core.getSolrName() + "]", e);
+        }
+
+        // For each segment, Solr compares the structure of each field in the segment with its definition in the schema
+        Set<String> fields = new TreeSet<>();
+        for (Object segment : toMap(response.get("segments")).values()) {
+            toMap(toMap(segment).get("fields")).forEach((name, field) -> {
+                if (toMap(field).get("nonCompliant") != null) {
+                    fields.add((String) name);
+                }
+            });
+        }
+
+        return fields;
+    }
+
+    private static Map<?, ?> toMap(Object value)
+    {
+        if (value instanceof NamedList<?> namedList) {
+            return namedList.asShallowMap();
+        } else if (value instanceof Map<?, ?> map) {
+            return map;
+        }
+
+        return Map.of();
     }
 }

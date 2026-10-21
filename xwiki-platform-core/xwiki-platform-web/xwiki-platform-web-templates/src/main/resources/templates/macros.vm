@@ -3120,7 +3120,7 @@ Recursive title display detected!##
   #try ('rawResponseException')
     #set ($discard = $response.flushBuffer())
   #end
-  #if ("$!rawResponseException" != '')
+  #if ($rawResponseException)
     #set ($discard = $services.logging.getLogger('macros.vm').debug(
       'Failed to send the response, the connection was probably closed by the client.', $rawResponseException))
   #end

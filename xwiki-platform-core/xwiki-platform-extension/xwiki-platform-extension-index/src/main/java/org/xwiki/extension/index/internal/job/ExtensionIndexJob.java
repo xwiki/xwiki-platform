@@ -713,17 +713,4 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
         return updated;
     }
-
-    /**
-     * Thrown to stop the update of the index when the store was disposed.
-     */
-    private static final class IndexStoppedException extends RuntimeException
-    {
-        private static final long serialVersionUID = 1L;
-
-        IndexStoppedException(Exception cause)
-        {
-            super(cause);
-        }
-    }
 }

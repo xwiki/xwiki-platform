@@ -232,6 +232,9 @@ public class ExtensionIndexStore implements Initializable, Disposable
 
     /**
      * @return {@code true} if the store was disposed (e.g. because XWiki is stopping) and cannot be used anymore
+     * @since 17.10.15
+     * @since 18.4.8
+     * @since 18.10.0RC1
      */
     public boolean isDisposed()
     {

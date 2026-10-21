@@ -47,6 +47,7 @@ import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.internal.junit5.TestExtensionRepository;
 import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
+import org.xwiki.test.docker.internal.junit5.blobstore.SharedFileSystemBlobStore;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.libreoffice.LibreOfficeResolver;
@@ -431,6 +432,11 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             File permanentDirectoryOnHost = new File(this.testConfiguration.getOutputDirectory(), "permanentDirectory");
             this.servletContainer.withFileSystemBind(permanentDirectoryOnHost.getAbsolutePath(),
                 this.testConfiguration.getServletEngine().getPermanentDirectory());
+        }
+
+        // The instances of a cluster share the filesystem blob store, like they share the database.
+        if (this.testConfiguration.isSharedFileSystemBlobStore()) {
+            SharedFileSystemBlobStore.mountVolume(this.servletContainer, this.testConfiguration);
         }
 
         start(this.servletContainer, this.testConfiguration);

@@ -36,7 +36,7 @@ import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Represents the navigation panel administration page (PanelsCode.NavigationConfiguration).

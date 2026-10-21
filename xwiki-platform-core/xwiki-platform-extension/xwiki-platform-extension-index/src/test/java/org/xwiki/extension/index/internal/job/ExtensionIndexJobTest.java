@@ -31,6 +31,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.repository.search.SearchableExtensionRepository;
@@ -59,6 +60,9 @@ class ExtensionIndexJobTest
 
     @MockComponent
     private ExtensionRepositoryManager repositoryManager;
+
+    @MockComponent
+    private LocalExtensionRepository localExtensions;
 
     private SearchableExtensionRepository repository1;
 
@@ -112,5 +116,26 @@ class ExtensionIndexJobTest
         verify(this.indexStore, never()).add(this.extension12, true);
         verify(this.indexStore).add(this.extension21, true);
         verify(this.indexStore).add(this.extension22, true);
+    }
+
+    @Test
+    void addLocalExtensions() throws SolrServerException, IOException, SearchException
+    {
+        Extension stableExtension = new TestExtension(new ExtensionId("local", "1.0"), null);
+        Extension snapshotExtension = new TestExtension(new ExtensionId("local", "2.0-SNAPSHOT"), null);
+        Extension indexedExtension = new TestExtension(new ExtensionId("indexed", "1.0"), null);
+        when(this.localExtensions.search("", 0, -1)).thenReturn(new CollectionIterableResult<>(0, 0,
+            Arrays.asList(stableExtension, snapshotExtension, indexedExtension)));
+        when(this.indexStore.exists(indexedExtension.getId())).thenReturn(true);
+
+        ExtensionIndexRequest request = new ExtensionIndexRequest(true, false, Collections.emptyList());
+
+        this.job.initialize(request);
+        this.job.run();
+
+        verify(this.indexStore).add(stableExtension, true);
+        verify(this.indexStore, never()).add(snapshotExtension, true);
+        verify(this.indexStore, never()).add(indexedExtension, true);
+        verify(this.indexStore).commit();
     }
 }

@@ -200,7 +200,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         // 1: Add local extensions
         this.progress.startStep(this);
         if (getRequest().isLocalExtensionsEnabled()) {
-            //addLocalExtensions(indexedExtensions);
+            addLocalExtensions(indexedExtensions);
         }
 
         // 2: Gather all extensions from searchable repositories
@@ -579,7 +579,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
             if (!this.invalidFlavors.contains(extension.getId().getId())) {
                 // TODO: support beta and snapshots versions too ?
                 if (extension.getId().getVersion().getType() == Type.STABLE
-                    && !this.indexStore.exists(extension.getId(), true)) {
+                    && !this.indexStore.exists(extension.getId())) {
                     this.indexStore.add(extension, true);
 
                     updated = true;

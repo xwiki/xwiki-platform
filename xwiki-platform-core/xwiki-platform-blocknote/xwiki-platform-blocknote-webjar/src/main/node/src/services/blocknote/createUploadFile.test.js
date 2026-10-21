@@ -157,6 +157,23 @@ describe("createUploadFile", () => {
       expect(result.props.url).toBe("/xwiki/bin/download/Space/Page/photo.png");
     });
 
+    it("generates a name for a dropped file that has none", async () => {
+      const result = await uploadFile(file("", "image/png"), "id");
+
+      const uploaded = saveAttachments.mock.calls[0][1][0].name;
+      expect(uploaded).toMatch(/^\d+-[1-9]\d\d$/);
+      expect(result.props.url).toBe(
+        `/xwiki/bin/download/Space/Page/${uploaded}`,
+      );
+    });
+
+    it("labels the link of a nameless file with the generated name", async () => {
+      const result = await uploadFile(file("", "application/pdf"), "id");
+
+      const uploaded = saveAttachments.mock.calls[0][1][0].name;
+      expect(result.content[0].content).toBe(uploaded);
+    });
+
     it("labels the link with the name the attachment was created with", async () => {
       paste = true;
 

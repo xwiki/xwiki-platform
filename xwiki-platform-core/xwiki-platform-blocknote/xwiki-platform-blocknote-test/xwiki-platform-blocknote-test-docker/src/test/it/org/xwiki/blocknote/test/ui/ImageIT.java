@@ -19,9 +19,11 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
@@ -32,6 +34,9 @@ import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rest.model.jaxb.Attachment;
+import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.rest.resources.attachments.AttachmentsResource;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -263,5 +268,43 @@ class ImageIT extends AbstractBlockNoteIT
         byte[] uploaded = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
         assertTrue(Arrays.equals(content, uploaded));
+    }
+
+    @Test
+    @Order(4)
+    void dropFileWithExistingName(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Start fresh, with an attachment the dropped file is going to collide with.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+        byte[] before = "before".getBytes(StandardCharsets.UTF_8);
+        setup.rest().attachFile(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference),
+            new ByteArrayInputStream(before), true);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] after = "after".getBytes(StandardCharsets.UTF_8);
+        textArea.click().dropFile("notes.txt", "text/plain", after);
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // Dropping a file whose name is already taken overwrites the existing attachment, which is what the CKEditor
+        // integration and the attachment upload UI do as well: a new version of the same attachment, with no warning.
+        // This test documents that behaviour rather than endorsing it.
+        assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
+
+        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
+        List<Attachment> notes = attachments.getAttachments().stream()
+            .filter(attachment -> "notes.txt".equals(attachment.getName())).toList();
+        // The dropped file didn't create a second attachment.
+        assertEquals(1, notes.size());
+        // It created a new version of the existing one instead.
+        assertEquals("1.2", notes.get(0).getVersion());
+
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
+        assertTrue(Arrays.equals(after, uploaded));
     }
 }

@@ -183,9 +183,9 @@ function createUploadFile(
     file: File,
     blockId?: string,
   ): Promise<UploadResult> {
-    // Pasted files are named after their media type by the browser, so they need a unique name. Dropped files keep the
-    // name the user gave them.
-    const toUpload = isPaste() ? withUniqueName(file) : file;
+    // Pasted files are named after their media type by the browser, so they need a unique name. Dropped files keep
+    // the name the user gave them, unless they have none, in which case we need to generate one to upload them.
+    const toUpload = isPaste() || !file.name ? withUniqueName(file) : file;
     try {
       const reference = await upload(toUpload);
       return file.type.startsWith("image/")

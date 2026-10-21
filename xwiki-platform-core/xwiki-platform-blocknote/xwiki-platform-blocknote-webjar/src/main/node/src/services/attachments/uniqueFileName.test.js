@@ -46,6 +46,12 @@ describe("withUniqueName", () => {
     );
   });
 
+  it("generates a name for a file that has none", () => {
+    expect(withUniqueName(file("")).name).toMatch(
+      new RegExp(`${generatedName.source}$`),
+    );
+  });
+
   it("keeps the media type, the last modified date and the content", async () => {
     const original = file("image.png", "image/webp");
     const renamed = withUniqueName(original);

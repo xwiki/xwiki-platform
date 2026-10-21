@@ -1215,6 +1215,7 @@ public class TestConfiguration
      * @return {@code true} if the XWiki instances of the test share a filesystem blob store, i.e. when they form a
      *     cluster using the filesystem blob store, {@code false} otherwise
      * @since 18.10.0RC1
+     * @since 18.4.8
      */
     @Unstable
     public boolean isSharedFileSystemBlobStore()

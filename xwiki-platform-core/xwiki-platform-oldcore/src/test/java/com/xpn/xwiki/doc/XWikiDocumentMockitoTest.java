@@ -22,6 +22,7 @@ package com.xpn.xwiki.doc;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,6 +33,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -56,8 +64,11 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -87,6 +98,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.web.EditForm;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -97,6 +109,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -2031,5 +2044,58 @@ class XWikiDocumentMockitoTest
         BaseObject cloneObj = cloneDoc.getXObject(xclassWikiReference);
         assertEquals(xclassRelativeReference, cloneObj.getRelativeXClassReference());
         assertSame(cloneObj, cloneDoc.getXObject(xclassReference));
+    }
+
+    @Test
+    void getPreparedXDOMWhilePreparingWaitsForPreparation() throws Exception
+    {
+        XDOM parsedXDOM = new XDOM(List.of(new WordBlock("content")));
+        when(this.parser.parse(any(), any(), any())).thenAnswer(invocation -> parsedXDOM.clone());
+        Transformation macroTransformation =
+            this.oldcore.getMocker().registerMockComponent(Transformation.class, "macro");
+        AtomicInteger preparations = new AtomicInteger();
+        CountDownLatch preparing = new CountDownLatch(1);
+        CountDownLatch finishPreparation = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            preparations.incrementAndGet();
+            preparing.countDown();
+            finishPreparation.await();
+            return null;
+        }).when(macroTransformation).prepare(any());
+        this.document.setContent("content");
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<XDOM> first = executor.submit(this.document::getPreparedXDOM);
+            assertTrue(preparing.await(10, TimeUnit.SECONDS));
+
+            CompletableFuture<Thread> secondThread = new CompletableFuture<>();
+            Future<XDOM> second = executor.submit(() -> {
+                secondThread.complete(Thread.currentThread());
+                return this.document.getPreparedXDOM();
+            });
+            Thread thread = secondThread.get(10, TimeUnit.SECONDS);
+            // Wait until the second thread is blocked in getPreparedXDOM, waiting for the first preparation or
+            // preparing the content too.
+            await().atMost(Duration.ofSeconds(10)).pollInterval(Duration.ofMillis(10))
+                .until(() -> isWaitingInGetPreparedXDOM(thread));
+            finishPreparation.countDown();
+
+            assertEquals(parsedXDOM, first.get(10, TimeUnit.SECONDS));
+            assertEquals(parsedXDOM, second.get(10, TimeUnit.SECONDS));
+            assertEquals(1, preparations.get());
+        } finally {
+            finishPreparation.countDown();
+            executor.shutdownNow();
+        }
+    }
+
+    private boolean isWaitingInGetPreparedXDOM(Thread thread)
+    {
+        // Blocked when waiting for the lock of the preparation, waiting when preparing the content too.
+        Thread.State state = thread.getState();
+        return (state == Thread.State.BLOCKED || state == Thread.State.WAITING)
+            && Arrays.stream(thread.getStackTrace())
+                .anyMatch(element -> element.getMethodName().equals("getPreparedXDOM"));
     }
 }

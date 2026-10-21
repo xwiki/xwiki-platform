@@ -305,6 +305,29 @@ describe("Toolbar", () => {
     expect(queryAll(".realtime-users .realtime-user")).toHaveLength(0);
   });
 
+  it("allows saving while disconnected when the session can save without the connection", async () => {
+    const realtimeToolbar = await createToolbar({
+      ...createSession(),
+      canSaveWhileDisconnected: true,
+    });
+
+    realtimeToolbar.onConnectionStatusChange(0);
+    await flushPromises();
+    expect(query(".realtime-connection-status").textContent!.trim()).toBe(
+      "realtime.disconnected",
+    );
+    expect(query<HTMLButtonElement>(".realtime-action-done").disabled).toBe(
+      false,
+    );
+
+    // Saving is still not possible while saving.
+    realtimeToolbar.onSaveStatusChange(1);
+    await flushPromises();
+    expect(query<HTMLButtonElement>(".realtime-action-done").disabled).toBe(
+      true,
+    );
+  });
+
   it("shows the warnings", async () => {
     vi.useFakeTimers();
     try {

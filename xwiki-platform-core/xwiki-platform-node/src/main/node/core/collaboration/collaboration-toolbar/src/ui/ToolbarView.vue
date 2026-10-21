@@ -82,7 +82,9 @@ const doneOpensModal = computed(
   () => saveOptions.editComment.enabled && saveOptions.editComment.mandatory,
 );
 const savingOrDisconnected = computed(
-  () => state.saveStatus === 1 || state.connectionStatus !== 2,
+  () =>
+    state.saveStatus === 1 ||
+    (state.connectionStatus !== 2 && !session.canSaveWhileDisconnected),
 );
 const visibleUsers = computed(() => state.users.slice(0, USER_LIMIT));
 const hiddenUserCount = computed(() => state.users.length - USER_LIMIT);

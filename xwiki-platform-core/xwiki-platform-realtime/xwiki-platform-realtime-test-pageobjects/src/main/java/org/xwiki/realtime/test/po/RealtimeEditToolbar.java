@@ -37,6 +37,8 @@ import org.xwiki.test.ui.po.ConfirmationModal;
  */
 public class RealtimeEditToolbar extends BaseElement
 {
+    private static final By TOOLBAR = By.className("realtime-edit-toolbar");
+
     private static final By ALLOW_REALTIME = By.cssSelector(".sticky-buttons .realtime-allow");
 
     private static final By SAVE_STATUS = By.cssSelector(".realtime-edit-toolbar .realtime-save-status");
@@ -71,6 +73,30 @@ public class RealtimeEditToolbar extends BaseElement
         getDriver().waitUntilCondition(
             ExpectedConditions.attributeToBe(By.cssSelector(CONNECTION_STATUS_SELECTOR), STATUS_ATTRIBUTE, CONNECTED));
         return this;
+    }
+
+    /**
+     * Waits until the toolbar is displayed, without waiting for the user to be connected to the realtime editing
+     * session.
+     *
+     * @return this instance
+     * @since 18.9.0
+     */
+    public RealtimeEditToolbar waitUntilDisplayed()
+    {
+        getDriver().waitUntilElementIsVisible(TOOLBAR);
+        return this;
+    }
+
+    /**
+     * @return {@code true} if the user is connected to the realtime editing session, {@code false} if the user is
+     *         disconnected or the connection is being established
+     * @since 18.9.0
+     */
+    public boolean isConnected()
+    {
+        return CONNECTED.equals(
+            getDriver().findElement(By.cssSelector(CONNECTION_STATUS_SELECTOR)).getDomAttribute(STATUS_ATTRIBUTE));
     }
 
     /**
@@ -221,7 +247,7 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public String getUserId()
     {
-        return getDriver().findElement(By.className("realtime-edit-toolbar")).getDomAttribute("data-user-id");
+        return getDriver().findElement(TOOLBAR).getDomAttribute("data-user-id");
     }
 
     /**

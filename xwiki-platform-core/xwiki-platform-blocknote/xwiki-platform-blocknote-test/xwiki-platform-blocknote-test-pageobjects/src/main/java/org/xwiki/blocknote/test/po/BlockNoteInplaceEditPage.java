@@ -56,6 +56,59 @@ public class BlockNoteInplaceEditPage extends RealtimeInplaceEditablePage
         return this;
     }
 
+    @Override
+    public BlockNoteInplaceEditPage waitForInplaceEditor(boolean waitForConnection)
+    {
+        super.waitForInplaceEditor(waitForConnection);
+        return this;
+    }
+
+    /**
+     * Makes the collaboration server unreachable from the current page, until {@link #restoreCollaborationServer()} is
+     * called or another page is loaded. Call this before editing in-place, so that the editor fails to connect to the
+     * realtime editing session.
+     *
+     * @return this instance
+     * @since 18.9.0
+     */
+    public BlockNoteInplaceEditPage simulateUnreachableCollaborationServer()
+    {
+        // Redirect the WebSocket connections to the Yjs end-point to a port where nothing listens, which fails like an
+        // unreachable server. The WebSocket constructor is looked up each time a connection is attempted, so we can
+        // restore the access to the collaboration server later, without reloading the page.
+        getDriver().executeScript("""
+            if (!window.collaborationServerAccess) {
+              const NativeWebSocket = window.WebSocket;
+              const access = window.collaborationServerAccess = {blocked: true};
+              window.WebSocket = class extends NativeWebSocket {
+                constructor(url, protocols) {
+                  url = String(url);
+                  if (access.blocked && /\\/websocket\\/.+\\/yjs(\\?|$)/.test(url)) {
+                    url = url.replace(/^(wss?:\\/\\/)[^\\/]+/, '$1localhost:1');
+                  }
+                  super(url, protocols);
+                }
+              };
+            }
+            window.collaborationServerAccess.blocked = true;
+            """);
+        return this;
+    }
+
+    /**
+     * Makes the collaboration server reachable again, after {@link #simulateUnreachableCollaborationServer()}, and
+     * waits for the editor to connect to the realtime editing session.
+     *
+     * @return this instance
+     * @since 18.9.0
+     */
+    public BlockNoteInplaceEditPage restoreCollaborationServer()
+    {
+        getDriver().executeScript("window.collaborationServerAccess.blocked = false;");
+        getToolbar().waitUntilConnected();
+        return this;
+    }
+
     /**
      * @return the editor used to edit the page content
      */

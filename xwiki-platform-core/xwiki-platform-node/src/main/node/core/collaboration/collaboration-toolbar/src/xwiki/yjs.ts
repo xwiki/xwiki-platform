@@ -192,6 +192,9 @@ async function loadToolbar(
         options.saver.save({
           action: continueEditing ? "saveAndContinue" : "saveAndView",
         }),
+      // The document is saved over HTTP, independently of the collaboration server, and the saver is elected locally
+      // when we're alone (which is the case while disconnected).
+      canSaveWhileDisconnected: true,
     },
     environment,
     i18n,

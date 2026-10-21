@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal.search;
 
+import java.io.IOException;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +28,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.xwiki.search.solr.Solr;
+import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -62,6 +65,9 @@ class SearchCoreInitializerTest
     @MockComponent
     private Solr solr;
 
+    @MockComponent
+    private SolrConfiguration configuration;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
@@ -89,6 +95,7 @@ class SearchCoreInitializerTest
     void initializeWithNonCompliantIndex() throws Exception
     {
         when(this.solrSchema.getNonCompliantFields(this.core)).thenReturn(Set.of("hidden"));
+        when(this.configuration.synchronizeAtStartup()).thenReturn(true);
 
         this.initializer.initialize(this.core);
 
@@ -100,8 +107,38 @@ class SearchCoreInitializerTest
 
         assertEquals("The index of the Solr core [xwiki_search_9] contains fields which are not compatible with their"
             + " definition in the schema [hidden] (usually because the configuration of the core was upgraded),"
-            + " deleting its index. The index will be filled again by the synchronization with the database (if"
-            + " solr.synchronizeAtStartup is enabled, which is the default, otherwise it needs to be triggered"
-            + " manually).", this.logCapture.getMessage(0));
+            + " deleting its index. It will be filled again by the synchronization with the database.",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void initializeWithNonCompliantIndexWithoutSynchronizationAtStartup() throws Exception
+    {
+        when(this.solrSchema.getNonCompliantFields(this.core)).thenReturn(Set.of("hidden"));
+        when(this.configuration.synchronizeAtStartup()).thenReturn(false);
+
+        this.initializer.initialize(this.core);
+
+        verify(this.solr).deleteIndex(this.core);
+
+        assertEquals("The index of the Solr core [xwiki_search_9] contains fields which are not compatible with their"
+            + " definition in the schema [hidden] (usually because the configuration of the core was upgraded),"
+            + " deleting its index. Since solr.synchronizeAtStartup is disabled, it needs to be filled again by"
+            + " triggering a synchronization with the database manually.", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void initializeWhenComplianceCheckFails() throws Exception
+    {
+        when(this.solrSchema.getNonCompliantFields(this.core))
+            .thenThrow(new SolrException("Failed to get the segments", new IOException("Forbidden")));
+
+        this.initializer.initialize(this.core);
+
+        verify(this.migrations).update(this.core);
+        verify(this.solr, never()).deleteIndex(any());
+
+        assertEquals("Failed to check if the index of the Solr core [xwiki_search_9] is compliant with its schema:"
+            + " IOException: Forbidden", this.logCapture.getMessage(0));
     }
 }

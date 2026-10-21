@@ -139,7 +139,12 @@ public class EmbeddedClient extends EmbeddedSolrServer
         StreamingResponseCallback callback) throws SolrServerException, IOException
     {
         // Get the current instance of the core (it might have been reloaded since this client was created)
-        try (SolrCore core = getCoreContainer().getCore(collection != null ? collection : this.coreName)) {
+        String name = collection != null ? collection : this.coreName;
+        try (SolrCore core = getCoreContainer().getCore(name)) {
+            if (core == null) {
+                throw new SolrServerException("No Solr core with name [" + name + "]");
+            }
+
             WrappingStreamingResponseCallback wrappingCallback;
             try {
                 wrappingCallback = new WrappingStreamingResponseCallback(core, params, callback);

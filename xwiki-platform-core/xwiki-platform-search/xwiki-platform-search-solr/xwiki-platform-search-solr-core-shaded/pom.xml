@@ -35,6 +35,9 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Core (shaded)</xwiki.extension.name>
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <!-- Make sure the Extension Manager does not install the standard solr-core next to this one. The embedded Jersey
+         and HK2 are not listed since they are relocated: this module does not provide their packages. -->
+    <xwiki.extension.features>org.apache.solr:solr-core/${solr.version}</xwiki.extension.features>
     <!-- Nothing to check: no source -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.skip>true</xwiki.jacoco.skip>
@@ -105,7 +108,7 @@
     <dependency>
       <groupId>org.glassfish.hk2</groupId>
       <artifactId>hk2-locator</artifactId>
-      <version>3.0.6</version>
+      <version>${solr.hk2.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -268,9 +271,15 @@
                     <exclude>META-INF/*.DSA</exclude>
                     <exclude>META-INF/*.RSA</exclude>
                     <exclude>META-INF/native-image/**</exclude>
-                    <exclude>META-INF/maven/**</exclude>
                     <exclude>module-info.class</exclude>
                     <exclude>META-INF/versions/*/module-info.class</exclude>
+                  </excludes>
+                </filter>
+                <!-- Only keep the Maven metadata of this module, which is used to identify it as a core extension -->
+                <filter>
+                  <artifact>org.apache.solr:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/maven/**</exclude>
                   </excludes>
                 </filter>
                 <!-- The shade plugin does not relocate multi-release classes, and the base classes work on any Java
@@ -278,6 +287,7 @@
                 <filter>
                   <artifact>org.glassfish.*:*</artifact>
                   <excludes>
+                    <exclude>META-INF/maven/**</exclude>
                     <exclude>META-INF/versions/**</exclude>
                   </excludes>
                 </filter>

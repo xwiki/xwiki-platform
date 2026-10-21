@@ -26,6 +26,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.search.solr.Solr;
@@ -33,6 +34,7 @@ import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
  * Take care of the initialization of the search core which can be done through the SolrJ API.
@@ -58,6 +60,9 @@ public class SearchCoreInitializer implements SolrCoreInitializer
 
     @Inject
     private Provider<Solr> solrProvider;
+
+    @Inject
+    private SolrConfiguration configuration;
 
     @Inject
     private Logger logger;
@@ -86,14 +91,29 @@ public class SearchCoreInitializer implements SolrCoreInitializer
 
     private void checkIndexCompliance(XWikiSolrCore core) throws SolrException
     {
-        Set<String> nonCompliantFields = this.solrSchema.getNonCompliantFields(core);
+        Set<String> nonCompliantFields;
+        try {
+            nonCompliantFields = this.solrSchema.getNonCompliantFields(core);
+        } catch (SolrException e) {
+            // The check is only a safety net, not being able to do it should not prevent the core from being used
+            this.logger.warn("Failed to check if the index of the Solr core [{}] is compliant with its schema: {}",
+                core.getSolrName(), ExceptionUtils.getRootCauseMessage(e));
+
+            return;
+        }
 
         if (!nonCompliantFields.isEmpty()) {
-            this.logger.warn("The index of the Solr core [{}] contains fields which are not compatible with their"
+            String message = "The index of the Solr core [{}] contains fields which are not compatible with their"
                 + " definition in the schema {} (usually because the configuration of the core was upgraded), deleting"
-                + " its index. The index will be filled again by the synchronization with the database (if"
-                + " solr.synchronizeAtStartup is enabled, which is the default, otherwise it needs to be triggered"
-                + " manually).", core.getSolrName(), nonCompliantFields);
+                + " its index.";
+            if (this.configuration.synchronizeAtStartup()) {
+                this.logger.warn(message + " It will be filled again by the synchronization with the database.",
+                    core.getSolrName(), nonCompliantFields);
+            } else {
+                this.logger.warn(message + " Since solr.synchronizeAtStartup is disabled, it needs to be filled"
+                    + " again by triggering a synchronization with the database manually.", core.getSolrName(),
+                    nonCompliantFields);
+            }
 
             this.solrProvider.get().deleteIndex(core);
         }

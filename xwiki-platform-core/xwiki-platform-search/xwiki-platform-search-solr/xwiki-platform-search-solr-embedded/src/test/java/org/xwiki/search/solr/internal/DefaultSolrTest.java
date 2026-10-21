@@ -40,6 +40,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.CommonParams;
 import org.junit.jupiter.api.BeforeEach;
@@ -199,10 +200,76 @@ class DefaultSolrTest
         assertEquals(Arrays.asList("0", "1"), ids);
         assertEquals(Arrays.asList(null, date), dates);
         assertEquals(Arrays.asList(null, List.of("link1", "link2")), links);
+    }
 
-        // The data indexed with the search core configuration is compliant with its schema
+    @Test
+    void searchCoreIndexCompliance() throws Exception
+    {
+        Solr instance = this.componentManager.getInstance(Solr.class);
+        XWikiSolrCore core = instance.getCore("search");
+        SolrClient client = core.getClient();
+
+        // Index a document with a value for each family of fields of the search core schema (any field reported as
+        // not compliant here would make XWiki delete the whole index at each startup)
+        Date date = new Date();
+        SolrInputDocument document = new SolrInputDocument("id", "0");
+        // Strings
+        document.setField("reference", "wiki:Space.Page");
+        document.setField("wiki", "wiki");
+        document.setField("space_exact", "Space");
+        document.setField("space_facet", "0/Space.");
+        document.setField("name", "Page");
+        document.setField("locale", "en");
+        document.setField("links", "link");
+        document.setField("links_extended", "link");
+        document.setField("class", "Space.Class");
+        document.setField("filename_exact", "file.txt");
+        // Booleans
+        document.setField("hidden", true);
+        // Points
+        document.setField("docid", 42L);
+        document.setField("number", 1);
+        document.setField("date", date);
+        document.setField("attdate", date);
+        document.setField("attsize", 10L);
+        document.setField("attdate_sort", date);
+        document.setField("attsize_sort", 10L);
+        // Text
+        document.setField("spaces", "Space");
+        document.setField("title_en", "Title");
+        document.setField("doccontent_fr", "Contenu");
+        document.setField("doccontentraw_de", "Inhalt");
+        document.setField("comment_ja", "コメント");
+        document.setField("author_display", "Author");
+        document.setField("objcontent__", "property:value");
+        document.setField("filename", "file.txt");
+        document.setField("propertyvalue__", "value");
+        // Object properties
+        document.setField("property.Space.Class.prop_boolean", true);
+        document.setField("property.Space.Class.prop_int", 1);
+        document.setField("property.Space.Class.prop_long", 1L);
+        document.setField("property.Space.Class.prop_float", 1.0F);
+        document.setField("property.Space.Class.prop_double", 1.0D);
+        document.setField("property.Space.Class.prop_string", "Value");
+        document.setField("property.Space.Class.prop_date", date);
+        document.setField("property.Space.Class.prop_string_ns", "Value");
+        document.setField("property.Space.Class.prop_sortBoolean", true);
+        document.setField("property.Space.Class.prop_sortInt", 1);
+        document.setField("property.Space.Class.prop_sortLong", 1L);
+        document.setField("property.Space.Class.prop_sortFloat", 1.0F);
+        document.setField("property.Space.Class.prop_sortDouble", 1.0D);
+        document.setField("property.Space.Class.prop_sortString", "Value");
+        document.setField("property.Space.Class.prop_sortDate", date);
+        // Ignored
+        document.setField("unknown", "value");
+        // Nested document
+        document.addChildDocument(new SolrInputDocument("id", "0.1"));
+
+        client.add(document);
+        client.commit();
+
         SolrSchemaUtils solrSchema = this.componentManager.getInstance(SolrSchemaUtils.class);
-        assertEquals(Set.of(), solrSchema.getNonCompliantFields(instance.getCore("search")));
+        assertEquals(Set.of(), solrSchema.getNonCompliantFields(core));
     }
 
     @Test
@@ -231,7 +298,9 @@ class DefaultSolrTest
         typeAttributes.put("docValues", true);
         new SchemaRequest.ReplaceFieldType(typeDefinition).process(client);
         SolrInputDocument newDocument = new SolrInputDocument("id", "2", "testflag", "true");
-        assertThrows(Exception.class, () -> client.add(newDocument));
+        SolrException exception = assertThrows(SolrException.class, () -> client.add(newDocument));
+        assertTrue(exception.getMessage().contains("cannot change field \"testflag\" from doc values type=NONE"),
+            exception.getMessage());
         assertEquals(Set.of("testflag"), solrSchema.getNonCompliantFields(core));
 
         solr.deleteIndex(core);

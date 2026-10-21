@@ -213,7 +213,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         }
     }
 
-    private void updateIndex() throws SolrServerException, IOException
+    private void updateIndex() throws SearchException, SolrServerException, IOException
     {
         // Gather known invalid flavor so that we skip them
         this.invalidFlavors = this.flavors.getKnownInvalidFlavors();

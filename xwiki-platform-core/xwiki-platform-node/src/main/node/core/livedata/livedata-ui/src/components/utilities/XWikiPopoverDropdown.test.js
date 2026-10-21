@@ -55,13 +55,13 @@ function initAttachedWrapper() {
 }
 
 /**
- * Dispatches the toggle event that the browser fires when the menu popover opens or closes.
+ * Dispatches the beforetoggle event that the browser fires when the menu popover opens or closes.
  *
  * @param wrapper - the wrapper of the component
  * @param newState - the new state of the popover, "open" or "closed"
  */
 async function toggleMenu(wrapper, newState) {
-  const event = new Event("toggle");
+  const event = new Event("beforetoggle");
   event.newState = newState;
   wrapper.find(".dropdown-menu").element.dispatchEvent(event);
   await wrapper.vm.$nextTick();
@@ -146,46 +146,62 @@ describe("XWikiPopoverDropdown.vue", () => {
     expect(hidePopover.callCount).toBe(0);
   });
 
-  it("Keeps only Escape from the Bootstrap dropdown script", async () => {
-    const wrapper = initWrapper();
-    // The Bootstrap dropdown script listens to the keys reaching the document.
-    const parentKeydown = spy();
-    wrapper.element.addEventListener("keydown", parentKeydown);
-    const menu = wrapper.find(".dropdown-menu");
+  describe("Keyboard", () => {
+    it("Keeps only Escape from the Bootstrap dropdown script", async () => {
+      const wrapper = initWrapper();
+      // The Bootstrap dropdown script listens to the keys reaching the document.
+      const parentKeydown = spy();
+      wrapper.element.addEventListener("keydown", parentKeydown);
+      const menu = wrapper.find(".dropdown-menu");
 
-    for (const key of ["Escape", "ArrowUp", "ArrowDown", " "]) {
-      await menu.trigger("keydown", { key });
-    }
+      for (const key of ["Escape", "ArrowUp", "ArrowDown", " "]) {
+        await menu.trigger("keydown", { key });
+      }
 
-    expect(parentKeydown.args.map(([event]) => event.key)).toEqual([
-      "ArrowUp",
-      "ArrowDown",
-      " ",
-    ]);
-  });
+      expect(parentKeydown.args.map(([event]) => event.key)).toEqual([
+        "ArrowUp",
+        "ArrowDown",
+        " ",
+      ]);
+    });
 
-  it("Opens the menu and focuses its first item on the arrow keys", async () => {
-    const { wrapper, showPopover } = initAttachedWrapper();
+    it("Opens the menu and focuses its first item on the arrow keys", async () => {
+      const { wrapper, showPopover } = initAttachedWrapper();
 
-    await wrapper
-      .find(".dropdown-toggle")
-      .trigger("keydown", { key: "ArrowDown" });
+      await wrapper
+        .find(".dropdown-toggle")
+        .trigger("keydown", { key: "ArrowDown" });
 
-    expect(showPopover.callCount).toBe(1);
-    expect(document.activeElement).toBe(wrapper.find(".first").element);
-    wrapper.unmount();
-  });
+      expect(showPopover.callCount).toBe(1);
+      expect(document.activeElement).toBe(wrapper.find(".first").element);
+      wrapper.unmount();
+    });
 
-  it("Only focuses the first item of an open menu on the arrow keys", async () => {
-    const { wrapper, showPopover } = initAttachedWrapper();
-    await toggleMenu(wrapper, "open");
+    it("Only focuses the first item of an open menu on the arrow keys", async () => {
+      const { wrapper, showPopover } = initAttachedWrapper();
+      await toggleMenu(wrapper, "open");
 
-    await wrapper
-      .find(".dropdown-toggle")
-      .trigger("keydown", { key: "ArrowUp" });
+      await wrapper
+        .find(".dropdown-toggle")
+        .trigger("keydown", { key: "ArrowUp" });
 
-    expect(showPopover.callCount).toBe(0);
-    expect(document.activeElement).toBe(wrapper.find(".first").element);
-    wrapper.unmount();
+      expect(showPopover.callCount).toBe(0);
+      expect(document.activeElement).toBe(wrapper.find(".first").element);
+      wrapper.unmount();
+    });
+
+    it("Keeps Escape on its toggle from the page while the menu is open", async () => {
+      const wrapper = initWrapper();
+      // The page keyboard shortcuts listen to the keys reaching the document.
+      const parentKeydown = spy();
+      wrapper.element.addEventListener("keydown", parentKeydown);
+      const toggle = wrapper.find(".dropdown-toggle");
+
+      await toggle.trigger("keydown", { key: "Escape" });
+      await toggleMenu(wrapper, "open");
+      await toggle.trigger("keydown", { key: "Escape" });
+
+      expect(parentKeydown.callCount).toBe(1);
+    });
   });
 });

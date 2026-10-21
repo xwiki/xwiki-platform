@@ -36,7 +36,8 @@
     </XWikiPopoverDropdown>
 -->
 <script setup lang="ts">
-import { ref, useId, useTemplateRef } from "vue";
+import { usePopoverDropdown } from "../../composables/usePopoverDropdown";
+import { useTemplateRef } from "vue";
 
 const {
   toggleClass = "btn btn-default",
@@ -55,28 +56,15 @@ const {
   closeOnClick?: boolean;
 }>();
 
-const menuId = useId();
-const isOpen = ref(false);
 const menu = useTemplateRef<HTMLElement>("menu");
-
-function onMenuClick() {
-  if (closeOnClick) {
-    menu.value?.hidePopover();
-  }
-}
-
-function onMenuToggle(event: ToggleEvent) {
-  isOpen.value = event.newState === "open";
-}
-
-// Like the Bootstrap dropdown script does for its toggles, the arrow keys open the menu and move
-// the focus to its first item.
-function onToggleArrowKey() {
-  if (!isOpen.value) {
-    menu.value?.showPopover();
-  }
-  menu.value?.querySelector<HTMLElement>("li:not(.disabled) a")?.focus();
-}
+const {
+  menuId,
+  isOpen,
+  onMenuClick,
+  onMenuToggle,
+  onToggleArrowKey,
+  onToggleEscape,
+} = usePopoverDropdown(menu, () => closeOnClick);
 </script>
 
 <template>
@@ -92,14 +80,16 @@ function onToggleArrowKey() {
       :title="toggleTitle"
       :popovertarget="menuId"
       aria-haspopup="true"
-      :aria-expanded="String(isOpen)"
+      :aria-expanded="isOpen"
       @keydown.up.down.prevent="onToggleArrowKey"
+      @keydown.esc="onToggleEscape"
     >
       <slot name="toggle" />
     </button>
     <!--
       The Bootstrap dropdown script moves the focus between the menu items with the arrow keys, but
-      Escape is kept from it since that script would prevent it from closing the popover.
+      Escape is kept from it and from the page keyboard shortcuts, since they would prevent it from
+      closing the popover.
     -->
     <ul
       :id="menuId"
@@ -109,7 +99,7 @@ function onToggleArrowKey() {
       :class="menuClass"
       @click="onMenuClick"
       @keydown.esc.stop
-      @toggle="onMenuToggle"
+      @beforetoggle="onMenuToggle"
     >
       <slot />
     </ul>

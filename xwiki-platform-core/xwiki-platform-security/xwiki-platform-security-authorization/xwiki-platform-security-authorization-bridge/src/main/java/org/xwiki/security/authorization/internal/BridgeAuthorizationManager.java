@@ -48,11 +48,18 @@ public class BridgeAuthorizationManager extends DefaultAuthorizationManager
     public void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
         throws AccessDeniedException
     {
-        boolean allowed = false;
+        Boolean allowed = null;
         try {
             super.checkAccess(right, userReference, entityReference);
 
             allowed = true;
+        } catch (AccessDeniedException e) {
+            // An access denied exception with a cause indicates that the right could not be evaluated
+            if (e.getCause() == null) {
+                allowed = false;
+            }
+
+            throw e;
         } finally {
             // Associated the currently executing content with the passed right check
             this.asyncContext.useRight(right, userReference, entityReference, allowed);
@@ -62,14 +69,14 @@ public class BridgeAuthorizationManager extends DefaultAuthorizationManager
     @Override
     public boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference)
     {
-        boolean allowed = false;
+        Boolean allowed = null;
         try {
-            allowed = super.hasAccess(right, userReference, entityReference);
+            allowed = evaluateAccess(right, userReference, entityReference);
         } finally {
             // Associated the currently executing content with the passed right check
             this.asyncContext.useRight(right, userReference, entityReference, allowed);
         }
 
-        return allowed;
+        return Boolean.TRUE.equals(allowed);
     }
 }

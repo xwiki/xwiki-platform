@@ -41,6 +41,7 @@ import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;
 import org.xwiki.security.internal.XWikiBridge;
+import org.xwiki.stability.Unstable;
 
 /**
  * Default implementation of the {@link AuthorizationManager}.
@@ -112,13 +113,33 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     @Override
     public boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference)
     {
+        return Boolean.TRUE.equals(evaluateAccess(right, userReference, entityReference));
+    }
+
+    /**
+     * Same as {@link #hasAccess(Right, DocumentReference, EntityReference)}, but makes the difference between a denied
+     * access and a failure to evaluate the access (which is logged).
+     *
+     * @param right the right to check
+     * @param userReference the user to check the right for
+     * @param entityReference the entity on which to check the right
+     * @return {@code true} if the user has the specified right on the entity, {@code false} if not, and {@code null}
+     *     if the right could not be evaluated
+     * @since 18.10.0RC1
+     * @since 18.9.0
+     * @since 18.4.8
+     * @since 17.10.15
+     */
+    @Unstable
+    protected Boolean evaluateAccess(Right right, DocumentReference userReference, EntityReference entityReference)
+    {
         try {
             return hasSecurityAccess(right, userReference, entityReference, false);
         } catch (Exception e) {
             this.logger.error("Failed to load rights for user [{}] on [{}].",
                 (userReference == null) ? AuthorizationException.NULL_USER : userReference,
                 (entityReference == null) ? AuthorizationException.NULL_ENTITY : entityReference, e);
-            return false;
+            return null;
         }
     }
 

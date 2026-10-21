@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 /**
  * Contextual information related to asynchronous rendering.
@@ -84,14 +85,22 @@ public interface AsyncContext
     void use(String type, Object value);
 
     /**
+     * Indicate that the current execution depends on the result of the passed right check and the result will need to
+     * be removed from the cache if the right check result changes.
+     *
      * @param right the right needed for execution of the action
      * @param userReference the user to check the right for
      * @param entityReference the entity on which to check the right
-     * @param allowed the result of the evaluation
-     * @since 11.8RC1
+     * @param allowed the result of the evaluation: {@code true} if the right is granted, {@code false} if it's denied
+     *     and {@code null} if the evaluation failed
+     * @since 18.10.0RC1
+     * @since 18.9.0
+     * @since 18.4.8
+     * @since 17.10.15
      */
+    @Unstable
     default void useRight(Right right, DocumentReference userReference, EntityReference entityReference,
-        boolean allowed)
+        Boolean allowed)
     {
     }
 }

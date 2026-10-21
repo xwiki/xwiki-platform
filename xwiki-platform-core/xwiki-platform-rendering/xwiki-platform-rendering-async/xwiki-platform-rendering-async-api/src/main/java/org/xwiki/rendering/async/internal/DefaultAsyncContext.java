@@ -70,15 +70,16 @@ public class DefaultAsyncContext implements AsyncContext
 
         private final EntityReference entityReference;
 
-        private final boolean allowed;
+        private final Boolean allowed;
 
         /**
          * @param right the right needed for execution of the action
          * @param userReference the user to check the right for
          * @param entityReference the entity on which to check the right
-         * @param result the result of the evaluation
+         * @param result the result of the evaluation: {@code true} if the right is granted, {@code false} if it's
+         *     denied and {@code null} if the evaluation failed
          */
-        public RightEntry(Right right, DocumentReference userReference, EntityReference entityReference, boolean result)
+        public RightEntry(Right right, DocumentReference userReference, EntityReference entityReference, Boolean result)
         {
             this.right = right;
             this.userReference = userReference;
@@ -111,9 +112,10 @@ public class DefaultAsyncContext implements AsyncContext
         }
 
         /**
-         * @return the result of the evaluation
+         * @return the result of the evaluation: {@code true} if the right is granted, {@code false} if it's denied and
+         *     {@code null} if the evaluation failed
          */
-        public boolean isAllowed()
+        public Boolean getAllowed()
         {
             return this.allowed;
         }
@@ -346,7 +348,7 @@ public class DefaultAsyncContext implements AsyncContext
     }
 
     @Override
-    public void useRight(Right right, DocumentReference userReference, EntityReference entityReference, boolean allowed)
+    public void useRight(Right right, DocumentReference userReference, EntityReference entityReference, Boolean allowed)
     {
         ContextUse contextUse = getContextUse();
 

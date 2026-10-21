@@ -68,6 +68,7 @@
                     <exclude>org.xwiki.platform:xwiki-platform-office-importer:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-oldcore:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-refactoring-api:*:jar:*</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-rendering-async-api:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-rendering-macro-include:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-rendering-wikimacro-api:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-rendering-wikimacro-store:*:jar:*</exclude>
@@ -130,6 +131,10 @@
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-office-importer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-rendering-async-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
@@ -303,6 +308,10 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-rendering-async-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -436,6 +445,34 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-rendering-async-api</artifactId>
+      <version>${project.version}</version>
+      <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-job-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-transformation-macro</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-rendering-wikimacro-api</artifactId>
       <version>${project.version}</version>
       <exclusions>
@@ -454,6 +491,10 @@
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-bridge</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-rendering-async-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

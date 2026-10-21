@@ -41,12 +41,9 @@ import org.xwiki.component.descriptor.ComponentRole;
 import org.xwiki.component.descriptor.DefaultComponentRole;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.async.internal.DefaultAsyncContext.RightEntry;
 import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Share cache containing the results of the {@link AsyncRenderer} executions.
@@ -63,9 +60,6 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
 
     @Inject
     private CacheManager cacheManager;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
 
     private Cache<AsyncRendererJobStatus> asyncCache;
 
@@ -279,6 +273,20 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
                 cleanCache(reference);
             }
         }
+
+        // Also clean entries associated with a right check of a user or an entity of the wiki
+        for (Map.Entry<RightEntry, Set<String>> entry : this.rightMapping.entrySet()) {
+            RightEntry right = entry.getKey();
+
+            if (isInWiki(right.getUserReference(), wiki) || isInWiki(right.getEntityReference(), wiki)) {
+                clean(entry.getValue());
+            }
+        }
+    }
+
+    private boolean isInWiki(EntityReference reference, String wiki)
+    {
+        return reference != null && reference.getRoot().getName().equals(wiki);
     }
 
     /**
@@ -303,29 +311,11 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
 
     private void checkRight(RightEntry right, Set<String> keys)
     {
-        // The right of a user or an entity of a wiki which doesn't exist anymore (e.g. while it's being deleted) cannot
-        // be evaluated, and it can only have changed. Otherwise, make sure the right check result changed.
-        if (!isWikiAvailable(right.getUserReference()) || !isWikiAvailable(right.getEntityReference())
-            || this.authorization.hasAccess(right.getRight(), right.getUserReference(),
-                right.getEntityReference()) != right.isAllowed()) {
+        // Make sure the right check result changed
+        if (this.authorization.hasAccess(right.getRight(), right.getUserReference(),
+            right.getEntityReference()) != right.isAllowed()) {
             clean(keys);
         }
-    }
-
-    private boolean isWikiAvailable(EntityReference reference)
-    {
-        EntityReference wikiReference = reference != null ? reference.extractReference(EntityType.WIKI) : null;
-
-        if (wikiReference != null) {
-            try {
-                return this.wikiDescriptorManager.exists(wikiReference.getName());
-            } catch (WikiManagerException e) {
-                // Evaluate the right as usual if the existence of the wiki is unknown
-                return true;
-            }
-        }
-
-        return true;
     }
 
     /**

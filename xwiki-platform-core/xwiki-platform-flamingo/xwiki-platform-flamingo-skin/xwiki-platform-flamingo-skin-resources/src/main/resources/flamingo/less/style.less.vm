@@ -29,7 +29,6 @@
 @import "accordion";
 @import "action-menus";
 @import "admin";
-@import "annotations";
 @import "buttons";
 @import "breadcrumbs";
 @import "drawer";

@@ -19,6 +19,8 @@
  */
 package org.xwiki.annotation.test.ui;
 
+import java.awt.Insets;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,8 +29,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.annotation.test.po.AnnotatableViewPage;
+import org.xwiki.annotation.test.po.AnnotationsPane;
 import org.xwiki.annotation.test.po.AnnotationsWindow;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.test.docker.junit5.ScreenshotComparator;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -80,6 +84,12 @@ class AnnotationsIT
     private static final String USER_NAME = "UserAnnotation";
 
     private static final String USER_PASS = "pass";
+
+    /**
+     * Shows the space between the annotation settings and the page content. The space above the settings is left out
+     * because it shows the date of the last modification of the page.
+     */
+    private static final Insets PANE_MARGIN = new Insets(0, 0, 30, 0);
 
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
@@ -229,7 +239,8 @@ class AnnotationsIT
      */
     @Test
     @Order(4)
-    void annotationsSurvivePageMove(TestUtils setup, TestReference testReference)
+    void annotationsSurvivePageMove(TestUtils setup, TestReference testReference, ScreenshotComparator screenshots)
+        throws IOException
     {
         AnnotatableViewPage annotatableViewPage =
             new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
@@ -246,7 +257,17 @@ class AnnotationsIT
         assertEquals("Done.", renameStatusPage.getInfoMessage());
         renameStatusPage.gotoNewPage();
 
-        annotatableViewPage.showAnnotationsPane().clickShowAnnotations();
+        AnnotationsPane annotationsPane = annotatableViewPage.showAnnotationsPane();
+        // Check the layout of the annotation settings, which differs on small screens.
+        screenshots.assertMatches("annotationsPane", annotationsPane.getContainer(), PANE_MARGIN);
+        setup.setBrowserWindowWidth(700);
+        try {
+            screenshots.assertMatches("annotationsPaneSmallScreen", annotationsPane.getContainer(), PANE_MARGIN);
+        } finally {
+            setup.maximizeBrowserWindow();
+        }
+
+        annotationsPane.clickShowAnnotations();
         annotatableViewPage.waitForAnnotationsDisplayed();
         assertEquals(1, annotatableViewPage.getAnnotationCount());
     }

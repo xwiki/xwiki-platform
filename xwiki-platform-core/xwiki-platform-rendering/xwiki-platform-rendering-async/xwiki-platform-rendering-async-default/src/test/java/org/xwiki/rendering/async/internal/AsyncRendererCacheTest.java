@@ -44,17 +44,12 @@ import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -71,9 +66,6 @@ class AsyncRendererCacheTest
     @MockComponent
     private AuthorizationManager authorization;
 
-    @MockComponent
-    private WikiDescriptorManager wikiDescriptorManager;
-
     @InjectMockComponents
     private AsyncRendererCache asyncCache;
 
@@ -88,10 +80,8 @@ class AsyncRendererCacheTest
     }
 
     @BeforeEach
-    void beforeEach() throws WikiManagerException
+    void beforeEach()
     {
-        when(this.wikiDescriptorManager.exists(anyString())).thenReturn(true);
-
         this.renderer = mock(AsyncRenderer.class);
 
         when(this.renderer.isAsyncAllowed()).thenReturn(true);
@@ -280,59 +270,5 @@ class AsyncRendererCacheTest
         assertSame(this.status, this.asyncCache.getAsync("2"));
 
         assertNull(this.asyncCache.getAsync("2"));
-    }
-
-    @Test
-    void invalidateSyncOnRightOfDeletedWiki() throws WikiManagerException
-    {
-        DocumentReference document = new DocumentReference("subwiki", "Space", "Document");
-        DocumentReference user = new DocumentReference("subwiki", "XWiki", "User");
-        setRights(new RightEntry(Right.VIEW, user, document, true));
-
-        this.asyncCache.put(this.status);
-
-        // The wiki is being deleted: its descriptor doesn't exist anymore.
-        when(this.wikiDescriptorManager.exists("subwiki")).thenReturn(false);
-
-        this.asyncCache.cleanCacheForRight();
-
-        assertNull(this.asyncCache.getSync(getId()));
-        // The right cannot be evaluated for a wiki which doesn't exist.
-        verify(this.authorization, never()).hasAccess(Right.VIEW, user, document);
-    }
-
-    @Test
-    void invalidateSyncOnRightOnEntityOfDeletedWiki() throws WikiManagerException
-    {
-        DocumentReference document = new DocumentReference("subwiki", "Space", "Document");
-        DocumentReference user = new DocumentReference("wiki", "XWiki", "User");
-        setRights(new RightEntry(Right.VIEW, user, document, true));
-
-        this.asyncCache.put(this.status);
-
-        when(this.wikiDescriptorManager.exists("subwiki")).thenReturn(false);
-
-        this.asyncCache.cleanCacheForRight();
-
-        assertNull(this.asyncCache.getSync(getId()));
-        verify(this.authorization, never()).hasAccess(Right.VIEW, user, document);
-    }
-
-    @Test
-    void cleanCacheForRightWhenWikiExistenceIsUnknown() throws WikiManagerException
-    {
-        DocumentReference document = new DocumentReference("wiki", "Space", "Document");
-        DocumentReference user = new DocumentReference("wiki", "XWiki", "User");
-        setRights(new RightEntry(Right.VIEW, user, document, true));
-
-        this.asyncCache.put(this.status);
-
-        when(this.wikiDescriptorManager.exists("wiki")).thenThrow(new WikiManagerException("error"));
-
-        this.asyncCache.cleanCacheForRight();
-
-        // The right is evaluated as usual and didn't change.
-        assertSame(this.status, this.asyncCache.getSync(getId()));
-        verify(this.authorization).hasAccess(Right.VIEW, user, document);
     }
 }

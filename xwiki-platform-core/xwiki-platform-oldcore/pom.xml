@@ -481,6 +481,12 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed to test the detection of the client closing the connection on Jetty -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-io</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Used in to prioritize MandatoryDocumentInitializers -->
     <dependency>

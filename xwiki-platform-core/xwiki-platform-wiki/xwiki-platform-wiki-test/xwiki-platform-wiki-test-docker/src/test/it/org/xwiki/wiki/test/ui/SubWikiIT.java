@@ -32,6 +32,7 @@ import org.xwiki.test.docker.junit5.SubWikiTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.LoginPage;
@@ -104,8 +105,14 @@ class SubWikiIT
     }
 
     @AfterAll
-    void deleteSubWiki(TestUtils setup) throws Exception
+    void deleteSubWiki(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
+        // TODO: Remove once XWIKI-25420 (Errors are logged when deleting a wiki whose users have cached asynchronous
+        // rendering results) is fixed. Deleting the wiki descriptor makes the asynchronous rendering cache check again
+        // the rights of the users of the wiki being deleted, which fails since the wiki doesn't exist anymore.
+        logCaptureConfiguration.registerExcludes(
+            "Failed to load rights for user [subwiki:XWiki.LocalSubWikiUser] on [subwiki:XWiki.LocalSubWikiUser].");
+
         setup.loginAsSuperAdmin();
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         if (wikiIndexPage.getWikiLink(SUBWIKI_NAME) == null) {

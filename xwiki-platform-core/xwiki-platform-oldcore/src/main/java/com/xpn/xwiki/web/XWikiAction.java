@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.inject.Inject;
@@ -145,6 +146,13 @@ public abstract class XWikiAction implements LegacyAction
     public static final String ACTION_PROGRESS = "actionprogress";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAction.class);
+
+    /**
+     * The root causes of the exceptions thrown when the client closed the connection while the response was being
+     * sent: depending on how the connection was closed, writing to it fails with a broken pipe or a connection reset.
+     */
+    private static final Set<String> CLIENT_ABORT_ROOT_CAUSES =
+        Set.of("IOException: Broken pipe", "IOException: Connection reset by peer");
 
     /**
      * Actions that need to be resolved on the main wiki instead of the current non-existing wiki. This is used to be
@@ -701,10 +709,10 @@ public abstract class XWikiAction implements LegacyAction
                     // right one.
                     velocityManager.getVelocityContext().put("exp", e);
                     if (LOGGER.isWarnEnabled()) {
-                        // Don't log "Broken Pipe" exceptions since they're not real errors and we don't want to pollute
-                        // the logs with unnecessary stack traces. It just means the client side has cancelled the
-                        // connection.
-                        if ("IOException: Broken pipe".equals(ExceptionUtils.getRootCauseMessage(e))) {
+                        // Don't log the exceptions caused by the client closing the connection since they're not real
+                        // errors and we don't want to pollute the logs with unnecessary stack traces. It just means the
+                        // client side has cancelled the connection.
+                        if (CLIENT_ABORT_ROOT_CAUSES.contains(ExceptionUtils.getRootCauseMessage(e))) {
                             return;
                         }
                         LOGGER.warn("Uncaught exception", e);
@@ -716,9 +724,10 @@ public abstract class XWikiAction implements LegacyAction
                     return;
                 } catch (XWikiException ex) {
                     if (ex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
-                        // No stack trace here: an aborted connection is a client-side event, and the surrounding
-                        // code already suppresses traces for it.
-                        LOGGER.error("Connection aborted. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(ex));
+                        // The client closed the connection while the error page was being sent (e.g. the browser
+                        // cancelled the request): there's not much we can do on the server side, and it's not an error
+                        // of the server.
+                        LOGGER.debug("Connection aborted", ex);
                     }
                 } catch (Exception e2) {
                     // I hope this never happens

@@ -152,11 +152,13 @@ class XWikiActionTest
 
         when(this.velocityManager.getVelocityContext()).thenReturn(new VelocityContext());
         when(this.engineContext.getAttribute("xwiki")).thenReturn(this.oldcore.getSpyXWiki());
-        when(this.request.getHttpServletRequest()).thenReturn(mock(HttpServletRequest.class));
+        HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+        when(this.request.getHttpServletRequest()).thenReturn(httpServletRequest);
         when(this.response.getOutputStream()).thenReturn(this.out);
 
         XWikiURLFactoryService urlFactoryService = mock(XWikiURLFactoryService.class);
-        when(urlFactoryService.createURLFactory(any(Integer.class), any())).thenReturn(mock(XWikiURLFactory.class));
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        when(urlFactoryService.createURLFactory(any(Integer.class), any())).thenReturn(urlFactory);
         doReturn(urlFactoryService).when(this.oldcore.getSpyXWiki()).getURLFactoryService();
         doReturn(true).when(this.oldcore.getSpyXWiki()).prepareDocuments(any(), any(), any());
         XWikiPluginManager pluginManager = new XWikiPluginManager();

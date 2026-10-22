@@ -77,6 +77,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.apache.hc.core5.util.Timeout;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -337,6 +338,33 @@ public class TestUtils
     public XWikiWebDriver getDriver()
     {
         return TestUtils.context.getDriver();
+    }
+
+    /**
+     * Resizes the browser window to the specified width, e.g. to display the page as on a small screen, and waits for
+     * the page to be laid out at that width. Call {@link #maximizeBrowserWindow()} afterwards, since the browser is
+     * shared by the tests.
+     *
+     * @param width the width of the browser window, in pixels, which is a bit larger than the width available to the
+     *            page
+     * @since 18.10.0RC1
+     */
+    public void setBrowserWindowWidth(int width)
+    {
+        XWikiWebDriver driver = getDriver();
+        int height = driver.manage().window().getSize().getHeight();
+        driver.manage().window().setSize(new Dimension(width, height));
+        driver.waitUntilCondition(d -> ((Number) driver.executeScript("return window.innerWidth")).intValue() <= width);
+    }
+
+    /**
+     * Restores the size of the browser window after a call to {@link #setBrowserWindowWidth(int)}.
+     *
+     * @since 18.10.0RC1
+     */
+    public void maximizeBrowserWindow()
+    {
+        getDriver().manage().window().maximize();
     }
 
     /**

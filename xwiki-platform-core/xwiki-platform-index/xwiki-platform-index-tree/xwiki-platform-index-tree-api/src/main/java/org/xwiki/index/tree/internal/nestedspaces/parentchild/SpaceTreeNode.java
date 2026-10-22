@@ -48,6 +48,9 @@ import org.xwiki.query.QueryFilter;
 @Component
 @Named("space/parentChildOnNestedSpaces")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+// The shadowing is deliberate: the tree node implementations of the various hierarchies are named after the
+// node they represent and told apart by their package and their component hint, not by their class name.
+@SuppressWarnings("java:S2176")
 public class SpaceTreeNode extends org.xwiki.index.tree.internal.nestedspaces.SpaceTreeNode
 {
     private static final String PARAMETER_ABSOLUTE_REFERENCE = "absoluteRef";

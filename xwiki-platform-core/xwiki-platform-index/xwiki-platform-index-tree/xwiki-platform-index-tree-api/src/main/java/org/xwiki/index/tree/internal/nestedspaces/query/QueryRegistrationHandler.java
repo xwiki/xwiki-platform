@@ -35,6 +35,9 @@ import org.xwiki.observation.event.Event;
 @Component
 @Named("queryRegistrationHandler/nestedSpaces")
 @Singleton
+// The shadowing is deliberate: the query registration handlers of the various hierarchies share the name of the
+// role they implement and are told apart by their package and their component hint.
+@SuppressWarnings("java:S2176")
 public class QueryRegistrationHandler extends org.xwiki.index.tree.internal.nestedpages.query.QueryRegistrationHandler
 {
     @Override

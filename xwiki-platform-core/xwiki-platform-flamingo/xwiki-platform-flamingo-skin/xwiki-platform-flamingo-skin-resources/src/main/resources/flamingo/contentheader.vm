@@ -58,6 +58,6 @@
 ## rendered content of old revisions and this would thus only confuse users.
 #if ($viewer == 'content' && $doc.isRestricted()
   && ($isAdvancedUser || $stringtool.contains($renderedContent, 'xwikirenderingerror')))
-  #warning($escapetool.xml($services.localization.render('core.document.restrictedInfo')))
+  #warning($escapetool.xml($services.localization.render('core.document.restrictedInfo')) 'restricted-mode-warning')
 #end
 <hr/>

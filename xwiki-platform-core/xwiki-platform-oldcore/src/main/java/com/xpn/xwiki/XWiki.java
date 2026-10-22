@@ -4428,7 +4428,7 @@ public class XWiki implements EventListener
 
     protected void addUserToGroup(String userName, String groupName, XWikiContext context) throws XWikiException
     {
-        DocumentReference groupReference = getDocument(groupName, context).getDocumentReference();
+        DocumentReference groupReference = getCurrentMixedDocumentReferenceResolver().resolve(groupName);
         DocumentReference groupClassReference = getGroupClass(context).getDocumentReference();
 
         // Users can be added concurrently to the same group, e.g. when they register at the same time.

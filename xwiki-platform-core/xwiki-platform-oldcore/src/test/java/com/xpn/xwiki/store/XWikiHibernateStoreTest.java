@@ -699,6 +699,8 @@ class XWikiHibernateStoreTest
 
         verify(versionQuery).setParameter("id", document.getId());
         verify(versionQuery).setLockMode("xwikidoc", LockMode.PESSIMISTIC_WRITE);
+        // The revision check already tells that the document isn't stored.
+        verify(this.session, never()).createQuery(SELECT_DOCUMENT_ID);
         verify(this.session).save(same(document));
         assertFalse(document.isNew());
     }
@@ -729,6 +731,8 @@ class XWikiHibernateStoreTest
 
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
+        // The revision check already tells that the document is stored.
+        verify(this.session, never()).createQuery(SELECT_DOCUMENT_ID);
         verify(this.session).update(same(document));
         assertEquals("3.1", document.getVersion());
         assertEquals("3.1", document.getOriginalDocument().getVersion());
@@ -781,6 +785,7 @@ class XWikiHibernateStoreTest
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
         verify(this.session, never()).createQuery(SELECT_STORED_VERSION, String.class);
+        verify(this.session).createQuery(SELECT_DOCUMENT_ID);
         verify(this.session).update(same(document));
     }
 
@@ -794,6 +799,7 @@ class XWikiHibernateStoreTest
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
         verify(this.session, never()).createQuery(SELECT_STORED_VERSION, String.class);
+        verify(this.session).createQuery(SELECT_DOCUMENT_ID);
         verify(this.session).update(same(document));
     }
 

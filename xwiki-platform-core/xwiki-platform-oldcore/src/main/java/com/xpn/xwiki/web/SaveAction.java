@@ -182,7 +182,9 @@ public class SaveAction extends EditAction
 
         // Another request can save the document after this request loaded it, in which case the store refuses to save
         // it. The request is then applied again on the latest version of the document, which gives the same result as
-        // if this request was received after the other one: the changes are merged again before saving.
+        // if this request was received after the other one: when the merge conflict check applies (an asynchronous
+        // save that sends the version it is based on), the changes are merged with those of the other request, and
+        // otherwise the submitted values replace them.
         XWikiDocument tdoc = null;
         for (int attempt = 1; tdoc == null; attempt++) {
             try {

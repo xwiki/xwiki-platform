@@ -548,12 +548,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      *
      * @param doc the document to save
      * @param session the session of the current transaction
+     * @return {@code true} if the stored revision was checked, which means that the document is stored if and only if
+     *     it isn't new, {@code false} if it wasn't checked
      * @throws DocumentRevisionConflictException if the document is not based on the stored revision
      */
-    private void checkStoredRevision(XWikiDocument doc, Session session) throws DocumentRevisionConflictException
+    private boolean checkStoredRevision(XWikiDocument doc, Session session) throws DocumentRevisionConflictException
     {
         if (!this.storeConfiguration.isRevisionCheckEnabled()) {
-            return;
+            return false;
         }
 
         String expectedRevision;
@@ -567,7 +569,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 .getDocumentReferenceWithLocale().equals(doc.getDocumentReferenceWithLocale())) {
                 // We don't know which stored revision the document is based on: e.g. when renaming a document, the
                 // original document is the one of the source document.
-                return;
+                return false;
             }
             // Compare with the original document and not with the document itself, because some code sets the version
             // of the saved document explicitly (e.g. when importing a document while preserving its history).
@@ -586,6 +588,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             throw new DocumentRevisionConflictException(doc.getDocumentReferenceWithLocale(), expectedRevision,
                 storedRevision);
         }
+
+        return true;
     }
 
     /**
@@ -676,7 +680,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                     // Before writing anything, make sure the document is based on the stored revision, and lock the
                     // stored document so that it can't be saved concurrently until this transaction ends.
-                    checkStoredRevision(doc, session);
+                    boolean revisionChecked = checkStoredRevision(doc, session);
 
                     // This information will allow to not look for attachments and objects on loading
                     doc.setElement(XWikiDocument.HAS_ATTACHMENTS, !doc.getAttachmentList().isEmpty());
@@ -778,12 +782,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
                     }
 
-                    // Verify if the document already exists
-                    Query query = session
-                        .createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
-                    query.setParameter("id", doc.getId());
-                    if (query.uniqueResult() == null) {
-                        doc.setNew(true);
+                    // Verify if the document already exists, unless the revision check already did.
+                    if (!revisionChecked) {
+                        Query query = session
+                            .createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
+                        query.setParameter("id", doc.getId());
+                        if (query.uniqueResult() == null) {
+                            doc.setNew(true);
+                        }
                     }
 
                     // Note: we don't use session.saveOrUpdate(doc) because it used to be slower in Hibernate than

@@ -54,6 +54,13 @@ public class SearchCoreInitializer implements SolrCoreInitializer
     }
 
     @Override
+    public boolean isCache()
+    {
+        // The search index is filled again from the database when it's lost
+        return true;
+    }
+
+    @Override
     public void initialize(XWikiSolrCore core) throws SolrException
     {
         this.migrations.update(core);

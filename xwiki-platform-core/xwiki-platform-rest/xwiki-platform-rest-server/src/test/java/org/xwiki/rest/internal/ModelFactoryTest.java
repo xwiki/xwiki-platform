@@ -40,6 +40,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.xwiki.mail.EmailAddressObfuscator;
 import org.xwiki.mail.GeneralMailConfiguration;
@@ -528,5 +529,19 @@ class ModelFactoryTest
             assertFalse(modified);
             verify(this.testDocument, never()).setHidden(anyBoolean());
         }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void toDocumentWithoutHidden(boolean pageHidden) throws Exception
+    {
+        when(this.testDocument.isHidden()).thenReturn(pageHidden);
+
+        Page restPage = new Page();
+        restPage.setContent("content");
+
+        assertTrue(this.modelFactory.toDocument(this.testDocument, restPage));
+        verify(this.testDocument).setContent("content");
+        verify(this.testDocument, never()).setHidden(anyBoolean());
     }
 }

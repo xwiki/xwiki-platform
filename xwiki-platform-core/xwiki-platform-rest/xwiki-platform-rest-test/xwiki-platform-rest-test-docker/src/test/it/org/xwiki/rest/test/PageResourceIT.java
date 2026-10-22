@@ -608,38 +608,61 @@ class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
-    void testPOSTPageFormURLEncodedHidden() throws Exception
+    void testUpdateHiddenPageWithoutHidden() throws Exception
     {
-        Page originalPage = getFirstPage();
-
-        Link link = getFirstLinkByRelation(originalPage, Relations.SELF);
-        assertNotNull(link);
+        String pageURI = buildURI(PageResource.class, getWiki(), this.spaces, this.pageName);
 
         // Mark the page as hidden.
         NameValuePair[] nameValuePairs = { new BasicNameValuePair("hidden", "true") };
 
         CloseableHttpResponse postMethod =
-            executePostForm(String.format("%s?method=PUT", link.getHref()), nameValuePairs,
+            executePostForm(pageURI + "?method=PUT", nameValuePairs,
                 TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
         assertEquals(HttpStatus.SC_ACCEPTED, postMethod.getCode(), getHttpResponseInfo(postMethod));
+        assertTrue(getPage(pageURI).isHidden());
 
-        Page modifiedPage = (Page) this.unmarshaller.unmarshal(postMethod.getEntity().getContent());
-
-        assertTrue(modifiedPage.isHidden());
-
-        // Set just the title.
+        // Set just the title through a form.
         String title = String.format("Title (%s)", UUID.randomUUID());
-
         nameValuePairs = new NameValuePair[] { new BasicNameValuePair("title", title) };
 
-        postMethod = executePostForm(String.format("%s?method=PUT", link.getHref()), nameValuePairs,
+        postMethod = executePostForm(pageURI + "?method=PUT", nameValuePairs,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
         assertEquals(HttpStatus.SC_ACCEPTED, postMethod.getCode(), getHttpResponseInfo(postMethod));
 
-        modifiedPage = (Page) this.unmarshaller.unmarshal(postMethod.getEntity().getContent());
-
+        Page modifiedPage = getPage(pageURI);
         assertEquals(title, modifiedPage.getTitle());
         assertTrue(modifiedPage.isHidden());
+
+        // Set just the content through XML.
+        String xmlContent = String.format("XML content (%s)", UUID.randomUUID());
+
+        CloseableHttpResponse putMethod = executePutXml(pageURI, new Page().withContent(xmlContent),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getCode(), getHttpResponseInfo(putMethod));
+
+        modifiedPage = getPage(pageURI);
+        assertEquals(xmlContent, modifiedPage.getContent());
+        assertTrue(modifiedPage.isHidden());
+
+        // Set just the content through JSON.
+        String jsonContent = String.format("JSON content (%s)", UUID.randomUUID());
+
+        putMethod = executePut(pageURI, String.format("{\"content\":\"%s\"}", jsonContent),
+            MediaType.APPLICATION_JSON, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getCode(), getHttpResponseInfo(putMethod));
+
+        modifiedPage = getPage(pageURI);
+        assertEquals(jsonContent, modifiedPage.getContent());
+        assertTrue(modifiedPage.isHidden());
+    }
+
+    private Page getPage(String pageURI) throws Exception
+    {
+        CloseableHttpResponse getMethod = executeGet(pageURI);
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        return (Page) this.unmarshaller.unmarshal(getMethod.getEntity().getContent());
     }
 
     @Test

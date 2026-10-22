@@ -27,7 +27,9 @@
 -->
 <jaxb:bindings
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
-  xmlns:xjc= "http://java.sun.com/xml/ns/jaxb/xjc" jaxb:extensionBindingPrefixes="xjc"
+  xmlns:xjc= "http://java.sun.com/xml/ns/jaxb/xjc" xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
+  xmlns:annox="http://annox.dev.java.net"
+  jaxb:extensionBindingPrefixes="xjc ci annox"
   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <jaxb:globalBindings>
@@ -43,6 +45,45 @@
       <!-- We use an existing Java class because we want to control how the property value meta data is serialized in
         JSON format. -->
       <jaxb:class ref="org.xwiki.rest.model.jaxb.PropertyValue" />
+    </jaxb:bindings>
+    <jaxb:bindings node="//xs:complexType[@name = 'Page']">
+      <!-- The hidden element is optional so that an update that doesn't specify it keeps the hidden status of the
+        page. Its value is stored in the Boolean hiddenValue property (null when not set), while the injected
+        isHidden(), setHidden(boolean) and withHidden(boolean) methods keep the boolean API that existing clients are
+        compiled against. JSON is handled by Jackson using the bean accessors: the getter of hiddenValue is marked
+        transient so that only the "hidden" property is exposed in JSON. -->
+      <jaxb:bindings node=".//xs:element[@name = 'hidden']">
+        <jaxb:property name="hiddenValue"/>
+        <annox:annotate target="getter">@java.beans.Transient</annox:annotate>
+      </jaxb:bindings>
+      <ci:code>
+    /**
+     * @return whether the page is hidden, {@code false} if the hidden property is not set
+     * @see #isHiddenValue()
+     */
+    public boolean isHidden()
+    {
+        return Boolean.TRUE.equals(this.hiddenValue);
+    }
+
+    /**
+     * @param value whether the page is hidden
+     */
+    public void setHidden(boolean value)
+    {
+        this.hiddenValue = value;
+    }
+
+    /**
+     * @param value whether the page is hidden
+     * @return this page
+     */
+    public Page withHidden(boolean value)
+    {
+        setHidden(value);
+        return this;
+    }
+      </ci:code>
     </jaxb:bindings>
   </jaxb:bindings>
 </jaxb:bindings>

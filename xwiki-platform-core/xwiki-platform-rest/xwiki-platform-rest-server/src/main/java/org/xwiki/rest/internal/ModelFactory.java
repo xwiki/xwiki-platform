@@ -197,8 +197,10 @@ public class ModelFactory
             modified = true;
         }
 
-        if (restPage.isHidden() != null && doc.isHidden() != restPage.isHidden()) {
-            doc.setHidden(restPage.isHidden());
+        // The hidden property is only set when the request specifies it.
+        Boolean hidden = restPage.isHiddenValue();
+        if (hidden != null && doc.isHidden() != hidden) {
+            doc.setHidden(hidden);
             modified = true;
         }
 

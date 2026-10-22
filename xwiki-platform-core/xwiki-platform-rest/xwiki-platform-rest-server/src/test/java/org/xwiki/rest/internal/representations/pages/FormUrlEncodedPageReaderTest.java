@@ -30,6 +30,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,6 +76,20 @@ class FormUrlEncodedPageReaderTest
 
         Page page = this.reader.readFrom(Page.class, null, null, null, null, null);
 
-        assertNull(page.isHidden());
+        assertNull(page.isHiddenValue());
+        assertFalse(page.isHidden());
+    }
+
+    @Test
+    void readsHiddenFalse() throws Exception
+    {
+        MultivaluedMap<String, String> form = new MultivaluedHashMap<>();
+        form.putSingle("hidden", "false");
+        when(this.jaxrs.readForm(any(), any(), any())).thenReturn(form);
+
+        Page page = this.reader.readFrom(Page.class, null, null, null, null, null);
+
+        assertEquals(Boolean.FALSE, page.isHiddenValue());
+        assertFalse(page.isHidden());
     }
 }

@@ -575,6 +575,9 @@ public class ViewPage extends BasePage
     /**
      * @return {@code true} if the page displays the warning saying that the document is rendered in restricted mode
      *     because it's not the current version, {@code false} otherwise
+     * @since 17.10.15
+     * @since 18.4.8
+     * @since 18.9.0
      * @since 18.10.0RC1
      */
     public boolean hasRestrictedModeWarning()

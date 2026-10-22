@@ -1,0 +1,639 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.6" reference="AnnotationCode.AnnotatePopupInline" locale="">
+  <web>AnnotationCode</web>
+  <name>AnnotatePopupInline</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <parent>AnnotationCode.WebHome</parent>
+  <version>1.1</version>
+  <title>AnnotatePopupInline</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>Inline annotate popup that opens when text is selected on a wiki page. An alternative to the keyboard shortcut to create an annotation.</content>
+  <object>
+    <name>AnnotationCode.AnnotatePopupInline</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>d2429a21-dbe2-4dd1-9511-3bc911af965c</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>"use strict";
+
+const Constants = Object.freeze({
+  /**
+   * The CSS class of the annotation bubble
+   * @type {string}
+   */
+  ANNOTATE_BUBBLE_CLASS: "annotation-bubble",
+  /**
+   * The name of the icon rendered in the popup
+   * @type {string}
+   */
+  ANNOTATE_ICON_NAME: "comment",
+  /**
+   * The translation key for the popup button title (for accessibility)
+   * @type {string}
+   */
+  ANNOTATE_TRANSLATION_KEY: "action.create.submit.text",
+  /**
+   * The debounce delay in milliseconds added to the "selectionchange" event listener
+   * @type {number}
+   */
+  DEBOUNCE_SELECTIONCHANGE_MS: 515,
+  /**
+   * The debounce delay in milliseconds added to the "resize" event listener
+   * @type {number}
+   */
+  DEBOUNCE_RESIZE_MS: 75,
+  /**
+   * The CSS class that needs to be added to show the popup
+   * @type {string}
+   */
+  POPUP_CLASS_OPEN: "opened",
+  /**
+   * The element id of the popup
+   * @type {string}
+   */
+  POPUP_ID: "annotation-popup",
+  /**
+   * The extra top offset of the popup (so that it does not seem attached to the selected text)
+   * @type {number}
+   */
+  POPUP_TOP_OFFSET: 4
+});
+
+// Icons API (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Icon%20Theme%20Application#HJavaScriptAPI)
+define("xwiki-annotate-popup/icons", {
+  icons: [Constants.ANNOTATE_ICON_NAME]
+});
+
+// Translation API (see: https://extensions.xwiki.org/xwiki/bin/view/Extension/Localization/#HFromJavaScript)
+define("xwiki-annotate-popup/translation-keys", {
+  prefix: "annotations.",
+  keys: [Constants.ANNOTATE_TRANSLATION_KEY]
+});
+
+define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-l10n!xwiki-annotate-popup/translation-keys", "jquery"], function(icons, l10n, $) {
+  /**
+   * Debounces a function
+   * @param {Function} func
+   * @param {number} delay - Delay time
+   * @returns {Function} - Debounced version of func (result of the function is NOT returned)
+   */
+  function debounce(func, delay) {
+    let timerId = null;
+    return function(...args) {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+      timerId = setTimeout(() =&gt; {
+        func.apply(this, args);
+      }, delay);
+    };
+  }
+
+  // TODO: use private class fields and methods once Closure Compiler supports it (see: https://github.com/google/closure-compiler/issues/4286)
+  class AnnotatePopup {
+    /**
+     * The page container
+     * @type {HTMLElement}
+     */
+    wikiContent = null;
+    /**
+     * Callback that opens the annotation bubble to create an annotation
+     * @type {() =&gt; void}
+     */
+    openAnnotationBubble = null;
+    /**
+     * The popup container element
+     * @type {HTMLElement}
+     */
+    popup = null;
+    /**
+     * The popup button
+     * @type {HTMLElement}
+     */
+    popupButton = null;
+    /**
+     * The last focussed element before setting focus programmatically
+     * @type {HTMLElement | null}
+     */
+    previousFocusElem = null;
+    /**
+     * The first range of the selection
+     * @type {Range | null}
+     */
+    currentRange = null;
+
+    /**
+     * @param {HTMLElement} wikiContent - The page container
+     * @param {Function} openAnnotationBubble - Callback that opens the annotation bubble to create an annotation. Signature: () =&gt; void;
+     */
+    constructor(wikiContent, openAnnotationBubble) {
+      if (!(wikiContent instanceof HTMLElement)) {
+        throw new TypeError("wikiContent must be an HTMLElement");
+      }
+      this.wikiContent = wikiContent;
+
+      if (typeof openAnnotationBubble !== "function") {
+        throw new TypeError("openAnnotationBubble must be a function");
+      }
+      this.openAnnotationBubble = openAnnotationBubble;
+
+      // Bind handlers to the class instance because event listeners call the function with a different "this"
+      this._onSelectionDebounced = debounce(this._onSelection.bind(this), Constants.DEBOUNCE_SELECTIONCHANGE_MS);
+      this._onButtonClick = this._onButtonClick.bind(this);
+      this._onEscapeKey = this._onEscapeKey.bind(this);
+      this._onClickAway = this._onClickAway.bind(this);
+      this._onViewportChangeDebounced = debounce(this._onViewportChange.bind(this), Constants.DEBOUNCE_RESIZE_MS);
+
+      this._create();
+      this._registerListeners();
+    }
+
+    /**
+     * Open the popup
+     * @param {Selection} selection
+     */
+    open(selection) {
+      // do not open if an annotate bubble is already open (opened by the Annotation class)
+      if (document.querySelector("." + Constants.ANNOTATE_BUBBLE_CLASS)) {
+        return;
+      }
+
+      if (selection.rangeCount &lt;= 0) {
+        return;
+      }
+      this.currentRange = selection.getRangeAt(0).cloneRange(); // clone range because the selection can change when focus is moved
+
+      this.previousFocusElem = selection.focusNode?.parentElement || document.activeElement;
+      const pos = this._getPositioning();
+      if (!pos) {
+        return;
+      }
+
+      requestAnimationFrame(() =&gt; {
+        this.popup.style.top = pos.top;
+        this.popup.style.left = pos.left;
+        this.popup.classList.add(Constants.POPUP_CLASS_OPEN);
+        this.popup.setAttribute("aria-hidden", "false");
+
+        this.popupButton.focus({ preventScroll: true }); // also allows pressing Enter to click the button
+
+        // Firefox 151 and lower: Shifting focus clears the selection. Restore the selection so users can still copy the originally selected text.
+        selection.addRange(this.currentRange);
+      });
+
+      document.addEventListener("click", this._onClickAway, { passive: true });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", this._onViewportChangeDebounced, { passive: true }); // re-positioning on resize/zoom
+      }
+    }
+
+    /**
+     * Close the popup
+     */
+    close() {
+      // restore focus if the previously focused element is still in the document and focusable; otherwise blur the popup button
+      const canRestoreFocus = this.previousFocusElem &amp;&amp;
+                              document.contains(this.previousFocusElem) &amp;&amp;
+                              typeof this.previousFocusElem.focus === "function" &amp;&amp;
+                              !this.previousFocusElem.hasAttribute("disabled") &amp;&amp;
+                              this.previousFocusElem.getClientRects().length;
+
+      this.popupButton.blur();
+      if (canRestoreFocus) {
+        this.previousFocusElem.focus({ preventScroll: true });
+      }
+
+      this.popup.classList.remove(Constants.POPUP_CLASS_OPEN);
+      this.popup.setAttribute("aria-hidden", "true");
+
+      // reset state variables
+      this.previousFocusElem = null;
+      this.currentRange = null;
+
+      document.removeEventListener("click", this._onClickAway);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", this._onViewportChangeDebounced);
+      }
+    }
+
+    /**
+     * Insert the popup to DOM
+     */
+    _create() {
+      this.popup = document.createElement("div");
+      this.popup.id = Constants.POPUP_ID;
+      this.popup.setAttribute("role", "toolbar");
+      this.popup.setAttribute("aria-hidden", "true");
+
+      this.popupButton = document.createElement("button");
+      this.popupButton.classList.add("btn-default", "btn-xs"); // "btn" class not added due to extra margin not needed here
+      this.popupButton.title = l10n[Constants.ANNOTATE_TRANSLATION_KEY];
+      this.popupButton.setAttribute("aria-label", l10n[Constants.ANNOTATE_TRANSLATION_KEY]);
+
+      this.popupButton.appendChild(icons[Constants.ANNOTATE_ICON_NAME].render());
+      this.popup.appendChild(this.popupButton);
+      document.body.appendChild(this.popup);
+    }
+
+    /**
+     * Register event listeners
+     */
+    _registerListeners() {
+      document.addEventListener("selectionchange", this._onSelectionDebounced, { passive: true });
+
+      // remove selectionchange handler in edit mode (annotations are disabled while editing), add it back in view mode
+      // NOTE: need to use a jQuery handler here to catch the custom jQuery event
+      $(document).on("xwiki:actions:edit", () =&gt; {
+        document.removeEventListener("selectionchange", this._onSelectionDebounced);
+      });
+      $(document).on("xwiki:actions:view", () =&gt; {
+        document.addEventListener("selectionchange", this._onSelectionDebounced, { passive: true });
+      });
+
+      // prevent losing focus (the selection) when clicking on the popup
+      this.popup.addEventListener("pointerdown", (event) =&gt; { event.preventDefault(); });
+
+      this.popupButton.addEventListener("click", this._onButtonClick, { passive: true });
+      this.popupButton.addEventListener("keydown", this._onEscapeKey, { passive: true }); // exit when pressing Escape
+    }
+
+    /**
+     * Event handler for document selection. Checks the current selection and opens the popup
+     */
+    _onSelection() {
+      const selection = document.getSelection();
+      if (!selection || !selection.anchorNode || !this.wikiContent.contains(selection.anchorNode) || selection.isCollapsed || !selection.toString().trim()) {
+        return;
+      }
+
+      this.open(selection);
+    }
+
+    /**
+     * Event handler for popup button click
+     */
+    _onButtonClick() {
+      this.close();
+      this.openAnnotationBubble();
+    }
+
+    /**
+     * Event handler for popup button keydown. Closes popup on Escape key press
+     * @param {KeyboardEvent} event
+     */
+    _onEscapeKey(event) {
+      if (event.key === "Escape") {
+        this.close();
+      }
+    }
+
+    /**
+     * Event handler for a page click (popup click away listener)
+     * @param {PointerEvent} event
+     */
+    _onClickAway(event) {
+      if (!this.popup.contains(event.target)) {
+        this.close();
+      }
+    }
+
+    /**
+     * Event handler for window resize/zoom. Recalculates the positioning of the popup
+     */
+    _onViewportChange() {
+      const pos = this._getPositioning();
+      if (!pos) {
+        return;
+      }
+
+      requestAnimationFrame(() =&gt; {
+        this.popup.style.top = pos.top;
+        this.popup.style.left = pos.left;
+      });
+    }
+
+    /**
+     * Get popup position that is near the selected text range
+     * @return {{top: String, left: String} | null} - CSS unit strings for top and left position for the popup
+     */
+    _getPositioning() {
+      if (!this.currentRange) {
+        return null;
+      }
+
+      // use last rectangle of selection (important for correct positioning in multi-line selections)
+      const rects = this.currentRange.getClientRects();
+      if (!rects.length) {
+        return null;
+      }
+      const rect = rects[rects.length - 1];
+
+      if (!this.previousFocusElem) {
+        return null;
+      }
+      const isRTL = window.getComputedStyle(this.previousFocusElem).direction === "rtl";
+      const afterLastWordAnchor = isRTL ? rect.left : rect.right;
+      const pSize = this.popup.getBoundingClientRect();
+      return {
+        top: (rect.top + window.scrollY - pSize.height - Constants.POPUP_TOP_OFFSET) + "px",
+        left: (afterLastWordAnchor + window.scrollX - (pSize.width / 2)) + "px"
+      };
+    }
+  }
+
+  return AnnotatePopup;
+});</code>
+    </property>
+    <property>
+      <name>Annotate Popup -- Main Script</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>AnnotationCode.AnnotatePopupInline</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>67f1f446-114a-4598-ac7d-b44446e9ecf2</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#annotation-popup {
+  position: absolute;
+  background-color: var(--xwiki-page-content-bg);
+  padding: 2px;
+  border-radius: 5px;
+  box-shadow: 0 1.5px 2.5px var(--btn-default-border);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .2s ease-in;
+  &amp;.opened {
+    visibility: visible;
+    opacity: 1;
+  }
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Annotate Popup -- Main Styles</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>AnnotationCode.AnnotatePopupInline</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>e962e367-f97d-4b92-b08f-10489b92a9cc</guid>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <prettyName>Level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>edit|script|wiki_admin|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <property type="String">
+      <level>wiki_admin</level>
+    </property>
+  </object>
+</xwikidoc>

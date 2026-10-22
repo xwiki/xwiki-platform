@@ -179,7 +179,7 @@ public class XWikiException extends Exception
      * The document to save is not based on the revision currently stored, because it was saved or deleted
      * concurrently.
      *
-     * @since 18.9.0RC1
+     * @since 18.10.0RC1
      */
     @Unstable
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC_REVISION_CONFLICT = 3237;

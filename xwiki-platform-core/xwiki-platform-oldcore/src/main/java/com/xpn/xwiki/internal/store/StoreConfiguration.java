@@ -216,7 +216,7 @@ public class StoreConfiguration
     /**
      * @return {@code true} if saving a document checks that it is based on the revision currently stored, and refuses
      *         to save it otherwise, {@code false} to let the last save overwrite the concurrent ones
-     * @since 18.9.0RC1
+     * @since 18.10.0RC1
      */
     public boolean isRevisionCheckEnabled()
     {

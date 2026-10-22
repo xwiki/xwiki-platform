@@ -2112,7 +2112,7 @@ public class XWiki implements EventListener
      * @return the saved document, or a copy of the stored document if {@code update} returned {@code false}
      * @throws DocumentRevisionConflictException if the document was still saved concurrently after several attempts
      * @throws XWikiException if loading, modifying or saving the document failed
-     * @since 18.9.0RC1
+     * @since 18.10.0RC1
      */
     @Unstable
     public XWikiDocument updateDocument(DocumentReference documentReference,

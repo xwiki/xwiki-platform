@@ -154,7 +154,7 @@ public class MergeScriptService implements ScriptService
      * @param exception the exception thrown when saving a document, possibly wrapped in other exceptions (e.g. the
      *     exception caught by the Velocity {@code #try} directive)
      * @return {@code true} if the exception (or one of its causes) is a revision conflict, {@code false} otherwise
-     * @since 18.9.0RC1
+     * @since 18.10.0RC1
      */
     @Unstable
     public boolean isDocumentRevisionConflict(Throwable exception)

@@ -281,7 +281,7 @@ public class MockitoOldcore
      * documents without loading them first.
      *
      * @param checkDocumentRevision {@code true} to check the revision of the saved documents
-     * @since 18.9.0RC1
+     * @since 18.10.0RC1
      */
     public void checkDocumentRevision(boolean checkDocumentRevision)
     {

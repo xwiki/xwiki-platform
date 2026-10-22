@@ -45,6 +45,7 @@ import ch.qos.logback.classic.spi.ThrowableProxy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -86,6 +87,13 @@ class SearchCoreInitializerTest
     {
         when(this.core.getSolrName()).thenReturn("xwiki_search_9");
         when(this.configuration.getServerType()).thenReturn(RemoteSolr.TYPE);
+    }
+
+    @Test
+    void isCache()
+    {
+        // The search index is filled again from the database when lost
+        assertTrue(this.initializer.isCache());
     }
 
     @Test

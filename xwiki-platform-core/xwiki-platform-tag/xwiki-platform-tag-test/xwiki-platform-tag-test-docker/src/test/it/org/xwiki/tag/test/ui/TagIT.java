@@ -116,7 +116,7 @@ class TagIT
     }
 
     /**
-     * Add many tags and remove one of them.
+     * Add many tags, check that editing the page inline preserves them, and remove one of them.
      */
     @Test
     @Order(3)
@@ -131,6 +131,12 @@ class TagIT
         AddTagsPane addTagsPane = taggablePage.addTags();
         addTagsPane.setTags(firstTag + "," + secondTag);
         assertTrue(addTagsPane.add());
+        assertTrue(taggablePage.hasTag(firstTag));
+        assertTrue(taggablePage.hasTag(secondTag));
+
+        // Editing the page inline preserves its tags.
+        taggablePage.editInline().clickSaveAndView();
+        taggablePage = new TaggablePage();
         assertTrue(taggablePage.hasTag(firstTag));
         assertTrue(taggablePage.hasTag(secondTag));
 

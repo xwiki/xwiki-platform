@@ -158,6 +158,9 @@ public class LegacyEventStatusManager implements EventStatusManager
         }
     }
 
+    /**
+     * @deprecated use {@link org.xwiki.eventstream.EventStore#deleteEventStatus(EventStatus)} instead
+     */
     @Override
     @Deprecated
     public void deleteEventStatus(EventStatus eventStatus) throws Exception
@@ -219,6 +222,9 @@ public class LegacyEventStatusManager implements EventStatusManager
         });
     }
 
+    /**
+     * @deprecated use {@link org.xwiki.eventstream.EventStore#deleteEventStatuses(String, Date)} instead
+     */
     @Override
     @Deprecated
     public void deleteAllForEntity(Date startDate, String entityId) throws Exception

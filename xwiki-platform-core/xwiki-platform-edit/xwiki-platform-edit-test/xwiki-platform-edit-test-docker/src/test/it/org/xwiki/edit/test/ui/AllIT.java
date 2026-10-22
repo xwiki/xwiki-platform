@@ -61,4 +61,14 @@ class AllIT
     class NestedWikiEditorIT extends WikiEditorIT
     {
     }
+
+    @Nested
+    class NestedInlineEditIT extends InlineEditIT
+    {
+    }
+
+    @Nested
+    class NestedPreviewIT extends PreviewIT
+    {
+    }
 }

@@ -27,33 +27,21 @@
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
     <version>18.10.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-flavor-test-ui</artifactId>
-  <name>XWiki Platform - Distribution - Flavor - Functional Tests - UI</name>
+  <artifactId>xwiki-platform-distribution-flavor-test-data</artifactId>
+  <name>XWiki Platform - Distribution - Flavor - Functional Tests - Data</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Distribution - Flavor - Functional Tests - UI</description>
+  <description>Verifies the data pre-populated in the demo package database</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-flavor-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-index-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-test-integration</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
-      <!-- Step 1: Compile the JUnit Selenium Tests -->
+      <!-- Step 1: Compile the tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -62,22 +50,20 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-      </plugin>      
+      </plugin>
       <!-- Step 3: Unpack the application -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
       </plugin>
-      <!-- Step 4: Execute the tests (they start/stop XE) -->
+      <!-- Step 4: Execute the tests (they start/stop XWiki) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <systemPropertyVariables>
-            <!-- Use a custom log configuration that sets the log level to INFO for tests. We need this for a TestRule
-              that logs debugging information on test failure. -->
-            <logback.configurationFile>logback.xml</logback.configurationFile>
-          </systemPropertyVariables>
+          <includes combine.self="override">
+            <include>**/*Test.java</include>
+          </includes>
         </configuration>
       </plugin>
     </plugins>

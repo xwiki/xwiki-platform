@@ -18,22 +18,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.test.ui;
+package org.xwiki.test.data;
 
-import org.junit.Test;
-import org.xwiki.rendering.syntax.Syntax;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.integration.XWikiExecutor;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Check that all mandatory document initializers are properly declared in the demo package build and that the pages
  * are not created at first start only. See also XWIKI-22368.
+ * <p>
+ * This can't be a Docker-based functional test: the Docker test framework starts XWiki with an empty database, while
+ * this test needs the database that the demo package build pre-populates.
  *
  * @version $Id$
  * @since 16.7.0
  */
-public class MandatoryDocInitializedTest extends AbstractTest
+class MandatoryDocInitializedTest
 {
+    private static final XWikiExecutor EXECUTOR = new XWikiExecutor(0);
+
+    private static final String ADMIN_AUTHORIZATION =
+        "Basic " + Base64.getEncoder().encodeToString("Admin:admin".getBytes(StandardCharsets.UTF_8));
+
+    private static final String PAGE_PATH = "Test/MandatoryDocInitialized";
+
     private static final String GROOVY_CODE =
     """
         {{groovy}}
@@ -101,13 +121,45 @@ public class MandatoryDocInitializedTest extends AbstractTest
         {{/groovy}}
     """;
 
-    @Test
-    public void docsAreInitialized() throws Exception
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    @BeforeAll
+    static void startXWiki() throws Exception
     {
-        getUtil().loginAsAdmin();
-        String result = getUtil().executeWikiPlain(GROOVY_CODE, Syntax.XWIKI_2_1);
+        EXECUTOR.start();
+    }
+
+    @AfterAll
+    static void stopXWiki() throws Exception
+    {
+        EXECUTOR.stop();
+    }
+
+    @Test
+    void docsAreInitialized() throws Exception
+    {
+        String baseURL = EXECUTOR.getHttpClientBaseURL();
+
+        // Save the script in a page, as Admin so that it gets the Programming Right needed by the Groovy macro.
+        String pageXML = "<page xmlns=\"http://www.xwiki.org\"><syntax>xwiki/2.1</syntax><content><![CDATA["
+            + GROOVY_CODE + "]]></content></page>";
+        HttpResponse<String> saveResponse = this.httpClient.send(HttpRequest.newBuilder()
+            .uri(URI.create(baseURL + "rest/wikis/xwiki/spaces/" + PAGE_PATH.replace("/", "/pages/")))
+            .header("Authorization", ADMIN_AUTHORIZATION)
+            .header("Content-Type", "application/xml")
+            .PUT(HttpRequest.BodyPublishers.ofString(pageXML))
+            .build(), HttpResponse.BodyHandlers.ofString());
+        // 201 when the page is created, 202 when it already exists (when XWiki is reused between runs).
+        assertTrue(saveResponse.statusCode() == 201 || saveResponse.statusCode() == 202, saveResponse::body);
+
+        // Execute the script and get its plain text output.
+        HttpResponse<String> executeResponse = this.httpClient.send(HttpRequest.newBuilder()
+            .uri(URI.create(baseURL + "bin/get/" + PAGE_PATH + "?outputSyntax=plain&basicauth=1"))
+            .header("Authorization", ADMIN_AUTHORIZATION)
+            .build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, executeResponse.statusCode(), executeResponse.body());
 
         // Using equals on purpose to see the output in case of failure.
-        assertEquals("", result);
+        assertEquals("", executeResponse.body().trim());
     }
 }

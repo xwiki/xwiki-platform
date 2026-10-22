@@ -124,8 +124,8 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <!-- Copy the remaining less file. Can be removed once XWIKI-23080 is done. -->
-            <id>copy-less-resources</id>
+            <!-- Copy the CSS file that is loaded separately from the Vite bundle. -->
+            <id>copy-css-resources</id>
             <phase>validate</phase>
             <goals>
               <goal>copy-resources</goal>
@@ -138,7 +138,7 @@
                 <resource>
                   <directory>${basedir}/src/main/node/src</directory>
                   <includes>
-                    <include>reactive.less</include>
+                    <include>reactive.css</include>
                   </includes>
                 </resource>
               </resources>

@@ -19,6 +19,9 @@
  */
 package org.xwiki.store.hibernate.internal;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +34,7 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.MetaAttribute;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Table;
@@ -38,6 +42,7 @@ import org.hibernate.query.NativeQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.InOrder;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.store.hibernate.HibernateStoreException;
@@ -54,9 +59,12 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -201,9 +209,18 @@ class MySQLHibernateAdapterTest
         NativeQuery<Object[]> foreignKeysQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.KEY_COLUMN_USAGE")))
             .thenReturn(foreignKeysQuery);
-        when(foreignKeysQuery.list()).thenReturn(
-            List.of(new Object[] { "xwikistrings", "FKstrings", "xwikiproperties" },
-                new Object[] { "custom_table", "FKcustom", "xwikidoc" }));
+        // table, name, referenced schema, referenced table, update rule, delete rule, column, referenced column,
+        // collation
+        when(foreignKeysQuery.list()).thenReturn(List.of(
+            new Object[] { "custom_table", "FKcustom", "xwiki", "xwikidoc", "CASCADE", "NO ACTION", "VALUE",
+                "XWD_FULLNAME", "utf8mb3_general_ci" },
+            // Not involving string columns
+            new Object[] { "xwikilistitems", "FKnumbers", "xwiki", "xwikistrings", "RESTRICT", "RESTRICT", "XWL_ID",
+                "XWS_ID", null },
+            new Object[] { "xwikistrings", "FKstrings", "xwiki", "xwikiproperties", "RESTRICT", "RESTRICT", "XWS_ID",
+                "XWP_ID", null },
+            new Object[] { "xwikistrings", "FKstrings", "xwiki", "xwikiproperties", "RESTRICT", "RESTRICT",
+                "XWS_NAME", "XWP_NAME", "utf8mb3_general_ci" }));
 
         // table, index, column, sub part, collation, max length, octet length, non unique
         NativeQuery<Object[]> indexesQuery = mock(NativeQuery.class);
@@ -376,8 +393,21 @@ class MySQLHibernateAdapterTest
         assertEquals(1, this.logCapture.size());
     }
 
+    private Statement mockJDBCStatement() throws SQLException
+    {
+        Connection connection = mock(Connection.class);
+        Statement jdbcStatement = mock(Statement.class);
+        when(connection.createStatement()).thenReturn(jdbcStatement);
+        doAnswer(invocation -> {
+            invocation.<Work>getArgument(0).execute(connection);
+            return null;
+        }).when(this.session).doWork(any());
+
+        return jdbcStatement;
+    }
+
     @Test
-    void convertToDatabaseCollation()
+    void convertToDatabaseCollation() throws SQLException
     {
         mockCollationQueries();
         when(this.tablesQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci" }));
@@ -386,6 +416,7 @@ class MySQLHibernateAdapterTest
         when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(statement);
         Transaction transaction = mock(Transaction.class);
         when(this.session.getTransaction()).thenReturn(transaction);
+        Statement jdbcStatement = mockJDBCStatement();
 
         this.adapter.convertToDatabaseCollation(this.metadata, this.session);
 
@@ -393,6 +424,44 @@ class MySQLHibernateAdapterTest
         verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT);
         verify(statement, times(2)).executeUpdate();
         verify(transaction, times(2)).commit();
+
+        // The dropped foreign key is re-created without the foreign key checks
+        InOrder inOrder = inOrder(jdbcStatement);
+        inOrder.verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=0");
+        inOrder.verify(jdbcStatement).execute("ALTER TABLE `xwiki`.custom_table ADD CONSTRAINT `FKcustom` FOREIGN KEY"
+            + " (`VALUE`) REFERENCES `xwiki`.xwikidoc (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION");
+        inOrder.verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=1");
+        verify(jdbcStatement).close();
+    }
+
+    @Test
+    void convertToDatabaseCollationWhenForeignKeyCannotBeRecreated() throws SQLException
+    {
+        mockCollationQueries();
+        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikidoc", "utf8mb4_general_ci" },
+            new Object[] { "xwikiproperties", "utf8mb4_general_ci" }));
+
+        when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(mock(NativeQuery.class));
+        when(this.session.getTransaction()).thenReturn(mock(Transaction.class));
+        Statement jdbcStatement = mockJDBCStatement();
+        String customForeignKey = "ALTER TABLE `xwiki`.custom_table ADD CONSTRAINT `FKcustom` FOREIGN KEY (`VALUE`)"
+            + " REFERENCES `xwiki`.xwikidoc (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION";
+        when(jdbcStatement.execute(customForeignKey)).thenThrow(new SQLException("incompatible"));
+
+        this.adapter.convertToDatabaseCollation(this.metadata, this.session);
+
+        // The failure does not prevent re-creating the other foreign keys
+        InOrder inOrder = inOrder(jdbcStatement);
+        inOrder.verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=0");
+        inOrder.verify(jdbcStatement).execute(customForeignKey);
+        inOrder.verify(jdbcStatement).execute("ALTER TABLE `xwiki`.xwikistrings ADD CONSTRAINT `FKstrings` FOREIGN KEY"
+            + " (`XWS_ID`, `XWS_NAME`) REFERENCES `xwiki`.xwikiproperties (`XWP_ID`, `XWP_NAME`) ON UPDATE RESTRICT"
+            + " ON DELETE RESTRICT");
+        inOrder.verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=1");
+
+        assertEquals("Failed to re-create a foreign key with [" + customForeignKey + "]: SQLException: incompatible."
+            + " The Hibernate schema update re-creates the missing foreign keys of the Hibernate mapping, the other"
+            + " ones have to be re-created manually.", this.logCapture.getMessage(0));
     }
 
     @Test

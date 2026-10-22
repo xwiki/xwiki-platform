@@ -19,6 +19,8 @@
  */
 package org.xwiki.store.hibernate.internal;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,6 +38,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
 import org.hibernate.mapping.PersistentClass;
@@ -277,11 +280,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
 
     /**
      * Convert the tables of the current wiki database to the character set configured on the database, with a binary
-     * collation.
-     * <p>
-     * <strong>WARNING: the foreign keys involving the converted string columns are dropped and are only re-created by
-     * the Hibernate schema update, so XWiki must be restarted right after calling this method (unless it's called
-     * right before the schema update, as done by {@link #repairDatabase(Metadata)}).</strong>
+     * collation, and re-create the foreign keys dropped for the conversion.
      *
      * @param metadata the configuration of the database, used to know which tables to convert
      * @param session the session in which to execute the conversion
@@ -290,7 +289,8 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      */
     public void convertToDatabaseCollation(Metadata metadata, Session session)
     {
-        List<String> statements = getConvertToDatabaseCollationStatements(metadata, session);
+        Conversion conversion = prepareConversion(metadata, session);
+        List<String> statements = conversion.statements;
         if (statements.isEmpty()) {
             return;
         }
@@ -316,8 +316,51 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
                 System.currentTimeMillis() - statementStart);
         }
 
+        recreateForeignKeys(conversion.foreignKeyStatements, session);
+
         this.logger.info("Tables of database [{}] converted in [{}] ms", getDatabaseFromWikiName(),
             System.currentTimeMillis() - conversionStart);
+    }
+
+    /**
+     * Re-create the foreign keys dropped for the conversion, without the foreign key checks: this way they are added
+     * without rebuilding the tables (the conversion does not modify the data, so it does not need to be checked
+     * again). A failure is only reported with a warning since the Hibernate schema update, which runs right after,
+     * re-creates the missing foreign keys of the Hibernate mapping anyway (rebuilding the table).
+     */
+    private void recreateForeignKeys(List<String> statements, Session session)
+    {
+        if (statements.isEmpty()) {
+            return;
+        }
+
+        // The foreign key checks are a connection setting, so all the statements must use the same connection
+        session.doWork(connection -> {
+            try (Statement jdbcStatement = connection.createStatement()) {
+                jdbcStatement.execute("SET FOREIGN_KEY_CHECKS=0");
+                try {
+                    for (String statement : statements) {
+                        recreateForeignKey(statement, jdbcStatement);
+                    }
+                } finally {
+                    // Don't give back the connection to the pool without the foreign key checks
+                    jdbcStatement.execute("SET FOREIGN_KEY_CHECKS=1");
+                }
+            }
+        });
+    }
+
+    private void recreateForeignKey(String statement, Statement jdbcStatement)
+    {
+        this.logger.info("Re-creating foreign key: [{}]", statement);
+
+        try {
+            jdbcStatement.execute(statement);
+        } catch (SQLException e) {
+            this.logger.warn("Failed to re-create a foreign key with [{}]: {}. The Hibernate schema update re-creates"
+                + " the missing foreign keys of the Hibernate mapping, the other ones have to be re-created manually.",
+                statement, ExceptionUtils.getRootCauseMessage(e));
+        }
     }
 
     /**
@@ -345,9 +388,9 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      * neither are the tables linked to it by a foreign key on string columns, since that foreign key could not be
      * re-created.
      * <p>
-     * <strong>WARNING: the dropped foreign keys are only re-created by the Hibernate schema update, so XWiki must be
-     * restarted after executing those statements (unless they are executed right before the schema update, as done by
-     * {@link #repairDatabase(Metadata)}).</strong>
+     * <strong>WARNING: the dropped foreign keys are not re-created by those statements (unlike
+     * {@link #convertToDatabaseCollation(Metadata, Session)}), only by the Hibernate schema update when XWiki is
+     * restarted.</strong>
      *
      * @param metadata the configuration of the database, used to know which tables to convert
      * @param session the session in which to execute the queries
@@ -356,11 +399,18 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      */
     public List<String> getConvertToDatabaseCollationStatements(Metadata metadata, Session session)
     {
+        return prepareConversion(metadata, session).statements;
+    }
+
+    private Conversion prepareConversion(Metadata metadata, Session session)
+    {
+        Conversion conversion = new Conversion();
+
         String databaseName = getDatabaseFromWikiName();
 
         Object[] databaseDefaults = getDatabaseDefaults(databaseName, session);
         if (databaseDefaults == null) {
-            return List.of();
+            return conversion;
         }
 
         String characterSet = (String) databaseDefaults[0];
@@ -371,30 +421,28 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         // The collations (other than the expected one) used by each table to convert
         Map<String, Set<String>> tables = getTablesToConvert(metadata, databaseName, collation, session);
         if (tables.isEmpty()) {
-            return List.of();
+            return conversion;
         }
 
         int maxCharacterLength = getMaxCharacterLength(characterSet, session);
-        List<Object[]> foreignKeys = getStringForeignKeys(databaseName, session);
+        List<ForeignKey> foreignKeys = getStringForeignKeys(databaseName, session);
 
         if (maxCharacterLength < UTF8MB4_MAX_CHARACTER_LENGTH) {
             removeWideTables(databaseName, characterSet, maxCharacterLength, tables, foreignKeys, session);
             if (tables.isEmpty()) {
-                return List.of();
+                return conversion;
             }
         }
 
         this.logger.info("Tables {} of database [{}] need to be converted to character set [{}] and collation [{}]",
             tables.keySet(), databaseName, characterSet, collation);
 
-        List<String> statements = new ArrayList<>();
-
         // Drop the foreign keys involving string columns of the tables to convert since MySQL/MariaDB refuse to convert
-        // those columns
-        addDropForeignKeyStatements(tables.keySet(), foreignKeys, statements);
+        // those columns (and remember how to re-create them)
+        addForeignKeyStatements(tables.keySet(), foreignKeys, conversion);
 
         // Drop the indexes which would exceed the maximum key length with the new character set
-        addDropIndexStatements(databaseName, tables.keySet(), maxCharacterLength, session, statements);
+        addDropIndexStatements(databaseName, tables.keySet(), maxCharacterLength, session, conversion.statements);
 
         // Convert the tables
         Map<String, String> rowFormats = getRowFormats(session);
@@ -410,11 +458,11 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
                 statement.append(ROW_FORMAT).append(rowFormat).append(',');
             }
 
-            statements.add(statement.append(" CONVERT TO CHARACTER SET ").append(characterSet).append(" COLLATE ")
-                .append(collation).toString());
+            conversion.statements.add(statement.append(" CONVERT TO CHARACTER SET ").append(characterSet)
+                .append(" COLLATE ").append(collation).toString());
         }
 
-        return statements;
+        return conversion;
     }
 
     private boolean isBinary(String collation)
@@ -469,7 +517,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      * columns would not use the same character set anymore).
      */
     private void removeWideTables(String databaseName, String characterSet, int maxCharacterLength,
-        Map<String, Set<String>> tables, List<Object[]> foreignKeys, Session session)
+        Map<String, Set<String>> tables, List<ForeignKey> foreignKeys, Session session)
     {
         NativeQuery<String> query = session.createNativeQuery("SELECT DISTINCT c.TABLE_NAME "
             + "FROM INFORMATION_SCHEMA.COLUMNS c JOIN INFORMATION_SCHEMA.CHARACTER_SETS s "
@@ -484,9 +532,9 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         boolean changed = !wideTables.isEmpty();
         while (changed) {
             changed = false;
-            for (Object[] foreignKey : foreignKeys) {
-                changed |= addLinkedTable((String) foreignKey[0], (String) foreignKey[2], tables, wideTables);
-                changed |= addLinkedTable((String) foreignKey[2], (String) foreignKey[0], tables, wideTables);
+            for (ForeignKey foreignKey : foreignKeys) {
+                changed |= addLinkedTable(foreignKey.tableName, foreignKey.referencedTableName, tables, wideTables);
+                changed |= addLinkedTable(foreignKey.referencedTableName, foreignKey.tableName, tables, wideTables);
             }
         }
 
@@ -519,14 +567,18 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             && wideTables.add(linkedTableName);
     }
 
-    private void addDropForeignKeyStatements(Set<String> tables, List<Object[]> foreignKeys, List<String> statements)
+    private void addForeignKeyStatements(Set<String> tables, List<ForeignKey> foreignKeys, Conversion conversion)
     {
-        for (Object[] foreignKey : foreignKeys) {
-            String tableName = (String) foreignKey[0];
+        for (ForeignKey foreignKey : foreignKeys) {
+            if (tables.contains(foreignKey.tableName) || tables.contains(foreignKey.referencedTableName)) {
+                String alterTable = ALTER_TABLE + getQualifiedTableName(foreignKey.tableName);
+                String name = quote(foreignKey.name);
 
-            if (tables.contains(tableName) || tables.contains(foreignKey[2])) {
-                statements.add(ALTER_TABLE + getQualifiedTableName(tableName) + " DROP FOREIGN KEY "
-                    + quote((String) foreignKey[1]));
+                conversion.statements.add(alterTable + " DROP FOREIGN KEY " + name);
+                conversion.foreignKeyStatements.add(alterTable + " ADD CONSTRAINT " + name + " FOREIGN KEY"
+                    + toColumnList(foreignKey.columns) + " REFERENCES " + quote(foreignKey.referencedSchema) + '.'
+                    + foreignKey.referencedTableName + toColumnList(foreignKey.referencedColumns) + " ON UPDATE "
+                    + foreignKey.updateRule + " ON DELETE " + foreignKey.deleteRule);
             }
         }
     }
@@ -556,8 +608,12 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     private String getIndexDefinition(Index index)
     {
         return (index.unique ? "CREATE UNIQUE INDEX " : "CREATE INDEX ") + quote(index.name) + " ON "
-            + quote(getDatabaseFromWikiName()) + '.' + quote(index.tableName) + " (" + String.join(", ", index.columns)
-            + ")";
+            + quote(getDatabaseFromWikiName()) + '.' + quote(index.tableName) + toColumnList(index.columns);
+    }
+
+    private String toColumnList(List<String> columns)
+    {
+        return " (" + String.join(", ", columns) + ')';
     }
 
     private Object[] getDatabaseDefaults(String databaseName, Session session)
@@ -632,18 +688,32 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         return tables;
     }
 
-    private List<Object[]> getStringForeignKeys(String databaseName, Session session)
+    private List<ForeignKey> getStringForeignKeys(String databaseName, Session session)
     {
         NativeQuery<Object[]> query = session.createNativeQuery(
-            "SELECT DISTINCT k.TABLE_NAME, k.CONSTRAINT_NAME, k.REFERENCED_TABLE_NAME "
-                + "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE k JOIN INFORMATION_SCHEMA.COLUMNS c "
+            "SELECT k.TABLE_NAME, k.CONSTRAINT_NAME, k.REFERENCED_TABLE_SCHEMA, k.REFERENCED_TABLE_NAME, "
+                + "r.UPDATE_RULE, r.DELETE_RULE, k.COLUMN_NAME, k.REFERENCED_COLUMN_NAME, c.COLLATION_NAME "
+                + "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE k JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS r "
+                + "ON r.CONSTRAINT_SCHEMA = k.CONSTRAINT_SCHEMA AND r.TABLE_NAME = k.TABLE_NAME "
+                + "AND r.CONSTRAINT_NAME = k.CONSTRAINT_NAME JOIN INFORMATION_SCHEMA.COLUMNS c "
                 + "ON c.TABLE_SCHEMA = k.TABLE_SCHEMA AND c.TABLE_NAME = k.TABLE_NAME "
                 + "AND c.COLUMN_NAME = k.COLUMN_NAME "
                 + "WHERE k.TABLE_SCHEMA = :schema AND k.REFERENCED_TABLE_NAME IS NOT NULL "
-                + "AND c.COLLATION_NAME IS NOT NULL");
+                + "ORDER BY k.TABLE_NAME, k.CONSTRAINT_NAME, k.ORDINAL_POSITION");
         query.setParameter(SCHEMA_PARAMETER, databaseName);
 
-        return query.list();
+        Map<List<String>, ForeignKey> foreignKeys = new LinkedHashMap<>();
+        for (Object[] part : query.list()) {
+            ForeignKey foreignKey = foreignKeys.computeIfAbsent(List.of((String) part[0], (String) part[1]),
+                key -> new ForeignKey(part));
+
+            foreignKey.columns.add(quote((String) part[6]));
+            foreignKey.referencedColumns.add(quote((String) part[7]));
+            foreignKey.string |= part[8] != null;
+        }
+
+        // Only the foreign keys involving string columns prevent the conversion
+        return foreignKeys.values().stream().filter(foreignKey -> foreignKey.string).toList();
     }
 
     private Collection<Index> getIndexes(String databaseName, Set<String> tables, int maxCharacterLength,
@@ -699,6 +769,48 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         }
 
         return NON_STRING_LENGTH;
+    }
+
+    private static final class Conversion
+    {
+        private final List<String> statements = new ArrayList<>();
+
+        private final List<String> foreignKeyStatements = new ArrayList<>();
+    }
+
+    private static final class ForeignKey
+    {
+        private final String tableName;
+
+        private final String name;
+
+        private final String referencedSchema;
+
+        private final String referencedTableName;
+
+        private final String updateRule;
+
+        private final String deleteRule;
+
+        private final List<String> columns = new ArrayList<>();
+
+        private final List<String> referencedColumns = new ArrayList<>();
+
+        private boolean string;
+
+        /**
+         * @param part the first part of the foreign key (table, name, referenced schema, referenced table, update rule
+         *            and delete rule)
+         */
+        ForeignKey(Object[] part)
+        {
+            this.tableName = (String) part[0];
+            this.name = (String) part[1];
+            this.referencedSchema = (String) part[2];
+            this.referencedTableName = (String) part[3];
+            this.updateRule = (String) part[4];
+            this.deleteRule = (String) part[5];
+        }
     }
 
     private static final class Index

@@ -45,6 +45,11 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
     </dependency>
+    <!-- Used to stream large Solr responses -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
     <!-- Apache Commons -->
     <dependency>
       <groupId>org.apache.commons</groupId>

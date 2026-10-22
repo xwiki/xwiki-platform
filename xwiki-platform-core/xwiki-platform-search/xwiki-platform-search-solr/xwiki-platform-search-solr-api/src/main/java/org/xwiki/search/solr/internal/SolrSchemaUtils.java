@@ -19,6 +19,9 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,15 +34,21 @@ import javax.inject.Singleton;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.impl.InputStreamResponseParser;
 import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.util.NamedList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.XWikiSolrCore;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Helper for performing operations in a Solr schema.
@@ -52,6 +61,8 @@ import org.xwiki.search.solr.XWikiSolrCore;
 @Singleton
 public class SolrSchemaUtils
 {
+    private static final JsonFactory JSON_FACTORY = new JsonFactory();
+
     /**
      * The name of the type used to store the version of the core schema.
      */
@@ -816,21 +827,44 @@ public class SolrSchemaUtils
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("fieldInfo", true);
 
-        Map<?, ?> response;
+        // The response contains each field of each segment, which can be huge for an index with many dynamic fields,
+        // so it's parsed as a stream instead of being loaded in memory
+        GenericSolrRequest request = new GenericSolrRequest(SolrRequest.METHOD.GET, "/admin/segments", params);
+        request.setResponseParser(new InputStreamResponseParser("json"));
+
+        NamedList<Object> response;
         try {
-            // Convert the whole response to standard maps
-            response = new GenericSolrRequest(SolrRequest.METHOD.GET, "/admin/segments", params)
-                .process(core.getClient()).getResponse().asMap(Integer.MAX_VALUE);
+            response = core.getClient().request(request);
         } catch (Exception e) {
             throw new SolrException("Failed to get the segments of the Solr core [" + core.getSolrName() + "]", e);
         }
 
-        // For each segment, Solr compares the structure of each field in the segment with its definition in the schema
+        Object status = response.get(InputStreamResponseParser.HTTP_STATUS_KEY);
+        try (InputStream stream = (InputStream) response.get(InputStreamResponseParser.STREAM_KEY)) {
+            if (!Integer.valueOf(HttpURLConnection.HTTP_OK).equals(status)) {
+                throw new SolrException(String.format("Failed to get the segments of the Solr core [%s]: status [%s]",
+                    core.getSolrName(), status));
+            }
+
+            return parseNonCompliantFields(stream);
+        } catch (IOException e) {
+            throw new SolrException("Failed to parse the segments of the Solr core [" + core.getSolrName() + "]", e);
+        }
+    }
+
+    private static Set<String> parseNonCompliantFields(InputStream stream) throws IOException
+    {
         Set<String> fields = new TreeSet<>();
-        for (Object segment : toMap(response.get("segments")).values()) {
-            toMap(toMap(segment).get("fields")).forEach((name, field) -> {
-                if (toMap(field).get("nonCompliant") != null) {
-                    fields.add((String) name);
+
+        // For each segment, Solr compares the structure of each field in the segment with its definition in the schema:
+        // {"segments": {"<segment>": {"fields": {"<field>": {"nonCompliant": {...}, ...}, ...}, ...}, ...}, ...}
+        try (JsonParser parser = JSON_FACTORY.createParser(stream)) {
+            parser.nextToken();
+            forEachEntry(parser, key -> {
+                if (key.equals("segments")) {
+                    forEachEntry(parser, segmentName -> parseSegment(parser, fields));
+                } else {
+                    parser.skipChildren();
                 }
             });
         }
@@ -838,8 +872,50 @@ public class SolrSchemaUtils
         return fields;
     }
 
-    private static Map<?, ?> toMap(Object value)
+    private static void parseSegment(JsonParser parser, Set<String> fields) throws IOException
     {
-        return value instanceof Map<?, ?> map ? map : Map.of();
+        forEachEntry(parser, key -> {
+            if (key.equals("fields")) {
+                forEachEntry(parser, fieldName -> parseField(parser, fieldName, fields));
+            } else {
+                parser.skipChildren();
+            }
+        });
+    }
+
+    private static void parseField(JsonParser parser, String fieldName, Set<String> fields) throws IOException
+    {
+        forEachEntry(parser, key -> {
+            if (key.equals("nonCompliant") && parser.currentToken() != JsonToken.VALUE_NULL) {
+                fields.add(fieldName);
+            }
+            parser.skipChildren();
+        });
+    }
+
+    /**
+     * Call the handler for each entry of the JSON object on which the parser is positioned (with the parser positioned
+     * on the value of the entry), and ignore any other kind of value. The handler must leave the parser on the last
+     * token of the value.
+     */
+    private static void forEachEntry(JsonParser parser, JsonEntryHandler handler) throws IOException
+    {
+        if (parser.currentToken() != JsonToken.START_OBJECT) {
+            parser.skipChildren();
+
+            return;
+        }
+
+        while (parser.nextToken() == JsonToken.FIELD_NAME) {
+            String key = parser.currentName();
+            parser.nextToken();
+            handler.handle(key);
+        }
+    }
+
+    @FunctionalInterface
+    private interface JsonEntryHandler
+    {
+        void handle(String key) throws IOException;
     }
 }

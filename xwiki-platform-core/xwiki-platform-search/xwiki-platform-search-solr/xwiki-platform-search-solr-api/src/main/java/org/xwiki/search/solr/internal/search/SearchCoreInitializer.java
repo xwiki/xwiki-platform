@@ -33,6 +33,7 @@ import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.XWikiSolrCore;
+import org.xwiki.search.solr.internal.RemoteSolr;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
@@ -85,16 +86,20 @@ public class SearchCoreInitializer implements SolrCoreInitializer
     {
         this.migrations.update(core);
 
-        // Make sure the data of the index can still be updated with the current schema
-        checkIndexCompliance(core);
+        // Make sure the data of the index can still be updated with the current schema. Only needed for a remote Solr,
+        // whose configuration is upgraded independently of its data: the embedded Solr already recreates the search
+        // core (configuration and data) when its configuration changes.
+        if (RemoteSolr.TYPE.equals(this.configuration.getServerType())) {
+            checkIndexCompliance(core);
+        }
     }
 
-    private void checkIndexCompliance(XWikiSolrCore core) throws SolrException
+    private void checkIndexCompliance(XWikiSolrCore core)
     {
         Set<String> nonCompliantFields;
         try {
             nonCompliantFields = this.solrSchema.getNonCompliantFields(core);
-        } catch (SolrException e) {
+        } catch (Exception e) {
             // The check is only a safety net, not being able to do it should not prevent the core from being used
             this.logger.warn("Failed to check if the index of the Solr core [{}] is compliant with its schema: {}",
                 core.getSolrName(), ExceptionUtils.getRootCauseMessage(e));
@@ -114,7 +119,21 @@ public class SearchCoreInitializer implements SolrCoreInitializer
             }
             this.logger.warn(message, core.getSolrName(), nonCompliantFields);
 
+            deleteIndex(core);
+        }
+    }
+
+    private void deleteIndex(XWikiSolrCore core)
+    {
+        try {
             this.solrProvider.get().deleteIndex(core);
+        } catch (Exception e) {
+            // Don't prevent the core from being used for searching. Retrying at the next initialization would not work:
+            // once the documents are deleted, the index does not contain any non-compliant field anymore, but the
+            // indexing keeps failing until the core is reloaded.
+            this.logger.error("Failed to delete the index of the Solr core [{}]. If its documents were deleted but the"
+                + " core could not be reloaded, the core can't be filled again until it's reloaded (with the CoreAdmin"
+                + " RELOAD action or by restarting Solr).", core.getSolrName(), e);
         }
     }
 }

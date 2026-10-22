@@ -30,6 +30,7 @@ import org.mockito.Mock;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.XWikiSolrCore;
+import org.xwiki.search.solr.internal.RemoteSolr;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.test.LogLevel;
@@ -38,8 +39,13 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ThrowableProxy;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -78,6 +84,19 @@ class SearchCoreInitializerTest
     void beforeEach()
     {
         when(this.core.getSolrName()).thenReturn("xwiki_search_9");
+        when(this.configuration.getServerType()).thenReturn(RemoteSolr.TYPE);
+    }
+
+    @Test
+    void initializeWithEmbeddedSolr() throws Exception
+    {
+        when(this.configuration.getServerType()).thenReturn("embedded");
+
+        this.initializer.initialize(this.core);
+
+        verify(this.migrations).update(this.core);
+        verify(this.solrSchema, never()).getNonCompliantFields(any());
+        verify(this.solr, never()).deleteIndex(any());
     }
 
     @Test
@@ -140,5 +159,40 @@ class SearchCoreInitializerTest
 
         assertEquals("Failed to check if the index of the Solr core [xwiki_search_9] is compliant with its schema:"
             + " IOException: Forbidden", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void initializeWhenComplianceCheckFailsUnexpectedly() throws Exception
+    {
+        when(this.solrSchema.getNonCompliantFields(this.core)).thenThrow(new IllegalStateException("Unexpected"));
+
+        this.initializer.initialize(this.core);
+
+        verify(this.solr, never()).deleteIndex(any());
+
+        assertEquals("Failed to check if the index of the Solr core [xwiki_search_9] is compliant with its schema:"
+            + " IllegalStateException: Unexpected", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void initializeWhenDeleteIndexFails() throws Exception
+    {
+        when(this.solrSchema.getNonCompliantFields(this.core)).thenReturn(Set.of("hidden"));
+        when(this.configuration.synchronizeAtStartup()).thenReturn(true);
+        SolrException exception = new SolrException("Failed to reload the Solr core [xwiki_search_9]");
+        doThrow(exception).when(this.solr).deleteIndex(this.core);
+
+        // The core can still be used
+        this.initializer.initialize(this.core);
+
+        assertEquals("The index of the Solr core [xwiki_search_9] contains fields which are not compatible with their"
+            + " definition in the schema [hidden] (usually because the configuration of the core was upgraded),"
+            + " deleting its index. It will be filled again by the synchronization with the database.",
+            this.logCapture.getMessage(0));
+        assertEquals("Failed to delete the index of the Solr core [xwiki_search_9]. If its documents were deleted but"
+            + " the core could not be reloaded, the core can't be filled again until it's reloaded (with the CoreAdmin"
+            + " RELOAD action or by restarting Solr).", this.logCapture.getMessage(1));
+        assertEquals(Level.ERROR, this.logCapture.getLogEvent(1).getLevel());
+        assertSame(exception, ((ThrowableProxy) this.logCapture.getLogEvent(1).getThrowableProxy()).getThrowable());
     }
 }

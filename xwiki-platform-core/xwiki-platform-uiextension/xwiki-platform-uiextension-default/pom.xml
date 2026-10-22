@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Add support for implementing User Interface extensions from a wiki page.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -63,6 +63,23 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-security-requiredrights-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-velocity</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <!-- The localization and WebJars APIs are used to evaluate the most common calls in UI extension parameters
+      without Velocity. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

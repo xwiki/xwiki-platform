@@ -83,7 +83,7 @@ define('xwiki-entityTypeSwitch', ['jquery', 'xwiki-suggestPages', 'xwiki-suggest
 
 require(['jquery', 'xwiki-entityTypeSwitch', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    var container = $(data?.elements || document);
     container.find('.entityType[data-property-group]').switchEntityType();
   };
 

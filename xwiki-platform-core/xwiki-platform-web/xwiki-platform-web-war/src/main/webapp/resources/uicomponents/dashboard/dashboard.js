@@ -404,7 +404,7 @@ XWiki.Dashboard = Class.create( {
         return;
       }
       const macroMetadata = findDirectChildWithClass(gadgetMetadata, 'isMacro');
-      if (macroMetadata && macroMetadata.innerHTML == 'true') {
+      if (macroMetadata?.innerHTML == 'true') {
         // it's a macro, edit it
         // get the gadget id
         var gadgetId = this._getGadgetId(gadget);
@@ -608,7 +608,7 @@ XWiki.Dashboard = Class.create( {
         parameters : editParameters,
         onSuccess : function(response) {
           this.edited = false;
-          if (response.responseJSON && response.responseJSON.newVersion) {
+          if (response.responseJSON?.newVersion) {
             // update the version
             require(['xwiki-meta'], function (xm) {
               xm.setVersion(response.responseJSON.newVersion);

@@ -80,7 +80,7 @@
   ##===========
   ## Display the Tabs
   ##===========
-  <div class="floatcontainer">
+  <div>
     <ul class="xwikitabbar">
       #foreach ($tab in $tabs)
         <li id="xwiki$tab['tabName']"#if($view == $tab['tabName']) class="active"#end>

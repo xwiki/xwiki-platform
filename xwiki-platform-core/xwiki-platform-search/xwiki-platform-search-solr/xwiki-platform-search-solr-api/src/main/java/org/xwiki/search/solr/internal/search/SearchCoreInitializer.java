@@ -111,6 +111,7 @@ public class SearchCoreInitializer implements SolrCoreInitializer
         }
 
         if (!nonCompliantFields.isEmpty()) {
+            String loggedFields = toLoggedFields(nonCompliantFields);
             String message = "The index of the Solr core [{}] contains fields which are not compatible with their"
                 + " definition in the schema {} (usually because the configuration of the core was upgraded), deleting"
                 + " its index.";
@@ -120,7 +121,7 @@ public class SearchCoreInitializer implements SolrCoreInitializer
                 message += " Since solr.synchronizeAtStartup is disabled, it needs to be filled again by triggering a"
                     + " synchronization with the database manually.";
             }
-            this.logger.warn(message, core.getSolrName(), toLoggedFields(nonCompliantFields));
+            this.logger.warn(message, core.getSolrName(), loggedFields);
 
             deleteIndex(core);
         }

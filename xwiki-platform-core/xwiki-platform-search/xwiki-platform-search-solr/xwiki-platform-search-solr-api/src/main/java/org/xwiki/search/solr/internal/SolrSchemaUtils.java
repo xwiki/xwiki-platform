@@ -856,8 +856,9 @@ public class SolrSchemaUtils
     {
         Set<String> fields = new TreeSet<>();
 
-        // For each segment, Solr compares the structure of each field in the segment with its definition in the schema:
-        // {"segments": {"<segment>": {"fields": {"<field>": {"nonCompliant": {...}, ...}, ...}, ...}, ...}, ...}
+        // For each segment, Solr compares the structure of each field in the segment with its definition in the schema,
+        // and reports the differences in the "nonCompliant" entry of the field, found under "segments" > segment name >
+        // "fields" > field name
         try (JsonParser parser = JSON_FACTORY.createParser(stream)) {
             parser.nextToken();
             forEachEntry(parser, key -> {

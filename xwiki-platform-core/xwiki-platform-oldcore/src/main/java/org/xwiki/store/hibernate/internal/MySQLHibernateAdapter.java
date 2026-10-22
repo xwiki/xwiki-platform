@@ -46,6 +46,8 @@ import org.xwiki.store.hibernate.AbstractHibernateAdapter;
 import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.store.hibernate.HibernateStoreException;
 
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
+
 /**
  * The default {@link HibernateAdapter} for MySQL. Based on MySQL 5.7 specifications.
  * 
@@ -76,6 +78,11 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     private static final String CHARACTER_SET_PARAMETER = "characterSet";
 
     /**
+     * The suffix of the binary collations (e.g. utf8mb4_bin), the only ones supported by XWiki.
+     */
+    private static final String BINARY_COLLATION_SUFFIX = "_bin";
+
+    /**
      * The maximum number of bytes of a character in the character sets able to store any character (e.g. utf8mb4).
      */
     private static final int UTF8MB4_MAX_CHARACTER_LENGTH = 4;
@@ -99,6 +106,9 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     @Named("xwikiproperties")
     private ConfigurationSource xwikiProperties;
 
+    @Inject
+    private HibernateStore store;
+
     @Override
     public void repairDatabase(Metadata metadata) throws HibernateStoreException
     {
@@ -112,7 +122,9 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         try (Session session = getSessionFactory().openSession()) {
             convertToDatabaseCollation(metadata, session);
         } catch (Exception e) {
-            throw new HibernateStoreException("Failed to repair the database", e);
+            throw new HibernateStoreException(String.format("Failed to convert the tables to the database character"
+                + " set and a binary collation. The conversion at startup can be disabled by setting [%s] to false in"
+                + " xwiki.properties.", PROPERTY_FIX_TABLE_COLLATION), e);
         }
     }
 
@@ -264,7 +276,8 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     }
 
     /**
-     * Convert the tables of the current wiki database to the character set and collation configured on the database.
+     * Convert the tables of the current wiki database to the character set configured on the database, with a binary
+     * collation.
      * <p>
      * <strong>WARNING: the foreign keys involving the converted string columns are dropped and are only re-created by
      * the Hibernate schema update, so XWiki must be restarted right after calling this method (unless it's called
@@ -282,7 +295,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             return;
         }
 
-        this.logger.info("Converting the tables of database [{}] to its collation ([{}] statements to execute). Each"
+        this.logger.info("Converting the tables of database [{}] ([{}] statements to execute). Each"
             + " converted table is rebuilt, which can take a long time for big tables: don't stop XWiki in the"
             + " meantime (a restart would resume the conversion anyway). The conversion at startup can be disabled by"
             + " setting [{}] to false in xwiki.properties.", getDatabaseFromWikiName(), statements.size(),
@@ -303,14 +316,19 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
                 System.currentTimeMillis() - statementStart);
         }
 
-        this.logger.info("Tables of database [{}] converted to its collation in [{}] ms", getDatabaseFromWikiName(),
+        this.logger.info("Tables of database [{}] converted in [{}] ms", getDatabaseFromWikiName(),
             System.currentTimeMillis() - conversionStart);
     }
 
     /**
-     * Compute the statements to execute to convert each table of the Hibernate mapping which does not use the
-     * character set and collation configured on the current wiki database (or which contains a column which does not
-     * use them).
+     * Compute the statements to execute to convert each standard table of the Hibernate mapping which does not use the
+     * character set configured on the current wiki database with a binary collation (or which contains a column which
+     * does not use them). XWiki requires a binary collation, so the target collation is the one configured on the
+     * database when it's binary (e.g. {@code utf8mb4_bin}), and the binary collation of the database character set
+     * otherwise (e.g. {@code utf8mb4_bin} for {@code utf8mb4_0900_ai_ci}).
+     * <p>
+     * The tables of the custom mappings of the XWiki classes are not converted, since their structure is controlled by
+     * the users (and might not support a character set using more bytes per character, for example).
      * <p>
      * In addition to the {@code CONVERT TO CHARACTER SET} of each of those tables (which also switches a legacy or
      * unexpected row format to the expected one, so that the table is rebuilt only once), the statements:
@@ -322,14 +340,10 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      * fail; a warning gives the definition of each of them, so that it can be re-created with a shorter prefix</li>
      * </ul>
      * <p>
-     * Only the conversions which cannot lose or break anything are done:
-     * <ul>
-     * <li>nothing is converted when the database collation is not case sensitive, since XWiki requires one (e.g.
-     * {@code utf8mb4_bin})</li>
-     * <li>a table which can contain characters not supported by the database character set (e.g. a {@code utf8mb4}
-     * table in a {@code utf8mb3} database) is not converted, and neither are the tables linked to it by a foreign key
-     * on string columns, since that foreign key could not be re-created</li>
-     * </ul>
+     * Only the conversions which cannot lose anything are done: a table which can contain characters not supported by
+     * the database character set (e.g. a {@code utf8mb4} table in a {@code utf8mb3} database) is not converted, and
+     * neither are the tables linked to it by a foreign key on string columns, since that foreign key could not be
+     * re-created.
      * <p>
      * <strong>WARNING: the dropped foreign keys are only re-created by the Hibernate schema update, so XWiki must be
      * restarted after executing those statements (unless they are executed right before the schema update, as done by
@@ -337,7 +351,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      *
      * @param metadata the configuration of the database, used to know which tables to convert
      * @param session the session in which to execute the queries
-     * @return the statements to execute in that order, empty if all the tables already use the database collation
+     * @return the statements to execute in that order, empty if all the tables already use the expected collation
      * @since 18.10.0RC1
      */
     public List<String> getConvertToDatabaseCollationStatements(Metadata metadata, Session session)
@@ -350,17 +364,11 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         }
 
         String characterSet = (String) databaseDefaults[0];
-        String collation = (String) databaseDefaults[1];
+        // XWiki requires a binary collation, whatever the database is configured with
+        String databaseCollation = (String) databaseDefaults[1];
+        String collation = isBinary(databaseCollation) ? databaseCollation : characterSet + BINARY_COLLATION_SUFFIX;
 
-        if (!isCaseSensitive(collation)) {
-            this.logger.warn("The collation [{}] configured on database [{}] is not case sensitive, its tables won't be"
-                + " converted to it. XWiki requires a case sensitive collation (e.g. utf8mb4_bin).", collation,
-                databaseName);
-
-            return List.of();
-        }
-
-        // The collations (other than the database one) used by each table to convert
+        // The collations (other than the expected one) used by each table to convert
         Map<String, Set<String>> tables = getTablesToConvert(metadata, databaseName, collation, session);
         if (tables.isEmpty()) {
             return List.of();
@@ -409,11 +417,9 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         return statements;
     }
 
-    private boolean isCaseSensitive(String collation)
+    private boolean isBinary(String collation)
     {
-        String lowerCollation = collation.toLowerCase();
-
-        return lowerCollation.endsWith("_bin") || lowerCollation.endsWith("_cs");
+        return collation.toLowerCase().endsWith(BINARY_COLLATION_SUFFIX);
     }
 
     /**
@@ -488,15 +494,15 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             return;
         }
 
-        // Keeping a case sensitive table in a wider character set is fine, but a case insensitive one is a problem
-        Set<String> caseInsensitiveTables = wideTables.stream()
-            .filter(tableName -> !tables.get(tableName).stream().allMatch(this::isCaseSensitive))
+        // Keeping a binary table in a wider character set is fine, but a non binary one is a problem
+        Set<String> nonBinaryTables = wideTables.stream()
+            .filter(tableName -> !tables.get(tableName).stream().allMatch(this::isBinary))
             .collect(Collectors.toCollection(TreeSet::new));
-        if (!caseInsensitiveTables.isEmpty()) {
-            this.logger.warn("Tables {} of database [{}] use a case insensitive collation, which XWiki does not"
-                + " support, but won't be converted to its character set [{}] since they (or a table linked to them by"
-                + " a foreign key) can contain characters it does not support. Converting them to utf8mb4_bin is"
-                + " recommended.", caseInsensitiveTables, databaseName, characterSet);
+        if (!nonBinaryTables.isEmpty()) {
+            this.logger.warn("Tables {} of database [{}] use a non binary collation, which XWiki does not support, but"
+                + " won't be converted to its character set [{}] since they (or a table linked to them by a foreign"
+                + " key) can contain characters it does not support. Converting them to utf8mb4_bin is recommended.",
+                nonBinaryTables, databaseName, characterSet);
         }
 
         this.logger.debug("Tables {} of database [{}] won't be converted to its character set [{}] since they (or a"
@@ -590,16 +596,36 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         query.setParameter(SCHEMA_PARAMETER, databaseName);
         query.setParameter("collation", collation);
 
-        // Only touch the tables of the Hibernate mapping
-        Set<String> mappedTables = metadata.collectTableMappings().stream()
-            .map(table -> getTableName(table).toLowerCase()).collect(Collectors.toSet());
+        Set<String> standardTables = getStandardTables(metadata);
 
         Map<String, Set<String>> tables = new TreeMap<>();
         for (Object[] tableCollation : query.list()) {
             String tableName = (String) tableCollation[0];
 
-            if (mappedTables.contains(tableName.toLowerCase())) {
+            if (standardTables.contains(tableName.toLowerCase())) {
                 tables.computeIfAbsent(tableName, key -> new HashSet<>()).add((String) tableCollation[1]);
+            }
+        }
+
+        return tables;
+    }
+
+    /**
+     * @param metadata the configuration of the database
+     * @return the (lower case) names of the tables of the Hibernate mapping, except the ones of the custom mappings of
+     *         the XWiki classes
+     */
+    private Set<String> getStandardTables(Metadata metadata)
+    {
+        Set<String> tables = metadata.collectTableMappings().stream().map(table -> getTableName(table).toLowerCase())
+            .collect(Collectors.toCollection(HashSet::new));
+
+        for (PersistentClass entity : metadata.getEntityBindings()) {
+            String tableName = getTableName(entity);
+
+            // The custom mapping of an XWiki class is injected with a table name derived from the class name
+            if (tableName.equalsIgnoreCase(this.store.toDynamicMappingTableName(entity.getEntityName()))) {
+                tables.remove(tableName.toLowerCase());
             }
         }
 

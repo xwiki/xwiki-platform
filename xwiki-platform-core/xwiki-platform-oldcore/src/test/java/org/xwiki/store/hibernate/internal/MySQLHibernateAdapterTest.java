@@ -54,6 +54,7 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
@@ -139,6 +140,15 @@ class MySQLHibernateAdapterTest
             this.adapter.getAlterRowFormatString("xwikircs", false, Map.of(), null));
     }
 
+    private PersistentClass mockEntity(String entityName, String tableName)
+    {
+        PersistentClass entity = mock(PersistentClass.class);
+        when(entity.getEntityName()).thenReturn(entityName);
+        when(entity.getTable()).thenReturn(new Table(tableName));
+
+        return entity;
+    }
+
     private void mockCollationQueries()
     {
         when(this.wikis.getCurrentWikiId()).thenReturn("xwiki");
@@ -148,13 +158,24 @@ class MySQLHibernateAdapterTest
 
         this.metadata = mock(Metadata.class);
         when(this.metadata.collectTableMappings()).thenReturn(List.of(new Table("xwikidoc"),
-            new Table("xwikiproperties"), new Table("xwikistrings"), new Table("activitystream_events")));
+            new Table("xwikiproperties"), new Table("xwikistrings"), new Table("xwikilistitems"),
+            new Table("activitystream_events"), new Table("xwikipreferences"), new Table("xwikicustom_Test_Custom")));
+        PersistentClass documentEntity = mockEntity("com.xpn.xwiki.doc.XWikiDocument", "xwikidoc");
         // xwikiproperties is the table of a compressed entity
-        PersistentClass propertiesEntity = mock(PersistentClass.class);
-        when(propertiesEntity.getTable()).thenReturn(new Table("xwikiproperties"));
+        PersistentClass propertiesEntity = mockEntity("com.xpn.xwiki.objects.BaseProperty", "xwikiproperties");
         when(propertiesEntity.getMetaAttribute(HibernateAdapter.META_ATTRIBUTE_COMPRESSED))
             .thenReturn(mock(MetaAttribute.class));
-        when(this.metadata.getEntityBindings()).thenReturn(List.of(propertiesEntity));
+        PersistentClass stringsEntity = mockEntity("com.xpn.xwiki.objects.StringProperty", "xwikistrings");
+        PersistentClass eventsEntity =
+            mockEntity("org.xwiki.eventstream.store.internal.LegacyEvent", "activitystream_events");
+        // A static mapping of an XWiki class, part of the standard mapping
+        PersistentClass preferencesEntity = mockEntity("XWiki.XWikiPreferences", "xwikipreferences");
+        // The custom mapping of an XWiki class
+        PersistentClass customEntity = mockEntity("Test.Custom", "xwikicustom_Test_Custom");
+        when(this.metadata.getEntityBindings()).thenReturn(List.of(documentEntity, propertiesEntity, stringsEntity,
+            eventsEntity, preferencesEntity, customEntity));
+        when(this.hibernateStore.toDynamicMappingTableName(anyString()))
+            .then(invocation -> "xwikicustom_" + invocation.<String>getArgument(0).replace('.', '_'));
 
         this.session = mock(Session.class);
 
@@ -172,6 +193,9 @@ class MySQLHibernateAdapterTest
         when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikistrings", "utf8mb3_general_ci" },
             new Object[] { "activitystream_events", "utf8mb3_general_ci" },
             new Object[] { "custom_table", "utf8mb3_general_ci" },
+            new Object[] { "xwikicustom_Test_Custom", "utf8mb3_general_ci" },
+            new Object[] { "xwikipreferences", "utf8mb3_bin" },
+            new Object[] { "xwikilistitems", "utf8mb3_bin" },
             new Object[] { "xwikiproperties", "utf8mb3_general_ci" }));
 
         NativeQuery<Object[]> foreignKeysQuery = mock(NativeQuery.class);
@@ -211,6 +235,7 @@ class MySQLHibernateAdapterTest
         when(rowFormatsQuery.list()).thenReturn(List.of(new Object[] { "xwiki/xwikidoc", "Compact" },
             new Object[] { "xwiki/activitystream_events", "Redundant" },
             new Object[] { "xwiki/xwikiproperties", "Dynamic" }, new Object[] { "xwiki/xwikistrings", "Compact" },
+            new Object[] { "xwiki/xwikilistitems", "Compact" },
             new Object[] { "xwiki/xwikircs", "Compressed" }));
     }
 
@@ -220,11 +245,13 @@ class MySQLHibernateAdapterTest
         mockCollationQueries();
 
         // The legacy row formats are switched in the same statement, as well as the row format of the compressed
-        // entity
+        // entity, and the custom mapping (unlike the static mapping of xwikipreferences) is left alone
         assertEquals(List.of("ALTER TABLE `xwiki`.xwikistrings DROP FOREIGN KEY `FKstrings`",
             "ALTER TABLE `xwiki`.activitystream_events DROP INDEX `ase_page_date`",
             "ALTER TABLE `xwiki`.xwikistrings DROP INDEX `custom_unique`",
             "ALTER TABLE `xwiki`.activitystream_events ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.xwikilistitems ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.xwikipreferences" + CONVERT,
             "ALTER TABLE `xwiki`.xwikiproperties ROW_FORMAT=Compressed," + CONVERT,
             "ALTER TABLE `xwiki`.xwikistrings ROW_FORMAT=Dynamic," + CONVERT),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
@@ -260,6 +287,8 @@ class MySQLHibernateAdapterTest
         assertEquals(List.of("ALTER TABLE `xwiki`.xwikistrings DROP FOREIGN KEY `FKstrings`",
             "ALTER TABLE `xwiki`.activitystream_events DROP INDEX `ase_page_date`",
             "ALTER TABLE `xwiki`.activitystream_events ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.xwikilistitems ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.xwikipreferences" + CONVERT,
             "ALTER TABLE `xwiki`.xwikiproperties ROW_FORMAT=Compressed," + CONVERT,
             "ALTER TABLE `xwiki`.xwikistrings ROW_FORMAT=Dynamic," + CONVERT),
             this.mariaDBAdapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
@@ -302,17 +331,20 @@ class MySQLHibernateAdapterTest
     }
 
     @Test
-    void getConvertToDatabaseCollationStatementsWhenCaseInsensitiveCollation()
+    void getConvertToDatabaseCollationStatementsWhenNonBinaryDatabaseCollation()
     {
         mockCollationQueries();
         when(this.defaultsQuery.list())
             .thenReturn(List.<Object[]>of(new Object[] { "utf8mb4", "utf8mb4_0900_ai_ci" }));
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_0900_ai_ci" }));
 
-        assertEquals(List.of(), this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+        // The binary collation of the database character set is used instead
+        assertEquals(List.of("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
-        assertEquals("The collation [utf8mb4_0900_ai_ci] configured on database [xwiki] is not case sensitive, its"
-            + " tables won't be converted to it. XWiki requires a case sensitive collation (e.g. utf8mb4_bin).",
-            this.logCapture.getMessage(0));
+        verify(this.tablesQuery).setParameter("collation", "utf8mb4_bin");
     }
 
     @Test
@@ -336,11 +368,11 @@ class MySQLHibernateAdapterTest
             "ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic, CONVERT TO CHARACTER SET utf8mb3 COLLATE utf8mb3_bin"),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
-        // Only the case insensitive tables are reported
-        assertEquals("Tables [activitystream_events, xwikiproperties] of database [xwiki] use a case insensitive"
-            + " collation, which XWiki does not support, but won't be converted to its character set [utf8mb3] since"
-            + " they (or a table linked to them by a foreign key) can contain characters it does not support."
-            + " Converting them to utf8mb4_bin is recommended.", this.logCapture.getMessage(0));
+        // Only the non binary tables are reported
+        assertEquals("Tables [activitystream_events, xwikiproperties] of database [xwiki] use a non binary collation,"
+            + " which XWiki does not support, but won't be converted to its character set [utf8mb3] since they (or a"
+            + " table linked to them by a foreign key) can contain characters it does not support. Converting them to"
+            + " utf8mb4_bin is recommended.", this.logCapture.getMessage(0));
         assertEquals(1, this.logCapture.size());
     }
 
@@ -437,7 +469,9 @@ class MySQLHibernateAdapterTest
         HibernateStoreException exception =
             assertThrows(HibernateStoreException.class, () -> this.adapter.repairDatabase(this.metadata));
 
-        assertEquals("Failed to repair the database", exception.getMessage());
+        assertEquals("Failed to convert the tables to the database character set and a binary collation. The"
+            + " conversion at startup can be disabled by setting [store.hibernate.mysql.fixTableCollation] to false in"
+            + " xwiki.properties.", exception.getMessage());
         assertSame(failure, exception.getCause());
         verify(this.session).close();
     }

@@ -31,6 +31,7 @@ import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.text.StringUtils;
 
@@ -54,8 +55,13 @@ class SecurityCacheStressIT
     private static final String QUOTE = "\"";
 
     @Test
-    void stressTest(TestUtils testUtils) throws Exception
+    void stressTest(TestUtils testUtils, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
+        // The test saves the rights of a space twice in a row, adding then removing a rights object, while the Solr
+        // indexer loads the document saved first: when the second save deletes the object between the listing of its
+        // properties and their loading, the store logs that the properties have no data.
+        logCaptureConfiguration.registerExcludes("No data for property [");
+
         testUtils.loginAsSuperAdmin();
 
         // Create 20 users.

@@ -55,6 +55,7 @@ public interface ObjectPropertyReferenceResolver<T>
     /**
      * @param propertyReferenceRepresentation the representation of an object reference (e.g. as a String)
      * @return the valid resolved object reference as an object
+     * @deprecated use {@link #resolve(Object, Object...)} instead
      */
     @Deprecated
     ObjectPropertyReference resolve(T propertyReferenceRepresentation);

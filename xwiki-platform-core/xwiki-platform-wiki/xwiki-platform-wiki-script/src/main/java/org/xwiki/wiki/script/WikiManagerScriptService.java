@@ -69,6 +69,8 @@ public class WikiManagerScriptService implements ScriptService
 
     /**
      * Field name of the last API exception inserted in context.
+     *
+     * @deprecated use {@link #getLastError()} instead
      */
     @Deprecated
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";

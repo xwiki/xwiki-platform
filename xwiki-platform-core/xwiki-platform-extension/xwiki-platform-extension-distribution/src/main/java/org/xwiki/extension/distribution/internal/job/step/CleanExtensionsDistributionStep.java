@@ -50,9 +50,17 @@ public class CleanExtensionsDistributionStep extends AbstractExtensionDistributi
     public static final String ID = "extension.clean";
 
     @Inject
+    // 'transient' is deliberate here: DistributionJobStatus holds the step list and the job status
+    // store serializes it with XStream, which honours 'transient' independently of
+    // java.io.Serializable. Removing it would write the injected components into the stored status.
+    @SuppressWarnings("java:S2065")
     private transient InstalledExtensionRepository installedRepository;
 
     @Inject
+    // 'transient' is deliberate here: DistributionJobStatus holds the step list and the job status
+    // store serializes it with XStream, which honours 'transient' independently of
+    // java.io.Serializable. Removing it would write the injected components into the stored status.
+    @SuppressWarnings("java:S2065")
     private transient Logger logger;
 
     /**

@@ -65,4 +65,18 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Don't lint src/test/node: it may hold Node dependencies (node_modules) that must not be linted at all. -->
+        <groupId>org.xwiki.contrib</groupId>
+        <artifactId>jshint-maven-plugin</artifactId>
+        <configuration>
+          <directories>
+            <directory>src/main</directory>
+          </directories>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -34,6 +34,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
@@ -65,6 +66,11 @@ class DashboardIT
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("Dashboard", "WebHome"));
         viewPage.edit();
+        // The content of the Dashboard home page requires script and maybe programming right, which guest doesn't
+        // have, so editing it shows the required rights warning first, even though editing the dashboard only modifies
+        // the gadget objects. The dashboard should be refactored to avoid this warning, see XWIKI-25466: Editing the
+        // wiki dashboard displays a required rights warning to users without script right.
+        new ForceEditLockPage().clickForceEdit();
         viewPage.waitUntilPageIsReady();
         DashboardEditPage dashboardEditPage = new DashboardEditPage();
         int initialWidgetCount = dashboardEditPage.countGadgets();

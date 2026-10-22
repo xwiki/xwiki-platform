@@ -49,7 +49,7 @@ class EditablePropertyEditConfirmationIT
      * cancelling aborts it.
      */
     @ParameterizedTest
-    @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-security-requiredrights-default")
+    @WikisSource
     @Order(1)
     void editablePropertyShowsRequiredRightsWarning(WikiReference wiki, TestLocalReference testLocalReference,
         TestUtils setup) throws Exception
@@ -109,7 +109,7 @@ class EditablePropertyEditConfirmationIT
      * showing the confirmation modal, when there are no required rights issues.
      */
     @ParameterizedTest
-    @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-security-requiredrights-default")
+    @WikisSource
     @Order(2)
     void editablePropertyNoWarningWhenNoRequiredRightsIssue(WikiReference wiki, TestLocalReference testLocalReference,
         TestUtils setup) throws Exception

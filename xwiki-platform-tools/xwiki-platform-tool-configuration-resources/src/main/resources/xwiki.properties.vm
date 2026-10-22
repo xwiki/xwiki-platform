@@ -1243,8 +1243,8 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #-# [Since 18.10.0RC1]
 #-# MySQL and MariaDB only. When the data migration system is enabled, XWiki makes sure at startup that each table of
 #-# the Hibernate mapping uses the character set and collation configured on the database, and converts the ones which
-#-# don't. Each converted table is rebuilt, which can take a long time for big tables. Set it to false to disable this
-#-# conversion.
+#-# don't (unless they could lose characters in the process). Each converted table is rebuilt, which can take a long
+#-# time for big tables. Set it to false to disable this conversion.
 #-#
 #-# The default is true.
 # store.hibernate.mysql.fixTableCollation = true

@@ -29,13 +29,17 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.mapping.MetaAttribute;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Table;
 import org.hibernate.query.NativeQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.store.hibernate.HibernateStoreException;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -98,7 +102,7 @@ class MySQLHibernateAdapterTest
 
     private NativeQuery<Object[]> defaultsQuery;
 
-    private NativeQuery<String> tablesQuery;
+    private NativeQuery<Object[]> tablesQuery;
 
     private NativeQuery<Number> maxLengthQuery;
 
@@ -139,9 +143,18 @@ class MySQLHibernateAdapterTest
     {
         when(this.wikis.getCurrentWikiId()).thenReturn("xwiki");
 
+        Configuration configuration = mock(Configuration.class);
+        when(this.hibernateStore.getConfiguration()).thenReturn(configuration);
+
         this.metadata = mock(Metadata.class);
         when(this.metadata.collectTableMappings()).thenReturn(List.of(new Table("xwikidoc"),
             new Table("xwikiproperties"), new Table("xwikistrings"), new Table("activitystream_events")));
+        // xwikiproperties is the table of a compressed entity
+        PersistentClass propertiesEntity = mock(PersistentClass.class);
+        when(propertiesEntity.getTable()).thenReturn(new Table("xwikiproperties"));
+        when(propertiesEntity.getMetaAttribute(HibernateAdapter.META_ATTRIBUTE_COMPRESSED))
+            .thenReturn(mock(MetaAttribute.class));
+        when(this.metadata.getEntityBindings()).thenReturn(List.of(propertiesEntity));
 
         this.session = mock(Session.class);
 
@@ -156,8 +169,10 @@ class MySQLHibernateAdapterTest
 
         this.tablesQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.TABLES"))).thenReturn(this.tablesQuery);
-        when(this.tablesQuery.list()).thenReturn(
-            List.of("xwikistrings", "activitystream_events", "custom_table", "xwikiproperties"));
+        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikistrings", "utf8mb3_general_ci" },
+            new Object[] { "activitystream_events", "utf8mb3_general_ci" },
+            new Object[] { "custom_table", "utf8mb3_general_ci" },
+            new Object[] { "xwikiproperties", "utf8mb3_general_ci" }));
 
         NativeQuery<Object[]> foreignKeysQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.KEY_COLUMN_USAGE")))
@@ -166,40 +181,37 @@ class MySQLHibernateAdapterTest
             List.of(new Object[] { "xwikistrings", "FKstrings", "xwikiproperties" },
                 new Object[] { "custom_table", "FKcustom", "xwikidoc" }));
 
-        // table, index, column, sub part, type, collation, max length, octet length, precision, datetime precision,
-        // non unique
+        // table, index, column, sub part, collation, max length, octet length, non unique
         NativeQuery<Object[]> indexesQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.STATISTICS"))).thenReturn(indexesQuery);
         when(indexesQuery.list()).thenReturn(List.of(
-            // 768 * 4 + 5 = 3077: too long
-            new Object[] { "activitystream_events", "ase_page_date", "ase_page", null, "varchar",
-                "utf8mb3_general_ci", 768L, 2304L, null, null, 1L },
-            new Object[] { "activitystream_events", "ase_page_date", "ase_date", null, "datetime", null, null, null,
-                null, 0L, 1L },
-            // 768 * 4 = 3072: fits
-            new Object[] { "activitystream_events", "EVENT_PAGE", "ase_page", null, "varchar", "utf8mb3_general_ci",
-                768L, 2304L, null, null, 1L },
-            // 200 * 4 = 800: fits
-            new Object[] { "activitystream_events", "ase_param1", "ase_param1", 200L, "longtext",
-                "utf8mb3_general_ci", 4294967295L, 4294967295L, null, null, 1L },
-            // 3000 + 2 + 8 + 8 + 8 = 3026: fits
-            new Object[] { "xwikistrings", "binary_index", "XWS_BINARY", null, "varbinary", null, 3000L, 3000L, null,
-                null, 1L },
-            new Object[] { "xwikistrings", "binary_index", "XWS_BIT", null, "bit", null, null, null, 9L, null, 1L },
-            new Object[] { "xwikistrings", "binary_index", "XWS_DATE", null, "datetime", null, null, null, null, 6L,
-                1L },
-            new Object[] { "xwikistrings", "binary_index", "XWS_ID", null, "bigint", null, null, null, 19L, null,
-                1L },
-            new Object[] { "xwikistrings", "binary_index", "XWS_DECIMAL", null, "decimal", null, null, null, 10L,
-                null, 1L },
             // 768 * 4 + 8 = 3080: too long
-            new Object[] { "xwikistrings", "custom_unique", "XWS_VALUE", null, "varchar", "utf8mb3_general_ci", 768L,
-                2304L, null, null, 0L },
-            new Object[] { "xwikistrings", "custom_unique", "XWS_ID", null, "bigint", null, null, null, 19L, null,
+            new Object[] { "activitystream_events", "ase_page_date", "ase_page", null, "utf8mb3_general_ci", 768L,
+                2304L, 1L },
+            new Object[] { "activitystream_events", "ase_page_date", "ase_date", null, null, null, null, 1L },
+            // 768 * 4 = 3072: fits
+            new Object[] { "activitystream_events", "EVENT_PAGE", "ase_page", null, "utf8mb3_general_ci", 768L,
+                2304L, 1L },
+            // 200 * 4 = 800: fits
+            new Object[] { "activitystream_events", "ase_param1", "ase_param1", 200L, "utf8mb3_general_ci",
+                4294967295L, 4294967295L, 1L },
+            // 3000 + 8 + 8 = 3016: fits
+            new Object[] { "xwikistrings", "binary_index", "XWS_BINARY", null, null, 3000L, 3000L, 1L },
+            new Object[] { "xwikistrings", "binary_index", "XWS_DATE", null, null, null, null, 1L },
+            new Object[] { "xwikistrings", "binary_index", "XWS_ID", null, null, null, null, 1L },
+            // 768 * 4 + 8 = 3080: too long
+            new Object[] { "xwikistrings", "custom_unique", "XWS_VALUE", null, "utf8mb3_general_ci", 768L, 2304L,
                 0L },
+            new Object[] { "xwikistrings", "custom_unique", "XWS_ID", null, null, null, null, 0L },
             // Not a table to convert
-            new Object[] { "custom_table", "custom_index", "VALUE", null, "varchar", "utf8mb3_general_ci", 2000L,
-                6000L, null, null, 1L }));
+            new Object[] { "custom_table", "custom_index", "VALUE", null, "utf8mb3_general_ci", 2000L, 6000L, 1L }));
+
+        NativeQuery<Object[]> rowFormatsQuery = mock(NativeQuery.class);
+        when(this.session.createNativeQuery(contains("INNODB_SYS_TABLES"))).thenReturn(rowFormatsQuery);
+        when(rowFormatsQuery.list()).thenReturn(List.of(new Object[] { "xwiki/xwikidoc", "Compact" },
+            new Object[] { "xwiki/activitystream_events", "Redundant" },
+            new Object[] { "xwiki/xwikiproperties", "Dynamic" }, new Object[] { "xwiki/xwikistrings", "Compact" },
+            new Object[] { "xwiki/xwikircs", "Compressed" }));
     }
 
     @Test
@@ -207,14 +219,17 @@ class MySQLHibernateAdapterTest
     {
         mockCollationQueries();
 
+        // The legacy row formats are switched in the same statement, as well as the row format of the compressed
+        // entity
         assertEquals(List.of("ALTER TABLE `xwiki`.xwikistrings DROP FOREIGN KEY `FKstrings`",
             "ALTER TABLE `xwiki`.activitystream_events DROP INDEX `ase_page_date`",
             "ALTER TABLE `xwiki`.xwikistrings DROP INDEX `custom_unique`",
-            "ALTER TABLE `xwiki`.activitystream_events" + CONVERT, "ALTER TABLE `xwiki`.xwikiproperties" + CONVERT,
-            "ALTER TABLE `xwiki`.xwikistrings" + CONVERT),
+            "ALTER TABLE `xwiki`.activitystream_events ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.xwikiproperties ROW_FORMAT=Compressed," + CONVERT,
+            "ALTER TABLE `xwiki`.xwikistrings ROW_FORMAT=Dynamic," + CONVERT),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
-        assertEquals("Index [ase_page_date] (key length of [3077] bytes after the conversion) exceeds the maximum key"
+        assertEquals("Index [ase_page_date] (key length of [3080] bytes after the conversion) exceeds the maximum key"
             + " length of [3072] bytes and will be dropped. It can be re-created with a shorter prefix using"
             + " [CREATE INDEX `ase_page_date` ON `xwiki`.`activitystream_events` (`ase_page`, `ase_date`)].",
             this.logCapture.getMessage(0));
@@ -225,6 +240,18 @@ class MySQLHibernateAdapterTest
     }
 
     @Test
+    void getConvertToDatabaseCollationStatementsWhenCompressionNotAllowed()
+    {
+        mockCollationQueries();
+        when(this.hibernateStore.getConfiguration().getProperty("xwiki.compressionAllowed")).thenReturn("false");
+        when(this.tablesQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "xwikiproperties", "latin1_bin" }));
+
+        assertEquals(List.of("ALTER TABLE `xwiki`.xwikistrings DROP FOREIGN KEY `FKstrings`",
+            "ALTER TABLE `xwiki`.xwikiproperties" + CONVERT),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+    }
+
+    @Test
     void getConvertToDatabaseCollationStatementsWhenMariaDB()
     {
         mockCollationQueries();
@@ -232,11 +259,12 @@ class MySQLHibernateAdapterTest
         // MariaDB supports too long unique indexes
         assertEquals(List.of("ALTER TABLE `xwiki`.xwikistrings DROP FOREIGN KEY `FKstrings`",
             "ALTER TABLE `xwiki`.activitystream_events DROP INDEX `ase_page_date`",
-            "ALTER TABLE `xwiki`.activitystream_events" + CONVERT, "ALTER TABLE `xwiki`.xwikiproperties" + CONVERT,
-            "ALTER TABLE `xwiki`.xwikistrings" + CONVERT),
+            "ALTER TABLE `xwiki`.activitystream_events ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.xwikiproperties ROW_FORMAT=Compressed," + CONVERT,
+            "ALTER TABLE `xwiki`.xwikistrings ROW_FORMAT=Dynamic," + CONVERT),
             this.mariaDBAdapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
-        assertEquals("Index [ase_page_date] (key length of [3077] bytes after the conversion) exceeds the maximum key"
+        assertEquals("Index [ase_page_date] (key length of [3080] bytes after the conversion) exceeds the maximum key"
             + " length of [3072] bytes and will be dropped. It can be re-created with a shorter prefix using"
             + " [CREATE INDEX `ase_page_date` ON `xwiki`.`activitystream_events` (`ase_page`, `ase_date`)].",
             this.logCapture.getMessage(0));
@@ -259,7 +287,7 @@ class MySQLHibernateAdapterTest
     void getConvertToDatabaseCollationStatementsWhenNothingToConvert()
     {
         mockCollationQueries();
-        when(this.tablesQuery.list()).thenReturn(List.of("custom_table"));
+        when(this.tablesQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "custom_table", "latin1_bin" }));
 
         assertEquals(List.of(), this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
     }
@@ -288,25 +316,31 @@ class MySQLHibernateAdapterTest
     }
 
     @Test
-    void getConvertToDatabaseCollationStatementsWhenLossyCharacterSet()
+    void getConvertToDatabaseCollationStatementsWhenWiderCharacterSet()
     {
         mockCollationQueries();
         when(this.defaultsQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "utf8mb3", "utf8mb3_bin" }));
-        when(this.tablesQuery.list()).thenReturn(List.of("xwikistrings", "xwikiproperties", "xwikidoc"));
+        when(this.maxLengthQuery.uniqueResult()).thenReturn(3L);
+        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikistrings", "utf8mb4_bin" },
+            new Object[] { "xwikiproperties", "utf8mb3_general_ci" }, new Object[] { "xwikidoc", "latin1_bin" },
+            new Object[] { "activitystream_events", "utf8mb4_general_ci" },
+            new Object[] { "activitystream_events", "utf8mb4_bin" }));
 
-        NativeQuery<String> lossyQuery = mock(NativeQuery.class);
-        when(this.session.createNativeQuery(contains("CHARACTER_SET_NAME <> :characterSet"))).thenReturn(lossyQuery);
-        when(lossyQuery.list()).thenReturn(List.of("custom_table", "xwikistrings"));
+        NativeQuery<String> wideQuery = mock(NativeQuery.class);
+        when(this.session.createNativeQuery(contains("s.MAXLEN > :maxLength"))).thenReturn(wideQuery);
+        when(wideQuery.list()).thenReturn(List.of("activitystream_events", "custom_table", "xwikistrings"));
 
-        // xwikiproperties is linked to xwikistrings by a foreign key, so it's not converted either
+        // xwikiproperties is linked to xwikistrings by a foreign key, so it's not converted either, while xwikidoc
+        // (latin1) can be converted without losing anything
         assertEquals(List.of("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`",
-            "ALTER TABLE `xwiki`.xwikidoc CONVERT TO CHARACTER SET utf8mb3 COLLATE utf8mb3_bin"),
+            "ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic, CONVERT TO CHARACTER SET utf8mb3 COLLATE utf8mb3_bin"),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
-        assertEquals("Tables [xwikiproperties, xwikistrings] of database [xwiki] won't be converted to character set"
-            + " [utf8mb3] since they (or a table linked to them by a foreign key) contain columns using another"
-            + " character set, some characters of which might be lost. Converting the database to utf8mb4 is"
-            + " recommended.", this.logCapture.getMessage(0));
+        // Only the case insensitive tables are reported
+        assertEquals("Tables [activitystream_events, xwikiproperties] of database [xwiki] use a case insensitive"
+            + " collation, which XWiki does not support, but won't be converted to its character set [utf8mb3] since"
+            + " they (or a table linked to them by a foreign key) can contain characters it does not support."
+            + " Converting them to utf8mb4_bin is recommended.", this.logCapture.getMessage(0));
         assertEquals(1, this.logCapture.size());
     }
 
@@ -314,7 +348,7 @@ class MySQLHibernateAdapterTest
     void convertToDatabaseCollation()
     {
         mockCollationQueries();
-        when(this.tablesQuery.list()).thenReturn(List.of("xwikidoc"));
+        when(this.tablesQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci" }));
 
         NativeQuery statement = mock(NativeQuery.class);
         when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(statement);
@@ -324,7 +358,7 @@ class MySQLHibernateAdapterTest
         this.adapter.convertToDatabaseCollation(this.metadata, this.session);
 
         verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`");
-        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc" + CONVERT);
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT);
         verify(statement, times(2)).executeUpdate();
         verify(transaction, times(2)).commit();
     }
@@ -340,7 +374,7 @@ class MySQLHibernateAdapterTest
         assertEquals("Cannot get the tables row formats without a current wiki database", exception.getMessage());
     }
 
-    private void mockRepairDatabase()
+    private SessionFactory mockRepairDatabase()
     {
         mockCollationQueries();
 
@@ -348,50 +382,49 @@ class MySQLHibernateAdapterTest
         when(this.hibernateStore.getSessionFactory()).thenReturn(sessionFactory);
         when(sessionFactory.openSession()).thenReturn(this.session);
 
-        NativeQuery<Object[]> rowFormatsQuery = mock(NativeQuery.class);
-        when(this.session.createNativeQuery(contains("INNODB_SYS_TABLES"))).thenReturn(rowFormatsQuery);
-        when(rowFormatsQuery.list()).thenReturn(List.of(new Object[] { "xwiki/xwikidoc", "Compact" },
-            new Object[] { "xwiki/xwikilistitems", "Redundant" }, new Object[] { "xwiki/xwikistrings", "Dynamic" },
-            new Object[] { "xwiki/xwikircs", "Compressed" }));
-
         this.alterStatement = mock(NativeQuery.class);
         when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(this.alterStatement);
         when(this.session.getTransaction()).thenReturn(mock(Transaction.class));
+
+        return sessionFactory;
     }
 
     @Test
     void repairDatabase() throws Exception
     {
         mockRepairDatabase();
-        when(this.tablesQuery.list()).thenReturn(List.of());
-
-        // xwikilistitems is a collection table and xwikiproperties does not exist yet
-        when(this.metadata.collectTableMappings()).thenReturn(List.of(new Table("xwikidoc"),
-            new Table("xwikilistitems"), new Table("xwikiproperties"), new Table("xwikistrings"),
-            new Table("xwikircs")));
+        when(this.tablesQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci" }));
 
         this.adapter.repairDatabase(this.metadata);
 
-        // Only the legacy row formats are changed
-        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic");
-        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikilistitems ROW_FORMAT=Dynamic");
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`");
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT);
         verify(this.alterStatement, times(2)).executeUpdate();
-        verify(this.tablesQuery).list();
+        verify(this.session).close();
+    }
+
+    @Test
+    void repairDatabaseWhenNothingToConvert() throws Exception
+    {
+        mockRepairDatabase();
+        when(this.tablesQuery.list()).thenReturn(List.of());
+
+        this.adapter.repairDatabase(this.metadata);
+
+        // Nothing is touched, not even the legacy row formats
+        verify(this.alterStatement, never()).executeUpdate();
         verify(this.session).close();
     }
 
     @Test
     void repairDatabaseWhenFixTableCollationDisabled() throws Exception
     {
-        mockRepairDatabase();
+        SessionFactory sessionFactory = mockRepairDatabase();
         when(this.xwikiProperties.getProperty(FIX_TABLE_COLLATION_PROPERTY, true)).thenReturn(false);
 
         this.adapter.repairDatabase(this.metadata);
 
-        // The legacy row formats are still fixed
-        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic");
-        verify(this.tablesQuery, never()).list();
-        verify(this.session).close();
+        verify(sessionFactory, never()).openSession();
     }
 
     @Test

@@ -98,7 +98,7 @@ class GetdocumentsPageTest extends PageTest
     {
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), any(), any(), any()))
             .thenReturn(false, true);
-        this.request.put("limit", "2");
+        this.stubRequest.put("limit", "2");
         initDefaultQueryMocks(3);
         when(this.query.execute()).thenReturn(Arrays.asList("XWiki.NotViewable", "XWiki.Viewable"));
 
@@ -121,7 +121,7 @@ class GetdocumentsPageTest extends PageTest
     {
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), any(), any(), any())).thenReturn(false,
             true);
-        this.request.put("limit", "2");
+        this.stubRequest.put("limit", "2");
         initDefaultQueryMocks(2);
         when(this.query.execute()).thenReturn(Arrays.asList("XWiki.NotViewable", "XWiki.Viewable"));
 
@@ -144,13 +144,13 @@ class GetdocumentsPageTest extends PageTest
     {
         initDefaultQueryMocks(0);
 
-        this.request.put("offset", "1");
-        this.request.put("limit", "15");
-        this.request.put("collist", "doc.date");
-        this.request.put("doc.date_match", "between");
-        this.request.put("doc.date/join_mode", "OR");
-        this.request.put("childrenOf", "Sandbox");
-        this.request.put("doc.date", "2021-09-22T00:00:00+02:00/2021-09-22T23:59:59+02:00");
+        this.stubRequest.put("offset", "1");
+        this.stubRequest.put("limit", "15");
+        this.stubRequest.put("collist", "doc.date");
+        this.stubRequest.put("doc.date_match", "between");
+        this.stubRequest.put("doc.date/join_mode", "OR");
+        this.stubRequest.put("childrenOf", "Sandbox");
+        this.stubRequest.put("doc.date", "2021-09-22T00:00:00+02:00/2021-09-22T23:59:59+02:00");
         this.templateManager.render(GETDOCUMENTS);
         verify(this.queryService).hql(
             "WHERE 1=1 AND doc.fullName LIKE ?1 AND doc.fullName <> ?2 and doc.date between ?3 and ?4 ");
@@ -172,18 +172,18 @@ class GetdocumentsPageTest extends PageTest
 
         initDefaultQueryMocks(0);
 
-        this.request.put("outputSyntax", "plain");
-        this.request.put("transprefix", "platform.index.");
-        this.request.put("classname", "");
-        this.request.put("collist", "doc.title,doc.location,doc.date,doc.author,_likes");
-        this.request.put("queryFilters", "currentlanguage,hidden");
-        this.request.put("offset", "1");
-        this.request.put("limit", "15");
-        this.request.put("reqNo", "3");
+        this.stubRequest.put("outputSyntax", "plain");
+        this.stubRequest.put("transprefix", "platform.index.");
+        this.stubRequest.put("classname", "");
+        this.stubRequest.put("collist", "doc.title,doc.location,doc.date,doc.author,_likes");
+        this.stubRequest.put("queryFilters", "currentlanguage,hidden");
+        this.stubRequest.put("offset", "1");
+        this.stubRequest.put("limit", "15");
+        this.stubRequest.put("reqNo", "3");
 
-        this.request.put("doc.date", String.format("%d-%d", start, end));
-        this.request.put("sort", "doc.date");
-        this.request.put("dir", "asc");
+        this.stubRequest.put("doc.date", String.format("%d-%d", start, end));
+        this.stubRequest.put("sort", "doc.date");
+        this.stubRequest.put("dir", "asc");
         this.templateManager.render(GETDOCUMENTS);
         verify(this.queryService).hql(
             "WHERE 1=1 and doc.date between ?1 and ?2 order by doc.date asc");
@@ -195,7 +195,7 @@ class GetdocumentsPageTest extends PageTest
     @Test
     void preventDOSAttackOnQueryItemsReturned() throws Exception
     {
-        this.request.put("limit", "2000");
+        this.stubRequest.put("limit", "2000");
 
         this.templateManager.render(GETDOCUMENTS);
 

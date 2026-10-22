@@ -110,7 +110,7 @@ class MovePageTest extends PageTest
             this.context);
         this.xwiki.saveDocument(document, this.context);
         this.context.setDoc(document);
-        this.request.put("attachment", ATTACHMENT_NAME);
+        this.stubRequest.put("attachment", ATTACHMENT_NAME);
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
         assertEquals("error notallowed", render.getElementsByClass("xwikimessage").get(0).text());
     }
@@ -124,7 +124,7 @@ class MovePageTest extends PageTest
             this.context);
         this.xwiki.saveDocument(document, this.context);
         this.context.setDoc(document);
-        this.request.put("attachment", ATTACHMENT_NAME);
+        this.stubRequest.put("attachment", ATTACHMENT_NAME);
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
         assertEquals("homeIcon Space Page attachment.txt", render.getElementsByClass("breadcrumb").get(0).text());
         assertEquals(ATTACHMENT_NAME, render.getElementById("targetAttachmentNameTitle").val());
@@ -147,14 +147,14 @@ class MovePageTest extends PageTest
         XWikiDocument document =
             this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Target"), this.context);
         this.xwiki.saveDocument(document, this.context);
-        this.request.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
-        this.request.put("async", "true");
-        this.request.put("sourceLocation", "xwiki:Space.Source");
-        this.request.put("sourceAttachmentName", "oldname.txt");
-        this.request.put("autoRedirect", "true");
-        this.request.put("targetAttachmentName", ATTACHMENT_NAME);
-        this.request.put("targetLocation", "Space.Target");
-        this.request.put("step", "2");
+        this.stubRequest.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
+        this.stubRequest.put("async", "true");
+        this.stubRequest.put("sourceLocation", "xwiki:Space.Source");
+        this.stubRequest.put("sourceAttachmentName", "oldname.txt");
+        this.stubRequest.put("autoRedirect", "true");
+        this.stubRequest.put("targetAttachmentName", ATTACHMENT_NAME);
+        this.stubRequest.put("targetLocation", "Space.Target");
+        this.stubRequest.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
         assertEquals("exclamationIcon error attachment.move.targetNotWritable",
@@ -165,8 +165,8 @@ class MovePageTest extends PageTest
     void submitTargetAttachmentNameEmpty() throws Exception
     {
         this.context.setDoc(this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Source"), this.context));
-        this.request.put("step", "2");
-        this.request.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
+        this.stubRequest.put("step", "2");
+        this.stubRequest.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
         assertEquals("exclamationIcon error attachment.move.emptyName", 
             render.select(".errormessage").text());
@@ -187,16 +187,16 @@ class MovePageTest extends PageTest
         document.setAttachment(ATTACHMENT_NAME, IOUtils.toInputStream("some content", Charset.defaultCharset()),
             this.context);
         this.xwiki.saveDocument(document, this.context);
-        this.request.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
-        this.request.put("async", "true");
-        this.request.put("sourceWikiName", "xwiki");
-        this.request.put("sourceSpaceName", "Space");
-        this.request.put("sourcePageName", "Source");
-        this.request.put("sourceAttachmentName", "oldname.txt");
-        this.request.put("autoRedirect", "true");
-        this.request.put("targetAttachmentName", ATTACHMENT_NAME);
-        this.request.put("targetLocation", "Space.Target\"'");
-        this.request.put("step", "2");
+        this.stubRequest.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
+        this.stubRequest.put("async", "true");
+        this.stubRequest.put("sourceWikiName", "xwiki");
+        this.stubRequest.put("sourceSpaceName", "Space");
+        this.stubRequest.put("sourcePageName", "Source");
+        this.stubRequest.put("sourceAttachmentName", "oldname.txt");
+        this.stubRequest.put("autoRedirect", "true");
+        this.stubRequest.put("targetAttachmentName", ATTACHMENT_NAME);
+        this.stubRequest.put("targetLocation", "Space.Target\"'");
+        this.stubRequest.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
         assertEquals("exclamationIcon error attachment.move.alreadyExists "

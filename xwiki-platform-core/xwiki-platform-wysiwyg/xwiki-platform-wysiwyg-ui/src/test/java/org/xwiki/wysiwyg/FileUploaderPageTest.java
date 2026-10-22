@@ -22,7 +22,8 @@ package org.xwiki.wysiwyg;
 import java.util.List;
 
 import javax.script.ScriptContext;
-import javax.servlet.http.Part;
+
+import jakarta.servlet.http.Part;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -102,7 +103,7 @@ class FileUploaderPageTest extends PageTest
     {
         this.context.setAction("get");
 
-        this.request.put("filename", "test.txt");
+        this.stubRequest.put("filename", "test.txt");
 
         Attachment attachment = mock(Attachment.class);
         when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(documentReference, "upload",
@@ -122,7 +123,7 @@ class FileUploaderPageTest extends PageTest
     {
         this.context.setAction("get");
 
-        this.request.put("filename", "test.txt");
+        this.stubRequest.put("filename", "test.txt");
 
         when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(documentReference, "upload",
             "test.txt")).thenThrow(new AttachmentValidationException("message", 42, "translationKey", null));
@@ -139,7 +140,7 @@ class FileUploaderPageTest extends PageTest
     {
         this.context.setAction("get");
 
-        this.request.put("filename", "test.txt");
+        this.stubRequest.put("filename", "test.txt");
 
         when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(documentReference, "upload",
             "test.txt")).thenThrow(mock(TemporaryAttachmentException.class));
@@ -157,7 +158,7 @@ class FileUploaderPageTest extends PageTest
     {
         this.context.setAction("get");
 
-        this.request.put("filename", "__fileCreatedFromDataURI__.zip");
+        this.stubRequest.put("filename", "__fileCreatedFromDataURI__.zip");
 
         Attachment attachment = mock(Attachment.class);
 
@@ -183,7 +184,7 @@ class FileUploaderPageTest extends PageTest
         Part part = mock(Part.class);
         when(part.getName()).thenReturn("upload");
         when(part.getSubmittedFileName()).thenReturn("__fileCreatedFromDataURI__.zip");
-        this.request.getParts().add(part);
+        this.stubRequest.getParts().add(part);
 
         Attachment attachment = mock(Attachment.class);
         // Match the call to uploadTemporaryAttachment only when the provided filename matches the name template used as

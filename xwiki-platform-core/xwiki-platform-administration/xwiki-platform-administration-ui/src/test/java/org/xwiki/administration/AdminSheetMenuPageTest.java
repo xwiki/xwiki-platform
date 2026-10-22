@@ -153,7 +153,7 @@ class AdminSheetMenuPageTest extends PageTest
         registerConfigurableSection(NO_SCRIPT, "mysection");
 
         // No category / section selected: the category grid (#admin_displayCategories) is rendered.
-        this.request.put("viewer", "content");
+        this.stubRequest.put("viewer", "content");
 
         Document result = renderHTMLPage(ADMIN_SHEET);
 
@@ -173,8 +173,8 @@ class AdminSheetMenuPageTest extends PageTest
         registerConfigurableSection("lf", NO_SCRIPT);
 
         // The category holding the section is selected: the section grid (#admin_displayCategory) is rendered.
-        this.request.put("viewer", "content");
-        this.request.put("category", "0");
+        this.stubRequest.put("viewer", "content");
+        this.stubRequest.put("category", "0");
 
         Document result = renderHTMLPage(ADMIN_SHEET);
 
@@ -194,8 +194,8 @@ class AdminSheetMenuPageTest extends PageTest
         registerConfigurableSection("lf", "mysection", ICON_ATTACHMENT);
 
         // The category holding the section is selected: the section grid (#admin_displayCategory) is rendered.
-        this.request.put("viewer", "content");
-        this.request.put("category", "0");
+        this.stubRequest.put("viewer", "content");
+        this.stubRequest.put("category", "0");
 
         Document result = renderHTMLPage(ADMIN_SHEET);
 

@@ -89,7 +89,7 @@ class SolrSearchPageTest extends PageTest
     void noEmptyParagraph() throws Exception
     {
         // Prevent that the search UI triggers a redirect.
-        this.request.put("r", "1");
+        this.stubRequest.put("r", "1");
         Document searchDocument = renderHTMLPage(SOLR_SEARCH_REFERENCE);
         Element firstElement = searchDocument.body().firstElementChild();
         assertNotNull(firstElement);
@@ -104,8 +104,8 @@ class SolrSearchPageTest extends PageTest
         String unescapedText = "<b>}}}{{noscript}}</b>";
         String escapedText = "&lt;b&gt;}}}{{noscript}}&lt;/b&gt;";
 
-        this.request.put("media", "rss");
-        this.request.put("text", unescapedText);
+        this.stubRequest.put("media", "rss");
+        this.stubRequest.put("text", unescapedText);
         this.context.setAction("get");
 
         XWikiDocument solrSearchDocument = loadPage(SOLR_SEARCH_REFERENCE);
@@ -114,14 +114,14 @@ class SolrSearchPageTest extends PageTest
         // Get directly the writer to check the RSS feed.
         StringWriter out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
-        this.response = new XWikiServletResponseStub() {
+        XWikiServletResponseStub javaxResponse = new XWikiServletResponseStub() {
             @Override
             public PrintWriter getWriter()
             {
                 return writer;
             }
         };
-        this.context.setResponse(this.response);
+        this.context.setResponse(javaxResponse);
 
         String rssFeed = solrSearchDocument.displayDocument(Syntax.PLAIN_1_0, this.context);
         assertTrue(StringUtils.isAllBlank(rssFeed));

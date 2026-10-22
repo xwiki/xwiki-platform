@@ -130,7 +130,7 @@ class GetdeleteddocumentsPageTest extends PageTest
     @Test
     void getDeletedDocumentsOfuscatedResultsAreNotFiltered() throws Exception
     {
-        this.request.put("limit", "1");
+        this.stubRequest.put("limit", "1");
 
         defaultQueryMocks();
 

@@ -150,9 +150,9 @@ class SchedulerPageTest extends PageTest
     {
         String wrongToken = "wrong token";
 
-        this.request.put("do", "trigger");
-        this.request.put("which", "Scheduler.TestJob");
-        this.request.put("form_token", wrongToken);
+        this.stubRequest.put("do", "trigger");
+        this.stubRequest.put("which", "Scheduler.TestJob");
+        this.stubRequest.put("form_token", wrongToken);
         Document result = renderHTMLPage(SCHEDULER_WEB_HOME);
 
         verify(this.schedulerPluginApi, never()).triggerJob(any(Object.class));
@@ -169,9 +169,9 @@ class SchedulerPageTest extends PageTest
     {
         when(this.schedulerPluginApi.triggerJob(this.testJobObjectApi)).thenReturn(true);
 
-        this.request.put("do", "trigger");
-        this.request.put("which", "Scheduler.TestJob");
-        this.request.put("form_token", CSRF_TOKEN);
+        this.stubRequest.put("do", "trigger");
+        this.stubRequest.put("which", "Scheduler.TestJob");
+        this.stubRequest.put("form_token", CSRF_TOKEN);
         Document result = renderHTMLPage(SCHEDULER_WEB_HOME);
 
         verify(this.schedulerPluginApi).triggerJob(this.testJobObjectApi);

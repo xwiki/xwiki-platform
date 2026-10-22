@@ -155,7 +155,7 @@ class CreateInlinePageTest extends PageTest
     void templateProviderRestrictionErrorEscaping(List<String> allowedSpaces) throws Exception
     {
         String provider = "\"provider</div>";
-        this.request.put("templateprovider", provider);
+        this.stubRequest.put("templateprovider", provider);
         String template = "template</div>";
 
         // Set "createException" to an XWikiException to simulate a template provider restriction error.
@@ -189,9 +189,9 @@ class CreateInlinePageTest extends PageTest
     void closeButtonHasLabel() throws Exception
     {
         // The template only renders the modal, and so its close button, for an AJAX request.
-        this.request = new XWikiServletRequestStub.Builder()
+        XWikiServletRequestStub javaxRequest = new XWikiServletRequestStub.Builder()
             .setHeaders(Map.of("X-Requested-With", List.of("XMLHttpRequest"))).build();
-        this.context.setRequest(this.request);
+        this.context.setRequest(javaxRequest);
 
         Document document = Jsoup.parse(this.templateManager.render(CREATE_INLINE_VM));
         Element closeButton = document.selectFirst(".modal-header button.close");

@@ -71,9 +71,9 @@ class ExportResubmitInlinePageTest extends PageTest
     @Test
     void resubmitTheRequestedExport() throws Exception
     {
-        this.request.put("format", "xar");
-        this.request.put("name", "My Export");
-        this.request.put("pages", "xwiki:Some.%");
+        this.stubRequest.put("format", "xar");
+        this.stubRequest.put("name", "My Export");
+        this.stubRequest.put("pages", "xwiki:Some.%");
 
         Document document = Jsoup.parse(this.templateManager.render(TEMPLATE_NAME));
 
@@ -111,7 +111,7 @@ class ExportResubmitInlinePageTest extends PageTest
     {
         // A token taken from the URL that led to this page must not be reused: the export is submitted by the user
         // reading the page, not by whoever built that URL.
-        this.request.put("form_token", "forgedToken");
+        this.stubRequest.put("form_token", "forgedToken");
 
         Document document = Jsoup.parse(this.templateManager.render(TEMPLATE_NAME));
 
@@ -125,7 +125,7 @@ class ExportResubmitInlinePageTest extends PageTest
     void escapeParameters() throws Exception
     {
         String escapingTest = "\"'><script>console.log('escaping');</script>";
-        this.request.put(escapingTest, escapingTest);
+        this.stubRequest.put(escapingTest, escapingTest);
 
         Document document = Jsoup.parse(this.templateManager.render(TEMPLATE_NAME));
 

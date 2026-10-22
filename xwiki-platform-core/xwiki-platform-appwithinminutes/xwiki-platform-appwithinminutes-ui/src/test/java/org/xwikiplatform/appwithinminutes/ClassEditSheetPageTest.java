@@ -164,7 +164,7 @@ class ClassEditSheetPageTest extends PageTest
         // A fresh token is offered to the client so that it can recover from an expired token.
         when(this.csrfTokenScriptService.getToken()).thenReturn("freshToken");
 
-        XWikiServletResponseStub responseSpy = spy(this.response);
+        XWikiServletResponseStub responseSpy = spy((XWikiServletResponseStub) this.context.getResponse());
         this.context.setResponse(responseSpy);
 
         Document document = renderHTMLPage(editedDocument);
@@ -233,7 +233,7 @@ class ClassEditSheetPageTest extends PageTest
         this.context.setUserReference(adminDocumentReference);
         this.context.setDoc(editedDocument);
         EditForm editForm = new EditForm();
-        editForm.setRequest(this.request);
+        editForm.setRequest(this.context.getRequest());
         this.context.setForm(editForm);
 
         return editedDocument;

@@ -37,6 +37,7 @@ import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.velocity.tools.EscapeTool;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 import static java.util.Collections.singletonMap;
 import static org.mockito.Mockito.spy;
@@ -77,23 +78,23 @@ class CreatePanelTest extends PageTest
     void createPanel() throws Exception
     {
         // Replace the response with a spy to be able to assert sendRedirect parameters.
-        this.response = spy(this.response);
-        this.context.setResponse(this.response);
+        XWikiServletResponseStub responseSpy = spy((XWikiServletResponseStub) this.context.getResponse());
+        this.context.setResponse(responseSpy);
 
         when(this.nameValidationConfiguration.getCharacterReplacementMap()).thenReturn(singletonMap("\\", ""));
 
         // Initialize the request parameters.
-        this.request.put("create", "1");
-        this.request.put("panelTitle", PAGE_TITLE);
-        this.request.put("parent", "Panels.WebHome");
+        this.stubRequest.put("create", "1");
+        this.stubRequest.put("panelTitle", PAGE_TITLE);
+        this.stubRequest.put("parent", "Panels.WebHome");
         String formToken = "csrfToken45";
-        this.request.put("form_token", formToken);
+        this.stubRequest.put("form_token", formToken);
 
         renderPage(new DocumentReference("xwiki", "Panels", "CreatePanel"));
 
         // Verify in particular that the document we are redirected to has a name that conforms to the naming strategy.
         EscapeTool tool = new EscapeTool();
-        verify(this.response).sendRedirect("/xwiki/bin/edit/Panels/" + tool.url(TRANSFORMED_PAGE_TITLE)
+        verify(responseSpy).sendRedirect("/xwiki/bin/edit/Panels/" + tool.url(TRANSFORMED_PAGE_TITLE)
             + "?template=Panels.PanelTemplate"
             + "&Panels.PanelClass_0_name=" + tool.url(PAGE_TITLE)
             + "&Panels.PanelClass_0_content=" + tool
@@ -105,13 +106,13 @@ class CreatePanelTest extends PageTest
     void createPanelPageAlreadyExist() throws Exception
     {
         // Replace the response with a spy to be able to assert sendRedirect parameters.
-        this.response = spy(this.response);
-        this.context.setResponse(this.response);
+        XWikiServletResponseStub responseSpy = spy((XWikiServletResponseStub) this.context.getResponse());
+        this.context.setResponse(responseSpy);
 
         // Initialize the request parameters.
-        this.request.put("create", "1");
-        this.request.put("panelTitle", "a");
-        this.request.put("parent", "Panels.WebHome");
+        this.stubRequest.put("create", "1");
+        this.stubRequest.put("panelTitle", "a");
+        this.stubRequest.put("parent", "Panels.WebHome");
 
         XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "Panels", "a"));
         this.xwiki.saveDocument(doc, this.context);
@@ -119,6 +120,6 @@ class CreatePanelTest extends PageTest
         renderPage(new DocumentReference("xwiki", "Panels", "CreatePanel"));
 
         // Verify in particular that the document we are redirected to has a name that conforms to the naming strategy.
-        verify(this.response).sendRedirect("/xwiki/bin/view/Panels/a?xpage=docalreadyexists");
+        verify(responseSpy).sendRedirect("/xwiki/bin/view/Panels/a?xpage=docalreadyexists");
     }
 }

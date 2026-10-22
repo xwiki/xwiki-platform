@@ -107,9 +107,9 @@ class LikersPageTest extends PageTest
         DocumentReference user1DocumentReference = new DocumentReference("xwiki", "XWiki", "user1");
         DocumentReference user2DocumentReference = new DocumentReference("xwiki", "XWiki", "user2");
 
-        this.request.put("livetable", "true");
-        this.request.put("limit", "5");
-        this.request.put("offset", "1");
+        this.stubRequest.put("livetable", "true");
+        this.stubRequest.put("limit", "5");
+        this.stubRequest.put("offset", "1");
 
         XWikiDocument likedDoc = this.xwiki.getDocument(likedDocumentReference, this.context);
         this.context.setDoc(likedDoc);
@@ -149,9 +149,9 @@ class LikersPageTest extends PageTest
         DocumentReference user1DocumentReference = new DocumentReference("xwiki", "XWiki", "user1");
         DocumentReference user2DocumentReference = new DocumentReference("xwiki", "XWiki", "user2");
 
-        this.request.put("livetable", "true");
-        this.request.put("limit", "1");
-        this.request.put("offset", "1");
+        this.stubRequest.put("livetable", "true");
+        this.stubRequest.put("limit", "1");
+        this.stubRequest.put("offset", "1");
 
         XWikiDocument likedDoc = this.xwiki.getDocument(likedDocumentReference, this.context);
         this.context.setDoc(likedDoc);

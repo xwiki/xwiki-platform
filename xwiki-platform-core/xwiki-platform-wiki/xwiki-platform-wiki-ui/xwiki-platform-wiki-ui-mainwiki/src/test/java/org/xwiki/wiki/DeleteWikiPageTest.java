@@ -56,7 +56,7 @@ class DeleteWikiPageTest extends PageTest
     @Test
     void unknownWikiId() throws Exception
     {
-        this.request.put("wikiId", "\" /}}{{noscript/}}");
+        this.stubRequest.put("wikiId", "\" /}}{{noscript/}}");
         Document document = renderHTMLPage(new DocumentReference("xwiki", "WikiManager", "DeleteWiki"));
         assertEquals("platform.wiki.error.wikidoesnotexist [\" /}}{{noscript/}}]",
             document.select(".box.errormessage").text());

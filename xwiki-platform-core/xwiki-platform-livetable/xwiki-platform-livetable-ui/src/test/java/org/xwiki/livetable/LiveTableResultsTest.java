@@ -122,8 +122,8 @@ class LiveTableResultsTest extends PageTest
         // The LiveTableResultsMacros page expects that the HTTP query is done with the "get" action and asking for
         // plain output.
         setOutputSyntax(Syntax.PLAIN_1_0);
-        this.request.put("outputSyntax", "plain");
-        this.request.put("xpage", "plain");
+        this.stubRequest.put("outputSyntax", "plain");
+        this.stubRequest.put("xpage", "plain");
         this.oldcore.getXWikiContext().setAction("get");
 
         // Prepare mock Query Service so that tests can control what the DB returns.
@@ -278,7 +278,7 @@ class LiveTableResultsTest extends PageTest
         setFilter("category", "-");
         setFilter("category_match", "exact");
         setFilter("category", "Information");
-        this.request.put("category/join_mode", "OR");
+        this.stubRequest.put("category/join_mode", "OR");
 
         when(this.queryService.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
@@ -384,7 +384,7 @@ class LiveTableResultsTest extends PageTest
         setFilter("category", "c");
         setFilter("category_match", "exact");
         setFilter("category", "d");
-        this.request.put("category/join_mode", "OR");
+        this.stubRequest.put("category/join_mode", "OR");
 
         when(this.queryService.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
@@ -459,7 +459,7 @@ class LiveTableResultsTest extends PageTest
     @Test
     void nonViewableResultsAreObfuscated() throws Exception
     {
-        this.request.put("limit", "2");
+        this.stubRequest.put("limit", "2");
         when(this.queryService.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
         when(this.query.setOffset(anyInt())).thenReturn(this.query);
@@ -487,7 +487,7 @@ class LiveTableResultsTest extends PageTest
     @Test
     void removeObfuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
     {
-        this.request.put("limit", "2");
+        this.stubRequest.put("limit", "2");
         when(this.queryService.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
         when(this.query.setOffset(anyInt())).thenReturn(this.query);
@@ -522,13 +522,13 @@ class LiveTableResultsTest extends PageTest
         when(this.oldcore.getMockContextualAuthorizationManager()
             .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "NotViewable")))).thenReturn(false);
 
-        this.request.put("limit", "0");
-        this.request.put("classname", "");
-        this.request.put("collist", "doc.title,doc.location,doc.content");
-        this.request.put("doc.title", "Sandbo");
-        this.request.put("doc.location", "Sandbox.TestPage3");
-        this.request.put("doc.content", "dummy");
-        this.request.put("limit", "0");
+        this.stubRequest.put("limit", "0");
+        this.stubRequest.put("classname", "");
+        this.stubRequest.put("collist", "doc.title,doc.location,doc.content");
+        this.stubRequest.put("doc.title", "Sandbo");
+        this.stubRequest.put("doc.location", "Sandbox.TestPage3");
+        this.stubRequest.put("doc.content", "dummy");
+        this.stubRequest.put("limit", "0");
 
         renderPage();
 
@@ -555,9 +555,9 @@ class LiveTableResultsTest extends PageTest
         when(this.query.count()).thenReturn(0L);
         when(this.query.execute()).thenReturn(Collections.emptyList());
 
-        this.request.put("classname", "XWiki.MyClass");
-        this.request.put("password", "abcd");
-        this.request.put("collist", "password");
+        this.stubRequest.put("classname", "XWiki.MyClass");
+        this.stubRequest.put("password", "abcd");
+        this.stubRequest.put("collist", "password");
 
         renderPage();
 
@@ -584,9 +584,9 @@ class LiveTableResultsTest extends PageTest
         when(this.query.count()).thenReturn(0L);
         when(this.query.execute()).thenReturn(Collections.emptyList());
 
-        this.request.put("password", "abcd");
-        this.request.put("password_class", "XWiki.MyClass");
-        this.request.put("collist", "password");
+        this.stubRequest.put("password", "abcd");
+        this.stubRequest.put("password_class", "XWiki.MyClass");
+        this.stubRequest.put("collist", "password");
 
         renderPage();
 
@@ -1030,50 +1030,50 @@ class LiveTableResultsTest extends PageTest
 
     private void setClassName(String className)
     {
-        this.request.put("classname", className);
+        this.stubRequest.put("classname", className);
     }
 
     private void setColumns(String... columns)
     {
-        this.request.put("collist", StringUtils.join(columns, ','));
+        this.stubRequest.put("collist", StringUtils.join(columns, ','));
     }
 
     private void setLocation(String location)
     {
-        this.request.put("location", location);
+        this.stubRequest.put("location", location);
     }
 
     private void setOffset(int offset)
     {
-        this.request.put("offset", String.valueOf(offset));
+        this.stubRequest.put("offset", String.valueOf(offset));
     }
 
     private void setLimit(int limit)
     {
-        this.request.put("limit", String.valueOf(limit));
+        this.stubRequest.put("limit", String.valueOf(limit));
     }
 
     private void setSort(String column, Boolean ascending)
     {
-        this.request.put("sort", column);
+        this.stubRequest.put("sort", column);
         if (ascending != null) {
-            this.request.put("dir", ascending ? "asc" : "desc");
+            this.stubRequest.put("dir", ascending ? "asc" : "desc");
         }
     }
 
     private void setFilter(String column, String value)
     {
-        this.request.put(column, value);
+        this.stubRequest.put(column, value);
     }
 
     private void setJoinMode(String column, String joinMode)
     {
-        this.request.put(column + "/join_mode", joinMode);
+        this.stubRequest.put(column + "/join_mode", joinMode);
     }
 
     private void setQueryFilters(String... filters)
     {
-        this.request.put("queryFilters", StringUtils.join(filters, ','));
+        this.stubRequest.put("queryFilters", StringUtils.join(filters, ','));
     }
 
     private Object getTotalRowCount()

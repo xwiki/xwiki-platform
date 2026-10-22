@@ -51,13 +51,13 @@ class XPartPageTest extends PageTest
     void setUp() throws Exception
     {
         this.templateManager = this.componentManager.getInstance(TemplateManager.class);
-        this.request.put("xpage", "xpart");
+        this.stubRequest.put("xpage", "xpart");
     }
 
     @Test
     void renderRegisterTemplate() throws Exception
     {
-        this.request.put(VM_PARAMETER, "register.vm");
+        this.stubRequest.put(VM_PARAMETER, "register.vm");
         String result = this.templateManager.render(X_PART_VM);
         assertTrue(result.contains("<form id=\"register\""));
     }
@@ -65,7 +65,7 @@ class XPartPageTest extends PageTest
     @Test
     void renderForbiddenTemplate() throws Exception
     {
-        this.request.put(VM_PARAMETER, "distribution/firstadminuser.wiki");
+        this.stubRequest.put(VM_PARAMETER, "distribution/firstadminuser.wiki");
         String result = this.templateManager.render(X_PART_VM);
         assertEquals("Invalid template.", result.trim());
     }

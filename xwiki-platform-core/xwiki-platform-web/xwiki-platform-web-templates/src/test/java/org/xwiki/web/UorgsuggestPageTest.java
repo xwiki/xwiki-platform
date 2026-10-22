@@ -130,7 +130,7 @@ class UorgsuggestPageTest extends PageTest
         when(this.oldcore.getMockContextualAuthorizationManager()
             .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "U2")))).thenReturn(false);
 
-        this.request.put("uorg", "user");
+        this.stubRequest.put("uorg", "user");
 
         String render = this.templateManager.render(UORGSUGGEST).trim();
 
@@ -159,8 +159,8 @@ class UorgsuggestPageTest extends PageTest
         when(this.oldcore.getMockContextualAuthorizationManager()
             .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "U2")))).thenReturn(false);
 
-        this.request.put("uorg", "user");
-        this.request.put("media", "json");
+        this.stubRequest.put("uorg", "user");
+        this.stubRequest.put("media", "json");
 
         String render = this.templateManager.render(UORGSUGGEST).trim();
 
@@ -173,9 +173,9 @@ class UorgsuggestPageTest extends PageTest
     @Test
     void usersIncludingInactiveUsers() throws Exception
     {
-        this.request.put("uorg", "user");
-        this.request.put("media", "json");
-        this.request.put("includeInactiveUsers", "true");
+        this.stubRequest.put("uorg", "user");
+        this.stubRequest.put("media", "json");
+        this.stubRequest.put("includeInactiveUsers", "true");
 
         String render = this.templateManager.render(UORGSUGGEST).trim();
 
@@ -207,7 +207,7 @@ class UorgsuggestPageTest extends PageTest
         when(this.query.execute()).thenReturn(asList("xwiki:XWiki.G1", "xwiki:XWiki.G2"));
         when(this.oldcore.getMockContextualAuthorizationManager()
             .hasAccess(same(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "G2")))).thenReturn(false);
-        this.request.put("media", "json");
+        this.stubRequest.put("media", "json");
 
         String render = this.templateManager.render(UORGSUGGEST).trim();
 

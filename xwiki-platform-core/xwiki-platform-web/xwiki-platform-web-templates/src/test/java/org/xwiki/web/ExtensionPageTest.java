@@ -90,16 +90,16 @@ class ExtensionPageTest extends PageTest
         this.context.setDoc(this.currentDocument);
         this.context.setAction("view");
 
-        this.request.put("section", "XWiki.Extensions");
-        this.request.put("extensionId", "org.xwiki.platform:xwiki-platform-web-templates");
-        this.request.put("extensionVersion", "1.0");
+        this.stubRequest.put("section", "XWiki.Extensions");
+        this.stubRequest.put("extensionId", "org.xwiki.platform:xwiki-platform-web-templates");
+        this.stubRequest.put("extensionVersion", "1.0");
     }
 
     @Test
     void backToTheRequestedURL() throws Exception
     {
         String backURL = "/xwiki/bin/view/Main/?a=b&c=d";
-        this.request.put("xback", backURL);
+        this.stubRequest.put("xback", backURL);
 
         assertEquals(backURL, getBackURL());
     }
@@ -113,7 +113,7 @@ class ExtensionPageTest extends PageTest
     @Test
     void backToTheCurrentPageWithEncodedParameters() throws Exception
     {
-        this.request.put("search", "a b&c");
+        this.stubRequest.put("search", "a b&c");
 
         assertEquals(DEFAULT_BACK_URL + "&search=a%20b%26c", getBackURL());
     }
@@ -121,7 +121,7 @@ class ExtensionPageTest extends PageTest
     @Test
     void backToTheCurrentPageWhenTheRequestedURLIsUnsafe() throws Exception
     {
-        this.request.put("xback", "javascript:alert(1)");
+        this.stubRequest.put("xback", "javascript:alert(1)");
 
         assertEquals(DEFAULT_BACK_URL, getBackURL());
     }
@@ -130,7 +130,7 @@ class ExtensionPageTest extends PageTest
     void backToTheCurrentPageWhenTheRequestedURLCannotBeParsed() throws Exception
     {
         String backURL = "javascript:alert(1)//";
-        this.request.put("xback", backURL);
+        this.stubRequest.put("xback", backURL);
         doThrow(new URISyntaxException(backURL, "Malformed URI")).when(this.urlSecurityScriptService)
             .parseToSafeURI(backURL);
 
@@ -141,7 +141,7 @@ class ExtensionPageTest extends PageTest
     void backToTheCurrentPageWhenTheRequestedURLIsUntrusted() throws Exception
     {
         String backURL = "https://untrusted.example.org/";
-        this.request.put("xback", backURL);
+        this.stubRequest.put("xback", backURL);
         doReturn(null).when(this.urlSecurityScriptService).parseToSafeURI(backURL);
 
         assertEquals(DEFAULT_BACK_URL, getBackURL());
@@ -153,7 +153,7 @@ class ExtensionPageTest extends PageTest
         // Only the sanitized URL is known to be safe, and the requested URL could be interpreted differently by the
         // browser, so the requested URL is used only if it is accepted unchanged.
         String backURL = "/xwiki/bin/view/Main/?a=b c";
-        this.request.put("xback", backURL);
+        this.stubRequest.put("xback", backURL);
         doReturn(new URI("/xwiki/bin/view/Main/?a=b%20c")).when(this.urlSecurityScriptService)
             .parseToSafeURI(backURL);
 

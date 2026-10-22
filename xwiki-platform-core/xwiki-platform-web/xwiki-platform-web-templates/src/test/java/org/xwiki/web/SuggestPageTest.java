@@ -111,7 +111,7 @@ class SuggestPageTest extends PageTest
         this.xwiki.saveDocument(classDocument, this.context);
 
         // Set this document as default class name.
-        this.request.put("classname", "XWiki.XWikiUsers");
+        this.stubRequest.put("classname", "XWiki.XWikiUsers");
     }
 
     @Test
@@ -188,7 +188,7 @@ class SuggestPageTest extends PageTest
 
     private Document getResult(String fieldName) throws Exception
     {
-        this.request.put("fieldname", fieldName);
+        this.stubRequest.put("fieldname", fieldName);
 
         String xmlResult = this.templateManager.render("suggest.vm").trim();
 

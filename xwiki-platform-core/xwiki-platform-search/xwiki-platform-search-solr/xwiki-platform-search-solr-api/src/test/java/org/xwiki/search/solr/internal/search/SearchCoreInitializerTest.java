@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.search;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -128,6 +129,31 @@ class SearchCoreInitializerTest
             + " definition in the schema [hidden] (usually because the configuration of the core was upgraded),"
             + " deleting its index. It will be filled again by the synchronization with the database.",
             this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void initializeWithManyNonCompliantFields() throws Exception
+    {
+        Set<String> fields = new TreeSet<>();
+        for (int i = 10; i < 25; i++) {
+            fields.add("property.Space.Class.prop" + i + "_boolean");
+        }
+        when(this.solrSchema.getNonCompliantFields(this.core)).thenReturn(fields);
+        when(this.configuration.synchronizeAtStartup()).thenReturn(true);
+
+        this.initializer.initialize(this.core);
+
+        verify(this.solr).deleteIndex(this.core);
+
+        // Only the first fields are listed
+        assertEquals("The index of the Solr core [xwiki_search_9] contains fields which are not compatible with their"
+            + " definition in the schema [property.Space.Class.prop10_boolean, property.Space.Class.prop11_boolean,"
+            + " property.Space.Class.prop12_boolean, property.Space.Class.prop13_boolean,"
+            + " property.Space.Class.prop14_boolean, property.Space.Class.prop15_boolean,"
+            + " property.Space.Class.prop16_boolean, property.Space.Class.prop17_boolean,"
+            + " property.Space.Class.prop18_boolean, property.Space.Class.prop19_boolean, and 5 more] (usually because"
+            + " the configuration of the core was upgraded), deleting its index. It will be filled again by the"
+            + " synchronization with the database.", this.logCapture.getMessage(0));
     }
 
     @Test

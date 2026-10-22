@@ -212,6 +212,89 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Several embedded artifacts have license and notice files with the same name, so they are copied once per
+           project with the project name as prefix instead (the original ones are excluded from the shaded jar) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-licenses</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <!-- Solr -->
+                <artifactItem>
+                  <groupId>org.apache.solr</groupId>
+                  <artifactId>solr-core</artifactId>
+                  <includes>META-INF/LICENSE*,META-INF/NOTICE*</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/</pattern>
+                      <replacement>META-INF/solr-</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+                <!-- Jersey: same license and notice in all the modules, plus a notice of the third-party content
+                     specific to some modules -->
+                <artifactItem>
+                  <groupId>org.glassfish.jersey.core</groupId>
+                  <artifactId>jersey-common</artifactId>
+                  <includes>META-INF/LICENSE.md,META-INF/NOTICE.md,META-INF/NOTICE.markdown</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/NOTICE\.markdown$</pattern>
+                      <replacement>META-INF/jersey-common-NOTICE.markdown</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/(LICENSE|NOTICE)\.md$</pattern>
+                      <replacement>META-INF/jersey-$1.md</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.glassfish.jersey.core</groupId>
+                  <artifactId>jersey-server</artifactId>
+                  <includes>META-INF/NOTICE.markdown</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/</pattern>
+                      <replacement>META-INF/jersey-server-</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.glassfish.jersey.media</groupId>
+                  <artifactId>jersey-media-json-jackson</artifactId>
+                  <includes>META-INF/NOTICE.markdown</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/</pattern>
+                      <replacement>META-INF/jersey-media-json-jackson-</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+                <!-- HK2: same license and notice in all the modules -->
+                <artifactItem>
+                  <groupId>org.glassfish.hk2</groupId>
+                  <artifactId>hk2-api</artifactId>
+                  <includes>META-INF/LICENSE.md,META-INF/NOTICE.md</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/</pattern>
+                      <replacement>META-INF/hk2-</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -289,6 +372,21 @@
                   <excludes>
                     <exclude>META-INF/maven/**</exclude>
                     <exclude>META-INF/versions/**</exclude>
+                  </excludes>
+                </filter>
+                <!-- Copied with the project name as prefix, see maven-dependency-plugin -->
+                <filter>
+                  <artifact>org.apache.solr:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/LICENSE*</exclude>
+                    <exclude>META-INF/NOTICE*</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <artifact>org.glassfish.*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/LICENSE*</exclude>
+                    <exclude>META-INF/NOTICE*</exclude>
                   </excludes>
                 </filter>
               </filters>

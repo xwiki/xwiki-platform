@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.search;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -52,6 +53,8 @@ public class SearchCoreInitializer implements SolrCoreInitializer
      * The name of the core containing the XWiki search index.
      */
     public static final String CORE_NAME = "search";
+
+    private static final int MAX_LOGGED_FIELDS = 10;
 
     @Inject
     private SearchCoreMigrationManager migrations;
@@ -117,10 +120,23 @@ public class SearchCoreInitializer implements SolrCoreInitializer
                 message += " Since solr.synchronizeAtStartup is disabled, it needs to be filled again by triggering a"
                     + " synchronization with the database manually.";
             }
-            this.logger.warn(message, core.getSolrName(), nonCompliantFields);
+            this.logger.warn(message, core.getSolrName(), toLoggedFields(nonCompliantFields));
 
             deleteIndex(core);
         }
+    }
+
+    private String toLoggedFields(Set<String> fields)
+    {
+        // Each dynamic field of a property counts, so the list can be very long
+        StringBuilder builder = new StringBuilder("[");
+        builder.append(fields.stream().limit(MAX_LOGGED_FIELDS).collect(Collectors.joining(", ")));
+        if (fields.size() > MAX_LOGGED_FIELDS) {
+            builder.append(String.format(", and %d more", fields.size() - MAX_LOGGED_FIELDS));
+        }
+        builder.append(']');
+
+        return builder.toString();
     }
 
     private void deleteIndex(XWikiSolrCore core)

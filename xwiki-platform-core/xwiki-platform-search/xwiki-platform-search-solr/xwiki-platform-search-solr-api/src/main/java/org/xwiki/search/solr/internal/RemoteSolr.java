@@ -30,8 +30,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.solr.client.api.util.SolrVersion;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -130,34 +128,18 @@ public class RemoteSolr extends AbstractSolr implements Initializable
             }
             String version = (String) systemInfo.findRecursive("lucene", "solr-impl-version");
             if (version != null) {
-                setServerVersion(version);
+                this.solrMajorVersion = Integer.parseInt(StringUtils.substringBefore(version, '.'));
+
+                if (this.solrMajorVersion < getCoreMajorVersion()) {
+                    this.logger.error("The version of the Solr server [{}] is older than the version of Solr the XWiki"
+                        + " cores are designed for ([{}]), the Solr server needs to be upgraded.", version,
+                        getCoreMajorVersion());
+                }
             } else {
                 throw new InitializationException(
                     "The Solr server does not give any information about its version in lucene -> solr-impl-version."
                         + " Received [" + systemInfo + "].");
             }
-        }
-    }
-
-    /**
-     * @param version the version of the Solr server, as indicated by the server (e.g. "9.11.0 6c6c4[...] - builder -
-     *            2026-01-01 10:00:00")
-     */
-    void setServerVersion(String version)
-    {
-        String[] numbers = StringUtils.substringBefore(version, ' ').split("\\.");
-        this.solrMajorVersion = Integer.parseInt(numbers[0]);
-        int minorVersion = numbers.length > 1 ? NumberUtils.toInt(numbers[1]) : 0;
-
-        // The configuration of the cores is designed for the version of Solr bundled with XWiki, and can rely on what
-        // was introduced in its minor version (e.g. a new schema version, which an older Solr does not support)
-        int coreMajorVersion = getCoreMajorVersion();
-        int coreMinorVersion = SolrVersion.LATEST.getMinorVersion();
-        if (this.solrMajorVersion < coreMajorVersion
-            || (this.solrMajorVersion == coreMajorVersion && minorVersion < coreMinorVersion)) {
-            String coreVersion = coreMajorVersion + "." + coreMinorVersion;
-            this.logger.error("The version of the Solr server [{}] is older than the version of Solr the XWiki cores"
-                + " are designed for ([{}]), the Solr server needs to be upgraded.", version, coreVersion);
         }
     }
 

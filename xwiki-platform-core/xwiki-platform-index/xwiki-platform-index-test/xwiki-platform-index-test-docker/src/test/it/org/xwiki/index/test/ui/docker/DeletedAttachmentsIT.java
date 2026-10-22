@@ -35,6 +35,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
@@ -111,7 +112,8 @@ public class DeletedAttachmentsIT
      */
     @Test
     @Order(3)
-    void sortFilterAndDeletePermanently(TestUtils setup, TestReference testReference) throws Exception
+    void sortFilterAndDeletePermanently(TestUtils setup, TestReference testReference,
+        LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         // The nested page and its deleted "deletedFile1.txt" attachment are created by setUp(). Note that the
         // attachment names are chosen to be sorted after "deletedFile1.txt", since the other tests of this class
@@ -124,11 +126,22 @@ public class DeletedAttachmentsIT
         setup.createPageWithAttachment(terminalPage, "", "Terminal Attachments", TERMINAL_FILE_1,
             new ByteArrayInputStream("terminal1".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
         setup.attachFile(terminalPage, TERMINAL_FILE_2, new ByteArrayInputStream("terminal2".getBytes()), true);
-        setup.deleteAttachement(new AttachmentReference(NESTED_FILE, testReference));
-        setup.deleteAttachement(new AttachmentReference(TERMINAL_FILE_1, terminalPage));
+
+        AttachmentReference nestedFile = new AttachmentReference(NESTED_FILE, testReference);
+        AttachmentReference terminalFile1 = new AttachmentReference(TERMINAL_FILE_1, terminalPage);
+        AttachmentReference terminalFile2 = new AttachmentReference(TERMINAL_FILE_2, terminalPage);
+        // The attachments are deleted one after the other: the Solr indexer can index a page while one of its
+        // attachments is being deleted, when its content is already removed but the page still has it. Nothing is lost
+        // since the deletion indexes the page again.
+        for (AttachmentReference attachment : List.of(nestedFile, terminalFile1, terminalFile2)) {
+            logCaptureConfiguration
+                .registerExcludes(String.format("Failed to retrieve the content of attachment [%s]", attachment));
+        }
+        setup.deleteAttachement(nestedFile);
+        setup.deleteAttachement(terminalFile1);
         UsernamePasswordCredentials previousCredentials = setup.setDefaultCredentials(deleter);
         try {
-            setup.deleteAttachement(new AttachmentReference(TERMINAL_FILE_2, terminalPage));
+            setup.deleteAttachement(terminalFile2);
         } finally {
             setup.setDefaultCredentials(previousCredentials);
         }

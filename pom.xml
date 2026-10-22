@@ -69,8 +69,8 @@
     <!-- Used for CVSS score calculation -->
     <metaeffekt.version>0.159.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
-    <solr.version>9.4.1</solr.version>
-    <lucene.version>9.8.0</lucene.version>
+    <solr.version>9.11.0</solr.version>
+    <lucene.version>9.12.3</lucene.version>
     <solr.minimum.java.version>11</solr.minimum.java.version>
     <jersey.version>2.48</jersey.version>
     <hk2.version>2.6.1</hk2.version>
@@ -843,13 +843,6 @@
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-api</artifactId>
         <version>${solr.version}</version>
-        <exclusions>
-          <!-- Wrong ids -->
-          <exclusion>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
@@ -865,10 +858,6 @@
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
           </exclusion>
           <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
           <exclusion>

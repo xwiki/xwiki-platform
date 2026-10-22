@@ -209,6 +209,16 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     }
 
     @Override
+    protected void reloadCore(XWikiSolrCore core) throws SolrException
+    {
+        try {
+            CoreAdminRequest.reloadCore(core.getSolrName(), this.rootClient);
+        } catch (Exception e) {
+            throw new SolrException("Failed to reload the Solr core [" + core.getSolrName() + "]", e);
+        }
+    }
+
+    @Override
     protected XWikiSolrCore getCore(String xwikiCoreName, int solrMajorVersion) throws SolrException
     {
         String solrCoreName = toSolrCoreName(xwikiCoreName, solrMajorVersion);

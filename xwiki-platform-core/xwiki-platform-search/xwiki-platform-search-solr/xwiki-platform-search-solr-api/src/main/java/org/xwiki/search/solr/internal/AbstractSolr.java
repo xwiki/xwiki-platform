@@ -347,4 +347,31 @@ public abstract class AbstractSolr implements Solr, Disposable
         // By default, we don't support creating new cores
         throw new SolrException("Creating new cores is not supported");
     }
+
+    @Override
+    public void deleteIndex(XWikiSolrCore core) throws SolrException
+    {
+        // Delete all the documents (which Solr optimizes into a deletion of all the segments of the index)
+        try {
+            core.getClient().deleteByQuery("*:*");
+            core.getClient().commit();
+        } catch (Exception e) {
+            throw new SolrException("Failed to delete the documents of the Solr core [" + core.getSolrName() + "]",
+                e);
+        }
+
+        // The index writer still remembers the structure of the fields of the deleted documents (which would make
+        // fail the indexing of new documents following an incompatible schema), the reload makes the core start again
+        // from an index without any segment
+        reloadCore(core);
+    }
+
+    /**
+     * Reload the passed core, to make it start again from the current state of its configuration and index.
+     *
+     * @param core the core to reload
+     * @throws SolrException when failing to reload the core
+     * @since 18.10.0RC1
+     */
+    protected abstract void reloadCore(XWikiSolrCore core) throws SolrException;
 }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
+import org.apache.solr.client.api.util.SolrVersion;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -105,5 +106,70 @@ class RemoteSolrTest
         RemoteSolr solr = this.componentManager.getInstance(Solr.class, RemoteSolr.TYPE);
 
         assertEquals("http://baseurl", solr.getRootClient().getBaseURL());
+    }
+
+    private RemoteSolr getRemoteSolr() throws ComponentLookupException
+    {
+        System.setProperty("xwiki.solr.remote.requestVersion", "false");
+
+        return this.componentManager.getInstance(Solr.class, RemoteSolr.TYPE);
+    }
+
+    @Test
+    void setServerVersionWithSameVersionAsCores() throws ComponentLookupException
+    {
+        RemoteSolr solr = getRemoteSolr();
+
+        solr.setServerVersion(SolrVersion.LATEST + " 6c6c4e2 - builder - 2026-01-01 10:00:00");
+
+        assertEquals(SolrVersion.LATEST.getMajorVersion(), solr.getSolrMajorVersion());
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void setServerVersionWithNewerVersionThanCores() throws ComponentLookupException
+    {
+        RemoteSolr solr = getRemoteSolr();
+
+        // A more recent patch version and a more recent major version are fine
+        solr.setServerVersion(SolrVersion.forIntegers(SolrVersion.LATEST.getMajorVersion(),
+            SolrVersion.LATEST.getMinorVersion(), SolrVersion.LATEST.getPatchVersion() + 1).toString());
+        solr.setServerVersion((SolrVersion.LATEST.getMajorVersion() + 1) + ".0.0");
+
+        assertEquals(SolrVersion.LATEST.getMajorVersion() + 1, solr.getSolrMajorVersion());
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void setServerVersionWithOlderMinorVersionThanCores() throws ComponentLookupException
+    {
+        RemoteSolr solr = getRemoteSolr();
+
+        // A Solr server with the same major version but an older minor version might not support the configuration of
+        // the cores (e.g. a schema version introduced in a more recent minor version)
+        String version = SolrVersion.LATEST.getMajorVersion() + "." + (SolrVersion.LATEST.getMinorVersion() - 1)
+            + ".0 abcdef - builder - 2024-01-01 10:00:00";
+        solr.setServerVersion(version);
+
+        assertEquals(SolrVersion.LATEST.getMajorVersion(), solr.getSolrMajorVersion());
+        assertEquals("The version of the Solr server [" + version + "] is older than the version of Solr the XWiki"
+            + " cores are designed for ([" + SolrVersion.LATEST.getMajorVersion() + "."
+            + SolrVersion.LATEST.getMinorVersion() + "]), the Solr server needs to be upgraded.",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void setServerVersionWithOlderMajorVersionThanCores() throws ComponentLookupException
+    {
+        RemoteSolr solr = getRemoteSolr();
+
+        String version = (SolrVersion.LATEST.getMajorVersion() - 1) + ".11.4";
+        solr.setServerVersion(version);
+
+        assertEquals(SolrVersion.LATEST.getMajorVersion() - 1, solr.getSolrMajorVersion());
+        assertEquals("The version of the Solr server [" + version + "] is older than the version of Solr the XWiki"
+            + " cores are designed for ([" + SolrVersion.LATEST.getMajorVersion() + "."
+            + SolrVersion.LATEST.getMinorVersion() + "]), the Solr server needs to be upgraded.",
+            this.logCapture.getMessage(0));
     }
 }

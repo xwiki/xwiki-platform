@@ -115,7 +115,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     @Override
     public void repairDatabase(Metadata metadata) throws HibernateStoreException
     {
-        if (!this.xwikiProperties.getProperty(PROPERTY_FIX_TABLE_COLLATION, true)) {
+        if (Boolean.FALSE.equals(this.xwikiProperties.getProperty(PROPERTY_FIX_TABLE_COLLATION, Boolean.class))) {
             this.logger.debug("Skipping the conversion of the tables to the database collation since [{}] is disabled",
                 PROPERTY_FIX_TABLE_COLLATION);
 
@@ -588,10 +588,11 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     {
         for (Index index : getIndexes(databaseName, tables, maxCharacterLength, session)) {
             if (index.length > MAX_KEY_LENGTH && !(index.unique && isLongUniqueIndexSupported())) {
-                this.logger.warn(
-                    "Index [{}] (key length of [{}] bytes after the conversion) exceeds the maximum key length of [{}]"
-                        + " bytes and will be dropped. It can be re-created with a shorter prefix using [{}].",
-                    index.name, index.length, MAX_KEY_LENGTH, getIndexDefinition(index));
+                if (this.logger.isWarnEnabled()) {
+                    this.logger.warn("Index [{}] (key length of [{}] bytes after the conversion) exceeds the maximum"
+                        + " key length of [{}] bytes and will be dropped. It can be re-created with a shorter prefix"
+                        + " using [{}].", index.name, index.length, MAX_KEY_LENGTH, getIndexDefinition(index));
+                }
 
                 statements.add(ALTER_TABLE + getQualifiedTableName(index.tableName) + " DROP INDEX "
                     + quote(index.name));

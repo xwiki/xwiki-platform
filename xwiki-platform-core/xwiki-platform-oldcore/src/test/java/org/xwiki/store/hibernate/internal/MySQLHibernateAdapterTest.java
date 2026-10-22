@@ -123,7 +123,6 @@ class MySQLHibernateAdapterTest
         when(this.hibernateStore.getDialect()).thenReturn(new MySQLDialect());
         when(this.hibernateConfiguration.getDBPrefix()).thenReturn("");
         when(this.wikis.getMainWikiId()).thenReturn("xwiki");
-        when(this.xwikiProperties.getProperty(FIX_TABLE_COLLATION_PROPERTY, true)).thenReturn(true);
     }
 
     @Test
@@ -171,8 +170,8 @@ class MySQLHibernateAdapterTest
         PersistentClass documentEntity = mockEntity("com.xpn.xwiki.doc.XWikiDocument", "xwikidoc");
         // xwikiproperties is the table of a compressed entity
         PersistentClass propertiesEntity = mockEntity("com.xpn.xwiki.objects.BaseProperty", "xwikiproperties");
-        when(propertiesEntity.getMetaAttribute(HibernateAdapter.META_ATTRIBUTE_COMPRESSED))
-            .thenReturn(mock(MetaAttribute.class));
+        MetaAttribute compressed = mock(MetaAttribute.class);
+        when(propertiesEntity.getMetaAttribute(HibernateAdapter.META_ATTRIBUTE_COMPRESSED)).thenReturn(compressed);
         PersistentClass stringsEntity = mockEntity("com.xpn.xwiki.objects.StringProperty", "xwikistrings");
         PersistentClass eventsEntity =
             mockEntity("org.xwiki.eventstream.store.internal.LegacyEvent", "activitystream_events");
@@ -441,8 +440,10 @@ class MySQLHibernateAdapterTest
         when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikidoc", "utf8mb4_general_ci" },
             new Object[] { "xwikiproperties", "utf8mb4_general_ci" }));
 
-        when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(mock(NativeQuery.class));
-        when(this.session.getTransaction()).thenReturn(mock(Transaction.class));
+        NativeQuery<?> alterQuery = mock(NativeQuery.class);
+        when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(alterQuery);
+        Transaction transaction = mock(Transaction.class);
+        when(this.session.getTransaction()).thenReturn(transaction);
         Statement jdbcStatement = mockJDBCStatement();
         String customForeignKey = "ALTER TABLE `xwiki`.custom_table ADD CONSTRAINT `FKcustom` FOREIGN KEY (`VALUE`)"
             + " REFERENCES `xwiki`.xwikidoc (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION";
@@ -485,7 +486,8 @@ class MySQLHibernateAdapterTest
 
         this.alterStatement = mock(NativeQuery.class);
         when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(this.alterStatement);
-        when(this.session.getTransaction()).thenReturn(mock(Transaction.class));
+        Transaction transaction = mock(Transaction.class);
+        when(this.session.getTransaction()).thenReturn(transaction);
 
         return sessionFactory;
     }
@@ -521,7 +523,7 @@ class MySQLHibernateAdapterTest
     void repairDatabaseWhenFixTableCollationDisabled() throws Exception
     {
         SessionFactory sessionFactory = mockRepairDatabase();
-        when(this.xwikiProperties.getProperty(FIX_TABLE_COLLATION_PROPERTY, true)).thenReturn(false);
+        when(this.xwikiProperties.getProperty(FIX_TABLE_COLLATION_PROPERTY, Boolean.class)).thenReturn(false);
 
         this.adapter.repairDatabase(this.metadata);
 

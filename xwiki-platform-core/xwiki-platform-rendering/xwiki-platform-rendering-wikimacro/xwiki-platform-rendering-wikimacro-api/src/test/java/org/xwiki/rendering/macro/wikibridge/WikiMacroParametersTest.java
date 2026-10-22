@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro.wikibridge;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -52,8 +53,9 @@ class WikiMacroParametersTest
         parameters.set("Size", 2);
         parameters.set("Color", "red");
 
-        assertEquals(List.of("Size", "Color"), List.copyOf(parameters.getParameterNames()));
-        assertThrows(UnsupportedOperationException.class, () -> parameters.getParameterNames().add("other"));
+        Set<String> parameterNames = parameters.getParameterNames();
+        assertEquals(List.of("Size", "Color"), List.copyOf(parameterNames));
+        assertThrows(UnsupportedOperationException.class, () -> parameterNames.add("other"));
     }
 
     @Test

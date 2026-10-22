@@ -299,8 +299,8 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
                         .setStart(0)
                         .setRows(1);
                     likeCore.getClient().query(solrQuery);
-                // we catch Throwable here since Solr create Runtime exceptions in case of client issues.
-                } catch (Throwable e) {
+                // we catch Exception here since Solr create Runtime exceptions in case of client issues.
+                } catch (Exception e) {
                     // in case of exception we consider that the client is null.
                     likeCore = null;
                     // and we log a debug message in case it's another issue

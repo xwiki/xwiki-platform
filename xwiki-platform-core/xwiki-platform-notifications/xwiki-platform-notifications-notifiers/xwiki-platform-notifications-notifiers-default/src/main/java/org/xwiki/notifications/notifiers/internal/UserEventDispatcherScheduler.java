@@ -124,8 +124,9 @@ public class UserEventDispatcherScheduler implements Disposable
             this.dispatcher.flush();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        } catch (Throwable e) {
-            // Catching Throwable to make sure we don't kill the scheduler which triggered this run
+        } catch (Exception | LinkageError e) {
+            // Catching the failures of the pre-filtering, including a LinkageError coming from an extension, to
+            // make sure we don't kill the scheduler which triggered this run
             this.logger.error("Failed to pre-filter events", e);
         } finally {
             // Indicate the pre-filtering is not running anymore

@@ -426,6 +426,10 @@ public abstract class XWikiAction implements LegacyAction
         }
     }
 
+    // Catching Throwable is deliberate in this method: it is the top level of a request, so the response and the
+    // end-of-request notifications still have to be produced whatever failed. The main catch also reassigns its
+    // parameter, which a multi-catch clause does not allow.
+    @SuppressWarnings("java:S1181")
     public void execute(XWikiContext context) throws Exception
     {
         MonitorPlugin monitor = null;

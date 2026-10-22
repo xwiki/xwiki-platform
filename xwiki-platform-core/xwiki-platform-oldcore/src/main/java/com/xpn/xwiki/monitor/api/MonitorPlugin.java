@@ -97,7 +97,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
             }
             mdata = new MonitorData(page, action, url, cthread.getName());
             this.activeTimerDataList.put(cthread, mdata);
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            // Monitoring must never break the request it monitors.
             LOGGER.debug("MONITOR: startRequest failed", e);
         }
     }
@@ -125,7 +126,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
             addTimerDuration(mdata);
             removeFromActiveTimerDataList(cthread);
             addToTimerDataList(mdata);
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            // Monitoring must never break the request it monitors.
             LOGGER.debug("MONITOR: endRequest failed", e);
         }
     }
@@ -154,7 +156,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
             if (mdata != null) {
                 mdata.setWikiPage(page);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             // TODO: log a warning instead of ignoring this exception.
             // Monitoring must never break the request being monitored.
         }
@@ -209,7 +211,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
             if (mdata != null) {
                 mdata.startTimer(timername, desc);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            // Monitoring must never break the request it monitors.
             LOGGER.debug("MONITOR: startTimer for timer [{}] failed", timername, e);
         }
     }
@@ -226,7 +229,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
             if (mdata != null) {
                 mdata.setTimerDetails(timername, desc);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            // Monitoring must never break the request it monitors.
             LOGGER.debug("MONITOR: setTimerDesc for timer [{}] failed", timername, e);
         }
     }
@@ -243,7 +247,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
             if (mdata != null) {
                 mdata.endTimer(timername);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            // Monitoring must never break the request it monitors.
             LOGGER.debug("MONITOR: endTimer for timer [{}] failed", timername, e);
         }
     }

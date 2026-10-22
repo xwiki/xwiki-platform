@@ -1087,7 +1087,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
                 LOGGER.debug("Found default custom displayer for property class name as template: [{}]", templateName);
                 return TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX + templateName;
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             // If we fail we consider there is no custom displayer
             LOGGER.error("Error finding if property [{}] has a custom displayer. "
                 + "Considering that there's no custom displayer.", propertyClassName, e);

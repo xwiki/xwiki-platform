@@ -772,6 +772,11 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitForUploadsToFinish()
     {
+        waitForUploadsToFinish(getDriver().getTimeout());
+    }
+
+    protected void waitForUploadsToFinish(int timeout)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
                 return !Strings.CS.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
@@ -780,7 +785,7 @@ public class RichTextAreaElement extends BaseElement
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
                 return false;
             }
-        });
+        }, timeout);
     }
 
     /**

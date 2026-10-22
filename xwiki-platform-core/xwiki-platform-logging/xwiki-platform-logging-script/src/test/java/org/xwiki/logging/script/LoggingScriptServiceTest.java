@@ -169,7 +169,8 @@ class LoggingScriptServiceTest
 
         assertEquals(1, this.logCapture.size());
         ILoggingEvent logEvent = this.logCapture.getLogEvent(0);
-        assertEquals("[DEPRECATED] Something is deprecated", logEvent.getMessage());
+        assertEquals("[DEPRECATED] {}", logEvent.getMessage());
+        assertEquals("[DEPRECATED] Something is deprecated", logEvent.getFormattedMessage());
         assertEquals("foo", logEvent.getLoggerName());
         assertEquals(Level.WARN, logEvent.getLevel());
     }

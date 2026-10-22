@@ -55,6 +55,9 @@ public abstract class AbstractPingDataProvider implements PingDataProvider
         return b0 -> b0;
     }
 
+    // warn/error are always enabled in XWiki's default logging configuration, so guarding this call
+    // could never skip the evaluation of its arguments.
+    @SuppressWarnings("java:S2629")
     protected void logWarning(String explanation, Throwable e)
     {
         this.logger.warn("{}. This information has not been added to the Active Installs ping data. Reason [{}]",

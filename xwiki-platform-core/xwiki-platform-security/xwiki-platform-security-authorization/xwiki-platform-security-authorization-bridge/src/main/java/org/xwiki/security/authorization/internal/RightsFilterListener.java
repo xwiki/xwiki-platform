@@ -164,6 +164,9 @@ public class RightsFilterListener extends AbstractEventListener
         }
     }
 
+    // warn/error are always enabled in XWiki's default logging configuration, so guarding this call
+    // could never skip the evaluation of its arguments.
+    @SuppressWarnings("java:S2629")
     private void cancel(DocumentReference user, XWikiDocument document, BaseObject originalRightObject,
         BaseObject rightObject)
     {

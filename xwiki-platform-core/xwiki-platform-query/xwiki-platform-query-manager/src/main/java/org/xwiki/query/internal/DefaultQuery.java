@@ -289,6 +289,9 @@ public class DefaultQuery implements SecureQuery
     }
 
     @Override
+    // warn/error are always enabled in XWiki's default logging configuration, so guarding this call
+    // could never skip the evaluation of its arguments.
+    @SuppressWarnings("java:S2629")
     public Query addFilter(QueryFilter filter)
     {
         if (!this.filters.contains(filter)) {

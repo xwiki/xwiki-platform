@@ -47,6 +47,8 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ForceEditLockModal;
+import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -581,6 +583,9 @@ class CollaborationIT extends AbstractBlockNoteIT
         String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
         setup.loginAsSuperAdmin();
         setup.gotoPage(testReferenceEn).editWYSIWYG();
+        // John, the content author, doesn't have script right, so superadmin is warned that editing the page would
+        // allow the velocity macro to be executed.
+        new ForceEditLockPage().clickForceEdit();
         BlockNoteStandaloneEditPage secondEditPage = new BlockNoteStandaloneEditPage();
         BlockNoteEditor secondEditor = secondEditPage.getContentEditor();
         BlockNoteRichTextArea secondTextArea = secondEditor.getRichTextArea();
@@ -654,8 +659,9 @@ class CollaborationIT extends AbstractBlockNoteIT
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
-        // Re-join the collaboration session.
-        joinSession(firstEditPage, setup);
+        // Re-join the collaboration session. Superadmin's save made them the content author, so John is warned that
+        // editing the page may break the velocity macro because he doesn't have script right.
+        joinSessionConfirmingRequiredRightsWarning(firstEditPage);
         firstEditor = firstEditPage.getContentEditor();
         firstTextArea = firstEditor.getRichTextArea();
         firstTextArea.waitUntilTextContains("five");
@@ -1098,6 +1104,25 @@ class CollaborationIT extends AbstractBlockNoteIT
         inplaceEditablePage.waitForInplaceEditor();
         assertTrue(setup.getDriver().findElementsWithoutWaiting(By.className("force-edit-lock-modal")).isEmpty(),
             "The user was asked to force the edit lock instead of joining the collaboration session.");
+    }
+
+    /**
+     * Joins the collaboration session after confirming the required rights warning that is displayed when the current
+     * user doesn't have a right that the content author of the edited page has.
+     *
+     * @param inplaceEditablePage the page to edit in-place
+     */
+    private void joinSessionConfirmingRequiredRightsWarning(BlockNoteInplaceEditPage inplaceEditablePage)
+    {
+        inplaceEditablePage.edit();
+        ForceEditLockModal requiredRightsWarning = new ForceEditLockModal();
+        String message = requiredRightsWarning.getMessage();
+        // Being asked to take over the edit lock would mean that the user doesn't join the collaboration session, so
+        // the warning must only be about the missing rights.
+        assertTrue(message.contains("you are missing the following rights"), "Unexpected warning: " + message);
+        assertFalse(message.contains("locked"), "Unexpected warning: " + message);
+        requiredRightsWarning.clickOk();
+        inplaceEditablePage.waitForInplaceEditor();
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

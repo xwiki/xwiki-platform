@@ -162,30 +162,102 @@ public abstract class AbstractSolr implements Solr, Disposable
 
         // Migrate the core, if needed
         Integer sVersion = getSVersion(newCore);
-        if (sVersion == null || sVersion < coreMajorVersion) {
-            for (int previousVersion = coreMajorVersion - 1; previousVersion >= 8; --previousVersion) {
-                // Check if a core for previous version of Solr exist
-                XWikiSolrCore previousCore = getCore(xwikiCoreName, previousVersion);
-
-                if (previousCore != null) {
-                    this.logger.debug("A previous core was found for name [{}] ([{}])", xwikiCoreName,
-                        previousCore.getSolrName());
-
-                    // Copy the previous core
-                    initializer.migrate(previousCore, newCore);
-
-                    // Close the previous client
-                    previousCore.getClient().close();
-
-                    break;
-                } else {
-                    this.logger.debug("Not previous core could be found for name [{}]", xwikiCoreName);
-                }
-            }
-
-            // Mark the core as fully migrated
+        if ((sVersion == null || sVersion < coreMajorVersion)
+            && migrateFromPreviousCore(xwikiCoreName, newCore, initializer)) {
+            // Mark the core as fully migrated (when the migration is not possible, the core is not marked so that the
+            // migration is attempted again at the next initialization, once the administrator made it possible)
             setSVersion(newCore, coreMajorVersion, sVersion == null);
         }
+    }
+
+    private boolean migrateFromPreviousCore(String xwikiCoreName, XWikiSolrCore newCore,
+        SolrCoreInitializer initializer) throws SolrException, IOException
+    {
+        for (int previousVersion = getCoreMajorVersion() - 1; previousVersion >= 8; --previousVersion) {
+            // Check if a core for previous version of Solr exist
+            XWikiSolrCore previousCore = getCore(xwikiCoreName, previousVersion);
+
+            if (previousCore != null) {
+                this.logger.debug("A previous core was found for name [{}] ([{}])", xwikiCoreName,
+                    previousCore.getSolrName());
+
+                // Copy the previous core
+                initializer.migrate(previousCore, newCore);
+
+                // Close the previous client
+                previousCore.getClient().close();
+
+                return true;
+            }
+
+            // The core might exist but fail to be loaded by Solr (in which case Solr does not list it among the
+            // available cores)
+            String loadFailure = getCoreLoadFailure(xwikiCoreName, previousVersion);
+            if (loadFailure != null) {
+                String previousSolrCoreName = toSolrCoreName(xwikiCoreName, previousVersion);
+
+                // Not being able to migrate a core which can be filled again is not a problem
+                if (initializer.isCache()) {
+                    this.logger.debug("Skipping the migration of the cache core [{}] which failed to be loaded: {}",
+                        previousSolrCoreName, loadFailure);
+
+                    return true;
+                }
+
+                logImpossibleMigration(previousSolrCoreName, previousVersion, newCore, loadFailure);
+
+                return false;
+            }
+
+            this.logger.debug("Not previous core could be found for name [{}]", xwikiCoreName);
+        }
+
+        return true;
+    }
+
+    private void logImpossibleMigration(String previousSolrCoreName, int previousVersion, XWikiSolrCore newCore,
+        String loadFailure)
+    {
+        int serverMajorVersion = getSolrMajorVersion();
+
+        String message = "The data of the Solr core [{}] (designed for Solr {}) cannot be migrated to the Solr core"
+            + " [{}]: it failed to be loaded by the Solr server ({}).";
+        // Lucene can only read an index created with the previous major version at most (even if all its segments
+        // were rewritten since by a more recent version)
+        if (previousVersion < serverMajorVersion - 1) {
+            message += String.format(" This is most probably because Solr %d can only read the data of cores created"
+                + " with Solr %d or more recent. %s", serverMajorVersion, serverMajorVersion - 1,
+                getImpossibleMigrationHint(serverMajorVersion - 1));
+        }
+        message += " In the meantime, the Solr core [{}] is used without the previous data, and the migration will"
+            + " be attempted again at the next startup.";
+        this.logger.error(message, previousSolrCoreName, previousVersion, newCore.getSolrName(), loadFailure,
+            newCore.getSolrName());
+    }
+
+    /**
+     * @param intermediateVersion the Solr major version through which the data needs to be migrated first
+     * @return what the administrator should do to make possible the migration of a core designed for a too old Solr
+     *         major version
+     * @since 18.10.0RC1
+     */
+    protected String getImpossibleMigrationHint(int intermediateVersion)
+    {
+        return String.format("To keep the data, upgrade first to an XWiki version bundling Solr %d.",
+            intermediateVersion);
+    }
+
+    /**
+     * @param xwikiCoreName the name of the core in XWiki
+     * @param solrMajorVersion the Solr major version the core is designed for
+     * @return the reason why the Solr server failed to load the core, or {@code null} if it did not fail (or the
+     *         information is not available)
+     * @throws SolrException when failing to get the information
+     * @since 18.10.0RC1
+     */
+    protected String getCoreLoadFailure(String xwikiCoreName, int solrMajorVersion) throws SolrException
+    {
+        return null;
     }
 
     protected Integer getSVersion(XWikiSolrCore core) throws SolrException

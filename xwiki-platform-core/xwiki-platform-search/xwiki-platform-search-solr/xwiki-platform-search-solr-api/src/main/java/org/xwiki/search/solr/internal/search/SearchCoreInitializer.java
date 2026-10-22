@@ -107,13 +107,12 @@ public class SearchCoreInitializer implements SolrCoreInitializer
                 + " definition in the schema {} (usually because the configuration of the core was upgraded), deleting"
                 + " its index.";
             if (this.configuration.synchronizeAtStartup()) {
-                this.logger.warn(message + " It will be filled again by the synchronization with the database.",
-                    core.getSolrName(), nonCompliantFields);
+                message += " It will be filled again by the synchronization with the database.";
             } else {
-                this.logger.warn(message + " Since solr.synchronizeAtStartup is disabled, it needs to be filled"
-                    + " again by triggering a synchronization with the database manually.", core.getSolrName(),
-                    nonCompliantFields);
+                message += " Since solr.synchronizeAtStartup is disabled, it needs to be filled again by triggering a"
+                    + " synchronization with the database manually.";
             }
+            this.logger.warn(message, core.getSolrName(), nonCompliantFields);
 
             this.solrProvider.get().deleteIndex(core);
         }

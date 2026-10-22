@@ -35,21 +35,8 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Core (shaded)</xwiki.extension.name>
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
-    <!-- The artifacts embedded in this module -->
-    <xwiki.extension.features>
-      org.apache.solr:solr-core/${solr.version},
-      org.glassfish.jersey.core:jersey-common/${solr.jersey.version},
-      org.glassfish.jersey.core:jersey-server/${solr.jersey.version},
-      org.glassfish.jersey.core:jersey-client/${solr.jersey.version},
-      org.glassfish.jersey.inject:jersey-hk2/${solr.jersey.version},
-      org.glassfish.jersey.media:jersey-media-json-jackson/${solr.jersey.version},
-      org.glassfish.jersey.ext:jersey-entity-filtering/${solr.jersey.version},
-      org.glassfish.hk2:hk2-api/${solr.hk2.version},
-      org.glassfish.hk2:hk2-utils/${solr.hk2.version},
-      org.glassfish.hk2:hk2-locator/${solr.hk2.version},
-      org.glassfish.hk2.external:aopalliance-repackaged/${solr.hk2.version},
-      org.glassfish.hk2:osgi-resource-locator/${solr.osgi-resource-locator.version}
-    </xwiki.extension.features>
+    <!-- Only the embedded artifacts which keep their packages: the relocated ones don't provide their original API -->
+    <xwiki.extension.features>org.apache.solr:solr-core/${solr.version}</xwiki.extension.features>
     <!-- Nothing to check: no source -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.skip>true</xwiki.jacoco.skip>

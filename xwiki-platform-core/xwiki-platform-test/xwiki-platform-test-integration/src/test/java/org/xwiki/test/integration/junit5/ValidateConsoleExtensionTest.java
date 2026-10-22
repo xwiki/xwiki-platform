@@ -162,8 +162,14 @@ class ValidateConsoleExtensionTest
     private void assertResult(TestExecutionSummary summary, String errContent)
     {
         assertEquals(1, summary.getFailures().size());
-        assertEquals("The following lines were matching forbidden content:[\nINFO  - Deprecated usage of something\n]",
-            summary.getFailures().getFirst().getException().getMessage());
+        // The error that is neither excluded nor expected fails the validation, like the deprecation.
+        assertEquals("""
+            The following lines were matching forbidden content:[
+            ERROR - in beforeAll
+            INFO  - Deprecated usage of something
+            ]""", summary.getFailures().getFirst().getException().getMessage());
+        // The expected error was found, and warnings are not validated so the excluded one is reported as not
+        // matched.
         assertEquals("""
             WARN  - The following excludes were not matched and could be candidates for removal \
             (beware of configs): [
@@ -172,7 +178,6 @@ class ValidateConsoleExtensionTest
             ]
             WARN  - The following expected were not matched and could be candidates for removal \
             (beware of configs): [
-            expected
             expected that didn't happen
             ]
             """, errContent);

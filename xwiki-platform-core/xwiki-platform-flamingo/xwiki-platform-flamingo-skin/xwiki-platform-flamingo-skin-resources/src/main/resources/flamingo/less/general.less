@@ -192,7 +192,8 @@ body {
     .xdocCreation, // In the document footer, this link is inline, similarly to last modification.
     .panel[class*="HelpTipsPanel "], // This panel, unlike other panels, contains mostly text with underline links.
     .commentauthor, #commentform > label, // Similarly to the page last modificator, we want to underline comment authors
-    .xHint // Form input hints, covered even outside of regular page content.
+    .xHint, // Form input hints, covered even outside of regular page content.
+    p.xwikimessage // Message box text, like the name of the user locking the page.
     {
       & a {
         .inline-link();

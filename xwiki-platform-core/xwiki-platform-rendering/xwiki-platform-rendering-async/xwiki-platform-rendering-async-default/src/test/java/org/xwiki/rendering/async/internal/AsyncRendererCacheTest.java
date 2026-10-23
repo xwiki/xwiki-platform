@@ -244,6 +244,40 @@ class AsyncRendererCacheTest
     }
 
     @Test
+    void invalidateSyncOnWikiOfRightUser()
+    {
+        setRights(new RightEntry(Right.VIEW, new DocumentReference("subwiki", "XWiki", "User"),
+            new DocumentReference("wiki", "Space", "Document"), true));
+
+        this.asyncCache.put(this.status);
+
+        this.asyncCache.cleanCache("otherwiki");
+
+        assertSame(this.status, this.asyncCache.getSync(getId()));
+
+        this.asyncCache.cleanCache("subwiki");
+
+        assertNull(this.asyncCache.getSync(getId()));
+    }
+
+    @Test
+    void invalidateSyncOnWikiOfRightEntity()
+    {
+        // Guest user
+        setRights(new RightEntry(Right.VIEW, null, new DocumentReference("subwiki", "Space", "Document"), true));
+
+        this.asyncCache.put(this.status);
+
+        this.asyncCache.cleanCache("otherwiki");
+
+        assertSame(this.status, this.asyncCache.getSync(getId()));
+
+        this.asyncCache.cleanCache("subwiki");
+
+        assertNull(this.asyncCache.getSync(getId()));
+    }
+
+    @Test
     void getAsyncSingleClient()
     {
         this.status.addClient("42");

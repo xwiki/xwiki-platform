@@ -28,6 +28,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 
 /**
  * Convert space resource reference into entity reference.
@@ -52,7 +53,8 @@ public class SpaceResourceReferenceEntityReferenceResolver extends AbstractResou
     }
 
     @Override
-    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
+    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
+        DocumentExistenceOverride existenceOverride)
     {
         return this.defaultSpaceReferenceResolver.resolve(resourceReference.getReference(), baseReference);
     }

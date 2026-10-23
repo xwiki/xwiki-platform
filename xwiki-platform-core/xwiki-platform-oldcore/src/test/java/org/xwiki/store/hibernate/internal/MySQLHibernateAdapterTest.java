@@ -119,6 +119,8 @@ class MySQLHibernateAdapterTest
 
     private NativeQuery<Number> maxLengthQuery;
 
+    private NativeQuery<Object[]> foreignKeysQuery;
+
     private NativeQuery<?> alterStatement;
 
     @BeforeEach
@@ -136,9 +138,9 @@ class MySQLHibernateAdapterTest
 
         // The statement must name the database explicitly, otherwise it is executed against whichever database the
         // pooled JDBC connection happens to be on.
-        assertEquals("ALTER TABLE `subwiki`.xwikircs ROW_FORMAT=Dynamic",
+        assertEquals("ALTER TABLE `subwiki`.`xwikircs` ROW_FORMAT=Dynamic",
             this.adapter.getAlterRowFormatString("xwikircs", false, Map.of("xwikircs", "Compact"), null));
-        assertEquals("ALTER TABLE `subwiki`.xwikircs ROW_FORMAT=Compressed",
+        assertEquals("ALTER TABLE `subwiki`.`xwikircs` ROW_FORMAT=Compressed",
             this.adapter.getAlterRowFormatString("xwikircs", true, Map.of(), null));
     }
 
@@ -147,7 +149,7 @@ class MySQLHibernateAdapterTest
     {
         when(this.wikis.getCurrentWikiId()).thenReturn(null);
 
-        assertEquals("ALTER TABLE xwikircs ROW_FORMAT=Dynamic",
+        assertEquals("ALTER TABLE `xwikircs` ROW_FORMAT=Dynamic",
             this.adapter.getAlterRowFormatString("xwikircs", false, Map.of(), null));
     }
 
@@ -209,20 +211,20 @@ class MySQLHibernateAdapterTest
             new Object[] { "xwikilistitems", "utf8mb3_bin", INNODB },
             new Object[] { "xwikiproperties", "utf8mb3_general_ci", INNODB }));
 
-        NativeQuery<Object[]> foreignKeysQuery = mock(NativeQuery.class);
+        this.foreignKeysQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.KEY_COLUMN_USAGE")))
-            .thenReturn(foreignKeysQuery);
-        // table, name, referenced schema, referenced table, update rule, delete rule, column, referenced column,
-        // collation
-        when(foreignKeysQuery.list()).thenReturn(List.of(
-            new Object[] { "custom_table", "FKcustom", "xwiki", "xwikidoc", "CASCADE", "NO ACTION", "VALUE",
+            .thenReturn(this.foreignKeysQuery);
+        // schema, table, name, referenced schema, referenced table, update rule, delete rule, column, referenced
+        // column, collation
+        when(this.foreignKeysQuery.list()).thenReturn(List.of(
+            new Object[] { "xwiki", "custom_table", "FKcustom", "xwiki", "xwikidoc", "CASCADE", "NO ACTION", "VALUE",
                 "XWD_FULLNAME", "utf8mb3_general_ci" },
             // Not involving string columns
-            new Object[] { "xwikilistitems", "FKnumbers", "xwiki", "xwikistrings", "RESTRICT", "RESTRICT", "XWL_ID",
-                "XWS_ID", null },
-            new Object[] { "xwikistrings", "FKstrings", "xwiki", "xwikiproperties", "RESTRICT", "RESTRICT", "XWS_ID",
-                "XWP_ID", null },
-            new Object[] { "xwikistrings", "FKstrings", "xwiki", "xwikiproperties", "RESTRICT", "RESTRICT",
+            new Object[] { "xwiki", "xwikilistitems", "FKnumbers", "xwiki", "xwikistrings", "RESTRICT", "RESTRICT",
+                "XWL_ID", "XWS_ID", null },
+            new Object[] { "xwiki", "xwikistrings", "FKstrings", "xwiki", "xwikiproperties", "RESTRICT", "RESTRICT",
+                "XWS_ID", "XWP_ID", null },
+            new Object[] { "xwiki", "xwikistrings", "FKstrings", "xwiki", "xwikiproperties", "RESTRICT", "RESTRICT",
                 "XWS_NAME", "XWP_NAME", "utf8mb3_general_ci" }));
 
         // table, index, column, sub part, collation, max length, octet length, non unique
@@ -266,14 +268,14 @@ class MySQLHibernateAdapterTest
 
         // The legacy row formats are switched in the same statement, as well as the row format of the compressed
         // entity, and the custom mapping (unlike the static mapping of xwikipreferences) is left alone
-        assertEquals(List.of("ALTER TABLE `xwiki`.xwikistrings DROP FOREIGN KEY `FKstrings`",
-            "ALTER TABLE `xwiki`.activitystream_events DROP INDEX `ase_page_date`",
-            "ALTER TABLE `xwiki`.xwikistrings DROP INDEX `custom_unique`",
-            "ALTER TABLE `xwiki`.activitystream_events ROW_FORMAT=Dynamic," + CONVERT,
-            "ALTER TABLE `xwiki`.xwikilistitems ROW_FORMAT=Dynamic," + CONVERT,
-            "ALTER TABLE `xwiki`.xwikipreferences" + CONVERT,
-            "ALTER TABLE `xwiki`.xwikiproperties ROW_FORMAT=Compressed," + CONVERT,
-            "ALTER TABLE `xwiki`.xwikistrings ROW_FORMAT=Dynamic," + CONVERT),
+        assertEquals(List.of("ALTER TABLE `xwiki`.`xwikistrings` DROP FOREIGN KEY `FKstrings`",
+            "ALTER TABLE `xwiki`.`activitystream_events` DROP INDEX `ase_page_date`",
+            "ALTER TABLE `xwiki`.`xwikistrings` DROP INDEX `custom_unique`",
+            "ALTER TABLE `xwiki`.`activitystream_events` ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikilistitems` ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikipreferences`" + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikiproperties` ROW_FORMAT=Compressed," + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikistrings` ROW_FORMAT=Dynamic," + CONVERT),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
         assertEquals("Index [ase_page_date] (key length of [3080] bytes after the conversion) exceeds the maximum key"
@@ -294,8 +296,8 @@ class MySQLHibernateAdapterTest
         when(this.tablesQuery.list())
             .thenReturn(List.<Object[]>of(new Object[] { "xwikiproperties", "latin1_bin", INNODB }));
 
-        assertEquals(List.of("ALTER TABLE `xwiki`.xwikistrings DROP FOREIGN KEY `FKstrings`",
-            "ALTER TABLE `xwiki`.xwikiproperties" + CONVERT),
+        assertEquals(List.of("ALTER TABLE `xwiki`.`xwikistrings` DROP FOREIGN KEY `FKstrings`",
+            "ALTER TABLE `xwiki`.`xwikiproperties`" + CONVERT),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
     }
 
@@ -305,13 +307,13 @@ class MySQLHibernateAdapterTest
         mockCollationQueries();
 
         // MariaDB supports too long unique indexes
-        assertEquals(List.of("ALTER TABLE `xwiki`.xwikistrings DROP FOREIGN KEY `FKstrings`",
-            "ALTER TABLE `xwiki`.activitystream_events DROP INDEX `ase_page_date`",
-            "ALTER TABLE `xwiki`.activitystream_events ROW_FORMAT=Dynamic," + CONVERT,
-            "ALTER TABLE `xwiki`.xwikilistitems ROW_FORMAT=Dynamic," + CONVERT,
-            "ALTER TABLE `xwiki`.xwikipreferences" + CONVERT,
-            "ALTER TABLE `xwiki`.xwikiproperties ROW_FORMAT=Compressed," + CONVERT,
-            "ALTER TABLE `xwiki`.xwikistrings ROW_FORMAT=Dynamic," + CONVERT),
+        assertEquals(List.of("ALTER TABLE `xwiki`.`xwikistrings` DROP FOREIGN KEY `FKstrings`",
+            "ALTER TABLE `xwiki`.`activitystream_events` DROP INDEX `ase_page_date`",
+            "ALTER TABLE `xwiki`.`activitystream_events` ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikilistitems` ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikipreferences`" + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikiproperties` ROW_FORMAT=Compressed," + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikistrings` ROW_FORMAT=Dynamic," + CONVERT),
             this.mariaDBAdapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
         assertEquals("Index [ase_page_date] (key length of [3080] bytes after the conversion) exceeds the maximum key"
@@ -354,8 +356,8 @@ class MySQLHibernateAdapterTest
             new Object[] { "custom_table", "latin1_bin", "MyISAM" }));
 
         // The InnoDB maximum key length and row formats don't apply to the other storage engines
-        assertEquals(List.of("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`",
-            "ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT),
+        assertEquals(List.of("ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic," + CONVERT),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
         assertEquals("Tables [xwikiproperties, xwikistrings] of database [xwiki] don't use collation [utf8mb4_bin] but"
@@ -382,12 +384,97 @@ class MySQLHibernateAdapterTest
         when(this.tablesQuery.list())
             .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_0900_ai_ci", INNODB }));
 
-        // The binary collation of the database character set is used instead
-        assertEquals(List.of("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`",
-            "ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT),
+        // The binary collation of the database character set is used instead, starting with the database default
+        assertEquals(List.of("ALTER DATABASE `xwiki` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin",
+            "ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic," + CONVERT),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
         verify(this.tablesQuery).setParameter("collation", "utf8mb4_bin");
+    }
+
+    @Test
+    void getConvertToDatabaseCollationStatementsWhenOnlyDatabaseCollationIsWrong()
+    {
+        mockCollationQueries();
+        when(this.defaultsQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "utf8mb4", "utf8mb4_0900_ai_ci" }));
+        when(this.tablesQuery.list()).thenReturn(List.of());
+
+        // The tables created later (e.g. by the schema update) get the expected collation
+        assertEquals(List.of("ALTER DATABASE `xwiki` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin"),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+    }
+
+    @Test
+    void getConvertToDatabaseCollationStatementsWhenLinkedToNonStandardTable()
+    {
+        mockCollationQueries();
+        // custom_table is not part of the mapping, but it's linked to xwikidoc by a foreign key on string columns
+        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikidoc", "utf8mb4_general_ci", INNODB },
+            new Object[] { "custom_table", "utf8mb3_general_ci", INNODB }));
+
+        // It's converted too (including dropping its too long index), otherwise the foreign key could not be
+        // re-created
+        assertEquals(List.of("ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.`custom_table` DROP INDEX `custom_index`",
+            "ALTER TABLE `xwiki`.`custom_table`" + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic," + CONVERT),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+
+        assertEquals("Index [custom_index] (key length of [8000] bytes after the conversion) exceeds the maximum key"
+            + " length of [3072] bytes and will be dropped. It can be re-created with a shorter prefix using"
+            + " [CREATE INDEX `custom_index` ON `xwiki`.`custom_table` (`VALUE`)].", this.logCapture.getMessage(0));
+        assertEquals(1, this.logCapture.size());
+    }
+
+    @Test
+    void getConvertToDatabaseCollationStatementsWhenLinkedToAnotherDatabase()
+    {
+        mockCollationQueries();
+        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikidoc", "utf8mb4_general_ci", INNODB },
+            new Object[] { "xwikiproperties", "utf8mb4_general_ci", INNODB },
+            new Object[] { "xwikistrings", "utf8mb4_general_ci", INNODB }));
+        when(this.foreignKeysQuery.list()).thenReturn(List.of(
+            new Object[] { "xwiki", "xwikistrings", "FKstrings", "xwiki", "xwikiproperties", "RESTRICT", "RESTRICT",
+                "XWS_NAME", "XWP_NAME", "utf8mb3_general_ci" },
+            // A foreign key of another database referencing a table to convert
+            new Object[] { "otherwiki", "other_table", "FKother", "xwiki", "xwikiproperties", "RESTRICT",
+                "RESTRICT", "VALUE", "XWP_NAME", "utf8mb3_general_ci" }));
+
+        // Neither xwikiproperties nor xwikistrings (linked to it) are converted
+        assertEquals(List.of("ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic," + CONVERT),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+
+        assertEquals("Tables [xwikiproperties, xwikistrings] of database [xwiki] won't be converted since they (or a"
+            + " table linked to them by a foreign key) are linked by a foreign key to a table of another database,"
+            + " which could not be re-created after the conversion", this.logCapture.getMessage(0));
+        assertEquals(1, this.logCapture.size());
+    }
+
+    @Test
+    void getConvertToDatabaseCollationStatementsWhenDroppedIndexNeededByForeignKey()
+    {
+        mockCollationQueries();
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikilistitems", "utf8mb3_bin", INNODB }));
+        NativeQuery<Object[]> indexesQuery = mock(NativeQuery.class);
+        when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.STATISTICS"))).thenReturn(indexesQuery);
+        // 8 + 1000 * 4 = 4008: too long, and needed by the FKnumbers foreign key (on non string columns)
+        when(indexesQuery.list()).thenReturn(List.of(
+            new Object[] { "xwikilistitems", "long_index", "XWL_ID", null, null, null, null, 1L },
+            new Object[] { "xwikilistitems", "long_index", "XWL_VALUE", null, "utf8mb3_bin", 1000L, 3000L, 1L }));
+
+        // The foreign key is dropped (and re-created after the conversion) since it prevents dropping the index
+        assertEquals(List.of("ALTER TABLE `xwiki`.`xwikilistitems` DROP FOREIGN KEY `FKnumbers`",
+            "ALTER TABLE `xwiki`.`xwikilistitems` DROP INDEX `long_index`",
+            "ALTER TABLE `xwiki`.`xwikilistitems` ROW_FORMAT=Dynamic," + CONVERT),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+
+        assertEquals("Index [long_index] (key length of [4008] bytes after the conversion) exceeds the maximum key"
+            + " length of [3072] bytes and will be dropped. It can be re-created with a shorter prefix using"
+            + " [CREATE INDEX `long_index` ON `xwiki`.`xwikilistitems` (`XWL_ID`, `XWL_VALUE`)].",
+            this.logCapture.getMessage(0));
     }
 
     @Test
@@ -408,8 +495,8 @@ class MySQLHibernateAdapterTest
 
         // xwikiproperties is linked to xwikistrings by a foreign key, so it's not converted either, while xwikidoc
         // (latin1) can be converted without losing anything
-        assertEquals(List.of("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`",
-            "ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic, CONVERT TO CHARACTER SET utf8mb3 COLLATE utf8mb3_bin"),
+        assertEquals(List.of("ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic, CONVERT TO CHARACTER SET utf8mb3 COLLATE utf8mb3_bin"),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
         // Only the non binary tables are reported
@@ -448,16 +535,16 @@ class MySQLHibernateAdapterTest
 
         this.adapter.convertToDatabaseCollation(this.metadata, this.session);
 
-        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`");
-        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT);
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`");
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic," + CONVERT);
         verify(statement, times(2)).executeUpdate();
         verify(transaction, times(2)).commit();
 
         // The dropped foreign key is re-created without the foreign key checks
         InOrder inOrder = inOrder(jdbcStatement);
         inOrder.verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=0");
-        inOrder.verify(jdbcStatement).execute("ALTER TABLE `xwiki`.custom_table ADD CONSTRAINT `FKcustom` FOREIGN KEY"
-            + " (`VALUE`) REFERENCES `xwiki`.xwikidoc (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION");
+        inOrder.verify(jdbcStatement).execute("ALTER TABLE `xwiki`.`custom_table` ADD CONSTRAINT `FKcustom` FOREIGN KEY"
+            + " (`VALUE`) REFERENCES `xwiki`.`xwikidoc` (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION");
         inOrder.verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=1");
         verify(jdbcStatement).close();
     }
@@ -474,8 +561,8 @@ class MySQLHibernateAdapterTest
         Transaction transaction = mock(Transaction.class);
         when(this.session.getTransaction()).thenReturn(transaction);
         Statement jdbcStatement = mockJDBCStatement();
-        String customForeignKey = "ALTER TABLE `xwiki`.custom_table ADD CONSTRAINT `FKcustom` FOREIGN KEY (`VALUE`)"
-            + " REFERENCES `xwiki`.xwikidoc (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION";
+        String customForeignKey = "ALTER TABLE `xwiki`.`custom_table` ADD CONSTRAINT `FKcustom` FOREIGN KEY (`VALUE`)"
+            + " REFERENCES `xwiki`.`xwikidoc` (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION";
         when(jdbcStatement.execute(customForeignKey)).thenThrow(new SQLException("incompatible"));
 
         this.adapter.convertToDatabaseCollation(this.metadata, this.session);
@@ -484,9 +571,9 @@ class MySQLHibernateAdapterTest
         InOrder inOrder = inOrder(jdbcStatement);
         inOrder.verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=0");
         inOrder.verify(jdbcStatement).execute(customForeignKey);
-        inOrder.verify(jdbcStatement).execute("ALTER TABLE `xwiki`.xwikistrings ADD CONSTRAINT `FKstrings` FOREIGN KEY"
-            + " (`XWS_ID`, `XWS_NAME`) REFERENCES `xwiki`.xwikiproperties (`XWP_ID`, `XWP_NAME`) ON UPDATE RESTRICT"
-            + " ON DELETE RESTRICT");
+        inOrder.verify(jdbcStatement).execute("ALTER TABLE `xwiki`.`xwikistrings` ADD CONSTRAINT `FKstrings`"
+            + " FOREIGN KEY (`XWS_ID`, `XWS_NAME`) REFERENCES `xwiki`.`xwikiproperties` (`XWP_ID`, `XWP_NAME`)"
+            + " ON UPDATE RESTRICT ON DELETE RESTRICT");
         inOrder.verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=1");
 
         assertEquals("Failed to re-create a foreign key with [" + customForeignKey + "]: SQLException: incompatible."
@@ -502,10 +589,10 @@ class MySQLHibernateAdapterTest
             .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci", INNODB }));
 
         NativeQuery<?> dropStatement = mock(NativeQuery.class);
-        when(this.session.createNativeQuery("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`"))
+        when(this.session.createNativeQuery("ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`"))
             .thenReturn(dropStatement);
         NativeQuery<?> convertStatement = mock(NativeQuery.class);
-        when(this.session.createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT))
+        when(this.session.createNativeQuery("ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic," + CONVERT))
             .thenReturn(convertStatement);
         HibernateException failure = new HibernateException("failure");
         when(convertStatement.executeUpdate()).thenThrow(failure);
@@ -518,8 +605,8 @@ class MySQLHibernateAdapterTest
         assertSame(failure, exception);
         verify(dropStatement).executeUpdate();
         // The dropped foreign key is re-created anyway, otherwise it would be lost
-        verify(jdbcStatement).execute("ALTER TABLE `xwiki`.custom_table ADD CONSTRAINT `FKcustom` FOREIGN KEY"
-            + " (`VALUE`) REFERENCES `xwiki`.xwikidoc (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION");
+        verify(jdbcStatement).execute("ALTER TABLE `xwiki`.`custom_table` ADD CONSTRAINT `FKcustom` FOREIGN KEY"
+            + " (`VALUE`) REFERENCES `xwiki`.`xwikidoc` (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION");
         verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=1");
     }
 
@@ -600,8 +687,8 @@ class MySQLHibernateAdapterTest
 
         this.adapter.repairDatabase(this.metadata);
 
-        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`");
-        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT);
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`");
+        verify(this.session).createNativeQuery("ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic," + CONVERT);
         verify(this.alterStatement, times(2)).executeUpdate();
         verify(this.session).close();
     }

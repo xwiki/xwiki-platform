@@ -1249,7 +1249,7 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #-# this conversion.
 #-#
 #-# The default is true.
-# store.hibernate.mysql.fixTableCollation = true
+# store.hibernate.mysql.fixTableEncoding = true
 
 #-------------------------------------------------------------------------------------
 # S3 Blob Store

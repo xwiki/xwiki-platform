@@ -85,7 +85,7 @@ class MySQLHibernateAdapterTest
 
     private static final String INNODB = "InnoDB";
 
-    private static final String FIX_TABLE_COLLATION_PROPERTY = "store.hibernate.mysql.fixTableCollation";
+    private static final String FIX_TABLE_ENCODING_PROPERTY = "store.hibernate.mysql.fixTableEncoding";
 
     @InjectMockComponents
     private MySQLHibernateAdapter adapter;
@@ -620,10 +620,10 @@ class MySQLHibernateAdapterTest
     }
 
     @Test
-    void repairDatabaseWhenFixTableCollationDisabled() throws Exception
+    void repairDatabaseWhenFixTableEncodingDisabled() throws Exception
     {
         SessionFactory sessionFactory = mockRepairDatabase();
-        when(this.xwikiProperties.getProperty(FIX_TABLE_COLLATION_PROPERTY, Boolean.class)).thenReturn(false);
+        when(this.xwikiProperties.getProperty(FIX_TABLE_ENCODING_PROPERTY, Boolean.class)).thenReturn(false);
 
         this.adapter.repairDatabase(this.metadata);
 
@@ -641,7 +641,7 @@ class MySQLHibernateAdapterTest
             assertThrows(HibernateStoreException.class, () -> this.adapter.repairDatabase(this.metadata));
 
         assertEquals("Failed to convert the tables to the database character set and a binary collation. The"
-            + " conversion at startup can be disabled by setting [store.hibernate.mysql.fixTableCollation] to false in"
+            + " conversion at startup can be disabled by setting [store.hibernate.mysql.fixTableEncoding] to false in"
             + " xwiki.properties.", exception.getMessage());
         assertSame(failure, exception.getCause());
         verify(this.session).close();

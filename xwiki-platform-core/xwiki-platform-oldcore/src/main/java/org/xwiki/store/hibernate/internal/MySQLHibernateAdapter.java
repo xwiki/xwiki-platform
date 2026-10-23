@@ -68,9 +68,10 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     public static final String HINT = "mysql";
 
     /**
-     * The xwiki.properties property controlling the conversion of the tables to the database collation at startup.
+     * The xwiki.properties property controlling the conversion of the tables to the database character set (with a
+     * binary collation) at startup.
      */
-    private static final String PROPERTY_FIX_TABLE_COLLATION = "store.hibernate.mysql.fixTableCollation";
+    private static final String PROPERTY_FIX_TABLE_ENCODING = "store.hibernate.mysql.fixTableEncoding";
 
     private static final String SCHEMA_PARAMETER = "schema";
 
@@ -123,9 +124,9 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     @Override
     public void repairDatabase(Metadata metadata) throws HibernateStoreException
     {
-        if (Boolean.FALSE.equals(this.xwikiProperties.getProperty(PROPERTY_FIX_TABLE_COLLATION, Boolean.class))) {
+        if (Boolean.FALSE.equals(this.xwikiProperties.getProperty(PROPERTY_FIX_TABLE_ENCODING, Boolean.class))) {
             this.logger.debug("Skipping the conversion of the tables to the database collation since [{}] is disabled",
-                PROPERTY_FIX_TABLE_COLLATION);
+                PROPERTY_FIX_TABLE_ENCODING);
 
             return;
         }
@@ -135,7 +136,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         } catch (Exception e) {
             throw new HibernateStoreException(String.format("Failed to convert the tables to the database character"
                 + " set and a binary collation. The conversion at startup can be disabled by setting [%s] to false in"
-                + " xwiki.properties.", PROPERTY_FIX_TABLE_COLLATION), e);
+                + " xwiki.properties.", PROPERTY_FIX_TABLE_ENCODING), e);
         }
     }
 
@@ -301,7 +302,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             + " converted table is rebuilt, which can take a long time for big tables: don't stop XWiki in the"
             + " meantime (a restart would resume the conversion anyway). The conversion at startup can be disabled by"
             + " setting [{}] to false in xwiki.properties.", getDatabaseFromWikiName(), statements.size(),
-            PROPERTY_FIX_TABLE_COLLATION);
+            PROPERTY_FIX_TABLE_ENCODING);
 
         long conversionStart = System.currentTimeMillis();
         try {

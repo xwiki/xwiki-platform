@@ -579,20 +579,6 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         }
     }
 
-    private Map<String, Set<String>> getStandardTables(Metadata metadata, Map<String, Set<String>> candidateTables)
-    {
-        Set<String> standardTables = getStandardTables(metadata);
-
-        Map<String, Set<String>> tables = new TreeMap<>();
-        candidateTables.forEach((tableName, collations) -> {
-            if (standardTables.contains(tableName.toLowerCase())) {
-                tables.put(tableName, collations);
-            }
-        });
-
-        return tables;
-    }
-
     private void addConvertStatements(Metadata metadata, Set<String> tables, String characterSet, String collation,
         Session session, Conversion conversion)
     {
@@ -789,12 +775,11 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     {
         Set<ForeignKey> foreignKeysToDrop = new LinkedHashSet<>();
         for (ForeignKey foreignKey : foreignKeys) {
-            if (foreignKey.string
+            boolean converted = foreignKey.string
                 && (foreignKey.isTable(databaseName, foreignKey.tableSchema, foreignKey.tableName, tables)
                     || foreignKey.isTable(databaseName, foreignKey.referencedSchema, foreignKey.referencedTableName,
-                        tables))) {
-                foreignKeysToDrop.add(foreignKey);
-            } else if (droppedIndexes.stream().anyMatch(index -> foreignKey.needs(databaseName, index))) {
+                        tables));
+            if (converted || droppedIndexes.stream().anyMatch(index -> foreignKey.needs(databaseName, index))) {
                 foreignKeysToDrop.add(foreignKey);
             }
         }
@@ -1078,7 +1063,14 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         void setTables(Metadata metadata, Map<String, Set<String>> candidateTables)
         {
             this.candidateTables = candidateTables;
-            this.tables = getStandardTables(metadata, candidateTables);
+
+            Set<String> standardTables = getStandardTables(metadata);
+            this.tables = new TreeMap<>();
+            candidateTables.forEach((tableName, collations) -> {
+                if (standardTables.contains(tableName.toLowerCase())) {
+                    this.tables.put(tableName, collations);
+                }
+            });
         }
     }
 

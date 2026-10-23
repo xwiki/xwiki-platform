@@ -643,7 +643,8 @@ class MySQLHibernateAdapterTest
             .thenReturn(convertStatement);
         HibernateException failure = new HibernateException("failure");
         when(convertStatement.executeUpdate()).thenThrow(failure);
-        when(this.session.getTransaction()).thenReturn(mock(Transaction.class));
+        Transaction transaction = mock(Transaction.class);
+        when(this.session.getTransaction()).thenReturn(transaction);
         Statement jdbcStatement = mockJDBCStatement();
 
         HibernateException exception = assertThrows(HibernateException.class,
@@ -668,7 +669,8 @@ class MySQLHibernateAdapterTest
         when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(statement);
         HibernateException failure = new HibernateException("failure");
         when(statement.executeUpdate()).thenThrow(failure);
-        when(this.session.getTransaction()).thenReturn(mock(Transaction.class));
+        Transaction transaction = mock(Transaction.class);
+        when(this.session.getTransaction()).thenReturn(transaction);
         HibernateException recreateFailure = new HibernateException("recreate failure");
         doThrow(recreateFailure).when(this.session).doWork(any());
 

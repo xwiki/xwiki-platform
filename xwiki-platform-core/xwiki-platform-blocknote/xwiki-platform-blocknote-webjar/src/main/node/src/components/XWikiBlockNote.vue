@@ -78,7 +78,9 @@
 </template>
 
 <script setup lang="ts">
+import { trackPaste } from "../services/attachments/pasteTracker";
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
+import { createUploadFile } from "../services/blocknote/createUploadFile";
 import {
   extractLinkId,
   injectLinkId,
@@ -107,6 +109,7 @@ import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcesso
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { CristalApp } from "@xwiki/platform-api";
+import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type {
   Collaboration,
   CollaborationManagerProvider,
@@ -119,6 +122,8 @@ import type {
   ImageEditionOverrideFn,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
@@ -279,6 +284,32 @@ function isSameResourceReference(
   return alice?.type === bob?.type && alice?.reference === bob?.reference;
 }
 
+// Pasted files are renamed, so we need to know how the file reached the editor.
+const pasteTracker = trackPaste(document);
+
+const uploadFile = createUploadFile({
+  storageProvider: container.get<StorageProvider>("StorageProvider"),
+  modelReferenceParser: container
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!,
+  remoteURLSerializer: container
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!,
+  getDocumentReference: () => documentReference,
+  getBlockNoteDocument: () => blockNoteDocument,
+  isPaste: pasteTracker.isPaste,
+  notifyUploadFailed: async (fileName, error) => {
+    console.error(`Failed to upload [${fileName}].`, error);
+    try {
+      const message = await translate("upload.failed", undefined, fileName);
+      new XWiki.widgets.Notification(message, "error");
+    } catch (notificationError) {
+      // Nobody awaits this callback, so an error here would go unhandled.
+      console.error("Failed to notify the user.", notificationError);
+    }
+  },
+});
+
 const syntaxes = container.getAll<SyntaxConfig>(
   SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
 );
@@ -310,6 +341,7 @@ const editorProps = shallowRef<
     // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
     // consistency between edit and view modes.
     defaultStyles: false,
+    uploadFile,
   },
   theme: "light",
   lang: (actualLocale || "en") as EditorLanguage,
@@ -377,6 +409,7 @@ async function joinCollaborationSession(): Promise<void> {
 }
 
 onUnmounted(async () => {
+  pasteTracker.dispose();
   // The realtime toolbar is removed and the auto-saver is stopped when the last editor leaves the session.
   try {
     (await formCollaboration)?.leave();
@@ -396,11 +429,16 @@ function onLocalInstantChange(): void {
 /**
  * @param key - the translation key, without the prefix the localization module adds back
  * @param fallback - what to return when the key has no translation
+ * @param params - the parameters of the translation message
  * @returns the translated message
  */
-async function translate(key: string, fallback?: string): Promise<string> {
+async function translate(
+  key: string,
+  fallback?: string,
+  ...params: unknown[]
+): Promise<string> {
   const fullKey = `blocknote.${key}`;
-  const translation = await logic.translate(fullKey);
+  const translation = await logic.translate(fullKey, ...params);
   // vue-i18n echoes the key back when it has no translation for it.
   return translation === fullKey ? (fallback ?? translation) : translation;
 }

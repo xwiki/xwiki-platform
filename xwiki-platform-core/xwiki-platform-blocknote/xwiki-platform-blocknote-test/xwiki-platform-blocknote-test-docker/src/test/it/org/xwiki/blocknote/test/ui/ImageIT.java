@@ -19,8 +19,11 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
@@ -31,6 +34,9 @@ import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rest.model.jaxb.Attachment;
+import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.rest.resources.attachments.AttachmentsResource;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -42,6 +48,7 @@ import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogAdvancedEditForm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -77,7 +84,6 @@ class ImageIT extends AbstractBlockNoteIT
     @Order(1)
     void editImage(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference, """
             before
@@ -203,5 +209,93 @@ class ImageIT extends AbstractBlockNoteIT
         byte[] uploadedAttachmentContent = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
         assertTrue(Arrays.equals(FileUtils.readFileToByteArray(file), uploadedAttachmentContent));
+    }
+
+    @Test
+    @Order(2)
+    void pasteImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
+        textArea.click().pasteFile("/image.gif");
+        // Shown only once uploaded, since that's when the URL is known.
+        textArea.waitUntilImageIsLoaded(0);
+
+        page.save();
+        String savedContent = page.editWiki().getContent();
+
+        // Untyped reference, and renamed: browsers name a pasted file after its media type, so a second paste would
+        // otherwise overwrite this attachment.
+        assertThat(savedContent, matchesPattern("(?s).*\\[\\[image:\\d+-\\d+\\.gif\\]\\].*"));
+
+        String attachmentName = savedContent.replaceAll("(?s).*\\[\\[image:([^\\]]+)\\]\\].*", "$1");
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference(attachmentName, EntityType.ATTACHMENT, testReference));
+        assertTrue(Arrays.equals(content, uploaded));
+    }
+
+    @Test
+    @Order(3)
+    void dropFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        // Unlike a pasted file, a dropped file keeps the name the user gave it.
+        textArea.click().dropFile("/notes.txt");
+        // The link replaces the inserted block only once uploaded.
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // A non-image has no XWiki counterpart, so it becomes an attachment link.
+        assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
+
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
+        assertTrue(Arrays.equals(content, uploaded));
+    }
+
+    @Test
+    @Order(4)
+    void dropFileWithExistingName(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // An attachment the dropped file is going to collide with.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+        byte[] before = "before".getBytes(StandardCharsets.UTF_8);
+        setup.rest().attachFile(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference),
+            new ByteArrayInputStream(before), true);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] after = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        textArea.click().dropFile("/notes.txt");
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do.
+        assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
+
+        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
+        List<Attachment> notes = attachments.getAttachments().stream()
+            .filter(attachment -> "notes.txt".equals(attachment.getName())).toList();
+        assertEquals(1, notes.size());
+        assertEquals("1.2", notes.get(0).getVersion());
+
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
+        assertTrue(Arrays.equals(after, uploaded));
     }
 }

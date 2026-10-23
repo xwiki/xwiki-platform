@@ -105,6 +105,11 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      */
     private static final Set<String> LEGACY_ROW_FORMATS = Set.of("compact", "redundant");
 
+    /**
+     * The only storage engine whose tables are converted.
+     */
+    private static final String INNODB_ENGINE = "InnoDB";
+
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource xwikiProperties;
@@ -302,6 +307,29 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             PROPERTY_FIX_TABLE_COLLATION);
 
         long conversionStart = System.currentTimeMillis();
+        try {
+            executeStatements(statements, session);
+        } catch (RuntimeException e) {
+            // Re-create the dropped foreign keys even when the conversion fails: they don't exist anymore when the
+            // conversion is resumed at the next startup, so the ones which are not part of the Hibernate mapping
+            // would be lost otherwise
+            try {
+                recreateForeignKeys(conversion.foreignKeyStatements, session);
+            } catch (RuntimeException recreateException) {
+                e.addSuppressed(recreateException);
+            }
+
+            throw e;
+        }
+
+        recreateForeignKeys(conversion.foreignKeyStatements, session);
+
+        this.logger.info("Tables of database [{}] converted in [{}] ms", getDatabaseFromWikiName(),
+            System.currentTimeMillis() - conversionStart);
+    }
+
+    private void executeStatements(List<String> statements, Session session)
+    {
         for (int i = 0; i < statements.size(); ++i) {
             String statement = statements.get(i);
 
@@ -315,11 +343,6 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             this.logger.info("Statement [{}/{}] executed in [{}] ms", i + 1, statements.size(),
                 System.currentTimeMillis() - statementStart);
         }
-
-        recreateForeignKeys(conversion.foreignKeyStatements, session);
-
-        this.logger.info("Tables of database [{}] converted in [{}] ms", getDatabaseFromWikiName(),
-            System.currentTimeMillis() - conversionStart);
     }
 
     /**
@@ -386,7 +409,8 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      * Only the conversions which cannot lose anything are done: a table which can contain characters not supported by
      * the database character set (e.g. a {@code utf8mb4} table in a {@code utf8mb3} database) is not converted, and
      * neither are the tables linked to it by a foreign key on string columns, since that foreign key could not be
-     * re-created.
+     * re-created. The tables which don't use the InnoDB storage engine are not converted either, since the maximum
+     * key length and the row formats taken into account are the InnoDB ones.
      * <p>
      * <strong>WARNING: the dropped foreign keys are not re-created by those statements (unlike
      * {@link #convertToDatabaseCollation(Metadata, Session)}), only by the Hibernate schema update when XWiki is
@@ -573,12 +597,18 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             if (tables.contains(foreignKey.tableName) || tables.contains(foreignKey.referencedTableName)) {
                 String alterTable = ALTER_TABLE + getQualifiedTableName(foreignKey.tableName);
                 String name = quote(foreignKey.name);
-
-                conversion.statements.add(alterTable + " DROP FOREIGN KEY " + name);
-                conversion.foreignKeyStatements.add(alterTable + " ADD CONSTRAINT " + name + " FOREIGN KEY"
+                String addStatement = alterTable + " ADD CONSTRAINT " + name + " FOREIGN KEY"
                     + toColumnList(foreignKey.columns) + " REFERENCES " + quote(foreignKey.referencedSchema) + '.'
                     + foreignKey.referencedTableName + toColumnList(foreignKey.referencedColumns) + " ON UPDATE "
-                    + foreignKey.updateRule + " ON DELETE " + foreignKey.deleteRule);
+                    + foreignKey.updateRule + " ON DELETE " + foreignKey.deleteRule;
+
+                // Keep a trace of the definition, in case the foreign key cannot be re-created automatically (e.g.
+                // XWiki is stopped in the middle of the conversion)
+                this.logger.info("Foreign key [{}] of table [{}] will be dropped for the conversion. It can be"
+                    + " re-created using [{}].", foreignKey.name, foreignKey.tableName, addStatement);
+
+                conversion.statements.add(alterTable + " DROP FOREIGN KEY " + name);
+                conversion.foreignKeyStatements.add(addStatement);
             }
         }
     }
@@ -646,22 +676,37 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     private Map<String, Set<String>> getTablesToConvert(Metadata metadata, String databaseName, String collation,
         Session session)
     {
-        NativeQuery<Object[]> query = session.createNativeQuery("SELECT TABLE_NAME, TABLE_COLLATION "
+        NativeQuery<Object[]> query = session.createNativeQuery("SELECT TABLE_NAME, TABLE_COLLATION, ENGINE "
             + "FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = :schema AND TABLE_TYPE = 'BASE TABLE' "
-            + "AND TABLE_COLLATION <> :collation UNION SELECT TABLE_NAME, COLLATION_NAME "
-            + "FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = :schema AND COLLATION_NAME <> :collation");
+            + "AND TABLE_COLLATION <> :collation UNION SELECT c.TABLE_NAME, c.COLLATION_NAME, t.ENGINE "
+            + "FROM INFORMATION_SCHEMA.COLUMNS c JOIN INFORMATION_SCHEMA.TABLES t "
+            + "ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME "
+            + "WHERE c.TABLE_SCHEMA = :schema AND t.TABLE_TYPE = 'BASE TABLE' AND c.COLLATION_NAME <> :collation");
         query.setParameter(SCHEMA_PARAMETER, databaseName);
         query.setParameter("collation", collation);
 
         Set<String> standardTables = getStandardTables(metadata);
 
         Map<String, Set<String>> tables = new TreeMap<>();
+        Set<String> nonInnoDBTables = new TreeSet<>();
         for (Object[] tableCollation : query.list()) {
             String tableName = (String) tableCollation[0];
 
             if (standardTables.contains(tableName.toLowerCase())) {
-                tables.computeIfAbsent(tableName, key -> new HashSet<>()).add((String) tableCollation[1]);
+                // The maximum key length and the row formats taken into account by the conversion are the InnoDB
+                // ones (e.g. a MyISAM index key cannot exceed 1000 bytes)
+                if (INNODB_ENGINE.equalsIgnoreCase((String) tableCollation[2])) {
+                    tables.computeIfAbsent(tableName, key -> new HashSet<>()).add((String) tableCollation[1]);
+                } else {
+                    nonInnoDBTables.add(tableName);
+                }
             }
+        }
+
+        if (!nonInnoDBTables.isEmpty()) {
+            this.logger.warn("Tables {} of database [{}] don't use collation [{}] but won't be converted since they"
+                + " don't use the InnoDB storage engine. Switching them to InnoDB is recommended, they will then be"
+                + " converted at the next startup.", nonInnoDBTables, databaseName, collation);
         }
 
         return tables;

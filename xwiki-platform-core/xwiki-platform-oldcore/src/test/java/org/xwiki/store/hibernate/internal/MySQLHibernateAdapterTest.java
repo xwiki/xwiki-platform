@@ -56,6 +56,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -64,6 +65,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -80,6 +82,8 @@ import static org.mockito.Mockito.when;
 class MySQLHibernateAdapterTest
 {
     private static final String CONVERT = " CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin";
+
+    private static final String INNODB = "InnoDB";
 
     private static final String FIX_TABLE_COLLATION_PROPERTY = "store.hibernate.mysql.fixTableCollation";
 
@@ -197,13 +201,13 @@ class MySQLHibernateAdapterTest
 
         this.tablesQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.TABLES"))).thenReturn(this.tablesQuery);
-        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikistrings", "utf8mb3_general_ci" },
-            new Object[] { "activitystream_events", "utf8mb3_general_ci" },
-            new Object[] { "custom_table", "utf8mb3_general_ci" },
-            new Object[] { "xwikicustom_Test_Custom", "utf8mb3_general_ci" },
-            new Object[] { "xwikipreferences", "utf8mb3_bin" },
-            new Object[] { "xwikilistitems", "utf8mb3_bin" },
-            new Object[] { "xwikiproperties", "utf8mb3_general_ci" }));
+        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikistrings", "utf8mb3_general_ci", INNODB },
+            new Object[] { "activitystream_events", "utf8mb3_general_ci", INNODB },
+            new Object[] { "custom_table", "utf8mb3_general_ci", INNODB },
+            new Object[] { "xwikicustom_Test_Custom", "utf8mb3_general_ci", INNODB },
+            new Object[] { "xwikipreferences", "utf8mb3_bin", INNODB },
+            new Object[] { "xwikilistitems", "utf8mb3_bin", INNODB },
+            new Object[] { "xwikiproperties", "utf8mb3_general_ci", INNODB }));
 
         NativeQuery<Object[]> foreignKeysQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("INFORMATION_SCHEMA.KEY_COLUMN_USAGE")))
@@ -287,7 +291,8 @@ class MySQLHibernateAdapterTest
     {
         mockCollationQueries();
         when(this.hibernateStore.getConfiguration().getProperty("xwiki.compressionAllowed")).thenReturn("false");
-        when(this.tablesQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "xwikiproperties", "latin1_bin" }));
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikiproperties", "latin1_bin", INNODB }));
 
         assertEquals(List.of("ALTER TABLE `xwiki`.xwikistrings DROP FOREIGN KEY `FKstrings`",
             "ALTER TABLE `xwiki`.xwikiproperties" + CONVERT),
@@ -332,9 +337,31 @@ class MySQLHibernateAdapterTest
     void getConvertToDatabaseCollationStatementsWhenNothingToConvert()
     {
         mockCollationQueries();
-        when(this.tablesQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "custom_table", "latin1_bin" }));
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "custom_table", "latin1_bin", INNODB }));
 
         assertEquals(List.of(), this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+    }
+
+    @Test
+    void getConvertToDatabaseCollationStatementsWhenNonInnoDBTables()
+    {
+        mockCollationQueries();
+        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikidoc", "utf8mb4_general_ci", INNODB },
+            new Object[] { "xwikistrings", "utf8mb3_general_ci", "MyISAM" },
+            new Object[] { "xwikiproperties", "latin1_bin", "Aria" },
+            // Not a table of the mapping
+            new Object[] { "custom_table", "latin1_bin", "MyISAM" }));
+
+        // The InnoDB maximum key length and row formats don't apply to the other storage engines
+        assertEquals(List.of("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+
+        assertEquals("Tables [xwikiproperties, xwikistrings] of database [xwiki] don't use collation [utf8mb4_bin] but"
+            + " won't be converted since they don't use the InnoDB storage engine. Switching them to InnoDB is"
+            + " recommended, they will then be converted at the next startup.", this.logCapture.getMessage(0));
+        assertEquals(1, this.logCapture.size());
     }
 
     @Test
@@ -353,7 +380,7 @@ class MySQLHibernateAdapterTest
         when(this.defaultsQuery.list())
             .thenReturn(List.<Object[]>of(new Object[] { "utf8mb4", "utf8mb4_0900_ai_ci" }));
         when(this.tablesQuery.list())
-            .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_0900_ai_ci" }));
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_0900_ai_ci", INNODB }));
 
         // The binary collation of the database character set is used instead
         assertEquals(List.of("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`",
@@ -369,10 +396,11 @@ class MySQLHibernateAdapterTest
         mockCollationQueries();
         when(this.defaultsQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "utf8mb3", "utf8mb3_bin" }));
         when(this.maxLengthQuery.uniqueResult()).thenReturn(3L);
-        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikistrings", "utf8mb4_bin" },
-            new Object[] { "xwikiproperties", "utf8mb3_general_ci" }, new Object[] { "xwikidoc", "latin1_bin" },
-            new Object[] { "activitystream_events", "utf8mb4_general_ci" },
-            new Object[] { "activitystream_events", "utf8mb4_bin" }));
+        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikistrings", "utf8mb4_bin", INNODB },
+            new Object[] { "xwikiproperties", "utf8mb3_general_ci", INNODB },
+            new Object[] { "xwikidoc", "latin1_bin", INNODB },
+            new Object[] { "activitystream_events", "utf8mb4_general_ci", INNODB },
+            new Object[] { "activitystream_events", "utf8mb4_bin", INNODB }));
 
         NativeQuery<String> wideQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("s.MAXLEN > :maxLength"))).thenReturn(wideQuery);
@@ -409,7 +437,8 @@ class MySQLHibernateAdapterTest
     void convertToDatabaseCollation() throws SQLException
     {
         mockCollationQueries();
-        when(this.tablesQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci" }));
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci", INNODB }));
 
         NativeQuery statement = mock(NativeQuery.class);
         when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(statement);
@@ -437,8 +466,8 @@ class MySQLHibernateAdapterTest
     void convertToDatabaseCollationWhenForeignKeyCannotBeRecreated() throws SQLException
     {
         mockCollationQueries();
-        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikidoc", "utf8mb4_general_ci" },
-            new Object[] { "xwikiproperties", "utf8mb4_general_ci" }));
+        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikidoc", "utf8mb4_general_ci", INNODB },
+            new Object[] { "xwikiproperties", "utf8mb4_general_ci", INNODB }));
 
         NativeQuery<?> alterQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(alterQuery);
@@ -463,6 +492,58 @@ class MySQLHibernateAdapterTest
         assertEquals("Failed to re-create a foreign key with [" + customForeignKey + "]: SQLException: incompatible."
             + " The Hibernate schema update re-creates the missing foreign keys of the Hibernate mapping, the other"
             + " ones have to be re-created manually.", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void convertToDatabaseCollationWhenConversionFails() throws SQLException
+    {
+        mockCollationQueries();
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci", INNODB }));
+
+        NativeQuery<?> dropStatement = mock(NativeQuery.class);
+        when(this.session.createNativeQuery("ALTER TABLE `xwiki`.custom_table DROP FOREIGN KEY `FKcustom`"))
+            .thenReturn(dropStatement);
+        NativeQuery<?> convertStatement = mock(NativeQuery.class);
+        when(this.session.createNativeQuery("ALTER TABLE `xwiki`.xwikidoc ROW_FORMAT=Dynamic," + CONVERT))
+            .thenReturn(convertStatement);
+        HibernateException failure = new HibernateException("failure");
+        when(convertStatement.executeUpdate()).thenThrow(failure);
+        when(this.session.getTransaction()).thenReturn(mock(Transaction.class));
+        Statement jdbcStatement = mockJDBCStatement();
+
+        HibernateException exception = assertThrows(HibernateException.class,
+            () -> this.adapter.convertToDatabaseCollation(this.metadata, this.session));
+
+        assertSame(failure, exception);
+        verify(dropStatement).executeUpdate();
+        // The dropped foreign key is re-created anyway, otherwise it would be lost
+        verify(jdbcStatement).execute("ALTER TABLE `xwiki`.custom_table ADD CONSTRAINT `FKcustom` FOREIGN KEY"
+            + " (`VALUE`) REFERENCES `xwiki`.xwikidoc (`XWD_FULLNAME`) ON UPDATE CASCADE ON DELETE NO ACTION");
+        verify(jdbcStatement).execute("SET FOREIGN_KEY_CHECKS=1");
+    }
+
+    @Test
+    void convertToDatabaseCollationWhenConversionAndForeignKeysRecreationFail()
+    {
+        mockCollationQueries();
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci", INNODB }));
+
+        NativeQuery<?> statement = mock(NativeQuery.class);
+        when(this.session.createNativeQuery(startsWith("ALTER TABLE "))).thenReturn(statement);
+        HibernateException failure = new HibernateException("failure");
+        when(statement.executeUpdate()).thenThrow(failure);
+        when(this.session.getTransaction()).thenReturn(mock(Transaction.class));
+        HibernateException recreateFailure = new HibernateException("recreate failure");
+        doThrow(recreateFailure).when(this.session).doWork(any());
+
+        HibernateException exception = assertThrows(HibernateException.class,
+            () -> this.adapter.convertToDatabaseCollation(this.metadata, this.session));
+
+        // The conversion failure is the one reported
+        assertSame(failure, exception);
+        assertArrayEquals(new Throwable[] { recreateFailure }, exception.getSuppressed());
     }
 
     @Test
@@ -496,7 +577,8 @@ class MySQLHibernateAdapterTest
     void repairDatabase() throws Exception
     {
         mockRepairDatabase();
-        when(this.tablesQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci" }));
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb4_general_ci", INNODB }));
 
         this.adapter.repairDatabase(this.metadata);
 

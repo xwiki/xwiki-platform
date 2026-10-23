@@ -1243,9 +1243,10 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #-# [Since 18.10.0RC1]
 #-# MySQL and MariaDB only. When the data migration system is enabled, XWiki makes sure at startup that each standard
 #-# table (custom mappings excluded) uses the character set configured on the database with a binary collation (the
-#-# collation configured on the database when it's binary, utf8mb4_bin for utf8mb4 otherwise), and converts the ones
-#-# which don't (unless they could lose characters in the process). Each converted table is rebuilt, which can take a
-#-# long time for big tables. Set it to false to disable this conversion.
+#-# collation configured on the database when it's binary, the binary collation of the database character set
+#-# otherwise, e.g. utf8mb4_bin), and converts the InnoDB ones which don't (unless they could lose characters in the
+#-# process). Each converted table is rebuilt, which can take a long time for big tables. Set it to false to disable
+#-# this conversion.
 #-#
 #-# The default is true.
 # store.hibernate.mysql.fixTableCollation = true

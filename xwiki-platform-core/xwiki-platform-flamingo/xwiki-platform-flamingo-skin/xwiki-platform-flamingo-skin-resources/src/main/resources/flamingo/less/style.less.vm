@@ -22,7 +22,6 @@
 // --------------------------------------------------
 
 // Imports ====================================================================
-@import "before-bootstrap"; // Fixes that must be included BEFORE bootstrap
 @import "bootstrap/bootstrap.less"; // Bootstrap
 @import "variables"; // Bootstrap variables overrided by flamingo
 @import "mixins"; // Mixins defined by flamingo

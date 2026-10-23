@@ -82,8 +82,8 @@ catalogs:
       specifier: 22.0.0
       version: 22.0.0
     '@vitejs/plugin-react':
-      specifier: 6.1.1
-      version: 6.1.1
+      specifier: 6.1.2
+      version: 6.1.2
     '@vitejs/plugin-vue':
       specifier: 6.0.9
       version: 6.0.9
@@ -465,7 +465,7 @@ importers:
         version: 24.13.6
       '@vitejs/plugin-react':
         specifier: 'catalog:'
-        version: 6.1.1(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
+        version: 6.1.2(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.9(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))(vue@3.5.44(typescript@5.9.3))
@@ -3983,7 +3983,7 @@ importers:
         version: 19.3.0
       '@vitejs/plugin-react':
         specifier: 'catalog:'
-        version: 6.1.1(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+        version: 6.1.2(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -4031,7 +4031,7 @@ importers:
         version: 5.0.5(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@5.0.5(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@5.0.5(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0)))
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.11(typescript@5.9.3)
@@ -5533,13 +5533,13 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@vitejs/plugin-react@6.1.1':
-    resolution: {integrity: sha512-yxLaQV9gkhS8ezJqCM6+ndU7mDY6gqAg75NQ+0IjwEI8IYOmQCgkRwHKVSfWXW076DsqMo0Dk+0FK1U+M5RgFw==}
+  '@vitejs/plugin-react@6.1.2':
+    resolution: {integrity: sha512-fhJNGUdscQa4HkI0xFxwonWyhnVReCPDbXI7FH7jmzpnVCrFQI7PRrhWecO263610vOrs9tr2Y4xcf8uAdFxbw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       '@rolldown/plugin-babel': ^0.1.7 || ^0.2.0
       babel-plugin-react-compiler: ^1.0.0
-      oxc-transform-react: ^0.145.0
+      oxc-transform-react: ^0.152.0
       vite: ^8.0.0
     peerDependenciesMeta:
       '@rolldown/plugin-babel':
@@ -5741,6 +5741,11 @@ packages:
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
+    peerDependencies:
+      ajv: ^8.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
 
   ajv@6.15.0:
     resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
@@ -9210,7 +9215,7 @@ snapshots:
   '@playwright/experimental-ct-react@1.62.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))(yaml@2.9.0)':
     dependencies:
       '@playwright/experimental-ct-core': 1.62.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
-      '@vitejs/plugin-react': 6.1.1(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+      '@vitejs/plugin-react': 6.1.2(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
     transitivePeerDependencies:
       - '@rolldown/plugin-babel'
       - '@types/node'
@@ -9782,12 +9787,12 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vitejs/plugin-react@6.1.1(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))':
+  '@vitejs/plugin-react@6.1.2(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
       vite: 8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
 
-  '@vitejs/plugin-react@6.1.1(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))':
+  '@vitejs/plugin-react@6.1.2(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
       vite: 8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0)
@@ -9809,15 +9814,6 @@ snapshots:
       vitest: 5.0.5(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
     transitivePeerDependencies:
       - supports-color
-
-  '@vitest/mocker@5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))':
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      '@vitest/spy': 5.0.5
-      estree-walker: 3.0.3
-      magic-string: 1.4.3
-    optionalDependencies:
-      vite: 8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
 
   '@vitest/mocker@5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))':
     dependencies:
@@ -12912,12 +12908,6 @@ snapshots:
       sugarss: 5.0.1(postcss@8.5.30)
       yaml: 2.9.0
 
-  vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@5.0.5(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))):
-    dependencies:
-      ts-essentials: 10.2.1(typescript@5.9.3)
-      typescript: 5.9.3
-      vitest: 5.0.5(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
-
   vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@5.0.5(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))):
     dependencies:
       ts-essentials: 10.2.1(typescript@5.9.3)
@@ -12927,7 +12917,7 @@ snapshots:
   vitest@5.0.5(@types/node@24.13.6)(happy-dom@20.9.0)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+      '@vitest/mocker': 5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
       chai: 6.3.0
       es-module-lexer: 2.3.2
       expect-type: 1.4.0

@@ -301,10 +301,7 @@ const uploadFile = createUploadFile({
   notifyUploadFailed: async (fileName, error) => {
     console.error(`Failed to upload [${fileName}].`, error);
     try {
-      const message = await logic.translate(
-        "blocknote.upload.failed",
-        fileName,
-      );
+      const message = await translate("upload.failed", undefined, fileName);
       new XWiki.widgets.Notification(message, "error");
     } catch (notificationError) {
       // Nobody awaits this callback, so an error here would go unhandled.
@@ -423,11 +420,16 @@ function onLocalInstantChange(): void {
 /**
  * @param key - the translation key, without the prefix the localization module adds back
  * @param fallback - what to return when the key has no translation
+ * @param params - the parameters of the translation message
  * @returns the translated message
  */
-async function translate(key: string, fallback?: string): Promise<string> {
+async function translate(
+  key: string,
+  fallback?: string,
+  ...params: unknown[]
+): Promise<string> {
   const fullKey = `blocknote.${key}`;
-  const translation = await logic.translate(fullKey);
+  const translation = await logic.translate(fullKey, ...params);
   // vue-i18n echoes the key back when it has no translation for it.
   return translation === fullKey ? (fallback ?? translation) : translation;
 }

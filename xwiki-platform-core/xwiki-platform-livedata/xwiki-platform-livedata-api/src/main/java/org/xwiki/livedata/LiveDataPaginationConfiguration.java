@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.stability.Unstable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -50,6 +51,8 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
     private Boolean showFirstLast;
 
     private Boolean showPageSizeDropdown;
+
+    private Boolean showPaginationOnSinglePage;
 
     /**
      * @return the maximum number of page links to display in the pagination
@@ -161,6 +164,33 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
         this.showPageSizeDropdown = showPageSizeDropdown;
     }
 
+    /**
+     * @return whether the pagination is shown when the live data has a single page of entries, {@code null} to
+     *     inherit from the default configuration, which shows it
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public Boolean getShowPaginationOnSinglePage()
+    {
+        return showPaginationOnSinglePage;
+    }
+
+    /**
+     * Sets whether the pagination is shown when the live data has a single page of entries. The decision is taken
+     * when the entries are loaded and the pagination is kept once it has been displayed, so that the controls it
+     * holds, such as the page size selector, cannot disappear while the user works with the live data.
+     *
+     * @param showPaginationOnSinglePage {@code true} to show the pagination on a single page, {@code false} to show
+     *     it only once the entries span more than one page, {@code null} to inherit from the default configuration,
+     *     which shows it
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)
+    {
+        this.showPaginationOnSinglePage = showPaginationOnSinglePage;
+    }
+
     @Override
     public void initialize()
     {
@@ -201,6 +231,7 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
             .append(this.showNextPrevious, that.showNextPrevious)
             .append(this.showFirstLast, that.showFirstLast)
             .append(this.showPageSizeDropdown, that.showPageSizeDropdown)
+            .append(this.showPaginationOnSinglePage, that.showPaginationOnSinglePage)
             .isEquals();
     }
 
@@ -217,6 +248,7 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
             .append(this.showNextPrevious)
             .append(this.showFirstLast)
             .append(this.showPageSizeDropdown)
+            .append(this.showPaginationOnSinglePage)
             .toHashCode();
     }
 }

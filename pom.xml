@@ -56,7 +56,7 @@
     <releaseProfiles>release</releaseProfiles>
 
     <!-- Dependencies versions -->
-    <batik.version>1.19</batik.version>
+    <batik.version>1.20</batik.version>
     <tika.version>4.1.0</tika.version>
     <pdfbox.version>3.0.8</pdfbox.version>
     <poi.version>6.0.0</poi.version>

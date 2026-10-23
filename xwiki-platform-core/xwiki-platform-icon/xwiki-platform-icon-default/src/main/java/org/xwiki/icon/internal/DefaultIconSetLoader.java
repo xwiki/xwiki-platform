@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -68,6 +70,10 @@ public class DefaultIconSetLoader implements IconSetLoader
     private static final String ICON_URL_PROPERTY_NAME = "xwiki.iconset.icon.url";
 
     private static final String ICON_CSS_CLASS_PROPERTY_NAME = "xwiki.iconset.icon.cssClass";
+
+    private static final String DEPRECATED_START = "#@deprecatedstart";
+
+    private static final String DEPRECATED_END = "#@deprecatedend";
 
     private static final String ERROR_MSG = "Failed to load the IconSet [%s].";
 
@@ -119,18 +125,42 @@ public class DefaultIconSetLoader implements IconSetLoader
     {
         IconSet iconSet = new IconSet(name);
         Properties properties = new Properties();
+        Properties deprecatedProperties = new Properties();
         try {
-            properties.load(input);
+            String content = IOUtils.toString(input);
+            properties.load(new StringReader(content));
+            // The deprecated icons are the ones declared between the deprecation markers, which are comments for the
+            // properties format.
+            deprecatedProperties.load(new StringReader(getDeprecatedBlocks(content)));
         } catch (IOException e) {
             throw new IconException(String.format(ERROR_MSG, name), e);
         }
 
-        properties.stringPropertyNames().forEach(key -> setIconSetProperty(iconSet, key, properties.getProperty(key)));
+        Set<String> deprecatedIconNames = deprecatedProperties.stringPropertyNames();
+        properties.stringPropertyNames().forEach(
+            key -> setIconSetProperty(iconSet, key, properties.getProperty(key), deprecatedIconNames));
 
         return iconSet;
     }
 
-    private void setIconSetProperty(IconSet iconSet, String key, String value)
+    private String getDeprecatedBlocks(String content)
+    {
+        StringBuilder deprecatedBlocks = new StringBuilder();
+        boolean inDeprecatedBlock = false;
+        for (String line : content.lines().toList()) {
+            String trimmedLine = line.trim();
+            if (DEPRECATED_START.equals(trimmedLine)) {
+                inDeprecatedBlock = true;
+            } else if (DEPRECATED_END.equals(trimmedLine)) {
+                inDeprecatedBlock = false;
+            } else if (inDeprecatedBlock) {
+                deprecatedBlocks.append(line).append('\n');
+            }
+        }
+        return deprecatedBlocks.toString();
+    }
+
+    private void setIconSetProperty(IconSet iconSet, String key, String value, Set<String> deprecatedIconNames)
     {
         if (CSS_PROPERTY_NAME.equals(key)) {
             iconSet.setCss(value);
@@ -151,6 +181,7 @@ public class DefaultIconSetLoader implements IconSetLoader
         } else {
             Icon icon = new Icon();
             icon.setValue(value);
+            icon.setDeprecated(deprecatedIconNames.contains(key));
             iconSet.addIcon(key, icon);
         }
     }

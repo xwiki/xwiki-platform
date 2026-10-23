@@ -19,7 +19,11 @@
  */
 package org.xwiki.icon.internal;
 
+import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.icon.Icon;
 import org.xwiki.icon.IconSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,5 +43,19 @@ class IconSetTest
         assertEquals("myIconSet", iconSet.getName());
         iconSet.setName("newName");
         assertEquals("newName", iconSet.getName());
+    }
+
+    @Test
+    void getIconNamesWithoutDeprecated()
+    {
+        IconSet iconSet = new IconSet("myIconSet");
+        iconSet.addIcon("table-sort", new Icon("table_sort"));
+        Icon deprecatedIcon = new Icon("table_sort");
+        deprecatedIcon.setDeprecated(true);
+        iconSet.addIcon("table_sort", deprecatedIcon);
+
+        assertEquals(List.of("table-sort"), iconSet.getIconNames(false));
+        assertEquals(Set.of("table-sort", "table_sort"), Set.copyOf(iconSet.getIconNames(true)));
+        assertEquals(Set.of("table-sort", "table_sort"), Set.copyOf(iconSet.getIconNames()));
     }
 }

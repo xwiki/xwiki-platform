@@ -67,7 +67,7 @@ public class AbstractTest
 
     protected String getAddressPrefix()
     {
-        return TestUtils.BASE_BIN_URL;
+        return executor.getHttpClientBaseURL() + "bin/";
     }
 
     protected String getTestMethodName()

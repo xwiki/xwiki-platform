@@ -35,9 +35,9 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.CopyPage;
+import org.xwiki.test.ui.po.DeletePageConfirmationPage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.EditRightsPane;
 import org.xwiki.test.ui.po.RenamePage;
@@ -444,7 +444,7 @@ class AllDocsIT
 
         // click on the copy action link.
         livetable.clickAction(1, "delete");
-        ConfirmationPage confirmationPage = new ConfirmationPage();
+        DeletePageConfirmationPage confirmationPage = new DeletePageConfirmationPage();
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilFinished();
         page = AllDocsPage.gotoPage();

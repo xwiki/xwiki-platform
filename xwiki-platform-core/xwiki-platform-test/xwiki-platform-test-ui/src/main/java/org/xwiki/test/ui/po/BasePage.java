@@ -349,16 +349,6 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * @since 7.3M2
-     * @deprecated use {@link #clickMoreActionsSubMenuEntry(String)} instead which has a better name
-     */
-    @Deprecated
-    public void clickAdminActionsSubMenuEntry(String id)
-    {
-        clickMoreActionsSubMenuEntry(id);
-    }
-
-    /**
      * @since 7.0RC1
      */
     private void clickSubMenuEntryFromMenu(By menuBy, String id)

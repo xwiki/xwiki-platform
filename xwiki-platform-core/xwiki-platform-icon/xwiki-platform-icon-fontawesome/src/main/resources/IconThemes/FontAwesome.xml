@@ -150,6 +150,7 @@ money = money
 more-vertical=ellipsis-v
 move=external-link
 music = music
+## Since 18.0.0RC1
 note = sticky-note
 page = file-o
 paste = paste
@@ -174,7 +175,9 @@ search-plus = search-plus
 shield = shield
 shopping-cart = shopping-cart
 soccer = futbol-o
+## Since 17.10.0RC1
 sort-ascending = sort-amount-asc
+## Since 17.10.0RC1
 sort-descending = sort-amount-desc
 space = folder
 star = star

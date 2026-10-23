@@ -110,6 +110,7 @@ money = money
 more-vertical=bullet_arrow_down
 move=page_go
 music = music
+## Since 18.0.0RC1
 note = note
 page = page_white_text
 paste = paste_plain
@@ -134,7 +135,9 @@ search-plus = zoom_in
 shield = shield
 shopping-cart = cart
 soccer = sport_soccer
+## Since 17.10.0RC1
 sort-ascending = arrow_up
+## Since 17.10.0RC1
 sort-descending = arrow_down
 space = folder
 star = star

@@ -39,7 +39,9 @@ import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingExcept
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ArrayNode;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ObjectNode;
+import org.xwiki.livedata.test.po.ListLayoutElement;
 import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.PropertiesPanelElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -86,6 +88,16 @@ class LiveDataIT
     private static final String ENTRY_TITLE = "My first entry";
 
     private static final String CHOICE_COLUMN = "choice";
+
+    private static final String CITY_COLUMN = "city";
+
+    private static final String CITY_PARIS = "Paris";
+
+    private static final String CITY_LISBON = "Lisbon";
+
+    private static final String EMPTY_VALUE = "-";
+
+    private static final String LIST_TRANSLATION_PREFIX = "listLayout.";
 
     private static final String NAME_LYNDA = "Lynda";
 
@@ -1110,6 +1122,150 @@ class LiveDataIT
         assertEquals(3, tableLayout.getTotalEntries());
         assertTrue(testUtils.rest()
             .exists(new DocumentReference(ENTRY_TITLE + "-1", testReference.getLastSpaceReference())));
+    }
+
+    /**
+     * Test the list layout: each entry is displayed on a compact line, made of its first visible property followed by
+     * its other visible properties that have a value. See {@link #listLayoutEditMode} for the edit mode.
+     */
+    @Test
+    @Order(17)
+    void listLayout(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
+        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
+        String content = """
+            {{liveData
+              id="test"
+              properties="%s,%s"
+              layouts="list,table"
+              sort="%s:asc"
+              source="liveTable"
+              sourceParameters="translationPrefix=%s&className=%s"
+            /}}
+            """.formatted(NAME_COLUMN, CITY_COLUMN, NAME_COLUMN, LIST_TRANSLATION_PREFIX, className);
+        testUtils.createPage(testReference, content, "Live Data with the list layout");
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        // Use a translation prefix of our own, so that the empty values are displayed the same way whatever the
+        // translations defined by the other tests.
+        DocumentReference translationReference = new DocumentReference("ListLayoutTranslations", testSpace);
+        testUtils.addObject(translationReference, "XWiki.TranslationDocumentClass", singletonMap("scope", "WIKI"));
+        testUtils.rest().savePage(translationReference, LIST_TRANSLATION_PREFIX + "emptyvalue=" + EMPTY_VALUE,
+            "translation");
+        testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
+        testUtils.addClassProperty(testReference, CITY_COLUMN, "String");
+        testUtils.addObject(new DocumentReference(NAME_LYNDA, testSpace), className,
+            Map.of(NAME_COLUMN, NAME_LYNDA, CITY_COLUMN, CITY_PARIS));
+        // Esther has no city: the liveTable source displays the empty values with the "emptyvalue" translation.
+        testUtils.addObject(new DocumentReference(NAME_ESTHER, testSpace), className,
+            Map.of(NAME_COLUMN, NAME_ESTHER));
+        testUtils.addObject(new DocumentReference(NAME_CHARLY, testSpace), className,
+            Map.of(NAME_COLUMN, NAME_CHARLY, CITY_COLUMN, CITY_LISBON));
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        assertEquals(List.of("List", "Table"), liveData.getLayoutNames());
+
+        // The first layout of the macro parameter is displayed initially.
+        ListLayoutElement listLayout = liveData.getListLayout();
+        listLayout.waitUntilItemCountEqualsTo(3);
+        assertEquals(List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA), listLayout.getMainValues());
+        assertEquals(List.of(CITY_LISBON), listLayout.getSecondaryValues(1));
+        assertEquals(List.of(EMPTY_VALUE), listLayout.getSecondaryValues(2));
+        assertEquals(List.of(CITY_PARIS), listLayout.getSecondaryValues(3));
+        // The secondary values are labelled for screen readers, and the entries have no marker.
+        assertEquals(List.of(CITY_COLUMN + ":"), listLayout.getSecondaryLabels(1));
+        assertFalse(listLayout.hasItemMarkers());
+
+        // The values can be edited from the list layout, like in the other layouts.
+        assertTrue(listLayout.hasEditableValues());
+
+        // Hiding a property removes its values from the list.
+        PropertiesPanelElement propertiesPanel = liveData.openPropertiesPanel();
+        propertiesPanel.setPropertyDisplayed(CITY_COLUMN, false);
+        propertiesPanel.closePanel();
+        listLayout.waitUntilReady();
+        assertEquals(List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA), listLayout.getMainValues());
+        assertEquals(List.of(), listLayout.getSecondaryValues(1));
+        assertEquals(List.of(), listLayout.getSecondaryValues(3));
+        // A marker is displayed before each entry, since they display a single property.
+        assertTrue(listLayout.hasItemMarkers());
+
+        // Hiding the first property makes the next visible one the main value.
+        propertiesPanel = liveData.openPropertiesPanel();
+        propertiesPanel.setPropertyDisplayed(CITY_COLUMN, true);
+        propertiesPanel.setPropertyDisplayed(NAME_COLUMN, false);
+        propertiesPanel.closePanel();
+        listLayout.waitUntilReady();
+        assertEquals(List.of(CITY_LISBON, EMPTY_VALUE, CITY_PARIS), listLayout.getMainValues());
+
+        // The other layouts are still available, and display the same entries.
+        propertiesPanel = liveData.openPropertiesPanel();
+        propertiesPanel.setPropertyDisplayed(NAME_COLUMN, true);
+        propertiesPanel.closePanel();
+        liveData.switchLayout("Table");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(3);
+        assertEquals(NAME_CHARLY, tableLayout.getCellText(NAME_COLUMN, 1));
+        assertEquals(CITY_LISBON, tableLayout.getCellText(CITY_COLUMN, 1));
+
+        liveData.switchLayout("List");
+        listLayout = liveData.getListLayout();
+        listLayout.waitUntilItemCountEqualsTo(3);
+        assertEquals(List.of(NAME_CHARLY, NAME_ESTHER, NAME_LYNDA), listLayout.getMainValues());
+    }
+
+    /**
+     * Test the edit mode of the list layout: the entries can be added and deleted, like in the other layouts.
+     */
+    @Test
+    @Order(18)
+    void listLayoutEditMode(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+        createEditableLiveDataPage(testUtils, testReference, "layouts=\"list,table\"", NAME_LYNDA);
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        ListLayoutElement listLayout = liveData.getListLayout();
+        listLayout.waitUntilItemCountEqualsTo(1);
+        assertEquals(List.of(NAME_LYNDA), listLayout.getMainValues());
+
+        // The list layout offers the edit mode, like the other layouts, but not its actions outside of it.
+        assertTrue(liveData.hasEditModeAction());
+        assertFalse(liveData.isEditMode());
+        assertFalse(listLayout.canAddEntry());
+        assertFalse(listLayout.hasDeleteActions());
+        // The labels of the properties are only displayed while editing.
+        assertEquals(List.of(), listLayout.getDisplayedLabels(1));
+
+        liveData.toggleEditMode();
+        listLayout.waitUntilReady();
+        assertTrue(liveData.isEditMode());
+        assertTrue(listLayout.canAddEntry());
+        assertTrue(listLayout.hasDeleteActions());
+        assertEquals(List.of(NAME_COLUMN + ":"), listLayout.getDisplayedLabels(1));
+
+        // Setting a first value on the new item creates the entry.
+        listLayout.startNewEntry();
+        listLayout.createNewEntry(NAME_COLUMN, NAME_ESTHER);
+        assertEquals(List.of(NAME_LYNDA, NAME_ESTHER), listLayout.getMainValues());
+
+        // Deleting the entry removes it for good.
+        listLayout.deleteEntry(2);
+        assertEquals(List.of(NAME_LYNDA), listLayout.getMainValues());
+
+        // Leaving the edit mode hides its actions again.
+        liveData.toggleEditMode();
+        listLayout.waitUntilReady();
+        assertFalse(liveData.isEditMode());
+        assertFalse(listLayout.canAddEntry());
+        assertFalse(listLayout.hasDeleteActions());
+        assertEquals(List.of(NAME_LYNDA), listLayout.getMainValues());
     }
 
     /**

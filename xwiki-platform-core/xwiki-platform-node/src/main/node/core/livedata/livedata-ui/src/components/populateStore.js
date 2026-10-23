@@ -43,6 +43,9 @@ export function populateStore() {
   componentStore.register("layout", "cards", async () => {
     return (await import("./layouts/cards/LayoutCards.vue")).default;
   });
+  componentStore.register("layout", "list", async () => {
+    return (await import("./layouts/list/LayoutList.vue")).default;
+  });
 
   componentStore.register("displayer", "actions", async () => {
     return (await import("./displayers/DisplayerActions.vue")).default;

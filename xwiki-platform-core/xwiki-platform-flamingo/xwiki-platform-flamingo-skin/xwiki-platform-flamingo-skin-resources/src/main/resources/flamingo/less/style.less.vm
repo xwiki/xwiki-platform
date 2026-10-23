@@ -29,7 +29,6 @@
 @import "accordion";
 @import "action-menus";
 @import "admin";
-@import "annotations";
 @import "buttons";
 @import "breadcrumbs";
 @import "drawer";
@@ -38,7 +37,6 @@
 @import "forms";
 @import "general";
 @import "grid";
-@import "headers";
 @import "layout";
 @import "livetable";
 @import "messages";

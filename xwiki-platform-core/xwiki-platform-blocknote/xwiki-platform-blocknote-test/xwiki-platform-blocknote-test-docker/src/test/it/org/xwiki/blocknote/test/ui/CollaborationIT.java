@@ -47,6 +47,8 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ForceEditLockModal;
+import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -581,6 +583,9 @@ class CollaborationIT extends AbstractBlockNoteIT
         String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
         setup.loginAsSuperAdmin();
         setup.gotoPage(testReferenceEn).editWYSIWYG();
+        // John, the content author, doesn't have script right, so superadmin is warned that editing the page would
+        // allow the velocity macro to be executed.
+        new ForceEditLockPage().clickForceEdit();
         BlockNoteStandaloneEditPage secondEditPage = new BlockNoteStandaloneEditPage();
         BlockNoteEditor secondEditor = secondEditPage.getContentEditor();
         BlockNoteRichTextArea secondTextArea = secondEditor.getRichTextArea();
@@ -654,8 +659,9 @@ class CollaborationIT extends AbstractBlockNoteIT
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
-        // Re-join the collaboration session.
-        joinSession(firstEditPage, setup);
+        // Re-join the collaboration session. Superadmin's save made them the content author, so John is warned that
+        // editing the page may break the velocity macro because he doesn't have script right.
+        joinSessionConfirmingRequiredRightsWarning(firstEditPage);
         firstEditor = firstEditPage.getContentEditor();
         firstTextArea = firstEditor.getRichTextArea();
         firstTextArea.waitUntilTextContains("five");
@@ -1002,6 +1008,87 @@ class CollaborationIT extends AbstractBlockNoteIT
         }
     }
 
+    @Test
+    @Order(12)
+    void editWhileCollaborationServerIsUnreachable(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "one", "");
+
+        // The editor is loaded even if it can't connect to the collaboration server.
+        BlockNoteInplaceEditPage firstEditPage = new BlockNoteInplaceEditPage();
+        firstEditPage.simulateUnreachableCollaborationServer().edit();
+        firstEditPage.waitForInplaceEditor(false);
+        RealtimeEditToolbar firstToolbar = firstEditPage.getToolbar();
+        assertFalse(firstToolbar.isConnected());
+        // The auto-save is started even if we're disconnected.
+        firstToolbar.waitForSaveStatus(SaveStatus.SAVED);
+        // We're identified in the realtime editing session even before we connect to it.
+        String firstCoeditorId = firstToolbar.getUserId();
+
+        // The user can edit and save while disconnected.
+        BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
+        firstTextArea.appendParagraph("two").waitUntilTextContains("two");
+        firstToolbar.waitForSaveStatus(SaveStatus.UNSAVED);
+        firstEditPage.save();
+        assertEquals(SaveStatus.SAVED, firstToolbar.getSaveStatus());
+        assertFalse(firstToolbar.isConnected());
+
+        // The created version is listed in the history dropdown.
+        List<VersionElement> versions =
+            firstToolbar.getHistoryDropdown().waitForVersion("1.2").open().getVersions();
+        assertEquals(2, versions.size());
+        assertEquals("1.2", versions.get(1).getNumber());
+        firstToolbar.getHistoryDropdown().close();
+
+        // The editor connects to the realtime editing session as soon as the collaboration server is reachable, and
+        // the changes made while disconnected are shared.
+        firstEditPage.restoreCollaborationServer();
+        firstToolbar.waitUntilEditingAlone();
+        firstTextArea.appendParagraph("three").waitUntilTextContains("three");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsAlice(setup);
+        BlockNoteInplaceEditPage secondEditPage = BlockNoteInplaceEditPage.gotoPage(testReference);
+        joinSession(secondEditPage, setup);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        secondTextArea.waitUntilTextContains("three");
+        RealtimeEditToolbar secondToolbar = secondEditPage.getToolbar();
+        String secondCoeditorId = secondToolbar.getUserId();
+        // The user who edited while disconnected is listed among the coeditors.
+        secondToolbar.waitForCoeditor(firstCoeditorId);
+        assertEquals(2, secondToolbar.getVisibleCoeditorCount());
+        secondTextArea.appendParagraph("four").waitUntilTextContains("four");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("four");
+        firstToolbar.waitForCoeditor(secondCoeditorId);
+        assertEquals(2, firstToolbar.getVisibleCoeditorCount());
+        assertEquals("one\ntwo\nthree\nfour", firstEditPage.done().getContent());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondToolbar.waitUntilEditingAlone();
+        assertEquals("one\ntwo\nthree\nfour", secondEditPage.done().getContent());
+    }
+
     /**
      * Joins an existing collaboration session, checking that the user is not asked to confirm that they want to take
      * over the edit lock held by the users that are already in the session.
@@ -1017,6 +1104,25 @@ class CollaborationIT extends AbstractBlockNoteIT
         inplaceEditablePage.waitForInplaceEditor();
         assertTrue(setup.getDriver().findElementsWithoutWaiting(By.className("force-edit-lock-modal")).isEmpty(),
             "The user was asked to force the edit lock instead of joining the collaboration session.");
+    }
+
+    /**
+     * Joins the collaboration session after confirming the required rights warning that is displayed when the current
+     * user doesn't have a right that the content author of the edited page has.
+     *
+     * @param inplaceEditablePage the page to edit in-place
+     */
+    private void joinSessionConfirmingRequiredRightsWarning(BlockNoteInplaceEditPage inplaceEditablePage)
+    {
+        inplaceEditablePage.edit();
+        ForceEditLockModal requiredRightsWarning = new ForceEditLockModal();
+        String message = requiredRightsWarning.getMessage();
+        // Being asked to take over the edit lock would mean that the user doesn't join the collaboration session, so
+        // the warning must only be about the missing rights.
+        assertTrue(message.contains("you are missing the following rights"), "Unexpected warning: " + message);
+        assertFalse(message.contains("locked"), "Unexpected warning: " + message);
+        requiredRightsWarning.clickOk();
+        inplaceEditablePage.waitForInplaceEditor();
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

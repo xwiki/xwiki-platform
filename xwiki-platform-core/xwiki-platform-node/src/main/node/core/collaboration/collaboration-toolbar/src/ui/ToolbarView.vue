@@ -23,6 +23,7 @@ import LeaveModal from "./LeaveModal.vue";
 import StatusLabel from "./StatusLabel.vue";
 import UserAvatar from "./UserAvatar.vue";
 import VersionModal from "./VersionModal.vue";
+import WarningPopover from "./WarningPopover.vue";
 import {
   useDocument,
   useEnvironment,
@@ -81,7 +82,9 @@ const doneOpensModal = computed(
   () => saveOptions.editComment.enabled && saveOptions.editComment.mandatory,
 );
 const savingOrDisconnected = computed(
-  () => state.saveStatus === 1 || state.connectionStatus !== 2,
+  () =>
+    state.saveStatus === 1 ||
+    (state.connectionStatus !== 2 && !session.canSaveWhileDisconnected),
 );
 const visibleUsers = computed(() => state.users.slice(0, USER_LIMIT));
 const hiddenUserCount = computed(() => state.users.length - USER_LIMIT);
@@ -255,6 +258,12 @@ async function save(continueEditing?: boolean): Promise<boolean> {
         </li>
       </ul>
     </div>
+    <!-- The warning is re-created when its content changes, in order to update and show again the popover. -->
+    <WarningPopover
+      v-for="warning in state.warnings"
+      :key="JSON.stringify(warning)"
+      :warning="warning"
+    />
     <!-- Other modules can append elements here (e.g. the concurrent editing warning). -->
   </div>
   <div class="realtime-edit-toolbar-right">

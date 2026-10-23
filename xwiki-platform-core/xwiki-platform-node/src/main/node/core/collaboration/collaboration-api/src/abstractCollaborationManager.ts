@@ -60,18 +60,36 @@ export abstract class AbstractCollaborationManager
           "no document reference provided and the current document reference is undefined.",
       );
     }
-    const key = this.modelReferenceSerializer.serialize(documentReference);
-    let collaboration = this.collaborations.get(key!);
+    const key = this.modelReferenceSerializer.serialize(documentReference)!;
+    const collaboration = this.collaborations.get(key);
+    // Share the connection when this client is already in the session, e.g. with another editor on the page.
     if (collaboration) {
       collaboration.usageCount++;
+      return collaboration.promise;
     } else {
-      collaboration = {
-        promise: this.connect(documentReference),
-        usageCount: 1,
-      };
-      this.collaborations.set(key!, collaboration);
+      return this.startCollaboration(key, documentReference);
     }
-    return collaboration.promise;
+  }
+
+  /**
+   * Start a new collaboration session and cache it, so that the next join() for the same document reuses it.
+   */
+  private async startCollaboration(
+    key: string,
+    documentReference: DocumentReference,
+  ): Promise<Collaboration> {
+    const promise = this.connect(documentReference);
+    const collaboration = { promise, usageCount: 1 };
+    this.collaborations.set(key, collaboration);
+    try {
+      return await promise;
+    } catch (error) {
+      // Don't keep a failed connection: there is nothing for leave() to disconnect and the next join() must retry.
+      if (this.collaborations.get(key) === collaboration) {
+        this.collaborations.delete(key);
+      }
+      throw error;
+    }
   }
 
   leave(documentReference?: DocumentReference): void {
@@ -187,7 +205,14 @@ export abstract class AbstractCollaborationManager
   ): Promise<void> {
     this.collaborations.delete(key);
     console.debug("Leaving realtime collaboration.");
-    const joined = await collaboration.promise;
+    let joined: Collaboration;
+    try {
+      joined = await collaboration.promise;
+    } catch {
+      // We failed to join the collaboration session (the error was reported to those who joined) so there's nothing
+      // to disconnect.
+      return;
+    }
     // Stop the auto-saver before disconnecting, so that it gets to tell the other collaborators what it leaves
     // unsaved while the connection is still up. We're the ones who know that nobody is using this session anymore.
     await joined.saver?.stop();

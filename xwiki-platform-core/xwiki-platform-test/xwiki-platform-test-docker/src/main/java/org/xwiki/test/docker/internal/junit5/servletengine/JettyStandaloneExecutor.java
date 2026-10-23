@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,6 +40,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
+import org.xwiki.test.docker.internal.junit5.blobstore.SharedFileSystemBlobStore;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
@@ -139,7 +142,16 @@ public class JettyStandaloneExecutor
         }
 
         // Step: Remove data directory since we will provision again the extensions to account for source changes.
-        FileUtils.deleteDirectory(new File(jettyDirectory, DATA_SUBDIR));
+        File dataDirectory = new File(jettyDirectory, DATA_SUBDIR);
+        FileUtils.deleteDirectory(dataDirectory);
+
+        // Step: The instances of a cluster share the filesystem blob store, like they share the database.
+        if (this.testConfiguration.isSharedFileSystemBlobStore()) {
+            Path storeDirectory = dataDirectory.toPath().resolve(SharedFileSystemBlobStore.STORE_PATH);
+            Files.createDirectories(storeDirectory.getParent());
+            Files.createSymbolicLink(storeDirectory,
+                SharedFileSystemBlobStore.getDirectory(this.testConfiguration).getAbsoluteFile().toPath());
+        }
 
         // Step: Start Jetty
 

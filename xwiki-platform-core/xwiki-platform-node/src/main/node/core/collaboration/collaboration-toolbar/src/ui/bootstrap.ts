@@ -23,15 +23,30 @@ import { onBeforeUnmount, onMounted } from "vue";
 import type { Ref } from "vue";
 
 /**
- * The subset of the jQuery API used to control the Bootstrap 3 modals, which are implemented as a jQuery plugin.
+ * The subset of the jQuery API used to control the Bootstrap 3 modals and popovers, which are implemented as jQuery
+ * plugins.
  */
-type JQueryModal = {
+type JQueryElement = {
   modal(action: "show" | "hide"): void;
+  popover(action?: "show" | "hide" | "destroy"): void;
   on(events: string, handler: () => void): void;
+  one(events: string, handler: () => void): void;
   off(events: string, handler: () => void): void;
 };
 
-type JQuery = (element: Element) => JQueryModal;
+type JQuery = (element: Element) => JQueryElement;
+
+/**
+ * How long to wait before showing a popover automatically, in milliseconds. The toolbar layout can change right after
+ * the popover toggle is added (e.g. the user list is cleared when disconnected), and the popover would then be
+ * misplaced. Moreover, this prevents quickly showing and hiding the popover when the toggle is removed right away.
+ */
+const POPOVER_SHOW_DELAY = 1000;
+
+/**
+ * How long to wait before hiding a popover that was shown automatically, in milliseconds.
+ */
+const POPOVER_HIDE_DELAY = 10000;
 
 /**
  * The Bootstrap modal events the realtime toolbar listens to.
@@ -93,5 +108,42 @@ function useModalEvent(
   onBeforeUnmount(async () => (await removeListener)?.());
 }
 
-export { hideModal, onModalEvent, useModalEvent };
+/**
+ * Turns the given element into a Bootstrap popover toggle while the calling component is mounted. The popover is shown
+ * automatically once, a bit after the component is mounted, and hidden automatically after a while (unless the user
+ * hides it before).
+ *
+ * @param toggle - the element that toggles the popover, specifying the popover title and content through its
+ *   attributes
+ */
+function usePopover(toggle: Readonly<Ref<HTMLElement | null>>): void {
+  const timeouts: ReturnType<typeof setTimeout>[] = [];
+  let element: HTMLElement | undefined;
+  onMounted(async () => {
+    const $ = await getJQuery();
+    // The component may have been unmounted while jQuery was loading.
+    if (!toggle.value) {
+      return;
+    }
+    element = toggle.value;
+    $(element).popover();
+    timeouts.push(
+      setTimeout(() => $(element!).popover("show"), POPOVER_SHOW_DELAY),
+    );
+    const autoHide = setTimeout(
+      () => $(element!).popover("hide"),
+      POPOVER_HIDE_DELAY,
+    );
+    timeouts.push(autoHide);
+    $(element).one("hide.bs.popover", () => clearTimeout(autoHide));
+  });
+  onBeforeUnmount(async () => {
+    timeouts.forEach(clearTimeout);
+    if (element) {
+      (await getJQuery())(element).popover("destroy");
+    }
+  });
+}
+
+export { hideModal, onModalEvent, useModalEvent, usePopover };
 export type { ModalEvent };

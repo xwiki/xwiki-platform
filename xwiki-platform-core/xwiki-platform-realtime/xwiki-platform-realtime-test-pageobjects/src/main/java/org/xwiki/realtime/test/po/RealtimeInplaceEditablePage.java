@@ -66,8 +66,26 @@ public class RealtimeInplaceEditablePage extends InplaceEditablePage
     @Override
     public RealtimeInplaceEditablePage waitForInplaceEditor()
     {
+        return waitForInplaceEditor(true);
+    }
+
+    /**
+     * Waits for the in-place editor to be loaded.
+     *
+     * @param waitForConnection whether to wait for the user to be connected to the realtime editing session; pass
+     *            {@code false} when the connection is expected to fail
+     * @return this instance
+     * @since 18.9.0
+     */
+    public RealtimeInplaceEditablePage waitForInplaceEditor(boolean waitForConnection)
+    {
         super.waitForInplaceEditor();
-        this.toolbar = new RealtimeEditToolbar().waitUntilConnected();
+        this.toolbar = new RealtimeEditToolbar();
+        if (waitForConnection) {
+            this.toolbar.waitUntilConnected();
+        } else {
+            this.toolbar.waitUntilDisplayed();
+        }
         return this;
     }
 

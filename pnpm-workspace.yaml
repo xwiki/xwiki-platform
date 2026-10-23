@@ -129,7 +129,8 @@ catalog:
   chainpad: 5.3.2
   cross-env: 10.1.0
   diff-dom: 5.2.1
-  dompurify: 3.4.16
+  dompurify: 3.4.17
+  esbuild: 0.28.2
   eslint: 10.12.0
   eslint-import-resolver-typescript: 4.4.5
   eslint-plugin-headers: 1.3.4
@@ -145,7 +146,7 @@ catalog:
   inversify: 8.2.3
   jiti: 2.7.0
   jquery: 4.0.0
-  jsdom: 30.1.1
+  jsdom: 30.1.3
   lib0: 0.2.118
   lodash-es: 4.18.1
   lz-string: 1.5.0
@@ -157,13 +158,13 @@ catalog:
   micromark-extension-gfm-task-list-item: 2.1.0
   npm-package-json-lint: 11.0.0
   npm-run-all: 4.1.5
-  npm-run-all2: 9.0.3
-  nx: 23.2.1
+  npm-run-all2: 9.0.4
+  nx: 24.0.0
   pinia: 4.0.3
   postcss: 8.5.28
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
-  publint: 0.3.24
+  publint: 0.3.25
   qunit: 2.26.0
   react: 19.3.0
   react-dom: 19.3.0
@@ -180,10 +181,10 @@ catalog:
   u-node: 0.0.8
   unified: 11.0.5
   utility-types: 3.11.0
-  vite: 8.3.1
+  vite: 8.3.4
   vite-plugin-css-injected-by-js: 5.0.2
   vite-plugin-dts: 4.5.4
-  vitest: 5.0.2
+  vitest: 5.0.5
   vitest-mock-extended: 5.1.1
   vue: 3.5.44
   vue-eslint-parser: 10.4.1

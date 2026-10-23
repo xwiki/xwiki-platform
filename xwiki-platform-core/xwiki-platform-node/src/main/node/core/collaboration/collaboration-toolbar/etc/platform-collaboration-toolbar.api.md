@@ -26,12 +26,14 @@ export function loadXWikiToolbarTranslations(): Promise<I18n>;
 // @beta
 export class Toolbar {
     constructor(options: ToolbarOptions);
+    addWarning(warning: ToolbarWarning): void;
     destroy(): void;
     getForm(): HTMLElement;
     onConnectionStatusChange(status: ToolbarStatus, userId?: string): void;
     onCreateVersion(version: ToolbarVersion): void;
     onSaveStatusChange(status: ToolbarStatus): void;
     onUserListChange(users: ToolbarUser[]): void;
+    removeWarning(id: string): void;
 }
 
 // @beta
@@ -40,6 +42,7 @@ export type ToolbarEnvironment = {
     icons: {
         check: string;
         clock: string;
+        warning: string;
     };
     getSaveOptions(form: HTMLElement): ToolbarSaveOptions;
     formatDate(date: number): string;
@@ -71,6 +74,7 @@ export type ToolbarSaveOptions = {
 // @beta
 export type ToolbarSession = {
     save(continueEditing?: boolean): Promise<void> | void;
+    canSaveWhileDisconnected?: boolean;
     leave?(): void;
     selectUser?(userId: string): void;
 };
@@ -91,6 +95,13 @@ export type ToolbarVersion = {
     number: string;
     date: number;
     author: Partial<Omit<ToolbarUser, "id">> | string;
+};
+
+// @beta
+export type ToolbarWarning = {
+    id: string;
+    title: string;
+    message: string;
 };
 
 // @beta

@@ -50,8 +50,6 @@ public class EmbeddedClient extends EmbeddedSolrServer
 {
     private static final long serialVersionUID = 1L;
 
-    private final transient SolrCore core;
-
     private final transient SolrRequestParsers parser;
 
     /**
@@ -64,8 +62,8 @@ public class EmbeddedClient extends EmbeddedSolrServer
 
         private final Resolver resolver;
 
-        private WrappingStreamingResponseCallback(SolrParams params, StreamingResponseCallback callback)
-            throws Exception
+        private WrappingStreamingResponseCallback(SolrCore core, SolrParams params,
+            StreamingResponseCallback callback) throws Exception
         {
             this.callback = callback;
 
@@ -134,17 +132,27 @@ public class EmbeddedClient extends EmbeddedSolrServer
     {
         super(core.getCoreContainer(), core.getName(), RequestWriterSupplier.JavaBin);
 
-        this.core = core;
         this.parser = new SolrRequestParsers(null);
     }
 
-    private WrappingStreamingResponseCallback createWrappingCallback(SolrParams params,
-        StreamingResponseCallback callback)
+    private QueryResponse queryAndStreamWrappedResponse(String collection, SolrParams params,
+        StreamingResponseCallback callback) throws SolrServerException, IOException
     {
-        try {
-            return new WrappingStreamingResponseCallback(params, callback);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create wrapping streaming response callback", e);
+        // Get the current instance of the core (it might have been reloaded since this client was created)
+        String name = collection != null ? collection : this.coreName;
+        try (SolrCore core = getCoreContainer().getCore(name)) {
+            if (core == null) {
+                throw new SolrServerException("No Solr core with name [" + name + "]");
+            }
+
+            WrappingStreamingResponseCallback wrappingCallback;
+            try {
+                wrappingCallback = new WrappingStreamingResponseCallback(core, params, callback);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create wrapping streaming response callback", e);
+            }
+
+            return super.queryAndStreamResponse(collection, params, wrappingCallback);
         }
     }
 
@@ -152,14 +160,14 @@ public class EmbeddedClient extends EmbeddedSolrServer
     public QueryResponse queryAndStreamResponse(SolrParams params, StreamingResponseCallback callback)
         throws SolrServerException, IOException
     {
-        return super.queryAndStreamResponse(params, createWrappingCallback(params, callback));
+        return queryAndStreamWrappedResponse(null, params, callback);
     }
 
     @Override
     public QueryResponse queryAndStreamResponse(String collection, SolrParams params,
         StreamingResponseCallback callback) throws SolrServerException, IOException
     {
-        return super.queryAndStreamResponse(collection, params, createWrappingCallback(params, callback));
+        return queryAndStreamWrappedResponse(collection, params, callback);
     }
 
     @Override

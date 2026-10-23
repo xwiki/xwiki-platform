@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-search-solr</artifactId>
+    <version>18.10.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-search-solr-core-shaded</artifactId>
+  <name>XWiki Platform - Search - Solr - Core Shaded</name>
+  <packaging>jar</packaging>
+  <description>Solr core with its own private copy of Jersey 3 (and its dependencies), so that it does not conflict with the Jersey 2 used by XWiki.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Solr Core (shaded)</xwiki.extension.name>
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <!-- Only the embedded artifacts which keep their packages: the relocated ones don't provide their original API -->
+    <xwiki.extension.features>org.apache.solr:solr-core/${solr.version}</xwiki.extension.features>
+    <!-- Nothing to check: no source -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <xwiki.jacoco.skip>true</xwiki.jacoco.skip>
+    <solr.shaded.prefix>org.xwiki.search.solr.shaded</solr.shaded.prefix>
+    <!-- The versions used by Solr, which are different from the ones managed by XWiki (Jersey 2) -->
+    <solr.jersey.version>3.1.12</solr.jersey.version>
+    <solr.hk2.version>3.1.1</solr.hk2.version>
+    <solr.osgi-resource-locator.version>1.0.4</solr.osgi-resource-locator.version>
+  </properties>
+  <dependencies>
+    <!-- The solr-core jar itself, only used as an input of the shading (optional so that it's never visible to the
+         modules depending on this one, including inside the same reactor where the dependency reduced POM is not
+         used) -->
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <!-- The artifacts embedded in the shaded jar, with the versions expected by Solr (XWiki manages different versions
+         for most of them) -->
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
+      <version>${solr.jersey.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>${solr.jersey.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>${solr.jersey.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <version>${solr.jersey.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-json-jackson</artifactId>
+      <version>${solr.jersey.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.ext</groupId>
+      <artifactId>jersey-entity-filtering</artifactId>
+      <version>${solr.jersey.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.hk2</groupId>
+      <artifactId>hk2-api</artifactId>
+      <version>${solr.hk2.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.hk2</groupId>
+      <artifactId>hk2-utils</artifactId>
+      <version>${solr.hk2.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.hk2</groupId>
+      <artifactId>hk2-locator</artifactId>
+      <version>${solr.hk2.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.hk2.external</groupId>
+      <artifactId>aopalliance-repackaged</artifactId>
+      <version>${solr.hk2.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.hk2</groupId>
+      <artifactId>osgi-resource-locator</artifactId>
+      <version>${solr.osgi-resource-locator.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- The dependencies of the embedded Jersey which are not embedded themselves -->
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <!-- All the dependencies of solr-core, except the ones which are embedded in the shaded jar -->
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-core</artifactId>
+      <version>${solr.version}</version>
+      <type>pom</type>
+      <exclusions>
+        <!-- Embedded and relocated in the shaded jar -->
+        <exclusion>
+          <groupId>org.glassfish.jersey.core</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.jersey.inject</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.jersey.media</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.jersey.ext</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.jersey.containers</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.hk2</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.hk2.external</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>javax.servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.dropwizard.metrics</groupId>
+          <artifactId>metrics-graphite</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.dropwizard.metrics</groupId>
+          <artifactId>metrics-jetty9</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.dropwizard.metrics</groupId>
+          <artifactId>metrics-jvm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jetty.http2</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jetty.toolchain</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <!-- We use slf4j in XWiki -->
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Several embedded artifacts have license and notice files with the same name, so they are copied once per
+           project with the project name as prefix instead (the original ones are excluded from the shaded jar) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-licenses</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <!-- Solr -->
+                <artifactItem>
+                  <groupId>org.apache.solr</groupId>
+                  <artifactId>solr-core</artifactId>
+                  <includes>META-INF/LICENSE*,META-INF/NOTICE*</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/</pattern>
+                      <replacement>META-INF/solr-</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+                <!-- Jersey: same license and notice in all the modules, plus a notice of the third-party content
+                     specific to some modules -->
+                <artifactItem>
+                  <groupId>org.glassfish.jersey.core</groupId>
+                  <artifactId>jersey-common</artifactId>
+                  <includes>META-INF/LICENSE.md,META-INF/NOTICE.md,META-INF/NOTICE.markdown</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/NOTICE\.markdown$</pattern>
+                      <replacement>META-INF/jersey-common-NOTICE.markdown</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/(LICENSE|NOTICE)\.md$</pattern>
+                      <replacement>META-INF/jersey-$1.md</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.glassfish.jersey.core</groupId>
+                  <artifactId>jersey-server</artifactId>
+                  <includes>META-INF/NOTICE.markdown</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/</pattern>
+                      <replacement>META-INF/jersey-server-</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.glassfish.jersey.media</groupId>
+                  <artifactId>jersey-media-json-jackson</artifactId>
+                  <includes>META-INF/NOTICE.markdown</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/</pattern>
+                      <replacement>META-INF/jersey-media-json-jackson-</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+                <!-- HK2: same license and notice in all the modules -->
+                <artifactItem>
+                  <groupId>org.glassfish.hk2</groupId>
+                  <artifactId>hk2-api</artifactId>
+                  <includes>META-INF/LICENSE.md,META-INF/NOTICE.md</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^META-INF/</pattern>
+                      <replacement>META-INF/hk2-</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.6.2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <!-- The dependencies are already right in the POM (and the dependency reduced POM is not used in the
+                   reactor anyway) -->
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <artifactSet>
+                <includes>
+                  <include>org.apache.solr:solr-core</include>
+                  <include>org.glassfish.jersey.core:*</include>
+                  <include>org.glassfish.jersey.inject:*</include>
+                  <include>org.glassfish.jersey.media:*</include>
+                  <include>org.glassfish.jersey.ext:*</include>
+                  <include>org.glassfish.hk2:*</include>
+                  <include>org.glassfish.hk2.external:*</include>
+                </includes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.glassfish.jersey</pattern>
+                  <shadedPattern>${solr.shaded.prefix}.org.glassfish.jersey</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.glassfish.hk2</pattern>
+                  <shadedPattern>${solr.shaded.prefix}.org.glassfish.hk2</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.jvnet.hk2</pattern>
+                  <shadedPattern>${solr.shaded.prefix}.org.jvnet.hk2</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.aopalliance</pattern>
+                  <shadedPattern>${solr.shaded.prefix}.org.aopalliance</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>jersey.repackaged</pattern>
+                  <shadedPattern>${solr.shaded.prefix}.jersey.repackaged</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sun.research.ws</pattern>
+                  <shadedPattern>${solr.shaded.prefix}.com.sun.research.ws</shadedPattern>
+                </relocation>
+              </relocations>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                    <exclude>META-INF/native-image/**</exclude>
+                    <exclude>module-info.class</exclude>
+                    <exclude>META-INF/versions/*/module-info.class</exclude>
+                  </excludes>
+                </filter>
+                <!-- Only keep the Maven metadata of this module, which is used to identify it as a core extension -->
+                <filter>
+                  <artifact>org.apache.solr:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/maven/**</exclude>
+                  </excludes>
+                </filter>
+                <!-- The shade plugin does not relocate multi-release classes, and the base classes work on any Java
+                     version -->
+                <filter>
+                  <artifact>org.glassfish.*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/maven/**</exclude>
+                    <exclude>META-INF/versions/**</exclude>
+                  </excludes>
+                </filter>
+                <!-- Copied with the project name as prefix, see maven-dependency-plugin -->
+                <filter>
+                  <artifact>org.apache.solr:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/LICENSE*</exclude>
+                    <exclude>META-INF/NOTICE*</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <artifact>org.glassfish.*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/LICENSE*</exclude>
+                    <exclude>META-INF/NOTICE*</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

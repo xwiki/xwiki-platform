@@ -212,7 +212,7 @@ describe("DisplayerXObjectProperty.vue", () => {
 
     it("loads its edit field from the values it holds", async () => {
       vi.mocked(edit).mockResolvedValue(EDIT_FORM);
-      vi.mocked(view).mockReset();
+      vi.mocked(view).mockResolvedValue(undefined);
 
       const wrapper = initWrapper(DisplayerXObjectProperty, {
         props: { entry: draftEntry },

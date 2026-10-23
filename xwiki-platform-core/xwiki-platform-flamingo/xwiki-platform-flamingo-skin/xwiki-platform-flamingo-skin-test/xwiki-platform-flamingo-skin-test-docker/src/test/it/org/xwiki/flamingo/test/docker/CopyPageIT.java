@@ -38,6 +38,7 @@ import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.CopyOverwritePromptPage;
@@ -83,7 +84,7 @@ class CopyPageIT
     @ParameterizedTest
     @WikisSource(extensions = {"org.xwiki.platform:xwiki-platform-index-tree-macro"})
     void copyPage(WikiReference wiki, TestLocalReference testReference, TestUtils setup,
-        TestConfiguration testConfiguration) throws Exception
+        TestConfiguration testConfiguration, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         String sourceSpaceName = testReference.getParent().getParent().getName();
         String sourcePageName = testReference.getParent().getName();
@@ -100,6 +101,11 @@ class CopyPageIT
         // Add an attachment to verify that its version is not incremented in the target document
         // And add several versions to make sure the history is copied
         AttachmentReference attachmentReference = new AttachmentReference("file.txt", sourceReference);
+        // The source page and its attachment are deleted, then saved again with several versions of the attachment in a
+        // row: the Solr indexer can index the page while the content of the attachment is being deleted or replaced,
+        // when the page still has it. Nothing is lost since the page is indexed again once saved.
+        logCaptureConfiguration
+            .registerExcludes(String.format("Failed to retrieve the content of attachment [%s]", attachmentReference));
         setup.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
         setup.rest().attachFile(attachmentReference, "attachment2".getBytes(), false);
         setup.rest().attachFile(attachmentReference, "attachment3".getBytes(), false);

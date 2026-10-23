@@ -124,7 +124,6 @@
     "border-radius-small": "5px",
     "button-spacing": "2px",
     "button-border-width": "1px",
-    "edit-section-relative-height": ".7",
     "main-padding": {"css": "calc(var(--grid-gutter-width) * 2)", "less": "@grid-gutter-width * 2"},
     "font-size-headings-scale": "1.190",
     "font-size-headings-scale-min": "1.125",

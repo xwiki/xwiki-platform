@@ -370,7 +370,16 @@ onBeforeMount(async () => {
   editorProps.value.label = await translate("editor.label", defaultLabel);
 
   if (collaborationURL && documentReference) {
-    await joinCollaborationSession();
+    try {
+      await joinCollaborationSession();
+    } catch (error) {
+      // Joining doesn't wait for the connection to the collaboration server (we can join disconnected) so this happens
+      // only if the collaboration session can't be created at all. Let the user edit (without realtime) nevertheless.
+      console.error(
+        "Failed to join the realtime collaboration session. Editing without realtime collaboration.",
+        error,
+      );
+    }
   }
 
   isLoading.value = false;

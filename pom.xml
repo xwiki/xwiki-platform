@@ -719,6 +719,11 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <dependency>
+        <groupId>org.simplejavamail</groupId>
+        <artifactId>simple-java-mail</artifactId>
+        <version>9.3.8</version>
+      </dependency>
 
       <!-- Jetty client libraries -->
       <dependency>

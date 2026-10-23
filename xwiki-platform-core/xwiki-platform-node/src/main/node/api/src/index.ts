@@ -35,7 +35,7 @@ import type { Logger } from "./api/logger.js";
 import type { LoggerConfig } from "./api/loggerConfig.js";
 import type { PageAttachment } from "./api/pageAttachment";
 import type { SkinManager } from "./api/skinManager.js";
-import type { Storage } from "./api/storage.js";
+import type { SaveAttachmentsOptions, Storage } from "./api/storage.js";
 import type { WrappingStorage } from "./api/wrappingStorage.js";
 import type { ConfigObjectType } from "./components/defaultWikiConfig.js";
 
@@ -49,6 +49,7 @@ export type {
   LoggerConfig,
   PageAttachment,
   PageData,
+  SaveAttachmentsOptions,
   SkinManager,
   Storage,
   WikiConfig,

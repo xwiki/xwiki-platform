@@ -74,6 +74,16 @@
       :form
       :disabled
     />
+    <!-- The files uploaded to the temporary store, which the save request attaches to the edited document. -->
+    <input
+      v-for="fileName in temporaryAttachments"
+      :key="fileName"
+      type="hidden"
+      name="uploadedFiles"
+      :value="fileName"
+      :form
+      :disabled
+    />
   </div>
 </template>
 
@@ -86,7 +96,10 @@ import {
   injectLinkId,
   stripLinkId,
 } from "../services/blocknote/linkId";
-import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
+import {
+  ConnectionStatus,
+  collaborationManagerProviderName,
+} from "@xwiki/platform-collaboration-api";
 import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
@@ -150,6 +163,7 @@ const {
   initialValue = "",
   form = undefined,
   disabled = false,
+  uploadDisabled = false,
   inputSyntax = "blocknote/1.0",
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
@@ -167,6 +181,10 @@ const {
 
   // Prevent the edited content and the conversion metadata from being submitted.
   disabled?: boolean;
+
+  // Prevent the user from attaching files to the edited document, set when the edited content is restricted and the
+  // user doesn't have edit right on the source document (e.g. when commenting a page they can't edit).
+  uploadDisabled?: boolean;
 
   // The syntax of the edited content, as expected by the editor.
   inputSyntax?: string;
@@ -287,28 +305,46 @@ function isSameResourceReference(
 // Pasted files are renamed, so we need to know how the file reached the editor.
 const pasteTracker = trackPaste(document);
 
-const uploadFile = createUploadFile({
-  storageProvider: container.get<StorageProvider>("StorageProvider"),
-  modelReferenceParser: container
-    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    .get()!,
-  remoteURLSerializer: container
-    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-    .get()!,
-  getDocumentReference: () => documentReference,
-  getBlockNoteDocument: () => blockNoteDocument,
-  isPaste: pasteTracker.isPaste,
-  notifyUploadFailed: async (fileName, error) => {
-    console.error(`Failed to upload [${fileName}].`, error);
-    try {
-      const message = await translate("upload.failed", undefined, fileName);
-      new XWiki.widgets.Notification(message, "error");
-    } catch (notificationError) {
-      // Nobody awaits this callback, so an error here would go unhandled.
-      console.error("Failed to notify the user.", notificationError);
-    }
-  },
-});
+// The files uploaded to the temporary store, submitted with the edit form so that the save attaches them.
+const temporaryAttachments: Ref<string[]> = ref([]);
+
+const uploadFile = uploadDisabled
+  ? undefined
+  : createUploadFile({
+      storageProvider: container.get<StorageProvider>("StorageProvider"),
+      modelReferenceParser: container
+        .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+        .get()!,
+      remoteURLSerializer: container
+        .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+        .get()!,
+      getDocumentReference: () => documentReference,
+      getBlockNoteDocument: () => blockNoteDocument,
+      isPaste: pasteTracker.isPaste,
+      // A file in the temporary store is visible only to the session that uploaded it, and only a save made from that
+      // session attaches it to the document. In a realtime session any of the collaborators can be the one that saves,
+      // so we attach the file right away instead, like the CKEditor integration does. The same goes when the editor
+      // has no field name, because then nothing it holds is submitted and the file would never be attached.
+      isTemporaryUpload: () =>
+        !!name &&
+        collaboration.value?.connectionStatus.value !==
+          ConnectionStatus.Connected,
+      registerTemporaryAttachment: (fileName) => {
+        if (!temporaryAttachments.value.includes(fileName)) {
+          temporaryAttachments.value.push(fileName);
+        }
+      },
+      notifyUploadFailed: async (fileName, error) => {
+        console.error(`Failed to upload [${fileName}].`, error);
+        try {
+          const message = await translate("upload.failed", undefined, fileName);
+          new XWiki.widgets.Notification(message, "error");
+        } catch (notificationError) {
+          // Nobody awaits this callback, so an error here would go unhandled.
+          console.error("Failed to notify the user.", notificationError);
+        }
+      },
+    });
 
 const syntaxes = container.getAll<SyntaxConfig>(
   SYNTAX_CONFIG_COMPONENT_GROUP_NAME,

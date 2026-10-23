@@ -24,10 +24,26 @@ import type { AttachmentsData } from "./attachmentsData";
 import type { PageAttachment } from "./pageAttachment";
 
 /**
+ * The options of {@link Storage.saveAttachments}.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type SaveAttachmentsOptions = {
+  /**
+   * Whether to upload the files to a temporary store, from where they are attached to the document only when it is
+   * saved. The caller is then responsible for telling the save request which temporary files to attach. Uploading to
+   * the temporary store doesn't require edit right on the document, and nothing is left behind when the edit is
+   * cancelled. Defaults to false, i.e. the files are attached to the document right away.
+   */
+  temporary?: boolean;
+};
+
+/**
  * @since 18.0.0RC1
  * @beta
  */
-export interface Storage {
+interface Storage {
   setWikiConfig(config: WikiConfig): void;
 
   getWikiConfig(): WikiConfig;
@@ -110,6 +126,7 @@ export interface Storage {
   /**
    * @param page - the serialized reference of the page
    * @param files - the list of files to upload
+   * @param options - (since 18.10.0RC1) how to upload the files
    * @returns (since 0.20) an optional list of resolved attachments URL (in the same order as the provided files). This
    *   is useful in the case where the url cannot be resolved from the name of the file and its document reference
    *   alone.
@@ -119,6 +136,7 @@ export interface Storage {
   saveAttachments(
     page: string,
     files: File[],
+    options?: SaveAttachmentsOptions,
   ): Promise<undefined | (undefined | string)[]>;
 
   /**
@@ -149,3 +167,5 @@ export interface Storage {
     preserveChildren: boolean,
   ): Promise<{ success: boolean; error?: string }>;
 }
+
+export type { SaveAttachmentsOptions, Storage };

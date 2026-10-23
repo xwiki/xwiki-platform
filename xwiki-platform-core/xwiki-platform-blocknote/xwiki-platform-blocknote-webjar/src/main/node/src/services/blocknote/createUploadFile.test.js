@@ -22,6 +22,7 @@ import { DefaultBlockNoteIterator } from "./DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./XWikiBlockNoteProcessor";
 import { createUploadFile } from "./createUploadFile";
 import { extractLinkId, stripLinkId } from "./linkId";
+import { EntityType } from "@xwiki/platform-model-api";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 function file(name, type) {
@@ -29,13 +30,23 @@ function file(name, type) {
 }
 
 describe("createUploadFile", () => {
-  let blockNoteDocument, saveAttachments, notifyUploadFailed, paste, uploadFile;
+  let blockNoteDocument,
+    saveAttachments,
+    notifyUploadFailed,
+    paste,
+    temporary,
+    registerTemporaryAttachment,
+    uploadFile;
 
   function dependencies() {
     return {
       storageProvider: { get: () => ({ saveAttachments }) },
       modelReferenceParser: {
-        parse: (reference) => ({ type: "ATTACHMENT", reference }),
+        parse: (reference) => ({
+          type: EntityType.ATTACHMENT,
+          name: reference,
+          reference,
+        }),
       },
       remoteURLSerializer: {
         serialize: (entityReference) =>
@@ -44,6 +55,8 @@ describe("createUploadFile", () => {
       getDocumentReference: () => "Space.Page",
       getBlockNoteDocument: () => blockNoteDocument,
       isPaste: () => paste,
+      isTemporaryUpload: () => temporary,
+      registerTemporaryAttachment,
       notifyUploadFailed,
     };
   }
@@ -51,6 +64,8 @@ describe("createUploadFile", () => {
   beforeEach(() => {
     blockNoteDocument = new BlockNoteDocument([]);
     paste = false;
+    temporary = false;
+    registerTemporaryAttachment = vi.fn();
     notifyUploadFailed = vi.fn();
     // The storage returns the reference of the created attachment.
     saveAttachments = vi.fn(async (page, files) => [files[0].name]);
@@ -247,6 +262,53 @@ describe("createUploadFile", () => {
         // Saves as [[attach:report.pdf]] rather than [[report.pdf>>attach:report.pdf]].
         xwikiGeneratedLabel: "report.pdf",
       });
+    });
+  });
+
+  describe("temporary uploads", () => {
+    it("attaches the file right away when the temporary store is not used", async () => {
+      await uploadFile(file("photo.png", "image/png"), "id");
+
+      expect(saveAttachments.mock.calls[0][2]).toEqual({ temporary: false });
+      expect(registerTemporaryAttachment).not.toHaveBeenCalled();
+    });
+
+    it("uploads to the temporary store and registers the attachment to commit", async () => {
+      temporary = true;
+
+      await uploadFile(file("photo.png", "image/png"), "id");
+
+      expect(saveAttachments.mock.calls[0][2]).toEqual({ temporary: true });
+      expect(registerTemporaryAttachment).toHaveBeenCalledWith("photo.png");
+    });
+
+    it("registers the name the upload end-point gave the file", async () => {
+      temporary = true;
+      // The end-point can rename the file (e.g. when the name it was given is not acceptable).
+      saveAttachments.mockResolvedValue(["sanitized.png"]);
+
+      await uploadFile(file("photo.png", "image/png"), "id");
+
+      expect(registerTemporaryAttachment).toHaveBeenCalledWith("sanitized.png");
+    });
+
+    it("registers the generated name of a pasted file", async () => {
+      temporary = true;
+      paste = true;
+
+      await uploadFile(file("image.png", "image/png"), "id");
+
+      const uploaded = saveAttachments.mock.calls[0][1][0].name;
+      expect(registerTemporaryAttachment).toHaveBeenCalledWith(uploaded);
+    });
+
+    it("registers nothing when the upload fails", async () => {
+      temporary = true;
+      saveAttachments.mockRejectedValue(new Error("Upload failed"));
+
+      await uploadFile(file("photo.png", "image/png"), "id");
+
+      expect(registerTemporaryAttachment).not.toHaveBeenCalled();
     });
   });
 

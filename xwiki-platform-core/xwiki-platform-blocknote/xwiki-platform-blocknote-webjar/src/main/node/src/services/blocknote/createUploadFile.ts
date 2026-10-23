@@ -40,6 +40,15 @@ type UploadFileDependencies = {
   getBlockNoteDocument: () => BlockNoteDocument | undefined;
 
   isPaste: () => boolean;
+
+  // Whether the files are uploaded to the temporary store of the user session, from where the save request attaches
+  // them to the document, rather than being attached right away.
+  isTemporaryUpload: () => boolean;
+
+  // Called for each file uploaded to the temporary store, with the name under which the save request has to ask for
+  // it, otherwise the file is never attached to the document.
+  registerTemporaryAttachment: (fileName: string) => void;
+
   notifyUploadFailed: (fileName: string, error: unknown) => void;
 };
 
@@ -66,18 +75,33 @@ function createUploadFile(
     getDocumentReference,
     getBlockNoteDocument,
     isPaste,
+    isTemporaryUpload,
+    registerTemporaryAttachment,
     notifyUploadFailed,
   } = dependencies;
 
   async function upload(file: File): Promise<string> {
+    const temporary = isTemporaryUpload();
     const result = await storageProvider
       .get()
-      .saveAttachments(getDocumentReference(), [file]);
+      .saveAttachments(getDocumentReference(), [file], { temporary });
     const reference = result?.[0];
     if (!reference) {
       throw new Error(`Failed to attach [${file.name}].`);
     }
+    if (temporary) {
+      registerTemporaryAttachment(attachmentName(reference) ?? file.name);
+    }
     return reference;
+  }
+
+  // The upload end-point can rename the file, so the name to commit is the one of the returned reference rather than
+  // the one we sent.
+  function attachmentName(reference: string): string | undefined {
+    const parsed = modelReferenceParser.parse(reference, {
+      type: EntityType.ATTACHMENT,
+    });
+    return parsed.type === EntityType.ATTACHMENT ? parsed.name : undefined;
   }
 
   function getDownloadURL(reference: string): string {

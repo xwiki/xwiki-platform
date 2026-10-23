@@ -25,6 +25,7 @@ import type {
   Logger,
   PageAttachment,
   PageData,
+  SaveAttachmentsOptions,
 } from "@xwiki/platform-api";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 
@@ -95,28 +96,37 @@ class XWikiStorage extends AbstractStorage {
   public saveAttachments(
     page: string,
     files: File[],
+    options?: SaveAttachmentsOptions,
   ): Promise<undefined | (undefined | string)[]> {
-    return Promise.all(files.map((file) => this.saveAttachment(page, file)));
+    return Promise.all(
+      files.map((file) => this.saveAttachment(page, file, options)),
+    );
   }
 
   public async saveAttachment(
     page: string,
     file: File,
+    options?: SaveAttachmentsOptions,
   ): Promise<undefined | (undefined | string)> {
     const uploadURL = this.getUploadURL(page, "filebrowser");
     const response = await fetch(uploadURL, {
       method: "POST",
       body: this.getAttachmentUploadData(file),
+      // The upload end-point attaches the file to the document right away unless this header asks it to keep the file
+      // in the temporary store of the current user session.
+      headers: options?.temporary
+        ? { "X-XWiki-Temporary-Attachment-Support": "true" }
+        : {},
     });
-    if (!response.ok) {
-      throw new Error(`Upload failed: ${response.statusText}`);
-    }
-    const result = await response.json();
-    if (result.uploaded) {
+    // The end-point reports a rejected upload (e.g. a file whose media type is not allowed) in the response body, so
+    // read it even when the status says the request failed.
+    const result = await response.json().catch(() => undefined);
+    if (result?.uploaded) {
       return result.message.resourceReference.reference;
-    } else {
-      throw new Error(`Upload failed: ${result.error}`);
     }
+    throw new Error(
+      `Upload failed: ${result?.error?.message ?? response.statusText}`,
+    );
   }
 
   private getAttachmentUploadData(file: File): FormData {

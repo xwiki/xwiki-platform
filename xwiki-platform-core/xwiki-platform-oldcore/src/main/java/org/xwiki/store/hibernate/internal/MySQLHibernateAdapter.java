@@ -99,6 +99,15 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      */
     private static final int UTF8MB4_MAX_CHARACTER_LENGTH = 4;
 
+    private static final String UTF8MB4 = "utf8mb4";
+
+    private static final String UTF8MB4_BIN = UTF8MB4 + BINARY_COLLATION_SUFFIX;
+
+    /**
+     * The character sets kept when configured on the database ({@code utf8} is the old name of {@code utf8mb3}).
+     */
+    private static final Set<String> SUPPORTED_CHARACTER_SETS = Set.of(UTF8MB4, "utf8mb3", "utf8");
+
     /**
      * The maximum length of an InnoDB index key with the DYNAMIC and COMPRESSED row formats (the ones used by XWiki).
      */
@@ -287,8 +296,8 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     }
 
     /**
-     * Convert the tables of the current wiki database to the character set configured on the database, with a binary
-     * collation, and re-create the foreign keys dropped for the conversion.
+     * Convert the current wiki database and its tables to the expected character set and collation, and re-create the
+     * foreign keys dropped for the conversion.
      *
      * @param metadata the configuration of the database, used to know which tables to convert
      * @param session the session in which to execute the conversion
@@ -394,11 +403,17 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
 
     /**
      * Compute the statements to execute to convert each standard table of the Hibernate mapping which does not use the
-     * character set configured on the current wiki database with a binary collation (or which contains a column which
-     * does not use them). XWiki requires a binary collation, so the target collation is the one configured on the
-     * database when it's binary (e.g. {@code utf8mb4_bin}), and the binary collation of the database character set
-     * otherwise (e.g. {@code utf8mb4_bin} for {@code utf8mb4_0900_ai_ci}). In that last case, the default collation of
-     * the database is changed too, so that the tables created later use the expected one.
+     * expected character set and collation (or which contains a column which does not use them):
+     * <ul>
+     * <li>the character set configured on the current wiki database when it's {@code utf8mb4} or {@code utf8mb3}
+     * (unless a standard table needs {@code utf8mb4}, see below), and {@code utf8mb4} otherwise (e.g. for
+     * {@code latin1}, which cannot hold most of the translations of the standard XWiki flavor)</li>
+     * <li>XWiki requires a binary collation, so the collation configured on the database when it's a binary collation
+     * of that character set (e.g. {@code utf8mb4_bin}), and the binary collation of that character set otherwise (e.g.
+     * {@code utf8mb4_bin} for {@code utf8mb4_0900_ai_ci})</li>
+     * </ul>
+     * The default character set and collation of the database are changed too when they don't match, so that the
+     * tables created later use the expected ones.
      * <p>
      * The tables of the custom mappings of the XWiki classes, and the tables which are not part of the Hibernate
      * mapping, are only converted when they are linked by a foreign key on string columns to a table being converted
@@ -416,12 +431,13 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
      * otherwise</li>
      * </ul>
      * <p>
-     * Only the conversions which cannot lose anything are done: a table which can contain characters not supported by
-     * the database character set (e.g. a {@code utf8mb4} table in a {@code utf8mb3} database) is not converted, and
-     * neither are the tables linked to it by a foreign key on string columns, since that foreign key could not be
-     * re-created. For the same reason, a table linked by a foreign key on string columns to a table of another database
-     * is not converted. The tables which don't use the InnoDB storage engine are not converted either, since the
-     * maximum key length and the row formats taken into account are the InnoDB ones.
+     * Nothing is lost by the conversion: when a standard table can contain characters not supported by the database
+     * character set (e.g. a {@code utf8mb4} table in a {@code utf8mb3} database), the database and all its tables are
+     * converted to {@code utf8mb4} instead, since having some standard tables in {@code utf8mb3} and others in
+     * {@code utf8mb4} does not make sense. A table linked by a foreign key on string columns to a table of another
+     * database is not converted, since that foreign key could not be re-created. The tables which don't use the InnoDB
+     * storage engine are not converted either, since the maximum key length and the row formats taken into account are
+     * the InnoDB ones.
      * <p>
      * <strong>WARNING: the dropped foreign keys are not re-created by those statements (unlike
      * {@link #convertToDatabaseCollation(Metadata, Session)}), only by the Hibernate schema update when XWiki is
@@ -449,41 +465,28 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             return conversion;
         }
 
-        String characterSet = (String) databaseDefaults[0];
-        // XWiki requires a binary collation, whatever the database is configured with. Going from a NO PAD collation
-        // (e.g. utf8mb4_0900_ai_ci, the MySQL 8 default) to a PAD SPACE one (e.g. utf8mb4_bin) makes the unique keys
-        // which only differ by trailing spaces collide: that case is not supported, the conversion of such a table
-        // fails and the duplicate values have to be fixed manually.
-        String databaseCollation = (String) databaseDefaults[1];
-        String collation = isBinary(databaseCollation) ? databaseCollation : characterSet + BINARY_COLLATION_SUFFIX;
-
-        addDatabaseStatement(databaseName, characterSet, databaseCollation, collation, conversion);
-
-        // The collations (other than the expected one) used by each InnoDB table which does not use the expected
-        // collation
-        Map<String, Set<String>> candidateTables = getTablesToConvert(metadata, databaseName, collation, session);
-
-        // Start with the standard tables
-        Map<String, Set<String>> tables = getStandardTables(metadata, candidateTables);
+        Target target = getTarget(metadata, databaseName, (String) databaseDefaults[0], (String) databaseDefaults[1],
+            session, conversion);
+        Map<String, Set<String>> tables = target.tables;
         if (tables.isEmpty()) {
             return conversion;
         }
 
         List<ForeignKey> foreignKeys = getForeignKeys(databaseName, session);
 
-        addLinkedTables(databaseName, candidateTables, tables, foreignKeys);
+        addLinkedTables(databaseName, target.candidateTables, tables, foreignKeys);
 
-        int maxCharacterLength = getMaxCharacterLength(characterSet, session);
-        removeUnconvertibleTables(databaseName, characterSet, maxCharacterLength, tables, foreignKeys, session);
+        removeCrossDatabaseTables(databaseName, tables, foreignKeys);
         if (tables.isEmpty()) {
             return conversion;
         }
 
         this.logger.info("Tables {} of database [{}] need to be converted to character set [{}] and collation [{}]",
-            tables.keySet(), databaseName, characterSet, collation);
+            tables.keySet(), databaseName, target.characterSet, target.collation);
 
         // The indexes which would exceed the maximum key length with the new character set
-        List<Index> tooLongIndexes = getTooLongIndexes(databaseName, tables.keySet(), maxCharacterLength, session);
+        List<Index> tooLongIndexes =
+            getTooLongIndexes(databaseName, tables.keySet(), target.maxCharacterLength, session);
 
         // Drop the foreign keys involving string columns of the tables to convert since MySQL/MariaDB refuse to convert
         // those columns, and the ones which need an index to drop (and remember how to re-create them)
@@ -496,21 +499,80 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
                 ALTER_TABLE + getQualifiedTableName(index.tableName) + " DROP INDEX " + quote(index.name));
         }
 
-        addConvertStatements(metadata, tables.keySet(), characterSet, collation, session, conversion);
+        addConvertStatements(metadata, tables.keySet(), target.characterSet, target.collation, session, conversion);
 
         return conversion;
     }
 
     /**
-     * Fix the default collation of the database so that the tables created later (starting with the ones created by
-     * the Hibernate schema update right after) use the expected collation.
+     * Resolve the expected character set and collation, the standard tables which don't use them, and fix the database
+     * default character set and collation.
      */
-    private void addDatabaseStatement(String databaseName, String characterSet, String databaseCollation,
-        String collation, Conversion conversion)
+    private Target getTarget(Metadata metadata, String databaseName, String databaseCharacterSet,
+        String databaseCollation, Session session, Conversion conversion)
     {
-        if (!databaseCollation.equalsIgnoreCase(collation)) {
-            this.logger.info("The default collation of database [{}] will be changed from [{}] to [{}]", databaseName,
-                databaseCollation, collation);
+        // The character set configured on the database is kept when it's utf8mb4 or utf8mb3, but the other ones
+        // (e.g. latin1) cannot hold most of the translations of the standard XWiki flavor, so they are replaced with
+        // utf8mb4
+        String characterSet = SUPPORTED_CHARACTER_SETS.contains(databaseCharacterSet.toLowerCase())
+            ? databaseCharacterSet : UTF8MB4;
+        // XWiki requires a binary collation, whatever the database is configured with. Going from a NO PAD collation
+        // (e.g. utf8mb4_0900_ai_ci, the MySQL 8 default) to a PAD SPACE one (e.g. utf8mb4_bin) makes the unique keys
+        // which only differ by trailing spaces collide: that case is not supported, the conversion of such a table
+        // fails and the duplicate values have to be fixed manually.
+        String collation = isBinary(databaseCollation) && isCollationOf(databaseCollation, characterSet)
+            ? databaseCollation : characterSet + BINARY_COLLATION_SUFFIX;
+
+        Target target = new Target(characterSet, collation, getMaxCharacterLength(characterSet, session));
+        Set<String> nonInnoDBTables = new TreeSet<>();
+        target.setTables(metadata, getTablesToConvert(metadata, databaseName, collation, nonInnoDBTables, session));
+
+        // Having some standard tables in utf8mb3 and others in utf8mb4 does not make sense, so when one of them can
+        // contain characters not supported by the database character set (e.g. a utf8mb4 table in a utf8mb3
+        // database), the database and all its tables are converted to utf8mb4 instead, so that nothing is lost
+        if (target.maxCharacterLength < UTF8MB4_MAX_CHARACTER_LENGTH) {
+            Set<String> wideTables =
+                getWideTables(databaseName, target.maxCharacterLength, target.tables.keySet(), session);
+            if (!wideTables.isEmpty()) {
+                this.logger.info("Tables {} of database [{}] can contain characters not supported by its character set"
+                    + " [{}], so the database and all its tables will be converted to [{}] instead", wideTables,
+                    databaseName, characterSet, UTF8MB4);
+
+                target = new Target(UTF8MB4, UTF8MB4_BIN, UTF8MB4_MAX_CHARACTER_LENGTH);
+                nonInnoDBTables.clear();
+                target.setTables(metadata,
+                    getTablesToConvert(metadata, databaseName, UTF8MB4_BIN, nonInnoDBTables, session));
+            }
+        }
+
+        if (!nonInnoDBTables.isEmpty()) {
+            this.logger.warn("Tables {} of database [{}] don't use collation [{}] but won't be converted since they"
+                + " don't use the InnoDB storage engine. Switching them to InnoDB is recommended, they will then be"
+                + " converted at the next startup.", nonInnoDBTables, databaseName, target.collation);
+        }
+
+        addDatabaseStatement(databaseName, databaseCharacterSet, databaseCollation, target.characterSet,
+            target.collation, conversion);
+
+        return target;
+    }
+
+    private boolean isCollationOf(String collation, String characterSet)
+    {
+        return collation.toLowerCase().startsWith(characterSet.toLowerCase() + '_');
+    }
+
+    /**
+     * Fix the default character set and collation of the database so that the tables created later (starting with the
+     * ones created by the Hibernate schema update right after) use the expected ones.
+     */
+    private void addDatabaseStatement(String databaseName, String databaseCharacterSet, String databaseCollation,
+        String characterSet, String collation, Conversion conversion)
+    {
+        if (!databaseCharacterSet.equalsIgnoreCase(characterSet) || !databaseCollation.equalsIgnoreCase(collation)) {
+            this.logger.info("The default character set and collation of database [{}] will be changed from [{}] and"
+                + " [{}] to [{}] and [{}]", databaseName, databaseCharacterSet, databaseCollation, characterSet,
+                collation);
 
             conversion.statements.add("ALTER DATABASE " + quote(databaseName) + CONVERT_CHARACTER_SET + characterSet
                 + COLLATE + collation);
@@ -643,30 +705,13 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     }
 
     /**
-     * Remove from the tables to convert the ones which cannot be converted without losing anything, and the ones linked
-     * to them by a foreign key on string columns (which could not be re-created since the columns would not use the
-     * same character set and collation anymore):
-     * <ul>
-     * <li>the tables which can contain characters not supported by the database character set</li>
-     * <li>the tables linked by a foreign key on string columns to a table of another database</li>
-     * </ul>
+     * Remove from the tables to convert the ones linked by a foreign key on string columns to a table of another
+     * database, and the ones linked to them by a foreign key on string columns, since that foreign key could not be
+     * re-created after the conversion (the columns would not use the same character set and collation anymore).
      */
-    private void removeUnconvertibleTables(String databaseName, String characterSet, int maxCharacterLength,
-        Map<String, Set<String>> tables, List<ForeignKey> foreignKeys, Session session)
+    private void removeCrossDatabaseTables(String databaseName, Map<String, Set<String>> tables,
+        List<ForeignKey> foreignKeys)
     {
-        Set<String> wideTables = new TreeSet<>();
-        if (maxCharacterLength < UTF8MB4_MAX_CHARACTER_LENGTH) {
-            NativeQuery<String> query = session.createNativeQuery("SELECT DISTINCT c.TABLE_NAME "
-                + "FROM INFORMATION_SCHEMA.COLUMNS c JOIN INFORMATION_SCHEMA.CHARACTER_SETS s "
-                + "ON s.CHARACTER_SET_NAME = c.CHARACTER_SET_NAME "
-                + "WHERE c.TABLE_SCHEMA = :schema AND s.MAXLEN > :maxLength");
-            query.setParameter(SCHEMA_PARAMETER, databaseName);
-            query.setParameter("maxLength", maxCharacterLength);
-
-            query.list().stream().filter(tables::containsKey).forEach(wideTables::add);
-            addExcludedLinkedTables(databaseName, tables, wideTables, foreignKeys);
-        }
-
         Set<String> crossDatabaseTables = new TreeSet<>();
         for (ForeignKey foreignKey : foreignKeys) {
             if (foreignKey.string && !foreignKey.isLocal(databaseName)) {
@@ -681,41 +726,34 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         }
         addExcludedLinkedTables(databaseName, tables, crossDatabaseTables, foreignKeys);
 
-        if (!wideTables.isEmpty()) {
-            warnWideTables(databaseName, characterSet, tables, wideTables);
-        }
-
         if (!crossDatabaseTables.isEmpty()) {
             this.logger.warn("Tables {} of database [{}] won't be converted since they (or a table linked to them by a"
                 + " foreign key) are linked by a foreign key to a table of another database, which could not be"
                 + " re-created after the conversion", crossDatabaseTables, databaseName);
+
+            tables.keySet().removeAll(crossDatabaseTables);
         }
-
-        tables.keySet().removeAll(wideTables);
-        tables.keySet().removeAll(crossDatabaseTables);
-    }
-
-    private void warnWideTables(String databaseName, String characterSet, Map<String, Set<String>> tables,
-        Set<String> wideTables)
-    {
-        // Keeping a binary table in a wider character set is fine, but a non binary one is a problem
-        Set<String> nonBinaryTables = wideTables.stream()
-            .filter(tableName -> !tables.get(tableName).stream().allMatch(this::isBinary))
-            .collect(Collectors.toCollection(TreeSet::new));
-        if (!nonBinaryTables.isEmpty()) {
-            this.logger.warn("Tables {} of database [{}] use a non binary collation, which XWiki does not support, but"
-                + " won't be converted to its character set [{}] since they (or a table linked to them by a foreign"
-                + " key) can contain characters it does not support. Converting them to utf8mb4_bin is recommended.",
-                nonBinaryTables, databaseName, characterSet);
-        }
-
-        this.logger.debug("Tables {} of database [{}] won't be converted to its character set [{}] since they (or a"
-            + " table linked to them by a foreign key) can contain characters it does not support", wideTables,
-            databaseName, characterSet);
     }
 
     /**
-     * Add to the excluded tables the tables to convert linked to them (directly or not) by a foreign key on string
+     * @return the passed tables which can contain characters not supported by a character set using at most the passed
+     *         number of bytes per character
+     */
+    private Set<String> getWideTables(String databaseName, int maxCharacterLength, Set<String> tables,
+        Session session)
+    {
+        NativeQuery<String> query = session.createNativeQuery("SELECT DISTINCT c.TABLE_NAME "
+            + "FROM INFORMATION_SCHEMA.COLUMNS c JOIN INFORMATION_SCHEMA.CHARACTER_SETS s "
+            + "ON s.CHARACTER_SET_NAME = c.CHARACTER_SET_NAME "
+            + "WHERE c.TABLE_SCHEMA = :schema AND s.MAXLEN > :maxLength");
+        query.setParameter(SCHEMA_PARAMETER, databaseName);
+        query.setParameter("maxLength", maxCharacterLength);
+
+        return query.list().stream().filter(tables::contains).collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    /**
+     * Add to the passed tables the tables to convert linked to them (directly or not) by a foreign key on string
      * columns.
      */
     private void addExcludedLinkedTables(String databaseName, Map<String, Set<String>> tables,
@@ -852,26 +890,18 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     }
 
     /**
+     * @param nonInnoDBTables filled with the standard tables which don't use the expected collation, but cannot be
+     *            converted since they don't use the InnoDB storage engine
      * @return the collations (other than the expected one) used by each InnoDB table which does not use the expected
      *         collation (or which contains a column which does not use it)
      */
     private Map<String, Set<String>> getTablesToConvert(Metadata metadata, String databaseName, String collation,
-        Session session)
+        Set<String> nonInnoDBTables, Session session)
     {
-        NativeQuery<Object[]> query = session.createNativeQuery("SELECT TABLE_NAME, TABLE_COLLATION, ENGINE "
-            + FROM_BASE_TABLES + "AND TABLE_COLLATION <> :collation "
-            + "UNION SELECT c.TABLE_NAME, c.COLLATION_NAME, t.ENGINE "
-            + "FROM INFORMATION_SCHEMA.COLUMNS c JOIN INFORMATION_SCHEMA.TABLES t "
-            + "ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME "
-            + "WHERE c.TABLE_SCHEMA = :schema AND t.TABLE_TYPE = 'BASE TABLE' AND c.COLLATION_NAME <> :collation");
-        query.setParameter(SCHEMA_PARAMETER, databaseName);
-        query.setParameter("collation", collation);
-
         Set<String> standardTables = getStandardTables(metadata);
 
         Map<String, Set<String>> tables = new TreeMap<>();
-        Set<String> nonInnoDBTables = new TreeSet<>();
-        for (Object[] tableCollation : query.list()) {
+        for (Object[] tableCollation : queryTableCollations(databaseName, collation, session)) {
             String tableName = (String) tableCollation[0];
 
             // The maximum key length and the row formats taken into account by the conversion are the InnoDB ones
@@ -883,13 +913,25 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             }
         }
 
-        if (!nonInnoDBTables.isEmpty()) {
-            this.logger.warn("Tables {} of database [{}] don't use collation [{}] but won't be converted since they"
-                + " don't use the InnoDB storage engine. Switching them to InnoDB is recommended, they will then be"
-                + " converted at the next startup.", nonInnoDBTables, databaseName, collation);
-        }
-
         return tables;
+    }
+
+    /**
+     * @return the table, collation and engine of each table (or column) of the database which does not use the
+     *         passed collation
+     */
+    private List<Object[]> queryTableCollations(String databaseName, String collation, Session session)
+    {
+        NativeQuery<Object[]> query = session.createNativeQuery("SELECT TABLE_NAME, TABLE_COLLATION, ENGINE "
+            + FROM_BASE_TABLES + "AND TABLE_COLLATION <> :collation "
+            + "UNION SELECT c.TABLE_NAME, c.COLLATION_NAME, t.ENGINE "
+            + "FROM INFORMATION_SCHEMA.COLUMNS c JOIN INFORMATION_SCHEMA.TABLES t "
+            + "ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME "
+            + "WHERE c.TABLE_SCHEMA = :schema AND t.TABLE_TYPE = 'BASE TABLE' AND c.COLLATION_NAME <> :collation");
+        query.setParameter(SCHEMA_PARAMETER, databaseName);
+        query.setParameter("collation", collation);
+
+        return query.list();
     }
 
     /**
@@ -1002,6 +1044,42 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         }
 
         return NON_STRING_LENGTH;
+    }
+
+    /**
+     * The expected character set and collation, and the tables which don't use them.
+     */
+    private final class Target
+    {
+        private final String characterSet;
+
+        private final String collation;
+
+        private final int maxCharacterLength;
+
+        /**
+         * The collations (other than the expected one) used by each InnoDB table which does not use the expected
+         * collation.
+         */
+        private Map<String, Set<String>> candidateTables;
+
+        /**
+         * The standard tables to convert, with the collations (other than the expected one) they use.
+         */
+        private Map<String, Set<String>> tables;
+
+        Target(String characterSet, String collation, int maxCharacterLength)
+        {
+            this.characterSet = characterSet;
+            this.collation = collation;
+            this.maxCharacterLength = maxCharacterLength;
+        }
+
+        void setTables(Metadata metadata, Map<String, Set<String>> candidateTables)
+        {
+            this.candidateTables = candidateTables;
+            this.tables = getStandardTables(metadata, candidateTables);
+        }
     }
 
     private static final class Conversion

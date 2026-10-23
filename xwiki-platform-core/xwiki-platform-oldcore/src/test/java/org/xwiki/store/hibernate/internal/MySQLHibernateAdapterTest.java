@@ -483,28 +483,75 @@ class MySQLHibernateAdapterTest
         mockCollationQueries();
         when(this.defaultsQuery.list()).thenReturn(List.<Object[]>of(new Object[] { "utf8mb3", "utf8mb3_bin" }));
         when(this.maxLengthQuery.uniqueResult()).thenReturn(3L);
-        when(this.tablesQuery.list()).thenReturn(List.of(new Object[] { "xwikistrings", "utf8mb4_bin", INNODB },
-            new Object[] { "xwikiproperties", "utf8mb3_general_ci", INNODB },
-            new Object[] { "xwikidoc", "latin1_bin", INNODB },
-            new Object[] { "activitystream_events", "utf8mb4_general_ci", INNODB },
-            new Object[] { "activitystream_events", "utf8mb4_bin", INNODB }));
+        when(this.tablesQuery.list()).thenReturn(
+            // The tables which don't use utf8mb3_bin
+            List.of(new Object[] { "xwikistrings", "utf8mb4_bin", INNODB },
+                new Object[] { "xwikiproperties", "utf8mb3_general_ci", INNODB },
+                new Object[] { "xwikidoc", "latin1_bin", INNODB },
+                new Object[] { "activitystream_events", "utf8mb4_general_ci", INNODB },
+                new Object[] { "activitystream_events", "utf8mb4_bin", INNODB }),
+            // The tables which don't use utf8mb4_bin
+            List.of(new Object[] { "xwikiproperties", "utf8mb3_general_ci", INNODB },
+                new Object[] { "xwikidoc", "latin1_bin", INNODB },
+                new Object[] { "activitystream_events", "utf8mb4_general_ci", INNODB }));
 
         NativeQuery<String> wideQuery = mock(NativeQuery.class);
         when(this.session.createNativeQuery(contains("s.MAXLEN > :maxLength"))).thenReturn(wideQuery);
         when(wideQuery.list()).thenReturn(List.of("activitystream_events", "custom_table", "xwikistrings"));
 
-        // xwikiproperties is linked to xwikistrings by a foreign key, so it's not converted either, while xwikidoc
-        // (latin1) can be converted without losing anything
-        assertEquals(List.of("ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`",
-            "ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic, CONVERT TO CHARACTER SET utf8mb3 COLLATE utf8mb3_bin"),
+        // Some standard tables use utf8mb4, so the database and all its tables are converted to utf8mb4 (xwikistrings
+        // already uses utf8mb4_bin)
+        assertEquals(List.of("ALTER DATABASE `xwiki` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin",
+            "ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.`xwikistrings` DROP FOREIGN KEY `FKstrings`",
+            "ALTER TABLE `xwiki`.`activitystream_events` DROP INDEX `ase_page_date`",
+            "ALTER TABLE `xwiki`.`activitystream_events` ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic," + CONVERT,
+            "ALTER TABLE `xwiki`.`xwikiproperties` ROW_FORMAT=Compressed," + CONVERT),
             this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
 
-        // Only the non binary tables are reported
-        assertEquals("Tables [activitystream_events, xwikiproperties] of database [xwiki] use a non binary collation,"
-            + " which XWiki does not support, but won't be converted to its character set [utf8mb3] since they (or a"
-            + " table linked to them by a foreign key) can contain characters it does not support. Converting them to"
-            + " utf8mb4_bin is recommended.", this.logCapture.getMessage(0));
+        verify(this.tablesQuery).setParameter("collation", "utf8mb3_bin");
+        verify(this.tablesQuery).setParameter("collation", "utf8mb4_bin");
+        assertEquals("Index [ase_page_date] (key length of [3080] bytes after the conversion) exceeds the maximum key"
+            + " length of [3072] bytes and will be dropped. It can be re-created with a shorter prefix using"
+            + " [CREATE INDEX `ase_page_date` ON `xwiki`.`activitystream_events` (`ase_page`, `ase_date`)].",
+            this.logCapture.getMessage(0));
         assertEquals(1, this.logCapture.size());
+    }
+
+    @Test
+    void getConvertToDatabaseCollationStatementsWhenUTF8MB3()
+    {
+        mockCollationQueries();
+        when(this.defaultsQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "utf8mb3", "utf8mb3_general_ci" }));
+        when(this.maxLengthQuery.uniqueResult()).thenReturn(3L);
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "utf8mb3_general_ci", INNODB }));
+
+        // utf8mb3 is kept since no standard table uses a wider character set
+        assertEquals(List.of("ALTER DATABASE `xwiki` CHARACTER SET utf8mb3 COLLATE utf8mb3_bin",
+            "ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic, CONVERT TO CHARACTER SET utf8mb3 COLLATE utf8mb3_bin"),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+    }
+
+    @Test
+    void getConvertToDatabaseCollationStatementsWhenNonUnicodeDatabase()
+    {
+        mockCollationQueries();
+        when(this.defaultsQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "latin1", "latin1_swedish_ci" }));
+        when(this.tablesQuery.list())
+            .thenReturn(List.<Object[]>of(new Object[] { "xwikidoc", "latin1_swedish_ci", INNODB }));
+
+        // latin1 cannot hold most of the translations, so the database and its tables are converted to utf8mb4
+        assertEquals(List.of("ALTER DATABASE `xwiki` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin",
+            "ALTER TABLE `xwiki`.`custom_table` DROP FOREIGN KEY `FKcustom`",
+            "ALTER TABLE `xwiki`.`xwikidoc` ROW_FORMAT=Dynamic," + CONVERT),
+            this.adapter.getConvertToDatabaseCollationStatements(this.metadata, this.session));
+
+        verify(this.tablesQuery).setParameter("collation", "utf8mb4_bin");
     }
 
     private Statement mockJDBCStatement() throws SQLException

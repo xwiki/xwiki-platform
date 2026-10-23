@@ -1240,6 +1240,21 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #-# The default is "filesystem".
 # store.blobMigrationStoreType = filesystem
 
+#-# [Since 18.10.0RC1]
+#-# MySQL and MariaDB only. When the data migration system is enabled, XWiki makes sure at startup that the database
+#-# and each table of its Hibernate configuration (including the ones registered by extensions, but not the custom
+#-# mappings of XWiki classes) use the expected character set with a binary collation, and converts the ones which
+#-# don't. The expected character set is the one configured on the database when it's utf8mb4, or utf8mb3 when no
+#-# table uses utf8mb4, and utf8mb4 otherwise (e.g. for latin1, which cannot hold most of the translations of the
+#-# standard flavor). The expected collation is the one configured on the database when it's a binary collation of
+#-# that character set, and its binary collation otherwise (e.g. utf8mb4_bin). Tables which don't use the InnoDB
+#-# storage engine are not converted. Each converted table is rebuilt, which can take a long time for big tables, and
+#-# its indexes which would exceed the maximum key length are dropped (their definition is logged so that they can be
+#-# re-created with a shorter prefix). Set it to false to disable this conversion.
+#-#
+#-# The default is true.
+# store.hibernate.mysql.fixTableEncoding = true
+
 #-------------------------------------------------------------------------------------
 # S3 Blob Store
 #-------------------------------------------------------------------------------------

@@ -119,9 +119,8 @@ class WikiManagerRestIT
 
         // The script is executed in the main wiki, where the {{groovy}} macro is provisioned, and switches the context
         // to the created wiki so that the store APIs target that wiki's database. The row formats are read through the
-        // store API so that the difference between the MySQL and the MariaDB information schema tables is handled, and
-        // they are compared with the format the configuration asks for rather than with a hardcoded one since
-        // compression can be disabled.
+        // store API, and they are compared with the format the configuration asks for rather than with a hardcoded one
+        // since compression can be disabled.
         assertEquals("The row format of table [xwikircs] is the expected one.", setup.executeWikiPlain("""
             {{groovy wiki="false"}}
             import com.xpn.xwiki.internal.store.hibernate.HibernateStore

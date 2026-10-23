@@ -251,12 +251,12 @@ class MySQLHibernateAdapterTest
             new Object[] { "custom_table", "custom_index", "VALUE", null, "utf8mb3_general_ci", 2000L, 6000L, 1L }));
 
         NativeQuery<Object[]> rowFormatsQuery = mock(NativeQuery.class);
-        when(this.session.createNativeQuery(contains("INNODB_SYS_TABLES"))).thenReturn(rowFormatsQuery);
-        when(rowFormatsQuery.list()).thenReturn(List.of(new Object[] { "xwiki/xwikidoc", "Compact" },
-            new Object[] { "xwiki/activitystream_events", "Redundant" },
-            new Object[] { "xwiki/xwikiproperties", "Dynamic" }, new Object[] { "xwiki/xwikistrings", "Compact" },
-            new Object[] { "xwiki/xwikilistitems", "Compact" },
-            new Object[] { "xwiki/xwikircs", "Compressed" }));
+        when(this.session.createNativeQuery(contains("ROW_FORMAT FROM INFORMATION_SCHEMA.TABLES")))
+            .thenReturn(rowFormatsQuery);
+        when(rowFormatsQuery.list()).thenReturn(List.of(new Object[] { "xwikidoc", "Compact" },
+            new Object[] { "activitystream_events", "Redundant" }, new Object[] { "xwikiproperties", "Dynamic" },
+            new Object[] { "xwikistrings", "Compact" }, new Object[] { "xwikilistitems", "Compact" },
+            new Object[] { "xwikircs", "Compressed" }));
     }
 
     @Test
@@ -544,6 +544,24 @@ class MySQLHibernateAdapterTest
         // The conversion failure is the one reported
         assertSame(failure, exception);
         assertArrayEquals(new Throwable[] { recreateFailure }, exception.getSuppressed());
+    }
+
+    @Test
+    void getRowFormats()
+    {
+        when(this.wikis.getCurrentWikiId()).thenReturn("subwiki");
+        Session rowFormatsSession = mock(Session.class);
+        NativeQuery<Object[]> query = mock(NativeQuery.class);
+        when(rowFormatsSession.createNativeQuery(anyString())).thenReturn(query);
+        when(query.list()).thenReturn(
+            List.of(new Object[] { "xwikidoc", "Dynamic" }, new Object[] { "xwikircs", "Compressed" }));
+
+        assertEquals(Map.of("xwikidoc", "Dynamic", "xwikircs", "Compressed"),
+            this.adapter.getRowFormats(rowFormatsSession));
+
+        verify(query).setParameter("schema", "subwiki");
+        verify(rowFormatsSession).createNativeQuery("SELECT TABLE_NAME, ROW_FORMAT FROM INFORMATION_SCHEMA.TABLES"
+            + " WHERE TABLE_SCHEMA = :schema AND TABLE_TYPE = 'BASE TABLE' AND ENGINE = 'InnoDB'");
     }
 
     @Test

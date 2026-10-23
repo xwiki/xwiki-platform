@@ -74,6 +74,9 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
 
     private static final String SCHEMA_PARAMETER = "schema";
 
+    private static final String FROM_BASE_TABLES =
+        "FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = :schema AND TABLE_TYPE = 'BASE TABLE' ";
+
     private static final String ALTER_TABLE = "ALTER TABLE ";
 
     private static final String ROW_FORMAT = " ROW_FORMAT=";
@@ -228,27 +231,21 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             throw new IllegalStateException("Cannot get the tables row formats without a current wiki database");
         }
 
-        NativeQuery<Object[]> query = session.createNativeQuery("SELECT DISTINCT NAME, ROW_FORMAT FROM "
-            + getInformationShemaInnoDBTables() + " WHERE LOWER(NAME) LIKE '" + currentDatabase.toLowerCase() + "/%'");
+        // Unlike the InnoDB system tables (INNODB_TABLES on MySQL 8, INNODB_SYS_TABLES on MariaDB), TABLES is the same
+        // on MySQL and MariaDB, and it does not encode the special characters of the database and table names
+        // (e.g. "my.wiki" is "my@002ewiki" in the InnoDB system tables)
+        NativeQuery<Object[]> query = session.createNativeQuery(
+            "SELECT TABLE_NAME, ROW_FORMAT " + FROM_BASE_TABLES + "AND ENGINE = '" + INNODB_ENGINE + "'");
+        query.setParameter(SCHEMA_PARAMETER, currentDatabase);
 
         List<Object[]> results = query.list();
 
         Map<String, String> rowFormats = HashMap.newHashMap(results.size());
         for (Object[] entry : results) {
-            String completeName = (String) entry[0];
-            String tableName = completeName.substring(completeName.indexOf('/') + 1);
-            rowFormats.put(tableName, (String) entry[1]);
+            rowFormats.put((String) entry[0], (String) entry[1]);
         }
 
         return rowFormats;
-    }
-
-    /**
-     * @return the table where to find the InnoDB tables metadata
-     */
-    public String getInformationShemaInnoDBTables()
-    {
-        return "INFORMATION_SCHEMA.INNODB_SYS_TABLES";
     }
 
     /**
@@ -677,8 +674,8 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         Session session)
     {
         NativeQuery<Object[]> query = session.createNativeQuery("SELECT TABLE_NAME, TABLE_COLLATION, ENGINE "
-            + "FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = :schema AND TABLE_TYPE = 'BASE TABLE' "
-            + "AND TABLE_COLLATION <> :collation UNION SELECT c.TABLE_NAME, c.COLLATION_NAME, t.ENGINE "
+            + FROM_BASE_TABLES + "AND TABLE_COLLATION <> :collation "
+            + "UNION SELECT c.TABLE_NAME, c.COLLATION_NAME, t.ENGINE "
             + "FROM INFORMATION_SCHEMA.COLUMNS c JOIN INFORMATION_SCHEMA.TABLES t "
             + "ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME "
             + "WHERE c.TABLE_SCHEMA = :schema AND t.TABLE_TYPE = 'BASE TABLE' AND c.COLLATION_NAME <> :collation");

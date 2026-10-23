@@ -1241,12 +1241,15 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 # store.blobMigrationStoreType = filesystem
 
 #-# [Since 18.10.0RC1]
-#-# MySQL and MariaDB only. When the data migration system is enabled, XWiki makes sure at startup that each standard
-#-# table (custom mappings excluded) uses the character set configured on the database with a binary collation (the
-#-# collation configured on the database when it's binary, the binary collation of the database character set
-#-# otherwise, e.g. utf8mb4_bin), and converts the InnoDB ones which don't (unless they could lose characters in the
-#-# process). Each converted table is rebuilt, which can take a long time for big tables. Set it to false to disable
-#-# this conversion.
+#-# MySQL and MariaDB only. When the data migration system is enabled, XWiki makes sure at startup that each table of
+#-# its Hibernate configuration (including the ones registered by extensions, but not the custom mappings of XWiki
+#-# classes) uses the character set configured on the database with a binary collation (the collation configured on
+#-# the database when it's binary, the binary collation of the database character set otherwise, e.g. utf8mb4_bin),
+#-# and converts the ones which don't. Tables which could lose characters in the process (e.g. a utf8mb4 table in a
+#-# utf8mb3 database) and tables which don't use the InnoDB storage engine are not converted. Each converted table is
+#-# rebuilt, which can take a long time for big tables, and its indexes which would exceed the maximum key length are
+#-# dropped (their definition is logged so that they can be re-created with a shorter prefix). Set it to false to
+#-# disable this conversion.
 #-#
 #-# The default is true.
 # store.hibernate.mysql.fixTableEncoding = true

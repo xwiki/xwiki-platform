@@ -18,8 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { describe, expect, it, vi } from "vitest";
+import { h, useId } from "vue";
 
-vi.mock("@xwiki/platform-livedata-ui", () => ({ XWikiLivedata: {} }));
+// Displays an identifier generated with useId, to check that the identifiers are unique in the page.
+vi.mock("@xwiki/platform-livedata-ui", () => ({
+  XWikiLivedata: { setup: () => () => h("div", { class: "generated", id: useId() }) },
+}));
 vi.mock("@xwiki/platform-livedata-xwiki", () => ({
   XWikiLiveDataSource: class {},
   initTranslationsBuilder: () => () => () => {},
@@ -37,5 +41,19 @@ describe("init", () => {
 
     // An already displayed live data must survive a redundant initialization attempt.
     expect(element.querySelector("#displayed")).not.toBeNull();
+  });
+
+  it("generates distinct identifiers in each live data of the page", () => {
+    const config = '<script type="application/json">{}</script>';
+    document.body.innerHTML =
+      `<div class="liveData" data-config="{}">${config}</div><div class="liveData" data-config="{}">${config}</div>`;
+
+    for (const element of document.querySelectorAll(".liveData")) {
+      init(element, undefined);
+    }
+
+    const ids = [...document.querySelectorAll(".generated")].map((generated) => generated.id);
+    expect(ids.length).toBe(2);
+    expect(ids[0]).not.toBe(ids[1]);
   });
 });

@@ -43,6 +43,8 @@ import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.TestEnvironment;
@@ -102,6 +104,9 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     @MockComponent
     private Container container;
 
+    @MockComponent
+    private ContextualAuthorizationManager authorization;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
@@ -124,6 +129,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         Utils.setComponentManager(mockitoComponentManager);
 
         when(this.attachmentValidatorProvider.get()).thenReturn(this.attachmentValidator);
+        when(this.authorization.hasAccess(eq(Right.EDIT), any())).thenReturn(true);
     }
 
     private void setupSession()
@@ -425,5 +431,21 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         verify(document).setAttachment(attachment2);
         verify(attachment1).setVersion(version);
         verifyNoInteractions(attachment2);
+    }
+
+    @Test
+    void uploadAttachmentWithoutEditRight() throws Exception
+    {
+        setupSession();
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Document");
+        Part part = mock(Part.class);
+        when(this.authorization.hasAccess(Right.EDIT, documentReference)).thenReturn(false);
+
+        TemporaryAttachmentException exception = assertThrows(TemporaryAttachmentException.class,
+            () -> this.attachmentManager.uploadAttachment(documentReference, part, "file.txt"));
+
+        assertEquals("The current user is not allowed to edit [xwiki:Space.Document].", exception.getMessage());
+        verifyNoInteractions(part);
+        verify(this.httpSession, never()).setAttribute(any(), any());
     }
 }

@@ -95,7 +95,7 @@ public class TitleLiveTableNewRowNamingStrategy extends AbstractLocationLiveTabl
      * @return the name of the page holding the entry, derived from its title
      * @throws LiveDataException when the title is missing, or holds nothing a name can be built from
      */
-    private String getName(Map<String, Object> entryValues) throws LiveDataException
+    protected String getName(Map<String, Object> entryValues) throws LiveDataException
     {
         String title = Objects.toString(entryValues.get(TITLE_PROPERTY), null);
         if (StringUtils.isBlank(title)) {

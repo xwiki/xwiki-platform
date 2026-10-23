@@ -73,6 +73,10 @@ class ResourceReferenceRenamerTest
     private EntityReferenceResolver<ResourceReference> entityReferenceResolver;
 
     @MockComponent
+    @Named("current")
+    private EntityReferenceResolver<String> currentEntityReferenceResolver;
+
+    @MockComponent
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
@@ -236,6 +240,108 @@ class ResourceReferenceRenamerTest
             currentDocumentReference,
             false, Map.of()));
         assertEquals(new AttachmentResourceReference("xwiki:Space.Page.file2.txt"), resourceReference);
+    }
+
+    @Test
+    void updateResourceReferenceNotRelativeWithImageOfRenamedTerminalDocument()
+    {
+        // The image targets an attachment of a renamed terminal document: since that document doesn't exist anymore,
+        // the image reference is now resolved as targeting the space home page with the same name.
+        AttachmentResourceReference resourceReference = new AttachmentResourceReference("Space.Page@image.png");
+        resourceReference.setTyped(false);
+        DocumentReference oldReference = new DocumentReference("xwiki", "Space", "Page");
+        DocumentReference newReference = new DocumentReference("xwiki", "NewSpace", "Page");
+        DocumentReference currentDocumentReference = new DocumentReference("xwiki", "Other", "Page");
+        DocumentReference spaceHomeReference = new DocumentReference("xwiki", List.of("Space", "Page"), "WebHome");
+        AttachmentReference spaceHomeAttachmentReference = new AttachmentReference("image.png", spaceHomeReference);
+        AttachmentReference oldAttachmentReference = new AttachmentReference("image.png", oldReference);
+        AttachmentReference newAttachmentReference = new AttachmentReference("image.png", newReference);
+
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
+            .thenReturn(spaceHomeAttachmentReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(spaceHomeAttachmentReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceHomeAttachmentReference))
+            .thenReturn(spaceHomeReference);
+        when(this.currentEntityReferenceResolver.resolve("Space.Page@image.png", EntityType.ATTACHMENT,
+            currentDocumentReference)).thenReturn(oldAttachmentReference);
+        when(this.currentEntityReferenceResolver.resolve("Space.Page@image.png", EntityType.ATTACHMENT))
+            .thenReturn(oldAttachmentReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldAttachmentReference)).thenReturn(oldReference);
+        when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
+            .thenReturn(new EntityReference("image.png", EntityType.ATTACHMENT,
+                new EntityReference("Page", EntityType.DOCUMENT, new EntityReference("Space", EntityType.SPACE))));
+        when(this.compactEntityReferenceSerializer.serialize(newAttachmentReference, currentDocumentReference))
+            .thenReturn("NewSpace.Page@image.png");
+
+        assertTrue(this.renamer.updateResourceReference(resourceReference, oldReference, newReference,
+            currentDocumentReference, false, Map.of(oldReference, newReference)));
+        AttachmentResourceReference expectedResourceReference =
+            new AttachmentResourceReference("NewSpace.Page@image.png");
+        expectedResourceReference.setTyped(false);
+        assertEquals(expectedResourceReference, resourceReference);
+    }
+
+    @Test
+    void updateResourceReferenceNotRelativeWithUntypedLinkToRenamedTerminalDocument()
+    {
+        // The untyped link targets a renamed terminal document: since that document doesn't exist anymore, the link
+        // is now resolved as targeting the space home page with the same name.
+        DocumentResourceReference resourceReference = new DocumentResourceReference("Space.Page");
+        resourceReference.setTyped(false);
+        DocumentReference oldReference = new DocumentReference("xwiki", "Space", "Page");
+        DocumentReference newReference = new DocumentReference("xwiki", "NewSpace", "Page");
+        DocumentReference currentDocumentReference = new DocumentReference("xwiki", "Other", "Page");
+        DocumentReference spaceHomeReference = new DocumentReference("xwiki", List.of("Space", "Page"), "WebHome");
+
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
+            .thenReturn(spaceHomeReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(spaceHomeReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceHomeReference)).thenReturn(spaceHomeReference);
+        when(this.currentEntityReferenceResolver.resolve("Space.Page", EntityType.DOCUMENT, currentDocumentReference))
+            .thenReturn(oldReference);
+        when(this.currentEntityReferenceResolver.resolve("Space.Page", EntityType.DOCUMENT)).thenReturn(oldReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldReference)).thenReturn(oldReference);
+        when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null))
+            .thenReturn(
+                new EntityReference("Page", EntityType.DOCUMENT, new EntityReference("Space", EntityType.SPACE)));
+        when(this.compactEntityReferenceSerializer.serialize(newReference, currentDocumentReference))
+            .thenReturn("NewSpace.Page");
+
+        assertTrue(this.renamer.updateResourceReference(resourceReference, oldReference, newReference,
+            currentDocumentReference, false, Map.of(oldReference, newReference)));
+        DocumentResourceReference expectedResourceReference = new DocumentResourceReference("NewSpace.Page");
+        expectedResourceReference.setTyped(false);
+        assertEquals(expectedResourceReference, resourceReference);
+    }
+
+    @Test
+    void updateResourceReferenceNotRelativeWithImageOfOtherTerminalDocument()
+    {
+        // The image targets an attachment of an existing space home page, whose name doesn't match the renamed
+        // terminal document.
+        AttachmentResourceReference resourceReference = new AttachmentResourceReference("Space.Other@image.png");
+        resourceReference.setTyped(false);
+        DocumentReference oldReference = new DocumentReference("xwiki", "Space", "Page");
+        DocumentReference newReference = new DocumentReference("xwiki", "NewSpace", "Page");
+        DocumentReference currentDocumentReference = new DocumentReference("xwiki", "Other", "Page");
+        DocumentReference spaceHomeReference = new DocumentReference("xwiki", List.of("Space", "Other"), "WebHome");
+        AttachmentReference spaceHomeAttachmentReference = new AttachmentReference("image.png", spaceHomeReference);
+        AttachmentReference terminalAttachmentReference =
+            new AttachmentReference("image.png", new DocumentReference("xwiki", "Space", "Other"));
+
+        when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
+            .thenReturn(spaceHomeAttachmentReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(spaceHomeAttachmentReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceHomeAttachmentReference))
+            .thenReturn(spaceHomeReference);
+        when(this.currentEntityReferenceResolver.resolve("Space.Other@image.png", EntityType.ATTACHMENT,
+            currentDocumentReference)).thenReturn(terminalAttachmentReference);
+        when(this.defaultReferenceDocumentReferenceResolver.resolve(terminalAttachmentReference))
+            .thenReturn(terminalAttachmentReference.getDocumentReference());
+
+        assertFalse(this.renamer.updateResourceReference(resourceReference, oldReference, newReference,
+            currentDocumentReference, false, Map.of(oldReference, newReference)));
+        assertEquals("Space.Other@image.png", resourceReference.getReference());
     }
 
     @Test

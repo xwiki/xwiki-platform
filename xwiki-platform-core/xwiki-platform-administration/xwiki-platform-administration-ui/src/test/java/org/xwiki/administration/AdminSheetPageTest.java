@@ -49,8 +49,8 @@ class AdminSheetPageTest extends PageTest
     @Test
     void sectionEscaping() throws Exception
     {
-        this.request.put("section", "{{noscript /}}");
-        this.request.put("viewer", "content");
+        this.stubRequest.put("section", "{{noscript /}}");
+        this.stubRequest.put("viewer", "content");
 
         Document result = renderHTMLPage(ADMIN_SHEET);
         Element documentTitle = result.getElementById("document-title");

@@ -117,7 +117,7 @@ class AllAttachmentsResultsTest extends PageTest
 
         this.oldcore.getMocker().registerComponent(ScriptService.class, "query", this.queryService);
 
-        this.request.put("reqNo", "1");
+        this.stubRequest.put("reqNo", "1");
 
         this.context.setAction("get");
     }
@@ -202,7 +202,7 @@ class AllAttachmentsResultsTest extends PageTest
     void filterByTimestampDateRange() throws Exception
     {
         initDefaultQueryMocks();
-        this.request.put("date", "1607295600000-1632347999999");
+        this.stubRequest.put("date", "1607295600000-1632347999999");
 
         renderPage();
 
@@ -217,7 +217,7 @@ class AllAttachmentsResultsTest extends PageTest
     void filterByISO8601DateRange() throws Exception
     {
         initDefaultQueryMocks();
-        this.request.put("date", "2021-09-22T00:00:00+02:00/2021-09-22T23:59:59+02:00");
+        this.stubRequest.put("date", "2021-09-22T00:00:00+02:00/2021-09-22T23:59:59+02:00");
 
         renderPage();
 

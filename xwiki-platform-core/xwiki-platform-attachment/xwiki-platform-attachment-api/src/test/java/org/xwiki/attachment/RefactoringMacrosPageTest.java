@@ -103,7 +103,7 @@ class RefactoringMacrosPageTest extends PageTest
         document.setSyntax(Syntax.XWIKI_2_1);
         this.xwiki.saveDocument(document, this.context);
 
-        this.request.put("updateReferences", updateReferences);
+        this.stubRequest.put("updateReferences", updateReferences);
 
         Document parse = Jsoup.parse(document.getRenderedContent(this.context));
         // The checkbox is checked by default, unless updateReferences is defined to value different than 'true'.

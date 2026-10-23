@@ -47,6 +47,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin;
 import com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin;
 import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
+import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -129,14 +130,14 @@ class DisplayPageTest extends PageTest
 
         this.serializedDocumentReference = localReferenceSerializer.serialize(document.getDocumentReference());
 
-        request.put("xpage", "display");
-        request.put("type", "object");
+        this.stubRequest.put("xpage", "display");
+        this.stubRequest.put("type", "object");
     }
 
     @Test
     void displayNonExistingProperty() throws Exception
     {
-        request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
+        this.stubRequest.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
         String result = this.templateManager.render(DISPLAY_VM);
         assertEquals("", result.trim());
     }
@@ -144,8 +145,8 @@ class DisplayPageTest extends PageTest
     @Test
     void displayNonExistingPropertyWithUpdateOrCreate() throws Exception
     {
-        request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
-        request.put("objectPolicy", "updateOrCreate");
+        this.stubRequest.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
+        this.stubRequest.put("objectPolicy", "updateOrCreate");
 
         String result = this.templateManager.render(DISPLAY_VM);
         assertEquals(DEFAULT_LABEL, result.trim());
@@ -156,9 +157,9 @@ class DisplayPageTest extends PageTest
     {
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.EDIT)).thenReturn(true);
 
-        request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
-        request.put("objectPolicy", "updateOrCreate");
-        request.put("mode", "edit");
+        this.stubRequest.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
+        this.stubRequest.put("objectPolicy", "updateOrCreate");
+        this.stubRequest.put("mode", "edit");
 
         String result = this.templateManager.render(DISPLAY_VM);
         assertEquals(DEFAULT_SELECT, result.trim());
@@ -175,8 +176,8 @@ class DisplayPageTest extends PageTest
         xObject.safeput(FIELD_NAME, ((PropertyClass) xclass.getField(FIELD_NAME)).newProperty());
         this.xwiki.saveDocument(document, this.context);
 
-        request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
-        request.put("mode", "edit");
+        this.stubRequest.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
+        this.stubRequest.put("mode", "edit");
 
         String result = this.templateManager.render(DISPLAY_VM);
         assertEquals(DEFAULT_SELECT, result.trim());
@@ -187,9 +188,9 @@ class DisplayPageTest extends PageTest
     {
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.EDIT)).thenReturn(true);
 
-        request.put("property", this.serializedDocumentReference + "[3]." + FIELD_NAME);
-        request.put("objectPolicy", "updateOrCreate");
-        request.put("mode", "edit");
+        this.stubRequest.put("property", this.serializedDocumentReference + "[3]." + FIELD_NAME);
+        this.stubRequest.put("objectPolicy", "updateOrCreate");
+        this.stubRequest.put("mode", "edit");
 
         String result = this.templateManager.render(DISPLAY_VM);
         assertEquals(DEFAULT_SELECT.replaceAll("_0_", "_3_"), result.trim());
@@ -199,15 +200,15 @@ class DisplayPageTest extends PageTest
     void displayWithSkinExtensions() throws Exception
     {
         // Replace the response by a spy to intercept the call to set the header.
-        this.response = spy(this.response);
-        this.context.setResponse(this.response);
+        XWikiServletResponseStub responseSpy = spy((XWikiServletResponseStub) this.context.getResponse());
+        this.context.setResponse(responseSpy);
 
         SkinExtensionPluginApi mockJSX = mock();
         when(mockJSX.getImportString()).thenReturn("common.js\npage.js", "common.js\nnew.js\nother.js\npage.js");
 
         when(this.oldcore.getSpyXWiki().getPluginApi("jsx", this.context)).thenReturn(mockJSX);
 
-        this.request.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
+        this.stubRequest.put("property", this.serializedDocumentReference + "." + FIELD_NAME);
 
         this.templateManager.render(DISPLAY_VM);
 
@@ -216,6 +217,6 @@ class DisplayPageTest extends PageTest
 
         // Verify that the header was set with the new skin extensions, without line breaks as they are forbidden in
         // header values.
-        verify(this.response).setHeader("X-XWIKI-HTML-HEAD", "new.js other.js");
+        verify(responseSpy).setHeader("X-XWIKI-HTML-HEAD", "new.js other.js");
     }
 }

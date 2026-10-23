@@ -73,7 +73,7 @@ class DisplaycontentPageTest extends PageTest
 
         // Allow setting the content type in the response, so we can assert it later. The default is consistent with
         // Utils#parseTemplate(String, boolean, XWikiContext).
-        this.response = new XWikiServletResponseStub()
+        this.context.setResponse(new XWikiServletResponseStub()
         {
             private String contentType = HTML_CONTENT_TYPE;
 
@@ -88,8 +88,7 @@ class DisplaycontentPageTest extends PageTest
             {
                 this.contentType = type;
             }
-        };
-        this.context.setResponse(this.response);
+        });
     }
 
     @Test
@@ -100,7 +99,7 @@ class DisplaycontentPageTest extends PageTest
 
         String result = this.templateManager.render(TEMPLATE_NAME).trim();
         assertEquals("<p>Hello World</p>", result);
-        assertEquals(HTML_CONTENT_TYPE, this.response.getContentType());
+        assertEquals(HTML_CONTENT_TYPE, this.context.getResponse().getContentType());
     }
 
     @Test
@@ -110,11 +109,11 @@ class DisplaycontentPageTest extends PageTest
         this.document.setContent(json
             + " {{velocity}}#set ($discard = $response.setContentType('application/json')){{/velocity}}");
         this.xwiki.saveDocument(this.document, this.context);
-        this.request.put("outputSyntax", "plain");
+        this.stubRequest.put("outputSyntax", "plain");
 
         String result = this.templateManager.render(TEMPLATE_NAME).trim();
         assertEquals(json, result);
-        assertEquals("application/json", this.response.getContentType());
+        assertEquals("application/json", this.context.getResponse().getContentType());
     }
 
     @Test
@@ -122,10 +121,10 @@ class DisplaycontentPageTest extends PageTest
     {
         this.document.setContent("<strong>Some HTML</strong>");
         this.xwiki.saveDocument(this.document, this.context);
-        this.request.put("outputSyntax", "plain");
+        this.stubRequest.put("outputSyntax", "plain");
 
         String result = this.templateManager.render(TEMPLATE_NAME).trim();
         assertEquals(this.document.getContent(), result);
-        assertEquals("text/plain", this.response.getContentType());
+        assertEquals("text/plain", this.context.getResponse().getContentType());
     }
 }

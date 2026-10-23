@@ -95,27 +95,11 @@ public class PageTest
     protected HttpServletRequestStub stubRequest;
 
     /**
-     * The javax version of the stubbed request used to simulate a real Servlet Request.
-     * 
-     * @deprecated use {@link #stubRequest} instead
-     */
-    @Deprecated(since = "17.0.0RC1")
-    protected XWikiServletRequestStub request;
-
-    /**
      * The stubbed response used to simulate a real Servlet Response.
      * 
      * @since 17.0.0RC1
      */
     protected HttpServletResponseStub stubResponse;
-
-    /**
-     * The javax version of the stubbed response used to simulate a real Servlet Response.
-     * 
-     * @deprecated use {@link #stubResponse} instead
-     */
-    @Deprecated(since = "17.0.0RC1")
-    protected XWikiServletResponseStub response;
 
     /**
      * The mocked XWiki instance, provided for ease of use (can also be retrieved through {@link #oldcore}).
@@ -288,13 +272,12 @@ public class PageTest
         // Need to be executed before ecm.initialize() so that XWikiScriptContextInitializer will initialize the
         // script context properly
         this.stubRequest = new HttpServletRequestStub();
-        this.request = new XWikiServletRequestStub(this.stubRequest);
-        this.request.setScheme("http");
-        this.context.setRequest(this.request);
+        XWikiServletRequestStub javaxRequest = new XWikiServletRequestStub(this.stubRequest);
+        javaxRequest.setScheme("http");
+        this.context.setRequest(javaxRequest);
 
         this.stubResponse = new HttpServletResponseStub();
-        this.response = new XWikiServletResponseStub(this.stubResponse);
-        this.context.setResponse(this.response);
+        this.context.setResponse(new XWikiServletResponseStub(this.stubResponse));
 
         ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
         ecm.initialize(this.oldcore.getExecutionContext());

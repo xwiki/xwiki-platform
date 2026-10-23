@@ -100,7 +100,7 @@ class NotificationRSSServicePageTest extends PageTest
     void rssResult() throws Exception
     {
         loadPage(RSS_DOCUMENT_REFERENCE);
-        this.request.put("outputSyntax", "plain");
+        this.stubRequest.put("outputSyntax", "plain");
         this.setOutputSyntax(Syntax.PLAIN_1_0);
         this.context.setAction("get");
 
@@ -110,14 +110,14 @@ class NotificationRSSServicePageTest extends PageTest
         StringWriter out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
 
-        this.response = new XWikiServletResponseStub() {
+        XWikiServletResponseStub javaxResponse = new XWikiServletResponseStub() {
             @Override
             public PrintWriter getWriter() throws IOException
             {
                 return writer;
             }
         };
-        this.context.setResponse(this.response);
+        this.context.setResponse(javaxResponse);
 
         String result = renderPage(RSS_DOCUMENT_REFERENCE);
         assertTrue(StringUtils.isAllBlank(result));

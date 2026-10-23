@@ -91,9 +91,9 @@ class LiveTableResultPagePageTest extends PageTest
         setOutputSyntax(Syntax.PLAIN_1_0);
         this.context.setAction("get");
 
-        this.request.put("offset", "1");
-        this.request.put("reqNo", "1");
-        this.request.put("limit", "10");
+        this.stubRequest.put("offset", "1");
+        this.stubRequest.put("reqNo", "1");
+        this.stubRequest.put("limit", "10");
 
         JsonNode json = renderJSON(DOCUMENT_REFERENCE);
 

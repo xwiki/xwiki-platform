@@ -233,7 +233,7 @@ class BooleanClassTest
 
         String escapedPrefix = "Some.My&#123;&#123;macro}}Class_0_prop";
         assertEquals("<select size='1' id='" + escapedPrefix
-            + "' aria-label='core.model.xclass.editClassProperty.textAlternative' name='" + escapedPrefix + "'>"
+            + "' aria-label='Boolean' name='" + escapedPrefix + "'>"
             + "<option value='' label='---'>---</option>"
             + "<option selected='selected' value='1' label='Yes &#39;&#34;&#60;em&#62;'>"
             + "Yes &#39;&#34;&#60;em&#62;</option>"

@@ -74,7 +74,7 @@ class StringClassTest
         StringBuffer stringBuffer = new StringBuffer();
         stringClass.displayEdit(stringBuffer, fieldName, spaceName + "." + pageName + "_0_", baseClass,
             xWikiContext);
-        assertEquals("<input aria-label='core.model.xclass.editClassProperty.textAlternative' "
+        assertEquals("<input aria-label='String' "
             + "onfocus='new ajaxSuggest(this, &#123;script:&#34;\\/a\\/b?xpage=suggest&#38;"
             + "classname=%22%20%2B%20alert%281%29%20%2B%20%22.WebHome&#38;fieldname=test&#38;firCol=-&#38;"
             + "secCol=-&#38;&#34;, varname:&#34;input&#34;} )' "

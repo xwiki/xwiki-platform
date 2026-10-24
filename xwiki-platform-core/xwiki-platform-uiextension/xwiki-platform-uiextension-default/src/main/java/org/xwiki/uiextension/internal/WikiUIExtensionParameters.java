@@ -41,6 +41,7 @@ import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -117,7 +118,7 @@ public class WikiUIExtensionParameters
     {
         boolean isValid(ExecutionContext currentExecutionContext, String currentWiki)
         {
-            return this.executionContext.get() == currentExecutionContext && this.wiki.equals(currentWiki);
+            return this.executionContext.get() == currentExecutionContext && Objects.equals(this.wiki, currentWiki);
         }
     }
 
@@ -202,8 +203,7 @@ public class WikiUIExtensionParameters
         // This cache has a short lifespan, it gets discarded for each new request, or if the database has been switched
         // during a request.
         ExecutionContext currentExecutionContext = this.execution.getContext();
-        String currentWiki =
-            this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
+        String currentWiki = getCurrentWiki();
         EvaluatedParameters cached = this.evaluatedParameters;
         if (cached != null && cached.isValid(currentExecutionContext, currentWiki)) {
             return cached.values();
@@ -222,6 +222,19 @@ public class WikiUIExtensionParameters
             new EvaluatedParameters(new WeakReference<>(currentExecutionContext), currentWiki, result);
 
         return result;
+    }
+
+    /**
+     * @return the name of the current wiki, or {@code null} when there is none (e.g. no XWiki context is
+     *     initialized for the current thread), in which case the evaluated parameters are cached for "no wiki"
+     */
+    private String getCurrentWiki()
+    {
+        EntityReference currentReference = this.modelContext.getCurrentEntityReference();
+        EntityReference wikiReference =
+            currentReference != null ? currentReference.extractReference(EntityType.WIKI) : null;
+
+        return wikiReference != null ? wikiReference.getName() : null;
     }
 
     private Map<String, String> evaluate()

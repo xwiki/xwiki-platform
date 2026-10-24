@@ -329,6 +329,22 @@ class WikiUIExtensionParametersTest
     }
 
     @Test
+    void getParametersWithoutCurrentWiki() throws Exception
+    {
+        // No current wiki, e.g. when no XWiki context is initialized for the current thread, then the second call is
+        // made once a wiki has been set.
+        when(this.modelContext.getCurrentEntityReference()).thenReturn(null, null, new WikiReference("wiki"));
+        WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE);
+
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+
+        // Evaluated once without a wiki (and cached for the second call), then again once a wiki is set.
+        verify(this.velocityEngine, times(2)).evaluate(any(), any(), eq(NAMESPACE), any(VelocityTemplate.class));
+    }
+
+    @Test
     void getParametersFromDifferentRequests() throws Exception
     {
         WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE);

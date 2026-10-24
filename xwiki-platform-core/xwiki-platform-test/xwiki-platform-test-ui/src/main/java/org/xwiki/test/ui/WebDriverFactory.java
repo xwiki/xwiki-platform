@@ -27,8 +27,6 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-
 /**
  * Create specific {@link WebDriver} instances for various Browsers.
  * 
@@ -37,6 +35,8 @@ import io.github.bonigarcia.wdm.WebDriverManager;
  */
 public class WebDriverFactory
 {
+    private static final String SE_AVOID_STATS = "SE_AVOID_STATS";
+
     public XWikiWebDriver createWebDriver(String browserName)
     {
         // Tell Webdriver to use Java11+'s bundled HTTP client instead of AsyncHttpClient.
@@ -45,14 +45,10 @@ public class WebDriverFactory
         // To be removed once https://github.com/SeleniumHQ/selenium/issues/9528 is fixed.
         System.setProperty("webdriver.http.factory", "jdk-http-client");
 
+        disableSeleniumManagerStatistics();
+
         WebDriver driver;
         if (browserName.startsWith("*firefox")) {
-            // Note: the Gecko driver needs to be set as a system property under the "webdriver.gecko.driver" key for
-            // the Firefox Driver to work with Selenium 3+.
-            // The following line will download and install the latest gecko driver corresponding to the OS and set
-            // this system property.
-            WebDriverManager.firefoxdriver().setup();
-
             FirefoxOptions options = new FirefoxOptions()
                 // Make sure Firefox doesn't upgrade automatically on CI agents.
                 .addPreference("app.update.auto", false)
@@ -61,6 +57,9 @@ public class WebDriverFactory
                 // Fix a recent regression leading to JavascriptException: Cyclic object value errors
                 // See: https://github.com/mozilla/geckodriver/issues/2212
                 .addPreference("remote.events.async.enabled", false);
+            // Unless the "webdriver.gecko.driver" system property is set or a geckodriver is found on the PATH,
+            // Selenium Manager (bundled with Selenium) detects the installed Firefox and downloads a matching
+            // geckodriver (cached in ~/.cache/selenium by default) when the driver is created.
             driver = new FirefoxDriver(options);
 
             // Hide the Add-on bar (from the bottom of the window, with "WebDriver" written on the right) because it can
@@ -84,5 +83,17 @@ public class WebDriverFactory
         driver.manage().window().maximize();
 
         return new XWikiWebDriver((RemoteWebDriver) driver);
+    }
+
+    /**
+     * Prevent Selenium Manager from sending usage statistics. Selenium passes the system properties starting with
+     * {@code SE_} as environment variables to the Selenium Manager process, which honours {@code SE_AVOID_STATS}.
+     * A value already set, either as a system property or as an environment variable, is kept.
+     */
+    private void disableSeleniumManagerStatistics()
+    {
+        if (System.getProperty(SE_AVOID_STATS) == null && System.getenv(SE_AVOID_STATS) == null) {
+            System.setProperty(SE_AVOID_STATS, "true");
+        }
     }
 }

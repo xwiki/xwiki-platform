@@ -74,12 +74,6 @@
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
     </dependency>
-    <!-- Used to download/install/setup the gecko driver for Selenium for the FF browser -->
-    <dependency>
-      <groupId>io.github.bonigarcia</groupId>
-      <artifactId>webdrivermanager</artifactId>
-      <version>${webdrivermanager.version}</version>
-    </dependency>
     <!-- Used by the REST calls -->
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
@@ -102,6 +96,13 @@
       <groupId>com.deque.html.axe-core</groupId>
       <artifactId>selenium</artifactId>
       <version>4.11.1</version>
+      <exclusions>
+        <!-- Not used by axe-core's code. Selenium Manager (bundled with Selenium) resolves the browser drivers. -->
+        <exclusion>
+          <groupId>io.github.bonigarcia</groupId>
+          <artifactId>webdrivermanager</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>

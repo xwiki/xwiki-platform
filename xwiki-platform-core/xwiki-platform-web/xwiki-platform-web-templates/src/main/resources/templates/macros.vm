@@ -975,13 +975,17 @@ $html
   </${blockTag}>
 #end
 
-## Display a block warning message with the content $text.
-#macro(warning $text)
+## Display a block warning message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1,
+##   18.4.8)
+#macro(warning $text $extraClass)
 #set( $parameters = {
 'text': $text,
 'classAffix': 'warning',
 'iconName': 'warning',
-'prettyNameKey': 'warning'
+'prettyNameKey': 'warning',
+'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end

@@ -77,6 +77,7 @@ import com.xpn.xwiki.internal.debug.DebugConfiguration;
 import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
+import com.xpn.xwiki.internal.skin.SkinActionURLParameters;
 import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
@@ -100,6 +101,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -711,5 +713,37 @@ class XWikiMockitoTest
 
         verify(environment, never()).getResource(anyString());
         verify(urlFactory).createResourceURL(any(), anyBoolean(), any(), any(Map.class));
+    }
+
+    @Test
+    void getSkinFileFromResourcesWithSkinAction() throws Exception
+    {
+        this.componentManager.registerMockComponent(DebugConfiguration.class);
+        this.componentManager.registerMockComponent(InternalSkinManager.class);
+        this.componentManager.registerMockComponent(URLConfiguration.class);
+        // Needed to compute the resource URL cache version.
+        this.componentManager.registerMockComponent(CoreExtensionRepository.class);
+        SkinActionURLParameters skinActionURLParameters =
+            this.componentManager.registerMockComponent(SkinActionURLParameters.class);
+        doAnswer(invocation -> {
+            Map<String, Object> parameters = invocation.getArgument(0);
+            parameters.put("iconTheme", "Silk");
+            return null;
+        }).when(skinActionURLParameters).addParameters(any());
+        Environment environment = this.componentManager.getInstance(Environment.class);
+
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        this.context.setURLFactory(urlFactory);
+
+        URL resourceURL = new URL("file:/webapp/resources/js/test.js");
+        when(environment.getResource("/resources/", "js/test.js")).thenReturn(resourceURL);
+        URL url = new URL("http://host/xwiki/bin/skin/resources/js/test.js?iconTheme=Silk");
+        when(urlFactory.createResourceURL(eq("js/test.js"), eq(true), same(this.context),
+            argThat(parameters -> "Silk".equals(parameters.get("iconTheme"))
+                && parameters.containsKey(XWiki.CACHE_VERSION)))).thenReturn(url);
+        when(urlFactory.getURL(url, this.context)).thenReturn("/xwiki/bin/skin/resources/js/test.js?iconTheme=Silk");
+
+        assertEquals("/xwiki/bin/skin/resources/js/test.js?iconTheme=Silk",
+            this.xwiki.getSkinFile("js/test.js", null, true, this.context));
     }
 }

@@ -132,6 +132,7 @@ com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor
 com.xpn.xwiki.internal.skin.DefaultSkinManager
 com.xpn.xwiki.internal.skin.InternalSkinConfiguration
 com.xpn.xwiki.internal.skin.InternalSkinManager
+com.xpn.xwiki.internal.skin.SkinActionURLParameters
 com.xpn.xwiki.internal.skin.WikiSkinUtils
 com.xpn.xwiki.internal.script.DebugInternalScriptService
 com.xpn.xwiki.internal.script.DocumentScriptSafeProvider

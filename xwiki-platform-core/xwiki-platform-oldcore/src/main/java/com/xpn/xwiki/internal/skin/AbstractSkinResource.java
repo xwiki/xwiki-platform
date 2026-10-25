@@ -62,6 +62,8 @@ public abstract class AbstractSkinResource extends AbstractResource<InputSource>
 
     protected URLConfiguration urlConfiguration;
 
+    private SkinActionURLParameters skinActionURLParameters;
+
     /**
      * Default constructor.
      * 
@@ -125,12 +127,22 @@ public abstract class AbstractSkinResource extends AbstractResource<InputSource>
         URL url;
 
         if (forceSkinAction) {
+            getSkinActionURLParameters().addParameters(parameters);
             url = urlf.createSkinURL(this.resourceName, "skins", getRepository().getId(), xcontext, parameters);
         } else {
             url = urlf.createSkinURL(this.resourceName, getRepository().getId(), xcontext, parameters);
         }
 
         return urlf.getURL(url, xcontext);
+    }
+
+    private SkinActionURLParameters getSkinActionURLParameters()
+    {
+        if (this.skinActionURLParameters == null) {
+            this.skinActionURLParameters = Utils.getComponent(SkinActionURLParameters.class);
+        }
+
+        return this.skinActionURLParameters;
     }
 
     private URLConfiguration getURLConfiguration()

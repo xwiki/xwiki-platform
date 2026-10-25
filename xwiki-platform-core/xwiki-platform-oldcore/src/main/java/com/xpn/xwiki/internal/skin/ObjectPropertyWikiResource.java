@@ -34,6 +34,7 @@ import org.xwiki.skin.ResourceRepository;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
@@ -74,6 +75,8 @@ public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPrope
 
         Map<String, Object> parameters = new LinkedHashMap<>();
         parameters.put(XWiki.CACHE_VERSION, document.getVersion());
+        // Skin object properties are served through the skin action, which evaluates them.
+        Utils.getComponent(SkinActionURLParameters.class).addParameters(parameters);
 
         XWikiURLFactory urlf = xcontext.getURLFactory();
 

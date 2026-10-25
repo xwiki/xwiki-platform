@@ -227,6 +227,7 @@ import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
+import com.xpn.xwiki.internal.skin.SkinActionURLParameters;
 import com.xpn.xwiki.internal.skin.WikiSkin;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
 import com.xpn.xwiki.internal.store.StoreConfiguration;
@@ -486,6 +487,8 @@ public class XWiki implements EventListener
 
     private URLConfiguration urlConfiguration;
 
+    private SkinActionURLParameters skinActionURLParameters;
+
     private StoreConfiguration storeConfiguration;
 
     private HibernateConfiguration hibernateConfiguration;
@@ -571,6 +574,15 @@ public class XWiki implements EventListener
         }
 
         return this.editConfiguration;
+    }
+
+    private SkinActionURLParameters getSkinActionURLParameters()
+    {
+        if (this.skinActionURLParameters == null) {
+            this.skinActionURLParameters = Utils.getComponent(SkinActionURLParameters.class);
+        }
+
+        return this.skinActionURLParameters;
     }
 
     private URLConfiguration getURLConfiguration()
@@ -2778,8 +2790,11 @@ public class XWiki implements EventListener
             URL resourceURL = getEnvironment().getResource("/resources/", fileName);
             if (resourceURL != null) {
                 XWikiURLFactory urlFactory = context.getURLFactory();
-                URL url = urlFactory.createResourceURL(fileName, forceSkinAction, context,
-                    getResourceURLCacheParameters(resourceURL));
+                Map<String, Object> parameters = getResourceURLCacheParameters(resourceURL);
+                if (forceSkinAction) {
+                    getSkinActionURLParameters().addParameters(parameters);
+                }
+                URL url = urlFactory.createResourceURL(fileName, forceSkinAction, context, parameters);
                 return urlFactory.getURL(url, context);
             }
         } catch (Exception e) {

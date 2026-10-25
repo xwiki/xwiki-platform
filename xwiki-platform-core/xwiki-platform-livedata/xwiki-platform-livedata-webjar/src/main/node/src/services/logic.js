@@ -35,18 +35,12 @@ export class Logic {
     this.liveDataSource = liveDataSourceModuleInit($);
     this.element = element;
     this.data = reactive(JSON.parse(element.getAttribute("data-config") || "{}"));
-    this.contentTrusted = false;
-    try {
-      const scriptEl = element.querySelector(':scope > script[type="application/json"]');
-      if(!scriptEl) {
-        console.error("Missing live data configuration for element", element, "The HTML content is" +
-          " considered unsafe.");
-      }
-      this.contentTrusted = scriptEl.getAttribute('data-config-content-trusted') === 'true';
-    } catch (e) {
-      console.error("Failed to access the live data configuration for element", element, "The HTML content is" +
-        " considered unsafe.", e);
-    }
+    // The content is trusted only if the Live Data macro says so, using a script element that the HTML sanitizer would
+    // strip from untrusted markup. The script element is legitimately missing when the live data markup is not produced
+    // by the Live Data macro (e.g. by the livetable Velocity macro), or when the macro output is displayed in the
+    // WYSIWYG editor (which replaces script elements with comments). The content is considered untrusted in this case.
+    const trustScript = element.querySelector(':scope > script[type="application/json"]');
+    this.contentTrusted = trustScript?.getAttribute("data-config-content-trusted") === "true";
 
     // Reactive properties must be initialized before Vue is instantiated.
     this.firstEntriesLoading = ref(true);

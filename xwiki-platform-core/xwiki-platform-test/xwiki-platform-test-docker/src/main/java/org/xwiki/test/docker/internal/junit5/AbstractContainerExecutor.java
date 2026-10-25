@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -43,6 +44,8 @@ public abstract class AbstractContainerExecutor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractContainerExecutor.class);
 
+    private final List<GenericContainer<?>> startedContainers = new ArrayList<>();
+
     protected void start(GenericContainer<?> container, TestConfiguration testConfiguration) throws Exception
     {
         if (testConfiguration.isVerbose()) {
@@ -54,6 +57,28 @@ public abstract class AbstractContainerExecutor
             testConfiguration.isVerbose()));
 
         startContainer(container, testConfiguration);
+        this.startedContainers.add(container);
+    }
+
+    /**
+     * Stop the containers started by this executor. TestContainers would stop them anyway when the JVM exits, but
+     * a test class must not leave its containers running for the next test classes executed in the same JVM: they
+     * would keep consuming resources and, worse, keep answering on the same network aliases (e.g. "xwikidb") as the
+     * containers of the next test class.
+     *
+     * @since 18.10.0RC1
+     */
+    protected void stopContainers()
+    {
+        for (GenericContainer<?> container : this.startedContainers) {
+            try {
+                container.stop();
+            } catch (Exception e) {
+                LOGGER.warn("Failed to stop container [{}]. Root error: [{}]", container.getDockerImageName(),
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+        this.startedContainers.clear();
     }
 
     /**

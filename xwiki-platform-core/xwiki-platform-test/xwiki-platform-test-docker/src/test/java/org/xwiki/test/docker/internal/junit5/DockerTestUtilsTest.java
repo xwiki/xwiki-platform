@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.docker.internal.junit5;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -28,6 +30,9 @@ import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,5 +63,35 @@ public class DockerTestUtilsTest
         assertEquals("./target/screenshots/mysql-default-default-tomcat-default-chrome-"
             + "org.xwiki.test.docker.internal.junit5.DockerTestUtilsTest-getResultFileLocation25.test",
             DockerTestUtils.getResultFileLocation("test", configuration, extensionContext).toString());
+    }
+
+    @Test
+    void getStoreReturnsTheStoreOfTheTopLevelTestClass()
+    {
+        ExtensionContext rootContext = mockContext(null);
+        ExtensionContext firstClassContext = mockContext(rootContext);
+        ExtensionContext nestedClassContext = mockContext(firstClassContext);
+        ExtensionContext methodContext = mockContext(nestedClassContext);
+        ExtensionContext secondClassContext = mockContext(rootContext);
+
+        ExtensionContext.Store firstClassStore = DockerTestUtils.getStore(firstClassContext);
+        ExtensionContext.Store secondClassStore = DockerTestUtils.getStore(secondClassContext);
+
+        // The nested test classes and the test methods share the store of their top level test class.
+        assertSame(firstClassStore, DockerTestUtils.getStore(nestedClassContext));
+        assertSame(firstClassStore, DockerTestUtils.getStore(methodContext));
+        // Another top level test class, executed in the same JVM, has its own store.
+        assertNotSame(firstClassStore, secondClassStore);
+        assertNotSame(DockerTestUtils.getStore(rootContext), firstClassStore);
+        assertNotSame(DockerTestUtils.getStore(rootContext), secondClassStore);
+    }
+
+    private ExtensionContext mockContext(ExtensionContext parent)
+    {
+        ExtensionContext context = mock(ExtensionContext.class);
+        when(context.getParent()).thenReturn(Optional.ofNullable(parent));
+        ExtensionContext.Store store = mock(ExtensionContext.Store.class);
+        when(context.getStore(any())).thenReturn(store);
+        return context;
     }
 }

@@ -18,9 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import LayoutCardsCard from "./LayoutCardsCard.vue";
+import LayoutCardsCover from "./LayoutCardsCover.vue";
 import { shallowMount } from "@vue/test-utils";
 import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
+import { nextTick } from "vue";
 
 /**
  * Vue Component initializer for LayoutCardsCard component. Since this component creates a deep
@@ -79,5 +81,80 @@ describe("LayoutCardsCard.vue", () => {
     });
     expect(wrapper.attributes("data-livedata-entry-index")).toBe("1");
     expect(wrapper.attributes("data-livedata-entry-id")).toBe("idA");
+  });
+
+  it("Has no cover by default", () => {
+    const wrapper = initWrapper({
+      propsData: { entry: { id: "idA", title: "title" }, entryIdx: 0 },
+    });
+    expect(wrapper.findComponent(LayoutCardsCover).exists()).toBe(false);
+    expect(wrapper.classes()).not.toContain("card-with-cover");
+  });
+
+  describe("With a cover", () => {
+    /**
+     * @param entry - the entry displayed by the card
+     * @returns a card whose cover property is "thumbnail" and title property is "title"
+     */
+    function initCoverWrapper(entry) {
+      return initWrapper({
+        propsData: { entry, entryIdx: 0 },
+        global: {
+          provide: {
+            logic: {
+              getLayoutDescriptor: () => ({
+                titleProperty: "title",
+                coverProperty: "thumbnail",
+              }),
+              isPropertyVisible: () => true,
+              getPropertyDescriptor: (id) => ({ id, visible: true }),
+              data: { query: { properties: ["title", "thumbnail"] } },
+            },
+          },
+        },
+      });
+    }
+
+    it("Displays the image of the cover property", () => {
+      const wrapper = initCoverWrapper({
+        id: "idA",
+        title: "Title A",
+        thumbnail: '<img src="/a.png" alt="A">',
+      });
+      expect(wrapper.classes()).toContain("card-with-cover");
+      expect(wrapper.findComponent(LayoutCardsCover).props()).toMatchObject({
+        image: { src: "/a.png", alt: "A" },
+      });
+      // The title is still displayed below the image.
+      expect(wrapper.find("h2").exists()).toBe(true);
+    });
+
+    it("Displays the title enlarged when there is no image", () => {
+      const wrapper = initCoverWrapper({
+        id: "idA",
+        title: "Title A",
+        thumbnail: "",
+      });
+      expect(wrapper.findComponent(LayoutCardsCover).props()).toMatchObject({
+        image: undefined,
+        textPropertyId: "title",
+      });
+      // The title is not displayed twice.
+      expect(wrapper.find("h2").exists()).toBe(false);
+    });
+
+    it("Falls back on the text when the image fails to load", async () => {
+      const wrapper = initCoverWrapper({
+        id: "idA",
+        title: "Title A",
+        thumbnail: "/missing.png",
+      });
+      const cover = wrapper.findComponent(LayoutCardsCover);
+      expect(cover.props("image")).toEqual({ src: "/missing.png", alt: "" });
+      cover.vm.$emit("imageError");
+      await nextTick();
+      expect(cover.props("image")).toBeUndefined();
+      expect(wrapper.find("h2").exists()).toBe(false);
+    });
   });
 });

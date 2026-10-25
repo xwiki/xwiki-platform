@@ -61,6 +61,10 @@ import static org.xwiki.security.authorization.Right.SCRIPT;
 @Singleton
 public class LiveDataRenderer
 {
+    private static final String CARDS_LAYOUT_ID = "cards";
+
+    private static final String COVER_PROPERTY = "coverProperty";
+
     /**
      * Used to add default Live Data configuration values.
      */
@@ -138,6 +142,8 @@ public class LiveDataRenderer
                 this.liveDataRendererConfiguration.getLiveDataConfiguration(advancedParameters, parameters);
             // Add the default values.
             liveDataConfig = this.defaultLiveDataConfigResolver.resolve(liveDataConfig);
+            // Set the card cover once the available layouts are known, so that it doesn't restrict them.
+            setCoverProperty(liveDataConfig, parameters.getCoverProperty());
             // Serialize as JSON.
             ObjectMapper objectMapper = new ObjectMapper();
             output.setParameter("data-config", objectMapper.writeValueAsString(liveDataConfig));
@@ -160,6 +166,25 @@ public class LiveDataRenderer
             throw new LiveDataException("Failed to generate live data configuration from macro parameters.", e);
         }
         return output;
+    }
+
+    /**
+     * Use the given property as the cover of the cards, when the cards layout is available. The cover is stored in the
+     * {@code coverProperty} field of the cards layout descriptor, which can also be set from the advanced
+     * configuration.
+     *
+     * @param liveDataConfig the resolved Live Data configuration
+     * @param coverProperty the id of the property to use as the cover of the cards, nothing is done when it is blank
+     */
+    private void setCoverProperty(LiveDataConfiguration liveDataConfig, String coverProperty)
+    {
+        if (StringUtils.isBlank(coverProperty) || liveDataConfig.getMeta() == null
+            || liveDataConfig.getMeta().getLayouts() == null) {
+            return;
+        }
+        liveDataConfig.getMeta().getLayouts().stream()
+            .filter(layout -> layout != null && CARDS_LAYOUT_ID.equals(layout.getId()))
+            .forEach(layout -> layout.setParameter(COVER_PROPERTY, coverProperty.trim()));
     }
 
     /**

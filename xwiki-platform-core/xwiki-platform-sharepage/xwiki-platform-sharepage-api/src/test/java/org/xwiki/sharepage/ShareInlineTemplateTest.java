@@ -78,13 +78,13 @@ class ShareInlineTemplateTest extends PageTest
         this.oldcore.getXWikiContext().setUserReference(new DocumentReference("xwiki", "XWiki", "SomeUser"));
 
         // Simulate that we're using the shareinline template to send the emails
-        this.request.put("send", "1");
+        this.stubRequest.put("send", "1");
 
         // Simulate the server name
-        this.request.setServerName("localhost");
+        this.stubRequest.setServerName("localhost");
 
         // Simulate a target recipient to send the share page to, specified using an email address
-        this.request.put("target", "john@doe.com");
+        this.stubRequest.put("target", "john@doe.com");
 
         // Simulate valid CSRF token
         this.stubRequest.put("form_token", VALID_TOKEN);
@@ -119,15 +119,15 @@ class ShareInlineTemplateTest extends PageTest
         this.oldcore.getXWikiContext().setUserReference(new DocumentReference("xwiki", "XWiki", "SomeUser"));
 
         // Simulate that we're using the shareinline template to send the emails
-        this.request.put("send", "1");
+        this.stubRequest.put("send", "1");
         // Simulate an unknown target recipient to send the share page to, to produce an error message.
         // The '@' is required in order to make it considered as a mail.
-        this.request.put("target", "<strong>hello</strong>@");
+        this.stubRequest.put("target", "<strong>hello</strong>@");
 
         // Simulate valid CSRF token
         this.stubRequest.put("form_token", VALID_TOKEN);
 
-        this.request.put("message", "Test message");
+        this.stubRequest.put("message", "Test message");
 
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
 

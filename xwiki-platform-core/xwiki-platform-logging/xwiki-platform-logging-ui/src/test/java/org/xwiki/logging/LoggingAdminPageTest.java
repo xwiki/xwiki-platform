@@ -99,11 +99,11 @@ class LoggingAdminPageTest extends PageTest
     @Test
     void unknownLogger() throws Exception
     {
-        this.request.put("loggeraction_set", "1");
-        this.request.put("logger_name", "{{cache}}{{groovy}}new File(\"/tmp/exploit.txt\").withWriter { out -> "
+        this.stubRequest.put("loggeraction_set", "1");
+        this.stubRequest.put("logger_name", "{{cache}}{{groovy}}new File(\"/tmp/exploit.txt\").withWriter { out -> "
             + "out.println(\"created from notification filter preferences!\"); "
             + "}{{/groovy}}{{/cache}}<strong>bold</strong>\"'");
-        this.request.put("logger_level", "TRACE");
+        this.stubRequest.put("logger_level", "TRACE");
         Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "LoggingAdmin"));
         assertEquals("logging.admin.setLevel.error [{{cache}}{{groovy}}new File(\"/tmp/exploit.txt\")"
             + ".withWriter { out -> out.println(\"created from notification filter preferences!\"); }{{/groovy}}"
@@ -114,9 +114,9 @@ class LoggingAdminPageTest extends PageTest
     @Test
     void unsetLogger() throws Exception
     {
-        this.request.put("loggeraction_set", "1");
-        this.request.put("logger_name", "loggerA");
-        this.request.put("logger_level", "");
+        this.stubRequest.put("loggeraction_set", "1");
+        this.stubRequest.put("logger_name", "loggerA");
+        this.stubRequest.put("logger_level", "");
         Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "LoggingAdmin"));
         assertEquals("logging.admin.unsetLevel.success [loggerA]", document.select(".box.successmessage").text());
         verify(this.loggerManager).setLoggerLevel("loggerA", null);
@@ -125,9 +125,9 @@ class LoggingAdminPageTest extends PageTest
     @Test
     void setLogger() throws Exception
     {
-        this.request.put("loggeraction_set", "1");
-        this.request.put("logger_name", "loggerA");
-        this.request.put("logger_level", "TRACE");
+        this.stubRequest.put("loggeraction_set", "1");
+        this.stubRequest.put("logger_name", "loggerA");
+        this.stubRequest.put("logger_level", "TRACE");
         Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "LoggingAdmin"));
         assertEquals("logging.admin.setLevel.success [loggerA, TRACE]", document.select(".box.successmessage").text());
         verify(this.loggerManager).setLoggerLevel("loggerA", LogLevel.TRACE);

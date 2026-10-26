@@ -274,8 +274,8 @@ class XWikiSkinsSheetPageTest extends PageTest
         this.context.setDoc(xwikiDocument);
         // Trigger displaying the object.
         this.context.setAction("get");
-        this.request.put("action", "displayObj");
-        this.request.put("objNumber", "0");
+        this.stubRequest.put("action", "displayObj");
+        this.stubRequest.put("objNumber", "0");
 
         XWikiDocument doc = loadPage(XWIKI_SKINS_SHEET);
         Document document = render(doc);

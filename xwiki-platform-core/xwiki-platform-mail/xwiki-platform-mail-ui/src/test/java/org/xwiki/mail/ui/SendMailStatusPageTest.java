@@ -74,9 +74,9 @@ class SendMailStatusPageTest extends PageTest
         Exception error = new Exception("Failed to load message (id [%s])".formatted(mailId));
         when(this.storageScriptService.getLastError()).thenReturn(error);
 
-        this.request.put(action, "1");
-        this.request.put("mail_id", mailId);
-        this.request.put("batch_id", "batchId");
+        this.stubRequest.put(action, "1");
+        this.stubRequest.put("mail_id", mailId);
+        this.stubRequest.put("batch_id", "batchId");
 
         Document document = renderHTMLPage(SEND_MAIL_STATUS_REFERENCE);
 

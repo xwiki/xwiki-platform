@@ -210,9 +210,9 @@ class EditMacrosPageTest extends PageTest
 
         when(this.httpSession.getAttribute("force_edit_xwiki:Space.Page_forced_warningChecker1")).thenReturn(true);
         
-        this.request.put("force", "true");
+        this.stubRequest.put("force", "true");
         document.getRenderedContent(this.context);
-        this.request.put("force", "");
+        this.stubRequest.put("force", "");
         document.getRenderedContent(this.context);
 
         ScriptContext scriptContext =
@@ -235,10 +235,10 @@ class EditMacrosPageTest extends PageTest
                 new EditConfirmationCheckerResult(new WordBlock("Warning 1"), false, true)));
 
         String forceToken = "forceToken";
-        this.request.put("force_token", forceToken);
+        this.stubRequest.put("force_token", forceToken);
         when(((CSRFTokenScriptService) this.csrfScriptService).isTokenValid(forceToken)).thenReturn(validToken);
 
-        this.request.put("force", "true");
+        this.stubRequest.put("force", "true");
         document.getRenderedContent(this.context);
 
         ScriptContext scriptContext =
@@ -266,9 +266,9 @@ class EditMacrosPageTest extends PageTest
 
         when(this.httpSession.getAttribute("force_edit_xwiki:Space.Page_forced_errorChecker")).thenReturn(true);
         
-        this.request.put("force", "true");
+        this.stubRequest.put("force", "true");
         document.getRenderedContent(this.context);
-        this.request.put("force", "");
+        this.stubRequest.put("force", "");
         document.getRenderedContent(this.context);
         
         ScriptContext scriptContext =

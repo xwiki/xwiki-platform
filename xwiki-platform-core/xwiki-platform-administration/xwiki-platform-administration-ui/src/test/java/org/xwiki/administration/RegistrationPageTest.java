@@ -109,13 +109,13 @@ class RegistrationPageTest extends PageTest
         doReturn(displayedName).when(this.oldcore.getSpyXWiki())
             .getUserName(eq("XWiki." + USER_NAME), isNull(), anyBoolean(), any(XWikiContext.class));
 
-        this.request.put("xwikiname", USER_NAME);
-        this.request.put("register_first_name", "Jane");
-        this.request.put("register_last_name", "Doe");
-        this.request.put("register_password", "Passw0rd!Passw0rd!");
-        this.request.put("register2_password", "Passw0rd!Passw0rd!");
-        this.request.put("register_email", "jane.doe@example.org");
-        this.request.put("form_token", "token");
+        this.stubRequest.put("xwikiname", USER_NAME);
+        this.stubRequest.put("register_first_name", "Jane");
+        this.stubRequest.put("register_last_name", "Doe");
+        this.stubRequest.put("register_password", "Passw0rd!Passw0rd!");
+        this.stubRequest.put("register2_password", "Passw0rd!Passw0rd!");
+        this.stubRequest.put("register_email", "jane.doe@example.org");
+        this.stubRequest.put("form_token", "token");
 
         Document result = renderHTMLPage(REGISTRATION);
 
@@ -128,7 +128,7 @@ class RegistrationPageTest extends PageTest
     void stopsWhenRegistrationIsNotAllowed() throws Exception
     {
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("register"), any(), any(), any())).thenReturn(false);
-        this.request.put("xwikiname", USER_NAME);
+        this.stubRequest.put("xwikiname", USER_NAME);
 
         Document result = renderHTMLPage(REGISTRATION);
 

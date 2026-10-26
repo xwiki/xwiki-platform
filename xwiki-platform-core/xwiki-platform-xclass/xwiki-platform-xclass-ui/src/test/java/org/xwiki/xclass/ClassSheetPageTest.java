@@ -301,7 +301,7 @@ class ClassSheetPageTest extends PageTest
             this.context);
         this.xwiki.saveDocument(docRef, this.context);
 
-        this.request.put("docName", "DOC_NAME");
+        this.stubRequest.put("docName", "DOC_NAME");
 
         // Set up the current doc in the context so that $doc is bound in scripts
         this.context.setDoc(xwikiDocument);
@@ -338,7 +338,7 @@ class ClassSheetPageTest extends PageTest
 
         XWikiDocument doc = loadPage(XWIKI_CLASS_SHEET);
 
-        this.request.put("docName", "DOC_NAME");
+        this.stubRequest.put("docName", "DOC_NAME");
 
         // Set up the current doc in the context so that $doc is bound in scripts
         this.context.setDoc(xwikiDocument);
@@ -375,7 +375,7 @@ class ClassSheetPageTest extends PageTest
 
         XWikiDocument doc = loadPage(XWIKI_CLASS_SHEET);
 
-        this.request.put("docName", "DOC_NAME");
+        this.stubRequest.put("docName", "DOC_NAME");
 
         // Set up the current doc in the context so that $doc is bound in scripts
         this.context.setDoc(xwikiDocument);
@@ -415,7 +415,7 @@ class ClassSheetPageTest extends PageTest
 
         XWikiDocument doc = loadPage(XWIKI_CLASS_SHEET);
 
-        this.request.put("docName", "DOC_NAME");
+        this.stubRequest.put("docName", "DOC_NAME");
 
         // Set up the current doc in the context so that $doc is bound in scripts
         this.context.setDoc(xwikiDocument);

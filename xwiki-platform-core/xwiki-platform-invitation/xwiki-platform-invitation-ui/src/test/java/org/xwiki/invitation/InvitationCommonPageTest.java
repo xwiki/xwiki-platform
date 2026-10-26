@@ -114,7 +114,7 @@ class InvitationCommonPageTest extends PageTest
         this.xwiki.saveDocument(doc, this.context);
         this.context.setDoc(doc);
 
-        this.request.put("test", "1");
+        this.stubRequest.put("test", "1");
 
         Document document = Jsoup.parse(loadPage(INVITATION_COMMON_REFERENCE).getRenderedContent(this.context));
 
@@ -152,7 +152,7 @@ class InvitationCommonPageTest extends PageTest
         invitationConfigXObject.set("from_address", "<script>console.log('from_address')</script>", this.context);
         this.xwiki.saveDocument(hopefullyNonExistantSpaceDoc, this.context);
 
-        this.request.put("test", "1");
+        this.stubRequest.put("test", "1");
 
         XWikiDocument invitationCommonDoc = loadPage(INVITATION_COMMON_REFERENCE);
         Document document = Jsoup.parse(invitationCommonDoc.getRenderedContent(this.context));
@@ -191,7 +191,7 @@ class InvitationCommonPageTest extends PageTest
         invitationConfigXObject.set("from_address", "no-reply@localhost.localdomain", this.context);
         this.xwiki.saveDocument(hopefullyNonExistantSpaceDoc, this.context);
 
-        this.request.put("test", "1");
+        this.stubRequest.put("test", "1");
 
         XWikiDocument invitationCommonDoc = loadPage(INVITATION_COMMON_REFERENCE);
         Document document = Jsoup.parse(invitationCommonDoc.getRenderedContent(this.context));
@@ -238,7 +238,7 @@ class InvitationCommonPageTest extends PageTest
             });
         this.xwiki.saveDocument(hopefullyNonExistantSpaceDoc, this.context);
 
-        this.request.put("test", "1");
+        this.stubRequest.put("test", "1");
 
         XWikiDocument invitationCommonDoc = loadPage(INVITATION_COMMON_REFERENCE);
         Document document = Jsoup.parse(invitationCommonDoc.getRenderedContent(this.context));

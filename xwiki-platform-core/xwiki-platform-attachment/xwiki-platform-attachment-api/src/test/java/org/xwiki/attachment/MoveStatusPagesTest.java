@@ -93,7 +93,7 @@ class MoveStatusPagesTest extends PageTest
     @Test
     void renderScriptStatusUnknown() throws Exception
     {
-        this.request.put("moveId", "42");
+        this.stubRequest.put("moveId", "42");
         Document render = Jsoup.parse(this.templateManager.render(MOVE_STATUS_TEMPLATE));
         assertEquals("exclamationIcon error attachment.move.status.notFound", render.select(".errormessage").text());
         verify(this.jobScriptService).getJobStatus(List.of("refactoring", "moveAttachment", "42"));
@@ -113,7 +113,7 @@ class MoveStatusPagesTest extends PageTest
         when(jobStatus.getProgress()).thenReturn(jobProgress);
         when(this.jobScriptService.getJobStatus(List.of("refactoring", "moveAttachment", "42")))
             .thenReturn(jobStatus);
-        this.request.put("moveId", "42");
+        this.stubRequest.put("moveId", "42");
         this.context.setAction("get");
         assertEquals(
             "{\"id\":[\"rq\",\"id\"],\"state\":\"RUNNING\",\"progress\":{\"offset\":10.0},"
@@ -135,7 +135,7 @@ class MoveStatusPagesTest extends PageTest
 
         this.xwiki.createUser("U1", Map.of(), this.context);
 
-        this.request.put("moveId", "42");
+        this.stubRequest.put("moveId", "42");
         this.context.setAction("view");
 
         when(this.jobScriptService.getJobStatus(List.of("refactoring", "moveAttachment", "42")))

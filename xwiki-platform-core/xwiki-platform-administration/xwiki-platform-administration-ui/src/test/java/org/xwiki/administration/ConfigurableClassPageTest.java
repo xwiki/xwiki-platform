@@ -163,7 +163,7 @@ class ConfigurableClassPageTest extends PageTest
     @Test
     void escapeHeadingForError() throws Exception
     {
-        this.request.put("section", "other");
+        this.stubRequest.put("section", "other");
         when(this.query.execute()).thenReturn(List.of(MY_SECTION_SERIALIZED)).thenReturn(List.of());
 
         XWikiDocument mySectionDoc = new XWikiDocument(MY_SECTION);
@@ -177,7 +177,7 @@ class ConfigurableClassPageTest extends PageTest
     @Test
     void escapeHeading() throws Exception
     {
-        this.request.put("section", "other");
+        this.stubRequest.put("section", "other");
         when(this.query.execute()).thenReturn(List.of(MY_SECTION_SERIALIZED)).thenReturn(List.of());
         when(this.oldcore.getMockRightService()
             .hasAccessLevel(eq("edit"), any(), any(), any())).thenReturn(true);
@@ -198,7 +198,7 @@ class ConfigurableClassPageTest extends PageTest
     @ValueSource(booleans = {true, false})
     void checkScriptRight(boolean hasScript) throws Exception
     {
-        this.request.put("section", "other");
+        this.stubRequest.put("section", "other");
         when(this.query.execute()).thenReturn(List.of(MY_SECTION_SERIALIZED)).thenReturn(List.of());
         when(this.oldcore.getMockRightService()
             .hasAccessLevel(eq("edit"), any(), any(), any())).thenReturn(true);
@@ -329,7 +329,7 @@ class ConfigurableClassPageTest extends PageTest
         when(this.oldcore.getMockRightService()
             .hasAccessLevel(eq("edit"), any(), any(), any())).thenReturn(true);
 
-        this.request.put("section", "other");
+        this.stubRequest.put("section", "other");
 
         XWikiDocument contextDoc = new XWikiDocument(new DocumentReference(WIKI_NAME, SPACE_NAME, WEB_HOME));
         this.xwiki.saveDocument(contextDoc, this.context);

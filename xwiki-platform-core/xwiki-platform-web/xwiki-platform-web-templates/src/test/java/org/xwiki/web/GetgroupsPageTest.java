@@ -83,9 +83,9 @@ class GetgroupsPageTest extends PageTest
     @Test
     void removeObuscatedResultsWhenTotalrowsLowerThanLimit() throws Exception
     {
-        this.request.put("wiki", "local");
-        this.request.put("limit", "10");
-        this.request.put("offset", "1");
+        this.stubRequest.put("wiki", "local");
+        this.stubRequest.put("limit", "10");
+        this.stubRequest.put("offset", "1");
 
         DocumentReference group1DocumentReference = new DocumentReference("xwiki", "XWiki", "G1");
         DocumentReference group2DocumentReference = new DocumentReference("xwiki", "XWiki", "G2");
@@ -108,9 +108,9 @@ class GetgroupsPageTest extends PageTest
     @Test
     void nonViewableResultsAreObfuscated() throws Exception
     {
-        this.request.put("wiki", "local");
-        this.request.put("limit", "2");
-        this.request.put("offset", "1");
+        this.stubRequest.put("wiki", "local");
+        this.stubRequest.put("limit", "2");
+        this.stubRequest.put("offset", "1");
 
         DocumentReference group1DocumentReference = new DocumentReference("xwiki", "XWiki", "G1");
         DocumentReference group2DocumentReference = new DocumentReference("xwiki", "XWiki", "G2");

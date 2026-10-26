@@ -105,9 +105,9 @@ class WebHomeSheetPageTest extends PageTest
     @Test
     void createAction() throws Exception
     {
-        this.request.put("newThemeName", "some content\"/}}{{noscript/}}");
-        this.request.put("form_token", "1");
-        this.request.put("action", "create");
+        this.stubRequest.put("newThemeName", "some content\"/}}{{noscript/}}");
+        this.stubRequest.put("form_token", "1");
+        this.stubRequest.put("action", "create");
 
         Document document = renderHTMLPage(WEBHOME_SHEET);
 

@@ -112,8 +112,8 @@ class HelpTest extends PageTest
         // URL that we're simulating:
         //   http://localhost:8080/xwiki/bin/view/XWiki/XWikiSyntax?syntax=2.1&section=Links&xpage=print
         setOutputSyntax(Syntax.HTML_5_0);
-        request.put("section", "Links");
-        request.put("xpage", "print");
+        this.stubRequest.put("section", "Links");
+        this.stubRequest.put("xpage", "print");
 
         // Register the XWikiSyntaxLinks page with an XWikiSyntaxClass xobject in it so that it can be found later on
         // by XWiki.XWikiSyntax
@@ -131,8 +131,8 @@ class HelpTest extends PageTest
     void displaySectionLimitedToOlderSyntax() throws Exception
     {
         setOutputSyntax(Syntax.HTML_5_0);
-        this.request.put("syntax", "2.1");
-        this.request.put("section", "GeneralRemarks");
+        this.stubRequest.put("syntax", "2.1");
+        this.stubRequest.put("section", "GeneralRemarks");
         loadPage(new DocumentReference("xwiki", "XWiki", "XWikiSyntaxGeneralRemarks"));
         when(this.syntaxSectionsQuery.execute()).thenReturn(List.of("XWiki.XWikiSyntaxGeneralRemarks"));
 
@@ -172,7 +172,7 @@ class HelpTest extends PageTest
     void displaySectionWithSyntaxInHeadings(String parameterName, String parameterValue) throws Exception
     {
         if (parameterName != null) {
-            this.request.put(parameterName, parameterValue);
+            this.stubRequest.put(parameterName, parameterValue);
         }
         // XWiki.XWikiSyntax needs programming rights to access the XDOM of the syntax pages.
         when(this.oldcore.getMockRightService().hasProgrammingRights(this.context)).thenReturn(true);

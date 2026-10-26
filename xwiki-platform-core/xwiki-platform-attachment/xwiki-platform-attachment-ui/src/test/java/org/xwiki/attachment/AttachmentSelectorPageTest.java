@@ -134,13 +134,13 @@ class AttachmentSelectorPageTest extends PageTest
     {
         commonFixup(fileName);
 
-        this.request.put("docname", "xwiki:Space.Test");
-        this.request.put("classname", "xwiki:Space.Test");
-        this.request.put("property", "avatar");
-        this.request.put("object", "0");
-        this.request.put("filter", "png");
-        this.request.put("displayImage", "false");
-        this.request.put("xpage", "plain");
+        this.stubRequest.put("docname", "xwiki:Space.Test");
+        this.stubRequest.put("classname", "xwiki:Space.Test");
+        this.stubRequest.put("property", "avatar");
+        this.stubRequest.put("object", "0");
+        this.stubRequest.put("filter", "png");
+        this.stubRequest.put("displayImage", "false");
+        this.stubRequest.put("xpage", "plain");
 
         Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
@@ -162,13 +162,13 @@ class AttachmentSelectorPageTest extends PageTest
     {
         commonFixup(fileName);
 
-        this.request.put("docname", "xwiki:Space.Test");
-        this.request.put("classname", "xwiki:Space.Test");
-        this.request.put("property", "avatar");
-        this.request.put("object", "0");
-        this.request.put("filter", "png");
-        this.request.put("displayImage", "true");
-        this.request.put("xpage", "plain");
+        this.stubRequest.put("docname", "xwiki:Space.Test");
+        this.stubRequest.put("classname", "xwiki:Space.Test");
+        this.stubRequest.put("property", "avatar");
+        this.stubRequest.put("object", "0");
+        this.stubRequest.put("filter", "png");
+        this.stubRequest.put("displayImage", "true");
+        this.stubRequest.put("xpage", "plain");
 
         Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
         assertNotNull(document);
@@ -315,13 +315,13 @@ class AttachmentSelectorPageTest extends PageTest
         when(this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachmentReference))
             .thenReturn(Optional.of(xWikiAttachment));
 
-        this.request.put("docname", "xwiki:Space.Test");
-        this.request.put("classname", "xwiki:Space.Test");
-        this.request.put("property", "avatar");
-        this.request.put("object", "0");
-        this.request.put("filter", "png");
-        this.request.put("displayImage", "true");
-        this.request.put("xpage", "plain");
+        this.stubRequest.put("docname", "xwiki:Space.Test");
+        this.stubRequest.put("classname", "xwiki:Space.Test");
+        this.stubRequest.put("property", "avatar");
+        this.stubRequest.put("object", "0");
+        this.stubRequest.put("filter", "png");
+        this.stubRequest.put("displayImage", "true");
+        this.stubRequest.put("xpage", "plain");
 
         Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
         Element element = document.selectFirst(".gallery_attachmentbox.current");
@@ -336,7 +336,7 @@ class AttachmentSelectorPageTest extends PageTest
     {
         commonFixup("test.png");
 
-        this.request.put("docname", "xwiki:Space.]] {{noscript/}}");
+        this.stubRequest.put("docname", "xwiki:Space.]] {{noscript/}}");
 
         Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
         assertEquals("Space.]] {{noscript/}}", document.getElementById("attachment-picker-close").attr("href"));
@@ -394,13 +394,13 @@ class AttachmentSelectorPageTest extends PageTest
     {
         commonFixup("test.png");
 
-        this.request.put("docname", "xwiki:Space.Test");
-        this.request.put("object", "0");
-        this.request.put("xpage", "plain");
+        this.stubRequest.put("docname", "xwiki:Space.Test");
+        this.stubRequest.put("object", "0");
+        this.stubRequest.put("xpage", "plain");
         // The payload goes through one of the two request parameters that make up the "select" URL of the empty value
         // box.
-        this.request.put("classname", "classname".equals(parameterName) ? PAYLOAD : "xwiki:Space.Test");
-        this.request.put("property", "property".equals(parameterName) ? PAYLOAD : "avatar");
+        this.stubRequest.put("classname", "classname".equals(parameterName) ? PAYLOAD : "xwiki:Space.Test");
+        this.stubRequest.put("property", "property".equals(parameterName) ? PAYLOAD : "avatar");
 
         Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
@@ -420,11 +420,11 @@ class AttachmentSelectorPageTest extends PageTest
         // The attachment name is the value reaching the action URLs of the attachment box.
         commonFixup(PAYLOAD + ".png");
 
-        this.request.put("docname", "xwiki:Space.Test");
-        this.request.put("classname", "xwiki:Space.Test");
-        this.request.put("property", "avatar");
-        this.request.put("object", "0");
-        this.request.put("xpage", "plain");
+        this.stubRequest.put("docname", "xwiki:Space.Test");
+        this.stubRequest.put("classname", "xwiki:Space.Test");
+        this.stubRequest.put("property", "avatar");
+        this.stubRequest.put("object", "0");
+        this.stubRequest.put("xpage", "plain");
 
         Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 
@@ -445,11 +445,11 @@ class AttachmentSelectorPageTest extends PageTest
         commonFixup("test.png");
 
         // The payload goes through the document name, which makes up the path of the "select" URL.
-        this.request.put("docname", String.format("xwiki:Space.%s", PAYLOAD));
-        this.request.put("classname", "xwiki:Space.Test");
-        this.request.put("property", "avatar");
-        this.request.put("object", "0");
-        this.request.put("xpage", "plain");
+        this.stubRequest.put("docname", String.format("xwiki:Space.%s", PAYLOAD));
+        this.stubRequest.put("classname", "xwiki:Space.Test");
+        this.stubRequest.put("property", "avatar");
+        this.stubRequest.put("object", "0");
+        this.stubRequest.put("xpage", "plain");
 
         Document document = renderHTMLPage(ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
 

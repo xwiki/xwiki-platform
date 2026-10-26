@@ -120,7 +120,7 @@ class ImportInlinePageTest extends PageTest
         xarPackage.setPackageExtensionId("packageExtensionId");
 
         when(this.xarScriptService.getXarPackage(any(InputStream.class), anyBoolean())).thenReturn(xarPackage);
-        this.request.put("file", "attachment.xar");
+        this.stubRequest.put("file", "attachment.xar");
         Document document = Jsoup.parse(this.templateManager.render("importinline.vm"));
 
         assertEquals("/xwiki/bin/upload/Doc/Space%22%27%2F%3E%3Cscript%3Econsole.log%28%27docTitle"

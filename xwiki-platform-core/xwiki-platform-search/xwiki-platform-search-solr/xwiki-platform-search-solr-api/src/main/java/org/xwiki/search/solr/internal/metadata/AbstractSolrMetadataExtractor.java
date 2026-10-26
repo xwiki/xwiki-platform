@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
@@ -533,7 +534,11 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 this.logger.debug("Failed to retrieve the content of attachment [{}] which doesn't exist anymore",
                     attachment.getReference(), e);
             } else {
-                this.logger.error("Failed to retrieve the content of attachment [{}]", attachment.getReference(), e);
+                // The content is also missing while the attachment is being deleted: its content is removed before the
+                // document is saved without it, and that save indexes the document again.
+                this.logger.warn("Failed to retrieve the content of attachment [{}], which might be because it's being"
+                    + " deleted at the same time. Root cause is [{}].", attachment.getReference(),
+                    ExceptionUtils.getRootCauseMessage(e));
             }
             return null;
         }

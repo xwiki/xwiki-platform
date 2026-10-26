@@ -19,31 +19,36 @@
  */
 package org.xwiki.rendering.macro.chart;
 
+import java.io.File;
 import java.io.InputStreamReader;
 
-import org.mockito.Mockito;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.SpaceReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.test.integration.Initialized;
 import org.xwiki.rendering.test.integration.junit5.RenderingTest;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.temporary.TemporaryResourceReference;
+import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.url.ExtendedURL;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -66,17 +71,28 @@ public class IntegrationTests extends RenderingTest
         // AuthorExecutor to satisfy the dependency.
         componentManager.registerMockComponent(AuthorExecutor.class);
 
-        ModelContext modelContext = componentManager.registerMockComponent(ModelContext.class);
-        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("currentWiki"));
+        // The chart images are written in the build directory, and their URLs expose the owning document of the image.
+        TemporaryResourceStore temporaryResourceStore =
+            componentManager.registerMockComponent(TemporaryResourceStore.class);
+        when(temporaryResourceStore.getTemporaryFile(any())).then(invocation -> new File("target/chart-images",
+            invocation.<TemporaryResourceReference>getArgument(0).getResourceName()));
+        ResourceReferenceSerializer<ResourceReference, ExtendedURL> resourceReferenceSerializer =
+            componentManager.registerMockComponent(new DefaultParameterizedType(null,
+                ResourceReferenceSerializer.class, ResourceReference.class, ExtendedURL.class));
+        when(resourceReferenceSerializer.serialize(any())).then(invocation -> {
+            TemporaryResourceReference reference = invocation.getArgument(0);
+            ExtendedURL url = mock();
+            when(url.serialize()).thenReturn(String.join("/", "tmp", reference.getModuleId(),
+                reference.getOwningEntityReference().toString(), reference.getResourceName()));
+            return url;
+        });
 
         // Document Access Bridge mock
         DocumentAccessBridge dab = componentManager.registerMockComponent(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         DocumentReference currentDocumentReference =
             new DocumentReference("currentwiki", "currentspace", "currentpage");
-        DocumentModelBridge document = Mockito.mock(DocumentModelBridge.class);
-        when(dab.getDocumentURL(new DocumentReference("currentWiki", "space", "page"), "temp", null, null))
-            .thenReturn("temppath");
+        DocumentModelBridge document = mock(DocumentModelBridge.class);
         when(dab.getCurrentDocumentReference()).thenReturn(currentDocumentReference);
         when(dab.exists(documentReference)).thenReturn(true);
         when(dab.getDocumentInstance(documentReference)).thenReturn(document);

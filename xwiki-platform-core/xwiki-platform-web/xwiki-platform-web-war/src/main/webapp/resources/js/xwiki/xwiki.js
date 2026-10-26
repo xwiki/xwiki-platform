@@ -19,6 +19,11 @@
  */
 var XWiki = (function(XWiki) {
 XWiki.widgets = XWiki.widgets || {};
+
+define('xwiki-section-edit-icons', {
+  icons: ['pencil']
+});
+
 /**
  * XWiki namespace.
  * TODO: move everything in it.
@@ -434,13 +439,14 @@ Object.extend(XWiki, {
 
               if (headerPattern.test(node.nodeName) && !node.classList.contains('wikigeneratedheader') &&
                       !node.down('a.edit_section')) {
-                  var editSectionLink = document.createElement('a');
+                  let editSectionLink = document.createElement('a');
                   editSectionLink.className = 'edit_section';
                   // Show the section editing link only if the section heading is visible.
                   editSectionLink.toggle(node.visible() && !node.hasClassName('hidden'));
                   editSectionLink.setAttribute('role', 'button');
                   editSectionLink.title = $jsontool.serialize($services.localization.render('edit'));
-                  editSectionLink.innerHTML = $jsontool.serialize($services.icon.renderHTML('pencil'));
+                  require(['xwiki-icon!xwiki-section-edit-icons'],
+                    icons => editSectionLink.prepend(icons.pencil.render()));
 
                   var editSectionLinkLabel = document.createElement('span');
                   editSectionLinkLabel.className = 'sr-only';

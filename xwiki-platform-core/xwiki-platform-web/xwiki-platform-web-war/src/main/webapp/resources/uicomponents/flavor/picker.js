@@ -17,8 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+define('xwiki-flavor-picker-icons', {
+  icons: ['wiki', 'star']
+});
+
 // TODO: use the xwiki select widget: http://jira.xwiki.org/browse/XWIKI-12503
-require(['jquery'], function($) {
+require(['jquery', 'xwiki-icon!xwiki-flavor-picker-icons'], function($, icons) {
   /**
    * The found flavors
    */
@@ -110,7 +114,7 @@ require(['jquery'], function($) {
       // Add new flavor
       var li = $('<li class="xwiki-flavor-picker-option"></li>');
       li.append($('<input type="radio"/>').attr('name', fieldName).attr('value', flavorValue).attr('id', fieldName + '_' + key));
-      li.append("<span class=\"xwiki-flavor-picker-option-icon\">$escapetool.javascript($services.icon.renderHTML('wiki'))</span>");
+      li.append($('<span class="xwiki-flavor-picker-option-icon"></span>').append(icons.wiki.render()));
       var div = $('<div></div>');
       var label = $('<div></div>');
       label.attr('for', fieldName + '_' + key);
@@ -134,9 +138,10 @@ require(['jquery'], function($) {
       label.append($('<small></small>').text(flavor.id.version.value));
 
       // Rating
-      var star = "$escapetool.javascript($services.icon.renderHTML('star'))";
       if (flavor.rating != null && flavor.rating > 0) {
-        label.append(new Array(Math.round(flavor.rating)).join(star));
+        for (let i = 1; i < Math.round(flavor.rating); i++) {
+          label.append(icons.star.render());
+        }
       }
 
       div.append(label);

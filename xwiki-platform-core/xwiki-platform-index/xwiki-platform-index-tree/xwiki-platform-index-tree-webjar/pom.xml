@@ -53,5 +53,12 @@
       <groupId>org.webjars</groupId>
       <artifactId>jquery-ui-touch-punch</artifactId>
     </dependency>
+    <dependency>
+      <!-- Used by the child page picker to load icons. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

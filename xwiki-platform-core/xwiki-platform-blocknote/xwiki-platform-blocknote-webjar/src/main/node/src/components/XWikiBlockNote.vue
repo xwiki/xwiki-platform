@@ -338,7 +338,7 @@ const uploadFile = uploadDisabled
         console.error(`Failed to upload [${fileName}].`, error);
         try {
           const message = await translate("upload.failed", undefined, fileName);
-          new XWiki.widgets.Notification(message, "error");
+          XWiki.widgets.Notification.show(message, "error");
         } catch (notificationError) {
           // Nobody awaits this callback, so an error here would go unhandled.
           console.error("Failed to notify the user.", notificationError);

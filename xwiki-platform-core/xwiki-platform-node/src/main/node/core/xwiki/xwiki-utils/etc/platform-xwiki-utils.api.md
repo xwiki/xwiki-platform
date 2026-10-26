@@ -71,7 +71,9 @@ export interface XWikiGlobal {
     Document: new (reference: EntityReference) => LegacyXWikiDocument;
     editor?: string;
     widgets: {
-        Notification: new (text: string, type?: LegacyNotificationType) => LegacyNotification;
+        Notification: (new (text: string, type?: LegacyNotificationType) => LegacyNotification) & {
+            show(text: string, type?: LegacyNotificationType): LegacyNotification;
+        };
         ConfirmationBox: new (behavior?: LegacyConfirmationBoxBehavior, interactionParameters?: LegacyConfirmationBoxParameters) => unknown;
     };
 }

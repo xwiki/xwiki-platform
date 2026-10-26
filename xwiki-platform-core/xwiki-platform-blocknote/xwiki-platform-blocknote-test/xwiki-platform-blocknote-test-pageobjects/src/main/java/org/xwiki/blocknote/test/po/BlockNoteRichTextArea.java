@@ -496,8 +496,15 @@ public class BlockNoteRichTextArea extends BaseElement
         return insertFile("drop", filePath);
     }
 
-    // Synthetic events, because WebDriver can drag and drop DOM elements but not files, and can't put one on the
-    // clipboard at all.
+    /**
+     * Inserts a file using a synthetic event, because WebDriver can drag and drop DOM elements but not files, and
+     * can't put one on the clipboard at all.
+     *
+     * @param eventType either {@code paste} or {@code drop}
+     * @param filePath the path of the file to insert, relative to the test resources
+     * @return this rich text area instance
+     * @throws URISyntaxException if the given file can't be located
+     */
     private BlockNoteRichTextArea insertFile(String eventType, String filePath) throws URISyntaxException
     {
         WebElement fileInput = loadFile(filePath);
@@ -521,8 +528,14 @@ public class BlockNoteRichTextArea extends BaseElement
         return this;
     }
 
-    // Gets the file into the browser, which runs in a different container than the test, through a throwaway file
-    // input. Same approach as the CKEditor page objects.
+    /**
+     * Gets the file into the browser, which runs in a different container than the test, through a throwaway file
+     * input. Same approach as the CKEditor page objects.
+     *
+     * @param filePath the path of the file to load, relative to the test resources
+     * @return the file input holding the loaded file
+     * @throws URISyntaxException if the given file can't be located
+     */
     private WebElement loadFile(String filePath) throws URISyntaxException
     {
         FileDetector originalFileDetector = getDriver().getFileDetector();
@@ -551,18 +564,9 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public WebElement waitUntilLinkIsPresent(String label)
     {
-        By locator = By.xpath(".//a[normalize-space(.) = " + escapeXPathValue(label) + "]");
+        By locator = By.xpath(".//a[normalize-space(.) = " + getUtil().escapeXPath(label) + "]");
         getDriver().waitUntilCondition(driver -> !this.container.findElements(locator).isEmpty());
         return this.container.findElement(locator);
-    }
-
-    // XPath string literals have no escape syntax of their own.
-    private String escapeXPathValue(String value)
-    {
-        if (!value.contains("'")) {
-            return "'" + value + "'";
-        }
-        return "concat('" + value.replace("'", "', \"'\", '") + "')";
     }
 
 }

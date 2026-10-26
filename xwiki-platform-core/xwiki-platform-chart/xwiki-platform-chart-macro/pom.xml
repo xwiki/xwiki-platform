@@ -40,10 +40,6 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-chart-renderer</artifactId>
       <version>${project.version}</version>
@@ -63,6 +59,11 @@
       <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-temporary</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -74,6 +75,12 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-standard</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed by the servlet components of the temporary resource API, loaded by the rendering integration tests. -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

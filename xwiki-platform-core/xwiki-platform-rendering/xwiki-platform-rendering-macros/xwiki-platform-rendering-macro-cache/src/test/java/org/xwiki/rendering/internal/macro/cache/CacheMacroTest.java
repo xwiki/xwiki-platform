@@ -23,9 +23,15 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
+import org.jmock.Expectations;
+import org.jmock.api.Invocation;
+import org.jmock.lib.action.CustomAction;
 import org.junit.Test;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -45,6 +51,7 @@ import org.xwiki.velocity.VelocityManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
 
 /**
@@ -61,12 +68,27 @@ public class CacheMacroTest extends AbstractComponentTestCase
 
     private PrintRendererFactory rendererFactory;
 
+    private DocumentReference currentAuthorReference;
+
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
 
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
+        DocumentAccessBridge documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations()
+        {{
+            allowing(documentAccessBridge).getCurrentAuthorReference();
+            will(new CustomAction("return the current author")
+            {
+                @Override
+                public Object invoke(Invocation invocation)
+                {
+                    return currentAuthorReference;
+                }
+            });
+        }});
         this.cacheMacro = getComponentManager().getInstance(Macro.class, "cache");
         this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
@@ -224,12 +246,130 @@ public class CacheMacroTest extends AbstractComponentTestCase
         assertFalse(result2.equals(result1));
     }
 
+    @Test
+    public void executeWithSameIdAndDifferentSources() throws Exception
+    {
+        CacheMacroParameters params = new CacheMacroParameters();
+        params.setId("id");
+
+        List<Block> result1 =
+            this.cacheMacro.execute(params, "content1", createMacroTransformationContext("Space.Page1"));
+
+        // The entry of a document must be neither readable nor writable from the rendering of another document.
+        List<Block> result2 =
+            this.cacheMacro.execute(params, "content2", createMacroTransformationContext("Space.Page2"));
+
+        assertNotEquals(result1, result2);
+    }
+
+    @Test
+    public void executeWithSameIdAndDifferentSourceMetaData() throws Exception
+    {
+        CacheMacroParameters params = new CacheMacroParameters();
+        params.setId("id");
+
+        List<Block> result1 = this.cacheMacro.execute(params, "content1",
+            createMacroTransformationContextWithSourceMetaData("Space.Page1"));
+
+        // The source of the content is taken from the metadata of the block when there is one.
+        List<Block> result2 = this.cacheMacro.execute(params, "content2",
+            createMacroTransformationContextWithSourceMetaData("Space.Page2"));
+
+        assertNotEquals(result1, result2);
+    }
+
+    @Test
+    public void executeWithSameIdAndSameSource() throws Exception
+    {
+        CacheMacroParameters params = new CacheMacroParameters();
+        params.setId("id");
+
+        List<Block> result1 =
+            this.cacheMacro.execute(params, "content1", createMacroTransformationContext("Space.Page"));
+
+        // Two renderings of the same document still share the entry.
+        List<Block> result2 =
+            this.cacheMacro.execute(params, "content2", createMacroTransformationContext("Space.Page"));
+
+        assertEquals(result1, result2);
+    }
+
+    @Test
+    public void executeWithSameIdAndDifferentAuthors() throws Exception
+    {
+        CacheMacroParameters params = new CacheMacroParameters();
+        params.setId("id");
+        MacroTransformationContext context = createMacroTransformationContext("Space.Page");
+
+        this.currentAuthorReference = new DocumentReference("wiki", "XWiki", "Alice");
+        List<Block> result1 = this.cacheMacro.execute(params, "content1", context);
+
+        // The content is executed with the rights of the author, so a result produced with the rights of another
+        // author must not be reused.
+        this.currentAuthorReference = new DocumentReference("wiki", "XWiki", "Bob");
+        List<Block> result2 = this.cacheMacro.execute(params, "content2", context);
+
+        assertNotEquals(result1, result2);
+    }
+
+    @Test
+    public void executeWithSameIdAndDifferentRestrictedModes() throws Exception
+    {
+        CacheMacroParameters params = new CacheMacroParameters();
+        params.setId("id");
+
+        List<Block> result1 =
+            this.cacheMacro.execute(params, "content1", createMacroTransformationContext("Space.Page"));
+
+        // A result computed without the restrictions must not be served to a restricted execution, and vice versa.
+        MacroTransformationContext restrictedContext = createMacroTransformationContext("Space.Page");
+        restrictedContext.getTransformationContext().setRestricted(true);
+        List<Block> result2 = this.cacheMacro.execute(params, "content2", restrictedContext);
+
+        assertNotEquals(result1, result2);
+    }
+
+    @Test
+    public void executeWithSameIdAndDifferentInlineModes() throws Exception
+    {
+        CacheMacroParameters params = new CacheMacroParameters();
+        params.setId("id");
+
+        List<Block> result1 =
+            this.cacheMacro.execute(params, "content1", createMacroTransformationContext("Space.Page"));
+
+        // An inline execution doesn't produce the same blocks as a standalone one.
+        MacroTransformationContext inlineContext = createMacroTransformationContext("Space.Page");
+        inlineContext.setInline(true);
+        List<Block> result2 = this.cacheMacro.execute(params, "content2", inlineContext);
+
+        assertNotEquals(result1, result2);
+    }
+
     private MacroTransformationContext createMacroTransformationContext() throws Exception
+    {
+        return createMacroTransformationContext(null);
+    }
+
+    private MacroTransformationContext createMacroTransformationContextWithSourceMetaData(String source)
+        throws Exception
+    {
+        MacroTransformationContext context = createMacroTransformationContext(null);
+        MacroBlock macroBlock = new MacroBlock("cache", Map.of(), "content", false);
+        XDOM xdom = new XDOM(List.of(
+            new MetaDataBlock(List.of(macroBlock), new MetaData(Map.of(MetaData.SOURCE, source)))));
+        context.setXDOM(xdom);
+        context.setCurrentMacroBlock(macroBlock);
+        return context;
+    }
+
+    private MacroTransformationContext createMacroTransformationContext(String source) throws Exception
     {
         MacroTransformation macroTransformation = getComponentManager().getInstance(Transformation.class, "macro");
         MacroTransformationContext context = new MacroTransformationContext();
         context.setTransformation(macroTransformation);
         context.setSyntax(Syntax.XWIKI_2_0);
+        context.setId(source);
         return context;
     }
 

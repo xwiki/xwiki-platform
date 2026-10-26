@@ -19,17 +19,25 @@
  */
 package org.xwiki.resource.servlet;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
+import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceType;
@@ -41,7 +49,12 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -88,6 +101,10 @@ class AbstractServletResourceReferenceHandlerTest
 
         InputStream filterStream;
 
+        boolean cachePublic;
+
+        boolean accessible = true;
+
         @Override
         public List<ResourceType> getSupportedResourceReferences()
         {
@@ -110,6 +127,18 @@ class AbstractServletResourceReferenceHandlerTest
         protected InputStream filterResource(ResourceReference resourceReference, InputStream resourceStream)
         {
             return this.filterStream;
+        }
+
+        @Override
+        protected boolean isResourceAccessible(ResourceReference resourceReference)
+        {
+            return this.accessible;
+        }
+
+        @Override
+        protected boolean isResourceCachePublic(ResourceReference resourceReference)
+        {
+            return this.cachePublic;
         }
     }
 
@@ -167,5 +196,51 @@ class AbstractServletResourceReferenceHandlerTest
         this.referenceHandler.handle(mock(ResourceReference.class), mock(ResourceReferenceHandlerChain.class));
 
         verify(this.inputStream, times(2)).close();
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "false, 'private, no-cache'", "true, public" })
+    void handleSetsCacheHeaders(boolean cachePublic, String expectedCacheControl) throws Exception
+    {
+        ServletResponse servletResponse = mock();
+        HttpServletResponse httpServletResponse = mock();
+        when(servletResponse.getHttpServletResponse()).thenReturn(httpServletResponse);
+        when(servletResponse.getOutputStream()).thenReturn(this.outputStream);
+        when(this.container.getResponse()).thenReturn(servletResponse);
+        this.referenceHandler.filterStream = new ByteArrayInputStream(new byte[] { 1, 2, 3 });
+        this.referenceHandler.cachePublic = cachePublic;
+
+        this.referenceHandler.handle(mock(ResourceReference.class), mock(ResourceReferenceHandlerChain.class));
+
+        verify(httpServletResponse).setHeader("Cache-Control", expectedCacheControl);
+        verify(httpServletResponse, times(cachePublic ? 1 : 0)).setDateHeader(eq("Expires"), anyLong());
+        verify(httpServletResponse).setDateHeader(eq("Last-Modified"), anyLong());
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "true, 304", "false, 403" })
+    void handleRevalidationChecksAccess(boolean accessible, int expectedStatus) throws Exception
+    {
+        ServletRequest servletRequest = mock();
+        HttpServletRequest httpServletRequest = mock();
+        when(servletRequest.getHttpServletRequest()).thenReturn(httpServletRequest);
+        when(httpServletRequest.getHeader("If-Modified-Since")).thenReturn("Fri, 09 Oct 2026 13:00:00 GMT");
+        when(this.container.getRequest()).thenReturn(servletRequest);
+        ServletResponse servletResponse = mock();
+        HttpServletResponse httpServletResponse = mock();
+        when(servletResponse.getHttpServletResponse()).thenReturn(httpServletResponse);
+        when(this.container.getResponse()).thenReturn(servletResponse);
+        this.referenceHandler.accessible = accessible;
+
+        this.referenceHandler.handle(mock(ResourceReference.class), mock(ResourceReferenceHandlerChain.class));
+
+        if (accessible) {
+            verify(httpServletResponse).setStatus(expectedStatus);
+            verify(httpServletResponse, never()).sendError(anyInt(), any());
+        } else {
+            verify(httpServletResponse).sendError(eq(expectedStatus), any());
+            verify(httpServletResponse, never()).setStatus(anyInt());
+        }
+        verify(this.inputStream, never()).close();
     }
 }

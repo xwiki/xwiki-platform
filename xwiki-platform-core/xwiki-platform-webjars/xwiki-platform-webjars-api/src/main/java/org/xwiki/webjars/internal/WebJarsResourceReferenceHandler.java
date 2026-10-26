@@ -94,6 +94,13 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
     }
 
     @Override
+    protected boolean isResourceCachePublic(WebJarsResourceReference resourceReference)
+    {
+        // WebJar resources are static files packaged in extensions, available to all users.
+        return true;
+    }
+
+    @Override
     protected InputStream filterResource(WebJarsResourceReference resourceReference, InputStream resourceStream)
         throws ResourceReferenceHandlerException
     {

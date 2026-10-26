@@ -31,7 +31,7 @@
   <name>XWiki Platform - Rendering - Macro - Code</name>
   <description>Highlights code</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Code Macro</xwiki.extension.name>
   </properties>
@@ -69,4 +69,81 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- Extract the Python modules of Pygments to compile them. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-pygments</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeGroupIds>org.pygments</includeGroupIds>
+              <includeArtifactIds>pygments</includeArtifactIds>
+              <includes>**/*.py</includes>
+              <outputDirectory>${project.build.directory}/pygments</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Compile the Python modules of Pygments and of this module to the Java classes Jython would otherwise
+           compile from their sources when the code macro is first used, which takes seconds. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile-python-modules</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>${java.home}/bin/java</executable>
+              <arguments>
+                <argument>-classpath</argument>
+                <classpath />
+                <argument>${project.basedir}/src/tool/PythonModuleCompiler.java</argument>
+                <argument>${project.build.outputDirectory}</argument>
+                <argument>${project.build.directory}/pygments</argument>
+                <argument>${project.build.outputDirectory}</argument>
+                <!-- The script executed by the parser, not a module. -->
+                <argument>-pygments/code.py</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Jython names the class of the module of a Python package after the package, while the class is in the
+           directory of the package, where Jython looks for it. -->
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <_fixupmessages>"Classes found in the wrong directory";is:=ignore</_fixupmessages>
+          </instructions>
+        </configuration>
+      </plugin>
+      <!-- The Python modules compiled at build time are third-party code for the most part, and are only partly used
+           by the tests. -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <excludes combine.children="append">
+            <!-- Class names, for the instrumentation. -->
+            <exclude>*$py</exclude>
+            <!-- Class files, for the coverage check. -->
+            <exclude>**/*$py.class</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -89,8 +89,10 @@ public class DefaultTemporaryResourceStore implements TemporaryResourceStore, In
         List<String> segments = new ArrayList<>();
 
         if (reference.getOwningEntityReference() != null) {
+            // Include the entity types so that entities with the same names but different types (e.g. the document
+            // A.B and the nested space A.B) don't share their temporary files.
             for (EntityReference component : reference.getOwningEntityReference().getReversedReferenceChain()) {
-                segments.add(component.getName());
+                segments.add(component.getType().getLowerCase() + ':' + component.getName());
             }
         }
         if (!reference.getParameters().isEmpty()) {

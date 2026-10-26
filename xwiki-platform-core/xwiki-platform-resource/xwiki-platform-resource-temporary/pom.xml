@@ -35,6 +35,10 @@
     <xwiki.jacoco.instructionRatio>0.39</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Temporary Resource API</xwiki.extension.name>
+    <!-- This extension needs to be installed in the root namespace because it contributes a URL Resource Handler and
+         those need to be installed in the root Component Manager (since they're executed before the wiki is extracted
+         from the URL during the URL parsing process). -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>

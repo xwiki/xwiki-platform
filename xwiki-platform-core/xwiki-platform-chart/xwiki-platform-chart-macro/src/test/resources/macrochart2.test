@@ -11,4 +11,4 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="temppath/chart/${{{regex:.*}}}"><img src="temppath/chart/${{{regex:.*}}}" class="wikimodel-freestanding" alt="Chart Test"/></a></span></p>
+<p><span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="tmp/chart/wiki:space.page/${{{regex:.*}}}"><img src="tmp/chart/wiki:space.page/${{{regex:.*}}}" class="wikimodel-freestanding" alt="Chart Test"/></a></span></p>

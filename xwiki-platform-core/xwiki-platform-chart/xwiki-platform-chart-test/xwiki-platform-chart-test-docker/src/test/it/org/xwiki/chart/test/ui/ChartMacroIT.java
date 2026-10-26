@@ -21,6 +21,7 @@ package org.xwiki.chart.test.ui;
 
 import java.util.List;
 
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.chart.test.po.ChartElement;
@@ -76,11 +77,35 @@ class ChartMacroIT
         setup.rest().savePage(dataReference, getDataTableContent("1.5"), "");
         viewPage = setup.gotoPage(reference);
         assertFalse(viewPage.hasRenderingError());
-        // The chart image isn't checked for being loaded because its URL uses the "temp" action, which is provided
-        // only by the legacy modules, and they aren't part of the minimal distribution used by this test.
         List<ChartElement> charts = ChartElement.getChartsInPageContent();
         assertEquals(1, charts.size());
         assertEquals("Script data", charts.get(0).getTitle());
+        assertTrue(charts.get(0).isImageLoaded());
+
+        // The author of the charted document sees the chart too, as long as they can view the charted document.
+        setup.login("chartDataTableProducedByScript", "chartDataTableProducedByScript");
+        setup.gotoPage(reference);
+        charts = ChartElement.getChartsInPageContent();
+        assertEquals(1, charts.size());
+        assertTrue(charts.get(0).isImageLoaded());
+        assertTrue(charts.get(0).openImage());
+
+        // Once they can't view the charted document anymore, they can't see the chart image anymore, even though their
+        // browser has stored it.
+        setup.gotoPage(reference);
+        ChartElement chart = ChartElement.getChartsInPageContent().get(0);
+        UsernamePasswordCredentials userCredentials = setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+        try {
+            setup.setRights(dataReference, null, "XWiki.chartDataTableProducedByScript", "view", false);
+        } finally {
+            setup.setDefaultCredentials(userCredentials);
+        }
+        assertFalse(chart.openImage());
+        viewPage = setup.gotoPage(reference);
+        assertTrue(viewPage.hasRenderingError());
+        assertThat(viewPage.getContent(), startsWith(
+            "Failed to execute the [chart] macro. Cause: [You do not have permission to view the document.]."));
+        assertTrue(ChartElement.getChartsInPageContent().isEmpty());
     }
 
     private static String getDataTableContent(String firstValue)

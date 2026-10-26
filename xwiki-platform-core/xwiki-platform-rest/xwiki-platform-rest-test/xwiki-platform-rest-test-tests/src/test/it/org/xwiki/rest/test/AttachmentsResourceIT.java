@@ -92,12 +92,6 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     @Test
     public void testPUTGETAttachments() throws Exception
     {
-        // The attachments are deleted right after being added, one after the other: the Solr indexer can index the
-        // page while an attachment is being deleted, when its content is already removed but the page still has it.
-        // Nothing is lost since the deletion indexes the page again.
-        validateConsole.getLogCaptureConfiguration().registerExcludes("Failed to retrieve the content of attachment "
-            + "[Attachment xwiki:AttachmentsResourceIT.testPUTGETAttachments@");
-
         /* Test normal random UUID method */
         String randomStr = String.format("%s.txt", UUID.randomUUID());
         /* Test filenames requiring url encoding */

@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -85,6 +86,8 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -687,16 +690,21 @@ class DocumentSolrMetadataExtractorTest
     {
         XWikiAttachment attachment = createMockAttachment("missing.txt", "text/plain", new Date(), "", "Alice",
             "Shy Alice");
-        when(attachment.getContentInputStream(this.xcontext)).thenThrow(new XWikiException());
+        when(attachment.getContentInputStream(this.xcontext)).thenThrow(
+            new XWikiException("Failed to load", new IOException("The attachment could not be found")));
         when(this.document.getAttachmentList()).thenReturn(List.of(attachment));
         when(this.document.getAttachment("missing.txt")).thenReturn(attachment);
 
         SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
 
         assertNull(solrDocument.getFieldValue("attcontent_en_US"));
-        // The attachment still exists, so its content is really missing.
-        assertEquals("Failed to retrieve the content of attachment [Attachment wiki:Path.To.Page.WebHome@missing.txt]",
-            this.logCapture.getMessage(0));
+        // The attachment still exists, but it could be about to be deleted, so it's only a warning, with the root
+        // cause.
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("Failed to retrieve the content of attachment [Attachment wiki:Path.To.Page.WebHome@missing.txt],"
+            + " which might be because it's being deleted at the same time. Root cause is"
+            + " [IOException: The attachment could not be found].", this.logCapture.getMessage(0));
+        assertNull(this.logCapture.getLogEvent(0).getThrowableProxy());
     }
 
     @Test

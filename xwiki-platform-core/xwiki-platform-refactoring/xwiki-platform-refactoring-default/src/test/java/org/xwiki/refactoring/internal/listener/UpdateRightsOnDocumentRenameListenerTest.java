@@ -32,6 +32,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.internal.wiki.WikiOwnerUpdater;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -103,6 +104,9 @@ class UpdateRightsOnDocumentRenameListenerTest
 
     @MockComponent
     private RequestFactory requestFactory;
+
+    @MockComponent
+    private WikiOwnerUpdater wikiOwnerUpdater;
 
     // Needed for the mandatory document initializer
     @MockComponent
@@ -182,6 +186,8 @@ class UpdateRightsOnDocumentRenameListenerTest
 
         triggerRenameEvent(source, target);
 
+        verify(this.wikiOwnerUpdater).replaceOwner(source, target);
+
         assertEquals(wikis, capturedWikisForSearch);
         assertEquals(wikis, capturedWikisForGroups);
         verifyUserReplacementJobCalled();
@@ -200,6 +206,8 @@ class UpdateRightsOnDocumentRenameListenerTest
         List<String> capturedWikisForGroups = captureWikisForGroups(source, target);
 
         triggerRenameEvent(source, target);
+
+        verify(this.wikiOwnerUpdater).replaceOwner(source, target);
 
         assertEquals(wikis, capturedWikisForSearch);
         assertEquals(wikis, capturedWikisForGroups);
@@ -220,6 +228,8 @@ class UpdateRightsOnDocumentRenameListenerTest
         List<String> capturedWikisForGroups = captureWikisForGroups(source, target);
 
         triggerRenameEvent(source, target);
+
+        verify(this.wikiOwnerUpdater).replaceOwner(source, target);
 
         // The search and the group member replacement should be called twice, once for the user object and once for
         // the group.

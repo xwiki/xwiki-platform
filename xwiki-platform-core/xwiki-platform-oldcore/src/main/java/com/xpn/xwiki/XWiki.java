@@ -1597,7 +1597,10 @@ public class XWiki implements EventListener
                 }
             } else {
                 wikiOwner = doc.getStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner");
-                if (wikiOwner.indexOf(':') == -1) {
+                if (StringUtils.isBlank(wikiOwner)) {
+                    // An empty owner means that the wiki has no owner.
+                    wikiOwner = null;
+                } else if (wikiOwner.indexOf(':') == -1) {
                     wikiOwner = context.getMainXWiki() + ":" + wikiOwner;
                 }
             }

@@ -26,6 +26,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -33,6 +35,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -59,9 +62,21 @@ class DefaultTemporaryResourceStoreTest
     @Test
     void getTemporaryFile() throws IOException
     {
-        assertEquals(new File("/tmp/xwiki/tmp/moduleid/c/4/53919da9e226032c090ffc08d7506d/resource/file.txt"),
+        assertEquals(new File("/tmp/xwiki/tmp/moduleid/9/c/cdc8ad6133d97938c6add3ea21fef2/resource/file.txt"),
             this.store.getTemporaryFile(new TemporaryResourceReference("moduleid", List.of("resource/file.txt"),
                 new DocumentReference("xwiki", "Test", "Test"))));
+    }
+
+    @Test
+    void getTemporaryFileWithOwningEntitiesOfDifferentTypes() throws IOException
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "Test", "Test");
+        SpaceReference spaceReference =
+            new SpaceReference("Test", new SpaceReference("Test", new WikiReference("xwiki")));
+
+        assertNotEquals(
+            this.store.getTemporaryFile(new TemporaryResourceReference("moduleid", "file.txt", documentReference)),
+            this.store.getTemporaryFile(new TemporaryResourceReference("moduleid", "file.txt", spaceReference)));
     }
 
     @Test

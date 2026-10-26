@@ -28,10 +28,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -117,6 +123,8 @@ public final class RightsManager
      */
     private static final String HQLLIKE_ALL_SYMBOL = "%";
 
+    private static final String EXPLICIT_HINT = "explicit";
+
     /**
      * Use to retrieve documents concerned by a specific user or group rights.
      * See {@link #removeUserOrGroupFromAllRights(String, String, String, boolean, XWikiContext)}
@@ -137,13 +145,31 @@ public final class RightsManager
      * Used to resolve document reference based on another reference.
      */
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, EXPLICIT_HINT);
 
     /**
      * Used to resolve reference based on context.
      */
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+
+    /**
+     * Used to resolve the user and group references stored in rights objects the same way the authorization does.
+     */
+    private DocumentReferenceResolver<String> userAndGroupReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "user");
+
+    /**
+     * Used to resolve the space of a user or group.
+     */
+    private EntityReferenceResolver<String> explicitEntityReferenceResolver =
+        Utils.getComponent(EntityReferenceResolver.TYPE_STRING, EXPLICIT_HINT);
+
+    /**
+     * Used to set the author of the rights documents which are updated.
+     */
+    private UserReferenceResolver<DocumentReference> documentUserReferenceResolver =
+        Utils.getComponent(UserReferenceResolver.TYPE_DOCUMENT_REFERENCE, "document");
 
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
@@ -907,7 +933,10 @@ public final class RightsManager
     }
 
     /**
-     * Remove all references to provided user or group from provided right object.
+     * Remove all references to provided user or group from provided right object, whatever the form of the reference
+     * stored in the object (e.g. {@code name}, {@code XWiki.name} or {@code wiki:XWiki.name}). The stored references
+     * are resolved relatively to the wiki of the right object, as the authorization does. Nothing is removed when the
+     * wiki of the user or group is not provided.
      *
      * @param right the object containing the right preferences.
      * @param userOrGroupWiki the name of the wiki of the use or group.
@@ -922,29 +951,59 @@ public final class RightsManager
     {
         boolean needUpdate = false;
 
-        String userOrGroupField = getUserOrGroupField(user);
-
-        List<String> usersOrGroups =
-            ListClass.getListFromString(right.getLargeStringValue(userOrGroupField), USERGROUPLISTFIELD_SEP, false);
-
         if (userOrGroupWiki != null) {
-            needUpdate |= usersOrGroups.remove(userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName);
-        }
+            String userOrGroupField = getUserOrGroupField(user);
 
-        if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(userOrGroupWiki)) {
-            needUpdate |= usersOrGroups.remove(userOrGroupName);
+            List<String> usersOrGroups = ListClass.getListFromString(right.getLargeStringValue(userOrGroupField),
+                USERGROUPLISTFIELD_SEP, false);
 
-            if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
-                needUpdate |= usersOrGroups.remove(userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName);
+            DocumentReference userOrGroupReference =
+                getUserOrGroupReference(userOrGroupWiki, userOrGroupSpace, userOrGroupName);
+            WikiReference rightWiki = right.getDocumentReference().getWikiReference();
+            needUpdate = usersOrGroups
+                .removeIf(userOrGroup -> isUserOrGroupEntry(userOrGroup, userOrGroupReference, rightWiki));
+
+            if (needUpdate) {
+                right.setLargeStringValue(userOrGroupField,
+                    ListClass.getStringFromList(usersOrGroups, USERGROUPLISTFIELD_SEP));
             }
         }
 
-        if (needUpdate) {
-            right.setLargeStringValue(userOrGroupField,
-                ListClass.getStringFromList(usersOrGroups, USERGROUPLISTFIELD_SEP));
+        return needUpdate;
+    }
+
+    private DocumentReference getUserOrGroupReference(String userOrGroupWiki, String userOrGroupSpace,
+        String userOrGroupName)
+    {
+        WikiReference wikiReference = new WikiReference(userOrGroupWiki);
+        SpaceReference spaceReference;
+        if (userOrGroupSpace != null) {
+            spaceReference = new SpaceReference(
+                this.explicitEntityReferenceResolver.resolve(userOrGroupSpace, EntityType.SPACE, wikiReference));
+        } else {
+            spaceReference = new SpaceReference(DEFAULT_USERORGROUP_SPACE, wikiReference);
         }
 
-        return needUpdate;
+        return new DocumentReference(userOrGroupName, spaceReference);
+    }
+
+    /**
+     * @param userOrGroup an entry of the users or groups of a rights object
+     * @param userOrGroupReference the reference of a user or group
+     * @param rightWiki the wiki of the rights object
+     * @return {@code true} if the entry designates the provided user or group
+     */
+    private boolean isUserOrGroupEntry(String userOrGroup, DocumentReference userOrGroupReference,
+        WikiReference rightWiki)
+    {
+        return StringUtils.isNotBlank(userOrGroup)
+            && userOrGroupReference.equals(this.userAndGroupReferenceResolver.resolve(userOrGroup, rightWiki));
+    }
+
+    private void setOriginalMetadataAuthor(XWikiDocument document, XWikiContext context)
+    {
+        document.getAuthors()
+            .setOriginalMetadataAuthor(this.documentUserReferenceResolver.resolve(context.getUserReference()));
     }
 
     private String getUserOrGroupField(boolean user)
@@ -975,15 +1034,14 @@ public final class RightsManager
         List<BaseObject> rightObjects = rightsDocument.getXObjects(rightClassReference);
         if (rightObjects != null) {
             for (BaseObject bobj : rightObjects) {
-                if (bobj == null) {
-                    continue;
-                }
-                needUpdate |=
-                    removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
+                if (bobj != null && removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace,
+                    userOrGroupName, user, context)) {
+                    needUpdate = true;
 
-                if (needUpdate && bobj.getLargeStringValue(RIGHTSFIELD_USERS).trim().length() == 0
-                    && bobj.getLargeStringValue(RIGHTSFIELD_GROUPS).trim().length() == 0) {
-                    rightsDocument.removeXObject(bobj);
+                    if (bobj.getLargeStringValue(RIGHTSFIELD_USERS).trim().isEmpty()
+                        && bobj.getLargeStringValue(RIGHTSFIELD_GROUPS).trim().isEmpty()) {
+                        rightsDocument.removeXObject(bobj);
+                    }
                 }
             }
         }
@@ -1005,10 +1063,12 @@ public final class RightsManager
     public boolean removeUserOrGroupFromAllRights(XWikiDocument rightsDocument, String userOrGroupWiki,
         String userOrGroupSpace, String userOrGroupName, boolean user, XWikiContext context)
     {
-        return removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
-            true, context)
-            || removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
-                false, context);
+        boolean globalUpdated = removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace,
+            userOrGroupName, user, true, context);
+        boolean localUpdated = removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace,
+            userOrGroupName, user, false, context);
+
+        return globalUpdated || localUpdated;
     }
 
     /**
@@ -1044,16 +1104,13 @@ public final class RightsManager
         parameterValues.add(globalRightClass.getName());
         parameterValues.add(fieldName);
 
-        if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(userOrGroupWiki)) {
-            if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
-                parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupName + HQLLIKE_ALL_SYMBOL);
-            } else {
-                parameterValues.add(
-                    HQLLIKE_ALL_SYMBOL + userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName + HQLLIKE_ALL_SYMBOL);
-            }
+        // Match any form of reference to the user or group (e.g. name, XWiki.name, wiki:name or wiki:XWiki.name): the
+        // exact entries to remove are then selected by resolving them.
+        if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
+            parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupName + HQLLIKE_ALL_SYMBOL);
         } else {
-            parameterValues
-                .add(HQLLIKE_ALL_SYMBOL + userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName + HQLLIKE_ALL_SYMBOL);
+            parameterValues.add(
+                HQLLIKE_ALL_SYMBOL + userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName + HQLLIKE_ALL_SYMBOL);
         }
 
         // TODO: load XWikiDocument instance one by one instead of all at once
@@ -1066,13 +1123,15 @@ public final class RightsManager
 
             if (removeUserOrGroupFromAllRights(clonedDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
                 context)) {
+                setOriginalMetadataAuthor(clonedDocument, context);
                 context.getWiki().saveDocument(clonedDocument, context);
             }
         }
     }
 
     /**
-     * Replace a user or a group reference with another one on a right object.
+     * Replace a user or a group reference with another one on a right object, whatever the form of the reference
+     * stored in the object (see {@link #removeUserOrGroupFromRight}).
      * @param right the right to change.
      * @param userOrGroupSourceReference the reference of the user or group that we need to replace
      * @param userOrGroupTargetReference the reference of the user or group that will be used as replacement
@@ -1089,11 +1148,14 @@ public final class RightsManager
         List<String> usersOrGroups =
             ListClass.getListFromString(right.getLargeStringValue(userOrGroupField), USERGROUPLISTFIELD_SEP, false);
 
-        String userOrGroupSource = this.compactWikiEntityReferenceSerializer.serialize(userOrGroupSourceReference);
-        String userOrGroupTarget = this.compactWikiEntityReferenceSerializer.serialize(userOrGroupTargetReference);
-
-        if (usersOrGroups.remove(userOrGroupSource)) {
-            usersOrGroups.add(userOrGroupTarget);
+        WikiReference rightWiki = right.getDocumentReference().getWikiReference();
+        if (usersOrGroups
+            .removeIf(userOrGroup -> isUserOrGroupEntry(userOrGroup, userOrGroupSourceReference, rightWiki))) {
+            String userOrGroupTarget =
+                this.compactWikiEntityReferenceSerializer.serialize(userOrGroupTargetReference, rightWiki);
+            if (!usersOrGroups.contains(userOrGroupTarget)) {
+                usersOrGroups.add(userOrGroupTarget);
+            }
             needUpdate = true;
         }
 
@@ -1154,10 +1216,12 @@ public final class RightsManager
     private boolean replaceUserOrGroupFromAllRights(XWikiDocument rightsDocument,
         DocumentReference userOrGroupSourceReference, DocumentReference userOrGroupTargetReference, boolean user)
     {
-        return replaceUserOrGroupFromRights(rightsDocument, userOrGroupSourceReference, userOrGroupTargetReference,
-            user, true)
-            || replaceUserOrGroupFromRights(rightsDocument, userOrGroupSourceReference, userOrGroupTargetReference,
-            user, false);
+        boolean globalUpdated = replaceUserOrGroupFromRights(rightsDocument, userOrGroupSourceReference,
+            userOrGroupTargetReference, user, true);
+        boolean localUpdated = replaceUserOrGroupFromRights(rightsDocument, userOrGroupSourceReference,
+            userOrGroupTargetReference, user, false);
+
+        return globalUpdated || localUpdated;
     }
 
     /**
@@ -1192,9 +1256,9 @@ public final class RightsManager
         parameterValues.add(this.localEntityReferenceSerializer.serialize(rightClass.getReference()));
         parameterValues.add(this.localEntityReferenceSerializer.serialize(globalRightClass.getReference()));
         parameterValues.add(fieldName);
-        parameterValues.add(HQLLIKE_ALL_SYMBOL
-            + this.compactWikiEntityReferenceSerializer.serialize(userOrGroupSourceReference)
-            + HQLLIKE_ALL_SYMBOL);
+        // Match any form of reference to the user or group: the exact entries to replace are then selected by
+        // resolving them.
+        parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupSourceReference.getName() + HQLLIKE_ALL_SYMBOL);
 
         // TODO: load XWikiDocument instance one by one instead of all at once
         List<XWikiDocument> documentList =
@@ -1206,6 +1270,7 @@ public final class RightsManager
 
             if (replaceUserOrGroupFromAllRights(clonedDocument, userOrGroupSourceReference, userOrGroupTargetReference,
                 user)) {
+                setOriginalMetadataAuthor(clonedDocument, context);
                 context.getWiki().saveDocument(clonedDocument, context);
             }
         }

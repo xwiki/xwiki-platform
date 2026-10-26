@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.internal.wiki.WikiOwnerUpdater;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.AbstractLocalEventListener;
@@ -82,6 +83,9 @@ public class UpdateRightsOnDocumentRenameListener extends AbstractLocalEventList
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Inject
+    private WikiOwnerUpdater wikiOwnerUpdater;
+
     /**
      * Default constructor.
      */
@@ -111,6 +115,12 @@ public class UpdateRightsOnDocumentRenameListener extends AbstractLocalEventList
                 document.getXObject(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE) != null;
             boolean definesUser =
                 document.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE) != null;
+
+            // The owner of a wiki is meant to be a user, but the owner field accepts any reference, so it's updated for
+            // groups too.
+            if (definesGroup || definesUser) {
+                this.wikiOwnerUpdater.replaceOwner(sourceReference, targetReference);
+            }
 
             // If the document contains a group object, then we need to rename the rights and groups
             // with the new group reference.

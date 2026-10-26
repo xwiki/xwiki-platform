@@ -178,7 +178,14 @@ public class LogCaptureValidator
             + "In case of a need to debug this call was triggered for right [like]."),
 
         // See https://jira.xwiki.org/browse/XWIKI-22043
-        new Line("org.xwiki.script.internal.safe.ScriptSafeProvider")
+        new Line("org.xwiki.script.internal.safe.ScriptSafeProvider"),
+
+        // Logged at error level by Jersey when writing a REST response fails after it was committed, which is what
+        // happens when the client (e.g. the browser moving to another page) closes the connection before receiving
+        // the whole response. Its stack trace ends with a broken pipe (an expected line), but the entry can be split
+        // when other output is printed in the middle of the stack trace, so exclude it by its first line.
+        // See https://github.com/eclipse-ee4j/jersey/issues/4420
+        new Line("An I/O error has occurred while writing a response message entity to the container output stream.")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

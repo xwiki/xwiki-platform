@@ -374,6 +374,7 @@ var XWiki = (function(XWiki) {
       if ($('forceSave')) {
         $('forceSave').remove();
       }
+      $('conflictVersion')?.remove();
 
       $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
       $$('input[name=customChoices]').forEach(function (item) {item.remove();});
@@ -630,6 +631,7 @@ var XWiki = (function(XWiki) {
         if ($('forceSave')) {
           $('forceSave').remove();
         }
+        $('conflictVersion')?.remove();
 
         $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
         $$('input[name=customChoices]').forEach(function (item) {item.remove();});
@@ -648,6 +650,16 @@ var XWiki = (function(XWiki) {
               id: "forceSave",
               value: action
             }));
+            // The decisions apply to the conflicts with this version. The server asks again if the document was saved
+            // in the meantime and the decisions don't cover the new changes.
+            const conflictVersion = document.createElement('input');
+            Object.assign(conflictVersion, {
+              type: 'hidden',
+              name: 'conflictVersion',
+              id: 'conflictVersion',
+              value: jsonAnswer.latestVersion
+            });
+            self.form.append(conflictVersion);
             if (state.isContinue) {
               $('input[name=action_saveandcontinue]').click();
             } else {

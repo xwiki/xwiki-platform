@@ -38,11 +38,27 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro (createAttachment $fileName)
-  #set ($document = $doc)
+  #set ($documentReference = $doc.documentReference)
   #if ("$!request.document" != '')
-    #set ($document = $xwiki.getDocument($request.document))
+    #set ($documentReference = $services.model.resolveDocument($request.document))
   #end
-  #if ($document &amp;&amp; $document.hasAccessLevel('edit'))
+  ## FIXME: Get the file content as an input stream instead of a byte array, but for this we need to expose
+  ## getFileItemInputStream in the public API of the fileupload plugin (or use a script service).
+  #set ($bytes = $xwiki.fileupload.getFileItemData('upload'))
+  #if (!$bytes)
+    ## Empty file (unfortunately getFileItemData returns null instead of an empty byte array).
+    #set ($bytes = [])
+  #end
+  ## Another request can save the document after we load it, e.g. when two users editing the document together upload
+  ## files at the same time. The save is then refused, so we load the document again and add the attachment again.
+  #set ($uploaded = false)
+  #set ($forbidden = false)
+  #foreach ($attempt in [1..5])
+    #set ($document = $xwiki.getDocument($documentReference))
+    #if (!$document || !$document.hasAccessLevel('edit'))
+      #set ($forbidden = true)
+      #break
+    #end
     ## If the attachment is uploaded to a new document then make sure we create the document with the right default
     ## locale. See CKEDITOR-316: Document translations are created when uploading a file from the WYSIWYG editor in a
     ## multi-language wiki. The following code replicates the behavior of the Upload action, but it has the desired
@@ -59,19 +75,25 @@
         #set ($discard = $document.setSyntaxId($request.syntax))
       #end
     #end
-    ## FIXME: Get the file content as an input stream instead of a byte array, but for this we need to expose
-    ## getFileItemInputStream in the public API of the fileupload plugin (or use a script service).
-    #set ($bytes = $xwiki.fileupload.getFileItemData('upload'))
-    #if (!$bytes)
-      ## Empty file (unfortunately getFileItemData returns null instead of an empty byte array).
-      #set ($bytes = [])
-    #end
     #set ($discard = $document.addAttachment($fileName, $bytes))
-    #set ($discard = $document.save($services.localization.render('core.comment.uploadAttachmentComment', [$fileName])))
+    #set ($saveException = $NULL)
+    #set ($comment = $services.localization.render('core.comment.uploadAttachmentComment', [$fileName]))
+    #try('saveException')
+      #set ($discard = $document.save($comment))
+    #end
+    #if ("$!saveException" == '')
+      #set ($uploaded = true)
+      #break
+    #elseif (!$services.merge.isDocumentRevisionConflict($saveException))
+      #break
+    #end
+  #end
+  #if ($uploaded)
     #sendSuccess($document $fileName)
-  #else
-    ## Forbidden
+  #elseif ($forbidden)
     #sendError(403 'You are not allowed to perform this action.')
+  #else
+    #sendError(500 $exceptiontool.getRootCauseMessage($saveException))
   #end
 #end
 

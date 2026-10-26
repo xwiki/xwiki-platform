@@ -22,7 +22,6 @@ package org.xwiki.blocknote.test.ui;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -49,6 +48,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -208,7 +208,7 @@ class ImageIT extends AbstractBlockNoteIT
         File file = setup.getResourceFile("/image.gif");
         byte[] uploadedAttachmentContent = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
-        assertTrue(Arrays.equals(FileUtils.readFileToByteArray(file), uploadedAttachmentContent));
+        assertArrayEquals(FileUtils.readFileToByteArray(file), uploadedAttachmentContent);
     }
 
     @Test
@@ -236,7 +236,7 @@ class ImageIT extends AbstractBlockNoteIT
         String attachmentName = savedContent.replaceAll("(?s).*\\[\\[image:([^\\]]+)\\]\\].*", "$1");
         byte[] uploaded = setup.rest()
             .getAttachmentAsByteArray(new EntityReference(attachmentName, EntityType.ATTACHMENT, testReference));
-        assertTrue(Arrays.equals(content, uploaded));
+        assertArrayEquals(content, uploaded);
     }
 
     @Test
@@ -262,7 +262,7 @@ class ImageIT extends AbstractBlockNoteIT
 
         byte[] uploaded = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
-        assertTrue(Arrays.equals(content, uploaded));
+        assertArrayEquals(content, uploaded);
     }
 
     @Test
@@ -296,6 +296,6 @@ class ImageIT extends AbstractBlockNoteIT
 
         byte[] uploaded = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
-        assertTrue(Arrays.equals(after, uploaded));
+        assertArrayEquals(after, uploaded);
     }
 }

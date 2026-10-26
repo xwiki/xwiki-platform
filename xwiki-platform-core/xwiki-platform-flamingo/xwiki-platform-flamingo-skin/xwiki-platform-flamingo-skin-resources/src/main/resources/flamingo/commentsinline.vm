@@ -87,10 +87,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #set($author = $services.localization.render('core.viewers.comments.add.guestName.default'))
 #end
 ##
-#set($xredirect = $!escapetool.xml($request.get("xredirect")))
-#if("$!xredirect" == '')
-  #set($xredirect = "$doc.getURL('view')?$request.getQueryString()")
-#end
+#set($xredirectFallbackURL = "$doc.getURL('view')?$!request.getQueryString()")
+#getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $xredirectFallbackURL, $xredirect)
 ##
 #if("$!offerGuestsCaptcha" == '')
   #set($offerGuestsCaptcha = $xwiki.getSpacePreferenceAsInt('guest_comment_requires_captcha', 0) == 1)

@@ -100,8 +100,10 @@ public class BlobStoreContainerExecutor extends AbstractContainerExecutor
      */
     public void stop(TestConfiguration testConfiguration)
     {
-        // Note that we don't need to stop the container as this is taken care of by TestContainers. Same for the volume
-        // shared by the instances of a cluster.
+        stopContainers();
+
+        // Note that we don't need to remove the volume shared by the instances of a cluster as this is taken care of by
+        // TestContainers.
         SharedFileSystemBlobStore.forgetVolume(testConfiguration);
     }
 

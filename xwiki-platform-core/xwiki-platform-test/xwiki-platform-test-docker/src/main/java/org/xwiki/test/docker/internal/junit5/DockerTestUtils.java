@@ -359,13 +359,22 @@ public final class DockerTestUtils
     }
 
     /**
+     * Each top level test class has its own store, shared with its nested test classes and its test methods. This
+     * allows several top level test classes to be executed in the same JVM, each with its own XWiki instances,
+     * browser, etc.
+     *
      * @param context the context where to find the store
-     * @return the store
+     * @return the store of the top level test class of the passed context (or the store of the root context when the
+     *     passed context is the root context)
      * @since 14.5
      */
     public static ExtensionContext.Store getStore(ExtensionContext context)
     {
-        return context.getRoot().getStore(NAMESPACE);
+        ExtensionContext topLevelContext = context;
+        while (topLevelContext.getParent().flatMap(ExtensionContext::getParent).isPresent()) {
+            topLevelContext = topLevelContext.getParent().get();
+        }
+        return topLevelContext.getStore(NAMESPACE);
     }
 
     /**

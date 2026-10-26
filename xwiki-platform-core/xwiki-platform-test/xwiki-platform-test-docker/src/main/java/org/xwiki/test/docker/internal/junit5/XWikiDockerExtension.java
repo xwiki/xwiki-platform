@@ -176,13 +176,13 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
             // Note: We start the database before the XWiki WAR is created because we need the IP of the docker
             // container for the database when configuring the JDBC URL, in the case when the servlet container is
             // running outside of docker and thus outside of the shared docker network...
-            startDatabase(testConfiguration, mavenResolver);
+            startDatabase(testConfiguration, mavenResolver, extensionContext);
 
             // Start the Blob Store container (if needed)
-            startBlobStore(testConfiguration);
+            startBlobStore(testConfiguration, extensionContext);
 
             // Start the Solr container (if needed)
-            startSolr(testConfiguration, mavenResolver);
+            startSolr(testConfiguration, mavenResolver, extensionContext);
 
             // Generate the extension repository of the test (if needed)
             generateTestExtensionRepository(testConfiguration);
@@ -446,13 +446,13 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
             stopServletEngines(extensionContext);
 
             // Stop the Blob Store
-            stopBlobStore(testConfiguration);
+            stopBlobStore(testConfiguration, extensionContext);
 
             // Stop the Solr instance
-            stopSolr(testConfiguration);
+            stopSolr(testConfiguration, extensionContext);
 
             // Stop the DB
-            stopDatabase(testConfiguration);
+            stopDatabase(testConfiguration, extensionContext);
         }
     }
 
@@ -502,57 +502,68 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         }
     }
 
-    private void startDatabase(TestConfiguration testConfiguration, MavenResolver mavenResolver) throws Exception
+    private void startDatabase(TestConfiguration testConfiguration, MavenResolver mavenResolver,
+        ExtensionContext extensionContext) throws Exception
     {
         LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
+        // Keep the executor to stop its container once the test class is finished.
+        DockerTestUtils.getStore(extensionContext).put(DatabaseContainerExecutor.class, executor);
         executor.start(testConfiguration, mavenResolver);
     }
 
-    private void stopDatabase(TestConfiguration testConfiguration)
+    private void stopDatabase(TestConfiguration testConfiguration, ExtensionContext extensionContext)
     {
-        LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
-
-        DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
-        executor.stop(testConfiguration);
+        DatabaseContainerExecutor executor = DockerTestUtils.getStore(extensionContext)
+            .get(DatabaseContainerExecutor.class, DatabaseContainerExecutor.class);
+        if (executor != null) {
+            LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
+            executor.stop(testConfiguration);
+        }
     }
 
-    private void startBlobStore(TestConfiguration testConfiguration) throws Exception
+    private void startBlobStore(TestConfiguration testConfiguration, ExtensionContext extensionContext)
+        throws Exception
     {
         if (testConfiguration.getBlobStore() != null) {
             LOGGER.info("(*) Starting blob store [{}]...", testConfiguration.getBlobStore());
 
             BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
+            // Keep the executor to stop its container once the test class is finished.
+            DockerTestUtils.getStore(extensionContext).put(BlobStoreContainerExecutor.class, executor);
             executor.start(testConfiguration);
         }
     }
 
-    private void stopBlobStore(TestConfiguration testConfiguration)
+    private void stopBlobStore(TestConfiguration testConfiguration, ExtensionContext extensionContext)
     {
-        if (testConfiguration.getBlobStore() != null) {
+        BlobStoreContainerExecutor executor = DockerTestUtils.getStore(extensionContext)
+            .get(BlobStoreContainerExecutor.class, BlobStoreContainerExecutor.class);
+        if (executor != null) {
             LOGGER.info("(*) Stopping blob store [{}]...", testConfiguration.getBlobStore());
-
-            BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
             executor.stop(testConfiguration);
         }
     }
 
-    private void startSolr(TestConfiguration testConfiguration, MavenResolver mavenResolver) throws Exception
+    private void startSolr(TestConfiguration testConfiguration, MavenResolver mavenResolver,
+        ExtensionContext extensionContext) throws Exception
     {
         if (testConfiguration.getSolrMode() != null) {
             LOGGER.info("(*) Starting Solr [{}]...", testConfiguration.getSolrMode());
 
             SolrContainerExecutor executor = new SolrContainerExecutor();
+            // Keep the executor to stop its container once the test class is finished.
+            DockerTestUtils.getStore(extensionContext).put(SolrContainerExecutor.class, executor);
             executor.start(testConfiguration, mavenResolver);
         }
     }
 
-    private void stopSolr(TestConfiguration testConfiguration)
+    private void stopSolr(TestConfiguration testConfiguration, ExtensionContext extensionContext)
     {
-        if (testConfiguration.getSolrMode() != null) {
+        SolrContainerExecutor executor =
+            DockerTestUtils.getStore(extensionContext).get(SolrContainerExecutor.class, SolrContainerExecutor.class);
+        if (executor != null) {
             LOGGER.info("(*) Stopping Solr [{}]...", testConfiguration.getSolrMode());
-
-            SolrContainerExecutor executor = new SolrContainerExecutor();
             executor.stop(testConfiguration);
         }
     }

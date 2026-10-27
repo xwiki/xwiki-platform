@@ -79,5 +79,6 @@ mailSender.admin.resendSuccess=Лист успішно надіслано пов
 mailSender.admin.resendFailure=Не вдалося повторно надіслати. Натисніть, щоб отримати докладнішу інформацію.
 mailSender.admin.deleteSuccess=Лист успішно видалено
 mailSender.admin.deleteFailure=Не вдалося видалити лист. Натисніть, щоб дізнатися більше.
+mailSender.admin.invalidCSRF=Недійсний CSRF-токен, будь ласка, оновіть сторінку та спробуйте ще раз.
 </content>
 </xwikidoc>

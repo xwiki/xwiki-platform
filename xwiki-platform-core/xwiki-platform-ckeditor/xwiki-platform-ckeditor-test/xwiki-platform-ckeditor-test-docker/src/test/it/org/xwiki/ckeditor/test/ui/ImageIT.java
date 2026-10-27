@@ -53,6 +53,7 @@ import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.ViewPage;
@@ -448,7 +449,8 @@ class ImageIT extends AbstractCKEditorIT
 
     @Test
     @Order(9)
-    void imageWithLinkAndCaptionUI(TestUtils setup, TestReference testReference) throws Exception
+    void imageWithLinkAndCaptionUI(TestUtils setup, TestReference testReference,
+        LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         loginStandardUser(setup);
@@ -472,6 +474,10 @@ class ImageIT extends AbstractCKEditorIT
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         editor.getToolBar().insertOrEditLink().setResourceValue("doc:Main.WebHome", false).submit();
+        // The link dialog asks CKEditor.LinkNameStrategyHelper for suggestions on the typed text, which resolves the
+        // raw resource reference "doc:Main.WebHome" as a document of the nonexistent wiki "doc", so the rights check
+        // fails with "No wiki with id [doc] could be found". The link itself is created with the typed reference.
+        logCaptureConfiguration.registerExcludes("Failed to load rights for user [xwiki:XWiki.alice] on [doc:");
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 

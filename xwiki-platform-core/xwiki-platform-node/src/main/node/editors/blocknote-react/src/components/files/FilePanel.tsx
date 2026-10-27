@@ -38,6 +38,7 @@ export const FilePanel: React.FC<FilePanelProps> = ({ blockId, editor }) => {
     return <ImageFilePanel currentBlock={block} />;
   }
 
-  // The other file blocks (file, video, audio) have no XWiki counterpart, so there is nothing to show for them.
+  // The file, video and audio blocks are saved as macro calls, but those macros don't exist yet, and we have no
+  // generic file panel, backed by an attachment selector, to show for them in the meantime.
   return null;
 };

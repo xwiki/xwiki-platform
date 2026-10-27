@@ -22,7 +22,6 @@ package org.xwiki.blocknote.test.ui;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
@@ -288,11 +287,12 @@ class ImageIT extends AbstractBlockNoteIT
         // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do.
         assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
 
+        // A single attachment, so the upload overwrote the existing one rather than adding another.
         Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
-        List<Attachment> notes = attachments.getAttachments().stream()
-            .filter(attachment -> "notes.txt".equals(attachment.getName())).toList();
-        assertEquals(1, notes.size());
-        assertEquals("1.2", notes.get(0).getVersion());
+        assertEquals(1, attachments.getAttachments().size());
+        Attachment notes = attachments.getAttachments().get(0);
+        assertEquals("notes.txt", notes.getName());
+        assertEquals("1.2", notes.getVersion());
 
         byte[] uploaded = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));

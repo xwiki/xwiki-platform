@@ -23,18 +23,15 @@ import { EntityType } from "@xwiki/platform-model-api";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteDocument } from "./BlockNoteProcessor";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
-import type { ModelReferenceParser } from "@xwiki/platform-model-reference-api";
-import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
+import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
+import type { Container } from "inversify";
 
 // A whole partial block, not just props, which is what lets us replace the block BlockNote guessed.
 type UploadResult = Record<string, unknown>;
 
 type UploadFileDependencies = {
-  storageProvider: StorageProvider;
-  modelReferenceParser: ModelReferenceParser;
-  remoteURLSerializer: RemoteURLSerializer;
-
   // Functions because neither is known yet when the editor is created.
   getDocumentReference: () => string;
   getBlockNoteDocument: () => BlockNoteDocument | undefined;
@@ -64,14 +61,16 @@ function attachmentReference(
 /**
  * The BlockNote `uploadFile` option: attaches the pasted and dropped files to the edited document, producing the same
  * wiki syntax as the CKEditor integration.
+ *
+ * @param container - the component container the storage and the model components are taken from
+ * @param dependencies - what only the editor knows
+ * @returns the upload function BlockNote calls for each pasted or dropped file
  */
 function createUploadFile(
+  container: Container,
   dependencies: UploadFileDependencies,
 ): (file: File, blockId?: string) => Promise<UploadResult> {
   const {
-    storageProvider,
-    modelReferenceParser,
-    remoteURLSerializer,
     getDocumentReference,
     getBlockNoteDocument,
     isPaste,
@@ -79,6 +78,14 @@ function createUploadFile(
     registerTemporaryAttachment,
     notifyUploadFailed,
   } = dependencies;
+
+  const storageProvider = container.get<StorageProvider>("StorageProvider");
+  const modelReferenceParser = container
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
+  const remoteURLSerializer = container
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!;
 
   async function upload(file: File): Promise<string> {
     const temporary = isTemporaryUpload();

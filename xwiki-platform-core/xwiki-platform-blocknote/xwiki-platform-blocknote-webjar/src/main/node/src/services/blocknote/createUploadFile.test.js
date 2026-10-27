@@ -29,6 +29,29 @@ function file(name, type) {
   return new File(["content"], name, { type });
 }
 
+// The components the upload function looks up itself.
+function container(saveAttachments) {
+  const components = {
+    StorageProvider: { get: () => ({ saveAttachments }) },
+    ModelReferenceParserProvider: {
+      get: () => ({
+        parse: (reference) => ({
+          type: EntityType.ATTACHMENT,
+          name: reference,
+          reference,
+        }),
+      }),
+    },
+    RemoteURLSerializerProvider: {
+      get: () => ({
+        serialize: (entityReference) =>
+          `/xwiki/bin/download/Space/Page/${entityReference.reference}`,
+      }),
+    },
+  };
+  return { get: (name) => components[name] };
+}
+
 describe("createUploadFile", () => {
   let blockNoteDocument,
     saveAttachments,
@@ -40,18 +63,6 @@ describe("createUploadFile", () => {
 
   function dependencies() {
     return {
-      storageProvider: { get: () => ({ saveAttachments }) },
-      modelReferenceParser: {
-        parse: (reference) => ({
-          type: EntityType.ATTACHMENT,
-          name: reference,
-          reference,
-        }),
-      },
-      remoteURLSerializer: {
-        serialize: (entityReference) =>
-          `/xwiki/bin/download/Space/Page/${entityReference.reference}`,
-      },
       getDocumentReference: () => "Space.Page",
       getBlockNoteDocument: () => blockNoteDocument,
       isPaste: () => paste,
@@ -69,7 +80,7 @@ describe("createUploadFile", () => {
     notifyUploadFailed = vi.fn();
     // The storage returns the reference of the created attachment.
     saveAttachments = vi.fn(async (page, files) => [files[0].name]);
-    uploadFile = createUploadFile(dependencies());
+    uploadFile = createUploadFile(container(saveAttachments), dependencies());
   });
 
   describe("image files", () => {

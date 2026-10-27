@@ -122,7 +122,6 @@ import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcesso
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { CristalApp } from "@xwiki/platform-api";
-import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type {
   Collaboration,
   CollaborationManagerProvider,
@@ -135,8 +134,6 @@ import type {
   ImageEditionOverrideFn,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
-import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
@@ -310,14 +307,7 @@ const temporaryAttachments: Ref<string[]> = ref([]);
 
 const uploadFile = uploadDisabled
   ? undefined
-  : createUploadFile({
-      storageProvider: container.get<StorageProvider>("StorageProvider"),
-      modelReferenceParser: container
-        .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-        .get()!,
-      remoteURLSerializer: container
-        .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-        .get()!,
+  : createUploadFile(container, {
       getDocumentReference: () => documentReference,
       getBlockNoteDocument: () => blockNoteDocument,
       isPaste: pasteTracker.isPaste,

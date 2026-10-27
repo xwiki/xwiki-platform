@@ -491,17 +491,21 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #break
 #end
 
-## The locations are given either as names in single quotes separated by commas, with a quote inside a name doubled,
-## or, like the location picker outputs them, as plain names separated by commas.
+## The locations are separated by commas. Each one is given either as typed, like the location picker outputs it, or in
+## single quotes with the quotes inside its name doubled, which a name containing a comma or starting with a quote needs.
+#set ($locationPattern = "\s*(?:'((?:[^']|'')+)'|([^,'\s](?:[^,]*[^,\s])?))\s*")
 #set ($tagCloudLocations = [])
-#if ($stringtool.startsWith($stringtool.trim($tagCloudSpaces), "'"))
-  #foreach ($match in $regextool.findAll($tagCloudSpaces, "'((?:[^']|'')*)'"))
-    #set ($discard = $tagCloudLocations.add($match.get(1).group.replace("''", "'")))
+#if ($stringtool.isNotBlank($tagCloudSpaces))
+  #if (!$regextool.compile("(?:$locationPattern,)*$locationPattern").matcher($tagCloudSpaces).matches())
+    #set ($escapedSpaces = $services.rendering.escape($tagCloudSpaces, 'xwiki/2.1'))
+    {{error}}$services.localization.render('tag.cloud.invalidLocations', [$escapedSpaces]){{/error}}
+    #break
   #end
-#elseif ("$!tagCloudSpaces" != '')
-  #foreach ($location in $tagCloudSpaces.split(','))
-    #if ($location.trim() != '')
-      #set ($discard = $tagCloudLocations.add($location.trim()))
+  #foreach ($match in $regextool.findAll($tagCloudSpaces, "(?:^|,)$locationPattern"))
+    #if ($match.get(1).group)
+      #set ($discard = $tagCloudLocations.add($match.get(1).group.replace("''", "'")))
+    #else
+      #set ($discard = $tagCloudLocations.add($match.get(2).group))
     #end
   #end
 #end

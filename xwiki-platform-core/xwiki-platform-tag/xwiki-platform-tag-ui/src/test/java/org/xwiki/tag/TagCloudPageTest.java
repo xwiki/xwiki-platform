@@ -309,6 +309,44 @@ class TagCloudPageTest extends PageTest
     }
 
     @Test
+    void withSpacesMixingQuotedAndPlainLocations() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{tagcloud spaces=\"'Space1','My, Space',Sandbox, O'Brien\"/}}");
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        renderHTMLPage(xwikiDocument);
+
+        verify(this.query).bindValues(List.of("Space1", "Space1.%", "My, Space", "My, Space.%", "Sandbox",
+            "Sandbox.%", "O'Brien", "O'Brien.%"));
+    }
+
+    public static Stream<String> withInvalidSpacesSource()
+    {
+        return Stream.of("'Sandbox", "'Sandbox' Space", "Sandbox,,Space", "Sandbox,", "''");
+    }
+
+    @ParameterizedTest
+    @MethodSource("withInvalidSpacesSource")
+    void withInvalidSpaces(String spaces) throws Exception
+    {
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent(String.format("{{tagcloud spaces=\"%s\"/}}", spaces));
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        Document document = renderHTMLPage(xwikiDocument);
+
+        assertEquals(String.format("tag.cloud.invalidLocations [%s]", spaces),
+            document.selectFirst(".errormessage").text());
+        verify(this.query, never()).execute();
+    }
+
+    @Test
     void withSpacesAndNoTags() throws Exception
     {
         when(this.query.execute()).thenReturn(List.of());

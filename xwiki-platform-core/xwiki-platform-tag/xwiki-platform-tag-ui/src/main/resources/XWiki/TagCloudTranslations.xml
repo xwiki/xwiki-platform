@@ -39,6 +39,7 @@
   <content>rendering.macro.tagcloud.parameter.space.description=Deprecated, use spaces instead. The location to display the tags of, with its child pages. If missing, the tags of the whole wiki are displayed.
 rendering.macro.tagcloud.parameter.spaces.description=The locations to display the tags of, with their child pages, separated by commas. For example, spaces="Sandbox,My Space". To use a location with a comma in its name, put each location in single quotes and double the quotes inside a name. For example, spaces="'My, Space','Space2'". If missing, the tags of the whole wiki are displayed.
 
+tag.cloud.invalidLocations=The locations {0} can''t be read. Separate them with commas, and put a location in single quotes when its name contains a comma or starts with a quote, doubling the quotes inside its name.
 tag.cloud.locationNotFound=The location {0} does not exist.</content>
   <object>
     <name>XWiki.TagCloudTranslations</name>

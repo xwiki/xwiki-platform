@@ -45,6 +45,8 @@ public interface CSRFTokenConfiguration
      * 
      * @return the lifetime of the tokens in hours, {@code 0} or a negative value meaning that the tokens never expire
      * @since 18.9.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
      */
     @Unstable
     default int getTokenLifetime()

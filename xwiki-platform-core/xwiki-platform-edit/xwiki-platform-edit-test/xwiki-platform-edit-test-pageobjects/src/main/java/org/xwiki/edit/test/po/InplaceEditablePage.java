@@ -86,6 +86,7 @@ public class InplaceEditablePage extends ViewPage
      * another user and thus the edit lock confirmation is expected instead.
      * 
      * @return this page object
+     * @since 17.10.15
      * @since 18.4.8
      * @since 18.8.0RC1
      */
@@ -99,6 +100,7 @@ public class InplaceEditablePage extends ViewPage
      * Wait for the modal asking the user to confirm that they want to take over the edit lock held by another user.
      * 
      * @return the message displayed by the edit lock confirmation modal
+     * @since 17.10.15
      * @since 18.4.8
      * @since 18.8.0RC1
      */
@@ -169,6 +171,7 @@ public class InplaceEditablePage extends ViewPage
      * 
      * @param locale the locale of the translation being edited, the empty string for the default translation
      * @return this page object
+     * @since 17.10.15
      * @since 18.4.8
      * @since 18.8.0RC1
      */

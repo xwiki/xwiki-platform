@@ -53,7 +53,7 @@ public interface CSRFToken
      * 
      * @deprecated tokens are derived and cannot be cleared, there is no replacement
      */
-    @Deprecated(since = "18.9.0RC1")
+    @Deprecated(since = "18.9.0RC1,18.4.8,17.10.15")
     void clearToken();
 
     /**

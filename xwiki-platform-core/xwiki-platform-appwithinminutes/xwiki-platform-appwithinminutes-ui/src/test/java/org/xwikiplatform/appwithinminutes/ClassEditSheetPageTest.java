@@ -44,6 +44,9 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReferenceSerializer;
+import org.xwiki.user.script.UserScriptService;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -53,6 +56,7 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -143,9 +147,39 @@ class ClassEditSheetPageTest extends PageTest
         Document document = renderHTMLPage(editedDocument);
 
         // The custom display is evaluated with the rights of the current user (U1) and not with those of the class
-        // document author. Since U1 has no script right, the custom display script is not executed at all (so the
-        // programming right escalation does not happen) and a rendering error is displayed instead.
-        assertFalse(document.text().contains("POC_PR=true"));
+        // document author. Since U1 has no script right, the custom display script is not executed at all and a
+        // rendering error is displayed instead.
+        assertFalse(document.text().contains("PR=true"));
+        assertEquals("Failed to execute the [velocity] macro. Cause: [The execution of the [velocity] script macro is "
+                + "not allowed in [xwiki:Space.Page]. Check the rights of its last author or the parameters if it's "
+                + "rendered from another script.]. Click on this message for details.",
+            document.selectFirst(".xwikirenderingerror").text());
+    }
+
+    @Test
+    void previewComputedFieldUsesCurrentUserRights() throws Exception
+    {
+        XWikiDocument editedDocument = setUpEditedClassRequest();
+        // The computed field resolves its class from the store, where the edited class is authored by the privileged
+        // user.
+        this.xwiki.saveDocument(editedDocument, this.context);
+        loadPage(new DocumentReference("xwiki", "AppWithinMinutes", "Title"));
+
+        // Simulate the POST submitted to the edit action in preview mode, requesting the preview of a computed field
+        // whose script outputs whether it has programming right.
+        this.stubRequest.put("preview", "true");
+        this.stubRequest.put("template-testField", "AppWithinMinutes.Title");
+        this.stubRequest.put("field-testField_customDisplay", "");
+        this.stubRequest.put("field-testField_script",
+            "{{velocity}}#set($pr = $services.security.authorization.hasAccess('programming'))PR=$pr{{/velocity}}");
+
+        setUpLowPrivilegedCurrentUser();
+
+        Document document = renderHTMLPage(editedDocument);
+
+        // The script of the computed field is executed with the rights of the current user (U1) and not with those of
+        // the stored class document author. Since U1 has no script right, the script is not executed at all.
+        assertFalse(document.text().contains("PR=true"));
         assertEquals("Failed to execute the [velocity] macro. Cause: [The execution of the [velocity] script macro is "
                 + "not allowed in [xwiki:Space.Page]. Check the rights of its last author or the parameters if it's "
                 + "rendered from another script.]. Click on this message for details.",
@@ -168,12 +202,51 @@ class ClassEditSheetPageTest extends PageTest
         Document document = renderHTMLPage(editedDocument);
 
         // The CSRF check rejects the forged request with a 403 before the custom display is rendered: the only output
-        // is the JSON carrying a fresh token, so the custom display (which would have leaked POC_PR) was not executed.
+        // is the JSON carrying a fresh token, so the custom display (which would have output PR) was not executed.
         verify(responseSpy).setStatus(403);
         verify(responseSpy).setContentType("application/json");
         // The fresh token is returned in the response body (same JSON shape as XWikiAction#csrfTokenCheck) so that the
         // client can refresh it (after an explicit, user-triggered confirmation) and retry the preview.
         assertEquals("{\"errorType\":\"CSRF\",\"newToken\":\"freshToken\"}", document.text());
+    }
+
+    @Test
+    void previewFieldFailsWithoutEditRight() throws Exception
+    {
+        XWikiDocument editedDocument = setUpPreviewRequest();
+
+        // The only difference with a working preview is that the current user is not allowed to edit the class.
+        when(this.oldcore.getMockContextualAuthorizationManager()
+            .hasAccess(Right.EDIT, editedDocument.getDocumentReference())).thenReturn(false);
+
+        XWikiServletResponseStub responseSpy = spy(this.response);
+        this.context.setResponse(responseSpy);
+
+        Document document = renderHTMLPage(editedDocument);
+
+        // The request is rejected with a 403 before the custom display is rendered.
+        verify(responseSpy).setStatus(403);
+        assertEquals("notallowed", document.text());
+    }
+
+    @Test
+    void displayNewFieldFailsWithoutEditRight() throws Exception
+    {
+        XWikiDocument editedDocument = setUpDisplayNewFieldRequest();
+
+        // The only difference with a working add-field request is that the current user is not allowed to edit the
+        // class.
+        when(this.oldcore.getMockContextualAuthorizationManager()
+            .hasAccess(Right.EDIT, editedDocument.getDocumentReference())).thenReturn(false);
+
+        XWikiServletResponseStub responseSpy = spy(this.response);
+        this.context.setResponse(responseSpy);
+
+        Document document = renderHTMLPage(editedDocument);
+
+        // The request is rejected with a 403 before the field is displayed.
+        verify(responseSpy).setStatus(403);
+        assertEquals("notallowed", document.text());
     }
 
     @Test
@@ -188,9 +261,9 @@ class ClassEditSheetPageTest extends PageTest
         Document document = renderHTMLPage(editedDocument);
 
         // The custom display is evaluated with the rights of the current user (U1) and not with those of the edited
-        // class document author. Since U1 has no script right, the custom display script is not executed at all (so
-        // the programming right escalation does not happen) and a rendering error is displayed instead.
-        assertFalse(document.text().contains("POC_PR=true"));
+        // class document author. Since U1 has no script right, the custom display script is not executed at all and a
+        // rendering error is displayed instead.
+        assertFalse(document.text().contains("PR=true"));
         assertEquals("Failed to execute the [velocity] macro. Cause: [The execution of the [velocity] script macro is "
                 + "not allowed in [xwiki:Space.Page]. Check the rights of its last author or the parameters if it's "
                 + "rendered from another script.]. Click on this message for details.",
@@ -211,8 +284,18 @@ class ClassEditSheetPageTest extends PageTest
     private XWikiDocument setUpEditedClassRequest() throws Exception
     {
         DocumentReference adminDocumentReference = new DocumentReference("xwiki", "XWiki", "Admin");
+        // The sheet sets the author of the edited class to the current user reference, which the actual implementation
+        // serializes to the reference of the user in the context.
+        UserScriptService userScriptService =
+            this.componentManager.registerMockComponent(ScriptService.class, "user", UserScriptService.class, false);
+        when(userScriptService.getCurrentUserReference()).thenReturn(CurrentUserReference.INSTANCE);
+        UserReferenceSerializer<DocumentReference> userReferenceSerializer =
+            this.componentManager.getInstance(UserReferenceSerializer.TYPE_DOCUMENT_REFERENCE, "document");
+        when(userReferenceSerializer.serialize(CurrentUserReference.INSTANCE))
+            .thenAnswer(invocation -> this.context.getUserReference());
         when(this.xwiki.getRightService().hasProgrammingRights(any())).thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(any())).thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(eq(Right.EDIT), any())).thenReturn(true);
         when(this.csrfTokenScriptService.isTokenValid(any())).thenReturn(true);
 
         loadPage(new DocumentReference("xwiki", "AppWithinMinutes", "VelocityMacros"));
@@ -239,7 +322,7 @@ class ClassEditSheetPageTest extends PageTest
 
     /**
      * Extends {@link #setUpEditedClassRequest()} into a working preview request of a String field whose custom display
-     * tries to escalate to programming right.
+     * outputs whether it has programming right.
      *
      * @return the document being edited, set as the current document in the context
      */
@@ -249,20 +332,20 @@ class ClassEditSheetPageTest extends PageTest
         loadPage(new DocumentReference("xwiki", "AppWithinMinutes", "String"));
 
         // Simulate the POST submitted to the edit action in preview mode, requesting the preview of a String field
-        // whose custom display tries to escalate to programming right.
+        // whose custom display outputs whether it has programming right.
         this.stubRequest.put("preview", "true");
         this.stubRequest.put("template-testField", "AppWithinMinutes.String");
         this.stubRequest.put("field-testField_customDisplay",
-            "{{velocity}}#set($pr = $services.security.authorization.hasAccess('programming'))POC_PR=$pr{{/velocity}}");
+            "{{velocity}}#set($pr = $services.security.authorization.hasAccess('programming'))PR=$pr{{/velocity}}");
 
         return editedDocument;
     }
 
     /**
      * Extends {@link #setUpEditedClassRequest()} into a working add-field request based on the AppWithinMinutes.String
-     * field template whose (first) class property is given a custom display that tries to escalate to programming
-     * right. #displayNewField clones that property into the edited class, so the escalation must be prevented by the
-     * current user's rights and not by the field template author's rights.
+     * field template whose (first) class property is given a custom display that outputs whether it has programming
+     * right. #displayNewField clones that property into the edited class, where it is displayed with the current
+     * user's rights and not with the field template author's rights.
      *
      * @return the document being edited, set as the current document in the context
      */
@@ -271,12 +354,12 @@ class ClassEditSheetPageTest extends PageTest
         XWikiDocument editedDocument = setUpEditedClassRequest();
 
         // The form field template cloned by #displayNewField. Its first class property is given a custom display that
-        // tries to escalate to programming right.
+        // outputs whether it has programming right.
         XWikiDocument fieldTemplate =
             loadPage(new DocumentReference("xwiki", "AppWithinMinutes", "String"));
         PropertyClass shortText = (PropertyClass) fieldTemplate.getXClass().get("shortText");
         shortText.setCustomDisplay(
-            "{{velocity}}#set($pr = $services.security.authorization.hasAccess('programming'))POC_PR=$pr{{/velocity}}");
+            "{{velocity}}#set($pr = $services.security.authorization.hasAccess('programming'))PR=$pr{{/velocity}}");
         this.xwiki.saveDocument(fieldTemplate, this.context);
 
         // The template document from which #displayNewField creates the object used to render the field being added.

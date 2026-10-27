@@ -62,10 +62,10 @@ public class Upgrade1610Test extends UpgradeTest
             // The Netflux API installed by the previous version uses the javax.websocket API without declaring it as a
             // dependency: it gets it only when the javax.websocket-api extension (installed as a dependency of other
             // extensions) is initialized before it, which depends on the initialization order of the installed
-            // extensions. Otherwise, it and the realtime extensions depending on it cannot be initialized until they
-            // are upgraded.
+            // extensions. Otherwise, it and the Netflux and realtime extensions depending on it cannot be initialized
+            // until they are upgraded.
             "Failed to initialize local extension [org.xwiki.platform:xwiki-platform-realtime-",
-            "Failed to initialize local extension [org.xwiki.platform:xwiki-platform-netflux-api/16.10.0]"
+            "Failed to initialize local extension [org.xwiki.platform:xwiki-platform-netflux-"
         );
     }
 }

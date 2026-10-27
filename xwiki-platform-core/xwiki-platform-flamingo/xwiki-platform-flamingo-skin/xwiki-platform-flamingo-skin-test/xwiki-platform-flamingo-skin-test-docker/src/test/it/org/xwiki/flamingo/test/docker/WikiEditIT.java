@@ -933,7 +933,8 @@ class WikiEditIT
             "org.hibernate.exception.DataException",
             "java.sql.BatchUpdateException: data exception: string data, right truncation",
             "SQL Error: 1406, SQLState: 22001",
-            "Data truncation: Data too long for column 'XWD_TITLE' at row 1",
+            // MySQL prefixes this message with Data truncation and MariaDB with the connection id
+            "Data too long for column 'XWD_TITLE' at row 1",
             "SQL Error: 3401, SQLState: 22001",
             "SQL Error: -3401, SQLState: 22001",
             "SQL Error: 0, SQLState: 22001",

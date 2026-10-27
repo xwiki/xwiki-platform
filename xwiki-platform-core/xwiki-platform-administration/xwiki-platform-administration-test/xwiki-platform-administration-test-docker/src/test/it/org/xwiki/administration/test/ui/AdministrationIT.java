@@ -21,10 +21,8 @@ package org.xwiki.administration.test.ui;
 
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,6 +32,8 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -44,7 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 4.3M1
  */
 @UITest
-@TestMethodOrder(OrderAnnotation.class)
 class AdministrationIT
 {
     private static final String LOCK_USER_NAME = "AdministrationLockUser";
@@ -131,13 +130,11 @@ class AdministrationIT
         setup.loginAsSuperAdmin();
         setup.gotoPage(webPreferencesReference, "admin");
         String notice = new BasePage().getXWikiMessageContent();
-        assertTrue(notice.contains("This page is currently locked by " + LOCK_USER_NAME),
-            String.format("Unexpected lock notice [%s]", notice));
+        assertThat(notice, containsString("This page is currently locked by " + LOCK_USER_NAME));
 
         // The editor shows a similar notice, from a different template.
         setup.gotoPage(webPreferencesReference, "edit");
         String editNotice = new ForceEditLockPage().getBody();
-        assertTrue(editNotice.contains("This page is currently locked by " + LOCK_USER_NAME),
-            String.format("Unexpected edit lock notice [%s]", editNotice));
+        assertThat(editNotice, containsString("This page is currently locked by " + LOCK_USER_NAME));
     }
 }

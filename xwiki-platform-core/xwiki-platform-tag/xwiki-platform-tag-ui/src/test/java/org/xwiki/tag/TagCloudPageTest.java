@@ -232,7 +232,7 @@ class TagCloudPageTest extends PageTest
 
         Document document = renderHTMLPage(xwikiDocument);
 
-        assertEquals("xe.tag.notagsforspace [My_Space]", document.selectFirst("p.noitems").text());
+        assertEquals("xe.tag.notagsforspace", document.selectFirst("p.noitems").text());
         verify(this.query).bindValues(List.of("My_Space", "My\\_Space.%"));
     }
 
@@ -358,7 +358,7 @@ class TagCloudPageTest extends PageTest
 
         Document document = renderHTMLPage(xwikiDocument);
 
-        assertEquals("xe.tag.notagsforspace [My_Space]", document.selectFirst("p.noitems").text());
+        assertEquals("xe.tag.notagsforspace", document.selectFirst("p.noitems").text());
         assertNull(document.selectFirst(".warningmessage"));
         verify(this.query).bindValues(List.of("My_Space", "My\\_Space.%"));
     }
@@ -378,5 +378,47 @@ class TagCloudPageTest extends PageTest
 
         assertEquals("tag.cloud.locationNotFound [No.Such]", document.selectFirst(".warningmessage").text());
         verify(this.spaceQuery).bindValue("space", "No.Such");
+    }
+
+    @Test
+    void withSpacesAndOneMissingLocation() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        ScriptQuery missingSpaceQuery = mock(ScriptQuery.class, RETURNS_SELF);
+        when(missingSpaceQuery.execute()).thenReturn(List.of());
+        when(this.spaceQuery.bindValue("space", "No**Such**")).thenReturn(missingSpaceQuery);
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{tagcloud spaces=\"Sandbox,No**Such**\"/}}");
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        Document document = renderHTMLPage(xwikiDocument);
+
+        Elements warnings = document.select(".warningmessage");
+        assertEquals(1, warnings.size());
+        // The location is displayed as typed, without being parsed as wiki syntax.
+        assertEquals("tag.cloud.locationNotFound [No**Such**]", warnings.get(0).text());
+        assertNull(warnings.get(0).selectFirst("strong"));
+        assertEquals("xe.tag.notagsforspace", document.selectFirst("p.noitems").text());
+        verify(this.spaceQuery).bindValue("space", "Sandbox");
+    }
+
+    @Test
+    void includedWithTagCloudSpace() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        XWikiDocument tagCloudDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "TagCloud"), this.context);
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{velocity}}#set ($tagCloudSpace = \"Apo'stroph, Space\"){{/velocity}}\n\n"
+            + tagCloudDocument.getContent());
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        renderHTMLPage(xwikiDocument);
+
+        verify(this.query).bindValues(List.of("Apo'stroph, Space", "Apo'stroph, Space.%"));
     }
 }

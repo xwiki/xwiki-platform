@@ -470,7 +470,8 @@ ol.tagCloud .ultraPopular {
 ##
 ## tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
 #set ($tagCloudSpace = $wikimacro.parameters.get('space'))
-## The value of spaces is read as typed, because its conversion to a list would also split the names on whitespace.
+## The value of spaces is read as typed through the deprecated $xcontext.macro binding on purpose: $wikimacro only gives
+## its conversion to a list, which also splits the names on whitespace, and has no macro context in async rendering.
 #set ($tagCloudSpaces = $xcontext.macro.params.spaces)
 #set ($limit = $wikimacro.parameters.get('limit'))
 #if ("$!limit" != '' &amp;&amp; $limit &lt; 0)
@@ -529,8 +530,8 @@ $xwiki.ssx.use('XWiki.TagCloud')##
 #foreach ($location in $tagCloudLocations)
   #set ($spaceQuery = $services.query.hql('select space.reference from XWikiSpace space where space.reference = :space'))
   #if ($spaceQuery.bindValue('space', $location).setLimit(1).execute().isEmpty())
-    #set ($notFoundMessage = $services.localization.render('tag.cloud.locationNotFound', [$location]))
-    {{warning}}$services.rendering.escape($notFoundMessage, 'xwiki/2.1'){{/warning}}
+    #set ($wikiLocation = $services.rendering.escape($location, 'xwiki/2.1'))
+    {{warning}}$services.localization.render('tag.cloud.locationNotFound', [$wikiLocation]){{/warning}}
   #end
 #end
 ## Organize tags as a list of {name, count} object so that it is easier to handle (sorting, limiting, ...)
@@ -605,9 +606,9 @@ $xwiki.ssx.use('XWiki.TagCloud')##
 #else
   &lt;p class="noitems"&gt;
   #if ($tagCloudLocations.isEmpty())
-    $services.localization.render('xe.tag.notags')
+    $escapetool.xml($services.localization.render('xe.tag.notags'))
   #else
-    $services.localization.render('xe.tag.notagsforspace', [$stringtool.join($tagCloudLocations, ', ')])
+    $escapetool.xml($services.localization.render('xe.tag.notagsforspace'))
   #end
   &lt;/p&gt;
 #end

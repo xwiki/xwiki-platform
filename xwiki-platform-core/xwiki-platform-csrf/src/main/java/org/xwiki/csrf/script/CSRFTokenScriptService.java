@@ -58,7 +58,7 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
      *             period and cannot be cleared, there is no replacement
      */
     @Override
-    @Deprecated(since = "18.9.0RC1")
+    @Deprecated(since = "18.9.0RC1,18.4.8,17.10.15")
     public void clearToken()
     {
         this.csrf.clearToken();

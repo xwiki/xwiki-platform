@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { injectLinkId } from "./linkId";
+import { trackPaste } from "../attachments/pasteTracker";
 import { withUniqueName } from "../attachments/uniqueFileName";
 import { EntityType } from "@xwiki/platform-model-api";
 import { uuidv4 } from "lib0/random";
@@ -31,12 +32,14 @@ import type { Container } from "inversify";
 // A whole partial block, not just props, which is what lets us replace the block BlockNote guessed.
 type UploadResult = Record<string, unknown>;
 
-type UploadFileDependencies = {
+type FileUploaderDependencies = {
+  // Where the paste and drop events are listened for, scoped to the editor so that two editors on the same page don't
+  // see each other's.
+  eventTarget: EventTarget;
+
   // Functions because neither is known yet when the editor is created.
   getDocumentReference: () => string;
   getBlockNoteDocument: () => BlockNoteDocument | undefined;
-
-  isPaste: () => boolean;
 
   // Whether the files are uploaded to the temporary store of the user session, from where the save request attaches
   // them to the document, rather than being attached right away.
@@ -49,6 +52,17 @@ type UploadFileDependencies = {
   notifyUploadFailed: (fileName: string, error: unknown) => void;
 };
 
+/**
+ * Attaches to the edited document the files pasted and dropped over the editor, producing the same wiki syntax as the
+ * CKEditor integration. Its upload function is what BlockNote expects as its `uploadFile` option.
+ */
+type FileUploader = {
+  upload: (file: File, blockId?: string) => Promise<UploadResult>;
+
+  // Stops listening for the paste and drop events. Call it when the editor goes away.
+  dispose: () => void;
+};
+
 const EMPTY_PARAGRAPH: UploadResult = { type: "paragraph", content: [] };
 
 function attachmentReference(
@@ -58,36 +72,44 @@ function attachmentReference(
   return { type: "attach", typed, reference, parameters: {} };
 }
 
+// The components the uploader needs, so that the editor doesn't have to know about them.
+function getComponents(container: Container) {
+  return {
+    storageProvider: container.get<StorageProvider>("StorageProvider"),
+    modelReferenceParser: container
+      .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+      .get()!,
+    remoteURLSerializer: container
+      .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+      .get()!,
+  };
+}
+
 /**
- * The BlockNote `uploadFile` option: attaches the pasted and dropped files to the edited document, producing the same
- * wiki syntax as the CKEditor integration.
- *
  * @param container - the component container the storage and the model components are taken from
  * @param dependencies - what only the editor knows
- * @returns the upload function BlockNote calls for each pasted or dropped file
+ * @returns a file uploader for the document the editor is editing
  */
-function createUploadFile(
+function createFileUploader(
   container: Container,
-  dependencies: UploadFileDependencies,
-): (file: File, blockId?: string) => Promise<UploadResult> {
+  dependencies: FileUploaderDependencies,
+): FileUploader {
   const {
+    eventTarget,
     getDocumentReference,
     getBlockNoteDocument,
-    isPaste,
     isTemporaryUpload,
     registerTemporaryAttachment,
     notifyUploadFailed,
   } = dependencies;
 
-  const storageProvider = container.get<StorageProvider>("StorageProvider");
-  const modelReferenceParser = container
-    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    .get()!;
-  const remoteURLSerializer = container
-    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-    .get()!;
+  const { storageProvider, modelReferenceParser, remoteURLSerializer } =
+    getComponents(container);
 
-  async function upload(file: File): Promise<string> {
+  // Pasted files are renamed, so we need to know how the file reached the editor.
+  const pasteTracker = trackPaste(eventTarget);
+
+  async function attach(file: File): Promise<string> {
     const temporary = isTemporaryUpload();
     const result = await storageProvider
       .get()
@@ -149,13 +171,11 @@ function createUploadFile(
     };
   }
 
-  return async function uploadFile(
-    file: File,
-    blockId?: string,
-  ): Promise<UploadResult> {
-    const toUpload = isPaste() || !file.name ? withUniqueName(file) : file;
+  async function upload(file: File, blockId?: string): Promise<UploadResult> {
+    const toUpload =
+      pasteTracker.isPaste() || !file.name ? withUniqueName(file) : file;
     try {
-      const reference = await upload(toUpload);
+      const reference = await attach(toUpload);
       return file.type.startsWith("image/")
         ? toImageBlock(reference, blockId)
         : toAttachmentLink(reference, toUpload.name);
@@ -165,7 +185,18 @@ function createUploadFile(
       notifyUploadFailed(toUpload.name, error);
       return EMPTY_PARAGRAPH;
     }
+  }
+
+  return {
+    upload,
+    // Not the method itself: that would assume it never comes to use `this`.
+    dispose: () => pasteTracker.dispose(),
   };
 }
 
-export { type UploadFileDependencies, type UploadResult, createUploadFile };
+export {
+  type FileUploader,
+  type FileUploaderDependencies,
+  type UploadResult,
+  createFileUploader,
+};

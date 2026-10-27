@@ -20,16 +20,21 @@
 import { BlockNoteDocument } from "./BlockNoteProcessor";
 import { DefaultBlockNoteIterator } from "./DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./XWikiBlockNoteProcessor";
-import { createUploadFile } from "./createUploadFile";
+import { createFileUploader } from "./createFileUploader";
 import { extractLinkId, stripLinkId } from "./linkId";
 import { EntityType } from "@xwiki/platform-model-api";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 function file(name, type) {
   return new File(["content"], name, { type });
 }
 
-// The components the upload function looks up itself.
+// The components the uploader looks up itself.
+// How the file reached the editor is told by the event that precedes the upload, not by a dependency.
+function paste(eventTarget) {
+  eventTarget.dispatchEvent(new Event("paste"));
+}
+
 function container(saveAttachments) {
   const components = {
     StorageProvider: { get: () => ({ saveAttachments }) },
@@ -52,20 +57,21 @@ function container(saveAttachments) {
   return { get: (name) => components[name] };
 }
 
-describe("createUploadFile", () => {
+describe("createFileUploader", () => {
   let blockNoteDocument,
     saveAttachments,
     notifyUploadFailed,
-    paste,
+    eventTarget,
     temporary,
     registerTemporaryAttachment,
+    fileUploader,
     uploadFile;
 
   function dependencies() {
     return {
+      eventTarget,
       getDocumentReference: () => "Space.Page",
       getBlockNoteDocument: () => blockNoteDocument,
-      isPaste: () => paste,
       isTemporaryUpload: () => temporary,
       registerTemporaryAttachment,
       notifyUploadFailed,
@@ -74,13 +80,21 @@ describe("createUploadFile", () => {
 
   beforeEach(() => {
     blockNoteDocument = new BlockNoteDocument([]);
-    paste = false;
+    eventTarget = document.createElement("div");
     temporary = false;
     registerTemporaryAttachment = vi.fn();
     notifyUploadFailed = vi.fn();
     // The storage returns the reference of the created attachment.
     saveAttachments = vi.fn(async (page, files) => [files[0].name]);
-    uploadFile = createUploadFile(container(saveAttachments), dependencies());
+    fileUploader = createFileUploader(
+      container(saveAttachments),
+      dependencies(),
+    );
+    uploadFile = fileUploader.upload;
+  });
+
+  afterEach(() => {
+    fileUploader.dispose();
   });
 
   describe("image files", () => {
@@ -164,7 +178,7 @@ describe("createUploadFile", () => {
 
   describe("file names", () => {
     it("renames a pasted file, which the browser names after its media type", async () => {
-      paste = true;
+      paste(eventTarget);
 
       const result = await uploadFile(file("image.png", "image/png"), "id");
 
@@ -177,6 +191,8 @@ describe("createUploadFile", () => {
     });
 
     it("keeps the name of a dropped file", async () => {
+      eventTarget.dispatchEvent(new Event("drop"));
+
       const result = await uploadFile(file("photo.png", "image/png"), "id");
 
       expect(saveAttachments.mock.calls[0][1][0].name).toBe("photo.png");
@@ -201,7 +217,7 @@ describe("createUploadFile", () => {
     });
 
     it("labels the link with the name the attachment was created with", async () => {
-      paste = true;
+      paste(eventTarget);
 
       const result = await uploadFile(
         file("image.pdf", "application/pdf"),
@@ -210,6 +226,23 @@ describe("createUploadFile", () => {
 
       const uploaded = saveAttachments.mock.calls[0][1][0].name;
       expect(result.content[0].content).toBe(uploaded);
+    });
+
+    it("stops watching for pastes once disposed of", async () => {
+      fileUploader.dispose();
+      paste(eventTarget);
+
+      await uploadFile(file("image.png", "image/png"), "id");
+
+      expect(saveAttachments.mock.calls[0][1][0].name).toBe("image.png");
+    });
+
+    it("ignores the pastes of the other editors on the page", async () => {
+      document.dispatchEvent(new Event("paste"));
+
+      await uploadFile(file("image.png", "image/png"), "id");
+
+      expect(saveAttachments.mock.calls[0][1][0].name).toBe("image.png");
     });
   });
 
@@ -305,7 +338,7 @@ describe("createUploadFile", () => {
 
     it("registers the generated name of a pasted file", async () => {
       temporary = true;
-      paste = true;
+      paste(eventTarget);
 
       await uploadFile(file("image.png", "image/png"), "id");
 

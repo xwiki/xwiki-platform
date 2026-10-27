@@ -192,6 +192,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Ziehen und platzieren Si
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Löschen
 platform.appwithinminutes.liveTableEditorAddColumnHint=Hinzufügen
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Einige Spalten sind nicht mehr aktuell, wahrscheinlich, weil die zugehörigen Felder gelöscht wurden. Möchten Sie diese Spalten entfernen?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Veraltete Spalten entfernen
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Behalten
 platform.appwithinminutes.liveTableEditorIcon=Symbol
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Das Anwendungssymbol. Sie können ein Symbol aus der Symbolauswahl auswählen oder auf ein angehängtes Bild verweisen.
 
@@ -272,5 +274,6 @@ appWithinMinutes.templateProviderEditor.title={0} Enträge
 
 ### Since 18.6.0
 #@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Einige Spalten sind nicht mehr aktuell, wahrscheinlich, weil die zugehörigen Felder gelöscht wurden. Möchten Sie diese Spalten entfernen? &lt;a href=""&gt;Ja&lt;/a&gt; / &lt;a href=""&gt;Nein&lt;/a&gt;</content>
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Einige Spalten sind nicht mehr aktuell, wahrscheinlich, weil die zugehörigen Felder gelöscht wurden. Möchten Sie diese Spalten entfernen? &lt;a href=""&gt;Ja&lt;/a&gt; / &lt;a href=""&gt;Nein&lt;/a&gt;
+</content>
 </xwikidoc>

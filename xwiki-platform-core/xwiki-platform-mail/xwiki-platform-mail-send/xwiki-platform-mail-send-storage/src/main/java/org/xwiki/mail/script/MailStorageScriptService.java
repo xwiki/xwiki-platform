@@ -382,7 +382,9 @@ public class MailStorageScriptService extends AbstractMailScriptService
     private boolean isFromCurrentWiki(MailStatus status)
     {
         XWikiContext xwikiContext = this.xwikiContextProvider.get();
-        return xwikiContext.isMainWiki() || xwikiContext.getWikiId().equals(status.getWiki());
+        // The context has no current wiki when it has no wiki reference: then the mail is not from it.
+        String wikiId = xwikiContext.getWikiId();
+        return xwikiContext.isMainWiki() || (wikiId != null && wikiId.equals(status.getWiki()));
     }
 
     private Map<String, Object> normalizeFilterMap(Map<String, Object> filterMap)

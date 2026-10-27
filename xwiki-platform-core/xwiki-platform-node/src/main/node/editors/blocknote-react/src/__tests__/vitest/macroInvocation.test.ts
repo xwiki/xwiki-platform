@@ -133,7 +133,6 @@ describe("insertMacroInvocation", () => {
         type: "xwikiMacroBlock",
         props: {
           call: JSON.stringify(invocationToMacroCall(invocation)),
-          output: "[]",
         },
       },
     ]);
@@ -162,7 +161,6 @@ describe("insertMacroInvocation", () => {
         type: "xwikiInlineMacro",
         props: {
           call: JSON.stringify(invocationToMacroCall(invocation)),
-          output: "[]",
         },
       },
     ]);

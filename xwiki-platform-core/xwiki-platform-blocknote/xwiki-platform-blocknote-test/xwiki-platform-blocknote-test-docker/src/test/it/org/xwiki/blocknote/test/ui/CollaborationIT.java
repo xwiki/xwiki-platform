@@ -22,6 +22,7 @@ package org.xwiki.blocknote.test.ui;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -1087,6 +1088,78 @@ class CollaborationIT extends AbstractBlockNoteIT
         multiUserSetup.switchToBrowserTab(secondTabHandle);
         secondToolbar.waitUntilEditingAlone();
         assertEquals("one\ntwo\nthree\nfour", secondEditPage.done().getContent());
+    }
+
+    @Test
+    @Order(13)
+    void macroOutputIsNotShared(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh. The macro output depends on the current user, and it's not supposed to be shared with the other
+        // users editing the page.
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference);
+        setup.createPage(testReference, """
+            Hello {{velocity}}$xcontext.userReference.name{{/velocity}}!
+
+            {{velocity}}
+            Welcome $xcontext.userReference.name
+            {{/velocity}}
+            """, "");
+
+        // Edit the page in-place as superadmin, who starts the collaboration session.
+        BlockNoteInplaceEditPage firstEditPage = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
+        firstTextArea.waitUntilTextContains("Welcome superadmin");
+        assertTrue(firstTextArea.getText().contains("Hello superadmin!"));
+
+        //
+        // Second Tab
+        //
+
+        // Join the collaboration session as John. The superadmin content author has script right, but John doesn't.
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsJohn(setup);
+        BlockNoteInplaceEditPage secondEditPage = BlockNoteInplaceEditPage.gotoPage(testReference);
+        joinSessionConfirmingRequiredRightsWarning(secondEditPage);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        // John gets the macro calls but not their output (which was rendered for superadmin).
+        secondTextArea.waitUntilTextContains("Hello macro:velocity!");
+        String secondText = secondTextArea.getText();
+        assertEquals(2, StringUtils.countMatches(secondText, "macro:velocity"), "Unexpected content: " + secondText);
+        assertFalse(secondText.contains("superadmin"), "Unexpected content: " + secondText);
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Superadmin keeps seeing the macro output while editing.
+        firstTextArea.appendParagraph("end").waitUntilTextContains("end");
+        assertTrue(firstTextArea.getText().contains("Hello superadmin!"));
+        assertTrue(firstTextArea.getText().contains("Welcome superadmin"));
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilTextContains("end");
+        assertFalse(secondTextArea.getText().contains("superadmin"));
+        // Leave without making changes, so that superadmin remains the effective author of the collaboration session.
+        secondEditPage.cancel();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstEditPage.getToolbar().waitUntilEditingAlone();
+        // The macro calls are saved even though the macro output is not part of the edited content.
+        assertEquals("Hello superadmin!\nWelcome superadmin\nend", firstEditPage.done().getContent());
     }
 
     /**

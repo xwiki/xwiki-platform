@@ -430,6 +430,10 @@ function getEditedDocument(): XWikiDocument {
 // resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
 const macros: BlockNoteViewWrapperProps["macros"] = {
   ctx: {
+    // The macro output is kept outside the edited content (which is shared with the other users when editing in
+    // realtime) because it was rendered for the current user.
+    getMacroOutput: (id, call) => blockNoteDocument?.getMacroOutput(id, call),
+
     openParamsEditor: async (invocation, update) => {
       try {
         const macroWizard: BlockNoteMacroWizard = container.get(

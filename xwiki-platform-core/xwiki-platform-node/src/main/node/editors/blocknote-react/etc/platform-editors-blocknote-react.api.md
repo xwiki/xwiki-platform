@@ -81,6 +81,7 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 export type ContextForMacros = {
     openParamsEditor?(invocation: MacroBlockInvocation | InlineMacroInvocation, update: (updated: MacroBlockInvocation | InlineMacroInvocation) => void): void;
     openInsertionEditor?(prefill: MacroInsertionEditorPrefillData, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
+    getMacroOutput?(id: string, call: string): unknown[] | undefined;
 };
 
 // @beta

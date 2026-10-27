@@ -395,10 +395,15 @@ function getNestedMacroOutput(
   call: MacroCall,
   macros: ContextForMacros | null,
 ): OutputNode[] {
+  // A macro nested in the output of another macro carries its own output, because the whole output of the top-level
+  // macro was rendered for the current user and is kept outside the edited content.
   const output = node.props?.output;
   if (output) {
     return output as OutputNode[];
   }
+  // A macro nested in the parameters or content of another macro call (i.e. in an xwikiEditable value) is part of the
+  // edited content, which is shared with the other users when editing in realtime, so it doesn't carry its output
+  // (rendered for the current user). Its output, if available, is kept by the macro context, under the macro id.
   const id = node.props?.id;
   if (typeof id === "string" && id) {
     return (macros?.getMacroOutput?.(id, JSON.stringify(call)) ??

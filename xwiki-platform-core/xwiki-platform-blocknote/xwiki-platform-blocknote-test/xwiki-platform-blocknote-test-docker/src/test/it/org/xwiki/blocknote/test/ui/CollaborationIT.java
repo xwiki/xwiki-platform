@@ -51,6 +51,9 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ForceEditLockModal;
 import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -1114,7 +1117,7 @@ class CollaborationIT extends AbstractBlockNoteIT
         BlockNoteInplaceEditPage firstEditPage = new BlockNoteInplaceEditPage().editInplace();
         BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
         firstTextArea.waitUntilTextContains("Welcome superadmin");
-        assertTrue(firstTextArea.getText().contains("Hello superadmin!"));
+        assertThat(firstTextArea.getText(), containsString("Hello superadmin!"));
 
         //
         // Second Tab
@@ -1130,7 +1133,7 @@ class CollaborationIT extends AbstractBlockNoteIT
         secondTextArea.waitUntilTextContains("Hello macro:velocity!");
         String secondText = secondTextArea.getText();
         assertEquals(2, StringUtils.countMatches(secondText, "macro:velocity"), "Unexpected content: " + secondText);
-        assertFalse(secondText.contains("superadmin"), "Unexpected content: " + secondText);
+        assertThat(secondText, not(containsString("superadmin")));
 
         //
         // First Tab
@@ -1139,8 +1142,9 @@ class CollaborationIT extends AbstractBlockNoteIT
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         // Superadmin keeps seeing the macro output while editing.
         firstTextArea.appendParagraph("end").waitUntilTextContains("end");
-        assertTrue(firstTextArea.getText().contains("Hello superadmin!"));
-        assertTrue(firstTextArea.getText().contains("Welcome superadmin"));
+        String firstText = firstTextArea.getText();
+        assertThat(firstText, containsString("Hello superadmin!"));
+        assertThat(firstText, containsString("Welcome superadmin"));
 
         //
         // Second Tab
@@ -1148,7 +1152,7 @@ class CollaborationIT extends AbstractBlockNoteIT
 
         multiUserSetup.switchToBrowserTab(secondTabHandle);
         secondTextArea.waitUntilTextContains("end");
-        assertFalse(secondTextArea.getText().contains("superadmin"));
+        assertThat(secondTextArea.getText(), not(containsString("superadmin")));
         // Leave without making changes, so that superadmin remains the effective author of the collaboration session.
         secondEditPage.cancel();
 

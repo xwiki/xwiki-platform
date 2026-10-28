@@ -246,7 +246,7 @@ $xwiki.getUserName("xwiki:${username}")
  *                    // are "small-avatar"/"medium-avatar"/"large-avatar" for the size and "circle-avatar"
  *                    // for a fully rounded avatar
  *   displayName: true // @since 18.9.0RC1 ; whether to visually display the name
- *   disabled: false // @since 18.9.0RC1 whether to show or not that the user got removed.
+ *   disabled: false // @since 18.10.0RC1 whether the user is disabled or not; disabled users are displayed distinctly
  * }
  *#
 #macro (displayUser $arg $options)
@@ -384,7 +384,7 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 
 #**
- * Util macro used to display users a specific way in a couple places in XWiki Standard.
+ * Utility macro used to display users in a specific way in a couple of places in XWiki Standard.
  * This is not an API, avoid relying on it.
  *#
 #macro (_displayUserAliasWithAvatar $userReference $disabled)

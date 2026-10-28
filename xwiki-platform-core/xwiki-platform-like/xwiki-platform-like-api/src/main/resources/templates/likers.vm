@@ -56,7 +56,7 @@
                 'doc_wiki': $userDoc.wiki,
                 'doc_url': $userDoc.getURL(),
                 'doc_viewable': true,
-                'name': "#_displayUserAliasWithAvatar($userDoc.documentReference $disabled)",
+                'name': "#_displayUserAliasWithAvatar($userDoc.documentReference)",
                 'first_name': $userProperties.firstName,
                 'last_name': $userProperties.lastName
             })

@@ -25,21 +25,28 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.internal.reference.converter.WikiReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.notifiers.script.NotificationNotifiersScriptService;
 import org.xwiki.notifications.script.NotificationScriptService;
 import org.xwiki.notifications.sources.script.NotificationSourcesScriptService;
 import org.xwiki.properties.internal.converter.ListConverter;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wikimacro.internal.WikiMacroFactoryComponentClass;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.tag.Tag;
 import org.xwiki.tag.internal.TagConverter;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.user.DefaultUserComponentList;
+import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.converter.UserReferenceConverter;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -88,6 +95,23 @@ class NotificationsMacroPageTest extends PageTest
 
         loadWikiMacro(this, this.componentManager,
             new DocumentReference("xwiki", List.of("XWiki", "Notifications", "Code", "Macro"), "NotificationsMacro"));
+    }
+
+    @Test
+    void locationParametersAreTyped() throws Exception
+    {
+        Macro<?> macro = this.componentManager.getInstance(Macro.class, "notifications");
+        Map<String, ParameterDescriptor> parameters = macro.getDescriptor().getParameterDescriptorMap();
+        assertEquals(new DefaultParameterizedType(null, List.class, WikiReference.class),
+            parameters.get("wikis").getParameterType());
+        assertEquals(new DefaultParameterizedType(null, List.class, SpaceReference.class),
+            parameters.get("spaces").getParameterType());
+        assertEquals(new DefaultParameterizedType(null, List.class, DocumentReference.class),
+            parameters.get("pages").getParameterType());
+        assertEquals(new DefaultParameterizedType(null, List.class, UserReference.class),
+            parameters.get("users").getParameterType());
+        assertEquals(new DefaultParameterizedType(null, List.class, Tag.class),
+            parameters.get("tags").getParameterType());
     }
 
     @Test

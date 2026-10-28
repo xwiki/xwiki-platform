@@ -23,14 +23,18 @@
 define('xwiki-suggestWikis', ['jquery', 'xwiki-entityReference', 'xwiki-selectize'], function($, XWiki) {
   function getSelectizeOptions() {
     const loadURL = [XWiki.contextPath, 'rest', 'wikis'].join('/');
-    // The wikis resource can't filter or paginate, but a farm holds few wikis, so all of them are listed and the
-    // picker filters them on the typed text.
+    // The wikis resource can't filter or paginate, but a farm holds few wikis, so all of them are fetched once per
+    // picker and the picker filters them on the typed text.
+    let wikisPromise;
     async function load(text, callback) {
       try {
-        const response = await $.getJSON(loadURL);
+        wikisPromise ??= $.getJSON(loadURL);
+        const response = await wikisPromise;
         const wikis = Array.isArray(response?.wikis) ? response.wikis : [];
         callback(wikis.map(wiki => ({value: wiki.name})));
       } catch {
+        // Fetch the wikis again on the next call.
+        wikisPromise = undefined;
         callback();
       }
     }

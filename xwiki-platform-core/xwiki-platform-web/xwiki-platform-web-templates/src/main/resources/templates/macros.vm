@@ -2815,7 +2815,6 @@ $string##
  * @param $parameters the picker parameters, see #suggestInput
  *#
 #macro (_valuePicker $type $class $parameters)
-  #picker_import
   #set ($discard = $parameters.put('class', "$!parameters.get('class') $class"))
   #if ($parameters.get('multiple') == 'multiple')
     #set ($macro.titleKey = "core.widgets.suggest.${type}Picker.multi.title")
@@ -2824,6 +2823,16 @@ $string##
   #end
   #set ($discard = $parameters.putIfAbsent('title', $services.localization.render($macro.titleKey)))
   #suggestInput($parameters)
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the tag picker.
+ *
+ * @since 18.10.0RC1
+ *#
+#macro (tagPicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
 #end
 
 #**
@@ -2837,7 +2846,7 @@ $string##
  * @since 18.10.0RC1
  *#
 #macro (tagPicker $parameters)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
+  #tagPicker_import
   #if ("$!parameters" == "")
     #set ($parameters = {})
   #end
@@ -2845,6 +2854,16 @@ $string##
   #set ($discard = $parameters.put('data-className', 'XWiki.TagClass'))
   #set ($discard = $parameters.put('data-propertyName', 'tags'))
   #_valuePicker('tag' 'suggest-propertyValues' $parameters)
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the wiki picker.
+ *
+ * @since 18.10.0RC1
+ *#
+#macro (wikiPicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestWikis.js'))
 #end
 
 #**
@@ -2857,7 +2876,7 @@ $string##
  * @since 18.10.0RC1
  *#
 #macro (wikiPicker $parameters)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestWikis.js'))
+  #wikiPicker_import
   #if ("$!parameters" == "")
     #set ($parameters = {})
   #end

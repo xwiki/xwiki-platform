@@ -22,10 +22,7 @@ import {
   tryFallibleOrError,
 } from "@xwiki/platform-fn-utils";
 import React from "react";
-import type {
-  RemoteURLParser,
-  RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
+import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 import type {
   Block,
   BlockStyles,
@@ -55,10 +52,7 @@ export type MacroEditableZoneRef =
  * @beta
  */
 export class UniAstToReactJsxConverter {
-  constructor(
-    private readonly remoteURLParser: RemoteURLParser,
-    private readonly remoteURLSerializer: RemoteURLSerializer,
-  ) {}
+  constructor(private readonly remoteURLSerializer: RemoteURLSerializer) {}
 
   /**
    * Render UniAst blocks to JSX elements
@@ -443,19 +437,13 @@ export class UniAstToReactJsxConverter {
       return target.url;
     }
 
-    const { rawReference } = target;
+    const { rawReference, parsedReference } = target;
 
-    const parsedRef = tryFallibleOrError(() =>
-      this.remoteURLParser.parse(rawReference),
-    );
-
-    if (parsedRef instanceof Error) {
-      throw new Error(
-        `Failed to parse reference "${rawReference}": ${parsedRef.message}`,
-      );
+    if (!parsedReference) {
+      throw new Error(`Invalid reference "${rawReference}"`);
     }
 
-    const url = this.remoteURLSerializer.serialize(parsedRef);
+    const url = this.remoteURLSerializer.serialize(parsedReference);
 
     // TODO: when could this even happen?
     if (!url) {

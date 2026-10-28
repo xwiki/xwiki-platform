@@ -27,10 +27,7 @@ import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 import type { MacroEditableZoneRef } from "../converter";
 import type { EntityReference } from "@xwiki/platform-model-api";
-import type {
-  RemoteURLParser,
-  RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
+import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 import type {
   Block,
   InlineContent,
@@ -38,19 +35,17 @@ import type {
 } from "@xwiki/platform-uniast-api";
 
 const imageReference = mock<EntityReference>();
-
-const remoteURLParser = mock<RemoteURLParser>();
-remoteURLParser.parse.mockReturnValue(imageReference);
+const pageReference = mock<EntityReference>();
 
 const remoteURLSerializer = mock<RemoteURLSerializer>();
 remoteURLSerializer.serialize
   .calledWith(imageReference)
   .mockReturnValue("/xwiki/bin/download/Space/Page/image.png");
+remoteURLSerializer.serialize
+  .calledWith(pageReference)
+  .mockReturnValue("/xwiki/bin/view/Space/Page");
 
-const converter = new UniAstToReactJsxConverter(
-  remoteURLParser,
-  remoteURLSerializer,
-);
+const converter = new UniAstToReactJsxConverter(remoteURLSerializer);
 
 const editableZoneRef: MacroEditableZoneRef = { type: "block", ref: null };
 
@@ -216,5 +211,43 @@ describe("UniAstToReactJsxConverter", () => {
     expect(container.querySelector("p > img")!.getAttribute("src")).toBe(
       "/xwiki/bin/download/Space/Page/image.png",
     );
+  });
+
+  test("renders a link to a page from its parsed reference", () => {
+    const container = render(
+      paragraph({
+        type: "link",
+        target: {
+          type: "internal",
+          rawReference: "Space.Page",
+          parsedReference: pageReference,
+        },
+        content: [text("label")],
+      }),
+    );
+
+    const a = container.querySelector("p > a")!;
+    expect(a.getAttribute("href")).toBe("/xwiki/bin/view/Space/Page");
+    expect(a.textContent).toBe("label");
+  });
+
+  test("fails to render a link whose reference could not be parsed", () => {
+    const result = converter.blocksToReactJSX(
+      [
+        paragraph({
+          type: "link",
+          target: {
+            type: "internal",
+            rawReference: "invalid",
+            parsedReference: null,
+          },
+          content: [text("label")],
+        }),
+      ],
+      editableZoneRef,
+    );
+
+    expect(result).toBeInstanceOf(Error);
+    expect((result as Error).message).toBe('Invalid reference "invalid"');
   });
 });

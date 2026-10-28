@@ -8,7 +8,6 @@ import { Block } from '@xwiki/platform-uniast-api';
 import { InlineContent } from '@xwiki/platform-uniast-api';
 import { JSX } from 'react';
 import { Ref } from 'react';
-import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
 import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
 
 // @beta (undocumented)
@@ -22,7 +21,7 @@ export type MacroEditableZoneRef = {
 
 // @beta
 export class UniAstToReactJsxConverter {
-    constructor(remoteURLParser: RemoteURLParser, remoteURLSerializer: RemoteURLSerializer);
+    constructor(remoteURLSerializer: RemoteURLSerializer);
     blocksToReactJSX(blocks: Block[], editableZoneRef: MacroEditableZoneRef): JSX.Element[] | Error;
     inlineContentsToReactJSX(inlineContents: InlineContent[], editableZoneRef: MacroEditableZoneRef): JSX.Element[] | Error;
 }

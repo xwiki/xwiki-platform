@@ -67,10 +67,7 @@ import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type {
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { Container } from "inversify";
 
@@ -267,10 +264,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   if (macros) {
     const uniAstToReactJsxConverter = new UniAstToReactJsxConverter(
-      depsContainer
-        .get<RemoteURLParserProvider>("RemoteURLParserProvider")
-        .get()!,
-
       depsContainer
         .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
         .get()!,

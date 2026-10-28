@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -93,6 +94,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -123,6 +125,11 @@ class XWikiDocumentTest
     private static final String CLASSNAME = DOCSPACE + "." + DOCNAME;
 
     private static final DocumentReference CLASS_REFERENCE = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
+
+    /**
+     * A fixed date, with no millisecond, used for the documents compared in the {@code apply*()} tests.
+     */
+    private static final long APPLY_DATE = 1234567890000L;
 
     private XWikiDocument document;
 
@@ -884,9 +891,11 @@ class XWikiDocumentTest
 
         assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
 
+        // The translation has a syntax of its own, to verify that its content is rendered with that syntax and not
+        // with the one of the default document: "**bold**" is bold in xwiki/2.0 but plain text in plain/1.0.
         this.translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
-        this.translatedDocument.setContent("//italic//");
-        this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
+        this.translatedDocument.setContent("**bold**");
+        this.translatedDocument.setSyntax(Syntax.PLAIN_1_0);
         this.translatedDocument.setNew(false);
 
         when(this.xWiki.getLanguagePreference(any())).thenReturn(Locale.FRENCH.toString());
@@ -894,7 +903,7 @@ class XWikiDocumentTest
             new DocumentReference(this.translatedDocument.getDocumentReference(), this.translatedDocument.getLocale())),
             any())).thenReturn(this.translatedDocument);
 
-        assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
+        assertEquals("<p>**bold**</p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -1250,12 +1259,73 @@ class XWikiDocumentTest
         assertEquals("text/html", targetDocument.getAttachment("file.txt").getMimeType());
     }
 
+    @Test
+    void getSyntaxOfNewTranslation()
+    {
+        this.document.setSyntax(Syntax.MARKDOWN_1_1);
+
+        XWikiDocument newTranslation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+
+        assertEquals(Syntax.MARKDOWN_1_1, newTranslation.getSyntax());
+    }
+
+    @Test
+    void getSyntaxOfNewTranslationWithExplicitSyntax()
+    {
+        this.document.setSyntax(Syntax.MARKDOWN_1_1);
+
+        XWikiDocument newTranslation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+        newTranslation.setSyntax(Syntax.PLAIN_1_0);
+
+        assertEquals(Syntax.PLAIN_1_0, newTranslation.getSyntax());
+    }
+
+    @Test
+    void getSyntaxOfNewTranslationOfNewDocument()
+    {
+        this.document.setSyntax(Syntax.MARKDOWN_1_1);
+        this.document.setNew(true);
+
+        XWikiDocument newTranslation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+
+        assertEquals(Syntax.XWIKI_2_1, newTranslation.getSyntax());
+    }
+
+    @Test
+    void getSyntaxOfNewTranslationWhenOriginalDocumentFailsToLoad() throws Exception
+    {
+        when(this.xWiki.getDocument(any(DocumentReference.class), any()))
+            .thenThrow(new XWikiException(0, 0, "load error"));
+
+        XWikiDocument newTranslation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+
+        assertEquals(Syntax.XWIKI_2_1, newTranslation.getSyntax());
+        assertEquals("Failed to load the original document of the new translation [Wiki:Space.Page(fr)] to get its"
+            + " syntax, using the default syntax instead. Root cause is [XWikiException: Error number 0 in 0:"
+            + " load error].", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void getSyntaxOfNewDocument() throws Exception
+    {
+        XWikiDocument newDocument = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, "NewPage"));
+
+        assertEquals(Syntax.XWIKI_2_1, newDocument.getSyntax());
+        verify(this.xWiki, never()).getDocument(any(DocumentReference.class), any());
+    }
+
     /**
      * @return a document with the various kinds of data {@link XWikiDocument#apply(XWikiDocument)} deals with
      */
     private XWikiDocument createDocumentToApply() throws Exception
     {
         XWikiDocument documentToApply = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, "ApplyPage"));
+        // Force the dates, which a new document initializes to the current time truncated to the second. Since
+        // XWikiDocument#equals() compares them, two documents created on either side of a second boundary would
+        // otherwise not be equal.
+        documentToApply.setDate(new Date(APPLY_DATE));
+        documentToApply.setContentUpdateDate(new Date(APPLY_DATE));
+        documentToApply.setCreationDate(new Date(APPLY_DATE));
         documentToApply.setSyntax(Syntax.XWIKI_2_1);
         documentToApply.setTitle("title");
         documentToApply.setContent("content");

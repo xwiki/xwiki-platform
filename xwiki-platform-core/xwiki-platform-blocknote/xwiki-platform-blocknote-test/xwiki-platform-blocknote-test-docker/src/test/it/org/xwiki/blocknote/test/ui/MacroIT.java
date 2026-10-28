@@ -23,14 +23,13 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
+import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.blocknote.test.po.BlockNoteToolBar;
 import org.xwiki.blocknote.test.po.SlashMenu;
-import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
@@ -39,6 +38,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Verify macro related features of the BlockNote editor integration.
@@ -90,9 +90,9 @@ class MacroIT extends AbstractBlockNoteIT
 
             end""");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Verify the macro output is rendered.
@@ -174,7 +174,7 @@ class MacroIT extends AbstractBlockNoteIT
         wikiEditor.clickCancel();
         page.editInplace();
 
-        editor = new BlockNoteEditor("content");
+        editor = page.getContentEditor();
         textArea = editor.getRichTextArea();
 
         // Change the inline macro from success to error.
@@ -257,13 +257,17 @@ class MacroIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "", "");
 
-        WYSIWYGEditPage page = WYSIWYGEditPage.gotoPage(testReference);
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
-        // Insert a macro using the slash menu.
-        textArea.click().sendKeys("/").sendKeys("macro");
-        SlashMenu slashMenu = new SlashMenu().waitForItemSelected("Macro");
+        // Insert a macro using the slash menu. The page is empty, which used to squeeze the slash menu to the height of
+        // the page content in the in-place edit mode.
+        textArea.click().sendKeys("/");
+        SlashMenu slashMenu = new SlashMenu();
+        assertTrue(slashMenu.isSelectedItemInView(), "The selected slash menu item is out of view.");
+        textArea.sendKeys("macro");
+        slashMenu.waitForItemSelected("Macro");
         textArea.sendKeys(Keys.ENTER);
         slashMenu.waitForItemSubmitted();
 
@@ -276,7 +280,7 @@ class MacroIT extends AbstractBlockNoteIT
         // show the macro placeholder.
         assertEquals("macro:info", textArea.getText());
 
-        page.clickSaveAndView();
+        page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("""
             {{info title="bar"}}
@@ -292,8 +296,8 @@ class MacroIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "", "");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Insert a macro using the toolbar. We need to select some text in order to get the toolbar.
@@ -320,7 +324,7 @@ class MacroIT extends AbstractBlockNoteIT
         wikiEditor.clickCancel();
         page.editInplace();
 
-        editor = new BlockNoteEditor("content");
+        editor = page.getContentEditor();
         textArea = editor.getRichTextArea();
 
         textArea.selectMacro(0);
@@ -343,5 +347,31 @@ class MacroIT extends AbstractBlockNoteIT
             {{success title="baz"}}
             foo
             {{/success}}""", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(4)
+    void editCodeMacro(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, """
+            {{code language="java" layout="linenumbers"}}
+            int count = 0;
+            {{/code}}""", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // The code macro is edited as a code block, so its content can be modified directly.
+        textArea.clickBlock(0).moveCaretTo(0).sendKeys("final ").waitUntilTextContains("final int count = 0;");
+
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            {{code language="java" layout="linenumbers"}}
+            final int count = 0;
+            {{/code}}""", wikiEditor.getContent());
     }
 }

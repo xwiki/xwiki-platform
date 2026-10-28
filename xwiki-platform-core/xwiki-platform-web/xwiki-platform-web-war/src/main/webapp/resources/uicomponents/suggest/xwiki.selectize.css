@@ -19,6 +19,31 @@
   box-shadow: inset 0 1px 1px rgb(0, 0, 0, .075), 0 0 8px rgb(from var(--input-border-focus) r g b / 0.6);
 }
 
+/* Bootstrap applies the validation states to .form-control only, which the Tom Select control is not. */
+.has-success .ts-control {
+  border-color: var(--state-success-text);
+}
+
+.has-success .focus .ts-control {
+  box-shadow: inset 0 1px 1px rgb(0, 0, 0, .075), 0 0 6px rgb(from var(--state-success-text) r g b / 0.6);
+}
+
+.has-warning .ts-control {
+  border-color: var(--state-warning-text);
+}
+
+.has-warning .focus .ts-control {
+  box-shadow: inset 0 1px 1px rgb(0, 0, 0, .075), 0 0 6px rgb(from var(--state-warning-text) r g b / 0.6);
+}
+
+.has-error .ts-control {
+  border-color: var(--state-danger-text);
+}
+
+.has-error .focus .ts-control {
+  box-shadow: inset 0 1px 1px rgb(0, 0, 0, .075), 0 0 6px rgb(from var(--state-danger-text) r g b / 0.6);
+}
+
 .ts-control,
 .full .ts-control,
 .ts-wrapper.single.input-active .ts-control {

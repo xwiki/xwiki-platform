@@ -20,6 +20,7 @@
 package org.xwiki.blocknote.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -31,7 +32,20 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class BlockNoteEditor extends BaseElement
 {
+    /**
+     * The interval between two consecutive auto-saves when the edit form doesn't overwrite it, in seconds.
+     */
+    private static final int DEFAULT_AUTO_SAVE_INTERVAL = 60;
+
+    /**
+     * The notification the edit form displays after it saved, see the
+     * {@code core.editors.saveandcontinue.notification.done} translation key.
+     */
+    private static final String SAVED_NOTIFICATION = "Saved";
+
     private final String name;
+
+    private int autoSaveInterval = DEFAULT_AUTO_SAVE_INTERVAL;
 
     private WebElement container;
 
@@ -82,10 +96,76 @@ public class BlockNoteEditor extends BaseElement
     }
 
     /**
+     * Overwrite the interval between two consecutive auto-saves, so that the tests don't have to wait for the default
+     * one (a minute). The value is read from the edit form each time a save is scheduled, so this can be called after
+     * the editor has loaded.
+     *
+     * @param seconds the number of seconds between two consecutive auto-saves
+     * @return this editor instance
+     * @since 18.8.0RC1
+     */
+    public BlockNoteEditor setAutoSaveInterval(int seconds)
+    {
+        // The editor is inside the edit form in standalone edit mode, but only associated with it, through the HTML
+        // form attribute, when editing in-place. Let the browser resolve the form the editor submits to, rather than
+        // looking for an ancestor form, which exists only in standalone edit mode.
+        WebElement valueInput = this.container.findElement(By.cssSelector("input[name='" + this.name + "']"));
+        getDriver().executeScript("arguments[0].form.dataset.autoSaveInterval = arguments[1];", valueInput,
+            String.valueOf(seconds));
+        this.autoSaveInterval = seconds;
+        return this;
+    }
+
+    /**
+     * Wait for the edited content to be saved without the user asking for it, i.e. for the edit form to report that
+     * it saved. Note that the save notification is displayed only by the client that saved, so when several clients
+     * edit together, call this on the one expected to save.
+     *
+     * @return this editor instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteEditor waitForAutoSave()
+    {
+        // A save lands a bit later than the interval: the saver adds a random amount to it, holds the save election
+        // for a moment and then waits for the server. Waiting costs nothing when the save does happen, so leave a
+        // wide margin rather than risk a flickering test on a loaded machine.
+        withTimeout(4 * this.autoSaveInterval, () -> waitForNotificationSuccessMessage(SAVED_NOTIFICATION));
+        return this;
+    }
+
+    /**
+     * Watch the editing session for longer than the auto-save interval, which is always waited out in full unless a
+     * save happens, because only then does the absence of a save prove something.
+     *
+     * @return {@code true} if the edit form reported that it saved during that time, {@code false} otherwise
+     * @since 18.9.0RC1
+     */
+    public boolean isAutoSavedWithinNextInterval()
+    {
+        try {
+            withTimeout(2 * this.autoSaveInterval, () -> waitForNotificationSuccessMessage(SAVED_NOTIFICATION));
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    /**
      * @return the rich text area of this editor
      */
     public BlockNoteRichTextArea getRichTextArea()
     {
         return new BlockNoteRichTextArea(this.container.findElement(By.cssSelector(".bn-container .bn-editor")));
+    }
+
+    private void withTimeout(int timeout, Runnable action)
+    {
+        int originalTimeout = getDriver().getTimeout();
+        getDriver().setTimeout(timeout);
+        try {
+            action.run();
+        } finally {
+            getDriver().setTimeout(originalTimeout);
+        }
     }
 }

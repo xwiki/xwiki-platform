@@ -39,6 +39,8 @@ import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -53,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,6 +78,9 @@ class LiveTableRequestHandlerTest
     @MockComponent
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    @MockComponent
+    private ContextualAuthorizationManager authorization;
 
     @Mock
     private XWikiContext xcontext;
@@ -142,6 +148,7 @@ class LiveTableRequestHandlerTest
         XWikiDocument contextDoc = mock(XWikiDocument.class, "$doc");
         DocumentReference contextDocRef = new DocumentReference("xwiki", Arrays.asList("Path", "To"), "Page");
         when(this.currentDocumentReferenceResolver.resolve("Path.To.Page")).thenReturn(contextDocRef);
+        when(this.authorization.hasAccess(Right.VIEW, contextDocRef)).thenReturn(true);
         when(this.xcontext.getWiki().getDocument(contextDocRef, this.xcontext)).thenReturn(contextDoc);
 
         when(this.xcontext.isFinished()).thenReturn(true);
@@ -176,6 +183,29 @@ class LiveTableRequestHandlerTest
         assertSame(this.originalResponse, responses.get(1));
 
         verify(this.xcontext).setFinished(true);
+    }
+
+    @Test
+    void getLiveTableResultsDeniesUnauthorizedContextDocument() throws Exception
+    {
+        LiveDataQuery query = new LiveDataQuery();
+        query.setSource(new Source("liveTable"));
+        query.getSource().setParameter("$doc", "Main.WebHome");
+
+        XWikiDocument originalContextDoc = mock(XWikiDocument.class, "original");
+        when(this.xcontext.getDoc()).thenReturn(originalContextDoc);
+
+        DocumentReference contextDocRef = new DocumentReference("xwiki", "Main", "WebHome");
+        when(this.currentDocumentReferenceResolver.resolve("Main.WebHome")).thenReturn(contextDocRef);
+        // The current user is not allowed to view the requested context document.
+        when(this.authorization.hasAccess(Right.VIEW, contextDocRef)).thenReturn(false);
+
+        this.handler.getLiveTableResults(query, () -> "live table JSON");
+
+        // The denied context document must never be loaded nor set as the context document.
+        verify(this.xcontext.getWiki(), never()).getDocument(contextDocRef, this.xcontext);
+        // The only context document change is the restore of the original context document in the finally block.
+        verify(this.xcontext, times(1)).setDoc(originalContextDoc);
     }
 
     @Test

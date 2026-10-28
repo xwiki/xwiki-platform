@@ -52,6 +52,25 @@ import com.xpn.xwiki.web.DownloadAction;
 @Singleton
 public class XWikiAttachmentSecurityManager
 {
+    /**
+     * The name of the HTTP response header controlling whether browsers may guess the type of the served content
+     * from the content itself ("MIME sniffing") instead of honoring the declared {@code Content-Type}.
+     *
+     * @since 18.10.0RC1
+     */
+    public static final String CONTENT_TYPE_OPTIONS_HEADER = "X-Content-Type-Options";
+
+    /**
+     * The value of the {@link #CONTENT_TYPE_OPTIONS_HEADER} header to send with the responses serving stored files
+     * (attachments, skin files and resources), so that browsers honor their declared {@code Content-Type}, from
+     * which {@link #shouldBeDownloaded(String)} also decides whether they are displayed inline. Note that it also
+     * makes browsers refuse to execute a script or to apply a style sheet served with a type other than a
+     * JavaScript or CSS one.
+     *
+     * @since 18.10.0RC1
+     */
+    public static final String CONTENT_TYPE_OPTIONS_NOSNIFF = "nosniff";
+
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource configuration;

@@ -22,7 +22,9 @@ package org.xwiki.blocknote.test.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
@@ -100,6 +102,36 @@ public class SlashMenu extends BaseElement
                     return true;
                 }
             });
+        }
+    }
+
+    /**
+     * Waits for the selected menu item to be in view, i.e. inside the visible area of the drop-down menu. Note that
+     * {@link WebElement#isDisplayed()} doesn't help here: an item that can be scrolled into view is considered
+     * displayed even when the drop-down menu is too small to show it.
+     *
+     * @return {@code true} if the selected menu item is in view, {@code false} if it remains (partially) out of view
+     * @since 18.9.0
+     */
+    public boolean isSelectedItemInView()
+    {
+        // The drop-down menu is positioned (and sized) asynchronously.
+        try {
+            getDriver().waitUntilCondition(driver -> {
+                try {
+                    Rectangle menu = getDriver().findElement(By.className("bn-suggestion-menu")).getRect();
+                    Rectangle item = getDriver()
+                        .findElement(By.cssSelector(".bn-suggestion-menu-item[aria-selected=\"true\"]")).getRect();
+                    return item.getY() >= menu.getY()
+                        && item.getY() + item.getHeight() <= menu.getY() + menu.getHeight();
+                } catch (StaleElementReferenceException e) {
+                    // The menu items are being updated.
+                    return false;
+                }
+            });
+            return true;
+        } catch (TimeoutException e) {
+            return false;
         }
     }
 }

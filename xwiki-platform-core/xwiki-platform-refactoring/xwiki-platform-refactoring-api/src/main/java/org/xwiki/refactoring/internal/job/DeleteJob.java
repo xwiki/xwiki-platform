@@ -151,7 +151,7 @@ public class DeleteJob extends AbstractEntityJobWithChecks<DeleteRequest, Entity
     private void delete(DocumentReference documentReference, boolean skipRecycleBin, String logMessage)
     {
         // Delete the document
-        this.modelBridge.delete(documentReference, skipRecycleBin);
+        this.modelBridge.delete(documentReference, skipRecycleBin, this.request.isCheckRights());
         this.logger.debug(logMessage, documentReference);
 
         DocumentReference backlinkDocumentReference = documentReference;

@@ -293,7 +293,7 @@ public class XWikiAttachmentContent implements Cloneable
             return new ByteArrayInputStream(NULLFILE);
         }
         try {
-            return new AutoCloseInputStream(this.file.getInputStream());
+            return AutoCloseInputStream.builder().setInputStream(this.file.getInputStream()).get();
         } catch (IOException e) {
             throw new RuntimeException("Failed to get InputStream", e);
         }
@@ -345,7 +345,7 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public void setContent(InputStream is, int len) throws IOException
     {
-        this.setContent(new BoundedInputStream(is, len));
+        setContent(BoundedInputStream.builder().setInputStream(is).setMaxCount(len).get());
     }
 
     /**

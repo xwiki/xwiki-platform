@@ -22,6 +22,7 @@ package org.xwiki.export.pdf.test.po;
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -37,6 +38,10 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureNode;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.StandardStructureTypes;
 import org.apache.pdfbox.pdmodel.interactive.action.PDAction;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
@@ -91,7 +96,11 @@ public class PDFDocument implements AutoCloseable
      */
     public PDFDocument(URL url, String userName, String password) throws IOException
     {
-        URLConnection connection = url.openConnection();
+        this(openConnection(url, null), userName, password);
+    }
+
+    private PDFDocument(URLConnection connection, String userName, String password) throws IOException
+    {
         if (!StringUtils.isEmpty(userName)) {
             String auth = userName + ":" + password;
             byte[] encodedAuth = Base64.getEncoder().encode((auth.getBytes(StandardCharsets.UTF_8)));
@@ -101,6 +110,29 @@ public class PDFDocument implements AutoCloseable
         this.document = Loader.loadPDF(IOUtils.toByteArray(connection));
         this.imageExtractor = new PDFImageExtractor();
         save();
+    }
+
+    /**
+     * Fetches and parses a PDF document by submitting a POST request to the given URL. Some actions, such as the
+     * export action, perform their job only on POST requests.
+     *
+     * @param url where to fetch the PDF document from
+     * @return the fetched PDF document
+     * @throws IOException if fetching and parsing the PDF document fails
+     * @since 18.8.0RC1
+     */
+    public static PDFDocument post(URL url) throws IOException
+    {
+        return new PDFDocument(openConnection(url, "POST"), null, null);
+    }
+
+    private static URLConnection openConnection(URL url, String httpMethod) throws IOException
+    {
+        URLConnection connection = url.openConnection();
+        if (httpMethod != null && connection instanceof HttpURLConnection httpConnection) {
+            httpConnection.setRequestMethod(httpMethod);
+        }
+        return connection;
     }
 
     private void save() throws IOException
@@ -353,5 +385,40 @@ public class PDFDocument implements AutoCloseable
     private List<PDFImage> getImagesFromPage(PDPage page) throws IOException
     {
         return this.imageExtractor.getImages(page);
+    }
+
+    /**
+     * Looks for the figures from the specified page in the structure tree of this tagged PDF document and returns their
+     * alternative text.
+     *
+     * @param pageNumber the page number
+     * @return the alternative text of each figure on the specified page, in document order, with {@code null} for a
+     *         figure that has no alternative text
+     * @since 18.9.0RC1
+     */
+    public List<String> getImageAlternativeTextsFromPage(int pageNumber)
+    {
+        List<String> alternativeTexts = new ArrayList<>();
+        PDStructureTreeRoot structureTreeRoot = this.document.getDocumentCatalog().getStructureTreeRoot();
+        if (structureTreeRoot != null) {
+            collectImageAlternativeTexts(structureTreeRoot, null, this.document.getPage(pageNumber),
+                alternativeTexts);
+        }
+        return alternativeTexts;
+    }
+
+    private void collectImageAlternativeTexts(PDStructureNode node, PDPage inheritedPage, PDPage page,
+        List<String> alternativeTexts)
+    {
+        for (Object kid : node.getKids()) {
+            if (kid instanceof PDStructureElement element) {
+                // The page can be specified on an ancestor rather than on the element itself.
+                PDPage elementPage = element.getPage() != null ? element.getPage() : inheritedPage;
+                if (StandardStructureTypes.Figure.equals(element.getStructureType()) && page.equals(elementPage)) {
+                    alternativeTexts.add(element.getAlternateDescription());
+                }
+                collectImageAlternativeTexts(element, elementPage, page, alternativeTexts);
+            }
+        }
     }
 }

@@ -180,7 +180,7 @@ public class BooleanClass extends PropertyClass
         Integer iValue = (Integer) prop.getValue();
         if (iValue != null) {
             int value = iValue.intValue();
-            buffer.append(getDisplayValue(value));
+            buffer.append(XMLUtils.escapeElementText(getDisplayValue(value)));
         }
     }
 
@@ -254,12 +254,10 @@ public class BooleanClass extends PropertyClass
         }
 
         int value = getValue(name, object);
-        if (value == 1) {
-            options[nb1].setSelected(true);
-        } else if (value == 0) {
-            options[nb2].setSelected(true);
-        } else {
-            options[0].setSelected(true);
+        switch (value) {
+            case 1 -> options[nb1].setSelected(true);
+            case 0 -> options[nb2].setSelected(true);
+            default -> options[0].setSelected(true);
         }
 
         select.addElement(options);
@@ -284,19 +282,25 @@ public class BooleanClass extends PropertyClass
         radioTrue.setDisabled(isDisabled());
         radioFalse.setDisabled(isDisabled());
         label labelNone = new label();
+        labelNone.setAttributeFilter(new XMLAttributeValueFilter());
         label labelTrue = new label();
+        labelTrue.setAttributeFilter(new XMLAttributeValueFilter());
         label labelFalse = new label();
+        labelFalse.setAttributeFilter(new XMLAttributeValueFilter());
         div divNone = new div();
+        divNone.setAttributeFilter(new XMLAttributeValueFilter());
         div divTrue = new div();
+        divTrue.setAttributeFilter(new XMLAttributeValueFilter());
         div divFalse = new div();
+        divFalse.setAttributeFilter(new XMLAttributeValueFilter());
         labelNone.addElement(radioNone);
-        labelNone.addElement(stringNone);
+        labelNone.addElement(XMLUtils.escape(stringNone));
         divNone.addElement(labelNone);
         labelTrue.addElement(radioTrue);
-        labelTrue.addElement(stringTrue);
+        labelTrue.addElement(XMLUtils.escape(stringTrue));
         divTrue.addElement(labelTrue);
         labelFalse.addElement(radioFalse);
-        labelFalse.addElement(stringFalse);
+        labelFalse.addElement(XMLUtils.escape(stringFalse));
         divFalse.addElement(labelFalse);
 
         radioNone.setID(prefix + name + "_none");
@@ -315,12 +319,10 @@ public class BooleanClass extends PropertyClass
         }
 
         int value = getValue(name, object);
-        if (value == 1) {
-            radioTrue.setChecked(true);
-        } else if (value == 0) {
-            radioFalse.setChecked(true);
-        } else {
-            radioNone.setChecked(true);
+        switch (value) {
+            case 1 -> radioTrue.setChecked(true);
+            case 0 -> radioFalse.setChecked(true);
+            default -> radioNone.setChecked(true);
         }
 
         for (div input : inputs) {

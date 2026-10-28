@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.docker.internal.junit5.configuration.PropertiesMerger;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
@@ -42,6 +43,17 @@ import org.xwiki.tool.extension.ExtensionOverride;
  */
 public class TestConfiguration
 {
+    /**
+     * The width, in pixels, of the screen of the browser container when the test doesn't specify one. It is one of
+     * the resolutions most used by our users.
+     */
+    public static final int DEFAULT_SCREEN_WIDTH = 1280;
+
+    /**
+     * The height, in pixels, of the screen of the browser container when the test doesn't specify one.
+     */
+    public static final int DEFAULT_SCREEN_HEIGHT = 960;
+
     private static final String DEFAULT = "default";
 
     private Browser browser;
@@ -63,6 +75,10 @@ public class TestConfiguration
     private String browserTag;
 
     private String jdbcDriverVersion;
+
+    private int screenWidth;
+
+    private int screenHeight;
 
     private boolean vnc;
 
@@ -110,6 +126,8 @@ public class TestConfiguration
 
     private XWikiInstances xwikiInstances;
 
+    private WikiDescriptorTarget wikiDescriptorTarget;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
@@ -128,6 +146,8 @@ public class TestConfiguration
         mergeServletEngineTag(testConfiguration.getServletEngineTag());
         mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
         mergeBrowserTag(testConfiguration.getBrowserTag());
+        mergeScreenWidth(testConfiguration.screenWidth);
+        mergeScreenHeight(testConfiguration.screenHeight);
         mergeVNC(testConfiguration.vnc());
         mergeWCAG(testConfiguration.isWCAG());
         mergeWCAGStopOnError(testConfiguration.shouldWCAGStopOnError());
@@ -150,6 +170,7 @@ public class TestConfiguration
         mergeSolrMode(testConfiguration.solrMode);
         mergeRemoteSolrTag(testConfiguration.getRemoteSolrTag());
         mergeXWikiInstances(testConfiguration.getXWikiInstances());
+        mergeWikiDescriptorTarget(testConfiguration.wikiDescriptorTarget);
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -446,6 +467,30 @@ public class TestConfiguration
         }
     }
 
+    private void mergeWikiDescriptorTarget(WikiDescriptorTarget wikiDescriptorTarget) throws DockerTestException
+    {
+        if (this.wikiDescriptorTarget != null) {
+            if (wikiDescriptorTarget != null && this.wikiDescriptorTarget != wikiDescriptorTarget) {
+                throw new DockerTestException(
+                    String.format("Cannot merge wiki descriptor target [%s] since it was already specified as [%s]",
+                        wikiDescriptorTarget, this.wikiDescriptorTarget));
+            }
+        } else {
+            this.wikiDescriptorTarget = wikiDescriptorTarget;
+        }
+    }
+
+    private void mergeScreenWidth(int screenWidth)
+    {
+        // The tests merged together share a single browser container, so keep the largest screen asked for.
+        this.screenWidth = Math.max(this.screenWidth, screenWidth);
+    }
+
+    private void mergeScreenHeight(int screenHeight)
+    {
+        this.screenHeight = Math.max(this.screenHeight, screenHeight);
+    }
+
     private void mergeXWikiInstances(XWikiInstances xwikiInstances)
     {
         // Select the configuration with the biggest number of instances.
@@ -453,6 +498,42 @@ public class TestConfiguration
             || (xwikiInstances != null && xwikiInstances.value() > getXWikiInstances().value())) {
             setXWikiInstances(xwikiInstances);
         }
+    }
+
+    /**
+     * @return the width, in pixels, of the screen of the browser container
+     * @since 18.9.0RC1
+     */
+    public int getScreenWidth()
+    {
+        return this.screenWidth > 0 ? this.screenWidth : DEFAULT_SCREEN_WIDTH;
+    }
+
+    /**
+     * @param screenWidth see {@link #getScreenWidth()}
+     * @since 18.9.0RC1
+     */
+    public void setScreenWidth(int screenWidth)
+    {
+        this.screenWidth = screenWidth;
+    }
+
+    /**
+     * @return the height, in pixels, of the screen of the browser container
+     * @since 18.9.0RC1
+     */
+    public int getScreenHeight()
+    {
+        return this.screenHeight > 0 ? this.screenHeight : DEFAULT_SCREEN_HEIGHT;
+    }
+
+    /**
+     * @param screenHeight see {@link #getScreenHeight()}
+     * @since 18.9.0RC1
+     */
+    public void setScreenHeight(int screenHeight)
+    {
+        this.screenHeight = screenHeight;
     }
 
     /**
@@ -934,6 +1015,8 @@ public class TestConfiguration
     /**
      * @return true if the extensions declared in the resources of the module executing the test are made available to
      *     the XWiki instances as an extension repository
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.7.0RC1
      */
     public boolean isTestExtensionRepository()
@@ -943,6 +1026,8 @@ public class TestConfiguration
 
     /**
      * @param testExtensionRepository see {@link #isTestExtensionRepository()}
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.7.0RC1
      */
     public void setTestExtensionRepository(boolean testExtensionRepository)
@@ -1098,12 +1183,44 @@ public class TestConfiguration
     }
 
     /**
+     * @return the host/port to set as the default one in the wiki descriptor for all the tests of the XWiki instance,
+     *         that is {@link WikiDescriptorTarget#BROWSER} when it's not specified. Note that a test can override
+     *         it with {@link UseWikiDescriptorTarget}. See {@link UITest#wikiDescriptorTarget()}.
+     * @since 18.8.0RC1
+     */
+    public WikiDescriptorTarget getWikiDescriptorTarget()
+    {
+        return this.wikiDescriptorTarget != null ? this.wikiDescriptorTarget : WikiDescriptorTarget.BROWSER;
+    }
+
+    /**
+     * @param wikiDescriptorTarget see {@link #getWikiDescriptorTarget()}
+     * @since 18.8.0RC1
+     */
+    public void setWikiDescriptorTarget(WikiDescriptorTarget wikiDescriptorTarget)
+    {
+        this.wikiDescriptorTarget = wikiDescriptorTarget;
+    }
+
+    /**
      * @return true if the test configuration is for a cluster setup (i.e. more than 1 XWiki instance), false otherwise
      * @since 18.3.0RC1
      */
     public boolean isCluster()
     {
         return getXWikiInstances().value() > 1;
+    }
+
+    /**
+     * @return {@code true} if the XWiki instances of the test share a filesystem blob store, i.e. when they form a
+     *     cluster using the filesystem blob store, {@code false} otherwise
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     */
+    @Unstable
+    public boolean isSharedFileSystemBlobStore()
+    {
+        return isCluster() && getBlobStore() == BlobStore.FILESYSTEM;
     }
 
     /**

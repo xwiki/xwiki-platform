@@ -108,15 +108,13 @@ public class PropertyConverter
 
     private Object convertPropertyValue(Object storedValue, PropertyClass modifiedPropertyClass)
     {
-        if (modifiedPropertyClass instanceof ListClass listClass) {
-            return convertPropertyValue(storedValue, listClass);
-        } else if (modifiedPropertyClass instanceof NumberClass numberClass) {
-            return convertPropertyValue(storedValue, numberClass);
-        } else {
+        return switch (modifiedPropertyClass) {
+            case ListClass listClass -> convertPropertyValue(storedValue, listClass);
+            case NumberClass numberClass -> convertPropertyValue(storedValue, numberClass);
             // Return the stored value if no specific converter has been found. We will attempt to convert the stored
             // value through string deserialization later.
-            return storedValue;
-        }
+            case null, default -> storedValue;
+        };
     }
 
     private Object convertPropertyValue(Object storedValue, ListClass modifiedListClass)

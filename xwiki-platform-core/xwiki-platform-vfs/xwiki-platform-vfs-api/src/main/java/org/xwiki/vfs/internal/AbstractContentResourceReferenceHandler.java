@@ -74,6 +74,9 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
             boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(actualContentType);
             response.addHeader("Content-disposition",
                 attachmentSecurityManager.getContentDispositionHeader(resourceName, shouldBeDownloaded));
+            // Make sure browsers honor the declared content type, from which the content disposition is also computed.
+            response.setHeader(XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_HEADER,
+                XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_NOSNIFF);
 
             IOUtils.copy(markResetSupportingStream, response.getOutputStream());
         } catch (Exception e) {

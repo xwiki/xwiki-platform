@@ -248,10 +248,13 @@ $syntaxMenu.add($cat)
     #end
     #if($heading)
     (% class="sectionheader" %)
-    $heading $section.name $heading
+    $heading $services.rendering.escape($section.name, 'xwiki/2.1') $heading
 
     #end
-    {{include reference="XWiki.XWikiSyntax${section.id}" section="H${displayVersion}${section.id}"/}}
+    ## Escape the values used as macro parameters.
+    #set ($includeReference = $services.rendering.escape("XWiki.XWikiSyntax${section.id}", 'xwiki/2.1'))
+    #set ($includeSection = $services.rendering.escape("H${displayVersion}${section.id}", 'xwiki/2.1'))
+    {{include reference="$includeReference" section="$includeSection"/}}
 #end
 
 
@@ -274,7 +277,7 @@ $syntaxMenu.add($cat)
 #macro(syntax_displayCategories $syntaxMenu $translationPrefix)
   #set ($subHeading = '====')
   #foreach ($category in $syntaxMenu)
-    == $category.name ==
+    == $services.rendering.escape($category.name, 'xwiki/2.1') ==
 
     #syntax_displayCategory($category.children 'syntax.' '===')
   #end
@@ -338,9 +341,19 @@ $xwiki.get('ssx').use($doc.getFullName())##
 #syntaxSwitch()
 (((
 #set ($query = "syntax=$escapetool.url(${crtSyntaxVer})${extraParams}")
-#if ($crtCategory){{html}}&lt;a href="${doc.getURL('view', ${query})}"&gt;$syntaxTitle&lt;/a&gt;{{/html}}#{else}(% class="current" %)$syntaxTitle#{end}#if ($crtCategory) » #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}#{end}#if ($crtSection) » (% class="current" %)${crtSection.name}#end#end
+#if ($crtCategory)
+  {{html}}&lt;a href="${doc.getURL('view', ${query})}"&gt;$syntaxTitle&lt;/a&gt;{{/html}} » ##
+  #if ($crtSection)
+    {{html}}&lt;a href="${crtCategory.url}"&gt;$escapetool.xml($crtCategory.name)&lt;/a&gt;{{/html}} » ##
+    (% class="current" %)$services.rendering.escape($crtSection.name, 'xwiki/2.1')
+  #else
+    (% class="current" %)$services.rendering.escape($crtCategory.name, 'xwiki/2.1')
+  #end
+#else
+  (% class="current" %)$syntaxTitle
+#end
 )))
-== $syntaxTitle: $sectionName ==
+== $syntaxTitle: $services.rendering.escape($sectionName, 'xwiki/2.1') ==
 
 #verticalNavigation($syntaxMenu {'translationPrefix' : 'syntax.', 'crtItemId' : "$!crtItemId", 'cssClass' : 'syntax-menu'})
 ##-----------------------------------------

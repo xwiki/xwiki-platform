@@ -1,0 +1,48 @@
+/* Smaller and muted text */
+
+.text-smaller,
+.text-muted-smaller,
+.noitems,
+#hierarchy,
+#xdocAuthors,
+.xdocLastModification,
+#xdocFooter,
+#historyform td,
+#changes-info {
+  /* Rounded down to a whole pixel, to keep the size the text had with LESS. */
+  font-size: round(down, calc(var(--font-size-base) * .95), 1px);
+}
+
+.text-muted-smaller,
+.noitems,
+#hierarchy,
+#xdocAuthors,
+.xdocLastModification,
+#xdocFooter,
+#historyform td,
+#changes-info,
+.separator,
+.itemCount {
+  color: var(--text-muted);
+}
+
+/* Headings */
+
+#document-title h1 {
+  font-size: var(--font-size-document-title);
+  margin-top: 0;
+}
+
+/* Verbatim */
+
+:is(tt, span).wikimodel-verbatim {
+  font-family: sans-serif;
+  white-space: pre-wrap;
+}
+
+/* Description lists */
+
+dl dd dl {
+  margin-left: var(--grid-gutter-width);
+  margin-bottom: 0;
+}

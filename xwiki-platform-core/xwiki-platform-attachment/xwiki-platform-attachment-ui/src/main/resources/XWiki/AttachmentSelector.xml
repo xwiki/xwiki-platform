@@ -530,7 +530,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     // this.property.down('input').value = uploadForm.down('input[type="file"]').value;
     // uploadForm.xredirect.value = window.location.pathname;
     document.observe('xwiki:document:saved', function () {
-      new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')",
+      XWiki.widgets.Notification.show("$services.localization.render('xe.attachmentSelector.upload.inProgress')",
         'inprogress');
       uploadForm.submit();
     })
@@ -592,10 +592,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
         var hasErrors = false;
         uploadForm.select('input[type="file"]').each(function(fileInput) {
           if (fileInput.value == '') {
-            new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.noFile')", 'error');
+            XWiki.widgets.Notification.show("$services.localization.render('xe.attachmentSelector.upload.error.noFile')", 'error');
             hasErrors = true;
           } else if (fileInput.__allowedExtensions &amp;&amp; fileInput.__allowedExtensions.indexOf(this.getFileExtension(fileInput.value)) == -1) {
-            new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.badExtension')", 'error');
+            XWiki.widgets.Notification.show("$services.localization.render('xe.attachmentSelector.upload.error.badExtension')", 'error');
             hasErrors = true;
           }
           const beforeUploadEvent = Event.fire(document, 'xwiki:actions:beforeUpload', {
@@ -717,7 +717,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
               if (targetElement._x_notif) {
                 targetElement._x_notif.replace(new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.failed')" + failureReason, "error"));
               } else {
-                new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error");
+                XWiki.widgets.Notification.show(this.interactionParameters.failureMessageText + failureReason, "error");
               }
             },
             on0 : function(response) {

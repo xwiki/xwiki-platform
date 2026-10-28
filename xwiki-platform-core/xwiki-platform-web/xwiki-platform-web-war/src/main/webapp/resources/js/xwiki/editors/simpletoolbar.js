@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(['jquery'], function ($) {
+require(['jquery', 'xwiki-events-bridge'], function ($) {
   class SimpleToolbar {
     constructor()
     {
@@ -128,15 +128,12 @@ require(['jquery'], function ($) {
   const XWiki = globalThis.XWiki = globalThis.XWiki || {};
   XWiki.editors = XWiki.editors || {};
   XWiki.editors.SimpleToolbar = new SimpleToolbar();
-  $(document).on('xwiki:dom:updated', function (event, data) {
-    $(data.elements).find('.simpletoolbar-configuration').not('.initialized').each(function () {
+  const init = function (event, data) {
+    $(data?.elements || document).find('.simpletoolbar-configuration').not('.initialized').each(function () {
       XWiki.editors.SimpleToolbar._initTextarea($(this), XWiki.editors.SimpleToolbar);
     });
-  });
-  let init = function () {
-    $(document).find('.simpletoolbar-configuration').not('.initialized').each(function () {
-      XWiki.editors.SimpleToolbar._initTextarea($(this), XWiki.editors.SimpleToolbar);
-    });
-  }
-  XWiki.domIsLoaded && init() || document.observe('xwiki:dom:loaded', init);
+  };
+
+  $(document).on('xwiki:dom:updated', init);
+  $(init);
 });

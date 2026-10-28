@@ -34,7 +34,7 @@
 define('es-module', () => {
   return {
     load: function(name, req, onLoad, config) {
-      import(name).then(onLoad);
+      import(name).then(onLoad, onLoad.error);
     }
   };
 });

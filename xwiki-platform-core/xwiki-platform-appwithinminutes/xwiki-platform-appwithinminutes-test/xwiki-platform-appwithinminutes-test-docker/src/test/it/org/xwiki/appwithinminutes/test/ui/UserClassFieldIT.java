@@ -38,6 +38,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
 import static java.util.Arrays.asList;
@@ -136,7 +137,7 @@ class UserClassFieldIT
         assertUserSuggestion(suggestions.get(0), "Eduard Moraru", "Enygma2002");
 
         // The guest user shouldn't be suggested.
-        suggestions = userPicker.clear().sendKeys("guest").waitForSuggestions().getSuggestions();
+        suggestions = userPicker.clear().sendKeys("guest").getSuggestions();
         assertTrue(suggestions.isEmpty());
 
         // Default administrator user should be suggested.
@@ -209,7 +210,7 @@ class UserClassFieldIT
 
         // Select 2 users.
         userPicker.sendKeys("tmortagne").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
-        userPicker.clear().sendKeys("2002").waitForNonTypedSuggestions().selectByValue("XWiki.Enygma2002");
+        userPicker.clear().sendKeys("2002").selectByValue("XWiki.Enygma2002");
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
@@ -327,10 +328,11 @@ class UserClassFieldIT
 
         // Change the selected user.
         userPicker.clearSelectedSuggestions().sendKeys("eduard").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
-        entryEditPage.clickSaveAndView();
+        ViewPage entryViewPage = entryEditPage.clickSaveAndView();
 
-        // Assert the view mode.
-        List<WebElement> users = setup.getDriver().findElements(By.className("user"));
+        // Assert the view mode. Look for the displayed users only in the page content, since the page UI (e.g. the
+        // drawer) displays the current user too.
+        List<WebElement> users = entryViewPage.getContentContainer().findElements(By.className("user"));
         assertEquals(1, users.size());
         assertEquals("Eduard Moraru", users.get(0).getText());
         assertTrue(

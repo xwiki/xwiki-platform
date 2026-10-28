@@ -28,7 +28,6 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
@@ -69,8 +68,7 @@ public class ObjectPropertyResourceImpl extends BaseObjectsResource implements O
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            Object object = DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                    componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), withPrettyNames);
+            Object object = this.factory.toRestObject(uriInfo.getBaseUri(), doc, baseObject, false, withPrettyNames);
 
             for (Property property : object.getProperties()) {
                 if (property.getName().equals(propertyName)) {
@@ -99,7 +97,8 @@ public class ObjectPropertyResourceImpl extends BaseObjectsResource implements O
     // Needs a lot of parameters to bind path and query parameters
     @SuppressWarnings("checkstyle:ParameterNumber")
     public Response updateObjectProperty(String wikiName, String spaceName, String pageName, String className,
-        Integer objectNumber, String propertyName, Boolean minorRevision, Property property) throws XWikiRestException
+        Integer objectNumber, String propertyName, Boolean minorRevision, String comment, Property property)
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -118,7 +117,7 @@ public class ObjectPropertyResourceImpl extends BaseObjectsResource implements O
 
             xwikiObject.set(propertyName, property.getValue());
 
-            doc.save("", Boolean.TRUE.equals(minorRevision));
+            saveDocument(doc, comment, minorRevision);
 
             BaseObject baseObject = getBaseObject(doc, className, xwikiObject.getNumber());
 

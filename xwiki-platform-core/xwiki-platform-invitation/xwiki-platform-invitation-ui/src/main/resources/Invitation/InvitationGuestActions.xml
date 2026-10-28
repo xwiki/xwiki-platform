@@ -169,7 +169,10 @@
           #setMessageStatus($message, 'accepted')
           $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.doAction.accept.saveComment'))
         #end
-        #set($invited = true)
+        ## Allow the guest to register even if the register right is denied. It's only possible when this document
+        ## has programming right (see canGuestAcceptInvitation), and it applies only to the registration page included
+        ## right after.
+        #set ($discard = $services.security.registration.allowInvitedRegistration())
         {{include reference="XWiki.Registration"/}}
       #end
     #end

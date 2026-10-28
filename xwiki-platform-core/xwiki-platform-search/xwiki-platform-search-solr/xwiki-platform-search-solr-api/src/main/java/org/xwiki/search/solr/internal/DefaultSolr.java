@@ -74,4 +74,10 @@ public class DefaultSolr implements Solr, Initializable
     {
         return this.configuredSolr.getCore(name);
     }
+
+    @Override
+    public void deleteIndex(XWikiSolrCore core) throws SolrException
+    {
+        this.configuredSolr.deleteIndex(core);
+    }
 }

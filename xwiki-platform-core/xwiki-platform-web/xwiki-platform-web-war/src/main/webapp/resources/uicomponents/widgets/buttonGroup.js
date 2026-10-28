@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-var XWiki = (function (XWiki) {
-// Start XWiki augmentation.
-var widgets = XWiki.widgets = XWiki.widgets || {};
+require(['jquery', 'xwiki-events-bridge'], function($) {
+const XWiki = window.XWiki = window.XWiki || {};
+const widgets = XWiki.widgets = XWiki.widgets || {};
 const l10n = {
-  "core.widgets.buttonGroup.dropDown.toggle.hint" : "$!escapetool.javascript($services.localization.render('core.widgets.buttonGroup.dropDown.toggle.hint'))",
+  "core.widgets.buttonGroup.dropDown.toggle.hint" :
+    $jsontool.serialize($services.localization.render('core.widgets.buttonGroup.dropDown.toggle.hint')),
 };
 
 /**
@@ -40,85 +41,98 @@ const l10n = {
  *     <a href="#third">Third item</a>
  *   </span>
  * </span>
+ *
+ * Note that this class can be extended using Prototype.js' Class.create(XWiki.widgets.ButtonGroup, {...}). This is why
+ * the constructor only delegates to the initialize method (Prototype.js calls only the initialize method when creating
+ * an instance of a subclass).
  */
-widgets.ButtonGroup = Class.create({
-  initialize : function(container) {
+class ButtonGroup {
+  constructor(...args) {
+    this.initialize(...args);
+  }
+
+  initialize(container) {
     this.container = container;
-    this.displayInsideParent = container.hasClassName('inside');
-    this._dropDownMenu = container.down('.dropdown-menu');
-    this._dropDownToggle = container.down('.dropdown-toggle');
+    this.displayInsideParent = container.classList.contains('inside');
+    this._dropDownMenu = container.querySelector('.dropdown-menu');
+    this._dropDownToggle = container.querySelector('.dropdown-toggle');
     if (this._dropDownMenu && this._dropDownToggle) {
       // Toggle the drop down menu on click.
-      this._dropDownToggle.observe('click', this._onClick.bindAsEventListener(this));
+      this._dropDownToggle.addEventListener('click', event => this._onClick(event));
       // Close the drop down menu when pressing the Escape key.
-      this._dropDownToggle.observe('keydown', this._onKeyDown.bindAsEventListener(this));
+      this._dropDownToggle.addEventListener('keydown', event => this._onKeyDown(event));
       // Close the drop down menu when the toggle button looses the focus.
-      this._dropDownToggle.observe('blur', this._scheduleClose.bind(this));
-      this._dropDownToggle.observe('focus', this._cancelClose.bind(this));
+      this._dropDownToggle.addEventListener('blur', () => this._scheduleClose());
+      this._dropDownToggle.addEventListener('focus', () => this._cancelClose());
       // Close the drop down menu when an item is clicked.
-      this._dropDownMenu.observe('click', this._scheduleClose.bindAsEventListener(this));
+      this._dropDownMenu.addEventListener('click', event => this._scheduleClose(event));
       // Keep the drop down menu open if one of the items is focused (in order to support Tab key navigation).
       // The focus and blur events don't bubble so we have to catch them on the source element.
-      this._dropDownMenu.select('a, input, button').each(function(item) {
-        item.observe('blur', this._scheduleClose.bind(this));
-        item.observe('focus', this._cancelClose.bind(this));
-      }.bind(this));
+      this._dropDownMenu.querySelectorAll('a, input, button').forEach(item => {
+        item.addEventListener('blur', () => this._scheduleClose());
+        item.addEventListener('focus', () => this._cancelClose());
+      });
     }
-  },
+  }
 
   /**
    * Toggle the drop down menu.
    */
-  _onClick : function(event) {
-    event.stop();
+  _onClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
     this._toggle();
-  },
+  }
 
   /**
    * Close the drop down menu when pressing the Escape key.
    */
-  _onKeyDown : function(event) {
-    event.keyCode == 27 && this._toggle(false);
-  },
+  _onKeyDown(event) {
+    event.key === 'Escape' && this._toggle(false);
+  }
 
   /**
    * Don't close the drop down menu immediately because:
    * - the focus could be moving from one item to another (Tag key navigation)
    * - in case an item is clicked we need to keep it visible for a while so that its default behaviour is executed.
    */
-  _scheduleClose : function(event) {
+  _scheduleClose(event) {
     // In case of an item being clicked we just delay the close.
-    var forceClose = event?.type == 'click';
+    const forceClose = event?.type == 'click';
     // We let the focus event cancel the close if it follows immediately after the blur (e.g. when navigating through
     // the menu items using the Tab key).
     this._closing = true;
-    (function() {
+    setTimeout(() => {
       (this._closing || forceClose) && this._toggle(false);
       delete this._closing;
-    }).bind(this).delay(0.15);
+    }, 150);
     // NOTE: A lower delay time doesn't work well in Chrome.
-  },
+  }
 
   /**
    * We got the focus back so no need to close the drop down menu for the moment.
    */
-  _cancelClose : function() {
+  _cancelClose() {
     this._closing = false;
-  },
+  }
 
-  _toggle: function(open) {
-    this._dropDownMenu.toggleClassName('open', open);
+  _toggle(open) {
+    this._dropDownMenu.classList.toggle('open', open);
     if (this.displayInsideParent) {
-      if (this._dropDownMenu.hasClassName('open')) {
-        this.container.up().setStyle({
-          'height': (this.container.up().getHeight() + this._dropDownMenu.getHeight()) + 'px'
-        })
+      const parent = this.container.parentElement;
+      if (this._dropDownMenu.classList.contains('open')) {
+        parent.style.height = (parent.offsetHeight + this._dropDownMenu.offsetHeight) + 'px';
       } else {
-        this.container.up().setStyle({'height': ''});
+        parent.style.height = '';
       }
     }
   }
-});
+}
+
+/** Required by Prototype.js' Class.create(), which registers each new subclass on its parent class. */
+ButtonGroup.subclasses = [];
+
+widgets.ButtonGroup = ButtonGroup;
 
 /**
  * A dynamic button group. This widget looks for all the buttons inside a 'dynamic-button-group' container and creates
@@ -138,60 +152,72 @@ widgets.ButtonGroup = Class.create({
  *     <a href="#three" class="secondary">Three</a>
  *   </span>
  * </span>
+ *
+ * Note that this class can be extended using Prototype.js' Class.create(XWiki.widgets.DynamicButtonGroup, {...}). This
+ * is why the constructor only delegates to the initialize method (Prototype.js calls only the initialize method when
+ * creating an instance of a subclass).
  */
-widgets.DynamicButtonGroup = Class.create({
-  initialize : function(container) {
+class DynamicButtonGroup {
+  constructor(...args) {
+    this.initialize(...args);
+  }
+
+  initialize(container) {
     // Collect the visible buttons.
-    var buttons = container.select('button, input.button, a').filter(function(button) {
-      return button.offsetWidth > 0;
-    });
+    const buttons = Array.from(container.querySelectorAll('button, input.button, a'))
+      .filter(button => button.offsetWidth > 0);
     if (buttons.length < 2) return;
 
     // Unwrap the buttons.
-    buttons.each(function(button) {
-      button.up().hasClassName('buttonwrapper') && button.up().insert({before: button}).remove();
+    buttons.forEach(button => {
+      button.parentElement.classList.contains('buttonwrapper') && button.parentElement.replaceWith(button);
     });
 
     // Initialize the container.
-    container.removeClassName('dynamic-button-group').addClassName('buttonwrapper button-group initialized');
+    container.classList.remove('dynamic-button-group');
+    container.classList.add('buttonwrapper', 'button-group', 'initialized');
 
     // Insert the dropdown menu toggle.
-    buttons[0].insert({after: new Element('a', {
-      href: '#dropDownMenu',
-      'class': 'dropdown-toggle' + (buttons[0].hasClassName('secondary') ? ' secondary' : ''),
-      tabindex: 0
-    }).insert("<span class='caret'></span><span class='sr-only'>" 
-      + l10n['core.widgets.buttonGroup.dropDown.toggle.hint'] + "</span>")});
+    const dropDownToggle = document.createElement('a');
+    dropDownToggle.href = '#dropDownMenu';
+    dropDownToggle.className = 'dropdown-toggle' + (buttons[0].classList.contains('secondary') ? ' secondary' : '');
+    dropDownToggle.tabIndex = 0;
+    dropDownToggle.innerHTML = "<span class='caret'></span><span class='sr-only'>"
+      + l10n['core.widgets.buttonGroup.dropDown.toggle.hint'] + "</span>";
+    buttons[0].after(dropDownToggle);
 
     // Insert the drop down menu.
-    var dropDownMenu = new Element('span', {'class': 'dropdown-menu'});
-    for (var i = 1; i < buttons.length; i++) {
-      dropDownMenu.insert(buttons[i].removeClassName('secondary'));
+    const dropDownMenu = document.createElement('span');
+    dropDownMenu.className = 'dropdown-menu';
+    for (const button of buttons.slice(1)) {
+      button.classList.remove('secondary');
+      dropDownMenu.append(button);
     }
-    buttons[0].next().insert({after: dropDownMenu});
+    dropDownToggle.after(dropDownMenu);
 
     new widgets.ButtonGroup(container);
   }
-});
+}
 
-var init = function(event) {
-  (event?.memo.elements || [$('body')]).each(function(element) {
-    element.select('.button-group').each(function(buttonGroup) {
-      if (!buttonGroup.hasClassName('initialized')) {
+/** Required by Prototype.js' Class.create(), which registers each new subclass on its parent class. */
+DynamicButtonGroup.subclasses = [];
+
+widgets.DynamicButtonGroup = DynamicButtonGroup;
+
+const init = function(event, data) {
+  for (const element of (data?.elements || [document.body])) {
+    element.querySelectorAll('.button-group').forEach(buttonGroup => {
+      if (!buttonGroup.classList.contains('initialized')) {
         new XWiki.widgets.ButtonGroup(buttonGroup);
-        buttonGroup.addClassName('initialized');
+        buttonGroup.classList.add('initialized');
       }
     });
-    element.select('.dynamic-button-group').each(function(dynamicButtonGroup) {
+    element.querySelectorAll('.dynamic-button-group').forEach(dynamicButtonGroup => {
       new XWiki.widgets.DynamicButtonGroup(dynamicButtonGroup);
     });
-  });
-  return true;
+  }
 };
 
-(XWiki.domIsLoaded && init()) || document.observe("xwiki:dom:loaded", init);
-document.observe('xwiki:dom:updated', init);
-
-// End XWiki augmentation.
-return XWiki;
-}(XWiki || {}));
+$(init);
+$(document).on('xwiki:dom:updated', init);
+});

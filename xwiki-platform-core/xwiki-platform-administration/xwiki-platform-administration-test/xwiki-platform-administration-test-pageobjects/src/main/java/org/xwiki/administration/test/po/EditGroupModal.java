@@ -19,6 +19,8 @@
  */
 package org.xwiki.administration.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.ui.po.BaseModal;
@@ -82,6 +84,20 @@ public class EditGroupModal extends BaseModal
     {
         this.groupEditPage.removeMembers(members);
         return this;
+    }
+
+    /**
+     * Types the given text in the user picker and collects the suggested users, then clears the picker.
+     *
+     * @param text the text to type in the user picker
+     * @return the values (user references) of the suggested users
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public List<String> getUserSuggestions(String text)
+    {
+        return this.groupEditPage.getUserSuggestions(text);
     }
 
     public TableLayoutElement filterMembers(String member)

@@ -78,6 +78,23 @@ public abstract class AbstractCache<T> implements LESSCache<T>
 
     private Map<String, String> mutexList = new HashMap<>();
 
+    /**
+     * Incremented each time some content is cleared, whatever the cleared skin, color theme or LESS resource.
+     * <p>
+     * A single version for the whole cache, rather than one per skin, color theme and LESS resource: clears only
+     * happen when one of them is saved, so the only cost is that the computations running at that moment are not
+     * cached and run again on the next request. Versions per criteria would need maps of versions that grow with
+     * every resource ever compiled, for little gain.
+     * <p>
+     * The key maps are only accessed, and this field only changed, while holding the lock of this object, rather than
+     * through concurrent collections: setting and clearing run on different threads (requests and event listeners),
+     * storing must check the version and register the keys atomically with respect to clears, and a key registered in
+     * a list that a clear is processing would be lost, so that no later clear would remove its entry. A single lock
+     * gives that directly, and it is never held during a computation. {@link #getVersion()} reads this field without
+     * the lock, so that a compilation does not wait for a running clear before starting.
+     */
+    private volatile long version;
+
     @Override
     public T get(LESSResourceReference lessResourceReference, SkinReference skin, ColorThemeReference colorTheme)
     {
@@ -85,9 +102,14 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     }
 
     @Override
-    public void set(LESSResourceReference lessResourceReference, SkinReference skin,
-        ColorThemeReference colorTheme, T content)
+    public synchronized void set(LESSResourceReference lessResourceReference, SkinReference skin,
+        ColorThemeReference colorTheme, T content, long expectedVersion)
     {
+        // Do not store an object computed from content that was cleared during the computation
+        if (expectedVersion != this.version) {
+            return;
+        }
+
         // Store the content in the cache
         String cacheKey = cacheKeyFactory.getCacheKey(lessResourceReference, skin, colorTheme, isContextHandled);
         cache.set(cacheKey, content);
@@ -96,6 +118,12 @@ public abstract class AbstractCache<T> implements LESSCache<T>
         registerCacheKey(cachedFilesKeysMapPerSkin, cacheKey, skin);
         registerCacheKey(cachedFilesKeysMapPerColorTheme, cacheKey, colorTheme);
         registerCacheKey(cachedFilesKeysMapPerLESSResource, cacheKey, lessResourceReference);
+    }
+
+    @Override
+    public long getVersion()
+    {
+        return this.version;
     }
 
     /**
@@ -118,16 +146,21 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     }
 
     @Override
-    public void clear()
+    public synchronized void clear()
     {
+        this.version++;
         cache.removeAll();
         cachedFilesKeysMapPerSkin.clear();
         cachedFilesKeysMapPerColorTheme.clear();
         cachedFilesKeysMapPerLESSResource.clear();
     }
 
-    private void clearFromCriteria(Map<Object, List<String>> cachedFilesKeysMap, Object criteria)
+    private synchronized void clearFromCriteria(Map<Object, List<String>> cachedFilesKeysMap, Object criteria)
     {
+        // Increment even when nothing is cached for the criteria: an object for it may be being computed from the
+        // content that just changed.
+        this.version++;
+
         // Get the list of cached files keys corresponding to the criteria
         List<String> cachedFilesKeys = cachedFilesKeysMap.get(criteria);
         if (cachedFilesKeys == null) {

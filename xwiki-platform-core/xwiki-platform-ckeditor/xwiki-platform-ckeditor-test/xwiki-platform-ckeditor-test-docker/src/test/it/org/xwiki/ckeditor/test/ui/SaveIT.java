@@ -30,9 +30,11 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -79,10 +81,22 @@ class SaveIT extends AbstractCKEditorIT
     void save(TestUtils setup, TestReference testReference)
     {
         WYSIWYGEditPage editPage = edit(setup, testReference);
+
+        // Save from the full screen mode: the form action buttons are moved inside the maximized editor.
+        assertFalse(editor.getToolBar().isInFullScreenMode());
+        editor.getToolBar().toggleFullScreenMode();
+        assertTrue(editor.getToolBar().isInFullScreenMode());
+
         textArea.clear();
         textArea.sendKeys("xyz");
-        editPage.clickSaveAndView().editWYSIWYG();
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertTrue(setup.isInViewMode());
+        assertEquals("xyz", viewPage.getContent());
+
+        viewPage.editWYSIWYG();
         assertEquals("<p>xyz</p>", editor.waitToLoad().getRichTextArea().getContent());
+        // The full screen mode is not restored when editing the page again.
+        assertFalse(editor.getToolBar().isInFullScreenMode());
     }
 
     @Test

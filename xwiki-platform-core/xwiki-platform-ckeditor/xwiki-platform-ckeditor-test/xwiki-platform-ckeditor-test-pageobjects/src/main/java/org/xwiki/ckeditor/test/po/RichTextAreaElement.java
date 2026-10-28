@@ -30,6 +30,7 @@ import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -37,6 +38,7 @@ import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 /**
  * Represents the editing area of a WYSIWYG editor.
@@ -62,6 +64,15 @@ public class RichTextAreaElement extends BaseElement
         {
 
             return getRootEditableElement(false).findElements(By.tagName("img"));
+        }
+
+        /**
+         * @return the list of macros included in the rich text area
+         * @since 18.8.0RC1
+         */
+        public List<WebElement> getMacros()
+        {
+            return getRootEditableElement(false).findElements(By.className("macro"));
         }
     }
 
@@ -150,6 +161,25 @@ public class RichTextAreaElement extends BaseElement
         try {
             WebElement rootEditableElement = getRootEditableElement();
             getDriver().findElementWithoutWaiting(rootEditableElement, contentSelector).click();
+        } finally {
+            maybeSwitchToDefaultContent();
+        }
+    }
+
+    /**
+     * Clicks on the caption of a captioned image from the edited content, e.g. to edit the caption in-line.
+     *
+     * @param captionedImageIndex the index of the captioned image, among the captioned images from the edited content
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void clickImageCaption(int captionedImageIndex)
+    {
+        try {
+            WebElement rootEditableElement = getRootEditableElement();
+            getDriver().findElementsWithoutWaiting(rootEditableElement, By.tagName("figcaption"))
+                .get(captionedImageIndex).click();
         } finally {
             maybeSwitchToDefaultContent();
         }
@@ -456,12 +486,95 @@ public class RichTextAreaElement extends BaseElement
             // Either wait until the refresh counter has the expected value...
             if ((expectedRefreshCounter != null && Objects.equals(expectedRefreshCounter, refreshCounter))
                 // ...or until its value is different from the cached value.
-                || (expectedRefreshCounter == null && !Objects.equals(cachedRefreshCounter, refreshCounter))) {
+                || (expectedRefreshCounter == null && !Objects.equals(getLastKnownRefreshCounter(), refreshCounter))) {
                 cachedRefreshCounter = refreshCounter;
                 return true;
             }
             return false;
         });
+    }
+
+    /**
+     * @return the newest of the refresh counter value known by this rich text area and the one of the last content
+     *         refresh waited for by a page object action (which may have used another rich text area page object),
+     *         so that we don't wait again for a refresh that was already waited for
+     */
+    private String getLastKnownRefreshCounter()
+    {
+        String awaitedRefreshCounter = this.editor.getAwaitedRefreshCounter();
+        if (awaitedRefreshCounter != null && (this.cachedRefreshCounter == null
+            || Integer.parseInt(awaitedRefreshCounter) > Integer.parseInt(this.cachedRefreshCounter))) {
+            return awaitedRefreshCounter;
+        }
+        return this.cachedRefreshCounter;
+    }
+
+    /**
+     * Open the macro edit modal for the selected macro by pressing Enter, after waiting for the macro to be selected.
+     * Submitting the modal waits for the updated macro to be rendered.
+     *
+     * @return the macro edit modal
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public MacroDialogEditModal editSelectedMacro()
+    {
+        waitUntilWidgetSelected();
+        sendKeys(Keys.ENTER);
+        return new MacroDialogEditModal(this.editor::runAndWaitForContentRefresh).waitUntilReady();
+    }
+
+    /**
+     * Type the given quick action query (e.g. {@code /info}) and submit the quick action with the given label, waiting
+     * for the auto-complete drop-down to take it into account.
+     *
+     * @param query the quick action query, starting with {@code /}
+     * @param label the label of the quick action to submit
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void executeQuickAction(String query, String label)
+    {
+        sendKeys(query);
+        AutocompleteDropdown quickActions = new AutocompleteDropdown();
+        quickActions.waitForItemSelected(query, label);
+        sendKeys(Keys.ENTER);
+        quickActions.waitForItemSubmitted();
+    }
+
+    /**
+     * Insert a macro that has no required parameters using the quick action with the given query and label, and wait
+     * for the inserted macro to be rendered.
+     *
+     * @param query the quick action query, starting with {@code /}
+     * @param label the label of the quick action that inserts the macro
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void insertMacro(String query, String label)
+    {
+        this.editor.runAndWaitForContentRefresh(() -> executeQuickAction(query, label));
+    }
+
+    /**
+     * Insert a macro that has required parameters using the quick action with the given query and label. Such a macro
+     * is inserted through the macro edit modal, which is opened automatically, and submitting it waits for the
+     * inserted macro to be rendered.
+     *
+     * @param query the quick action query, starting with {@code /}
+     * @param label the label of the quick action that inserts the macro
+     * @return the macro edit modal used to set the required macro parameters
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public MacroDialogEditModal insertMacroWithRequiredParameters(String query, String label)
+    {
+        executeQuickAction(query, label);
+        return new MacroDialogEditModal(this.editor::runAndWaitForContentRefresh).waitUntilReady();
     }
 
     /**
@@ -508,7 +621,7 @@ public class RichTextAreaElement extends BaseElement
     {
         dropFile(loadFile(filePath));
         // Wait for the upload widget to be inserted and selected.
-        waitUntilWidgetSelected();
+        waitUntilUploadWidgetSelected();
         if (wait) {
             // Wait for the upload to finish.
             waitForOwnNotificationSuccessMessage("File successfully uploaded.");
@@ -574,6 +687,23 @@ public class RichTextAreaElement extends BaseElement
         script.append("});\n");
 
         script.append("const editor = CKEDITOR.instances[editorName];\n");
+
+        // Remember, on the editor instance, that the upload widget created by this drop has been selected. We can't
+        // simply wait for the "cke_widget_selected" CSS class to show up in the edited content because the upload
+        // widget is replaced by the uploaded content as soon as the upload finishes, and this can happen before we
+        // manage to look at the content (we've seen uploads finish in less than 300ms, while we look at the content
+        // every 500ms), leaving us waiting for a state that is gone for good.
+        script.append("editor._testUploadWidgetSelected = false;\n");
+        script.append("const widgetListener = editor.widgets.on('instanceCreated', function(event) {\n");
+        script.append("  const widget = event.data;\n");
+        script.append("  if (widget.name === 'uploadfile' || widget.name === 'uploadimage') {\n");
+        script.append("    widgetListener.removeListener();\n");
+        script.append("    widget.once('select', function() {\n");
+        script.append("      editor._testUploadWidgetSelected = true;\n");
+        script.append("    });\n");
+        script.append("  }\n");
+        script.append("});\n");
+
         script.append("const dropTarget = CKEDITOR.plugins.clipboard.getDropTarget(editor);\n");
         // Register a drop event listener on the drop target with high priority in order to intercept the event data and
         // set the test range. The CKEditor drop handler will then use this test range to insert the dropped content.
@@ -666,6 +796,11 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitForUploadsToFinish()
     {
+        waitForUploadsToFinish(getDriver().getTimeout());
+    }
+
+    protected void waitForUploadsToFinish(int timeout)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
                 return !Strings.CS.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
@@ -674,7 +809,7 @@ public class RichTextAreaElement extends BaseElement
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
                 return false;
             }
-        });
+        }, timeout);
     }
 
     /**
@@ -687,6 +822,19 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilWidgetSelected()
     {
         waitUntilContentContains("cke_widget_selected");
+    }
+
+    /**
+     * Waits until the upload widget created by the last dropped file has been selected. Unlike
+     * {@link #waitUntilWidgetSelected()} this doesn't look for the "selected" marker in the edited content, because
+     * that marker is dropped again as soon as the upload finishes and the upload widget is replaced by the uploaded
+     * content. It relies instead on the flag that the drop script sets when the upload widget gets selected, which
+     * remains set afterwards.
+     */
+    private void waitUntilUploadWidgetSelected()
+    {
+        getDriver().waitUntilCondition(driver -> (Boolean) getDriver().executeScript(
+            "return CKEDITOR.instances[arguments[0]]?._testUploadWidgetSelected === true", this.editor.getName()));
     }
 
     /**
@@ -753,6 +901,35 @@ public class RichTextAreaElement extends BaseElement
                 .moveToElement(targetImage)
                 // We have to drag the image using the dedicated drag handle.
                 .dragAndDropBy(dragHandle, xOffset, yOffset).perform();
+        });
+    }
+
+    /**
+     * Hovers the specified macro, in order to display its move handle.
+     *
+     * @param macroIndex the index of the macro to hover (0-based)
+     * @since 18.8.0RC1
+     */
+    public void hoverMacro(int macroIndex)
+    {
+        verifyContent(editedContent -> getDriver().createActions()
+            .moveToElement(editedContent.getMacros().get(macroIndex)).perform());
+    }
+
+    /**
+     * @param macroIndex the index of the macro to look at (0-based)
+     * @return the macro name displayed next to the move handle of the specified macro, or {@code null} if the macro
+     *         name is not displayed
+     * @since 18.8.0RC1
+     */
+    public String getMacroNameNextToMoveHandle(int macroIndex)
+    {
+        return getFromEditedContent(() -> {
+            // A nested macro has one widget wrapper per ancestor macro, so take the closest one.
+            WebElement macroName = this.content.getMacros().get(macroIndex).findElement(By.xpath(
+                "./ancestor::*[@data-cke-widget-wrapper][1]"
+                    + "/*[contains(@class, 'cke_widget_drag_handler_container')]/*[@class = 'macro-name']"));
+            return macroName.isDisplayed() ? macroName.getText() : null;
         });
     }
 }

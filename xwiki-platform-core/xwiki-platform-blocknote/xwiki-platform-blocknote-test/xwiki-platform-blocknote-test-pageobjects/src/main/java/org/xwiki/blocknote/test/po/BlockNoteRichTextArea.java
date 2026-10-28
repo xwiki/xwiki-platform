@@ -107,6 +107,20 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
+     * Clicks in the middle of the specified block, e.g. to place the caret inside its text.
+     *
+     * @param index the index of the block to click, starting from 0
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea clickBlock(int index)
+    {
+        getBlock(index).click();
+        waitUntilFocused();
+        return this;
+    }
+
+    /**
      * Simulate typing in the rich text area.
      * 
      * @param keysToSend the sequence of keys to by typed
@@ -140,7 +154,10 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         By trailingBlock = By.cssSelector(".bn-trailing-block");
         getDriver().waitUntilCondition(visibilityOfNestedElementsLocatedBy(this.container, trailingBlock));
-        getDriver().createActions().click(this.container.findElement(trailingBlock)).perform();
+        // When the trailing block is below the content (i.e., outside the viewport when the content is long) we need
+        // to scroll first.
+        WebElement trailingBlockElement = getDriver().scrollTo(this.container.findElement(trailingBlock));
+        getDriver().createActions().click(trailingBlockElement).perform();
         return sendKeys(keysToSend);
     }
 
@@ -218,6 +235,22 @@ public class BlockNoteRichTextArea extends BaseElement
             }
         });
         return getImage(index);
+    }
+
+    /**
+     * Waits until all the images in the rich text area have been loaded successfully, including the ones that are part
+     * of a macro output, such as the icon of an info box. Don't call this when an image is expected to fail to load.
+     *
+     * @return this rich text area instance
+     * @since 18.9.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilImagesAreLoaded()
+    {
+        int imageCount = this.container.findElements(By.tagName("img")).size();
+        for (int i = 0; i < imageCount; i++) {
+            waitUntilImageIsLoaded(i);
+        }
+        return this;
     }
 
     /**
@@ -407,5 +440,28 @@ public class BlockNoteRichTextArea extends BaseElement
         String script = "return arguments[0].editor.view.state.selection.$from.parentOffset";
         getDriver().waitUntilCondition(
             driver -> ((Number) getDriver().executeScript(script, this.container)).intValue() == offset);
+    }
+
+    /**
+     * Hovers the block with the specified index, in order to show its side menu.
+     *
+     * @param index the index of the block to hover, starting from 0
+     * @return the side menu of the hovered block
+     * @since 18.9.0RC1
+     */
+    public SideMenu hoverBlock(int index)
+    {
+        getDriver().createActions().moveToElement(getBlock(index)).perform();
+        return new SideMenu();
+    }
+
+    /**
+     * @param index the index of the block, starting from 0
+     * @return the element holding the content of the specified block
+     * @since 18.9.0RC1
+     */
+    public WebElement getBlock(int index)
+    {
+        return this.container.findElements(By.className("bn-block-content")).get(index);
     }
 }

@@ -23,8 +23,8 @@ import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
+import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
-import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -325,6 +325,90 @@ class RoundTripIT extends AbstractBlockNoteIT
             after""");
     }
 
+    @Test
+    @Order(16)
+    void codeBlock(TestUtils setup, TestReference testReference)
+    {
+        roundTrip(setup, testReference, """
+            {{{
+            no language
+            }}}
+
+            (% data-xwiki-verbatim-language="java" %)
+            {{{
+            public class Test
+            {
+                /** **not bold** [[not a link]] {{not a macro}} ~escape */
+
+                private int count;
+            }
+            }}}
+
+            (% data-xwiki-verbatim-language="velocity" %)
+            {{{
+            #set ($unsupported = 'language')
+            }}}
+
+            (% data-xwiki-verbatim-language="text" %)
+            {{{
+            plain text
+            }}}
+
+            {{{no new lines}}}""",
+            // The content is modified on save:
+            // * "text" is the default code block language so it is not saved
+            """
+                {{{
+                no language
+                }}}
+
+                (% data-xwiki-verbatim-language="java" %)
+                {{{
+                public class Test
+                {
+                    /** **not bold** [[not a link]] {{not a macro}} ~escape */
+
+                    private int count;
+                }
+                }}}
+
+                (% data-xwiki-verbatim-language="velocity" %)
+                {{{
+                #set ($unsupported = 'language')
+                }}}
+
+                {{{
+                plain text
+                }}}
+
+                {{{no new lines}}}""");
+    }
+
+    @Test
+    @Order(17)
+    void codeMacro(TestUtils setup, TestReference testReference)
+    {
+        roundTrip(setup, testReference, """
+            {{code language="java" layout="linenumbers"}}
+            public class Test
+            {
+                private int count;
+            }
+            {{/code}}
+
+            {{code}}
+            no language
+            {{/code}}
+
+            {{code language="text"}}
+            plain text
+            {{/code}}
+
+            {{code language="java" source="string:int count = 0;"/}}
+
+            Inline {{code language="java"}}int count = 0;{{/code}} code.""");
+    }
+
     /**
      * Insert the provided content in the provided page (testReference), edit the page with blocknote, save it back, and
      * verify that the content is not altered. If you expect the content to be modified, see
@@ -355,13 +439,13 @@ class RoundTripIT extends AbstractBlockNoteIT
     private void roundTrip(TestUtils setup, TestReference testReference, String contentBefore, String contentAfter)
     {
         setup.createPage(testReference, contentBefore, "");
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
         textArea.appendParagraph("end").waitUntilTextContains("end");
 
-        page = page.save();
+        page.save();
         WikiEditPage wikiEditor = page.editWiki();
         String ending = """
 

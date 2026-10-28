@@ -305,10 +305,10 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     }
 
     /**
-     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
+     * @deprecated Virtual mode is on by default.
      * @return true if running in virtual mode
      */
-    @Deprecated
+    @Deprecated(since = "5.0M2")
     protected boolean isVirtualMode()
     {
         return true;

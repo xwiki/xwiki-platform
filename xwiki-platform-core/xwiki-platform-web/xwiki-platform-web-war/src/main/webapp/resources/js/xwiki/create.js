@@ -28,6 +28,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
      */
     var computeTargetPageName = function() {
       var documentReference;
+      var spaceReference;
       // Test if the parent reference field exists
       if (parentReferenceField.length > 0) {
         var parentReference = parentReferenceField.val();
@@ -40,7 +41,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
           }
           documentReference = new XWiki.DocumentReference(xm.wiki, nameField.val(), 'WebHome');
         } else {
-          var spaceReference = XWiki.Model.resolve(parentReference, XWiki.EntityType.SPACE);
+          spaceReference = XWiki.Model.resolve(parentReference, XWiki.EntityType.SPACE);
           if (terminalCheckbox.prop('checked')) {
             documentReference = new XWiki.EntityReference(nameField.val(), XWiki.EntityType.DOCUMENT, spaceReference);
           } else {
@@ -50,7 +51,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         }
       } else if ($('.modal-popup').length > 0) {
         // We are in the 'create page' popup
-        var spaceReference = XWiki.Model.resolve($('#spaceReference').val(), XWiki.EntityType.SPACE);
+        spaceReference = XWiki.Model.resolve($('#spaceReference').val(), XWiki.EntityType.SPACE);
         documentReference = new XWiki.EntityReference($('#name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
       } else if (terminalCheckbox.prop('checked')) {
         // We are in the create page action, with a page name already filled, and the page is terminal

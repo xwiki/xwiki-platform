@@ -11,3 +11,5 @@
 #template('css/converted.min.css')
 /* Start of the LESS styles.*/
 $!cssFromLess
+/* Start of the custom styles.*/
+#template('custom.css')

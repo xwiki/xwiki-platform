@@ -22,10 +22,7 @@ import {
   tryFallibleOrError,
 } from "@xwiki/platform-fn-utils";
 import React from "react";
-import type {
-  RemoteURLParser,
-  RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
+import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 import type {
   Block,
   BlockStyles,
@@ -41,7 +38,7 @@ import type {
 } from "react";
 
 /**
- * @since 18.0.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 export type MacroEditableZoneRef =
@@ -51,14 +48,11 @@ export type MacroEditableZoneRef =
 /**
  * Converter that transforms UniAst content (e.g. a macro's render() output) to React JSX
  *
- * @since 18.0.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 export class UniAstToReactJsxConverter {
-  constructor(
-    private readonly remoteURLParser: RemoteURLParser,
-    private readonly remoteURLSerializer: RemoteURLSerializer,
-  ) {}
+  constructor(private readonly remoteURLSerializer: RemoteURLSerializer) {}
 
   /**
    * Render UniAst blocks to JSX elements
@@ -182,14 +176,17 @@ export class UniAstToReactJsxConverter {
         );
 
       case "list": {
-        // Ordered vs. unordered is expressed per-item (a `number` set on at least the first item), not on the list
-        // itself - see `default-uni-ast-to-markdown-converter.ts` for the same convention.
+        // Ordered vs. unordered is expressed per-item (through `number`), not on the list itself: the list is
+        // ordered as soon as one of its items has a number - see `default-uni-ast-to-markdown-converter.ts` for the
+        // same convention.
         const ListTag = block.items.some((item) => item.number !== undefined)
           ? "ol"
           : "ul";
+        // An ordered list doesn't necessarily start at 1 (e.g. a list continued after a paragraph).
+        const start = ListTag === "ol" ? block.items[0]?.number : undefined;
 
         return (
-          <ListTag {...this.convertBlockStyles(block.styles)}>
+          <ListTag start={start} {...this.convertBlockStyles(block.styles)}>
             {block.items.map((item, i) => {
               const childKey = `${key}.${i}`;
 
@@ -308,7 +305,7 @@ export class UniAstToReactJsxConverter {
         );
 
       case "break":
-        return <br />;
+        return <hr />;
 
       case "rawHtml":
         return <div dangerouslySetInnerHTML={{ __html: block.html }} />;
@@ -381,17 +378,26 @@ export class UniAstToReactJsxConverter {
           style.fontStyle = "italic";
         }
 
-        if (inlineContent.styles.underline) {
-          style.textDecoration = "underline";
-        }
+        const textDecorations = [
+          inlineContent.styles.underline && "underline",
+          inlineContent.styles.strikethrough && "line-through",
+        ].filter(Boolean);
 
-        if (inlineContent.styles.strikethrough) {
-          style.textDecoration = "line-through";
+        if (textDecorations.length > 0) {
+          style.textDecoration = textDecorations.join(" ");
         }
 
         const attr = Object.values(style).length > 0 ? { style } : {};
 
-        return <span {...attr}>{inlineContent.content}</span>;
+        return (
+          <span {...attr}>
+            {inlineContent.styles.code ? (
+              <code>{inlineContent.content}</code>
+            ) : (
+              inlineContent.content
+            )}
+          </span>
+        );
 
       case "image":
         return (
@@ -441,19 +447,13 @@ export class UniAstToReactJsxConverter {
       return target.url;
     }
 
-    const { rawReference } = target;
+    const { rawReference, parsedReference } = target;
 
-    const parsedRef = tryFallibleOrError(() =>
-      this.remoteURLParser.parse(rawReference),
-    );
-
-    if (parsedRef instanceof Error) {
-      throw new Error(
-        `Failed to parse reference "${rawReference}": ${parsedRef.message}`,
-      );
+    if (!parsedReference) {
+      throw new Error(`Invalid reference "${rawReference}"`);
     }
 
-    const url = this.remoteURLSerializer.serialize(parsedRef);
+    const url = this.remoteURLSerializer.serialize(parsedReference);
 
     // TODO: when could this even happen?
     if (!url) {

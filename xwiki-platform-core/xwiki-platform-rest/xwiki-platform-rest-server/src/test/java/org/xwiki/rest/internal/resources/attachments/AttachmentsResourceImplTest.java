@@ -26,10 +26,11 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;

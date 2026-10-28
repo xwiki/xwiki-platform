@@ -28,7 +28,8 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('core.modal.close'))">
             $services.icon.renderHTML('cross')
           </button>
           <div class="modal-title" id="exportModalLabel">
@@ -79,12 +80,15 @@
         }
       })
       #set ($exportFormat.data.multipage = $uix.parameters.multipage == 'true')
+      ## Export formats targeting an action that only accepts POST requests (e.g. the export action) have to declare
+      ## it, so that the export URL is submitted through a form instead of being navigated to.
+      #set ($exportFormat.data.method = $uix.parameters.getOrDefault('method', 'get'))
       #set ($discard = $exportFormat.data.put('filter-hidden-pages', $uix.parameters.filterHiddenPages == 'true'))
       #set ($discard = $exportFormat.data.put('exclude-nested-pages-by-default',
         $uix.parameters.excludeNestedPagesByDefault == 'true'))
       #set ($discard = $exportFormatsForCategory.add($exportFormat))
       ## Include the resources and configuration required by this export format.
-      $!services.rendering.render($uix.execute(), 'html/5.0')
+      $!services.uix.render($uix, 'html/5.0')
     #end
   #end
   #addLegacyExportFormats($exportFormatsByCategory)
@@ -134,6 +138,7 @@
         'icon': 'file-word',
         'category': 'office',
         'url': $doc.getURL('export', "format=odt&$!request.getQueryString()"),
+        'method': 'post',
         'multipage': false,
         'enabled': $services.officemanager.isConnected()
       }
@@ -145,6 +150,7 @@
         'icon': 'file-word',
         'category': 'office',
         'url': $doc.getURL('export', "format=rtf&$!request.getQueryString()"),
+        'method': 'post',
         'multipage': false,
         'enabled': $services.officemanager.isConnected()
       }
@@ -155,6 +161,7 @@
         'hint': $services.localization.render('core.exporter.formats.html.hint'),
         'icon': 'file-code',
         'url': $doc.getURL('export', "format=html&$!request.getQueryString()"),
+        'method': 'post',
         'multipage': true,
         'enabled': true
       }
@@ -165,6 +172,7 @@
         'hint': $services.localization.render('core.exporter.formats.xar.hint'),
         'icon': 'file-archive',
         'url': $doc.getURL('export', "$escapetool.url($xarExportParams)&$!docvariant"),
+        'method': 'post',
         'multipage': true,
         'enabled': $xarExportEnabled
       }
@@ -176,12 +184,12 @@
   ## Legacy way of providing export formats.
   #foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.menu.export.buttons'))
     #set ($exportURL = $NULL)
-    #set ($html = $services.rendering.render($uix.execute(), 'html/5.0'))
+    #set ($html = $services.uix.render($uix, 'html/5.0'))
     #set ($results = $regextool.find($html, 'href=[''"]([^''"]+)[''"]'))
     #if ($results.size() == 2)
       #set ($exportURL = $results.get(1).group)
     #end
-    #set ($exportName = $services.rendering.render($uix.execute(), 'plain/1.0'))
+    #set ($exportName = $services.uix.render($uix, 'plain/1.0'))
     #if ("$!exportName" != '' && "$!exportURL" != '')
       #set ($categoryId = $uix.parameters.category)
       #if ("$!categoryId" == '')
@@ -209,7 +217,10 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">$services.icon.renderHTML('cross')</button>
+          <button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('core.modal.close'))">
+              $services.icon.renderHTML('cross')
+          </button>
           <div class="modal-title" id="exportTreeModalLabel">
             <span class="modal-title-icon">$services.icon.renderHTML('download')</span>
             #set ($title = $escapetool.xml($services.localization.render('core.exporter.exportAs', ['__format__'])))

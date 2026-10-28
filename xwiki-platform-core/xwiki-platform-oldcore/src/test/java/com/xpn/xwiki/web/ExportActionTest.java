@@ -22,12 +22,19 @@ package com.xpn.xwiki.web;
 import java.util.Arrays;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.ServletOutputStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.Request;
+import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.export.ExportFormatHandler;
 import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
@@ -38,9 +45,14 @@ import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.export.DocumentSelectionResolver;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
@@ -52,7 +64,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,10 +90,20 @@ class ExportActionTest
     @Named("xwiki+instance")
     InputFilterStreamFactory inputFilterStreamFactory;
 
+    @MockComponent
+    private Container container;
+
+    @MockComponent
+    private DocumentRevisionProvider documentRevisionProvider;
+
+    @InjectMockComponents
+    private ExportAction action;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @Mock
     BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory;
-
-    private ExportAction action = new ExportAction();
 
     @Mock
     private XWikiRequest request;
@@ -86,11 +111,38 @@ class ExportActionTest
     @Mock
     private XWikiResponse response;
 
+    /**
+     * An export format handler that fails to be initialized.
+     */
+    @Component
+    @Named("xar")
+    @Singleton
+    public static class FailingExportFormatHandler implements ExportFormatHandler
+    {
+        /**
+         * Always fails.
+         */
+        public FailingExportFormatHandler()
+        {
+            throw new IllegalStateException("Failed to initialize");
+        }
+
+        @Override
+        public String export(XWikiContext context)
+        {
+            return null;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @BeforeEach
     void configure() throws Exception
     {
+        when(this.container.getRequest()).thenReturn(new ServletRequest(this.request));
+
         this.oldcore.getXWikiContext().setRequest(this.request);
+        // The export action only performs an export on POST requests.
+        when(this.request.getMethod()).thenReturn("POST");
 
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(this.response.getOutputStream()).thenReturn(outputStream);
@@ -114,11 +166,19 @@ class ExportActionTest
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     void exportXARInvalid() throws Exception
     {
-        // A request originating from a script tag in an HTML page.
-        when(this.request.getHeader("Sec-Fetch-Dest")).thenReturn("script");
-        assertEquals("docdoesnotexist", this.action.render(this.oldcore.getXWikiContext()));
+        // A request that doesn't express a clear intent to export, e.g. a resource loaded with a relative URL from a
+        // page served by the export action.
+        when(this.request.getMethod()).thenReturn("GET");
+        assertEquals("exportresubmit", this.action.render(this.oldcore.getXWikiContext()));
+        verify(this.oldcore.getMockRightService(), never()).hasWikiAdminRights(any(XWikiContext.class));
+        // The refusal is described on the response by the action, not by the template, which is also rendered on its
+        // own through actions these headers would be wrong for.
+        verify(this.response).setStatus(405);
+        verify(this.response).addHeader("Allow", "POST");
+        verify(this.response).addHeader("X-FRAME-OPTIONS", "DENY");
     }
 
     @Test
@@ -191,5 +251,92 @@ class ExportActionTest
         ArgumentCaptor<XAROutputProperties> xarProperties = ArgumentCaptor.forClass(XAROutputProperties.class);
         verify(this.xarFilterStreamFactory).createOutputFilterStream(xarProperties.capture());
         assertEquals("backup", xarProperties.getValue().getPackageName());
+    }
+
+    @Test
+    void exportContributedFormatAcceptingGET() throws Exception
+    {
+        XWikiContext context = this.oldcore.getXWikiContext();
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
+        context.setDoc(document);
+        context.put("tdoc", document);
+        XWikiDocument revision = new XWikiDocument(document.getDocumentReference());
+        when(this.documentRevisionProvider.getRevision(document.getDocumentReferenceWithLocale(), "1.1"))
+            .thenReturn(revision);
+
+        ExportFormatHandler formatHandler =
+            this.oldcore.getMocker().registerMockComponent(ExportFormatHandler.class, "html-print");
+        when(formatHandler.validate(any(Request.class))).thenReturn(true);
+        // Check that the requested revision is set on the context before the export format handler is called.
+        when(formatHandler.export(context)).then(invocation -> context.getDoc() == revision ? "get" : "wrong");
+
+        when(this.request.getMethod()).thenReturn("GET");
+        when(this.request.get("format")).thenReturn("html-print");
+        when(this.request.getParameter("rev")).thenReturn("1.1");
+
+        assertEquals("get", this.action.render(context));
+        assertEquals("1.1", context.get("rev"));
+        verify(this.response, never()).setStatus(405);
+        verify(this.response, never()).addHeader(anyString(), anyString());
+    }
+
+    @Test
+    void exportContributedFormatRequiringPOST() throws Exception
+    {
+        ExportFormatHandler formatHandler =
+            this.oldcore.getMocker().registerMockComponent(ExportFormatHandler.class, "custom");
+        // Use the default validation, which accepts only POST requests.
+        when(formatHandler.validate(any(Request.class))).thenCallRealMethod();
+        when(formatHandler.export(this.oldcore.getXWikiContext())).thenReturn("done");
+        when(this.request.get("format")).thenReturn("custom");
+
+        assertEquals("done", this.action.render(this.oldcore.getXWikiContext()));
+
+        when(this.request.getMethod()).thenReturn("GET");
+        assertEquals("exportresubmit", this.action.render(this.oldcore.getXWikiContext()));
+        verify(formatHandler).export(any(XWikiContext.class));
+        verify(this.response).setStatus(405);
+
+        // The HTTP method of a non-servlet request is unknown so the default validation rejects it.
+        assertFalse(formatHandler.validate(mock(Request.class)));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void exportNativeFormatOverwritten() throws Exception
+    {
+        ExportFormatHandler formatHandler =
+            this.oldcore.getMocker().registerMockComponent(ExportFormatHandler.class, "xar");
+        // Use the default validation, which accepts only POST requests.
+        when(formatHandler.validate(any(Request.class))).thenCallRealMethod();
+        when(formatHandler.export(this.oldcore.getXWikiContext())).thenReturn("done");
+
+        // The handler is used for the default export format.
+        assertEquals("done", this.action.render(this.oldcore.getXWikiContext()));
+
+        when(this.request.get("format")).thenReturn("xar");
+        assertEquals("done", this.action.render(this.oldcore.getXWikiContext()));
+
+        // The native XAR export is not performed.
+        verify(this.oldcore.getMockRightService(), never()).hasWikiAdminRights(any(XWikiContext.class));
+        verify(this.inputFilterStreamFactory, never()).createInputFilterStream(anyMap());
+
+        // The handler still requires POST.
+        when(this.request.getMethod()).thenReturn("GET");
+        assertEquals("exportresubmit", this.action.render(this.oldcore.getXWikiContext()));
+        verify(formatHandler, times(2)).export(any(XWikiContext.class));
+        verify(this.response).setStatus(405);
+    }
+
+    @Test
+    void exportFormatHandlerLookupFailure() throws Exception
+    {
+        this.oldcore.getMocker().registerComponent(FailingExportFormatHandler.class);
+
+        // The native XAR export is performed, which requires administration right.
+        assertEquals("exception", this.action.render(this.oldcore.getXWikiContext()));
+        assertEquals("needadminrights", this.oldcore.getXWikiContext().get("message"));
+        assertEquals("Failed to load the handler for the [xar] export format. Root cause is: "
+            + "[IllegalStateException: Failed to initialize].", this.logCapture.getMessage(0));
     }
 }

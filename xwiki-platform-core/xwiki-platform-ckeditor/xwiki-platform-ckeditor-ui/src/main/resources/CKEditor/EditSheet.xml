@@ -572,6 +572,23 @@ body .modal {
 }
 
 /**
+ * Standalone edit mode: display the document title as a text input (while preserving the heading styles) in order to
+ * emphasize that the title can be changed. The in-place edit mode keeps the borderless title in order to avoid text
+ * flickering when entering or leaving the edit mode.
+ */
+#editMeta #document-title h1.editable {
+  /* The title input is aligned with the edited content, like the other form fields. */
+  margin-left: 0;
+
+  &amp; &gt; input[name="title"] {
+    border: 1px solid @input-border;
+    border-radius: @input-border-radius;
+    .box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075));
+    .form-control-focus();
+  }
+}
+
+/**
  * Full-screen styles (for the standalone / classic editor).
  */
 

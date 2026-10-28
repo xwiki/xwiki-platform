@@ -203,7 +203,7 @@ class DisplayPageTest extends PageTest
         this.context.setResponse(this.response);
 
         SkinExtensionPluginApi mockJSX = mock();
-        when(mockJSX.getImportString()).thenReturn("common.js\npage.js", "common.js\nnew.js\npage.js");
+        when(mockJSX.getImportString()).thenReturn("common.js\npage.js", "common.js\nnew.js\nother.js\npage.js");
 
         when(this.oldcore.getSpyXWiki().getPluginApi("jsx", this.context)).thenReturn(mockJSX);
 
@@ -214,7 +214,8 @@ class DisplayPageTest extends PageTest
         // Verify that our mock was used.
         verify(mockJSX, times(2)).getImportString();
 
-        // Verify that the header was set with the new skin extension.
-        verify(this.response).setHeader("X-XWIKI-HTML-HEAD", "new.js");
+        // Verify that the header was set with the new skin extensions, without line breaks as they are forbidden in
+        // header values.
+        verify(this.response).setHeader("X-XWIKI-HTML-HEAD", "new.js other.js");
     }
 }

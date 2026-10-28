@@ -38,9 +38,21 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 ##
+## Only the administrators of the wiki can resend or delete a mail (the mail storage script service only checks the
+## rights of the author of this page), and the request needs a valid CSRF token.
+##
+#set ($isMailActionRequested = ($request.mailsendingaction_resend || $request.mailsendingaction_delete)
+  &amp;&amp; $request.mail_id &amp;&amp; $request.batch_id)
+#set ($isMailActionAllowed = $isMailActionRequested
+  &amp;&amp; $services.security.authorization.hasAccess('admin', $doc.documentReference.wikiReference))
+#if ($isMailActionAllowed &amp;&amp; !$services.csrf.isTokenValid($request.form_token))
+
+  {{error}}{{translation key="mailSender.admin.invalidCSRF" /}}{{/error}}
+
+##
 ## Resending an email ##
 ##
-#if ($request.mailsendingaction_resend &amp;&amp; $request.mail_id &amp;&amp; $request.batch_id)
+#elseif ($isMailActionAllowed &amp;&amp; $request.mailsendingaction_resend)
   ## resending email
   #set($mailResult = $services.mail.storage.resend($request.batch_id, $request.mail_id))
   #set ($mailError = false)
@@ -48,10 +60,10 @@
 
     {{html}}
       &lt;div class="xwikirenderingerror" title="Click to get more details about the error" style="cursor: pointer;"&gt;
-        $services.localization.render('mailSender.admin.resendFailure')
+        $escapetool.xml($services.localization.render('mailSender.admin.resendFailure'))
       &lt;/div&gt;
       &lt;div class="xwikirenderingerrordescription hidden"&gt;
-        &lt;pre&gt;${description}&lt;/pre&gt;
+        &lt;pre&gt;$escapetool.xml($description)&lt;/pre&gt;
       &lt;/div&gt;
     {{/html}}
 
@@ -71,7 +83,7 @@
     {{success}}$services.localization.render('mailSender.admin.resendSuccess'){{/success}}
 
   #end
-#elseif ($request.mailsendingaction_delete &amp;&amp; $request.mail_id &amp;&amp; $request.batch_id)
+#elseif ($isMailActionAllowed &amp;&amp; $request.mailsendingaction_delete)
   ## Delete email
   #set($discard = $services.mail.storage.delete($request.batch_id, $request.mail_id))
   #set ($mailError = false)
@@ -79,10 +91,10 @@
 
     {{html}}
       &lt;div class="xwikirenderingerror" title="Click to get more details about the error" style="cursor: pointer;"&gt;
-        $services.localization.render('mailSender.admin.deleteFailure')
+        $escapetool.xml($services.localization.render('mailSender.admin.deleteFailure'))
       &lt;/div&gt;
       &lt;div class="xwikirenderingerrordescription hidden"&gt;
-        &lt;pre&gt;${description}&lt;/pre&gt;
+        &lt;pre&gt;$escapetool.xml($description)&lt;/pre&gt;
       &lt;/div&gt;
     {{/html}}
 

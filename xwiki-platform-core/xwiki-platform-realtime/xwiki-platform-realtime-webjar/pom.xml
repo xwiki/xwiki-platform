@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-realtime</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-realtime-webjar</artifactId>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>chainpad-webjar</artifactId>
-      <version>5.3.0</version>
+      <version>5.3.2</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -63,6 +63,12 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>json.sortify</artifactId>
       <version>2.2.2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-realtime-toolbar-webjar</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

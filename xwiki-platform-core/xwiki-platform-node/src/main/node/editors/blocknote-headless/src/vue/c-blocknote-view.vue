@@ -72,7 +72,7 @@ type Props = {
   macros:
     | {
         /** Optional list of client-rendered macros; omit it when only the server-rendered macros are used. */
-        list: MacroWithUnknownParamsType[];
+        list?: MacroWithUnknownParamsType[];
         ctx: ContextForMacros;
       }
     | false;
@@ -96,14 +96,23 @@ const {
 
 const editorRef = shallowRef<EditorType | null>(null);
 
+let unsubscribeFromLocalChanges: (() => void) | undefined;
+
 const emit = defineEmits<{
-  // Emitted as soon as a user-triggered change happens into the editor
-  // The event won't be triggered when the editor is filled with its initial content,
-  // or when the editor's content changes due to modifications made by other players in the realtime session
+  // Emitted as soon as the editor's content changes, whoever caused the change: the local user, the initial content
+  // being loaded, or another participant of the realtime session. Use it to invalidate anything derived from the
+  // content, and "local-instant-change" to react to what the local user did.
   "instant-change": [];
 
   // Emitted in the same context as "instant-change", but debounced
   "debounced-change": [content: BlockType[]];
+
+  // The subset of "instant-change" caused by the local user. It is emitted neither when the editor is filled with
+  // its initial content, nor when the content changes because of another participant of the realtime session: both
+  // of those reach the editor through the Yjs synchronization plugin, which is what this excludes. Note that the
+  // initial content load is a local change as far as Yjs itself is concerned, so it cannot be told apart by looking
+  // at the shared document.
+  "local-instant-change": [];
 }>();
 
 const remoteURLParser = depsContainer
@@ -154,6 +163,13 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   refs: {
     setEditor(editor) {
       editorRef.value = editor;
+      unsubscribeFromLocalChanges?.();
+      // Ask the editor itself which changes are the local user's, rather than watching the shared Yjs document: a
+      // document update cannot tell typing apart from the initial content load, since both are local Yjs changes.
+      unsubscribeFromLocalChanges = editor.onChange(
+        () => emit("local-instant-change"),
+        false,
+      );
     },
   },
   depsContainer,
@@ -236,6 +252,8 @@ onBeforeUnmount(() => {
 
 onUnmounted(() => {
   window.removeEventListener("mousedown", handleLinkEditorOutsideClick);
+  unsubscribeFromLocalChanges?.();
+  unsubscribeFromLocalChanges = undefined;
 });
 </script>
 
@@ -321,9 +339,20 @@ onUnmounted(() => {
     font-family: var(--cr-font-mono);
     color: var(--cr-base-text-color);
 
+    /* Keep the padding from BlockNote because the language selector is displayed in the top padding. */
     & pre {
       margin: 0;
-      padding: 0;
+    }
+
+    /* BlockNote uses the dark syntax highlighting theme because its code blocks have a dark background, but ours have
+      a light background. */
+    & .shiki {
+      color: var(--shiki-light);
+    }
+
+    /* BlockNote displays the language selector in white, which is not visible on our light background. */
+    & > div > select {
+      color: inherit;
     }
   }
 

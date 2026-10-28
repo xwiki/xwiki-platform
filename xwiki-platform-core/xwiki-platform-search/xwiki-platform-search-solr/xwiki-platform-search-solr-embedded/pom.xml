@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-embedded</artifactId>
   <name>XWiki Platform - Search - Solr - Embedded</name>
@@ -47,23 +47,22 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
     </dependency>
-    <!-- Embedded Solr instance. -->
+    <!-- Embedded Solr instance (with its own private Jersey). -->
     <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-core</artifactId>
-    </dependency>
-    <!-- Jersey require javax validation but declare a dependency on jakarta validation -->
-    <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-core-shaded</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-analysis-extras</artifactId>
+      <exclusions>
+        <!-- Provided by xwiki-platform-search-solr-core-shaded -->
+        <exclusion>
+          <groupId>org.apache.solr</groupId>
+          <artifactId>solr-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>

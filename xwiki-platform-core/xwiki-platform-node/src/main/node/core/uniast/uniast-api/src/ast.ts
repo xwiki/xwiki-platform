@@ -70,13 +70,13 @@ type Block =
     }
   | {
       /**
-       * @since 18.8.0RC1
+       * @since 18.10.0RC1
        * @beta
        */
       type: "rawHtml";
 
       /**
-       * @since 18.8.0RC1
+       * @since 18.10.0RC1
        * @beta
        */
       html: string;
@@ -88,13 +88,13 @@ type Block =
        * Unlike `macroBlock` (an invocation placeholder waiting to be rendered), this marks where a
        * macro's user-editable body should be mounted inside the macro's *own* render() output.
        *
-       * @since 18.8.0RC1
+       * @since 18.10.0RC1
        * @beta
        */
       type: "macroBlockEditableArea";
 
       /**
-       * @since 18.8.0RC1
+       * @since 18.10.0RC1
        * @beta
        */
       styles: BlockStyles;
@@ -110,7 +110,7 @@ type BlockStyles = {
   textAlignment?: Alignment;
 
   /**
-   * @since 18.8.0RC1
+   * @since 18.10.0RC1
    * @beta
    */
   cssClasses?: string[];
@@ -231,13 +231,13 @@ type InlineContent =
     }
   | {
       /**
-       * @since 18.8.0RC1
+       * @since 18.10.0RC1
        * @beta
        */
       type: "rawHtml";
 
       /**
-       * @since 18.8.0RC1
+       * @since 18.10.0RC1
        * @beta
        */
       html: string;
@@ -249,7 +249,7 @@ type InlineContent =
        * Unlike `inlineMacro` (an invocation placeholder waiting to be rendered), this marks where a
        * macro's user-editable body should be mounted inside the macro's *own* render() output.
        *
-       * @since 18.8.0RC1
+       * @since 18.10.0RC1
        * @beta
        */
       type: "inlineMacroEditableArea";

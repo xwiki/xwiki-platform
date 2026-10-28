@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-ui</artifactId>
   <name>XWiki Platform - Test - UI Tests Framework</name>
@@ -33,9 +33,6 @@
   <description>XWiki Platform - UI Tests Framework</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.05</xwiki.jacoco.instructionRatio>
-
-    <!-- TODO: removing when not using Apache HttpClient 3 anymore -->
-    <xwiki.enforcer.enforce-apache-http5.skip>true</xwiki.enforcer.enforce-apache-http5.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -53,32 +50,19 @@
       <artifactId>xwiki-platform-test-integration</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--
-		TODO: remove it when no integration test uses it anymore
-		See https://jira.xwiki.org/browse/XCOMMONS-3481 for the work left to be done.
-    -->
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>3.1</version>
-      <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-http</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
-    </dependency>
-    <!-- Used to download/install/setup the gecko driver for Selenium for the FF browser -->
-    <dependency>
-      <groupId>io.github.bonigarcia</groupId>
-      <artifactId>webdrivermanager</artifactId>
-      <version>${webdrivermanager.version}</version>
     </dependency>
     <!-- Used by the REST calls -->
     <dependency>
@@ -101,7 +85,14 @@
     <dependency>
       <groupId>com.deque.html.axe-core</groupId>
       <artifactId>selenium</artifactId>
-      <version>4.13.0</version>
+      <version>4.14.0</version>
+      <exclusions>
+        <!-- Not used by axe-core's code. Selenium Manager (bundled with Selenium) resolves the browser drivers. -->
+        <exclusion>
+          <groupId>io.github.bonigarcia</groupId>
+          <artifactId>webdrivermanager</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>

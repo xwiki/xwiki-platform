@@ -66,9 +66,79 @@ public class RealtimeInplaceEditablePage extends InplaceEditablePage
     @Override
     public RealtimeInplaceEditablePage waitForInplaceEditor()
     {
+        return waitForInplaceEditor(true);
+    }
+
+    /**
+     * Waits for the in-place editor to be loaded.
+     *
+     * @param waitForConnection whether to wait for the user to be connected to the realtime editing session; pass
+     *            {@code false} when the connection is expected to fail
+     * @return this instance
+     * @since 18.9.0
+     */
+    public RealtimeInplaceEditablePage waitForInplaceEditor(boolean waitForConnection)
+    {
         super.waitForInplaceEditor();
-        this.toolbar = new RealtimeEditToolbar().waitUntilConnected();
+        this.toolbar = new RealtimeEditToolbar();
+        if (waitForConnection) {
+            this.toolbar.waitUntilConnected();
+        } else {
+            this.toolbar.waitUntilDisplayed();
+        }
         return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * While collaborating, the standard save buttons are replaced by the realtime edit toolbar, so this uses the Save
+     * &amp; Continue shortcut key instead, and waits for the realtime save status, not for the given message.
+     */
+    @Override
+    public RealtimeInplaceEditablePage save(String expectedSuccessMessage)
+    {
+        if (isCollaborating()) {
+            this.toolbar.sendSaveShortcutKey(expectedSuccessMessage != null);
+        } else {
+            super.save(expectedSuccessMessage);
+        }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * While collaborating, the standard save buttons are replaced by the realtime edit toolbar, so this clicks its Done
+     * button instead, and waits for the view mode, not for the given message.
+     */
+    @Override
+    public RealtimeInplaceEditablePage saveAndView(String expectedSuccessMessage)
+    {
+        if (isCollaborating()) {
+            return done();
+        }
+        super.saveAndView(expectedSuccessMessage);
+        return this;
+    }
+
+    /**
+     * Leaves the edit mode without saving, using the Cancel shortcut key (the realtime edit toolbar doesn't have a
+     * Cancel button), and waits for the page to be rendered in view mode.
+     *
+     * @return this page object
+     */
+    @Override
+    public RealtimeInplaceEditablePage cancel()
+    {
+        getUtil().leaveEditMode();
+        waitForView();
+        return this;
+    }
+
+    private boolean isCollaborating()
+    {
+        return this.toolbar != null && this.toolbar.isCollaborating();
     }
 
     /**

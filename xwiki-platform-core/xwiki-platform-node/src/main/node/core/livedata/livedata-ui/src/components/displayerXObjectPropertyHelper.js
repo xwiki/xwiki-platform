@@ -20,6 +20,9 @@
 
 import { loadById } from "@xwiki/platform-xwiki-utils";
 
+// Lists the properties whose value is submitted as HTML, which the server converts to their syntax.
+const HTML_CONVERSION_FIELD = "RequiresHTMLConversion";
+
 /**
  * Resolve the url of the document reference in the given mode.
  * @param documentReference - the document reference
@@ -53,10 +56,16 @@ function getPropertyReference(propertyName, className) {
   return XWiki.Model.serialize(entityReference);
 }
 
-async function load(mode, documentReference, property, className, extraParams) {
-  const targetUrl = computeTargetURL(documentReference, "get");
+async function load(
+  mode,
+  documentReference,
+  property,
+  className,
+  extraParams,
+  pendingValues,
+) {
   const [xcontext, $] = await loadById("xwiki-meta", "jquery");
-  return $.get(targetUrl, {
+  const parameters = {
     xpage: "display",
     mode: mode,
     // TODO: handle the object index when provided
@@ -66,7 +75,47 @@ async function load(mode, documentReference, property, className, extraParams) {
     objectPolicy: "updateOrCreate",
     // Extra parameters such as force/force_token when the user confirms an edit confirmation.
     ...extraParams,
+  };
+  if (!pendingValues) {
+    return $.get(computeTargetURL(documentReference, "get"), parameters);
+  }
+  // The values of a row whose entry does not exist yet are only held by the client, so the field is
+  // rendered by the preview action, which applies them to the document the row would become without
+  // saving anything. That action requires a POST carrying the CSRF token.
+  return $.ajax({
+    type: "POST",
+    url: computeTargetURL(documentReference, "preview"),
+    data: {
+      ...parameters,
+      ...toFormFields(pendingValues, className),
+      form_token: xcontext.form_token,
+    },
+    // The wiki reads repeated parameters, not the indexed names jQuery produces by default, which
+    // is how a property holding several values is sent.
+    traditional: true,
   });
+}
+
+/**
+ * Name the values of an entry the way the edit form of its document does, which is how the wiki
+ * reads them back.
+ *
+ * @param pendingValues - the values held on the row, by property name
+ * @param className - the class name of the XObject
+ * @returns the values, by form field name
+ */
+function toFormFields(pendingValues, className) {
+  return Object.fromEntries(
+    Object.entries(pendingValues)
+      // Document properties are not read from the object, and the field listing the properties to
+      // convert from HTML already holds their form names.
+      .filter(([name]) => !name.startsWith("doc."))
+      .map(([name, value]) =>
+        name === HTML_CONVERSION_FIELD
+          ? [name, value]
+          : [`${className}_0_${name}`, value],
+      ),
+  );
 }
 
 /**
@@ -75,10 +124,25 @@ async function load(mode, documentReference, property, className, extraParams) {
  * @param className - the class name of the XObject
  * @param property - the XObject property to display
  * @param extraParams - optional extra request parameters (e.g. force and force_token to force an edit confirmation)
+ * @param pendingValues - the values of a row whose entry does not exist yet, which the field is
+ * rendered from, or undefined to render the field from the stored document
  * @returns the XObject property field html content in edit mode
  */
-function edit(documentReference, className, property, extraParams) {
-  return load("edit", documentReference, property, className, extraParams);
+function edit(
+  documentReference,
+  className,
+  property,
+  extraParams,
+  pendingValues,
+) {
+  return load(
+    "edit",
+    documentReference,
+    property,
+    className,
+    extraParams,
+    pendingValues,
+  );
 }
 
 /**
@@ -86,10 +150,19 @@ function edit(documentReference, className, property, extraParams) {
  * @param documentReference - the reference of the document containing the XObject
  * @param className - the class name of the XObject
  * @param property - the XObject property to display
+ * @param pendingValues - the values of a row whose entry does not exist yet, which the field is
+ * rendered from, or undefined to render the field from the stored document
  * @returns the XObject property field html content in view mode
  */
-function view(documentReference, className, property) {
-  return load("view", documentReference, property, className);
+function view(documentReference, className, property, pendingValues) {
+  return load(
+    "view",
+    documentReference,
+    property,
+    className,
+    undefined,
+    pendingValues,
+  );
 }
 
 export { edit, view };

@@ -20,6 +20,7 @@
 import { Logic } from "./Logic";
 import { container } from "./container";
 import { mockI18n } from "../testUtils";
+import { DocumentReference } from "@xwiki/platform-xwiki-model-api";
 import { describe, it, vi } from "vitest";
 
 define("xwiki-l10n!xwiki-blocknote-translation-keys", () => ({}));
@@ -28,10 +29,7 @@ container.bind("XWikiMeta").toConstantValue({});
 
 globalThis.XWiki = {
   currentDocument: {
-    documentReference: {},
-  },
-  Model: {
-    serialize: () => "",
+    documentReference: new DocumentReference("xwiki", ["Space"], "Page"),
   },
 };
 

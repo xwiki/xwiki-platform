@@ -1,0 +1,53 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/* Headings */
+
+/* Display flex can cause problems while editing in-place so we use it only when viewing the headings. */
+#xwikicontent:not([contenteditable]) > :is(h1, h2, h3, h4, h5, h6) {
+  /* Display the section edit link at the end of the heading row without overflowing an existing floating box. */
+  display: flex;
+  /* Make sure the heading text doesn't overflow a previous sibling that is floated with 100% width. */
+  min-width: 1px;
+}
+
+#xwikicontent:not([contenteditable]) > :is(h1, h2, h3, h4, h5, h6) > span:first-child {
+  /* The heading text takes all the available space, while the section edit link takes only what it needs. */
+  flex: auto;
+}
+
+.edit_section {
+  color: inherit;
+  /* Slightly smaller than the heading text, in case the section edit link uses a font icon. */
+  font-size: 70%;
+  /* Use the line height of the parent heading, so that the edit icon is aligned vertically with the heading text. */
+  line-height: 1lh;
+  /* Distinguish the section edit link from the heading text. */
+  margin-left: 1em;
+  /* We can have many section edit links on a page so they should have a low profile.
+    We don't reduce the opacity too much in order to keep a correct contrast at least on the Iceberg color theme. */
+  opacity: .65;
+  /* Display the focus border nicely without cramping it around the icon. */
+  padding-inline: 4px;
+}
+
+.edit_section:not(.disabled):is(:hover, :focus) {
+  opacity: 1;
+}

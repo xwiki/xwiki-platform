@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>
@@ -33,6 +33,7 @@
   <description>Parent project for the Solr search engine.</description>
   <modules>
     <module>xwiki-platform-search-solr-server</module>
+    <module>xwiki-platform-search-solr-core-shaded</module>
     <module>xwiki-platform-search-solr-api</module>
     <module>xwiki-platform-search-solr-embedded</module>
     <module>xwiki-platform-search-solr-query</module>

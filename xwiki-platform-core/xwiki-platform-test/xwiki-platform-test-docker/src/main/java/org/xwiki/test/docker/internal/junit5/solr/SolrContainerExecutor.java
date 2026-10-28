@@ -107,7 +107,7 @@ public class SolrContainerExecutor extends AbstractContainerExecutor
      */
     public void stop(TestConfiguration testConfiguration)
     {
-        // Note that we don't need to stop the container as this is taken care of by TestContainers
+        stopContainers();
     }
 
     private void startSolrContainer(TestConfiguration testConfiguration, MavenResolver mavenResolver) throws Exception

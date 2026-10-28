@@ -19,9 +19,9 @@
  */
 package org.xwiki.extension.test.junit5;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.Assertions;
 import org.xwiki.extension.test.AbstractExtensionTestUtils;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.test.ui.TestUtils;
 
 /**
@@ -37,7 +37,7 @@ public class ExtensionTestUtils extends AbstractExtensionTestUtils
         super(utils);
     }
 
-    public ExtensionTestUtils(TestUtils utils, UsernamePasswordCredentials adminCredentials)
+    public ExtensionTestUtils(TestUtils utils, XWikiCredentials adminCredentials)
     {
         super(utils, adminCredentials);
     }

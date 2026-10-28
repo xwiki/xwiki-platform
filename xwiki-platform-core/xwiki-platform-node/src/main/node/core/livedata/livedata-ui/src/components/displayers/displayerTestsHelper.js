@@ -139,6 +139,9 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
           isEditable() {
             return true;
           },
+          getPropertyDescriptor(propertyId) {
+            return { id: propertyId };
+          },
           getDisplayerDescriptor() {
             return {
               actions: ["jump", "dance"],
@@ -168,9 +171,7 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
               isEditable() {
                 return true;
               },
-              hasPendingSave: () => false,
-              requestEdit: () => {},
-              enablePendingEdit: () => false,
+              whenSaved: () => Promise.resolve(),
               onAnyEvent: () => {},
               ...editBus,
             };

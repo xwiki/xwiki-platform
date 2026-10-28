@@ -70,7 +70,8 @@
 #set ($captchaImplementationAdministrations = $services.uix.getExtensions('org.xwiki.captcha', {'select' : "$!{services.captcha.defaultCaptchaName}"}))
 #if ($captchaImplementationAdministrations.size() &gt; 0)
   == $services.localization.render('captcha.admin.configure.title', $services.rendering.resolveSyntax('xwiki/2.1'), [$services.localization.render("captcha.${services.captcha.defaultCaptchaName}")]) ==
-  $services.rendering.render($captchaImplementationAdministrations[0].execute(), $doc.syntax)
+
+{{uiextension id="$services.rendering.escape($captchaImplementationAdministrations[0].id, 'xwiki/2.1')"/}}
 #end
 )))
 (% class='col-xs-12 col-lg-5 well' %)(((

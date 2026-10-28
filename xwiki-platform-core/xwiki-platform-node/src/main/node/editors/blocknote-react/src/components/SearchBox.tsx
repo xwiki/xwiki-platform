@@ -154,7 +154,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     value.startsWith("http://") || value.startsWith("https://");
 
   const runSearch = useCallback(
-    (search: string) => {
+    async (search: string) => {
       if (isUrl(search)) {
         setSuggestions({ status: "resolved", suggestions: [] });
         return;
@@ -162,15 +162,12 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
       setSuggestions({ status: "loading" });
 
-      // eslint-disable-next-line promise/catch-or-return
-      getSuggestions(search).then((suggestions) => {
-        setSuggestions(
-          // eslint-disable-next-line promise/always-return
-          suggestions !== false
-            ? { status: "resolved", suggestions }
-            : { status: "backendSearchUnsupported" },
-        );
-      });
+      const suggestions = await getSuggestions(search);
+      setSuggestions(
+        suggestions !== false
+          ? { status: "resolved", suggestions }
+          : { status: "backendSearchUnsupported" },
+      );
     },
     [setSuggestions, getSuggestions],
   );
@@ -225,13 +222,13 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
   // Automatically perform a search when the query changes
   useEffect(() => {
-    performSearch(query);
+    void performSearch(query);
   }, [query, performSearch]);
 
   // Perform a search at the opening, immediately: there's no rapid typing to debounce yet, and the
   // suggestions should be available as soon as possible (e.g. to be keyboard-navigable right away).
   useEffect(() => {
-    runSearch("");
+    void runSearch("");
   }, [runSearch]);
 
   return (

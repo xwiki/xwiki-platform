@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.query.SimpleEventQuery;
+import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.sources.NotificationParameters;
 
 /**
@@ -47,11 +48,17 @@ public class EventQueryGenerator
      * Generate the query.
      *
      * @param parameters parameters to use
-     * @return the query to execute
+     * @return the query to execute, or {@code null} if no event can match the parameters (e.g. when there is no
+     *         notification preference, as for the guest user)
      * @throws EventStreamException if error happens
      */
     public SimpleEventQuery generateQuery(NotificationParameters parameters) throws EventStreamException
     {
-        return this.eventQueryConverter.parse(this.expressionGenerator.generateQueryExpression(parameters));
+        ExpressionNode expression = this.expressionGenerator.generateQueryExpression(parameters);
+        if (expression == null) {
+            return null;
+        }
+
+        return this.eventQueryConverter.parse(expression);
     }
 }

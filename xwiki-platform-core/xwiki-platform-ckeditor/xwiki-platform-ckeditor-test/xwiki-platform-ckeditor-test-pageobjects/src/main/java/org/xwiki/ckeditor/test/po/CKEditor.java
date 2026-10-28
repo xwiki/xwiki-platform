@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.po;
 
 import java.time.Duration;
+import java.util.Objects;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -41,6 +42,12 @@ public class CKEditor extends BaseElement
      * The editor field name.
      */
     private final String name;
+
+    /**
+     * The value of the refresh counter after the last content refresh waited for by a page object action, shared by
+     * all the rich text area page objects of this editor so that none of them waits again for that refresh.
+     */
+    private String awaitedRefreshCounter;
 
     /**
      * Create a new instance that can be used to interact with the specified CKEditor instance.
@@ -129,6 +136,30 @@ public class CKEditor extends BaseElement
     }
 
     /**
+     * @return the value of the refresh counter after the last content refresh waited for by a page object action, or
+     *         {@code null} if there was none
+     */
+    String getAwaitedRefreshCounter()
+    {
+        return this.awaitedRefreshCounter;
+    }
+
+    /**
+     * Run an action that refreshes the edited content, such as inserting or updating a macro (macros are rendered
+     * server-side), and wait for that refresh.
+     *
+     * @param action the action to run
+     */
+    void runAndWaitForContentRefresh(Runnable action)
+    {
+        RichTextAreaElement textArea = getRichTextArea(false);
+        String refreshCounter = textArea.getRefreshCounter();
+        action.run();
+        getDriver().waitUntilCondition(driver -> !Objects.equals(refreshCounter, textArea.getRefreshCounter()));
+        this.awaitedRefreshCounter = textArea.getRefreshCounter();
+    }
+
+    /**
      * @return the source text area, but you need to switch to Source first
      */
     public WebElement getSourceTextArea()
@@ -137,6 +168,50 @@ public class CKEditor extends BaseElement
             (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].editable().$;", this.name);
         getDriver().waitUntilCondition(ExpectedConditions.domPropertyToBe(sourceTextArea, "readOnly", "false"));
         return sourceTextArea;
+    }
+
+    /**
+     * @return the edited source, but you need to switch to Source first
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public String getSource()
+    {
+        return getSourceTextArea().getDomProperty("value");
+    }
+
+    /**
+     * @return the offset in the edited source where the selection starts, but you need to switch to Source first
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public int getSourceSelectionStart()
+    {
+        return Integer.parseInt(getSourceTextArea().getDomProperty("selectionStart"));
+    }
+
+    /**
+     * @return the offset in the edited source where the selection ends, but you need to switch to Source first
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public int getSourceSelectionEnd()
+    {
+        return Integer.parseInt(getSourceTextArea().getDomProperty("selectionEnd"));
+    }
+
+    /**
+     * @return the source text that is currently selected, but you need to switch to Source first
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public String getSourceSelectedText()
+    {
+        return getSource().substring(getSourceSelectionStart(), getSourceSelectionEnd());
     }
 
     protected WebElement getContentContainer()

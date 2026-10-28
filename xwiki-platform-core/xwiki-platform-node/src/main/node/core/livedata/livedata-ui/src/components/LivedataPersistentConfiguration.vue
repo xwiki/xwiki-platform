@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import { XWiki } from "../services/xwiki.js";
 // lz-string is used to compress / decompress the encoded config
 import LZString from "lz-string";
 // u-node is used to encode and decode the config

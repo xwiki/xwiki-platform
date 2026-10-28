@@ -43,6 +43,19 @@ define('xwiki-realtime-loader', [
     state: false
   };
 
+  /**
+   * Sends a message to all the users editing the current document.
+   *
+   * @param {Object} message the message to send
+   */
+  function broadcast(message) {
+    allRt.wChan?.bcast(JSON.stringify(message)).catch(error => {
+      // The All Users channel can be gone for a short while after the WebSocket connection is restored, until we join
+      // it again (see joinAllUsers). The others will find out our state when we join again, so this isn't an error.
+      console.debug('Failed to send message to the All Users channel.', {message, error});
+    });
+  }
+
   class RealtimeContext {
     constructor(info) {
       this.info = info;
@@ -66,17 +79,32 @@ define('xwiki-realtime-loader', [
       RealtimeContext.instances[info.field] = this;
     }
 
-    async updateChannels() {
-      const channels = await doc.getChannels({
-        path: [
-          `translations/${doc.realLocale}/saver`,
-          `translations/${doc.realLocale}/userData`,
-          `translations/${doc.realLocale}/fields/${this.info.field}/editors/${this.info.type}`,
-          // Check also if the field is edited in real-time with other editors at the same time.
-          `translations/${doc.realLocale}/fields/${this.info.field}/editors/`,
-        ],
-        create: true
-      });
+    /**
+     * Fetches the channels used to edit the document field, creating them if needed. Concurrent calls share the same
+     * request, because the editor and its components (e.g. the user data) ask for the channels at the same time when
+     * the WebSocket connection is restored.
+     *
+     * @returns {Promise<Object>} the channel keys, by type
+     */
+    updateChannels() {
+      if (!this._updatingChannels) {
+        this._updatingChannels = this._fetchChannels().finally(() => {
+          delete this._updatingChannels;
+        });
+      }
+      return this._updatingChannels;
+    }
+
+    async _fetchChannels() {
+      // The array of key / value pairs is what allows repeating the 'path' parameter.
+      const channels = await doc.getChannels(new URLSearchParams([
+        ['path', `translations/${doc.realLocale}/saver`],
+        ['path', `translations/${doc.realLocale}/userData`],
+        ['path', `translations/${doc.realLocale}/fields/${this.info.field}/editors/${this.info.type}`],
+        // Check also if the field is edited in real-time with other editors at the same time.
+        ['path', `translations/${doc.realLocale}/fields/${this.info.field}/editors/`],
+        ['create', true]
+      ]));
       this.channels = this._parseChannels(channels);
       return this.channels;
     }
@@ -119,11 +147,11 @@ define('xwiki-realtime-loader', [
       this.realtimeEnabled = realtimeEnabled;
       // Notify the others only if we're still editing (only if this context is still associated with the edited field).
       if (RealtimeContext.instances[this.info.field] === this) {
-        allRt.wChan?.bcast(JSON.stringify({
+        broadcast({
           cmd: 'join',
           field: this.info.field,
           realtime: realtimeEnabled
-        }));
+        });
         RealtimeContext.detectConcurrentEditing();
       }
     }
@@ -132,10 +160,10 @@ define('xwiki-realtime-loader', [
       if (RealtimeContext.instances[this.info.field] === this) {
         delete RealtimeContext.instances[this.info.field];
         // Notify the others that we stopped editing this field.
-        allRt.wChan?.bcast(JSON.stringify({
+        broadcast({
           cmd: 'leave',
           field: this.info.field
-        }));
+        });
         RealtimeContext.detectConcurrentEditing();
       }
     }
@@ -191,10 +219,10 @@ define('xwiki-realtime-loader', [
         // Check if someone is editing offline any of the document fields we're editing.
         const editedFields = RealtimeContext.getEditedFields();
         if (editedFields.length) {
-          allRt.wChan?.bcast(JSON.stringify({
+          broadcast({
             cmd: 'isSomeoneOffline',
             fields: editedFields
-          }));
+          });
         }
       }
     }
@@ -481,10 +509,10 @@ define('xwiki-realtime-loader', [
   },
 
   getAllUsersChannel = async function() {
-    const channels = await doc.getChannels({
+    const channels = await doc.getChannels(new URLSearchParams({
       path: `translations/${doc.realLocale}/loader`,
       create: true
-    });
+    }));
     if (channels.length) {
       return channels[0];
     } else {

@@ -29,7 +29,7 @@ import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.po.SortableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Represents the applications panel administration page (PanelsCode.ApplicationsPanelConfiguration).

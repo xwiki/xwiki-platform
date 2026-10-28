@@ -21,7 +21,7 @@ package org.xwiki.lesscss.internal.cache;
 
 import java.util.HashMap;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.container.Container;

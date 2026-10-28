@@ -33,23 +33,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.InvalidRedirectLocationException;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpClientParams;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ProtocolException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.test.escaping.suite.FileTest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.validator.ValidationError;
 
 /**
@@ -89,7 +88,7 @@ public abstract class AbstractEscapingTest implements FileTest
     private static final String SECRET_TOKEN = "form_token";
 
     /** HTTP client shared between all subclasses. */
-    private static HttpClient client;
+    private static XWikiHTTPClient client;
 
     /** A flag controlling login. If true, administrator credentials are used. */
     private static boolean loggedIn = true;
@@ -249,43 +248,43 @@ public abstract class AbstractEscapingTest implements FileTest
      */
     protected static URLContent getUrlContent(String url)
     {
-        GetMethod get = new GetMethod(url);
-        get.setFollowRedirects(true);
+        XWikiHTTPClient client = getClient();
+
         if (isLoggedIn()) {
-            get.setDoAuthentication(true);
-            get.addRequestHeader("Authorization", "Basic " + new String(Base64.encodeBase64("Admin:admin".getBytes())));
+            client.setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
         }
 
         try {
-            int statusCode = AbstractEscapingTest.getClient().executeMethod(get);
-            switch (statusCode) {
-                case HttpStatus.SC_OK:
-                    // everything is fine
-                    break;
-                case HttpStatus.SC_UNAUTHORIZED:
-                    // do not fail on 401 (unauthorized), used in some tests
-                    System.out.println("WARNING, Ignoring status 401 (unauthorized) for URL: " + url);
-                    break;
-                case HttpStatus.SC_CONFLICT:
-                    // do not fail on 409 (conflict), used in some templates
-                    System.out.println("WARNING, Ignoring status 409 (conflict) for URL: " + url);
-                    break;
-                case HttpStatus.SC_NOT_FOUND:
-                    // ignore 404 (the page is still rendered)
-                    break;
-                case HttpStatus.SC_INTERNAL_SERVER_ERROR:
-                    // ignore 500 (internal server error)
-                    break;
-                default:
-                    throw new RuntimeException("HTTP GET request returned status " + statusCode + " ("
-                        + get.getStatusText() + ") for URL: " + url);
-            }
+            return client.executeGet(url, (response, context) -> {
+                int statusCode = response.getCode();
+                switch (statusCode) {
+                    case HttpStatus.SC_OK:
+                        // everything is fine
+                        break;
+                    case HttpStatus.SC_UNAUTHORIZED:
+                        // do not fail on 401 (unauthorized), used in some tests
+                        System.out.println("WARNING, Ignoring status 401 (unauthorized) for URL: " + url);
+                        break;
+                    case HttpStatus.SC_CONFLICT:
+                        // do not fail on 409 (conflict), used in some templates
+                        System.out.println("WARNING, Ignoring status 409 (conflict) for URL: " + url);
+                        break;
+                    case HttpStatus.SC_NOT_FOUND:
+                        // ignore 404 (the page is still rendered)
+                        break;
+                    case HttpStatus.SC_INTERNAL_SERVER_ERROR:
+                        // ignore 500 (internal server error)
+                        break;
+                    default:
+                        throw new RuntimeException("HTTP GET request returned status " + statusCode + " ("
+                            + response.getReasonPhrase() + ") for URL: " + url);
+                }
 
-            return new URLContent(get.getResponseHeader("Content-Type").getValue(), get.getResponseBody());
+                return new URLContent(response.getHeader("Content-Type").getValue(),
+                    EntityUtils.toByteArray(response.getEntity()));
+            });
         } catch (IOException exception) {
             throw new RuntimeException("Error retrieving URL: " + url, exception);
-        } finally {
-            get.releaseConnection();
         }
     }
 
@@ -310,29 +309,26 @@ public abstract class AbstractEscapingTest implements FileTest
      * 
      * @return HTTP client initialized with admin credentials
      */
-    protected static HttpClient getClient()
+    protected static XWikiHTTPClient getClient()
     {
         if (AbstractEscapingTest.client == null) {
-            HttpClient adminClient = new HttpClient();
+            RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+            // The code that prevents circular redirects (HttpMethodDirector#processRedirectResponse) ignores the query
+            // string when comparing the redirect location with the current location. The browser doesn't behave like
+            // this
+            // and we have pages that redirect to themselves with different query string parameters.
+            requestConfigBuilder.setCircularRedirectsAllowed(true);
+
+            ConnectionConfig connConfig = ConnectionConfig.custom().setConnectTimeout(30, TimeUnit.SECONDS)
+                .setSocketTimeout(20, TimeUnit.SECONDS).build();
+            BasicHttpClientConnectionManager cm = new BasicHttpClientConnectionManager();
+            cm.setConnectionConfig(connConfig);
+
+            XWikiHTTPClient adminClient = new XWikiHTTPClient(XWikiHTTPClient.builder()
+                .setDefaultRequestConfig(requestConfigBuilder.build()).setConnectionManager(cm));
 
             // set up admin credentials
-            Credentials defaultcreds = new UsernamePasswordCredentials("Admin", "admin");
-            adminClient.getState().setCredentials(AuthScope.ANY, defaultcreds);
-
-            // set up client parameters
-            HttpClientParams clientParams = new HttpClientParams();
-            clientParams.setSoTimeout(20000);
-            // We need to allow circular redirects, because some templates redirect to the same location with different
-            // query parameters and the check for circular redirect in HttpClient only checks the URI path without the
-            // parameters.
-            // Note that actual circular redirects are still aborted after following them for some fixed number of times
-            clientParams.setBooleanParameter(HttpClientParams.ALLOW_CIRCULAR_REDIRECTS, true);
-            adminClient.setParams(clientParams);
-
-            // set up connections parameters
-            HttpConnectionManagerParams connectionParams = new HttpConnectionManagerParams();
-            connectionParams.setConnectionTimeout(30000);
-            adminClient.getHttpConnectionManager().setParams(connectionParams);
+            adminClient.setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
 
             AbstractEscapingTest.client = adminClient;
         }
@@ -360,7 +356,8 @@ public abstract class AbstractEscapingTest implements FileTest
         try {
             content = AbstractEscapingTest.getUrlContent(url);
         } catch (RuntimeException e) {
-            if (e.getCause() instanceof InvalidRedirectLocationException) {
+            if (e.getCause() instanceof ProtocolException protocolException
+                && protocolException.getMessage().startsWith("Invalid redirect URI")) {
                 // Don't fail the test if we can't follow a redirect because the redirect location can be taken from the
                 // request parameters which are controlled by the test and most of the tests use values that are not
                 // valid URLs. The code that performs the redirect always assumes the redirect URL is valid.

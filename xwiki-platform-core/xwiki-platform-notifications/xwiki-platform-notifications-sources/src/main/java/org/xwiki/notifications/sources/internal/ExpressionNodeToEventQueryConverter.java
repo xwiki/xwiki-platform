@@ -111,15 +111,14 @@ public class ExpressionNodeToEventQueryConverter
 
     private void parseBlock(ExpressionNode node, SimpleEventQuery result, boolean ingroup) throws EventStreamException
     {
-        if (node instanceof AbstractUnaryOperatorNode unaryOperatorNode) {
-            parseUnaryOperator(unaryOperatorNode, result, ingroup);
-        } else if (node instanceof AbstractBinaryOperatorNode binaryOperatorNode) {
-            parseBinaryOperator(binaryOperatorNode, result, ingroup);
-        } else if (node instanceof AbstractOperatorNode operatorNode) {
-            parseOtherOperation(operatorNode, result, ingroup);
-        } else {
+        switch (node) {
+            case AbstractUnaryOperatorNode unaryOperatorNode ->
+                parseUnaryOperator(unaryOperatorNode, result, ingroup);
+            case AbstractBinaryOperatorNode binaryOperatorNode ->
+                parseBinaryOperator(binaryOperatorNode, result, ingroup);
+            case AbstractOperatorNode operatorNode -> parseOtherOperation(operatorNode, result, ingroup);
             // Unsupported
-            throw new EventStreamException(String.format("Unsupported block node [%s]", node));
+            case null, default -> throw new EventStreamException(String.format("Unsupported block node [%s]", node));
         }
     }
 

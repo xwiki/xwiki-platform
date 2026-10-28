@@ -26,10 +26,11 @@ define('xwiki-realtime-wikiEditor', [
   'xwiki-realtime-saver',
   'chainpad',
   'xwiki-realtime-crypto',
-  'jquery'
+  'jquery',
+  'xwiki-l10n!xwiki-realtime-messages'
 ], function(
   /* jshint maxparams:false */
-  Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $
+  Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $, Messages
 ) {
   'use strict';
 
@@ -246,9 +247,22 @@ define('xwiki-realtime-wikiEditor', [
     }
 
     async resetContent() {
-      const data = await $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'})));
-      this.hideChangesFromSaver(this.setValueWithCursor.bind(this, data.content));
+      const savedContent = await this.getSavedContent();
+      this.hideChangesFromSaver(this.setValueWithCursor.bind(this, savedContent));
       this.onLocal();
+    }
+
+    async getSavedContent() {
+      try {
+        const data = await $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'})));
+        return data.content;
+      } catch (error) {
+        if (error?.status === 404) {
+          // The edited document was never saved.
+          return '';
+        }
+        throw error;
+      }
     }
 
     hideChangesFromSaver(task) {
@@ -286,7 +300,8 @@ define('xwiki-realtime-wikiEditor', [
         onLocal: this.onLocal.bind(this),
         onAbort: this.onAbort.bind(this),
         beforeReconnecting: this.beforeReconnecting.bind(this),
-        onConnectionChange: this.onConnectionChange.bind(this)
+        onConnectionChange: this.onConnectionChange.bind(this),
+        onError: this.onRealtimeError.bind(this)
       };
     }
 
@@ -295,6 +310,15 @@ define('xwiki-realtime-wikiEditor', [
     }
 
     async onReady(info) {
+      try {
+        await this.joinRealtimeSession(info);
+      } catch (error) {
+        // We failed to join the user data or the saver channel.
+        this.onRealtimeError(error);
+      }
+    }
+
+    async joinRealtimeSession(info) {
       this.chainpad = info.realtime;
       this.leaveChannel = info.leave;
 
@@ -304,12 +328,24 @@ define('xwiki-realtime-wikiEditor', [
         user: this.editorConfig.user,
         onChange: info.userList.onChange,
         crypto: Crypto,
-        editor: this.editorId
+        editor: this.editorId,
+        // Used to check if the user data channel is still available when the WebSocket connection is restored.
+        getChannel: async () => (await this.editorConfig.updateChannels()).userData
       });
       this.onUserListChange(info.userList, this.userData);
       info.userList.change.push(this.onUserListChange.bind(this, info.userList));
 
+      // When we rejoin the realtime session after the WebSocket connection was closed we create a new saver. If we use
+      // the same saver channel, the new saver gets our saver state from the other users, but if the saver channel has
+      // been removed in the mean time (because we were the only one using it) then the new saver doesn't know about the
+      // changes we didn't save before the connection was closed.
+      const hasUnsavedChanges = this.saver?.isDirty() && this.joinedSaverChannel !== this.saverChannel;
       this.saver = await this.createSaver(info);
+      this.joinedSaverChannel = this.saverChannel;
+      if (hasUnsavedChanges) {
+        // Mark the content as dirty in order to show the right save status and to trigger the auto-save.
+        this.saver.contentModifiedLocally();
+      }
       this.initializing = false;
       // Initialize the edited content with the content from the realtime session.
       this.onRemote(info);
@@ -346,17 +382,80 @@ define('xwiki-realtime-wikiEditor', [
 
     onAbort() {
       console.log('Aborting the session!');
-      this.chainpad.abort();
-      this.leaveChannel();
+      // We may not have finished joining the realtime session (e.g. if we failed to join one of the channels).
+      this.chainpad?.abort();
+      this.leaveChannel?.();
       this.aborted = true;
-      this.saver.stop();
+      this.saver?.stop();
       this.toolbar.destroy();
-      this.userData.stop?.();
+      this.userData?.stop?.();
+    }
+
+    /**
+     * Called when we fail to join or rejoin the realtime session. We leave the realtime session and let the user
+     * continue editing alone.
+     *
+     * @param {*} error the reason why we failed to join the realtime session
+     */
+    onRealtimeError(error) {
+      if (this.aborted) {
+        // We already left the realtime session (e.g. because of a previous error).
+        return;
+      }
+
+      console.error('Failed to join the realtime session.', error);
+      this.onAbort();
+      this.setEditable(true);
+      // Let the user know that they're not editing in realtime anymore.
+      Interface.getAllowRealtimeCheckbox().prop('checked', false).prop('disabled', false);
+      this.editorConfig.setRealtimeEnabled(false);
+      XWiki.widgets.Notification.show(Messages['join.error'], 'error');
     }
 
     async beforeReconnecting(callback) {
-      await this.updateKeys();
-      callback(this.channel, this.editor.getValue());
+      try {
+        const oldChannel = this.channel;
+        await this.updateKeys();
+        if (this.channel === oldChannel) {
+          // The channel used before the WebSocket connection closed is still available so we can continue to use it.
+          callback(this.channel, this.editor.getValue());
+        } else {
+          await this.restartRealtimeSync();
+        }
+      } catch (error) {
+        // We failed to fetch the channels (e.g. because the user session has expired).
+        this.onRealtimeError(error);
+      }
+    }
+
+    /**
+     * Called when the channel used before the WebSocket connection closed is not available anymore (it was removed
+     * because we were the only one using it). ChainPad-Netflux would join the new channel using the same ChainPad
+     * instance, whose history exists only in the removed channel, so the users joining the new channel would get an
+     * empty history: they wouldn't see our content and would ignore our next changes, whose parent they don't know.
+     * We start a new realtime synchronization instead. Its initial state is the saved content, i.e. the content the
+     * users joining after us start with, because ChainPad requires all the users to have the same initial state (and
+     * it sends the initial state only along with the first change). Our content, which may have unsaved changes, is
+     * recorded as a local change before the channel history is received, so that ChainPad merges it with the changes
+     * made by the users that joined the new channel before us, if any.
+     */
+    async restartRealtimeSync() {
+      const initialState = this.canonicalize(await this.getSavedContent() || '');
+      try {
+        this.realtimeInput.stop();
+      } catch (error) {
+        // The WebSocket connection used by the previous realtime synchronization is already closed.
+        console.debug('Failed to stop the previous realtime synchronization.', error);
+      }
+      this.realtimeInput = ChainPadNetflux.start({
+        ...this.getRealtimeOptions(),
+        initialState,
+        onInit: info => {
+          this.onInit(info);
+          // Called before the channel history is requested.
+          info.realtime.contentUpdate(this.canonicalize(this.editor.getValue()));
+        }
+      });
     }
 
     onConnectionChange(info) {

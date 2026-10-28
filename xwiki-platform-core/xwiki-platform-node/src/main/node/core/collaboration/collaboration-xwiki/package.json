@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-collaboration-xwiki",
-  "version": "18.8.0-SNAPSHOT",
+  "version": "18.10.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -40,11 +40,17 @@
   "dependencies": {
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-autosave-api": "workspace:*",
+    "@xwiki/platform-autosave-xwiki": "workspace:*",
     "@xwiki/platform-collaboration-api": "workspace:*",
+    "@xwiki/platform-collaboration-toolbar": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
+    "@xwiki/platform-document-xwiki": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
+    "@xwiki/platform-model-xwiki": "workspace:*",
     "lib0": "catalog:",
+    "y-protocols": "catalog:",
     "y-websocket": "catalog:",
     "yjs": "catalog:"
   },
@@ -60,6 +66,7 @@
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "@xwiki/platform-xwiki-model-api": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",

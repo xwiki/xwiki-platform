@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-editors-blocknote-react",
-  "version": "18.8.0-SNAPSHOT",
+  "version": "18.10.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -44,9 +44,11 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "@blocknote/code-block": "catalog:",
     "@blocknote/core": "catalog:",
     "@blocknote/mantine": "catalog:",
     "@blocknote/react": "catalog:",
+    "@floating-ui/react": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
     "@types/react-dom": "catalog:",

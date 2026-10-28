@@ -34,7 +34,7 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
 #if ($xcontext.action == 'edit')
@@ -60,7 +60,20 @@
     #userPicker(true $parameters)
   {{/html}}
 #else
-  #foreach($page in $pageList)#if($foreach.count &gt; 1), #end#if($xwiki.exists($page))[[${xwiki.getUserName($page, false)}&gt;&gt;$page]]#else$services.rendering.escape($page, 'xwiki/2.1')#end#end
+  #foreach($page in $pageList)
+    #if($foreach.count &gt; 1), #end
+    #set ($userReference = $services.model.resolveDocument($page))
+    #if($xwiki.exists($userReference))
+      ## A link label is parsed twice (the link parser unescapes it once before parsing it as wiki syntax), so it
+      ## needs to be escaped twice.
+      #set ($escapedUserName = $services.rendering.escape($xwiki.getPlainUserName($userReference), 'xwiki/2.1'))
+      #set ($escapedUserName = $services.rendering.escape($escapedUserName, 'xwiki/2.1'))
+      #set ($escapedUserReference = $services.rendering.escape($services.model.serialize($userReference, 'default'), 'xwiki/2.1'))
+      [[$escapedUserName&gt;&gt;doc:$escapedUserReference]]##
+    #else
+      $services.rendering.escape($page, 'xwiki/2.1')##
+    #end
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

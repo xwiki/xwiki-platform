@@ -23,6 +23,7 @@ import { mount } from "@vue/test-utils";
 import { assertAxe } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
+import { reactive } from "vue";
 
 /**
  * Vue component initializer for the LivedataPagination component. Calls `mount()` from
@@ -38,6 +39,7 @@ import { describe, expect, it } from "vitest";
  *           maxShownPages: 10,
  *           showEntryRange: true,
  *           showPageSizeDropdown: true,
+ *           showPaginationOnSinglePage: true,
  *           pageSizes: [10, 20, 30]
  *         }
  *       },
@@ -80,6 +82,7 @@ function initWrapper({ provide } = {}) {
                   maxShownPages: 10,
                   showEntryRange: true,
                   showPageSizeDropdown: true,
+                  showPaginationOnSinglePage: true,
                   pageSizes: [10, 20, 30, 100],
                 },
               },
@@ -194,5 +197,95 @@ describe("LivedataPagination.vue", () => {
       "livedata.pagination.loadPageByNumber",
     );
     await assertAxe(wrapper);
+  });
+
+  it("Hides the pagination on a single page when showPaginationOnSinglePage is false", () => {
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          data: {
+            meta: { pagination: { showPaginationOnSinglePage: false } },
+            data: { count: 5 },
+          },
+          getPageCount: () => 1,
+          getPageIndex: () => 0,
+        },
+      },
+    });
+    expect(wrapper.find(".livedata-pagination").exists()).toBe(false);
+  });
+
+  it("Displays the pagination on several pages when showPaginationOnSinglePage is false", () => {
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          data: {
+            meta: { pagination: { showPaginationOnSinglePage: false } },
+            data: { count: 25 },
+          },
+          getPageCount: () => 2,
+          getPageIndex: () => 0,
+        },
+      },
+    });
+    expect(wrapper.find(".livedata-pagination").exists()).toBe(true);
+  });
+
+  it("Displays the pagination when showPaginationOnSinglePage is false but the current page is not the first one", () => {
+    // The entries the user was paginating through have disappeared, leaving a single page while the user is still
+    // on the second one. The pagination is the only way back to the first page.
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          data: {
+            meta: { pagination: { showPaginationOnSinglePage: false } },
+            query: { limit: 20, offset: 20 },
+            data: { count: 5 },
+          },
+          getPageCount: () => 1,
+          getPageIndex: () => 1,
+        },
+      },
+    });
+    expect(wrapper.find(".livedata-pagination").exists()).toBe(true);
+    const pageNavs = wrapper.findAll(".pagination-indexes .page-nav");
+    expect(pageNavs.at(0).text()).toContain("1");
+  });
+
+  it("Keeps the pagination displayed when the entries later fit a single page", async () => {
+    // The user raises the page size until every entry fits one page. The pagination, which holds the page size
+    // selector, has to stay so that the page size can be lowered again.
+    const data = reactive({
+      meta: {
+        pagination: {
+          maxShownPages: 10,
+          showEntryRange: true,
+          showPageSizeDropdown: true,
+          showPaginationOnSinglePage: false,
+          pageSizes: [10, 100],
+        },
+      },
+      query: { limit: 10, offset: 0 },
+      data: { count: 25, entries: [] },
+    });
+    const logic = {
+      data,
+      getPageCount: () => Math.ceil(data.data.count / data.query.limit),
+      getPageIndex: () => Math.floor(data.query.offset / data.query.limit),
+      getFirstIndexOfPage: () => 0,
+      getLastIndexOfPage: () => 9,
+    };
+    const wrapper = mount(LivedataPagination, {
+      attachTo: document.body,
+      global: { provide: { logic }, mocks: { $t: (key) => key } },
+    });
+    expect(wrapper.find(".livedata-pagination").exists()).toBe(true);
+
+    data.query.limit = 100;
+    await wrapper.vm.$nextTick();
+
+    expect(logic.getPageCount()).toBe(1);
+    expect(wrapper.find(".livedata-pagination").exists()).toBe(true);
+    expect(wrapper.find(".pagination-page-size select").exists()).toBe(true);
   });
 });

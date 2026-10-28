@@ -34,6 +34,7 @@ import { nextTick } from "vue";
  *   provide: {
  *     logic: {
  *       canAddEntry: () => false,
+ *       getPageCount: () => 1,
  *       getEntryId: (e) => e.id,
  *       getEntryKeys: (entries) => entries.map((e) => `entry-${e.id}`),
  *       data: {
@@ -64,6 +65,7 @@ function initWrapper({ options, afterEntryFetchWrapper } = {}) {
           provide: {
             logic: {
               canAddEntry: () => false,
+              getPageCount: () => 1,
               getEntryId: (e) => e.id,
               getEntryKeys: (entries) => entries.map((e) => `entry-${e.id}`),
               onEvent: (eventName, callback) => {

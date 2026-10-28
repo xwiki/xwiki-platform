@@ -38,6 +38,9 @@
 
 #macro (tree $options)
   <div #treeAttributes($options)></div>
+  <p id="$escapetool.xml("$!{attributes.id}-description")" class="sr-only">
+    $escapetool.xml($services.localization.render('tree.macro.description'))
+  </p>
 #end
 
 #macro (treeAttributes $options $isWikiSyntax)
@@ -63,14 +66,16 @@
     $entry.key = "$escapedValue"##
   #end
 #end
-
 #macro (getTreeAttributes $options $attributes)
   #set ($macro.options = {})
   #set ($discard = $macro.options.putAll($defaultTreeOptions))
   #set ($discard = $macro.options.putAll($options))
-  #if ($macro.options.id)
-    #set ($discard = $attributes.put('id', $macro.options.id))
+  ## Generate the default id here so that each tree of the page gets its own.
+  #if ("$!macro.options.id" == '')
+    #set ($macro.options.id = "xtree-${datetool.date.time}-${mathtool.random(100, 1000)}")
   #end
+  #set ($discard = $attributes.put('id', $macro.options.id))
+  #set ($discard = $attributes.put('aria-describedby', "${macro.options.id}-description"))
   #set ($classes = ["$!macro.options.get('class')"])
   #set ($noLinks = $macro.options.links != 'true')
   #if ($noLinks)

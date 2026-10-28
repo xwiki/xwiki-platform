@@ -133,7 +133,7 @@ export default {
     // Creates the function to fetch the suggestions using the given parameters.
     getLoader(searchParams) {
       return async (text, callback) => {
-        // TODO: Support multiple search URLs (sources). See suggestValues.js for an example.
+        // TODO: Support multiple search URLs (sources). See suggestUsersAndGroups.js for an example.
         const searchURL = this.config.searchURL.replace(
           "{encodedQuery}",
           encodeURIComponent(text),

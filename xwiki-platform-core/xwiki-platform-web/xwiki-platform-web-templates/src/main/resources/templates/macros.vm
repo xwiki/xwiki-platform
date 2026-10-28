@@ -2687,7 +2687,7 @@ $string##
  *#
 #macro (userPicker_import)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestValues.js'))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js'))
 #end
 
 #macro (userPicker_input $multiSelect $parameters)
@@ -2815,7 +2815,7 @@ $string##
  *#
 #macro (_restListPicker $type $parameters)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestValues.js'))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestRestListValues.js'))
   #if ("$!parameters" == "")
     #set ($parameters = {})
   #end

@@ -28,7 +28,7 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
         return source(params).then(function(response) {
           // Success.
           if (Array.isArray(response)) {
-            suggestions.push(...response.slice(0, params.limit - suggestions.length));
+            suggestions.push.apply(suggestions, response.slice(0, params.limit - suggestions.length));
             suggestions.sort(suggestionComparator);
           }
           return suggestions;
@@ -178,52 +178,11 @@ define('xwiki-suggestGroups', ['jquery', 'xwiki-selectize-utils', 'xwiki-selecti
 
 require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
-    const container = $(data?.elements || document);
+    var container = $((data && data.elements) || document);
     container.find('.suggest-users').suggestUsers();
     container.find('.suggest-groups').suggestGroups();
   };
 
   $(document).on('xwiki:dom:updated', init);
-  $(init);
-});
-
-/**
- * Values listed by a REST resource, such as tags and wikis.
- */
-define('xwiki-suggestRestListValues', ['jquery', 'xwiki-entityReference', 'xwiki-selectize'], function($, XWiki) {
-  /**
-   * Builds the selectize options for a REST resource that returns the list of values under the given response key,
-   * each value having a name.
-   */
-  function getSelectizeOptions(restPath, responseKey) {
-    const loadURL = [XWiki.contextPath, 'rest', ...restPath].join('/');
-    async function load(text, callback) {
-      try {
-        const response = await $.getJSON(loadURL);
-        const values = Array.isArray(response?.[responseKey]) ? response[responseKey] : [];
-        callback(values.map(value => ({value: value.name})));
-      } catch {
-        callback();
-      }
-    }
-    return {create: true, load, loadSelected: load};
-  }
-
-  $.fn.suggestRestListValues = function(restPath, responseKey) {
-    return this.each(function() {
-      $(this).xwikiSelectize(getSelectizeOptions(restPath, responseKey));
-    });
-  };
-});
-
-require(['jquery', 'xwiki-entityReference', 'xwiki-suggestRestListValues', 'xwiki-events-bridge'], function($, XWiki) {
-  function init(event, data) {
-    const container = $(data?.elements || document);
-    container.find('.suggest-tags')
-      .suggestRestListValues(['wikis', encodeURIComponent(XWiki.currentWiki), 'tags'], 'tags');
-    container.find('.suggest-wikis').suggestRestListValues(['wikis'], 'wikis');
-  }
-
-  $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
   $(init);
 });

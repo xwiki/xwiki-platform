@@ -553,29 +553,29 @@ Get the actual notifications.
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
+      <code>
 /***********************************************
  * Notifications Header
  ***********************************************/
 #tmNotifications {
   &amp; &gt; button {
-    background-color: @navbar-default-bg;
-    color: @navbar-default-link-color;
+    background-color: var(--navbar-default-bg);
+    color: var(--navbar-default-link-color);
     border: 0;
-    padding: 10px @navbar-padding-horizontal;
+    padding: 10px 15px;
 
-    @media (min-width: @grid-float-breakpoint) {
-      padding: @navbar-padding-vertical @navbar-padding-horizontal;
+    @media (min-width: 768px) {
+      padding: 15px 15px;
     }
     &amp;:hover,
     &amp;:focus {
       outline: revert;
-      background-color: @navbar-default-link-hover-bg;
-      color: @navbar-default-link-hover-color;
+      background-color: var(--navbar-default-link-hover-bg);
+      color: var(--navbar-default-link-hover-color);
     }
     &amp;:active {
-      background-color: @navbar-default-link-active-bg;
-      color: @navbar-default-link-active-color;
+      background-color: var(--navbar-default-link-active-bg);
+      color: var(--navbar-default-link-active-color);
     }
   }
   
@@ -586,8 +586,8 @@ Get the actual notifications.
 }
 
 .notifications-count {
-  color: @btn-danger-color;
-  background-color: @btn-danger-bg;
+  color: var(--btn-danger-color);
+  background-color: var(--btn-danger-bg);
   position: absolute;
   top: 0;
 }
@@ -621,8 +621,8 @@ Get the actual notifications.
 }
 
 .notifications-toggles .bootstrap-switch .bootstrap-switch-label {
-  background-color: $theme.buttonSecondaryBackgroundColor;
-  color: $theme.buttonSecondaryTextColor;
+  background-color: var(--btn-default-bg);
+  color: var(--btn-default-color);
 }
 
 /***********************************************
@@ -639,13 +639,13 @@ Get the actual notifications.
 }</code>
     </property>
     <property>
-      <contentType>LESS</contentType>
+      <contentType>CSS</contentType>
     </property>
     <property>
-      <name>LESS</name>
+      <name>CSS</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -785,8 +785,13 @@ Get the actual notifications.
   #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+    ## We make sure to use the color theme of the document where this UIX is used.
+    #set ($colorTheme = $xwiki.getUserPreference('colorTheme'))
+    #if ("$!colorTheme" != '')
+    #set ($colorTheme = $services.model.resolveDocument($colorTheme, $doc.documentReference))
+    #end
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro', {'colorTheme': $colorTheme}))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX', {'colorTheme': $colorTheme}))
     {{html clean="false"}} ## We need the clean false to avoid getting a supplementary ul element.
     &lt;li class="notification-uix loading"&gt;&lt;/li&gt;
     {{/html}}

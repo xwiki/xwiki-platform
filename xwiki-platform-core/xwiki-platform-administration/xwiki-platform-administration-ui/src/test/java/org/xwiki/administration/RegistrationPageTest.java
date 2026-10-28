@@ -19,6 +19,9 @@
  */
 package org.xwiki.administration;
 
+import java.text.MessageFormat;
+import java.util.Collection;
+
 import javax.script.ScriptContext;
 
 import org.jsoup.nodes.Document;
@@ -27,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
+import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
@@ -55,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -84,6 +89,9 @@ class RegistrationPageTest extends PageTest
     private static final DocumentReference REGISTRATION =
         new DocumentReference("xwiki", "XWiki", "Registration");
 
+    private static final DocumentReference REGISTRATION_CONFIG =
+        new DocumentReference("xwiki", "XWiki", "RegistrationConfig");
+
     private static final String USER_NAME = "JaneDoe";
 
     @MockComponent
@@ -109,19 +117,68 @@ class RegistrationPageTest extends PageTest
         doReturn(displayedName).when(this.oldcore.getSpyXWiki())
             .getUserName(eq("XWiki." + USER_NAME), isNull(), anyBoolean(), any(XWikiContext.class));
 
-        this.request.put("xwikiname", USER_NAME);
-        this.request.put("register_first_name", "Jane");
-        this.request.put("register_last_name", "Doe");
-        this.request.put("register_password", "Passw0rd!Passw0rd!");
-        this.request.put("register2_password", "Passw0rd!Passw0rd!");
-        this.request.put("register_email", "jane.doe@example.org");
-        this.request.put("form_token", "token");
+        putRegistrationRequest("Jane", "Doe");
 
         Document result = renderHTMLPage(REGISTRATION);
 
         Element successMessage = result.selectFirst(".box.infomessage");
         assertNotNull(successMessage);
         assertEquals("core.register.successful [" + displayedName + ", " + USER_NAME + "]", successMessage.text());
+    }
+
+    @Test
+    void successHeadlineDisplaysTheUserNameNextToTheReadableName() throws Exception
+    {
+        loadPage(REGISTRATION_CONFIG);
+        mockWelcomeHeadlineTranslation();
+        putRegistrationRequest("Jane", "<em>Doe</em>");
+
+        Document result = renderHTMLPage(REGISTRATION);
+
+        Element headline = result.selectFirst(".registration-success-headline h2");
+        assertNotNull(headline);
+        // No space is expected between the user name and the exclamation mark, as the English translation has none.
+        assertEquals("Welcome, Jane <em>Doe</em> (" + USER_NAME + ")!", headline.text());
+        // The readable name is escaped, so the only element of the headline is the one holding the user name.
+        assertEquals(1, headline.children().size());
+        assertEquals("small", headline.child(0).tagName());
+        assertEquals("(" + USER_NAME + ")", headline.child(0).text());
+    }
+
+    @Test
+    void successHeadlineDisplaysOnlyTheUserNameWithoutReadableName() throws Exception
+    {
+        loadPage(REGISTRATION_CONFIG);
+        mockWelcomeHeadlineTranslation();
+        putRegistrationRequest("Jane", "");
+
+        Document result = renderHTMLPage(REGISTRATION);
+
+        Element headline = result.selectFirst(".registration-success-headline h2");
+        assertNotNull(headline);
+        assertEquals("Welcome, " + USER_NAME + "!", headline.text());
+        assertTrue(headline.children().isEmpty());
+    }
+
+    private void putRegistrationRequest(String firstName, String lastName)
+    {
+        this.request.put("xwikiname", USER_NAME);
+        this.request.put("register_first_name", firstName);
+        this.request.put("register_last_name", lastName);
+        this.request.put("register_password", "Passw0rd!Passw0rd!");
+        this.request.put("register2_password", "Passw0rd!Passw0rd!");
+        this.request.put("register_email", "jane.doe@example.org");
+        this.request.put("form_token", "token");
+    }
+
+    private void mockWelcomeHeadlineTranslation() throws Exception
+    {
+        // Use the actual English value, since the test checks the spaces and punctuation around the parameters.
+        LocalizationScriptService localization = this.componentManager.getInstance(ScriptService.class,
+            "localization");
+        when(localization.render(eq("core.register.successful.welcome.headline"), anyCollection()))
+            .thenAnswer(invocation -> MessageFormat.format("Welcome, {0}{1}!",
+                invocation.<Collection<?>>getArgument(1).toArray()));
     }
 
     @Test

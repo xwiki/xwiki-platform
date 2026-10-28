@@ -35,7 +35,11 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Translation Macro</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
-    </properties>
+      <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/translation
+    </xwiki.extension.components>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

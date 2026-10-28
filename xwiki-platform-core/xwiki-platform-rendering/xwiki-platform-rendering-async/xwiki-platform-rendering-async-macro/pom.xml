@@ -33,7 +33,11 @@
   <description>XWiki Platform - Rendering - Async - Macro</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
-    </properties>
+      <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/async
+    </xwiki.extension.components>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

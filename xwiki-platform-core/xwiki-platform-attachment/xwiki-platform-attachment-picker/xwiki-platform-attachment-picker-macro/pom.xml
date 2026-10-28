@@ -37,6 +37,10 @@
     <xwiki.extension.name>Attachment Picker Macro</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->
     <xwiki.extension.category>macro</xwiki.extension.category>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/attachmentGalleryPicker
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>

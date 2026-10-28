@@ -35,6 +35,10 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>User Mentions Application</xwiki.extension.name>
     <xwiki.extension.category>application</xwiki.extension.category>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/mention
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <!-- Notifications UI should be declared first so that all components are initialized before the Mentions are

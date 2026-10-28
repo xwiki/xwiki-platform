@@ -73,8 +73,8 @@ public class DefaultQuoteService implements QuoteService
         }
 
         return firstBlock
-           .map(new RenderFunction())
-           .map(it -> StringUtils.abbreviate(it, "...", 200));
+            .map(new RenderFunction())
+            .map(it -> StringUtils.abbreviate(it, "...", 200));
     }
 
     private static class ExactAnchorBlockMatcher implements BlockMatcher

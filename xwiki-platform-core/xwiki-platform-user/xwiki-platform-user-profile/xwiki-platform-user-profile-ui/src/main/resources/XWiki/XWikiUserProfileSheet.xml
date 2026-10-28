@@ -195,7 +195,7 @@
         'target': 'user'
       }).then(() =&gt; {
         notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');
+        XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');
         if (action == 'watchUser') {
           $('.notificationWatchUserNotFollowing').addClass('hidden');
           $('.notificationWatchUserFollowing').removeClass('hidden')
@@ -205,7 +205,7 @@
         }
       }).catch(() =&gt; {
         notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
+        XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
       });
     };
 
@@ -219,7 +219,7 @@
       }).then(data =&gt; {
         notification.hide();
         if (data.success) {
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.done'))", 'done');
+          XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('user.profile.status.done'))", 'done');
           if (action == 'disable') {
             $('#disable').addClass('hidden');
             $('#enable').removeClass('hidden');
@@ -228,11 +228,11 @@
             $('#enable').addClass('hidden');
           }
         } else {
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
+          XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
         }
       }).catch(() =&gt; {
         notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
+        XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
       });
     };
 

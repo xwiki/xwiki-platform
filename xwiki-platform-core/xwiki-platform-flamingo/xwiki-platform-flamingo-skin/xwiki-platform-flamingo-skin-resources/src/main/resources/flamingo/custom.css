@@ -1,0 +1,5 @@
+/*
+ * Voluntary left empty.
+ * This file is intended to be used by custom skins that want to override styling.
+ * It is loaded after all the other skin styles. CSS properties such as var(--brand-primary) can be used here.
+ */

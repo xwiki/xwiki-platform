@@ -41,7 +41,8 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import static org.mockito.Mockito.when;
 
 /**
- * Base class to easily emulate two instances of observation manager communicating with each other by network.
+ * Base class to easily emulate two (or more) instances of observation manager communicating with each other by
+ * network.
  * 
  * @version $Id$
  */
@@ -61,11 +62,8 @@ public abstract class AbstractROMTestCase
     private ObservationManager observationManager2;
 
     @XWikiTempDir
-    private File tmpDir1;
+    private File tmpDir;
 
-    @XWikiTempDir
-    private File tmpDir2;
-    
     @Mock
     private Environment environment1;
 
@@ -75,25 +73,8 @@ public abstract class AbstractROMTestCase
     @BeforeEach
     public void beforeEach() throws Exception
     {
-        this.componentManager1.initializeTest(this);
-        initializeExecution(this.componentManager1);
-        this.configurationSource1 = this.componentManager1.registerMemoryConfigurationSource();
-
-        this.componentManager2.initializeTest(this);
-        initializeExecution(this.componentManager2);
-        this.configurationSource2 = this.componentManager2.registerMemoryConfigurationSource();
-
-        getConfigurationSource1().setProperty("observation.remote.enabled", Boolean.TRUE);
-        getConfigurationSource2().setProperty("observation.remote.enabled", Boolean.TRUE);
-
-        DefaultComponentDescriptor<Environment> componentDescriptor = new DefaultComponentDescriptor<>();
-        componentDescriptor.setRoleType(Environment.class);
-        componentDescriptor.setRoleHint("default");
-        this.componentManager1.registerComponent(componentDescriptor, this.environment1);
-        this.componentManager2.registerComponent(componentDescriptor, this.environment2);
-        
-        when(this.environment1.getPermanentDirectory()).thenReturn(this.tmpDir1);
-        when(this.environment2.getPermanentDirectory()).thenReturn(this.tmpDir2);
+        this.configurationSource1 = initializeComponentManager(this.componentManager1, this.environment1, "instance1");
+        this.configurationSource2 = initializeComponentManager(this.componentManager2, this.environment2, "instance2");
 
         this.observationManager1 = getComponentManager1().getInstance(ObservationManager.class);
         this.observationManager2 = getComponentManager2().getInstance(ObservationManager.class);
@@ -102,18 +83,60 @@ public abstract class AbstractROMTestCase
     @AfterEach
     void afterEach() throws Exception
     {
-        cleanExecution(this.componentManager1);
-        cleanExecution(this.componentManager2);
-
-        // Clean possible resources some components might hold
-        this.componentManager1.dispose();
-        this.componentManager2.dispose();
+        disposeComponentManager(this.componentManager1);
+        disposeComponentManager(this.componentManager2);
 
         // Make sure we mark the component manager for garbage collection as otherwise each JUnit test will
         // have an instance of the Component Manager (will all the components it's holding), leading to
         // out of memory errors when there are lots of tests...
         this.componentManager1 = null;
         this.componentManager2 = null;
+    }
+
+    /**
+     * Initialize a component manager emulating one more instance of the observation manager, with remote events
+     * enabled.
+     *
+     * @param componentManager the component manager to initialize
+     * @param environment the (mock) environment to register in the component manager
+     * @param instanceName the name of the emulated instance, each instance needs its own permanent directory (where
+     *            the identifier of the instance is stored)
+     * @return the configuration source to use to configure the instance
+     * @throws Exception when failing to initialize the component manager
+     */
+    protected MemoryConfigurationSource initializeComponentManager(MockitoComponentManager componentManager,
+        Environment environment, String instanceName) throws Exception
+    {
+        componentManager.initializeTest(this);
+        initializeExecution(componentManager);
+        MemoryConfigurationSource configurationSource = componentManager.registerMemoryConfigurationSource();
+
+        configurationSource.setProperty("observation.remote.enabled", Boolean.TRUE);
+
+        DefaultComponentDescriptor<Environment> componentDescriptor = new DefaultComponentDescriptor<>();
+        componentDescriptor.setRoleType(Environment.class);
+        componentDescriptor.setRoleHint("default");
+        componentManager.registerComponent(componentDescriptor, environment);
+
+        when(environment.getPermanentDirectory()).thenReturn(new File(this.tmpDir, instanceName));
+
+        return configurationSource;
+    }
+
+    /**
+     * Dispose a component manager initialized with
+     * {@link #initializeComponentManager(MockitoComponentManager, Environment, String)}, emulating the stop of an
+     * instance.
+     *
+     * @param componentManager the component manager to dispose
+     * @throws Exception when failing to dispose the component manager
+     */
+    protected void disposeComponentManager(MockitoComponentManager componentManager) throws Exception
+    {
+        cleanExecution(componentManager);
+
+        // Clean possible resources some components might hold
+        componentManager.dispose();
     }
 
     private void initializeExecution(MockitoComponentManager componentManager)

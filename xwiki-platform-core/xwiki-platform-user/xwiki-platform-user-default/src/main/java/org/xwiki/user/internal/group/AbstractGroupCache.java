@@ -89,7 +89,7 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
         {
             this.direct = Collections.unmodifiableCollection(direct);
 
-            addToIndex(this.key, direct);
+            addToIndex(direct);
 
             return this.direct;
         }
@@ -110,9 +110,16 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
         {
             this.all = Collections.unmodifiableCollection(all);
 
-            addToIndex(this.key, all);
+            addToIndex(all);
 
             return this.all;
+        }
+
+        private void addToIndex(Collection<DocumentReference> references)
+        {
+            for (DocumentReference reference : references) {
+                AbstractGroupCache.this.addToIndex(this.key, reference);
+            }
         }
     }
 
@@ -192,13 +199,6 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
     private void addToIndex(String key, DocumentReference reference)
     {
         this.cacheDocumentIndex.computeIfAbsent(reference, k -> new HashSet<>()).add(key);
-    }
-
-    private void addToIndex(String key, Collection<DocumentReference> references)
-    {
-        for (DocumentReference reference : references) {
-            addToIndex(key, reference);
-        }
     }
 
     private void cleanIndex(String key, Collection<DocumentReference> references)

@@ -22,9 +22,11 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -108,10 +110,17 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     @Override
     public Optional<Map<String, Object>> get(Object entryId) throws LiveDataException
     {
+        return get(entryId, List.of());
+    }
+
+    @Override
+    public Optional<Map<String, Object>> get(Object entryId, List<String> properties) throws LiveDataException
+    {
         LiveDataQuery query = new LiveDataQuery();
         query.setSource(new Source(ROLE_HINT));
         String idProperty = this.liveDataConfigurationProvider.get().getMeta().getEntryDescriptor().getIdProperty();
-        query.setProperties(List.of(idProperty));
+        query.setProperties(Stream.concat(Stream.of(idProperty), properties.stream())
+            .filter(StringUtils::isNotEmpty).distinct().toList());
         query.setFilters(List.of(new LiveDataQuery.Filter(idProperty, entryId)));
         query.setLimit(1);
         return this.get(query).getEntries().stream().findFirst();
@@ -239,7 +248,7 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         DocumentReference documentReference;
         boolean create = false;
         if (fullName == null) {
-            documentReference = generateNewEntryReference();
+            documentReference = generateNewEntryReference(entry);
             create = true;
         } else {
             documentReference = this.currentDocumentReferenceResolver.resolve(fullName);
@@ -252,6 +261,21 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         }
 
         return Optional.of(this.stringEntityReferenceSerializer.serialize(documentReference));
+    }
+
+    @Override
+    public Optional<Map<String, Object>> remove(Object entryId) throws LiveDataException
+    {
+        Optional<Map<String, Object>> entry = get(entryId);
+        if (entry.isPresent()) {
+            try {
+                this.modelBridge.delete(this.currentDocumentReferenceResolver.resolve((String) entryId));
+            } catch (AccessDeniedException | XWikiException e) {
+                throw new LiveDataException(e);
+            }
+        }
+
+        return entry;
     }
 
     private void checkAllXObjectPropertiesHaveXClass(Map<String, Object> entry,
@@ -295,7 +319,7 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         return StringUtils.defaultIfEmpty(property, "").startsWith(DOC_PREFIX);
     }
 
-    private DocumentReference generateNewEntryReference() throws LiveDataException
+    private DocumentReference generateNewEntryReference(Map<String, Object> entry) throws LiveDataException
     {
         String namingStrategy = (String) getParameters().get("newRowNamingStrategy");
         if (!this.componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
@@ -304,12 +328,26 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         try {
             LiveTableNewRowNamingStrategy strategy =
                 this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
-            return strategy.generate(getParameters());
+            checkMandatoryProperties(strategy.getMandatoryProperties(getParameters()), entry);
+            return strategy.generate(getParameters(), entry);
         } catch (ComponentLookupException e) {
             throw new LiveDataException(
                 String.format("Failed to instantiate the row naming strategy [%s].", namingStrategy), e);
         } catch (XWikiException e) {
             throw new LiveDataException("An error occurred while generating the new entry reference.", e);
+        }
+    }
+
+    private void checkMandatoryProperties(Set<String> mandatoryProperties, Map<String, Object> entry)
+        throws LiveDataException
+    {
+        List<String> missingProperties = mandatoryProperties.stream()
+            .filter(property -> StringUtils.isBlank(Objects.toString(entry.get(property), null)))
+            .sorted()
+            .toList();
+        if (!missingProperties.isEmpty()) {
+            throw new LiveDataException(
+                String.format("Cannot create an entry without a value for %s.", missingProperties));
         }
     }
 }

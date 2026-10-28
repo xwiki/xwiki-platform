@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.script.ScriptContext;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -36,7 +37,11 @@ import org.xwiki.rendering.async.internal.block.BlockAsyncRenderer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererDecorator;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.internal.AbstractWikiUIExtension;
 
@@ -64,6 +69,12 @@ public class PanelWikiUIExtension extends AbstractWikiUIExtension implements Blo
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
+    @Inject
+    private Logger logger;
+
     /**
      * @param baseObject the object containing panel setup
      * @param id the ID of this UI extension
@@ -82,6 +93,19 @@ public class PanelWikiUIExtension extends AbstractWikiUIExtension implements Blo
     public String getId()
     {
         return getRoleHint();
+    }
+
+    @Override
+    public Block execute(boolean inline)
+    {
+        // A panel is only displayed to users who can view the document holding it.
+        if (!this.authorization.hasAccess(Right.VIEW, getDocumentReference())) {
+            this.logger.debug("Panel [{}] not displayed because the current user is not allowed to view its document.",
+                getDocumentReference());
+            return new CompositeBlock();
+        }
+
+        return super.execute(inline);
     }
 
     @Override

@@ -34,6 +34,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -50,6 +51,7 @@ import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Adds missing live data configuration values specific to the live table source.
@@ -84,6 +86,13 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
+
+    @Inject
+    private Logger logger;
+
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
     {
@@ -105,9 +114,19 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
                 LiveTableNewRowNamingStrategy strategy =
                     this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
                 if (strategy.isCreationAllowed(sourceParams)) {
-                    LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
-                    addEntry.setId("addEntry");
-                    mergedConfig.getMeta().getActions().add(addEntry);
+                    List<String> undescribedProperties =
+                        setMandatory(mergedConfig.getMeta(), strategy.getMandatoryProperties(sourceParams));
+                    if (undescribedProperties.isEmpty()) {
+                        LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
+                        addEntry.setId("addEntry");
+                        strategy.getNewEntryLocation(sourceParams).ifPresent(location -> addEntry.getParameters()
+                            .put("location", this.stringEntityReferenceSerializer.serialize(location)));
+                        mergedConfig.getMeta().getActions().add(addEntry);
+                    } else {
+                        // No entry could be created, since the user has no cell to give those values in.
+                        this.logger.warn("Adding entries is disabled because the mandatory properties {} have no "
+                            + "descriptor in this live data.", undescribedProperties);
+                    }
                 }
             } catch (ComponentLookupException e) {
                 throw new LiveDataException(
@@ -117,6 +136,30 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
 
         // Translate using the context locale.
         return translate(mergedConfig, config);
+    }
+
+    /**
+     * Flag as mandatory the descriptors of the properties a new entry cannot be created without.
+     *
+     * @param meta the metadata holding the property descriptors
+     * @param mandatoryProperties the identifiers of the properties that must hold a value
+     * @return the mandatory properties that have no descriptor
+     */
+    private List<String> setMandatory(LiveDataMeta meta, Set<String> mandatoryProperties)
+    {
+        List<LiveDataPropertyDescriptor> descriptors = new ArrayList<>();
+        List<String> undescribedProperties = new ArrayList<>();
+        for (String property : mandatoryProperties) {
+            meta.getPropertyDescriptors().stream()
+                .filter(Objects::nonNull)
+                .filter(candidate -> Objects.equals(property, candidate.getId()))
+                .findFirst()
+                .ifPresentOrElse(descriptors::add, () -> undescribedProperties.add(property));
+        }
+        if (undescribedProperties.isEmpty()) {
+            descriptors.forEach(descriptor -> descriptor.setMandatory(true));
+        }
+        return undescribedProperties.stream().sorted().toList();
     }
 
     @Override

@@ -20,8 +20,8 @@
 
 import DisplayerXObjectProperty from "./DisplayerXObjectProperty.vue";
 import { initWrapper } from "./displayerTestsHelper";
-import { loadById } from "../../services/require.js";
-import { edit } from "../displayerXObjectPropertyHelper.js";
+import { edit, view } from "../displayerXObjectPropertyHelper.js";
+import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import flushPromises from "flush-promises";
 import $ from "jquery";
 import { restore } from "sinon";
@@ -36,18 +36,13 @@ const EDIT_FORM =
 vi.mock("../displayerXObjectPropertyHelper.js", () => {
   return {
     edit: vi.fn(),
-  };
-});
-
-// The edit confirmation modal is loaded as a RequireJS module through loadById; mock the require service so that
-// loadById resolves with stubs instead of trying to load the real modules.
-vi.mock("../../services/require.js", () => {
-  return {
-    loadById: vi.fn(),
+    view: vi.fn(),
   };
 });
 
 describe("DisplayerXObjectProperty.vue", () => {
+  let requireJS;
+
   const editConfirmationStub = {
     parseConfirmationResponse: vi.fn((error) => {
       if (error && error.status === 423) {
@@ -61,18 +56,19 @@ describe("DisplayerXObjectProperty.vue", () => {
 
   beforeEach(function () {
     vi.mocked(edit).mockResolvedValue(EDIT_FORM);
+    vi.mocked(view).mockReset();
     editConfirmationStub.parseConfirmationResponse.mockClear();
     editConfirmationStub.showConfirmationModal.mockClear();
-    vi.mocked(loadById).mockImplementation((id) => {
-      if (id === "xwiki-edit-confirmation") {
-        return Promise.resolve(editConfirmationStub);
-      }
-      // xwiki-meta
-      return Promise.resolve({ locale: "en", form_token: "token" });
+    // The edit confirmation modal and the XWiki context are loaded as RequireJS modules; register stubs so that
+    // the tests don't need the real modules.
+    requireJS = mockRequireJS({
+      "xwiki-edit-confirmation": editConfirmationStub,
+      "xwiki-meta": { locale: "en", form_token: "token" },
     });
   });
 
   afterEach(function () {
+    requireJS.restore();
     // completely restore all fakes created through the sandbox
     restore();
   });
@@ -177,5 +173,165 @@ describe("DisplayerXObjectProperty.vue", () => {
       vi.mocked(edit).mock.calls.some((call) => call[3] && call[3].force === 1),
     ).toBe(true);
     expect(wrapper.find("#editForm").exists()).toBe(true);
+  });
+
+  describe("Rendering a row that has no entry yet", () => {
+    const draftEntry = {
+      color: "red",
+      _new: true,
+      _displayReference: "NewRows.placeholder",
+    };
+
+    const draftLogic = {
+      getEntryId: () => undefined,
+      isEditMode: () => false,
+      data: { query: { source: { className: "XWiki.TestClass" } } },
+    };
+
+    it("renders its content from the values it holds", async () => {
+      vi.mocked(view).mockResolvedValue("<strong>Red</strong>");
+
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: draftEntry },
+        logic: draftLogic,
+      });
+      await flushPromises();
+
+      // No query result holds the content of a row that is not an entry yet, so it is rendered
+      // from the values held on the row instead of showing them raw.
+      expect(vi.mocked(view)).toHaveBeenCalledWith(
+        "NewRows.placeholder",
+        "XWiki.TestClass",
+        "color",
+        { color: "red" },
+      );
+      expect(wrapper.find(".html-wrapper").html()).toContain(
+        "<strong>Red</strong>",
+      );
+    });
+
+    it("loads its edit field from the values it holds", async () => {
+      vi.mocked(edit).mockResolvedValue(EDIT_FORM);
+      vi.mocked(view).mockResolvedValue(undefined);
+
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: draftEntry },
+        logic: draftLogic,
+      });
+      await wrapper.setProps({ isView: false });
+      await wrapper.setData({ isView: false });
+      await flushPromises();
+
+      // The wiki stores nothing for that row, so the field would come back empty unless what was
+      // edited is sent along with it.
+      expect(vi.mocked(edit)).toHaveBeenCalledWith(
+        "NewRows.placeholder",
+        "XWiki.TestClass",
+        "color",
+        undefined,
+        { color: "red" },
+      );
+    });
+
+    it("falls back on the value it holds when the rendering fails", async () => {
+      vi.mocked(view).mockRejectedValue(new Error("nope"));
+
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: draftEntry },
+        logic: draftLogic,
+      });
+      await flushPromises();
+
+      expect(wrapper.find(".html-wrapper").html()).toContain("red");
+    });
+
+    it("displays the value it holds when its location is unknown", async () => {
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: { color: "red", _new: true } },
+        logic: draftLogic,
+      });
+      await flushPromises();
+
+      // There is no document to render the content against.
+      expect(vi.mocked(view)).not.toHaveBeenCalled();
+      expect(wrapper.find(".html-wrapper").html()).toContain("red");
+    });
+
+    it("drops a rendering that arrives after the row got its entry", async () => {
+      let resolveView;
+      vi.mocked(view).mockReturnValue(
+        new Promise((resolve) => {
+          resolveView = resolve;
+        }),
+      );
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: draftEntry },
+        logic: draftLogic,
+      });
+
+      // The entry is created before the content of the row comes back, and has its own content.
+      await wrapper.setProps({ entry: { color: "<em>red</em>" } });
+      resolveView("<strong>Red</strong>");
+      await flushPromises();
+
+      expect(wrapper.find(".html-wrapper").html()).toContain("<em>red</em>");
+      expect(wrapper.find(".html-wrapper").html()).not.toContain("<strong>");
+    });
+
+    it("displays the rendering of the latest value", async () => {
+      const resolvers = [];
+      vi.mocked(view).mockImplementation(
+        () => new Promise((resolve) => resolvers.push(resolve)),
+      );
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: draftEntry },
+        logic: draftLogic,
+      });
+      await wrapper.setProps({ entry: { ...draftEntry, color: "blue" } });
+
+      // The second content comes back before the first one.
+      resolvers[1]("<strong>Blue</strong>");
+      resolvers[0]("<strong>Red</strong>");
+      await flushPromises();
+
+      expect(wrapper.find(".html-wrapper").html()).toContain(
+        "<strong>Blue</strong>",
+      );
+    });
+  });
+
+  describe("Rendering an entry", () => {
+    it("displays the content of the query results and loads its field from the store", async () => {
+      vi.mocked(edit).mockResolvedValue(EDIT_FORM);
+      vi.mocked(view).mockReset();
+
+      const wrapper = initWrapper(DisplayerXObjectProperty, {
+        props: { entry: { color: "<strong>Red</strong>" } },
+        logic: {
+          getEntryId: () => "NewRows.My first entry",
+          isEditMode: () => false,
+          data: { query: { source: { className: "XWiki.TestClass" } } },
+        },
+      });
+      await flushPromises();
+
+      // An entry is in the store, so the wiki renders it on its own.
+      expect(vi.mocked(view)).not.toHaveBeenCalled();
+      expect(wrapper.find(".html-wrapper").html()).toContain(
+        "<strong>Red</strong>",
+      );
+
+      await wrapper.setProps({ isView: false });
+      await wrapper.setData({ isView: false });
+      await flushPromises();
+
+      expect(vi.mocked(edit)).toHaveBeenCalledWith(
+        "NewRows.My first entry",
+        "XWiki.TestClass",
+        "color",
+        undefined,
+        undefined,
+      );
+    });
   });
 });

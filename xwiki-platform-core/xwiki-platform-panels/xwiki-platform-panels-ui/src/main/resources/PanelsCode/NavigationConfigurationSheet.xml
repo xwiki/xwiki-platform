@@ -557,11 +557,42 @@ require([
 
   const $navigationTree = $('.navigationPanelConfiguration .xtree');
 
-  // Make sure the root node accepts known node types as children.
-  $navigationTree.on('ready.jstree', function(event, data) {
-    const tree = data.instance;
+  //
+  // Tree Initialization
+  //
+  // The navigation tree is initialized and loaded asynchronously, by a different module, while this module has to
+  // wait for its own dependencies (e.g. the translations, which are fetched from the server). There is thus no
+  // guarantee that this code is executed before the tree is ready, so everything we set up here through tree event
+  // listeners has to be applied also when the tree happens to be ready already by the time we register those
+  // listeners (see the catch-up code at the end of this module). See also XWIKI-24857.
+  //
+
+  // Specify the node types accepted as children by the tree root. We have to do this explicitly because otherwise the
+  // tree infers them from the nodes it receives from the server: when all the top level pages are excluded the server
+  // returns only the "empty" node, and otherwise it returns only document nodes. In both cases creating the missing
+  // node type on the client side, when the user drags a page out of or into the tree, would be rejected.
+  function setValidRootChildren(rootData) {
+    rootData.validChildren = ['document', 'pagination', 'empty'];
+    // Make sure the tree doesn't infer the valid child nodes again when the root node is loaded or refreshed.
+    delete rootData.validChildrenInferred;
+    return rootData;
+  }
+
+  // This covers the case where the root node hasn't been loaded yet: the tree takes the root node data from the tree
+  // element when it loads the root node.
+  $navigationTree.data('root', setValidRootChildren($navigationTree.data('root') || {}));
+
+  let treeInitialized = false;
+
+  function initializeTree(tree) {
+    if (treeInitialized) {
+      return;
+    }
+    treeInitialized = true;
+
+    // This covers the case where the root node has already been loaded, with its own copy of the root node data.
     const root = tree.get_node($.jstree.root);
-    root.data.validChildren = ['document', 'pagination', 'empty'];
+    root.data = setValidRootChildren(root.data || {});
 
     // Make sure top level nodes can't be moved to a lower level. We only allow reordering the top level nodes.
     const originalCheckCallback = tree.settings.core.check_callback;
@@ -572,17 +603,23 @@ require([
         return originalCheckCallback.apply(this, arguments);
       }
     };
+  }
 
   // Prevent drag &amp; drop for tree nodes that are not on the top level.
+  function preventChildNodeDragAndDrop(tree, nodeIds) {
+    nodeIds.forEach(nodeId =&gt; {
+      const node = tree.get_node(nodeId);
+      if (node?.data) {
+        node.data.draggable = false;
+      }
+    });
+  }
+
+  $navigationTree.on('ready.jstree', function(event, data) {
+    initializeTree(data.instance);
   }).on('model.jstree', function(event, data) {
     if (data.parent !== $.jstree.root) {
-      const tree = data.instance;
-      data.nodes.forEach(nodeId =&gt; {
-        const node = tree.get_node(nodeId);
-        if (node?.data) {
-          node.data.draggable = false;
-        }
-      });
+      preventChildNodeDragAndDrop(data.instance, data.nodes);
     }
   });
 
@@ -600,11 +637,8 @@ require([
     });
   } else {
     modifyNodeTemplate(nodeTemplate);
-    if (navigationTree._data.core.ready) {
-      // Tree nodes have already been created from the template. We have to redraw them in order to use the modified
-      // template.
-      navigationTree.redraw(true);
-    }
+    // Note that the tree nodes that have already been created from the original template are redrawn by the catch-up
+    // code at the end of this module, once all our tree event listeners are registered.
   }
 
   function modifyNodeTemplate(nodeTemplate) {
@@ -718,19 +752,22 @@ require([
     .map(value =&gt; decodeURIComponent(value.endsWith('/') ? value.substring(0, value.length - 1) : value));
   let pinnedTopLevelPagesDirty = false;
 
-  $navigationTree.on('model.jstree', function(event, data) {
-    // Mark pinned top level pages.
-    const tree = data.instance;
-    if (data.parent === $.jstree.root) {
-      data.nodes.forEach(nodeId =&gt; {
-        const node = tree.get_node(nodeId);
-        if (node?.data?.type === 'document') {
-          const documentReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
-          if (pinnedTopLevelPages.includes(documentReference.parent.name)) {
-            node.a_attr['data-pinned'] = true;
-          }
+  // Mark pinned top level pages.
+  function markPinnedTopLevelPages(tree, nodeIds) {
+    nodeIds.forEach(nodeId =&gt; {
+      const node = tree.get_node(nodeId);
+      if (node?.data?.type === 'document') {
+        const documentReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
+        if (pinnedTopLevelPages.includes(documentReference.parent.name)) {
+          node.a_attr['data-pinned'] = true;
         }
-      });
+      }
+    });
+  }
+
+  $navigationTree.on('model.jstree', function(event, data) {
+    if (data.parent === $.jstree.root) {
+      markPinnedTopLevelPages(data.instance, data.nodes);
     }
   });
 
@@ -887,6 +924,31 @@ require([
     // Add back the custom save handler.
     $saveButton.off(submitEvent).on(submitEvent, savePinnedTopLevelPages);
   });
+
+  //
+  // Tree Initialization Catch-up
+  //
+  // See the comment about the tree initialization race at the top of this module: when the tree is loaded before this
+  // module is executed, the tree events we listen to have already been fired, so we have to apply ourselves what our
+  // listeners would have applied.
+  //
+
+  if (navigationTree?._data?.core?.ready) {
+    initializeTree(navigationTree);
+    const catchUpWithLoadedNodes = function(parentNodeId) {
+      const childNodeIds = navigationTree.get_node(parentNodeId).children;
+      if (parentNodeId === $.jstree.root) {
+        markPinnedTopLevelPages(navigationTree, childNodeIds);
+      } else {
+        preventChildNodeDragAndDrop(navigationTree, childNodeIds);
+      }
+      childNodeIds.forEach(childNodeId =&gt; catchUpWithLoadedNodes(childNodeId));
+    };
+    catchUpWithLoadedNodes($.jstree.root);
+    // The tree nodes have been created before we modified the node template and before we marked the pinned top level
+    // pages, and the pin action is added only when a node is (re)drawn, so we need a full redraw.
+    navigationTree.redraw(true);
+  }
 });</code>
     </property>
     <property>

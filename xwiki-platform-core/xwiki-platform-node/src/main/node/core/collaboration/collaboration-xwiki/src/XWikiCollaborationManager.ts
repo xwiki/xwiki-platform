@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { SESSION_REPLACED_EVENT } from "./events";
 import {
   AbstractCollaborationManager,
   ConnectionStatus,
@@ -34,6 +35,13 @@ import type { DocumentService } from "@xwiki/platform-document-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
 import type { WebsocketProvider } from "y-websocket";
+
+/**
+ * How long to wait, in milliseconds, for the connection to the collaboration server to be established before giving up
+ * on the initial synchronization. Joining a session blocks the editor until then, so it shouldn't take too long, but
+ * the provider needs a few connection attempts (with exponential back-off) to get over a transient failure.
+ */
+const CONNECTION_TIMEOUT = 5000;
 
 /**
  * A collaboration provider for the websocket endpoint provided by xwiki for realtime editing with yjs based editors.
@@ -93,6 +101,7 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
     const collaboration: Collaboration = {
       connectionStatus: ref(ConnectionStatus.Connecting),
       collaborators: ref([]),
+      warnings: ref([]),
       collaborator,
       provider,
       doc: provider.doc,
@@ -138,15 +147,55 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
           break;
       }
     });
+    // The provider stops synchronizing (so we are disconnected) when the session is replaced.
+    // @ts-expect-error The provider doesn't declare our custom event.
+    provider.on(SESSION_REPLACED_EVENT, () => {
+      collaboration.warnings!.value = [
+        ...collaboration.warnings!.value,
+        "sessionReplaced",
+      ];
+    });
   }
 
+  /**
+   * Waits for the initial synchronization, or until we give up connecting to the collaboration server. In the latter
+   * case the collaboration session starts disconnected, letting the user edit (and save) while the provider keeps
+   * trying to connect. The changes are synchronized when the connection is established, unless someone else started
+   * the session meanwhile (the provider can't merge two sessions so it stops the synchronization and warns the user).
+   *
+   * @returns a promise resolved once the session is synchronized, or once we give up waiting for it
+   */
   private sync(collaboration: Collaboration): Promise<void> {
+    const provider: WebsocketProvider = collaboration.provider;
     return new Promise((resolve) => {
-      const provider: WebsocketProvider = collaboration.provider;
-      provider.once("sync", () => {
-        console.debug("Collaboration synchronized.");
+      let timeout: ReturnType<typeof setTimeout>;
+      const stopWaiting = () => {
+        clearTimeout(timeout);
+        provider.off("sync", onSync);
         resolve();
-      });
+      };
+      const onSync = (synced: boolean) => {
+        if (synced) {
+          console.debug("Collaboration synchronized.");
+          stopWaiting();
+        }
+      };
+      const onTimeout = () => {
+        if (provider.wsconnected) {
+          // The connection is established and the synchronization is in progress. Giving up now would make us
+          // initialize the content locally, which can't be merged with the session we're about to synchronize with.
+          // Note that the provider closes the connection if the server doesn't send anything for a while.
+          timeout = setTimeout(onTimeout, CONNECTION_TIMEOUT);
+        } else {
+          console.warn(
+            "Failed to connect to the collaboration server. Editing offline until the connection is established.",
+          );
+          stopWaiting();
+        }
+      };
+      timeout = setTimeout(onTimeout, CONNECTION_TIMEOUT);
+      // We can't use once() because it registers a wrapper that off() doesn't remove.
+      provider.on("sync", onSync);
     });
   }
 

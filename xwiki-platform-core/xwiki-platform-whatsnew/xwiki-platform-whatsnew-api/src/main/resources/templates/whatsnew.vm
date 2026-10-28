@@ -33,9 +33,7 @@
     <div class="xcontent">
       <div class="row document-header">
         <div class="document-info col-xs-12">
-          #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.title.before'))
-            $services.rendering.render($uix.execute(), 'xhtml/1.0')
-          #end
+          $services.uix.renderExtensions('org.xwiki.platform.template.title.before', 'html/5.0')
           <div id="document-title"><h1>$titleToDisplay</h1></div>
         </div>
       </div>

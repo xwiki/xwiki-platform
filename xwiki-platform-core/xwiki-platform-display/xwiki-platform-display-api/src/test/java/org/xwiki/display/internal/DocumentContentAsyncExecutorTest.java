@@ -21,16 +21,24 @@ package org.xwiki.display.internal;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -39,8 +47,16 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -51,6 +67,17 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DocumentContentAsyncExecutorTest
 {
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("wiki", "Space", "Page");
+
+    /**
+     * A document which can be cloned, like {@code XWikiDocument}.
+     */
+    abstract static class CloneableDocument implements DocumentModelBridge, Cloneable
+    {
+        @Override
+        public abstract CloneableDocument clone();
+    }
+
     @InjectMockComponents
     private DocumentContentAsyncExecutor documentContentAsyncExecutor;
 
@@ -60,8 +87,17 @@ class DocumentContentAsyncExecutorTest
     @MockComponent
     private VelocityManager velocityManager;
 
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private TransformationManager transformationManager;
+
     @Mock
     private DocumentModelBridge document;
+
+    @Mock
+    private DocumentModelBridge translatedDocument;
 
     private Map<Object, Object> xcontext = new HashMap<>();
 
@@ -92,7 +128,7 @@ class DocumentContentAsyncExecutorTest
         XDOM preparedXDOM = new XDOM(List.of(image));
         when(this.document.getPreparedXDOM()).thenReturn(preparedXDOM);
 
-        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters);
+        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters, true);
         XDOM xdom = this.documentContentAsyncExecutor.execute(true);
 
         // Verify the returned XDOM is using the id generator provided in the display parameters.
@@ -100,5 +136,136 @@ class DocumentContentAsyncExecutorTest
 
         // Verify the image id has been adapted.
         assertEquals("Ilogo-1", image.getId());
+    }
+
+    @Test
+    void executeIsolatedWithTranslatedContent() throws Exception
+    {
+        XDOM translatedXDOM = mockTranslation();
+        this.parameters.setExecutionContextIsolated(true);
+        this.parameters.setContentTranslated(true);
+
+        AtomicReference<Object> secureDocument = new AtomicReference<>();
+        doAnswer(invocation -> secureDocument.getAndSet(this.xcontext.get("sdoc"))).when(this.transformationManager)
+            .performTransformations(any(XDOM.class), any(TransformationContext.class));
+
+        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters, false);
+
+        assertSame(translatedXDOM, this.documentContentAsyncExecutor.execute(false));
+        // The translated content is executed with the translation as secure document.
+        assertSame(this.translatedDocument, secureDocument.get());
+    }
+
+    @Test
+    void executeIsolatedWithoutTranslatedContent() throws Exception
+    {
+        mockTranslation();
+        this.parameters.setExecutionContextIsolated(true);
+
+        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters, false);
+
+        this.documentContentAsyncExecutor.execute(false);
+
+        assertFalse(this.xcontext.containsKey("sdoc"));
+    }
+
+    private XDOM mockTranslation() throws Exception
+    {
+        when(this.document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.document.getLocale()).thenReturn(Locale.ROOT);
+        when(this.document.getPreparedXDOM()).thenReturn(new XDOM(List.of()));
+
+        XDOM translatedXDOM = new XDOM(List.of());
+        when(this.translatedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.translatedDocument.getLocale()).thenReturn(Locale.FRENCH);
+        when(this.translatedDocument.getPreparedXDOM()).thenReturn(translatedXDOM);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(this.document))
+            .thenReturn(this.translatedDocument);
+
+        return translatedXDOM;
+    }
+
+    @Test
+    void executeIsolatedAsync() throws Exception
+    {
+        CloneableDocument modifiedDocument = mockCloneableDocument();
+        CloneableDocument copy = mockCloneableDocument();
+        when(modifiedDocument.clone()).thenReturn(copy);
+        this.parameters.setExecutionContextIsolated(true);
+
+        this.documentContentAsyncExecutor.initialize("test", modifiedDocument, this.parameters, true);
+        this.documentContentAsyncExecutor.execute(true);
+
+        // The content is executed in the context of the copy of the document taken before the asynchronous execution.
+        verify(this.documentAccessBridge).pushDocumentInContext(anyMap(), same((DocumentModelBridge) copy));
+    }
+
+    @Test
+    void executeIsolatedSync() throws Exception
+    {
+        CloneableDocument modifiedDocument = mockCloneableDocument();
+        this.parameters.setExecutionContextIsolated(true);
+
+        this.documentContentAsyncExecutor.initialize("test", modifiedDocument, this.parameters, false);
+        this.documentContentAsyncExecutor.execute(false);
+
+        verify(modifiedDocument, never()).clone();
+        verify(this.documentAccessBridge).pushDocumentInContext(anyMap(), same((DocumentModelBridge) modifiedDocument));
+    }
+
+    private CloneableDocument mockCloneableDocument()
+    {
+        CloneableDocument cloneableDocument = mock();
+        when(cloneableDocument.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(cloneableDocument.getPreparedXDOM()).thenReturn(new XDOM(List.of()));
+        return cloneableDocument;
+    }
+
+    @Test
+    void initializeWithTranslatedContent() throws Exception
+    {
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.document.getLocale()).thenReturn(Locale.ROOT);
+        when(this.translatedDocument.getSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
+        when(this.translatedDocument.getLocale()).thenReturn(Locale.FRENCH);
+        XDOM translatedXDOM = new XDOM(List.of());
+        when(this.translatedDocument.getPreparedXDOM()).thenReturn(translatedXDOM);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(this.document))
+            .thenReturn(this.translatedDocument);
+
+        this.parameters.setContentTranslated(true);
+
+        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters, true);
+        assertSame(translatedXDOM, this.documentContentAsyncExecutor.execute(true));
+
+        // The transformations must be executed with the syntax of the translation, not the one of the default
+        // translation.
+        ArgumentCaptor<TransformationContext> txContext = ArgumentCaptor.forClass(TransformationContext.class);
+        verify(this.transformationManager).performTransformations(eq(translatedXDOM), txContext.capture());
+        assertEquals(Syntax.MARKDOWN_1_1, txContext.getValue().getSyntax());
+    }
+
+    @Test
+    void initializeWithTranslatedContentWhenTheDocumentIsAlreadyTheTranslation() throws Exception
+    {
+        // The given document is already the variant matching the context locale, so its content must be executed, even
+        // though the document access bridge returns a distinct instance of that same translation.
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.document.getLocale()).thenReturn(Locale.FRENCH);
+        XDOM preparedXDOM = new XDOM(List.of());
+        when(this.document.getPreparedXDOM()).thenReturn(preparedXDOM);
+        when(this.translatedDocument.getLocale()).thenReturn(Locale.FRENCH);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(this.document))
+            .thenReturn(this.translatedDocument);
+
+        this.parameters.setContentTranslated(true);
+
+        this.documentContentAsyncExecutor.initialize("test", this.document, this.parameters, true);
+        assertSame(preparedXDOM, this.documentContentAsyncExecutor.execute(true));
+
+        ArgumentCaptor<TransformationContext> txContext = ArgumentCaptor.forClass(TransformationContext.class);
+        verify(this.transformationManager).performTransformations(eq(preparedXDOM), txContext.capture());
+        assertEquals(Syntax.XWIKI_2_1, txContext.getValue().getSyntax());
     }
 }

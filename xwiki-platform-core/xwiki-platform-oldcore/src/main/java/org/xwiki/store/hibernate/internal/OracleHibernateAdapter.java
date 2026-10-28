@@ -50,6 +50,8 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
      */
     public static final String HINT = "oracle";
 
+    private static final String OWNER_PARAMETER = "owner";
+
     @Override
     public void updateDatabaseAfter(Metadata metadata, Session session) throws HibernateStoreException
     {
@@ -73,10 +75,12 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
             boolean compressed = isCompressed(entity);
 
             // Compute the query statement
-            if (compressedTables.contains(tableName) != compressed) {
+            String statement = getAlterCompressionString(tableName, compressed, compressedTables);
+            if (statement != null) {
+                this.logger.info("Changing the compression of table [{}] with [{}]", tableName, statement);
+
                 // Create the query
-                NativeQuery<?> query = session
-                    .createNativeQuery("ALTER TABLE " + tableName + " " + (compressed ? "COMPRESS" : "NOCOMPRESS"));
+                NativeQuery<?> query = session.createNativeQuery(statement);
 
                 // Execute the query
                 session.getTransaction().begin();
@@ -87,15 +91,72 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
     }
 
     /**
+     * @param tableName the name of the table to modify
+     * @param compressed true if the table should be compressed
+     * @param compressedTables the tables which are currently compressed
+     * @return the SQL statement to execute, or null if the table compression already matches the configuration
+     */
+    public String getAlterCompressionString(String tableName, boolean compressed, Set<String> compressedTables)
+    {
+        if (compressedTables.contains(tableName) == compressed) {
+            return null;
+        }
+
+        // Qualify the table with the schema of the current wiki: the statement is executed on a session obtained
+        // straight from the session factory, whose pooled connection is still on the schema selected by whoever used
+        // it last. An unqualified table would be resolved in that other schema.
+        return "ALTER TABLE " + getQualifiedTableName(tableName) + " " + (compressed ? "COMPRESS" : "NOCOMPRESS");
+    }
+
+    /**
+     * @param tableName the name of the table to qualify
+     * @return the table name prefixed with the schema of the current wiki, so that the statement does not depend on
+     *         the schema currently selected in the JDBC connection
+     */
+    private String getQualifiedTableName(String tableName)
+    {
+        String schema = getDatabaseFromWikiName();
+
+        if (schema == null) {
+            return tableName;
+        }
+
+        return escapeDatabaseName(schema) + '.' + tableName;
+    }
+
+    /**
      * @param session the session in which to execute the query
-     * @return the tables which are configured to be compressed
+     * @return the tables of the current wiki which are configured to be compressed
      */
     public Set<String> getCompressedTables(Session session)
     {
-        NativeQuery<String> query =
-            session.createNativeQuery("SELECT DISTINCT table_name FROM user_tables WHERE compression = 'ENABLED'");
+        String schema = getDatabaseFromWikiName();
+
+        NativeQuery<String> query = session.createNativeQuery(getCompressedTablesStatement(schema));
+        if (schema != null) {
+            query.setParameter(OWNER_PARAMETER, schema);
+        }
 
         return query.list().stream().map(String::toUpperCase).collect(Collectors.toSet());
+    }
+
+    /**
+     * @param schema the schema of the current wiki, or null if there is no current wiki
+     * @return the SQL statement listing the compressed tables of the schema, expecting the schema as the
+     *         {@code owner} parameter when the schema is not null
+     */
+    public String getCompressedTablesStatement(String schema)
+    {
+        // ALL_TABLES restricted to the schema of the current wiki, and not USER_TABLES: USER_TABLES only lists the
+        // tables owned by the connected user, while XWiki connects with a single user and reaches each wiki by
+        // switching the schema of the session.
+        String statement = "SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED'";
+
+        if (schema != null) {
+            statement += " AND owner = :" + OWNER_PARAMETER;
+        }
+
+        return statement;
     }
 
     @Override
@@ -103,6 +164,13 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
     {
         // Oracle generally needs the table name to be upper case
         return tableName != null ? tableName.toUpperCase() : null;
+    }
+
+    @Override
+    public String getColumnName(String columnName)
+    {
+        // Oracle stores the unquoted column names in upper case
+        return columnName != null ? columnName.toUpperCase() : null;
     }
 
     @Override

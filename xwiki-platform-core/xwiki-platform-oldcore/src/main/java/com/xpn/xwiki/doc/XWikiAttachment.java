@@ -328,21 +328,6 @@ public class XWikiAttachment implements Cloneable
      * @param context current XWikiContext
      * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
      * @throws XWikiException
-     * @since 2.3M2
-     * @deprecated use {@link #getContentLongSize(XWikiContext)} instead
-     */
-    @Deprecated(since = "9.0RC1")
-    public int getContentSize(XWikiContext context) throws XWikiException
-    {
-        long longSize = getContentLongSize(context);
-
-        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
-    }
-
-    /**
-     * @param context current XWikiContext
-     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
-     * @throws XWikiException
      * @since 9.0RC1
      */
     public long getContentLongSize(XWikiContext context) throws XWikiException
@@ -1336,7 +1321,7 @@ public class XWikiAttachment implements Cloneable
             modified = true;
         }
 
-        if (Strings.CS.equals(getMimeType(), attachment.getMimeType())) {
+        if (!Strings.CS.equals(getMimeType(), attachment.getMimeType())) {
             setMimeType(attachment.getMimeType());
             modified = true;
         }
@@ -1344,10 +1329,10 @@ public class XWikiAttachment implements Cloneable
         try {
             // Note: If the attachment from which to copy data from has a null content, don't copy the content.
             if (isContentDifferentButNotNull(attachment)) {
-				try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
-					setContent(attachmentIs);
-					modified = true;
-				}
+                try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
+                    setContent(attachmentIs);
+                    modified = true;
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Failed to set content of attachment [{}] onto [{}]", this, attachment, e);
@@ -1360,20 +1345,19 @@ public class XWikiAttachment implements Cloneable
     {
         boolean isDifferent = false;
 
-		try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
-			if (attachmentIs != null) {
-				if (this.content == null) {
-					isDifferent = true;
-				} else {
-					try (InputStream is = getContentInputStream(null)) {
-						if (is != null && !IOUtils.contentEquals(is, attachmentIs)) {
-							isDifferent = true;
-						}
-					}
-				}
-
-			}
-		}
+        try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
+            if (attachmentIs != null) {
+                if (this.content == null) {
+                    isDifferent = true;
+                } else {
+                    try (InputStream is = getContentInputStream(null)) {
+                        if (is != null && !IOUtils.contentEquals(is, attachmentIs)) {
+                            isDifferent = true;
+                        }
+                    }
+                }
+            }
+        }
 
         return isDifferent;
     }

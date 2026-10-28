@@ -130,8 +130,9 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     /**
-     * @deprecated since 10.2 and 9.11.4, should be used as a component instead
+     * @deprecated should be used as a component instead
      */
+    @Deprecated(since = "10.2,9.11.4")
     public XWikiCacheStore(XWikiStoreInterface store, XWikiContext context) throws XWikiException
     {
         setStore(store);

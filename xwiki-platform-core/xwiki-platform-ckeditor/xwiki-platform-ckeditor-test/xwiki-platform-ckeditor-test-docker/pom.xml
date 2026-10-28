@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor-test</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ckeditor-test-docker</artifactId>
   <name>XWiki Platform - CKEditor - Tests - Docker</name>
@@ -81,6 +81,13 @@
       <artifactId>xwiki-platform-wysiwyg-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- We need this to test the insertion of the Display Macro. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <!-- We need this to test how the Children Macro is displayed in edit mode. -->

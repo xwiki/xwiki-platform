@@ -44,7 +44,10 @@ import org.xwiki.export.pdf.test.po.PDFExportOptionsModal;
 import org.xwiki.export.pdf.test.po.PDFImage;
 import org.xwiki.export.pdf.test.po.PDFTemplateEditPage;
 import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
@@ -53,6 +56,7 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.WCAGContext;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
@@ -115,7 +119,7 @@ class PDFExportIT
 
         // Make sure we start with the default settings.
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage().reset();
-        adminSection.getTemplatesInput().sendKeys("custom").waitForSuggestions().selectByVisibleText("CustomTemplate");
+        adminSection.getTemplatesInput().sendKeys("custom").selectByVisibleText("CustomTemplate");
         adminSection.getGeneratorSelect().selectByVisibleText("Chrome Docker Container");
 
         if (!testConfiguration.getServletEngine().isOutsideDocker()) {
@@ -251,6 +255,11 @@ class PDFExportIT
             // For the second image we force the server-side resize.
             assertEquals(100, contentPageImages.get(1).getRawWidth());
             assertEquals(100, contentPageImages.get(1).getRawHeight());
+
+            // The images should keep their alternative text: the one specified in the wiki syntax, the default one
+            // generated from the image reference and the one specified in the HTML.
+            assertEquals(List.of("XWiki logo resized client-side", "xwiki-logo.png", "XWiki Logo"),
+                pdf.getImageAlternativeTextsFromPage(3));
         }
     }
 
@@ -321,7 +330,7 @@ class PDFExportIT
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
         SuggestInputElement templatesInput = adminSection.getTemplatesInput();
         if (!StringUtils.join(templatesInput.getValues(), ",").contains("My cool template")) {
-            templatesInput.sendKeys("my cool").waitForSuggestions().selectByVisibleText("My cool template");
+            templatesInput.sendKeys("my cool").selectByVisibleText("My cool template");
             adminSection.clickSave();
         }
 
@@ -771,7 +780,7 @@ class PDFExportIT
         // Change the state of the Live Table in order to verify that the PDF export preserves it.
         LiveTableElement liveTable = new LiveTableElement("docs");
         liveTable.sortDescending("Date");
-        liveTable.filterColumn("xwiki-livetable-docs-filter-2", "live");
+        liveTable.filterColumn("xwiki-livetable-docs-filter-2", "livetable");
 
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
@@ -784,7 +793,7 @@ class PDFExportIT
             assertTrue(content.contains("""
                 Results 1 - 2 out of 2 per page of 15
                 Page Location Date Last Author Actions
-                live
+                livetable
                 """), "Unexpected content: " + content);
             // Verify the results and the order.
             // Depending on the screen width the text from the live table cells might be wrapped on multiple lines,
@@ -804,7 +813,7 @@ class PDFExportIT
     @Order(12)
     void codeMacro(TestUtils setup) throws Exception
     {
-        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "CodeMacro"));
+        ViewPage viewPage = gotoPageWithoutWCAG(setup, new LocalDocumentReference("PDFExportIT", "CodeMacro"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
         try (PDFDocument pdf = export(exportOptions)) {
@@ -1644,7 +1653,7 @@ class PDFExportIT
     @Order(34)
     void autoScaleTable(TestUtils setup) throws Exception
     {
-        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "AutoScaleTable"));
+        ViewPage viewPage = gotoPageWithoutWCAG(setup, new LocalDocumentReference("PDFExportIT", "AutoScaleTable"));
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
         try (PDFDocument pdf = export(exportOptions)) {
@@ -1736,6 +1745,88 @@ class PDFExportIT
             // Make sure we're actually testing a table of contents that is split between print pages.
             assertTrue(tocPageCount > 1, "The table of contents is not split between print pages.");
             assertEquals(expectedAnchors, actualAnchors);
+        }
+    }
+
+    @Test
+    @Order(37)
+    void liveData(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The page name is used both as the page title and as the value of the Location filter below, so that the live
+        // data lists only the pages created by this test.
+        String pageName = testReference.getLastSpaceReference().getName();
+        setup.createPage(testReference, """
+            {{liveData
+              id="docs"
+              properties="doc.title,doc.location,doc.date,doc.author"
+              source="liveTable"
+              sourceParameters="translationPrefix=platform.index."
+              pageSizes="1,15,25"
+            /}}""", pageName);
+        // Create a child page after the parent because we want to verify that the PDF export preserves the live data
+        // state (we sort by last modification date and show a single entry per page, so only the child page should be
+        // exported).
+        DocumentReference childReference = new DocumentReference("Child", testReference.getLastSpaceReference());
+        setup.createPage(childReference, "", "Child");
+
+        ViewPage viewPage = setup.gotoPage(testReference);
+
+        // Change the state of the live data in order to verify that the PDF export preserves it.
+        LiveDataElement liveData = new LiveDataElement("docs");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilReady();
+        // Keep only the pages from the space used by this test.
+        tableLayout.filterColumn("Location", pageName);
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        // Sort by date, descending, so that the child page comes first. The first click sorts ascending, replacing the
+        // default sort (by title, ascending), while the second click reverses the order.
+        tableLayout.sortBy("Date");
+        tableLayout.sortBy("Date");
+        // Show a single entry per page.
+        liveData.setPagination(1);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        assertEquals("Child", tableLayout.getCell("Title", 1).getText());
+
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions)) {
+            // We should have 2 pages: cover page and content page.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            String content = pdf.getTextFromPage(1);
+            // Depending on the screen width the text from the live data cells might be wrapped on multiple lines,
+            // which translates to new lines in the PDF text as well. For this reason we need to do the lookup ignoring
+            // line endings. Moreover, we normally get a space character between the text from two adjacent cells, but
+            // even this is not always consistent, so we need to ignore spaces also.
+            String contentWithoutWhitespace = content.replaceAll("\\s+", "");
+            // Verify the column headers.
+            assertTrue(contentWithoutWhitespace.contains("TitleLocationDateLastAuthor"),
+                "Unexpected content: " + content);
+            // Verify that the entries were actually fetched (2 pages match the filter) and that the page size was
+            // preserved (a single entry is displayed).
+            assertTrue(contentWithoutWhitespace.contains("Entries1-1outof2"), "Unexpected content: " + content);
+            // The displayed entry should be the child page, because we sorted by date descending.
+            String childLocation = setup.serializeLocalReference(childReference).replace(".", "");
+            assertTrue(contentWithoutWhitespace.contains(/* Title */ "Child" + /* Location */ childLocation),
+                "Unexpected content: " + content);
+        }
+    }
+
+    private ViewPage gotoPageWithoutWCAG(TestUtils setup, LocalDocumentReference reference)
+    {
+        WCAGContext wcagContext = setup.getWCAGUtils().getWCAGContext();
+        boolean wcagEnabled = wcagContext.isWCAGEnabled();
+        // The page has a scrollable region without focusable content, which fails the axe-core rule
+        // `scrollable-region-focusable`. Chrome and Firefox make such regions keyboard focusable on their own, only
+        // Safari doesn't, and the rule only targets Safari since axe-core 4.11.2. The tests don't run on Safari, so
+        // we disable the WCAG validation for this page load. This workaround can be removed once Safari makes
+        // scrollable regions focusable, see https://bugs.webkit.org/show_bug.cgi?id=190870 .
+        wcagContext.setWCAGEnabled(false);
+        try {
+            return setup.gotoPage(reference);
+        } finally {
+            // We set back the WCAG validation in the state it was in before this page load.
+            wcagContext.setWCAGEnabled(wcagEnabled);
         }
     }
 

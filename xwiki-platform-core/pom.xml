@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -100,6 +100,10 @@
                 <exclude>
                   <item>org\.xwiki\.commons:.*:.*</item>
                   <item>org\.xwiki\.rendering:.*:.*</item>
+                  <!-- The API of xwiki-platform-oldcore is checked by xwiki-platform-legacy-oldcore, which wraps it
+                       with the legacy aspects. Modules exposing oldcore types depend on the oldcore jar without those
+                       aspects and would report as removed every deprecated method moved to legacy. -->
+                  <item>org\.xwiki\.platform:xwiki-platform-oldcore:.*</item>
                 </exclude>
               </archives>
             </revapi.filter>
@@ -151,61 +155,100 @@
             -->
             <revapi.differences>
               <justification>
-                We changed the default algorithm for PasswordClass hash computation for something more robust and we
-                also changed the format of the hash for better handling in the future.
+                The live table new row naming strategies now receive the values the entry is created with, so that a
+                strategy can name the entry after one of them. This API is still @Unstable.
               </justification>
-              <criticality>highlight</criticality>
-                <differences>
-                  <item>
-                    <ignore>true</ignore>
-                    <code>java.field.constantValueChanged</code>
-                    <old>field com.xpn.xwiki.objects.classes.PasswordClass.DEFAULT_HASH_ALGORITHM</old>
-                    <new>field com.xpn.xwiki.objects.classes.PasswordClass.DEFAULT_HASH_ALGORITHM</new>
-                  </item>
-                  <item>
-                    <ignore>true</ignore>
-                    <code>java.method.removed</code>
-                    <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::getPasswordHash(java.lang.String, java.lang.String, java.lang.String)</old>
-                  </item>
-                  <item>
-                    <ignore>true</ignore>
-                    <code>java.method.removed</code>
-                    <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::getSaltFromPassword(java.lang.String)</old>
-                  </item>
-                  <item>
-                    <ignore>true</ignore>
-                    <code>java.method.removed</code>
-                    <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::randomSalt()</old>
-                  </item>
-                </differences>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method org.xwiki.model.reference.DocumentReference org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy::generate(java.util.Map&lt;java.lang.String, java.lang.Object&gt;) throws org.xwiki.livedata.LiveDataException, com.xpn.xwiki.XWikiException</old>
+                  <new>method org.xwiki.model.reference.DocumentReference org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy::generate(java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;) throws org.xwiki.livedata.LiveDataException, com.xpn.xwiki.XWikiException</new>
+                </item>
+              </differences>
             </revapi.differences>
             <revapi.differences>
               <justification>
-                ResourceReferenceHandler was declared as Comparable over the raw ResourceReferenceHandler type. It is
-                now Comparable over ResourceReferenceHandler&lt;?&gt;, which removes the raw type without changing the
-                erasure: the compiled compareTo() descriptor and the Comparable bridge method are identical, so
-                existing compiled Handlers keep working, and Handlers declaring the former raw parameter still
-                override it (with an unchecked warning).
+                Modifying xobjects through REST needs a way to set the version comment, and deleting an xobject needs
+                a way to create a minor version. The REST API shouldn't be called directly from Java but through HTTP
+                requests. Adding a new query string parameter to an existing REST resource doesn't break existing code
+                that calls this resource through HTTP.
               </justification>
               <criticality>allowed</criticality>
               <differences>
                 <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, java.lang.String, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.rest.resources.objects.ObjectResource::deleteObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method void org.xwiki.rest.resources.objects.ObjectResource::deleteObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.String, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, java.lang.String, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+                <item>
+                  <code>java.annotation.added</code>
+                  <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, ===org.xwiki.rest.model.jaxb.Object===) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectResource::updateObject(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Boolean, ===java.lang.String===, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.QueryParam("comment")</annotation>
+                </item>
+                <item>
+                  <code>java.annotation.added</code>
+                  <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, ===org.xwiki.rest.model.jaxb.Object===) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectsResource::addObject(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, ===java.lang.String===, org.xwiki.rest.model.jaxb.Object) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.QueryParam("comment")</annotation>
+                </item>
+                <item>
+                  <code>java.annotation.added</code>
+                  <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, ===org.xwiki.rest.model.jaxb.Property===) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.objects.ObjectPropertyResource::updateObjectProperty(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.Boolean, ===java.lang.String===, org.xwiki.rest.model.jaxb.Property) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.QueryParam("comment")</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>No retro compatibility impact, only makes the macro parameter mandatory in the macro
+                parameter descriptor.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
                   <ignore>true</ignore>
-                  <code>java.class.superTypeTypeParametersChanged</code>
-                  <old>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</old>
-                  <new>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</new>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setAttachment(java.lang.String)</old>
+                  <new>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setAttachment(java.lang.String)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
                 </item>
                 <item>
                   <ignore>true</ignore>
-                  <code>java.class.noLongerImplementsInterface</code>
-                  <old>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</old>
-                  <new>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</new>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setReference(org.xwiki.rendering.listener.reference.ResourceReference)</old>
+                  <new>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setReference(org.xwiki.rendering.listener.reference.ResourceReference)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
                 </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
+                It's very unlikely for the Solr role to be implemented outside of XWiki Platform, and there is no way to
+                provide an accurate default implementation of deleting the whole index of a core.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
                 <item>
                   <ignore>true</ignore>
-                  <regex>true</regex>
-                  <code>java\.class\.noLongerImplementsInterface</code>
-                  <interface>java\.lang\.Comparable&lt;org\.xwiki\.resource\.ResourceReferenceHandler&gt;</interface>
+                  <code>java.method.addedToInterface</code>
+                  <new>method void org.xwiki.search.solr.Solr::deleteIndex(org.xwiki.search.solr.XWikiSolrCore) throws org.xwiki.search.solr.SolrException</new>
                 </item>
               </differences>
             </revapi.differences>
@@ -215,7 +258,7 @@
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-importmap-plugin</artifactId>
-        <version>18.8.0-SNAPSHOT</version>
+        <version>18.10.0-SNAPSHOT</version>
         <executions>
           <!-- Make sure declared importmap are valid. -->
           <execution>
@@ -295,6 +338,7 @@
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-ratings</module>
     <module>xwiki-platform-realtime</module>
+    <module>xwiki-platform-records</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>

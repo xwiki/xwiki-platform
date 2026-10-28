@@ -21,13 +21,13 @@ package org.xwiki.rest.internal.resources.objects;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.RangeIterable;
-import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.resources.objects.ObjectsAtPageVersionResource;
 
@@ -41,6 +41,9 @@ import com.xpn.xwiki.api.Document;
 @Named("org.xwiki.rest.internal.resources.objects.ObjectsAtPageVersionResourceImpl")
 public class ObjectsAtPageVersionResourceImpl extends BaseObjectsResource implements ObjectsAtPageVersionResource
 {
+    @Inject
+    private ModelFactory factory;
+
     @Override
     public Objects getObjects(String wikiName, String spaceName, String pageName, String version, Integer start,
             Integer number, Boolean withPrettyNames) throws XWikiRestException
@@ -60,10 +63,8 @@ public class ObjectsAtPageVersionResourceImpl extends BaseObjectsResource implem
             for (com.xpn.xwiki.objects.BaseObject object : ri) {
                 /* By deleting objects, some of them might become null, so we must check for this */
                 if (object != null) {
-                    objects.getObjectSummaries().add(DomainObjectFactory
-                            .createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                                    componentManager), doc, object, true, Utils.getXWikiApi(componentManager),
-                                    withPrettyNames));
+                    objects.getObjectSummaries().add(
+                        this.factory.toRestObjectSummary(uriInfo.getBaseUri(), doc, object, true, withPrettyNames));
                 }
             }
 

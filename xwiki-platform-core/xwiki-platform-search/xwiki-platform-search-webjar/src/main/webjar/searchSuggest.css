@@ -1,5 +1,3 @@
-#template('colorThemeInit.vm')
-
 div.suggestItems.searchSuggest {
   border-top: 1px solid var(--xwiki-border-color);
   border-radius: var(--border-radius-base);

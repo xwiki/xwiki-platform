@@ -70,7 +70,11 @@ public interface AuthenticationConfiguration
     }
 
     /**
-     * Get from the configuration or generate a Validation Key used to generate hash values for the the cookies.
+     * Get from the configuration or generate a Validation Key used to generate hash values for the the cookies and to
+     * derive the anti-CSRF tokens. Implementations must return a stable value: the same value on every call and on
+     * every node of a cluster, otherwise the cookies and the tokens of one node are rejected by the others. The default
+     * implementation of this method generates a new value on every call and is not suitable for a production
+     * implementation.
      * 
      * @return the Validation Key
      * @since 15.9
@@ -84,7 +88,9 @@ public interface AuthenticationConfiguration
 
     /**
      * Get from the configuration of generate Encryption Key used to create a secret key used to encrypt/decrypt value
-     * for the cookies.
+     * for the cookies. Implementations must return a stable value: the same value on every call and on every node of
+     * a cluster, otherwise the cookies of one node cannot be decrypted by the others. The default implementation of
+     * this method generates a new value on every call and is not suitable for a production implementation.
      * 
      * @return the Encryption Key
      * @since 15.9

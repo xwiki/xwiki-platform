@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-xwiki-utils",
-  "version": "18.8.0-SNAPSHOT",
+  "version": "18.10.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -17,11 +17,15 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./src/index.ts"
+    },
+    "./global": {
+      "types": "./global.d.ts"
     }
   },
   "main": "./src/index.ts",
   "files": [
     "dist",
+    "global.d.ts",
     "src",
     "!src/**/*.spec.*",
     "!src/**/*.test.*",
@@ -38,16 +42,19 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-api": "workspace:*"
+    "@xwiki/platform-api": "workspace:*",
+    "@xwiki/platform-xwiki-model-api": "workspace:*"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-test-requirejs": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
+    "jsdom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
@@ -63,6 +70,9 @@
           "types": "./dist/index.d.cts",
           "default": "./dist/index.umd.js"
         }
+      },
+      "./global": {
+        "types": "./global.d.ts"
       }
     },
     "main": "./dist/index.es.js",

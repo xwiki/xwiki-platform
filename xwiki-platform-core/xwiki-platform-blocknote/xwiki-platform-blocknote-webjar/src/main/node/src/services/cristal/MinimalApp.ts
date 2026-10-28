@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { Container, inject, injectable } from "inversify";
+import type { Logger, Storage } from "@xwiki/platform-api";
 
 // FIXME: We have to inject a partial Cristal Application for BlockNote to work at the moment.
 @injectable("Singleton")
@@ -26,13 +27,24 @@ export class MinimalApp {
     container.bind("CristalApp").to(MinimalApp).inSingletonScope();
   }
 
-  private readonly wikiConfig = {
-    getType: () => "XWiki",
-    realtimeHint: "xwiki",
-    baseURL: XWiki.contextPath,
+  private readonly wikiConfig: {
+    getType: () => string;
+    realtimeHint: string;
+    baseURL: string;
+    readonly storage: Storage;
   };
 
-  constructor(@inject("Container") private readonly container: Container) {}
+  constructor(@inject("Container") private readonly container: Container) {
+    this.wikiConfig = {
+      getType: () => "XWiki",
+      realtimeHint: "xwiki",
+      baseURL: XWiki.contextPath,
+      // Resolved on access because the storage is registered after this configuration is built.
+      get storage(): Storage {
+        return container.get("Storage", { name: "XWiki" });
+      },
+    };
+  }
 
   getContainer() {
     return this.container;
@@ -40,5 +52,11 @@ export class MinimalApp {
 
   getWikiConfig() {
     return this.wikiConfig;
+  }
+
+  getLogger(module: string): Logger {
+    const logger: Logger = this.container.get("Logger");
+    logger.setModule(module);
+    return logger;
   }
 }

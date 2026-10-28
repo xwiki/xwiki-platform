@@ -33,6 +33,8 @@ defineOptions({
 </script>
 
 <template>
-  <label :for="textFieldId">{{ label }}</label>
-  <input :id="textFieldId" :type="type" v-model="model" v-bind="$attrs" />
+  <div>
+    <label :for="textFieldId">{{ label }}</label>
+    <input :id="textFieldId" :type="type" v-model="model" v-bind="$attrs" />
+  </div>
 </template>

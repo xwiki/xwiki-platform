@@ -20,7 +20,6 @@
 package org.xwiki.extension.index.internal.job;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +38,7 @@ public class ExtensionIndexRequest extends AbstractRequest
     /**
      * The identifier of the job.
      */
-    public static final List<String> JOB_ID = Arrays.asList("extension", "index");
+    public static final List<String> JOB_ID = List.of("extension", "index");
 
     private static final long serialVersionUID = 1L;
 

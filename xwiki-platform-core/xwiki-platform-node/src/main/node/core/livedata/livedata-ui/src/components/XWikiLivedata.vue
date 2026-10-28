@@ -38,9 +38,11 @@ import {
   inject,
   nextTick,
   onMounted,
+  onUnmounted,
   provide,
   ref,
   useTemplateRef,
+  watch,
 } from "vue";
 import type { LiveDataSource, Logic } from "@xwiki/platform-livedata-api";
 import type { Query, Translations } from "@xwiki/platform-localization-api";
@@ -74,6 +76,61 @@ const translationsLoaded = ref(false);
 
 const dataId = computed(() => logic.data?.id);
 const layoutId = computed(() => logic.currentLayoutId?.value);
+const maximized = computed(() => logic.isMaximized());
+
+// Escape should allow to exit maximized mode,
+// unless it's already handled by another component (e.g., editor).
+function onEscape(event: KeyboardEvent) {
+  if (event.key === "Escape" && maximized.value) {
+    logic.toggleMaximized();
+  }
+}
+
+// The elements we made inert, so that only those are restored afterwards. An element already
+// inert before the Live Data was maximized must stay inert once the normal view is back.
+let inertElements: Element[] = [];
+
+// The maximized view is painted over the page, so the content it hides must not stay reachable
+// with the keyboard nor exposed to assistive technologies. Everything becomes inert except the
+// ancestors of the Live Data, which are the only path leading to it.
+function setPageInert(inert: boolean) {
+  if (inert) {
+    for (
+      let node = element.value as Element | null;
+      node && node !== document.body && node.parentElement;
+      node = node.parentElement
+    ) {
+      for (const sibling of Array.from(node.parentElement.children)) {
+        if (sibling !== node && !sibling.hasAttribute("inert")) {
+          sibling.setAttribute("inert", "");
+          inertElements.push(sibling);
+        }
+      }
+    }
+  } else {
+    for (const inertElement of inertElements) {
+      inertElement.removeAttribute("inert");
+    }
+    inertElements = [];
+  }
+}
+
+// We only set the escape listener when we're actually in maximized mode.
+watch(maximized, (isMaximized) => {
+  setPageInert(isMaximized);
+  if (isMaximized) {
+    document.addEventListener("keydown", onEscape);
+  } else {
+    document.removeEventListener("keydown", onEscape);
+  }
+});
+
+// Unmounting while maximized removes the view without toggling it back, so the rest of the page
+// must be restored here too.
+onUnmounted(() => {
+  document.removeEventListener("keydown", onEscape);
+  setPageInert(false);
+});
 
 // eslint-disable-next-line max-statements
 onMounted(async () => {
@@ -81,70 +138,108 @@ onMounted(async () => {
   logic.setElement(elementValue);
   // Register the logic on the parent of the root element to make its API accessible publicly.
   jQuery(elementValue).parent().data("liveData", logic);
-  // Waits for the layout to be (lazily) loaded before hiding the loader.
-  logic.onEvent("layoutLoaded", () => {
-    layoutLoaded.value = true;
+  // Waits for the layout to be (lazily) loaded before hiding the loader. The promise resolves with the error when no
+  // layout can be loaded at all, so that we never wait for one indefinitely. It never rejects because it is awaited
+  // only at the end, after the translations and the entries, and a rejection would be reported as unhandled meanwhile.
+  const layoutReady = new Promise<unknown>((resolve) => {
+    logic.onEvent("layoutLoaded", (event) => {
+      const { error } = (event as CustomEvent).detail;
+      if (error) {
+        resolve(error);
+      } else {
+        // Hide the loader and show the footnotes only when a layout was actually loaded. When none could be
+        // loaded the loader keeps running: there is nothing to display in its place yet, and it is also what
+        // tells the functional tests that the live data is not usable.
+        // TODO: XWIKI-24835: The Live Data displays an endless loading animation instead of an error when no
+        // layout can be loaded
+        layoutLoaded.value = true;
+        resolve(undefined);
+      }
+    });
   });
 
+  let error: unknown;
   try {
-    await logic.translationsLoaded();
-  } finally {
-    translationsLoaded.value = true;
-  }
-
-  logic.registerPanel({
-    id: "propertiesPanel",
-    title: logic.t("livedata.panel.properties.title"),
-    name: logic.t("livedata.dropdownMenu.panels.properties"),
-    icon: "list-bullets",
-    component: "LivedataAdvancedPanelProperties",
-    order: 1000,
-  });
-  logic.registerPanel({
-    id: "sortPanel",
-    title: logic.t("livedata.panel.sort.title"),
-    name: logic.t("livedata.dropdownMenu.panels.sort"),
-    icon: "table_sort",
-    component: "LivedataAdvancedPanelSort",
-    order: 2000,
-  });
-  logic.registerPanel({
-    id: "filterPanel",
-    title: logic.t("livedata.panel.filter.title"),
-    name: logic.t("livedata.dropdownMenu.panels.filter"),
-    icon: "filter",
-    component: "LivedataAdvancedPanelFilter",
-    order: 3000,
-  });
-
-  // Fetch the data if we don't have any. This call must be made just after the main Vue
-  // component is initialized as  LivedataPersistentConfiguration must be mounted for the
-  // persisted filters to be loaded and applied when fetching  the entries. We use a dedicated
-  // field (firstEntriesLoading) for the first load as the fetch start/end events can be
-  // triggered  before the loader components is loaded (and in this case the loader is never
-  // hidden even once the entries are displayed).
-  if (!logic.data.data.entries.length) {
     try {
-      await logic.updateEntries();
+      await logic.translationsLoaded();
     } finally {
-      // Mark the loader as finished, even if it fails as the loader should stop and a message be
-      // displayed to the user in this case.
+      translationsLoaded.value = true;
+    }
+
+    logic.registerPanel({
+      id: "propertiesPanel",
+      title: logic.t("livedata.panel.properties.title"),
+      name: logic.t("livedata.dropdownMenu.panels.properties"),
+      icon: "list-bullets",
+      component: "LivedataAdvancedPanelProperties",
+      order: 1000,
+    });
+    logic.registerPanel({
+      id: "sortPanel",
+      title: logic.t("livedata.panel.sort.title"),
+      name: logic.t("livedata.dropdownMenu.panels.sort"),
+      icon: "table_sort",
+      component: "LivedataAdvancedPanelSort",
+      order: 2000,
+    });
+    logic.registerPanel({
+      id: "filterPanel",
+      title: logic.t("livedata.panel.filter.title"),
+      name: logic.t("livedata.dropdownMenu.panels.filter"),
+      icon: "filter",
+      component: "LivedataAdvancedPanelFilter",
+      order: 3000,
+    });
+
+    // Fetch the data if we don't have any. This call must be made just after the main Vue
+    // component is initialized as  LivedataPersistentConfiguration must be mounted for the
+    // persisted filters to be loaded and applied when fetching  the entries. We use a dedicated
+    // field (firstEntriesLoading) for the first load as the fetch start/end events can be
+    // triggered  before the loader components is loaded (and in this case the loader is never
+    // hidden even once the entries are displayed).
+    if (!logic.data.data.entries.length) {
+      try {
+        await logic.updateEntries();
+      } finally {
+        // Mark the loader as finished, even if it fails as the loader should stop and a message be
+        // displayed to the user in this case.
+        logic.firstEntriesLoading.value = false;
+      }
+    } else {
       logic.firstEntriesLoading.value = false;
     }
-  } else {
-    logic.firstEntriesLoading.value = false;
-  }
 
-  // Trigger the "instanceCreated" event on the next tick to ensure that the constructor has
-  // returned, and thus all references to the logic instance have been initialized.
-  nextTick(() => {
-    logic.triggerEvent("instanceCreated", {});
-  });
+    // Trigger the "instanceCreated" event on the next tick to ensure that the constructor has
+    // returned, and thus all references to the logic instance have been initialized.
+    nextTick(() => {
+      logic.triggerEvent("instanceCreated", {});
+    });
+
+    // The layout is loaded in parallel with the entries so we have to wait for it too, and for
+    // the tick that renders it, before the live data can be considered fully displayed.
+    const layoutError = await layoutReady;
+    if (layoutError) {
+      throw layoutError;
+    }
+    await nextTick();
+  } catch (e) {
+    error = e;
+  } finally {
+    // Notify that the live data is fully loaded and displayed, or that it failed, because there are
+    // listeners that can't wait indefinitely, such as the page ready detection used by the PDF
+    // export. The "error" event data tells the two cases apart: it is undefined on success, and the
+    // live data instance is always available as the "livedata" event data.
+    logic.triggerEvent("instanceReady", { error });
+  }
 });
 </script>
 
 <template>
-  <div class="xwiki-livedata" ref="rootElement">
+  <div
+    class="xwiki-livedata"
+    :class="{ 'livedata-maximized': maximized }"
+    ref="rootElement"
+  >
     <!-- Import the Livedata advanced configuration panels -->
     <LivedataAdvancedPanels />
 
@@ -161,3 +256,17 @@ onMounted(async () => {
     <div v-if="!layoutLoaded" class="loading"></div>
   </div>
 </template>
+
+<style>
+.xwiki-livedata.livedata-maximized {
+  position: fixed;
+  inset: 0;
+  /*
+   * We use the same z-index as the gallery application, which maximizes the same way.
+   */
+  z-index: 1001;
+  overflow: auto;
+  padding: 0 var(--grid-gutter-width);
+  background-color: var(--body-bg);
+}
+</style>

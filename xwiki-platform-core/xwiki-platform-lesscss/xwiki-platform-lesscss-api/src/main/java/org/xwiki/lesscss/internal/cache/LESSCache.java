@@ -43,15 +43,27 @@ public interface LESSCache<T>
     T get(LESSResourceReference lessResourceReference, SkinReference skin, ColorThemeReference colorTheme);
 
     /**
-     * Add an object in the cache.
+     * Add an object in the cache, unless some cached content has been cleared since {@link #getVersion()} returned
+     * the expected version. Use it to store an object computed from content read after calling {@link #getVersion()}:
+     * when the content changes during the computation, the clear triggered by the change happens before the object
+     * is stored, and the object, computed from the old content, must not be cached.
      *
      * @param lessResourceReference reference of the code to compile
      * @param skin reference of the skin
-     * @param colorThemeName reference of the color theme
+     * @param colorTheme reference of the color theme
      * @param object the object to cache
+     * @param expectedVersion the value returned by {@link #getVersion()} before computing the object
+     * @since 18.10.0RC1
      */
-    void set(LESSResourceReference lessResourceReference, SkinReference skin, ColorThemeReference colorThemeName,
-        T object);
+    void set(LESSResourceReference lessResourceReference, SkinReference skin, ColorThemeReference colorTheme,
+        T object, long expectedVersion);
+
+    /**
+     * @return a value that changes each time some content of the cache is cleared, to pass to
+     *     {@link #set(LESSResourceReference, SkinReference, ColorThemeReference, Object, long)}
+     * @since 18.10.0RC1
+     */
+    long getVersion();
 
     /**
      * Clear the cache.

@@ -42,6 +42,9 @@ import type { Query, Translations } from "@xwiki/platform-localization-api";
 import type { Reactive, Ref } from "vue";
 import type { ComposerTranslation } from "vue-i18n";
 
+// Lists the properties whose value is submitted as HTML, which the server converts to their syntax.
+const HTML_CONVERSION_KEY = "RequiresHTMLConversion";
+
 /**
  * Defines the internal logic of the Live Data.
  * This component expects a LiveDataSource providing the logic required to retrieve or update data from a remote source.
@@ -66,6 +69,13 @@ export class LiveDataLogic implements Logic {
   private readonly isTranslationsLoaded: Promise<boolean>;
 
   private editMode: Ref<boolean> = ref(false);
+
+  // The view should be frozen in edit mode, this stores the current query and the order of the entries.
+  private frozenView?: { query: string; entryIds: string[] };
+  // The key of each entry, by entry identifier.
+  private readonly entryKeys = new Map<string, string>();
+
+  private maximized: Ref<boolean> = ref(false);
 
   constructor(
     private readonly liveDataSource: LiveDataSource,
@@ -211,12 +221,76 @@ export class LiveDataLogic implements Logic {
   }
 
   /**
+   * Return a key identifying an entry, stable across the refreshes and across the creation of the
+   * entry of a new row.
+   * @param entry - an entry
+   * @returns the key of the entry
+   * @since 18.9.0RC1
+   */
+  getEntryKey(entry: Values): string {
+    // An entry that does not exist yet has no identifier to find its key with.
+    if (entry._entryKey) {
+      return entry._entryKey;
+    }
+    const entryId = this.getEntryId(entry);
+    if (!entryId) {
+      return "entry";
+    }
+    let entryKey = this.entryKeys.get(entryId);
+    if (!entryKey) {
+      entryKey = LiveDataLogic.newEntryKey();
+      this.entryKeys.set(entryId, entryKey);
+    }
+    return entryKey;
+  }
+
+  /**
+   * Return the keys of the given entries, in the same order. Each entry gets the key returned by
+   * getEntryKey, made unique among the given entries in case of inconsistent data, for instance
+   * duplicated entry IDs.
+   * @param entries - the entries to get the keys of
+   * @returns the keys of the entries
+   * @since 18.9.0RC1
+   */
+  getEntryKeys(entries: Values[]): string[] {
+    const occurrences = new Map<string, number>();
+    return entries.map((entry) => {
+      const entryKey = this.getEntryKey(entry);
+      const occurrence = occurrences.get(entryKey) ?? 0;
+      occurrences.set(entryKey, occurrence + 1);
+      // Only the repeated keys get a suffix, so that the key of an entry does not depend on its
+      // position.
+      return occurrence ? `${entryKey}-${occurrence}` : entryKey;
+    });
+  }
+
+  /**
+   * @returns a key that no other entry holds
+   */
+  private static newEntryKey(): string {
+    return `entry-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  }
+
+  /**
+   * Forget the keys of the entries that are not displayed anymore.
+   * @param entries - the entries that are displayed
+   */
+  private pruneEntryKeys(entries: Values[]) {
+    const displayed = new Set(entries.map((entry) => this.getEntryId(entry)));
+    for (const entryId of [...this.entryKeys.keys()]) {
+      if (!displayed.has(entryId)) {
+        this.entryKeys.delete(entryId);
+      }
+    }
+  }
+
+  /**
    * Return the id of the given entry.
    * @param values - an entry
    * @returns the entry id
    */
   getEntryId(values: Values): string | undefined {
-    const idProperty = this.data.meta.entryDescriptor.idProperty || "id";
+    const idProperty = this.getIdProperty();
     if (values._new) {
       return undefined;
     }
@@ -410,7 +484,7 @@ export class LiveDataLogic implements Logic {
    */
 
   /**
-   * Fetch the entries of the current page according to the query configuration.
+   * Fetch the entries of the current page according to the query configuration, keeping the frozen view if any.
    * @returns the fetched entries
    */
   async fetchEntries(): Promise<{ count: number; entries: Values[] }> {
@@ -418,64 +492,174 @@ export class LiveDataLogic implements Logic {
     this.triggerEvent("beforeEntryFetch");
     // Fetch entries from data source
     try {
-      return await this.liveDataSource.getEntries(this.data.query!);
+      const data = await this.liveDataSource.getEntries(this.data.query!);
+      data.entries = await this.restoreFrozenView(data.entries);
+      return data;
     } finally {
       this.triggerEvent("afterEntryFetch");
     }
   }
 
-  updateEntries() {
-    return (
-      this.fetchEntries()
-        // eslint-disable-next-line promise/always-return
-        .then((data) => {
-          // We need to keep drafts to insert them back in the entries.
-          const drafts = this.data.data.entries.filter((entry) => entry._new);
-          data.entries.push(...drafts);
+  // eslint-disable-next-line max-statements
+  async updateEntries() {
+    try {
+      const data = await this.fetchEntries();
+      // We need to keep drafts to insert them back in the entries.
+      const drafts = this.data.data.entries.filter((entry) => entry._new);
+      // Refreeze the values (the restore operation might have unfrozen them).
+      this.freezeView(data.entries);
+      data.entries.push(...drafts);
 
-          this.data.data = data;
-          // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated
-          // first.
-          // It turns out this is not enough when components are resolved asynchronously.
-          // Therefore, we preemptively resolve the components that are going to be displayed here. Since they are
-          // cached, the rendering of the displayers will not be delayed later on, and listeners of entriesUpdated
-          // have access to a fully rendered DOM. Note that this approach is not optimal, and we should aim for a
-          // mechanism that does not rely on direct DOM access. Instead, we should provide way to alter the data
-          // externally before starting the rendering. (see https://jira.xwiki.org/browse/XWIKI-23423)
-          const preloadDisplayer = this.getPropertyDescriptors()
-            .filter((it) => it != undefined && this.isPropertyVisible(it.id))
-            .map((it) =>
-              componentStore.load(
-                "displayer",
-                (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
-              ),
-            );
-          // eslint-disable-next-line promise/catch-or-return,promise/always-return,promise/no-nesting
-          Promise.all(preloadDisplayer).then(() => {
-            nextTick(() => this.triggerEvent("entriesUpdated", {}));
-          });
-          // Remove the outdated footnotes, they will be recomputed by the new entries.
-          this.footnotes.reset();
-        })
-        .catch((err) => {
-          // Prevent undesired notifications of the end user for non business related errors (for
-          // instance, the user left the page before the request was completed). See
-          // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
-          if (err.readyState === 4) {
-            // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
-            this.translate("livedata.error.updateEntriesFailed").then(
-              // @ts-expect-error XWiki.widget is excepted to be globally accessible
-              (value) => new XWiki.widgets.Notification(value, "error"),
-            );
-          }
+      this.pruneEntryKeys(data.entries);
+      this.data.data = data;
+      // Remove the outdated footnotes, they will be recomputed by the new entries.
+      this.footnotes.reset();
+      // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated
+      // first.
+      // It turns out this is not enough when components are resolved asynchronously.
+      // Therefore, we preemptively resolve the components that are going to be displayed here. Since they are
+      // cached, the rendering of the displayers will not be delayed later on, and listeners of entriesUpdated
+      // have access to a fully rendered DOM. Note that this approach is not optimal, and we should aim for a
+      // mechanism that does not rely on direct DOM access. Instead, we should provide way to alter the data
+      // externally before starting the rendering. (see https://jira.xwiki.org/browse/XWIKI-23423)
+      const preloadDisplayer = this.getPropertyDescriptors()
+        .filter((it) => it != undefined && this.isPropertyVisible(it.id))
+        .map((it) =>
+          componentStore.load(
+            "displayer",
+            (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
+          ),
+        );
+      await Promise.all(preloadDisplayer);
+      await nextTick();
+      this.triggerEvent("entriesUpdated", {});
+    } catch (err) {
+      // Prevent undesired notifications of the end user for non business related errors (for
+      // instance, the user left the page before the request was completed). See
+      // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
+      if ((err as { readyState?: number }).readyState === 4) {
+        // Fire-and-forget: the notification must not delay the caller.
+        void this.notifyError("livedata.error.updateEntriesFailed");
+      }
 
-          // Do not log if the request has been aborted (e.g., because a second request was started
-          // for the same LD with new criteria).
-          if (err.statusText !== "abort") {
-            console.error("Failed to fetch the entries", err);
-          }
-        })
+      // Do not log if the request has been aborted (e.g., because a second request was started
+      // for the same LD with new criteria).
+      if ((err as { statusText?: string }).statusText !== "abort") {
+        console.error("Failed to fetch the entries", err);
+      }
+    }
+  }
+
+  /**
+   * Freeze the view.
+   * @param entries - the displayed entries to freeze
+   */
+  private freezeView(entries: Values[]) {
+    if (!this.editMode.value) {
+      this.frozenView = undefined;
+      return;
+    }
+    this.frozenView = {
+      query: this.getQuerySerialized(),
+      entryIds: entries
+        .map((entry) => this.getEntryId(entry))
+        .filter((entryId): entryId is string => entryId !== undefined),
+    };
+  }
+
+  /**
+   * Restore the frozen view.
+   * Newly fetched values are passed as parameter and will be used as-is if they are part of the frozen set.
+   * Missing values will be fetched manually.
+   * @param entries - the newly fetched entries
+   * @returns the entries to display
+   */
+  private async restoreFrozenView(entries: Values[]): Promise<Values[]> {
+    if (this.frozenView?.query !== this.getQuerySerialized()) {
+      // If the query changed, the view needs to be unfrozen.
+      return entries;
+    }
+    const fetchedEntries = new Map(
+      entries.map((entry): [string | undefined, Values] => [
+        this.getEntryId(entry),
+        entry,
+      ]),
     );
+    // The missing entries changed page, we didn't fetch their new state and need to do it manually.
+    const movedEntries = await this.fetchEntriesById(
+      this.frozenView.entryIds.filter(
+        (entryId) => !fetchedEntries.has(entryId),
+      ),
+    );
+    return this.frozenView.entryIds
+      .map(
+        (entryId) => fetchedEntries.get(entryId) ?? movedEntries.get(entryId),
+      )
+      .filter((entry): entry is Values => entry !== undefined);
+  }
+
+  /**
+   * Indicate whether the view is frozen, meaning the entries should keep their position.
+   * @returns true if the view is frozen, false otherwise
+   * @since 18.9.0RC1
+   */
+  isViewFrozen(): boolean {
+    return this.editMode.value && this.frozenView !== undefined;
+  }
+
+  /**
+   * Fetch the entries having the given ids, one by one and independently of the current query, since
+   * they are precisely the entries that the query does not select anymore.
+   * @param entryIds - the ids of the entries to fetch
+   * @returns the fetched entries, by id, without the ones that do not exist anymore
+   */
+  private async fetchEntriesById(entryIds: string[]) {
+    const source = this.data.query.source;
+    const idProperty = this.data.meta.entryDescriptor.idProperty || "id";
+    const displayedEntries = new Map(
+      this.data.data.entries.map((entry): [string | undefined, Values] => [
+        this.getEntryId(entry),
+        entry,
+      ]),
+    );
+    const fetchedEntries = await Promise.all(
+      entryIds.map(
+        async (entryId): Promise<[string, Values | undefined]> => [
+          entryId,
+          // An entry that the source does not return anymore does not exist anymore.
+          await this.liveDataSource
+            .getEntry(source, entryId, this.data.query.properties)
+            .catch((err) => {
+              // An aborted request means a newer update is in progress, this one must be dropped.
+              if (err.statusText === "abort") {
+                throw err;
+              }
+              // The entry might still exist, so its displayed values are kept.
+              console.error(`Failed to fetch the entry [${entryId}]`, err);
+              return displayedEntries.get(entryId);
+            }),
+        ],
+      ),
+    );
+    const entries = new Map<string, Values>();
+    fetchedEntries.forEach(([entryId, entry]) => {
+      if (entry) {
+        // The entry is identified by the id it was fetched with, which its values do not necessarily
+        // hold.
+        entries.set(entryId, { ...entry, [idProperty]: entryId });
+      }
+    });
+    return entries;
+  }
+
+  private getQuerySerialized() {
+    const query = this.data.query;
+    return JSON.stringify({
+      filters: query.filters,
+      sort: query.sort,
+      offset: query.offset,
+      limit: query.limit,
+    });
   }
 
   /**
@@ -540,7 +724,7 @@ export class LiveDataLogic implements Logic {
    * @param propertyId - The property id we want to modify in the entry
    * @param value - The new value of entry property
    */
-  setValue({
+  async setValue({
     entry,
     propertyId,
     value,
@@ -548,7 +732,7 @@ export class LiveDataLogic implements Logic {
     entry: Values;
     propertyId: string;
     value: string;
-  }): void {
+  }): Promise<void> {
     // TODO: Ensure entry is valid (need other current PR)
     // TODO: Ensure property is valid (need other current PR)
     if (!this.isEditable({ entry, propertyId })) {
@@ -560,10 +744,13 @@ export class LiveDataLogic implements Logic {
     // Once the entry updated, reload the whole livedata because changing a single entry can have
     // an impact on other properties of the entry, but also possibly on other entriers, or in the
     // way they are sorted.
-    // eslint-disable-next-line promise/catch-or-return
-    this.liveDataSource
-      .updateEntryProperty(source, entryId ?? "", propertyId, entry[propertyId])
-      .then(() => this.updateEntries());
+    await this.liveDataSource.updateEntryProperty(
+      source,
+      entryId ?? "",
+      propertyId,
+      entry[propertyId],
+    );
+    await this.updateEntries();
   }
 
   /**
@@ -573,17 +760,12 @@ export class LiveDataLogic implements Logic {
    */
   setValues({ entryId, values }: { entryId: string; values: unknown }) {
     const newEntry = this.data.data.entries.find((entry) => entry._new);
-    // We don't automatically save on new row changes.
+    // A new row is only a placeholder: its edits are held on it until they are enough to create the
+    // entry, which is what makes the row appear on the wiki.
     if (!entryId && newEntry) {
-      return new Promise<void>((resolve) => {
-        Object.assign(newEntry, values);
-        resolve();
-      });
+      return this.editPendingRow(newEntry, values as Values);
     } else {
-      const source = this.data.query.source;
-      return this.liveDataSource
-        .updateEntry(source, entryId, values)
-        .then(() => this.updateEntries());
+      return this.updateEntry(entryId, values);
     }
   }
 
@@ -600,11 +782,41 @@ export class LiveDataLogic implements Logic {
   }
 
   addEntry() {
-    const newEntry: Record<string, string> = { _new: "true" };
+    const newEntry: Record<string, string> = {
+      _new: "true",
+      _entryKey: LiveDataLogic.newEntryKey(),
+    };
     for (const actionKey of this.getEntryActionKeys()) {
       newEntry[actionKey] = "true";
     }
+    try {
+      const displayReference = this.getNewEntryDisplayReference();
+      if (displayReference) {
+        newEntry._displayReference = displayReference;
+      }
+    } catch (e) {
+      // The row is still added, but the cells that need a page to load their editor from can't be edited.
+      console.warn("Failed to compute the display reference of the new row", e);
+    }
     this.data.data.entries.push(newEntry);
+  }
+
+  /**
+   * Compute the reference a row that has no entry yet is displayed against. Only its location
+   * matters, nothing is ever saved under it.
+   *
+   * @returns the reference of a page that does not exist in the location new entries go to, or
+   * undefined when that location is unknown
+   */
+  private getNewEntryDisplayReference(): string | undefined {
+    const location = this.getActionDescriptor("addEntry")?.location;
+    if (!location) {
+      return undefined;
+    }
+    // Any free name works, since nothing is stored there. crypto.randomUUID is avoided since it is
+    // only defined in secure contexts.
+    const random = Math.random().toString(36).slice(2, 10);
+    return `${location}.new-entry-${Date.now().toString(36)}-${random}`;
   }
 
   /**
@@ -1538,10 +1750,12 @@ export class LiveDataLogic implements Logic {
 
   enableEditMode() {
     this.editMode.value = true;
+    this.freezeView(this.data.data.entries);
   }
 
   disableEditMode() {
     this.editMode.value = false;
+    this.frozenView = undefined;
   }
 
   isEditMode(): boolean {
@@ -1552,42 +1766,294 @@ export class LiveDataLogic implements Logic {
     return this.data.query.source.hasEditMode === "true";
   }
 
-  // eslint-disable-next-line max-statements
-  async saveNewEntry() {
-    const newEntryIndex = this.data.data.entries.findIndex((e) => e._new);
-    if (newEntryIndex >= 0) {
-      const entryActionKeys = this.getEntryActionKeys();
-      try {
-        // Submit only data properties, filtering out internal flags and action keys.
-        await this.liveDataSource.addEntry(
-          this.data.query.source,
-          Object.fromEntries(
-            Object.entries(this.data.data.entries[newEntryIndex]).filter(
-              ([k]) => !k.startsWith("_") && !entryActionKeys.has(k),
-            ),
-          ),
-        );
-        // We remove the draft once it's successfully saved.
-        this.data.data.entries.splice(newEntryIndex, 1);
-        await this.updateEntries();
-      } catch (e) {
-        console.error("Failed to create entry", e);
-        try {
-          const message = await this.translate("livedata.error.addEntryFailed");
-          // @ts-expect-error XWiki.widgets is expected to be globally accessible
-          new XWiki.widgets.Notification(message, "error");
-        } catch {
-          /* ignore translation failure */
-        }
-        throw e;
-      }
+  /**
+   * @returns whether the Live Data should be maximized, covering the rest of the page
+   */
+  isMaximized(): boolean {
+    return this.maximized.value;
+  }
+
+  /**
+   * Switches between the maximized view and the normal one
+   */
+  toggleMaximized(): void {
+    this.maximized.value = !this.maximized.value;
+  }
+
+  /**
+   * Apply an edit to a row whose entry does not exist yet, and create that entry as soon as the row
+   * holds every value it cannot be created without.
+   *
+   * @param newEntry - the row being edited
+   * @param values - the values edited on that row
+   * @returns a promise completing when the entry is created, or right away while the row is still
+   * waiting for values
+   */
+  private editPendingRow(newEntry: Values, values: Values): Promise<void> {
+    this.collectCreationValues(newEntry, values);
+    const creationValues = this.getCreationValues(newEntry);
+    // Leaving a cell without entering anything must not create an entry, and neither must an edit
+    // that leaves a mandatory property empty: the row keeps waiting for those values.
+    if (
+      !this.hasAnyValue(creationValues) ||
+      this.getMissingMandatoryProperties(creationValues).length > 0
+    ) {
+      return Promise.resolve();
+    }
+    return this.createEntry(newEntry, creationValues);
+  }
+
+  /**
+   * Hold on a row that has no entry yet the values edited on it, so that they all end up in the
+   * entry once it is created.
+   *
+   * @param newEntry - the row being edited
+   * @param values - the values edited on that row
+   */
+  private collectCreationValues(newEntry: Values, values: Values) {
+    // Each cell only declares its own HTML conversions, so the declarations of the cells edited
+    // before this one would be lost.
+    const htmlConversions = LiveDataLogic.mergeHTMLConversions(
+      newEntry[HTML_CONVERSION_KEY],
+      values[HTML_CONVERSION_KEY],
+    );
+    Object.assign(newEntry, values);
+    if (htmlConversions) {
+      newEntry[HTML_CONVERSION_KEY] = htmlConversions;
     }
   }
 
+  /**
+   * @param conversions - the properties requiring an HTML conversion, as comma separated lists
+   * @returns the properties of every list, or undefined when none of them holds any
+   */
+  private static mergeHTMLConversions(
+    ...conversions: (string | undefined)[]
+  ): string | undefined {
+    const properties = new Set(
+      conversions
+        .filter((conversion) => conversion)
+        .flatMap((conversion) => conversion!.split(","))
+        .filter((property) => property),
+    );
+    return properties.size > 0 ? [...properties].join(",") : undefined;
+  }
+
+  /**
+   * @param values - the values an entry would be created with
+   * @returns the properties that must hold a value for an entry to be created, and do not
+   */
+  private getMissingMandatoryProperties(values: Values): string[] {
+    return this.data.meta.propertyDescriptors
+      .filter((propertyDescriptor) => propertyDescriptor.mandatory)
+      .map((propertyDescriptor) => propertyDescriptor.id)
+      .filter((propertyId) => this.isBlank(values[propertyId]));
+  }
+
+  /**
+   * Create the entry of a row from the values collected on it.
+   *
+   * @param newEntry - the row being created
+   * @param creationValues - the values the entry is created with
+   */
+  private async createEntry(newEntry: Values, creationValues: Values) {
+    let createdEntry;
+    try {
+      createdEntry = await this.liveDataSource.addEntry(
+        this.data.query.source,
+        creationValues,
+      );
+    } catch (e) {
+      console.error("Failed to create entry", e);
+      await this.notifyError("livedata.error.addEntryFailed");
+      // The row is kept so that the values can be fixed and tried again.
+      throw e;
+    }
+
+    this.adoptCreatedEntry(newEntry, createdEntry);
+    await this.updateEntries();
+  }
+
+  /**
+   * Save values edited on an existing entry.
+   *
+   * @param entryId - the identifier of the entry
+   * @param values - the values edited on that entry
+   */
+  private async updateEntry(entryId: string, values: unknown) {
+    try {
+      await this.liveDataSource.updateEntry(
+        this.data.query.source,
+        entryId,
+        values,
+      );
+    } catch (e) {
+      console.error("Failed to update entry", e);
+      await this.notifyError("livedata.error.saveEntryFailed");
+      throw e;
+    }
+    await this.updateEntries();
+  }
+
+  /**
+   * Turn the row an entry was created from into that entry, and freeze it at its position.
+   *
+   * @param newEntry - the row the entry was created from
+   * @param createdEntry - the entry returned by the creation, when the source returned one
+   */
+  private adoptCreatedEntry(
+    newEntry: Values,
+    createdEntry: Values | undefined,
+  ) {
+    const createdEntryId = createdEntry && this.getEntryId(createdEntry);
+    if (createdEntryId) {
+      // The editions in progress follow the row to the identifier it just got.
+      this.getEditBus().reassign(this.getEntryId(newEntry), createdEntryId);
+      this.entryKeys.set(createdEntryId, newEntry._entryKey);
+      newEntry[this.getIdProperty()] = createdEntryId;
+      delete newEntry._new;
+      this.frozenView?.entryIds.push(createdEntryId);
+    }
+  }
+
+  /**
+   * Compute the values an entry is created with.
+   * @param values - the values collected on the row
+   * @returns the values to create the entry with, without the internal ones
+   */
+  private getCreationValues(values: Values): Values {
+    const entryActionKeys = this.getEntryActionKeys();
+    // Submit only data properties, filtering out internal flags and action keys.
+    const entryValues: Values = Object.fromEntries(
+      Object.entries(values).filter(
+        ([key]) => !key.startsWith("_") && !entryActionKeys.has(key),
+      ),
+    );
+    return entryValues;
+  }
+
+  /**
+   * Return whether a row carries a value.
+   * @param values - the values collected on a row
+   * @returns true when at least one property is set, ignoring the encoding fields
+   */
+  private hasAnyValue(values: Values): boolean {
+    return Object.entries(values).some(
+      ([key, value]) => !this.isEncodingKey(key) && !this.isBlank(value),
+    );
+  }
+
+  /**
+   * @param key - a key of an edit
+   * @returns true when the key describes how a value is encoded rather than holding a value
+   */
+  private isEncodingKey(key: string): boolean {
+    return (
+      key === HTML_CONVERSION_KEY ||
+      key.endsWith("_syntax") ||
+      key.endsWith("_cache")
+    );
+  }
+
+  /**
+   * @param value - a value of an edit
+   * @returns true when the value holds nothing
+   */
+  private isBlank(value: unknown): boolean {
+    if (Array.isArray(value)) {
+      return value.every((item) => this.isBlank(item));
+    }
+    return value === undefined || value === null || String(value).trim() === "";
+  }
+
+  /**
+   * Delete an entry. A placeholder row, which has no entry behind it yet, is only dropped.
+   *
+   * @param entry - the entry to delete
+   */
+  async deleteEntry(entry: Values) {
+    if (entry._new) {
+      this.removeRow(entry);
+    } else if (await this.confirm("livedata.table.action.delete.confirm")) {
+      await this.removeStoredEntry(entry);
+    }
+  }
+
+  /**
+   * Delete an entry from the store, and refresh the Live Data.
+   *
+   * @param entry - the entry to delete
+   */
+  private async removeStoredEntry(entry: Values) {
+    try {
+      await this.liveDataSource.removeEntry(
+        this.data.query.source,
+        this.getEntryId(entry)!,
+      );
+    } catch (e) {
+      console.error("Failed to delete entry", e);
+      await this.notifyError("livedata.error.deleteEntryFailed");
+      throw e;
+    }
+    await this.updateEntries();
+  }
+
   cancelNewEntry() {
-    const newIndex = this.data.data.entries.findIndex((e) => e._new);
-    if (newIndex >= 0) {
-      this.data.data.entries.splice(newIndex, 1);
+    const newEntry = this.data.data.entries.find((entry) => entry._new);
+    if (newEntry) {
+      this.removeRow(newEntry);
+    }
+  }
+
+  /**
+   * Drop a row from the displayed entries.
+   *
+   * @param entry - the entry of the row to drop
+   */
+  private removeRow(entry: Values) {
+    this.getEditBus().discard(entry);
+    const entryIndex = this.data.data.entries.indexOf(entry);
+    if (entryIndex >= 0) {
+      this.data.data.entries.splice(entryIndex, 1);
+    }
+  }
+
+  /**
+   * @returns the name of the property holding the identifier of the entries
+   */
+  private getIdProperty(): string {
+    return this.data.meta.entryDescriptor.idProperty || "id";
+  }
+
+  /**
+   * Ask the user to confirm an action.
+   * @param translationKey - the key of the question to ask
+   * @returns whether the user confirmed
+   */
+  private async confirm(translationKey: string): Promise<boolean> {
+    const confirmationText = await this.translate(translationKey);
+    return new Promise((resolve) => {
+      new XWiki.widgets.ConfirmationBox(
+        {
+          onYes: () => resolve(true),
+          onNo: () => resolve(false),
+        },
+        { confirmationText },
+      );
+    });
+  }
+
+  /**
+   * Display an error notification, ignoring a failure to translate its message.
+   *
+   * @param translationKey - the key of the message to display
+   */
+  private async notifyError(translationKey: string) {
+    try {
+      const message = await this.translate(translationKey);
+      new XWiki.widgets.Notification(message, "error");
+    } catch {
+      /* ignore translation failure */
     }
   }
 }

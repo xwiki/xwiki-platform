@@ -49,7 +49,7 @@ public class NotificationEmailPreferenceDocumentInitializer extends AbstractMand
      * 
      * @since 12.6
      */
-    public static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
+    public static final List<String> PARENT_PATH = List.of("XWiki", "Notifications", "Code");
 
     /**
      * The reference of the class of the object holding the notification email preferences.

@@ -87,8 +87,10 @@ public class EditModeResolver
     private Provider<ComponentManager> componentManagerProvider;
 
     /**
-     * @return the edit mode that is going to be used to edit the current document, in lower case; one of
-     *         {@link #WYSIWYG}, {@link #INPLACE}, {@link #WIKI} or {@link #INLINE}
+     * @return the edit mode that is going to be used to edit the current document, in lower case; usually one of
+     *         {@link #WYSIWYG}, {@link #INPLACE}, {@link #WIKI} or {@link #INLINE}, but it can be any value when the
+     *         edit mode is specified explicitly, e.g. through the {@code editor} request parameter (the object editor
+     *         is reached with {@code editor=object})
      */
     public String getEditMode()
     {

@@ -69,7 +69,7 @@ public abstract class AbstractStatsStoreItem implements XWikiStatsStoreItem
      * @param periodType the period type.
      * @param context the XWiki context.
      */
-    public AbstractStatsStoreItem(String name, Date periodDate, PeriodType periodType, XWikiContext context)
+    protected AbstractStatsStoreItem(String name, Date periodDate, PeriodType periodType, XWikiContext context)
     {
         this.name = name;
 

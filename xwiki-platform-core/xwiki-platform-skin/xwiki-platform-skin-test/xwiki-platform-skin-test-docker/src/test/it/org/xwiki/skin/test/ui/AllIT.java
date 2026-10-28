@@ -39,4 +39,9 @@ public class AllIT
     class NestedSXSkinIT extends SXSkinIT
     {
     }
+
+    @Nested
+    class NestedSkinExtensionIT extends SkinExtensionIT
+    {
+    }
 }

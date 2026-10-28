@@ -170,7 +170,12 @@ public class HistoryPane extends BaseElement
     {
         getDriver().makeConfirmDialogSilent(true);
         this.selectVersions(fromVersion, toVersion);
+        // We cannot count on Selenium to wait for the page to be reloaded because the action is handled with
+        // JavaScript: there's a click event listener that prevents the default behaviour, changes the form action URL
+        // and then submits the form (see history.js).
+        getDriver().addPageNotYetReloadedMarker();
         getDriver().findElementWithoutWaiting(pane, By.xpath(".//input[@name = 'deleteVersions']")).click();
+        getDriver().waitUntilPageIsReloaded();
 
         return new HistoryPane();
     }

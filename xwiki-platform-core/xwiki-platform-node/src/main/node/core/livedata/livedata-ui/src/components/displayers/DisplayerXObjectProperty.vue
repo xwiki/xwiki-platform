@@ -36,7 +36,7 @@
     <template #viewer>
       <div
         :class="['html-wrapper', isLoading ? 'disabled' : '']"
-        v-html="sanitizeHtml(value)"
+        v-html="sanitizeHtml(viewField ?? value)"
         ref="xObjectPropertyView"
       />
     </template>
@@ -52,9 +52,8 @@
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin.js";
-import { loadById } from "../../services/require.js";
-import { XWiki } from "../../services/xwiki.js";
-import { edit } from "../displayerXObjectPropertyHelper.js";
+import { edit, view } from "../displayerXObjectPropertyHelper.js";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 
 export default {
   name: "displayer-xobject-property",
@@ -71,6 +70,10 @@ export default {
   data() {
     return {
       editField: undefined,
+      // The rendered content of a row that has no entry yet, which no query result can hold.
+      viewField: undefined,
+      // Counts the calls to updateViewField, so that only the last one changes what is displayed.
+      viewFieldRequest: 0,
     };
   },
 
@@ -138,11 +141,75 @@ export default {
      * @returns a `Promise` with the content of the updated view
      */
     update(updateMethod) {
+      // A row that has no entry yet is displayed against the location it is created in.
+      // Without one there is no document to load the field from, nor to check the edit rights against.
+      if (this.entry._new && !this.entry._displayReference) {
+        throw new Error("Unknown location for the row that has no entry yet.");
+      }
       this.isLoading = true;
-      const documentName = this.logic.getEntryId(this.entry);
-      const className = this.getClassName();
-      const property = this.propertyId;
-      return updateMethod(documentName, className, property);
+      const { documentName, className, property, pendingValues } =
+        this.getFieldArguments();
+      return updateMethod(documentName, className, property, pendingValues);
+    },
+
+    /**
+     * @returns what the field of this cell is loaded from: an entry, or the row it is not yet
+     */
+    getFieldArguments() {
+      // A row that has no entry yet is displayed against the location it is created in, which
+      // stores none of its values, so they are sent along to be rendered.
+      const isDraft = !!this.entry._new;
+      return {
+        documentName: isDraft
+          ? this.entry._displayReference
+          : this.logic.getEntryId(this.entry),
+        className: this.getClassName(),
+        property: this.propertyId,
+        pendingValues: isDraft ? this.getPendingValues() : undefined,
+      };
+    },
+
+    /**
+     * @returns the values held on the row, which are the ones the wiki has no way to know about
+     */
+    getPendingValues() {
+      return Object.fromEntries(
+        Object.entries(this.entry).filter(
+          ([name]) => !name.startsWith("_") && !name.startsWith("doc."),
+        ),
+      );
+    },
+
+    /**
+     * Render the content of a cell of a row that has no entry yet. The query results only hold
+     * rendered content for the entries of the store, so there is none for such a row.
+     */
+    async updateViewField() {
+      // An earlier call that finishes later must not replace the content of this one.
+      const request = ++this.viewFieldRequest;
+      // Only a row that has no entry yet needs this: the query results already hold the rendered
+      // content of the entries. Without a location, there is no document to render the content against.
+      if (
+        !this.entry._new ||
+        !this.entry._displayReference ||
+        this.value === undefined ||
+        this.value === ""
+      ) {
+        this.viewField = undefined;
+        return;
+      }
+      const { documentName, className, property, pendingValues } =
+        this.getFieldArguments();
+      // When the rendering fails, the value held on the row is displayed as it is.
+      const viewField = await view(
+        documentName,
+        className,
+        property,
+        pendingValues,
+      ).catch(() => undefined);
+      if (request === this.viewFieldRequest) {
+        this.viewField = viewField;
+      }
     },
 
     /**
@@ -156,8 +223,15 @@ export default {
       // request forcing the confirmation so that the editor is returned.
       const loadEditField = async (extraParams) => {
         try {
-          return await this.update((documentName, className, property) =>
-            edit(documentName, className, property, extraParams),
+          return await this.update(
+            (documentName, className, property, pendingValues) =>
+              edit(
+                documentName,
+                className,
+                property,
+                extraParams,
+                pendingValues,
+              ),
           );
         } catch (error) {
           const editConfirmation = await editConfirmationPromise;
@@ -237,6 +311,14 @@ export default {
       if (!isView) {
         this.updateEdit();
       }
+    },
+    // The content of a row that has no entry yet is rendered from the values it holds, so it is
+    // refreshed whenever they change, and dropped once the entry brings its own.
+    value: {
+      immediate: true,
+      handler: function () {
+        this.updateViewField();
+      },
     },
   },
 };

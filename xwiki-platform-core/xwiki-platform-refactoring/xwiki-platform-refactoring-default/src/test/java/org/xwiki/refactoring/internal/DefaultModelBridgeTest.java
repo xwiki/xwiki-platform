@@ -37,6 +37,7 @@ import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -243,7 +244,7 @@ class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, this.xcontext);
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, true);
     }
 
@@ -257,8 +258,38 @@ class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference, true);
 
-        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, this.xcontext);
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, false);
+    }
+
+    @Test
+    void deleteByContextUser() throws Exception
+    {
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
+        when(sourceDocument.getTranslation()).thenReturn(1);
+
+        assertTrue(this.modelBridge.delete(sourceReference, false, true));
+
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, true);
+    }
+
+    @Test
+    void deleteAllTranslationsByContextUser() throws Exception
+    {
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
+
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
+        when(sourceDocument.getTranslation()).thenReturn(0);
+
+        assertTrue(this.modelBridge.delete(sourceReference, true, true));
+
+        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, false, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
+            sourceReference, false);
     }
 
     @Test
@@ -286,7 +317,7 @@ class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, true, this.xcontext);
+        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, true, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
             sourceReference, true);
     }
@@ -303,7 +334,8 @@ class DefaultModelBridgeTest
         BaseObject baseObjectMock = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
             .thenReturn(baseObjectMock);
-        when(oldDocument.getAuthors()).thenReturn(mock());
+        DocumentAuthors documentAuthorsMock = mock();
+        when(oldDocument.getAuthors()).thenReturn(documentAuthorsMock);
         when(oldDocument.isNew()).thenReturn(true);
 
         UserReference userReference = mock();
@@ -333,7 +365,8 @@ class DefaultModelBridgeTest
         BaseObject baseObjectMock2 = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
             .thenReturn(baseObjectMock2);
-        when(oldDocument.getAuthors()).thenReturn(mock());
+        DocumentAuthors documentAuthorsMock = mock();
+        when(oldDocument.getAuthors()).thenReturn(documentAuthorsMock);
         when(oldDocument.isNew()).thenReturn(false);
 
         UserReference userReference = mock();

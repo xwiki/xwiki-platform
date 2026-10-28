@@ -28,7 +28,6 @@ import java.util.Optional;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -42,13 +41,11 @@ import org.xwiki.url.URLSecurityManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.internal.filter.http.MutableHttpServletRequestFactory;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -79,8 +76,6 @@ class HTMLRequestParameterConverterTest
         HttpServletRequest servletRequest = mock();
         String domain = "domain";
         when(servletRequest.getServerName()).thenReturn(domain);
-        HttpSession httpSessionMock = mock();
-        when(servletRequest.getSession()).thenReturn(httpSessionMock);
         HttpServletResponse servletResponse = mock();
 
         String parameterName = "test";
@@ -98,7 +93,7 @@ class HTMLRequestParameterConverterTest
         when(this.htmlConverter.fromHTML(testContent, testSyntax)).thenThrow(testException);
 
         String safeURL = "https://www.xwiki.org";
-        when(this.urlSecurityManager.parseToSafeURI(startsWith(errorURL), eq(domain)))
+        when(this.urlSecurityManager.parseToSafeURI(errorURL, domain))
             .thenReturn(new URI(safeURL));
 
         Optional<ServletRequest> result = this.converter.convert(servletRequest, servletResponse);
@@ -106,9 +101,11 @@ class HTMLRequestParameterConverterTest
         assertTrue(result.isEmpty());
 
         verify(servletResponse).sendRedirect(safeURL);
+        verify(servletRequest, never()).getSession();
+        verify(servletRequest, never()).getSession(anyBoolean());
 
         assertEquals(1, this.logCapture.size());
-        ILoggingEvent logEvent = this.logCapture.getLogEvent(0);
-        assertEquals(testMessage, logEvent.getMessage());
+        assertEquals("Failed to convert the [test] request parameter. Root cause is "
+            + "[IllegalArgumentException: TestException].", this.logCapture.getMessage(0));
     }
 }

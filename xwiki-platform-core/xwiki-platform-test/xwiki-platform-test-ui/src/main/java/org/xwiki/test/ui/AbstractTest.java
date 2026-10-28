@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.ui;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,20 +29,11 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
-import org.xwiki.component.annotation.ComponentAnnotationLoader;
-import org.xwiki.component.annotation.ComponentDeclaration;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.DefaultSymbolScheme;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit4.ValidateConsoleRule;
 import org.xwiki.test.ui.browser.BrowserTestRule;
-import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.internal.TestFrameworkInitializer;
 
 import com.google.code.tempusfugit.concurrency.IntermittentTestRunner;
 
@@ -89,24 +79,7 @@ public abstract class AbstractTest
     public static void initializeSystem(PersistentTestContext context) throws Exception
     {
         AbstractTest.setContext(context);
-        BaseElement.setContext(context);
-        TestUtils.setContext(context);
-        AbstractTest.componentManager = new EmbeddableComponentManager();
-
-        // Only load the minimal number of components required for the test framework, for both performance reasons
-        // and for avoiding having to declare dependencies such as HttpServletRequest.
-        ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-        List<ComponentDeclaration> componentDeclarations = new ArrayList<>();
-        componentDeclarations.add(new ComponentDeclaration(DefaultStringEntityReferenceResolver.class.getName()));
-        componentDeclarations.add(new ComponentDeclaration(DefaultStringEntityReferenceSerializer.class.getName()));
-        componentDeclarations.add(new ComponentDeclaration(RelativeStringEntityReferenceResolver.class.getName()));
-        componentDeclarations.add(new ComponentDeclaration(DefaultEntityReferenceProvider.class.getName()));
-        componentDeclarations.add(new ComponentDeclaration(DefaultModelConfiguration.class.getName()));
-        componentDeclarations.add(new ComponentDeclaration(DefaultSymbolScheme.class.getName()));
-        componentDeclarations.add(new ComponentDeclaration(LocalStringEntityReferenceSerializer.class.getName()));
-        loader.initialize(AbstractTest.componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);
-
-        TestUtils.initializeComponent(AbstractTest.componentManager);
+        AbstractTest.componentManager = TestFrameworkInitializer.initialize(context);
     }
 
     public static void setContext(PersistentTestContext testContext)

@@ -70,7 +70,7 @@ require(['jquery'], function($) {
         maybeNextStatus();
       }
     }).catch(() => {
-      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('flavor.picker.ajaxError'))", 'error');
+      XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('flavor.picker.ajaxError'))", 'error');
     });
   }
 
@@ -94,7 +94,7 @@ require(['jquery'], function($) {
       // Update event listeners
       initPickerResults($('.xwiki-flavor-picker'));
     }).catch(() => {
-      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('flavor.picker.ajaxError'))", 'error');
+      XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('flavor.picker.ajaxError'))", 'error');
     });
   }
 

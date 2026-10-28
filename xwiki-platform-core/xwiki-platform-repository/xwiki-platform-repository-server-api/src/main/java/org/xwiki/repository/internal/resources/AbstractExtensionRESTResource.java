@@ -523,6 +523,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             restRepository.setId(descriptor.getId());
             restRepository.setType(descriptor.getType());
             restRepository.setUri(descriptor.getURI().toString());
+            for (Map.Entry<String, String> entry : descriptor.getProperties().entrySet()) {
+                Property restProperty = this.extensionObjectFactory.createProperty();
+                restProperty.setKey(entry.getKey());
+                restProperty.setStringValue(entry.getValue());
+                restRepository.getProperties().add(restProperty);
+            }
 
             return restRepository;
         }

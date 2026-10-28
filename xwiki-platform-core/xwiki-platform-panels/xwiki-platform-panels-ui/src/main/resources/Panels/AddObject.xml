@@ -122,10 +122,10 @@
       <content>{{velocity}}
 #largepanelheader($services.localization.render('addobject'))
 {{html}}
-&lt;form id="objectadd" method="post" action="$doc.getURL('objectadd')" onsubmit="cancelCancelEdit()"&gt;
+&lt;form id="objectadd" method="post" action="$escapetool.xml($doc.getURL('objectadd'))" onsubmit="cancelCancelEdit()"&gt;
 &lt;p&gt;
 &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-&lt;input type="hidden" name="xredirect" value="$doc.getURL('edit', 'editor=object')" /&gt;
+&lt;input type="hidden" name="xredirect" value="$escapetool.xml($doc.getURL('edit', 'editor=object'))" /&gt;
 &lt;select name="classname" size="1"&gt;
 &lt;option value="---"&gt;$services.localization.render('selectclass')&lt;/option&gt;
 ##
@@ -142,10 +142,10 @@
     #else
       #set($optGroupOpen = true)
     #end
-    &lt;optgroup label="$classdoc.space"&gt;
+    &lt;optgroup label="$escapetool.xml($classdoc.space)"&gt;
     #set($prevSpace = $classdoc.space)
   #end
-  &lt;option value="$classdoc.fullName"&gt;$classdoc.documentReference.name&lt;/option&gt;
+  &lt;option value="$escapetool.xml($classdoc.fullName)"&gt;$escapetool.xml($classdoc.documentReference.name)&lt;/option&gt;
 #end
 #if($optGroupOpen)
   &lt;/optgroup&gt;

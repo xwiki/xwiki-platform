@@ -51,6 +51,7 @@ class ResourceReferenceHandlerTest
         public void handle(ResourceReference reference, ResourceReferenceHandlerChain chain) throws
             ResourceReferenceHandlerException
         {
+            // Does nothing: this test handler only needs to declare a priority and a supported resource type.
         }
     }
 

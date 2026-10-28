@@ -33,6 +33,8 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
  * content of the {@code repository/maven} resources (see {@link RepositoryUtils}).
  *
  * @version $Id$
+ * @since 17.10.14
+ * @since 18.4.7
  * @since 18.7.0RC1
  */
 public final class TestExtensionRepository

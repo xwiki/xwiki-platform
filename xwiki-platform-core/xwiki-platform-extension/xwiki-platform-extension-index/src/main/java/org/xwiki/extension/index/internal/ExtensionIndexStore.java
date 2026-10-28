@@ -44,10 +44,12 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.SolrParams;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
@@ -202,6 +204,8 @@ public class ExtensionIndexStore implements Initializable, Disposable
 
     private int documentsToStore;
 
+    private volatile boolean disposed;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -221,7 +225,20 @@ public class ExtensionIndexStore implements Initializable, Disposable
     @Override
     public void dispose() throws ComponentLifecycleException
     {
+        this.disposed = true;
+
         this.cache.dispose();
+    }
+
+    /**
+     * @return {@code true} if the store was disposed (e.g. because XWiki is stopping) and cannot be used anymore
+     * @since 17.10.15
+     * @since 18.4.8
+     * @since 18.10.0RC1
+     */
+    public boolean isDisposed()
+    {
+        return this.disposed;
     }
 
     /**
@@ -259,6 +276,8 @@ public class ExtensionIndexStore implements Initializable, Disposable
     }
 
     /**
+     * The document is looked up with a real-time get, so that a document added but not yet committed is found.
+     *
      * @param extensionId the extension id and version
      * @return true if a document corresponding to the passed extension can be found in the index
      * @throws SolrServerException
@@ -266,31 +285,8 @@ public class ExtensionIndexStore implements Initializable, Disposable
      */
     public boolean exists(ExtensionId extensionId) throws SolrServerException, IOException
     {
-        return exists(extensionId, null);
-    }
-
-    /**
-     * @param extensionId the extension id and version
-     * @param local true if it's the searched extension is a local extension
-     * @return true if a document corresponding to the passed extension can be found in the index
-     * @throws SolrServerException
-     * @throws IOException
-     */
-    public boolean exists(ExtensionId extensionId, Boolean local) throws SolrServerException, IOException
-    {
-        SolrQuery solrQuery = new SolrQuery();
-
-        solrQuery.addFilterQuery(AbstractSolrCoreInitializer.SOLR_FIELD_ID + ':'
-            + this.utils.toCompleteFilterQueryString(this.extensionIndexSolrUtil.toSolrId(extensionId)));
-
-        if (local != null) {
-            solrQuery.addFilterQuery(Extension.FIELD_REPOSITORY + ":local");
-        }
-
-        // We don't want to actually get the document, we just want to know if one exist
-        solrQuery.setRows(0);
-
-        return this.client.query(solrQuery).getResults().getNumFound() > 0;
+        return this.client.getById(this.extensionIndexSolrUtil.toSolrId(extensionId),
+            new SolrQuery().setFields(AbstractSolrCoreInitializer.SOLR_FIELD_ID)) != null;
     }
 
     /**
@@ -362,6 +358,10 @@ public class ExtensionIndexStore implements Initializable, Disposable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SOLR_FIELD_EXTENSIONID, extensionId.getId(), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Extension.FIELD_VERSION,
             extensionId.getVersion().getValue(), doc);
+
+        // The analyzed extension is not necessarily indexed yet (for example an extension coming from a non searchable
+        // repository like Maven Central), in which case this update creates its document, so set its installed state.
+        this.extensionIndexSolrUtil.updateInstalledState(extensionId, doc);
 
         if (!result.getSecurityVulnerabilities().isEmpty()) {
             this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_MAX_CVSS, result.getMaxCVSS(), doc);
@@ -464,8 +464,8 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
-            this.extensionIndexSolrUtil.toSolrId(extensionId), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, this.extensionIndexSolrUtil.toSolrId(extensionId),
+            document);
 
         // Update installed
         this.utils.setAtomic(
@@ -484,7 +484,9 @@ public class ExtensionIndexStore implements Initializable, Disposable
             }
         }
 
-        add(document);
+        // An installed extension is not necessarily indexed (for example an extension coming from a non searchable
+        // repository like Maven Central). The installed state is set when an extension is added to the index.
+        updateIfExists(document);
     }
 
     /**
@@ -500,12 +502,12 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
-            this.extensionIndexSolrUtil.toSolrId(extensionId), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, this.extensionIndexSolrUtil.toSolrId(extensionId),
+            document);
 
         updateCompatible(document, namespace, compatible, incompatible);
 
-        add(document);
+        updateIfExists(document);
     }
 
     private void updateCompatible(SolrInputDocument document, String namespace, Boolean compatible,
@@ -642,6 +644,33 @@ public class ExtensionIndexStore implements Initializable, Disposable
         // Add the document to the Solr queue
         this.client.add(document);
 
+        return added(document);
+    }
+
+    /**
+     * Apply an atomic update only if the document already exists in the index (committed or not).
+     * <p>
+     * Solr creates the document when an atomic update targets a document which does not exist, and such a document
+     * would only contain the updated fields (no extension id, version, repository, etc.). A {@code _version_} of 1
+     * requires the document to exist, and disabling the failure on version conflicts makes Solr silently skip the
+     * update when it does not.
+     */
+    private boolean updateIfExists(SolrInputDocument document) throws SolrServerException, IOException
+    {
+        document.setField(CommonParams.VERSION_FIELD, 1L);
+
+        UpdateRequest request = new UpdateRequest();
+        request.add(document);
+        request.setParam(CommonParams.FAIL_ON_VERSION_CONFLICTS, Boolean.FALSE.toString());
+
+        // Add the document to the Solr queue
+        request.process(this.client);
+
+        return added(document);
+    }
+
+    private boolean added(SolrInputDocument document) throws SolrServerException, IOException
+    {
         // Remember the modified entry
         addMofiedId((String) document.getFieldValue(AbstractSolrCoreInitializer.SOLR_FIELD_ID));
 

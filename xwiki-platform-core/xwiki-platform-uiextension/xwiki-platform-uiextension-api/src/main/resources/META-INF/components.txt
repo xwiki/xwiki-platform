@@ -1,4 +1,5 @@
 org.xwiki.uiextension.internal.DefaultUIExtensionManager
+org.xwiki.uiextension.internal.UIExtensionRenderer
 org.xwiki.uiextension.internal.filter.ExcludeFilter
 org.xwiki.uiextension.internal.filter.SelectFilter
 org.xwiki.uiextension.internal.filter.SortByCustomOrderFilter

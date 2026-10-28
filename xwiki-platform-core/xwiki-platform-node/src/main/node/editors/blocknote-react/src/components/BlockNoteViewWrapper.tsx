@@ -19,6 +19,7 @@
  */
 
 import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
+import { centerOnFirstLine } from "./SideMenu/centerOnFirstLine";
 import { FilePanel } from "./files/FilePanel";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import {
@@ -29,6 +30,7 @@ import {
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import { DepsContainerContext, MacrosContext } from "../contexts";
+import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -37,6 +39,7 @@ import {
   FormattingToolbar,
   FormattingToolbarController,
   LinkToolbarController,
+  SideMenuController,
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
@@ -210,11 +213,30 @@ type BlockNoteViewWrapperProps = {
   syntax: SyntaxConfig;
 
   /**
+   * The CSS classes (space separated) to add to the code blocks, e.g. to style them like the code snippets displayed in
+   * view mode.
+   *
+   * @since 18.9.0RC1
+   * @beta
+   */
+  codeBlockClassName?: string;
+
+  /**
    * Make the wrapper forward some data through references
    */
   refs?: {
     setEditor?: (editor: EditorType) => void;
   };
+};
+
+/**
+ * Replaces the middleware BlockNote uses to center the side menu vertically on the hovered block, which offsets the
+ * menu by a fixed amount per block type that only matches BlockNote's own styling.
+ */
+const SIDE_MENU_FLOATING_OPTIONS = {
+  useFloatingOptions: {
+    middleware: [centerOnFirstLine()],
+  },
 };
 
 /**
@@ -235,6 +257,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   overrides,
   label,
   syntax,
+  codeBlockClassName,
   refs: { setEditor } = {},
   // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
@@ -260,7 +283,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     }
   }
 
-  const schema = createBlockNoteSchema(builtMacros);
+  const schema = createBlockNoteSchema(builtMacros, { codeBlockClassName });
 
   // When realtime collaboration is enabled, the initial content is set through the shared document. Moreover, BlockNote
   // doesn't support empty content, as in an empty array of blocks, so instead of passing an empty array we don't pass
@@ -289,6 +312,8 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     initialContent,
     // Editor's schema, with custom blocks definition
     schema,
+    // Highlight the code blocks based on their language.
+    extensions: [...(blockNoteOptions?.extensions ?? []), syntaxHighlighter],
     // Use the provided language for the dictionary
     dictionary: createDictionary(lang),
     // The default drop cursor only shows up above and below blocks - we replace
@@ -353,20 +378,27 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           linkToolbar={false}
           filePanel={false}
           slashMenu={false}
+          sideMenu={false}
           onChange={(editor) => onChange?.(editor)}
         >
+          {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
+          <SideMenuController floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS} />
+
           <SuggestionMenuController
             triggerCharacter={"/"}
             getItems={async (query) =>
-              querySuggestionsMenuItems(
+              querySuggestionsMenuItems({
                 editor,
                 query,
-                builtMacros,
+                macros: builtMacros,
                 syntax,
                 lang,
                 t,
-                macros ? macros.ctx.openInsertionEditor : undefined,
-              )
+                linkEditionHandler,
+                openMacroInsertionEditor: macros
+                  ? macros.ctx.openInsertionEditor
+                  : undefined,
+              })
             }
           />
 

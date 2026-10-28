@@ -20,6 +20,7 @@
 package org.xwiki.wysiwyg.test.po;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -34,6 +35,31 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class MacroDialogSelectModal extends BaseElement
 {
+    private final Consumer<Runnable> submitHandler;
+
+    /**
+     * Creates a page object for a macro selection modal whose edit modal only clicks its submit button.
+     */
+    public MacroDialogSelectModal()
+    {
+        this(Runnable::run);
+    }
+
+    /**
+     * Creates a page object for a macro selection modal whose edit modal lets the editor that opened it wait for the
+     * result of the submission.
+     *
+     * @param submitHandler passed to the macro edit modal, see
+     *            {@link MacroDialogEditModal#MacroDialogEditModal(Consumer)}
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public MacroDialogSelectModal(Consumer<Runnable> submitHandler)
+    {
+        this.submitHandler = submitHandler;
+    }
+
     /**
      * Wait until the macro selection modal is loaded.
      *
@@ -82,7 +108,7 @@ public class MacroDialogSelectModal extends BaseElement
     public MacroDialogEditModal clickSelect()
     {
         getDriver().findElement(By.cssSelector("[class*=-selector-modal] .modal-footer .btn-primary")).click();
-        return new MacroDialogEditModal().waitUntilReady();
+        return new MacroDialogEditModal(this.submitHandler).waitUntilReady();
     }
 
     private long countDisplayedMacros()

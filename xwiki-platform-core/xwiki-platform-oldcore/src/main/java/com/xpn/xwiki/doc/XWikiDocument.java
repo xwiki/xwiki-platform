@@ -73,6 +73,7 @@ import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.DocumentResult;
 import org.dom4j.io.OutputFormat;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -935,13 +936,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         return this.uidStringEntityReferenceSerializer;
     }
 
-    private JobProgressManager getProgress()
+    private @NonNull JobProgressManager getProgress()
     {
         if (this.progress == null) {
             this.progress = Utils.getComponent(JobProgressManager.class);
         }
 
-        return this.progress;
+        return Objects.requireNonNull(this.progress);
     }
 
     private VelocityContextFactory getVelocityContextFactory()
@@ -1386,7 +1387,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             getProgress().startStep(getDocumentReference(), "document.progress.render.translatedcontent",
                 "Get translated content");
 
-            XWikiContext xcontext = getXWikiContext();
+            // There's nothing to display without a context: the translated content, the rendering cache and
+            // the display itself below are all resolved through it.
+            XWikiContext xcontext = Objects.requireNonNull(getXWikiContext());
 
             XWikiDocument tdoc = translate ? getTranslatedDocument(xcontext) : this;
             String translatedContent = tdoc.getContent();
@@ -2916,15 +2919,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * @deprecated use {@link #getXObject()} instead
-     */
-    @Deprecated(since = "2.2M1")
-    public BaseObject getxWikiObject()
-    {
-        return getXObject(getDocumentReference());
-    }
-
-    /**
      * @since 2.2M1
      */
     public List<BaseClass> getXClasses(XWikiContext context)
@@ -3465,15 +3459,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * @deprecated use {@link #mergeXClass(XWikiDocument)} instead
-     */
-    @Deprecated(since = "2.2M1")
-    public void mergexWikiClass(XWikiDocument templatedoc)
-    {
-        mergeXClass(templatedoc);
-    }
-
-    /**
      * @since 2.2M1
      */
     public void mergeXObjects(XWikiDocument templateDoc)
@@ -3495,15 +3480,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 }
             }
         }
-    }
-
-    /**
-     * @deprecated use {@link #mergeXObjects(XWikiDocument)} instead
-     */
-    @Deprecated(since = "2.2M1")
-    public void mergexWikiObjects(XWikiDocument templatedoc)
-    {
-        mergeXObjects(templatedoc);
     }
 
     /**
@@ -7774,10 +7750,40 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntax() need to create a
         // XWikiDocument object to get preferences from wiki preferences pages and would thus generate an infinite loop
         if (isNew() && this.content.syntax == null) {
-            this.content.syntax = getDefaultDocumentSyntax();
+            this.content.syntax = getNewDocumentSyntax();
         }
 
         return this.content.syntax;
+    }
+
+    /**
+     * A new translation is displayed with its own syntax, so it takes the syntax of the document it translates: its
+     * content usually starts as a copy of the original content. This matters for the code that creates a translation
+     * without setting its syntax (in-place editing, REST, scripts), which would otherwise save it with the default
+     * syntax of the wiki.
+     *
+     * @return the syntax to give to a new document that has none
+     */
+    private Syntax getNewDocumentSyntax()
+    {
+        if (!Locale.ROOT.equals(getLocale()) && getDocumentReference() != null) {
+            XWikiContext xcontext = getXWikiContext();
+            if (xcontext != null && xcontext.getWiki() != null) {
+                try {
+                    XWikiDocument defaultLocaleDocument =
+                        xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
+                    if (!defaultLocaleDocument.isNew()) {
+                        return defaultLocaleDocument.getSyntax();
+                    }
+                } catch (XWikiException e) {
+                    LOGGER.warn("Failed to load the original document of the new translation [{}] to get its syntax,"
+                        + " using the default syntax instead. Root cause is [{}].", getDocumentReferenceWithLocale(),
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+        }
+
+        return getDefaultDocumentSyntax();
     }
 
     /**
@@ -9005,6 +9011,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         Execution execution = Utils.getComponent(Execution.class);
         execution.popContext();
 
+        // The Execution Context is popped first so that backupContext()'s push is undone whatever happens next.
+        // Everything restored below is written to the XWiki Context, which backupContext() also requires.
+        Objects.requireNonNull(context);
+
         // Restore the current document on the XWiki Context.
         context.setDoc((XWikiDocument) backup.get("doc"));
 
@@ -9537,7 +9547,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             modified = true;
         }
 
-        if (isHidden() != document.isHidden()) {
+        if (!Objects.equals(isHidden(), document.isHidden())) {
             setHidden(document.isHidden());
             modified = true;
         }
@@ -9601,6 +9611,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             for (XWikiAttachment attachment : new ArrayList<XWikiAttachment>(getAttachmentList())) {
                 if (document.getAttachment(attachment.getFilename()) == null) {
                     removeAttachment(attachment);
+                    modified = true;
                 }
             }
         }
@@ -9609,8 +9620,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             XWikiAttachment originalAttachment = getAttachment(attachment.getFilename());
             if (originalAttachment == null) {
                 addAttachment(attachment);
+                modified = true;
             } else {
-                originalAttachment.apply(attachment);
+                modified |= originalAttachment.apply(attachment);
             }
         }
 
@@ -9639,18 +9651,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         return null;
-    }
-
-    /**
-     * Compute and return the maximum authorized length for the full name (i.e. the serialized reference of the
-     * document) based on the current store limitation.
-     *
-     * @return the maximum authorized length for a document full name.
-     * @since 11.4RC1
-     */
-    public int getLocalReferenceMaxLength()
-    {
-        return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");
     }
 
     @Override

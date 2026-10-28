@@ -173,16 +173,13 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                     modified = true;
                 }
             } else {
-                ResourceReference reference;
-                if (matchingBlock instanceof LinkBlock linkBlock) {
-                    reference = linkBlock.getReference();
-                } else if (matchingBlock instanceof ImageBlock imageBlock) {
-                    reference = imageBlock.getReference();
-                } else {
-                    throw new IllegalArgumentException(String.format(
+                ResourceReference reference = switch (matchingBlock) {
+                    case LinkBlock linkBlock -> linkBlock.getReference();
+                    case ImageBlock imageBlock -> imageBlock.getReference();
+                    default -> throw new IllegalArgumentException(String.format(
                         "Only LinkBlock and ImageBlock can be processed and given class was: [%s]",
                         matchingBlock.getClass().getName()));
-                }
+                };
                 modified |= this.renameResourceReference(reference, allowedResourceTypes, renameResourceLambda);
             }
         }

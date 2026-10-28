@@ -21,8 +21,8 @@ package org.xwiki.user.rest.test.docker;
 
 import javax.xml.bind.JAXBContext;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -57,13 +57,13 @@ class CurrentUserIT
     void testUnauthenticatedUser(TestUtils setup) throws Exception
     {
         setup.forceGuestUser();
-        GetMethod get = setup.rest().executeGet(CurrentUserResource.class, "xwiki");
+        CloseableHttpResponse get = setup.rest().executeGet(CurrentUserResource.class, "xwiki");
 
         try {
-            assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, get.getCode());
 
             JAXBContext userContext = JAXBContext.newInstance(User.class);
-            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getResponseBodyAsStream());
+            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getEntity().getContent());
 
             assertEquals("XWiki.XWikiGuest", parsedUser.getId());
             assertEquals("Unknown User", parsedUser.getDisplayName());
@@ -73,7 +73,7 @@ class CurrentUserIT
                     this.baseURL, parsedUser.getAvatarUrl()));
             assertTrue(parsedUser.isGlobal(), "User should be global.");
         } finally {
-            get.releaseConnection();
+            get.close();
         }
     }
 
@@ -83,13 +83,13 @@ class CurrentUserIT
     {
         setup.loginAsSuperAdmin();
 
-        GetMethod get = setup.rest().executeGet(CurrentUserResource.class, "xwiki");
+        CloseableHttpResponse get = setup.rest().executeGet(CurrentUserResource.class, "xwiki");
 
         try {
-            assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, get.getCode());
 
             JAXBContext userContext = JAXBContext.newInstance(User.class);
-            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getResponseBodyAsStream());
+            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getEntity().getContent());
 
             assertEquals("XWiki.superadmin", parsedUser.getId());
             assertEquals("superadmin", parsedUser.getDisplayName());
@@ -99,7 +99,7 @@ class CurrentUserIT
                     this.baseURL, parsedUser.getAvatarUrl()));
             assertTrue(parsedUser.isGlobal(), "User should be global.");
         } finally {
-            get.releaseConnection();
+            get.close();
         }
     }
 
@@ -112,13 +112,13 @@ class CurrentUserIT
 
         setup.createUserAndLogin(user, password);
 
-        GetMethod get = setup.rest().executeGet(CurrentUserResource.class, "xwiki");
+        CloseableHttpResponse get = setup.rest().executeGet(CurrentUserResource.class, "xwiki");
 
         try {
-            assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+            assertEquals(HttpStatus.SC_OK, get.getCode());
 
             JAXBContext userContext = JAXBContext.newInstance(User.class);
-            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getResponseBodyAsStream());
+            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getEntity().getContent());
 
             assertEquals("xwiki:XWiki.user", parsedUser.getId());
             assertEquals("user", parsedUser.getDisplayName());
@@ -128,7 +128,7 @@ class CurrentUserIT
                     this.baseURL, parsedUser.getAvatarUrl()));
             assertTrue(parsedUser.isGlobal(), "User should be global.");
         } finally {
-            get.releaseConnection();
+            get.close();
         }
 
         // Cleaning.

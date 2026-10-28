@@ -26,15 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.SpaceReferenceResolver;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiException;
@@ -49,46 +44,20 @@ import com.xpn.xwiki.XWikiException;
 @Named("uuid")
 @Singleton
 @Unstable
-public class UUIDLiveTableNewRowNamingStrategy implements LiveTableNewRowNamingStrategy
+public class UUIDLiveTableNewRowNamingStrategy extends AbstractLocationLiveTableNewRowNamingStrategy
 {
-    private static final String NEW_ROW_LOCATION_PARAMETER_KEY = "newRowLocation";
-
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    @Inject
-    @Named("current")
-    private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
-
     @Inject
     private ModelBridge modelBridge;
 
-    @Inject
-    private ContextualAuthorizationManager authorization;
-
     @Override
-    public DocumentReference generate(Map<String, Object> parameters) throws LiveDataException, XWikiException
+    public DocumentReference generate(Map<String, Object> parameters, Map<String, Object> entryValues)
+        throws LiveDataException, XWikiException
     {
-        String location = (String) parameters.get(NEW_ROW_LOCATION_PARAMETER_KEY);
-        if (StringUtils.isBlank(location)) {
-            throw new LiveDataException("Missing location for row creation.");
-        }
         DocumentReference candidate =
-            this.currentDocumentReferenceResolver.resolve(String.format("%s.%s", location, UUID.randomUUID()));
+            new DocumentReference(UUID.randomUUID().toString(), getRequiredLocation(parameters));
         if (this.modelBridge.exists(candidate)) {
             throw new LiveDataException(String.format("The page [%s] already exists.", candidate));
         }
         return candidate;
-    }
-
-    @Override
-    public boolean isCreationAllowed(Map<String, Object> parameters)
-    {
-        String location = (String) parameters.get(NEW_ROW_LOCATION_PARAMETER_KEY);
-        if (StringUtils.isBlank(location)) {
-            return false;
-        }
-        return this.authorization.hasAccess(Right.EDIT, this.currentSpaceReferenceResolver.resolve(location));
     }
 }

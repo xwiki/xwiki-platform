@@ -30,9 +30,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.display.internal.DisplayConfiguration;
+import org.xwiki.display.internal.DocumentDisplayer;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
@@ -53,6 +57,8 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -82,9 +88,32 @@ class SyndEntryDocumentSourceTest
 
     public static final String ARTICLE_CLASS_NAME = "XWiki.ArticleClass";
 
+    private static final String WIKI_NAME = "xwiki";
+
+    private static final String XWIKI_SPACE = "XWiki";
+
+    private static final String CONTENT = "Once upon a <i>time</i> there was..";
+
+    private static final String CONTENT_MAPPING = ARTICLE_CLASS_NAME + "_content";
+
+    private static final String CAPTURING_DISPLAYER_HINT = "capturing";
+
     protected SyndEntryDocumentSource source;
 
     protected XWikiDocument doc;
+
+    private DisplayConfiguration displayConfiguration;
+
+    /**
+     * What a document displayer was asked to display.
+     *
+     * @param content the displayed content
+     * @param restricted whether the content was displayed in a restricted transformation context
+     * @param secureDocument the secure document of the context when the content was displayed
+     */
+    private record CapturedDisplay(String content, boolean restricted, XWikiDocument secureDocument)
+    {
+    }
 
     @BeforeEach
     protected void beforeEach() throws Exception
@@ -105,7 +134,8 @@ class SyndEntryDocumentSourceTest
 
         this.doc.createNewObject(ARTICLE_CLASS_NAME, this.oldcore.getXWikiContext());
         this.doc.setStringValue(ARTICLE_CLASS_NAME, "title", "Old story");
-        this.doc.setStringValue(ARTICLE_CLASS_NAME, "content", "Once upon a <i>time</i> there was..");
+        this.doc.setStringValue(ARTICLE_CLASS_NAME, "content", CONTENT);
+        this.doc.setStringValue(ARTICLE_CLASS_NAME, "restrictedContent", "Restricted <i>content</i>..");
         List<String> categories = new ArrayList<String>();
         categories.add("News");
         categories.add("Information");
@@ -130,10 +160,9 @@ class SyndEntryDocumentSourceTest
         this.oldcore.getMocker().unregisterComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
 
         // Setup display configuration.
-        DisplayConfiguration mockDisplayConfiguration =
-            this.oldcore.getMocker().registerMockComponent(DisplayConfiguration.class);
-        when(mockDisplayConfiguration.getDocumentDisplayerHint()).thenReturn("default");
-        when(mockDisplayConfiguration.getTitleHeadingDepth()).thenReturn(2);
+        this.displayConfiguration = this.oldcore.getMocker().registerMockComponent(DisplayConfiguration.class);
+        when(this.displayConfiguration.getDocumentDisplayerHint()).thenReturn("default");
+        when(this.displayConfiguration.getTitleHeadingDepth()).thenReturn(2);
     }
 
     private void mockUp() throws Exception
@@ -172,6 +201,7 @@ class SyndEntryDocumentSourceTest
 
         needsUpdate |= bclass.addTextField("title", "Title", 64);
         needsUpdate |= bclass.addTextAreaField("content", "Content", 45, 4);
+        needsUpdate |= bclass.addTextAreaField("restrictedContent", "Restricted Content", 45, 4, true);
         needsUpdate |= bclass.addTextField("category", "Category", 64);
 
         if (needsUpdate) {
@@ -323,6 +353,69 @@ class SyndEntryDocumentSourceTest
         assertTrue(descriptionLength <= maxLength, PARAMETERS_IGNORED);
     }
 
+    /**
+     * Tests that the description is produced by the standard object property display, so that the property content is
+     * executed with the rights of the effective metadata author of the document holding it, and not with the rights of
+     * the document asking for the feed nor with the rights of the content author.
+     */
+    @Test
+    void descriptionIsExecutedWithTheEffectiveMetadataAuthorOfTheSourcedDocument() throws Exception
+    {
+        DocumentReference contentAuthor = new DocumentReference(WIKI_NAME, XWIKI_SPACE, "ContentAuthor");
+        DocumentReference metadataAuthor = new DocumentReference(WIKI_NAME, XWIKI_SPACE, "MetadataAuthor");
+
+        this.doc.setContentAuthorReference(contentAuthor);
+        this.doc.setAuthorReference(metadataAuthor);
+        setFeedDocument();
+        List<CapturedDisplay> displays = captureDisplays();
+
+        sourceDescription(this.doc, CONTENT_MAPPING);
+
+        CapturedDisplay display = getCapturedDisplay(displays, CONTENT);
+        assertFalse(display.restricted());
+        assertEquals(metadataAuthor, display.secureDocument().getContentAuthorReference());
+    }
+
+    /**
+     * Tests that a document modified through the public API before being given to the feed is displayed as modified,
+     * with the rights of the script author that modified it, and not with the rights of the author of the stored
+     * document.
+     */
+    @Test
+    void descriptionOfADocumentModifiedThroughTheAPIIsExecutedWithTheRightsOfTheScriptAuthor() throws Exception
+    {
+        XWikiContext context = this.oldcore.getXWikiContext();
+        DocumentReference metadataAuthor = new DocumentReference(WIKI_NAME, XWIKI_SPACE, "MetadataAuthor");
+        this.doc.setContentAuthorReference(metadataAuthor);
+        this.doc.setAuthorReference(metadataAuthor);
+        setFeedDocument();
+        List<CapturedDisplay> displays = captureDisplays();
+
+        Document document = this.doc.newDocument(context);
+        document.getObject(ARTICLE_CLASS_NAME).set("content", "Modified content");
+
+        sourceDescription(document, CONTENT_MAPPING);
+
+        CapturedDisplay display = getCapturedDisplay(displays, "Modified content");
+        assertNotEquals(metadataAuthor, display.secureDocument().getContentAuthorReference());
+        assertEquals(context.getAuthorReference(), display.secureDocument().getContentAuthorReference());
+    }
+
+    /**
+     * Tests that the restricted flag of the displayed property is honoured, so that the feed cannot be used to execute
+     * a property that is never meant to be executed, such as a comment.
+     */
+    @Test
+    void descriptionOfARestrictedPropertyIsRenderedRestricted() throws Exception
+    {
+        setFeedDocument();
+        List<CapturedDisplay> displays = captureDisplays();
+
+        sourceDescription(this.doc, ARTICLE_CLASS_NAME + "_restrictedContent");
+
+        assertTrue(getCapturedDisplay(displays, "Restricted <i>content</i>..").restricted());
+    }
+
     @Test
     void testPreviewContentEncoding()
     {
@@ -336,5 +429,67 @@ class SyndEntryDocumentSourceTest
         String previewExpected = "Test Text ê";
         String transformedPlain = SyndEntryDocumentSource.getPlainPreview(plainSnippet, 12);
         assertEquals(previewExpected, transformedPlain);
+    }
+
+    /**
+     * Tests that the HTML macro that wraps the property display when the feed is built from wiki content is removed,
+     * since a feed entry description holds HTML and not wiki syntax.
+     */
+    @Test
+    void descriptionIsNotWrappedInAnHTMLMacroWhenBuiltFromWikiContent() throws Exception
+    {
+        setFeedDocument();
+        // Make display() believe its output is inserted in wiki content.
+        this.oldcore.getXWikiContext().put("isInRenderingEngine", true);
+
+        SyndEntry entry = sourceDescription(this.doc, CONTENT_MAPPING);
+
+        assertEquals("<p>Once upon a &lt;i&gt;time&lt;/i&gt; there was..</p>",
+            entry.getDescription().getValue().trim());
+    }
+
+    /**
+     * Makes the feed be built from a different document than the sourced one.
+     */
+    private void setFeedDocument()
+    {
+        XWikiDocument feedDocument = new XWikiDocument(new DocumentReference(WIKI_NAME, "Feeds", "WebHome"));
+        feedDocument.setSyntax(Syntax.XWIKI_2_1);
+        this.oldcore.getXWikiContext().setDoc(feedDocument);
+    }
+
+    /**
+     * Replaces the document displayer by one that records what it is asked to display, instead of executing it.
+     *
+     * @return the list the displays are recorded in
+     */
+    private List<CapturedDisplay> captureDisplays() throws Exception
+    {
+        List<CapturedDisplay> displays = new ArrayList<>();
+        DocumentDisplayer displayer =
+            this.oldcore.getMocker().registerMockComponent(DocumentDisplayer.class, CAPTURING_DISPLAYER_HINT);
+        when(displayer.display(any(), any())).then(invocation -> {
+            DocumentModelBridge document = invocation.getArgument(0);
+            DocumentDisplayerParameters parameters = invocation.getArgument(1);
+            displays.add(new CapturedDisplay(document.getContent(), parameters.isTransformationContextRestricted(),
+                this.oldcore.getXWikiContext().getSecureDocument()));
+            return new XDOM(List.of());
+        });
+        when(this.displayConfiguration.getDocumentDisplayerHint()).thenReturn(CAPTURING_DISPLAYER_HINT);
+        return displays;
+    }
+
+    private CapturedDisplay getCapturedDisplay(List<CapturedDisplay> displays, String content)
+    {
+        return displays.stream().filter(display -> content.equals(display.content())).findFirst()
+            .orElseThrow(() -> new AssertionError("No display of [" + content + "] in " + displays));
+    }
+
+    private SyndEntry sourceDescription(Object document, String descriptionMapping) throws XWikiException
+    {
+        SyndEntry entry = new SyndEntryImpl();
+        this.source.source(entry, document, Map.of(SyndEntryDocumentSource.FIELD_DESCRIPTION, descriptionMapping),
+            this.oldcore.getXWikiContext());
+        return entry;
     }
 }

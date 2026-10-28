@@ -19,6 +19,8 @@
  */
 package org.xwiki.administration.test.ui;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.administration.test.po.UsersAdministrationSectionPage;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -46,8 +49,10 @@ import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -139,6 +144,8 @@ class UsersGroupsRightsManagementIT
      * <li>Validate adding sub-groups</li>
      * <li>Validate removing user members.</li>
      * <li>Validate removing sub-groups.</li>
+     * <li>Validate that the alias of a member is displayed as text.</li>
+     * <li>Validate that the user picker doesn't suggest disabled users.</li>
      * </ul>
      */
     @Test
@@ -244,6 +251,37 @@ class UsersGroupsRightsManagementIT
         // Close the modal and check the updated member count.
         devsGroupModal.close();
         assertEquals("2", groupsPage.getMemberCount(devs));
+
+        //
+        // Check the display of the alias of a member.
+        //
+
+        // The alias is only displayed for a member whose display name differs from its page name, so this member
+        // needs a first and a last name.
+        String carol = String.format("%s_%s", testName, "Carol");
+        setup.rest().deletePage("XWiki", carol);
+        setup.createUser(carol, carol, "", "first_name", "Carol", "last_name", "Smith");
+
+        // Both users match the text typed later in the user picker, but only the enabled one should be suggested.
+        String erin = String.format("%s_%s", testName, "Erin");
+        String erik = String.format("%s_%s", testName, "Erik");
+        setup.rest().deletePage("XWiki", erin);
+        setup.rest().deletePage("XWiki", erik);
+        setup.createUser(erin, erin, "", "first_name", "", "last_name", "");
+        setup.createUser(erik, erik, "", "first_name", "", "last_name", "", "active", "0");
+
+        // Verify that the alias is part of the text of the member cell, separator space and parentheses included.
+        groupsPage = GroupsPage.gotoPage();
+        devsGroupModal = groupsPage.clickEditGroup(devs);
+        devsGroupModal.addUsers(carol);
+        devsGroupModal.getMembersTable().assertRow("Member", String.format("Carol Smith (%s)", carol));
+
+        //
+        // Check that the user picker doesn't suggest disabled users.
+        //
+
+        assertEquals(List.of("XWiki." + erin), devsGroupModal.getUserSuggestions(testName + "_Eri"));
+        devsGroupModal.close();
     }
 
     /**
@@ -441,6 +479,10 @@ class UsersGroupsRightsManagementIT
      * or more pages, the delete confirmation modal warns about it, states that the user is the last author of the
      * affected pages and links to them. This automates the "Delete user with Script or Programming Rights" manual
      * test for the Script Rights case.
+     * <p>
+     * Also verify that the modal lets the administrator choose another user with Script Rights to replace the deleted
+     * user as author of those pages, rejects a user without Script Rights, and that the page is then last modified by
+     * the chosen user. This automates the "Replace Author when Deleting Users" manual test.
      */
     @Test
     @Order(8)
@@ -451,6 +493,14 @@ class UsersGroupsRightsManagementIT
         String scriptUserPassword = "password";
         setup.createUser(scriptUserName, scriptUserPassword, "");
         String userFullName = "XWiki.%s".formatted(scriptUserName);
+
+        // The candidates to replace the deleted user as author: only the first one has Script Right. Their names don't
+        // contain the name of the deleted user, so that filtering the users live data on it matches only that user.
+        String newAuthorUserName = "ReplacementAuthor";
+        setup.createUser(newAuthorUserName, "password", "", "first_name", "New", "last_name", "Author");
+        setup.setGlobalRights("", "XWiki." + newAuthorUserName, "script", true);
+        String noScriptUserName = "ReplacementAuthorWithoutScript";
+        setup.createUser(noScriptUserName, "password", "");
 
         // Grant Script Right to the user and make them the last author of a page.
         setup.setGlobalRights("", userFullName, "script", true);
@@ -470,8 +520,20 @@ class UsersGroupsRightsManagementIT
         assertEquals("/xwiki/bin/view/Main/AllDocs?doc.author=%s".formatted(userFullName),
             deleteUserConfirmationModal.getScriptRightUserErrorMessageHrefValue());
 
+        // A user without Script Right can't replace the deleted user as author.
+        deleteUserConfirmationModal.setNewAuthor(noScriptUserName);
+        assertTrue(deleteUserConfirmationModal.isNewAuthorErrorDisplayed());
+
+        // Replace the deleted user with a user who has Script Right, as author of the page they last modified.
+        deleteUserConfirmationModal.setNewAuthor(newAuthorUserName);
+        assertFalse(deleteUserConfirmationModal.isNewAuthorErrorDisplayed());
+
         deleteUserConfirmationModal.clickOk();
         assertEquals(0, usersPage.getUsersLiveData().getTableLayout().countRows());
+
+        // The page is now last modified by the selected user.
+        String lastModifiedText = setup.gotoPage(testReference).getLastModifiedText();
+        assertThat(lastModifiedText, containsString("Last modified by New Author"));
     }
 
     @Test
@@ -884,6 +946,128 @@ class UsersGroupsRightsManagementIT
         wikiRightsPane.switchToUsers();
         wikiRightsPane.getRightsTable().filterColumn("name", userName);
         wikiRightsPane.setRight(userName, EditRightsPane.Right.EDIT, EditRightsPane.State.NONE);
+    }
+
+    /**
+     * Verify that a right denied to a user at page level takes precedence over that same right granted at page level
+     * to a group the user is a member of: the user has no Edit option on that page but still has one on the other
+     * pages of the wiki. The scenario is also run on a subwiki, with a user local to that subwiki.
+     */
+    @ParameterizedTest
+    @Order(16)
+    @WikisSource(extensions = { "org.xwiki.platform:xwiki-platform-administration-ui" })
+    void denyUserRightAtPageLevelWhenAllowedToGroupAtPageLevel(WikiReference wiki, TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setCurrentWiki(wiki.getName());
+
+        String userName = "userDeniedAtPageLevel";
+        String groupName = "groupOfUserDeniedAtPageLevel";
+
+        // The page the rights are set on, and a page located outside of it and thus not covered by those rights.
+        DocumentReference testPage = new DocumentReference(wiki.getName(), "DenyUserAtPageLevel", "WebHome");
+        DocumentReference otherPage = new DocumentReference(wiki.getName(), "DenyUserAtPageLevelOther", "WebHome");
+
+        // Make sure the user, the group and the pages don't exist yet.
+        setup.deletePage("XWiki", userName);
+        setup.deletePage("XWiki", groupName);
+        setup.deletePage(testPage);
+        setup.deletePage(otherPage);
+
+        // Create a new user, a new group and add the user to the group.
+        setup.createUser(userName, userName, "");
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        groupsPage = groupsPage.addNewGroup(groupName);
+        groupsPage.clickEditGroup(groupName).addMember(userName, true).close();
+
+        // Create the page on which the rights are set, and the page on which they aren't.
+        setup.createPage(testPage, "Group allowed content", "Group Allowed Page");
+        setup.createPage(otherPage, "No right set content", "No Right Set Page");
+
+        // Give the "view", "comment" and "edit" rights to the group and deny the "edit" right to the user, both from
+        // Administer Page > Users & Rights > Rights: Page, so that both rules are set at the same level.
+        AdministrationPage pageAdministrationPage =
+            AdministrationPage.gotoSpaceAdministrationPage(testPage.getLastSpaceReference());
+        pageAdministrationPage.clickSection("Users & Rights", "Rights: Page");
+        EditRightsPane pageRightsPane = new EditRightsPane();
+        pageRightsPane.switchToGroups();
+        pageRightsPane.getRightsTable().filterColumn("name", groupName);
+        assertTrue(pageRightsPane.hasEntity(groupName));
+        pageRightsPane.setRight(groupName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+        pageRightsPane.setRight(groupName, EditRightsPane.Right.COMMENT, EditRightsPane.State.ALLOW);
+        pageRightsPane.setRight(groupName, EditRightsPane.Right.EDIT, EditRightsPane.State.ALLOW);
+        pageRightsPane.switchToUsers();
+        pageRightsPane.getRightsTable().filterColumn("name", userName);
+        assertTrue(pageRightsPane.hasEntity(userName));
+        pageRightsPane.setRight(userName, EditRightsPane.Right.EDIT, EditRightsPane.State.DENY);
+
+        setup.login(userName, userName);
+
+        // The rule targeting the user takes precedence over the one targeting its group: the user still views the
+        // page, since "view" is only granted through the group, but has no Edit option on it.
+        ViewPage viewPage = setup.gotoPage(testPage);
+        assertEquals("Group allowed content", viewPage.getContent());
+        assertFalse(viewPage.isEditAvailable(),
+            "The Edit option should not be available since \"edit\" is denied to the user at page level");
+
+        // The deny is limited to that page: the Edit option is still available on the other pages of the wiki.
+        viewPage = setup.gotoPage(otherPage);
+        assertEquals("No right set content", viewPage.getContent());
+        assertTrue(viewPage.isEditAvailable(),
+            "The Edit option should be available on a page on which \"edit\" is not denied to the user");
+    }
+
+    /**
+     * Verify that a right granted on a terminal page overrides the same right restricted on its nested parent page:
+     * when only the XWikiAdminGroup can view the nested page {@code a/b/c/d} and its children, a user can still view
+     * the terminal child page {@code a/b/c/d/test} on which "view" is granted to the XWikiAllGroup, but not the parent
+     * page nor its other children.
+     */
+    @Test
+    @Order(17)
+    void overrideRightAtPageLevel(TestUtils setup, TestReference testReference)
+    {
+        String userName = testReference.getLastSpaceReference().getName();
+        SpaceReference parentSpace = new SpaceReference("d", new SpaceReference("c",
+            new SpaceReference("b", new SpaceReference("a", testReference.getLastSpaceReference()))));
+        DocumentReference parentPage = new DocumentReference("WebHome", parentSpace);
+        DocumentReference overridingPage = new DocumentReference("test", parentSpace);
+        DocumentReference otherPage = new DocumentReference("other", parentSpace);
+
+        setup.createPage(parentPage, "Parent content", "d");
+        setup.createPage(overridingPage, "Overriding content", "test");
+        setup.createPage(otherPage, "Other content", "other");
+        setup.createUser(userName, userName, "");
+
+        // Give the "view" right only to the XWikiAdminGroup on the nested page and its children, from Administer Page >
+        // Users & Rights > Rights: Page & Children.
+        AdministrationPage.gotoSpaceAdministrationPage(parentSpace).clickSection("Users & Rights",
+            "Rights: Page & Children");
+        EditRightsPane parentRightsPane = new EditRightsPane();
+        parentRightsPane.switchToGroups();
+        parentRightsPane.getRightsTable().filterColumn("name", "XWikiAdminGroup");
+        parentRightsPane.setRight("XWikiAdminGroup", EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+
+        // Give the "view" right to the XWikiAllGroup on the terminal child page, from Edit > Access Rights.
+        setup.gotoPage(overridingPage, "edit", "editor=rights");
+        RightsEditPage overridingRightsPage = new RightsEditPage();
+        overridingRightsPage.switchToGroups();
+        overridingRightsPage.getRightsTable().filterColumn("name", "XWikiAllGroup");
+        overridingRightsPage.setRight("XWikiAllGroup", EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+
+        setup.login(userName, userName);
+
+        // The restriction set on the nested page applies to the page and to its children.
+        assertTrue(setup.gotoPage(parentPage).isForbidden(),
+            "The nested page should not be viewable since \"view\" is granted only to the XWikiAdminGroup");
+        assertTrue(setup.gotoPage(otherPage).isForbidden(),
+            "A child page without rights of its own should inherit the restriction of its parent");
+
+        // The right granted on the terminal child page overrides the restriction inherited from its parent.
+        ViewPage viewPage = setup.gotoPage(overridingPage);
+        assertFalse(viewPage.isForbidden(),
+            "The terminal page should be viewable since \"view\" is granted to the XWikiAllGroup on it");
+        assertEquals("Overriding content", viewPage.getContent());
     }
 
     private void assertRightsTableShowsUsersAndGroups(EditRightsPane editRightsPane)

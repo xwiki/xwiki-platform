@@ -20,6 +20,7 @@
 package org.xwiki.livedata;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -66,6 +67,33 @@ class LiveDataEntryStoreTest
         Optional<Object> propertyValue = liveDataEntryStore.get("entryIdTest", "propertyTest");
         assertTrue(propertyValue.isPresent());
         assertEquals(2, propertyValue.get());
+    }
+
+    @Test
+    void getWithRequestedProperty() throws Exception
+    {
+        LiveDataEntryStore liveDataEntryStore = new LiveDataEntryStore()
+        {
+            @Override
+            public Optional<Map<String, Object>> get(Object entryId)
+            {
+                return Optional.of(Map.of());
+            }
+
+            @Override
+            public Optional<Map<String, Object>> get(Object entryId, List<String> properties)
+            {
+                return Optional.of(Map.of(properties.get(0), "value"));
+            }
+
+            @Override
+            public LiveData get(LiveDataQuery query)
+            {
+                return null;
+            }
+        };
+
+        assertEquals(Optional.of("value"), liveDataEntryStore.get("entryIdTest", "propertyTest"));
     }
 
     @Test

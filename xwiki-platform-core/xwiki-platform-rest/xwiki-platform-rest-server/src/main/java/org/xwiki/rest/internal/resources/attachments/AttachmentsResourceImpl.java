@@ -29,12 +29,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -131,7 +132,7 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
         // The file name submitted as a separate form field. When present, it overwrites the original file name.
         String overwritingFileName = null;
 
-        HttpServletRequest request = ((ServletRequest) this.container.getRequest()).getHttpServletRequest();
+        HttpServletRequest request = ((ServletRequest) this.container.getRequest()).getRequest();
         Collection<Part> parts = request.getParts();
 
         for (Part part : parts) {

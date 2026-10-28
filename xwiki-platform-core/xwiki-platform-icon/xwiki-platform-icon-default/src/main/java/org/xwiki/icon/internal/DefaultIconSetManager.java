@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +33,7 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.environment.Environment;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetCache;
@@ -46,9 +46,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
@@ -63,9 +60,6 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 public class DefaultIconSetManager implements IconSetManager
 {
     private static final String DEFAULT_ICONSET_NAME = "default";
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     @Named("current")
@@ -92,6 +86,9 @@ public class DefaultIconSetManager implements IconSetManager
     @Inject
     @Named("all")
     private ConfigurationSource configurationSource;
+
+    @Inject
+    private Environment environment;
 
     @Inject
     private Logger logger;
@@ -135,14 +132,11 @@ public class DefaultIconSetManager implements IconSetManager
     @Override
     public IconSet getDefaultIconSet() throws IconException
     {
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-
         IconSet iconSet = iconSetCache.get(DEFAULT_ICONSET_NAME);
         if (iconSet == null) {
             // lazy loading
             try (InputStreamReader reader =
-                new InputStreamReader(xwiki.getResourceAsStream("/resources/icons/default.iconset"))) {
+                new InputStreamReader(this.environment.getResourceAsStream("/resources/icons/default.iconset"))) {
                 iconSet = iconSetLoader.loadIconSet(reader, DEFAULT_ICONSET_NAME);
                 iconSetCache.put(DEFAULT_ICONSET_NAME, iconSet);
             } catch (IOException e) {

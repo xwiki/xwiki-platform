@@ -85,6 +85,10 @@ public class GlobalRightsAdministrationSectionPage extends AdministrationSection
                     getDriver().waitUntilCondition(driver ->
                         this.forceAuthenticatedViewLink.getAttribute("checked") == null);
                 }
+                // The checkbox state changes as soon as it's clicked, while the setting is saved by an asynchronous
+                // request: wait for it to be done, so that the next actions (e.g. a logout invalidating the session)
+                // don't interfere with the save.
+                getDriver().waitUntilJavascriptCondition("return Ajax.activeRequestCount === 0");
             } finally {
                 // Restore the utils timeout for other tests.
                 getDriver().setTimeout(defaultTimeout);

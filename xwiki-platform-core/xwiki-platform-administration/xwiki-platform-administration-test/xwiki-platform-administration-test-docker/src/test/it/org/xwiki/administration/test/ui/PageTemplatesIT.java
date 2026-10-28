@@ -145,8 +145,6 @@ class PageTemplatesIT
         ViewPage vp = templateInstanceEdit.clickSaveAndView();
 
         // Make sure the attachment has been copied from the template
-        // FIXME: Remove the following wait when XWIKI-6688 is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
 

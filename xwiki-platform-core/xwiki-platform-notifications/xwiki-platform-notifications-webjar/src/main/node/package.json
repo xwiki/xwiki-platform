@@ -14,7 +14,8 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
-    "@xwiki/platform-livedata-ui": "workspace:*"
+    "@xwiki/platform-livedata-ui": "workspace:*",
+    "@xwiki/platform-xwiki-utils": "workspace:*"
   },
   "peerDependencies": {
     "@xwiki/platform-livedata-componentstore": "workspace:*",
@@ -28,6 +29,7 @@
     "@vue/test-utils": "catalog:",
     "@vue/tsconfig": "catalog:",
     "@xwiki/platform-livedata-componentstore": "workspace:*",
+    "@xwiki/platform-test-requirejs": "workspace:*",
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "eslint": "catalog:",
     "jiti": "catalog:",

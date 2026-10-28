@@ -132,6 +132,22 @@ describe('XWiki Macro Plugin for CKEditor', function() {
     });
   });
 
+  it('displays the macro name next to the move handle', function(done) {
+    editor.setData('<!--startmacro:info|-||-|info--><div class="box infomessage">info</div><!--stopmacro-->', {
+      callback: function() {
+        var infoMacro = getWikiMacroWidgets(editor)[0];
+        var macroName = infoMacro.dragHandlerContainer.findOne('.macro-name');
+        expect(macroName.getText()).toBe('info');
+        expect(macroName.getAttribute('aria-hidden')).toBe('true');
+
+        infoMacro.setData('name', 'warning');
+        expect(infoMacro.dragHandlerContainer.findOne('.macro-name').getText()).toBe('warning');
+
+        done();
+      }
+    });
+  });
+
   it('handles nested editable macros', function(done) {
     editor.setData([
       '<!--startmacro:info|-|-->',

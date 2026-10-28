@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
@@ -71,9 +70,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
                 /* By deleting objects, some of them might become null, so we must check for this */
                 if (object != null) {
                     objects.getObjectSummaries().add(
-                        DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(),
-                            Utils.getXWikiContext(componentManager), doc, object, false,
-                            Utils.getXWikiApi(componentManager), withPrettyNames));
+                        this.factory.toRestObjectSummary(uriInfo.getBaseUri(), doc, object, false, withPrettyNames));
                 }
             }
 
@@ -84,8 +81,8 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
     }
 
     @Override
-    public Response addObject(String wikiName, String spaceName, String pageName, Boolean minorRevision, Object object)
-        throws XWikiRestException
+    public Response addObject(String wikiName, String spaceName, String pageName, Boolean minorRevision,
+        String comment, Object object) throws XWikiRestException
     {
         if (object.getClassName() == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
@@ -109,7 +106,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 
             this.factory.toObject(xwikiObject, object);
 
-            doc.save("", Boolean.TRUE.equals(minorRevision));
+            saveDocument(doc, comment, minorRevision);
 
             BaseObject baseObject = getBaseObject(doc, object.getClassName(), xwikiObject.getNumber());
 

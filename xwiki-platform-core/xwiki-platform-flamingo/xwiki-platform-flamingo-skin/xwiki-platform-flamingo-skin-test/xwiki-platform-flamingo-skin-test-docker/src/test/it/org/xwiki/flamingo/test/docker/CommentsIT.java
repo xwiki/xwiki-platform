@@ -39,8 +39,11 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CommentElement;
 import org.xwiki.test.ui.po.CommentForm;
 import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.PermalinkModal;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -167,6 +170,19 @@ class CommentsIT
         commentsTab.cancelCommentForm();
         commentsTab.clickOnReplyToCommentByID(commentIndex);
         commentsTab.cancelCommentForm();
+
+        // Comment from the comments viewer, opened through the "More actions" menu.
+        ViewPage viewPage = new ViewPage();
+        CommentsTab commentsViewer = viewPage.openCommentsViewerFromMoreActions();
+        assertThat(viewPage.getPageURL(), containsString("viewer=comments"));
+        String viewerComment = "Comment from the comments viewer";
+        commentIndex = commentsViewer.postComment(viewerComment, true);
+        assertEquals(USER_NAME, commentsViewer.getCommentAuthorByID(commentIndex));
+
+        // The comment is listed in the comments of the page.
+        CommentsTab pageCommentsTab = setup.gotoPage(reference).openCommentsDocExtraPane();
+        commentIndex = pageCommentsTab.getCommentID(viewerComment);
+        assertEquals(USER_NAME, pageCommentsTab.getCommentAuthorByID(commentIndex));
     }
 
     @Test
@@ -388,5 +404,26 @@ class CommentsIT
     {
         setup.loginAsSuperAdmin();
         setup.setPropertyInXWikiPreferences("dateformat", "String", "");
+    }
+
+    @Test
+    @Order(5)
+    void shareCommentPermalink(TestUtils setup, TestReference reference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.deletePage(reference);
+        setup.createAdminUser();
+        setup.loginAsAdmin();
+
+        CommentsTab commentsTab = setup.createPage(reference, "").openCommentsDocExtraPane();
+        int commentId = commentsTab.postComment(COMMENT_CONTENT, true);
+
+        PermalinkModal permalinkModal = commentsTab.openPermalinkModalByID(commentId);
+        assertTrue(permalinkModal.getPermalinkValue().endsWith("#xwikicomment_" + commentId),
+            () -> String.format("Expected the permalink to end with [#xwikicomment_%d], got [%s] instead.", commentId,
+                permalinkModal.getPermalinkValue()));
+
+        permalinkModal.clickCopyToClipboard();
+        permalinkModal.waitForNotificationInfoMessage("Link copied to clipboard");
     }
 }

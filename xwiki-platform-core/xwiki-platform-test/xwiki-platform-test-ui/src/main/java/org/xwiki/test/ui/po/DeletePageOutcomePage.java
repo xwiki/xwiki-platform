@@ -43,23 +43,6 @@ public class DeletePageOutcomePage extends ViewPage
     private WebElement batchLink;
 
     /**
-     * Return first page deleted deleter.
-     * @since 3.2M3
-     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
-     *             {@link DeletedPageEntry#getDeleter()}.
-     */
-    @Deprecated(since = "14.10")
-    public String getPageDeleter()
-    {
-        List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
-        if (deletedPagesEntries == null) {
-            return "";
-        } else {
-            return deletedPagesEntries.get(0).getDeleter();
-        }
-    }
-
-    /**
      * @since 4.0M2
      */
     public String getMessage()
@@ -110,25 +93,6 @@ public class DeletePageOutcomePage extends ViewPage
         }
     }
 
-    /**
-     * Clicks on the first link to restore the deleted page from the recycle bin.
-     * 
-     * @return the restored view page
-     * @since 5.2M2
-     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
-     *              {@link DeletedPageEntry#clickRestore()}.
-     */
-    @Deprecated(since = "14.10")
-    public ViewPage clickRestore()
-    {
-        List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
-        if (deletedPagesEntries == null) {
-            throw new RuntimeException("There's no deleted entries.");
-        } else {
-            return deletedPagesEntries.get(0).clickRestore();
-        }
-    }
-
     /**  
      * @return if there are terminal pages in the recycle bin
      * 
@@ -137,67 +101,6 @@ public class DeletePageOutcomePage extends ViewPage
     public boolean hasTerminalPagesInRecycleBin()
     {
         return !getDeletedTerminalPagesEntries().isEmpty();
-    }
-
-    /**
-     * Clicks on the link to permanently delete the deleted page from the recycle bin.
-     *
-     * @return the recycle bin page updated
-     * @since 7.2RC1
-     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
-     *             {@link DeletedPageEntry#clickDelete()}.
-     */
-    @Deprecated(since = "14.10")
-    public DeletePageOutcomePage clickDeletePage()
-    {
-        List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
-        if (deletedPagesEntries == null) {
-            throw new RuntimeException("There's no deleted entries.");
-        } else {
-            return deletedPagesEntries.get(0).clickDelete();
-        }
-    }
-
-    /**
-     * Clicks on the link to restore the deleted terminal page from the recycle bin.
-     *
-     * @return the restored view page
-     * @since 7.2RC1
-     * @deprecated Since 14.10 prefer using {@link #getDeletedTerminalPagesEntries()} and
-     *             {@link DeletedPageEntry#clickDelete()}.
-     */
-    @Deprecated(since = "14.10")
-    public DeletePageOutcomePage clickDeleteTerminalPage()
-    {
-        List<DeletedPageEntry> deletedPagesEntries = getDeletedTerminalPagesEntries();
-        if (deletedPagesEntries == null) {
-            throw new RuntimeException("There's no deleted entries.");
-        } else {
-            return deletedPagesEntries.get(0).clickDelete();
-        }
-    }
-
-    /**
-     * Click on the link to view the deleted page.
-     *
-     * @param row the revision row for which to view the deleted page, starting at 1
-     * @return the view page of the deleted page
-     * @since 13.10.4
-     * @since 14.2RC1
-     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
-     *            {@link DeletedPageEntry#clickDelete()}.
-     */
-    @Deprecated(since = "14.10")
-    public ViewPage clickViewDocument(int row)
-    {
-        int actualEntryNumber = row - 1;
-        List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
-        if (deletedPagesEntries == null || actualEntryNumber >= deletedPagesEntries.size()) {
-            throw new RuntimeException(String.format(
-                "Requested row is [%s] while number of deleted entries is [%s].", row, deletedPagesEntries.size()));
-        } else {
-            return deletedPagesEntries.get(actualEntryNumber).clickView();
-        }
     }
 
     /**

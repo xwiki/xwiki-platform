@@ -334,13 +334,13 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
         traditional: true
       }).then(data =&gt; {
         notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+        XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
 
         // Reload the livetable
         self.filterPreferencesLivetable.refresh();
       }).catch(() =&gt; {
         notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+        XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
       });
     };
 
@@ -485,10 +485,10 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
         $.post(restURL, params).then(data =&gt; {
           self.domElement.attr('data-objectNumber', data.number);
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
+          XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
         }).catch(() =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
+          XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
       } else if (objectNumber != '') {
         // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by default, in notifications)
@@ -500,11 +500,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
           data: state ? '1' : '0'
         }).then(data =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
+          XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
           $(document).trigger('xwiki:livetable:notifications-filters:toggle', {'row': self.row, 'state': state});
         }).catch(() =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
+          XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
         });
       }
     };
@@ -648,11 +648,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
             csrf: xm.form_token
           }).then(() =&gt; {
             notif.hide();
-            new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.done'))", 'done');
+            XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.done'))", 'done');
             window.livetable_notificationFilterPreferencesLiveTable.refresh();
           }).catch(() =&gt; {
             notif.hide();
-            new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.error'))", 'error');
+            XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.filters.preferences.delete.error'))", 'error');
           });
         }
       });
@@ -670,11 +670,11 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'xwiki-bootstrap-
         csrf: xm.form_token
       }).then(() =&gt; {
         notif.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
+        XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
         $(document).trigger('xwiki:livetable:notifications-filters:toggle', {'row': data.data, 'state': state});
       }).catch(() =&gt; {
         notif.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
+        XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
       });
     });
     // Enable / Disable action for toggleable filter preferences

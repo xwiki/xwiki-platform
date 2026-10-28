@@ -1,0 +1,1 @@
+org.xwiki.xclass.test.XClassVisibilityTestScriptService

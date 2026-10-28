@@ -85,23 +85,23 @@
       </template>
     </draggable>
 
-    <!-- Save/cancel actions for a draft entry being created in edit mode. -->
-    <div v-if="logic.isEditMode() && entry._new" class="card-actions">
+    <!-- Entry actions, only available in edit mode. -->
+    <div v-if="logic.isEditMode()" class="card-actions">
       <button
         type="button"
         class="btn btn-default"
-        :title="$t('livedata.table.action.save')"
-        @click="logic.saveNewEntry()"
+        :title="
+          $t(
+            isEntrySaved
+              ? 'livedata.table.action.delete'
+              : 'livedata.table.action.cancel',
+          )
+        "
+        @click="logic.deleteEntry(entry)"
       >
-        <XWikiIcon :icon-descriptor="{ name: 'check' }" />
-      </button>
-      <button
-        type="button"
-        class="btn btn-default"
-        :title="$t('livedata.table.action.cancel')"
-        @click="logic.cancelNewEntry()"
-      >
-        <XWikiIcon :icon-descriptor="{ name: 'cross' }" />
+        <XWikiIcon
+          :icon-descriptor="{ name: isEntrySaved ? 'trash' : 'cross' }"
+        />
       </button>
     </div>
   </div>
@@ -162,6 +162,9 @@ export default {
 
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
+    },
+    isEntrySaved() {
+      return this.logic.getEntryId(this.entry) !== undefined;
     },
   },
 

@@ -202,7 +202,7 @@ class PageResourceImplTest
         this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", false);
 
         verify(this.testPageDocument).delete();
-        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), anyBoolean(), any());
     }
 
     @Test
@@ -215,7 +215,7 @@ class PageResourceImplTest
 
         this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", true);
 
-        verify(this.xwiki).deleteDocument(this.testPageXWikiDocument, false, this.context);
+        verify(this.xwiki).deleteDocument(this.testPageXWikiDocument, false, true, this.context);
         verify(this.testPageDocument, never()).delete();
     }
 
@@ -230,7 +230,7 @@ class PageResourceImplTest
         this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", true);
 
         verify(this.testPageDocument).delete();
-        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), anyBoolean(), any());
     }
 
     @Test
@@ -246,7 +246,7 @@ class PageResourceImplTest
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), exception.getResponse().getStatus());
 
         verify(this.testPageDocument, never()).delete();
-        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), anyBoolean(), any());
     }
 
     private DocumentReference initTestPage(String wikiName, String spaceName, String pageName) throws XWikiException

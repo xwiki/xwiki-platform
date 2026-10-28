@@ -34,12 +34,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Part;
 
 import org.slf4j.Logger;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.Request;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.store.TemporaryAttachmentException;
@@ -72,6 +76,9 @@ public class TemporaryAttachmentsScriptService implements ScriptService
 
     @Inject
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    @Inject
+    private Container container;
 
     @Inject
     private Logger logger;
@@ -113,7 +120,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
         XWikiContext context = this.contextProvider.get();
 
         try {
-            Part part = context.getRequest().getPart(fieldName);
+            Part part = getPart(fieldName);
             if (part != null) {
                 XWikiAttachment attachment =
                     this.temporaryAttachmentSessionsManager.uploadAttachment(documentReference, part, filename);
@@ -128,6 +135,16 @@ public class TemporaryAttachmentsScriptService implements ScriptService
             this.logger.warn("Error while reading the request content part: [{}]", getRootCauseMessage(e));
             return null;
         }
+    }
+
+    private Part getPart(String fieldName) throws IOException, ServletException
+    {
+        Request request = this.container.getRequest();
+        if (request instanceof ServletRequest servletRequest) {
+            return servletRequest.getRequest().getPart(fieldName);
+        }
+
+        return null;
     }
 
     /**

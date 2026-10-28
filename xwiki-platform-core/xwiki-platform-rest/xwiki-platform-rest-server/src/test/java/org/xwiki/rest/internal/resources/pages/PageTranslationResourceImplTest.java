@@ -124,7 +124,7 @@ class PageTranslationResourceImplTest
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), exception.getResponse().getStatus());
 
         verify(this.translationDocument, never()).delete();
-        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), anyBoolean(), any());
     }
 
     @Test
@@ -136,7 +136,7 @@ class PageTranslationResourceImplTest
         this.pageTranslationResource.deletePageTranslation(WIKI, SPACE, PAGE, LANGUAGE, false);
 
         verify(this.translationDocument).delete();
-        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), anyBoolean(), any());
     }
 
     @Test
@@ -148,7 +148,7 @@ class PageTranslationResourceImplTest
 
         this.pageTranslationResource.deletePageTranslation(WIKI, SPACE, PAGE, LANGUAGE, true);
 
-        verify(this.xwiki).deleteDocument(this.translationXWikiDocument, false, this.context);
+        verify(this.xwiki).deleteDocument(this.translationXWikiDocument, false, true, this.context);
         verify(this.translationDocument, never()).delete();
     }
 
@@ -162,7 +162,7 @@ class PageTranslationResourceImplTest
         this.pageTranslationResource.deletePageTranslation(WIKI, SPACE, PAGE, LANGUAGE, true);
 
         verify(this.translationDocument).delete();
-        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), anyBoolean(), any());
     }
 
     private DocumentReference initTranslation() throws XWikiException

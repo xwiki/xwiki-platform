@@ -33,6 +33,15 @@ import org.xwiki.stability.Unstable;
 public interface RequiredSkinExtensionsRecorder
 {
     /**
+     * Default header to be used to inject the skin extensions.
+     *
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    String XWIKI_SKIN_EXTENSIONS_DEFAULT_HEADER = "X-XWIKI-HTML-HEAD";
+
+    /**
      * Start recording.
      */
     void start();

@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,6 +59,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.ExportURLFactory;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 /**
@@ -83,6 +86,11 @@ public class HtmlPackager
      * The separator in an internal zip path.
      */
     private static final String ZIPPATH_SEPARATOR = "/";
+
+    /**
+     * The path of the skins folder in the web application.
+     */
+    private static final String SKINS_PATH = "/skins/";
 
     /**
      * The name of the package for which packager append ".zip".
@@ -474,8 +482,11 @@ public class HtmlPackager
         XWikiContext context) throws IOException
     {
         // Protect against non-existing skins.
-        String realPath = context.getWiki().getEngineContext().getRealPath("/skins/" + skinName);
-        if (realPath != null) {
+        XWikiEngineContext engineContext = context.getWiki().getEngineContext();
+        String skinsPath = engineContext.getRealPath(SKINS_PATH);
+        String realPath = engineContext.getRealPath(SKINS_PATH + skinName);
+        // Make sure the skin name cannot be used to package a folder outside of the skins folder.
+        if (skinsPath != null && realPath != null && isSkinDirectory(Paths.get(skinsPath), Paths.get(realPath))) {
             File file = new File(realPath);
 
             // Don't include vm and LESS files by default
@@ -485,6 +496,15 @@ public class HtmlPackager
             addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR,
                 exportedSkinFiles);
         }
+    }
+
+    private static boolean isSkinDirectory(Path skinsDirectory, Path skinDirectory)
+    {
+        Path normalizedSkinsDirectory = skinsDirectory.toAbsolutePath().normalize();
+        Path normalizedSkinDirectory = skinDirectory.toAbsolutePath().normalize();
+
+        return normalizedSkinDirectory.startsWith(normalizedSkinsDirectory)
+            && !normalizedSkinDirectory.equals(normalizedSkinsDirectory);
     }
 
     /**

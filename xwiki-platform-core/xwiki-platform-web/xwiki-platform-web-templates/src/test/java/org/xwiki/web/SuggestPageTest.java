@@ -74,7 +74,17 @@ class SuggestPageTest extends PageTest
 
     private static final String RESULTS_TAG = "rs";
 
+    private static final String MANAGER_FIELD = "manager";
+
+    private static final String TEAM_FIELD = "team";
+
+    private static final String FIRST_COLUMN_PARAMETER = "firCol";
+
+    private static final String SECOND_COLUMN_PARAMETER = "secCol";
+
     private TemplateManager templateManager;
+
+    private QueryManagerScriptService queryManager;
 
     private ScriptQuery query;
 
@@ -91,12 +101,14 @@ class SuggestPageTest extends PageTest
 
         // Set the query manager to basically ignore any parameters set, the individual tests set the results
         // independently of them.
-        QueryManagerScriptService qmss = mock(QueryManagerScriptService.class);
-        this.oldcore.getMocker().registerComponent(ScriptService.class, "query", qmss);
-        this.query = mock(ScriptQuery.class);
-        when(qmss.hql(anyString())).thenReturn(this.query);
+        this.queryManager = mock();
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "query", this.queryManager);
+        this.query = mock();
+        when(this.queryManager.hql(anyString())).thenReturn(this.query);
         when(this.query.setLimit(anyInt())).thenReturn(this.query);
         when(this.query.bindValues(anyMap())).thenReturn(this.query);
+        when(this.query.bindValue(anyString(), any())).thenReturn(this.query);
+        when(this.query.setQueryAuthor(any(), any())).thenReturn(this.query);
 
         // Create a document with some properties to test. Most of them are inspired by XWiki.XWikiUsers, thus the
         // naming.
@@ -108,6 +120,9 @@ class SuggestPageTest extends PageTest
         xclass.addPasswordField(PASSWORD_FIELD, "Password", 10);
         xclass.addStaticListField("imtype", "IM Type", 30, true, "AIM|Yahoo|Jabber|MSN|Skype|ICQ");
         xclass.addStaticListField("tags", "Tags", 30, true, true, "", "checkbox", ",");
+        xclass.addDBListField(MANAGER_FIELD, "Manager", 1, false,
+            "select doc.fullName from XWikiDocument doc where doc.space = 'People'");
+        xclass.addDBListField(TEAM_FIELD, "Team", 1, false, "select doc.fullName, doc.title from XWikiDocument doc");
         this.xwiki.saveDocument(classDocument, this.context);
 
         // Set this document as default class name.
@@ -179,6 +194,43 @@ class SuggestPageTest extends PageTest
         NodeList resultElements = getResult(EMAIL_FIELD).getElementsByTagName(RESULTS_TAG);
         verify(this.query, never()).execute();
         assertEquals(0, resultElements.getLength());
+    }
+
+    @Test
+    void customQueryWithOneColumn() throws Exception
+    {
+        // The filter column is taken from the query, whatever the request says.
+        this.request.put(FIRST_COLUMN_PARAMETER, "doc.name");
+        this.request.put(SECOND_COLUMN_PARAMETER, "-");
+        when(this.query.execute()).thenReturn(List.of("People.Alice"));
+
+        Document result = getResult(MANAGER_FIELD);
+
+        verify(this.queryManager).hql("select doc.fullName from XWikiDocument doc where "
+            + "lower(doc.fullName) like :input ESCAPE '!' and doc.space = 'People'");
+        assertEquals("2", result.getDocumentElement().getAttribute("type"));
+        NodeList resultElements = result.getElementsByTagName(RESULTS_TAG);
+        assertEquals(1, resultElements.getLength());
+        assertEquals("People.Alice", resultElements.item(0).getTextContent());
+    }
+
+    @Test
+    void customQueryWithTwoColumns() throws Exception
+    {
+        // The request asks for the one column mode on another column, the query selects two columns.
+        this.request.put(FIRST_COLUMN_PARAMETER, "doc.name");
+        this.request.put(SECOND_COLUMN_PARAMETER, "-");
+        when(this.query.execute()).thenReturn(Collections.singletonList(new Object[] { "Teams.Core", "Core Team" }));
+
+        Document result = getResult(TEAM_FIELD);
+
+        verify(this.queryManager).hql(
+            "select doc.fullName, doc.title from XWikiDocument doc where lower(doc.title) like :input ESCAPE '!'");
+        assertEquals("1", result.getDocumentElement().getAttribute("type"));
+        NodeList resultElements = result.getElementsByTagName(RESULTS_TAG);
+        assertEquals(1, resultElements.getLength());
+        assertEquals("Teams.Core", resultElements.item(0).getAttributes().getNamedItem("info").getTextContent());
+        assertEquals("Core Team", resultElements.item(0).getTextContent());
     }
 
     private void mockEmailObfuscation(boolean shallObfuscate)

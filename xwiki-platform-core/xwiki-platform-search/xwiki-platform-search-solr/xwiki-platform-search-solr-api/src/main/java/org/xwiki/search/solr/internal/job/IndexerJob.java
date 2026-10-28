@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.job;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,6 +46,7 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
+import org.xwiki.store.StoreStoppedException;
 
 /**
  * Provide progress information and store logging of an advanced indexing.
@@ -191,15 +193,36 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
                 "[{}] documents added, [{}] deleted and [{}] updated during the synchronization of the Solr index.",
                 counter[Action.ADD.ordinal()], counter[Action.DELETE.ordinal()], counter[Action.UPDATE.ordinal()]);
 
-            if (getRequest().isCleanInvalid()) {
-                // Wait for the indexing to be fully applied
-                this.indexer.waitReady().get();
-
+            if (getRequest().isCleanInvalid() && waitForIndexing()) {
                 // Remove invalid entries
                 cleanInvalid();
             }
         } finally {
             this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    /**
+     * Wait for the indexing to be fully applied.
+     *
+     * @return {@code true} if the indexing was applied, {@code false} if the indexer was stopped before
+     */
+    private boolean waitForIndexing() throws InterruptedException, ExecutionException
+    {
+        try {
+            this.indexer.waitReady().get();
+
+            return true;
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof StoreStoppedException) {
+                // The indexer is stopped (e.g. XWiki is stopping): there's nothing to clean since the synchronization
+                // will be executed again at the next start.
+                this.logger.info("The synchronization of the Solr index was interrupted because the indexer stopped.");
+
+                return false;
+            }
+
+            throw e;
         }
     }
 

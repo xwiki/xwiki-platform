@@ -89,6 +89,10 @@ public class EventSearcher
     {
         // Create the query
         SimpleEventQuery query = this.eventQueryGenerator.generateQuery(parameters);
+        if (query == null) {
+            // No event can match the parameters.
+            return List.of();
+        }
 
         query.setLimit(limit).setOffset(offset);
 

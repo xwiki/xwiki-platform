@@ -479,6 +479,10 @@ public class BaseAttachmentsResource extends XWikiResource
                 .header("Content-Disposition",
                     attachmentSecurityManager.getContentDispositionHeader(
                         xwikiAttachment.getFilename(), shouldBeDownloaded))
+                // Make sure browsers honor the declared content type, from which the content disposition is also
+                // computed.
+                .header(XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_HEADER,
+                    XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_NOSNIFF)
                 .build();
         } catch (XWikiException e) {
             throw new XWikiRestException(e);

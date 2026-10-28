@@ -71,7 +71,7 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
      * @param reference the reference of the document to update. Can be either local or absolute depending if the
      *            document is associated to a specific wiki or not
      */
-    public AbstractMandatoryDocumentInitializer(EntityReference reference)
+    protected AbstractMandatoryDocumentInitializer(EntityReference reference)
     {
         this(reference, null);
     }
@@ -81,7 +81,7 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
      *            document is associated to a specific wiki or not
      * @param title the title of the document
      */
-    public AbstractMandatoryDocumentInitializer(EntityReference reference, String title)
+    protected AbstractMandatoryDocumentInitializer(EntityReference reference, String title)
     {
         this.reference = reference;
         this.title = title;

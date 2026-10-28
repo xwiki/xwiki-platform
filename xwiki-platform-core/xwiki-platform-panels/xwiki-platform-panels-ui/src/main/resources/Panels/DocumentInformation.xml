@@ -178,7 +178,7 @@
 {{html}}
 &lt;dl&gt;
 #foreach ($extension in $services.uix.getExtensions('org.xwiki.platform.panels.documentInformation', {'sortByParameter': 'order'}))
-  $services.rendering.render($extension.execute(), 'html/5.0')
+  $services.uix.render($extension, 'html/5.0')
 #end
 &lt;/dl&gt;
 {{/html}}

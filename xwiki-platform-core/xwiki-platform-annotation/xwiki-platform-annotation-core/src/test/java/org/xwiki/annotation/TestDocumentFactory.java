@@ -47,7 +47,7 @@ public class TestDocumentFactory
      */
     public TestDocumentFactory()
     {
-
+        // Nothing to initialize here: the document map is filled in lazily by getDocument().
     }
 
     /**

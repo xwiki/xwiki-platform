@@ -235,7 +235,7 @@ class PrepareMailRunnableTest
                     @Override
                     public void remove()
                     {
-
+                        // Not used: the code under test only iterates over the messages.
                     }
                 }, session, listener1, batchId1, context1);
         MemoryMailListener listener2 = this.componentManager.getInstance(MailListener.class, "memory");

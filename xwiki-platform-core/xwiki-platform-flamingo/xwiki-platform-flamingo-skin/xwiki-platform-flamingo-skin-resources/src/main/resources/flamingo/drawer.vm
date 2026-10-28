@@ -28,9 +28,11 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
     ## Drawer header (with elements concerning the current user: profile, login, logout, register, etc...)
     ##
     <li class="drawer-brand clearfix">
-      <a href="$xwiki.getURL($xcontext.user, 'view')">
-        #largeUserAvatar($xcontext.user)
-      </a>
+      #displayUser($xcontext.user {
+        'useInlineHTML': true,
+        'displayName': false,
+        'avatarClass': 'large-avatar circle-avatar'
+      })
       <div class="brand-links">
         #define ($logoutLink)
           ## In the event of a logout action being performed while currently on the logout page
@@ -137,7 +139,7 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
         #drawerSeparator()
         #set ($canHaveMenuSeparator = false)
       #end
-      #set ($content = $services.rendering.render($uix.execute(), 'html/5.0'))
+      #set ($content = $services.uix.render($uix, 'html/5.0'))
       $content
       #if (!$canHaveMenuSeparator && $stringtool.isNotBlank($content))
         #set ($canHaveMenuSeparator = true)

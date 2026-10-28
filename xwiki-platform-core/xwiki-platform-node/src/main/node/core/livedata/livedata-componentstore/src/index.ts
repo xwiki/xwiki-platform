@@ -59,12 +59,12 @@ const componentStore = {
 
     // If the component was requested before registration, it is resolved and registered directly.
     if (awaiting?.[kind]?.[key]) {
-      // eslint-disable-next-line promise/catch-or-return,promise/always-return
-      componentProvider().then((resolved) => {
+      void (async () => {
+        const resolved = await componentProvider();
         store[kind][key] = resolved;
         awaiting[kind][key].resolve(resolved);
         delete awaiting[kind][key];
-      });
+      })();
     }
   },
 

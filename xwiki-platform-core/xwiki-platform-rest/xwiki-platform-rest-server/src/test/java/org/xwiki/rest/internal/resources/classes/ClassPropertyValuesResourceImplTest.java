@@ -134,16 +134,18 @@ class ClassPropertyValuesResourceImplTest
     {
         doThrow(new AccessDeniedException(this.xcontext.getUserReference(), this.propertyReference))
             .when(this.authorization).checkAccess(Right.VIEW, this.propertyReference);
+        List<String> properties = List.of("text");
         WebApplicationException expected = assertThrows(WebApplicationException.class,
-            () -> this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, List.of("text"), false));
+            () -> this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, properties, false));
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), expected.getResponse().getStatus());
     }
 
     @Test
     void getClassPropertyValuesNotFound()
     {
+        List<String> properties = List.of("text");
         WebApplicationException expected = assertThrows(WebApplicationException.class,
-            () -> this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, List.of("text"), false));
+            () -> this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, properties, false));
         assertEquals(Status.NOT_FOUND.getStatusCode(), expected.getResponse().getStatus());
     }
 

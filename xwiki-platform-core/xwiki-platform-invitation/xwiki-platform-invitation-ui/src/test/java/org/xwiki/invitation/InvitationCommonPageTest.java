@@ -19,6 +19,7 @@
  */
 package org.xwiki.invitation;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 import javax.script.ScriptContext;
@@ -26,6 +27,7 @@ import javax.script.ScriptContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -288,5 +290,27 @@ class InvitationCommonPageTest extends PageTest
             this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Test"), this.context), this.context);
         String renderedContent = testDocument.getRenderedContent(value, XWIKI_2_0.toIdString(), PLAIN_1_0.toIdString());
         assertEquals("xe.invitation.emailContent.subjectLine [XWikiGuest, null, {{noscript/}}]", renderedContent);
+    }
+
+    /**
+     * Check that the line breaks of the user message are kept, and that the message is still escaped.
+     */
+    @Test
+    void messageBodyTemplate() throws Exception
+    {
+        com.xpn.xwiki.api.Document invitationCommonDocument =
+            new com.xpn.xwiki.api.Document(loadPage(INVITATION_COMMON_REFERENCE), this.context);
+        String value = String.valueOf(
+            invitationCommonDocument.getObject("xwiki:Invitation.WebHome").getProperty("messageBodyTemplate")
+                .getValue());
+        this.oldcore.getScriptContext().setAttribute("messageBody", "first line\nsecond <b>line</b>\r\nthird line",
+            GLOBAL_SCOPE);
+        com.xpn.xwiki.api.Document testDocument = new com.xpn.xwiki.api.Document(
+            this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Test"), this.context), this.context);
+        Document document = Jsoup.parse(testDocument.getRenderedContent(value, XWIKI_2_0.toIdString()));
+        Element message = document.selectFirst("p[style*=font-size]");
+        assertEquals(List.of("first line", "second <b>line</b>", "third line"),
+            message.textNodes().stream().map(TextNode::text).map(String::trim).toList());
+        assertEquals(2, message.select("br").size());
     }
 }

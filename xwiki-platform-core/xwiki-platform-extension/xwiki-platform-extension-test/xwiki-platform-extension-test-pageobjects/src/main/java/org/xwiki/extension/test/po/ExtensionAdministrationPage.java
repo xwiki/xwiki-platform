@@ -120,4 +120,21 @@ public class ExtensionAdministrationPage extends ViewPage
         getDriver().findElement(By.cssSelector("input[name=\"index_start\"]")).click();
         getDriver().waitUntilPageIsReloaded();
     }
+
+    /**
+     * Waits until the extensions indexation started with {@link #startIndex()} is done. When the index job is still
+     * running when the page is rendered, a progress bar is displayed and then replaced by the job result once the job
+     * is done. When the index job is already finished when the page is rendered, only the index date is displayed,
+     * without any progress bar.
+     *
+     * @param timeout the maximum time to wait for, in seconds
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public void waitUntilIndexIsDone(int timeout)
+    {
+        getDriver().waitUntilCondition(
+            driver -> !getDriver().hasElementWithoutWaiting(By.cssSelector(".job-status .ui-progress")), timeout);
+    }
 }

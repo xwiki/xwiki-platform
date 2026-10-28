@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
+import org.xwiki.xml.XMLUtils;
+
 /**
  * Add a backward compatibility layer to the {@link Utils} class.
  * 
@@ -51,5 +53,18 @@ public privileged aspect UtilsCompatibilityAspect
     public static Object Utils.getComponent(String role)
     {
         return getComponent(role, "default");
+    }
+
+    /**
+     * Escapes the XML special characters in a <code>String</code> using numerical XML entities.
+     *
+     * @param value the text to escape, may be null
+     * @return a new escaped <code>String</code>, <code>null</code> if null input
+     * @deprecated use {@link XMLUtils#escape(Object) $services.xml.escape(content)}
+     */
+    @Deprecated(since = "2.7")
+    public static String Utils.formEncode(String value)
+    {
+        return XMLUtils.escape(value);
     }
 }

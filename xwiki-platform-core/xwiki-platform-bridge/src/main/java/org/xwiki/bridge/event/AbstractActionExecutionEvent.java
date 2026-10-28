@@ -46,7 +46,7 @@ public abstract class AbstractActionExecutionEvent implements Serializable, Acti
     /**
      * Match any {@link ActionExecutedEvent}.
      */
-    public AbstractActionExecutionEvent()
+    protected AbstractActionExecutionEvent()
     {
 
     }
@@ -56,7 +56,7 @@ public abstract class AbstractActionExecutionEvent implements Serializable, Acti
      * 
      * @param actionName the name of the action
      */
-    public AbstractActionExecutionEvent(String actionName)
+    protected AbstractActionExecutionEvent(String actionName)
     {
         this.actionName = actionName;
     }

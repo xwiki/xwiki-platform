@@ -91,6 +91,7 @@ function childTags(element: Element): string[] {
   return Array.from(element.children, (child) => child.tagName);
 }
 
+// eslint-disable-next-line max-statements
 describe("UniAstToReactJsxConverter", () => {
   test("renders a list without numbers as a bulleted list", () => {
     const container = render(list(listItem("first"), listItem("second")));
@@ -176,6 +177,35 @@ describe("UniAstToReactJsxConverter", () => {
     });
 
     expect(container.querySelector("p")!.className).toBe("box infomessage");
+  });
+
+  test("renders text that is both underlined and struck through", () => {
+    const container = render(
+      paragraph({
+        type: "text",
+        content: "both",
+        styles: { underline: true, strikethrough: true },
+      }),
+    );
+
+    expect(
+      container.querySelector<HTMLElement>("p > span")!.style.textDecoration,
+    ).toBe("underline line-through");
+  });
+
+  test("renders code text as a code element", () => {
+    const container = render(
+      paragraph(text("call "), {
+        type: "text",
+        content: "render()",
+        styles: { code: true, bold: true },
+      }),
+    );
+
+    const code = container.querySelector("p > span > code")!;
+    expect(code.textContent).toBe("render()");
+    expect(code.parentElement!.style.fontWeight).toBe("bold");
+    expect(container.querySelectorAll("code")).toHaveLength(1);
   });
 
   test("renders an inline image with an external URL", () => {

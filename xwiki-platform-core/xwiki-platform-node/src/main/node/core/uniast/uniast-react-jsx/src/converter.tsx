@@ -377,17 +377,26 @@ export class UniAstToReactJsxConverter {
           style.fontStyle = "italic";
         }
 
-        if (inlineContent.styles.underline) {
-          style.textDecoration = "underline";
-        }
+        const textDecorations = [
+          inlineContent.styles.underline && "underline",
+          inlineContent.styles.strikethrough && "line-through",
+        ].filter(Boolean);
 
-        if (inlineContent.styles.strikethrough) {
-          style.textDecoration = "line-through";
+        if (textDecorations.length > 0) {
+          style.textDecoration = textDecorations.join(" ");
         }
 
         const attr = Object.values(style).length > 0 ? { style } : {};
 
-        return <span {...attr}>{inlineContent.content}</span>;
+        return (
+          <span {...attr}>
+            {inlineContent.styles.code ? (
+              <code>{inlineContent.content}</code>
+            ) : (
+              inlineContent.content
+            )}
+          </span>
+        );
 
       case "image":
         return (

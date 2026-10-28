@@ -23,10 +23,6 @@
   flex-direction: column;
 }
 
-.slash-menu-upload {
-  background: red;
-}
-
 .slash-menu-item {
   background-color: var(--cr-color-neutral-50);
   border-radius: var(--cr-border-radius-small);

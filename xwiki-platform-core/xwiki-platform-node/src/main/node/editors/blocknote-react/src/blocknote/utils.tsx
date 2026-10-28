@@ -294,9 +294,10 @@ type MacroInsertionEditorPrefillData = {
 };
 
 /**
- * Information about a macro block invocation
+ * Information about a macro block invocation.
  *
- * Identical to `UniAstMacroBlockInvocation` except for `body` which is a BlockNote AST piece here
+ * Identical to `MacroBlockInvocation` from `@xwiki/platform-uniast-api`, except for `body` which is a BlockNote AST
+ * piece here.
  *
  * @since 18.5.0RC1
  * @beta
@@ -311,10 +312,10 @@ type MacroBlockInvocation = Omit<UniAstMacroBlockInvocation, "body"> & {
 };
 
 /**
- * Information about an inline macro invocation
+ * Information about an inline macro invocation.
  *
- * Identical to `UniAstInlineMacroInvocation` except for `body` which is a BlockNote AST piece here
- * {@link MacroBlockInvocation}.
+ * Identical to `InlineMacroInvocation` from `@xwiki/platform-uniast-api`, except for `body` which is a BlockNote AST
+ * piece here.
  *
  * @since 18.5.0RC1
  * @beta

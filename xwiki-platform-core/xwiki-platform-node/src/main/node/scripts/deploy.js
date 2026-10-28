@@ -198,9 +198,8 @@ const declaredVersion = declaredVersions[0];
 
 let distTag;
 try {
-  // The packages are looked up in a stable order, so that every run of a release reads the same one.
   const existingVersions = needsPublishedVersions(declaredVersion)
-    ? await readPublishedVersions(publishedPackages.map(({name}) => name).sort(), {registry: releaseRegistry})
+    ? await readPublishedVersions(publishedPackages.map(({name}) => name), {registry: releaseRegistry})
     : [];
   distTag = computeDistTag(declaredVersion, existingVersions);
   console.log(`Publishing ${declaredVersion} under the "${distTag}" dist-tag`);

@@ -29,43 +29,54 @@ export function packageUrl(registry, name) {
 }
 
 /**
- * Read the versions already published on a registry, from the first of the given packages the
- * registry knows. The packages of a release are all released together with the same version, so
- * any of them tells which versions were released.
+ * Read the versions of a package already published on a registry.
  *
- * @param {string[]} names the names of the packages being published, in the order to look them up
+ * @param {string} name the package name
+ * @param {string} registry the registry URL
+ * @param {function} fetch the fetch function
+ * @returns {Promise<string[]>} the published versions of the package, empty when it has never been
+ *   published
+ * @throws {Error} when the registry cannot be queried
+ */
+async function readPackageVersions(name, registry, fetch) {
+  const url = packageUrl(registry, name);
+  let response;
+  try {
+    // The abbreviated metadata is enough to list the versions and much smaller than the full one.
+    response = await fetch(url, {headers: {accept: 'application/vnd.npm.install-v1+json'}});
+  } catch (error) {
+    // Node's fetch hides the network error (DNS, refused connection...) in the cause.
+    const reason = error.cause ? `${error.message} (${error.cause.code ?? error.cause.message})` : error.message;
+    throw new Error(`Failed to query [${url}]: ${reason}`, {cause: error});
+  }
+
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error(`Failed to query [${url}]: HTTP ${response.status}`);
+  }
+
+  const {versions = {}} = await response.json();
+  return Object.keys(versions);
+}
+
+/**
+ * Read the versions already published on a registry, across all the given packages. Every package
+ * is read because the set of packages changes between branches: a package dropped after 18.4 only
+ * has 18.4.x versions on the registry, so reading it alone would make an 18.4.x release look like
+ * the highest one.
+ *
+ * @param {string[]} names the names of the packages being published
  * @param {{registry: string, fetch?: function}} options the registry to read from and the
  *   injectable fetch function
- * @returns {Promise<string[]>} the published versions of the first package found on the registry,
- *   empty when the registry knows none of the packages
+ * @returns {Promise<string[]>} the versions published for at least one of the packages, empty when
+ *   the registry knows none of them
  * @throws {Error} when the registry cannot be queried, since the dist-tag would then be guessed
  */
 export async function readPublishedVersions(names, options) {
   const {registry, fetch = globalThis.fetch} = options;
 
-  for (const name of names) {
-    const url = packageUrl(registry, name);
-    let response;
-    try {
-      // The abbreviated metadata is enough to list the versions and much smaller than the full one.
-      response = await fetch(url, {headers: {accept: 'application/vnd.npm.install-v1+json'}});
-    } catch (error) {
-      // Node's fetch hides the network error (DNS, refused connection...) in the cause.
-      const reason = error.cause ? `${error.message} (${error.cause.code ?? error.cause.message})` : error.message;
-      throw new Error(`Failed to query [${url}]: ${reason}`, {cause: error});
-    }
-
-    if (response.status === 404) {
-      // This package has never been published, look for another one.
-      continue;
-    }
-    if (!response.ok) {
-      throw new Error(`Failed to query [${url}]: HTTP ${response.status}`);
-    }
-
-    const {versions = {}} = await response.json();
-    return Object.keys(versions);
-  }
-
-  return [];
+  const versions = await Promise.all(names.map(name => readPackageVersions(name, registry, fetch)));
+  return [...new Set(versions.flat())];
 }

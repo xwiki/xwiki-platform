@@ -47,19 +47,31 @@ describe('packageUrl', () => {
 });
 
 describe('readPublishedVersions', () => {
-  it('reads the versions of the first package the registry knows', async () => {
+  it('reads the versions of every package the registry knows', async () => {
     const fetch = registryFetch({
       [`${REGISTRY}/@xwiki%2fb`]: ['18.4.0', '18.8.0'],
-      [`${REGISTRY}/@xwiki%2fc`]: ['18.4.0'],
+      [`${REGISTRY}/@xwiki%2fc`]: ['18.4.0', '18.4.1'],
     });
 
     const versions = await readPublishedVersions(['@xwiki/a', '@xwiki/b', '@xwiki/c'], {registry: REGISTRY, fetch});
 
-    expect(versions).toEqual(['18.4.0', '18.8.0']);
-    // "a" has never been published, "c" is not needed.
-    expect(fetch).toHaveBeenCalledTimes(2);
+    // "a" has never been published.
+    expect(versions.sort()).toEqual(['18.4.0', '18.4.1', '18.8.0']);
+    expect(fetch).toHaveBeenCalledTimes(3);
     expect(fetch).toHaveBeenCalledWith(`${REGISTRY}/@xwiki%2fa`,
       {headers: {accept: 'application/vnd.npm.install-v1+json'}});
+  });
+
+  it('reads the higher versions of a package even when another one stopped being published', async () => {
+    // "a" was dropped after 18.4, "b" is still published by 18.8.
+    const fetch = registryFetch({
+      [`${REGISTRY}/@xwiki%2fa`]: ['18.4.0', '18.4.8'],
+      [`${REGISTRY}/@xwiki%2fb`]: ['18.4.0', '18.4.8', '18.8.0'],
+    });
+
+    const versions = await readPublishedVersions(['@xwiki/a', '@xwiki/b'], {registry: REGISTRY, fetch});
+
+    expect(versions).toContain('18.8.0');
   });
 
   it('answers no version when the registry knows none of the packages', async () => {
@@ -74,7 +86,6 @@ describe('readPublishedVersions', () => {
 
     await expect(readPublishedVersions(['@xwiki/a', '@xwiki/b'], {registry: REGISTRY, fetch}))
       .rejects.toThrow(`Failed to query [${REGISTRY}/@xwiki%2fa]: HTTP 503`);
-    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it('fails when the registry cannot be reached', async () => {

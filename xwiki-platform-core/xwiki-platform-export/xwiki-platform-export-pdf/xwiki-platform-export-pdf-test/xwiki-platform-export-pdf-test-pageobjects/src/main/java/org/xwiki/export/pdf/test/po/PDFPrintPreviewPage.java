@@ -19,10 +19,10 @@
  */
 package org.xwiki.export.pdf.test.po;
 
-import java.time.Duration;
+import java.util.Map;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BasePage;
 
@@ -36,24 +36,6 @@ import org.xwiki.test.ui.po.BasePage;
  */
 public class PDFPrintPreviewPage extends BasePage
 {
-    private static final String PRINT_PREVIEW_URL_ATTRIBUTE = "data-test-print-preview-url";
-
-    /**
-     * Captures the print preview URL and removes the iframe before it is loaded, so that the browser print dialog,
-     * which would block the test, is never opened.
-     */
-    private static final String CAPTURE_PRINT_PREVIEW_URL = """
-        const attributeName = arguments[0];
-        new MutationObserver((mutations, observer) => {
-          const iframe = mutations.flatMap(mutation => [...mutation.addedNodes])
-            .find(node => node.matches?.('iframe[src*="format=html-print"]'));
-          if (iframe) {
-            observer.disconnect();
-            document.body.setAttribute(attributeName, iframe.src);
-            iframe.remove();
-          }
-        }).observe(document.body, {childList: true});""";
-
     /**
      * The page ready flag is set before paged.js has finished laying out the print pages, because the print layout is
      * computed in a page ready callback registered later. We wait for all the page ready callbacks instead, which also
@@ -66,23 +48,21 @@ public class PDFPrintPreviewPage extends BasePage
         });""";
 
     /**
-     * Triggers the PDF export from the given modal and opens the resulting print preview, once its print layout is
-     * done. The PDF generator must be set to the user's web browser.
+     * Opens the print preview of the given PDF export job, once its print layout is done. The job must be finished and
+     * must have been executed with client-side printing, i.e. without the server-side PDF printer.
      *
-     * @param exportOptions the PDF export options modal
+     * @param documentReference the document from where the PDF export was triggered
+     * @param jobId the identifier of the PDF export job, with its parts separated by slashes
      * @return the print preview page
      */
-    public static PDFPrintPreviewPage open(PDFExportOptionsModal exportOptions)
+    public static PDFPrintPreviewPage gotoPage(EntityReference documentReference, String jobId)
     {
+        // These are the query parameters used by the PDF export modal when it loads the print preview.
+        getUtil().gotoPage(documentReference, "export",
+            Map.of("format", "html-print", "xpage", "get", "outputSyntax", "plain", "async", true, "sheet",
+                "XWiki.PDFExport.Sheet", "jobId", jobId));
+
         XWikiWebDriver driver = getUtil().getDriver();
-        driver.executeScript(CAPTURE_PRINT_PREVIEW_URL, PRINT_PREVIEW_URL_ATTRIBUTE);
-        exportOptions.triggerExport();
-
-        // The print preview is loaded only after the PDF export job is done, which can take a while.
-        String printPreviewURL = new WebDriverWait(driver, Duration.ofSeconds(60))
-            .until(d -> d.findElement(By.tagName("body")).getAttribute(PRINT_PREVIEW_URL_ATTRIBUTE));
-
-        driver.get(printPreviewURL);
         driver.waitUntilElementHasAttributeValue(By.tagName("html"), "data-xwiki-page-ready", "true");
         driver.executeAsyncScript(WAIT_FOR_PRINT_LAYOUT);
 

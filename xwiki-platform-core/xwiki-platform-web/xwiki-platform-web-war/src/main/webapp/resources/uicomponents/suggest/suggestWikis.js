@@ -17,22 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 /**
- * Values listed by a REST resource, such as tags and wikis.
+ * Wikis
  */
-define('xwiki-suggestRestListValues', ['jquery', 'xwiki-entityReference', 'xwiki-selectize'], function($, XWiki) {
-  /**
-   * Builds the selectize options for a REST resource that returns the list of values under the given response key,
-   * each value having a name.
-   */
-  function getSelectizeOptions(restPath, responseKey) {
-    const loadURL = [XWiki.contextPath, 'rest', ...restPath].join('/');
+define('xwiki-suggestWikis', ['jquery', 'xwiki-entityReference', 'xwiki-selectize'], function($, XWiki) {
+  function getSelectizeOptions() {
+    const loadURL = [XWiki.contextPath, 'rest', 'wikis'].join('/');
+    // The wikis resource can't filter or paginate, but a farm holds few wikis, so all of them are listed and the
+    // picker filters them on the typed text.
     async function load(text, callback) {
       try {
         const response = await $.getJSON(loadURL);
-        const values = Array.isArray(response?.[responseKey]) ? response[responseKey] : [];
-        callback(values.map(value => ({value: value.name})));
+        const wikis = Array.isArray(response?.wikis) ? response.wikis : [];
+        callback(wikis.map(wiki => ({value: wiki.name})));
       } catch {
         callback();
       }
@@ -40,19 +37,17 @@ define('xwiki-suggestRestListValues', ['jquery', 'xwiki-entityReference', 'xwiki
     return {create: true, load, loadSelected: load};
   }
 
-  $.fn.suggestRestListValues = function(restPath, responseKey) {
+  $.fn.suggestWikis = function() {
     return this.each(function() {
-      $(this).xwikiSelectize(getSelectizeOptions(restPath, responseKey));
+      $(this).xwikiSelectize(getSelectizeOptions());
     });
   };
 });
 
-require(['jquery', 'xwiki-entityReference', 'xwiki-suggestRestListValues', 'xwiki-events-bridge'], function($, XWiki) {
+require(['jquery', 'xwiki-suggestWikis', 'xwiki-events-bridge'], function($) {
   function init(event, data) {
     const container = $(data?.elements || document);
-    container.find('.suggest-tags')
-      .suggestRestListValues(['wikis', encodeURIComponent(XWiki.currentWiki), 'tags'], 'tags');
-    container.find('.suggest-wikis').suggestRestListValues(['wikis'], 'wikis');
+    container.find('.suggest-wikis').suggestWikis();
   }
 
   $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);

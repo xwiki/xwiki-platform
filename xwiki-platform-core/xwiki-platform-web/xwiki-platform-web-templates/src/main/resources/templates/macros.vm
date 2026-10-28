@@ -2808,18 +2808,15 @@ $string##
 #end
 
 #**
- * Outputs a suggest input for picking one or more values listed by a REST resource, such as tags or wikis.
+ * Outputs a suggest input for picking one or more values of the given type.
  *
- * @param $type the type of value, used to build the CSS class (suggest-${type}s) and the title translation keys
+ * @param $type the type of value, used to build the title translation keys
+ * @param $class the CSS class that the suggester of this type of value is applied to
  * @param $parameters the picker parameters, see #suggestInput
  *#
-#macro (_restListPicker $type $parameters)
+#macro (_valuePicker $type $class $parameters)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestRestListValues.js'))
-  #if ("$!parameters" == "")
-    #set ($parameters = {})
-  #end
-  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-${type}s"))
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') $class"))
   #if ($parameters.get('multiple') == 'multiple')
     #set ($macro.titleKey = "core.widgets.suggest.${type}Picker.multi.title")
   #else
@@ -2840,7 +2837,14 @@ $string##
  * @since 18.10.0RC1
  *#
 #macro (tagPicker $parameters)
-  #_restListPicker('tag' $parameters)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  ## The tags are suggested from the values of the tags property of the tag class, like in the Live Data tag filter.
+  #set ($discard = $parameters.put('data-className', 'XWiki.TagClass'))
+  #set ($discard = $parameters.put('data-propertyName', 'tags'))
+  #_valuePicker('tag' 'suggest-propertyValues' $parameters)
 #end
 
 #**
@@ -2853,7 +2857,11 @@ $string##
  * @since 18.10.0RC1
  *#
 #macro (wikiPicker $parameters)
-  #_restListPicker('wiki' $parameters)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestWikis.js'))
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #_valuePicker('wiki' 'suggest-wikis' $parameters)
 #end
 
 #**

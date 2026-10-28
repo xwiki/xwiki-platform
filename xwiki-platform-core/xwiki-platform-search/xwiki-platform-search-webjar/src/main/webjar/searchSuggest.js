@@ -108,20 +108,22 @@ var XWiki = (function (XWiki) {
     onSuggestionSelected: function(event) {
       if (event.memo.suggest === this.suggest) {
         event.stop();
+        const originalEvent = event.memo.originalEvent;
         if (!event.memo.url) {
           // Stop the browser event that triggered the custom "xwiki:suggest:selected" event.
-          if (event.memo.originalEvent.type === 'click' && event.memo.originalEvent) {
-            Event.stop(event.memo.originalEvent);
+          if (originalEvent) {
+            Event.stop(originalEvent);
           }
           // Submit form
           this.searchInput.up('form').submit();
-        }
-        else {
-          // The page anchor should be able to handle its own click event (event.memo.originalEvent here) itself.
-          if (event.memo.originalEvent.type !== 'click' && event.memo.originalEvent) {
-            Event.stop(event.memo.originalEvent);
-            window.location = event.memo.url;
+        } else if (originalEvent?.type === 'click') {
+          // Let the suggestion anchor handle the click natively, so that modifier keys such as Ctrl keep working.
+        } else {
+          if (originalEvent) {
+            Event.stop(originalEvent);
           }
+          // Go to page
+          window.location = event.memo.url;
         }
       }
     },

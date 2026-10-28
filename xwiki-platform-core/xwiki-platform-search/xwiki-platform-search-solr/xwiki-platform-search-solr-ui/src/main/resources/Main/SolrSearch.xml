@@ -750,6 +750,8 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 .search-facet-body li {
   display: flex;
   flex-wrap: wrap;
+  /* Keep the checkbox and the count aligned with the first line of a facet value displayed on several lines. */
+  align-items: flex-start;
   padding: .3em .5em;
 }
 
@@ -801,7 +803,7 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 }
 
 .search-facet-body input[type="checkbox"] {
-  margin: .2em 0;
+  margin: .3em 0;
 }
 
 .search-facet-body .itemName,

@@ -852,6 +852,7 @@ public abstract class ListClass extends PropertyClass
         }
 
         // Add options from Set
+        StringBuilder groupContent = new StringBuilder();
         int count = 0;
         for (Object rawvalue : list) {
             String value = getElementValue(rawvalue);
@@ -868,11 +869,11 @@ public abstract class ListClass extends PropertyClass
             }
             radio.addElement(display);
 
-            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-")
+            groupContent.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-")
                 .append(XMLUtils.escape(name)).append('-').append(object.getNumber()).append('-')
                 .append(count++).append("\">");
-            buffer.append(radio.toString());
-            buffer.append("</label>");
+            groupContent.append(radio.toString());
+            groupContent.append("</label>");
         }
 
         // We need a hidden input with an empty value to be able to clear the selected values when no value is selected
@@ -880,7 +881,9 @@ public abstract class ListClass extends PropertyClass
         org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
         hidden.setAttributeFilter(new XMLAttributeValueFilter());
         hidden.setDisabled(isDisabled());
-        buffer.append(hidden);
+        groupContent.append(hidden);
+
+        buffer.append(displayControlGroup(groupContent.toString(), context));
     }
 
     protected class MapComparator implements Comparator<String>

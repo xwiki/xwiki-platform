@@ -325,9 +325,12 @@ public class BooleanClass extends PropertyClass
             default -> radioNone.setChecked(true);
         }
 
+        StringBuilder groupContent = new StringBuilder();
         for (div input : inputs) {
-            buffer.append(input.toString());
+            groupContent.append(input.toString());
         }
+
+        buffer.append(displayControlGroup(groupContent.toString(), context));
     }
 
     public void displayCheckboxEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,

@@ -52,4 +52,17 @@ public class Upgrade1210CustomTest extends UpgradeTest
         // We expect the user "user1" to have a notification associated
         NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki.user1", "xwiki", 1);
     }
+
+    @Override
+    protected void setupLogs()
+    {
+        // The migration increasing the columns size to 768 skips the columns declared in lowercase on HSQLDB and
+        // Oracle, such as the ones of the activity stream table of this old version: its page column keeps its size of
+        // 255, so storing the event of the page with 768 characters in its reference saved by UpgradeTest fails. The
+        // fix (XWIKI-25211: The migration increasing the columns size to 768 skips the columns declared in lowercase on
+        // HSQLDB and Oracle) is not on this branch since it adds a risky migration for a problem that only happens when
+        // upgrading an old instance on HSQLDB or Oracle.
+        validateConsole.getLogCaptureConfiguration()
+            .registerExcludes("size limit: 255 table: ACTIVITYSTREAM_EVENTS column: ASE_PAGE");
+    }
 }

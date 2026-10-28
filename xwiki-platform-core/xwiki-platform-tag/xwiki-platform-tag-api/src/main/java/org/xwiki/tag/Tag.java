@@ -20,11 +20,14 @@
 package org.xwiki.tag;
 
 import java.io.Serializable;
+import java.util.Locale;
+import java.util.Objects;
 
 import org.xwiki.stability.Unstable;
 
 /**
- * Represents a document tag, identified by its name.
+ * Represents a document tag, identified by its name. Tags are compared ignoring case, like the tag cloud and the tag
+ * notification filter do, but the name is kept as given.
  *
  * @param name the name of the tag
  * @version $Id$
@@ -40,5 +43,22 @@ public record Tag(String name) implements Serializable
     public String toString()
     {
         return this.name;
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        return object instanceof Tag tag && Objects.equals(normalize(this.name), normalize(tag.name));
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(normalize(this.name));
+    }
+
+    private static String normalize(String name)
+    {
+        return name == null ? null : name.toLowerCase(Locale.ROOT);
     }
 }

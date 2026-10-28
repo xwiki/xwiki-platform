@@ -41,6 +41,18 @@ class TagTest
         assertNotEquals(new Tag("bar"), tag);
         assertNotEquals("foo", tag);
         assertEquals(new Tag(null), new Tag(null));
+        assertNotEquals(new Tag(null), tag);
+        assertNotEquals(tag, new Tag(null));
+    }
+
+    @Test
+    void equalsAndHashCodeIgnoreCase()
+    {
+        Tag tag = new Tag("Foo");
+        assertEquals(new Tag("foo"), tag);
+        assertEquals(new Tag("FOO").hashCode(), tag.hashCode());
+        // The name is kept as given.
+        assertEquals("Foo", tag.name());
     }
 
     @Test

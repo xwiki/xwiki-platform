@@ -117,6 +117,7 @@ function buildFile(): File {
 /** Resolves to whether `promise` had already settled once pending microtasks were flushed. */
 async function isSettled(promise: Promise<unknown>): Promise<boolean> {
   let settled = false;
+  // eslint-disable-next-line promise/prefer-await-to-then -- Awaiting would block on the settlement being probed.
   void promise.finally(() => {
     settled = true;
   });

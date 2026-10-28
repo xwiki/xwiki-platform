@@ -93,7 +93,11 @@ function triggerUserFileUpload(
         return;
       }
 
-      uploadSelectedFile(file, depsContainer).then(resolve).catch(reject);
+      try {
+        resolve(await uploadSelectedFile(file, depsContainer));
+      } catch (error) {
+        reject(error);
+      }
     });
 
     // Removes the input from the DOM again if the user closes the file

@@ -181,9 +181,9 @@
     $(this).before(checkBox)
   };
 
-  var addFacetTitle = function() {
-    let facetPrettyNameText = $(this).text();
-    $(this).attr('title', facetPrettyNameText);
+  function addFacetTitle() {
+    const facetTitle = $(this).attr('title') || $(this).text().trim();
+    $(this).attr('title', facetTitle);
   }
 
   var enhanceSearchFacets = function() {

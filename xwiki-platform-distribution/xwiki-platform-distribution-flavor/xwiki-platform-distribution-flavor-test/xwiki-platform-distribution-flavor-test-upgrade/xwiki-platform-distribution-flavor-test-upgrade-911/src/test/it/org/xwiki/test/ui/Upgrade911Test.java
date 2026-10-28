@@ -42,5 +42,12 @@ public class Upgrade911Test extends UpgradeTest
             "Invalid extension [org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/9.11.8] on namespace "
                 + "[wiki:xwiki] (InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-"
                 + "[9.11.8]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/");
+
+        // TODO: Remove once XWIKI-25211 (The migration increasing the columns size to 768 skips the columns declared
+        // in lowercase on HSQLDB and Oracle) is fixed on this branch. The activity stream table of this old version
+        // declares its columns in lowercase, so its page column keeps its size of 255 and storing the event of the
+        // page with 768 characters in its reference saved by UpgradeTest fails.
+        validateConsole.getLogCaptureConfiguration()
+            .registerExcludes("size limit: 255 table: ACTIVITYSTREAM_EVENTS column: ASE_PAGE");
     }
 }

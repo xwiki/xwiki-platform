@@ -105,5 +105,12 @@ public class Upgrade84FileStoreTest extends UpgradeTest
             "Deprecated usage of method [org.apache.velocity.tools.generic.MathTool.toInteger]",
             "Deprecated usage of method [org.xwiki.velocity.tools.CollectionsTool.sort]"
         );
+
+        // TODO: Remove once XWIKI-25211 (The migration increasing the columns size to 768 skips the columns declared
+        // in lowercase on HSQLDB and Oracle) is fixed on this branch. The activity stream table of this old version
+        // declares its columns in lowercase, so its page column keeps its size of 255 and storing the event of the
+        // page with 768 characters in its reference saved by UpgradeTest fails.
+        validateConsole.getLogCaptureConfiguration()
+            .registerExcludes("size limit: 255 table: ACTIVITYSTREAM_EVENTS column: ASE_PAGE");
     }
 }

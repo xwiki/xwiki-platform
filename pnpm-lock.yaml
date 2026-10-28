@@ -136,8 +136,8 @@ catalogs:
       specifier: 4.4.5
       version: 4.4.5
     eslint-plugin-headers:
-      specifier: 1.3.4
-      version: 1.3.4
+      specifier: 1.3.5
+      version: 1.3.5
     eslint-plugin-import-x:
       specifier: 4.17.1
       version: 4.17.1
@@ -4042,10 +4042,10 @@ importers:
         version: 8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+        version: 5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(@typescript/typescript6@6.0.2)(vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)))
+        version: 5.1.1(@typescript/typescript6@6.0.2)(vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0)))
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.11(@typescript/typescript6@6.0.2)
@@ -4065,7 +4065,7 @@ importers:
         version: 4.4.5(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.70.1(@typescript/typescript6@6.0.2)(eslint@10.12.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1))(eslint@10.12.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1))(eslint@10.12.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
       eslint-plugin-headers:
         specifier: 'catalog:'
-        version: 1.3.4(eslint@10.12.0(jiti@2.7.0)(supports-color@8.1.1))
+        version: 1.3.5(eslint@10.12.0(jiti@2.7.0)(supports-color@8.1.1))
       eslint-plugin-import-x:
         specifier: 'catalog:'
         version: 4.17.1(@typescript-eslint/utils@8.70.1(@typescript/typescript6@6.0.2)(eslint@10.12.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1))(eslint@10.12.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
@@ -5839,6 +5839,11 @@ packages:
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
+    peerDependencies:
+      ajv: ^8.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
 
   ajv@6.15.0:
     resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
@@ -6318,8 +6323,8 @@ packages:
       eslint-plugin-import-x:
         optional: true
 
-  eslint-plugin-headers@1.3.4:
-    resolution: {integrity: sha512-sfgmrq+geMaB7yilx1wbbzSHTmLRPm+hX6kxJhb6LQQwmF00CqZ8d3ks2ZADlDdREhP31THPHgRhcQuDogVZ4w==}
+  eslint-plugin-headers@1.3.5:
+    resolution: {integrity: sha512-FmI5eJOCoP8kcYhcUNE4OkS7MadUjGm6IYxMI8BzQREJ1BPNXlyXo9ksxctNC+dYa896SsTq/mHsFHUSj0kiQg==}
     engines: {node: ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -9896,15 +9901,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/mocker@5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))':
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      '@vitest/spy': 5.0.5
-      estree-walker: 3.0.3
-      magic-string: 1.4.3
-    optionalDependencies:
-      vite: 8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
-
   '@vitest/mocker@5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
@@ -10651,7 +10647,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-headers@1.3.4(eslint@10.12.0(jiti@2.7.0)(supports-color@8.1.1)):
+  eslint-plugin-headers@1.3.5(eslint@10.12.0(jiti@2.7.0)(supports-color@8.1.1)):
     dependencies:
       eslint: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
 
@@ -13008,39 +13004,11 @@ snapshots:
       sugarss: 5.0.1(postcss@8.5.30)
       yaml: 2.9.0
 
-  vitest-mock-extended@5.1.1(@typescript/typescript6@6.0.2)(vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))):
-    dependencies:
-      ts-essentials: 10.2.1(@typescript/typescript6@6.0.2)
-      typescript: '@typescript/typescript6@6.0.2'
-      vitest: 5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
-
   vitest-mock-extended@5.1.1(@typescript/typescript6@6.0.2)(vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))):
     dependencies:
       ts-essentials: 10.2.1(@typescript/typescript6@6.0.2)
       typescript: '@typescript/typescript6@6.0.2'
       vitest: 5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
-
-  vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)):
-    dependencies:
-      '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
-      chai: 6.3.0
-      es-module-lexer: 2.3.2
-      expect-type: 1.4.0
-      magic-string: 1.4.3
-      obug: 3.0.0
-      picomatch: 4.0.7
-      std-env: 4.3.0
-      tinybench: 6.2.2
-      tinyexec: 1.3.1
-      tinyglobby: 0.2.17
-      vite: 8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
-      why-is-node-running: 3.2.1
-    optionalDependencies:
-      '@types/node': 24.13.6
-      jsdom: 30.1.3
-    transitivePeerDependencies:
-      - msw
 
   vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0)):
     dependencies:

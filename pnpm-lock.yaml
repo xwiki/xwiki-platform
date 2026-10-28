@@ -31,11 +31,11 @@ catalogs:
       specifier: 2.3.5
       version: 2.3.5
     '@mantine/core':
-      specifier: 9.6.3
-      version: 9.6.3
+      specifier: 9.7.4
+      version: 9.7.4
     '@mantine/hooks':
-      specifier: 9.6.3
-      version: 9.6.3
+      specifier: 9.7.4
+      version: 9.7.4
     '@microsoft/api-extractor':
       specifier: 7.60.0
       version: 7.60.0
@@ -3897,7 +3897,7 @@ importers:
         version: 0.56.0(@types/hast@3.0.5)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/mantine':
         specifier: 'catalog:'
-        version: 0.56.0(@floating-ui/dom@1.8.0)(@mantine/core@9.6.3(@mantine/hooks@9.6.3(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.6.3(react@19.3.0))(@types/hast@3.0.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.56.0(@floating-ui/dom@1.8.0)(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.7.4(react@19.3.0))(@types/hast@3.0.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/react':
         specifier: 'catalog:'
         version: 0.56.0(@floating-ui/dom@1.8.0)(@types/hast@3.0.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
@@ -3906,10 +3906,10 @@ importers:
         version: 0.27.20(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.6.3(@mantine/hooks@9.6.3(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 9.7.4(@mantine/hooks@9.7.4(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@mantine/hooks':
         specifier: 'catalog:'
-        version: 9.6.3(react@19.3.0)
+        version: 9.7.4(react@19.3.0)
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.3.0(@types/react@19.3.0)
@@ -4042,10 +4042,10 @@ importers:
         version: 8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+        version: 5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(@typescript/typescript6@6.0.2)(vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)))
+        version: 5.1.1(@typescript/typescript6@6.0.2)(vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0)))
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.11(@typescript/typescript6@6.0.2)
@@ -4863,15 +4863,15 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@mantine/core@9.6.3':
-    resolution: {integrity: sha512-o9xzpkma6RiLbENNU4VoxKnCU4VaFlB6Yh6wAjAUiU329ypPV6tBY7VkVeQQ5Z+e12D3I+NTPrUw43onlYCqTg==}
+  '@mantine/core@9.7.4':
+    resolution: {integrity: sha512-c7aTGELNn74CxG9i5/tq9BHGh0lKdKmGGz+9iDF+gR7Ipt4U1TMM286lAmLpRrKL2bR+UEaN4blZ8UJmOuGJ4Q==}
     peerDependencies:
-      '@mantine/hooks': 9.6.3
+      '@mantine/hooks': 9.7.4
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@mantine/hooks@9.6.3':
-    resolution: {integrity: sha512-b3uJx1p5vlXOmLEgp4OqzC3FUxSIc5bmqPPxPLHsgR6S0aBiqn9psaihJP7u/v//mr3qeCmyMeIwSw9ROu4pXg==}
+  '@mantine/hooks@9.7.4':
+    resolution: {integrity: sha512-j6Xf9Sc1fhhGEKXg6BZA2geyP/Czqvo6Rsi0IduOCWgwl/MAAJbKRjRc7xe2+9vePLdfqLZqRIAOY5rta88uNA==}
     peerDependencies:
       react: ^19.2.0
 
@@ -5839,6 +5839,11 @@ packages:
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
+    peerDependencies:
+      ajv: ^8.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
 
   ajv@6.15.0:
     resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
@@ -8180,12 +8185,12 @@ packages:
     resolution: {integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==}
     engines: {node: '>=8'}
 
-  type-fest@5.8.0:
-    resolution: {integrity: sha512-YGYEVz3Fm5iy/AybuA0oyNFq7H4CgQNfRp/qfe8nurE1kuCeNm3/vfm9X4Mtl+qLyaKJUh5xrFZwogr41SMjYA==}
+  type-fest@5.10.0:
+    resolution: {integrity: sha512-NoSdpq/WEiAg5sjmBkmV/hfxv6HJH4NqPNrqjtSO5CwRmpsDfaf4begxW34KdJykH/l1yHtwBWQkCRdoXO8mPA==}
     engines: {node: '>=20'}
 
-  type-fest@5.9.0:
-    resolution: {integrity: sha512-yANm3Jr3GiJ1qgJlxGAVxTOIcEOk1rhQHamlXtnrCK7EHP4HeM9OGxtMg/W7HFdrVzw/ZWJKGVIJusVH85sLtw==}
+  type-fest@5.8.0:
+    resolution: {integrity: sha512-YGYEVz3Fm5iy/AybuA0oyNFq7H4CgQNfRp/qfe8nurE1kuCeNm3/vfm9X4Mtl+qLyaKJUh5xrFZwogr41SMjYA==}
     engines: {node: '>=20'}
 
   typed-array-buffer@1.0.3:
@@ -8749,12 +8754,12 @@ snapshots:
       - refractor
       - sugar-high
 
-  '@blocknote/mantine@0.56.0(@floating-ui/dom@1.8.0)(@mantine/core@9.6.3(@mantine/hooks@9.6.3(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.6.3(react@19.3.0))(@types/hast@3.0.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@blocknote/mantine@0.56.0(@floating-ui/dom@1.8.0)(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.7.4(react@19.3.0))(@types/hast@3.0.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
       '@blocknote/core': 0.56.0(@types/hast@3.0.5)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/react': 0.56.0(@floating-ui/dom@1.8.0)(@types/hast@3.0.5)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
-      '@mantine/core': 9.6.3(@mantine/hooks@9.6.3(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@mantine/hooks': 9.6.3(react@19.3.0)
+      '@mantine/core': 9.7.4(@mantine/hooks@9.7.4(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@mantine/hooks': 9.7.4(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
     transitivePeerDependencies:
@@ -9131,20 +9136,20 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@mantine/core@9.6.3(@mantine/hooks@9.6.3(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@floating-ui/react': 0.27.20(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@mantine/hooks': 9.6.3(react@19.3.0)
+      '@mantine/hooks': 9.7.4(react@19.3.0)
       clsx: 2.1.1
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
       react-number-format: 5.4.5(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react-remove-scroll: 2.7.2(@types/react@19.3.0)(react@19.3.0)
-      type-fest: 5.9.0
+      type-fest: 5.10.0
     transitivePeerDependencies:
       - '@types/react'
 
-  '@mantine/hooks@9.6.3(react@19.3.0)':
+  '@mantine/hooks@9.7.4(react@19.3.0)':
     dependencies:
       react: 19.3.0
 
@@ -9895,15 +9900,6 @@ snapshots:
       vitest: 5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
     transitivePeerDependencies:
       - supports-color
-
-  '@vitest/mocker@5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))':
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      '@vitest/spy': 5.0.5
-      estree-walker: 3.0.3
-      magic-string: 1.4.3
-    optionalDependencies:
-      vite: 8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
 
   '@vitest/mocker@5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))':
     dependencies:
@@ -12741,11 +12737,11 @@ snapshots:
 
   type-fest@0.8.1: {}
 
-  type-fest@5.8.0:
+  type-fest@5.10.0:
     dependencies:
       tagged-tag: 1.0.0
 
-  type-fest@5.9.0:
+  type-fest@5.8.0:
     dependencies:
       tagged-tag: 1.0.0
 
@@ -13008,39 +13004,11 @@ snapshots:
       sugarss: 5.0.1(postcss@8.5.30)
       yaml: 2.9.0
 
-  vitest-mock-extended@5.1.1(@typescript/typescript6@6.0.2)(vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))):
-    dependencies:
-      ts-essentials: 10.2.1(@typescript/typescript6@6.0.2)
-      typescript: '@typescript/typescript6@6.0.2'
-      vitest: 5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
-
   vitest-mock-extended@5.1.1(@typescript/typescript6@6.0.2)(vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))):
     dependencies:
       ts-essentials: 10.2.1(@typescript/typescript6@6.0.2)
       typescript: '@typescript/typescript6@6.0.2'
       vitest: 5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0))
-
-  vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)):
-    dependencies:
-      '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.5(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
-      chai: 6.3.0
-      es-module-lexer: 2.3.2
-      expect-type: 1.4.0
-      magic-string: 1.4.3
-      obug: 3.0.0
-      picomatch: 4.0.7
-      std-env: 4.3.0
-      tinybench: 6.2.2
-      tinyexec: 1.3.1
-      tinyglobby: 0.2.17
-      vite: 8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
-      why-is-node-running: 3.2.1
-    optionalDependencies:
-      '@types/node': 24.13.6
-      jsdom: 30.1.3
-    transitivePeerDependencies:
-      - msw
 
   vitest@5.0.5(@types/node@24.13.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.30))(yaml@2.9.0)):
     dependencies:

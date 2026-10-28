@@ -19,7 +19,10 @@
  */
 package org.xwiki.user.profile;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jsoup.Jsoup;
@@ -27,6 +30,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponentManagerEventListener;
@@ -34,6 +38,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -72,6 +80,12 @@ class UserProfilePageTest extends PageTest
 
     private static final DocumentReference ALICE_REFERENCE = new DocumentReference("xwiki", "XWiki", "alice");
 
+    private static final DocumentReference USER_PROFILE_SHEET =
+        new DocumentReference("xwiki", "XWiki", "XWikiUserProfileSheet");
+
+    @Mock
+    private Macro<Object> notificationsMacro;
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -99,6 +113,30 @@ class UserProfilePageTest extends PageTest
         assertEquals(userProperties.get("timezone"), timeZone.text());
     }
 
+    @Test
+    void notificationsUsersWithSpecialCharactersInUserName() throws Exception
+    {
+        // Collect the users passed to the notifications macro displayed by the user profile.
+        List<String> users = new ArrayList<>();
+        when(this.notificationsMacro.supportsInlineMode()).thenReturn(true);
+        when(this.notificationsMacro.getDescriptor())
+            .thenReturn(new DefaultMacroDescriptor(new MacroId("notifications"), "Notifications Macro"));
+        when(this.notificationsMacro.execute(any(), any(), any())).then(invocation -> {
+            users.add(invocation.getArgument(2, MacroTransformationContext.class).getCurrentMacroBlock()
+                .getParameter("users"));
+            return Collections.emptyList();
+        });
+        this.componentManager.registerComponent(Macro.class, "notifications", this.notificationsMacro);
+        registerUIX(USER_PROFILE_SHEET);
+
+        DocumentReference userReference =
+            new DocumentReference("xwiki", "XWiki", "a\" /}}{{notifications users=\"b");
+        createUser(userReference, new HashMap<>());
+        renderSheet(USER_SHEET);
+
+        assertEquals(List.of("xwiki:XWiki.a\" /}}{{notifications users=\"b"), users);
+    }
+
     private void registerUIX(DocumentReference documentReference) throws Exception
     {
         XWikiDocument document = loadPage(documentReference);
@@ -113,12 +151,18 @@ class UserProfilePageTest extends PageTest
 
     private XWikiDocument createUser(Map<String, Object> userProperties) throws Exception
     {
-        this.xwiki.createUser(ALICE_REFERENCE.getName(), userProperties, this.context);
-        XWikiDocument userDocument = this.xwiki.getDocument(ALICE_REFERENCE, this.context);
+        return createUser(ALICE_REFERENCE, userProperties);
+    }
+
+    private XWikiDocument createUser(DocumentReference userReference, Map<String, Object> userProperties)
+        throws Exception
+    {
+        this.xwiki.createUser(userReference.getName(), userProperties, this.context);
+        XWikiDocument userDocument = this.xwiki.getDocument(userReference, this.context);
 
         // Setup the script context as if we are logged in with the created user on its user profile.
         this.context.setDoc(userDocument);
-        this.context.setUserReference(ALICE_REFERENCE);
+        this.context.setUserReference(userReference);
 
         return userDocument;
     }

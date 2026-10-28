@@ -22,16 +22,13 @@ import {
   tryFallibleOrError,
 } from "@xwiki/platform-fn-utils";
 import React from "react";
+import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 import type {
-  MacroBlock,
-  MacroBlockStyles,
-  MacroInlineContent,
-  MacroLinkTarget,
-} from "@xwiki/platform-macros-api";
-import type {
-  RemoteURLParser,
-  RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
+  Block,
+  BlockStyles,
+  InlineContent,
+  LinkTarget,
+} from "@xwiki/platform-uniast-api";
 import type {
   CSSProperties,
   HTMLAttributes,
@@ -41,7 +38,7 @@ import type {
 } from "react";
 
 /**
- * @since 18.0.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 export type MacroEditableZoneRef =
@@ -49,19 +46,16 @@ export type MacroEditableZoneRef =
   | { type: "inline"; ref: Ref<HTMLSpanElement> };
 
 /**
- * Converter that transforms a macro's returned AST to React JSX
+ * Converter that transforms UniAst content (e.g. a macro's render() output) to React JSX
  *
- * @since 18.0.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
-export class MacrosAstToReactJsxConverter {
-  constructor(
-    private readonly remoteURLParser: RemoteURLParser,
-    private readonly remoteURLSerializer: RemoteURLSerializer,
-  ) {}
+export class UniAstToReactJsxConverter {
+  constructor(private readonly remoteURLSerializer: RemoteURLSerializer) {}
 
   /**
-   * Render a macro's AST blocks to JSX elements
+   * Render UniAst blocks to JSX elements
    *
    * Will force re-render every time, even if the AST is exactly the same
    * (see the private `generateId` function for more information)
@@ -72,7 +66,7 @@ export class MacrosAstToReactJsxConverter {
    * @returns The JSX elements
    */
   blocksToReactJSX(
-    blocks: MacroBlock[],
+    blocks: Block[],
     editableZoneRef: MacroEditableZoneRef,
   ): JSX.Element[] | Error {
     return tryFallibleOrError(() =>
@@ -81,7 +75,7 @@ export class MacrosAstToReactJsxConverter {
   }
 
   /**
-   * Render a macro's AST inline contents to JSX elements
+   * Render UniAst inline contents to JSX elements
    *
    * Will force re-render every time, even if the AST is exactly the same
    * (see the private `generateId` function for more information)
@@ -92,7 +86,7 @@ export class MacrosAstToReactJsxConverter {
    * @returns The JSX elements
    */
   inlineContentsToReactJSX(
-    inlineContents: MacroInlineContent[],
+    inlineContents: InlineContent[],
     editableZoneRef: MacroEditableZoneRef,
   ): JSX.Element[] | Error {
     return tryFallibleOrError(() =>
@@ -104,11 +98,11 @@ export class MacrosAstToReactJsxConverter {
     );
   }
 
-  private generateId(root: MacroBlock[] | MacroInlineContent[]): string {
+  private generateId(root: Block[] | InlineContent[]): string {
     // When mapping an array to React elements, each child needs a `key` identifying it based on its content.
     // This allows React to quickly check whether the child changed or not, and update / reorder the DOM accordingly.
     //
-    // Because we are iterating over generic structures without identifiers (`MacroBlock` and `MacroInlineContent` don't have an ID),
+    // Because we are iterating over generic structures without identifiers (`Block` and `InlineContent` don't have an ID),
     // and adding an ID would pollute the object without any real benefit (it wouldn't be linked to the actual content), we "hash" the root object here,
     // and derive an ID from it. All sub-elements will use it.
     //
@@ -128,7 +122,7 @@ export class MacrosAstToReactJsxConverter {
   }
 
   private convertBlocks(
-    blocks: MacroBlock[],
+    blocks: Block[],
     editableZoneRef: MacroEditableZoneRef,
     key: string,
   ): JSX.Element[] {
@@ -144,7 +138,7 @@ export class MacrosAstToReactJsxConverter {
   }
 
   private convertInlineContents(
-    inlineContents: MacroInlineContent[],
+    inlineContents: InlineContent[],
     editableZoneRef: MacroEditableZoneRef,
     key: string,
   ): JSX.Element[] {
@@ -160,7 +154,7 @@ export class MacrosAstToReactJsxConverter {
   }
 
   private convertBlock(
-    block: MacroBlock,
+    block: Block,
     editableZoneRef: MacroEditableZoneRef,
     key: string,
   ): JSX.Element {
@@ -181,11 +175,18 @@ export class MacrosAstToReactJsxConverter {
           </TagName>
         );
 
-      case "list":
-        const ListTag = block.numbered ? "ol" : "ul";
+      case "list": {
+        // Ordered vs. unordered is expressed per-item (through `number`), not on the list itself: the list is
+        // ordered as soon as one of its items has a number - see `default-uni-ast-to-markdown-converter.ts` for the
+        // same convention.
+        const ListTag = block.items.some((item) => item.number !== undefined)
+          ? "ol"
+          : "ul";
+        // An ordered list doesn't necessarily start at 1 (e.g. a list continued after a paragraph).
+        const start = ListTag === "ol" ? block.items[0]?.number : undefined;
 
         return (
-          <ListTag {...this.convertBlockStyles(block.styles)}>
+          <ListTag start={start} {...this.convertBlockStyles(block.styles)}>
             {block.items.map((item, i) => {
               const childKey = `${key}.${i}`;
 
@@ -194,16 +195,13 @@ export class MacrosAstToReactJsxConverter {
                   {item.checked !== undefined && (
                     <input type="checkbox" checked={item.checked} readOnly />
                   )}
-                  {this.convertInlineContents(
-                    item.content,
-                    editableZoneRef,
-                    childKey,
-                  )}
+                  {this.convertBlocks(item.content, editableZoneRef, childKey)}
                 </li>
               );
             })}
           </ListTag>
         );
+      }
 
       case "quote":
         return (
@@ -306,6 +304,9 @@ export class MacrosAstToReactJsxConverter {
           />
         );
 
+      case "break":
+        return <hr />;
+
       case "rawHtml":
         return <div dangerouslySetInnerHTML={{ __html: block.html }} />;
 
@@ -330,9 +331,7 @@ export class MacrosAstToReactJsxConverter {
     }
   }
 
-  private convertBlockStyles(
-    styles: MacroBlockStyles,
-  ): HTMLAttributes<unknown> {
+  private convertBlockStyles(styles: BlockStyles): HTMLAttributes<unknown> {
     const out: HTMLAttributes<unknown> = {};
 
     if (styles.backgroundColor) {
@@ -355,7 +354,7 @@ export class MacrosAstToReactJsxConverter {
   }
 
   private convertInlineContent(
-    inlineContent: MacroInlineContent,
+    inlineContent: InlineContent,
     editableZoneRef: MacroEditableZoneRef,
     key: string,
   ): JSX.Element {
@@ -379,17 +378,36 @@ export class MacrosAstToReactJsxConverter {
           style.fontStyle = "italic";
         }
 
-        if (inlineContent.styles.underline) {
-          style.textDecoration = "underline";
-        }
+        const textDecorations = [
+          inlineContent.styles.underline && "underline",
+          inlineContent.styles.strikethrough && "line-through",
+        ].filter(Boolean);
 
-        if (inlineContent.styles.strikethrough) {
-          style.textDecoration = "line-through";
+        if (textDecorations.length > 0) {
+          style.textDecoration = textDecorations.join(" ");
         }
 
         const attr = Object.values(style).length > 0 ? { style } : {};
 
-        return <span {...attr}>{inlineContent.content}</span>;
+        return (
+          <span {...attr}>
+            {inlineContent.styles.code ? (
+              <code>{inlineContent.content}</code>
+            ) : (
+              inlineContent.content
+            )}
+          </span>
+        );
+
+      case "image":
+        return (
+          <img
+            src={this.getTargetUrl(inlineContent.target)}
+            alt={inlineContent.alt}
+            width={inlineContent.widthPx}
+            height={inlineContent.heightPx}
+          />
+        );
 
       case "link":
         return (
@@ -424,24 +442,18 @@ export class MacrosAstToReactJsxConverter {
     }
   }
 
-  private getTargetUrl(target: MacroLinkTarget): string {
+  private getTargetUrl(target: LinkTarget): string {
     if (target.type === "external") {
       return target.url;
     }
 
-    const { rawReference } = target;
+    const { rawReference, parsedReference } = target;
 
-    const parsedRef = tryFallibleOrError(() =>
-      this.remoteURLParser.parse(rawReference),
-    );
-
-    if (parsedRef instanceof Error) {
-      throw new Error(
-        `Failed to parse reference "${rawReference}": ${parsedRef.message}`,
-      );
+    if (!parsedReference) {
+      throw new Error(`Invalid reference "${rawReference}"`);
     }
 
-    const url = this.remoteURLSerializer.serialize(parsedRef);
+    const url = this.remoteURLSerializer.serialize(parsedReference);
 
     // TODO: when could this even happen?
     if (!url) {

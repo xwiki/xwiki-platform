@@ -44,7 +44,7 @@ import {
   useCreateBlockNote,
 } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
-import { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
+import { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type {
@@ -67,10 +67,7 @@ import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type {
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { Container } from "inversify";
 
@@ -266,11 +263,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
   if (macros) {
-    const macroAstToReactJsxConverter = new MacrosAstToReactJsxConverter(
-      depsContainer
-        .get<RemoteURLParserProvider>("RemoteURLParserProvider")
-        .get()!,
-
+    const uniAstToReactJsxConverter = new UniAstToReactJsxConverter(
       depsContainer
         .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
         .get()!,
@@ -278,7 +271,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
     for (const macro of macros.list ?? []) {
       builtMacros.push(
-        adaptMacroForBlockNote(macro, macros.ctx, macroAstToReactJsxConverter),
+        adaptMacroForBlockNote(macro, macros.ctx, uniAstToReactJsxConverter),
       );
     }
   }

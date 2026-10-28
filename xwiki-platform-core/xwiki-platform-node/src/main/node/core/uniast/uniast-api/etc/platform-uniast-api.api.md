@@ -43,6 +43,12 @@ export type Block = {
 } | {
     type: "macroBlock";
     call: MacroBlockInvocation;
+} | {
+    type: "rawHtml";
+    html: string;
+} | {
+    type: "macroBlockEditableArea";
+    styles: BlockStyles;
 };
 
 // @beta (undocumented)
@@ -50,6 +56,7 @@ export type BlockStyles = {
     textColor?: string;
     backgroundColor?: string;
     textAlignment?: Alignment;
+    cssClasses?: string[];
 };
 
 // @beta (undocumented)
@@ -75,6 +82,11 @@ export type InlineContent = ({
 } & Link) | {
     type: "inlineMacro";
     call: InlineMacroInvocation;
+} | {
+    type: "rawHtml";
+    html: string;
+} | {
+    type: "inlineMacroEditableArea";
 };
 
 // @beta (undocumented)

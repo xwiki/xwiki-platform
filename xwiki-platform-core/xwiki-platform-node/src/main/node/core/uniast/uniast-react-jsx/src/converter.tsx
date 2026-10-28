@@ -308,7 +308,7 @@ export class UniAstToReactJsxConverter {
         );
 
       case "break":
-        return <br />;
+        return <hr />;
 
       case "rawHtml":
         return <div dangerouslySetInnerHTML={{ __html: block.html }} />;

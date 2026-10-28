@@ -229,8 +229,9 @@ class ImageIT extends AbstractBlockNoteIT
         String savedContent = page.editWiki().getContent();
 
         // Untyped reference, and renamed: browsers name a pasted file after its media type, so a second paste would
-        // otherwise overwrite this attachment.
-        assertThat(savedContent, matchesPattern("(?s).*\\[\\[image:\\d+-\\d+\\.gif\\]\\].*"));
+        // otherwise overwrite this attachment. A block of its own, after the paragraph that held the caret, since
+        // BlockNote inserts the file block after the current block instead of splitting it.
+        assertThat(savedContent, matchesPattern("before\n\n\\[\\[image:\\d+-\\d+\\.gif\\]\\]"));
 
         String attachmentName = savedContent.replaceAll("(?s).*\\[\\[image:([^\\]]+)\\]\\].*", "$1");
         byte[] uploaded = setup.rest()
@@ -256,8 +257,12 @@ class ImageIT extends AbstractBlockNoteIT
 
         page.save();
 
-        // A non-image has no XWiki counterpart, so it becomes an attachment link.
-        assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
+        // A non-image has no XWiki counterpart, so it becomes an attachment link, in a block of its own after the
+        // paragraph that held the caret.
+        assertEquals("""
+            before
+
+            [[attach:notes.txt]]""", page.editWiki().getContent());
 
         byte[] uploaded = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
@@ -285,7 +290,10 @@ class ImageIT extends AbstractBlockNoteIT
         page.save();
 
         // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do.
-        assertThat(page.editWiki().getContent(), containsString("[[attach:notes.txt]]"));
+        assertEquals("""
+            before
+
+            [[attach:notes.txt]]""", page.editWiki().getContent());
 
         // A single attachment, so the upload overwrote the existing one rather than adding another.
         Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
@@ -297,5 +305,43 @@ class ImageIT extends AbstractBlockNoteIT
         byte[] uploaded = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
         assertArrayEquals(after, uploaded);
+    }
+
+    @Test
+    @Order(5)
+    void dropFileWithoutRealtime(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        // The editor loads even when it can't reach the collaboration server, which is also what happens for a user
+        // who can't edit the document (e.g. with Change Request).
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage();
+        page.simulateUnreachableCollaborationServer().edit();
+        page.waitForInplaceEditor(false);
+        assertFalse(page.getToolbar().isConnected());
+
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        textArea.click().dropFile("/notes.txt");
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        // Out of a realtime session the file waits in the temporary store, so it isn't attached yet.
+        Attachments beforeSave = setup.rest().get(AttachmentsResource.class, testReference);
+        assertEquals(0, beforeSave.getAttachments().size());
+
+        page.save();
+
+        assertEquals("""
+            before
+
+            [[attach:notes.txt]]""", page.editWiki().getContent());
+
+        // The save is what attaches the file.
+        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
+        assertEquals(1, attachments.getAttachments().size());
+        assertEquals("notes.txt", attachments.getAttachments().get(0).getName());
+        assertArrayEquals(content, setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference)));
     }
 }

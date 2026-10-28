@@ -17,10 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 /**
  * Wikis
  */
 define('xwiki-suggestWikis', ['jquery', 'xwiki-entityReference', 'xwiki-selectize'], function($, XWiki) {
+  "use strict";
+
   function getSelectizeOptions() {
     const loadURL = [XWiki.contextPath, 'rest', 'wikis'].join('/');
     // The wikis resource can't filter or paginate, but a farm holds few wikis, so all of them are fetched once per
@@ -49,11 +52,13 @@ define('xwiki-suggestWikis', ['jquery', 'xwiki-entityReference', 'xwiki-selectiz
 });
 
 require(['jquery', 'xwiki-suggestWikis', 'xwiki-events-bridge'], function($) {
+  "use strict";
+
   function init(event, data) {
     const container = $(data?.elements || document);
     container.find('.suggest-wikis').suggestWikis();
   }
 
-  $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);
+  $(document).on('xwiki:dom:updated', init);
   $(init);
 });

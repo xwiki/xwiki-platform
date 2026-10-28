@@ -316,7 +316,7 @@ class MacroIT extends AbstractCKEditorIT
     /**
      * Verify that a macro parameter whose type has a dedicated picker (e.g. a list of space references) is edited with
      * that picker rather than with a plain text input, and that its value is properly loaded and saved. See
-     * XWIKI-23834.
+     * XWIKI-23834: Add pickers for the notification macro.
      */
     @Test
     @Order(8)

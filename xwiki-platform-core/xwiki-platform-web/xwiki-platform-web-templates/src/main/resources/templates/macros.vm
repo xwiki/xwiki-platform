@@ -2810,16 +2810,16 @@ $string##
 #**
  * Outputs a suggest input for picking one or more values of the given type.
  *
- * @param $type the type of value, used to build the title translation keys
+ * @param $titleKeyPrefix the prefix of the title translation keys, followed by .single.title or .multi.title
  * @param $class the CSS class that the suggester of this type of value is applied to
  * @param $parameters the picker parameters, see #suggestInput
  *#
-#macro (_valuePicker $type $class $parameters)
+#macro (_valuePicker $titleKeyPrefix $class $parameters)
   #set ($discard = $parameters.put('class', "$!parameters.get('class') $class"))
   #if ($parameters.get('multiple') == 'multiple')
-    #set ($macro.titleKey = "core.widgets.suggest.${type}Picker.multi.title")
+    #set ($macro.titleKey = "${titleKeyPrefix}.multi.title")
   #else
-    #set ($macro.titleKey = "core.widgets.suggest.${type}Picker.single.title")
+    #set ($macro.titleKey = "${titleKeyPrefix}.single.title")
   #end
   #set ($discard = $parameters.putIfAbsent('title', $services.localization.render($macro.titleKey)))
   #suggestInput($parameters)
@@ -2853,7 +2853,7 @@ $string##
   ## The tags are suggested from the values of the tags property of the tag class, like in the Live Data tag filter.
   #set ($discard = $parameters.put('data-className', 'XWiki.TagClass'))
   #set ($discard = $parameters.put('data-propertyName', 'tags'))
-  #_valuePicker('tag' 'suggest-propertyValues' $parameters)
+  #_valuePicker('core.widgets.suggest.tagPicker' 'suggest-propertyValues' $parameters)
 #end
 
 #**
@@ -2880,7 +2880,7 @@ $string##
   #if ("$!parameters" == "")
     #set ($parameters = {})
   #end
-  #_valuePicker('wiki' 'suggest-wikis' $parameters)
+  #_valuePicker('core.widgets.suggest.wikiPicker' 'suggest-wikis' $parameters)
 #end
 
 #**

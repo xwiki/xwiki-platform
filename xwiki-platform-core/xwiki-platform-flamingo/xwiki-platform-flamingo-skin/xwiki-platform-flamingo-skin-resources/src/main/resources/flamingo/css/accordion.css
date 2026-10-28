@@ -21,8 +21,8 @@
 .accordionTabTitleBar h1 {
   display: block;
   background-color: var(--panel-header-bg);
-  /* TODO: Replace this copy of icons/xwiki/accordion.png with the caret icon of the icon theme, see XWIKI-25606. */
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAQUlEQVR4Xu3UMQoAMAxC0d7/Bl4yeIN27/SHgBAyBLe3GDx2tV4OlHQJiDGKQoyjGPszXcqCC6Yem6OBcYDojJYflI1hzfJY7f4AAAAASUVORK5CYII=");
+  /* TODO: Replace this image with the caret icon of the icon theme, see XWIKI-25606. */
+  background-image: url("../../resources/icons/xwiki/accordion.png");
   background-repeat: no-repeat;
   background-position: center left;
   border-bottom: 1px solid var(--xwiki-border-color);

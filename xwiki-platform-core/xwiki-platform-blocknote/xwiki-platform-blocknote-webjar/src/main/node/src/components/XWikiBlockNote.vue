@@ -300,7 +300,7 @@ function isSameResourceReference(
 }
 
 // The files uploaded to the temporary store, submitted with the edit form so that the save attaches them.
-const temporaryAttachments: Ref<string[]> = ref([]);
+const temporaryAttachments: Ref<Set<string>> = ref(new Set<string>());
 
 // Created only once the editor is in the DOM, because that is what the uploader listens on. See the watch below.
 let fileUploader: FileUploader | undefined;
@@ -329,9 +329,7 @@ function newFileUploader(eventTarget: EventTarget): FileUploader {
       collaboration.value?.connectionStatus.value !==
         ConnectionStatus.Connected,
     registerTemporaryAttachment: (fileName) => {
-      if (!temporaryAttachments.value.includes(fileName)) {
-        temporaryAttachments.value.push(fileName);
-      }
+      temporaryAttachments.value.add(fileName);
     },
     notifyUploadFailed: async (fileName, error) => {
       console.error(`Failed to upload [${fileName}].`, error);

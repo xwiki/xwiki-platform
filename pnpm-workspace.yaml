@@ -216,7 +216,7 @@ overrides:
   chainpad>nthen: "-"
   chainpad>xmhell: "-"
   # nx pins a vulnerable undici version. Remove this override once nx depends on undici 7.30.1 or later.
-  nx>undici: 7.30.1
+  nx>undici: 8.12.3
   # eslint-plugin-tsdoc pins @typescript-eslint/utils ~8.56.0, which does not accept TypeScript 6. Align it with the
   # typescript-eslint version of the catalog. Remove this override once eslint-plugin-tsdoc supports TypeScript 6.
   eslint-plugin-tsdoc>@typescript-eslint/utils: 8.70.1

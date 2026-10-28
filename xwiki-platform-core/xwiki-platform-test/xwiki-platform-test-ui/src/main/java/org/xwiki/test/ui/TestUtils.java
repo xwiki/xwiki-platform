@@ -144,28 +144,6 @@ public class TestUtils
     public static final XWikiCredentials SUPER_ADMIN_CREDENTIALS = new XWikiCredentials("superadmin", "pass");
 
     /**
-     * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
-     */
-    @Deprecated
-    public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT
-        + XWikiExecutor.DEFAULT_CONTEXT + "/";
-
-    /**
-     * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseBinURL()} instead
-     */
-    @Deprecated
-    public static final String BASE_BIN_URL = BASE_URL + "bin/";
-
-    /**
-     * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
-     */
-    @Deprecated
-    public static final String BASE_REST_URL = BASE_URL + "rest/";
-
-    /**
      * @since 7.3M1
      */
     public static final int[] STATUS_OK_NOT_FOUND =

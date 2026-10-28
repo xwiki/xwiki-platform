@@ -109,7 +109,7 @@ class RecycleBinIT
 
         // Open the page in preview mode (by clicking on the link of the second column), and check that the content is
         // the one expected.
-        ViewPage viewPage = deletePageOutcomePage.clickViewDocument(1);
+        ViewPage viewPage = deletePageOutcomePage.getDeletedPagesEntries().get(0).clickView();
         assertEquals("A story", viewPage.getDocumentTitle());
         assertEquals("Once upon a time..", viewPage.getContent());
 
@@ -117,7 +117,7 @@ class RecycleBinIT
         setup.getDriver().navigate().back();
 
         // Restore the page.
-        page = deletePageOutcomePage.clickRestore();
+        page = deletePageOutcomePage.getDeletedPagesEntries().get(0).clickRestore();
 
         // Check the page title and content.
         assertEquals("A story", page.getDocumentTitle());

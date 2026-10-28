@@ -104,6 +104,27 @@ class SearchSuggestIT
         quickSearchElement.search(scriptPageTitle);
         assertEquals(List.of(scriptPageTitle), quickSearchElement.getResults("Page titles").stream()
             .map(QuickSearchResult::getTitle).toList());
+
+        // Ctrl+click opens a result in a new tab and leaves the current page as it is.
+        setup.gotoPage(testReference);
+        quickSearchElement = new QuickSearchElement();
+        quickSearchElement.search(scriptPageTitle);
+        String currentTab = setup.getCurrentTabHandle();
+        String newTab = quickSearchElement.getResults("Page titles").get(0).openInNewTab();
+        try {
+            assertEquals(testDocumentTitle, new ViewPage().getDocumentTitle());
+            setup.switchTab(newTab);
+            assertEquals(scriptPageTitle, new ViewPage().getDocumentTitle());
+        } finally {
+            setup.switchTab(currentTab);
+            setup.closeTab(newTab);
+        }
+
+        // A plain click opens a result in the current tab.
+        setup.gotoPage(testReference);
+        quickSearchElement = new QuickSearchElement();
+        quickSearchElement.search(scriptPageTitle);
+        assertEquals(scriptPageTitle, quickSearchElement.getResults("Page titles").get(0).open().getDocumentTitle());
     }
 
     /**

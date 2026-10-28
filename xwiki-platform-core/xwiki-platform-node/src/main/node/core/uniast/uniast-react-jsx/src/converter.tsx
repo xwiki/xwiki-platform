@@ -187,9 +187,11 @@ export class UniAstToReactJsxConverter {
         const ListTag = block.items.some((item) => item.number !== undefined)
           ? "ol"
           : "ul";
+        // An ordered list doesn't necessarily start at 1 (e.g. a list continued after a paragraph).
+        const start = ListTag === "ol" ? block.items[0]?.number : undefined;
 
         return (
-          <ListTag {...this.convertBlockStyles(block.styles)}>
+          <ListTag start={start} {...this.convertBlockStyles(block.styles)}>
             {block.items.map((item, i) => {
               const childKey = `${key}.${i}`;
 

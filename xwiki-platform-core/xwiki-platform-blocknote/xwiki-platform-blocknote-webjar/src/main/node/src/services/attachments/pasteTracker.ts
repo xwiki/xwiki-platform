@@ -25,7 +25,9 @@ type PasteTracker = {
 
 /**
  * Remembers whether the last interaction was a paste, because BlockNote doesn't pass the originating event to its
- * upload callback. Capture phase, so both listeners run before BlockNote starts the upload. Dispose with the editor.
+ * upload callback. Capture phase, so both listeners run before BlockNote starts the upload. The flag stays set until
+ * the opposite event rather than being cleared once the upload starts, because BlockNote uploads the pasted files one
+ * after another, so all but the first are read after the paste event is over. Dispose with the editor.
  */
 function trackPaste(target: EventTarget): PasteTracker {
   let paste = false;

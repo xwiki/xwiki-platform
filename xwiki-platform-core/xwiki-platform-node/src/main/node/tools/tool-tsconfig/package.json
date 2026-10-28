@@ -17,7 +17,7 @@
     "*.json"
   ],
   "peerDependencies": {
-    "typescript": "6.x"
+    "typescript": "6.x || 7.x"
   },
   "devDependencies": {
     "typescript": "catalog:"

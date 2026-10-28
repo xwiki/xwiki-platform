@@ -81,8 +81,14 @@ class UserProfilePageTest extends PageTest
 
     private static final DocumentReference ALICE_REFERENCE = new DocumentReference("xwiki", "XWiki", "alice");
 
+    private static final DocumentReference USER_PROFILE_SHEET =
+        new DocumentReference("xwiki", "XWiki", "XWikiUserProfileSheet");
+
     @Mock
     private Macro<Object> attachmentSelectorMacro;
+
+    @Mock
+    private Macro<Object> notificationsMacro;
 
     @BeforeEach
     void setUp() throws Exception
@@ -132,6 +138,30 @@ class UserProfilePageTest extends PageTest
         assertEquals(List.of("png,jpg,jpeg,gif,webp,avif,jxl"), filters);
     }
 
+    @Test
+    void notificationsUsersWithSpecialCharactersInUserName() throws Exception
+    {
+        // Collect the users passed to the notifications macro displayed by the user profile.
+        List<String> users = new ArrayList<>();
+        when(this.notificationsMacro.supportsInlineMode()).thenReturn(true);
+        when(this.notificationsMacro.getDescriptor())
+            .thenReturn(new DefaultMacroDescriptor(new MacroId("notifications"), "Notifications Macro"));
+        when(this.notificationsMacro.execute(any(), any(), any())).then(invocation -> {
+            users.add(invocation.getArgument(2, MacroTransformationContext.class).getCurrentMacroBlock()
+                .getParameter("users"));
+            return Collections.emptyList();
+        });
+        this.componentManager.registerComponent(Macro.class, "notifications", this.notificationsMacro);
+        registerUIX(USER_PROFILE_SHEET);
+
+        DocumentReference userReference =
+            new DocumentReference("xwiki", "XWiki", "a\" /}}{{notifications users=\"b");
+        createUser(userReference, new HashMap<>());
+        renderSheet(USER_SHEET);
+
+        assertEquals(List.of("xwiki:XWiki.a\" /}}{{notifications users=\"b"), users);
+    }
+
     private void registerUIX(DocumentReference documentReference) throws Exception
     {
         XWikiDocument document = loadPage(documentReference);
@@ -146,12 +176,18 @@ class UserProfilePageTest extends PageTest
 
     private XWikiDocument createUser(Map<String, Object> userProperties) throws Exception
     {
-        this.xwiki.createUser(ALICE_REFERENCE.getName(), userProperties, this.context);
-        XWikiDocument userDocument = this.xwiki.getDocument(ALICE_REFERENCE, this.context);
+        return createUser(ALICE_REFERENCE, userProperties);
+    }
+
+    private XWikiDocument createUser(DocumentReference userReference, Map<String, Object> userProperties)
+        throws Exception
+    {
+        this.xwiki.createUser(userReference.getName(), userProperties, this.context);
+        XWikiDocument userDocument = this.xwiki.getDocument(userReference, this.context);
 
         // Setup the script context as if we are logged in with the created user on its user profile.
         this.context.setDoc(userDocument);
-        this.context.setUserReference(ALICE_REFERENCE);
+        this.context.setUserReference(userReference);
 
         return userDocument;
     }

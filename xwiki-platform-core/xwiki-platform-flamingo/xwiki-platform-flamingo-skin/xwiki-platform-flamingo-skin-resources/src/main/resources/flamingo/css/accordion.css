@@ -1,0 +1,46 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+.accordionTabTitleBar h1 {
+  display: block;
+  background-color: var(--panel-header-bg);
+  /* TODO: Replace this copy of icons/xwiki/accordion.png with the caret icon of the icon theme, see XWIKI-25606. */
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAQUlEQVR4Xu3UMQoAMAxC0d7/Bl4yeIN27/SHgBAyBLe3GDx2tV4OlHQJiDGKQoyjGPszXcqCC6Yem6OBcYDojJYflI1hzfJY7f4AAAAASUVORK5CYII=");
+  background-repeat: no-repeat;
+  background-position: center left;
+  border-bottom: 1px solid var(--xwiki-border-color);
+  color: var(--panel-header-text);
+  font: 700 .8em / 1.8em sans-serif;
+  margin: 0;
+  overflow: hidden;
+  padding: 4px 21px;
+  text-transform: uppercase;
+}
+
+.accordionTabContentBox {
+  background: var(--xwiki-background-secondary-color);
+  overflow: auto;
+  padding: 5px;
+}
+
+.openDetails {
+  cursor: pointer;
+  float: right;
+}

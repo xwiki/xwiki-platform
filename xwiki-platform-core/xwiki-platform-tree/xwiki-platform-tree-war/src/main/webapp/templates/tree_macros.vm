@@ -39,9 +39,9 @@
 
 #macro (tree $options)
   <div #treeAttributes($options)></div>
-  <span id="$!{attributes.id}-description" class="sr-only">
+  <p id="$escapetool.xml("$!{macro.options.id}-description")" class="sr-only">
     $escapetool.xml($services.localization.render('tree.macro.description'))
-  </span>
+  </p>
 #end
 
 #macro (treeAttributes $options $isWikiSyntax)

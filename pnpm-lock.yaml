@@ -79,8 +79,8 @@ catalogs:
       specifier: 2.1.37
       version: 2.1.37
     '@types/sinon':
-      specifier: 22.0.0
-      version: 22.0.0
+      specifier: 22.0.2
+      version: 22.0.2
     '@vitejs/plugin-react':
       specifier: 6.1.1
       version: 6.1.1
@@ -2561,7 +2561,7 @@ importers:
         version: 4.0.1
       '@types/sinon':
         specifier: 'catalog:'
-        version: 22.0.0
+        version: 22.0.2
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -5305,11 +5305,8 @@ packages:
   '@types/requirejs@2.1.37':
     resolution: {integrity: sha512-jmFgr3mwN2NSmtRP6IpZ2nfRS7ufSXuDYQ6YyPFArN8x5dARQcD/DXzT0J6NYbvquVT4pg9K9HWdi6e6DZR9iQ==}
 
-  '@types/sinon@22.0.0':
-    resolution: {integrity: sha512-TDbVpbccc2HfiqHR09Argj3mHV1KMW7sCCKj52fsl8lbRLkEn7fB1966EWhOKWUBcqfBueZuPoA7/OK1CKiy3g==}
-
-  '@types/sinonjs__fake-timers@15.0.1':
-    resolution: {integrity: sha512-Ko2tjWJq8oozHzHV+reuvS5KYIRAokHnGbDwGh/J64LntgpbuylF74ipEL24HCyRjf9FOlBiBHWBR1RlVKsI1w==}
+  '@types/sinon@22.0.2':
+    resolution: {integrity: sha512-2qLRFlluKkn6mci189eKhlOsHcdFpsn/9+29S4VmwKCpfb+vseKrZSSOSy5259yzIpP/y4gLfqQfIIR/lZn4Ng==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -9528,11 +9525,9 @@ snapshots:
 
   '@types/requirejs@2.1.37': {}
 
-  '@types/sinon@22.0.0':
+  '@types/sinon@22.0.2':
     dependencies:
-      '@types/sinonjs__fake-timers': 15.0.1
-
-  '@types/sinonjs__fake-timers@15.0.1': {}
+      '@sinonjs/fake-timers': 15.4.0
 
   '@types/tough-cookie@4.0.5': {}
 

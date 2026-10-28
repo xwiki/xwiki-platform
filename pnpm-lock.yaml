@@ -3645,9 +3645,15 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/platform-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-apiextractorconfig
@@ -3672,6 +3678,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.3.0
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.0(react@19.3.0)
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'

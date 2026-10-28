@@ -48,7 +48,9 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",
@@ -57,6 +59,7 @@
     "inversify": "catalog:",
     "jsdom": "catalog:",
     "react": "catalog:",
+    "react-dom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

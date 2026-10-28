@@ -43,7 +43,7 @@
     "@xwiki/platform-uniast-api": "workspace:*"
   },
   "peerDependencies": {
-    "inversify": "8.x"
+    "react": "19.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
@@ -56,7 +56,6 @@
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
-    "inversify": "catalog:",
     "jsdom": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

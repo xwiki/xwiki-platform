@@ -3669,9 +3669,6 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
-      inversify:
-        specifier: 'catalog:'
-        version: 8.2.3(reflect-metadata@0.2.2)
       jsdom:
         specifier: 'catalog:'
         version: 30.1.3

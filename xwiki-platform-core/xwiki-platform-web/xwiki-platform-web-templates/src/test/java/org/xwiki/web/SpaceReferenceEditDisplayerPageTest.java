@@ -54,10 +54,11 @@ class SpaceReferenceEditDisplayerPageTest extends PageTest
     {
         XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Test", "Page"), this.context);
         document.setSyntax(XWIKI_2_1);
-        document.setContent("{{velocity}}\n"
-            + "#set ($displayer = {'parameters': {'name': 'location'}, 'value': 'A.B'})\n"
-            + "{{html clean='false'}}#template('html_displayer/spacereference/edit.vm'){{/html}}\n"
-            + "{{/velocity}}");
+        document.setContent("""
+            {{velocity}}
+            #set ($displayer = {'parameters': {'name': 'location'}, 'value': 'A.B'})
+            {{html clean='false'}}#template('html_displayer/spacereference/edit.vm'){{/html}}
+            {{/velocity}}""");
         Document html = renderHTMLPage(document);
 
         Element select = html.selectFirst("select.suggest-spaces");

@@ -27,6 +27,14 @@ export const RELEASE_CANDIDATE_TAG = 'rc';
 export const LATEST_TAG = 'latest';
 
 /**
+ * @param {string} version a final release version, e.g. "18.4.8"
+ * @returns {string} the dist-tag of a maintenance release of that version's line, e.g. "stable-18.4.x"
+ */
+export function maintenanceTag(version) {
+  return `stable-${semver.major(version)}.${semver.minor(version)}.x`;
+}
+
+/**
  * @param {string} version the version being published
  * @returns {boolean} true when the dist-tag of the version depends on the versions already on the
  *   registry, i.e. when the version is a final release
@@ -44,11 +52,11 @@ export function needsPublishedVersions(version) {
  * - a release candidate gets "rc"
  * - a final release gets "latest" when it is higher than every final release already on the
  *   registry, or when the registry has none
- * - any other final release gets "stable-X.Y.x". npm requires a dist-tag on every publication, and
- *   "pnpm publish" writes "latest" when given none, so a maintenance release needs a dist-tag of its
- *   own to leave "latest" untouched. Consumers are not expected to use it: they select a maintenance
- *   line with a semver range, e.g. "~18.4.0". It cannot be named "18.4" or "v18.4", because npm
- *   rejects a dist-tag name that is a valid semver range.
+ * - any other final release gets maintenanceTag(), e.g. "stable-18.4.x". npm requires a dist-tag on
+ *   every publication, and "pnpm publish" writes "latest" when given none, so a maintenance release
+ *   needs a dist-tag of its own to leave "latest" untouched. Consumers are not expected to use it:
+ *   they select a maintenance line with a semver range, e.g. "~18.4.0". It cannot be named "18.4" or
+ *   "v18.4", because npm rejects a dist-tag name that is a valid semver range.
  *
  * @param {string} version the version being published
  * @param {string[]} publishedVersions the versions already on the registry, empty when the package
@@ -75,5 +83,5 @@ export function computeDistTag(version, publishedVersions = []) {
     return LATEST_TAG;
   }
 
-  return `stable-${semver.major(version)}.${semver.minor(version)}.x`;
+  return maintenanceTag(version);
 }

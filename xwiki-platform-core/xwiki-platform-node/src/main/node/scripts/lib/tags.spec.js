@@ -19,7 +19,7 @@
  */
 
 import {describe, expect, it} from 'vitest';
-import {computeDistTag, needsPublishedVersions} from './tags.js';
+import {computeDistTag, maintenanceTag, needsPublishedVersions} from './tags.js';
 
 // The final and release candidate versions on the registry once 18.8.0 and 18.4.7 are released.
 const PUBLISHED = ['18.4.0-rc-1', '18.4.0', '18.4.6', '18.8.0-rc-1', '18.8.0', '18.4.7'];
@@ -29,6 +29,15 @@ describe('needsPublishedVersions', () => {
     expect(needsPublishedVersions('18.10.0-SNAPSHOT')).toBe(false);
     expect(needsPublishedVersions('18.10.0-rc-1')).toBe(false);
     expect(needsPublishedVersions('18.10.0')).toBe(true);
+  });
+});
+
+describe('maintenanceTag', () => {
+  it.each([
+    ['18.4.8', 'stable-18.4.x'],
+    ['18.10.0', 'stable-18.10.x'],
+  ])('names the maintenance line of %s "%s"', (version, tag) => {
+    expect(maintenanceTag(version)).toBe(tag);
   });
 });
 

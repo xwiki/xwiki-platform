@@ -43,7 +43,7 @@
     <solr.shaded.prefix>org.xwiki.search.solr.shaded</solr.shaded.prefix>
     <!-- The versions used by Solr, which are different from the ones managed by XWiki (Jersey 2) -->
     <solr.jersey.version>3.1.12</solr.jersey.version>
-    <solr.hk2.version>3.1.1</solr.hk2.version>
+    <solr.hk2.version>4.0.3</solr.hk2.version>
     <solr.osgi-resource-locator.version>1.0.4</solr.osgi-resource-locator.version>
   </properties>
   <dependencies>

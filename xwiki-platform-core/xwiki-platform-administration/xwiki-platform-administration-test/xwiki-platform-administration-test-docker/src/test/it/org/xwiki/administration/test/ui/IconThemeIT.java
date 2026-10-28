@@ -20,6 +20,7 @@
 package org.xwiki.administration.test.ui;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate that the icon theme can be changed from the Themes administration section (at space level) and that the
- * change is inherited by child pages.
+ * change is inherited by child pages, and that icons displayed by JavaScript code follow an icon theme change.
  *
  * @version $Id$
  * @since 18.6.0RC1
@@ -57,6 +58,7 @@ class IconThemeIT
     }
 
     @Test
+    @Order(1)
     void changeIconThemeFromSpaceAdministration(TestUtils setup, TestReference testReference)
     {
         // Create a parent page 'a' and a child page 'a.b', both rendering an icon, so that we can observe the icon
@@ -95,5 +97,32 @@ class IconThemeIT
         viewPage = setup.gotoPage(childPage);
         assertTrue(viewPage.isSilkIconDisplayedInContent(),
             "The child page should inherit the Silk icon theme from its parent space");
+    }
+
+    @Test
+    @Order(2)
+    void iconsDisplayedByJavaScriptFollowIconThemeChange(TestUtils setup, TestReference testReference)
+    {
+        DocumentReference wikiPreferences = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
+        setup.createPage(testReference, "= Section =\n\nContent", "Section");
+
+        // The icon theme is not configured by default in the test instance, so the default (Silk based) icon set is
+        // used, including for the section edit link icon which is displayed by JavaScript code.
+        ViewPage viewPage = setup.gotoPage(testReference);
+        assertTrue(viewPage.isSectionEditIconFromSilkTheme(1),
+            "The section edit icon should use the default (Silk) icon set before the change");
+
+        try {
+            setup.updateObject(wikiPreferences, "XWiki.XWikiPreferences", 0, "iconTheme",
+                "IconThemes.FontAwesome");
+
+            // The JavaScript code displaying the section edit icon may be cached by the browser, but the icon must
+            // follow the icon theme change without a hard refresh.
+            viewPage = setup.gotoPage(testReference);
+            assertFalse(viewPage.isSectionEditIconFromSilkTheme(1),
+                "The section edit icon should use the Font Awesome icon theme after the change");
+        } finally {
+            setup.updateObject(wikiPreferences, "XWiki.XWikiPreferences", 0, "iconTheme", "");
+        }
     }
 }

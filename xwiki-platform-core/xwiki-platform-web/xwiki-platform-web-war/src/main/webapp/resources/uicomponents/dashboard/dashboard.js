@@ -48,23 +48,23 @@
 #foreach ($key in $l10nKeys)
   #set ($discard = $l10n.put($key, $services.localization.render($key)))
 #end
-#set ($iconNames = ['pencil', 'cross', 'add'])
-#set ($icons = {})
-#foreach ($iconName in $iconNames)
-  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
-#end
 #[[*/
 // Start JavaScript-only code.
-(function(paths, l10n, icons) {
+(function(paths, l10n) {
   "use strict";
 
 require.config({paths});
 
+define('xwiki-dashboard-icons', {
+  icons: ['pencil', 'cross', 'add']
+});
+
 window.XWiki = window.XWiki || {};
 // Start XWiki augmentation.
 XWiki.Dashboard = Class.create( {
-  initialize : function(element) {
-    this.element = element;  
+  initialize : function(element, icons) {
+    this.element = element;
+    this.icons = icons;
     //the class of the gadget objects 
     this.gadgetsClass = "XWiki.GadgetClass";
     // read the metadata of the dashboard, the edit, add, remove URLs and the source of the dashboard
@@ -276,14 +276,14 @@ XWiki.Dashboard = Class.create( {
       'title': l10n['dashboard.gadget.actions.delete.tooltip']
     });
     removeIcon.observe('click', this.onRemoveGadget.bindAsEventListener(this));
-    removeIcon.update(icons.cross);
+    removeIcon.update(this.icons.cross.render());
 
     var editIcon = new Element('span', {
       'class': 'edit action',
       'title': l10n['dashboard.gadget.actions.edit.tooltip']
     });
     editIcon.observe('click', this.onEditGadgetClick.bindAsEventListener(this));
-    editIcon.update(icons.pencil);
+    editIcon.update(this.icons.pencil.render());
 
     var actionsContainer = new Element('div', {'class' : 'gadget-actions'})
     actionsContainer.insert(editIcon);
@@ -300,7 +300,8 @@ XWiki.Dashboard = Class.create( {
       'class': 'btn btn-success addgadget',
       'title': l10n['dashboard.actions.add.tooltip']
     });
-    addButton.update(icons.add + l10n['dashboard.actions.add.button']);
+    addButton.update(l10n['dashboard.actions.add.button']);
+    addButton.insert({top: this.icons.add.render()});
     addButton.observe('click', this.onAddGadgetClick.bindAsEventListener(this));
     this.element.down('.containeradd').insert(addButton);
   },
@@ -544,7 +545,8 @@ XWiki.Dashboard = Class.create( {
       'class': 'btn btn-success addcontainer',
       'title': l10n['dashboard.actions.columns.add.tooltip']
     });
-    addButton.update(icons.add + l10n['dashboard.actions.columns.add.button']);
+    addButton.update(l10n['dashboard.actions.columns.add.button']);
+    addButton.insert({top: this.icons.add.render()});
     addButton.observe('click', this.onAddColumn.bindAsEventListener(this));
     this.element.down('.containeradd').insert(addButton);
   },
@@ -732,8 +734,8 @@ function init() {
     // edit first dashboard FIXME: to create a dashboard editor for all dashboards
     var dashboardRootElt = $$('.dashboard')[0];
     if (dashboardRootElt) {
-      require(['scriptaculous/dragdrop'], function() {
-        new XWiki.Dashboard(dashboardRootElt);
+      require(['xwiki-icon!xwiki-dashboard-icons', 'scriptaculous/dragdrop'], function(icons) {
+        return new XWiki.Dashboard(dashboardRootElt, icons);
       });
     }
   }
@@ -745,4 +747,4 @@ function init() {
 || document.observe("xwiki:dom:loaded", init);
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $l10n, $icons]));
+}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

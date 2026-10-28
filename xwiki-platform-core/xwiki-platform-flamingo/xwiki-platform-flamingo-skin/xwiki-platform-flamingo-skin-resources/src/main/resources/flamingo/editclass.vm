@@ -21,7 +21,7 @@
   $response.sendRedirect($doc.getURL('edit', 'editor=class'))
 #end
 $xwiki.ssfx.use('js/xwiki/editors/dataeditors.css', true)##
-$xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
+$xwiki.jsfx.use('js/xwiki/editors/dataeditors.js')##
 ##
 ##
 ## The edited XClass

@@ -19,14 +19,9 @@
  */
 /* this represent a triple state checkbox */
 /*!
-#set ($iconNames = ['check', 'cross'])
-#set ($icons = {})
-#foreach ($iconName in $iconNames)
-  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
-#end
 #[[*/
 // Start JavaScript-only code.
-(function(icons) {
+(function() {
   "use strict";
 define('users-and-groups-translation-keys', { keys: [
   "platform.core.rightsManagement.allowed",
@@ -43,6 +38,9 @@ define('users-and-groups-translation-keys', { keys: [
   "platform.core.rightsManagement.saveFailure",
   "platform.core.rightsManagement.ajaxFailure"
 ]});
+define('users-and-groups-icons', {
+  icons: ['check', 'cross']
+});
 window.MSCheckbox = Class.create({
   /**
     * @todo Make confirmations generic.
@@ -55,8 +53,9 @@ window.MSCheckbox = Class.create({
     */
   initialize: function(domNode, right, saveUrl, defaultState, table, idx)
   {
-    require(['xwiki-l10n!users-and-groups-translation-keys'], (l10n) => {
-      this._l10n = l10n; 
+    require(['xwiki-l10n!users-and-groups-translation-keys', 'xwiki-icon!users-and-groups-icons'], (l10n, icons) => {
+      this._l10n = l10n;
+      this._icons = icons;
       this.table = table;
       this.idx = idx;
       if (this.table && this.idx && this.table.fetchedRows[this.idx]) {
@@ -92,13 +91,13 @@ window.MSCheckbox = Class.create({
   {
     //Change the display icon
     if(this.state === 0) {
-      this.button.innerHTML = '';
+      this.button.replaceChildren();
     }
     if(this.state === 1) {
-      this.button.innerHTML = icons.check;
+      this.button.replaceChildren(this._icons.check.render());
     }
     if(this.state === 2) {
-      this.button.innerHTML = icons.cross;
+      this.button.replaceChildren(this._icons.cross.render());
     }
 
     this.button.classList.add(this.stateClasses[this.state]);
@@ -253,7 +252,7 @@ window.MSCheckbox = Class.create({
     }
   }
 });
-}).apply(']]#', $jsontool.serialize([$icons]));
+}).apply(']]#');
 
 /**
   * user list element creator. Used in adminusers.vm.

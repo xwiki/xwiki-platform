@@ -26,7 +26,6 @@
   'exclusions': $collectiontool.set,
   'finder': false,
   'icons': true,
-  'id': "xtree-${datetool.date.time}-${mathtool.random(100, 1000)}",
   'limit': 15,
   'links': false,
   'openTo': '',
@@ -71,10 +70,12 @@
   #set ($macro.options = {})
   #set ($discard = $macro.options.putAll($defaultTreeOptions))
   #set ($discard = $macro.options.putAll($options))
-  #if ($macro.options.id)
-    #set ($discard = $attributes.put('id', $macro.options.id))
+  ## Generate the default id here so that each tree of the page gets its own.
+  #if ("$!macro.options.id" == '')
+    #set ($macro.options.id = "xtree-${datetool.date.time}-${mathtool.random(100, 1000)}")
   #end
-  #set ($discard = $attributes.put('aria-describedby', "$!{macro.options.id}-description"))
+  #set ($discard = $attributes.put('id', $macro.options.id))
+  #set ($discard = $attributes.put('aria-describedby', "${macro.options.id}-description"))
   #set ($classes = ["$!macro.options.get('class')"])
   #set ($noLinks = $macro.options.links != 'true')
   #if ($noLinks)

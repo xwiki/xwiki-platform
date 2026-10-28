@@ -38,7 +38,7 @@ import type {
 } from "react";
 
 /**
- * @since 18.0.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 export type MacroEditableZoneRef =
@@ -48,7 +48,7 @@ export type MacroEditableZoneRef =
 /**
  * Converter that transforms UniAst content (e.g. a macro's render() output) to React JSX
  *
- * @since 18.0.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 export class UniAstToReactJsxConverter {
@@ -176,8 +176,9 @@ export class UniAstToReactJsxConverter {
         );
 
       case "list": {
-        // Ordered vs. unordered is expressed per-item (a `number` set on at least the first item), not on the list
-        // itself - see `default-uni-ast-to-markdown-converter.ts` for the same convention.
+        // Ordered vs. unordered is expressed per-item (through `number`), not on the list itself: the list is
+        // ordered as soon as one of its items has a number - see `default-uni-ast-to-markdown-converter.ts` for the
+        // same convention.
         const ListTag = block.items.some((item) => item.number !== undefined)
           ? "ol"
           : "ul";

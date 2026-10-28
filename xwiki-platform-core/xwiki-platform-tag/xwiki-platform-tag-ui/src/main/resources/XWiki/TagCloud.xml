@@ -531,7 +531,9 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #set ($spaceQuery = $services.query.hql('select space.reference from XWikiSpace space where space.reference = :space'))
   #if ($spaceQuery.bindValue('space', $location).setLimit(1).execute().isEmpty())
     #set ($wikiLocation = $services.rendering.escape($location, 'xwiki/2.1'))
+    ## The empty line keeps the warning apart from the tag cloud, which is a block of HTML that can't be inline.
     {{warning}}$services.localization.render('tag.cloud.locationNotFound', [$wikiLocation]){{/warning}}
+
   #end
 #end
 ## Organize tags as a list of {name, count} object so that it is easier to handle (sorting, limiting, ...)

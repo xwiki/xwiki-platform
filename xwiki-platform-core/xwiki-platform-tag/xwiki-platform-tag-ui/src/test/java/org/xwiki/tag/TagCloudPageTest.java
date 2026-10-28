@@ -383,7 +383,10 @@ class TagCloudPageTest extends PageTest
     @Test
     void withSpacesAndOneMissingLocation() throws Exception
     {
-        when(this.query.execute()).thenReturn(List.of());
+        when(this.query.execute()).thenReturn(List.of(
+            new Object[] { "xwiki:Sandbox.TaggedPage1", "tag1" },
+            new Object[] { "xwiki:Sandbox.TaggedPage2", "tag1" }
+        ));
         ScriptQuery missingSpaceQuery = mock(ScriptQuery.class, RETURNS_SELF);
         when(missingSpaceQuery.execute()).thenReturn(List.of());
         when(this.spaceQuery.bindValue("space", "No**Such**")).thenReturn(missingSpaceQuery);
@@ -400,7 +403,9 @@ class TagCloudPageTest extends PageTest
         // The location is displayed as typed, without being parsed as wiki syntax.
         assertEquals("tag.cloud.locationNotFound [No**Such**]", warnings.get(0).text());
         assertNull(warnings.get(0).selectFirst("strong"));
-        assertEquals("xe.tag.notagsforspace", document.selectFirst("p.noitems").text());
+        // The warning is a block of its own, otherwise the HTML of the tag cloud that follows would be inline too.
+        assertEquals("div", warnings.get(0).tagName());
+        assertEquals(List.of("tag1"), document.select("ol.tagCloud li a").eachText());
         verify(this.spaceQuery).bindValue("space", "Sandbox");
     }
 

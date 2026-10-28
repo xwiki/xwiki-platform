@@ -486,10 +486,10 @@ Object.extend(XWiki.watchlist, {
  * instead, passing it in the elements property of the event data, which also initializes everything else that content
  * needs.
  *
- * Deprecated since 18.8.0RC1
+ * Deprecated since 18.10.0RC1
  */
 XWiki.makeRenderingErrorsExpandable = function(content) {
-  warn("XWiki.makeRenderingErrorsExpandable is deprecated since XWiki 18.8.0RC1. Rendering errors are made expandable "
+  warn("XWiki.makeRenderingErrorsExpandable is deprecated since XWiki 18.10.0RC1. Rendering errors are made expandable "
     + "by default, trigger the xwiki:dom:updated event on the new content instead.");
   require(['jquery'], function($) {
     $(document).trigger('xwiki:dom:updated', {'elements': $(content || 'body').toArray()});

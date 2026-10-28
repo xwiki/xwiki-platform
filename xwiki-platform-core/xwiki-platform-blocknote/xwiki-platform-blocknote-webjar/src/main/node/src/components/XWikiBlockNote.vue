@@ -390,7 +390,8 @@ const editorProps = shallowRef<
 });
 
 // This is passed to the BlockNote editor component.
-const collaboration: Ref<Collaboration | undefined> = ref(undefined);
+// Shallow on purpose: a normal ref would hide the refs inside, leaving connectionStatus.value undefined.
+const collaboration = shallowRef<Collaboration | undefined>(undefined);
 // Set as soon as we start joining, so that we can leave even if the editor is unmounted before the join completes.
 let formCollaboration: Promise<FormCollaboration> | undefined;
 // Set once the join completes, together with the collaboration passed to the BlockNote editor component.

@@ -528,6 +528,8 @@ class CollaborationIT extends AbstractBlockNoteIT
         // Leave the German translation and join the French Canadian translation.
         secondEditPage.clickCancel();
         setup.gotoPage(testReference, "edit", "language=fr_CA&editor=wysiwyg");
+        // The first tab locks the French Canadian translation it is creating.
+        new ForceEditLockPage().clickForceEdit();
         secondEditor = new BlockNoteEditor("content");
         secondTextArea = secondEditor.getRichTextArea();
         secondTextArea.waitUntilTextContains("Un deux").click();

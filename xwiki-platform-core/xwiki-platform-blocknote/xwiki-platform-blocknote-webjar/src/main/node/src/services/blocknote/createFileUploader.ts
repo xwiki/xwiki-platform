@@ -146,7 +146,9 @@ function createFileUploader(
       getBlockNoteDocument()!.getMetadata(blockId, true)!.xwikiReference =
         attachmentReference(reference, false);
     }
-    // Empty name, otherwise BlockNote defaults the alt text to the file name.
+    // Empty name, otherwise BlockNote saves it as the alt text of the image (||alt="image.gif"), and for a pasted
+    // file that is the name the browser made up rather than the attachment we uploaded. XWikiImageBlock displays a
+    // label instead, without saving one.
     return { props: { url: getDownloadURL(reference), name: "" } };
   }
 

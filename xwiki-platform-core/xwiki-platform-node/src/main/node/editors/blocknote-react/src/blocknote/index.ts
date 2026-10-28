@@ -21,6 +21,7 @@
 import { XWikiCodeBlock } from "./codeBlock";
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
+import { XWikiImageBlock } from "./imageBlock";
 import { XWikiInlineMacro, XWikiMacroBlock } from "./macro";
 import { XWikiRawBlock } from "./raw";
 import {
@@ -73,6 +74,7 @@ function createBlockNoteSchema(
     blockSpecs: {
       ...defaultBlockSpecs,
       codeBlock: XWikiCodeBlock({ className: options?.codeBlockClassName }),
+      image: XWikiImageBlock(),
       xwikiDefinitionListItem: DefinitionListItemBlock(),
       xwikiGroup: XWikiGroupBlock(),
       xwikiMacroBlock: XWikiMacroBlock(),

@@ -344,4 +344,24 @@ class ImageIT extends AbstractBlockNoteIT
         assertArrayEquals(content, setup.rest()
             .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference)));
     }
+
+    @Test
+    @Order(6)
+    void missingImageShowsItsName(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "[[image:missing.png]]");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        // The image can't be displayed, so the editor labels it with its file name, otherwise the block would look
+        // empty and there would be nothing to select.
+        assertEquals("missing.png", textArea.getImage(0).getDomAttribute("alt"));
+
+        page.save();
+
+        // The label is only displayed, so nothing is added to the source: an alt is saved only when the user sets it.
+        assertEquals("[[image:missing.png]]", page.editWiki().getContent());
+    }
 }

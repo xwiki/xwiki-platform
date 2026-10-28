@@ -43,15 +43,6 @@ public class ForgotUsernamePage extends ViewPage
         return new ForgotUsernamePage();
     }
 
-    /**
-     * @return the value of the {@code autocomplete} attribute of the email field
-     * @since 18.9.0RC1
-     */
-    public String getEmailAutocomplete()
-    {
-        return this.emailField.getAttribute("autocomplete");
-    }
-
     public void setEmail(String email)
     {
         this.emailField.sendKeys(email);

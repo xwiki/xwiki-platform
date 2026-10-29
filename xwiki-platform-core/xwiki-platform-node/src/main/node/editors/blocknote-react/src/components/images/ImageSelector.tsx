@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DepsContainerContext } from "../../contexts";
+import { DepsContainerContext, EditedDocumentContext } from "../../contexts";
 import { triggerUserImageUpload } from "../../misc/fileUpload";
 import { SearchBox } from "../SearchBox";
 import {
@@ -125,13 +125,18 @@ export function ImageSelector({
     [linkSuggestService],
   );
 
+  const editedDocumentReference = useContext(EditedDocumentContext);
+
   const uploadImage = useCallback(async () => {
-    const image = await triggerUserImageUpload(depsContainer);
+    const image = await triggerUserImageUpload(
+      depsContainer,
+      editedDocumentReference,
+    );
 
     if (image) {
       onSelected(image.url, image.reference);
     }
-  }, [depsContainer, onSelected]);
+  }, [depsContainer, editedDocumentReference, onSelected]);
 
   return (
     <Box>

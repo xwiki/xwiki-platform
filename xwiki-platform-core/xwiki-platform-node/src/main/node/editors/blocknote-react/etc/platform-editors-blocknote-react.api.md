@@ -48,6 +48,7 @@ export type BlockNoteViewWrapperProps = {
     theme?: "light" | "dark";
     lang: EditorLanguage;
     label: string;
+    documentReference?: string;
     content: BlockType[];
     macros: {
         list?: MacroWithUnknownParamsType[];

@@ -50,7 +50,7 @@ export interface AttachmentsService {
     // (undocumented)
     list(): Ref<Attachment[]>;
     refresh(page: string): Promise<void>;
-    upload(page: string, files: File[]): Promise<(Attachment | undefined)[] | undefined>;
+    upload(page: string, files: File[]): Promise<Attachment[]>;
 }
 
 // (No @packageDocumentation comment for this package)

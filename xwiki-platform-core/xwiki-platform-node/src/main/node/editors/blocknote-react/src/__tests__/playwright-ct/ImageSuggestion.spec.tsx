@@ -347,6 +347,41 @@ test("Uploading an image from the upload action inserts it with its reference", 
   );
 });
 
+test("Uploading an image attaches it to the edited document, when specified", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      uploadedImageURL="https://picsum.photos/600"
+      uploadedImageName="uploaded.png"
+      documentReference="Other.Page"
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await openImageQuickAction(page, editorEl);
+
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
+
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await menuEl.locator(".bn-suggestion-menu-item").nth(1).click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
+    name: "picture.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("some content"),
+  });
+
+  // The image is attached to the edited document rather than to the current one ("Some.Page").
+  await expectSelectedImage(
+    page,
+    editorEl,
+    attachmentResourceReference("Other.Page@uploaded.png", true),
+  );
+});
+
 test("A failed upload from the upload action is logged and leaves the editor unchanged", async ({
   mount,
   page,

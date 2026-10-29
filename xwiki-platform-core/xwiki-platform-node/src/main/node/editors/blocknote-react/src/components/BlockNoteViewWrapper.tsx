@@ -30,7 +30,11 @@ import {
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
-import { DepsContainerContext, MacrosContext } from "../contexts";
+import {
+  DepsContainerContext,
+  EditedDocumentContext,
+  MacrosContext,
+} from "../contexts";
 import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -121,6 +125,14 @@ type BlockNoteViewWrapperProps = {
    * @since 18.3.0RC1
    */
   label: string;
+
+  /**
+   * The serialized reference of the edited document, e.g. to upload files to. The current document (as provided by the
+   * `DocumentService`) is edited when not specified.
+   *
+   * @since 18.10.0RC1
+   */
+  documentReference?: string;
 
   /**
    * The editor's initial content
@@ -253,6 +265,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   blockNoteOptions,
   name = "content",
   theme,
+  documentReference,
   content,
   macros,
   collaboration,
@@ -371,84 +384,88 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // Renders the editor instance using a React component.
   return (
     <DepsContainerContext.Provider value={depsContainer}>
-      <MacrosContext.Provider value={macros ? macros.ctx : null}>
-        <BlockNoteView
-          editor={editor}
-          theme={theme}
-          // Override some builtin components
-          formattingToolbar={false}
-          linkToolbar={false}
-          filePanel={false}
-          slashMenu={false}
-          sideMenu={false}
-          onChange={(editor) => onChange?.(editor)}
-        >
-          {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
-          <SideMenuController floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS} />
-
-          <SuggestionMenuController
-            triggerCharacter={"/"}
-            getItems={async (query) =>
-              querySuggestionsMenuItems({
-                editor,
-                query,
-                macros: builtMacros,
-                syntax,
-                lang,
-                t,
-                linkEditionHandler,
-                openMacroInsertionEditor: macros
-                  ? macros.ctx.openInsertionEditor
-                  : undefined,
-              })
-            }
-          />
-
-          {syntax.features.blocks.images.basicImages && (
-            <ImageSuggestionController
-              maxSuggestions={5}
-              imageEditionHooks={overrides?.imageEditionHooks}
+      <EditedDocumentContext.Provider value={documentReference}>
+        <MacrosContext.Provider value={macros ? macros.ctx : null}>
+          <BlockNoteView
+            editor={editor}
+            theme={theme}
+            // Override some builtin components
+            formattingToolbar={false}
+            linkToolbar={false}
+            filePanel={false}
+            slashMenu={false}
+            sideMenu={false}
+            onChange={(editor) => onChange?.(editor)}
+          >
+            {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
+            <SideMenuController
+              floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS}
             />
-          )}
 
-          {/* TODO: suggestions menu for inline macros */}
+            <SuggestionMenuController
+              triggerCharacter={"/"}
+              getItems={async (query) =>
+                querySuggestionsMenuItems({
+                  editor,
+                  query,
+                  macros: builtMacros,
+                  syntax,
+                  lang,
+                  t,
+                  linkEditionHandler,
+                  openMacroInsertionEditor: macros
+                    ? macros.ctx.openInsertionEditor
+                    : undefined,
+                })
+              }
+            />
 
-          <FormattingToolbarController
-            formattingToolbar={(props) => (
-              <CustomFormattingToolbar
-                formattingToolbarProps={props}
-                imageEditionOverrideFn={overrides?.imageEdition}
+            {syntax.features.blocks.images.basicImages && (
+              <ImageSuggestionController
+                maxSuggestions={5}
                 imageEditionHooks={overrides?.imageEditionHooks}
-                linkEditionHandler={linkEditionHandler}
-                linkEditionHooks={overrides?.linkEdition}
-                additionalBlockTypes={filterMap(
-                  builtMacros,
-                  (built) => built.dropdownTransformItem,
-                )}
-                macros={macros}
               />
             )}
-          />
 
-          <LinkToolbarController
-            linkToolbar={(props) => (
-              <FormattingToolbar>
-                <CustomLinkToolbar
-                  linkToolbarProps={props}
+            {/* TODO: suggestions menu for inline macros */}
+
+            <FormattingToolbarController
+              formattingToolbar={(props) => (
+                <CustomFormattingToolbar
+                  formattingToolbarProps={props}
+                  imageEditionOverrideFn={overrides?.imageEdition}
+                  imageEditionHooks={overrides?.imageEditionHooks}
                   linkEditionHandler={linkEditionHandler}
                   linkEditionHooks={overrides?.linkEdition}
+                  additionalBlockTypes={filterMap(
+                    builtMacros,
+                    (built) => built.dropdownTransformItem,
+                  )}
+                  macros={macros}
                 />
-              </FormattingToolbar>
-            )}
-          />
+              )}
+            />
 
-          <FilePanelController
-            filePanel={({ blockId }) => (
-              <FilePanel blockId={blockId} editor={editor} />
-            )}
-          />
-        </BlockNoteView>
-      </MacrosContext.Provider>
+            <LinkToolbarController
+              linkToolbar={(props) => (
+                <FormattingToolbar>
+                  <CustomLinkToolbar
+                    linkToolbarProps={props}
+                    linkEditionHandler={linkEditionHandler}
+                    linkEditionHooks={overrides?.linkEdition}
+                  />
+                </FormattingToolbar>
+              )}
+            />
+
+            <FilePanelController
+              filePanel={({ blockId }) => (
+                <FilePanel blockId={blockId} editor={editor} />
+              )}
+            />
+          </BlockNoteView>
+        </MacrosContext.Provider>
+      </EditedDocumentContext.Provider>
     </DepsContainerContext.Provider>
   );
 };

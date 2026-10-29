@@ -47,6 +47,8 @@ export type ImageSuggestionForTestProps = {
   uploadedImageURL?: string;
   // The name of the uploaded image, as reported by the attachments service ("picture.png" when not set).
   uploadedImageName?: string;
+  // The reference of the edited document (the current document, "Some.Page", is edited when not set).
+  documentReference?: string;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
@@ -68,6 +70,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   linkSuggestServiceFailing,
   uploadedImageURL,
   uploadedImageName,
+  documentReference,
   content,
   syntax,
 }) => {
@@ -113,9 +116,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
 
     // A page reference that the model reference parser of the mocked container understands.
     container.get.calledWith("DocumentService").mockReturnValue({
-      getCurrentDocumentReferenceString: () => ({
-        value: "some page reference",
-      }),
+      getCurrentDocumentReferenceString: () => ({ value: "Some.Page" }),
     });
     container.get.calledWith("AttachmentsService").mockReturnValue({
       async upload() {
@@ -135,14 +136,22 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
         ];
       },
     });
-    // Serializes the attachment references like XWiki does, in order to check that the uploaded images are inserted
-    // with the reference of the uploaded attachment.
+    // Parses and serializes the page and attachment references like XWiki does, in order to check that the uploaded
+    // images are inserted with the reference of the uploaded attachment, on the page it was uploaded to.
+    container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
+      get: () => ({
+        parse: (page: string) => ({ name: page }),
+        parseAsync: async (page: string) => ({ name: page }),
+      }),
+    });
     container.get
       .calledWith("ModelReferenceSerializerProvider")
       .mockReturnValue({
         get: () => ({
-          serialize: (reference?: { name: string }) =>
-            `attach:Some.Page@${reference?.name}`,
+          serialize: (reference: {
+            name: string;
+            document: { name: string };
+          }) => `attach:${reference.document.name}@${reference.name}`,
         }),
       });
 
@@ -155,6 +164,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
         lang="en"
         label="Some Label"
         depsContainer={depsContainer}
+        documentReference={documentReference}
         macros={false}
         content={content ?? []}
         syntax={syntax ?? FULL_SYNTAX}

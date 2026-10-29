@@ -22,7 +22,6 @@
 import {
   triggerUserFileUpload,
   triggerUserImageUpload,
-  uploadSelectedFile,
 } from "../../misc/fileUpload";
 import {
   AttachmentReference,
@@ -41,22 +40,11 @@ import type {
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
-import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { Container } from "inversify";
 
-const CURRENT_PAGE_REFERENCE_STRING = "Some.Page";
-const CURRENT_PAGE_REFERENCE = new DocumentReference(
-  "Page",
-  new SpaceReference(),
-);
+const EDITED_PAGE = "Edited.Page";
 
-function buildDocumentServiceMock(): DocumentService {
-  const documentServiceMock = mock<DocumentService>();
-  documentServiceMock.getCurrentDocumentReferenceString.mockReturnValue({
-    value: CURRENT_PAGE_REFERENCE_STRING,
-  } as ReturnType<DocumentService["getCurrentDocumentReferenceString"]>);
-  return documentServiceMock;
-}
+const CURRENT_PAGE = "Current.Page";
 
 /**
  * @returns an attachment reported by the attachments service, named differently than the uploaded file (e.g.
@@ -74,89 +62,58 @@ function buildUploadedAttachment(): Attachment {
   };
 }
 
-function buildAttachmentsServiceMock(
-  uploadedAttachments: (Attachment | undefined)[] | undefined,
-): AttachmentsService {
-  const attachmentsServiceMock = mock<AttachmentsService>();
-  attachmentsServiceMock.upload.mockResolvedValue(uploadedAttachments);
-  return attachmentsServiceMock;
-}
-
-function buildModelReferenceParserProvider(): ModelReferenceParserProvider {
-  return {
-    get: () => ({
-      parse: () => CURRENT_PAGE_REFERENCE,
-      async parseAsync() {
-        return CURRENT_PAGE_REFERENCE;
-      },
-    }),
-  };
-}
-
-function buildRemoteURLSerializerProvider(
-  serializedURL: string | undefined,
-): RemoteURLSerializerProvider {
-  return {
-    get: () => ({
-      serialize: (reference) => {
-        // Only the fallback path (no URL returned by the upload) should ever reach this,
-        // and it must serialize an AttachmentReference built from the file name.
-        expect(reference).toBeInstanceOf(AttachmentReference);
-        expect((reference as AttachmentReference).document).toBe(
-          CURRENT_PAGE_REFERENCE,
-        );
-        return serializedURL;
-      },
-    }),
-  };
-}
-
-function buildModelReferenceSerializerProvider(
-  serializeReferences: boolean,
-): ModelReferenceSerializerProvider {
-  return {
-    get: () => ({
-      serialize: (reference) =>
-        serializeReferences
-          ? `attach:${CURRENT_PAGE_REFERENCE_STRING}@${reference!.name}`
-          : undefined,
-    }),
-  };
-}
-
-/** Builds a minimal Container mock covering everything `uploadSelectedFile`/`triggerUserFileUpload` depend on. */
-function buildContainer(options: {
-  uploadedAttachments?: (Attachment | undefined)[];
-  serializedURL?: string;
-  // Whether the attachment references can be serialized (true by default).
-  serializeReferences?: boolean;
-}): Container {
+/** Builds a minimal Container mock covering everything the upload functions depend on. */
+function buildContainer(
+  options: {
+    // Whether the upload fails.
+    failUpload?: boolean;
+    // Whether the attachment references can be serialized (true by default).
+    serializeReferences?: boolean;
+  } = {},
+): { container: Container; attachmentsService: AttachmentsService } {
   const container = mock<Container>();
 
-  container.get
-    .calledWith("DocumentService")
-    .mockReturnValue(buildDocumentServiceMock());
+  const attachmentsService = mock<AttachmentsService>();
+  if (options.failUpload) {
+    attachmentsService.upload.mockRejectedValue(new Error("Upload failed"));
+  } else {
+    attachmentsService.upload.mockResolvedValue([buildUploadedAttachment()]);
+  }
   container.get
     .calledWith("AttachmentsService")
-    .mockReturnValue(buildAttachmentsServiceMock(options.uploadedAttachments));
-  container.get
-    .calledWith("ModelReferenceParserProvider")
-    .mockReturnValue(buildModelReferenceParserProvider());
-  container.get
-    .calledWith("RemoteURLSerializerProvider")
-    .mockReturnValue(buildRemoteURLSerializerProvider(options.serializedURL));
-  container.get
-    .calledWith("ModelReferenceSerializerProvider")
-    .mockReturnValue(
-      buildModelReferenceSerializerProvider(
-        options.serializeReferences ?? true,
-      ),
-    );
+    .mockReturnValue(attachmentsService);
+  mockReferenceServices(container, options.serializeReferences !== false);
+
+  return { container, attachmentsService };
+}
+
+/**
+ * Mocks the services used to resolve the page to upload to and to build the reference of the uploaded attachment.
+ */
+function mockReferenceServices(
+  container: ReturnType<typeof mock<Container>>,
+  serializeReferences: boolean,
+) {
+  container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
+    get: () => ({
+      parse: (page: string) =>
+        new DocumentReference(page, new SpaceReference()),
+    }),
+  } as unknown as ModelReferenceParserProvider);
+  container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue({
+    get: () => ({
+      serialize: (reference: AttachmentReference) =>
+        serializeReferences
+          ? `attach:${reference.document.name}@${reference.name}`
+          : undefined,
+    }),
+  } as unknown as ModelReferenceSerializerProvider);
   container.get
     .calledWith("ResourceReferenceParser")
     .mockReturnValue(new DefaultResourceReferenceParser());
-
-  return container;
+  container.get.calledWith("DocumentService").mockReturnValue({
+    getCurrentDocumentReferenceString: () => ({ value: CURRENT_PAGE }),
+  } as unknown as DocumentService);
 }
 
 function buildFile(): File {
@@ -169,87 +126,31 @@ function getHiddenFileInput(): HTMLInputElement {
   return input as HTMLInputElement;
 }
 
-function selectFile(input: HTMLInputElement): void {
-  Object.defineProperty(input, "files", { value: [buildFile()] });
+function selectFile(input: HTMLInputElement): File {
+  const file = buildFile();
+  Object.defineProperty(input, "files", { value: [file] });
   input.dispatchEvent(new Event("change"));
+  return file;
 }
 
-describe("uploadSelectedFile", () => {
-  test("returns the URL and the reference of the attachment reported by the attachment service", async () => {
-    const container = buildContainer({
-      uploadedAttachments: [buildUploadedAttachment()],
-    });
-
-    await expect(uploadSelectedFile(buildFile(), container)).resolves.toEqual({
-      url: "https://example.org/attachments/uploaded.png",
-      reference: new AttachmentReference(
-        "uploaded.png",
-        CURRENT_PAGE_REFERENCE,
-      ),
-    });
-  });
-
-  test("falls back to a serialized attachment reference when the upload doesn't resolve a URL", async () => {
-    const container = buildContainer({
-      uploadedAttachments: undefined,
-      serializedURL: "https://example.org/fallback/picture.png",
-    });
-
-    await expect(uploadSelectedFile(buildFile(), container)).resolves.toEqual({
-      url: "https://example.org/fallback/picture.png",
-      reference: new AttachmentReference("picture.png", CURRENT_PAGE_REFERENCE),
-    });
-  });
-
-  test("also falls back when the upload doesn't report the uploaded file", async () => {
-    const container = buildContainer({
-      uploadedAttachments: [undefined],
-      serializedURL: "https://example.org/fallback/picture.png",
-    });
-
-    await expect(uploadSelectedFile(buildFile(), container)).resolves.toEqual({
-      url: "https://example.org/fallback/picture.png",
-      reference: new AttachmentReference("picture.png", CURRENT_PAGE_REFERENCE),
-    });
-  });
-
-  test("throws when no URL can be resolved at all", async () => {
-    const container = buildContainer({
-      uploadedAttachments: undefined,
-      serializedURL: undefined,
-    });
-
-    await expect(uploadSelectedFile(buildFile(), container)).rejects.toThrow(
-      "Internal error: could not get URL for uploaded file",
-    );
-  });
-});
-
 describe("triggerUserFileUpload", () => {
-  test("appends a hidden file input, resolves with the uploaded file, and removes the input", async () => {
-    const container = buildContainer({
-      uploadedAttachments: [buildUploadedAttachment()],
-    });
+  test("appends a hidden file input, uploads the selected file to the given page, and removes the input", async () => {
+    const { container, attachmentsService } = buildContainer();
 
-    const promise = triggerUserFileUpload(container);
+    const promise = triggerUserFileUpload(container, EDITED_PAGE);
 
     const input = getHiddenFileInput();
     expect(input.style.display).toBe("none");
 
-    selectFile(input);
+    const file = selectFile(input);
 
-    await expect(promise).resolves.toEqual({
-      url: "https://example.org/attachments/uploaded.png",
-      reference: new AttachmentReference(
-        "uploaded.png",
-        CURRENT_PAGE_REFERENCE,
-      ),
-    });
+    await expect(promise).resolves.toEqual(buildUploadedAttachment());
+    expect(attachmentsService.upload).toHaveBeenCalledWith(EDITED_PAGE, [file]);
     expect(document.body.contains(input)).toBe(false);
   });
 
   test("offers all file types by default", () => {
-    triggerUserFileUpload(buildContainer({}));
+    triggerUserFileUpload(buildContainer().container, EDITED_PAGE);
 
     const input = getHiddenFileInput();
     expect(input.hasAttribute("accept")).toBe(false);
@@ -258,7 +159,7 @@ describe("triggerUserFileUpload", () => {
   });
 
   test("offers only the accepted file types when specified", () => {
-    triggerUserFileUpload(buildContainer({}), "image/*");
+    triggerUserFileUpload(buildContainer().container, EDITED_PAGE, "image/*");
 
     const input = getHiddenFileInput();
     expect(input.accept).toBe("image/*");
@@ -267,7 +168,10 @@ describe("triggerUserFileUpload", () => {
   });
 
   test("removes the input and resolves with undefined when the change event carries no file", async () => {
-    const promise = triggerUserFileUpload(buildContainer({}));
+    const promise = triggerUserFileUpload(
+      buildContainer().container,
+      EDITED_PAGE,
+    );
 
     const input = getHiddenFileInput();
     Object.defineProperty(input, "files", { value: [] });
@@ -278,7 +182,10 @@ describe("triggerUserFileUpload", () => {
   });
 
   test("removes the input and resolves with undefined when the file picker is dismissed", async () => {
-    const promise = triggerUserFileUpload(buildContainer({}));
+    const promise = triggerUserFileUpload(
+      buildContainer().container,
+      EDITED_PAGE,
+    );
 
     const input = getHiddenFileInput();
     input.dispatchEvent(new Event("cancel"));
@@ -288,14 +195,15 @@ describe("triggerUserFileUpload", () => {
   });
 
   test("rejects when the upload fails", async () => {
-    const promise = triggerUserFileUpload(buildContainer({}));
+    const promise = triggerUserFileUpload(
+      buildContainer({ failUpload: true }).container,
+      EDITED_PAGE,
+    );
 
     const input = getHiddenFileInput();
     selectFile(input);
 
-    await expect(promise).rejects.toThrow(
-      "Internal error: could not get URL for uploaded file",
-    );
+    await expect(promise).rejects.toThrow("Upload failed");
     expect(document.body.contains(input)).toBe(false);
   });
 });
@@ -307,30 +215,45 @@ describe("triggerUserImageUpload", () => {
 
   test("offers only images and resolves with the uploaded image's URL and resource reference", async () => {
     const promise = triggerUserImageUpload(
-      buildContainer({ uploadedAttachments: [buildUploadedAttachment()] }),
+      buildContainer().container,
+      EDITED_PAGE,
     );
 
     const input = getHiddenFileInput();
     expect(input.accept).toBe("image/*");
     selectFile(input);
 
+    // The reference of the uploaded image is built from the page it was uploaded to and the name of the uploaded
+    // attachment.
     await expect(promise).resolves.toEqual({
       url: "https://example.org/attachments/uploaded.png",
       reference: {
         type: "attach",
         typed: true,
-        reference: "Some.Page@uploaded.png",
+        reference: "Edited.Page@uploaded.png",
         parameters: {},
       },
     });
   });
 
+  test("uploads the image to the current page when the page isn't specified", async () => {
+    const { container, attachmentsService } = buildContainer();
+    const promise = triggerUserImageUpload(container);
+
+    const file = selectFile(getHiddenFileInput());
+
+    await expect(promise).resolves.toMatchObject({
+      reference: { reference: "Current.Page@uploaded.png" },
+    });
+    expect(attachmentsService.upload).toHaveBeenCalledWith(CURRENT_PAGE, [
+      file,
+    ]);
+  });
+
   test("resolves with only the uploaded image's URL when its reference can't be serialized", async () => {
     const promise = triggerUserImageUpload(
-      buildContainer({
-        uploadedAttachments: [buildUploadedAttachment()],
-        serializeReferences: false,
-      }),
+      buildContainer({ serializeReferences: false }).container,
+      EDITED_PAGE,
     );
 
     selectFile(getHiddenFileInput());
@@ -342,7 +265,10 @@ describe("triggerUserImageUpload", () => {
   });
 
   test("resolves with undefined when the file picker is dismissed", async () => {
-    const promise = triggerUserImageUpload(buildContainer({}));
+    const promise = triggerUserImageUpload(
+      buildContainer().container,
+      EDITED_PAGE,
+    );
 
     getHiddenFileInput().dispatchEvent(new Event("cancel"));
 
@@ -353,16 +279,17 @@ describe("triggerUserImageUpload", () => {
     const consoleError = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
-    const promise = triggerUserImageUpload(buildContainer({}));
+    const promise = triggerUserImageUpload(
+      buildContainer({ failUpload: true }).container,
+      EDITED_PAGE,
+    );
 
     selectFile(getHiddenFileInput());
 
     await expect(promise).resolves.toBeUndefined();
     expect(consoleError).toHaveBeenCalledWith(
       "Failed to upload the selected image.",
-      expect.objectContaining({
-        message: "Internal error: could not get URL for uploaded file",
-      }),
+      expect.objectContaining({ message: "Upload failed" }),
     );
   });
 });

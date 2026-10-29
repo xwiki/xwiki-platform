@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { AttachmentReference } from "@xwiki/platform-model-api";
 import { inject, injectable } from "inversify";
 import { defineStore, storeToRefs } from "pinia";
 import type { PageAttachment } from "@xwiki/platform-api";
@@ -26,6 +27,12 @@ import type {
   AttachmentsService,
 } from "@xwiki/platform-attachments-api";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
+import type {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { Store, StoreDefinition } from "pinia";
 import type { Ref } from "vue";
 
@@ -152,6 +159,12 @@ export class DefaultAttachmentsService implements AttachmentsService {
   constructor(
     @inject("StorageProvider")
     private readonly storageProvider: StorageProvider,
+    @inject("ModelReferenceParserProvider")
+    private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
+    @inject("ModelReferenceSerializerProvider")
+    private readonly modelReferenceSerializerProvider: ModelReferenceSerializerProvider,
+    @inject("RemoteURLSerializerProvider")
+    private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
   ) {
     // An internal store is kept to easily provide refs for updatable elements.
     this.store = attachmentsStore();
@@ -196,10 +209,7 @@ export class DefaultAttachmentsService implements AttachmentsService {
       }
     }
   }
-  async upload(
-    page: string,
-    files: File[],
-  ): Promise<(Attachment | undefined)[] | undefined> {
+  async upload(page: string, files: File[]): Promise<Attachment[]> {
     this.store.startUploading();
     let uploadedAttachments;
     try {
@@ -211,8 +221,50 @@ export class DefaultAttachmentsService implements AttachmentsService {
     }
 
     await this.refresh(page);
-    return uploadedAttachments?.map(
-      (attachment) => attachment && toAttachment(attachment),
+    return files.map((file, index) =>
+      toAttachment(
+        uploadedAttachments?.[index] ??
+          this.getDefaultUploadedAttachment(page, file),
+      ),
     );
+  }
+
+  /**
+   * Describes an uploaded file that the storage didn't describe, assuming the attachment is named after the file.
+   *
+   * @param page - the page the file was uploaded to
+   * @param file - the uploaded file
+   * @returns the attachment holding the uploaded file
+   */
+  private getDefaultUploadedAttachment(
+    page: string,
+    file: File,
+  ): PageAttachment {
+    const attachmentReference = new AttachmentReference(
+      file.name,
+      this.modelReferenceParserProvider
+        .get()
+        ?.parse(page, { relative: false }) as DocumentReference,
+    );
+    const href = this.remoteURLSerializerProvider
+      .get()
+      ?.serialize(attachmentReference);
+    if (!href) {
+      throw new Error(
+        `Failed to compute the URL of the uploaded file [${file.name}].`,
+      );
+    }
+    return {
+      id:
+        this.modelReferenceSerializerProvider
+          .get()
+          ?.serialize(attachmentReference) ?? file.name,
+      reference: file.name,
+      mimetype: file.type,
+      href,
+      size: file.size,
+      date: new Date(),
+      author: undefined,
+    };
   }
 }

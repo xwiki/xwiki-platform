@@ -19,30 +19,22 @@
  */
 import { toResourceReference } from "./resourceReference";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
-import {
-  AttachmentReference,
-  DocumentReference,
-} from "@xwiki/platform-model-api";
-import type { AttachmentsService } from "@xwiki/platform-attachments-api";
+import { AttachmentReference } from "@xwiki/platform-model-api";
+import type {
+  Attachment,
+  AttachmentsService,
+} from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
-import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type {
   ResourceReference,
   ResourceReferenceParser,
 } from "@xwiki/platform-rendering-api";
 import type { Container } from "inversify";
-
-/**
- * A file uploaded by the user, as an attachment of the current page.
- */
-type UploadedFile = {
-  url: string;
-  reference: AttachmentReference;
-};
 
 /**
  * An image uploaded by the user, ready to be inserted into the content.
@@ -55,69 +47,20 @@ type UploadedImage = {
   reference?: ResourceReference;
 };
 
-// eslint-disable-next-line max-statements
-async function uploadSelectedFile(
-  file: File,
-  depsContainer: Container,
-): Promise<UploadedFile> {
-  const remoteURLSerializer = depsContainer
-    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-    .get()!;
-
-  const modelReferenceParser = depsContainer
-    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    .get()!;
-
-  const documentService = depsContainer.get<DocumentService>("DocumentService");
-
-  const attachmentsService =
-    depsContainer.get<AttachmentsService>("AttachmentsService")!;
-
-  const currentPageName =
-    documentService.getCurrentDocumentReferenceString().value ?? "";
-
-  const uploadedAttachments = await attachmentsService.upload(currentPageName, [
-    file,
-  ]);
-
-  const currentPageReference = modelReferenceParser?.parse(currentPageName, {
-    relative: false,
-  }) as DocumentReference;
-
-  const uploadedAttachment = uploadedAttachments?.[0];
-  if (uploadedAttachment) {
-    return {
-      url: uploadedAttachment.href,
-      reference: new AttachmentReference(
-        uploadedAttachment.name,
-        currentPageReference,
-      ),
-    };
-  }
-
-  // The storage doesn't report the uploaded attachment, so we assume it's named after the uploaded file.
-  const reference = new AttachmentReference(file.name, currentPageReference);
-  const url = remoteURLSerializer?.serialize(reference);
-
-  if (!url) {
-    throw new Error("Internal error: could not get URL for uploaded file");
-  }
-
-  return { url, reference };
-}
-
 /**
- * Opens the system file picker and uploads the selected file as an attachment of the current page.
+ * Opens the system file picker and uploads the selected file as an attachment of the given page.
  *
  * @param depsContainer - the container providing the upload services
+ * @param page - the serialized reference of the page to upload the file to, the current page when not specified
  * @param accept - the file types the file picker offers, e.g. "image/*" (all types when not specified)
- * @returns the uploaded file, or `undefined` when the user closes the file picker without selecting a file
+ * @returns the uploaded attachment, or `undefined` when the user closes the file picker without selecting a file
  *   (rejected when the upload fails)
  */
 function triggerUserFileUpload(
   depsContainer: Container,
+  page: string | undefined,
   accept?: string,
-): Promise<UploadedFile | undefined> {
+): Promise<Attachment | undefined> {
   return new Promise((resolve, reject) => {
     // Creates a hidden file input element and temporarily adds it to the DOM,
     // so we can open the system file picker by clicking it. See
@@ -139,7 +82,10 @@ function triggerUserFileUpload(
       }
 
       try {
-        resolve(await uploadSelectedFile(file, depsContainer));
+        const [uploadedAttachment] = await depsContainer
+          .get<AttachmentsService>("AttachmentsService")
+          .upload(page ?? getCurrentPage(depsContainer), [file]);
+        resolve(uploadedAttachment);
       } catch (error) {
         reject(error);
       }
@@ -159,49 +105,86 @@ function triggerUserFileUpload(
 
 /**
  * Opens the system file picker for images and uploads the selected image as an attachment of the
- * current page.
+ * given page.
  *
  * Meant for UI event handlers, which don't handle the returned promise: an upload failure is logged
  * rather than rejected.
  *
  * @param depsContainer - the container providing the upload services
+ * @param page - the serialized reference of the page to upload the image to, the current page when not specified
  * @returns the uploaded image, or `undefined` when the user closes the file picker without selecting an
  *   image or when the upload fails
  */
 async function triggerUserImageUpload(
   depsContainer: Container,
+  page?: string,
 ): Promise<UploadedImage | undefined> {
-  let uploadedFile;
+  const targetPage = page ?? getCurrentPage(depsContainer);
+  let uploadedAttachment;
   try {
-    uploadedFile = await triggerUserFileUpload(depsContainer, "image/*");
+    uploadedAttachment = await triggerUserFileUpload(
+      depsContainer,
+      targetPage,
+      "image/*",
+    );
   } catch (error) {
     console.error("Failed to upload the selected image.", error);
     return undefined;
   }
 
-  if (!uploadedFile) {
+  if (!uploadedAttachment) {
     return undefined;
   }
 
-  const serializedReference = depsContainer
-    .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
-    .get()
-    ?.serialize(uploadedFile.reference);
-
   return {
-    url: uploadedFile.url,
-    reference:
-      serializedReference === undefined
-        ? undefined
-        : toResourceReference(
-            depsContainer.get<ResourceReferenceParser>(
-              "ResourceReferenceParser",
-            ),
-            serializedReference,
-            LinkType.ATTACHMENT,
-          ),
+    url: uploadedAttachment.href,
+    reference: getAttachmentResourceReference(
+      depsContainer,
+      targetPage,
+      uploadedAttachment.name,
+    ),
   };
 }
 
-export { triggerUserFileUpload, triggerUserImageUpload, uploadSelectedFile };
-export type { UploadedFile, UploadedImage };
+/**
+ * @param depsContainer - the container providing the document service
+ * @returns the serialized reference of the current page
+ */
+function getCurrentPage(depsContainer: Container): string {
+  return (
+    depsContainer
+      .get<DocumentService>("DocumentService")
+      .getCurrentDocumentReferenceString().value ?? ""
+  );
+}
+
+/**
+ * @param depsContainer - the container providing the model reference services
+ * @param page - the serialized reference of the page holding the attachment
+ * @param name - the name of the attachment
+ * @returns the resource reference of the specified attachment, or `undefined` when it can't be serialized
+ */
+function getAttachmentResourceReference(
+  depsContainer: Container,
+  page: string,
+  name: string,
+): ResourceReference | undefined {
+  const pageReference = depsContainer
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()
+    ?.parse(page, { relative: false }) as DocumentReference | undefined;
+  const serializedReference = depsContainer
+    .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+    .get()
+    ?.serialize(new AttachmentReference(name, pageReference!));
+  return serializedReference === undefined
+    ? undefined
+    : toResourceReference(
+        depsContainer.get<ResourceReferenceParser>("ResourceReferenceParser"),
+        serializedReference,
+        LinkType.ATTACHMENT,
+      );
+}
+
+export { triggerUserFileUpload, triggerUserImageUpload };
+export type { UploadedImage };

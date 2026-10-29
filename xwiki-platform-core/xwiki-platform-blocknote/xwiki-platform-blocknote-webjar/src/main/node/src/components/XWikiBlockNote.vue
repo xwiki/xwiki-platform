@@ -329,6 +329,8 @@ const editorProps = shallowRef<
   },
   theme: "light",
   lang: (actualLocale || "en") as EditorLanguage,
+  // The images uploaded from the editor are attached to the edited document.
+  documentReference,
   // Style the code blocks like the code macro output in view mode.
   codeBlockClassName: "box code",
   label: defaultLabel,

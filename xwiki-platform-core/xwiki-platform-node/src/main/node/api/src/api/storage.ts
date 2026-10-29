@@ -110,9 +110,10 @@ export interface Storage {
   /**
    * @param page - the serialized reference of the page
    * @param files - the list of files to upload
-   * @returns an optional list of the uploaded attachments (in the same order as the provided files), e.g. to get their
-   *   URL, which can't always be resolved from the name of the file and its document reference alone (since 18.10.0RC1
-   *   the list holds the uploaded attachments rather than their URL)
+   * @returns the uploaded attachments, in the same order as the provided files (since 18.10.0RC1, rather than their
+   *   URL); the list, or some of its items, can be undefined when the storage doesn't describe the uploaded attachments,
+   *   in which case they are assumed to be named after the uploaded files, with the URL resolved from their file name
+   *   and page reference; rejected when the upload fails
    * @since 18.0.0RC1
    * @beta
    */

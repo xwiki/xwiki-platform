@@ -35,6 +35,11 @@ import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/platform-link-suggest-api";
+import type { AttachmentReference } from "@xwiki/platform-model-api";
+import type {
+  ModelReferenceParser,
+  ModelReferenceParserProvider,
+} from "@xwiki/platform-model-reference-api";
 
 import "./ImageSuggestionController.css";
 
@@ -50,6 +55,10 @@ export function ImageSuggestionController({
   const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
   ).get!();
+
+  const modelReferenceParser = depsContainer
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
 
   const editor = useEditor();
   const uploadImage = useImageUploader(editor, depsContainer);
@@ -73,6 +82,7 @@ export function ImageSuggestionController({
       const suggestions = await fetchImageSuggestions(
         query,
         linkSuggestService,
+        modelReferenceParser,
         editor,
         t,
       );
@@ -97,7 +107,14 @@ export function ImageSuggestionController({
           : suggestions),
       ];
     }),
-    [t, linkSuggestService, maxSuggestions, openImageSelector, uploadImage],
+    [
+      t,
+      linkSuggestService,
+      modelReferenceParser,
+      maxSuggestions,
+      openImageSelector,
+      uploadImage,
+    ],
   );
 
   return (
@@ -138,6 +155,7 @@ export function ImageSuggestionController({
 async function fetchImageSuggestions(
   query: string,
   linkSuggestService: LinkSuggestService | undefined,
+  modelReferenceParser: ModelReferenceParser,
   editor: EditorType,
   t: ReturnType<typeof useTranslation>["t"],
 ): Promise<DefaultReactSuggestionItem[]> {
@@ -160,9 +178,22 @@ async function fetchImageSuggestions(
     "image/*",
   );
 
-  return results.map(
-    (link): DefaultReactSuggestionItem => ({
+  return results.map((link): DefaultReactSuggestionItem => {
+    const attachmentReference = modelReferenceParser.parse(link.reference, {
+      relative: false,
+    }) as AttachmentReference;
+
+    // The location of the page holding the image, shown under its name like in the image selector.
+    const documentReference = attachmentReference.document;
+    const segments = documentReference.space?.names.slice(0) ?? [];
+
+    if (documentReference.terminal) {
+      segments.push(documentReference.name);
+    }
+
+    return {
       title: link.label,
+      subtext: segments.length > 0 ? segments.join(" / ") : undefined,
       group,
       // The image is described by the title right next to it, hence the empty alternative text.
       icon: (
@@ -178,6 +209,6 @@ async function fetchImageSuggestions(
           props: { url: link.url },
         });
       },
-    }),
-  );
+    };
+  });
 }

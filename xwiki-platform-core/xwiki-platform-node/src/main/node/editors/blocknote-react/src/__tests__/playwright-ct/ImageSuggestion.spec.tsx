@@ -28,8 +28,16 @@ test("Triggering the image suggestions shows the browse and upload actions, then
   const component = await mount(
     <ImageSuggestionForTest
       images={[
-        { label: "Cat picture", url: "https://picsum.photos/150" },
-        { label: "Dog picture", url: "https://picsum.photos/300" },
+        {
+          label: "Cat picture",
+          url: "https://picsum.photos/150",
+          reference: "some nested attachment reference",
+        },
+        {
+          label: "Dog picture",
+          url: "https://picsum.photos/300",
+          reference: "some terminal attachment reference",
+        },
       ]}
     />,
   );
@@ -62,19 +70,26 @@ test("Triggering the image suggestions shows the browse and upload actions, then
   );
 
   // The following items are the matching image suggestions, in order, each with a preview that
-  // has an empty alternative text, the image's title being right next to it.
+  // has an empty alternative text, the image's title being right next to it, and the location of
+  // the page holding the image under it.
   await expect(items.nth(2).locator("img")).toHaveAttribute(
     "src",
     "https://picsum.photos/150",
   );
   await expect(items.nth(2).locator("img")).toHaveAttribute("alt", "");
   await expect(items.nth(2)).toContainText("Cat picture");
+  await expect(
+    items.nth(2).locator(".bn-mt-suggestion-menu-item-subtitle"),
+  ).toHaveText("Animals / Cats");
 
   await expect(items.nth(3).locator("img")).toHaveAttribute(
     "src",
     "https://picsum.photos/300",
   );
   await expect(items.nth(3)).toContainText("Dog picture");
+  await expect(
+    items.nth(3).locator(".bn-mt-suggestion-menu-item-subtitle"),
+  ).toHaveText("Animals / Cat");
 });
 
 test("Only the first 5 image suggestions are shown, in addition to the browse and upload actions", async ({

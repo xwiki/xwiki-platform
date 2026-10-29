@@ -89,7 +89,7 @@ export function ImageSuggestionController({
 
       const actions: DefaultReactSuggestionItem[] = [
         {
-          title: t("blocknote.imageSelector.browseButton"),
+          title: t("blocknote.imageSuggestion.browse"),
           icon: <RiFolderImageLine size={18} />,
           onItemClick: openImageSelector,
         },

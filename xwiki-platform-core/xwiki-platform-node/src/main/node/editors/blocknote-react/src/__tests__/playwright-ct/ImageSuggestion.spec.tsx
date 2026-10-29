@@ -60,9 +60,7 @@ test("Triggering the image suggestions shows the browse and upload actions, then
 
   // The first item is the "browse" action, initially selected so it stays keyboard-navigable.
   await expect(items.nth(0)).toHaveAttribute("aria-selected", "true");
-  await expect(items.nth(0)).toContainText(
-    "blocknote.imageSelector.browseButton",
-  );
+  await expect(items.nth(0)).toContainText("blocknote.imageSuggestion.browse");
 
   // The second item is the upload action.
   await expect(items.nth(1)).toContainText(

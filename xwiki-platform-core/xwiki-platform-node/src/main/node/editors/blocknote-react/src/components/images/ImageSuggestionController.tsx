@@ -94,7 +94,7 @@ export function ImageSuggestionController({
           onItemClick: openImageSelector,
         },
         {
-          title: t("blocknote.imageSelector.uploadButton"),
+          title: t("blocknote.imageSuggestion.upload"),
           icon: <RiUpload2Line size={18} />,
           onItemClick: uploadImage,
         },

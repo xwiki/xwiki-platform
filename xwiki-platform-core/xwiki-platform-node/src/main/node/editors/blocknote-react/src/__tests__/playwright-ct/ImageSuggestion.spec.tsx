@@ -63,9 +63,7 @@ test("Triggering the image suggestions shows the browse and upload actions, then
   await expect(items.nth(0)).toContainText("blocknote.imageSuggestion.browse");
 
   // The second item is the upload action.
-  await expect(items.nth(1)).toContainText(
-    "blocknote.imageSelector.uploadButton",
-  );
+  await expect(items.nth(1)).toContainText("blocknote.imageSuggestion.upload");
 
   // A group label separates the actions from the image suggestions.
   await expect(menuEl.locator(".bn-suggestion-menu-label")).toHaveText(

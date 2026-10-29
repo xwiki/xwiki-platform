@@ -23,6 +23,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Import for the side effect of registering the global define / requirejs used to load the legacy image wizard.
 import "../../testUtils";
 
+// eslint-disable-next-line max-statements
 describe("DefaultImageWizard", () => {
   let capturedOptions;
   let resolvedImageData;
@@ -65,6 +66,45 @@ describe("DefaultImageWizard", () => {
       wizard.edit(image, { submit: resolve, cancel: () => resolve(undefined) });
     });
   }
+
+  describe("insert", () => {
+    it("reports the inserted image", async () => {
+      const reference = { type: "attach", typed: false, reference: "cat.png" };
+      // No width nor alignment set for the new image.
+      resolvedImageData = {
+        width: "",
+        src: "catURL",
+        resourceReference: reference,
+      };
+
+      const result = await new Promise((resolve) => {
+        wizard.insert({ submit: resolve, cancel: () => resolve(undefined) });
+      });
+
+      expect(capturedOptions.isInsert).toBe(true);
+      expect(result.url).toBe("catURL");
+      expect(result.reference).toBe(reference);
+      // Without width, the image is displayed with its natural width.
+      expect(result.previewWidth).toBeUndefined();
+    });
+
+    it("notifies when the image insertion is cancelled", async () => {
+      // The legacy wizard rejects when the user closes it.
+      global.define("xwiki-wysiwyg-image-wizard", () => (options) => {
+        capturedOptions = options;
+        return Promise.reject(new Error("cancelled"));
+      });
+
+      const cancelled = await new Promise((resolve) => {
+        wizard.insert({
+          submit: () => resolve(false),
+          cancel: () => resolve(true),
+        });
+      });
+
+      expect(cancelled).toBe(true);
+    });
+  });
 
   it("passes the stored resource reference to the image wizard", async () => {
     const reference = { type: "attach", typed: true, reference: "photo.png" };
@@ -111,6 +151,14 @@ describe("DefaultImageWizard", () => {
     expect(result.url).toBe("updatedImageURL");
     expect(result.previewWidth).toBe(150);
     expect(result.textAlignment).toBe("right");
+  });
+
+  it("removes the width of the image when the user removes it", async () => {
+    resolvedImageData = { width: "", src: "imageURL" };
+
+    const result = await edit({ url: "imageURL", previewWidth: 200 });
+
+    expect(result.previewWidth).toBeUndefined();
   });
 
   it("reports the newly selected reference when the user picks a different image", async () => {

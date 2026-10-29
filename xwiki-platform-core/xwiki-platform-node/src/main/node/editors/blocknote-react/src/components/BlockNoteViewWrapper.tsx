@@ -67,6 +67,7 @@ import type {
 } from "../blocknote/utils";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { ImageEditionHooks } from "./images/imageEditionHooks";
+import type { ImageInsertionOverrideFn } from "./images/imageInsertionOverride";
 import type { LinkEditionHandler } from "./links/linkEdition";
 import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
@@ -211,6 +212,13 @@ type BlockNoteViewWrapperProps = {
      * @since 18.10.0RC1
      */
     imageEditionHooks?: ImageEditionHooks;
+
+    /**
+     * Intercept the image insertion mechanism (i.e. browsing the images to insert, from the image quick action)
+     *
+     * @since 18.10.0RC1
+     */
+    imageInsertion?: ImageInsertionOverrideFn;
 
     /**
      * Hooks to intercept the link creation / edition flow.
@@ -424,6 +432,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               <ImageSuggestionController
                 maxSuggestions={5}
                 imageEditionHooks={overrides?.imageEditionHooks}
+                imageInsertionOverrideFn={overrides?.imageInsertion}
               />
             )}
 

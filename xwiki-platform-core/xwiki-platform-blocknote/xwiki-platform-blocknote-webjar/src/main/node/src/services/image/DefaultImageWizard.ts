@@ -203,7 +203,11 @@ export class DefaultImageWizard implements ImageWizard {
   ): Partial<ImageWithReference> {
     const newReference = imageData.resourceReference;
     return {
-      previewWidth: Number.parseInt(imageData.width),
+      // The width is empty when the user doesn't set it (or removes it), in which case the image is displayed with its
+      // natural width.
+      previewWidth: imageData.width
+        ? Number.parseInt(imageData.width)
+        : undefined,
       textAlignment: saveAlignment[imageData.alignment],
       url: imageData.src,
       // Preserve the old reference (with its parameters) when the image itself doesn't change, otherwise report

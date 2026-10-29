@@ -118,6 +118,7 @@ import type {
   EditorLanguage,
   ImageEditionHooks,
   ImageEditionOverrideFn,
+  ImageInsertionOverrideFn,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
@@ -221,6 +222,17 @@ const imageEdition: ImageEditionOverrideFn = (block, update) => {
       cancel: () => update({ type: "aborted" }),
     },
   );
+};
+
+const imageInsertion: ImageInsertionOverrideFn = (insert) => {
+  const imageWizard: ImageWizard = container.get("ImageWizard");
+  // The image wizard lets the user select the image to insert (among the existing images, or by uploading a new one)
+  // and set its properties. The resource reference of the selected image is stored by the image edition hooks.
+  imageWizard.insert({
+    submit: ({ reference, ...props }) =>
+      insert({ type: "insert", props, reference }),
+    cancel: () => insert({ type: "aborted" }),
+  });
 };
 
 const imageEditionHooks: ImageEditionHooks = {
@@ -337,6 +349,7 @@ const editorProps = shallowRef<
   overrides: {
     imageEdition,
     imageEditionHooks,
+    imageInsertion,
     linkEdition,
   },
   syntax,

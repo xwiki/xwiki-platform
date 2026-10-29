@@ -61,6 +61,7 @@ export type BlockNoteViewWrapperProps = {
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
         imageEditionHooks?: ImageEditionHooks;
+        imageInsertion?: ImageInsertionOverrideFn;
         linkEdition?: LinkEditionHooks;
     };
     syntax: SyntaxConfig;
@@ -129,6 +130,18 @@ export type ImageEditionHooks = {
 
 // @beta
 export type ImageEditionOverrideFn = (block: BlockOfType<"image">, update: (updateResult: ImageUpdateResult) => void) => void;
+
+// @beta
+export type ImageInsertionOverrideFn = (insert: (insertionResult: ImageInsertionResult) => void) => void;
+
+// @beta
+export type ImageInsertionResult = {
+    type: "insert";
+    props: Partial<BlockOfType<"image">["props"]>;
+    reference?: ResourceReference;
+} | {
+    type: "aborted";
+};
 
 // @beta
 export type ImageUpdateResult = {

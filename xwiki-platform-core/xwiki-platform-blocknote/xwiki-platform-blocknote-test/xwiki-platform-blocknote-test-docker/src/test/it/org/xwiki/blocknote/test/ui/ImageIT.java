@@ -249,4 +249,39 @@ class ImageIT extends AbstractBlockNoteIT
         assertEquals("[[image:%s@%s]]".formatted(setup.serializeReference(testReference), imageName),
             wikiEditor.getContent());
     }
+
+    @Test
+    @Order(3)
+    void insertImageFromImageWizard(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // The image quick action shows the action to browse the images first, selected.
+        textArea.click().sendKeys("/");
+        SlashMenu slashMenu = new SlashMenu();
+        textArea.sendKeys("image");
+        slashMenu.waitForItemSelected("Image");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+        slashMenu = new SlashMenu().waitForItemSelected("Browse images...");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+
+        // Browsing the images opens the image wizard, where we upload a new image and insert it.
+        ImageDialogSelectModal imageSelectModal = new ImageDialogSelectModal();
+        imageSelectModal.switchToUploadTab().upload("/image.gif");
+        imageSelectModal.clickSelect().clickInsert();
+        textArea.waitUntilImageIsLoaded(0);
+
+        // Save and check the source: the image is saved with the reference provided by the image wizard.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("[[image:image.gif]]", wikiEditor.getContent());
+    }
 }

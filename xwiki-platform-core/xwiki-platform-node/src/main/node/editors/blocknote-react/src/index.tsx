@@ -80,6 +80,11 @@ export type {
 
 export type { ImageEditionHooks } from "./components/images/imageEditionHooks";
 
+export type {
+  ImageInsertionOverrideFn,
+  ImageInsertionResult,
+} from "./components/images/imageInsertionOverride";
+
 export {
   MACRO_NAME_PREFIX,
   buildMacroRawContent,

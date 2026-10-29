@@ -26,6 +26,10 @@ import { useMemo, useState } from "react";
 // the Vite pipeline used to bundle this story) can't parse.
 import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
 import type { ImageEditionHooks } from "../../components/images/imageEditionHooks";
+import type {
+  ImageInsertionOverrideFn,
+  ImageInsertionResult,
+} from "../../components/images/imageInsertionOverride";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
@@ -49,6 +53,9 @@ export type ImageSuggestionForTestProps = {
   uploadedImageName?: string;
   // The reference of the edited document (the current document, "Some.Page", is edited when not set).
   documentReference?: string;
+  // When set, the image insertion is overridden, the override returning this result right away (the default image
+  // selector is used otherwise).
+  imageInsertionResult?: ImageInsertionResult;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
@@ -71,11 +78,18 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   uploadedImageURL,
   uploadedImageName,
   documentReference,
+  imageInsertionResult,
   content,
   syntax,
 }) => {
   // The images selected by the user, as reported by the image edition hooks.
   const [selectedImages, setSelectedImages] = useState<unknown[]>([]);
+  // Stable, like the overrides of a real integration.
+  const imageInsertion = useMemo<ImageInsertionOverrideFn | undefined>(
+    () => imageInsertionResult && ((insert) => insert(imageInsertionResult)),
+    [],
+  );
+
   // Stable, like the hooks of a real integration, so that the editor doesn't rebuild its menus on each selection.
   const imageEditionHooks = useMemo<ImageEditionHooks>(
     () => ({
@@ -171,7 +185,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
         linkEditionHandler={() => {
           throw new Error("Link editor should not open for this test");
         }}
-        overrides={{ imageEditionHooks }}
+        overrides={{ imageEditionHooks, imageInsertion }}
       />
       <output data-testid="selectedImages">
         {JSON.stringify(selectedImages)}

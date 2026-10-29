@@ -443,6 +443,51 @@ test("Clicking the browse action opens the full image selector where the suggest
   await expect(page.locator('[data-test="searchBoxInput"]')).toBeVisible();
 });
 
+test("The browse action uses the image insertion override, when specified, to insert an image", async ({
+  mount,
+  page,
+}) => {
+  const reference = attachmentResourceReference("cat.png");
+  const component = await mount(
+    <ImageSuggestionForTest
+      imageInsertionResult={{
+        type: "insert",
+        props: { url: "https://picsum.photos/700", previewWidth: 120 },
+        reference,
+      }}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await openImageQuickAction(page, editorEl);
+  await page.locator(".bn-suggestion-menu-item").nth(0).click();
+
+  // The image returned by the override is inserted, with all its properties, instead of opening the image selector.
+  const image = editorEl.locator("img.bn-visual-media");
+  await expect(image).toHaveAttribute("src", "https://picsum.photos/700");
+  await expect(image).toHaveCSS("width", "120px");
+  await expect(page.locator('[data-test="searchBoxInput"]')).not.toBeAttached();
+  await expectSelectedImage(page, editorEl, reference);
+});
+
+test("Aborting the image insertion override inserts nothing", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest imageInsertionResult={{ type: "aborted" }} />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await openImageQuickAction(page, editorEl);
+  await page.locator(".bn-suggestion-menu-item").nth(0).click();
+
+  await expect(page.locator(".bn-suggestion-menu")).not.toBeAttached();
+  await expect(page.locator('[data-test="searchBoxInput"]')).not.toBeAttached();
+  await expect(editorEl.locator("img")).toHaveCount(0);
+  await expect(page.getByTestId("selectedImages")).toHaveText("[]");
+});
+
 test("The upload button of the opened image selector opens a file picker offering only images", async ({
   mount,
   page,

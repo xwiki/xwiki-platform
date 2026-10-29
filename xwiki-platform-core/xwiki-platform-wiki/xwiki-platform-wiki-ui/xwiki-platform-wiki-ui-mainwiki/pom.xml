@@ -40,6 +40,11 @@
     </xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wiki Application</xwiki.extension.name>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes Macro components -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/wikis
+      org.xwiki.rendering.macro.Macro/workspaces
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>

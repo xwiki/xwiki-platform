@@ -34,6 +34,15 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications Application</xwiki.extension.name>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes Macro components -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/notificationsApplicationsPreferences
+      org.xwiki.rendering.macro.Macro/notificationsAutoWatchPreferences
+      org.xwiki.rendering.macro.Macro/notificationsCustomFiltersPreferences
+      org.xwiki.rendering.macro.Macro/notificationsEmailPreferences
+      org.xwiki.rendering.macro.Macro/notificationsFiltersPreferences
+      org.xwiki.rendering.macro.Macro/notificationsSystemFiltersPreferences
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <!-- We should keep notifications-preferences-default as first dependency since it declares DefaultModelBridge

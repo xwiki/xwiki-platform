@@ -34,6 +34,11 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Document Tree Macro</xwiki.extension.name>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes Macro components -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/children
+      org.xwiki.rendering.macro.Macro/documentTree
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>

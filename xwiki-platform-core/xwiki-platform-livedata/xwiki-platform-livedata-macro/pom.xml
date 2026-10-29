@@ -35,6 +35,10 @@
     <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data Macro</xwiki.extension.name>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/liveData
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>

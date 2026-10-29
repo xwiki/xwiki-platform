@@ -39,6 +39,10 @@
       org.xwiki.contrib:application-help-center
     </xwiki.extension.features>
     <help.base.path>${basedir}/src/main/resources/Help</help.base.path>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/example
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>

@@ -44,6 +44,10 @@
       when inserting the macro. The WYSIWYG editor can't load the translations on demand because there's no mapping
       between macros and their translation pages. -->
     <xar.verify.translationVisibility.skip>true</xar.verify.translationVisibility.skip>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/menu
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <!-- JavaScript dependencies -->

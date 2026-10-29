@@ -51,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -124,7 +125,7 @@ class AbstractExtensionRESTResourceTest
         // Resolving the version document of an extension using version pages fails without a version.
         when(this.extensionStore.getExtensionVersionDocument(eq(extensionDocument), isNull(String.class), any()))
             .thenThrow(new IllegalArgumentException("An Entity Reference name cannot be null or empty"));
-        when(this.extensionStore.getValue(any(List.class), eq(XWikiRepositoryModel.PROP_EXTENSION_ID)))
+        when(this.extensionStore.getValue(anyList(), eq(XWikiRepositoryModel.PROP_EXTENSION_ID)))
             .thenReturn("extension-id");
 
         Extension extension = this.resource.createExtension(extensionDocument, null);
@@ -157,7 +158,7 @@ class AbstractExtensionRESTResourceTest
 
         assertEquals("1.0", extension.getVersion());
         assertEquals(1, extension.getDependencies().size());
-        assertEquals("dependency-id", extension.getDependencies().get(0).getId());
+        assertEquals("dependency-id", extension.getDependencies().getFirst().getId());
     }
 
     private XWikiDocument mockExtensionDocument() throws Exception

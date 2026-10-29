@@ -24,7 +24,7 @@ import { useImageUploader } from "../../misc/fileUpload";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
 import { Paper } from "@mantine/core";
-import { debounceAsync } from "@xwiki/platform-fn-utils";
+import { debounceAsync, tryFallible } from "@xwiki/platform-fn-utils";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -178,22 +178,11 @@ async function fetchImageSuggestions(
     "image/*",
   );
 
-  return results.map((link): DefaultReactSuggestionItem => {
-    const attachmentReference = modelReferenceParser.parse(link.reference, {
-      relative: false,
-    }) as AttachmentReference;
-
-    // The location of the page holding the image, shown under its name like in the image selector.
-    const documentReference = attachmentReference.document;
-    const segments = documentReference.space?.names.slice(0) ?? [];
-
-    if (documentReference.terminal) {
-      segments.push(documentReference.name);
-    }
-
-    return {
+  return results.map(
+    (link): DefaultReactSuggestionItem => ({
       title: link.label,
-      subtext: segments.length > 0 ? segments.join(" / ") : undefined,
+      // Shown under the image's name, like in the image selector.
+      subtext: getImageLocation(link.reference, modelReferenceParser),
       group,
       // The image is described by the title right next to it, hence the empty alternative text.
       icon: (
@@ -209,6 +198,35 @@ async function fetchImageSuggestions(
           props: { url: link.url },
         });
       },
-    };
-  });
+    }),
+  );
+}
+
+/**
+ * Returns the location of the page holding an image attachment, or `undefined` when it has none or
+ * when the attachment reference can't be parsed: the image can still be suggested without it.
+ */
+function getImageLocation(
+  reference: string,
+  modelReferenceParser: ModelReferenceParser,
+): string | undefined {
+  const attachmentReference = tryFallible(
+    () =>
+      modelReferenceParser.parse(reference, {
+        relative: false,
+      }) as AttachmentReference,
+  );
+
+  if (!attachmentReference) {
+    return undefined;
+  }
+
+  const documentReference = attachmentReference.document;
+  const segments = documentReference.space?.names.slice(0) ?? [];
+
+  if (documentReference.terminal) {
+    segments.push(documentReference.name);
+  }
+
+  return segments.length > 0 ? segments.join(" / ") : undefined;
 }

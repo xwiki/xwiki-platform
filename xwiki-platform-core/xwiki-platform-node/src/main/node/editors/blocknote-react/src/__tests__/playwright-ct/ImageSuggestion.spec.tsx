@@ -38,6 +38,11 @@ test("Triggering the image suggestions shows the browse and upload actions, then
           url: "https://picsum.photos/300",
           reference: "some terminal attachment reference",
         },
+        {
+          label: "Bird picture",
+          url: "https://picsum.photos/450",
+          reference: "some invalid reference",
+        },
       ]}
     />,
   );
@@ -51,7 +56,7 @@ test("Triggering the image suggestions shows the browse and upload actions, then
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
   const items = menuEl.locator(".bn-suggestion-menu-item");
-  await expect(items).toHaveCount(4);
+  await expect(items).toHaveCount(5);
 
   // The first item is the "browse" action, initially selected so it stays keyboard-navigable.
   await expect(items.nth(0)).toHaveAttribute("aria-selected", "true");
@@ -90,6 +95,12 @@ test("Triggering the image suggestions shows the browse and upload actions, then
   await expect(
     items.nth(3).locator(".bn-mt-suggestion-menu-item-subtitle"),
   ).toHaveText("Animals / Cat");
+
+  // An image whose reference can't be parsed is still suggested, only without its location.
+  await expect(items.nth(4)).toContainText("Bird picture");
+  await expect(
+    items.nth(4).locator(".bn-mt-suggestion-menu-item-subtitle"),
+  ).toBeEmpty();
 });
 
 test("Only the first 5 image suggestions are shown, in addition to the browse and upload actions", async ({

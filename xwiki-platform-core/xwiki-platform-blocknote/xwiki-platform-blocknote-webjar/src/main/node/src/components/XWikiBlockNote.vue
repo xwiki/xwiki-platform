@@ -150,6 +150,7 @@ const {
   collaborationURL = undefined,
   documentReference = Model.serialize(XWiki.currentDocument.documentReference),
   locale,
+  startupFocus = undefined,
 } = defineProps<{
   // The key used to submit the edited content.
   name?: string;
@@ -182,6 +183,9 @@ const {
    * reference doesn't specify a locale.
    */
   locale?: string;
+
+  // Whether to focus the editor when it's created. It's a string when it comes from an HTML attribute.
+  startupFocus?: boolean | string;
 }>();
 
 const actualLocale = locale || xwikiMeta.locale;
@@ -310,6 +314,9 @@ const editorProps = shallowRef<
     // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
     // consistency between edit and view modes.
     defaultStyles: false,
+    // Put the caret at the start of the content when the editor is focused on creation.
+    autofocus:
+      startupFocus === true || startupFocus === "true" ? "start" : false,
   },
   theme: "light",
   lang: (actualLocale || "en") as EditorLanguage,

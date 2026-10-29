@@ -47,7 +47,10 @@ vi.mock("@xwiki/platform-livedata-ui", async (importOriginal) => {
   };
 });
 
-function initWrapper(props = {}) {
+function initWrapper(
+  props = {},
+  propertyDescriptor: object = { name: "Notify" },
+) {
   return mount(DisplayerToggle, {
     props: {
       propertyId: "notify",
@@ -60,7 +63,13 @@ function initWrapper(props = {}) {
       ...props,
     },
     global: {
-      provide: { jQuery: jQueryMock, logic: { triggerEvent: vi.fn() } },
+      provide: {
+        jQuery: jQueryMock,
+        logic: {
+          triggerEvent: vi.fn(),
+          getPropertyDescriptor: vi.fn(() => propertyDescriptor),
+        },
+      },
     },
   });
 }
@@ -126,6 +135,20 @@ describe("DisplayerToggle", () => {
         disabled: false,
       }),
     );
+  });
+
+  it("sets an aria-label from the property descriptor name", async () => {
+    const wrapper = initWrapper();
+    wrapper.vm.iconReady = true;
+    await flushPromises();
+    expect(wrapper.find("input").attributes("aria-label")).toBe("Notify");
+  });
+
+  it("does NOT set an aria-label when the property descriptor has no name", async () => {
+    const wrapper = initWrapper({}, {});
+    wrapper.vm.iconReady = true;
+    await flushPromises();
+    expect(wrapper.find("input").attributes("aria-label")).toBeUndefined();
   });
 
   it("does NOT initialize bootstrapSwitch when iconReady is false", async () => {

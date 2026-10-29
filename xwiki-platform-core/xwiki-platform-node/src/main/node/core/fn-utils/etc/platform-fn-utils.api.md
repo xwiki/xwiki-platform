@@ -42,6 +42,9 @@ export function tryFallibleOrError<T>(func: () => T): T | Error;
 // @beta
 export function tryFalliblePromiseOrError<T>(func: () => Promise<T>): Promise<T | Error>;
 
+// @beta
+export function unescapeXml(str: string): string;
+
 // (No @packageDocumentation comment for this package)
 
 ```

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { escapeHtml, produceHtmlEl } from "..";
+import { escapeHtml, produceHtmlEl, unescapeXml } from "..";
 import { describe, expect, it } from "vitest";
 
 describe("HTML", () => {
@@ -57,5 +57,24 @@ describe("HTML", () => {
     expect(escapeHtml('<iframe src="somewhere" />')).toBe(
       '&lt;iframe src="somewhere" /&gt;',
     );
+  });
+
+  it("should unescape XML correctly", () => {
+    expect(unescapeXml("R&amp;D &lt;new&gt; &quot;a&quot; &apos;b&apos;")).toBe(
+      "R&D <new> \"a\" 'b'",
+    );
+    expect(unescapeXml("R&#38;D &#123;1&#x7D; &#X3C;")).toBe("R&D {1} <");
+    expect(unescapeXml("plain text")).toBe("plain text");
+  });
+
+  it("should keep invalid character references and unknown entities when unescaping XML", () => {
+    expect(unescapeXml("&#x110000; &unknown; &amp")).toBe(
+      "&#x110000; &unknown; &amp",
+    );
+  });
+
+  it("should unescape what was escaped", () => {
+    const text = '<p class="x">Tom & Jerry</p>';
+    expect(unescapeXml(escapeHtml(text))).toBe(text);
   });
 });

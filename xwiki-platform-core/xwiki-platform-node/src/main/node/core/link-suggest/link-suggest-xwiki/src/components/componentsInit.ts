@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { unescapeXml } from "@xwiki/platform-fn-utils";
 import { LinkType, name } from "@xwiki/platform-link-suggest-api";
 import { Container, inject, injectable } from "inversify";
 import type { CristalApp } from "@xwiki/platform-api";
@@ -28,36 +29,6 @@ import type {
 } from "@xwiki/platform-link-suggest-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
-
-const XML_ENTITIES: Record<string, string> = {
-  amp: "&",
-  lt: "<",
-  gt: ">",
-  quot: '"',
-  apos: "'",
-};
-
-/**
- * Decodes the character references and the predefined entities of an XML escaped text.
- *
- * @param text - the XML escaped text
- * @returns the decoded text
- */
-function unescapeXML(text: string): string {
-  return text.replace(
-    /&(?:#(\d+)|#x([\da-f]+)|(amp|lt|gt|quot|apos));/gi,
-    (match, decimal?: string, hexadecimal?: string, name?: string) => {
-      if (name) {
-        return XML_ENTITIES[name.toLowerCase()];
-      }
-      const codePoint = decimal
-        ? Number.parseInt(decimal, 10)
-        : Number.parseInt(hexadecimal!, 16);
-      // Keep invalid character references as they are.
-      return codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : match;
-    },
-  );
-}
 
 /**
  * Default implementation of the link suggestion service, for XWiki.
@@ -187,7 +158,7 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     location?: string;
   }) {
     const type = result.type;
-    const hint = unescapeXML(result.location?.trim() ?? "");
+    const hint = unescapeXml(result.location?.trim() ?? "");
     const reference = this.stripEntityTypePrefix(result.reference, type);
     const xwikiURL =
       this.remoteURLSerializerProvider

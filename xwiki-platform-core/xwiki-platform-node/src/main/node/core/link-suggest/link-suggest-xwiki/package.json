@@ -40,6 +40,7 @@
   "dependencies": {
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-fn-utils": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*"

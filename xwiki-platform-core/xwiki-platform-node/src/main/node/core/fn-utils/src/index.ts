@@ -264,6 +264,41 @@ function escapeHtml(str: string): string {
   return new XMLSerializer().serializeToString(document.createTextNode(str));
 }
 
+const XML_ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+};
+
+/**
+ * Unescape an XML escaped string, i.e. decode its character references and predefined entities
+ *
+ * Invalid character references and unknown entities are kept as they are.
+ *
+ * @param str - The XML escaped string
+ *
+ * @returns - The unescaped string
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+function unescapeXml(str: string): string {
+  return str.replace(
+    /&(?:#(\d+)|#x([\da-f]+)|(amp|lt|gt|quot|apos));/gi,
+    (match, decimal?: string, hexadecimal?: string, name?: string) => {
+      if (name) {
+        return XML_ENTITIES[name.toLowerCase()];
+      }
+      const codePoint = decimal
+        ? Number.parseInt(decimal, 10)
+        : Number.parseInt(hexadecimal!, 16);
+      return codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : match;
+    },
+  );
+}
+
 /**
  * Debounce an async function: the function is called only once no new call was made for `delay`
  * milliseconds, with the arguments of the last call.
@@ -330,6 +365,7 @@ export {
   tryFallible,
   tryFallibleOrError,
   tryFalliblePromiseOrError,
+  unescapeXml,
 };
 
 export type { TreeNode };

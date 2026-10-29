@@ -18,43 +18,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
-import {
-  IMAGE_SELECTOR_BTN_TITLE_PLACEHOLDER,
-  IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER,
-  ImageSuggestionMenu,
-} from "./ImageSuggestionMenu";
 import { DepsContainerContext } from "../../contexts";
 import { useEditor } from "../../hooks";
 import { useImageUploader } from "../../misc/fileUpload";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
-import { SuggestionMenu as SuggestionMenuExtension } from "@blocknote/core/extensions";
-import {
-  PositionPopover,
-  SuggestionMenuController,
-  useExtension,
-} from "@blocknote/react";
+import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
 import { Paper } from "@mantine/core";
 import { debounceAsync } from "@xwiki/platform-fn-utils";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { RiFolderImageLine, RiUpload2Line } from "react-icons/ri";
 import type { EditorType } from "../../blocknote";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/platform-link-suggest-api";
-import type { AttachmentReference } from "@xwiki/platform-model-api";
-import type {
-  ModelReferenceParser,
-  ModelReferenceParserProvider,
-} from "@xwiki/platform-model-reference-api";
+
+import "./ImageSuggestionController.css";
 
 export type ImageSuggestionControllerProps = {
   maxSuggestions?: number;
 };
 
-// eslint-disable-next-line max-statements
 export function ImageSuggestionController({
   maxSuggestions,
 }: ImageSuggestionControllerProps) {
@@ -64,13 +51,8 @@ export function ImageSuggestionController({
     "LinkSuggestServiceProvider",
   ).get!();
 
-  const modelReferenceParser = depsContainer
-    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    .get()!;
-
   const editor = useEditor();
   const uploadImage = useImageUploader(editor, depsContainer);
-  const suggestionMenu = useExtension(SuggestionMenuExtension);
 
   const { t } = useTranslation();
 
@@ -79,51 +61,43 @@ export function ImageSuggestionController({
     to: number;
   }>();
 
-  // Closes/clears the "img::" suggestion menu (same as the built-in keyboard-selection path
-  // already does, see `SuggestionMenuWrapper`'s `onItemClickCloseMenu`) and opens the full image
-  // selector popover where the suggestion menu was.
+  // Opens the full image selector popover where the "img::" suggestion menu was (the menu itself
+  // is already closed, and its query removed, by the time an item is clicked).
   const openImageSelector = useCallback(() => {
-    suggestionMenu.closeMenu();
-    suggestionMenu.clearQuery();
     const pos = editor.transact((tr) => tr.selection.from);
     setSelectorPosition({ from: pos, to: pos });
-  }, [editor, suggestionMenu]);
+  }, [editor]);
 
   const searchImages = useCallback(
     debounceAsync(async (query: string) => {
       const suggestions = await fetchImageSuggestions(
         query,
         linkSuggestService,
-        modelReferenceParser,
         editor,
         t,
       );
 
-      // HACK: placeholders for the browse and upload buttons (see the `ImageSuggestionMenu`
-      // component for more info.)
-      suggestions.unshift(
+      const actions: DefaultReactSuggestionItem[] = [
         {
-          title: IMAGE_SELECTOR_BTN_TITLE_PLACEHOLDER,
+          title: t("blocknote.imageSelector.browseButton"),
+          icon: <RiFolderImageLine size={18} />,
           onItemClick: openImageSelector,
         },
         {
-          title: IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER,
+          title: t("blocknote.imageSelector.uploadButton"),
+          icon: <RiUpload2Line size={18} />,
           onItemClick: uploadImage,
         },
-      );
+      ];
 
-      return maxSuggestions
-        ? suggestions.slice(0, maxSuggestions + 2) // account for the two placeholder items
-        : suggestions;
+      return [
+        ...actions,
+        ...(maxSuggestions
+          ? suggestions.slice(0, maxSuggestions)
+          : suggestions),
+      ];
     }),
-    [
-      t,
-      linkSuggestService,
-      modelReferenceParser,
-      maxSuggestions,
-      openImageSelector,
-      uploadImage,
-    ],
+    [t, linkSuggestService, maxSuggestions, openImageSelector, uploadImage],
   );
 
   return (
@@ -131,7 +105,6 @@ export function ImageSuggestionController({
       <SuggestionMenuController
         triggerCharacter={"img::"}
         getItems={searchImages}
-        suggestionMenuComponent={ImageSuggestionMenu}
       />
 
       <PositionPopover
@@ -165,14 +138,17 @@ export function ImageSuggestionController({
 async function fetchImageSuggestions(
   query: string,
   linkSuggestService: LinkSuggestService | undefined,
-  modelReferenceParser: ModelReferenceParser,
   editor: EditorType,
   t: ReturnType<typeof useTranslation>["t"],
 ): Promise<DefaultReactSuggestionItem[]> {
+  // The group's label separates the image suggestions from the browse and upload actions above.
+  const group = t("blocknote.imageSuggestion.imagesGroup");
+
   if (!linkSuggestService) {
     return [
       {
         title: t("blocknote.combobox.backendSearchUnsupported"),
+        group,
         onItemClick() {},
       },
     ];
@@ -184,28 +160,24 @@ async function fetchImageSuggestions(
     "image/*",
   );
 
-  return results.map((link): DefaultReactSuggestionItem => {
-    const attachmentReference = modelReferenceParser?.parse(link.reference, {
-      relative: false,
-    }) as AttachmentReference;
-
-    const documentReference = attachmentReference.document;
-    const segments = documentReference.space?.names.slice(0) ?? [];
-
-    if (documentReference.terminal) {
-      segments.push(documentReference.name);
-    }
-
-    return {
+  return results.map(
+    (link): DefaultReactSuggestionItem => ({
       title: link.label,
-      // NOTE: this is not actually used as a subtext but as a reference, see `ImageSuggestionMenu`
-      subtext: link.url,
+      group,
+      // The image is described by the title right next to it, hence the empty alternative text.
+      icon: (
+        <img
+          className="xwiki-image-suggestion-thumbnail"
+          src={link.url}
+          alt=""
+        />
+      ),
       onItemClick() {
         insertOrUpdateBlockForSlashMenu(editor, {
           type: "image",
           props: { url: link.url },
         });
       },
-    };
-  });
+    }),
+  );
 }

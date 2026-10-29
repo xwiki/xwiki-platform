@@ -18,35 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-.slash-menu {
-  display: flex;
-  flex-direction: column;
-}
-
-.slash-menu-item {
-  background-color: var(--cr-color-neutral-50);
-  border-radius: var(--cr-border-radius-small);
-  box-shadow: 0 0 4px var(--cr-color-neutral-300);
-
-  cursor: pointer;
-
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-
-  padding: var(--cr-spacing-medium);
-}
-
-.slash-menu-item:hover,
-.slash-menu-item.selected {
-  background-color: var(--cr-color-neutral-300);
-}
-
-.slash-menu-item img {
-  width: 10rem;
-  max-height: 10rem;
-}
-
-.slash-menu-item span {
-  padding-left: var(--cr-spacing-large);
+/* The image previews are shown in the suggestion menu items' icon slot, sized like a thumbnail. */
+.xwiki-image-suggestion-thumbnail {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  object-fit: cover;
 }

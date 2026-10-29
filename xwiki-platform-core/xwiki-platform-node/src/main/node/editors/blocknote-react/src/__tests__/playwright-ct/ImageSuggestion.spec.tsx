@@ -20,7 +20,7 @@
 import { ImageSuggestionForTest } from "./ImageSuggestion.story";
 import { expect, test } from "@playwright/experimental-ct-react";
 
-test("Triggering the image suggestions shows the browse and upload buttons, then the matching images", async ({
+test("Triggering the image suggestions shows the browse and upload actions, then the matching images", async ({
   mount,
   page,
   // eslint-disable-next-line max-statements
@@ -38,24 +38,36 @@ test("Triggering the image suggestions shows the browse and upload buttons, then
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  // The menu is shown (with a loader) before its items are loaded.
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  const items = menuEl.locator(".slash-menu-item");
+  const items = menuEl.locator(".bn-suggestion-menu-item");
   await expect(items).toHaveCount(4);
 
-  // The first item is the "browse" button, initially selected so it stays keyboard-navigable.
-  await expect(items.nth(0)).toHaveClass(/selected/);
-  await expect(items.nth(0).locator("button")).toBeVisible();
+  // The first item is the "browse" action, initially selected so it stays keyboard-navigable.
+  await expect(items.nth(0)).toHaveAttribute("aria-selected", "true");
+  await expect(items.nth(0)).toContainText(
+    "blocknote.imageSelector.browseButton",
+  );
 
-  // The second item is the upload button.
-  await expect(items.nth(1).locator("button")).toBeVisible();
+  // The second item is the upload action.
+  await expect(items.nth(1)).toContainText(
+    "blocknote.imageSelector.uploadButton",
+  );
 
-  // The following items are the matching image suggestions, in order, each with a preview.
+  // A group label separates the actions from the image suggestions.
+  await expect(menuEl.locator(".bn-suggestion-menu-label")).toHaveText(
+    "blocknote.imageSuggestion.imagesGroup",
+  );
+
+  // The following items are the matching image suggestions, in order, each with a preview that
+  // has an empty alternative text, the image's title being right next to it.
   await expect(items.nth(2).locator("img")).toHaveAttribute(
     "src",
     "https://picsum.photos/150",
   );
+  await expect(items.nth(2).locator("img")).toHaveAttribute("alt", "");
   await expect(items.nth(2)).toContainText("Cat picture");
 
   await expect(items.nth(3).locator("img")).toHaveAttribute(
@@ -65,7 +77,7 @@ test("Triggering the image suggestions shows the browse and upload buttons, then
   await expect(items.nth(3)).toContainText("Dog picture");
 });
 
-test("Only the first 5 image suggestions are shown, in addition to the browse and upload buttons", async ({
+test("Only the first 5 image suggestions are shown, in addition to the browse and upload actions", async ({
   mount,
   page,
 }) => {
@@ -80,11 +92,11 @@ test("Only the first 5 image suggestions are shown, in addition to the browse an
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  // 1 browse button + 1 upload button + 5 suggestions max, even though 8 were available.
-  await expect(menuEl.locator(".slash-menu-item")).toHaveCount(7);
+  // 1 browse action + 1 upload action + 5 suggestions max, even though 8 were available.
+  await expect(menuEl.locator(".bn-suggestion-menu-item")).toHaveCount(7);
 });
 
 test("Clicking an image suggestion inserts an image block with its URL", async ({
@@ -101,15 +113,19 @@ test("Clicking an image suggestion inserts an image block with its URL", async (
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  await menuEl.locator(".slash-menu-item").nth(2).click();
+  await menuEl.locator(".bn-suggestion-menu-item").nth(2).click();
 
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
     "https://picsum.photos/150",
   );
+
+  // The menu is closed and the trigger text removed, as when selecting with the keyboard.
+  await expect(menuEl).not.toBeAttached();
+  await expect(editorEl).not.toContainText("img::");
 });
 
 test("Keyboard navigation can select an image suggestion", async ({
@@ -130,16 +146,16 @@ test("Keyboard navigation can select an image suggestion", async ({
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  // Moves the selection from the browse button (index 0), past the upload button (index 1), to
+  // Moves the selection from the browse action (index 0), past the upload action (index 1), to
   // the first image suggestion (index 2).
   await editorEl.press("ArrowDown");
   await editorEl.press("ArrowDown");
-  await expect(menuEl.locator(".slash-menu-item").nth(2)).toHaveClass(
-    /selected/,
-  );
+  await expect(
+    menuEl.locator(".bn-suggestion-menu-item").nth(2),
+  ).toHaveAttribute("aria-selected", "true");
 
   await editorEl.press("Enter");
 
@@ -161,8 +177,8 @@ test("Falls back to an explanatory message when the backend doesn't support sear
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
   // i18next isn't initialized in this component test harness (as with the rest of this suite), so
   // the untranslated key is rendered as-is instead of its "Search is not supported for the current
@@ -173,11 +189,11 @@ test("Falls back to an explanatory message when the backend doesn't support sear
 
   // It shouldn't be rendered as an image suggestion (no preview, not clickable to insert a block).
   await expect(
-    menuEl.locator(".slash-menu-item").nth(2).locator("img"),
+    menuEl.locator(".bn-suggestion-menu-item").nth(2).locator("img"),
   ).toHaveCount(0);
 });
 
-test("Clicking the browse button opens the full image selector where the suggestion menu was", async ({
+test("Clicking the browse action opens the full image selector where the suggestion menu was", async ({
   mount,
   page,
 }) => {
@@ -191,10 +207,10 @@ test("Clicking the browse button opens the full image selector where the suggest
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  await menuEl.locator(".slash-menu-item").nth(0).click();
+  await menuEl.locator(".bn-suggestion-menu-item").nth(0).click();
 
   // The suggestion menu is gone, replaced by the full selector's own upload button and search box.
   await expect(menuEl).not.toBeAttached();
@@ -204,7 +220,7 @@ test("Clicking the browse button opens the full image selector where the suggest
   await expect(page.locator('[data-test="searchBoxInput"]')).toBeVisible();
 });
 
-test("Selecting the browse button with the keyboard also opens the full image selector", async ({
+test("Selecting the browse action with the keyboard also opens the full image selector", async ({
   mount,
   page,
 }) => {
@@ -218,10 +234,10 @@ test("Selecting the browse button with the keyboard also opens the full image se
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  // The browse button is selected by default (index 0), so <Enter> selects it directly.
+  // The browse action is selected by default (index 0), so <Enter> selects it directly.
   await editorEl.press("Enter");
 
   await expect(menuEl).not.toBeAttached();
@@ -243,10 +259,10 @@ test("Selecting a search result in the opened image selector inserts the image b
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  await menuEl.locator(".slash-menu-item").nth(0).click();
+  await menuEl.locator(".bn-suggestion-menu-item").nth(0).click();
 
   const searchInput = page.locator('[data-test="searchBoxInput"]');
   await searchInput.click();
@@ -275,10 +291,10 @@ test("Keyboard navigation can select a search result in the opened image selecto
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  // Selects the browse button with the keyboard, same as the dedicated test above.
+  // Selects the browse action with the keyboard, same as the dedicated test above.
   await editorEl.press("Enter");
 
   const searchInput = page.locator('[data-test="searchBoxInput"]');
@@ -309,10 +325,10 @@ test("Pressing Escape closes the opened image selector without inserting anythin
   await editorEl.click();
   await page.keyboard.type("img::");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  await menuEl.locator(".slash-menu-item").nth(0).click();
+  await menuEl.locator(".bn-suggestion-menu-item").nth(0).click();
 
   const searchInput = page.locator('[data-test="searchBoxInput"]');
   await expect(searchInput).toBeVisible();
@@ -337,10 +353,10 @@ test("Opening the full image selector clears the typed trigger text from the edi
   await editorEl.click();
   await page.keyboard.type("img::some query");
 
-  const menuEl = page.locator(".slash-menu");
-  await menuEl.waitFor({ state: "attached" });
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  await menuEl.locator(".slash-menu-item").nth(0).click();
+  await menuEl.locator(".bn-suggestion-menu-item").nth(0).click();
 
   await expect(page.locator('[data-test="searchBoxInput"]')).toBeVisible();
 

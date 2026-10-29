@@ -21,10 +21,7 @@ import { DepsContainerContext } from "../contexts";
 import { LinkType } from "../misc/linkEditionCtx";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
 import { debounceAsync } from "@xwiki/platform-fn-utils";
-import {
-  DefaultResourceReferenceParser,
-  ResourceType,
-} from "@xwiki/platform-rendering-api";
+import { ResourceType } from "@xwiki/platform-rendering-api";
 import { t } from "i18next";
 import {
   useCallback,
@@ -37,7 +34,10 @@ import {
 import { RiLink } from "react-icons/ri";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
-import type { ResourceReference } from "@xwiki/platform-rendering-api";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "@xwiki/platform-rendering-api";
 import type { ReactElement } from "react";
 
 /**
@@ -139,7 +139,9 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
     .get()!;
 
-  const resourceReferenceParser = new DefaultResourceReferenceParser();
+  const resourceReferenceParser = depsContainer.get<ResourceReferenceParser>(
+    "ResourceReferenceParser",
+  );
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),

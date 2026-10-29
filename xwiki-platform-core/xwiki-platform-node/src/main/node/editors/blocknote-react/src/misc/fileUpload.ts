@@ -74,8 +74,16 @@ async function uploadSelectedFile(
   return { url };
 }
 
+/**
+ * Opens the system file picker and uploads the selected file as an attachment of the current page.
+ *
+ * @param depsContainer - the container providing the upload services
+ * @param accept - the file types the file picker offers, e.g. "image/*" (all types when not specified)
+ * @returns the URL of the uploaded file
+ */
 function triggerUserFileUpload(
   depsContainer: Container,
+  accept?: string,
 ): Promise<{ url: string }> {
   return new Promise((resolve, reject) => {
     // Creates a hidden file input element and temporarily adds it to the DOM,
@@ -83,6 +91,9 @@ function triggerUserFileUpload(
     // https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#using_hidden_file_input_elements_using_the_click_method
     const input = document.createElement("input");
     input.type = "file";
+    if (accept) {
+      input.accept = accept;
+    }
     input.style.display = "none";
 
     input.addEventListener("change", async () => {
@@ -111,7 +122,7 @@ function triggerUserFileUpload(
 
 function useImageUploader(editor: EditorType, depsContainer: Container) {
   const uploadImage = useCallback(async () => {
-    const { url } = await triggerUserFileUpload(depsContainer);
+    const { url } = await triggerUserFileUpload(depsContainer, "image/*");
 
     insertOrUpdateBlockForSlashMenu(editor, {
       type: "image",

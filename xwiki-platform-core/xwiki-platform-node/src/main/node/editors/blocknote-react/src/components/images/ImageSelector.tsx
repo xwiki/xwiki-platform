@@ -142,7 +142,7 @@ export function ImageSelector({
   const editor = useEditor();
 
   const uploadImage = useCallback(async () => {
-    const { url } = await triggerUserFileUpload(depsContainer);
+    const { url } = await triggerUserFileUpload(depsContainer, "image/*");
     insertOrUpdateBlockForSlashMenu(editor, {
       type: "image",
       props: { url },

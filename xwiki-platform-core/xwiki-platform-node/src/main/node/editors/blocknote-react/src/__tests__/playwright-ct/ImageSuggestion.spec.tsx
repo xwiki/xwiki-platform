@@ -235,6 +235,26 @@ test("Still shows the browse and upload actions when searching for images fails"
   await expect(menuEl.locator(".bn-suggestion-menu-item")).toHaveCount(2);
 });
 
+test("Clicking the upload action opens a file picker offering only images", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(<ImageSuggestionForTest />);
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.click();
+  await page.keyboard.type("img::");
+
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
+
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await menuEl.locator(".bn-suggestion-menu-item").nth(1).click();
+  const fileChooser = await fileChooserPromise;
+
+  expect(await fileChooser.element().getAttribute("accept")).toBe("image/*");
+});
+
 test("Clicking the browse action opens the full image selector where the suggestion menu was", async ({
   mount,
   page,
@@ -260,6 +280,28 @@ test("Clicking the browse action opens the full image selector where the suggest
     page.getByText("blocknote.imageSelector.uploadButton"),
   ).toBeVisible();
   await expect(page.locator('[data-test="searchBoxInput"]')).toBeVisible();
+});
+
+test("The upload button of the opened image selector opens a file picker offering only images", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const component = await mount(<ImageSuggestionForTest />);
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.click();
+  await page.keyboard.type("img::");
+
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
+  await menuEl.locator(".bn-suggestion-menu-item").nth(0).click();
+
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await page.getByText("blocknote.imageSelector.uploadButton").click();
+  const fileChooser = await fileChooserPromise;
+
+  expect(await fileChooser.element().getAttribute("accept")).toBe("image/*");
 });
 
 test("Selecting the browse action with the keyboard also opens the full image selector", async ({

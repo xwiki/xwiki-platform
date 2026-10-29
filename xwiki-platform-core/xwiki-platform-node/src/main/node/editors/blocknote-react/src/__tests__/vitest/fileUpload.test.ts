@@ -200,6 +200,24 @@ describe("triggerUserFileUpload", () => {
     expect(document.body.contains(input)).toBe(false);
   });
 
+  test("offers all file types by default", () => {
+    triggerUserFileUpload(buildContainer({}));
+
+    const input = getHiddenFileInput();
+    expect(input.hasAttribute("accept")).toBe(false);
+
+    input.dispatchEvent(new Event("cancel"));
+  });
+
+  test("offers only the accepted file types when specified", () => {
+    triggerUserFileUpload(buildContainer({}), "image/*");
+
+    const input = getHiddenFileInput();
+    expect(input.accept).toBe("image/*");
+
+    input.dispatchEvent(new Event("cancel"));
+  });
+
   test("removes the input without resolving when the change event carries no file", async () => {
     const container = buildContainer({});
     const promise = triggerUserFileUpload(container);

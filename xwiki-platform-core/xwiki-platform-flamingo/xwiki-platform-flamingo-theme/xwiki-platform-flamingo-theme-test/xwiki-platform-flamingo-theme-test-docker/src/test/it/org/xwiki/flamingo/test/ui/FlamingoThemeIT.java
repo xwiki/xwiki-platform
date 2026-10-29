@@ -62,6 +62,10 @@ class FlamingoThemeIT
 {
     private static final String THEMES_SPACE = "FlamingoThemes";
 
+    private static final String THEME_CLASS = "FlamingoThemesCode.ThemeClass";
+
+    private static final String CSS_CODE = ".main { color: #000099; }";
+
     private static final String COLOR_THEME_PREFERENCE = "colorTheme";
 
     private static final String LOGO_NAME = "logo.png";
@@ -124,7 +128,7 @@ class FlamingoThemeIT
         validateThemeCreation(themeApplicationWebHomePage, testMethodName);
 
         // Validate viewing and setting a color theme from the color theme home page
-        validateViewAndSetThemeFromThemeHomePage(testMethodName);
+        validateViewAndSetThemeFromThemeHomePage(testMethodName, setup);
 
         // Validate setting a color theme from the wiki Admin UI
         validateSetThemeFromWikiAdminUI(testMethodName, setup);
@@ -240,7 +244,7 @@ class FlamingoThemeIT
         editThemePage.clickSaveAndView();
     }
 
-    private void validateViewAndSetThemeFromThemeHomePage(String testMethodName)
+    private void validateViewAndSetThemeFromThemeHomePage(String testMethodName, TestUtils setup)
     {
         // Go back to the theme application
         ThemeApplicationWebHomePage themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
@@ -254,6 +258,13 @@ class FlamingoThemeIT
 
         // Verify we can view a theme by clicking it
         themeApplicationWebHomePage.seeTheme(testMethodName);
+
+        // The 'cssCode' color overrides the 'lessCode' one, so remove it to verify that the 'lessCode' color is applied
+        // too, then put it back for the next checks.
+        setup.updateObject(THEMES_SPACE, testMethodName, THEME_CLASS, 0, "cssCode", "");
+        ViewPage viewPage = setup.gotoPage(THEMES_SPACE, testMethodName);
+        assertColor(0, 0, 255, viewPage.getTitleColor());
+        setup.updateObject(THEMES_SPACE, testMethodName, THEME_CLASS, 0, "cssCode", CSS_CODE);
 
         // Switch back to Charcoal
         // TODO: Replace this with a setup.updateObject() call since we don't need to test the useTheme() UI as it's
@@ -337,10 +348,10 @@ class FlamingoThemeIT
     {
         assertColor(255, 218, 218, page.getPageBackgroundColor());
         // The text color set by the theme is inherited from the "body" element. Note that we cannot assert it on the
-        // page content since the 'lessCode' variable set by this test colors the whole ".main" block in blue.
+        // page content since the 'cssCode' variable set by this test colors the whole ".main" block in dark blue.
         assertColor(102, 51, 0, page.getTextColor());
-        // Test 'lessCode' is correctly handled, the title being inside the ".main" block it colors.
-        assertColor(0, 0, 255, page.getTitleColor());
+        // Test 'cssCode' is correctly handled, the title being inside the ".main" block it colors.
+        assertColor(0, 0, 153, page.getTitleColor());
         assertEquals("monospace", page.getTitleFontFamily().toLowerCase());
     }
 
@@ -413,20 +424,27 @@ class FlamingoThemeIT
         // below reads the computed CSS value, so no matching font needs to be installed on the OS running the browser.
         // Avoid the "fantasy" generic family here since Firefox doesn't support it on Linux.
         editThemePage.setVariableValue("font-family-sans-serif", "math");
+        // Test that the @lessCode variable is handled too!
+        editThemePage.selectVariableCategory("Advanced");
+        editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");
         refreshPreviewWithRetry(editThemePage);
         previewBox = editThemePage.getPreviewBox();
         assertFalse(previewBox.hasError());
         assertEquals("math", previewBox.getTitleFontFamily().toLowerCase());
+        // The title is inside the ".main" block colored by the LESS code.
+        assertColor(0, 0, 255, previewBox.getTitleColor());
         previewBox.switchToDefaultContent();
 
+        editThemePage.selectVariableCategory("Typography");
         editThemePage.setVariableValue("font-family-base", "Monospace");
         // Change the background of the buttons using the default style. It's light enough to keep a proper contrast
         // with the button text color.
         editThemePage.selectVariableCategory("Buttons");
         editThemePage.setVariableValue("btn-default-bg", "#99ccff");
-        // Test that the @lessCode variable is handled too!
+        // Test that the @cssCode variable is handled too. It overrides the color set by the LESS code with the same
+        // selector, which is only possible if it's added after the styles compiled from LESS.
         editThemePage.selectVariableCategory("Advanced");
-        editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");
+        editThemePage.setTextareaValue("cssCode", CSS_CODE);
         // Refresh
         refreshPreviewWithRetry(editThemePage);
         previewBox = editThemePage.getPreviewBox();

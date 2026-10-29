@@ -26,7 +26,14 @@ import {
   ResourceType,
 } from "@xwiki/platform-rendering-api";
 import { t } from "i18next";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { RiLink } from "react-icons/ri";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
@@ -172,7 +179,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     [setSuggestions, getSuggestions],
   );
 
-  const performSearch = useCallback(debounceAsync(runSearch), [runSearch]);
+  const performSearch = useMemo(() => debounceAsync(runSearch), [runSearch]);
 
   const submitRawValue = useCallback(
     // eslint-disable-next-line max-statements

@@ -215,6 +215,26 @@ test("Falls back to an explanatory message when the backend doesn't support sear
   ).toHaveCount(0);
 });
 
+test("Still shows the browse and upload actions when searching for images fails", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest linkSuggestServiceFailing={true} />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.click();
+  await page.keyboard.type("img::");
+
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
+
+  // The menu doesn't keep loading forever: it shows the actions, without any image suggestion.
+  await expect(menuEl.locator(".bn-suggestion-menu-loader")).not.toBeAttached();
+  await expect(menuEl.locator(".bn-suggestion-menu-item")).toHaveCount(2);
+});
+
 test("Clicking the browse action opens the full image selector where the suggestion menu was", async ({
   mount,
   page,

@@ -33,6 +33,8 @@ export type ImageSuggestionForTestProps = {
   images?: Array<{ label: string; url: string; reference?: string }>;
   // When set, the LinkSuggestService is unavailable, as with a backend that doesn't support search.
   linkSuggestServiceUnavailable?: boolean;
+  // When set, searching for images fails, as when the backend can't be reached.
+  linkSuggestServiceFailing?: boolean;
 };
 
 /**
@@ -47,6 +49,7 @@ export type ImageSuggestionForTestProps = {
 export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   images,
   linkSuggestServiceUnavailable,
+  linkSuggestServiceFailing,
 }) => {
   const depsContainer = useMemo(() => {
     const container = depsContainerMock();
@@ -57,6 +60,10 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
         : ({
             get: () => ({
               async getLinks() {
+                if (linkSuggestServiceFailing) {
+                  throw new Error("Failed to reach the backend");
+                }
+
                 return (images ?? []).map((image, index) => ({
                   id: `image-${index}`,
                   hint: "",

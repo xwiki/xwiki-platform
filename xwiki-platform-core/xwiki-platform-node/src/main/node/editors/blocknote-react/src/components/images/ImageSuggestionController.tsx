@@ -24,9 +24,13 @@ import { useImageUploader } from "../../misc/fileUpload";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
 import { Paper } from "@mantine/core";
-import { debounceAsync, tryFallible } from "@xwiki/platform-fn-utils";
+import {
+  debounceAsync,
+  tryFallible,
+  tryFalliblePromiseOrError,
+} from "@xwiki/platform-fn-utils";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiFolderImageLine, RiUpload2Line } from "react-icons/ri";
 import type { EditorType } from "../../blocknote";
@@ -77,40 +81,42 @@ export function ImageSuggestionController({
     setSelectorPosition({ from: pos, to: pos });
   }, [editor]);
 
-  const searchImages = useCallback(
-    debounceAsync(async (query: string) => {
-      const suggestions = await fetchImageSuggestions(
-        query,
-        linkSuggestService,
-        modelReferenceParser,
-        editor,
-        t,
-      );
+  const searchImages = useMemo(
+    () =>
+      debounceAsync(async (query: string) => {
+        const suggestions = await fetchImageSuggestions(
+          query,
+          linkSuggestService,
+          modelReferenceParser,
+          editor,
+          t,
+        );
 
-      const actions: DefaultReactSuggestionItem[] = [
-        {
-          title: t("blocknote.imageSuggestion.browse"),
-          icon: <RiFolderImageLine size={18} />,
-          onItemClick: openImageSelector,
-        },
-        {
-          title: t("blocknote.imageSuggestion.upload"),
-          icon: <RiUpload2Line size={18} />,
-          onItemClick: uploadImage,
-        },
-      ];
+        const actions: DefaultReactSuggestionItem[] = [
+          {
+            title: t("blocknote.imageSuggestion.browse"),
+            icon: <RiFolderImageLine size={18} />,
+            onItemClick: openImageSelector,
+          },
+          {
+            title: t("blocknote.imageSuggestion.upload"),
+            icon: <RiUpload2Line size={18} />,
+            onItemClick: uploadImage,
+          },
+        ];
 
-      return [
-        ...actions,
-        ...(maxSuggestions
-          ? suggestions.slice(0, maxSuggestions)
-          : suggestions),
-      ];
-    }),
+        return [
+          ...actions,
+          ...(maxSuggestions
+            ? suggestions.slice(0, maxSuggestions)
+            : suggestions),
+        ];
+      }),
     [
       t,
       linkSuggestService,
       modelReferenceParser,
+      editor,
       maxSuggestions,
       openImageSelector,
       uploadImage,
@@ -172,11 +178,18 @@ async function fetchImageSuggestions(
     ];
   }
 
-  const results = await linkSuggestService.getLinks(
-    query,
-    LinkType.ATTACHMENT,
-    "image/*",
+  const results = await tryFalliblePromiseOrError(() =>
+    linkSuggestService.getLinks(query, LinkType.ATTACHMENT, "image/*"),
   );
+
+  if (results instanceof Error) {
+    // Don't fail the whole menu: the browse and upload actions remain available.
+    console.warn(
+      `Failed to get the image suggestions for [${query}].`,
+      results,
+    );
+    return [];
+  }
 
   return results.map(
     (link): DefaultReactSuggestionItem => ({

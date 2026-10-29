@@ -265,15 +265,17 @@ function escapeHtml(str: string): string {
 }
 
 /**
- * Debounce async function call
+ * Debounce an async function: the function is called only once no new call was made for `delay`
+ * milliseconds, with the arguments of the last call.
  *
- * Returned promise will be rejected if a new one starts in the meantime
+ * The calls made while waiting are merged: the promises they returned all settle with the outcome
+ * of that single function call (they never get rejected only because a newer call superseded them).
  *
- * @param fn - Function to call (returns a promise)
+ * @param fn - Function to call (can return a promise)
  * @param delay - Delay in milliseconds
- * @returns A debounced promise
+ * @returns The debounced function
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 function debounceAsync<Args extends unknown[], R>(
@@ -281,31 +283,30 @@ function debounceAsync<Args extends unknown[], R>(
   delay = 100,
 ): (...args: Args) => Promise<R> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
-  let pendingReject: ((reason?: unknown) => void) | undefined;
+  let waitingCalls: {
+    resolve: (result: R) => void;
+    reject: (reason: unknown) => void;
+  }[] = [];
 
-  return (...args: Args): Promise<R> => {
-    // Cancel any pending call
-    if (timeoutId !== undefined) {
+  return (...args: Args): Promise<R> =>
+    new Promise<R>((resolve, reject) => {
       clearTimeout(timeoutId);
-      pendingReject?.(new Error("Debounced: call cancelled by a newer call"));
-    }
-
-    return new Promise<R>((resolve, reject) => {
-      pendingReject = reject;
+      waitingCalls.push({ resolve, reject });
 
       timeoutId = setTimeout(async () => {
+        // Calls made from now on wait for a new function call.
+        const calls = waitingCalls;
+        waitingCalls = [];
+        timeoutId = undefined;
+
         try {
           const result = await fn(...args);
-          resolve(result);
-        } catch (err) {
-          reject(err);
-        } finally {
-          timeoutId = undefined;
-          pendingReject = undefined;
+          calls.forEach((call) => call.resolve(result));
+        } catch (error) {
+          calls.forEach((call) => call.reject(error));
         }
       }, delay);
     });
-  };
 }
 
 /**

@@ -364,4 +364,46 @@ class ImageIT extends AbstractBlockNoteIT
         // The label is only displayed, so nothing is added to the source: an alt is saved only when the user sets it.
         assertEquals("[[image:missing.png]]", page.editWiki().getContent());
     }
+
+    @Test
+    @Order(7)
+    void pasteImageInsideText(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.click().moveCaretTo(2);
+        textArea.pasteFile("/image.gif");
+        textArea.waitUntilImageIsLoaded(0);
+
+        page.save();
+
+        // The caret was in the middle of "before", yet the image goes after the whole paragraph.
+        assertThat(page.editWiki().getContent(),
+            matchesPattern("before\n\n\\[\\[image:\\d+-\\d+\\.gif\\]\\]"));
+    }
+
+    @Test
+    @Order(8)
+    void pasteFileInsideText(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.click().moveCaretTo(2);
+        textArea.pasteFile("/notes.txt");
+        textArea.waitUntilLinkIsPresent();
+
+        page.save();
+
+        // Same for the link: the caret was inside the text, the link lands in a paragraph of its own.
+        assertThat(page.editWiki().getContent(),
+            matchesPattern("before\n\n\\[\\[attach:\\d+-\\d+\\.txt\\]\\]"));
+    }
 }

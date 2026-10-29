@@ -63,11 +63,16 @@ public class AttachmentsRedirectionFilter implements RedirectionFilter
     {
         boolean redirect = false;
         if (Objects.equals(context.getAction(), ACTION_NAME)) {
-            AttachmentReference attachmentReference = getAttachmentReference();
-            Optional<AttachmentReference> redirection = this.attachmentsManager.getRedirection(attachmentReference);
-            if (redirection.isPresent()) {
-                doRedirect(context, redirection.get());
-                redirect = true;
+            Optional<AttachmentReference> attachmentReference = getAttachmentReference();
+            // A download URL without a file name (e.g., /bin/download/Space/Page) doesn't target any attachment, so
+            // there is nothing to redirect; the download action is left to answer with a not found error.
+            if (attachmentReference.isPresent()) {
+                Optional<AttachmentReference> redirection =
+                    this.attachmentsManager.getRedirection(attachmentReference.get());
+                if (redirection.isPresent()) {
+                    doRedirect(context, redirection.get());
+                    redirect = true;
+                }
             }
         }
         return redirect;
@@ -87,10 +92,11 @@ public class AttachmentsRedirectionFilter implements RedirectionFilter
         }
     }
 
-    private AttachmentReference getAttachmentReference()
+    private Optional<AttachmentReference> getAttachmentReference()
     {
         EntityResourceReference entityResource =
             (EntityResourceReference) this.resourceReferenceManager.getResourceReference();
-        return new AttachmentReference(entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT));
+        return Optional.ofNullable(entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT))
+            .map(AttachmentReference::new);
     }
 }

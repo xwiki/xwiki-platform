@@ -106,17 +106,22 @@ var XWiki = (function (XWiki) {
      * Submits the form or go to a selected page according to selection.
      */
     onSuggestionSelected: function(event) {
-      if (event.memo.suggest == this.suggest) {
+      if (event.memo.suggest === this.suggest) {
         event.stop();
-        // Also stop the browser event that triggered the custom "xwiki:suggest:selected" event.
-        if (event.memo.originalEvent) {
-          Event.stop(event.memo.originalEvent);
-        }
+        const originalEvent = event.memo.originalEvent;
         if (!event.memo.url) {
+          // Stop the browser event that triggered the custom "xwiki:suggest:selected" event.
+          if (originalEvent) {
+            Event.stop(originalEvent);
+          }
           // Submit form
           this.searchInput.up('form').submit();
-        }
-        else {
+        } else if (originalEvent?.type === 'click') {
+          // Let the suggestion anchor handle the click natively, so that modifier keys such as Ctrl keep working.
+        } else {
+          if (originalEvent) {
+            Event.stop(originalEvent);
+          }
           // Go to page
           window.location = event.memo.url;
         }

@@ -18,9 +18,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSuggestionForTest } from "./ImageSuggestion.story";
+import { FULL_SYNTAX } from "./syntax.mock";
 import { expect, test } from "@playwright/experimental-ct-react";
+import type { Locator, Page } from "@playwright/test";
 
-test("Triggering the image suggestions shows the browse and upload actions, then the matching images", async ({
+/**
+ * Opens the image suggestion menu with the image quick action, i.e. the "Image" item of the slash menu.
+ */
+async function openImageQuickAction(page: Page, editorEl: Locator) {
+  await editorEl.click();
+  await page.keyboard.type("/image");
+  await expect(
+    page.locator('.bn-suggestion-menu-item[aria-selected="true"]'),
+  ).toContainText("Image");
+  await page.keyboard.press("Enter");
+
+  // The slash menu is replaced by the image suggestion menu (the slash menu stays attached for a
+  // moment while it closes).
+  await page
+    .locator(".bn-suggestion-menu-item", {
+      hasText: "blocknote.imageSuggestion.browse",
+    })
+    .waitFor();
+  await expect(page.locator(".bn-suggestion-menu")).toHaveCount(1);
+}
+
+test("The image quick action shows the browse and upload actions, then the matching images", async ({
   mount,
   page,
   // eslint-disable-next-line max-statements
@@ -48,8 +71,7 @@ test("Triggering the image suggestions shows the browse and upload actions, then
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   // The menu is shown (with a loader) before its items are loaded.
@@ -111,8 +133,7 @@ test("Only the first 5 image suggestions are shown, in addition to the browse an
   const component = await mount(<ImageSuggestionForTest images={images} />);
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -132,8 +153,7 @@ test("Clicking an image suggestion inserts an image block with its URL", async (
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -145,15 +165,15 @@ test("Clicking an image suggestion inserts an image block with its URL", async (
     "https://picsum.photos/150",
   );
 
-  // The menu is closed and the trigger text removed, as when selecting with the keyboard.
+  // The menu is closed and no text is left behind (neither the slash menu's query nor the image
+  // suggestion menu's trigger).
   await expect(menuEl).not.toBeAttached();
-  await expect(editorEl).not.toContainText("img::");
+  await expect(editorEl).not.toContainText("image");
 });
 
 test("Keyboard navigation can select an image suggestion", async ({
   mount,
   page,
-  // eslint-disable-next-line max-statements
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
@@ -165,8 +185,7 @@ test("Keyboard navigation can select an image suggestion", async ({
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -196,8 +215,7 @@ test("Only shows the browse and upload actions when the backend doesn't support 
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -218,8 +236,7 @@ test("Still shows the browse and upload actions when searching for images fails"
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -236,8 +253,7 @@ test("Clicking the upload action opens a file picker offering only images", asyn
   const component = await mount(<ImageSuggestionForTest />);
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -261,8 +277,7 @@ test("A failed upload from the upload action is logged and leaves the editor unc
   const component = await mount(<ImageSuggestionForTest />);
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -296,8 +311,7 @@ test("Clicking the browse action opens the full image selector where the suggest
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -315,13 +329,11 @@ test("Clicking the browse action opens the full image selector where the suggest
 test("The upload button of the opened image selector opens a file picker offering only images", async ({
   mount,
   page,
-  // eslint-disable-next-line max-statements
 }) => {
   const component = await mount(<ImageSuggestionForTest />);
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -344,8 +356,7 @@ test("Uploading an image from the opened image selector inserts it and closes th
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -420,8 +431,7 @@ test("Selecting the browse action with the keyboard also opens the full image se
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -445,8 +455,7 @@ test("Selecting a search result in the opened image selector inserts the image b
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -477,8 +486,7 @@ test("Keyboard navigation can select a search result in the opened image selecto
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -511,8 +519,7 @@ test("Pressing Escape closes the opened image selector without inserting anythin
   );
 
   const editorEl = component.locator(".bn-editor");
-  await editorEl.click();
-  await page.keyboard.type("img::");
+  await openImageQuickAction(page, editorEl);
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -540,7 +547,7 @@ test("Opening the full image selector clears the typed trigger text from the edi
 
   const editorEl = component.locator(".bn-editor");
   await editorEl.click();
-  await page.keyboard.type("img::some query");
+  await page.keyboard.type("image:some query");
 
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
@@ -551,6 +558,65 @@ test("Opening the full image selector clears the typed trigger text from the edi
 
   // The trigger and any typed query are removed from the document once the full selector opens,
   // instead of being left behind as stray text.
-  await expect(editorEl).not.toContainText("img::");
+  await expect(editorEl).not.toContainText("image:");
   await expect(editorEl).not.toContainText("some query");
+});
+
+test("Typing the trigger shows the image suggestions only once followed by a query", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await editorEl.click();
+
+  // Writing the trigger in a sentence doesn't get in the way: Enter breaks the line, instead of
+  // selecting an action of a hidden menu.
+  await page.keyboard.type("The image: a cat");
+  await page.keyboard.press("Enter");
+  await expect(editorEl.locator(".bn-block-content")).toHaveCount(2);
+  await expect(menuEl).not.toBeAttached();
+
+  await page.keyboard.type("image:cat");
+  await expect(
+    menuEl.locator(".bn-suggestion-menu-item", { hasText: "Cat picture" }),
+  ).toBeVisible();
+});
+
+test("The image suggestions aren't available when the syntax doesn't support images", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      syntax={{
+        ...FULL_SYNTAX,
+        features: {
+          ...FULL_SYNTAX.features,
+          blocks: {
+            ...FULL_SYNTAX.features.blocks,
+            images: {
+              ...FULL_SYNTAX.features.blocks.images,
+              basicImages: false,
+            },
+          },
+        },
+      }}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.click();
+  await page.keyboard.type("image:cat");
+
+  // The text stays plain text: the suggestion menu doesn't open.
+  await expect(editorEl).toContainText("image:cat");
+  await expect(page.locator(".bn-suggestion-menu")).not.toBeAttached();
 });

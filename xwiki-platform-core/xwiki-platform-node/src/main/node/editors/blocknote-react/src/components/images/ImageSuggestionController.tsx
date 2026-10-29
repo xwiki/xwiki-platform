@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
+import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
 import { DepsContainerContext } from "../../contexts";
 import { useEditor } from "../../hooks";
 import { useImageUploader } from "../../misc/fileUpload";
@@ -74,7 +75,7 @@ export function ImageSuggestionController({
     to: number;
   }>();
 
-  // Opens the full image selector popover where the "img::" suggestion menu was (the menu itself
+  // Opens the full image selector popover where the image suggestion menu was (the menu itself
   // is already closed, and its query removed, by the time an item is clicked).
   const openImageSelector = useCallback(() => {
     const pos = editor.transact((tr) => tr.selection.from);
@@ -126,7 +127,10 @@ export function ImageSuggestionController({
   return (
     <>
       <SuggestionMenuController
-        triggerCharacter={"img::"}
+        triggerCharacter={IMAGE_SUGGESTION_TRIGGER}
+        // A typed trigger shows the menu only once followed by a query, so that writing "image: "
+        // in a sentence doesn't open it (and let Enter pick an action instead of breaking the line).
+        minQueryLength={1}
         getItems={searchImages}
       />
 

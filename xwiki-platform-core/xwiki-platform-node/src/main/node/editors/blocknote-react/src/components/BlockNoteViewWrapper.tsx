@@ -396,7 +396,9 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             }
           />
 
-          <ImageSuggestionController maxSuggestions={5} />
+          {syntax.features.blocks.images.basicImages && (
+            <ImageSuggestionController maxSuggestions={5} />
+          )}
 
           {/* TODO: suggestions menu for inline macros */}
 

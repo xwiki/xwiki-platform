@@ -40,6 +40,8 @@ export type ImageSuggestionForTestProps = {
   uploadedImageUrl?: string;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
+  // The syntax of the edited content (supporting everything when not set).
+  syntax?: BlockNoteViewWrapperProps["syntax"];
 };
 
 /**
@@ -57,6 +59,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   linkSuggestServiceFailing,
   uploadedImageUrl,
   content,
+  syntax,
 }) => {
   const depsContainer = useMemo(() => {
     const container = depsContainerMock();
@@ -103,7 +106,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
       depsContainer={depsContainer}
       macros={false}
       content={content ?? []}
-      syntax={FULL_SYNTAX}
+      syntax={syntax ?? FULL_SYNTAX}
       linkEditionHandler={() => {
         throw new Error("Link editor should not open for this test");
       }}

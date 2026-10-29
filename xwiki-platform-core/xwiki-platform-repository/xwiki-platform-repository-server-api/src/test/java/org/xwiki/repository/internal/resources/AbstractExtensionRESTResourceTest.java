@@ -32,8 +32,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionRepository;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Property;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.ratings.AverageRating;
-import org.xwiki.ratings.RatingsManager;
+import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.repository.internal.ExtensionStore;
 import org.xwiki.repository.internal.RepositoryManager;
@@ -138,12 +137,12 @@ class AbstractExtensionRESTResourceTest
     void createExtensionWithVersion() throws Exception
     {
         XWikiDocument extensionDocument = mockExtensionDocument();
-        BaseObject extensionVersionObject = mock();
+        BaseObject extensionVersionObject = new BaseObject();
         when(this.repositoryManager.getExtensionVersionObject(eq(extensionDocument), eq("1.0"), any()))
             .thenReturn(extensionVersionObject);
         when(this.extensionStore.getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_VERSION))
             .thenReturn("1.0");
-        BaseObject dependencyObject = mock();
+        BaseObject dependencyObject = new BaseObject();
         when(this.extensionStore.getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION,
             null)).thenReturn("1.0");
         when(this.extensionStore.getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID))
@@ -165,12 +164,11 @@ class AbstractExtensionRESTResourceTest
     {
         XWikiDocument extensionDocument = mock();
         when(extensionDocument.getDocumentReference()).thenReturn(EXTENSION_DOCUMENT_REFERENCE);
-        when(extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE)).thenReturn(mock());
+        when(extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE)).thenReturn(new BaseObject());
 
-        RatingsManager ratingsManager = mock();
+        // The rating is irrelevant here: an unavailable ratings manager falls back to an empty rating.
         when(this.ratingsManagerFactory.getRatingsManager(RatingsManagerFactory.DEFAULT_APP_HINT))
-            .thenReturn(ratingsManager);
-        when(ratingsManager.getAverageRating(EXTENSION_DOCUMENT_REFERENCE)).thenReturn(mock(AverageRating.class));
+            .thenThrow(new RatingsException("Ratings are unavailable"));
 
         return extensionDocument;
     }

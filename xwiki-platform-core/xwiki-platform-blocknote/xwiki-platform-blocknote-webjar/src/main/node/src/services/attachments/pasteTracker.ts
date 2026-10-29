@@ -18,6 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+type FileTransfer = {
+  // Whether the files were pasted rather than dropped.
+  paste: boolean;
+
+  files: File[];
+
+  // Where the files were dropped, since a drop leaves the caret where it was. Undefined for a paste.
+  coordinates?: { left: number; top: number };
+};
+
 type PasteTracker = {
   isPaste(): boolean;
   dispose(): void;
@@ -28,14 +38,36 @@ type PasteTracker = {
  * upload callback. Capture phase, so both listeners run before BlockNote starts the upload. The flag stays set until
  * the opposite event rather than being cleared once the upload starts, because BlockNote uploads the pasted files one
  * after another, so all but the first are read after the paste event is over. Dispose with the editor.
+ *
+ * @param target - the editor element, so that two editors on the same page don't see each other's transfers
+ * @param takeOver - offered every transfer that carries files; returning true stops the event, which keeps it from
+ *   reaching BlockNote, so the caller inserts those files itself
+ * @returns the tracker
  */
-function trackPaste(target: EventTarget): PasteTracker {
+function trackPaste(
+  target: EventTarget,
+  takeOver: (transfer: FileTransfer) => boolean = () => false,
+): PasteTracker {
   let paste = false;
-  const onPaste = () => {
-    paste = true;
+  const offer = (event: Event, transfer: Omit<FileTransfer, "paste">) => {
+    if (transfer.files.length > 0 && takeOver({ ...transfer, paste })) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   };
-  const onDrop = () => {
+  const onPaste = (event: Event) => {
+    paste = true;
+    const files = (event as ClipboardEvent).clipboardData?.files;
+    offer(event, { files: Array.from(files ?? []) });
+  };
+  const onDrop = (event: Event) => {
     paste = false;
+    const { dataTransfer, clientX, clientY } = event as DragEvent;
+    offer(event, {
+      files: Array.from(dataTransfer?.files ?? []),
+      // A drop leaves the caret where it was, so where it landed is the only clue to where its files belong.
+      coordinates: { left: clientX, top: clientY },
+    });
   };
   target.addEventListener("paste", onPaste, true);
   target.addEventListener("drop", onDrop, true);
@@ -48,4 +80,4 @@ function trackPaste(target: EventTarget): PasteTracker {
   };
 }
 
-export { type PasteTracker, trackPaste };
+export { type FileTransfer, type PasteTracker, trackPaste };

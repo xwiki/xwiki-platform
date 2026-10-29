@@ -266,11 +266,8 @@ class ImageIT extends AbstractBlockNoteIT
         page.save();
 
         // The file block is saved as a macro call, but that macro doesn't exist yet, so the file becomes an
-        // attachment link instead, in a block of its own after the paragraph that held the caret.
-        assertEquals("""
-            before
-
-            [[attach:notes.txt]]""", page.editWiki().getContent());
+        // attachment link instead, inline where it landed rather than in a block of its own.
+        assertEquals("before[[attach:notes.txt]]", page.editWiki().getContent());
 
         byte[] uploaded = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
@@ -298,10 +295,7 @@ class ImageIT extends AbstractBlockNoteIT
         page.save();
 
         // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do.
-        assertEquals("""
-            before
-
-            [[attach:notes.txt]]""", page.editWiki().getContent());
+        assertEquals("before[[attach:notes.txt]]", page.editWiki().getContent());
 
         // A single attachment, so the upload overwrote the existing one rather than adding another.
         Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
@@ -340,10 +334,7 @@ class ImageIT extends AbstractBlockNoteIT
 
         page.save();
 
-        assertEquals("""
-            before
-
-            [[attach:notes.txt]]""", page.editWiki().getContent());
+        assertEquals("before[[attach:notes.txt]]", page.editWiki().getContent());
 
         // The save is what attaches the file.
         Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
@@ -388,9 +379,8 @@ class ImageIT extends AbstractBlockNoteIT
 
         page.save();
 
-        // Renamed like a pasted image, and like it the link lands after the paragraph that held the caret.
-        assertThat(page.editWiki().getContent(),
-            matchesPattern("before\n\n\\[\\[attach:\\d+-\\d+\\.txt\\]\\]"));
+        // The link goes where the caret was, splitting the text, rather than after the paragraph that held it.
+        assertThat(page.editWiki().getContent(), matchesPattern("be\\[\\[attach:\\d+-\\d+\\.txt\\]\\]fore"));
     }
 
     @Test

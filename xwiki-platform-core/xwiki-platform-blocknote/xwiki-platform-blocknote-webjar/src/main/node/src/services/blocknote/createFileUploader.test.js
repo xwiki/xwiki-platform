@@ -48,6 +48,7 @@ function uploadedAttachment(name) {
 
 describe("createFileUploader", () => {
   let blockNoteDocument,
+    insertInlineContent,
     saveAttachments,
     notifyUploadFailed,
     eventTarget,
@@ -61,6 +62,7 @@ describe("createFileUploader", () => {
       eventTarget,
       getDocumentReference: () => "Space.Page",
       getBlockNoteDocument: () => blockNoteDocument,
+      insertInlineContent,
       isTemporaryUpload: () => temporary,
       registerTemporaryAttachment,
       notifyUploadFailed,
@@ -69,6 +71,8 @@ describe("createFileUploader", () => {
 
   beforeEach(() => {
     blockNoteDocument = new BlockNoteDocument([]);
+    // What the insertion does with the links is covered by the insertFilesInline tests.
+    insertInlineContent = vi.fn();
     eventTarget = document.createElement("div");
     temporary = false;
     registerTemporaryAttachment = vi.fn();
@@ -224,6 +228,20 @@ describe("createFileUploader", () => {
 
       const uploaded = saveAttachments.mock.calls[0][1][0].name;
       expect(result.content[0].content).toBe(uploaded);
+    });
+
+    it("renames a pasted file it attaches for the inline insertion", async () => {
+      const event = new Event("paste", { bubbles: true, cancelable: true });
+      const files = [file("text.pdf", "application/pdf")];
+      Object.defineProperty(event, "clipboardData", { value: { files } });
+      eventTarget.dispatchEvent(event);
+
+      await vi.waitFor(() => expect(saveAttachments).toHaveBeenCalled());
+
+      expect(saveAttachments.mock.calls[0][1][0].name).toMatch(
+        /^\d+-[1-9]\d\d\.pdf$/,
+      );
+      expect(event.defaultPrevented).toBe(true);
     });
 
     it("stops watching for pastes once disposed of", async () => {

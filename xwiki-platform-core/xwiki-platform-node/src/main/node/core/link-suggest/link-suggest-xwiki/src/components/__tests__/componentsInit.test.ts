@@ -20,6 +20,7 @@
 
 import { ComponentInit } from "../componentsInit";
 import { LinkType, name } from "@xwiki/platform-link-suggest-api";
+import { EntityType } from "@xwiki/platform-model-api";
 import { Container } from "inversify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type {
@@ -30,7 +31,8 @@ import type {
 /**
  * Builds the container the link suggest service is resolved from, with just enough of its
  * dependencies for the service to run: the entity reference parser and the URL serializer are
- * identity-like so that the tests can assert on the raw reference the service produces.
+ * identity-like so that the tests can assert on the raw reference the service produces, and on the
+ * type of entity it designates (the parser prefixes the reference with it).
  */
 function buildContainer(): Container {
   const container = new Container();
@@ -38,7 +40,10 @@ function buildContainer(): Container {
     getWikiConfig: () => ({ baseURL: "http://localhost/xwiki" }),
   });
   container.bind("ModelReferenceParserProvider").toConstantValue({
-    get: () => ({ parse: (reference: string) => reference }),
+    get: () => ({
+      parse: (reference: string, options?: { type?: EntityType }) =>
+        `${EntityType[options?.type ?? -1] ?? "untyped"}/${reference}`,
+    }),
   });
   container.bind("RemoteURLSerializerProvider").toConstantValue({
     get: () => ({
@@ -88,7 +93,7 @@ describe("XWikiLinkSuggestService", () => {
       {
         type: LinkType.PAGE,
         id: "wiki:Space.Page_en",
-        url: "http://localhost/xwiki/wiki:Space.Page",
+        url: "http://localhost/xwiki/DOCUMENT/wiki:Space.Page",
         reference: "wiki:Space.Page",
         label: "Some Page",
         hint: "Space",
@@ -111,7 +116,7 @@ describe("XWikiLinkSuggestService", () => {
       {
         type: LinkType.ATTACHMENT,
         id: "wiki:Space.Page@image.gif",
-        url: "http://localhost/xwiki/wiki:Space.Page@image.gif",
+        url: "http://localhost/xwiki/ATTACHMENT/wiki:Space.Page@image.gif",
         reference: "wiki:Space.Page@image.gif",
         label: "image.gif",
         hint: "Space / Page",

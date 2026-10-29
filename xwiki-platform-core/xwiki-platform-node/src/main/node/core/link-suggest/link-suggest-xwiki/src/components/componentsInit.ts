@@ -20,6 +20,7 @@
 
 import { unescapeXML } from "@xwiki/platform-fn-utils";
 import { LinkType, name } from "@xwiki/platform-link-suggest-api";
+import { EntityType } from "@xwiki/platform-model-api";
 import { Container, inject, injectable } from "inversify";
 import type { CristalApp } from "@xwiki/platform-api";
 import type { AuthenticationManagerProvider } from "@xwiki/platform-authentication-api";
@@ -160,11 +161,16 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     const type = result.type;
     const hint = unescapeXML(result.location?.trim() ?? "");
     const reference = this.stripEntityTypePrefix(result.reference, type);
+    // The type is needed to parse an attachment reference, which would otherwise be taken for a page reference.
+    const entityType =
+      type == "ATTACHMENT" ? EntityType.ATTACHMENT : EntityType.DOCUMENT;
     const xwikiURL =
       this.remoteURLSerializerProvider
         .get()
         ?.serialize(
-          this.modelReferenceParserProvider.get()?.parse(reference),
+          this.modelReferenceParserProvider
+            .get()
+            ?.parse(reference, { type: entityType }),
         ) ?? "";
 
     if (type == "ATTACHMENT") {

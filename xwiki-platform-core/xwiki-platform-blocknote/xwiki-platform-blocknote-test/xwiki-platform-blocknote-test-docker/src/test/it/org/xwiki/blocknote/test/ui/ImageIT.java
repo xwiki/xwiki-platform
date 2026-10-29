@@ -230,8 +230,9 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // The image quick action shows the image suggestions.
-        textArea.click().sendKeys("/image");
+        textArea.click().sendKeys("/");
         SlashMenu slashMenu = new SlashMenu();
+        textArea.sendKeys("image");
         slashMenu.waitForItemSelected("Image");
         textArea.sendKeys(Keys.ENTER);
         slashMenu.waitForItemSubmitted();

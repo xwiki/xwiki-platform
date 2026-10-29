@@ -2332,6 +2332,9 @@ importers:
       '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../link-suggest-api
+      '@xwiki/platform-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
       '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api

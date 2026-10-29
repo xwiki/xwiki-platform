@@ -21,7 +21,7 @@ import { depsContainerMock } from "./depsContainer.mock";
 import { SearchBox } from "../../components/SearchBox";
 import { DepsContainerContext } from "../../contexts";
 import { MantineProvider } from "@mantine/core";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 export type SearchBoxForTestProps = {
   onSelect?: (url: string) => void;
@@ -34,34 +34,48 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
 }) => {
   const depsContainer = useMemo(depsContainerMock, []);
 
+  // Every query searched so far, rendered for the tests to check which searches were performed.
+  const [searchedQueries, setSearchedQueries] = useState<string[]>([]);
+
+  // Stable, like the suggestion providers of the actual consumers, so that only query changes
+  // trigger a search.
+  const getSuggestions = useCallback(async (query: string) => {
+    setSearchedQueries((queries) => [...queries, query]);
+
+    return [
+      {
+        type: 1,
+        reference: "",
+        segments: [],
+        title: "Some great suggestion title starting with " + query,
+        url: "https://picsum.photos/150",
+      },
+      {
+        type: 1,
+        reference: "",
+        segments: [],
+        title: "Another great suggestion title starting with " + query,
+        url: "https://picsum.photos/300",
+      },
+    ];
+  }, []);
+
   return (
     <MantineProvider>
       <DepsContainerContext value={depsContainer}>
         <SearchBox
           initialValue="Some great initial value"
           placeholder="Some super placeholder"
-          getSuggestions={async (query) => [
-            {
-              type: 1,
-              reference: "",
-              segments: [],
-              title: "Some great suggestion title starting with " + query,
-              url: "https://picsum.photos/150",
-            },
-            {
-              type: 1,
-              reference: "",
-              segments: [],
-              title: "Another great suggestion title starting with " + query,
-              url: "https://picsum.photos/300",
-            },
-          ]}
+          getSuggestions={getSuggestions}
           renderSuggestion={(suggestion) => (
             <span>Suggestion title: {suggestion.title}</span>
           )}
           onSelect={(url) => onSelect?.(url)}
           onSubmit={(url) => onSubmit?.(url)}
         />
+        <output data-test="searchedQueries">
+          {JSON.stringify(searchedQueries)}
+        </output>
       </DepsContainerContext>
     </MantineProvider>
   );

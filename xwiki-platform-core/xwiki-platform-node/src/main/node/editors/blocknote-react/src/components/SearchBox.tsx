@@ -26,7 +26,7 @@ import {
   ResourceType,
 } from "@xwiki/platform-rendering-api";
 import { t } from "i18next";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { RiLink } from "react-icons/ri";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
@@ -220,16 +220,19 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     ],
   );
 
-  // Automatically perform a search when the query changes
-  useEffect(() => {
-    void performSearch(query);
-  }, [query, performSearch]);
+  const isFirstSearch = useRef(true);
 
-  // Perform a search at the opening, immediately: there's no rapid typing to debounce yet, and the
-  // suggestions should be available as soon as possible (e.g. to be keyboard-navigable right away).
+  // Automatically perform a search when the query changes, starting with the initial value. The first
+  // search isn't debounced: there's no rapid typing to wait for yet, and the suggestions should be
+  // available as soon as possible (e.g. to be keyboard-navigable right away).
   useEffect(() => {
-    void runSearch("");
-  }, [runSearch]);
+    if (isFirstSearch.current) {
+      isFirstSearch.current = false;
+      void runSearch(query);
+    } else {
+      void performSearch(query);
+    }
+  }, [query, runSearch, performSearch]);
 
   return (
     <Combobox

@@ -38,7 +38,7 @@ import {
   DocumentReference,
   EntityType,
 } from "@xwiki/platform-model-api";
-import { useCallback, useContext, useEffect, useMemo } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
 import type { LinkSuggestion } from "../SearchBox";
@@ -138,11 +138,6 @@ export function ImageSelector({
     },
     [modelReferenceParser, linkSuggestService],
   );
-
-  // Start a first empty search on the first load, to not let the results empty.
-  useEffect(() => {
-    searchAttachments(initialQuery);
-  }, []);
 
   const editor = useEditor();
 

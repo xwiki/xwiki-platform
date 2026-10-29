@@ -243,11 +243,11 @@ class ImageIT extends AbstractBlockNoteIT
         new SlashMenu().clickItem(imageName, testReference.getLastSpaceReference().getName());
         textArea.waitUntilImageIsLoaded(0);
 
-        // Save and check the source: the image is saved with its reference rather than with its URL.
+        // Save and check the source: the image is saved with its reference rather than with its URL, relative to the
+        // edited page.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("[[image:%s@%s]]".formatted(setup.serializeReference(testReference), imageName),
-            wikiEditor.getContent());
+        assertEquals("[[image:%s]]".formatted(imageName), wikiEditor.getContent());
     }
 
     @Test

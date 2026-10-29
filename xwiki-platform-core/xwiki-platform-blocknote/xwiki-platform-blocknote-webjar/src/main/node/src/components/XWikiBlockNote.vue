@@ -79,6 +79,7 @@
 
 <script setup lang="ts">
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
+import { toRelativeImageReference } from "../services/blocknote/imageReference";
 import {
   extractLinkId,
   injectLinkId,
@@ -238,12 +239,18 @@ const imageInsertion: ImageInsertionOverrideFn = (insert) => {
 const imageEditionHooks: ImageEditionHooks = {
   // Runs right after an image is inserted or its source is changed (e.g. from the image suggestions or by uploading
   // it). The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so that the image is
-  // saved with the reference provided by the server rather than with its URL. An image known only by its URL is saved
-  // with that URL, so we drop the reference of the previous image source.
+  // saved with the reference provided by the server rather than with its URL, relative to the edited document. An image
+  // known only by its URL is saved with that URL, so we drop the reference of the previous image source.
   afterUpdate: (block, reference) => {
     const metadata = blockNoteDocument?.getMetadata(block.id, !!reference);
+    const editedDocumentReference = Model.resolve(
+      documentReference,
+      EntityType.DOCUMENT,
+    );
     if (reference) {
-      metadata!.xwikiReference = reference;
+      metadata!.xwikiReference = editedDocumentReference
+        ? toRelativeImageReference(reference, editedDocumentReference)
+        : reference;
     } else if (metadata) {
       delete metadata.xwikiReference;
     }

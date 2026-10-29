@@ -67,6 +67,11 @@ public class LiveTableRequestHandler
 
     static final String CONTEXT_DOC = "$doc";
 
+    /**
+     * The page containing the Live Data.
+     */
+    static final String HOST_DOCUMENT = "hostDocument";
+
     private static final Map<String, String> MATCH_TYPE = Map.of(
         "equals", "exact",
         "contains", "partial",
@@ -163,7 +168,7 @@ public class LiveTableRequestHandler
         addSourceRequestParameters(query, requestParams);
 
         // Remove internal source parameters.
-        Stream.of(TEMPLATE, RESULT_PAGE, CONTEXT_DOC).forEach(requestParams::remove);
+        Stream.of(TEMPLATE, RESULT_PAGE, CONTEXT_DOC, HOST_DOCUMENT).forEach(requestParams::remove);
 
         // Rename the className parameter.
         String[] className = requestParams.remove("className");

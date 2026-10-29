@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.ui;
+package org.xwiki.pagetemplate.test.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +25,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebElement;
-import org.xwiki.administration.test.po.TemplateProviderInlinePage;
-import org.xwiki.administration.test.po.TemplateProviderViewPage;
-import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
+import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.EntityType;
@@ -36,6 +33,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.pagetemplate.test.po.TemplateProviderInlinePage;
+import org.xwiki.pagetemplate.test.po.TemplateProviderViewPage;
+import org.xwiki.pagetemplate.test.po.TemplatesAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -408,7 +408,8 @@ class PageTemplatesIT
     }
 
     /**
-     * The goal of this test is to check that the template provider's title is correctly escaped.
+     * The goal of this test is to check that the template provider's title is correctly escaped in the Templates
+     * administration section, and that this section is only available in the wiki administration.
      */
     @Test
     @Order(5)
@@ -425,9 +426,14 @@ class PageTemplatesIT
             "Funny templates", true);
 
         TemplatesAdministrationSectionPage adminPage = TemplatesAdministrationSectionPage.gotoPage();
-        List<WebElement> links = adminPage.getExistingTemplatesLinks();
-        assertFalse(links.stream().anyMatch(element -> element.getText().equals("HTML")));
-        assertTrue(links.stream().anyMatch(element -> providerName.equals(element.getText())));
+        List<String> templateNames = adminPage.getExistingTemplateNames();
+        assertFalse(templateNames.contains("HTML"));
+        assertTrue(templateNames.contains(providerName));
+
+        String sectionId = TemplatesAdministrationSectionPage.ADMINISTRATION_SECTION_ID;
+        assertTrue(AdministrationPage.gotoPage().hasSection(sectionId));
+        assertTrue(AdministrationPage.gotoSpaceAdministrationPage(testReference.getLastSpaceReference())
+            .hasNotSection(sectionId));
     }
 
     /**

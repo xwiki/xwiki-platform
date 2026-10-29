@@ -117,6 +117,26 @@ describe("displayerXObjectPropertyHelper.js", () => {
     });
   });
 
+  it("Renders a pending entry from its template", async () => {
+    await view("Space.Page", CLASS_NAME, "color", {}, "Space.Template");
+
+    expect(jQuery.ajax).toHaveBeenCalledWith({
+      type: "POST",
+      url: "/preview/Space.Page",
+      data: {
+        xpage: "display",
+        mode: "view",
+        property: "Space.Class[0].color",
+        type: "object",
+        language: "en",
+        objectPolicy: "updateOrCreate",
+        template: "Space.Template",
+        form_token: "token",
+      },
+      traditional: true,
+    });
+  });
+
   it("Edits a pending document property with the extra parameters", async () => {
     await edit(
       "Space.Page",

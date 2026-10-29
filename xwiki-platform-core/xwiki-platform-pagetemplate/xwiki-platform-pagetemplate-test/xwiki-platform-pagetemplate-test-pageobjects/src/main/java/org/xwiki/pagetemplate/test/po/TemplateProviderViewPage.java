@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.pagetemplate.test.po;
 
 import java.util.List;
 
@@ -28,6 +28,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Represents a template provider page in view mode.
  *
+ * @version $Id$
  * @since 17.10.10
  * @since 18.3.0RC1
  */
@@ -35,8 +36,8 @@ public class TemplateProviderViewPage extends ViewPage
 {
     /**
      * @return the icon name displayed on the template provider view page, extracted from the {@code <img>} element's
-     *         {@code src} attribute (e.g., {@code "page"} for {@code icons/silk/page.png}), or an empty string if no
-     *         icon is displayed
+     *         {@code src} attribute (for example {@code "page"} for {@code icons/silk/page.png}), or an empty string if
+     *         no icon is displayed
      */
     public String getIcon()
     {

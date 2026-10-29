@@ -25,16 +25,16 @@ import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xwiki-model-api";
 
 /**
- * Makes the reference of an image attachment relative to the edited document, as the WYSIWYG editors do, so that the
- * image keeps working when the document is renamed or copied (e.g. `[[image:cat.png]]` rather than
- * `[[image:xwiki:Space.Page@cat.png]]` for an image attached to the edited document).
+ * Makes the reference of an attachment relative to the edited document, as the WYSIWYG editors do, so that the
+ * attachment reference keeps working when the document is renamed or copied (e.g. `cat.png` rather than
+ * `xwiki:Space.Page@cat.png` for a file attached to the edited document).
  *
- * @param reference - the resource reference of an image
+ * @param reference - the resource reference of an attachment
  * @param documentReference - the reference of the edited document
  * @returns the given resource reference, with its attachment reference made relative to the edited document, or the
  *   given resource reference itself when it doesn't point to an attachment
  */
-function toRelativeImageReference(
+function toRelativeAttachmentResourceReference(
   reference: ResourceReference,
   documentReference: XWikiEntityReference,
 ): ResourceReference {
@@ -46,35 +46,12 @@ function toRelativeImageReference(
     XWikiEntityType.ATTACHMENT,
     documentReference,
   );
-  if (!attachmentReference) {
-    return reference;
-  }
-  // A reference relative to a document doesn't always resolve back to the same entity (e.g. the attachment of a child
-  // page loses its parent spaces), so we use the shortest serialization that does.
-  const serializedReference = Model.serialize(attachmentReference);
-  const relativeReference = [
-    documentReference,
-    documentReference.extractReference(XWikiEntityType.WIKI),
-  ]
-    .map((baseReference) =>
-      Model.serialize(attachmentReference.relativeTo(baseReference)),
-    )
-    .find(
-      (candidate) =>
-        Model.serialize(
-          Model.resolve(
-            candidate,
-            XWikiEntityType.ATTACHMENT,
-            documentReference,
-          ),
-        ) === serializedReference,
-    );
-  return {
-    ...reference,
-    // Untyped, like the image references written by the WYSIWYG editors (an image points to an attachment by default).
-    typed: false,
-    reference: relativeReference ?? serializedReference,
-  };
+  return attachmentReference
+    ? {
+        ...reference,
+        reference: Model.serialize(attachmentReference, documentReference),
+      }
+    : reference;
 }
 
-export { toRelativeImageReference };
+export { toRelativeAttachmentResourceReference };

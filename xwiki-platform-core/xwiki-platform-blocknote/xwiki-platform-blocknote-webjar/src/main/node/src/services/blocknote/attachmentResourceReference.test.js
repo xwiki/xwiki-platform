@@ -17,27 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { toRelativeImageReference } from "./imageReference";
+import { toRelativeAttachmentResourceReference } from "./attachmentResourceReference";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { describe, expect, it } from "vitest";
 
-describe("toRelativeImageReference", () => {
+describe("toRelativeAttachmentResourceReference", () => {
   function relativeTo(documentReference, reference, typed = false) {
-    return toRelativeImageReference(
+    return toRelativeAttachmentResourceReference(
       { type: "attach", typed, reference, parameters: {} },
       Model.resolve(documentReference, EntityType.DOCUMENT),
     );
   }
 
   it("keeps only the name of an attachment of the edited document", () => {
-    expect(
-      relativeTo("xwiki:Space.Page", "xwiki:Space.Page@cat.png", true),
-    ).toEqual({
+    expect(relativeTo("xwiki:Space.Page", "xwiki:Space.Page@cat.png")).toEqual({
       type: "attach",
       typed: false,
       reference: "cat.png",
       parameters: {},
     });
+  });
+
+  it("keeps whether the resource reference is typed", () => {
+    expect(
+      relativeTo("xwiki:Space.Page", "xwiki:Space.Page@cat.png", true).typed,
+    ).toBe(true);
+    expect(
+      relativeTo("xwiki:Space.Page", "xwiki:Space.Page@cat.png", false).typed,
+    ).toBe(false);
   });
 
   it("keeps a reference that is already relative to the edited document", () => {
@@ -73,7 +80,7 @@ describe("toRelativeImageReference", () => {
   });
 
   it("keeps the parameters of the resource reference", () => {
-    const reference = toRelativeImageReference(
+    const reference = toRelativeAttachmentResourceReference(
       {
         type: "attach",
         typed: true,
@@ -93,7 +100,7 @@ describe("toRelativeImageReference", () => {
       parameters: {},
     };
     expect(
-      toRelativeImageReference(
+      toRelativeAttachmentResourceReference(
         reference,
         Model.resolve("xwiki:Space.Page", EntityType.DOCUMENT),
       ),

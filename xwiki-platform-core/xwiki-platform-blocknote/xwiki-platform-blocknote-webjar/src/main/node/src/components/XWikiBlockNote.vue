@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
-import { toRelativeImageReference } from "../services/blocknote/imageReference";
+import { toRelativeAttachmentResourceReference } from "../services/blocknote/attachmentResourceReference";
 import {
   extractLinkId,
   injectLinkId,
@@ -188,6 +188,8 @@ const {
 }>();
 
 const actualLocale = locale || xwikiMeta.locale;
+const editedDocumentReference =
+  Model.resolve(documentReference, EntityType.DOCUMENT) ?? undefined;
 
 //
 // Data
@@ -243,14 +245,20 @@ const imageEditionHooks: ImageEditionHooks = {
   // known only by its URL is saved with that URL, so we drop the reference of the previous image source.
   afterUpdate: (block, reference) => {
     const metadata = blockNoteDocument?.getMetadata(block.id, !!reference);
-    const editedDocumentReference = Model.resolve(
-      documentReference,
-      EntityType.DOCUMENT,
-    );
-    if (reference) {
-      metadata!.xwikiReference = editedDocumentReference
-        ? toRelativeImageReference(reference, editedDocumentReference)
-        : reference;
+    if (reference?.type === "attach") {
+      metadata!.xwikiReference = {
+        ...(editedDocumentReference
+          ? toRelativeAttachmentResourceReference(
+              reference,
+              editedDocumentReference,
+            )
+          : reference),
+        // Untyped, like the image references written by the WYSIWYG editors (an image points to an attachment by
+        // default).
+        typed: false,
+      };
+    } else if (reference) {
+      metadata!.xwikiReference = reference;
     } else if (metadata) {
       delete metadata.xwikiReference;
     }
@@ -458,8 +466,7 @@ function getEditedDocument(): XWikiDocument {
     return XWikiDocument.currentDocument(xwikiMeta);
   }
   return new XWikiDocument({
-    documentReference:
-      Model.resolve(documentReference, EntityType.DOCUMENT) ?? undefined,
+    documentReference: editedDocumentReference,
     language: actualLocale,
   });
 }

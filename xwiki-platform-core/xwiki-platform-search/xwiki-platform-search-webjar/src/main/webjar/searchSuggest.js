@@ -86,6 +86,9 @@ var XWiki = (function (XWiki) {
     onSuggestContainerPrepared: function(event) {
       // Hide the "No results!" message.
       this.noResultsMessage.addClassName('hidden');
+      // Keep the "Go to search page..." link in sync with the text the suggestions are requested for. Don't wait for
+      // all the sources to answer, since a slow source would otherwise leave the link pointing to the previous text.
+      this._updateAllResultsLink();
     },
 
     /**
@@ -99,9 +102,6 @@ var XWiki = (function (XWiki) {
         // Show the "No results!" message.
         this.noResultsMessage.removeClassName('hidden');
       }
-      // Keep the "Go to search page..." link in sync with the results it sits alongside, instead of the raw input
-      // (which would update ahead of the results it belongs to).
-      this._updateAllResultsLink();
     },
 
     /**
@@ -140,8 +140,9 @@ var XWiki = (function (XWiki) {
      */
     _updateAllResultsLink: function() {
       const form = this.searchInput.up('form');
-      const params = new URLSearchParams(new FormData(form));
-      this.allResultsLink.href = `${form.action}?${params.toString()}`;
+      const url = new URL(form.action);
+      url.search = new URLSearchParams(new FormData(form));
+      this.allResultsLink.href = url;
     },
 
     /**

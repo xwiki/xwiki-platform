@@ -76,14 +76,17 @@ class SearchSuggestIT
         quickSearchElement.search(testDocumentTitle);
         assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
 
-        // Verify that "Go to search page..." is displayed last.
+        // Verify that "Go to search page..." is displayed last, and is a link to the search page for the typed terms.
+        String searchPageURLPattern = ".*/Main/Search\\?text=" + Pattern.quote(testDocumentTitle);
         assertTrue(quickSearchElement.isShowAllResultsLast());
+        assertThat(quickSearchElement.getShowAllResultsURL(), matchesPattern(searchPageURLPattern));
 
         // Verify that closing and reopening the suggestions panel doesn't leave "Go to search page..." behind.
         quickSearchElement.closeSuggestions();
         quickSearchElement.reopenSuggestions(testDocumentTitle);
         assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
         assertTrue(quickSearchElement.isShowAllResultsLast());
+        assertThat(quickSearchElement.getShowAllResultsURL(), matchesPattern(searchPageURLPattern));
 
         // A page saved from a script, without setting its locale, is found too.
         DocumentReference scriptPageReference =

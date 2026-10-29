@@ -298,6 +298,81 @@ test("The upload button of the opened image selector opens a file picker offerin
   expect(await fileChooser.element().getAttribute("accept")).toBe("image/*");
 });
 
+test("Uploading an image from the opened image selector inserts it and closes the selector", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest uploadedImageUrl="https://picsum.photos/600" />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.click();
+  await page.keyboard.type("img::");
+
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
+  await menuEl.locator(".bn-suggestion-menu-item").nth(0).click();
+
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await page.getByText("blocknote.imageSelector.uploadButton").click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
+    name: "picture.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("some content"),
+  });
+
+  await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
+    "src",
+    "https://picsum.photos/600",
+  );
+  await expect(page.locator('[data-test="searchBoxInput"]')).not.toBeAttached();
+});
+
+test("Uploading an image from the edit panel of an image replaces that image", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      uploadedImageUrl="https://picsum.photos/600"
+      content={[
+        {
+          id: "some-image",
+          type: "image",
+          props: {
+            url: "https://picsum.photos/150",
+          },
+          content: undefined,
+          children: [],
+        },
+      ]}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.locator("img.bn-visual-media").click();
+  await page.getByLabel("blocknote.imageToolbar.buttons.edit").click();
+
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await page.getByText("blocknote.imageSelector.uploadButton").click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
+    name: "picture.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("some content"),
+  });
+
+  // The image is replaced, rather than a new one being inserted.
+  await expect(editorEl.locator("img.bn-visual-media")).toHaveCount(1);
+  await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
+    "src",
+    "https://picsum.photos/600",
+  );
+});
+
 test("Selecting the browse action with the keyboard also opens the full image selector", async ({
   mount,
   page,

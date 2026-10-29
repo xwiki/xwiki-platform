@@ -18,10 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DepsContainerContext } from "../../contexts";
-import { useEditor } from "../../hooks";
 import { triggerUserFileUpload } from "../../misc/fileUpload";
 import { SearchBox } from "../SearchBox";
-import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import {
   Box,
   Breadcrumbs,
@@ -54,7 +52,6 @@ export type ImageSelectorProps = {
   onSelected: (url: string) => void;
 };
 
-// eslint-disable-next-line max-statements
 export function ImageSelector({
   currentSelection,
   onSelected,
@@ -139,15 +136,10 @@ export function ImageSelector({
     [modelReferenceParser, linkSuggestService],
   );
 
-  const editor = useEditor();
-
   const uploadImage = useCallback(async () => {
     const { url } = await triggerUserFileUpload(depsContainer, "image/*");
-    insertOrUpdateBlockForSlashMenu(editor, {
-      type: "image",
-      props: { url },
-    });
-  }, [depsContainer, editor]);
+    onSelected(url);
+  }, [depsContainer, onSelected]);
 
   return (
     <Box>

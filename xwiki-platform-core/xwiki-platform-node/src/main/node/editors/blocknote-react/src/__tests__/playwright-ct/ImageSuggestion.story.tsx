@@ -24,6 +24,7 @@ import { useMemo } from "react";
 // NOTE: `LinkType` is intentionally not imported here (not even type-only): the module also
 // transitively exports classes using decorators, which the Playwright Node-side transform (unlike
 // the Vite pipeline used to bundle this story) can't parse.
+import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
@@ -35,6 +36,10 @@ export type ImageSuggestionForTestProps = {
   linkSuggestServiceUnavailable?: boolean;
   // When set, searching for images fails, as when the backend can't be reached.
   linkSuggestServiceFailing?: boolean;
+  // The URL of the uploaded image, whatever the file the user picks (uploading fails when not set).
+  uploadedImageUrl?: string;
+  // The editor's initial content (an empty paragraph when not set).
+  content?: BlockNoteViewWrapperProps["content"];
 };
 
 /**
@@ -50,6 +55,8 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   images,
   linkSuggestServiceUnavailable,
   linkSuggestServiceFailing,
+  uploadedImageUrl,
+  content,
 }) => {
   const depsContainer = useMemo(() => {
     const container = depsContainerMock();
@@ -77,6 +84,15 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
           } satisfies LinkSuggestServiceProvider),
     );
 
+    container.get.calledWith("DocumentService").mockReturnValue({
+      getCurrentDocumentReferenceString: () => ({ value: "Some.Page" }),
+    });
+    container.get.calledWith("AttachmentsService").mockReturnValue({
+      async upload() {
+        return [uploadedImageUrl];
+      },
+    });
+
     return container;
   }, []);
 
@@ -86,7 +102,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
       label="Some Label"
       depsContainer={depsContainer}
       macros={false}
-      content={[]}
+      content={content ?? []}
       syntax={FULL_SYNTAX}
       linkEditionHandler={() => {
         throw new Error("Link editor should not open for this test");

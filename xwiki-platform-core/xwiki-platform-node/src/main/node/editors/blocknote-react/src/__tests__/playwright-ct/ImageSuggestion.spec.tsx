@@ -187,7 +187,7 @@ test("Keyboard navigation can select an image suggestion", async ({
   );
 });
 
-test("Falls back to an explanatory message when the backend doesn't support search", async ({
+test("Only shows the browse and upload actions when the backend doesn't support search", async ({
   mount,
   page,
 }) => {
@@ -202,17 +202,11 @@ test("Falls back to an explanatory message when the backend doesn't support sear
   const menuEl = page.locator(".bn-suggestion-menu");
   await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
 
-  // i18next isn't initialized in this component test harness (as with the rest of this suite), so
-  // the untranslated key is rendered as-is instead of its "Search is not supported for the current
-  // backend" translation.
-  await expect(menuEl).toContainText(
-    "blocknote.combobox.backendSearchUnsupported",
-  );
-
-  // It shouldn't be rendered as an image suggestion (no preview, not clickable to insert a block).
-  await expect(
-    menuEl.locator(".bn-suggestion-menu-item").nth(2).locator("img"),
-  ).toHaveCount(0);
+  // No message pretending to be a menu item (it would be selectable and clickable): the image
+  // selector opened by the browse action is the one telling that search isn't supported.
+  await expect(menuEl.locator(".bn-suggestion-menu-loader")).not.toBeAttached();
+  await expect(menuEl.locator(".bn-suggestion-menu-item")).toHaveCount(2);
+  await expect(menuEl.locator(".bn-suggestion-menu-label")).toHaveCount(0);
 });
 
 test("Still shows the browse and upload actions when searching for images fails", async ({

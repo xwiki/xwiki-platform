@@ -165,17 +165,10 @@ async function fetchImageSuggestions(
   editor: EditorType,
   t: ReturnType<typeof useTranslation>["t"],
 ): Promise<DefaultReactSuggestionItem[]> {
-  // The group's label separates the image suggestions from the browse and upload actions above.
-  const group = t("blocknote.imageSuggestion.imagesGroup");
-
   if (!linkSuggestService) {
-    return [
-      {
-        title: t("blocknote.combobox.backendSearchUnsupported"),
-        group,
-        onItemClick() {},
-      },
-    ];
+    // Only the browse and upload actions are offered: the image selector opened by the browse action
+    // tells that search isn't supported, without the message being mistaken for a menu item.
+    return [];
   }
 
   const results = await tryFalliblePromiseOrError(() =>
@@ -190,6 +183,9 @@ async function fetchImageSuggestions(
     );
     return [];
   }
+
+  // The group's label separates the image suggestions from the browse and upload actions above.
+  const group = t("blocknote.imageSuggestion.imagesGroup");
 
   return results.map(
     (link): DefaultReactSuggestionItem => ({

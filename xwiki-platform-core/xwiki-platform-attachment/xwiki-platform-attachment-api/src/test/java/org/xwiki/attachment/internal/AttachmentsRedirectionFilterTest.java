@@ -41,6 +41,7 @@ import static com.xpn.xwiki.web.DownloadAction.ACTION_NAME;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -106,6 +107,16 @@ class AttachmentsRedirectionFilterTest
             .thenReturn(new EntityResourceReference(SOURCE_ATTACHMENT_REFERENCE, null));
         when(this.attachmentsManager.getRedirection(SOURCE_ATTACHMENT_REFERENCE)).thenReturn(Optional.empty());
         assertFalse(this.redirectionFilter.redirect(this.xWikiContext));
+    }
+
+    @Test
+    void redirectNoAttachmentInURL() throws Exception
+    {
+        when(this.xWikiContext.getAction()).thenReturn(ACTION_NAME);
+        when(this.resourceReferenceManager.getResourceReference())
+            .thenReturn(new EntityResourceReference(SOURCE_DOCUMENT_REFERENCE, null));
+        assertFalse(this.redirectionFilter.redirect(this.xWikiContext));
+        verifyNoInteractions(this.attachmentsManager);
     }
 
     @Test

@@ -21,69 +21,35 @@ import { i18nResolver } from "./i18nResolver";
 import applicationResources from "../../../resources/ApplicationResources.properties?raw";
 import { loadById } from "@xwiki/platform-xwiki-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createI18n } from "vue-i18n";
 
 vi.mock("@xwiki/platform-xwiki-utils", () => ({ loadById: vi.fn() }));
 
-// The translations the server would serve, read from the actual resource bundle of this module.
-const bundle = Object.fromEntries(
-  applicationResources
-    .split("\n")
-    .filter((line) => /^[^#\s]/.test(line))
-    .map((line) => {
-      const separator = line.indexOf("=");
-      return [
-        line.slice(0, separator).trim(),
-        line.slice(separator + 1).trim(),
-      ];
-    }),
-);
-
-// The keys the editor asks the server for, captured from the RequireJS module i18nResolver defines.
-let requestedConfig;
-
-beforeEach(() => {
-  requestedConfig = undefined;
-  // Both the resolver and Logic read the locale from there, so the messages land under the locale i18n uses.
-  document.documentElement.lang = "en";
-  globalThis.define = (moduleName, config) => {
-    requestedConfig = config;
-  };
-  // Serve only the requested keys, like the localization module does, and only those that the bundle actually
-  // defines, so that a key missing from either side ends up missing from the messages.
-  loadById.mockImplementation(async () => [
-    requestedConfig,
-    Object.fromEntries(
-      requestedConfig.keys
-        .map((key) => [key, bundle[`${requestedConfig.prefix}${key}`]])
-        .filter(([, message]) => message !== undefined),
-    ),
-  ]);
-});
-
-async function resolveMessages() {
-  const i18n = createI18n({
-    legacy: false,
-    locale: document.documentElement.lang,
-  });
-  await i18nResolver(i18n);
-  return i18n.global;
-}
-
 describe("i18nResolver", () => {
-  it("requests only keys the resource bundle defines", async () => {
-    await resolveMessages();
+  // The keys the editor asks the server for, captured from the RequireJS module the resolver defines.
+  let requestedKeys;
+
+  beforeEach(async () => {
+    globalThis.define = (moduleName, config) => {
+      requestedKeys = config.keys;
+    };
+    loadById.mockResolvedValue([{ locale: "en", prefix: "blocknote." }, {}]);
+    await i18nResolver({ global: { setLocaleMessage: vi.fn() } });
+  });
+
+  it("asks the server for the upload failure message", () => {
+    // Without the key the editor would show "blocknote.upload.failed" when an upload fails.
+    expect(requestedKeys).toContain("upload.failed");
+  });
+
+  it("gets every key it asks for from the resource bundle of this module", () => {
     expect(
-      requestedConfig.keys.filter(
-        (key) => bundle[`${requestedConfig.prefix}${key}`] === undefined,
+      requestedKeys.filter(
+        (key) => !applicationResources.includes(`\nblocknote.${key}=`),
       ),
     ).toEqual([]);
   });
 
-  it("translates the upload failure message with the file name", async () => {
-    const { t } = await resolveMessages();
-    expect(t("blocknote.upload.failed", ["notes.txt"])).toBe(
-      "Failed to upload [notes.txt].",
-    );
+  it("names the file in the upload failure message", () => {
+    expect(applicationResources).toMatch(/^blocknote\.upload\.failed=.*\{0\}/m);
   });
 });

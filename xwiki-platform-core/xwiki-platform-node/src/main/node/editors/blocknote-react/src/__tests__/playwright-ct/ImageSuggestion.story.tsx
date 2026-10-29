@@ -20,24 +20,33 @@
 import { depsContainerMock } from "./depsContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 // NOTE: `LinkType` is intentionally not imported here (not even type-only): the module also
 // transitively exports classes using decorators, which the Playwright Node-side transform (unlike
 // the Vite pipeline used to bundle this story) can't parse.
 import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
+import type { ImageEditionHooks } from "../../components/images/imageEditionHooks";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
 
 export type ImageSuggestionForTestProps = {
-  // The hint (i.e. the location of the image) defaults to an empty string.
-  images?: Array<{ label: string; url: string; hint?: string }>;
+  // The hint (i.e. the location of the image) defaults to an empty string, and the reference to an attachment of
+  // "Some.Page" named after the position of the image.
+  images?: Array<{
+    label: string;
+    url: string;
+    hint?: string;
+    reference?: string;
+  }>;
   // When set, the LinkSuggestService is unavailable, as with a backend that doesn't support search.
   linkSuggestServiceUnavailable?: boolean;
   // When set, searching for images fails, as when the backend can't be reached.
   linkSuggestServiceFailing?: boolean;
   // The URL of the uploaded image, whatever the file the user picks (uploading fails when not set).
   uploadedImageURL?: string;
+  // The reference of the uploaded image, as reported by the storage (none when not set).
+  uploadedImageReference?: string;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
@@ -58,9 +67,24 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   linkSuggestServiceUnavailable,
   linkSuggestServiceFailing,
   uploadedImageURL,
+  uploadedImageReference,
   content,
   syntax,
 }) => {
+  // The images selected by the user, as reported by the image edition hooks.
+  const [selectedImages, setSelectedImages] = useState<unknown[]>([]);
+  // Stable, like the hooks of a real integration, so that the editor doesn't rebuild its menus on each selection.
+  const imageEditionHooks = useMemo<ImageEditionHooks>(
+    () => ({
+      afterSelect: (block, reference) =>
+        setSelectedImages((images) => [
+          ...images,
+          { blockId: block.id, url: block.props.url, reference },
+        ]),
+    }),
+    [],
+  );
+
   const depsContainer = useMemo(() => {
     const container = depsContainerMock();
 
@@ -78,7 +102,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
                   id: `image-${index}`,
                   hint: image.hint ?? "",
                   label: image.label,
-                  reference: "some attachment reference",
+                  reference: image.reference ?? `Some.Page@image-${index}.png`,
                   type: LINK_TYPE_ATTACHMENT,
                   url: image.url,
                 }));
@@ -92,7 +116,12 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
     });
     container.get.calledWith("AttachmentsService").mockReturnValue({
       async upload() {
-        return [uploadedImageURL];
+        return [
+          uploadedImageURL && {
+            url: uploadedImageURL,
+            reference: uploadedImageReference,
+          },
+        ];
       },
     });
 
@@ -100,16 +129,22 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   }, []);
 
   return (
-    <BlockNoteViewWrapper
-      lang="en"
-      label="Some Label"
-      depsContainer={depsContainer}
-      macros={false}
-      content={content ?? []}
-      syntax={syntax ?? FULL_SYNTAX}
-      linkEditionHandler={() => {
-        throw new Error("Link editor should not open for this test");
-      }}
-    />
+    <>
+      <BlockNoteViewWrapper
+        lang="en"
+        label="Some Label"
+        depsContainer={depsContainer}
+        macros={false}
+        content={content ?? []}
+        syntax={syntax ?? FULL_SYNTAX}
+        linkEditionHandler={() => {
+          throw new Error("Link editor should not open for this test");
+        }}
+        overrides={{ imageEditionHooks }}
+      />
+      <output data-testid="selectedImages">
+        {JSON.stringify(selectedImages)}
+      </output>
+    </>
   );
 };

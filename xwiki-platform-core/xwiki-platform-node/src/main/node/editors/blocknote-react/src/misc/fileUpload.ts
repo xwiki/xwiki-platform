@@ -17,24 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
+import { toResourceReference } from "./resourceReference";
+import { LinkType } from "@xwiki/platform-link-suggest-api";
 import {
   AttachmentReference,
   DocumentReference,
 } from "@xwiki/platform-model-api";
-import { useCallback } from "react";
-import type { EditorType } from "../blocknote";
-import type { AttachmentsService } from "@xwiki/platform-attachments-api";
+import type {
+  AttachmentsService,
+  UploadedAttachment,
+} from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "@xwiki/platform-rendering-api";
 import type { Container } from "inversify";
+
+/**
+ * An image uploaded by the user, ready to be inserted into the content.
+ */
+type UploadedImage = {
+  url: string;
+  /**
+   * The resource reference of the uploaded image, when the storage provides the reference of the uploaded attachment.
+   */
+  reference?: ResourceReference;
+};
 
 // eslint-disable-next-line max-statements
 async function uploadSelectedFile(
   file: File,
   depsContainer: Container,
-): Promise<{ url: string }> {
+): Promise<UploadedAttachment> {
   const remoteURLSerializer = depsContainer
     .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
     .get()!;
@@ -51,12 +68,12 @@ async function uploadSelectedFile(
   const currentPageName =
     documentService.getCurrentDocumentReferenceString().value ?? "";
 
-  const uploadedFilesUrls = await attachmentsService.upload(currentPageName, [
+  const uploadedAttachments = await attachmentsService.upload(currentPageName, [
     file,
   ]);
 
-  if (uploadedFilesUrls && uploadedFilesUrls[0]) {
-    return { url: uploadedFilesUrls[0] };
+  if (uploadedAttachments && uploadedAttachments[0]) {
+    return uploadedAttachments[0];
   }
 
   const parser = modelReferenceParser?.parse(currentPageName, {
@@ -79,13 +96,13 @@ async function uploadSelectedFile(
  *
  * @param depsContainer - the container providing the upload services
  * @param accept - the file types the file picker offers, e.g. "image/*" (all types when not specified)
- * @returns the URL of the uploaded file, or `undefined` when the user closes the file picker without
- *   selecting a file (rejected when the upload fails)
+ * @returns the uploaded attachment, or `undefined` when the user closes the file picker without selecting a
+ *   file (rejected when the upload fails)
  */
 function triggerUserFileUpload(
   depsContainer: Container,
   accept?: string,
-): Promise<{ url: string } | undefined> {
+): Promise<UploadedAttachment | undefined> {
   return new Promise((resolve, reject) => {
     // Creates a hidden file input element and temporarily adds it to the DOM,
     // so we can open the system file picker by clicking it. See
@@ -133,38 +150,33 @@ function triggerUserFileUpload(
  * rather than rejected.
  *
  * @param depsContainer - the container providing the upload services
- * @returns the URL of the uploaded image, or `undefined` when the user closes the file picker without
- *   selecting an image or when the upload fails
+ * @returns the uploaded image, or `undefined` when the user closes the file picker without selecting an
+ *   image or when the upload fails
  */
 async function triggerUserImageUpload(
   depsContainer: Container,
-): Promise<string | undefined> {
+): Promise<UploadedImage | undefined> {
+  let uploadedAttachment;
   try {
-    return (await triggerUserFileUpload(depsContainer, "image/*"))?.url;
+    uploadedAttachment = await triggerUserFileUpload(depsContainer, "image/*");
   } catch (error) {
     console.error("Failed to upload the selected image.", error);
     return undefined;
   }
+
+  if (!uploadedAttachment?.reference) {
+    return uploadedAttachment && { url: uploadedAttachment.url };
+  }
+
+  return {
+    url: uploadedAttachment.url,
+    reference: toResourceReference(
+      depsContainer.get<ResourceReferenceParser>("ResourceReferenceParser"),
+      uploadedAttachment.reference,
+      LinkType.ATTACHMENT,
+    ),
+  };
 }
 
-function useImageUploader(editor: EditorType, depsContainer: Container) {
-  const uploadImage = useCallback(async () => {
-    const url = await triggerUserImageUpload(depsContainer);
-
-    if (url) {
-      insertOrUpdateBlockForSlashMenu(editor, {
-        type: "image",
-        props: { url },
-      });
-    }
-  }, [depsContainer, editor]);
-
-  return uploadImage;
-}
-
-export {
-  triggerUserFileUpload,
-  triggerUserImageUpload,
-  uploadSelectedFile,
-  useImageUploader,
-};
+export { triggerUserFileUpload, triggerUserImageUpload, uploadSelectedFile };
+export type { UploadedImage };

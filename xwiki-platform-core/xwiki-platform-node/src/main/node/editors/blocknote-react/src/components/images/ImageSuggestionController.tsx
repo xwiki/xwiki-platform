@@ -21,7 +21,8 @@ import { ImageSelector } from "./ImageSelector";
 import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
 import { DepsContainerContext } from "../../contexts";
 import { useEditor } from "../../hooks";
-import { useImageUploader } from "../../misc/fileUpload";
+import { triggerUserImageUpload } from "../../misc/fileUpload";
+import { toResourceReference } from "../../misc/resourceReference";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
 import { Paper } from "@mantine/core";
@@ -33,21 +34,37 @@ import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiFolderImageLine, RiUpload2Line } from "react-icons/ri";
-import type { EditorType } from "../../blocknote";
+import type { ImageEditionHooks } from "./imageEditionHooks";
+import type { BlockOfType, EditorType } from "../../blocknote";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/platform-link-suggest-api";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "@xwiki/platform-rendering-api";
+import type { Container } from "inversify";
 
 import "./ImageSuggestionController.css";
 
+/**
+ * Inserts an image selected by the user.
+ *
+ * @param url - the URL of the selected image
+ * @param reference - the resource reference of the selected image, when known
+ */
+type InsertImage = (url: string, reference?: ResourceReference) => void;
+
 export type ImageSuggestionControllerProps = {
   maxSuggestions?: number;
+  imageEditionHooks?: ImageEditionHooks;
 };
 
 export function ImageSuggestionController({
   maxSuggestions,
+  imageEditionHooks,
 }: ImageSuggestionControllerProps) {
   const depsContainer = useContext(DepsContainerContext)!;
 
@@ -55,8 +72,16 @@ export function ImageSuggestionController({
     "LinkSuggestServiceProvider",
   ).get!();
 
+  const resourceReferenceParser = depsContainer.get<ResourceReferenceParser>(
+    "ResourceReferenceParser",
+  );
+
   const editor = useEditor();
-  const uploadImage = useImageUploader(editor, depsContainer);
+  const { insertImage, uploadImage } = useImageInsertion(
+    editor,
+    depsContainer,
+    imageEditionHooks,
+  );
 
   const { t } = useTranslation();
 
@@ -78,7 +103,8 @@ export function ImageSuggestionController({
         const suggestions = await fetchImageSuggestions(
           query,
           linkSuggestService,
-          editor,
+          resourceReferenceParser,
+          insertImage,
           t,
         );
 
@@ -105,7 +131,8 @@ export function ImageSuggestionController({
     [
       t,
       linkSuggestService,
-      editor,
+      resourceReferenceParser,
+      insertImage,
       maxSuggestions,
       openImageSelector,
       uploadImage,
@@ -136,11 +163,8 @@ export function ImageSuggestionController({
       >
         <Paper shadow="md" p="sm">
           <ImageSelector
-            onSelected={(url) => {
-              insertOrUpdateBlockForSlashMenu(editor, {
-                type: "image",
-                props: { url },
-              });
+            onSelected={(url, reference) => {
+              insertImage(url, reference);
               setSelectorPosition(undefined);
             }}
           />
@@ -150,10 +174,41 @@ export function ImageSuggestionController({
   );
 }
 
+/**
+ * @returns the functions inserting an image selected by the user, letting the given hooks know about it
+ */
+function useImageInsertion(
+  editor: EditorType,
+  depsContainer: Container,
+  imageEditionHooks?: ImageEditionHooks,
+) {
+  const insertImage: InsertImage = useCallback(
+    (url, reference) => {
+      const image = insertOrUpdateBlockForSlashMenu(editor, {
+        type: "image",
+        props: { url },
+      }) as BlockOfType<"image">;
+      imageEditionHooks?.afterSelect?.(image, reference);
+    },
+    [editor, imageEditionHooks],
+  );
+
+  const uploadImage = useCallback(async () => {
+    const image = await triggerUserImageUpload(depsContainer);
+
+    if (image) {
+      insertImage(image.url, image.reference);
+    }
+  }, [depsContainer, insertImage]);
+
+  return { insertImage, uploadImage };
+}
+
 async function fetchImageSuggestions(
   query: string,
   linkSuggestService: LinkSuggestService | undefined,
-  editor: EditorType,
+  resourceReferenceParser: ResourceReferenceParser,
+  insertImage: InsertImage,
   t: ReturnType<typeof useTranslation>["t"],
 ): Promise<DefaultReactSuggestionItem[]> {
   if (!linkSuggestService) {
@@ -194,10 +249,14 @@ async function fetchImageSuggestions(
         />
       ),
       onItemClick() {
-        insertOrUpdateBlockForSlashMenu(editor, {
-          type: "image",
-          props: { url: link.url },
-        });
+        insertImage(
+          link.url,
+          toResourceReference(
+            resourceReferenceParser,
+            link.reference,
+            link.type,
+          ),
+        );
       },
     }),
   );

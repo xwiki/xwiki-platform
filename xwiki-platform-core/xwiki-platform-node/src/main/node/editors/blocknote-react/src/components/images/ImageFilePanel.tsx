@@ -21,23 +21,31 @@ import { ImageSelector } from "./ImageSelector";
 import { useEditor } from "../../hooks";
 import { Paper } from "@mantine/core";
 import { useCallback } from "react";
+import type { ImageEditionHooks } from "./imageEditionHooks";
 import type { BlockOfType } from "../../blocknote";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 export type ImageFilePanelProps = {
   currentBlock: BlockOfType<"image">;
+  imageEditionHooks?: ImageEditionHooks;
 };
 
 export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
   currentBlock: image,
+  imageEditionHooks,
 }) => {
   const editor = useEditor();
 
   const updateImage = useCallback(
-    (url: string) => {
-      editor.updateBlock({ id: image.id }, { props: { url } });
+    (url: string, reference?: ResourceReference) => {
+      const updatedImage = editor.updateBlock(
+        { id: image.id },
+        { props: { url } },
+      ) as BlockOfType<"image">;
+      imageEditionHooks?.afterSelect?.(updatedImage, reference);
       editor.focus();
     },
-    [editor, image],
+    [editor, image, imageEditionHooks],
   );
 
   return (

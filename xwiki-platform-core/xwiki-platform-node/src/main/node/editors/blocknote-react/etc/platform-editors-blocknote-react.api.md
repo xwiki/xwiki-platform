@@ -59,6 +59,7 @@ export type BlockNoteViewWrapperProps = {
     linkEditionHandler: LinkEditionHandler;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
+        imageEditionHooks?: ImageEditionHooks;
         linkEdition?: LinkEditionHooks;
     };
     syntax: SyntaxConfig;
@@ -119,6 +120,11 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 
 // @beta
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
+
+// @beta
+export type ImageEditionHooks = {
+    afterSelect?: (block: BlockOfType<"image">, reference?: ResourceReference) => void;
+};
 
 // @beta
 export type ImageEditionOverrideFn = (block: BlockOfType<"image">, update: (updateResult: ImageUpdateResult) => void) => void;

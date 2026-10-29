@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DepsContainerContext } from "../contexts";
-import { LinkType } from "../misc/linkEditionCtx";
+import { toResourceReference } from "../misc/resourceReference";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
 import { debounceAsync } from "@xwiki/platform-fn-utils";
 import { ResourceType } from "@xwiki/platform-rendering-api";
@@ -32,6 +32,7 @@ import {
   useState,
 } from "react";
 import { RiLink } from "react-icons/ri";
+import type { LinkType } from "../misc/linkEditionCtx";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type {
@@ -39,15 +40,6 @@ import type {
   ResourceReferenceParser,
 } from "@xwiki/platform-rendering-api";
 import type { ReactElement } from "react";
-
-/**
- * Map a link suggestion type to the XWiki resource type used to build its resource reference.
- */
-function linkTypeToResourceType(type: LinkType): string {
-  return type === LinkType.ATTACHMENT
-    ? ResourceType.ATTACHMENT
-    : ResourceType.DOCUMENT;
-}
 
 type SearchBoxProps = {
   /**
@@ -268,13 +260,13 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
         combobox.closeDropdown();
         setQuery(result.title);
-        // Build the resource reference from the suggestion's entity reference (with the right default
-        // type), rather than parsing it back from the URL.
         onSelect(
           url,
-          resourceReferenceParser.parse(result.reference, {
-            type: linkTypeToResourceType(result.type),
-          }),
+          toResourceReference(
+            resourceReferenceParser,
+            result.reference,
+            result.type,
+          ),
         );
       }}
     >

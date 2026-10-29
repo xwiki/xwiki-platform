@@ -62,6 +62,7 @@ import type {
   ContextForMacros,
 } from "../blocknote/utils";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
+import type { ImageEditionHooks } from "./images/imageEditionHooks";
 import type { LinkEditionHandler } from "./links/linkEdition";
 import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
@@ -191,6 +192,13 @@ type BlockNoteViewWrapperProps = {
      * Intercept image edition mechanism (i.e. clicking on the edition icon in images' toolbar)
      */
     imageEdition?: ImageEditionOverrideFn;
+
+    /**
+     * Hooks to intercept the image insertion / edition flow.
+     *
+     * @since 18.10.0RC1
+     */
+    imageEditionHooks?: ImageEditionHooks;
 
     /**
      * Hooks to intercept the link creation / edition flow.
@@ -397,7 +405,10 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           />
 
           {syntax.features.blocks.images.basicImages && (
-            <ImageSuggestionController maxSuggestions={5} />
+            <ImageSuggestionController
+              maxSuggestions={5}
+              imageEditionHooks={overrides?.imageEditionHooks}
+            />
           )}
 
           {/* TODO: suggestions menu for inline macros */}
@@ -407,6 +418,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               <CustomFormattingToolbar
                 formattingToolbarProps={props}
                 imageEditionOverrideFn={overrides?.imageEdition}
+                imageEditionHooks={overrides?.imageEditionHooks}
                 linkEditionHandler={linkEditionHandler}
                 linkEditionHooks={overrides?.linkEdition}
                 additionalBlockTypes={filterMap(

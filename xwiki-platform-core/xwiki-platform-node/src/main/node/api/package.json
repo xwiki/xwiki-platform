@@ -38,6 +38,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "@xwiki/platform-attachments-api": "workspace:*",
     "@xwiki/platform-authentication-api": "workspace:*",
     "@xwiki/platform-configuration-api": "workspace:*"
   },

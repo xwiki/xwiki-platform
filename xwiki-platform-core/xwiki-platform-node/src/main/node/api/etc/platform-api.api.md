@@ -13,6 +13,7 @@ import { Configurations } from '@xwiki/platform-configuration-api';
 import { Container } from 'inversify';
 import { Ref } from 'vue';
 import { Router } from 'vue-router';
+import { UploadedAttachment } from '@xwiki/platform-attachments-api';
 import { UserDetails } from '@xwiki/platform-authentication-api';
 
 // @beta
@@ -430,7 +431,7 @@ interface Storage_2 {
     }>;
     save(page: string, title: string, content: string, syntax: string): Promise<unknown>;
     // (undocumented)
-    saveAttachments(page: string, files: File[]): Promise<undefined | (undefined | string)[]>;
+    saveAttachments(page: string, files: File[]): Promise<undefined | (undefined | UploadedAttachment)[]>;
     // (undocumented)
     setWikiConfig(config: WikiConfig): void;
 }

@@ -43,6 +43,35 @@ async function openImageQuickAction(page: Page, editorEl: Locator) {
   await expect(page.locator(".bn-suggestion-menu")).toHaveCount(1);
 }
 
+/**
+ * Expects the image edition hooks to have been told about the selection of the (single) image of the editor.
+ *
+ * @param reference - the expected resource reference of the selected image, undefined when it's known only by its URL
+ */
+async function expectSelectedImage(
+  page: Page,
+  editorEl: Locator,
+  reference?: Record<string, unknown>,
+) {
+  const imageBlock = editorEl.locator(
+    ".bn-block-outer:has(img.bn-visual-media)",
+  );
+  const blockId = await imageBlock.getAttribute("data-id");
+  const url = await imageBlock
+    .locator("img.bn-visual-media")
+    .getAttribute("src");
+  await expect(page.getByTestId("selectedImages")).toHaveText(
+    JSON.stringify([{ blockId, url, reference }]),
+  );
+}
+
+/**
+ * @returns the resource reference expected for the given serialized attachment reference
+ */
+function attachmentResourceReference(reference: string) {
+  return { type: "attach", typed: false, reference, parameters: {} };
+}
+
 test("The image quick action shows the browse and upload actions, then the matching images", async ({
   mount,
   page,
@@ -141,13 +170,19 @@ test("Only the first 5 image suggestions are shown, in addition to the browse an
   await expect(menuEl.locator(".bn-suggestion-menu-item")).toHaveCount(7);
 });
 
-test("Clicking an image suggestion inserts an image block with its URL", async ({
+test("Clicking an image suggestion inserts an image block with its URL and reference", async ({
   mount,
   page,
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      images={[
+        {
+          label: "Cat picture",
+          url: "https://picsum.photos/150",
+          reference: "wiki:Animals.Cats@cat.png",
+        },
+      ]}
     />,
   );
 
@@ -162,6 +197,13 @@ test("Clicking an image suggestion inserts an image block with its URL", async (
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
     "https://picsum.photos/150",
+  );
+  // The reference of the suggested image is passed on, so that the image can be saved with it rather
+  // than with its URL.
+  await expectSelectedImage(
+    page,
+    editorEl,
+    attachmentResourceReference("wiki:Animals.Cats@cat.png"),
   );
 
   // The menu is closed and no text is left behind (neither the slash menu's query nor the image
@@ -264,6 +306,45 @@ test("Clicking the upload action opens a file picker offering only images", asyn
   expect(await fileChooser.element().getAttribute("accept")).toBe("image/*");
 });
 
+test("Uploading an image from the upload action inserts it with its reference", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      uploadedImageURL="https://picsum.photos/600"
+      uploadedImageReference="picture.png"
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await openImageQuickAction(page, editorEl);
+
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
+
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await menuEl.locator(".bn-suggestion-menu-item").nth(1).click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
+    name: "picture.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("some content"),
+  });
+
+  await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
+    "src",
+    "https://picsum.photos/600",
+  );
+  // The reference reported by the storage is passed on.
+  await expectSelectedImage(
+    page,
+    editorEl,
+    attachmentResourceReference("picture.png"),
+  );
+});
+
 test("A failed upload from the upload action is logged and leaves the editor unchanged", async ({
   mount,
   page,
@@ -351,7 +432,10 @@ test("Uploading an image from the opened image selector inserts it and closes th
   // eslint-disable-next-line max-statements
 }) => {
   const component = await mount(
-    <ImageSuggestionForTest uploadedImageURL="https://picsum.photos/600" />,
+    <ImageSuggestionForTest
+      uploadedImageURL="https://picsum.photos/600"
+      uploadedImageReference="picture.png"
+    />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -374,12 +458,18 @@ test("Uploading an image from the opened image selector inserts it and closes th
     "src",
     "https://picsum.photos/600",
   );
+  await expectSelectedImage(
+    page,
+    editorEl,
+    attachmentResourceReference("picture.png"),
+  );
   await expect(page.locator('[data-test="searchBoxInput"]')).not.toBeAttached();
 });
 
 test("Uploading an image from the edit panel of an image replaces that image", async ({
   mount,
   page,
+  // eslint-disable-next-line max-statements
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
@@ -417,6 +507,9 @@ test("Uploading an image from the edit panel of an image replaces that image", a
     "src",
     "https://picsum.photos/600",
   );
+  // The storage doesn't report the reference of the uploaded image: it's known only by its URL, which
+  // lets the integration drop the reference of the replaced image.
+  await expectSelectedImage(page, editorEl);
 });
 
 test("Selecting the browse action with the keyboard also opens the full image selector", async ({
@@ -470,6 +563,11 @@ test("Selecting a search result in the opened image selector inserts the image b
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
     "https://picsum.photos/150",
+  );
+  await expectSelectedImage(
+    page,
+    editorEl,
+    attachmentResourceReference("Some.Page@image-0.png"),
   );
 });
 

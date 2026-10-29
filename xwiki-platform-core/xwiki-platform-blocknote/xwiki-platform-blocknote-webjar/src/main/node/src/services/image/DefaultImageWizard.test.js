@@ -18,18 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DefaultImageWizard } from "./DefaultImageWizard";
-import { beforeEach, describe, expect, it } from "vitest";
+import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 // Import for the side effect of registering the global define / requirejs used to load the legacy image wizard.
 import "../../testUtils";
 
 describe("DefaultImageWizard", () => {
   let capturedOptions;
   let resolvedImageData;
+  let uploadedAttachments;
   let wizard;
 
   beforeEach(() => {
     capturedOptions = undefined;
     resolvedImageData = undefined;
+    uploadedAttachments = [];
 
     // Register a fake legacy image wizard that captures its options and resolves with a chosen image data.
     global.define("xwiki-wysiwyg-image-wizard", () => (options) => {
@@ -39,7 +42,10 @@ describe("DefaultImageWizard", () => {
 
     global.XWiki = {
       currentDocument: {
-        documentReference: { type: "DOCUMENT" },
+        documentReference: Model.resolve(
+          "wiki:Space.Page",
+          EntityType.DOCUMENT,
+        ),
         getURL: (action, parameters) =>
           `/xwiki/bin/${action}/Space/Page?${parameters.toString()}`,
       },
@@ -49,7 +55,7 @@ describe("DefaultImageWizard", () => {
       parse: () => ({ type: "attach", typed: true, reference: "" }),
     };
     const storageProvider = {
-      get: () => ({ saveAttachments: async () => [] }),
+      get: () => ({ saveAttachments: async () => uploadedAttachments }),
     };
     wizard = new DefaultImageWizard(resourceReferenceParser, storageProvider);
   });
@@ -119,5 +125,43 @@ describe("DefaultImageWizard", () => {
     });
 
     expect(result.reference).toBe(newReference);
+  });
+
+  describe("upload", () => {
+    async function upload() {
+      await edit({});
+      const callback = {
+        onSuccess: vi.fn(),
+        onError: vi.fn(),
+        onAbort: vi.fn(),
+      };
+      await capturedOptions.upload(new File([""], "cat.png"), callback);
+      return callback;
+    }
+
+    it("reports the reference of the uploaded attachment, relative to the edited document", async () => {
+      uploadedAttachments = [
+        {
+          url: "/xwiki/bin/download/Space/Page/cat.png",
+          reference: "cat.png",
+        },
+      ];
+
+      const callback = await upload();
+
+      expect(callback.onSuccess).toHaveBeenCalledOnce();
+      expect(Model.serialize(callback.onSuccess.mock.calls[0][0])).toBe(
+        "wiki:Space.Page@cat.png",
+      );
+    });
+
+    it("aborts when the storage doesn't report the reference of the uploaded attachment", async () => {
+      uploadedAttachments = [{ url: "/xwiki/bin/download/Space/Page/cat.png" }];
+
+      const callback = await upload();
+
+      expect(callback.onSuccess).not.toHaveBeenCalled();
+      expect(callback.onAbort).toHaveBeenCalledOnce();
+    });
   });
 });

@@ -78,6 +78,8 @@ export type {
   ImageUpdateResult,
 } from "./components/images/CustomImageToolbar";
 
+export type { ImageEditionHooks } from "./components/images/imageEditionHooks";
+
 export {
   MACRO_NAME_PREFIX,
   buildMacroRawContent,

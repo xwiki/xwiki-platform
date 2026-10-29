@@ -233,17 +233,21 @@ export class DefaultImageWizard implements ImageWizard {
    */
   private async upload(file: File, callback: UploadCallback): Promise<void> {
     // For now, we assume the current document is being edited.
-    const currentDocumentReference = Model.serialize(
-      XWiki.currentDocument.documentReference,
-    );
+    const currentDocumentReference = XWiki.currentDocument.documentReference;
     try {
       const result = await this.storageProvider
         .get()
-        .saveAttachments(currentDocumentReference, [file]);
-      if (result?.[0]) {
+        .saveAttachments(Model.serialize(currentDocumentReference), [file]);
+      const attachmentReference = result?.[0]?.reference;
+      if (attachmentReference) {
         callback.onSuccess(
-          // The upload result is a non empty attachment reference string, so it always resolves.
-          Model.resolve(result[0], XWikiEntityType.ATTACHMENT)!,
+          // The reference of the uploaded attachment is a non empty string, relative to the document it was uploaded
+          // to, so it always resolves.
+          Model.resolve(
+            attachmentReference,
+            XWikiEntityType.ATTACHMENT,
+            currentDocumentReference,
+          )!,
         );
       } else {
         callback.onAbort();

@@ -26,6 +26,7 @@ import type {
   PageAttachment,
   PageData,
 } from "@xwiki/platform-api";
+import type { UploadedAttachment } from "@xwiki/platform-attachments-api";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 
 @injectable()
@@ -95,14 +96,14 @@ class XWikiStorage extends AbstractStorage {
   public saveAttachments(
     page: string,
     files: File[],
-  ): Promise<undefined | (undefined | string)[]> {
+  ): Promise<undefined | (undefined | UploadedAttachment)[]> {
     return Promise.all(files.map((file) => this.saveAttachment(page, file)));
   }
 
   public async saveAttachment(
     page: string,
     file: File,
-  ): Promise<undefined | (undefined | string)> {
+  ): Promise<undefined | UploadedAttachment> {
     const uploadURL = this.getUploadURL(page, "filebrowser");
     const response = await fetch(uploadURL, {
       method: "POST",
@@ -113,7 +114,12 @@ class XWikiStorage extends AbstractStorage {
     }
     const result = await response.json();
     if (result.uploaded) {
-      return result.message.resourceReference.reference;
+      // The upload response provides both the URL of the uploaded attachment and its reference, serialized relative to
+      // the page it was uploaded to.
+      return {
+        url: result.url,
+        reference: result.message.resourceReference.reference,
+      };
     } else {
       throw new Error(`Upload failed: ${result.error}`);
     }

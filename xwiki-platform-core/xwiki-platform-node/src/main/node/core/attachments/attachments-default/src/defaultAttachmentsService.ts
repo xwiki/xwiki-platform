@@ -23,6 +23,7 @@ import { defineStore, storeToRefs } from "pinia";
 import type {
   Attachment,
   AttachmentsService,
+  UploadedAttachment,
 } from "@xwiki/platform-attachments-api";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type { Store, StoreDefinition } from "pinia";
@@ -189,7 +190,7 @@ export class DefaultAttachmentsService implements AttachmentsService {
   async upload(
     page: string,
     files: File[],
-  ): Promise<(string | undefined)[] | undefined> {
+  ): Promise<(UploadedAttachment | undefined)[] | undefined> {
     this.store.startUploading();
     let resolvedAttachments;
     try {

@@ -116,6 +116,7 @@ import type {
   BlockNoteViewWrapperProps,
   BlockType,
   EditorLanguage,
+  ImageEditionHooks,
   ImageEditionOverrideFn,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
@@ -222,6 +223,21 @@ const imageEdition: ImageEditionOverrideFn = (block, update) => {
   );
 };
 
+const imageEditionHooks: ImageEditionHooks = {
+  // Runs right after the user selects an image (e.g. from the image suggestions or by uploading it). The XWiki resource
+  // reference is kept as block metadata (outside the BlockNote schema), so that the image is saved with the reference
+  // provided by the server rather than with its URL. An image known only by its URL is saved with that URL, so we drop
+  // the reference of the previously selected image.
+  afterSelect: (block, reference) => {
+    const metadata = blockNoteDocument?.getMetadata(block.id, !!reference);
+    if (reference) {
+      metadata!.xwikiReference = reference;
+    } else if (metadata) {
+      delete metadata.xwikiReference;
+    }
+  },
+};
+
 const linkEdition: LinkEditionHooks = {
   // Runs before the link editor is opened on an existing link. The reference of the linked resource is kept as link
   // metadata (outside the BlockNote schema), mapped to a synthetic id stored in the link url, so we resolve it here
@@ -318,6 +334,7 @@ const editorProps = shallowRef<
   label: defaultLabel,
   overrides: {
     imageEdition,
+    imageEditionHooks,
     linkEdition,
   },
   syntax,

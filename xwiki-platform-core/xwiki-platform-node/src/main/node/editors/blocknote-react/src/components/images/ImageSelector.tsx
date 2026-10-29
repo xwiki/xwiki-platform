@@ -43,10 +43,18 @@ import type { LinkSuggestion } from "../SearchBox";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type { ModelReferenceHandlerProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLParserProvider } from "@xwiki/platform-model-remote-url-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 export type ImageSelectorProps = {
   currentSelection?: string;
-  onSelected: (url: string) => void;
+  /**
+   * Called when the user selects an image.
+   *
+   * @param url - the URL of the selected image
+   * @param reference - the resource reference of the selected image, when known (e.g. for a suggested or an uploaded
+   *   image)
+   */
+  onSelected: (url: string, reference?: ResourceReference) => void;
 };
 
 export function ImageSelector({
@@ -118,10 +126,10 @@ export function ImageSelector({
   );
 
   const uploadImage = useCallback(async () => {
-    const url = await triggerUserImageUpload(depsContainer);
+    const image = await triggerUserImageUpload(depsContainer);
 
-    if (url) {
-      onSelected(url);
+    if (image) {
+      onSelected(image.url, image.reference);
     }
   }, [depsContainer, onSelected]);
 
@@ -156,7 +164,9 @@ export function ImageSelector({
           </Flex>
         )}
         onSelect={onSelected}
-        onSubmit={onSelected}
+        // The search box builds a page reference from an entered entity reference, so only keep the URL of an entered
+        // value.
+        onSubmit={(url) => onSelected(url)}
       />
 
       {selectedEntityPath && (

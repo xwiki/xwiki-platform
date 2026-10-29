@@ -88,7 +88,9 @@
     restoreSelection: async function(editor, options) {
       const editable = editor.editable();
       let textSelection = editor._.textSelection;
-      let {ranges, beforeApply, async = true} = options || {};
+      // Set preventScroll to true in order to keep the scroll position even if the content was overwritten since the
+      // selection was saved, e.g. when the content is overwritten as a result of a change made by someone else.
+      let {ranges, beforeApply, async = true, preventScroll = false} = options || {};
       if (!editable || !textSelection) {
         beforeApply?.();
         return;
@@ -110,7 +112,7 @@
         beforeApply = () => {};
 
         // Apply the transformed text selection or the provided selection ranges.
-        this._applySelection({editor, editable, textSelection, ranges});
+        this._applySelection({editor, editable, textSelection, ranges, preventScroll});
       } catch (e) {
         console.error("Failed to restore selection: ", e);
         beforeApply?.();
@@ -119,8 +121,9 @@
       }
     },
 
-    _applySelection: function({editor, editable, textSelection, ranges}) {
-      const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
+    _applySelection: function({editor, editable, textSelection, ranges, preventScroll}) {
+      const focus = textSelection.restoreFocus ?
+        {preventScroll: preventScroll || !textSelection.contentOverwritten} : false;
       if (focus) {
         // The editor saves (locks) the selection when the editing area loses the focus, in order to restore it when
         // the editing area is focused again. That saved selection can become stale while the editing area doesn't

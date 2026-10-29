@@ -331,6 +331,8 @@ function newFileUploader(eventTarget: EventTarget): FileUploader {
     eventTarget,
     getDocumentReference: () => documentReference,
     getBlockNoteDocument: () => blockNoteDocument,
+    insertInlineContent: (content, coordinates) =>
+      editorInstance.value?.insertInlineContent(content, coordinates),
     // A file in the temporary store is visible only to the session that uploaded it, and only a save made from that
     // session attaches it to the document. In a realtime session any of the collaborators can be the one that saves,
     // so we attach the file right away instead, like the CKEditor integration does. The same goes when the editor

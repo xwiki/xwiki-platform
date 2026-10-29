@@ -309,6 +309,9 @@ public class XWikiRepositoryModel
 
     public static final String SOLR_BOOLEAN = "boolean";
 
+    public static final String SOLRPROP_LASTVERSION =
+        toExtensionClassSolrPropertyName(PROP_EXTENSION_LASTVERSION, SOLR_STRING);
+
     public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
 
     public static class ExtensionSolrField extends SolrField

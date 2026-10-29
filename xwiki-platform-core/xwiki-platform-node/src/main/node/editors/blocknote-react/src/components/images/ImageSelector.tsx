@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DepsContainerContext } from "../../contexts";
-import { triggerUserFileUpload } from "../../misc/fileUpload";
+import { triggerUserImageUpload } from "../../misc/fileUpload";
 import { SearchBox } from "../SearchBox";
 import {
   Box,
@@ -137,8 +137,11 @@ export function ImageSelector({
   );
 
   const uploadImage = useCallback(async () => {
-    const { url } = await triggerUserFileUpload(depsContainer, "image/*");
-    onSelected(url);
+    const url = await triggerUserImageUpload(depsContainer);
+
+    if (url) {
+      onSelected(url);
+    }
   }, [depsContainer, onSelected]);
 
   return (

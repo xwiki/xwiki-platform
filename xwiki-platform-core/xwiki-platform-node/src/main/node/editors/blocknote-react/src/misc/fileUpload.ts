@@ -79,12 +79,13 @@ async function uploadSelectedFile(
  *
  * @param depsContainer - the container providing the upload services
  * @param accept - the file types the file picker offers, e.g. "image/*" (all types when not specified)
- * @returns the URL of the uploaded file
+ * @returns the URL of the uploaded file, or `undefined` when the user closes the file picker without
+ *   selecting a file (rejected when the upload fails)
  */
 function triggerUserFileUpload(
   depsContainer: Container,
   accept?: string,
-): Promise<{ url: string }> {
+): Promise<{ url: string } | undefined> {
   return new Promise((resolve, reject) => {
     // Creates a hidden file input element and temporarily adds it to the DOM,
     // so we can open the system file picker by clicking it. See
@@ -101,6 +102,7 @@ function triggerUserFileUpload(
       input.remove();
 
       if (!file) {
+        resolve(undefined);
         return;
       }
 
@@ -113,24 +115,56 @@ function triggerUserFileUpload(
 
     // Removes the input from the DOM again if the user closes the file
     // picker without selecting a file.
-    input.addEventListener("cancel", () => input.remove());
+    input.addEventListener("cancel", () => {
+      input.remove();
+      resolve(undefined);
+    });
 
     document.body.appendChild(input);
     input.click();
   });
 }
 
+/**
+ * Opens the system file picker for images and uploads the selected image as an attachment of the
+ * current page.
+ *
+ * Meant for UI event handlers, which don't handle the returned promise: an upload failure is logged
+ * rather than rejected.
+ *
+ * @param depsContainer - the container providing the upload services
+ * @returns the URL of the uploaded image, or `undefined` when the user closes the file picker without
+ *   selecting an image or when the upload fails
+ */
+async function triggerUserImageUpload(
+  depsContainer: Container,
+): Promise<string | undefined> {
+  try {
+    return (await triggerUserFileUpload(depsContainer, "image/*"))?.url;
+  } catch (error) {
+    console.error("Failed to upload the selected image.", error);
+    return undefined;
+  }
+}
+
 function useImageUploader(editor: EditorType, depsContainer: Container) {
   const uploadImage = useCallback(async () => {
-    const { url } = await triggerUserFileUpload(depsContainer, "image/*");
+    const url = await triggerUserImageUpload(depsContainer);
 
-    insertOrUpdateBlockForSlashMenu(editor, {
-      type: "image",
-      props: { url },
-    });
+    if (url) {
+      insertOrUpdateBlockForSlashMenu(editor, {
+        type: "image",
+        props: { url },
+      });
+    }
   }, [depsContainer, editor]);
 
   return uploadImage;
 }
 
-export { triggerUserFileUpload, uploadSelectedFile, useImageUploader };
+export {
+  triggerUserFileUpload,
+  triggerUserImageUpload,
+  uploadSelectedFile,
+  useImageUploader,
+};

@@ -21,6 +21,7 @@
 
 import {
   triggerUserFileUpload,
+  triggerUserImageUpload,
   uploadSelectedFile,
 } from "../../misc/fileUpload";
 import {
@@ -28,7 +29,7 @@ import {
   DocumentReference,
   SpaceReference,
 } from "@xwiki/platform-model-api";
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 import type { AttachmentsService } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
@@ -114,19 +115,15 @@ function buildFile(): File {
   return new File(["some content"], "picture.png", { type: "image/png" });
 }
 
-/** Resolves to whether `promise` had already settled once pending microtasks were flushed. */
-async function isSettled(promise: Promise<unknown>): Promise<boolean> {
-  let settled = false;
-  // eslint-disable-next-line promise/prefer-await-to-then -- Awaiting would block on the settlement being probed.
-  void promise.finally(() => {
-    settled = true;
-  });
+function getHiddenFileInput(): HTMLInputElement {
+  const input = document.body.querySelector('input[type="file"]');
+  expect(input).not.toBeNull();
+  return input as HTMLInputElement;
+}
 
-  // Let any pending microtasks from the (async) event handler under test flush.
-  await Promise.resolve();
-  await Promise.resolve();
-
-  return settled;
+function selectFile(input: HTMLInputElement): void {
+  Object.defineProperty(input, "files", { value: [buildFile()] });
+  input.dispatchEvent(new Event("change"));
 }
 
 describe("uploadSelectedFile", () => {
@@ -175,12 +172,6 @@ describe("uploadSelectedFile", () => {
 });
 
 describe("triggerUserFileUpload", () => {
-  function getHiddenFileInput(): HTMLInputElement {
-    const input = document.body.querySelector('input[type="file"]');
-    expect(input).not.toBeNull();
-    return input as HTMLInputElement;
-  }
-
   test("appends a hidden file input, resolves with the uploaded URL, and removes the input", async () => {
     const container = buildContainer({
       uploadedUrls: ["https://example.org/attachments/picture.png"],
@@ -191,8 +182,7 @@ describe("triggerUserFileUpload", () => {
     const input = getHiddenFileInput();
     expect(input.style.display).toBe("none");
 
-    Object.defineProperty(input, "files", { value: [buildFile()] });
-    input.dispatchEvent(new Event("change"));
+    selectFile(input);
 
     await expect(promise).resolves.toEqual({
       url: "https://example.org/attachments/picture.png",
@@ -218,26 +208,83 @@ describe("triggerUserFileUpload", () => {
     input.dispatchEvent(new Event("cancel"));
   });
 
-  test("removes the input without resolving when the change event carries no file", async () => {
-    const container = buildContainer({});
-    const promise = triggerUserFileUpload(container);
+  test("removes the input and resolves with undefined when the change event carries no file", async () => {
+    const promise = triggerUserFileUpload(buildContainer({}));
 
     const input = getHiddenFileInput();
     Object.defineProperty(input, "files", { value: [] });
     input.dispatchEvent(new Event("change"));
 
-    expect(await isSettled(promise)).toBe(false);
+    await expect(promise).resolves.toBeUndefined();
     expect(document.body.contains(input)).toBe(false);
   });
 
-  test("removes the input without resolving when the file picker is dismissed", async () => {
-    const container = buildContainer({});
-    const promise = triggerUserFileUpload(container);
+  test("removes the input and resolves with undefined when the file picker is dismissed", async () => {
+    const promise = triggerUserFileUpload(buildContainer({}));
 
     const input = getHiddenFileInput();
     input.dispatchEvent(new Event("cancel"));
 
-    expect(await isSettled(promise)).toBe(false);
+    await expect(promise).resolves.toBeUndefined();
     expect(document.body.contains(input)).toBe(false);
+  });
+
+  test("rejects when the upload fails", async () => {
+    const promise = triggerUserFileUpload(buildContainer({}));
+
+    const input = getHiddenFileInput();
+    selectFile(input);
+
+    await expect(promise).rejects.toThrow(
+      "Internal error: could not get URL for uploaded file",
+    );
+    expect(document.body.contains(input)).toBe(false);
+  });
+});
+
+describe("triggerUserImageUpload", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("offers only images and resolves with the uploaded image's URL", async () => {
+    const promise = triggerUserImageUpload(
+      buildContainer({
+        uploadedUrls: ["https://example.org/attachments/picture.png"],
+      }),
+    );
+
+    const input = getHiddenFileInput();
+    expect(input.accept).toBe("image/*");
+    selectFile(input);
+
+    await expect(promise).resolves.toBe(
+      "https://example.org/attachments/picture.png",
+    );
+  });
+
+  test("resolves with undefined when the file picker is dismissed", async () => {
+    const promise = triggerUserImageUpload(buildContainer({}));
+
+    getHiddenFileInput().dispatchEvent(new Event("cancel"));
+
+    await expect(promise).resolves.toBeUndefined();
+  });
+
+  test("logs the error and resolves with undefined when the upload fails", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const promise = triggerUserImageUpload(buildContainer({}));
+
+    selectFile(getHiddenFileInput());
+
+    await expect(promise).resolves.toBeUndefined();
+    expect(consoleError).toHaveBeenCalledWith(
+      "Failed to upload the selected image.",
+      expect.objectContaining({
+        message: "Internal error: could not get URL for uploaded file",
+      }),
+    );
   });
 });

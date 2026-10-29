@@ -249,6 +249,42 @@ test("Clicking the upload action opens a file picker offering only images", asyn
   expect(await fileChooser.element().getAttribute("accept")).toBe("image/*");
 });
 
+test("A failed upload from the upload action is logged and leaves the editor unchanged", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const pageErrors: Error[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error));
+
+  // No uploaded image URL: the upload fails.
+  const component = await mount(<ImageSuggestionForTest />);
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.click();
+  await page.keyboard.type("img::");
+
+  const menuEl = page.locator(".bn-suggestion-menu");
+  await menuEl.locator(".bn-suggestion-menu-item").first().waitFor();
+
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await menuEl.locator(".bn-suggestion-menu-item").nth(1).click();
+  const fileChooser = await fileChooserPromise;
+
+  const errorLogPromise = page.waitForEvent("console", (message) =>
+    message.text().includes("Failed to upload the selected image."),
+  );
+  await fileChooser.setFiles({
+    name: "picture.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("some content"),
+  });
+  expect((await errorLogPromise).type()).toBe("error");
+
+  await expect(editorEl.locator("img")).toHaveCount(0);
+  expect(pageErrors).toEqual([]);
+});
+
 test("Clicking the browse action opens the full image selector where the suggestion menu was", async ({
   mount,
   page,

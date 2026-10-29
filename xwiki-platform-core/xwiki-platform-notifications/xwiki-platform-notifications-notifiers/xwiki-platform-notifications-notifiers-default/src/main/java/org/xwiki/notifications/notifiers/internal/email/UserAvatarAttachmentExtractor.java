@@ -30,6 +30,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -37,6 +39,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
@@ -73,14 +76,13 @@ public class UserAvatarAttachmentExtractor
      */
     public Attachment getUserAvatar(DocumentReference userReference, int size) throws Exception
     {
-        InputStream imageStream = null;
         try {
-            imageStream = getUserAvatarStream(userReference);
+            BufferedImage image = getUserAvatarImage(userReference);
 
             XWikiAttachment fakeAttachment = new XWikiAttachment();
             XWikiAttachmentContent content = new XWikiAttachmentContent(fakeAttachment);
 
-            resizeImage(imageStream, size, content.getContentOutputStream());
+            resizeImage(image, size, content.getContentOutputStream());
 
             fakeAttachment.setAttachment_content(content);
             fakeAttachment.setFilename(
@@ -91,43 +93,78 @@ public class UserAvatarAttachmentExtractor
 
         } catch (Exception e) {
             throw new Exception(String.format("Failed to resize the avatar of [%s].", userReference), e);
-        } finally {
-            IOUtils.closeQuietly(imageStream);
         }
     }
 
-    private InputStream getUserAvatarStream(DocumentReference userReference)
+    private BufferedImage getUserAvatarImage(DocumentReference userReference) throws IOException
     {
         if (userReference != null) {
             try {
-
-                XWikiContext context = xwikiContextProvider.get();
-                XWiki xwiki = context.getWiki();
-
-                XWikiDocument userProfileDocument = xwiki.getDocument(userReference, context);
-                String avatarFileName = userProfileDocument.getStringValue(
-                    XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE, "avatar");
-                XWikiAttachment attachment = userProfileDocument.getAttachment(avatarFileName);
-
-                if (attachment != null && attachment.isImage(context)) {
-                    return attachment.getContentInputStream(context);
+                BufferedImage image = readUserAvatarImage(userReference);
+                if (image != null) {
+                    return image;
                 }
             } catch (Exception e) {
-                logger.warn("Failed to get the avatar of [{}]. Fallback to default one", userReference, e);
+                logger.warn("Failed to get the avatar of [{}]. Fallback to default one. Root cause: [{}]",
+                    userReference, ExceptionUtils.getRootCauseMessage(e));
+                logger.debug("Full stack trace of the avatar loading failure:", e);
             }
         }
 
-        return getDefaultAvatarStream();
+        return getDefaultAvatarImage();
     }
 
-    private InputStream getDefaultAvatarStream()
+    /**
+     * @param userReference reference of the user
+     * @return the decoded avatar of the given user, or {@code null} if the user has no avatar or if ImageIO cannot
+     *     decode it
+     */
+    private BufferedImage readUserAvatarImage(DocumentReference userReference) throws XWikiException, IOException
     {
-        return environment.getResourceAsStream("/resources/icons/xwiki/noavatar.png");
+        XWikiContext context = xwikiContextProvider.get();
+        XWiki xwiki = context.getWiki();
+
+        XWikiDocument userProfileDocument = xwiki.getDocument(userReference, context);
+        String avatarFileName = userProfileDocument.getStringValue(
+            XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE, "avatar");
+        XWikiAttachment attachment = userProfileDocument.getAttachment(avatarFileName);
+
+        if (attachment != null) {
+            String mediaType = attachment.getMimeType(context);
+            if (Strings.CS.startsWith(mediaType, "image/")) {
+                BufferedImage image = readImage(attachment.getContentInputStream(context));
+                if (image == null) {
+                    // ImageIO has no reader for some image formats that are accepted as avatar (e.g. SVG or WebP),
+                    // which is expected and not worth more than a debug log.
+                    logger.debug("Unsupported image format [{}] for the avatar of [{}]. Fallback to default one",
+                        mediaType, userReference);
+                }
+
+                return image;
+            }
+        }
+
+        return null;
     }
 
-    private void resizeImage(InputStream imageFileInputStream, int size, OutputStream outputStream) throws IOException
+    private BufferedImage getDefaultAvatarImage() throws IOException
     {
-        BufferedImage bufferedImage = ImageIO.read(imageFileInputStream);
+        return readImage(environment.getResourceAsStream("/resources/icons/xwiki/noavatar.png"));
+    }
+
+    /**
+     * @param imageStream the stream of the image to read, closed by this method
+     * @return the decoded image, or {@code null} if no ImageIO reader supports its format
+     */
+    private BufferedImage readImage(InputStream imageStream) throws IOException
+    {
+        try (imageStream) {
+            return ImageIO.read(imageStream);
+        }
+    }
+
+    private void resizeImage(BufferedImage bufferedImage, int size, OutputStream outputStream) throws IOException
+    {
         int sourceWidth = bufferedImage.getWidth();
         int sourceHeight = bufferedImage.getHeight();
 

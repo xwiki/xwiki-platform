@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.pagetemplate.test.po;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,22 +30,21 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
- * Represents the location picker.
+ * Represents the picker used to edit the visibility and creation restrictions of a template provider.
  *
  * @version $Id$
- * @since 8.4.3
- * @since 9.0RC1
+ * @since 18.10.0RC1
  */
-public class LocationPicker extends BaseElement
+public class TemplateProviderRestrictionsPicker extends BaseElement
 {
     private String name;
 
-    public LocationPicker(String name)
+    public TemplateProviderRestrictionsPicker(String name)
     {
         this.name = name;
     }
 
-    public LocationPicker add(String value)
+    public TemplateProviderRestrictionsPicker add(String value)
     {
         EntityReference spaceReference = getUtil().resolveSpaceReference(value);
         EntityReference wikiReference = spaceReference.extractReference(EntityType.WIKI);
@@ -59,7 +58,7 @@ public class LocationPicker extends BaseElement
         return waitToDisplayValue(value);
     }
 
-    public LocationPicker remove(String value)
+    public TemplateProviderRestrictionsPicker remove(String value)
     {
         getRemoveButton(value).click();
         return this;
@@ -75,7 +74,7 @@ public class LocationPicker extends BaseElement
         return values;
     }
 
-    public LocationPicker setValue(List<String> values)
+    public TemplateProviderRestrictionsPicker setValue(List<String> values)
     {
         clear();
         for (String value : values) {
@@ -84,7 +83,7 @@ public class LocationPicker extends BaseElement
         return this;
     }
 
-    public LocationPicker clear()
+    public TemplateProviderRestrictionsPicker clear()
     {
         for (String value : getValue()) {
             remove(value);
@@ -110,7 +109,7 @@ public class LocationPicker extends BaseElement
             + "' and @value = '" + value + "']/preceding-sibling::a[@class = 'path-delete']"));
     }
 
-    private LocationPicker waitToDisplayValue(String value)
+    private TemplateProviderRestrictionsPicker waitToDisplayValue(String value)
     {
         getDriver().waitUntilElementIsVisible(By.xpath("//*[@class='path']/input[@name='" + this.name + "' and @value='"
             + value + "']/following-sibling::*[@class='breadcrumb']/li[not(@class='loading')]"));

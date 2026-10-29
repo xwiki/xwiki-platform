@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.pagetemplate.test.po;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.administration.test.po.AdministrationSectionPage;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.po.DocumentPicker;
 
@@ -120,10 +121,15 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
             templateProviderReference.getName());
     }
 
-    public List<WebElement> getExistingTemplatesLinks()
+    /**
+     * @return the names of the template providers listed in the "Available Template Providers" section
+     * @since 18.10.0RC1
+     */
+    public List<String> getExistingTemplateNames()
     {
         // A bit unreliable here, but it's the best I can do. Don't wait as these links are part of the static HTML.
         return getDriver().findElementsWithoutWaiting(
-            By.xpath("//ul[preceding-sibling::*[. = 'Available Template Providers']]//a"));
+            By.xpath("//ul[preceding-sibling::*[. = 'Available Template Providers']]//a")).stream()
+            .map(WebElement::getText).toList();
     }
 }

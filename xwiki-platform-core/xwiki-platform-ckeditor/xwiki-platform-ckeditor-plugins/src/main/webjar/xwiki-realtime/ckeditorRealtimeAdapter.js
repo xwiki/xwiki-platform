@@ -92,6 +92,7 @@ define('xwiki-ckeditor-realtime-adapter', [
       // Don't push local changes when saving the snapshot. Wait until the content has been updated (see below),
       // otherwise we risk reverting the received remote changes.
       this._isRemoteChange = true;
+      delete this._contentRefreshed;
       // Save the editor state before updating the content in order to be able to undo the remote changes.
       this._ckeditor.fire('saveSnapshot');
       // Prevent the editor from recording Undo/Redo history entries while the edited content is being refreshed:
@@ -148,7 +149,12 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     /** @inheritdoc */
     restoreSelection(ranges) {
-      this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, {ranges, async: false});
+      // The content refresh triggered by a remote change overwrites the edited content, which normally scrolls the
+      // restored selection into view. But the local user didn't ask for this refresh, and may be reading a different
+      // part of the content, so we keep their scroll position (see #_refreshContent()).
+      const preventScroll = this._contentRefreshed;
+      delete this._contentRefreshed;
+      this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, {ranges, async: false, preventScroll});
 
       // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
       // selection is restored.
@@ -525,11 +531,14 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     async _refreshContent() {
       console.debug('Refreshing the content to re-render the macros.');
+      // Refreshing the content overwrites it, which loses the scroll position (e.g. the iframe-based editing area is
+      // reloaded) so we have to restore it afterwards.
+      const restoreScrollPosition = this._saveScrollPosition();
       // Refresh the content to re-render the macros. Don't preserve the selection because this is done by the realtime
       // framework when applying remove changes.
       this._ckeditor.execCommand('xwiki-refresh', {preserveSelection: false});
 
-      return new Promise(resolve => {
+      await new Promise(resolve => {
         const macroPlugin = this._ckeditor.plugins['xwiki-macro'];
         if (macroPlugin) {
           macroPlugin.onceAfterRefresh(this._ckeditor, resolve);
@@ -537,6 +546,38 @@ define('xwiki-ckeditor-realtime-adapter', [
           resolve();
         }
       });
+
+      restoreScrollPosition();
+      this._contentRefreshed = true;
+    }
+
+    /**
+     * Saves the vertical scroll position of all the ancestors of the editing area, including the ones from the parent
+     * document when the editing area is inside an iframe.
+     *
+     * @returns {Function} a function that restores the saved scroll position, even if the editing area was recreated
+     *   in the mean time (e.g. when the iframe-based editing area is reloaded)
+     */
+    _saveScrollPosition() {
+      const getScrollContainers = () => {
+        const containers = [];
+        let element = this.getContentWrapper();
+        while (element) {
+          containers.push(element);
+          // Continue with the iframe that holds the editing area, if we reached the root of its document.
+          element = element.parentElement || element.ownerDocument.defaultView.frameElement;
+        }
+        return containers;
+      };
+      const scrollPosition = getScrollContainers().map(container => container.scrollTop);
+      return () => {
+        const containers = getScrollContainers();
+        if (containers.length === scrollPosition.length) {
+          containers.forEach((container, index) => {
+            container.scrollTop = scrollPosition[index];
+          });
+        }
+      };
     }
 
     /** @inheritdoc */

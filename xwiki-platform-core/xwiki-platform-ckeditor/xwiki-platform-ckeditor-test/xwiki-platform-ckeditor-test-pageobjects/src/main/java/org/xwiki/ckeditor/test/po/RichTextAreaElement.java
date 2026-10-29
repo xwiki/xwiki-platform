@@ -872,6 +872,48 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
+     * @return the vertical scroll position of the edited content, in pixels; this is the scroll position of the
+     *         rich text area itself when it is implemented using an iframe, or the scroll position of its closest
+     *         scrollable ancestor (usually the page) otherwise
+     * @since 18.10.0RC1
+     */
+    public int getScrollTop()
+    {
+        return ((Number) executeOnScrollContainer("return scrollContainer.scrollTop;")).intValue();
+    }
+
+    /**
+     * Scrolls the edited content vertically, like the user would do using the mouse wheel or the scroll bar, i.e.
+     * without moving the caret or changing the focus.
+     *
+     * @param scrollTop the new vertical scroll position of the edited content, in pixels
+     * @see #getScrollTop()
+     * @since 18.10.0RC1
+     */
+    public void scrollTo(int scrollTop)
+    {
+        executeOnScrollContainer("scrollContainer.scrollTop = arguments[1];", scrollTop);
+    }
+
+    private Object executeOnScrollContainer(String script, Object... arguments)
+    {
+        return getFromEditedContent(() -> {
+            Object[] allArguments = new Object[arguments.length + 1];
+            allArguments[0] = getRootEditableElement(false);
+            System.arraycopy(arguments, 0, allArguments, 1, arguments.length);
+            return getDriver().executeScript("""
+                const isScrollable = element => element.scrollHeight > element.clientHeight
+                  && ['auto', 'scroll'].includes(getComputedStyle(element).overflowY);
+                let scrollContainer = arguments[0];
+                while (scrollContainer && !isScrollable(scrollContainer)) {
+                  scrollContainer = scrollContainer.parentElement;
+                }
+                scrollContainer = scrollContainer || arguments[0].ownerDocument.scrollingElement;
+                """ + script, allArguments);
+        });
+    }
+
+    /**
      * Drag the specified image relative to its current position.
      * 
      * @param imageIndex the index of the image to be dragged (0-based)

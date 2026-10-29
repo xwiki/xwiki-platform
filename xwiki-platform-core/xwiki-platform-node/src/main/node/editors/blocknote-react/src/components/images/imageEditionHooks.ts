@@ -28,15 +28,16 @@ import type { ResourceReference } from "@xwiki/platform-rendering-api";
  */
 type ImageEditionHooks = {
   /**
-   * Run right after the image selected by the user (e.g. from the image suggestions, the image selector or an upload)
-   * is written into the content, either as a new image block or as the new source of an existing image block.
+   * Run right after an image is written into the content, either as a new image block or as the new source of an
+   * existing image block, when the user picks it from the image suggestions or the image selector, or uploads it. It
+   * isn't called when the image edition is overridden (see `ImageEditionOverrideFn`), since the override updates the
+   * image itself.
    *
    * @param block - the image block, as written into the content
-   * @param reference - the resource reference of the selected image, when known (e.g. provided by the server with the
-   *   image suggestions or the upload response); undefined when the image is only known by its URL (e.g. the user
-   *   entered it)
+   * @param reference - the resource reference of the image, when known (e.g. for a suggested or an uploaded image);
+   *   undefined when the image is only known by its URL (e.g. the user entered it)
    */
-  afterSelect?: (
+  afterUpdate?: (
     block: BlockOfType<"image">,
     reference?: ResourceReference,
   ) => void;

@@ -10,7 +10,6 @@ import { Logger } from '@xwiki/platform-api';
 import { PageAttachment } from '@xwiki/platform-api';
 import { PageData } from '@xwiki/platform-api';
 import { Storage as Storage_2 } from '@xwiki/platform-api';
-import { UploadedAttachment } from '@xwiki/platform-attachments-api';
 import { WikiConfig } from '@xwiki/platform-api';
 
 // @beta (undocumented)
@@ -47,7 +46,7 @@ export abstract class AbstractStorage implements Storage_2 {
     }>;
     abstract save(page: string, title: string, content: string, syntax: string): Promise<unknown>;
     // (undocumented)
-    abstract saveAttachments(page: string, files: File[]): Promise<undefined | (UploadedAttachment | undefined)[]>;
+    abstract saveAttachments(page: string, files: File[]): Promise<undefined | (PageAttachment | undefined)[]>;
     // (undocumented)
     setWikiConfig(wikiConfig: WikiConfig): void;
     // (undocumented)

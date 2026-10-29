@@ -885,9 +885,6 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/api:
     dependencies:
-      '@xwiki/platform-attachments-api':
-        specifier: workspace:*
-        version: link:../core/attachments/attachments-api
       '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../core/authentication/authentication-api
@@ -1285,9 +1282,6 @@ importers:
       '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/platform-attachments-api':
-        specifier: workspace:*
-        version: link:../../attachments/attachments-api
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -1331,9 +1325,6 @@ importers:
       '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/platform-attachments-api':
-        specifier: workspace:*
-        version: link:../../attachments/attachments-api
       '@xwiki/platform-backend-api':
         specifier: workspace:*
         version: link:../backend-api

@@ -139,11 +139,12 @@ describe("DefaultImageWizard", () => {
       return callback;
     }
 
-    it("reports the reference of the uploaded attachment, relative to the edited document", async () => {
+    it("reports the reference of the uploaded attachment, attached to the edited document", async () => {
+      // The storage identifies the uploaded attachment by its name, which can contain reference separators.
       uploadedAttachments = [
         {
-          url: "/xwiki/bin/download/Space/Page/cat.png",
-          reference: "cat.png",
+          reference: "cat@home.png",
+          href: "/xwiki/bin/download/Space/Page/cat%40home.png",
         },
       ];
 
@@ -151,12 +152,12 @@ describe("DefaultImageWizard", () => {
 
       expect(callback.onSuccess).toHaveBeenCalledOnce();
       expect(Model.serialize(callback.onSuccess.mock.calls[0][0])).toBe(
-        "wiki:Space.Page@cat.png",
+        "wiki:Space.Page@cat\\@home.png",
       );
     });
 
-    it("aborts when the storage doesn't report the reference of the uploaded attachment", async () => {
-      uploadedAttachments = [{ url: "/xwiki/bin/download/Space/Page/cat.png" }];
+    it("aborts when the storage doesn't report the uploaded attachment", async () => {
+      uploadedAttachments = [undefined];
 
       const callback = await upload();
 

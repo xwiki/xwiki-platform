@@ -45,8 +45,8 @@ export type ImageSuggestionForTestProps = {
   linkSuggestServiceFailing?: boolean;
   // The URL of the uploaded image, whatever the file the user picks (uploading fails when not set).
   uploadedImageURL?: string;
-  // The reference of the uploaded image, as reported by the storage (none when not set).
-  uploadedImageReference?: string;
+  // The name of the uploaded image, as reported by the attachments service ("picture.png" when not set).
+  uploadedImageName?: string;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
@@ -67,7 +67,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   linkSuggestServiceUnavailable,
   linkSuggestServiceFailing,
   uploadedImageURL,
-  uploadedImageReference,
+  uploadedImageName,
   content,
   syntax,
 }) => {
@@ -76,7 +76,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   // Stable, like the hooks of a real integration, so that the editor doesn't rebuild its menus on each selection.
   const imageEditionHooks = useMemo<ImageEditionHooks>(
     () => ({
-      afterSelect: (block, reference) =>
+      afterUpdate: (block, reference) =>
         setSelectedImages((images) => [
           ...images,
           { blockId: block.id, url: block.props.url, reference },
@@ -111,19 +111,40 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
           } satisfies LinkSuggestServiceProvider),
     );
 
+    // A page reference that the model reference parser of the mocked container understands.
     container.get.calledWith("DocumentService").mockReturnValue({
-      getCurrentDocumentReferenceString: () => ({ value: "Some.Page" }),
+      getCurrentDocumentReferenceString: () => ({
+        value: "some page reference",
+      }),
     });
     container.get.calledWith("AttachmentsService").mockReturnValue({
       async upload() {
+        if (!uploadedImageURL) {
+          throw new Error("Failed to upload the file");
+        }
         return [
-          uploadedImageURL && {
-            url: uploadedImageURL,
-            reference: uploadedImageReference,
+          {
+            id: "uploaded image",
+            name: uploadedImageName ?? "picture.png",
+            mimetype: "image/png",
+            href: uploadedImageURL,
+            date: new Date(),
+            size: 12,
+            author: undefined,
           },
         ];
       },
     });
+    // Serializes the attachment references like XWiki does, in order to check that the uploaded images are inserted
+    // with the reference of the uploaded attachment.
+    container.get
+      .calledWith("ModelReferenceSerializerProvider")
+      .mockReturnValue({
+        get: () => ({
+          serialize: (reference?: { name: string }) =>
+            `attach:Some.Page@${reference?.name}`,
+        }),
+      });
 
     return container;
   }, []);

@@ -19,7 +19,6 @@
  */
 
 import type { Attachment } from "./attachment";
-import type { UploadedAttachment } from "./uploadedAttachment";
 import type { Ref } from "vue";
 
 /**
@@ -49,14 +48,14 @@ interface AttachmentsService {
    * Upload the provided list of files to a given page
    * @param page - the page where to save the files
    * @param files - the list of files to upload
-   * @returns an optional list describing the uploaded attachments (in the same order as the provided files), e.g. with
-   *   their URL, which can't always be resolved from the name of the file and its document reference alone (since
-   *   18.10.0RC1 the list holds {@link UploadedAttachment} rather than URLs)
+   * @returns an optional list of the uploaded attachments (in the same order as the provided files), e.g. to get their
+   *   URL, which can't always be resolved from the name of the file and its document reference alone (since 18.10.0RC1
+   *   the list holds the uploaded attachments rather than their URL)
    */
   upload(
     page: string,
     files: File[],
-  ): Promise<(UploadedAttachment | undefined)[] | undefined>;
+  ): Promise<(Attachment | undefined)[] | undefined>;
 }
 
 export { type AttachmentsService };

@@ -123,7 +123,7 @@ export function extractMacroRawContent(content: InlineContent<DefaultInlineConte
 
 // @beta
 export type ImageEditionHooks = {
-    afterSelect?: (block: BlockOfType<"image">, reference?: ResourceReference) => void;
+    afterUpdate?: (block: BlockOfType<"image">, reference?: ResourceReference) => void;
 };
 
 // @beta

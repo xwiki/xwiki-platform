@@ -59,13 +59,21 @@ describe("XWikiStorage", () => {
   }
 
   describe("saveAttachments", () => {
-    it("reports the URL and the reference of the uploaded attachments", async () => {
+    it("reports the uploaded attachments", async () => {
       mockUploadResponse({
         uploaded: 1,
         url: "/xwiki/bin/download/Space/Page/cat.png",
         fileName: "cat.png",
         message: {
           resourceReference: { type: "attach", reference: "cat.png" },
+        },
+        attachment: {
+          id: "wiki:Space.Page@cat.png",
+          name: "cat.png",
+          size: 42,
+          mimeType: "image/png",
+          date: 1000,
+          author: "wiki:XWiki.Alice",
         },
       });
 
@@ -74,7 +82,15 @@ describe("XWikiStorage", () => {
       ]);
 
       expect(uploadedAttachments).toEqual([
-        { url: "/xwiki/bin/download/Space/Page/cat.png", reference: "cat.png" },
+        {
+          id: "wiki:Space.Page@cat.png",
+          reference: "cat.png",
+          mimetype: "image/png",
+          href: "/xwiki/bin/download/Space/Page/cat.png",
+          size: 42,
+          date: new Date(1000),
+          author: "wiki:XWiki.Alice",
+        },
       ]);
     });
 

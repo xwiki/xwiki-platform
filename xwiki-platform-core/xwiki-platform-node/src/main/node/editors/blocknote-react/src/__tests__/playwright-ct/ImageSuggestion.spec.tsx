@@ -66,10 +66,12 @@ async function expectSelectedImage(
 }
 
 /**
+ * @param reference - the serialized attachment reference
+ * @param typed - whether the serialized reference is prefixed with its type
  * @returns the resource reference expected for the given serialized attachment reference
  */
-function attachmentResourceReference(reference: string) {
-  return { type: "attach", typed: false, reference, parameters: {} };
+function attachmentResourceReference(reference: string, typed = false) {
+  return { type: "attach", typed, reference, parameters: {} };
 }
 
 test("The image quick action shows the browse and upload actions, then the matching images", async ({
@@ -314,7 +316,7 @@ test("Uploading an image from the upload action inserts it with its reference", 
   const component = await mount(
     <ImageSuggestionForTest
       uploadedImageURL="https://picsum.photos/600"
-      uploadedImageReference="picture.png"
+      uploadedImageName="uploaded.png"
     />,
   );
 
@@ -337,11 +339,11 @@ test("Uploading an image from the upload action inserts it with its reference", 
     "src",
     "https://picsum.photos/600",
   );
-  // The reference reported by the storage is passed on.
+  // The reference of the uploaded attachment is passed on.
   await expectSelectedImage(
     page,
     editorEl,
-    attachmentResourceReference("picture.png"),
+    attachmentResourceReference("Some.Page@uploaded.png", true),
   );
 });
 
@@ -434,7 +436,7 @@ test("Uploading an image from the opened image selector inserts it and closes th
   const component = await mount(
     <ImageSuggestionForTest
       uploadedImageURL="https://picsum.photos/600"
-      uploadedImageReference="picture.png"
+      uploadedImageName="uploaded.png"
     />,
   );
 
@@ -461,7 +463,7 @@ test("Uploading an image from the opened image selector inserts it and closes th
   await expectSelectedImage(
     page,
     editorEl,
-    attachmentResourceReference("picture.png"),
+    attachmentResourceReference("Some.Page@uploaded.png", true),
   );
   await expect(page.locator('[data-test="searchBoxInput"]')).not.toBeAttached();
 });
@@ -507,8 +509,47 @@ test("Uploading an image from the edit panel of an image replaces that image", a
     "src",
     "https://picsum.photos/600",
   );
-  // The storage doesn't report the reference of the uploaded image: it's known only by its URL, which
-  // lets the integration drop the reference of the replaced image.
+  await expectSelectedImage(
+    page,
+    editorEl,
+    attachmentResourceReference("Some.Page@picture.png", true),
+  );
+});
+
+test("Entering an image URL in the edit panel of an image replaces that image, known only by its URL", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      content={[
+        {
+          id: "some-image",
+          type: "image",
+          props: {
+            url: "https://picsum.photos/150",
+          },
+          content: undefined,
+          children: [],
+        },
+      ]}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.locator("img.bn-visual-media").click();
+  await page.getByLabel("blocknote.imageToolbar.buttons.edit").click();
+
+  const searchInput = page.locator('[data-test="searchBoxInput"]');
+  await searchInput.fill("https://picsum.photos/600");
+  await searchInput.press("Enter");
+
+  await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
+    "src",
+    "https://picsum.photos/600",
+  );
+  // Without a reference, the integration knows the image must be saved with its URL, rather than
+  // with the reference of the replaced image.
   await expectSelectedImage(page, editorEl);
 });
 

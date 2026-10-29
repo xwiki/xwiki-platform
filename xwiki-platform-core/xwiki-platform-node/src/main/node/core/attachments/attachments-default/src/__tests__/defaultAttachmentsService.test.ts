@@ -60,4 +60,39 @@ describe("defaultAttachmentsService", () => {
       storageMock.getAttachments,
     );
   });
+
+  it("upload returns the uploaded attachments", async () => {
+    const { storageMock, service } = initServiceWithMocks();
+    const date = new Date(1000);
+    storageMock.saveAttachments.mockResolvedValue([
+      {
+        id: "wiki:my.page@cat.png",
+        reference: "cat.png",
+        mimetype: "image/png",
+        href: "/download/my/page/cat.png",
+        size: 42,
+        date,
+        author: "XWiki.Alice",
+      },
+      undefined,
+    ]);
+
+    const uploadedAttachments = await service.upload(pageReference, [
+      new File([""], "cat.png"),
+      new File([""], "dog.png"),
+    ]);
+
+    expect(uploadedAttachments).toEqual([
+      {
+        id: "wiki:my.page@cat.png",
+        name: "cat.png",
+        mimetype: "image/png",
+        href: "/download/my/page/cat.png",
+        size: 42,
+        date,
+        author: { name: "XWiki.Alice" },
+      },
+      undefined,
+    ]);
+  });
 });

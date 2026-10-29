@@ -224,11 +224,11 @@ const imageEdition: ImageEditionOverrideFn = (block, update) => {
 };
 
 const imageEditionHooks: ImageEditionHooks = {
-  // Runs right after the user selects an image (e.g. from the image suggestions or by uploading it). The XWiki resource
-  // reference is kept as block metadata (outside the BlockNote schema), so that the image is saved with the reference
-  // provided by the server rather than with its URL. An image known only by its URL is saved with that URL, so we drop
-  // the reference of the previously selected image.
-  afterSelect: (block, reference) => {
+  // Runs right after an image is inserted or its source is changed (e.g. from the image suggestions or by uploading
+  // it). The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so that the image is
+  // saved with the reference provided by the server rather than with its URL. An image known only by its URL is saved
+  // with that URL, so we drop the reference of the previous image source.
+  afterUpdate: (block, reference) => {
     const metadata = blockNoteDocument?.getMetadata(block.id, !!reference);
     if (reference) {
       metadata!.xwikiReference = reference;

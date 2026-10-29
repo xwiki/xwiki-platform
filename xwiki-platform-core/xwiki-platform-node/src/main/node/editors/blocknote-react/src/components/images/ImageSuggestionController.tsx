@@ -188,7 +188,7 @@ function useImageInsertion(
         type: "image",
         props: { url },
       }) as BlockOfType<"image">;
-      imageEditionHooks?.afterSelect?.(image, reference);
+      imageEditionHooks?.afterUpdate?.(image, reference);
     },
     [editor, imageEditionHooks],
   );

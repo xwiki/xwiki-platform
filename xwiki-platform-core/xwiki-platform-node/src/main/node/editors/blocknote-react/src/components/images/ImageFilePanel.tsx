@@ -42,7 +42,7 @@ export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
         { id: image.id },
         { props: { url } },
       ) as BlockOfType<"image">;
-      imageEditionHooks?.afterSelect?.(updatedImage, reference);
+      imageEditionHooks?.afterUpdate?.(updatedImage, reference);
       editor.focus();
     },
     [editor, image, imageEditionHooks],

@@ -20,10 +20,10 @@
 
 import { inject, injectable } from "inversify";
 import { defineStore, storeToRefs } from "pinia";
+import type { PageAttachment } from "@xwiki/platform-api";
 import type {
   Attachment,
   AttachmentsService,
-  UploadedAttachment,
 } from "@xwiki/platform-attachments-api";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type { Store, StoreDefinition } from "pinia";
@@ -112,6 +112,35 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore<
 });
 
 /**
+ * @param attachment - an attachment, as provided by the storage
+ * @returns the given attachment, as exposed by the attachments service
+ */
+function toAttachment({
+  id,
+  reference,
+  mimetype,
+  href,
+  date,
+  size,
+  author,
+}: PageAttachment): Attachment {
+  let userDetails = undefined;
+  if (author) {
+    // TODO: resolve author details
+    userDetails = { name: author };
+  }
+  return {
+    id,
+    name: reference,
+    mimetype,
+    href,
+    date,
+    size,
+    author: userDetails,
+  };
+}
+
+/**
  * @since 18.0.0RC1
  * @beta
  */
@@ -157,27 +186,7 @@ export class DefaultAttachmentsService implements AttachmentsService {
         .getAttachments(page);
       if (attachmentData) {
         const { attachments, count } = attachmentData;
-        this.store.updateAttachments(
-          attachments?.map(
-            ({ id, reference, mimetype, href, date, size, author }) => {
-              let userDetails = undefined;
-              if (author) {
-                // TODO: resolve author details
-                userDetails = { name: author };
-              }
-              return {
-                id,
-                name: reference,
-                mimetype,
-                href,
-                date,
-                size,
-                author: userDetails,
-              };
-            },
-          ),
-          count,
-        );
+        this.store.updateAttachments(attachments?.map(toAttachment), count);
       } else {
         this.store.updateAttachments([], 0);
       }
@@ -190,11 +199,11 @@ export class DefaultAttachmentsService implements AttachmentsService {
   async upload(
     page: string,
     files: File[],
-  ): Promise<(UploadedAttachment | undefined)[] | undefined> {
+  ): Promise<(Attachment | undefined)[] | undefined> {
     this.store.startUploading();
-    let resolvedAttachments;
+    let uploadedAttachments;
     try {
-      resolvedAttachments = await this.storageProvider
+      uploadedAttachments = await this.storageProvider
         .get()
         .saveAttachments(page, files);
     } finally {
@@ -202,6 +211,8 @@ export class DefaultAttachmentsService implements AttachmentsService {
     }
 
     await this.refresh(page);
-    return resolvedAttachments;
+    return uploadedAttachments?.map(
+      (attachment) => attachment && toAttachment(attachment),
+    );
   }
 }

@@ -20,11 +20,5 @@
 import type { Attachment } from "./attachment";
 import type { AttachmentPreview } from "./attachmentsPreview";
 import type { AttachmentsService } from "./attachmentsService";
-import type { UploadedAttachment } from "./uploadedAttachment";
 
-export type {
-  Attachment,
-  AttachmentPreview,
-  AttachmentsService,
-  UploadedAttachment,
-};
+export type { Attachment, AttachmentPreview, AttachmentsService };

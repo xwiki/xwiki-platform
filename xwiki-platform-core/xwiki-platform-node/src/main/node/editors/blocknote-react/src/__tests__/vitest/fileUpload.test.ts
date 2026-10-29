@@ -33,11 +33,14 @@ import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 import type {
+  Attachment,
   AttachmentsService,
-  UploadedAttachment,
 } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
-import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { Container } from "inversify";
 
@@ -55,8 +58,24 @@ function buildDocumentServiceMock(): DocumentService {
   return documentServiceMock;
 }
 
+/**
+ * @returns an attachment reported by the attachments service, named differently than the uploaded file (e.g.
+ *   because the server normalized its name)
+ */
+function buildUploadedAttachment(): Attachment {
+  return {
+    id: "uploaded",
+    name: "uploaded.png",
+    mimetype: "image/png",
+    href: "https://example.org/attachments/uploaded.png",
+    date: new Date(1000),
+    size: 12,
+    author: undefined,
+  };
+}
+
 function buildAttachmentsServiceMock(
-  uploadedAttachments: (UploadedAttachment | undefined)[] | undefined,
+  uploadedAttachments: (Attachment | undefined)[] | undefined,
 ): AttachmentsService {
   const attachmentsServiceMock = mock<AttachmentsService>();
   attachmentsServiceMock.upload.mockResolvedValue(uploadedAttachments);
@@ -92,10 +111,25 @@ function buildRemoteURLSerializerProvider(
   };
 }
 
+function buildModelReferenceSerializerProvider(
+  serializeReferences: boolean,
+): ModelReferenceSerializerProvider {
+  return {
+    get: () => ({
+      serialize: (reference) =>
+        serializeReferences
+          ? `attach:${CURRENT_PAGE_REFERENCE_STRING}@${reference!.name}`
+          : undefined,
+    }),
+  };
+}
+
 /** Builds a minimal Container mock covering everything `uploadSelectedFile`/`triggerUserFileUpload` depend on. */
 function buildContainer(options: {
-  uploadedAttachments?: (UploadedAttachment | undefined)[];
+  uploadedAttachments?: (Attachment | undefined)[];
   serializedURL?: string;
+  // Whether the attachment references can be serialized (true by default).
+  serializeReferences?: boolean;
 }): Container {
   const container = mock<Container>();
 
@@ -111,6 +145,13 @@ function buildContainer(options: {
   container.get
     .calledWith("RemoteURLSerializerProvider")
     .mockReturnValue(buildRemoteURLSerializerProvider(options.serializedURL));
+  container.get
+    .calledWith("ModelReferenceSerializerProvider")
+    .mockReturnValue(
+      buildModelReferenceSerializerProvider(
+        options.serializeReferences ?? true,
+      ),
+    );
   container.get
     .calledWith("ResourceReferenceParser")
     .mockReturnValue(new DefaultResourceReferenceParser());
@@ -134,19 +175,17 @@ function selectFile(input: HTMLInputElement): void {
 }
 
 describe("uploadSelectedFile", () => {
-  test("returns the uploaded attachment reported by the attachment service", async () => {
+  test("returns the URL and the reference of the attachment reported by the attachment service", async () => {
     const container = buildContainer({
-      uploadedAttachments: [
-        {
-          url: "https://example.org/attachments/picture.png",
-          reference: "picture.png",
-        },
-      ],
+      uploadedAttachments: [buildUploadedAttachment()],
     });
 
     await expect(uploadSelectedFile(buildFile(), container)).resolves.toEqual({
-      url: "https://example.org/attachments/picture.png",
-      reference: "picture.png",
+      url: "https://example.org/attachments/uploaded.png",
+      reference: new AttachmentReference(
+        "uploaded.png",
+        CURRENT_PAGE_REFERENCE,
+      ),
     });
   });
 
@@ -158,6 +197,7 @@ describe("uploadSelectedFile", () => {
 
     await expect(uploadSelectedFile(buildFile(), container)).resolves.toEqual({
       url: "https://example.org/fallback/picture.png",
+      reference: new AttachmentReference("picture.png", CURRENT_PAGE_REFERENCE),
     });
   });
 
@@ -169,6 +209,7 @@ describe("uploadSelectedFile", () => {
 
     await expect(uploadSelectedFile(buildFile(), container)).resolves.toEqual({
       url: "https://example.org/fallback/picture.png",
+      reference: new AttachmentReference("picture.png", CURRENT_PAGE_REFERENCE),
     });
   });
 
@@ -185,11 +226,9 @@ describe("uploadSelectedFile", () => {
 });
 
 describe("triggerUserFileUpload", () => {
-  test("appends a hidden file input, resolves with the uploaded attachment, and removes the input", async () => {
+  test("appends a hidden file input, resolves with the uploaded file, and removes the input", async () => {
     const container = buildContainer({
-      uploadedAttachments: [
-        { url: "https://example.org/attachments/picture.png" },
-      ],
+      uploadedAttachments: [buildUploadedAttachment()],
     });
 
     const promise = triggerUserFileUpload(container);
@@ -200,7 +239,11 @@ describe("triggerUserFileUpload", () => {
     selectFile(input);
 
     await expect(promise).resolves.toEqual({
-      url: "https://example.org/attachments/picture.png",
+      url: "https://example.org/attachments/uploaded.png",
+      reference: new AttachmentReference(
+        "uploaded.png",
+        CURRENT_PAGE_REFERENCE,
+      ),
     });
     expect(document.body.contains(input)).toBe(false);
   });
@@ -264,14 +307,7 @@ describe("triggerUserImageUpload", () => {
 
   test("offers only images and resolves with the uploaded image's URL and resource reference", async () => {
     const promise = triggerUserImageUpload(
-      buildContainer({
-        uploadedAttachments: [
-          {
-            url: "https://example.org/attachments/picture.png",
-            reference: "picture.png",
-          },
-        ],
-      }),
+      buildContainer({ uploadedAttachments: [buildUploadedAttachment()] }),
     );
 
     const input = getHiddenFileInput();
@@ -279,29 +315,29 @@ describe("triggerUserImageUpload", () => {
     selectFile(input);
 
     await expect(promise).resolves.toEqual({
-      url: "https://example.org/attachments/picture.png",
+      url: "https://example.org/attachments/uploaded.png",
       reference: {
         type: "attach",
-        typed: false,
-        reference: "picture.png",
+        typed: true,
+        reference: "Some.Page@uploaded.png",
         parameters: {},
       },
     });
   });
 
-  test("resolves with only the uploaded image's URL when the storage doesn't report its reference", async () => {
+  test("resolves with only the uploaded image's URL when its reference can't be serialized", async () => {
     const promise = triggerUserImageUpload(
       buildContainer({
-        uploadedAttachments: [
-          { url: "https://example.org/attachments/picture.png" },
-        ],
+        uploadedAttachments: [buildUploadedAttachment()],
+        serializeReferences: false,
       }),
     );
 
     selectFile(getHiddenFileInput());
 
-    await expect(promise).resolves.toStrictEqual({
-      url: "https://example.org/attachments/picture.png",
+    await expect(promise).resolves.toEqual({
+      url: "https://example.org/attachments/uploaded.png",
+      reference: undefined,
     });
   });
 

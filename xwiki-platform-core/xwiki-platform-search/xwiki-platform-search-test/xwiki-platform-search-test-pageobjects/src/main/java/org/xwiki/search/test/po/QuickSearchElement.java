@@ -92,6 +92,17 @@ public class QuickSearchElement extends BaseElement
     }
 
     /**
+     * @return the URL the "Go to search page..." suggestion links to, or {@code null} if that suggestion is not a link
+     * @since 18.10.0RC1
+     */
+    public String getShowAllResultsURL()
+    {
+        List<WebElement> links =
+            getDriver().findElementsWithoutWaiting(By.cssSelector(".searchSuggest li.showAllResults a"));
+        return links.isEmpty() ? null : links.get(0).getAttribute("href");
+    }
+
+    /**
      * Closes the suggestions panel by pressing the Escape key.
      *
      * @since 18.9.0RC1

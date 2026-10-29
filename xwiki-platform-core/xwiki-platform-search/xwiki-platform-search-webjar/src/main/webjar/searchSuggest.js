@@ -86,6 +86,9 @@ var XWiki = (function (XWiki) {
     onSuggestContainerPrepared: function(event) {
       // Hide the "No results!" message.
       this.noResultsMessage.addClassName('hidden');
+      // Keep the "Go to search page..." link in sync with the text the suggestions are requested for. Don't wait for
+      // all the sources to answer, since a slow source would otherwise leave the link pointing to the previous text.
+      this._updateAllResultsLink();
     },
 
     /**
@@ -133,6 +136,16 @@ var XWiki = (function (XWiki) {
     },
 
     /**
+     * Keeps the href in sync with the text currently typed in the search field.
+     */
+    _updateAllResultsLink: function() {
+      const form = this.searchInput.up('form');
+      const url = new URL(form.action);
+      url.search = new URLSearchParams(new FormData(form));
+      this.allResultsLink.href = url;
+    },
+
+    /**
      * Creates the underlying suggest widget.
      */
     createSuggest: function() {
@@ -153,7 +166,7 @@ var XWiki = (function (XWiki) {
           eventCallbackScope: this,
           noHighlight: true,
           value: valueNode,
-          containerTagName: 'button'
+          containerTagName: 'a'
         } ),
       ],
       {
@@ -165,6 +178,8 @@ var XWiki = (function (XWiki) {
         }
       });
       var allResults = allResultsNode.getElement();
+      this.allResultsLink = allResults.down('a');
+      this._updateAllResultsLink();
       allResultsNode.items[0].getElement().addEventListener('focusin',
         (event) => this.suggest.setHighlight($(event.currentTarget)));
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {

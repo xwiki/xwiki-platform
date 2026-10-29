@@ -52,10 +52,10 @@ function buildDocumentServiceMock(): DocumentService {
 }
 
 function buildAttachmentsServiceMock(
-  uploadedUrls: (string | undefined)[] | undefined,
+  uploadedURLs: (string | undefined)[] | undefined,
 ): AttachmentsService {
   const attachmentsServiceMock = mock<AttachmentsService>();
-  attachmentsServiceMock.upload.mockResolvedValue(uploadedUrls);
+  attachmentsServiceMock.upload.mockResolvedValue(uploadedURLs);
   return attachmentsServiceMock;
 }
 
@@ -71,7 +71,7 @@ function buildModelReferenceParserProvider(): ModelReferenceParserProvider {
 }
 
 function buildRemoteURLSerializerProvider(
-  serializedUrl: string | undefined,
+  serializedURL: string | undefined,
 ): RemoteURLSerializerProvider {
   return {
     get: () => ({
@@ -82,7 +82,7 @@ function buildRemoteURLSerializerProvider(
         expect((reference as AttachmentReference).document).toBe(
           CURRENT_PAGE_REFERENCE,
         );
-        return serializedUrl;
+        return serializedURL;
       },
     }),
   };
@@ -90,8 +90,8 @@ function buildRemoteURLSerializerProvider(
 
 /** Builds a minimal Container mock covering everything `uploadSelectedFile`/`triggerUserFileUpload` depend on. */
 function buildContainer(options: {
-  uploadedUrls?: (string | undefined)[];
-  serializedUrl?: string;
+  uploadedURLs?: (string | undefined)[];
+  serializedURL?: string;
 }): Container {
   const container = mock<Container>();
 
@@ -100,13 +100,13 @@ function buildContainer(options: {
     .mockReturnValue(buildDocumentServiceMock());
   container.get
     .calledWith("AttachmentsService")
-    .mockReturnValue(buildAttachmentsServiceMock(options.uploadedUrls));
+    .mockReturnValue(buildAttachmentsServiceMock(options.uploadedURLs));
   container.get
     .calledWith("ModelReferenceParserProvider")
     .mockReturnValue(buildModelReferenceParserProvider());
   container.get
     .calledWith("RemoteURLSerializerProvider")
-    .mockReturnValue(buildRemoteURLSerializerProvider(options.serializedUrl));
+    .mockReturnValue(buildRemoteURLSerializerProvider(options.serializedURL));
 
   return container;
 }
@@ -129,7 +129,7 @@ function selectFile(input: HTMLInputElement): void {
 describe("uploadSelectedFile", () => {
   test("returns the attachment service's resolved URL when it provides one", async () => {
     const container = buildContainer({
-      uploadedUrls: ["https://example.org/attachments/picture.png"],
+      uploadedURLs: ["https://example.org/attachments/picture.png"],
     });
 
     await expect(uploadSelectedFile(buildFile(), container)).resolves.toEqual({
@@ -139,8 +139,8 @@ describe("uploadSelectedFile", () => {
 
   test("falls back to a serialized attachment reference when the upload doesn't resolve a URL", async () => {
     const container = buildContainer({
-      uploadedUrls: undefined,
-      serializedUrl: "https://example.org/fallback/picture.png",
+      uploadedURLs: undefined,
+      serializedURL: "https://example.org/fallback/picture.png",
     });
 
     await expect(uploadSelectedFile(buildFile(), container)).resolves.toEqual({
@@ -150,8 +150,8 @@ describe("uploadSelectedFile", () => {
 
   test("also falls back when the upload resolves an array without a URL for the file", async () => {
     const container = buildContainer({
-      uploadedUrls: [undefined],
-      serializedUrl: "https://example.org/fallback/picture.png",
+      uploadedURLs: [undefined],
+      serializedURL: "https://example.org/fallback/picture.png",
     });
 
     await expect(uploadSelectedFile(buildFile(), container)).resolves.toEqual({
@@ -161,8 +161,8 @@ describe("uploadSelectedFile", () => {
 
   test("throws when no URL can be resolved at all", async () => {
     const container = buildContainer({
-      uploadedUrls: undefined,
-      serializedUrl: undefined,
+      uploadedURLs: undefined,
+      serializedURL: undefined,
     });
 
     await expect(uploadSelectedFile(buildFile(), container)).rejects.toThrow(
@@ -174,7 +174,7 @@ describe("uploadSelectedFile", () => {
 describe("triggerUserFileUpload", () => {
   test("appends a hidden file input, resolves with the uploaded URL, and removes the input", async () => {
     const container = buildContainer({
-      uploadedUrls: ["https://example.org/attachments/picture.png"],
+      uploadedURLs: ["https://example.org/attachments/picture.png"],
     });
 
     const promise = triggerUserFileUpload(container);
@@ -250,7 +250,7 @@ describe("triggerUserImageUpload", () => {
   test("offers only images and resolves with the uploaded image's URL", async () => {
     const promise = triggerUserImageUpload(
       buildContainer({
-        uploadedUrls: ["https://example.org/attachments/picture.png"],
+        uploadedURLs: ["https://example.org/attachments/picture.png"],
       }),
     );
 

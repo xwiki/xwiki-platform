@@ -284,7 +284,7 @@ const XML_ENTITIES: Record<string, string> = {
  * @since 18.10.0RC1
  * @beta
  */
-function unescapeXml(str: string): string {
+function unescapeXML(str: string): string {
   return str.replace(
     /&(?:#(\d+)|#x([\da-f]+)|(amp|lt|gt|quot|apos));/gi,
     (match, decimal?: string, hexadecimal?: string, name?: string) => {
@@ -365,7 +365,7 @@ export {
   tryFallible,
   tryFallibleOrError,
   tryFalliblePromiseOrError,
-  unescapeXml,
+  unescapeXML,
 };
 
 export type { TreeNode };

@@ -37,7 +37,7 @@ export type ImageSuggestionForTestProps = {
   // When set, searching for images fails, as when the backend can't be reached.
   linkSuggestServiceFailing?: boolean;
   // The URL of the uploaded image, whatever the file the user picks (uploading fails when not set).
-  uploadedImageUrl?: string;
+  uploadedImageURL?: string;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
@@ -57,7 +57,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   images,
   linkSuggestServiceUnavailable,
   linkSuggestServiceFailing,
-  uploadedImageUrl,
+  uploadedImageURL,
   content,
   syntax,
 }) => {
@@ -92,7 +92,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
     });
     container.get.calledWith("AttachmentsService").mockReturnValue({
       async upload() {
-        return [uploadedImageUrl];
+        return [uploadedImageURL];
       },
     });
 

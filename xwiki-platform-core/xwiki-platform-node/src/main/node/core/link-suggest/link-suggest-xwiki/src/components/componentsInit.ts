@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { unescapeXml } from "@xwiki/platform-fn-utils";
+import { unescapeXML } from "@xwiki/platform-fn-utils";
 import { LinkType, name } from "@xwiki/platform-link-suggest-api";
 import { Container, inject, injectable } from "inversify";
 import type { CristalApp } from "@xwiki/platform-api";
@@ -158,7 +158,7 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     location?: string;
   }) {
     const type = result.type;
-    const hint = unescapeXml(result.location?.trim() ?? "");
+    const hint = unescapeXML(result.location?.trim() ?? "");
     const reference = this.stripEntityTypePrefix(result.reference, type);
     const xwikiURL =
       this.remoteURLSerializerProvider

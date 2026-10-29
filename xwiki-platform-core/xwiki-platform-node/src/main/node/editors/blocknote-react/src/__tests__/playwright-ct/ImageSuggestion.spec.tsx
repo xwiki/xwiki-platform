@@ -351,7 +351,7 @@ test("Uploading an image from the opened image selector inserts it and closes th
   // eslint-disable-next-line max-statements
 }) => {
   const component = await mount(
-    <ImageSuggestionForTest uploadedImageUrl="https://picsum.photos/600" />,
+    <ImageSuggestionForTest uploadedImageURL="https://picsum.photos/600" />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -383,7 +383,7 @@ test("Uploading an image from the edit panel of an image replaces that image", a
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      uploadedImageUrl="https://picsum.photos/600"
+      uploadedImageURL="https://picsum.photos/600"
       content={[
         {
           id: "some-image",

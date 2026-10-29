@@ -88,6 +88,11 @@ require(['jquery', 'xwiki-events-bridge'], function ($) {
             alt: item.speedTip,
             title: item.speedTip
           });
+          // Keep the focus and the selection in the editor when the button is clicked with the mouse, so that the
+          // editor is not blurred before the markup is inserted.
+          button.on('mousedown', function (event) {
+            event.preventDefault();
+          });
           button.on('click', function () {
             self._getInsertTagFunction(textarea[0], self)(textarea[0],
               self._unescapeLineBreaks(item.tagOpen),

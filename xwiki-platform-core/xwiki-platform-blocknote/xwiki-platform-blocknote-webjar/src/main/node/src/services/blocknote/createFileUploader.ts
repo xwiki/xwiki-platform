@@ -152,8 +152,9 @@ function createFileUploader(
     return { props: { url: getDownloadURL(reference), name: "" } };
   }
 
-  // BlockNote's file, video and audio blocks have no XWiki counterpart, so they become a link instead. Its metadata
-  // hangs off a synthetic id carried in the href, because links have no id of their own.
+  // The file, video and audio blocks are saved as macro calls, but those macros don't exist yet, so such a file
+  // becomes a link to the attachment instead. The link metadata hangs off a synthetic id carried in the href,
+  // because links have no id of their own.
   function toAttachmentLink(reference: string, label: string): UploadResult {
     const linkId = uuidv4();
     const metadata = getBlockNoteDocument()!.getMetadata(linkId, true)!;

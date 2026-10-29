@@ -132,7 +132,7 @@ test("A dropped non-image file can be replaced by a link", async ({
   const component = await mount(
     <BlockNoteForTest
       blockNoteOptions={{
-        // What the XWiki integration returns for a file with no XWiki counterpart.
+        // What the XWiki integration returns for a file it links instead of embedding.
         uploadFile: async () => ({
           type: "paragraph",
           content: [

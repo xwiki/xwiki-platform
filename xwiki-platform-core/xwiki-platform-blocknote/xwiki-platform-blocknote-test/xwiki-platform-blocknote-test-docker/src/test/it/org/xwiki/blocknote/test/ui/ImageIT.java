@@ -257,8 +257,8 @@ class ImageIT extends AbstractBlockNoteIT
 
         page.save();
 
-        // A non-image has no XWiki counterpart, so it becomes an attachment link, in a block of its own after the
-        // paragraph that held the caret.
+        // The file block is saved as a macro call, but that macro doesn't exist yet, so the file becomes an
+        // attachment link instead, in a block of its own after the paragraph that held the caret.
         assertEquals("""
             before
 

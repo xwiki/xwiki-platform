@@ -30,8 +30,8 @@ import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-ap
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
 
 export type ImageSuggestionForTestProps = {
-  // The reference defaults to "some attachment reference" (see `depsContainerMock`).
-  images?: Array<{ label: string; url: string; reference?: string }>;
+  // The hint (i.e. the location of the image) defaults to an empty string.
+  images?: Array<{ label: string; url: string; hint?: string }>;
   // When set, the LinkSuggestService is unavailable, as with a backend that doesn't support search.
   linkSuggestServiceUnavailable?: boolean;
   // When set, searching for images fails, as when the backend can't be reached.
@@ -76,9 +76,9 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
 
                 return (images ?? []).map((image, index) => ({
                   id: `image-${index}`,
-                  hint: "",
+                  hint: image.hint ?? "",
                   label: image.label,
-                  reference: image.reference ?? "some attachment reference",
+                  reference: "some attachment reference",
                   type: LINK_TYPE_ATTACHMENT,
                   url: image.url,
                 }));

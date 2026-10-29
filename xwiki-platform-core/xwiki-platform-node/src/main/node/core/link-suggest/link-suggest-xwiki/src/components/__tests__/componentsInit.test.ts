@@ -80,6 +80,7 @@ describe("XWikiLinkSuggestService", () => {
         type: "DOCUMENT",
         reference: "document:wiki:Space.Page",
         title_: "Some Page",
+        location: "Space",
       },
     ]);
 
@@ -90,7 +91,7 @@ describe("XWikiLinkSuggestService", () => {
         url: "http://localhost/xwiki/wiki:Space.Page",
         reference: "wiki:Space.Page",
         label: "Some Page",
-        hint: "Some Page",
+        hint: "Space",
       },
     ]);
   });
@@ -102,6 +103,7 @@ describe("XWikiLinkSuggestService", () => {
         type: "ATTACHMENT",
         reference: "attachment:wiki:Space.Page@image.gif",
         filename: ["image.gif"],
+        location: "Space / Page",
       },
     ]);
 
@@ -112,7 +114,7 @@ describe("XWikiLinkSuggestService", () => {
         url: "http://localhost/xwiki/wiki:Space.Page@image.gif",
         reference: "wiki:Space.Page@image.gif",
         label: "image.gif",
-        hint: "image.gif",
+        hint: "Space / Page",
       },
     ]);
   });
@@ -128,5 +130,50 @@ describe("XWikiLinkSuggestService", () => {
     ]);
 
     expect((await getLinks("Some"))[0].reference).toBe("wiki:Space.Page");
+  });
+
+  it("uses the location of the suggested entity, trimmed and unescaped, as its hint", async () => {
+    mockSolrResults([
+      {
+        id: "wiki:Space.Page_en",
+        type: "DOCUMENT",
+        reference: "document:wiki:Space.Page",
+        title_: "Some Page",
+        // The location is XML escaped and surrounded by the white space of the Velocity code producing it.
+        location:
+          "\n      R&#38;D / Cats &amp; dogs &#x7B;1&#125; &#60;new&#62;\n  ",
+      },
+    ]);
+
+    expect((await getLinks("Some"))[0].hint).toBe(
+      "R&D / Cats & dogs {1} <new>",
+    );
+  });
+
+  it("keeps the invalid character references of the location as they are", async () => {
+    mockSolrResults([
+      {
+        id: "wiki:Space.Page_en",
+        type: "DOCUMENT",
+        reference: "document:wiki:Space.Page",
+        title_: "Some Page",
+        location: "Space &#x110000; &unknown;",
+      },
+    ]);
+
+    expect((await getLinks("Some"))[0].hint).toBe("Space &#x110000; &unknown;");
+  });
+
+  it("leaves the hint empty when the suggested entity has no location", async () => {
+    mockSolrResults([
+      {
+        id: "wiki:Main.WebHome_en",
+        type: "DOCUMENT",
+        reference: "document:wiki:Main.WebHome",
+        title_: "Home",
+      },
+    ]);
+
+    expect((await getLinks("Home"))[0].hint).toBe("");
   });
 });

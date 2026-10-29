@@ -27,7 +27,6 @@ import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
 import { Paper } from "@mantine/core";
 import {
   debounceAsync,
-  tryFallible,
   tryFalliblePromiseOrError,
 } from "@xwiki/platform-fn-utils";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
@@ -40,11 +39,6 @@ import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/platform-link-suggest-api";
-import type { AttachmentReference } from "@xwiki/platform-model-api";
-import type {
-  ModelReferenceParser,
-  ModelReferenceParserProvider,
-} from "@xwiki/platform-model-reference-api";
 
 import "./ImageSuggestionController.css";
 
@@ -60,10 +54,6 @@ export function ImageSuggestionController({
   const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
   ).get!();
-
-  const modelReferenceParser = depsContainer
-    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    .get()!;
 
   const editor = useEditor();
   const uploadImage = useImageUploader(editor, depsContainer);
@@ -88,7 +78,6 @@ export function ImageSuggestionController({
         const suggestions = await fetchImageSuggestions(
           query,
           linkSuggestService,
-          modelReferenceParser,
           editor,
           t,
         );
@@ -116,7 +105,6 @@ export function ImageSuggestionController({
     [
       t,
       linkSuggestService,
-      modelReferenceParser,
       editor,
       maxSuggestions,
       openImageSelector,
@@ -165,7 +153,6 @@ export function ImageSuggestionController({
 async function fetchImageSuggestions(
   query: string,
   linkSuggestService: LinkSuggestService | undefined,
-  modelReferenceParser: ModelReferenceParser,
   editor: EditorType,
   t: ReturnType<typeof useTranslation>["t"],
 ): Promise<DefaultReactSuggestionItem[]> {
@@ -194,8 +181,9 @@ async function fetchImageSuggestions(
   return results.map(
     (link): DefaultReactSuggestionItem => ({
       title: link.label,
-      // Shown under the image's name, like in the image selector.
-      subtext: getImageLocation(link.reference, modelReferenceParser),
+      // The location of the image (shown under its name, like in the image selector), to distinguish
+      // images with the same name.
+      subtext: link.hint || undefined,
       group,
       // The image is described by the title right next to it, hence the empty alternative text.
       icon: (
@@ -213,33 +201,4 @@ async function fetchImageSuggestions(
       },
     }),
   );
-}
-
-/**
- * Returns the location of the page holding an image attachment, or `undefined` when it has none or
- * when the attachment reference can't be parsed: the image can still be suggested without it.
- */
-function getImageLocation(
-  reference: string,
-  modelReferenceParser: ModelReferenceParser,
-): string | undefined {
-  const attachmentReference = tryFallible(
-    () =>
-      modelReferenceParser.parse(reference, {
-        relative: false,
-      }) as AttachmentReference,
-  );
-
-  if (!attachmentReference) {
-    return undefined;
-  }
-
-  const documentReference = attachmentReference.document;
-  const segments = documentReference.space?.names.slice(0) ?? [];
-
-  if (documentReference.terminal) {
-    segments.push(documentReference.name);
-  }
-
-  return segments.length > 0 ? segments.join(" / ") : undefined;
 }

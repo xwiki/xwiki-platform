@@ -29,6 +29,36 @@ import type {
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 
+const XML_ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+};
+
+/**
+ * Decodes the character references and the predefined entities of an XML escaped text.
+ *
+ * @param text - the XML escaped text
+ * @returns the decoded text
+ */
+function unescapeXML(text: string): string {
+  return text.replace(
+    /&(?:#(\d+)|#x([\da-f]+)|(amp|lt|gt|quot|apos));/gi,
+    (match, decimal?: string, hexadecimal?: string, name?: string) => {
+      if (name) {
+        return XML_ENTITIES[name.toLowerCase()];
+      }
+      const codePoint = decimal
+        ? Number.parseInt(decimal, 10)
+        : Number.parseInt(hexadecimal!, 16);
+      // Keep invalid character references as they are.
+      return codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : match;
+    },
+  );
+}
+
 /**
  * Default implementation of the link suggestion service, for XWiki.
  * Currently limited to guests, and to XWiki instances that have explicitly
@@ -153,8 +183,11 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     title_: string;
     name: string;
     reference: string;
+    // The (XML escaped) labels of the pages containing the entity, separated by " / ".
+    location?: string;
   }) {
     const type = result.type;
+    const hint = unescapeXML(result.location?.trim() ?? "");
     const reference = this.stripEntityTypePrefix(result.reference, type);
     const xwikiURL =
       this.remoteURLSerializerProvider
@@ -170,7 +203,7 @@ class XWikiLinkSuggestService implements LinkSuggestService {
         url: xwikiURL,
         reference,
         label: result.filename[0],
-        hint: result.filename[0],
+        hint,
       };
     } else if (type == "DOCUMENT") {
       const label = result.title_;
@@ -180,7 +213,7 @@ class XWikiLinkSuggestService implements LinkSuggestService {
         url: xwikiURL,
         reference,
         label,
-        hint: label,
+        hint,
       };
     }
   }

@@ -164,34 +164,5 @@ const parseModelReference: ModelReferenceParser["parse"] = (
     );
   }
 
-  // An attachment of a non-terminal page, i.e. Animals.Cats.WebHome
-  if (
-    reference === "some nested attachment reference" &&
-    (!opts?.type || opts?.type === EntityType.ATTACHMENT)
-  ) {
-    return new AttachmentReference(
-      "some attachment",
-      new DocumentReference(
-        "WebHome",
-        new SpaceReference(undefined, "Animals", "Cats"),
-      ),
-    );
-  }
-
-  // An attachment of a terminal page, i.e. Animals.Cat
-  if (
-    reference === "some terminal attachment reference" &&
-    (!opts?.type || opts?.type === EntityType.ATTACHMENT)
-  ) {
-    return new AttachmentReference(
-      "some attachment",
-      new DocumentReference(
-        "Cat",
-        new SpaceReference(undefined, "Animals"),
-        true,
-      ),
-    );
-  }
-
   throw new Error("Invalid reference provided");
 };

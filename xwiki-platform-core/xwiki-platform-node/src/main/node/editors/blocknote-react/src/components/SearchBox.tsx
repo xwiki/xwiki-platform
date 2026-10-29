@@ -103,7 +103,11 @@ type SearchBoxProps = {
  */
 type LinkSuggestion = {
   title: string;
-  segments: string[];
+  /**
+   * Additional information to distinguish suggestions with the same title (e.g. their location), empty when there's
+   * none.
+   */
+  hint: string;
   reference: string;
   url: string;
   type: LinkType;

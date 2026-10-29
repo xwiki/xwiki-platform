@@ -54,17 +54,16 @@ test("The image quick action shows the browse and upload actions, then the match
         {
           label: "Cat picture",
           url: "https://picsum.photos/150",
-          reference: "some nested attachment reference",
+          hint: "Animals / Cats",
         },
         {
           label: "Dog picture",
           url: "https://picsum.photos/300",
-          reference: "some terminal attachment reference",
+          hint: "Animals / Cat",
         },
         {
           label: "Bird picture",
           url: "https://picsum.photos/450",
-          reference: "some invalid reference",
         },
       ]}
     />,
@@ -114,7 +113,7 @@ test("The image quick action shows the browse and upload actions, then the match
     items.nth(3).locator(".bn-mt-suggestion-menu-item-subtitle"),
   ).toHaveText("Animals / Cat");
 
-  // An image whose reference can't be parsed is still suggested, only without its location.
+  // An image without a location (empty hint) is shown without subtitle.
   await expect(items.nth(4)).toContainText("Bird picture");
   await expect(
     items.nth(4).locator(".bn-mt-suggestion-menu-item-subtitle"),
@@ -472,6 +471,39 @@ test("Selecting a search result in the opened image selector inserts the image b
     "src",
     "https://picsum.photos/150",
   );
+});
+
+test("The opened image selector shows the location of the found images", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      images={[
+        {
+          label: "Cat picture",
+          url: "https://picsum.photos/150",
+          hint: "Animals / Cats",
+        },
+        { label: "Bird picture", url: "https://picsum.photos/450" },
+      ]}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await openImageQuickAction(page, editorEl);
+  await page.locator(".bn-suggestion-menu-item").nth(0).click();
+
+  const searchInput = page.locator('[data-test="searchBoxInput"]');
+  await searchInput.click();
+  await searchInput.fill("picture");
+
+  const options = page.getByRole("option");
+  await expect(options).toHaveCount(2);
+  await expect(options.nth(0)).toHaveText("Cat pictureAnimals / Cats");
+  // An image without a location is shown with its name only.
+  await expect(options.nth(1)).toHaveText("Bird picture");
 });
 
 test("Keyboard navigation can select a search result in the opened image selector", async ({

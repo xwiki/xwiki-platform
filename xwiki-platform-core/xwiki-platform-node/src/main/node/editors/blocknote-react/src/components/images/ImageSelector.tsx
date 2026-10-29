@@ -41,10 +41,7 @@ import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
 import type { LinkSuggestion } from "../SearchBox";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
-import type {
-  ModelReferenceHandlerProvider,
-  ModelReferenceParserProvider,
-} from "@xwiki/platform-model-reference-api";
+import type { ModelReferenceHandlerProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLParserProvider } from "@xwiki/platform-model-remote-url-api";
 
 export type ImageSelectorProps = {
@@ -64,10 +61,6 @@ export function ImageSelector({
 
   const modelReferenceHandler = depsContainer
     .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
-    .get()!;
-
-  const modelReferenceParser = depsContainer
-    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
     .get()!;
 
   const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
@@ -111,29 +104,17 @@ export function ImageSelector({
         "image/*",
       );
 
-      return results.map((link): LinkSuggestion => {
-        const attachmentReference = modelReferenceParser?.parse(
-          link.reference,
-          { relative: false },
-        ) as AttachmentReference;
-
-        const documentReference = attachmentReference.document;
-        const segments = documentReference.space?.names.slice(0) ?? [];
-
-        if (documentReference.terminal) {
-          segments.push(documentReference.name);
-        }
-
-        return {
+      return results.map(
+        (link): LinkSuggestion => ({
           type: link.type,
           title: link.label,
           reference: link.reference,
           url: link.url,
-          segments,
-        };
-      });
+          hint: link.hint,
+        }),
+      );
     },
-    [modelReferenceParser, linkSuggestService],
+    [linkSuggestService],
   );
 
   const uploadImage = useCallback(async () => {
@@ -170,11 +151,7 @@ export function ImageSelector({
               <Text>
                 <RiAttachmentLine /> {suggestion.title}
               </Text>
-              <Breadcrumbs c="gray">
-                {suggestion.segments.map((segment, i) => (
-                  <Text key={`${i}${segment}`}>{segment}</Text>
-                ))}
-              </Breadcrumbs>
+              {suggestion.hint && <Text c="gray">{suggestion.hint}</Text>}
             </Stack>
           </Flex>
         )}

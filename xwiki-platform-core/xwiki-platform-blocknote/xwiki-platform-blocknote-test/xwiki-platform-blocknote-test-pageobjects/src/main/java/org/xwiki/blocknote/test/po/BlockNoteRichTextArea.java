@@ -564,27 +564,21 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public WebElement waitUntilLinkIsPresent(String label)
     {
-        return waitUntilLinkIsPresent(By.xpath(".//a[normalize-space(.) = " + getUtil().escapeXPath(label) + "]"));
+        By locator = By.xpath(".//a[normalize-space(.) = " + getUtil().escapeXPath(label) + "]");
+        getDriver().waitUntilCondition(driver -> !this.container.findElements(locator).isEmpty());
+        return this.container.findElement(locator);
     }
 
     /**
-     * Waits for a link, whatever its label, which is what a pasted file needs: it is attached under a generated name
-     * the test doesn't know in advance.
+     * Waits for the link a pasted file is turned into. Its label is the name the attachment was created with, which
+     * is generated for a pasted file, so the test can't ask for it by label.
      *
      * @return the link element
      * @since 18.10.0RC1
      */
-    public WebElement waitUntilLinkIsPresent()
+    public WebElement waitUntilAttachmentLinkIsPresent()
     {
-        return waitUntilLinkIsPresent(By.xpath(".//a"));
-    }
-
-    /**
-     * @param locator the locator of the expected link
-     * @return the link element
-     */
-    private WebElement waitUntilLinkIsPresent(By locator)
-    {
+        By locator = By.xpath(".//a");
         getDriver().waitUntilCondition(driver -> !this.container.findElements(locator).isEmpty());
         return this.container.findElement(locator);
     }

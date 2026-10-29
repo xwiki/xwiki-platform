@@ -158,7 +158,7 @@ class AbstractExtensionRESTResourceTest
 
         assertEquals("1.0", extension.getVersion());
         assertEquals(1, extension.getDependencies().size());
-        assertEquals("dependency-id", extension.getDependencies().getFirst().getId());
+        assertEquals("dependency-id", extension.getDependencies().get(0).getId());
     }
 
     private XWikiDocument mockExtensionDocument() throws Exception

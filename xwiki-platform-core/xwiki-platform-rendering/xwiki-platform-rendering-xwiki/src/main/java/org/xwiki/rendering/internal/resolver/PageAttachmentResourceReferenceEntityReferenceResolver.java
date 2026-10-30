@@ -28,6 +28,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageAttachmentReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 
 /**
  * Convert attachment resource reference into entity reference.
@@ -54,7 +55,8 @@ public class PageAttachmentResourceReferenceEntityReferenceResolver
     }
 
     @Override
-    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
+    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
+        DocumentExistenceOverride existenceOverride)
     {
         return this.defaultStringAttachmentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
     }

@@ -33,6 +33,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 
 /**
  * Convert attachment resource reference into entity reference.
@@ -64,7 +65,8 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
     }
 
     @Override
-    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
+    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
+        DocumentExistenceOverride existenceOverride)
     {
         // If the reference is empty let default resolver deal with it
         if (StringUtils.isEmpty(resourceReference.getReference())) {
@@ -85,7 +87,8 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
 
         // Take care of fallback if needed
         DocumentReference finalDocumentReference =
-            resolveDocumentReference(relativeReference.getParent(), documentReference, baseReference);
+            resolveDocumentReference(relativeReference.getParent(), documentReference, baseReference,
+                existenceOverride);
         if (finalDocumentReference != documentReference) {
             attachmentReference = new AttachmentReference(attachmentReference.getName(), finalDocumentReference);
         }

@@ -64,6 +64,12 @@
       <type>xar</type>
     </dependency>
     <dependency>
+      <!-- We need this to test the wiki picker, which lists the wikis through the REST API. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-user-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <!-- We need this to test the code snippet Quick Action. -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-code</artifactId>

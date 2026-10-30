@@ -1858,7 +1858,7 @@ $notifs
       <name>wikis</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.model.reference.WikiReference&gt;</type>
     </property>
   </object>
   <object>
@@ -1936,7 +1936,7 @@ $notifs
       <name>spaces</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.model.reference.SpaceReference&gt;</type>
     </property>
   </object>
   <object>
@@ -2014,7 +2014,7 @@ $notifs
       <name>pages</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;</type>
     </property>
   </object>
   <object>
@@ -2092,7 +2092,7 @@ $notifs
       <name>users</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.user.UserReference&gt;</type>
     </property>
   </object>
   <object>
@@ -2326,7 +2326,7 @@ $notifs
       <name>tags</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.tag.Tag&gt;</type>
     </property>
   </object>
 </xwikidoc>

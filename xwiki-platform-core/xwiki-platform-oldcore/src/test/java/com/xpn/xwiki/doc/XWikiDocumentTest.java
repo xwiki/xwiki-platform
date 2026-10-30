@@ -46,6 +46,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
@@ -315,6 +316,29 @@ class XWikiDocumentTest
                 "ImageSpace.ImageDocument.WebHome",
                 "Space.ObjectTargetPage.WebHome"
             )), linkedPages);
+    }
+
+    @Test
+    void getUniqueLinkedEntitiesWithExistenceRecorder() throws XWikiException
+    {
+        DocumentReference existingReference = new DocumentReference(DOCWIKI, "ExistingSpace", "ExistingPage");
+        doReturn(true).when(this.xWiki).exists(existingReference, this.oldcore.getXWikiContext());
+
+        this.document.setSyntax(Syntax.XWIKI_2_1);
+        this.document
+            .setContent("[[TargetSpace.TargetPage]][[ExistingSpace.ExistingPage]][[doc:TypedSpace.TypedPage]]");
+        this.baseObject.setLargeStringValue("area", "[[ObjectTargetPage]]");
+
+        DocumentExistenceCheckRecorder recorder = new DocumentExistenceCheckRecorder();
+        Set<EntityReference> linkedEntities =
+            this.document.getUniqueLinkedEntities(this.oldcore.getXWikiContext(), recorder);
+
+        assertEquals(Set.of(new DocumentReference(DOCWIKI, List.of("TargetSpace", "TargetPage"), "WebHome"),
+            existingReference, new DocumentReference(DOCWIKI, "TypedSpace", "TypedPage"),
+            new DocumentReference(DOCWIKI, List.of(DOCSPACE, "ObjectTargetPage"), "WebHome")), linkedEntities);
+        // Only the untyped links, from the content and from the xobjects, depend on the existence of documents.
+        assertEquals(Set.of(new DocumentReference(DOCWIKI, "TargetSpace", "TargetPage"), existingReference,
+            new DocumentReference(DOCWIKI, DOCSPACE, "ObjectTargetPage")), recorder.getDocuments());
     }
 
     @Test

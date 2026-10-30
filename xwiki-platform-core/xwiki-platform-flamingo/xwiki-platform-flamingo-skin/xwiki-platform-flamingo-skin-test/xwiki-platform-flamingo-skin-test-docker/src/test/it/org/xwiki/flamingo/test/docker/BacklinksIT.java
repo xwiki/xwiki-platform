@@ -19,6 +19,7 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.repository.test.SolrTestUtils;
@@ -37,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BacklinksIT
 {
     @Test
+    @Order(1)
     void backlinks(TestUtils setup, TestReference reference) throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -76,5 +78,38 @@ class BacklinksIT
         vp = setup.gotoPage(targetDocumentReference);
 
         assertEquals(setup.serializeReference(sourceDocumentReference1.getLocalDocumentReference()), vp.getContent());
+    }
+
+    @Test
+    @Order(2)
+    void backlinksToTerminalPageCreatedAfterTheLink(TestUtils setup, TestReference reference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        DocumentReference targetDocumentReference =
+            new DocumentReference("LaterBacklinkTargetTest", reference.getLastSpaceReference());
+        DocumentReference sourceDocumentReference =
+            new DocumentReference("LaterBacklinkSourceTest", reference.getLastSpaceReference());
+
+        setup.rest().delete(targetDocumentReference);
+        setup.rest().delete(sourceDocumentReference);
+
+        // Create a source page with an untyped link to a terminal page which doesn't exist yet: at this stage the link
+        // targets the space home page with the same name.
+        setup.createPage(sourceDocumentReference,
+            String.format("[[%s]]", setup.serializeReference(targetDocumentReference.getLocalDocumentReference())),
+            null);
+        SolrTestUtils solrUtils = new SolrTestUtils(setup);
+        solrUtils.waitEmptyQueue();
+
+        // Create the terminal page targeted by the link, listing the backlinks leading to it.
+        setup.createPage(targetDocumentReference,
+            "{{velocity}}#foreach ($link in $doc.getBacklinks())\n$link\n#end{{/velocity}}", null);
+
+        // Wait for the solr indexing to be completed before checking the backlinks of the target.
+        solrUtils.waitEmptyQueue();
+
+        // The link of the source page now targets the terminal page, without saving the source page again.
+        ViewPage vp = setup.gotoPage(targetDocumentReference);
+        assertEquals(setup.serializeReference(sourceDocumentReference.getLocalDocumentReference()), vp.getContent());
     }
 }

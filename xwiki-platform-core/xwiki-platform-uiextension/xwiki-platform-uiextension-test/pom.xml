@@ -62,6 +62,14 @@
       <artifactId>xwiki-rendering-macro-html</artifactId>
       <version>${rendering.version}</version>
     </dependency>
+    <!-- Required since the Solr components fail to initialize without a configured Solr implementation, which logs
+         errors that fail the tests -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

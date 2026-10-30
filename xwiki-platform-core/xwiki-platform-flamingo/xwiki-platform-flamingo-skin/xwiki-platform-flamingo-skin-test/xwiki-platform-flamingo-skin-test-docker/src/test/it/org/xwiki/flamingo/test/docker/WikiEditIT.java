@@ -22,6 +22,7 @@ package org.xwiki.flamingo.test.docker;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,6 +37,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.panels.test.po.DocumentInformationPanel;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -53,6 +55,7 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.PreviewEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -1139,5 +1142,22 @@ class WikiEditIT
         } finally {
             setup.setWikiPreference("xwiki.title.mandatory", "0");
         }
+    }
+
+    /**
+     * Verify that the edit form can save a large content: servlet containers limit the size of the form data they
+     * accept (200 KB by default for Jetty), so XWiki must raise that limit.
+     */
+    @Test
+    @Order(16)
+    void saveLargeContent(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+
+        String content = secure().nextAlphanumeric(300000);
+        assertEquals(200, setup.submitForm(testReference, "save", Map.of("content", content)));
+
+        Page page = setup.rest().get(testReference);
+        assertEquals(content, page.getContent());
     }
 }

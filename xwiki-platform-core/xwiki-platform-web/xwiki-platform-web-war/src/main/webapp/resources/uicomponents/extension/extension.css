@@ -61,6 +61,12 @@
   padding: 4px 0px;
 }
 
+/* The multi-plan supporter element is a div (it holds the support plans dialog) but it must be displayed inline, like
+   the single-plan supporters, when the supporters are listed inline. */
+.support-multi-plan.supporter-inline {
+  display: inline;
+}
+
 .supporter-name {
   border: none;
   background: transparent;

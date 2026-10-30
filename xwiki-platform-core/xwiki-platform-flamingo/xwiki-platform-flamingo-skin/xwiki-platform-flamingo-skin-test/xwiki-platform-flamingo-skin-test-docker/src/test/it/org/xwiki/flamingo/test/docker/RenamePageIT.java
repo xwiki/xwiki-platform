@@ -320,11 +320,14 @@ class RenamePageIT
         TestConfiguration testConfiguration) throws Exception
     {
         // The image and the untyped link target a terminal page, to check that their references are updated even
-        // though the renamed terminal page doesn't exist anymore when the backlinks are updated.
+        // though the renamed terminal page doesn't exist anymore when the backlinks are updated. The sibling link is
+        // an untyped link resolved to the sibling space home page of the test page, which the resolver only does when
+        // that space home page exists, so it has to be updated even though the renamed page doesn't exist anymore.
         // Fixture: we're creating 5 different pages to ensure that the backlinks, rename are working properly
         // and independently in different situations.
         String sourcePageName = "WebHome";
-        String sourcePageLocation1 = RenamePageIT.class.getSimpleName() + ".StandardLink";
+        String siblingLink = "StandardLink";
+        String sourcePageLocation1 = RenamePageIT.class.getSimpleName() + "." + siblingLink;
         String sourcePage1 = sourcePageLocation1 + "." + sourcePageName;
 
         String sourcePageLocation2 = RenamePageIT.class.getSimpleName() + ".StandardMacroLink";
@@ -402,9 +405,11 @@ class RenamePageIT
             + "{{warning}}%n"
             + "Withing a macro: Check out this page: [[type the link label>>doc:%1$s]]%n"
             + "{{/warning}}%n%n"
+            + "Sibling link: [[%6$s]]%n%n"
             + "Final line.";
         setup.rest().savePage(testReference,
-            String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5),
+            String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5,
+                siblingLink),
             "testPage");
 
         // Wait for the solr indexing to be completed before doing any rename
@@ -421,8 +426,8 @@ class RenamePageIT
 
         viewPage = setup.gotoPage(testReference);
         WikiEditPage wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5,
+            targetPage1), wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
@@ -438,8 +443,8 @@ class RenamePageIT
 
         viewPage = setup.gotoPage(testReference);
         wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, targetPage2, sourcePage3, sourcePage4, sourcePage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, sourcePage3, sourcePage4, sourcePage5,
+            targetPage1), wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
@@ -455,8 +460,8 @@ class RenamePageIT
 
         viewPage = setup.gotoPage(testReference);
         wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, sourcePage4, sourcePage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, sourcePage4, sourcePage5,
+            targetPage1), wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
@@ -472,8 +477,8 @@ class RenamePageIT
 
         viewPage = setup.gotoPage(testReference);
         wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, sourcePage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, sourcePage5,
+            targetPage1), wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
@@ -489,8 +494,8 @@ class RenamePageIT
 
         viewPage = setup.gotoPage(testReference);
         wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, targetPage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, targetPage5,
+            targetPage1), wikiEditPage.getContent());
     }
 
     /**

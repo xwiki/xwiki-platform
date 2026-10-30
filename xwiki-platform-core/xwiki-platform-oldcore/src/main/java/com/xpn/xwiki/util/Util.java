@@ -172,6 +172,9 @@ public class Util
      * @param mapString The string that must be parsed.
      * @return A Map containing the keys and values. If a key is defined more than once, the last value is used.
      */
+    // Published API returning a Hashtable since XWiki 1.0: widening the return type to Map would break the callers
+    // that assign it to a Hashtable.
+    @SuppressWarnings("java:S1319")
     public static Hashtable<String, String> keyValueToHashtable(String mapString) throws IOException
     {
         Hashtable<String, String> result = new Hashtable<>();

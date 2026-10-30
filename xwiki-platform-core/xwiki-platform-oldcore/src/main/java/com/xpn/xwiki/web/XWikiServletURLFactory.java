@@ -795,6 +795,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return createAttachmentRevisionURL(filename, spaces, name, revision, -1, querystring, xwikidb, context);
     }
 
+    // Published API of the URL factory, overridden by extensions: the signature cannot change.
+    @SuppressWarnings("java:S107")
     public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, long recycleId,
         String querystring, String xwikidb, XWikiContext context)
     {

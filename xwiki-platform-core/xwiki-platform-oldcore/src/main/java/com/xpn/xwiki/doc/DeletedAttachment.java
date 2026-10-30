@@ -137,6 +137,8 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param id the synthetic id of this deleted attachment. Uniquely identifies an entry in the recycle bin.
      * @since 9.10RC1
      */
+    // Published constructor (@since 9.10RC1) taking one parameter per recycle bin column: the signature cannot change.
+    @SuppressWarnings("java:S107")
     public DeletedAttachment(long docId, String docName, String filename, String storeType, String deleter,
         Date deleteDate, DeletedAttachmentContent content, long id)
     {

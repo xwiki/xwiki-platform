@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import "./mentionMenu.css";
 import { insertMacroInvocation } from "../../blocknote/utils";
 import { createElement } from "react";
 import type { EditorType } from "../../blocknote";
@@ -92,7 +93,11 @@ async function queryMentionMenuItems({
     subtext: user.hint,
     group: t("blocknote.mentionMenu.group"),
     icon: user.icon?.url
-      ? createElement("img", { src: user.icon.url, alt: "" })
+      ? createElement("img", {
+          src: user.icon.url,
+          alt: "",
+          className: "xwiki-mention-avatar",
+        })
       : createElement("span", { className: user.icon?.cssClass }),
     onItemClick: () =>
       insertMacroInvocation(editor, {

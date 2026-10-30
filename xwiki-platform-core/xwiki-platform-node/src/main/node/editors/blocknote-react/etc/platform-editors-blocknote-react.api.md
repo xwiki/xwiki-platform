@@ -60,6 +60,7 @@ export type BlockNoteViewWrapperProps = {
     onChange?: (editor: EditorType) => void;
     depsContainer: Container;
     linkEditionHandler: LinkEditionHandler;
+    userSuggest?: UserSuggestFn;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
         imageEditionHooks?: ImageEditionHooks;
@@ -228,9 +229,23 @@ export type MacroInsertionEditorPrefillData = {
 };
 
 // @beta
+export type MentionableUser = {
+    reference: string;
+    label: string;
+    hint?: string;
+    icon?: {
+        url?: string;
+        cssClass?: string;
+    };
+};
+
+// @beta
 export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWrapperProps): {
     unmount: () => void;
 };
+
+// @beta
+export type UserSuggestFn = (query: string) => Promise<MentionableUser[]>;
 
 // (No @packageDocumentation comment for this package)
 

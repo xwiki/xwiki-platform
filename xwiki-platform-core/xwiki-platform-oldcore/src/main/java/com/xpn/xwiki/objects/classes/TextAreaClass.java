@@ -448,6 +448,7 @@ public class TextAreaClass extends StringClass
         parameters.put("cols", getSize());
         parameters.put(ROWS, getRows());
         parameters.put("disabled", isDisabled());
+        parameters.put(ARIA_LABEL, getAriaLabelFallback(context));
         parameters.put(RESTRICTED, isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
         // The document reference is used client-side (e.g. to resolve relative references and build URLs).
         parameters.put("sourceDocumentReference", ownerDocument.getDocumentReferenceWithLocale());

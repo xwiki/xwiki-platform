@@ -167,6 +167,7 @@ class StaticListClassTest
     void testDisplayEditInput()
     {
         testDisplayEdit("input", VALUES_WITH_HTML_SPECIAL_CHARS, "<input size='7' id='w&#62;vb&#38;a&#60;r' "
+            + "aria-label='Static List' "
             + "value='a&#60;b&#62;c|1&#34;2&#39;3|x&#123;y&#38;z' name='w&#62;vb&#38;a&#60;r' type='text'/>");
     }
 
@@ -177,7 +178,7 @@ class StaticListClassTest
     void testDisplayEditSelect()
     {
         String expectedHTML = "<select size='7' id='w&#62;vb&#38;a&#60;r' "
-            + "aria-label='core.model.xclass.editClassProperty.textAlternative' name='w&#62;vb&#38;a&#60;r'>"
+            + "aria-label='Static List' name='w&#62;vb&#38;a&#60;r'>"
             + "<option value='' label='---'>---</option>"
             + "<option value='a&#60;b&#62;c' label='c&#62;b&#60;a'>c&#62;b&#60;a</option>"
             + "<option selected='selected' value='1&#34;2&#39;3' label='3&#39;2&#34;1'>3&#39;2&#34;1</option>"

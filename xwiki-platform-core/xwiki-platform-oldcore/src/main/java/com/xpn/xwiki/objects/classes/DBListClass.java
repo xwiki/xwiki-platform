@@ -596,6 +596,7 @@ public class DBListClass extends ListClass
             }
 
             input.setDisabled(isDisabled());
+            setAriaLabelFallback(input, context);
             buffer.append(input.toString());
         } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
             displayRadioEdit(buffer, name, prefix, object, context);

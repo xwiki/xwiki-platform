@@ -1842,7 +1842,7 @@ class PDFExportIT
         String jobId = StringUtils.substringBetween(output, "[jobId:", ":jobId]");
 
         PDFPrintPreviewPage printPreview = PDFPrintPreviewPage
-            .gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"), jobId);
+            .gotoPage(new LocalDocumentReference(List.of("PDFExportIT", "Parent"), "WebHome"), jobId);
         // We should have 4 print pages: cover page, table of contents, one page for the parent document and one
         // page for the child document.
         assertEquals(4, printPreview.getPrintPageCount());

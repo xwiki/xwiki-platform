@@ -43,13 +43,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
@@ -90,6 +87,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -109,6 +107,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ReferenceComponentList
 // @formatter:off
 @ComponentList({
     ResourceReferenceRenamer.class,
@@ -124,20 +123,7 @@ class DefaultReferenceUpdaterTest
     private static final String TRANSLATED_BACKLINK_COMMENT = "Back-link save";
 
     @MockComponent
-    @Named("compact")
-    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
-
-    @MockComponent
-    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
-
-    @MockComponent
-    private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
-
-    @MockComponent
     private EntityReferenceResolver<ResourceReference> resourceReferenceResolver;
-
-    @MockComponent
-    private PageReferenceResolver<EntityReference> defaultReferencePageReferenceResolver;
 
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;
@@ -355,14 +341,11 @@ class DefaultReferenceUpdaterTest
         when(this.resourceReferenceResolver.resolve(xobjectSpaceLinkReference, null, newReference))
             .thenReturn(originalSpaceReference);
 
-        when(this.compactEntityReferenceSerializer.serialize(originalDocLinkReference, newReference)).thenReturn("A.C");
-        when(this.defaultEntityReferenceSerializer.serialize(absoluteDocLinkReference, newReference))
-            .thenReturn("wiki:C.WebHome");
 
         updater.update(newReference, oldReference, newReference);
 
         // Document link block is updated.
-        assertEquals("A.C", docLinkBlock.getReference().getReference());
+        assertEquals("A.C.WebHome", docLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, docLinkBlock.getReference().getType());
         assertEquals("wiki:C.WebHome", absoluteDocLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, absoluteDocLinkBlock.getReference().getType());
@@ -373,7 +356,7 @@ class DefaultReferenceUpdaterTest
         assertEquals("attachment.txt", imageBlock.getReference().getReference());
 
         // XObject Document link block is updated.
-        assertEquals("A.C", xobjectDocLinkBlock.getReference().getReference());
+        assertEquals("A.C.WebHome", xobjectDocLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, xobjectDocLinkBlock.getReference().getType());
         // XObject Space link block stays the same, since they were on the same wiki.
         assertEquals("Z", xobjectSpaceLinkBlock.getReference().getReference());
@@ -430,10 +413,6 @@ class DefaultReferenceUpdaterTest
         when(this.relativeEntityReferenceResolver.resolve(spaceLinkReference, null, null))
             .thenReturn(relativeSpaceLinkReference);
 
-        when(this.compactEntityReferenceSerializer.serialize(originalDocLinkReference, newReference))
-            .thenReturn("wiki1:A.C");
-        when(this.compactEntityReferenceSerializer.serialize(originalSpaceReference, newReference))
-            .thenReturn("wiki1:Z");
 
         updater.update(newReference, oldReference, newReference);
 
@@ -464,7 +443,7 @@ class DefaultReferenceUpdaterTest
         // Setup document content
         ResourceReference linkReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
         LinkBlock linkBlock = new LinkBlock(List.of(), linkReference, false);
-        ResourceReference absoluteLinkReference = new ResourceReference("xwiki:A.B.WebHome", ResourceType.DOCUMENT);
+        ResourceReference absoluteLinkReference = new ResourceReference("wiki:A.B", ResourceType.DOCUMENT);
         LinkBlock absoluteLinkBlock = new LinkBlock(List.of(), absoluteLinkReference, false);
         XDOM xdom = new XDOM(List.of(linkBlock, absoluteLinkBlock));
         when(document.getXDOM()).thenReturn(xdom);
@@ -477,9 +456,8 @@ class DefaultReferenceUpdaterTest
 
         EntityReference relativeLinkReference = new EntityReference("B", EntityType.DOCUMENT,
             new EntityReference("A", EntityType.SPACE));
-        EntityReference relativeAbsoluteLinkReference = new EntityReference("WebHome", EntityType.DOCUMENT,
-            new EntityReference("B", EntityType.SPACE, new EntityReference("B", EntityType.SPACE,
-                new EntityReference("xwiki", EntityType.WIKI))));
+        EntityReference relativeAbsoluteLinkReference = new EntityReference("B", EntityType.DOCUMENT,
+            new EntityReference("A", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)));
 
         when(this.resourceReferenceResolver.resolve(linkReference, null, null,
             beforeRename(oldLinkTarget, newLinkTarget))).thenReturn(oldLinkTarget);
@@ -496,7 +474,6 @@ class DefaultReferenceUpdaterTest
         when(this.resourceReferenceResolver.resolve(xobjectLinkReference, null, documentReference,
             beforeRename(oldLinkTarget, newLinkTarget)))
             .thenReturn(oldLinkTarget);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.relativeEntityReferenceResolver.resolve(xobjectLinkReference,null, null))
             .thenReturn(relativeLinkReference);
         when(this.relativeEntityReferenceResolver.resolve(linkReference, null, null))
@@ -504,14 +481,11 @@ class DefaultReferenceUpdaterTest
         when(this.relativeEntityReferenceResolver.resolve(absoluteLinkReference, null, null))
             .thenReturn(relativeAbsoluteLinkReference);
 
-        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
-        when(this.defaultEntityReferenceSerializer.serialize(newLinkTarget, documentReference))
-            .thenReturn("xwiki:X.Y.WebHome");
 
         updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         assertEquals("X.Y", linkBlock.getReference().getReference());
-        assertEquals("xwiki:X.Y.WebHome", absoluteLinkBlock.getReference().getReference());
+        assertEquals("wiki:X.Y", absoluteLinkBlock.getReference().getReference());
         assertEquals("X.Y", xobjectLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, linkBlock.getReference().getType());
         verifyDocumentSave(document, false);
@@ -549,12 +523,8 @@ class DefaultReferenceUpdaterTest
         when(this.resourceReferenceResolver.resolve(imageReference, null, documentReference,
             beforeRename(oldImageTarget, newImageTarget)))
             .thenReturn(oldImageTargetAttachment);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldImageTargetAttachment))
-            .thenReturn(oldImageTarget);
         when(this.relativeEntityReferenceResolver.resolve(imageReference, null, null)).thenReturn(relativeReference);
 
-        when(this.compactEntityReferenceSerializer.serialize(newImageTargetAttachment, documentReference))
-            .thenReturn("X.Y@attachment.txt");
 
         updater.update(documentReference, oldImageTarget, newImageTarget);
 
@@ -596,11 +566,8 @@ class DefaultReferenceUpdaterTest
         when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference,
             beforeRename(oldLinkTarget, newLinkTarget)))
             .thenReturn(oldLinkTargetAttachment);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTargetAttachment)).thenReturn(oldLinkTarget);
         when(this.relativeEntityReferenceResolver.resolve(linkReference, null, null)).thenReturn(relativeReference);
 
-        when(this.compactEntityReferenceSerializer.serialize(newLinkTargetAttachment, documentReference))
-            .thenReturn("X.Y@attachment.txt");
 
         updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
@@ -646,8 +613,6 @@ class DefaultReferenceUpdaterTest
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference,
             beforeRename(oldLinkTarget, newLinkTarget)))
             .thenReturn(oldLinkTarget);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
-        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.WebHome");
         when(this.relativeEntityReferenceResolver.resolve(docLinkReference, null, null)).thenReturn(relativeReference);
 
         // Space link
@@ -658,9 +623,6 @@ class DefaultReferenceUpdaterTest
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, documentReference,
             beforeRename(oldLinkTarget, newLinkTarget)))
             .thenReturn(spaceReference);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceReference)).thenReturn(oldLinkTarget);
-        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget.getLastSpaceReference(), documentReference))
-            .thenReturn("X");
         when(this.relativeEntityReferenceResolver.resolve(spaceLinkReference, null, null))
             .thenReturn(relativeSpaceReference);
 
@@ -712,8 +674,6 @@ class DefaultReferenceUpdaterTest
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, documentReference,
             beforeRename(oldLinkTarget, newLinkTarget)))
             .thenReturn(oldLinkTarget);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
-        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
         when(this.relativeEntityReferenceResolver.resolve(docLinkReference, null, null)).thenReturn(relativeReference);
 
         // Space link
@@ -724,9 +684,6 @@ class DefaultReferenceUpdaterTest
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, documentReference,
             beforeRename(oldLinkTarget, newLinkTarget)))
             .thenReturn(spaceReference);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceReference)).thenReturn(oldLinkTarget);
-        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget.getLastSpaceReference(), documentReference))
-            .thenReturn("X");
         when(this.relativeEntityReferenceResolver.resolve(spaceLinkReference, null, null))
             .thenReturn(relativeSpaceReference);
 
@@ -783,8 +740,6 @@ class DefaultReferenceUpdaterTest
             .thenReturn(oldLinkTarget);
         when(this.resourceReferenceResolver.resolve(macroResourceReference, null, documentReference))
             .thenReturn(oldLinkTarget);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
-        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
 
         MacroRefactoring includeMacroRefactoring =
             componentManager.registerMockComponent(MacroRefactoring.class, "include");
@@ -834,8 +789,6 @@ class DefaultReferenceUpdaterTest
             new AttachmentReference("oldname.txt", new DocumentReference("wiki", "Main", "WebHome")));
         when(this.resourceReferenceResolver.resolve(resourceReference, null, documentReference)).thenReturn(
             oldLinkTarget);
-        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn(
-            "newname.txt");
 
         updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
@@ -879,8 +832,6 @@ class DefaultReferenceUpdaterTest
         when(this.resourceReferenceResolver.resolve(resourceReference, null, documentReference,
             beforeRename(oldLinkTarget, newLinkTarget)))
             .thenReturn(oldLinkTarget);
-        when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
-        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
         when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null)).thenReturn(relativeReference);
 
         MacroRefactoring includeMacroRefactoring =
@@ -964,8 +915,6 @@ class DefaultReferenceUpdaterTest
             when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference,
             beforeRename(oldLinkTarget, newLinkTarget)))
                 .thenReturn(oldLinkTarget);
-            when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
-            when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
             when(this.relativeEntityReferenceResolver.resolve(linkReference, null, null))
                 .thenReturn(relativeReference);
         }

@@ -19,11 +19,16 @@
  */
 package org.xwiki.blocknote.test.po;
 
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.FileDetector;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
@@ -464,4 +469,118 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         return this.container.findElements(By.className("bn-block-content")).get(index);
     }
+
+    /**
+     * Pastes a file over the rich text area.
+     *
+     * @param filePath the path of the file to paste, relative to the test resources
+     * @return this rich text area instance
+     * @throws URISyntaxException if the given file can't be located
+     * @since 18.10.0RC1
+     */
+    public BlockNoteRichTextArea pasteFile(String filePath) throws URISyntaxException
+    {
+        return insertFile("paste", filePath);
+    }
+
+    /**
+     * Drops a file over the rich text area.
+     *
+     * @param filePath the path of the file to drop, relative to the test resources
+     * @return this rich text area instance
+     * @throws URISyntaxException if the given file can't be located
+     * @since 18.10.0RC1
+     */
+    public BlockNoteRichTextArea dropFile(String filePath) throws URISyntaxException
+    {
+        return insertFile("drop", filePath);
+    }
+
+    /**
+     * Inserts a file using a synthetic event, because WebDriver can drag and drop DOM elements but not files, and
+     * can't put one on the clipboard at all.
+     *
+     * @param eventType either {@code paste} or {@code drop}
+     * @param filePath the path of the file to insert, relative to the test resources
+     * @return this rich text area instance
+     * @throws URISyntaxException if the given file can't be located
+     */
+    private BlockNoteRichTextArea insertFile(String eventType, String filePath) throws URISyntaxException
+    {
+        WebElement fileInput = loadFile(filePath);
+        String script = """
+            const [editor, fileInput, eventType] = arguments;
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(fileInput.files[0]);
+            const {left, top, width, height} = editor.getBoundingClientRect();
+            const eventInit = {bubbles: true, cancelable: true, clientX: left + width / 2, clientY: top + height / 2};
+            if (eventType === 'paste') {
+                const paste = new ClipboardEvent('paste', eventInit);
+                // Firefox ignores clipboardData passed to the constructor, so define it as an own property instead.
+                Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
+                editor.dispatchEvent(paste);
+            } else {
+                editor.dispatchEvent(new DragEvent('drop', {...eventInit, dataTransfer}));
+            }
+            fileInput.remove();
+            """;
+        getDriver().executeScript(script, this.container, fileInput, eventType);
+        return this;
+    }
+
+    /**
+     * Gets the file into the browser, which runs in a different container than the test, through a throwaway file
+     * input. Same approach as the CKEditor page objects.
+     *
+     * @param filePath the path of the file to load, relative to the test resources
+     * @return the file input holding the loaded file
+     * @throws URISyntaxException if the given file can't be located
+     */
+    private WebElement loadFile(String filePath) throws URISyntaxException
+    {
+        FileDetector originalFileDetector = getDriver().getFileDetector();
+        try {
+            getDriver().setFileDetector(new LocalFileDetector());
+            WebElement fileInput = (WebElement) getDriver().executeScript("""
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                document.body.append(fileInput);
+                return fileInput;
+                """);
+            fileInput.sendKeys(Paths.get(getClass().getResource(filePath).toURI()).toFile().getAbsolutePath());
+            return fileInput;
+        } finally {
+            getDriver().setFileDetector(originalFileDetector);
+        }
+    }
+
+    /**
+     * Waits for a link with the given label. Waiting for the text alone wouldn't do: the block BlockNote inserts
+     * while uploading already shows the file name.
+     *
+     * @param label the expected link label
+     * @return the link element
+     * @since 18.10.0RC1
+     */
+    public WebElement waitUntilLinkIsPresent(String label)
+    {
+        By locator = By.xpath(".//a[normalize-space(.) = " + getUtil().escapeXPath(label) + "]");
+        getDriver().waitUntilCondition(driver -> !this.container.findElements(locator).isEmpty());
+        return this.container.findElement(locator);
+    }
+
+    /**
+     * Waits for the link a pasted file is turned into. Its label is the name the attachment was created with, which
+     * is generated for a pasted file, so the test can't ask for it by label.
+     *
+     * @return the link element
+     * @since 18.10.0RC1
+     */
+    public WebElement waitUntilAttachmentLinkIsPresent()
+    {
+        By locator = By.xpath(".//a");
+        getDriver().waitUntilCondition(driver -> !this.container.findElements(locator).isEmpty());
+        return this.container.findElement(locator);
+    }
+
 }

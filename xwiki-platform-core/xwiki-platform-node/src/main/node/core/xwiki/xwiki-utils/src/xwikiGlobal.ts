@@ -222,10 +222,17 @@ interface XWikiGlobal {
    * @since 18.9.0RC1
    */
   widgets: {
-    Notification: new (
+    Notification: (new (
       text: string,
       type?: LegacyNotificationType,
-    ) => LegacyNotification;
+    ) => LegacyNotification) & {
+      /**
+       * Displays a notification, the preferred alternative to the constructor.
+       *
+       * @since 18.10.0RC1
+       */
+      show(text: string, type?: LegacyNotificationType): LegacyNotification;
+    };
 
     /**
      * Displays a modal dialog asking the user to confirm, as soon as it is created.

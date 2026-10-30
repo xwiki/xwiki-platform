@@ -410,6 +410,9 @@ importers:
       '@xwiki/platform-minimal-syntax-config':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/minimal
+      '@xwiki/platform-model-api':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-api
       '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api

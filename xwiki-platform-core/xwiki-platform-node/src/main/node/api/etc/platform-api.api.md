@@ -384,6 +384,11 @@ export function registerAsyncComponent<T extends Component = {
     new (): ComponentPublicInstance;
 }>(app: App, name: string, source: AsyncComponentLoader<T> | AsyncComponentOptions<T>): void;
 
+// @beta
+export type SaveAttachmentsOptions = {
+    temporary?: boolean;
+};
+
 // @beta (undocumented)
 export interface SkinManager {
     // (undocumented)
@@ -430,7 +435,7 @@ interface Storage_2 {
     }>;
     save(page: string, title: string, content: string, syntax: string): Promise<unknown>;
     // (undocumented)
-    saveAttachments(page: string, files: File[]): Promise<undefined | (undefined | string)[]>;
+    saveAttachments(page: string, files: File[], options?: SaveAttachmentsOptions): Promise<undefined | (undefined | string)[]>;
     // (undocumented)
     setWikiConfig(config: WikiConfig): void;
 }

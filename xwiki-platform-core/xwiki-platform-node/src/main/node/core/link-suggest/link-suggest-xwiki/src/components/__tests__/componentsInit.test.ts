@@ -64,10 +64,22 @@ function mockSolrResults(results: unknown[]): void {
   );
 }
 
-function getLinks(query: string): Promise<Link[]> {
+function getLinks(
+  query: string,
+  type?: LinkType,
+  mimetype?: string,
+): Promise<Link[]> {
   return buildContainer()
     .get<LinkSuggestService>(name, { name: "XWiki" })
-    .getLinks(query);
+    .getLinks(query, type, mimetype);
+}
+
+/**
+ * @returns the parameters of the request made to the search suggest service
+ */
+function getRequestParameters(): URLSearchParams {
+  const [url] = vi.mocked(fetch).mock.calls[0];
+  return new URL(url as string).searchParams;
 }
 
 describe("XWikiLinkSuggestService", () => {
@@ -180,5 +192,58 @@ describe("XWikiLinkSuggestService", () => {
     ]);
 
     expect((await getLinks("Home"))[0].hint).toBe("");
+  });
+});
+
+describe("XWikiLinkSuggestService search request", () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("searches for each word of the query", async () => {
+    mockSolrResults([]);
+
+    await getLinks(" cat.png ", LinkType.ATTACHMENT, "image/*");
+
+    const parameters = getRequestParameters();
+    expect(parameters.get("input")).toBe("*cat* *png*");
+    expect(parameters.get("query")).toBe(
+      "fq=locale:*\nfq=wiki:xwiki\nfq=type:ATTACHMENT\nfq=mimetype:((image/*))",
+    );
+  });
+
+  it("suggests the most recent attachments for an empty query", async () => {
+    mockSolrResults([]);
+
+    await getLinks("", LinkType.ATTACHMENT, "image/*");
+
+    const parameters = getRequestParameters();
+    expect(parameters.get("input")).toBe("*");
+    expect(parameters.get("query")).toBe(
+      "fq=locale:*\nfq=wiki:xwiki\nfq=type:ATTACHMENT\nfq=mimetype:((image/*))\n" +
+        "sort=attdate_sort desc",
+    );
+  });
+
+  it("suggests the most recent pages for a query without words", async () => {
+    mockSolrResults([]);
+
+    await getLinks(" . ", LinkType.PAGE);
+
+    const parameters = getRequestParameters();
+    expect(parameters.get("input")).toBe("*");
+    expect(parameters.get("query")).toBe(
+      "fq=locale:*\nfq=wiki:xwiki\nfq=type:DOCUMENT\nsort=date desc",
+    );
+  });
+
+  it("searches all the entity types when no type is specified", async () => {
+    mockSolrResults([]);
+
+    await getLinks("cat");
+
+    expect(getRequestParameters().get("query")).toBe(
+      "fq=locale:*\nfq=wiki:xwiki",
+    );
   });
 });

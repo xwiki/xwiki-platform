@@ -30,6 +30,7 @@ import {
   XWikiParametersStyle,
 } from "./styles";
 import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
+import { openImageSuggestionMenu } from "../components/images/imageSuggestionMenu";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -184,6 +185,15 @@ function querySuggestionsMenuItems({
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
 
+  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
+  // eslint-disable-next-line import-x/namespace
+  const locale = locales[lang].slash_menu;
+
+  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
+    candidates.some(
+      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
+    );
+
   // A single generic "Link" entry that opens the link wizard.
   // Only enabled if the syntax supports it
   const genericLinkItem: DefaultReactSuggestionItem[] = inlineSupport.links
@@ -236,7 +246,13 @@ function querySuggestionsMenuItems({
 
   let items = filterSuggestionItems(
     combineByGroup(
-      getDefaultReactSlashMenuItems(editor),
+      getDefaultReactSlashMenuItems(editor).map((item) =>
+        // The image quick action suggests images to insert, in addition to uploading or browsing
+        // images, instead of inserting an empty image block.
+        isLocale(item.title, ["image"])
+          ? { ...item, onItemClick: () => openImageSuggestionMenu(editor) }
+          : item,
+      ),
 
       // Block macros
       blocksSupport.macros
@@ -262,15 +278,6 @@ function querySuggestionsMenuItems({
     ),
     query,
   );
-
-  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
-  // eslint-disable-next-line import-x/namespace
-  const locale = locales[lang].slash_menu;
-
-  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
-    candidates.some(
-      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
-    );
 
   if (!blocksSupport.headings.levels1To3) {
     items = items.filter(

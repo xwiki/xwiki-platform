@@ -95,14 +95,14 @@ class XWikiStorage extends AbstractStorage {
   public saveAttachments(
     page: string,
     files: File[],
-  ): Promise<undefined | (undefined | string)[]> {
+  ): Promise<undefined | (undefined | PageAttachment)[]> {
     return Promise.all(files.map((file) => this.saveAttachment(page, file)));
   }
 
   public async saveAttachment(
     page: string,
     file: File,
-  ): Promise<undefined | (undefined | string)> {
+  ): Promise<undefined | PageAttachment> {
     const uploadURL = this.getUploadURL(page, "filebrowser");
     const response = await fetch(uploadURL, {
       method: "POST",
@@ -113,7 +113,17 @@ class XWikiStorage extends AbstractStorage {
     }
     const result = await response.json();
     if (result.uploaded) {
-      return result.message.resourceReference.reference;
+      // The upload response describes the uploaded attachment like the REST API describes attachments.
+      const { id, name, mimeType, size, date, author } = result.attachment;
+      return {
+        id,
+        reference: name,
+        mimetype: mimeType,
+        href: result.url,
+        size,
+        date: new Date(date),
+        author,
+      };
     } else {
       throw new Error(`Upload failed: ${result.error}`);
     }

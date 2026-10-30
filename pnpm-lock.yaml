@@ -2326,9 +2326,15 @@ importers:
       '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
+      '@xwiki/platform-fn-utils':
+        specifier: workspace:*
+        version: link:../../fn-utils
       '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../link-suggest-api
+      '@xwiki/platform-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
       '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api

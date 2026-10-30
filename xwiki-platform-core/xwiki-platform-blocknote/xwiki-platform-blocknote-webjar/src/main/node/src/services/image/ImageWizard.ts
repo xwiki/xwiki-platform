@@ -19,6 +19,7 @@
  */
 import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
+import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xwiki-model-api";
 
 /**
  * The image block properties augmented with the full-fidelity XWiki resource reference. The plain BlockNote image URL
@@ -45,6 +46,20 @@ interface ImageWizardCallback {
 }
 
 /**
+ * The context in which the image wizard is shown.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type ImageWizardContext = {
+  /**
+   * The reference of the edited document, which the images are uploaded to and which the image references are relative
+   * to. The current document is edited when not specified.
+   */
+  documentReference?: XWikiEntityReference;
+};
+
+/**
  * The component used to insert or edit image blocks in the editor.
  *
  * @since 18.3.0RC1
@@ -56,8 +71,9 @@ interface ImageWizard {
    * insert the new image block with the provided properties or to cancel the image insertion.
    *
    * @param callback - the callback used to either insert the new image block or to cancel the insertion
+   * @param context - (since 18.10.0RC1) the context in which the image is inserted, e.g. the edited document
    */
-  insert(callback: ImageWizardCallback): void;
+  insert(callback: ImageWizardCallback, context?: ImageWizardContext): void;
 
   /**
    * Shows the UI to edit the image properties and uses the provided callback to update the image block with the new
@@ -65,8 +81,18 @@ interface ImageWizard {
    *
    * @param image - the image block properties to edit, including the current XWiki resource reference
    * @param callback - the callback used to either update the image block or to cancel the image edition
+   * @param context - (since 18.10.0RC1) the context in which the image is edited, e.g. the edited document
    */
-  edit(image: ImageWithReference, callback: ImageWizardCallback): void;
+  edit(
+    image: ImageWithReference,
+    callback: ImageWizardCallback,
+    context?: ImageWizardContext,
+  ): void;
 }
 
-export type { ImageWithReference, ImageWizard, ImageWizardCallback };
+export type {
+  ImageWithReference,
+  ImageWizard,
+  ImageWizardCallback,
+  ImageWizardContext,
+};

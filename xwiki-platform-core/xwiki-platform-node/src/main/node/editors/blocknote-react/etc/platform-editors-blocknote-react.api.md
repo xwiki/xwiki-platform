@@ -48,6 +48,7 @@ export type BlockNoteViewWrapperProps = {
     theme?: "light" | "dark";
     lang: EditorLanguage;
     label: string;
+    documentReference?: string;
     content: BlockType[];
     macros: {
         list?: MacroWithUnknownParamsType[];
@@ -59,6 +60,8 @@ export type BlockNoteViewWrapperProps = {
     linkEditionHandler: LinkEditionHandler;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
+        imageEditionHooks?: ImageEditionHooks;
+        imageInsertion?: ImageInsertionOverrideFn;
         linkEdition?: LinkEditionHooks;
     };
     syntax: SyntaxConfig;
@@ -121,7 +124,24 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
 
 // @beta
+export type ImageEditionHooks = {
+    afterUpdate?: (block: BlockOfType<"image">, reference?: ResourceReference) => void;
+};
+
+// @beta
 export type ImageEditionOverrideFn = (block: BlockOfType<"image">, update: (updateResult: ImageUpdateResult) => void) => void;
+
+// @beta
+export type ImageInsertionOverrideFn = (insert: (insertionResult: ImageInsertionResult) => void) => void;
+
+// @beta
+export type ImageInsertionResult = {
+    type: "insert";
+    props: Partial<BlockOfType<"image">["props"]>;
+    reference?: ResourceReference;
+} | {
+    type: "aborted";
+};
 
 // @beta
 export type ImageUpdateResult = {

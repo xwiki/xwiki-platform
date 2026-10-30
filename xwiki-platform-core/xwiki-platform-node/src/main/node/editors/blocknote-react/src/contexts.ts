@@ -29,4 +29,9 @@ const DepsContainerContext = createContext<Container | null>(null);
  */
 const MacrosContext = createContext<ContextForMacros | null>(null);
 
-export { DepsContainerContext, MacrosContext };
+/**
+ * The serialized reference of the edited document, when specified. The current document is edited otherwise.
+ */
+const EditedDocumentContext = createContext<string | undefined>(undefined);
+
+export { DepsContainerContext, EditedDocumentContext, MacrosContext };

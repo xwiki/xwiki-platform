@@ -25,12 +25,15 @@ import java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
+import org.xwiki.blocknote.test.po.SlashMenu;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -55,7 +58,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest(
     properties = {
         // The Image Wizard needs this to be able to upload images.
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+
+        // The image suggestions execute a Solr query from XWiki.SuggestSolrService / XWiki.SuggestSolrMacros, which
+        // requires programming right. These pages are authored by a user that has programming right in a normal wiki,
+        // but the test wiki blocks programming right by default, so we need to explicitly exclude them.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.SuggestSolr(Service|Macros)"
     },
     extraJARs = {
         // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
@@ -66,7 +74,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // core extension so we need to make the extension index also core.
         "org.xwiki.platform:xwiki-platform-extension-index",
 
-        // Solr search is used to get suggestions for the link quick action.
+        // Solr search is used to get suggestions for the image quick action.
         "org.xwiki.platform:xwiki-platform-search-solr-query"
     },
     servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS
@@ -203,5 +211,77 @@ class ImageIT extends AbstractBlockNoteIT
         byte[] uploadedAttachmentContent = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
         assertTrue(Arrays.equals(FileUtils.readFileToByteArray(file), uploadedAttachmentContent));
+    }
+
+    @Test
+    @Order(2)
+    void insertImageFromSuggestions(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Start fresh, with a page holding an image, and wait for the image to be indexed, since the image suggestions
+        // are based on Solr indexation.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+        String imageName = "image.gif";
+        setup.attachFile(testReference, imageName, getClass().getResourceAsStream('/' + imageName), false);
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // The image quick action shows the image suggestions.
+        textArea.click().sendKeys("/");
+        SlashMenu slashMenu = new SlashMenu();
+        textArea.sendKeys("image");
+        slashMenu.waitForItemSelected("Image");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+
+        // Search the image by its name (as a real user would), but pick the suggestion using its location, since other
+        // tests running in the same wiki may also attach an image with the same name.
+        textArea.sendKeys(imageName);
+        new SlashMenu().clickItem(imageName, testReference.getLastSpaceReference().getName());
+        textArea.waitUntilImageIsLoaded(0);
+
+        // Save and check the source: the image is saved with its reference rather than with its URL, relative to the
+        // edited page.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("[[image:%s]]".formatted(imageName), wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(3)
+    void insertImageFromImageWizard(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // The image quick action shows the action to browse the images first, selected.
+        textArea.click().sendKeys("/");
+        SlashMenu slashMenu = new SlashMenu();
+        textArea.sendKeys("image");
+        slashMenu.waitForItemSelected("Image");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+        slashMenu = new SlashMenu().waitForItemSelected("Browse images...");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+
+        // Browsing the images opens the image wizard, where we upload a new image and insert it.
+        ImageDialogSelectModal imageSelectModal = new ImageDialogSelectModal();
+        imageSelectModal.switchToUploadTab().upload("/image.gif");
+        imageSelectModal.clickSelect().clickInsert();
+        textArea.waitUntilImageIsLoaded(0);
+
+        // Save and check the source: the image is saved with the reference provided by the image wizard.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("[[image:image.gif]]", wikiEditor.getContent());
     }
 }

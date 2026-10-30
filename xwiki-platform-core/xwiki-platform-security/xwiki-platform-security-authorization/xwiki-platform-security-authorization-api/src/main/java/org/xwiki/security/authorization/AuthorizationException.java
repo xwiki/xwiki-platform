@@ -21,7 +21,6 @@ package org.xwiki.security.authorization;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * This is the base exception raised for various reasons by the authorization module.
@@ -31,21 +30,11 @@ import org.xwiki.stability.Unstable;
  */
 public class AuthorizationException extends Exception
 {
-    /**
-     * Constant value displayed for null entityReference.
-     *
-     * @since 18.10.0RC1
-     */
-    @Unstable
-    public static final String NULL_ENTITY = "Main Wiki";
+    /** Constant value displayed for null entityReference. */
+    static final String NULL_ENTITY = "Main Wiki";
 
-    /**
-     * Constant value displayed for null userReference.
-     *
-     * @since 18.10.0RC1
-     */
-    @Unstable
-    public static final String NULL_USER = "Public";
+    /** Constant value displayed for null userReference. */
+    static final String NULL_USER = "Public";
 
     /** Serialization identifier. */
     private static final long serialVersionUID = 1L;

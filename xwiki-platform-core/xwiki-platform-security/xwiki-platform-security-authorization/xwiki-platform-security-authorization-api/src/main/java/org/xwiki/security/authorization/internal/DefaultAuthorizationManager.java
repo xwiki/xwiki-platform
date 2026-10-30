@@ -55,12 +55,9 @@ import org.xwiki.security.internal.XWikiBridge;
 
 /**
  * Default implementation of the {@link AuthorizationManager}.
- * <p>
- * This default implementation exists since 4.0M2, but was located in the {@code org.xwiki.security.authorization}
- * package before being moved to this internal package.
  *
  * @version $Id$
- * @since 18.10.0RC1
+ * @since 4.0M2
  */
 @Component
 @Singleton
@@ -72,6 +69,12 @@ public class DefaultAuthorizationManager implements AuthorizationManager
      * List of rights that should imply any newly registered right.
      */
     private static final List<Right> DEFAULT_IMPLIED_BY_RIGHTS = Arrays.asList(Right.ADMIN, Right.PROGRAM);
+
+    /** Value displayed in logs for a null entity reference. */
+    private static final String NULL_ENTITY = "Main Wiki";
+
+    /** Value displayed in logs for a null user reference. */
+    private static final String NULL_USER = "Public";
 
     /** Logger. **/
     @Inject
@@ -130,8 +133,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return hasSecurityAccess(right, userReference, entityReference, false);
         } catch (Exception e) {
             this.logger.error("Failed to load rights for user [{}] on [{}].",
-                (userReference == null) ? AuthorizationException.NULL_USER : userReference,
-                (entityReference == null) ? AuthorizationException.NULL_ENTITY : entityReference, e);
+                (userReference == null) ? NULL_USER : userReference,
+                (entityReference == null) ? NULL_ENTITY : entityReference, e);
             return false;
         }
     }
@@ -364,10 +367,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         boolean debugLevel)
     {
         if ((debugLevel && logger.isDebugEnabled()) || (!debugLevel && logger.isInfoEnabled())) {
-            String userName =
-                (user != null) ? entityReferenceSerializer.serialize(user) : AuthorizationException.NULL_USER;
-            String docName =
-                (entity != null) ? entityReferenceSerializer.serialize(entity) : AuthorizationException.NULL_ENTITY;
+            String userName = (user != null) ? entityReferenceSerializer.serialize(user) : NULL_USER;
+            String docName = (entity != null) ? entityReferenceSerializer.serialize(entity) : NULL_ENTITY;
             String rightName = (right != null) ? right.getName() : "no right";
             String accessName = (access == RuleState.ALLOW) ? "granted" : "denied";
             String message = "[{}] access has been {} for user [{}] on [{}]: {}";

@@ -38,12 +38,24 @@ import org.xwiki.stability.Unstable;
  * targeting before a document got renamed.
  *
  * @version $Id$
+ * @since 17.10.15
+ * @since 18.4.8
  * @since 18.10.0RC1
  */
 @Unstable
 public final class DocumentExistenceOverride
 {
-    private final Map<DocumentReference, Boolean> existence;
+    /**
+     * Overrides the existence of no document: the actual state of all documents is used.
+     *
+     * @since 17.10.15
+     * @since 18.4.8
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public static final DocumentExistenceOverride NONE = new DocumentExistenceOverride(Map.of());
+
+    private final Map<DocumentReference, Boolean> existence = new HashMap<>();
 
     /**
      * @param existence the existence to assume for each document, whatever its actual state; the locale of the
@@ -51,7 +63,6 @@ public final class DocumentExistenceOverride
      */
     public DocumentExistenceOverride(Map<DocumentReference, Boolean> existence)
     {
-        this.existence = new HashMap<>();
         existence.forEach((reference, exists) -> this.existence.put(reference.withoutLocale(), exists));
     }
 

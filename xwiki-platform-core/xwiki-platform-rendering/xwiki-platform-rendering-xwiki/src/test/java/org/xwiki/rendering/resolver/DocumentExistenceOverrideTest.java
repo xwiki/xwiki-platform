@@ -54,6 +54,12 @@ class DocumentExistenceOverrideTest
     }
 
     @Test
+    void getExistenceWithNone()
+    {
+        assertEquals(Optional.empty(), DocumentExistenceOverride.NONE.getExistence(EXISTING));
+    }
+
+    @Test
     void getExistenceIgnoresLocale()
     {
         DocumentExistenceOverride existenceOverride =

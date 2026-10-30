@@ -463,17 +463,17 @@ class DefaultResourceReferenceEntityReferenceResolverTest
         EntityReference baseReference = sourceReference;
 
         assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, null,
-            defaultDocumentName, null));
+            defaultDocumentName, DocumentExistenceOverride.NONE));
         assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName, null));
+            defaultDocumentName, DocumentExistenceOverride.NONE));
 
         defaultDocumentName = "Bar";
         assertTrue(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName, null));
+            defaultDocumentName, DocumentExistenceOverride.NONE));
 
         this.existingDocuments.add(finalReference);
         assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName, null));
+            defaultDocumentName, DocumentExistenceOverride.NONE));
     }
 
     @Test

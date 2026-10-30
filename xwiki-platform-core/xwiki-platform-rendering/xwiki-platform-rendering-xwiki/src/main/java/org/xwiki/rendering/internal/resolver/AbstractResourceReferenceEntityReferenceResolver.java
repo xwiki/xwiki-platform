@@ -122,7 +122,8 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     /**
      * @param resourceReference the resource reference to resolve
      * @param baseReference the reference relative to which the resource reference is resolved
-     * @param existenceOverride the existence to assume for some documents, or {@code null} to use their actual state
+     * @param existenceOverride the existence to assume for some documents, or
+     *     {@link DocumentExistenceOverride#NONE} to use their actual state
      * @return the resolved entity reference
      */
     protected abstract EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
@@ -136,7 +137,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
             }
         }
 
-        return null;
+        return DocumentExistenceOverride.NONE;
     }
 
     protected EntityReference getBaseReference(ResourceReference resourceReference, Object... parameters)
@@ -265,11 +266,9 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
     private boolean exists(DocumentReference documentReference, DocumentExistenceOverride existenceOverride)
     {
-        if (existenceOverride != null) {
-            Optional<Boolean> existence = existenceOverride.getExistence(documentReference);
-            if (existence.isPresent()) {
-                return existence.get();
-            }
+        Optional<Boolean> existence = existenceOverride.getExistence(documentReference);
+        if (existence.isPresent()) {
+            return existence.get();
         }
 
         try {

@@ -120,6 +120,15 @@ class AttachmentsRedirectionFilterTest
     }
 
     @Test
+    void redirectNoResourceReference() throws Exception
+    {
+        when(this.xWikiContext.getAction()).thenReturn(ACTION_NAME);
+        when(this.resourceReferenceManager.getResourceReference()).thenReturn(null);
+        assertFalse(this.redirectionFilter.redirect(this.xWikiContext));
+        verifyNoInteractions(this.attachmentsManager);
+    }
+
+    @Test
     void redirect() throws Exception
     {
         when(this.xWikiContext.getAction()).thenReturn(ACTION_NAME);

@@ -94,9 +94,12 @@ public class AttachmentsRedirectionFilter implements RedirectionFilter
 
     private Optional<AttachmentReference> getAttachmentReference()
     {
-        EntityResourceReference entityResource =
-            (EntityResourceReference) this.resourceReferenceManager.getResourceReference();
-        return Optional.ofNullable(entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT))
-            .map(AttachmentReference::new);
+        // The current resource is missing outside of a request (and is not an entity for non-entity URLs), in which
+        // case there is no attachment to redirect.
+        if (this.resourceReferenceManager.getResourceReference() instanceof EntityResourceReference entityResource) {
+            return Optional.ofNullable(entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT))
+                .map(AttachmentReference::new);
+        }
+        return Optional.empty();
     }
 }

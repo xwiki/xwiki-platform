@@ -18,10 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { h, useId } from "vue";
 
-const createApp = vi.fn();
-vi.mock("vue", async (importOriginal) => ({ ...(await importOriginal()), createApp }));
-vi.mock("@xwiki/platform-livedata-ui", () => ({ XWikiLivedata: {} }));
+// Calls the actual createApp unless a test provides its own application.
+const createApp = vi.hoisted(() => vi.fn());
+vi.mock("vue", async (importOriginal) => {
+  const vue = await importOriginal();
+  createApp.mockImplementation(vue.createApp);
+  return { ...vue, createApp };
+});
+// Displays an identifier generated with useId, to check that the identifiers are unique in the page.
+vi.mock("@xwiki/platform-livedata-ui", () => ({
+  XWikiLivedata: { setup: () => () => h("div", { class: "generated", id: useId() }) },
+}));
 vi.mock("@xwiki/platform-livedata-xwiki", () => ({
   XWikiLiveDataSource: class {},
   initTranslationsBuilder: () => () => () => {},
@@ -33,7 +42,7 @@ const { init } = await import("../init.js");
 describe("init", () => {
   afterEach(() => {
     vi.restoreAllMocks();
-    createApp.mockReset();
+    createApp.mockClear();
   });
 
   /**
@@ -41,9 +50,9 @@ describe("init", () => {
    */
   function getContentTrusted(markup) {
     // A minimal application, that is never mounted for real.
-    const app = {};
+    const app = { config: {} };
     app.mixin = app.provide = app.use = app.mount = () => app;
-    createApp.mockReturnValue(app);
+    createApp.mockReturnValueOnce(app);
 
     document.body.innerHTML = markup;
     init(document.querySelector(".liveData"), undefined);
@@ -78,5 +87,19 @@ describe("init", () => {
 
     // An already displayed live data must survive a redundant initialization attempt.
     expect(element.querySelector("#displayed")).not.toBeNull();
+  });
+
+  it("generates distinct identifiers in each live data of the page", () => {
+    const config = '<script type="application/json">{}</script>';
+    document.body.innerHTML =
+      `<div class="liveData" data-config="{}">${config}</div><div class="liveData" data-config="{}">${config}</div>`;
+
+    for (const element of document.querySelectorAll(".liveData")) {
+      init(element, undefined);
+    }
+
+    const ids = [...document.querySelectorAll(".generated")].map((generated) => generated.id);
+    expect(ids.length).toBe(2);
+    expect(ids[0]).not.toBe(ids[1]);
   });
 });

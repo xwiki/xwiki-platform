@@ -27,22 +27,20 @@
 <template>
   <!--
     The Livedata Dropdown
-    Uses the Bootstrap 3 dropdown syntax.
+    Opens as a popover, so that the containers of the Live Data can't clip it.
   -->
-  <div class="livedata-dropdown-menu btn-group">
+  <XWikiPopoverDropdown
+    class="livedata-dropdown-menu btn-group"
+    :toggle-title="$t('livedata.dropdownMenu.title')"
+    menu-class="dropdown-menu-right"
+  >
     <!-- Drowpdown open / close button-->
-    <button
-      class="btn btn-default dropdown-toggle"
-      :title="$t('livedata.dropdownMenu.title')"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
+    <template #toggle>
       <XWikiIcon :icon-descriptor="{ name: 'more-vertical' }" />
-    </button>
+    </template>
 
     <!-- Drowpdown body -->
-    <ul class="dropdown-menu dropdown-menu-right">
+    <template #default>
       <!-- Actions -->
       <li>
         <span class="dropdown-header">{{
@@ -124,18 +122,20 @@
           </li>
         </ul>
       </li>
-    </ul>
-  </div>
+    </template>
+  </XWikiPopoverDropdown>
 </template>
 
 <script>
 import XWikiIcon from "./utilities/XWikiIcon.vue";
+import XWikiPopoverDropdown from "./utilities/XWikiPopoverDropdown.vue";
 
 export default {
   name: "LivedataDropdownMenu",
 
   components: {
     XWikiIcon,
+    XWikiPopoverDropdown,
   },
 
   inject: ["logic"],

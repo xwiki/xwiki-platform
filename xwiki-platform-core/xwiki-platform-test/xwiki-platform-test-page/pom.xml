@@ -32,8 +32,48 @@
   <packaging>jar</packaging>
   <description>Allow writing unit tests for wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
   </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Provision Node.js and install the npm dependencies (axe-core, jsdom) of the WCAG validation of
+             the rendered pages, executed by the axe-bridge.js module resource. The dependencies come from the
+             pnpm workspace of the repository: installing them from this module installs the workspace. -->
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>install-node-and-pnpm</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>install-node-and-pnpm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>${node.version}</nodeVersion>
+              <pnpmVersion>${pnpm.version}</pnpmVersion>
+              <installDirectory>${basedir}/target</installDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-install</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+              <workingDirectory>${basedir}/src/main/node</workingDirectory>
+              <installDirectory>${basedir}/target</installDirectory>
+              <environmentVariables>
+                <CI>true</CI>
+              </environmentVariables>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

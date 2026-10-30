@@ -23,6 +23,7 @@ import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultImageWizard } from "./image/DefaultImageWizard";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
 import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
+import { DefaultUserSuggest } from "./mentions/DefaultUserSuggest";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
@@ -77,6 +78,7 @@ DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);
 
 DefaultImageWizard.bind(container);
+DefaultUserSuggest.bind(container);
 DefaultMacroWizard.bind(container);
 DefaultBlockNoteMacroWizard.bind(container);
 

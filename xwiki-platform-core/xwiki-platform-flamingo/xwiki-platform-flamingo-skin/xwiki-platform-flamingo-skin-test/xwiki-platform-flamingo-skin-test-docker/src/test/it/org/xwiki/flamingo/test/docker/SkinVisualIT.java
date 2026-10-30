@@ -28,6 +28,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.ScreenshotComparator;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.DrawerMenu;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -74,5 +75,19 @@ class SkinVisualIT
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Headings"));
         screenshots.assertMatches("headings", viewPage.getContentContainer());
+    }
+
+    /**
+     * Verify the layout of the drawer menu: the brand with the current user, the category headers, the menu items and
+     * the separators.
+     */
+    @Test
+    @Order(2)
+    void drawer(TestUtils setup, ScreenshotComparator screenshots) throws IOException
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Headings"));
+        DrawerMenu drawerMenu = viewPage.getDrawerMenu();
+        drawerMenu.show();
+        screenshots.assertMatches("drawer", drawerMenu.getContainer());
     }
 }

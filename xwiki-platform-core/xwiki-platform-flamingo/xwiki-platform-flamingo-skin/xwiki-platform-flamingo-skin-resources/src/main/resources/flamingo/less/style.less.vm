@@ -30,7 +30,6 @@
 @import "admin";
 @import "buttons";
 @import "breadcrumbs";
-@import "drawer";
 @import "edit";
 @import "figure";
 @import "forms";

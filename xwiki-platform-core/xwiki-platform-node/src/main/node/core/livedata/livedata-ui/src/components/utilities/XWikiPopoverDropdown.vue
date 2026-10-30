@@ -106,7 +106,7 @@ const {
   </div>
 </template>
 
-<style>
+<style scoped>
 /* The Bootstrap open class styles the toggle, but only the popover shows the menu. */
 .xwiki-popover-dropdown > .dropdown-menu:not(:popover-open) {
   display: none;
@@ -134,6 +134,11 @@ const {
   position-area: block-end span-inline-start;
 }
 
+/*
+ * The fallback used when the full menu fits neither below nor above its toggle. The position area
+ * becomes the containing block of the menu, so a percentage height caps the menu to the room left
+ * on its side of the toggle, and the menu scrolls.
+ */
 @position-try --xwiki-popover-dropdown-scroll {
   /* Leave room for the margin between the menu and its toggle. */
   max-height: calc(100% - 2px);

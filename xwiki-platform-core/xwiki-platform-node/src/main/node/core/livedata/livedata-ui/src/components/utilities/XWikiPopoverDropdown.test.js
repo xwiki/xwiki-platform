@@ -49,8 +49,12 @@ function initWrapper(props = {}) {
 function initAttachedWrapper() {
   const wrapper = initWrapper();
   document.body.appendChild(wrapper.element);
+  const menu = wrapper.find(".dropdown-menu").element;
   const showPopover = spy();
-  wrapper.find(".dropdown-menu").element.showPopover = showPopover;
+  menu.showPopover = showPopover;
+  // jsdom doesn't display a popover that isn't open and can't open it, so the menu is displayed for
+  // its items to get the focus.
+  menu.style.display = "block";
   return { wrapper, showPopover };
 }
 

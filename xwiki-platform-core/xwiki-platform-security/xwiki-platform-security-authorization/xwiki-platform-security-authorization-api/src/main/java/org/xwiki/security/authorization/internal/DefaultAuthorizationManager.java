@@ -55,9 +55,12 @@ import org.xwiki.security.internal.XWikiBridge;
 
 /**
  * Default implementation of the {@link AuthorizationManager}.
+ * <p>
+ * This default implementation exists since 4.0M2, but was located in the {@code org.xwiki.security.authorization}
+ * package before being moved to this internal package.
  *
  * @version $Id$
- * @since 4.0M2
+ * @since 18.10.0RC1
  */
 @Component
 @Singleton

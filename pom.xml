@@ -638,13 +638,13 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.4.3</version>
+        <version>1.4.5</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
         <classifier>native</classifier>
-        <version>1.4.3</version>
+        <version>1.4.5</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>

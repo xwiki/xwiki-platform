@@ -263,6 +263,17 @@ public class CommentsTab extends BaseElement
 
     /**
      * @param id the comment id
+     * @return true if the reply button of the comment is visible (it's hidden while replying to that comment)
+     * @since 18.10.0RC1
+     */
+    public boolean isReplyButtonVisibleForCommentByID(int id)
+    {
+        return getDriver().findElementsWithoutWaiting(By.cssSelector("#xwikicomment_" + id + " a.commentreply"))
+            .stream().anyMatch(WebElement::isDisplayed);
+    }
+
+    /**
+     * @param id the comment id
      * @return true if the comment has the delete button
      * @since 10.6RC1
      * @since 9.11.9

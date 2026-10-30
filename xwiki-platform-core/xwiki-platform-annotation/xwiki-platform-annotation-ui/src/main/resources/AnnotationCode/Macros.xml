@@ -438,7 +438,7 @@
 
 #macro(displayAnnotationProperty $annotatedDocument $annotationObject $annotationProperty $mode)
   #if ($mode == 'edit' || $mode == 'create')
-    ## This startupFocus parameter is used by the CKEditor WYSIWYG editor.
+    ## This startupFocus parameter is used by the WYSIWYG editors.
     #set ($wysiwygEditorConfig = {
       'startupFocus': true
     })

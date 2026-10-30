@@ -164,6 +164,10 @@ class DefaultReferenceUpdaterTest
     @Named("relative")
     private EntityReferenceResolver<ResourceReference> relativeEntityReferenceResolver;
 
+    @MockComponent
+    @Named("current")
+    private EntityReferenceResolver<String> currentEntityReferenceResolver;
+
     @Mock
     private Job job;
 

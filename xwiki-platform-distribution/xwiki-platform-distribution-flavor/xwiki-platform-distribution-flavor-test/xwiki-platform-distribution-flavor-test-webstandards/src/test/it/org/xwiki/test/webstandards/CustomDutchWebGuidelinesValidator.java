@@ -20,8 +20,7 @@
 package org.xwiki.test.webstandards;
 
 import org.jsoup.nodes.Element;
-import org.xwiki.test.webstandards.framework.DocumentReferenceTarget;
-import org.xwiki.test.webstandards.framework.Target;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.validator.HTML5DutchWebGuidelinesValidator;
 import org.xwiki.validator.ValidationError.Type;
 
@@ -29,16 +28,16 @@ public class CustomDutchWebGuidelinesValidator extends HTML5DutchWebGuidelinesVa
 {
     private static final String SPACE_META = "space";
 
-    private Target target;
+    private DocumentReference documentReference;
 
     /**
-     * Set the target being analyzed.
-     * 
-     * @param target the target
+     * Set the document being analyzed.
+     *
+     * @param documentReference the reference of the document, or {@code null} when the target is not a document
      */
-    public void setTarget(Target target)
+    public void setDocumentReference(DocumentReference documentReference)
     {
-        this.target = target;
+        this.documentReference = documentReference;
     }
 
     /**
@@ -60,19 +59,8 @@ public class CustomDutchWebGuidelinesValidator extends HTML5DutchWebGuidelinesVa
      */
     private boolean isPage(String space, String page)
     {
-        boolean isPage;
-
-        if (target instanceof DocumentReferenceTarget) {
-            DocumentReferenceTarget documentReferenceTarget = (DocumentReferenceTarget) target;
-
-            isPage =
-                documentReferenceTarget.getDocumentReference().getName().equals(page)
-                    && documentReferenceTarget.getDocumentReference().getLastSpaceReference().getName().equals(space);
-        } else {
-            isPage = false;
-        }
-
-        return isPage;
+        return this.documentReference != null && this.documentReference.getName().equals(page)
+            && this.documentReference.getLastSpaceReference().getName().equals(space);
     }
 
     /**

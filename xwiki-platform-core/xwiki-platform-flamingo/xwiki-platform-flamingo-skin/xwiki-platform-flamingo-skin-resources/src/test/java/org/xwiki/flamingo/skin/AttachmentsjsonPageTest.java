@@ -37,6 +37,7 @@ import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -132,6 +133,21 @@ class AttachmentsjsonPageTest extends PageTest
         List<Map<String, Object>> rows = (List<Map<String, Object>>) result.get("rows");
         assertEquals(List.of("first.txt"), rows.stream().map(row -> row.get("id")).toList());
         assertEquals(1, result.get("returnedrows"));
+    }
+
+    @Test
+    void revisionNotViewable() throws Exception
+    {
+        this.context.setDoc(saveDocumentWithAttachments("first.txt"));
+        this.request.put("rev", "1.1");
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, DOCUMENT_REFERENCE))
+            .thenReturn(false);
+
+        Map<String, Object> result = renderTemplate();
+
+        assertEquals(0, result.get("totalrows"));
+        assertEquals(0, result.get("returnedrows"));
+        assertEquals(List.of(), result.get("rows"));
     }
 
     private XWikiDocument saveDocumentWithAttachments(String... fileNames) throws Exception

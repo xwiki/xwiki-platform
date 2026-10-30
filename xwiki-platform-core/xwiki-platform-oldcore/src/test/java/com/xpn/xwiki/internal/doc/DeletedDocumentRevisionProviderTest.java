@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.internal.doc;
 
+import java.util.List;
+import java.util.Locale;
+
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -86,6 +89,7 @@ class DeletedDocumentRevisionProviderTest
         when(this.xwiki.getDeletedDocument(145L, this.context)).thenReturn(deletedDocument);
 
         DocumentReference deletedDocRef = mock(DocumentReference.class, "originalRef");
+        when(deletedDocRef.withoutLocale()).thenReturn(deletedDocRef);
         when(deletedDocument.getDocumentReference()).thenReturn(deletedDocRef);
         PageReference originalRef = mock(PageReference.class, "originalRef");
         PageReference obtainedDocRef = mock(PageReference.class, "otherRef");
@@ -100,5 +104,28 @@ class DeletedDocumentRevisionProviderTest
 
         when(this.pageReferenceResolver.resolve(deletedDocRef)).thenReturn(originalRef);
         assertEquals(revisionDoc, this.revisionProvider.getRevision(documentReference, revision));
+    }
+
+    @Test
+    void getRevisionWithLocale() throws XWikiException
+    {
+        DocumentReference reference = new DocumentReference("wiki", "Space", "WebHome");
+        DocumentReference rootLocaleReference = new DocumentReference(reference, Locale.ROOT);
+        DocumentReference frenchReference = new DocumentReference(reference, Locale.FRENCH);
+
+        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
+        when(this.xwiki.getDeletedDocument(42L, this.context)).thenReturn(deletedDocument);
+        when(deletedDocument.getDocumentReference()).thenReturn(rootLocaleReference);
+        XWikiDocument revisionDoc = mock(XWikiDocument.class);
+        when(deletedDocument.restoreDocument(this.context)).thenReturn(revisionDoc);
+
+        when(this.pageReferenceResolver.resolve(any()))
+            .then(invocation -> new PageReference("wiki", List.of("Space"),
+                invocation.<DocumentReference>getArgument(0).getLocale()));
+
+        // A reference without locale matches the deleted document whatever its locale.
+        assertEquals(revisionDoc, this.revisionProvider.getRevision(reference, "42"));
+        assertEquals(revisionDoc, this.revisionProvider.getRevision(rootLocaleReference, "42"));
+        assertNull(this.revisionProvider.getRevision(frenchReference, "42"));
     }
 }

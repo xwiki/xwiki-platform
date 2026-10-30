@@ -35,7 +35,12 @@
     ## current document regardless of the rev parameter.
     ##
     #set ($revDoc = $xwiki.getDocument($doc.documentReference, $request.rev))
-    #set ($allAttachments = $revDoc.getAttachmentList())
+    ## The revision is null when it doesn't exist or the current user is not allowed to view it.
+    #if ($revDoc)
+      #set ($allAttachments = $revDoc.getAttachmentList())
+    #else
+      #set ($allAttachments = [])
+    #end
     #set ($totalrows = $allAttachments.size())
     #if ($offset < $totalrows)
       #set ($endOffset = $mathtool.min($mathtool.add($offset, $limit), $totalrows))

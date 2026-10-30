@@ -24,6 +24,7 @@ import type {
   ImageWithReference,
   ImageWizard,
   ImageWizardCallback,
+  ImageWizardContext,
 } from "./ImageWizard";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
@@ -32,6 +33,7 @@ import type {
   ResourceReferenceParser,
 } from "@xwiki/platform-rendering-api";
 import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xwiki-model-api";
+import type { LegacyXWikiDocument } from "@xwiki/platform-xwiki-utils";
 
 // The image alignment options supported by the Image Wizard.
 type ImageAlignment = "none" | "start" | "center" | "end";
@@ -115,30 +117,47 @@ export class DefaultImageWizard implements ImageWizard {
     private readonly storageProvider: StorageProvider,
   ) {}
 
-  public insert(callback: ImageWizardCallback): void {
-    void this.showWizard(callback);
+  public insert(
+    callback: ImageWizardCallback,
+    context?: ImageWizardContext,
+  ): void {
+    void this.showWizard(callback, undefined, context);
   }
 
-  public edit(image: ImageWithReference, callback: ImageWizardCallback): void {
-    void this.showWizard(callback, image);
+  public edit(
+    image: ImageWithReference,
+    callback: ImageWizardCallback,
+    context?: ImageWizardContext,
+  ): void {
+    void this.showWizard(callback, image, context);
   }
 
   private async showWizard(
     callback: ImageWizardCallback,
     image?: ImageWithReference,
+    context?: ImageWizardContext,
   ): Promise<void> {
+    // The image references are relative to the edited document, so the image previews are computed for it, and the
+    // images are uploaded to it.
+    const documentReference =
+      context?.documentReference ?? XWiki.currentDocument.documentReference;
+    const editedDocument = context?.documentReference
+      ? new XWiki.Document(context.documentReference)
+      : XWiki.currentDocument;
     try {
       const imageWizard = await loadById<XWikiWYSIWYGImageWizard>(
         "xwiki-wysiwyg-image-wizard",
       );
       const imageData = await imageWizard({
         captionAllowed: true,
-        currentDocument: XWiki.currentDocument.documentReference,
-        getImageResourceURL: this.getResourceURL.bind(this),
+        currentDocument: documentReference,
+        getImageResourceURL: (resourceReference, extraParams) =>
+          this.getResourceURL(resourceReference, extraParams, editedDocument),
         imageData: image ? this.getImageData(image) : {},
         isHTML5: true,
         isInsert: !image,
-        upload: this.upload.bind(this),
+        upload: (file, uploadCallback) =>
+          this.upload(file, uploadCallback, documentReference),
       });
       callback.submit(this.getImageProperties(imageData, image?.reference));
     } catch {
@@ -149,6 +168,7 @@ export class DefaultImageWizard implements ImageWizard {
   private getResourceURL(
     resourceReference: ResourceReference,
     extraParams: Record<string, string>,
+    editedDocument: LegacyXWikiDocument,
   ): string {
     if (["url", "path", "unc", "unknown"].includes(resourceReference.type)) {
       return resourceReference.reference;
@@ -164,7 +184,8 @@ export class DefaultImageWizard implements ImageWizard {
       });
       parameters.set("type", resourceReference.type);
       parameters.set("reference", resourceReference.reference);
-      return XWiki.currentDocument.getURL("get", parameters);
+      // The resource reference is resolved relative to the document the URL points to.
+      return editedDocument.getURL("get", parameters);
     }
   }
 
@@ -231,19 +252,22 @@ export class DefaultImageWizard implements ImageWizard {
    *
    * @param file - the image file to upload
    * @param callback - used to notify the Image Wizard about the upload progress
+   * @param documentReference - the reference of the edited document
    */
-  private async upload(file: File, callback: UploadCallback): Promise<void> {
-    // For now, we assume the current document is being edited.
-    const currentDocumentReference = XWiki.currentDocument.documentReference;
+  private async upload(
+    file: File,
+    callback: UploadCallback,
+    documentReference: XWikiEntityReference,
+  ): Promise<void> {
     try {
       const result = await this.storageProvider
         .get()
-        .saveAttachments(Model.serialize(currentDocumentReference), [file]);
+        .saveAttachments(Model.serialize(documentReference), [file]);
       // The storage identifies the uploaded attachment by its name.
       const attachmentName = result?.[0]?.reference;
       if (attachmentName) {
         callback.onSuccess(
-          new AttachmentReference(attachmentName, currentDocumentReference),
+          new AttachmentReference(attachmentName, documentReference),
         );
       } else {
         callback.onAbort();

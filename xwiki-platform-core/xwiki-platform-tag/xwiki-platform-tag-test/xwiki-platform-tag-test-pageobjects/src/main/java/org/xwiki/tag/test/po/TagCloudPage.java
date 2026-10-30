@@ -23,10 +23,12 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Models the {@code Main.Tags} page, which displays the tag cloud of the wiki when no action is requested.
+ * Models a page displaying a tag cloud, like the {@code Main.Tags} page, which displays the tag cloud of the wiki when no
+ * action is requested.
  *
  * @version $Id$
  * @since 17.10.14
@@ -45,6 +47,19 @@ public class TagCloudPage extends ViewPage
     public static TagCloudPage gotoPage()
     {
         getUtil().gotoPage("Main", "Tags");
+        return new TagCloudPage();
+    }
+
+    /**
+     * Opens a page displaying a tag cloud with the tag cloud macro.
+     *
+     * @param reference the page to open
+     * @return the tag cloud page
+     * @since 18.10.0RC1
+     */
+    public static TagCloudPage gotoPage(DocumentReference reference)
+    {
+        getUtil().gotoPage(reference);
         return new TagCloudPage();
     }
 

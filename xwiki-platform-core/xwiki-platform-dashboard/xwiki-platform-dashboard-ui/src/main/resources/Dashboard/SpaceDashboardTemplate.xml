@@ -207,12 +207,14 @@
     </class>
     <property>
       <content>{{velocity}}
-#set($tagSpace = $NULL)
+#set($tagSpaces = $NULL)
 #if ($doc.space != "Main")
-  #set($tagSpace = $services.rendering.escape($doc.space, 'xwiki/2.1'))
+  ## Quote the space, since its name could contain a comma.
+  #set($quotedSpace = $doc.space.replace("'", "''"))
+  #set($tagSpaces = $services.rendering.escape("'$quotedSpace'", 'xwiki/2.1'))
 #end
 
-{{tagcloud  space="$!tagSpace" /}}
+{{tagcloud spaces="$!tagSpaces" /}}
 {{/velocity}}</content>
     </property>
     <property>

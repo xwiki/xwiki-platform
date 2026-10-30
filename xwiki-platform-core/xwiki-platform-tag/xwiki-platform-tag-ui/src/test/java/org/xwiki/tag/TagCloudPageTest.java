@@ -23,6 +23,8 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.inject.Named;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -35,13 +37,20 @@ import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.internal.HiddenDocumentFilter;
+import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.internal.UniqueDocumentFilter;
+import org.xwiki.query.script.QueryManagerScriptService;
+import org.xwiki.rendering.RenderingScriptServiceComponentList;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
+import org.xwiki.rendering.internal.macro.message.WarningMessageMacro;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wikimacro.internal.WikiMacroFactoryComponentClass;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.tag.internal.selector.DefaultTagsSelector;
 import org.xwiki.tag.internal.selector.ExhaustiveCheckTagsSelector;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
@@ -53,7 +62,10 @@ import com.xpn.xwiki.plugin.tag.TagPlugin;
 import com.xpn.xwiki.plugin.tag.TagQueryUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.RETURNS_SELF;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -73,15 +85,24 @@ import static org.xwiki.test.page.WikiMacroSetup.loadWikiMacro;
     UniqueDocumentFilter.class,
     DefaultUserPropertiesResolver.class,
     ErrorMessageMacro.class,
+    WarningMessageMacro.class,
     TranslationMacro.class
 })
 @DefaultUserComponentList
+@RenderingScriptServiceComponentList
+@DefaultRenderingConfigurationComponentList
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
 @WikiMacroFactoryComponentClass
 class TagCloudPageTest extends PageTest
 {
     private final Query query = mock(Query.class);
+
+    private final ScriptQuery spaceQuery = mock(ScriptQuery.class, RETURNS_SELF);
+
+    @MockComponent(classToMock = QueryManagerScriptService.class)
+    @Named("query")
+    private ScriptService queryService;
 
     @BeforeEach
     void setUp() throws Exception
@@ -94,6 +115,10 @@ class TagCloudPageTest extends PageTest
 
         when(this.oldcore.getQueryManager().createQuery(any(String.class), any(String.class))).thenReturn(this.query);
         when(this.query.addFilter(any())).thenReturn(this.query);
+
+        // The locations exist, unless a test says otherwise.
+        when(((QueryManagerScriptService) this.queryService).hql(anyString())).thenReturn(this.spaceQuery);
+        when(this.spaceQuery.execute()).thenReturn(List.of("Space"));
 
         loadWikiMacro(this, this.componentManager, new DocumentReference("xwiki", "XWiki", "TagCloud"));
 
@@ -207,7 +232,7 @@ class TagCloudPageTest extends PageTest
 
         Document document = renderHTMLPage(xwikiDocument);
 
-        assertEquals("xe.tag.notagsforspace [My_Space]", document.selectFirst("p.noitems").text());
+        assertEquals("xe.tag.notagsforspace", document.selectFirst("p.noitems").text());
         verify(this.query).bindValues(List.of("My_Space", "My\\_Space.%"));
     }
 
@@ -245,5 +270,160 @@ class TagCloudPageTest extends PageTest
 
         assertEquals("xe.tag.paramerror", document.selectFirst(".errormessage").text());
         verify(this.query, never()).execute();
+    }
+
+    @Test
+    void withSpacesWithoutQuotes() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of(
+            new Object[] { "xwiki:Sandbox.TaggedPage1", "tag1" },
+            new Object[] { "xwiki:My Space.TaggedPage2", "tag1" }
+        ));
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{tagcloud spaces=\"Sandbox,My Space\"/}}");
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        Document document = renderHTMLPage(xwikiDocument);
+
+        Elements lis = document.select("ol.tagCloud li");
+        assertEquals(1, lis.size());
+        assertEquals("tag1", lis.get(0).selectFirst("a").text());
+        verify(this.query).bindValues(List.of("Sandbox", "Sandbox.%", "My Space", "My Space.%"));
+    }
+
+    @Test
+    void withSpacesWithDoubledQuote() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{tagcloud spaces=\"'Apo''stroph','My, Space'\"/}}");
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        renderHTMLPage(xwikiDocument);
+
+        verify(this.query).bindValues(List.of("Apo'stroph", "Apo'stroph.%", "My, Space", "My, Space.%"));
+    }
+
+    @Test
+    void withSpacesMixingQuotedAndPlainLocations() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{tagcloud spaces=\"'Space1','My, Space',Sandbox, O'Brien\"/}}");
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        renderHTMLPage(xwikiDocument);
+
+        verify(this.query).bindValues(List.of("Space1", "Space1.%", "My, Space", "My, Space.%", "Sandbox",
+            "Sandbox.%", "O'Brien", "O'Brien.%"));
+    }
+
+    public static Stream<String> withInvalidSpacesSource()
+    {
+        return Stream.of("'Sandbox", "'Sandbox' Space", "Sandbox,,Space", "Sandbox,", "''");
+    }
+
+    @ParameterizedTest
+    @MethodSource("withInvalidSpacesSource")
+    void withInvalidSpaces(String spaces) throws Exception
+    {
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent(String.format("{{tagcloud spaces=\"%s\"/}}", spaces));
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        Document document = renderHTMLPage(xwikiDocument);
+
+        assertEquals(String.format("tag.cloud.invalidLocations [%s]", spaces),
+            document.selectFirst(".errormessage").text());
+        verify(this.query, never()).execute();
+    }
+
+    @Test
+    void withSpacesAndNoTags() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{tagcloud spaces=\"My_Space\"/}}");
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        Document document = renderHTMLPage(xwikiDocument);
+
+        assertEquals("xe.tag.notagsforspace", document.selectFirst("p.noitems").text());
+        assertNull(document.selectFirst(".warningmessage"));
+        verify(this.query).bindValues(List.of("My_Space", "My\\_Space.%"));
+    }
+
+    @Test
+    void withMissingLocation() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        when(this.spaceQuery.execute()).thenReturn(List.of());
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{tagcloud space=\"No.Such\"/}}");
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        Document document = renderHTMLPage(xwikiDocument);
+
+        assertEquals("tag.cloud.locationNotFound [No.Such]", document.selectFirst(".warningmessage").text());
+        verify(this.spaceQuery).bindValue("space", "No.Such");
+    }
+
+    @Test
+    void withSpacesAndOneMissingLocation() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of(
+            new Object[] { "xwiki:Sandbox.TaggedPage1", "tag1" },
+            new Object[] { "xwiki:Sandbox.TaggedPage2", "tag1" }
+        ));
+        ScriptQuery missingSpaceQuery = mock(ScriptQuery.class, RETURNS_SELF);
+        when(missingSpaceQuery.execute()).thenReturn(List.of());
+        when(this.spaceQuery.bindValue("space", "No**Such**")).thenReturn(missingSpaceQuery);
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{tagcloud spaces=\"Sandbox,No**Such**\"/}}");
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        Document document = renderHTMLPage(xwikiDocument);
+
+        Elements warnings = document.select(".warningmessage");
+        assertEquals(1, warnings.size());
+        // The location is displayed as typed, without being parsed as wiki syntax.
+        assertEquals("tag.cloud.locationNotFound [No**Such**]", warnings.get(0).text());
+        assertNull(warnings.get(0).selectFirst("strong"));
+        // The warning is a block of its own, otherwise the HTML of the tag cloud that follows would be inline too.
+        assertEquals("div", warnings.get(0).tagName());
+        assertEquals(List.of("tag1"), document.select("ol.tagCloud li a").eachText());
+        verify(this.spaceQuery).bindValue("space", "Sandbox");
+    }
+
+    @Test
+    void includedWithTagCloudSpace() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        XWikiDocument tagCloudDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "TagCloud"), this.context);
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent("{{velocity}}#set ($tagCloudSpace = \"Apo'stroph, Space\"){{/velocity}}\n\n"
+            + tagCloudDocument.getContent());
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        renderHTMLPage(xwikiDocument);
+
+        verify(this.query).bindValues(List.of("Apo'stroph, Space", "Apo'stroph, Space.%"));
     }
 }

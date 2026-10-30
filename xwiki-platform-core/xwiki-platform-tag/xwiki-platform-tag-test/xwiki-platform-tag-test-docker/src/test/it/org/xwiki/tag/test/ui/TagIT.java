@@ -35,6 +35,7 @@ import org.xwiki.tag.test.po.TaggablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.MessageBoxElement;
 
 import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -335,7 +336,8 @@ class TagIT
 
     /**
      * Tags a nested page and a terminal page and checks that the tag cloud of {@code Main.Tags} lists all their tags,
-     * and that a tag shared by both pages lists both of them.
+     * that a tag shared by both pages lists both of them, and that the tag cloud macro given their location and a
+     * missing one lists their tags and warns only about the missing location.
      */
     @Test
     @Order(11)
@@ -367,5 +369,14 @@ class TagIT
         TagPage sharedTagPage = tagCloudPage.clickTag(sharedTag);
         assertEquals(List.of(terminalPageTitle, testSpace.getName()),
             sharedTagPage.getTaggedPages().stream().sorted().toList());
+
+        // The tag cloud macro shows the tags of an existing nested location and warns only about the missing one.
+        DocumentReference tagCloudMacroPage = new DocumentReference("TagCloudMacro", testSpace);
+        setup.rest().savePage(tagCloudMacroPage, String.format("{{tagcloud spaces=\"%s,NoSuchLocation\"/}}",
+            setup.serializeLocalReference(testSpace)), "");
+        tagCloudPage = TagCloudPage.gotoPage(tagCloudMacroPage);
+        assertThat(tagCloudPage.getTags(), hasItems(nestedTag, terminalTag, sharedTag));
+        assertEquals(List.of("The location NoSuchLocation does not exist."),
+            tagCloudPage.getMessageBoxes().stream().map(MessageBoxElement::getText).toList());
     }
 }

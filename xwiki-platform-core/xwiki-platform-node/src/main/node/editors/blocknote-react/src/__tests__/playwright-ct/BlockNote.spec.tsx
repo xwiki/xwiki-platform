@@ -130,6 +130,36 @@ test("Allowed syntax features should be available", async ({ mount, page }) => {
   expect(menuItemsText).toContain("Quote");
 });
 
+test("The mention menu suggests the users of the host application", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      macros={false}
+      content={[]}
+      syntax={FULL_SYNTAX}
+      userSuggest={async () => [
+        { reference: "XWiki.Admin", label: "Administrator", hint: "admin" },
+      ]}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+
+  await editorEl.press("@");
+
+  const mentionMenuEl = page.locator(
+    "[data-floating-ui-portal] .bn-suggestion-menu",
+  );
+
+  await mentionMenuEl.waitFor({ state: "attached" });
+
+  await expect(
+    mentionMenuEl.locator(".bn-suggestion-menu-item p:first-child"),
+  ).toHaveText(["Administrator"]);
+});
+
 test("Disallowed syntax features should be unavailable", async ({
   mount,
   page,

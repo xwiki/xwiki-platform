@@ -74,6 +74,11 @@ export type {
 export type { DefaultBlockNoteEditorOptions } from "./components/BlockNoteViewWrapper";
 
 export type {
+  MentionableUser,
+  UserSuggestFn,
+} from "./components/mentions/mentionMenu";
+
+export type {
   ImageEditionOverrideFn,
   ImageUpdateResult,
 } from "./components/images/CustomImageToolbar";

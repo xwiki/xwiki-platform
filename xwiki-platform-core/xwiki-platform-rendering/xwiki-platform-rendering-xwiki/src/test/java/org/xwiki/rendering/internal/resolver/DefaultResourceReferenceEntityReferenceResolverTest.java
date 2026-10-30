@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.resolver;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -55,6 +56,7 @@ import org.xwiki.rendering.listener.reference.PageResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.reference.SpaceResourceReference;
+import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -322,6 +324,47 @@ class DefaultResourceReferenceEntityReferenceResolverTest
     }
 
     @Test
+    void resolveWithDocumentExistenceOverride()
+    {
+        // A terminal page assumed to exist is targeted instead of the space home page with the same name.
+        DocumentReference terminalReference = new DocumentReference(CURRENT_WIKI, SPACE, PAGE);
+        DocumentExistenceOverride terminalExists = new DocumentExistenceOverride(Map.of(terminalReference, true));
+
+        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+            this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null));
+        assertEquals(terminalReference,
+            this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null, null, terminalExists));
+        assertEquals(new AttachmentReference(ATTACHMENT, terminalReference), this.resolver
+            .resolve(attachmentResource(SPACE + '.' + PAGE + '@' + ATTACHMENT, false), null, null, terminalExists));
+
+        // An existing terminal page assumed not to exist is not targeted.
+        this.existingDocuments.add(terminalReference);
+        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+            this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null, null,
+                new DocumentExistenceOverride(Map.of(terminalReference, false))));
+
+        // A top level space home page assumed to exist is targeted from another top level space home page.
+        DocumentReference currentSpaceHomeReference = new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, DEFAULT_PAGE);
+        DocumentReference siblingReference = new DocumentReference(CURRENT_WIKI, PAGE, DEFAULT_PAGE);
+
+        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
+            this.resolver.resolve(documentResource(PAGE, false), null, currentSpaceHomeReference));
+        assertEquals(siblingReference, this.resolver.resolve(documentResource(PAGE, false), null,
+            currentSpaceHomeReference, new DocumentExistenceOverride(Map.of(siblingReference, true))));
+
+        // A space home page assumed to exist is targeted from a sibling space home page.
+        DocumentReference currentSubspaceHomeReference =
+            new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE), DEFAULT_PAGE);
+        DocumentReference subspaceSiblingReference =
+            new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, PAGE), DEFAULT_PAGE);
+
+        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE, PAGE), DEFAULT_PAGE),
+            this.resolver.resolve(documentResource(PAGE, false), null, currentSubspaceHomeReference));
+        assertEquals(subspaceSiblingReference, this.resolver.resolve(documentResource(PAGE, false), null,
+            currentSubspaceHomeReference, new DocumentExistenceOverride(Map.of(subspaceSiblingReference, true))));
+    }
+
+    @Test
     void resolveTypeSpace()
     {
         assertEquals(new SpaceReference(WIKI, SPACE),
@@ -401,7 +444,8 @@ class DefaultResourceReferenceEntityReferenceResolverTest
         }
 
         @Override
-        protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
+        protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
+            DocumentExistenceOverride existenceOverride)
         {
             return null;
         }
@@ -419,17 +463,17 @@ class DefaultResourceReferenceEntityReferenceResolverTest
         EntityReference baseReference = sourceReference;
 
         assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, null,
-            defaultDocumentName));
+            defaultDocumentName, DocumentExistenceOverride.NONE));
         assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName));
+            defaultDocumentName, DocumentExistenceOverride.NONE));
 
         defaultDocumentName = "Bar";
         assertTrue(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName));
+            defaultDocumentName, DocumentExistenceOverride.NONE));
 
         this.existingDocuments.add(finalReference);
         assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName));
+            defaultDocumentName, DocumentExistenceOverride.NONE));
     }
 
     @Test

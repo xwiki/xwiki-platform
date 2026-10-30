@@ -120,6 +120,7 @@ import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcesso
 import type { FileUploader } from "../services/blocknote/createFileUploader";
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
+import type { UserSuggest } from "../services/mentions/UserSuggest";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -133,6 +134,7 @@ import type {
   ImageEditionHooks,
   ImageEditionOverrideFn,
   ImageInsertionOverrideFn,
+  UserSuggestFn,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
@@ -355,6 +357,11 @@ function newFileUploader(eventTarget: EventTarget): FileUploader {
   });
 }
 
+const userSuggest: UserSuggestFn = (query) => {
+  const userSuggestService: UserSuggest = container.get("UserSuggest");
+  return userSuggestService.getUsers(query);
+};
+
 const syntaxes = container.getAll<SyntaxConfig>(
   SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
 );
@@ -404,6 +411,7 @@ const editorProps = shallowRef<
     imageInsertion,
     linkEdition,
   },
+  userSuggest,
   syntax,
 });
 

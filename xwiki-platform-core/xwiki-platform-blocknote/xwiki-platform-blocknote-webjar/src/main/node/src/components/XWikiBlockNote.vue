@@ -106,6 +106,7 @@ import type { Logic } from "../services/Logic";
 import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
+import type { UserSuggest } from "../services/mentions/UserSuggest";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -118,6 +119,7 @@ import type {
   EditorLanguage,
   ImageEditionOverrideFn,
   LinkEditionHooks,
+  UserSuggestFn,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
@@ -279,6 +281,11 @@ function isSameResourceReference(
   return alice?.type === bob?.type && alice?.reference === bob?.reference;
 }
 
+const userSuggest: UserSuggestFn = (query) => {
+  const userSuggestService: UserSuggest = container.get("UserSuggest");
+  return userSuggestService.getUsers(query);
+};
+
 const syntaxes = container.getAll<SyntaxConfig>(
   SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
 );
@@ -320,6 +327,7 @@ const editorProps = shallowRef<
     imageEdition,
     linkEdition,
   },
+  userSuggest,
   syntax,
 });
 

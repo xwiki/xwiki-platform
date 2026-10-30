@@ -75,4 +75,16 @@ class SkinVisualIT
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Headings"));
         screenshots.assertMatches("headings", viewPage.getContentContainer());
     }
+
+    /**
+     * Verify the layout of the vertical menus, with their group headers and items, including the current item, the
+     * current group and a group with a single item.
+     */
+    @Test
+    @Order(2)
+    void verticalMenus(TestUtils setup, ScreenshotComparator screenshots) throws IOException
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "VerticalMenus"));
+        screenshots.assertMatches("verticalMenus", viewPage.getContentContainer());
+    }
 }

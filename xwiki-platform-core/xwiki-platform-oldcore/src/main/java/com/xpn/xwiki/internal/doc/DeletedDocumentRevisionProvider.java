@@ -80,8 +80,12 @@ public class DeletedDocumentRevisionProvider implements DocumentRevisionProvider
             // We might be trying to access a terminal doc and the requested reference is a non-terminal doc because
             // if the page doesn't exist we always assume it's non-terminal: so we need to compare the PageReference
             // here.
+            // A requested reference without locale targets the page whatever the locale of the deleted document,
+            // which always has one (Locale.ROOT for the default translation).
+            DocumentReference comparedDeletedDocRef =
+                requestedDocRef.getLocale() == null ? deletedDocRef.withoutLocale() : deletedDocRef;
             PageReference requestedPageRef = this.pageReferenceResolver.resolve(requestedDocRef);
-            PageReference deletedPageRef = this.pageReferenceResolver.resolve(deletedDocRef);
+            PageReference deletedPageRef = this.pageReferenceResolver.resolve(comparedDeletedDocRef);
             result = requestedPageRef.equals(deletedPageRef);
         }
         return result;

@@ -48,6 +48,7 @@ import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.MacroRefactoring;
+import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -167,6 +168,27 @@ class LinkParserTest
             Map.of(EntityType.DOCUMENT, Set.of(ResourceType.DOCUMENT, ResourceType.ATTACHMENT)),
             CURRENT_REFERENCE));
         verify(this.entityReferenceResolver).resolve(ref2, EntityType.DOCUMENT);
+    }
+
+    @Test
+    void getUniqueLinkedEntityReferenceWithExistenceRecorder()
+    {
+        ResourceReference ref = new ResourceReference("myref", ResourceType.DOCUMENT);
+        ref.setTyped(false);
+
+        when(this.xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenAnswer(new AnswerGetBlocks(
+            List.of(new LinkBlock(List.of(), ref, false)),
+            List.of(),
+            List.of()
+        ));
+
+        DocumentExistenceRecorder recorder = new DocumentExistenceRecorder();
+        EntityReference entityReference = new EntityReference("myref", EntityType.DOCUMENT);
+        when(this.entityReferenceResolver.resolve(ref, EntityType.DOCUMENT, recorder)).thenReturn(entityReference);
+
+        // The recorder is passed to the resolver so that it collects the existence checks of the resolution.
+        assertEquals(Set.of(entityReference), this.linkParser.getUniqueLinkedEntityReferences(this.xdom,
+            Map.of(EntityType.DOCUMENT, Set.of(ResourceType.DOCUMENT)), CURRENT_REFERENCE, recorder));
     }
 
     @Test

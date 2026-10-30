@@ -29,7 +29,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 
 /**
  * Abstract class for all relative resource reference resolvers.
@@ -83,7 +82,7 @@ public abstract class AbstractRelativeResourceReferenceEntityReferenceResolver
 
     @Override
     protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistenceOverride existenceOverride)
+        DocumentExistence existence)
     {
         return this.relativeReferenceResolver.resolve(resourceReference.getReference(), getEntityType(), baseReference);
     }

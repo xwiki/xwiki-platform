@@ -35,7 +35,8 @@ define('xwiki-suggestWikis', ['jquery', 'xwiki-entityReference', 'xwiki-selectiz
         const response = await wikisPromise;
         const wikis = Array.isArray(response?.wikis) ? response.wikis : [];
         callback(wikis.map(wiki => ({value: wiki.name})));
-      } catch {
+      } catch (error) {
+        console.error('Failed to fetch the wikis: ', error);
         // Fetch the wikis again on the next call.
         wikisPromise = undefined;
         callback();

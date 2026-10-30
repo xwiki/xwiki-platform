@@ -48,7 +48,7 @@ public record Tag(String name) implements Serializable
     @Override
     public boolean equals(Object object)
     {
-        return object instanceof Tag tag && Objects.equals(normalize(this.name), normalize(tag.name));
+        return object instanceof Tag(String otherName) && Objects.equals(normalize(this.name), normalize(otherName));
     }
 
     @Override

@@ -319,8 +319,8 @@ class RenamePageIT
     void renamePageUsedInMacroContentAndParameters(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
-        // FIXME: Using WebHome locations and not terminal page, since it's not properly supported yet.
-        // Improve the test whenever XWIKI-18634 is fixed
+        // The image and the untyped link target a terminal page, to check that their references are updated even
+        // though the renamed terminal page doesn't exist anymore when the backlinks are updated.
         // Fixture: we're creating 5 different pages to ensure that the backlinks, rename are working properly
         // and independently in different situations.
         String sourcePageName = "WebHome";
@@ -333,8 +333,7 @@ class RenamePageIT
         String sourcePageLocation3 = RenamePageIT.class.getSimpleName() + ".NestedMacroLink";
         String sourcePage3 = sourcePageLocation3 + "." + sourcePageName;
 
-        String sourcePageLocation4 = RenamePageIT.class.getSimpleName() + ".ImageLink";
-        String sourcePage4 = sourcePageLocation4 + "." + sourcePageName;
+        String sourcePage4 = RenamePageIT.class.getSimpleName() + ".ImageLink";
 
         String sourcePageLocation5 = RenamePageIT.class.getSimpleName() + ".IncludeLink";
         String sourcePage5 = sourcePageLocation5 + "." + sourcePageName;
@@ -349,8 +348,8 @@ class RenamePageIT
         String targetPageLastSpace3 = "TargetNestedMacroLink";
         String targetPage3 = targetPageSubSpace + "." + targetPageLastSpace3 + ".WebHome";
 
-        String targetPageLastSpace4 = "TargetImageLink";
-        String targetPage4 = targetPageSubSpace + "." + targetPageLastSpace4 + ".WebHome";
+        String targetPageName4 = "TargetImageLink";
+        String targetPage4 = targetPageSubSpace + "." + targetPageName4;
 
         String targetPageLastSpace5 = "TargetIncludeLink";
         String targetPage5 = targetPageSubSpace + "." + targetPageLastSpace5 + ".WebHome";
@@ -395,7 +394,8 @@ class RenamePageIT
         String testPageContent = "Check out this page: [[type the link label>>doc:%1$s]]%n" + "%n" + "{{warning}}%n"
             + "Withing a macro: Check out this page: [[type the link label>>doc:%2$s]]%n" + "%n" + "{{error}}%n"
             + "And in nested macro: Check out this page: [[type the link label>>doc:%3$s]]%n" + "{{/error}}%n" + "%n"
-            + " %n" + "{{/warning}}%n" + "%n" + "Picture: [[image:%4$s@image.gif]]%n" + "Include macro:%n" + "%n"
+            + " %n" + "{{/warning}}%n" + "%n" + "Picture: [[image:%4$s@image.gif]]%n" + "Untyped link: [[%4$s]]%n"
+            + "Include macro:%n" + "%n"
             + "{{include reference=\"%5$s\"/}}%n%n"
             + "== A section ==%n%n"
             + "First link again: [[type the link label>>doc:%1$s]]%n%n"
@@ -416,7 +416,7 @@ class RenamePageIT
         DocumentPicker documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
         documentPicker.setName(targetPageLastSpace1);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.setTerminal(false);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);
@@ -433,7 +433,7 @@ class RenamePageIT
         documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
         documentPicker.setName(targetPageLastSpace2);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.setTerminal(false);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);
@@ -450,7 +450,7 @@ class RenamePageIT
         documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
         documentPicker.setName(targetPageLastSpace3);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.setTerminal(false);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);
@@ -466,8 +466,8 @@ class RenamePageIT
         rename = viewPage.rename();
         documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
-        documentPicker.setName(targetPageLastSpace4);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        documentPicker.setName(targetPageName4);
+        rename.setTerminal(true);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);
@@ -484,7 +484,7 @@ class RenamePageIT
         documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
         documentPicker.setName(targetPageLastSpace5);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.setTerminal(false);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);

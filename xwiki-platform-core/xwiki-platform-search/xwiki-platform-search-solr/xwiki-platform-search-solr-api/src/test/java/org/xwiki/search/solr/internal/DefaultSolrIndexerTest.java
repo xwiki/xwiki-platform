@@ -58,6 +58,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -133,7 +134,8 @@ class DefaultSolrIndexerTest
     {
         // Make the indexer able to extract documents.
         XWikiContext xcontext = mock();
-        when(xcontext.getWiki()).thenReturn(mock());
+        XWiki xwiki = mock();
+        when(xcontext.getWiki()).thenReturn(xwiki);
         when(this.xcontextProvider.get()).thenReturn(xcontext);
         doAnswer(invocation -> {
             ExecutionContext executionContext = invocation.getArgument(0);

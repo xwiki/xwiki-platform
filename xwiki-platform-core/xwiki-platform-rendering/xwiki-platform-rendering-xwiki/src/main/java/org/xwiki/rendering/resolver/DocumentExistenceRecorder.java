@@ -48,7 +48,7 @@ public final class DocumentExistenceRecorder
     /**
      * @param documentReference the reference of a document whose existence was checked; its locale is ignored
      */
-    public void record(DocumentReference documentReference)
+    public void add(DocumentReference documentReference)
     {
         this.documents.add(documentReference.withoutLocale());
     }

@@ -257,8 +257,8 @@ class DocumentSolrMetadataExtractorTest
         when(this.document.getUniqueLinkedEntities(any(XWikiContext.class), any(DocumentExistenceRecorder.class)))
             .then(invocation -> {
                 DocumentExistenceRecorder recorder = invocation.getArgument(1);
-                recorder.record(new DocumentReference("wiki", "space", "document2"));
-                recorder.record(new DocumentReference("wiki", List.of("space", "document2"), "WebHome"));
+                recorder.add(new DocumentReference("wiki", "space", "document2"));
+                recorder.add(new DocumentReference("wiki", List.of("space", "document2"), "WebHome"));
 
                 return Set.of(new DocumentReference("wiki", "space", "document1"),
                     new DocumentReference("wiki", List.of("space", "document2"), "WebHome"));

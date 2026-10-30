@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.resolver;
 
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -196,7 +195,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         DocumentReference finalReference = reference;
 
         // If same as base reference, no fallback
-        if (!Objects.equals(reference, baseReference)) {
+        if (!reference.equals(baseReference)) {
             // If already a space home page, no fallback
             String defaultDocumentName =
                 this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();

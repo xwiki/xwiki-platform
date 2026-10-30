@@ -64,7 +64,7 @@ public final class DocumentExistence
     public boolean exists(DocumentReference documentReference)
     {
         if (this.recorder != null) {
-            this.recorder.record(documentReference);
+            this.recorder.add(documentReference);
         }
 
         return this.existenceOverride.getExistence(documentReference)

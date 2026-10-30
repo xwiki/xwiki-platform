@@ -698,6 +698,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         }
     }
 
+    // Catching Throwable on purpose: this runs in the indexer thread, which must keep indexing the other documents
+    // whatever the failure of the extraction of one of them (as for the other entries of the queue).
+    @SuppressWarnings("java:S1181")
     private void indexExistenceDependent(DocumentReference dependent, List<SolrInputDocument> solrDocuments)
     {
         try {

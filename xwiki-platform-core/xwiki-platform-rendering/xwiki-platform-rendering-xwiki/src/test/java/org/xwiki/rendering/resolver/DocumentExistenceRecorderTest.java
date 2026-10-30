@@ -41,26 +41,26 @@ class DocumentExistenceRecorderTest
     private static final DocumentReference HOME = new DocumentReference("wiki", List.of("Space", "Page"), "WebHome");
 
     @Test
-    void record()
+    void add()
     {
         DocumentExistenceRecorder recorder = new DocumentExistenceRecorder();
 
         assertEquals(Set.of(), recorder.getDocuments());
 
-        recorder.record(TERMINAL);
-        recorder.record(HOME);
-        recorder.record(TERMINAL);
+        recorder.add(TERMINAL);
+        recorder.add(HOME);
+        recorder.add(TERMINAL);
 
         assertEquals(List.of(TERMINAL, HOME), List.copyOf(recorder.getDocuments()));
     }
 
     @Test
-    void recordIgnoresLocale()
+    void addIgnoresLocale()
     {
         DocumentExistenceRecorder recorder = new DocumentExistenceRecorder();
 
-        recorder.record(new DocumentReference(TERMINAL, Locale.FRENCH));
-        recorder.record(TERMINAL);
+        recorder.add(new DocumentReference(TERMINAL, Locale.FRENCH));
+        recorder.add(TERMINAL);
 
         assertEquals(Set.of(TERMINAL), recorder.getDocuments());
     }

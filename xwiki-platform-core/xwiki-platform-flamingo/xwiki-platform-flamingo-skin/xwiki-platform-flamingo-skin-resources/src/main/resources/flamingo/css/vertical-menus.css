@@ -1,0 +1,120 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/* Vertical Menus */
+
+.vertical-menu {
+  margin: 10px 0;
+
+  ul {
+    margin-left: 0;
+    padding-left: 0;
+    margin-bottom: 20px;
+
+    li {
+      display: block;
+      /* Rounded up to a whole pixel, to keep the size the text had with LESS. */
+      font-size: round(up, var(--font-size-small), 1px);
+
+      .group {
+        position: relative;
+        display: block;
+        margin-bottom: -1px;
+        border: 1px solid var(--list-group-border);
+        padding: 5px 30px;
+        text-transform: uppercase;
+        font-weight: 700;
+        background-color: var(--navbar-default-bg);
+        background-repeat: no-repeat;
+
+        &:first-child {
+          border-top-left-radius: var(--border-radius-base);
+          border-top-right-radius: var(--border-radius-base);
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom-right-radius: var(--border-radius-base);
+          border-bottom-left-radius: var(--border-radius-base);
+        }
+
+        &:hover, &.current-group {
+          background-color: var(--navbar-default-link-hover-bg);
+
+          & a {
+            color: var(--navbar-default-link-hover-color);
+          }
+        }
+
+        a {
+          color: var(--navbar-default-link-color);
+        }
+      }
+
+      ul {
+        margin-left: 0;
+
+        li {
+          position: relative;
+          margin-bottom: -1px;
+          border: 1px solid var(--list-group-border);
+          padding: 0;
+          background-color: var(--xwiki-page-content-bg);
+
+          &:last-child {
+            margin-bottom: 0;
+            border-bottom-right-radius: var(--border-radius-base);
+            border-bottom-left-radius: var(--border-radius-base);
+          }
+
+          /* This rule has to stay after the :last-child one, so that an only child has no rounded corners. */
+          &:first-child {
+            border-radius: 0;
+          }
+
+          .current,
+          .current a,
+          .current a:hover,
+          .current a:focus {
+            color: var(--component-active-color);
+            background-color: var(--component-active-bg);
+          }
+
+          a {
+            display: block;
+            padding: 5px;
+            color: var(--list-group-link-color);
+
+            &:hover,
+            &:focus {
+              text-decoration: none;
+              background-color: var(--list-group-hover-bg);
+            }
+
+            &:before {
+              margin: 0 1px;
+              content: "";
+            }
+          }
+        }
+      }
+    }
+  }
+}

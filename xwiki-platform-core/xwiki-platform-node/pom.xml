@@ -152,6 +152,22 @@
               <installDirectory>${basedir}/target</installDirectory>
             </configuration>
           </execution>
+          <!-- This module doesn't produce any JAR in which to embed the SBOM of the npm packages (see the npm-sbom
+               profile of the root POM): the webjars bundling these packages list them in their own SBOM. -->
+          <execution>
+            <id>npm-sbom</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-sbom-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>npm-sbom</id>
+            <phase>none</phase>
+          </execution>
         </executions>
       </plugin>
     </plugins>

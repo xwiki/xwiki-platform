@@ -1892,6 +1892,73 @@
       </build>
     </profile>
     <profile>
+      <!-- Embed in the JAR of each module building JavaScript code with pnpm (i.e. the webjar-node modules) a CycloneDX
+           SBOM of the npm packages it bundles. These packages are not Maven dependencies, so without it they would be
+           missing from the SBOM of the module and of every artifact depending on it (up to the WAR), and vulnerability
+           scanners couldn't report the advisories affecting them. The SBOM generation of the release build reads the
+           CycloneDX SBOMs found in META-INF/sbom/ to add their components to the artifact SBOM.
+           The list comes from the pnpm lockfile, limited to the production dependencies of the module package: it may
+           include packages that the bundler tree-shakes or keeps external, but it never misses a bundled one.
+           It runs in every build (it takes less than a second) so that it's verified by the CI and not only at release
+           time. -->
+      <id>npm-sbom</id>
+      <activation>
+        <file>
+          <exists>${basedir}/src/main/node/package.json</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>npm-sbom</id>
+                <!-- After "pnpm install" (which the store-based SBOM needs to get the package licenses) and before the
+                     JAR is packaged. -->
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>pnpm</goal>
+                </goals>
+                <configuration>
+                  <!-- "filter ." selects the workspace package of the module. Use the same CycloneDX specification
+                       version as the Maven SBOM. -->
+                  <arguments>
+                    sbom --sbom-format cyclonedx --sbom-spec-version 1.6 --prod --filter .
+                    --out ${project.build.directory}/npm-sbom/bom.json
+                  </arguments>
+                  <workingDirectory>${basedir}/src/main/node</workingDirectory>
+                  <installDirectory>${basedir}/target</installDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.xwiki.commons</groupId>
+            <artifactId>xwiki-commons-tool-sbom-plugin</artifactId>
+            <version>${commons.version}</version>
+            <executions>
+              <execution>
+                <id>npm-sbom</id>
+                <!-- Make the SBOM reproducible, like the rest of the build (pnpm sets the current date, a random serial
+                     number, and its component order and dependency graph vary from one run to the next) and embed it
+                     where the SBOM generation of the release build looks for it. -->
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>normalize</goal>
+                </goals>
+                <configuration>
+                  <sourceFile>${project.build.directory}/npm-sbom/bom.json</sourceFile>
+                  <targetFile>${project.build.outputDirectory}/META-INF/sbom/npm.cdx.json</targetFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <!-- To be executed when building snapshots. This allows to not have to have a special settings.xml file
            when building snapshots while not incurring the downside of specifying a maven remote repo for releases,
            see https://blog.sonatype.com/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/ -->

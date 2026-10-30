@@ -327,7 +327,9 @@ class RenamePageIT
         // and independently in different situations.
         String sourcePageName = "WebHome";
         String siblingLink = "StandardLink";
-        String sourcePageLocation1 = RenamePageIT.class.getSimpleName() + "." + siblingLink;
+        // The sibling space is computed from the test reference and not from the test class name, since the test page
+        // is in a space named after the running class, which is NestedRenamePageIT when running through AllIT.
+        String sourcePageLocation1 = testReference.getLastSpaceReference().getParent().getName() + "." + siblingLink;
         String sourcePage1 = sourcePageLocation1 + "." + sourcePageName;
 
         String sourcePageLocation2 = RenamePageIT.class.getSimpleName() + ".StandardMacroLink";

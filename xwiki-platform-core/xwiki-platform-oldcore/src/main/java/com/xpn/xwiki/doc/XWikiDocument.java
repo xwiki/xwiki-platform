@@ -151,7 +151,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -5868,7 +5868,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @since 14.2RC1
      */
     private Set<EntityReference> getUniqueLinkedEntityReferences(XWikiContext context,
-        Map<EntityType, Set<ResourceType>> entityTypes, DocumentExistenceRecorder existenceRecorder)
+        Map<EntityType, Set<ResourceType>> entityTypes, DocumentExistenceCheckRecorder existenceCheckRecorder)
     {
         Set<EntityReference> references;
 
@@ -5888,12 +5888,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
                 // Document content
                 XDOM dom = getXDOM();
-                getUniqueLinkedEntityReferences(dom, entityTypes, existenceRecorder, references);
+                getUniqueLinkedEntityReferences(dom, entityTypes, existenceCheckRecorder, references);
 
                 // XObjects
                 for (List<BaseObject> xobjects : getXObjects().values()) {
                     xobjects.forEach(xobject -> getUniqueLinkedEntityReferences(xobject, entityTypes,
-                        existenceRecorder, references, context));
+                        existenceCheckRecorder, references, context));
                 }
             }
         } finally {
@@ -5905,7 +5905,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     private void getUniqueLinkedEntityReferences(BaseObject xobject, Map<EntityType, Set<ResourceType>> entityTypes,
-        DocumentExistenceRecorder existenceRecorder, Set<EntityReference> references, XWikiContext xcontext)
+        DocumentExistenceCheckRecorder existenceCheckRecorder, Set<EntityReference> references, XWikiContext xcontext)
     {
         if (xobject == null) {
             return;
@@ -5928,7 +5928,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
                     try {
                         XDOM dom = parseContent(getSyntax(), largeField.getValue(), getDocumentReference());
-                        getUniqueLinkedEntityReferences(dom, entityTypes, existenceRecorder, references);
+                        getUniqueLinkedEntityReferences(dom, entityTypes, existenceCheckRecorder, references);
                     } catch (XWikiException e) {
                         LOGGER.warn("Failed to extract links from xobject property [{}], skipping it. Error: [{}]",
                             largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
@@ -5939,10 +5939,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     private void getUniqueLinkedEntityReferences(XDOM dom, Map<EntityType, Set<ResourceType>> entityTypes,
-        DocumentExistenceRecorder existenceRecorder, Set<EntityReference> references)
+        DocumentExistenceCheckRecorder existenceCheckRecorder, Set<EntityReference> references)
     {
         Set<EntityReference> uniqueLinkedEntityReferences = getLinkParser().getUniqueLinkedEntityReferences(dom,
-            entityTypes, getDocumentReference(), existenceRecorder);
+            entityTypes, getDocumentReference(), existenceCheckRecorder);
         references.addAll(uniqueLinkedEntityReferences);
     }
 
@@ -6018,14 +6018,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * are recorded since creating or deleting any of them can change the target of the link.
      *
      * @param context the XWiki context
-     * @param existenceRecorder collects the documents whose existence the resolution of the references depends on,
+     * @param existenceCheckRecorder collects the documents whose existence the resolution of the references depends on,
      *     {@code null} if not needed
      * @return the entity references pointing to either document or attachments. If {@code null}, an error happened
      * @since 18.10.0RC1
      */
     @Unstable
     public Set<EntityReference> getUniqueLinkedEntities(XWikiContext context,
-        DocumentExistenceRecorder existenceRecorder)
+        DocumentExistenceCheckRecorder existenceCheckRecorder)
     {
         // Return both document and attachment references.
         // Note that we return PAGE and PAGE_ATTACHMENT since it's not possible to convert them to DOCUMENT and
@@ -6034,7 +6034,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         return getUniqueLinkedEntityReferences(context,
             Map.of(EntityType.DOCUMENT, Set.of(ResourceType.SPACE, ResourceType.DOCUMENT), EntityType.PAGE,
                 Set.of(ResourceType.PAGE), EntityType.ATTACHMENT, Set.of(ResourceType.ATTACHMENT),
-                EntityType.PAGE_ATTACHMENT, Set.of(ResourceType.PAGE_ATTACHMENT)), existenceRecorder);
+                EntityType.PAGE_ATTACHMENT, Set.of(ResourceType.PAGE_ATTACHMENT)), existenceCheckRecorder);
     }
 
     /**

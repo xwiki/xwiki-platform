@@ -52,7 +52,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.MacroRefactoring;
 import org.xwiki.rendering.macro.MacroRefactoringException;
-import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 
 /**
  * Utility component whose job is to retrieve and extract all links from an XDOM.
@@ -148,27 +148,27 @@ public class LinkParser
      * @param dom the XDOM for which to retrieve links
      * @param entityTypes mapping of the types of references to return (and their corresponding resource types)
      * @param currentReference the current document reference for making a relative resolution
-     * @param existenceRecorder collects the documents whose existence the resolution of the references depends on,
+     * @param existenceCheckRecorder collects the documents whose existence the resolution of the references depends on,
      *     {@code null} if not needed
      * @return a set of references contained in the XDOM
      * @since 18.10.0RC1
      */
     public Set<EntityReference> getUniqueLinkedEntityReferences(XDOM dom,
         Map<EntityType, Set<ResourceType>> entityTypes, DocumentReference currentReference,
-        DocumentExistenceRecorder existenceRecorder)
+        DocumentExistenceCheckRecorder existenceCheckRecorder)
     {
         Set<EntityReference> result = new LinkedHashSet<>();
 
         Set<ResourceReference> resourceReferences = this.extractReferences(dom);
         for (ResourceReference resourceReference : resourceReferences) {
-            addReference(resourceReference, entityTypes, currentReference, existenceRecorder, result);
+            addReference(resourceReference, entityTypes, currentReference, existenceCheckRecorder, result);
         }
 
         return result;
     }
 
     private void addReference(ResourceReference reference, Map<EntityType, Set<ResourceType>> entityTypes,
-        DocumentReference currentReference, DocumentExistenceRecorder existenceRecorder,
+        DocumentReference currentReference, DocumentExistenceCheckRecorder existenceCheckRecorder,
         Set<EntityReference> references)
     {
         String referenceString = reference.getReference();
@@ -188,8 +188,8 @@ public class LinkParser
             return;
         }
 
-        EntityReference linkEntityReference = existenceRecorder != null
-            ? this.entityReferenceResolver.resolve(reference, entityType.get(), existenceRecorder)
+        EntityReference linkEntityReference = existenceCheckRecorder != null
+            ? this.entityReferenceResolver.resolve(reference, entityType.get(), existenceCheckRecorder)
             : this.entityReferenceResolver.resolve(reference, entityType.get());
 
         // Verify after resolving it that the link is not an autolink (i.e., a link to the current document)

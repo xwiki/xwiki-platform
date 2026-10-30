@@ -56,7 +56,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
@@ -254,9 +254,9 @@ class DocumentSolrMetadataExtractorTest
         when(this.document.getComment()).thenReturn(comment);
 
         // Links, the second one being an untyped link to a missing terminal document, resolved to the space home page
-        when(this.document.getUniqueLinkedEntities(any(XWikiContext.class), any(DocumentExistenceRecorder.class)))
+        when(this.document.getUniqueLinkedEntities(any(XWikiContext.class), any(DocumentExistenceCheckRecorder.class)))
             .then(invocation -> {
-                DocumentExistenceRecorder recorder = invocation.getArgument(1);
+                DocumentExistenceCheckRecorder recorder = invocation.getArgument(1);
                 recorder.add(new DocumentReference("wiki", "space", "document2"));
                 recorder.add(new DocumentReference("wiki", List.of("space", "document2"), "WebHome"));
 

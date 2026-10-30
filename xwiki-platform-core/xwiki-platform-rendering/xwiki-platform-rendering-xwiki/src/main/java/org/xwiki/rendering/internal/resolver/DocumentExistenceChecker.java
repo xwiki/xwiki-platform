@@ -22,21 +22,21 @@ package org.xwiki.rendering.internal.resolver;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.rendering.resolver.DocumentExistenceOverride;
-import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
 
 /**
- * The existence of documents as seen by the resolution of a resource reference: the existence overridden by the caller
- * if any, the actual state of the document otherwise, each check being reported to the caller's recorder if any.
+ * Checks the existence of documents during the resolution of a resource reference: the existence overridden by the
+ * caller if any, the actual state of the document otherwise. Each check is reported to the caller's recorder, if any.
  *
  * @version $Id$
  * @since 18.10.0RC1
  */
-public final class DocumentExistence
+public final class DocumentExistenceChecker
 {
     private final DocumentExistenceOverride existenceOverride;
 
-    private final DocumentExistenceRecorder recorder;
+    private final DocumentExistenceCheckRecorder recorder;
 
     private final DocumentAccessBridge documentAccessBridge;
 
@@ -48,8 +48,8 @@ public final class DocumentExistence
      * @param documentAccessBridge used to check the actual existence of the documents
      * @param logger used to report the failures to check the existence of a document
      */
-    public DocumentExistence(DocumentExistenceOverride existenceOverride, DocumentExistenceRecorder recorder,
-        DocumentAccessBridge documentAccessBridge, Logger logger)
+    public DocumentExistenceChecker(DocumentExistenceOverride existenceOverride,
+        DocumentExistenceCheckRecorder recorder, DocumentAccessBridge documentAccessBridge, Logger logger)
     {
         this.existenceOverride = existenceOverride;
         this.recorder = recorder;

@@ -36,8 +36,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.rendering.resolver.DocumentExistenceOverride;
-import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
 
 /**
  * Base class helper for EntityReferenceResolver<ResourceReference> implementations.
@@ -99,34 +99,34 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         }
 
         EntityReference baseReference = getBaseReference(resourceReference, parameters);
-        DocumentExistence existence = new DocumentExistence(getExistenceOverride(parameters),
-            getExistenceRecorder(parameters), this.documentAccessBridge, this.logger);
+        DocumentExistenceChecker existenceChecker = new DocumentExistenceChecker(getExistenceOverride(parameters),
+            getExistenceCheckRecorder(parameters), this.documentAccessBridge, this.logger);
 
         EntityReference entityReference;
 
         if (resourceReference.isTyped()) {
-            entityReference = resolveTyped(resourceReference, baseReference, existence);
+            entityReference = resolveTyped(resourceReference, baseReference, existenceChecker);
         } else {
-            entityReference = resolveUntyped(resourceReference, baseReference, existence);
+            entityReference = resolveUntyped(resourceReference, baseReference, existenceChecker);
         }
 
         return convertReference(entityReference, entityType);
     }
 
     protected EntityReference resolveUntyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
-        return resolveTyped(resourceReference, baseReference, existence);
+        return resolveTyped(resourceReference, baseReference, existenceChecker);
     }
 
     /**
      * @param resourceReference the resource reference to resolve
      * @param baseReference the reference relative to which the resource reference is resolved
-     * @param existence the existence of the documents to use for the resolution
+     * @param existenceChecker checks the existence of the documents the resolution depends on
      * @return the resolved entity reference
      */
     protected abstract EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistence existence);
+        DocumentExistenceChecker existenceChecker);
 
     private DocumentExistenceOverride getExistenceOverride(Object... parameters)
     {
@@ -139,10 +139,10 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         return DocumentExistenceOverride.NONE;
     }
 
-    private DocumentExistenceRecorder getExistenceRecorder(Object... parameters)
+    private DocumentExistenceCheckRecorder getExistenceCheckRecorder(Object... parameters)
     {
         for (Object parameter : parameters) {
-            if (parameter instanceof DocumentExistenceRecorder recorder) {
+            if (parameter instanceof DocumentExistenceCheckRecorder recorder) {
                 return recorder;
             }
         }
@@ -190,7 +190,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     }
 
     protected DocumentReference resolveDocumentReference(EntityReference sourceReference, DocumentReference reference,
-        EntityReference baseReference, DocumentExistence existence)
+        EntityReference baseReference, DocumentExistenceChecker existenceChecker)
     {
         DocumentReference finalReference = reference;
 
@@ -202,7 +202,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
             if (!reference.getName().equals(defaultDocumentName)) {
                 finalReference =
                     resolveDocumentReference(sourceReference, finalReference, baseReference, true, defaultDocumentName,
-                        existence);
+                        existenceChecker);
             }
         }
 
@@ -211,11 +211,11 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
     protected DocumentReference resolveDocumentReference(EntityReference sourceReference, DocumentReference reference,
         EntityReference baseReference, boolean trySpaceSibling, String defaultDocumentName,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
         DocumentReference finalReference = reference;
 
-        if (!existence.exists(reference)) {
+        if (!existenceChecker.exists(reference)) {
             // It does not exist, make it a space home page.
             SpaceReference spaceReference =
                 new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
@@ -223,17 +223,17 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
             if (sourceReference != null && trySpaceSibling
                 && trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName,
-                    existence)) {
+                    existenceChecker)) {
                 // Try as a space sibling.
                 DocumentReference siblingReference =
                     resolveSiblingSpaceDocumentReference(sourceReference, reference, baseReference,
-                    defaultDocumentName, existence);
+                    defaultDocumentName, existenceChecker);
 
                 // We accept the resolved sibling reference only if it is a terminal document (i.e. an exists check was
                 // already performed for it) OR, in the case of a non-terminal document, if it actually exists (by
                 // performing the exists check now). Otherwise, the default will remain the child non-terminal document.
                 if (!siblingReference.getName().equals(defaultDocumentName)
-                    || existence.exists(siblingReference)) {
+                    || existenceChecker.exists(siblingReference)) {
                     finalReference = siblingReference;
                 }
             }
@@ -244,7 +244,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
     protected DocumentReference resolveSiblingSpaceDocumentReference(EntityReference sourceReference,
         DocumentReference reference, EntityReference baseReference, String defaultDocumentName,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
         DocumentReference finalReference;
 
@@ -255,7 +255,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
             finalReference =
                 resolveDocumentReference(sourceReference, finalReference, baseReference, false, defaultDocumentName,
-                    existence);
+                    existenceChecker);
         } else {
             SpaceReference spaceReference = new SpaceReference(reference.getName(), (WikiReference) parentReference);
             finalReference = new DocumentReference(defaultDocumentName, spaceReference);
@@ -265,12 +265,12 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     }
 
     protected boolean trySpaceSiblingFallback(EntityReference sourceReference, DocumentReference finalReference,
-        EntityReference baseReference, String defaultDocumentName, DocumentExistence existence)
+        EntityReference baseReference, String defaultDocumentName, DocumentExistenceChecker existenceChecker)
     {
         // If not relative, no space sibling fallback
         // If base reference not a space home page, no space sibling fallback
         // If finalReference exist, no space sibling fallback
         return sourceReference.getParent() == null && baseReference != null
-            && baseReference.getName().equals(defaultDocumentName) && !existence.exists(finalReference);
+            && baseReference.getName().equals(defaultDocumentName) && !existenceChecker.exists(finalReference);
     }
 }

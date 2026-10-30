@@ -65,7 +65,7 @@ public class RelativeAttachmentResourceReferenceEntityReferenceResolver
 
     @Override
     protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
         if (StringUtils.isEmpty(resourceReference.getReference())) {
             return null;
@@ -88,7 +88,7 @@ public class RelativeAttachmentResourceReferenceEntityReferenceResolver
             // Take care of fallback if needed
             DocumentReference finalDocumentReference =
                 resolveDocumentReference(relativeReference.getParent(), documentReference, baseReference,
-                    existence);
+                    existenceChecker);
             // Also use that resolution if the relative reference doesn't contain any document, even if it doesn't
             // exists, to not produce incorrect references.
             if (finalDocumentReference != documentReference

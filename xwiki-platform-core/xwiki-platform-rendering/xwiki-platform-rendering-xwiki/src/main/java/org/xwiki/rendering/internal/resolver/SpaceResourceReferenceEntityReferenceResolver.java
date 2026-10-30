@@ -53,7 +53,7 @@ public class SpaceResourceReferenceEntityReferenceResolver extends AbstractResou
 
     @Override
     protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
         return this.defaultSpaceReferenceResolver.resolve(resourceReference.getReference(), baseReference);
     }

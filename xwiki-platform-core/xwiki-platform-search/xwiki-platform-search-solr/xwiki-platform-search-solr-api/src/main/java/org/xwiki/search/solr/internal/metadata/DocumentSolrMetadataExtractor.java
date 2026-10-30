@@ -40,7 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
@@ -185,12 +185,12 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     {
         // Extract links
         // TODO: support more than EntityReference (extract and index any type of link found in the content)
-        DocumentExistenceRecorder existenceRecorder = new DocumentExistenceRecorder();
-        Set<EntityReference> references = translatedDocument.getUniqueLinkedEntities(xcontext, existenceRecorder);
+        DocumentExistenceCheckRecorder existenceCheckRecorder = new DocumentExistenceCheckRecorder();
+        Set<EntityReference> references = translatedDocument.getUniqueLinkedEntities(xcontext, existenceCheckRecorder);
 
         // Remember the documents whose creation or deletion can change the target of the links, so that the document
         // can be indexed again when it happens
-        for (DocumentReference existenceReference : existenceRecorder.getDocuments()) {
+        for (DocumentReference existenceReference : existenceCheckRecorder.getDocuments()) {
             solrDocument.addField(FieldUtils.LINKS_EXISTENCE, this.linkSerializer.serialize(existenceReference));
         }
 

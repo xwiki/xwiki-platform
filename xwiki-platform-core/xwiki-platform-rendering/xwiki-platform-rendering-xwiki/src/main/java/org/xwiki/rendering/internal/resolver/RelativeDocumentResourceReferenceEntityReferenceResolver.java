@@ -69,11 +69,11 @@ public class RelativeDocumentResourceReferenceEntityReferenceResolver
 
     @Override
     protected EntityReference resolveUntyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
         // If the reference is empty fallback on typed logic
         if (StringUtils.isEmpty(resourceReference.getReference())) {
-            return resolveTyped(resourceReference, baseReference, existence);
+            return resolveTyped(resourceReference, baseReference, existenceChecker);
         }
 
         // Get relative reference
@@ -91,7 +91,7 @@ public class RelativeDocumentResourceReferenceEntityReferenceResolver
             reference =
                 this.defaultStringDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
             // Take care of fallback if needed
-            return resolveDocumentReference(relativeReference, reference, baseReference, existence);
+            return resolveDocumentReference(relativeReference, reference, baseReference, existenceChecker);
         }
     }
 

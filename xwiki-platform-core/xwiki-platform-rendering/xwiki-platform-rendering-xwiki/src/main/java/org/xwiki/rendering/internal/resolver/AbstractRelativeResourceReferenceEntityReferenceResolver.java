@@ -82,7 +82,7 @@ public abstract class AbstractRelativeResourceReferenceEntityReferenceResolver
 
     @Override
     protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
         return this.relativeReferenceResolver.resolve(resourceReference.getReference(), getEntityType(), baseReference);
     }

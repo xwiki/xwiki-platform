@@ -41,7 +41,7 @@ import org.xwiki.stability.Unstable;
  * @since 18.10.0RC1
  */
 @Unstable
-public final class DocumentExistenceRecorder
+public final class DocumentExistenceCheckRecorder
 {
     private final Set<DocumentReference> documents = new LinkedHashSet<>();
 

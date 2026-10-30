@@ -57,8 +57,8 @@ import org.xwiki.rendering.listener.reference.PageResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.reference.SpaceResourceReference;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.rendering.resolver.DocumentExistenceOverride;
-import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -368,32 +368,32 @@ class DefaultResourceReferenceEntityReferenceResolverTest
     }
 
     @Test
-    void resolveWithDocumentExistenceRecorder()
+    void resolveWithDocumentExistenceCheckRecorder()
     {
         DocumentReference terminalReference = new DocumentReference(CURRENT_WIKI, SPACE, PAGE);
         DocumentReference spaceHomeReference = new DocumentReference(CURRENT_WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE);
 
         // The target of an untyped link to a missing terminal page depends on the existence of the terminal page.
-        DocumentExistenceRecorder recorder = new DocumentExistenceRecorder();
+        DocumentExistenceCheckRecorder recorder = new DocumentExistenceCheckRecorder();
         assertEquals(spaceHomeReference,
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null, null, recorder));
         assertEquals(Set.of(terminalReference), recorder.getDocuments());
 
         // Same for an existing terminal page, whose deletion would change the target.
         this.existingDocuments.add(terminalReference);
-        recorder = new DocumentExistenceRecorder();
+        recorder = new DocumentExistenceCheckRecorder();
         assertEquals(terminalReference,
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null, null, recorder));
         assertEquals(Set.of(terminalReference), recorder.getDocuments());
 
         // Same for an untyped link to an attachment.
-        recorder = new DocumentExistenceRecorder();
+        recorder = new DocumentExistenceCheckRecorder();
         assertEquals(new AttachmentReference(ATTACHMENT, terminalReference), this.resolver
             .resolve(attachmentResource(SPACE + '.' + PAGE + '@' + ATTACHMENT, false), null, null, recorder));
         assertEquals(Set.of(terminalReference), recorder.getDocuments());
 
         // The target of a typed link doesn't depend on the existence of any document.
-        recorder = new DocumentExistenceRecorder();
+        recorder = new DocumentExistenceCheckRecorder();
         assertEquals(terminalReference,
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, true), null, null, recorder));
         assertEquals(Set.of(), recorder.getDocuments());
@@ -401,7 +401,7 @@ class DefaultResourceReferenceEntityReferenceResolverTest
         // The space sibling fallback depends on the existence of each candidate, even with an existence override.
         DocumentReference currentSpaceHomeReference = new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, DEFAULT_PAGE);
         DocumentReference siblingReference = new DocumentReference(CURRENT_WIKI, PAGE, DEFAULT_PAGE);
-        recorder = new DocumentExistenceRecorder();
+        recorder = new DocumentExistenceCheckRecorder();
         assertEquals(siblingReference, this.resolver.resolve(documentResource(PAGE, false), null,
             currentSpaceHomeReference, new DocumentExistenceOverride(Map.of(siblingReference, true)), recorder));
         assertEquals(Set.of(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE),
@@ -490,7 +490,7 @@ class DefaultResourceReferenceEntityReferenceResolverTest
 
         @Override
         protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
-            DocumentExistence existence)
+            DocumentExistenceChecker existenceChecker)
         {
             return null;
         }
@@ -506,21 +506,21 @@ class DefaultResourceReferenceEntityReferenceResolverTest
         DocumentReference finalReference = new DocumentReference("xwiki", "Bar",
             "WebHome");
         EntityReference baseReference = sourceReference;
-        DocumentExistence existence =
-            new DocumentExistence(DocumentExistenceOverride.NONE, null, this.bridge, mock(Logger.class));
+        DocumentExistenceChecker existenceChecker =
+            new DocumentExistenceChecker(DocumentExistenceOverride.NONE, null, this.bridge, mock(Logger.class));
 
         assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, null,
-            defaultDocumentName, existence));
+            defaultDocumentName, existenceChecker));
         assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName, existence));
+            defaultDocumentName, existenceChecker));
 
         defaultDocumentName = "Bar";
         assertTrue(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName, existence));
+            defaultDocumentName, existenceChecker));
 
         this.existingDocuments.add(finalReference);
         assertFalse(voidResolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName, existence));
+            defaultDocumentName, existenceChecker));
     }
 
     @Test

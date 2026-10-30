@@ -48,7 +48,7 @@ import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.MacroRefactoring;
-import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -182,7 +182,7 @@ class LinkParserTest
             List.of()
         ));
 
-        DocumentExistenceRecorder recorder = new DocumentExistenceRecorder();
+        DocumentExistenceCheckRecorder recorder = new DocumentExistenceCheckRecorder();
         EntityReference entityReference = new EntityReference("myref", EntityType.DOCUMENT);
         when(this.entityReferenceResolver.resolve(ref, EntityType.DOCUMENT, recorder)).thenReturn(entityReference);
 

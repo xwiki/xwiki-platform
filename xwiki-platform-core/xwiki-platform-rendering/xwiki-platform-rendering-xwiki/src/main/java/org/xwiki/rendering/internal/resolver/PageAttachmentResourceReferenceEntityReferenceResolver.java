@@ -55,7 +55,7 @@ public class PageAttachmentResourceReferenceEntityReferenceResolver
 
     @Override
     protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
         return this.defaultStringAttachmentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
     }

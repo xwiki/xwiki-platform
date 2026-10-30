@@ -46,7 +46,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
-import org.xwiki.rendering.resolver.DocumentExistenceRecorder;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
@@ -325,10 +325,11 @@ class XWikiDocumentTest
         doReturn(true).when(this.xWiki).exists(existingReference, this.oldcore.getXWikiContext());
 
         this.document.setSyntax(Syntax.XWIKI_2_1);
-        this.document.setContent("[[TargetSpace.TargetPage]][[ExistingSpace.ExistingPage]][[doc:TypedSpace.TypedPage]]");
+        this.document
+            .setContent("[[TargetSpace.TargetPage]][[ExistingSpace.ExistingPage]][[doc:TypedSpace.TypedPage]]");
         this.baseObject.setLargeStringValue("area", "[[ObjectTargetPage]]");
 
-        DocumentExistenceRecorder recorder = new DocumentExistenceRecorder();
+        DocumentExistenceCheckRecorder recorder = new DocumentExistenceCheckRecorder();
         Set<EntityReference> linkedEntities =
             this.document.getUniqueLinkedEntities(this.oldcore.getXWikiContext(), recorder);
 

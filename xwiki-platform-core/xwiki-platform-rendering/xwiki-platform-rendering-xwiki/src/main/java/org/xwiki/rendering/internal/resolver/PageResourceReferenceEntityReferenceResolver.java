@@ -53,7 +53,7 @@ public class PageResourceReferenceEntityReferenceResolver extends AbstractResour
 
     @Override
     protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
         return this.defaultPageReferenceResolver.resolve(resourceReference.getReference(), baseReference);
     }

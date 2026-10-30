@@ -30,11 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Unit tests for {@link DocumentExistenceRecorder}.
+ * Unit tests for {@link DocumentExistenceCheckRecorder}.
  *
  * @version $Id$
  */
-class DocumentExistenceRecorderTest
+class DocumentExistenceCheckRecorderTest
 {
     private static final DocumentReference TERMINAL = new DocumentReference("wiki", "Space", "Page");
 
@@ -43,7 +43,7 @@ class DocumentExistenceRecorderTest
     @Test
     void add()
     {
-        DocumentExistenceRecorder recorder = new DocumentExistenceRecorder();
+        DocumentExistenceCheckRecorder recorder = new DocumentExistenceCheckRecorder();
 
         assertEquals(Set.of(), recorder.getDocuments());
 
@@ -57,7 +57,7 @@ class DocumentExistenceRecorderTest
     @Test
     void addIgnoresLocale()
     {
-        DocumentExistenceRecorder recorder = new DocumentExistenceRecorder();
+        DocumentExistenceCheckRecorder recorder = new DocumentExistenceCheckRecorder();
 
         recorder.add(new DocumentReference(TERMINAL, Locale.FRENCH));
         recorder.add(TERMINAL);
@@ -68,7 +68,7 @@ class DocumentExistenceRecorderTest
     @Test
     void getDocumentsIsReadOnly()
     {
-        Set<DocumentReference> documents = new DocumentExistenceRecorder().getDocuments();
+        Set<DocumentReference> documents = new DocumentExistenceCheckRecorder().getDocuments();
 
         assertThrows(UnsupportedOperationException.class, () -> documents.add(TERMINAL));
     }

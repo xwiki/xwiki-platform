@@ -65,7 +65,7 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
 
     @Override
     protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistence existence)
+        DocumentExistenceChecker existenceChecker)
     {
         // If the reference is empty let default resolver deal with it
         if (StringUtils.isEmpty(resourceReference.getReference())) {
@@ -87,7 +87,7 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
         // Take care of fallback if needed
         DocumentReference finalDocumentReference =
             resolveDocumentReference(relativeReference.getParent(), documentReference, baseReference,
-                existence);
+                existenceChecker);
         if (finalDocumentReference != documentReference) {
             attachmentReference = new AttachmentReference(attachmentReference.getName(), finalDocumentReference);
         }

@@ -32,12 +32,39 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Vandret linje</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Redigering =
+
+== Vandret linje ==
+
+=== 1.0 Horizontal Line ===
+
+{{info}}Der skal være 4 eller flere bindestreger.{{/info}}
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Simpel vandret linje|{{{----}}}|(((----)))
+|Vandret linje med parametre|&lt;hr style="border-color:blue"/&gt;|(((
+(% style="border-color:blue" %)
+----
+)))
+
+=== 2.0 Horizontal Line ===
+
+{{info}}Der skal være 4 eller flere bindestreger.{{/info}}
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Simpel vandret linje|{{{----}}}|(((----)))
+|Vandret linje med parametre|((({{{
+(% style="border-color:blue" %)
+----
+}}})))|(((
+(% style="border-color:blue" %)
+----
+)))</content>
   </xwikidoc>

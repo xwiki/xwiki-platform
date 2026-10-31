@@ -32,12 +32,62 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Overskrifter</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Redigering =
+
+== Overskrifter ==
+
+=== 1.0 Headings ===
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Standardoverskrifter|(((
+1 niveau 1
+1.1 niveau 2
+1.1.1 niveau 3
+1.1.1.1 niveau 4
+1.1.1.1.1 niveau 5
+1.1.1.1.1.1 niveau 6
+)))|(((
+= niveau 1 = 
+== niveau 2 ==
+=== niveau 3 ===
+==== niveau 4 ====
+===== niveau 5 =====
+====== niveau 6 ======
+)))
+|Overskrifter med parametre|&lt;h1&gt;&lt;span style="color:blue"&gt;Overskrift&lt;/span&gt;&lt;/h1&gt;|(((
+(% style="color:blue" %)
+= overskrift =
+)))
+|Overskrifter med XWiki-syntaks|1.1 Overskrift med *fed*|(((== Overskrift med **fed** ==)))
+
+=== 2.0 Headings ===
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Standardoverskrifter|((({{{
+= niveau 1 = 
+== niveau 2 ==
+=== niveau 3 ===
+==== niveau 4 ====
+===== niveau 5 =====
+====== niveau 6 ======
+}}})))|(((
+= niveau 1 = 
+== niveau 2 ==
+=== niveau 3 ===
+==== niveau 4 ====
+===== niveau 5 =====
+====== niveau 6 ======
+)))
+|Overskrifter med parametre|{{{(% style="color:blue" %)}}}= overskrift =|(((
+(% style="color:blue" %)
+= overskrift =
+)))
+|Overskrifter med XWiki-syntaks|{{{== Overskrift med **fed** ==}}}|(((== Overskrift med **fed** ==)))</content>
 </xwikidoc>

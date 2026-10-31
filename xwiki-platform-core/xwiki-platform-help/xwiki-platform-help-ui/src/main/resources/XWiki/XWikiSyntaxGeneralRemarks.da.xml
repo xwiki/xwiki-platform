@@ -32,12 +32,25 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Generelle bemærkninger</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Generelt =
+
+== Generelle bemærkninger ==
+
+=== 2.0 General Remarks ===
+
+XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} retter nogle fejl eller tvetydige skrivemåder, som brugeren har skrevet, som vist i eksemplerne i tabellen nedenfor.
+
+|=Beskrivelse|=Eksempel på ugyldig eller tvetydig syntaks|=Rettet XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
+|Typografier, der ikke er lukket|{{{**fed}}}|{{{**fed**}}}
+|To selvstændige elementer, der ikke er adskilt af 2 nye linjer|{{{| tabelcelle}}}{{{* listepunkt}}}|{{{| tabelcelle}}}\\{{{* listepunkt}}}
+|To selvstændige elementer, der ikke er adskilt af 2 nye linjer|{{{afsnit}}}{{{----}}}{{{afsnit}}}|{{{afsnit}}}\\{{{----}}}\\{{{afsnit}}}
+|Ignoreret ny linje i starten af dokumentet|&lt;ny linje i starten af dokumentet&gt;afsnit|afsnit
+|Overskrift, der ikke er lukket|{{{=== overskrift}}}|{{{=== overskrift ===}}}</content>
 </xwikidoc>

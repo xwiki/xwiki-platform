@@ -37,49 +37,49 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Class fields
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_longText1=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_title1=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_date1=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_actor=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_composer=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_director=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_editor=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_hairdresser=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_make_up_artist=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_producer=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_writer=
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_content1=
+Help.Applications.Contributors.Code.ContributorsClass_longText1=Billede
+Help.Applications.Contributors.Code.ContributorsClass_title1=Navn
+Help.Applications.Contributors.Code.ContributorsClass_date1=Fødselsdato
+Help.Applications.Contributors.Code.ContributorsClass_staticList1=Type
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_actor=Skuespiller
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_composer=Komponist
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_director=Instruktør
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_editor=Klipper
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_hairdresser=Frisør
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_make_up_artist=Makeupartist
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_producer=Producer
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_writer=Manuskriptforfatter
+Help.Applications.Contributors.Code.ContributorsClass_content1=Biografi
 
 # Live table generic keys
-### Missing: contributors.livetable.doc.title=
-### Missing: contributors.livetable.doc.name=
-### Missing: contributors.livetable.doc.space=
-### Missing: contributors.livetable.doc.fullname=
-### Missing: contributors.livetable.doc.location=
-### Missing: contributors.livetable.doc.author=
-### Missing: contributors.livetable.doc.creator=
-### Missing: contributors.livetable.doc.date=
-### Missing: contributors.livetable.doc.creationDate=
-### Missing: contributors.livetable._avatar=
-### Missing: contributors.livetable._images=
-### Missing: contributors.livetable._attachments=
-### Missing: contributors.livetable._actions=
-### Missing: contributors.livetable._actions.edit=
-### Missing: contributors.livetable._actions.delete=
-### Missing: contributors.livetable.emptyvalue=
+contributors.livetable.doc.title=Sidetitel
+contributors.livetable.doc.name=Sidenavn
+contributors.livetable.doc.space=Område
+contributors.livetable.doc.fullname=Sidens fulde navn
+contributors.livetable.doc.location=Placering
+contributors.livetable.doc.author=Seneste forfatter
+contributors.livetable.doc.creator=Oprettet af
+contributors.livetable.doc.date=Dato
+contributors.livetable.doc.creationDate=Oprettelsesdato
+contributors.livetable._avatar=Avatar
+contributors.livetable._images=Billeder
+contributors.livetable._attachments=Bilag
+contributors.livetable._actions=Handlinger
+contributors.livetable._actions.edit=Rediger
+contributors.livetable._actions.delete=Slet
+contributors.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: contributors.livetable.longText1=
-### Missing: contributors.livetable.title1=
-### Missing: contributors.livetable.date1=
-### Missing: contributors.livetable.staticList1=
-### Missing: contributors.livetable.content1=
+contributors.livetable.longText1=Billede
+contributors.livetable.title1=Navn
+contributors.livetable.date1=Fødselsdato
+contributors.livetable.staticList1=Type
+contributors.livetable.content1=Biografi
 
 # Other keys
-### Missing: contributors.entry.name=
+contributors.entry.name=Bidragydere
 
 # Deprecated keys
-### Missing: contributors.dataSpace.title=
+contributors.dataSpace.title=Data
 </content>
 </xwikidoc>

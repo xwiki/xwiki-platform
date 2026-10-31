@@ -36,9 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: admin.syntaxes=
-### Missing: admin.syntaxes.description=
-### Missing: Rendering.RenderingConfigClass_disabledSyntaxes=
-### Missing: Rendering.RenderingConfigClass_disabledSyntaxes.hint=
+  <content>admin.syntaxes=Syntakser
+admin.syntaxes.description=Vælg standardsyntaksen for sider, og konfigurer de tilgængelige opmærkningssyntakser.
+Rendering.RenderingConfigClass_disabledSyntaxes=Deaktiverede syntakser
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Listen over de opmærkningssyntakser, som sider ikke kan skrives i
 </content>
 </xwikidoc>

@@ -32,12 +32,59 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Citater</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Avanceret =
+
+== Citater ==
+
+=== 1.0 Quotations ===
+
+Gør det muligt at citere tekst.
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Enkelt citat|(((
+&lt;blockquote&gt;&lt;p&gt;john sagde dette&lt;/p&gt;&lt;/blockquote&gt;
+jeg sagde ok
+)))|(((
+&gt; john sagde dette
+jeg sagde ok
+)))
+|Indlejrede citater|(((
+&lt;blockquote&gt;&lt;p&gt;john sagde dette&lt;/p&gt;
+  &lt;blockquote&gt;&lt;p&gt;marie svarede det&lt;/p&gt;&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+jeg sagde ok 
+)))|(((
+&gt; john sagde dette
+&gt;&gt; marie svarede det
+jeg sagde ok
+)))
+
+=== 2.0 Quotations ===
+
+Gør det muligt at citere tekst.
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Enkelt citat|((({{{
+&gt; john sagde dette
+jeg sagde ok
+}}})))|(((
+&gt; john sagde dette
+jeg sagde ok
+)))
+|Indlejrede citater|((({{{
+&gt; john sagde dette
+&gt;&gt; marie svarede det
+jeg sagde ok
+}}})))|(((
+&gt; john sagde dette
+&gt;&gt; marie svarede det
+jeg sagde ok
+)))</content>
 </xwikidoc>

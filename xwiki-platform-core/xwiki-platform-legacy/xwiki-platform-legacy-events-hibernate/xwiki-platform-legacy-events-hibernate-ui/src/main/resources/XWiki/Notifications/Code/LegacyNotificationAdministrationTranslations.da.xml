@@ -36,11 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: legacy.event.migration.description=
-### Missing: legacy.event.count.store=
-### Missing: legacy.event.count.legacy=
-### Missing: legacy.event.migration.alltime=
-### Missing: legacy.event.migration.since=
-### Missing: legacy.event.migration.start=
+  <content>legacy.event.migration.description=XWiki skiftede til et nyt lager for hændelser (notifikationer) i 12.6. Det kan tage lang tid at kopiere hændelserne i gamle wikier med mange hændelser, og det er ikke altid ønskeligt at beholde dem, så valget er overladt til wikiens administrator. Hvis de ikke kopieres, ser det ud, som om alle tidligere notifikationer er forsvundet. Overflytningen kører i baggrunden.
+legacy.event.count.store=Antal hændelser i standardlageret
+legacy.event.count.legacy=Antal hændelser i det gamle lager
+legacy.event.migration.alltime=Hele perioden
+legacy.event.migration.since=Siden
+legacy.event.migration.start=Start overflytning
 </content>
 </xwikidoc>

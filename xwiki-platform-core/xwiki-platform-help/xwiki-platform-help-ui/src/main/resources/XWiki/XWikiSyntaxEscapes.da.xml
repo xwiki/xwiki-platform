@@ -32,12 +32,33 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Escapetegn</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Avanceret =
+
+== Escapetegn ==
+
+=== 1.0 Escapes ===
+
+Gør det muligt at escape XWiki-syntaks, så den vises som almindelig tekst.
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Escape et tegn|{{{Dette er ikke et [link]}}}|{{{Dette er ikke et [link]}}}
+
+=== 2.0 Escapes ===
+
+Gør det muligt at escape XWiki-syntaks, så den vises som almindelig tekst.
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Escape et tegn|(((
+{{{Dette er ikke et ~[~[link~]~]}}}
+{{info}}Hvis du vil skrive tegnet ~~, så brug dobbelt escape: ~~~~{{/info}}
+)))|{{{Dette er ikke et [[link]]}}}
+|Escape længere tekst
+(se også "Ordret tekst")|~{~{~{{{{ noget **længere** tekst //uden// formatering}}}~}~}~}|{{{ noget **længere** tekst //uden// formatering}}}</content>
 </xwikidoc>

@@ -32,12 +32,54 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Ordret tekst</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Avanceret =
+
+== Ordret tekst ==
+
+=== 1.0 Verbatim ===
+
+Gør det muligt at skrive indhold, der ikke formateres (med andre ord tages der ikke hensyn til XWiki-syntaksen).
+
+{{info}}I XWiki Syntax 1.0 bevarer [[Pre-makroen&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]] kun XWiki-syntaks og Radeox-makroer. HTML-uddrag og Groovy/Velocity-scripts udføres dog stadig.{{/info}}
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Ordret tekst i linjen|{{{Noget ordret {pre}*[ikke gengivet]*{/pre} indhold}}}|Noget ordret {{{*[ikke gengivet]*}}} indhold
+|Ordret tekstblok|((({{{
+{pre}
+flere linjer
+*ordret*
+indhold
+{/pre}
+}}}
+{{info}}Du kan også bruge [[Code-makroen&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Code%20Macro%20%28Radeox%29]], men den viser som standard indholdet i en boks.{{/info}}
+)))|((({{{
+flere linjer
+*ordret*
+indhold
+}}})))
+
+=== 2.0 Verbatim ===
+
+Gør det muligt at skrive indhold, der ikke formateres (med andre ord tages der ikke hensyn til XWiki-syntaksen).
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Ordret tekst i linjen|{{{Noget ordret {{{**[[ikke gengivet]]**}}} indhold}}}|Noget ordret {{{**[[ikke gengivet]]**}}} indhold
+|Ordret tekstblok|((({{{
+{{{
+flere linjer
+**ordret**
+indhold
+}}}
+}}})))|((({{{
+flere linjer
+**ordret**
+indhold
+}}})))</content>
 </xwikidoc>

@@ -32,12 +32,54 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Grupper</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Redigering =
+
+== Grupper ==
+
+=== 2.0 Groups ===
+
+Grupper kan bruges til at indsætte et andet dokument direkte i det aktuelle dokument. Det gør det fx muligt at indsætte komplekse elementer eller typografier i et listepunkt, en tabelcelle eller et afsnit. Grupper afgrænses af følgende syntakselementer: ##{{{(((...)))}}}##. En gruppe kan indeholde en anden gruppe, og der er ingen grænse for, hvor mange niveauer de kan indlejres i.
+
+|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|((({{{
+|=Overskrift 1|=Overskrift 2|=Overskrift 3
+|Celle et|(((
+= Indlejret dokument =
+
+Et indlejret afsnit.
+
+* listepunkt et
+* listepunkt to
+  ** underpunkt 1
+  ** underpunkt 2
+))) | Celle tre
+
+Næste afsnit i dokumentet på øverste niveau
+}}})))|(((
+|=Overskrift 1|=Overskrift 2|=Overskrift 3
+|Celle et|(((
+{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Indlejret dokument&lt;/span&gt;&lt;/h1&gt;{{/html}}
+
+Et indlejret afsnit.
+
+* listepunkt et
+* listepunkt to
+  ** underpunkt 1
+  ** underpunkt 2
+))) | Celle tre
+
+Næste afsnit i dokumentet på øverste niveau
+)))
+|((({{{(% class="myClass" style="color:blue" %)(((blå afsnit
+
+inde i myClass)))}}})))| (% class="myClass" style="color:blue" %)(((blå afsnit
+
+inde i min gruppe)))</content>
 </xwikidoc>

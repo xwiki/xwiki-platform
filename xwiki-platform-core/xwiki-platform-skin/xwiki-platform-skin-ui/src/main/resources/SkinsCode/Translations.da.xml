@@ -36,25 +36,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: skin.sheet.title=
-### Missing: skin.sheet.properties=
-### Missing: skin.sheet.properties.logo.warning=
-### Missing: skin.sheet.deprecatedProperties=
-### Missing: skin.sheet.overriddenTemplates=
-### Missing: skin.sheet.addTemplate=
-### Missing: skin.sheet.add=
-### Missing: skin.sheet.overrideTemplateWarning=
-### Missing: skin.sheet.deprecatedPropertiesWarning=
-### Missing: skin.sheet.nojs=
-### Missing: skin.sheet.js.deleting=
-### Missing: skin.sheet.js.deletingDone=
-### Missing: skin.sheet.js.error.csrf=
-### Missing: skin.sheet.js.error.rights=
-### Missing: skin.sheet.js.deleteConfirmationText=
-### Missing: skin.sheet.js.deleteConfirmationYes=
-### Missing: skin.sheet.js.deleteConfirmationNo=
-### Missing: skin.sheet.js.adding=
-### Missing: skin.sheet.js.addingDone=
+  <content>skin.sheet.title=Skin
+skin.sheet.properties=Skinnets egenskaber
+skin.sheet.properties.logo.warning=Logoet tilsidesættes som regel af logoet i farvetemaet. Hvis du vil ændre wikiens logo, så rediger hellere det aktuelle farvetema.
+skin.sheet.deprecatedProperties=Forældede egenskaber
+skin.sheet.overriddenTemplates=Tilsidesatte skabeloner
+skin.sheet.addTemplate=Tilføj en ny skabelon, der tilsidesætter
+skin.sheet.add=Tilføj
+skin.sheet.overrideTemplateWarning=Her kan du tilsidesætte en skabelon i skinnet. Det er teknisk, og du bør kende konsekvenserne.
+skin.sheet.deprecatedPropertiesWarning=Dette afsnit findes af hensyn til bagudkompatibilitet. Brug mekanismen med tilsidesatte skabeloner ovenfor.
+skin.sheet.nojs=Uden JavaScript kan du ikke bruge dette afsnit. Du kan i stedet bruge {0}objekteditoren{1} og tilføje {2}-objekter manuelt.
+skin.sheet.js.deleting=Sletter...
+skin.sheet.js.deletingDone=Skabelonen er slettet!
+skin.sheet.js.error.csrf=CSRF-valideringen mislykkedes under gemningen. Opdater browseren, og prøv igen.
+skin.sheet.js.error.rights=Skinnene kunne ikke gemmes på grund af manglende rettigheder.
+skin.sheet.js.deleteConfirmationText=Er du sikker på, at du vil slette denne skabelon?
+skin.sheet.js.deleteConfirmationYes=Ja, slet den
+skin.sheet.js.deleteConfirmationNo=Nej, annuller
+skin.sheet.js.adding=Tilføjer...
+skin.sheet.js.addingDone=Skabelonen er tilføjet!
 
 ###############################################################################
 ## Deprecated
@@ -67,7 +67,7 @@
 #######################################
 ## until 7.1M1
 #######################################
-### Missing: skin.sheet.overridedTemplates=
+skin.sheet.overridedTemplates=Tilsidesatte skabeloner
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

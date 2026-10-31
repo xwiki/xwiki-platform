@@ -31,10 +31,109 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Billeder</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Redigering =
+
+== Billeder ==
+
+=== 1.0 Images ===
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Billede fra bilag på den aktuelle side|(((
+{{info}}Se [[Image-makroen&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Image%20Macro%20%28Radeox%29]] for detaljer{{/info}}
+{{{{image:img.png}}}}
+)))|image:XWiki.XWikiSyntaxImages@img.png
+|Billede fra bilag på en anden side|{{{{image:img.png|document=Space.Page}}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Billede med parametre|{{{{image:img.png|width=25|height=25}}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Billeder fra en URL|{{{https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+
+=== 2.0 Images ===
+
+|=Funktion|=XWiki Syntax 2.0|=Resultat
+|Billede fra bilag på den aktuelle side|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Billede fra bilag på en anden side|{{{image:Space.Page@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Billede med parametre|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Billede med billedtekst|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] understøtter billedtekster.&gt;&gt;image:img.png]]}}}|((([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] understøtter billedtekster.&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
+|Billeder fra en URL|{{{image:https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+
+{{velocity}}$subHeading Specifikation af billeder i XWiki Syntax 2.0 $subHeading{{/velocity}}
+
+{{info}}
+Delen i ##( )## er obligatorisk, mens delene i ##{ }## er valgfrie.
+{{/info}}
+
+Det fulde format for et billede er enten **##image~: (reference)##** eller **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]##**
+
+* **##caption##**: En valgfri billedtekst. Kan indeholde vilkårlig XWiki 2.0-syntaks, men indlejret linksyntaks skal escapes med ##~~##. Billedteksten understøttes kun, når billedsyntaksen er det eneste indhold i et afsnit. Billedet med billedtekst kan også omsluttes af et link. I så fald indeholder linket billedet, men ikke billedteksten.
+* **##image~:##** En obligatorisk streng, der angiver, at ressourcen er et billede.
+* **##reference##**: Henvisningen til det billede, der skal vises, i en af følgende former:
+** **URL**: En hvilken som helst URL til et billede i formen **##http:~/~/path/imageName##**. Eksempel: ##http:~/~/domain.org/path/img.png##
+** **Bilag**-henvisning i formen **##~{~{~{wikiName:} space.} page@} (imageName)##**
+*** **##wikiName##**: En valgfri streng med navnet på en wiki. Billedhenvisningen peger på et billede, der er vedhæftet en side i den wiki. Eksempel: mywiki
+*** **##space##**: Et valgfrit navn på et område i wikien. Hvis der ikke er angivet et område, bruges det aktuelle. Eksempel: Main
+*** **##page##**: En valgfri streng med navnet på den wikiside, som billedet er vedhæftet. Eksempel: WebHome
+*** **##imageName##**: En obligatorisk streng med navnet på billedet, som det er gemt i wikien.
+* **##parameters##**: En valgfri liste over mellemrumsadskilte parametre, der sendes til billedet. Eksempel: ##width="800" height="600" alt="img.png" title="My nice image"##
+** **HTML-attributter**: Alle attributter, der er defineret af HTML-standarden, føjes til det gengivne HTML-tag ##&lt;img&gt;##.
+*** **##style##**: CSS-typografioplysninger, der skal anvendes på billedet. Eksempler: ##style="float:right;height:50"## (billedet til højre, højde 50 px), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (billedet centreret, bredde 80 % af blokkens bredde), ##style="vertical-align:bottom"## (teksten starter ved billedets bund)
+*** **##height##**: En parameter, der angiver højden på det viste billede. Værdien angives enten i pixel (eksempel: ##height="80"##) eller i forhold til højden på den blok, der indeholder billedet (eksempel: ##height="40%"##).
+*** **##width##**: En parameter, der angiver bredden på det viste billede. Værdien angives enten i pixel (eksempel: ##width="80"##) eller i forhold til bredden på den blok, der indeholder billedet (eksempel: ##width="40%"##).
+*** **##title##**: En parameter, der angiver titlen på det viste billede, som fx vises, når musen holdes over billedet. Eksempel: ##title="My nice image"##
+*** **##alt##**: En parameter, der angiver, hvilken tekst der skal vises, hvis browseren ikke kan vise billedet. Da det er en obligatorisk HTML-attribut, bruger XWiki filnavnet, hvis parameteren ##alt## ikke er angivet. Eksempel: ##alt="img.png"##
+*** **Mere**: Du kan læse en mere grundig forklaring af HTML-tagget ##&lt;img&gt;##, herunder flere attributter, [[i HTML-standarden&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]].
+
+=== 2.1 Images ===
+
+|=Funktion|=XWiki Syntax 2.1|=Resultat
+|Billede fra bilag på den aktuelle side|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Billede fra bilag på en anden side|{{{image:PageA.PageB@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Billede med parametre|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Billede med billedtekst|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] understøtter billedtekster.&gt;&gt;image:img.png]]}}}|((([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] understøtter billedtekster.&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
+|Billeder fra en URL|{{{image:https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Indbyggede ikoner|{{{image:icon:accept}}}|image:icon:accept
+
+{{velocity}}$subHeading Specifikation af billeder i XWiki Syntax 2.1 $subHeading{{/velocity}}
+
+{{info}}
+Forklaring: Delene i ##()## er obligatoriske, mens delene i ##{}## er valgfrie.
+{{/info}}
+
+Det fulde format for et billede er enten **##image~: (reference)##** eller **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]##**
+
+* **##caption##**: En valgfri billedtekst. Kan indeholde vilkårlig XWiki 2.1-syntaks, men indlejret linksyntaks skal escapes med ##~~##. Billedteksten understøttes kun, når billedsyntaksen er det eneste indhold i et afsnit. Billedet med billedtekst kan også omsluttes af et link. I så fald indeholder linket billedet, men ikke billedteksten.
+* **##image~:##** En obligatorisk streng, der angiver, at ressourcen er et billede.
+* **##reference##**: Henvisningen til det billede, der skal vises, i en af følgende former:
+** **URL**: En hvilken som helst URL til et billede i formen **##[url:](protocol:~/~/path/imageName)##**. Eksempel: ##http:~/~/domain.org/path/img.png##
+*** **##url:##** En valgfri streng, der angiver, at billedet er en URL.
+*** **##protocol:~/~/path/imageName##**: Billedets URL
+** **Bilag**: En henvisning i formen **##[attach~:]~{~{~{(wikiName):}(spaceNameList).}(pageName)@}(imageName)##**
+*** **##attach~:##** En valgfri streng, der angiver, at henvisningen er et bilag til et XWiki-dokument.
+*** **##wikiName##**: En valgfri streng med navnet på en wiki. Billedhenvisningen peger på et billede, der er vedhæftet en side i den wiki. Hvis der ikke er angivet en wiki, bruges den aktuelle. Eksempel: ##mywiki##.
+*** **##spaceNameList##**: En valgfri punktumadskilt liste over navne på områder i wikien. Hvis der ikke er angivet et område, bruges det aktuelle. Eksempler: ##Main##, ##A.B##, ##A.B.C##
+*** **##pageName##**: En valgfri streng med navnet på den wikiside, som billedet er vedhæftet. Eksempel: ##Welcome##
+*** **##imageName##**: En obligatorisk streng med navnet på billedet, som det er gemt i wikien. Eksempel: ##myImage.png##
+** **Sidebilag**: En henvisning i formen **##pageAttach~:~{~{~{(wikiName):}(pageNameList)/}(imageName)##**
+*** **##pageAttach~:##** En obligatorisk streng, der angiver, at henvisningen er et bilag til en XWiki-side.
+*** **##wikiName##**: En valgfri streng med navnet på en wiki. Billedhenvisningen peger på et billede, der er vedhæftet en side i den wiki. Hvis der ikke er angivet en wiki, bruges den aktuelle. Eksempel: ##mywiki##.
+*** **##pageNameList##**: En valgfri punktumadskilt liste over navne på wikisider. Hvis der ikke er angivet en side, bruges den aktuelle. Eksempler: ##Main##, ##A/B##, ##A/B/C##
+*** **##imageName##**: En obligatorisk streng med navnet på billedet, som det er gemt i wikien. Eksempel: ##myImage.png##
+** **Ikon**: En henvisning i formen **##icon{{{:(}}}iconName)##**. Eksempel: **##icon:accept##**
+*** **##icon:##** En obligatorisk streng, der angiver, at billedhenvisningen er et ikon fra [[XWikis ikonsæt&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
+*** **##iconName##**: En obligatorisk streng, der angiver det ikon, der henvises til. Eksempel: ##accept##
+** **Data URI**: En henvisning i formen **##(data{{{:)}}}(content)##**. Eksempel: **##{{{data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##**
+*** **##data:##** En obligatorisk streng, der angiver, at billedet er angivet direkte med [[Data URI-skemaet&gt;&gt;https://en.wikipedia.org/wiki/Data_URI_scheme]].
+*** **##content##**: Det kodede billede. Eksempel: ##{{{image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##
+* **##parameters##**: En valgfri liste over mellemrumsadskilte parametre, der sendes til billedet. Eksempel: ##width="800" height="600" alt="img.png" title="My nice image"##
+** **HTML-attributter**: Alle attributter, der er defineret af HTML-standarden, føjes til det gengivne HTML-tag ##&lt;img&gt;##.
+*** **##style##**: CSS-typografioplysninger, der skal anvendes på billedet. Eksempler: ##style="float:right;height:50"## (billedet til højre, højde 50 px), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (billedet centreret, bredde 80 % af blokkens bredde), ##style="vertical-align:bottom"## (teksten starter ved billedets bund)
+*** **##height##**: En parameter, der angiver højden på det viste billede. Værdien angives enten i pixel (eksempel: ##height="80"##) eller i forhold til højden på den blok, der indeholder billedet (eksempel: ##height="40%"##).
+*** **##width##**: En parameter, der angiver bredden på det viste billede. Værdien angives enten i pixel (eksempel: ##width="80"##) eller i forhold til bredden på den blok, der indeholder billedet (eksempel: ##width="40%"##).
+*** **##title##**: En parameter, der angiver titlen på det viste billede, som fx vises, når musen holdes over billedet. Eksempel: ##title="My nice image"##
+*** **##alt##**: En parameter, der angiver, hvilken tekst der skal vises, hvis browseren ikke kan vise billedet. Da det er en obligatorisk HTML-attribut, bruger XWiki filnavnet, hvis parameteren ##alt## ikke er angivet. Eksempel: ##alt="img.png"##
+*** **Mere**: Du kan læse en mere grundig forklaring af HTML-tagget ##&lt;img&gt;##, herunder flere attributter, [[i HTML-standarden&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]].
+** **##queryString##**: Gør det muligt at sende forespørgsler til serveren, når linket til at hente billedet dannes. Eksempel: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## virker ikke, hvis parametrene ##width## og ##height## angives ud over ##queryString##!**)</content>
   </xwikidoc>

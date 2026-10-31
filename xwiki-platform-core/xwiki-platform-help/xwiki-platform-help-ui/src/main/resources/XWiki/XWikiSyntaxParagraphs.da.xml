@@ -32,12 +32,38 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Afsnit</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Redigering =
+
+== Afsnit ==
+
+=== 1.0 Paragraphs ===
+
+Afsnit er tekstelementer, der er adskilt af 2 eller flere nye linjer.
+
+{{info}}Nye linjer respekteres ikke i XWiki Syntax 1.0. 
+Du skal i stedet indsætte en dobbelt omvendt skråstreg, fx: {{{}}}{{/info}}
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Simpelt afsnit|Dette er et afsnit|Dette er et afsnit
+|Afsnit over flere linjer|Afsnit over{{{}}}flere linjer|Afsnit overflere linjer
+|To afsnit|Afsnit et\\Afsnit to|Afsnit et\\Afsnit to
+|Afsnit med parametre|&lt;p style="text-align:center;color:blue"&gt;Centreret og blåt afsnit&lt;/p&gt;|(% style="text-align:center;color:blue" %)Centreret og blåt afsnit
+
+=== 2.0 Paragraphs ===
+
+Afsnit er tekstelementer, der er adskilt af 2 eller flere nye linjer.
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Simpelt afsnit|Dette er et afsnit|Dette er et afsnit
+|Afsnit over flere linjer|Afsnit overflere linjer|Afsnit overflere linjer
+|To afsnit|Afsnit et\\Afsnit to|Afsnit et\\Afsnit to
+|Afsnit med parametre|{{{(% style="text-align:center;color:blue" %)}}}Centreret og blåt afsnit|(% style="text-align:center;color:blue" %)Centreret og blåt afsnit
+|Anden typografi på en del af afsnittets indhold|afsnit med {{{(% style="color:red" %)}}}rød{{{(%%)}}} anden typografi indeni|afsnit med (% style="color:red" %)rød(%%) tekst indeni</content>
 </xwikidoc>

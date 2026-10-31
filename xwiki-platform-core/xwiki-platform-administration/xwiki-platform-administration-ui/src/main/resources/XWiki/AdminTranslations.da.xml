@@ -68,7 +68,7 @@ XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Hvis feltet er markeret, sk
 
 # Look &amp; Feel Sections
 admin.themes=Temaer
-admin.themes.description=Tilpas farve- og ikontemaer, skin og logo.
+admin.themes.description=Tilpas farveskemaer, ikontemaer, tema og logo.
 admin.colorthemes.local=Lokale
 admin.colorthemes.global=Globale
 XWiki.XWikiPreferences_showannotations.hint=Vis afsnittet med annoteringer i sidelayoutet.
@@ -80,9 +80,9 @@ XWiki.XWikiPreferences_title.hint=Angiv formatet for sidetitlen, som browseren v
 XWiki.XWikiPreferences_meta.hint=Angiver de metadata, der medtages i HTML-headeren på hver side, herunder sidens beskrivelse, forfatter og nøgleord. Standardskabelonen meta.vm bruges, når feltet er tomt. Brug #template('meta.vm') som en del af feltets indhold for at få gavn af fremtidige forbedringer af standarddefinitionen.
 XWiki.XWikiPreferences_webcopyright.hint=Angiv de oplysninger, der vises i sidefodens afsnit om ophavsret.
 XWiki.XWikiPreferences_version.hint=Angiv de oplysninger, der vises i sidefodens afsnit om version.
-XWiki.XWikiPreferences_skin.hint=Angiv det skin, der bruges som standard. Det kan være et skin i filsystemet, fx "flamingo", eller et skin på en side, fx "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_skin.hint=Angiv det tema, der bruges som standard. Det kan være et tema i filsystemet, fx "flamingo", eller et tema på en side, fx "XWiki.DefaultSkin"
 XWiki.XWikiPreferences_iconTheme.hint=Angiv det ikontema, der bruges som standard.
-XWiki.XWikiPreferences_colorTheme.hint=Angiv det farvetema, der bruges som standard.
+XWiki.XWikiPreferences_colorTheme.hint=Angiv det farveskema, der bruges som standard.
 
 # Editing Sections
 admin.edit=Redigering

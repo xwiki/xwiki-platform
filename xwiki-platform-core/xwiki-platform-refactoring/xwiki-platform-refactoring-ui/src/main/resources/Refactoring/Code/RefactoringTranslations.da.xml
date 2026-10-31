@@ -36,10 +36,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: refactoring.configuration.delete.heading=
-### Missing: admin.delete=
-### Missing: Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=
-### Missing: Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=
-### Missing: refactoring.configuration.delete.emptySection=
+  <content>refactoring.configuration.delete.heading=Egenskaber for sletning
+admin.delete=Sletning
+Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=Kan springe papirkurven over
+Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=Når den er sat til Ja, kan avancerede brugere vælge, om sider skal flyttes til papirkurven eller slettes permanent, når de slettes. Når den er sat til Nej, flyttes sider altid til papirkurven, hvis den er slået til, og ellers slettes de altid permanent. Standardværdien er Nej.
+refactoring.configuration.delete.emptySection=Der er intet at konfigurere i dette afsnit.
 </content>
 </xwikidoc>

@@ -36,26 +36,26 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: rendering.macro.mention.name=
-### Missing: rendering.macro.mention.description=
-### Missing: rendering.macro.mention.parameter.reference.name=
-### Missing: rendering.macro.mention.parameter.reference.description=
-### Missing: rendering.macro.mention.parameter.style.name=
-### Missing: rendering.macro.mention.parameter.style.description=
-### Missing: rendering.macro.mention.parameter.anchor.name=
-### Missing: rendering.macro.mention.parameter.anchor.description=
-### Missing: rendering.macro.mention.parameter.type.name=
-### Missing: rendering.macro.mention.parameter.type.description=
-### Missing: org.xwiki.mentions.DisplayStyle.FULL_NAME=
-### Missing: org.xwiki.mentions.DisplayStyle.FIRST_NAME=
-### Missing: org.xwiki.mentions.DisplayStyle.LOGIN=
-### Missing: XWiki.Mentions.MentionsConfigurationClass_mentionsColor=
-### Missing: XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=
-### Missing: XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=
-### Missing: XWiki.Mentions.MentionsConfigurationClass_selfMentionsForeground=
-### Missing: XWiki.Mentions.MentionsConfigurationClass_quoteActivated=
-### Missing: XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=
-### Missing: mentions.tip=
-### Missing: mentions.configuration.heading=
+  <content>rendering.macro.mention.name=Omtale af bruger
+rendering.macro.mention.description=Indsæt en omtale af en bruger.
+rendering.macro.mention.parameter.reference.name=Henvisning
+rendering.macro.mention.parameter.reference.description=Henvisning til den bruger eller gruppe, der omtales.
+rendering.macro.mention.parameter.style.name=Visningsform
+rendering.macro.mention.parameter.style.description=Omtalens visningsform (understøttes kun for omtaler af brugere).
+rendering.macro.mention.parameter.anchor.name=Anker
+rendering.macro.mention.parameter.anchor.description=Det anker, der bruges til at linke til omtalen (ankeret bør så vidt muligt være entydigt på siden).
+rendering.macro.mention.parameter.type.name=Type
+rendering.macro.mention.parameter.type.description=Typen af den aktør, der omtales.
+org.xwiki.mentions.DisplayStyle.FULL_NAME=Brugerens fulde navn
+org.xwiki.mentions.DisplayStyle.FIRST_NAME=Kun brugerens fornavn
+org.xwiki.mentions.DisplayStyle.LOGIN=Brugernavn
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Farve på omtaler
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Farven på omtaler af den aktuelle bruger (bemærk: bruges som værdi i CSS-attributten background-color).
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Farve på omtaler af en selv
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsForeground=Forgrundsfarve på omtaler af en selv
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Slå citater til
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Bestemmer, om et citat af teksten omkring en omtale medtages i notifikationer om omtaler.
+mentions.tip=Når du redigerer i WYSIWYG-editoren, kan du skrive @ og derefter begynde at skrive bogstaver for at få forslag til, hvem du kan omtale.
+mentions.configuration.heading=Indstillinger for omtaler
 </content>
 </xwikidoc>

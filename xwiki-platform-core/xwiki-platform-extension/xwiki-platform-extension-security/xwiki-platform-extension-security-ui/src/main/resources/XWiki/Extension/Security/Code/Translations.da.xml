@@ -36,22 +36,22 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: extension.security.admin.title=
-### Missing: extension.security.indexed.started=
-### Missing: extension.security.indexed.on=
-### Missing: extension.security.indexed.nojob=
-### Missing: extension.security.admin.generalWarning=
-### Missing: extension.security.admin.configuration.title=
-### Missing: extension.security.admin.environment.explanation=
-### Missing: extension.security.notification.message=
-### Missing: extension.security.experimental.warning=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanEnabled=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanDelay=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanURL=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=
-### Missing: XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=
+  <content>extension.security.admin.title=Sikkerhedssårbarheder
+extension.security.indexed.started=Indekseringen startede {0}.
+extension.security.indexed.on=Indekseret {0}. Udvidelser, der er installeret efter denne dato, og sikkerhedssårbarheder, der er offentliggjort efter denne dato, vises ikke. Der køres jævnligt nye sikkerhedsscanninger.
+extension.security.indexed.nojob=Der blev ikke fundet nogen tidligere indeksering.
+extension.security.admin.generalWarning=Bemærk, at sikkerhedsscanningen ikke omfatter alle installerede udvidelser. Udvidelser, der ikke kan opdateres via Udvidelseshåndtering, er ikke med lige nu.
+extension.security.admin.configuration.title=Konfiguration
+extension.security.admin.environment.explanation=Udvidelserne i dette afsnit har kendte sårbarheder, men kan ikke opgraderes fra Udvidelseshåndtering. De kan altså kun rettes ved at opgradere XWiki selv eller dets miljø (fx servlet-motor eller Docker-container).
+extension.security.notification.message=Vi har fundet {0} udvidelser med kendte sikkerhedssårbarheder. Se detaljerne i rapporten {1}
+extension.security.experimental.warning=Bemærk, at denne udvidelse stadig er eksperimentel og kan vise unøjagtige analyser. Læs derfor resultaterne grundigt, før du gør noget. 
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Scanning slået til
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=Når feltet ikke er markeret, køres sikkerhedsscanningen ikke længere
+XWiki.Extension.Security.Code.ConfigClass_scanDelay=Forsinkelse mellem scanninger
+XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=Antal timer, der ventes mellem to sikkerhedsscanninger (standard: 24 t)
+XWiki.Extension.Security.Code.ConfigClass_scanURL=URL til scanning
+XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=Den URL, der bruges som ekstern kilde til sikkerhedsscanningen (standardværdi: https://api.osv.dev/v1/query)
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=URL til gennemgange
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=Den URL, der bruges som ekstern kilde til gennemgange af sikkerhedsscanningen (standardværdi: https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)
 </content>
 </xwikidoc>

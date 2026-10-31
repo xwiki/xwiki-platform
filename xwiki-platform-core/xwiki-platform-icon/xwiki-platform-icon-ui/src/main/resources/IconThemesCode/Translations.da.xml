@@ -36,15 +36,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <parent>IconThemes.WebHome</parent>
-  <content>### Missing: platform.icon.picker.preview=
-### Missing: platform.icon.picker.loading=
-### Missing: rendering.macro.iconPicker.name=
-### Missing: rendering.macro.iconPicker.description=
-### Missing: rendering.macro.iconPicker.parameter.id.name=
-### Missing: rendering.macro.iconPicker.parameter.id.description=
-### Missing: rendering.macro.iconPicker.parameter.class.name=
-### Missing: rendering.macro.iconPicker.parameter.class.description=
-### Missing: rendering.macro.iconPicker.parameter.prefix.name=
-### Missing: rendering.macro.iconPicker.parameter.prefix.description=
+  <content>platform.icon.picker.preview=Eksempel med:
+platform.icon.picker.loading=Indlæser
+rendering.macro.iconPicker.name=Ikonvælger
+rendering.macro.iconPicker.description=Vælg et ikon i XWikis ikonsæt.
+rendering.macro.iconPicker.parameter.id.name=Id
+rendering.macro.iconPicker.parameter.id.description=DOM-id for det inputfelt, som vælgeren skal bruges på
+rendering.macro.iconPicker.parameter.class.name=Klasse
+rendering.macro.iconPicker.parameter.class.description=CSS-klassen for de inputfelter, som vælgeren skal bruges på
+rendering.macro.iconPicker.parameter.prefix.name=Præfiks
+rendering.macro.iconPicker.parameter.prefix.description=Præfiks, der sættes foran ikonets navn i inputfeltet (standard: "image:icon:")
 </content>
 </xwikidoc>

@@ -36,25 +36,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: authentication.admin.failureStrategy.label=
-### Missing: authentication.admin.failureStrategy.hint=
-### Missing: authentication.admin.failureStrategy.disableAccount.name=
-### Missing: authentication.admin.failureStrategy.captcha.name=
-### Missing: authentication.admin.maxAttempts.label=
-### Missing: authentication.admin.maxAttempts.hint=
-### Missing: authentication.admin.timeWindow.label=
-### Missing: authentication.admin.timeWindow.hint=
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.label=
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.hint=
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.disabled=
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.enabled=
-### Missing: authentication.admin.heading=
-### Missing: security.authservice.admin.title=
-### Missing: security.authservice.admin.currentAuthService=
-### Missing: security.authservice.admin.component.label=
-### Missing: security.authservice.admin.component.save=
-### Missing: security.authservice.admin.component.noService=
-### Missing: security.authservice.admin.other.warning=
-### Missing: security.authservice.admin.class.warning=
+  <content>authentication.admin.failureStrategy.label=Strategier ved fejl
+authentication.admin.failureStrategy.hint=Strategier, der bruges ved gentagne mislykkede godkendelser. Du kan vælge flere strategier.
+authentication.admin.failureStrategy.disableAccount.name=Deaktiver kontoen
+authentication.admin.failureStrategy.captcha.name=CAPTCHA
+authentication.admin.maxAttempts.label=Højeste antal tilladte forsøg
+authentication.admin.maxAttempts.hint=Det højeste antal mislykkede logins, der tillades, før strategien aktiveres. Antallet gælder kun inden for tidsrummet nedenfor. Bemærk, at værdien 0 betyder, at funktionen er slået fra.
+authentication.admin.timeWindow.label=Tidsrum for mislykkede logins
+authentication.admin.timeWindow.hint=Det tidsrum i sekunder, hvor mislykkede loginforsøg tælles med, før strategien aktiveres.
+authentication.admin.isAuthenticationSecurityEnabled.label=Slå sikkerhedsmekanismen for godkendelse til eller fra
+authentication.admin.isAuthenticationSecurityEnabled.hint=Når sikkerhedsmekanismen for godkendelse slås fra, nulstilles registreringerne af mislykkede godkendelser også.
+authentication.admin.isAuthenticationSecurityEnabled.disabled=Slået fra
+authentication.admin.isAuthenticationSecurityEnabled.enabled=Slået til
+authentication.admin.heading=Godkendelsessikkerhed
+security.authservice.admin.title=Godkendelsestjeneste
+security.authservice.admin.currentAuthService=Aktuel godkendelsestjeneste
+security.authservice.admin.component.label=Angiv godkendelsestjeneste:
+security.authservice.admin.component.save=Gem
+security.authservice.admin.component.noService=Der blev ikke fundet nogen alternativ godkendelsestjeneste.
+security.authservice.admin.other.warning=Den aktuelle godkendelsestjeneste kan ikke ændres, fordi den indsættes af et brugerdefineret system.
+security.authservice.admin.class.warning=Den aktuelle godkendelsestjeneste kan ikke ændres, fordi den styres af konfigurationsfilen xwiki.cfg.
 </content>
 </xwikidoc>

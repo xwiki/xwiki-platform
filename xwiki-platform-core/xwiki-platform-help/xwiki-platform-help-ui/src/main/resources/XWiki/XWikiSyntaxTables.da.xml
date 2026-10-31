@@ -32,12 +32,127 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Tabeller</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Redigering =
+
+== Tabeller ==
+
+=== 1.0 Tables ===
+
+Gør det let at lave indhold i tabelform.
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Standardtabel|((({{{
+{table}
+Titel 1 | Titel 2
+Ord 1 | Ord 2
+{table}
+}}})))|(((
+|=Titel 1|=Titel 2
+|Ord 1|Ord 2
+)))
+|Tabel med parametre|(((
+&lt;table style="background-color:red;text-align:center"&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Titel 1&lt;/td&gt;
+      &lt;td style="background-color:yellow"&gt;Titel 2&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Ord 1&lt;/td&gt;
+      &lt;td&gt;Ord 2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+)))|(((
+(% style="background-color:red;text-align:center" %)
+|=Titel 1|=(% style="background-color:yellow" %)Titel 2
+|Ord 1|Ord 2
+)))
+|Tabel, der kan filtreres og sorteres|((({{{
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
+  &lt;tr class="sortHeader"&gt;
+    &lt;th&gt;Titel 1&lt;/th&gt;
+    &lt;th&gt;Titel 2&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td&gt;Celle 11&lt;/td&gt;
+   &lt;td&gt;Celle 12&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td&gt;Celle 21&lt;/td&gt;
+   &lt;td&gt;Celle 22&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+}}}
+
+{{info}}Flere funktioner finder du i [[LiveData-makroen&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Live%20Data%20Macro/]].{{/info}}
+)))|(((
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="table1id" %)
+(% class="sortHeader" %)|=Titel 1|=Titel 2
+|Celle 11|Celle 12
+|Celle 21|Celle 22
+)))
+
+=== 2.0 Tables ===
+
+Gør det let at lave indhold i tabelform. Parametre for tabel, række og celle understøttes også i XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}.
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Standardtabel|((({{{
+|=Titel 1|=Titel 2
+|Ord 1|Ord 2
+}}}))) eller ((({{{
+!=Titel 1!=Titel 2
+!!Ord 1!!Ord 2
+}}})))|(((
+|=Titel 1|=Titel 2
+|Ord 1|Ord 2
+)))
+|Tabel med parametre|((({{{
+(% style="background-color:red;text-align:center" %)
+|=Titel 1|=(% style="background-color:yellow" %)Titel 2
+|Ord 1|Ord 2
+}}})))|(((
+(% style="background-color:red;text-align:center" %)
+|=Titel 1|=(% style="background-color:yellow" %)Titel 2
+|Ord 1|Ord 2
+)))
+|Tabel, der kan filtreres og sorteres|((({{{
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=Titel 1|=Titel 2
+|Celle 11|Celle 12
+|Celle 21|Celle 22
+}}}
+
+{{info}}Flere funktioner finder du i [[LiveData-makroen&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Live%20Data%20Macro/]].{{/info}}
+)))|(((
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=Titel 1|=Titel 2
+|Celle 11|Celle 12
+|Celle 21|Celle 22
+)))</content>
 </xwikidoc>

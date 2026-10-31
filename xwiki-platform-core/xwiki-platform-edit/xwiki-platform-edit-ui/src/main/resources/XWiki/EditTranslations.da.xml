@@ -36,13 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: edit.inplace.close=
-### Missing: edit.inplace.page.lockFailed=
-### Missing: edit.inplace.page.loadFailed=
-### Missing: edit.inplace.page.renderFailed=
-### Missing: edit.inplace.page.translate.messageBefore=
-### Missing: edit.inplace.page.translate.messageAfter=
-### Missing: edit.inplace.actionButtons.loadFailed=
+  <content>edit.inplace.close=Luk
+edit.inplace.page.lockFailed=Siden kunne ikke låses.
+edit.inplace.page.loadFailed=Siden kunne ikke indlæses.
+edit.inplace.page.renderFailed=Siden kunne ikke gengives.
+edit.inplace.page.translate.messageBefore=Du redigerer oversættelsen {0} af siden (dens oprindelige version), fordi siden endnu ikke er oversat til {1} (det aktuelle sprog).
+edit.inplace.page.translate.messageAfter=Du redigerer nu oversættelsen {0}. Begynd med at oversætte sidens titel.
+edit.inplace.actionButtons.loadFailed=Handlingsknapperne kunne ikke indlæses.
 
 ###############################################################################
 ## Deprecated
@@ -55,8 +55,8 @@
 #######################################
 ## until 12.10.5, 13.1
 #######################################
-### Missing: edit.inplace.page.original=
-### Missing: edit.inplace.page.translation=
+edit.inplace.page.original=Du redigerer den oprindelige side ({0})
+edit.inplace.page.translation=Du redigerer følgende oversættelse: {0}.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

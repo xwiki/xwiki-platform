@@ -32,12 +32,34 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Ny linje og linjeskift</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Redigering =
+
+== Ny linje/linjeskift ==
+
+=== 1.0 New Line Line Breaks ===
+
+En ny linje er et tryk på Enter. Et linjeskift er en tvungen ny linje, der kan stå hvor som helst i teksten.
+
+{{info}}
+Nye linjer respekteres ikke i XWiki Syntax 1.0. Brug linjeskift i stedet.
+{{/info}}
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Linjeskift|{{{Linje\\Ny linje}}}|Linje\\Ny linje
+|Ny linje|Linje\\Ny linje|Linje Ny linje
+
+=== 2.0 New Line Line Breaks ===
+
+En ny linje er et tryk på Enter. Et linjeskift er en tvungen ny linje, der kan stå hvor som helst i teksten.
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Linjeskift|{{{Linje\\Ny linje}}}|Linje\\Ny linje
+|Ny linje|Linje\\Ny linje|Linje\\Ny linje</content>
 </xwikidoc>

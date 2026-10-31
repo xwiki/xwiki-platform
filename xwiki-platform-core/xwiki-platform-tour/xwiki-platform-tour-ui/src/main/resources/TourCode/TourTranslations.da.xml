@@ -37,66 +37,66 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># App name
-### Missing: tour.app.name=
+tour.app.name=Rundvisning
 
 # Class fields
-### Missing: TourCode.TourClass_description=
-### Missing: TourCode.TourClass_isActive=
-### Missing: TourCode.TourClass_targetPage=
+TourCode.TourClass_description=Beskrivelse
+TourCode.TourClass_isActive=Aktiv
+TourCode.TourClass_targetPage=Målside
 
 # Live table generic keys
-### Missing: tour.livetable.doc.title=
-### Missing: tour.livetable._actions=
-### Missing: tour.livetable._actions.edit=
-### Missing: tour.livetable._actions.delete=
-### Missing: tour.livetable._actions.launch=
-### Missing: tour.livetable.emptyvalue=
+tour.livetable.doc.title=Rundvisningens navn
+tour.livetable._actions=Handlinger
+tour.livetable._actions.edit=Rediger
+tour.livetable._actions.delete=Slet
+tour.livetable._actions.launch=Start
+tour.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: tour.livetable.description=
-### Missing: tour.livetable.isActive=
-### Missing: tour.livetable.targetPage=
-### Missing: tour.livetable.targetClass=
+tour.livetable.description=Beskrivelse
+tour.livetable.isActive=Aktiv
+tour.livetable.targetPage=Målside
+tour.livetable.targetClass=Målklasse
 
 # Tour popover
-### Missing: tour.popover.previous=
-### Missing: tour.popover.next=
-### Missing: tour.popover.end=
-### Missing: tour.popover.quit=
-### Missing: tour.popover.show=
-### Missing: tour.popover.show.hint=
+tour.popover.previous=« Forrige
+tour.popover.next=Næste »
+tour.popover.end=Afslut rundvisningen
+tour.popover.quit=Forlad rundvisningen
+tour.popover.show=Vis rundvisningen
+tour.popover.show.hint=Du kan til enhver tid starte rundvisningen forfra ved at klikke på denne knap
 
 # Steps
-### Missing: TourCode.StepClass_order=
-### Missing: TourCode.StepClass_element=
-### Missing: TourCode.StepClass_title=
-### Missing: TourCode.StepClass_content=
-### Missing: TourCode.StepClass_backdrop=
-### Missing: TourCode.StepClass_placement=
-### Missing: TourCode.StepClass_targetPage=
-### Missing: TourCode.StepClass_action=
-### Missing: TourCode.StepClass_queryString=
-### Missing: TourCode.StepClass_reflex=
-### Missing: tour.steps=
-### Missing: tour.steps.new_step=
-### Missing: tour.steps.add_step=
-### Missing: tour.steps.edit_step=
-### Missing: tour.steps.save_step=
-### Missing: tour.steps.delete_confirm=
-### Missing: tour.steps.delete_done=
-### Missing: tour.steps.deleting=
-### Missing: tour.steps.yes=
-### Missing: tour.steps.no=
-### Missing: tour.steps.edit=
-### Missing: tour.steps.delete=
+TourCode.StepClass_order=Rækkefølge
+TourCode.StepClass_element=Element (CSS-selektor, der identificerer et element)
+TourCode.StepClass_title=Titel
+TourCode.StepClass_content=Indhold
+TourCode.StepClass_backdrop=Baggrundsdæmpning
+TourCode.StepClass_placement=Placering
+TourCode.StepClass_targetPage=Målside
+TourCode.StepClass_action=Målhandling
+TourCode.StepClass_queryString=Forespørgselsstreng
+TourCode.StepClass_reflex=Reflex
+tour.steps=Trin
+tour.steps.new_step=Nyt trin
+tour.steps.add_step=Tilføj trin
+tour.steps.edit_step=Rediger trin
+tour.steps.save_step=Gem
+tour.steps.delete_confirm=Er du sikker på, at du vil slette trinnet?
+tour.steps.delete_done=Trinnet er slettet!
+tour.steps.deleting=Sletter trin...
+tour.steps.yes=Ja
+tour.steps.no=Nej
+tour.steps.edit=Rediger
+tour.steps.delete=Slet
 
 # Upgrade
-### Missing: tour.upgrade.title=
-### Missing: tour.upgrade.successList=
-### Missing: tour.upgrade.successNothing=
+tour.upgrade.title=Opgrader
+tour.upgrade.successList=Følgende sider er konverteret:
+tour.upgrade.successNothing=Der er intet at opgradere!
 
 # Template
-### Missing: tour.template.name=
-### Missing: tour.template.description=
+tour.template.name=Rundvisning
+tour.template.description=Rundvisning trin for trin
 </content>
 </xwikidoc>

@@ -37,57 +37,57 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Class fields
-### Missing: Help.Applications.Movies.Code.MoviesClass_title1=
-### Missing: Help.Applications.Movies.Code.MoviesClass_longText1=
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1=
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_action=
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_comedy=
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_drama=
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_horror=
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_musical=
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_romance=
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_sf=
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_thriller=
-### Missing: Help.Applications.Movies.Code.MoviesClass_date1=
-### Missing: Help.Applications.Movies.Code.MoviesClass_number1=
-### Missing: Help.Applications.Movies.Code.MoviesClass_boolean1=
-### Missing: Help.Applications.Movies.Code.MoviesClass_databaseList1=
-### Missing: Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Charlie\ Chaplin=
-### Missing: Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Frank\ Capra=
-### Missing: Help.Applications.Movies.Code.MoviesClass_content1=
+Help.Applications.Movies.Code.MoviesClass_title1=Titel
+Help.Applications.Movies.Code.MoviesClass_longText1=Plakat
+Help.Applications.Movies.Code.MoviesClass_staticList1=Genre
+Help.Applications.Movies.Code.MoviesClass_staticList1_action=Action
+Help.Applications.Movies.Code.MoviesClass_staticList1_comedy=Komedie
+Help.Applications.Movies.Code.MoviesClass_staticList1_drama=Drama
+Help.Applications.Movies.Code.MoviesClass_staticList1_horror=Gyser
+Help.Applications.Movies.Code.MoviesClass_staticList1_musical=Musical
+Help.Applications.Movies.Code.MoviesClass_staticList1_romance=Romantik
+Help.Applications.Movies.Code.MoviesClass_staticList1_sf=Science fiction
+Help.Applications.Movies.Code.MoviesClass_staticList1_thriller=Thriller
+Help.Applications.Movies.Code.MoviesClass_date1=Premieredato
+Help.Applications.Movies.Code.MoviesClass_number1=Spilletid (minutter)
+Help.Applications.Movies.Code.MoviesClass_boolean1=Set
+Help.Applications.Movies.Code.MoviesClass_databaseList1=Instruktør
+Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Charlie\ Chaplin=Charlie Chaplin
+Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Frank\ Capra=Frank Capra
+Help.Applications.Movies.Code.MoviesClass_content1=Handling
 
 # Live table generic keys
-### Missing: movies.livetable.doc.title=
-### Missing: movies.livetable.doc.name=
-### Missing: movies.livetable.doc.space=
-### Missing: movies.livetable.doc.fullname=
-### Missing: movies.livetable.doc.location=
-### Missing: movies.livetable.doc.author=
-### Missing: movies.livetable.doc.creator=
-### Missing: movies.livetable.doc.date=
-### Missing: movies.livetable.doc.creationDate=
-### Missing: movies.livetable._avatar=
-### Missing: movies.livetable._images=
-### Missing: movies.livetable._attachments=
-### Missing: movies.livetable._actions=
-### Missing: movies.livetable._actions.edit=
-### Missing: movies.livetable._actions.delete=
-### Missing: movies.livetable.emptyvalue=
+movies.livetable.doc.title=Sidetitel
+movies.livetable.doc.name=Sidenavn
+movies.livetable.doc.space=Område
+movies.livetable.doc.fullname=Sidens fulde navn
+movies.livetable.doc.location=Placering
+movies.livetable.doc.author=Seneste forfatter
+movies.livetable.doc.creator=Oprettet af
+movies.livetable.doc.date=Dato
+movies.livetable.doc.creationDate=Oprettelsesdato
+movies.livetable._avatar=Avatar
+movies.livetable._images=Billeder
+movies.livetable._attachments=Bilag
+movies.livetable._actions=Handlinger
+movies.livetable._actions.edit=Rediger
+movies.livetable._actions.delete=Slet
+movies.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: movies.livetable.title1=
-### Missing: movies.livetable.longText1=
-### Missing: movies.livetable.staticList1=
-### Missing: movies.livetable.date1=
-### Missing: movies.livetable.number1=
-### Missing: movies.livetable.boolean1=
-### Missing: movies.livetable.databaseList1=
-### Missing: movies.livetable.content1=
+movies.livetable.title1=Titel
+movies.livetable.longText1=Plakat
+movies.livetable.staticList1=Genre
+movies.livetable.date1=Premieredato
+movies.livetable.number1=Spilletid (minutter)
+movies.livetable.boolean1=Set
+movies.livetable.databaseList1=Instruktør
+movies.livetable.content1=Handling
 
 # Other keys
-### Missing: movies.entry.name=
+movies.entry.name=Film
 
 # Deprecated keys
-### Missing: movies.dataSpace.title=
+movies.dataSpace.title=Data
 </content>
 </xwikidoc>

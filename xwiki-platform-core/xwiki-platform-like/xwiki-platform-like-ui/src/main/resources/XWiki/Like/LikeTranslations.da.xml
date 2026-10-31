@@ -36,37 +36,37 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: rightsmanager.like=
-### Missing: like.unlike.modal.title=
-### Missing: like.unlike.modal.body=
-### Missing: like.unlike.modal.closeButton=
-### Missing: like.unlike.modal.unlikeButton=
-### Missing: like.unlike.modal.viewLikersButton=
-### Missing: like.newlike.success=
-### Missing: like.newlike.error=
-### Missing: like.unlike.success=
-### Missing: like.unlike.error=
-### Missing: like.userprofile.menu=
-### Missing: like.toggle.hint.like=
-### Missing: like.toggle.hint.unlike=
-### Missing: like.toggle.hint.like.noright=
-### Missing: like.likers.link.zero=
-### Missing: like.likers.link.one=
-### Missing: like.likers.link.many=
-### Missing: like.likers.link.title=
-### Missing: like.likers.empty=
-### Missing: like.likers.number=
-### Missing: like.likers.title=
-### Missing: like.livetable.column.title=
-### Missing: like.livetable.column.location=
-### Missing: like.livetable.column.likes=
-### Missing: like.configuration.heading=
-### Missing: XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=
-### Missing: XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=
-### Missing: XWiki.Like.LikeConfigurationClass_cacheCapacity=
-### Missing: XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=
-### Missing: XWiki.Like.LikeConfigurationClass_enabled=
-### Missing: XWiki.Like.LikeConfigurationClass_enabled.hint=
+  <content>rightsmanager.like=Synes godt om
+like.unlike.modal.title=Bekræft, at du ikke længere synes godt om siden
+like.unlike.modal.body=Er du sikker på, at du vil fjerne din »synes godt om« fra siden {0}?
+like.unlike.modal.closeButton=Luk
+like.unlike.modal.unlikeButton=Synes ikke længere godt om siden
+like.unlike.modal.viewLikersButton=Synes godt om
+like.newlike.success=Du synes nu godt om siden.
+like.newlike.error=Der opstod en fejl, da du prøvede at synes godt om siden.
+like.unlike.success=Du synes ikke længere godt om siden.
+like.unlike.error=Der opstod en fejl, da du prøvede at fjerne din »synes godt om«.
+like.userprofile.menu=Sider, jeg synes godt om
+like.toggle.hint.like=Synes godt om siden.
+like.toggle.hint.unlike=Synes ikke længere godt om siden. Du synes godt om siden nu.
+like.toggle.hint.like.noright=Du kan ikke bruge Synes godt om på denne side.
+like.likers.link.zero={0} synes godt om
+like.likers.link.one={0} synes godt om
+like.likers.link.many={0} synes godt om
+like.likers.link.title=Antal, der synes godt om siden: {0}. Klik for at se, hvem der synes godt om siden.
+like.likers.empty=Ingen synes godt om siden endnu.
+like.likers.number={0} person(er) synes godt om siden:
+like.likers.title=Personer, der synes godt om {0}
+like.livetable.column.title=Titel
+like.livetable.column.location=Placering
+like.livetable.column.likes=Synes godt om
+like.configuration.heading=Indstillinger for Synes godt om
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Vis altid knappen Synes godt om
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Vis knappen, selv om brugeren ikke har rettigheder til at bruge den. Brug det, hvis tælleren altid skal vises.
+XWiki.Like.LikeConfigurationClass_cacheCapacity=Cachens kapacitet
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Antal oplysninger om »synes godt om«, der gemmes i cachen. Bemærk, at XWiki skal genstartes, før en ændring af indstillingen træder i kraft.
+XWiki.Like.LikeConfigurationClass_enabled=Slå funktionen Synes godt om til
+XWiki.Like.LikeConfigurationClass_enabled.hint=Hvis feltet ikke er markeret, slås funktionen Synes godt om fra, og oplysninger om den skjules.
 
 ###############################################################################
 ## Deprecated
@@ -79,9 +79,9 @@
 #######################################
 ## until 18.0.0RC1
 #######################################
-### Missing: like.button.title=
-### Missing: like.button.title.like=
-### Missing: like.button.title.unlike=
+like.button.title=Antal, der synes godt om siden: {0}
+like.button.title.like=Klik for at synes godt om siden. Antal, der synes godt om siden: {0}.
+like.button.title.unlike=Klik for ikke længere at synes godt om siden. Antal, der synes godt om siden: {0}.
 
 #@deprecatedend
 </content>

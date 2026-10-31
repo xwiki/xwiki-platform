@@ -39,41 +39,41 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: platform.flamingo.themes.home.title=
-### Missing: platform.flamingo.themes.home.currenttheme=
-### Missing: platform.flamingo.themes.home.otherthemes=
-### Missing: platform.flamingo.themes.home.warningOldColorThemeInstalled=
-### Missing: platform.flamingo.themes.home.warningCurrentOldColorTheme=
-### Missing: platform.flamingo.themes.home.useThisTheme=
-### Missing: platform.flamingo.themes.home.newThemeName=
-### Missing: platform.flamingo.themes.home.create=
-### Missing: platform.flamingo.themes.home.create.invalid=
-### Missing: platform.flamingo.themes.home.create.csrf=
-### Missing: platform.flamingo.themes.home.create.confirm=
-### Missing: platform.flamingo.themes.home.set.success=
-### Missing: platform.flamingo.themes.title.variables=
-### Missing: platform.flamingo.themes.title.preview=
-### Missing: platform.flamingo.themes.autorefresh=
-### Missing: platform.flamingo.themes.refresh=
-### Missing: platform.flamingo.themes.refreshwarning=
-### Missing: platform.flamingo.themes.preview.iframe.label=
-### Missing: platform.flamingo.themes.loading=
-### Missing: platform.flamingo.themes.category.logos=
-### Missing: platform.flamingo.themes.category.base-colors=
-### Missing: platform.flamingo.themes.category.typography=
-### Missing: platform.flamingo.themes.category.forms=
-### Missing: platform.flamingo.themes.category.buttons=
-### Missing: platform.flamingo.themes.category.tables=
-### Missing: platform.flamingo.themes.category.navbar=
-### Missing: platform.flamingo.themes.category.dropdowns=
-### Missing: platform.flamingo.themes.category.panels=
-### Missing: platform.flamingo.themes.category.breadcrumb=
-### Missing: platform.flamingo.themes.category.advanced=
-### Missing: platform.flamingo.themes.defaultvalue=
-### Missing: platform.flamingo.themes.lessCode.description=
-### Missing: platform.flamingo.themes.local=
-### Missing: platform.flamingo.themes.global=
-### Missing: FlamingoThemesCode.ThemeClass_logo-description_hint=
+  <content>platform.flamingo.themes.home.title=Temaer til Flamingo
+platform.flamingo.themes.home.currenttheme=Aktuelt tema
+platform.flamingo.themes.home.otherthemes=Andre tilgængelige temaer
+platform.flamingo.themes.home.warningOldColorThemeInstalled=Dette er programmet til at administrere Flamingo-temaer. Et Flamingo-tema er en tilpasselig variant af et skin, der bygger på Flamingo. Hvis du vil administrere farvetemaer til Colibri-baserede skins, skal du gå til {0}programmet til Colibri-farvetemaer{1}.
+platform.flamingo.themes.home.warningCurrentOldColorTheme=Det aktuelle tema er et Colibri-farvetema, som ikke er optimeret til et skin, der bygger på Flamingo. Vi har gjort vores bedste for at gøre det kompatibelt, men resultatet er måske ikke optimalt.
+platform.flamingo.themes.home.useThisTheme=Brug dette tema
+platform.flamingo.themes.home.newThemeName=Temanavn…
+platform.flamingo.themes.home.create=Opret nyt tema
+platform.flamingo.themes.home.create.invalid=Ugyldigt temanavn!
+platform.flamingo.themes.home.create.csrf=Af sikkerhedsgrunde skal du bekræfte, at du vil oprette et tema med navnet "{0}".
+platform.flamingo.themes.home.create.confirm=Bekræft
+platform.flamingo.themes.home.set.success=Temaet er sat til "{0}".
+platform.flamingo.themes.title.variables=Variabler
+platform.flamingo.themes.title.preview=Eksempel
+platform.flamingo.themes.autorefresh=Opdater automatisk
+platform.flamingo.themes.refresh=Opdater
+platform.flamingo.themes.refreshwarning=Opdateringen kan tage flere sekunder.
+platform.flamingo.themes.preview.iframe.label=Eksempel på farvetemaet.
+platform.flamingo.themes.loading=Indlæser...
+platform.flamingo.themes.category.logos=Logoer
+platform.flamingo.themes.category.base-colors=Grundfarver
+platform.flamingo.themes.category.typography=Typografi
+platform.flamingo.themes.category.forms=Formularer
+platform.flamingo.themes.category.buttons=Knapper
+platform.flamingo.themes.category.tables=Tabeller
+platform.flamingo.themes.category.navbar=Navigationslinje
+platform.flamingo.themes.category.dropdowns=Rullelister
+platform.flamingo.themes.category.panels=Paneler
+platform.flamingo.themes.category.breadcrumb=Brødkrummesti
+platform.flamingo.themes.category.advanced=Avanceret
+platform.flamingo.themes.defaultvalue=Standard
+platform.flamingo.themes.lessCode.description=I dette felt kan du skrive LESS-kode direkte, som føjes til skinnet.
+platform.flamingo.themes.local=Lokalt
+platform.flamingo.themes.global=Globalt
+FlamingoThemesCode.ThemeClass_logo-description_hint=Alternativ tekst til logoet. Den skal beskrive, hvad logoet betyder. Som standard bruges den oversatte værdi for nøglen "core.document.header.logo.image.text".
 
 ###############################################################################
 ## Deprecated
@@ -86,12 +86,12 @@
 #######################################
 ## until 7.3M1
 #######################################
-### Missing: platform.flamingo.themes.lessCode.warning=
+platform.flamingo.themes.lessCode.warning=Feltet medtages desværre ikke i det levende eksempel.
 
 #######################################
 ## until 12.9RC1
 #######################################
-### Missing: platform.flamingo.themes.incompatiblebrowser=
+platform.flamingo.themes.incompatiblebrowser=Eksemplet virker desværre ikke med denne version af Internet Explorer. Brug en nyere browser.
 
 #@deprecatedend
 </content>

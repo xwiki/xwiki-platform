@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: platform.whatsnew.drawer.text=
-### Missing: platform.whatsnew.title=
+  <content>platform.whatsnew.drawer.text=Nyheder
+platform.whatsnew.title=Nyt i XWiki
 </content>
 </xwikidoc>

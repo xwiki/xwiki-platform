@@ -32,12 +32,84 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Definitionslister</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Redigering =
+
+== Definitionslister ==
+
+=== 1.0 Definition Lists ===
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Standarddefinition|((({{{
+&lt;dl&gt;
+  &lt;dt&gt;begreb&lt;/dt&gt;
+  &lt;dd&gt;definition&lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|(((
+; begreb
+: definition
+)))
+|Indlejrede definitioner|((({{{
+&lt;dl&gt;
+  &lt;dt&gt;begreb 1&lt;/dt&gt;
+  &lt;dd&gt;definition 1
+    &lt;dl&gt;
+      &lt;dt&gt;begreb 2&lt;/dt&gt;
+      &lt;dd&gt;definition 2&lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|(((
+; begreb 1
+: definition 1
+:; begreb 2
+:: definition 2
+)))
+|Definition med parametre|((({{{
+&lt;dl style="color:blue"&gt;
+  &lt;dt&gt;begreb&lt;/dt&gt;
+  &lt;dd&gt;definition&lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|(((
+(% style="color:blue" %)
+; begreb
+: definition
+)))
+
+=== 2.0 Definition Lists ===
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Standarddefinition|((({{{
+; begreb
+: definition
+}}})))|(((
+; begreb
+: definition
+)))
+|Indlejrede definitioner|((({{{
+; begreb 1
+: definition 1
+:; begreb 2
+:: definition 2
+}}})))|(((
+; begreb 1
+: definition 1
+:; begreb 2
+:: definition 2
+)))
+|Definition med parametre|((({{{
+(% style="color:blue" %)
+; begreb
+: definition
+}}})))|(((
+(% style="color:blue" %)
+; begreb
+: definition
+)))</content>
 </xwikidoc>

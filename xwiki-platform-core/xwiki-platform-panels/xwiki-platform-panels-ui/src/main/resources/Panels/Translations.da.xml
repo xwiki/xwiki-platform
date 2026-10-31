@@ -36,25 +36,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: panels.available=
-### Missing: panels.name=
-### Missing: panels.description=
-### Missing: panels.type=
-### Missing: panels.category=
-### Missing: panels._actions=
+  <content>panels.available=Tilgængelige paneler
+panels.name=Navn
+panels.description=Beskrivelse
+panels.type=Type
+panels.category=Kategori
+panels._actions=Handlinger
 ### Missing: panels.emptyvalue=
-### Missing: panels.children.title=
-### Missing: panels.siblings.title=
-### Missing: panels.customize=
+panels.children.title=Undersider
+panels.siblings.title=Sider på samme niveau
+panels.customize=Du kan tilpasse sidekolonnerne med {0}
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
 ## Deprecated since 12.6.3, 12.9RC1
-### Missing: panels.documentInformation.configureSyntaxes=
-### Missing: panels.documentInformation.confirmChangeSyntaxWysiwyg=
-### Missing: panels.documentInformation.confirmChangeSyntax=
-### Missing: panels.documentInformation.failedSyntaxConversion=
+panels.documentInformation.configureSyntaxes=Konfigurer flere syntakser
+panels.documentInformation.confirmChangeSyntaxWysiwyg=Vil du også konvertere sidens indhold og objekter til den valgte syntaks? Hvis du vælger "Annuller", nulstilles syntaksen til den forrige, og der sker ikke andet. Bemærk, at hvis du vælger "OK", mister du ændringer, og siden gemmes automatisk. Du kan fortryde ændringen ved at gå til sidens historik og gendanne den seneste version.
+panels.documentInformation.confirmChangeSyntax=Vil du også konvertere sidens indhold og objekter til den valgte syntaks? Hvis du vælger "Annuller", ændres kun syntaksens id uden at ændre sidens indhold. Bemærk, at hvis du vælger "OK", gemmes siden automatisk. Du kan fortryde ændringen ved at gå til sidens historik og gendanne den seneste version.
+panels.documentInformation.failedSyntaxConversion=Konverteringen til den valgte syntaks mislykkedes. Hvis du vil bruge syntaksen alligevel, kan du vælge den igen og vælge ikke at konvertere.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

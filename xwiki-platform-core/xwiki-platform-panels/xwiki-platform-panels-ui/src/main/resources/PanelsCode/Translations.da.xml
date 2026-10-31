@@ -36,33 +36,33 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: platform.panels.applications.helper=
-### Missing: platform.panels.applications.displayedapps=
-### Missing: platform.panels.applications.blacklistedapps=
-### Missing: platform.panels.applications.save=
-### Missing: platform.panels.applications.revert=
-### Missing: platform.panels.applications.ajax.success=
-### Missing: platform.panels.applications.ajax.csrf=
-### Missing: platform.panels.applications.ajax.noright=
-### Missing: platform.panels.applications.ajax.error=
-### Missing: admin.panels.applications=
-### Missing: admin.panels.applications.description=
-### Missing: admin.panels.navigation=
-### Missing: admin.panels.navigation.description=
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions=
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions=
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=
-### Missing: platform.panels.navigation.configuration.excludedPages=
-### Missing: platform.panels.navigation.configuration.excludedPages.hint=
-### Missing: platform.panels.navigation.configuration.excludedPages.empty=
-### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=
-### Missing: platform.panels.navigation.configuration.topLevelApplicationPages=
-### Missing: platform.panels.navigation.configuration.otherPages=
-### Missing: platform.panels.navigation.configuration.saveComment=
+  <content>platform.panels.applications.helper=Her kan du vælge, hvilke programmer der vises i programbjælken (som standard til venstre). Nye programmer vises der automatisk. Hvis du vil fjerne nogle af dem, skal du blot trække ikonet fra det første felt til det andet. Du kan også ændre programmernes rækkefølge, som du vil. Husk at gemme dine ændringer!
+platform.panels.applications.displayedapps=Programmer i bjælken
+platform.panels.applications.blacklistedapps=Programmer, der ikke er i bjælken
+platform.panels.applications.save=Gem
+platform.panels.applications.revert=Nulstil
+platform.panels.applications.ajax.success=Konfigurationen er gemt.
+platform.panels.applications.ajax.csrf=CSRF-valideringen mislykkedes. Prøv at genindlæse siden.
+platform.panels.applications.ajax.noright=Du har ikke rettighed til at redigere PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.error=Dine ændringer kunne ikke gemmes.
+admin.panels.applications=Programpanel
+admin.panels.applications.description=Bestem, hvilke programmer der vises i programpanelet.
+admin.panels.navigation=Navigationspanel
+admin.panels.navigation.description=Bestem, hvilke sider der vises i navigationspanelet.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Udelad udvidelsers sider på øverste niveau
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Dette dynamiske filter fjerner de sider på øverste niveau, der hører til en installeret udvidelse, fra navigationstræet, hvis de ikke er beregnet til at blive ændret.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Udelad programmers sider på øverste niveau
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=Dette dynamiske filter fjerner de sider på øverste niveau, der hører til et program, som er lavet med App Within Minutes, fra navigationstræet.
+PanelsCode.NavigationConfigurationClass_exclusions=Udeladte
+PanelsCode.NavigationConfigurationClass_exclusions.hint=Listen over sider, der skal udelades af navigationstræet.
+PanelsCode.NavigationConfigurationClass_inclusions=Medtagne
+PanelsCode.NavigationConfigurationClass_inclusions.hint=Listen over sider, der skal medtages i navigationstræet, selv om et tidligere filter har udeladt dem.
+platform.panels.navigation.configuration.excludedPages=Udeladte sider
+platform.panels.navigation.configuration.excludedPages.hint=Træk og slip sider for at fjerne dem fra navigationstræet eller sætte dem tilbage.
+platform.panels.navigation.configuration.excludedPages.empty=Ingen
+platform.panels.navigation.configuration.topLevelExtensionPages=Udvidelsers sider på øverste niveau
+platform.panels.navigation.configuration.topLevelApplicationPages=Programmers sider på øverste niveau
+platform.panels.navigation.configuration.otherPages=Andre sider
+platform.panels.navigation.configuration.saveComment=Navigationspanelets konfiguration er opdateret fra administrationen
 </content>
 </xwikidoc>

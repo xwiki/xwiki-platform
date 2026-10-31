@@ -40,70 +40,70 @@
 # Default Class Sheet
 #
 
-### Missing: platform.xclass.defaultClassSheet.title=
-### Missing: platform.xclass.defaultClassSheet.description=
-### Missing: platform.xclass.defaultClassSheet.properties.heading=
-### Missing: platform.xclass.defaultClassSheet.properties.empty=
-### Missing: platform.xclass.defaultClassSheet.properties.edit=
-### Missing: platform.xclass.defaultClassSheet.createPage.heading=
-### Missing: platform.xclass.defaultClassSheet.createPage.pageAlreadyExists=
-### Missing: platform.xclass.defaultClassSheet.createPage.denied=
-### Missing: platform.xclass.defaultClassSheet.createPage.label=
-### Missing: platform.xclass.defaultClassSheet.pages.heading=
-### Missing: platform.xclass.defaultClassSheet.pages.description=
-### Missing: platform.xclass.defaultClassSheet.sheets.heading=
-### Missing: platform.xclass.defaultClassSheet.sheets.missing=
-### Missing: platform.xclass.defaultClassSheet.sheets.description=
-### Missing: platform.xclass.defaultClassSheet.sheets.create=
-### Missing: platform.xclass.defaultClassSheet.sheets.notBound=
-### Missing: platform.xclass.defaultClassSheet.sheets.bind=
-### Missing: platform.xclass.defaultClassSheet.sheets.view=
-### Missing: platform.xclass.defaultClassSheet.sheets.list=
-### Missing: platform.xclass.defaultClassSheet.template.heading=
-### Missing: platform.xclass.defaultClassSheet.template.description=
-### Missing: platform.xclass.defaultClassSheet.template.create=
-### Missing: platform.xclass.defaultClassSheet.template.missingObject=
-### Missing: platform.xclass.defaultClassSheet.template.addObject=
-### Missing: platform.xclass.defaultClassSheet.template.view=
-### Missing: platform.xclass.defaultClassSheet.templateProvider.heading=
-### Missing: platform.xclass.defaultClassSheet.templateProvider.description=
-### Missing: platform.xclass.defaultClassSheet.templateProvider.create=
-### Missing: platform.xclass.defaultClassSheet.templateProvider.view=
-### Missing: platform.xclass.templateProvider.defaultDescription=
+platform.xclass.defaultClassSheet.title=Standardvisningsside for klasser
+platform.xclass.defaultClassSheet.description=Du kan redigere denne side for at ændre, hvordan klasser vises som standard, eller kopiere den for at lave en tilpasset visning til en eller flere klasser.
+platform.xclass.defaultClassSheet.properties.heading=Klassens egenskaber
+platform.xclass.defaultClassSheet.properties.empty=Klassen har endnu ingen egenskaber. Du kan definere dem med {0}klasseeditoren{1}.
+platform.xclass.defaultClassSheet.properties.edit=Du kan tilføje eller ændre klassens egenskaber med {0}klasseeditoren{1}.
+platform.xclass.defaultClassSheet.createPage.heading=Opret en ny side
+platform.xclass.defaultClassSheet.createPage.pageAlreadyExists=Målsiden findes allerede. Vælg et andet navn, eller {0}se{1} den eksisterende side.
+platform.xclass.defaultClassSheet.createPage.denied=Du har ikke tilladelse til at oprette siden
+platform.xclass.defaultClassSheet.createPage.label=Opret siden
+platform.xclass.defaultClassSheet.pages.heading=Eksisterende sider
+platform.xclass.defaultClassSheet.pages.description=Følgende sider har objekter, der er beskrevet af denne klasse.
+platform.xclass.defaultClassSheet.sheets.heading=Visningssider for klassen
+platform.xclass.defaultClassSheet.sheets.missing=Før du kan bruge klassen, skal du oprette en visningsside og en skabelon til den. Følg vejledningen nedenfor.
+platform.xclass.defaultClassSheet.sheets.description=Med {0}visningssiden{1} kan du styre, hvordan sider af denne type vises. Du kan bruge standardvisningen, som viser alle tilgængelige felter, eller lave din egen. Du kan også vælge forskellige visninger til visnings- og redigeringstilstand.
+platform.xclass.defaultClassSheet.sheets.create=Opret visningssiden
+platform.xclass.defaultClassSheet.sheets.notBound=Visningssiden er ikke knyttet til klassen, så den anvendes ikke automatisk, når en side med et objekt af denne klasse vises.
+platform.xclass.defaultClassSheet.sheets.bind=Knyt visningssiden til klassen
+platform.xclass.defaultClassSheet.sheets.view=Se visningssiden ({0})
+platform.xclass.defaultClassSheet.sheets.list=Følgende visningssider er knyttet til denne klasse:
+platform.xclass.defaultClassSheet.template.heading=Klassens skabelon
+platform.xclass.defaultClassSheet.template.description={0}Skabelonen{1} er den side, der bruges som forlæg, når der oprettes en ny side af denne type. Den indeholder en forekomst af din {0}klasse{1}.
+platform.xclass.defaultClassSheet.template.create=Opret skabelonen
+platform.xclass.defaultClassSheet.template.missingObject=Skabelonen indeholder ikke et objekt af typen {0}.
+platform.xclass.defaultClassSheet.template.addObject=Føj et {0}-objekt til skabelonen
+platform.xclass.defaultClassSheet.template.view=Se skabelonsiden ({0})
+platform.xclass.defaultClassSheet.templateProvider.heading=Klassens skabelonudbyder
+platform.xclass.defaultClassSheet.templateProvider.description=Med {0}skabelonudbyderen{0} kan der oprettes wikisider ud fra en eksisterende skabelon. Skabelonen vises i menuen {0}Opret{0}.
+platform.xclass.defaultClassSheet.templateProvider.create=Opret skabelonudbyderen
+platform.xclass.defaultClassSheet.templateProvider.view=Se skabelonudbyderens side ({0})
+platform.xclass.templateProvider.defaultDescription=Tilføj en ny post af typen {0}.
 
 #
 # Default Object Sheet
 #
 
-### Missing: xclass.defaultObjectSheet.noProperties=
+xclass.defaultObjectSheet.noProperties=Ingen egenskaber
 
 #
 # Classes
 #
 
-### Missing: platform.xclass.classes.title=
-### Missing: platform.xclass.classes.description=
-### Missing: platform.xclass.classes.templates.heading=
-### Missing: platform.xclass.classes.templates.description=
-### Missing: platform.xclass.classes.templates.classSheet=
-### Missing: platform.xclass.classes.templates.classTemplate=
-### Missing: platform.xclass.classes.templates.objectSheet=
-### Missing: platform.xclass.classes.createClass.heading=
-### Missing: platform.xclass.classes.createClass.description=
-### Missing: platform.xclass.classes.createClass.denied=
-### Missing: platform.xclass.classes.createClass.title.hint=
-### Missing: platform.xclass.classes.createClass.title.placeholder=
-### Missing: platform.xclass.classes.createClass.location.hint=
-### Missing: platform.xclass.classes.createClass.parent.hint=
-### Missing: platform.xclass.classes.createClass.parent.placeholder=
-### Missing: platform.xclass.classes.createClass.name.hint=
-### Missing: platform.xclass.classes.createClass.label=
-### Missing: platform.xclass.classes.livetable.heading=
-### Missing: platform.xclass.classes.livetable.doc.title=
-### Missing: platform.xclass.classes.livetable.doc.location=
-### Missing: platform.xclass.classes.livetable.doc.date=
-### Missing: platform.xclass.classes.livetable.doc.author=
-### Missing: platform.xclass.classes.livetable.pageCount=
-### Missing: platform.xclass.classes.livetable._actions=
+platform.xclass.classes.title=Datatyper
+platform.xclass.classes.description=Med dette værktøj kan du definere strukturerede datatyper (klasser) i din wiki. Læs {0}udviklervejledningen{1} for at lære XWikis datamodel og de offentlige API''er at kende.
+platform.xclass.classes.templates.heading=Skabeloner til nye datatyper
+platform.xclass.classes.templates.description=Her er skabelonerne og visningssiderne til at oprette nye klasser:
+platform.xclass.classes.templates.classSheet=Standardkode til visning af en klasse
+platform.xclass.classes.templates.classTemplate=Sideskabelon til nye klasser
+platform.xclass.classes.templates.objectSheet=Standardkode til visning af klassens forekomster (objekter)
+platform.xclass.classes.createClass.heading=Opret en ny datatype
+platform.xclass.classes.createClass.description=Vælg en enkel titel, fx {0}Artikel{1}, {0}Bog{1} eller {0}Medarbejder{1}. ''{0}Class{1}'' tilføjes automatisk til sidst.
+platform.xclass.classes.createClass.denied=Du har ikke tilladelse til at oprette klassen
+platform.xclass.classes.createClass.title.hint=Titel på den nye klasse
+platform.xclass.classes.createClass.title.placeholder=Ny klasse
+platform.xclass.classes.createClass.location.hint=Placeringen i sidehierarkiet, hvor den nye klasse oprettes
+platform.xclass.classes.createClass.parent.hint=Den nye klasses overordnede side
+platform.xclass.classes.createClass.parent.placeholder=Sti.Til.Klasse
+platform.xclass.classes.createClass.name.hint=Navn på den nye klasse
+platform.xclass.classes.createClass.label=Opret klassen
+platform.xclass.classes.livetable.heading=Datatyper, der er defineret i denne wiki
+platform.xclass.classes.livetable.doc.title=Klasse
+platform.xclass.classes.livetable.doc.location=Placering
+platform.xclass.classes.livetable.doc.date=Dato
+platform.xclass.classes.livetable.doc.author=Seneste forfatter
+platform.xclass.classes.livetable.pageCount=Antal sider
+platform.xclass.classes.livetable._actions=Handlinger
 </content>
 </xwikidoc>

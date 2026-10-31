@@ -36,37 +36,37 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: XWiki.XWikiUsers_displayHiddenDocuments.hint=
-### Missing: XWiki.XWikiUsers_underline.hint=
-### Missing: XWiki.XWikiUsers_timezone.hint=
-### Missing: XWiki.XWikiUsers_editor.hint=
-### Missing: XWiki.XWikiUsers_usertype.hint=
-### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=
-### Missing: userprofile.default=
-### Missing: user.profile.groups.title=
-### Missing: user.profile.groups.description=
-### Missing: user.profile.groups.table.group=
-### Missing: platform.core.profile.category.groups=
-### Missing: user.profile.notifications=
-### Missing: user.profile.network.unfollow.question=
-### Missing: user.profile.network.unfollow.question.yes=
-### Missing: user.profile.network.unfollow.question.no=
-### Missing: user.profile.network.following=
-### Missing: user.profile.network.notfollowing=
-### Missing: user.profile.network.follow=
-### Missing: user.profile.network.unfollow=
-### Missing: user.profile.network.done=
-### Missing: user.profile.network.saving=
-### Missing: user.profile.network.error=
-### Missing: user.profile.status.done=
-### Missing: user.profile.status.saving=
-### Missing: user.profile.status.error=
+  <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Wikien indeholder sider, der ikke vises som standard. Disse skjulte sider er teknisk indhold som programklasser, konfigurationssider, makroer, typografier, scripts osv.
+XWiki.XWikiUsers_underline.hint=Vælg, om links skal være understreget.
+XWiki.XWikiUsers_timezone.hint=Brug en bestemt tidszone, så datoerne passer til din aktuelle placering.
+XWiki.XWikiUsers_editor.hint=Vælg, hvilken editor der skal være din standard. Den tilsidesætter den globale standardeditor. Hvis der ikke er valgt nogen, vælges en standardeditor afhængigt af, hvad der redigeres.
+XWiki.XWikiUsers_usertype.hint=Vælg, hvilken brugertype der skal være standard. Avancerede brugere har adgang til flere redigeringsfunktioner, oprettelse af slutsider osv.
+XWiki.XWikiUsers_extensionConflictSetup.hint=Angiv, om Udvidelseshåndtering skal bede dig bekræfte standardreglerne for løsning af konflikter (fx spørge dig, hvad der skal ske, hvis den side, der skal opgraderes, er fjernet fra wikien).
+userprofile.default=Standard
+user.profile.groups.title=Grupper
+user.profile.groups.description=Her er alle de grupper, din bruger er medlem af.
+user.profile.groups.table.group=Gruppe
+platform.core.profile.category.groups=Grupper
+user.profile.notifications=Notifikationer
+user.profile.network.unfollow.question=Er du sikker på, at du ikke længere vil følge denne bruger?
+user.profile.network.unfollow.question.yes=Ja, følg ikke længere
+user.profile.network.unfollow.question.no=Nej, annuller
+user.profile.network.following=Følger
+user.profile.network.notfollowing=Følger ikke
+user.profile.network.follow=Følg
+user.profile.network.unfollow=Følg ikke længere
+user.profile.network.done=Færdig
+user.profile.network.saving=Gemmer...
+user.profile.network.error=Notifikationsindstillingen kunne ikke gemmes
+user.profile.status.done=Færdig
+user.profile.status.saving=Gemmer...
+user.profile.status.error=Brugerstatus kunne ikke gemmes
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
 ## Deprecated since 16.3.0RC1
-### Missing: XWiki.XWikiUsers_accessibility.hint=
+XWiki.XWikiUsers_accessibility.hint=Ekstra tilgængelighed slår forskellige visuelle forbedringer til, fx større skrift og understregede links.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

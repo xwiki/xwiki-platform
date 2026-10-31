@@ -36,14 +36,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: admin.attachmentsrestriction=
-### Missing: attachment.validation.filesize.errorMessage=
-### Missing: attachment.validation.mimetype.errorMessage=
-### Missing: attachment.validation.mimetype.allowedMimetypes=
-### Missing: attachment.validation.mimetype.blockerMimetypes=
-### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes=
-### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes.hint=
-### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=
-### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=
+  <content>admin.attachmentsrestriction=Begrænsning af bilag
+attachment.validation.filesize.errorMessage=Filen {0} er for stor ({1}). Maksimal filstørrelse: {2}.
+attachment.validation.mimetype.errorMessage=Filen {0} har en ugyldig MIME-type {1}.
+attachment.validation.mimetype.allowedMimetypes=Tilladte MIME-typer: {0}
+attachment.validation.mimetype.blockerMimetypes=Blokerede MIME-typer: {0}
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes=Tilladte MIME-typer
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes.hint=Angiv listen over tilladte MIME-typer for bilag. Som standard er listen tom, men du kan angive en kommasepareret liste over tilladte MIME-typer. Bemærk, at jokertegnet (*) kan bruges til at acceptere enhver medietype. Når listen ikke er tom, afvises alle bilag med en MIME-type, der ikke står på listen. Hvis du fx kun vil acceptere almindelig tekst og alle slags billeder, kan du sætte listen til: text/plain,image/*
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=Blokerede MIME-typer 
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=Angiv listen over afviste MIME-typer for bilag. Som standard er listen tom, men du kan angive en kommasepareret liste over blokerede MIME-typer. Bemærk, at jokertegnet (*) kan bruges til at ramme enhver medietype. Når listen ikke er tom, afvises alle bilag med en af MIME-typerne på listen. Hvis du fx vil afvise almindelig tekst og alle slags billeder, kan du sætte listen til: text/plain,image/*
 </content>
 </xwikidoc>

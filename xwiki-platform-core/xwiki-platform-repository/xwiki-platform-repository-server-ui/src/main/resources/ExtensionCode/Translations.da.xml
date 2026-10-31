@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Navn
 extension.repository.summary=Resume
 extension.repository.type=Type
@@ -49,5 +49,35 @@ extension.repository.doc.date=Senest rettet
 ### Missing: extension.repository.installedCount=Installs
 
 ## Administration UI
-admin.repository=Udvidelsesdepot</content>
+admin.repository=Repository for udvidelser
+
+## Support
+repository.support.createsupporter=Registrer
+
+## Supporters
+repository.supporter.sheet.description=Denne side styrer, hvordan ExtensionSupporter-sider vises i både visnings- og redigeringstilstand.
+repository.supporter.sheet.noObject=Den aktuelle side har ikke det forventede ExtensionSupporter-objekt.
+repository.supporter.sheet.createplan=Tilføj
+repository.supporter.sheet.plans=Aftaler
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+ExtensionCode.ExtensionSupporterClass_doc.title=Navn
+ExtensionCode.ExtensionSupporterClass_summary=Resumé
+ExtensionCode.ExtensionSupporterClass_url=URL
+ExtensionCode.ExtensionSupporterClass_email=E-mail
+ExtensionCode.ExtensionSupporterClass_content=Detaljer
+ExtensionCode.ExtensionSupporterClass_active=Aktiv
+
+## Support plans
+repository.supportplan.sheet.description=Denne side styrer, hvordan ExtensionSupportPlan-sider vises i både visnings- og redigeringstilstand.
+repository.supportplan.sheet.noObject=Den aktuelle side har ikke det forventede ExtensionSupportPlan-objekt.
+repository.supportplan.sheet.supportedExtensions=Understøttede udvidelser
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+ExtensionCode.ExtensionSupportPlanClass_doc.title=Navn
+ExtensionCode.ExtensionSupportPlanClass_supporter=Supportleverandør
+ExtensionCode.ExtensionSupportPlanClass_summary=Resumé
+ExtensionCode.ExtensionSupportPlanClass_url=URL
+ExtensionCode.ExtensionSupportPlanClass_content=Detaljer
+ExtensionCode.ExtensionSupportPlanClass_active=Aktiv
+ExtensionCode.ExtensionSupportPlanClass_paying=Betalt
+</content>
 </xwikidoc>

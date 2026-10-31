@@ -32,12 +32,36 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: Tekstformatering</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Redigering =
+
+== Tekstformatering ==
+
+=== 1.0 Text Formatting ===
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Fed|{{{*fed*}}}|**fed**
+|Understreget|{{{__understreget___}}}|__understreget__
+|Kursiv|{{{~~kursiv~~}}}|//kursiv//
+|Gennemstreget|{{{--gennemstreget--}}}|--gennemstreget--
+|Fast bredde|&lt;tt&gt;fast bredde&lt;/tt&gt;|##fast bredde##
+|Hævet skrift|noget &lt;sup&gt;hævet&lt;/sup&gt;|noget ^^hævet^^
+|Sænket skrift|noget &lt;sub&gt;sænket&lt;/sub&gt;|noget ,,sænket,,
+
+=== 2.0 Text Formatting ===
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Fed|{{{**fed**}}}|**fed**
+|Understreget|{{{__understreget__}}}|__understreget__
+|Kursiv|{{{//kursiv//}}}|//kursiv//
+|Gennemstreget|{{{--gennemstreget--}}}|--gennemstreget--
+|Fast bredde|{{{##fast bredde##}}}|##fast bredde##
+|Hævet skrift|{{{noget ^^hævet^^}}}|noget ^^hævet^^
+|Sænket skrift|{{{noget ,,sænket,,}}}|noget ,,sænket,,</content>
 </xwikidoc>

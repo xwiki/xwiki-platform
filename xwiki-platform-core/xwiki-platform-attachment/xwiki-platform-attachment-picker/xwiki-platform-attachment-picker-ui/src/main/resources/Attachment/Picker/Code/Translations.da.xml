@@ -36,17 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: attachment.picker.wysiwyg.imageSelector.title=
-### Missing: attachment.picker.searchField.placeholder=
-### Missing: attachment.picker.searchField.scope.currentPage=
-### Missing: attachment.picker.searchField.scope.allPages=
+  <content>attachment.picker.wysiwyg.imageSelector.title=Galleri
+attachment.picker.searchField.placeholder=Søg...
+attachment.picker.searchField.scope.currentPage=Aktuel side
+attachment.picker.searchField.scope.allPages=Alle sider
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
 ## Deprecated since 18.2.0RC1
 #@deprecated attachment.picker.wysiwyg.imageSelector.title
-### Missing: attachment.picker.ckeditor.pluginsImageSelector.title=
+attachment.picker.ckeditor.pluginsImageSelector.title=Galleri
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

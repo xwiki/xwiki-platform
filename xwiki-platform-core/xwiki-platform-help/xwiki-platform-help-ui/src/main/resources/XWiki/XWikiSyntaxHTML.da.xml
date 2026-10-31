@@ -31,10 +31,27 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title></title>
+  <title>XWiki-syntaks: HTML</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content></content>
+  <content>= Programmering =
+
+== HTML ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 HTML ===
+
+{{info}}I XWiki Syntax 1.0 er det muligt at skrive HTML-opmærkning direkte i teksten.{{/info}}
+
+|=XWiki Syntax 1.0|=Resultat
+|&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}
+
+=== 2.0 HTML ===
+
+{{info}}I XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} skal HTML eller XHTML skrives med [[HTML-makroen&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/HTML%20Macro]].{{/info}}
+
+|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|{{{{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}} }}}|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}</content>
   </xwikidoc>

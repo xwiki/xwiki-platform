@@ -36,31 +36,31 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: captcha.jcaptcha=
-### Missing: captcha.jcaptcha.displayer.image.alt=
-### Missing: captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=
-### Missing: captcha.jcaptcha.displayer.audio.play=
-### Missing: captcha.jcaptcha.displayer.error.unsupportedType=
-### Missing: captcha.jcaptcha.displayer.refresh=
-### Missing: captcha.jcaptcha.displayer.answer.placeholder=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_hint=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_image=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_sound=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_type_text=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_engine=
-### Missing: XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=
-### Missing: captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=
-### Missing: captcha.jcaptcha.engine.custom=
-### Missing: captcha.jcaptcha.engine.custom.input=
+  <content>captcha.jcaptcha=JCaptcha
+captcha.jcaptcha.displayer.image.alt=Billede-CAPTCHA
+captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=Din browser understøtter ikke lydelementet.
+captcha.jcaptcha.displayer.audio.play=Lyt
+captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha er ikke konfigureret korrekt
+captcha.jcaptcha.displayer.refresh=Genindlæs
+captcha.jcaptcha.displayer.answer.placeholder=Svar
+XWiki.Captcha.JCaptcha.ConfigurationClass_type=Type
+XWiki.Captcha.JCaptcha.ConfigurationClass_type_hint=Den type CAPTCHA, der skal vises.
+XWiki.Captcha.JCaptcha.ConfigurationClass_type_image=Billede
+XWiki.Captcha.JCaptcha.ConfigurationClass_type_sound=Lyd
+XWiki.Captcha.JCaptcha.ConfigurationClass_type_text=Tekst
+XWiki.Captcha.JCaptcha.ConfigurationClass_engine=Motor
+XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=Den CaptchaEngine-implementering, der bruges til at vise den valgte type CAPTCHA.
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=Default Gimpy (Gmail)
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Simpel liste
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Non Linear Text Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=Hotmail
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Deformed Baffle List Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Baffle List Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
+captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
+captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Simpel liste
+captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simpel matematik
+captcha.jcaptcha.engine.custom=Brugerdefineret:
+captcha.jcaptcha.engine.custom.input=Brugerdefineret motor
 </content>
 </xwikidoc>

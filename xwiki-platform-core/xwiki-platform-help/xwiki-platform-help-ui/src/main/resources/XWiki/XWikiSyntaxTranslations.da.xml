@@ -39,10 +39,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: help.syntaxpage.title=
-### Missing: help.syntaxtitle=
-### Missing: help.syntaxall=
-### Missing: help.changesyntax=
-### Missing: help.choose_syntax=
+  <content>help.syntaxpage.title=Vejledning i XWiki-syntaks
+help.syntaxtitle=XWiki-syntaks {0}
+help.syntaxall=Alle
+help.changesyntax=Skift syntaks
+help.choose_syntax=Vælg syntaks
 </content>
 </xwikidoc>

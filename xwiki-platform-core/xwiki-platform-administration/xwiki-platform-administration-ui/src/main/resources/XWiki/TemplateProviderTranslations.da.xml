@@ -36,18 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: administration.templateProvider.description=
-### Missing: administration.templateProvider.description.hint=
-### Missing: administration.templateProvider.icon=
-### Missing: administration.templateProvider.icon.hint=
-### Missing: administration.templateProvider.creationRestrictions=
-### Missing: administration.templateProvider.creationRestrictions.hint=
-### Missing: administration.templateProvider.creationRestrictions.none=
-### Missing: administration.templateProvider.creationRestrictionsAreSuggestions=
-### Missing: administration.templateProvider.creationRestrictionsAreSuggestions.hint=
-### Missing: administration.templateProvider.creationRestrictions.add=
-### Missing: administration.templateProvider.creationRestrictions.remove=
-### Missing: administration.templateProvider.visibilityRestrictions.add=
-### Missing: administration.templateProvider.visibilityRestrictions.remove=
+  <content>administration.templateProvider.description=Beskrivelse
+administration.templateProvider.description.hint=De oplysninger om skabelonudbyderen, der vises, når en ny side oprettes.
+administration.templateProvider.icon=Ikon
+administration.templateProvider.icon.hint=Det ikon for skabelonudbyderen, der vises, når en ny side oprettes. Vælg et på {0}den fulde liste over ikoner{1}.
+administration.templateProvider.creationRestrictions=Begrænsninger for oprettelse
+administration.templateProvider.creationRestrictions.hint=Listen over placeringer (inkl. deres undersider), hvor skabelonen må oprette sider
+administration.templateProvider.creationRestrictions.none=Skabelonen kan oprette sider alle steder
+administration.templateProvider.creationRestrictionsAreSuggestions=Begrænsninger for oprettelse som forslag
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Lader brugeren vælge en hvilken som helst placering til siden, der oprettes med skabelonen. Den første begrænsning bruges som forudfyldt standardplacering, når skabelonen vælges på listen.
+administration.templateProvider.creationRestrictions.add=Tilføj begrænsning for oprettelse
+administration.templateProvider.creationRestrictions.remove=Fjern begrænsning for oprettelse
+administration.templateProvider.visibilityRestrictions.add=Tilføj begrænsning for synlighed
+administration.templateProvider.visibilityRestrictions.remove=Fjern begrænsning for synlighed
 </content>
 </xwikidoc>

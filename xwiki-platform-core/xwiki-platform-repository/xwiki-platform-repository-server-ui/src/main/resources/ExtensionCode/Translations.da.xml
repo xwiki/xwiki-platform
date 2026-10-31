@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Navn
 extension.repository.summary=Resume
 extension.repository.type=Type
@@ -49,5 +49,96 @@ extension.repository.doc.date=Senest rettet
 ### Missing: extension.repository.installedCount=Installs
 
 ## Administration UI
-admin.repository=Udvidelsesdepot</content>
+admin.repository=Repository for udvidelser
+
+## Support
+repository.support.createsupporter=Registrer
+
+## Supporters
+repository.supporter.sheet.description=Denne side styrer, hvordan ExtensionSupporter-sider vises i både visnings- og redigeringstilstand.
+repository.supporter.sheet.noObject=Den aktuelle side har ikke det forventede ExtensionSupporter-objekt.
+repository.supporter.sheet.createplan=Tilføj
+repository.supporter.sheet.plans=Aftaler
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+ExtensionCode.ExtensionSupporterClass_doc.title=Navn
+ExtensionCode.ExtensionSupporterClass_summary=Resumé
+ExtensionCode.ExtensionSupporterClass_url=URL
+ExtensionCode.ExtensionSupporterClass_email=E-mail
+ExtensionCode.ExtensionSupporterClass_content=Detaljer
+ExtensionCode.ExtensionSupporterClass_active=Aktiv
+
+## Support plans
+repository.supportplan.sheet.description=Denne side styrer, hvordan ExtensionSupportPlan-sider vises i både visnings- og redigeringstilstand.
+repository.supportplan.sheet.noObject=Den aktuelle side har ikke det forventede ExtensionSupportPlan-objekt.
+repository.supportplan.sheet.supportedExtensions=Understøttede udvidelser
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+ExtensionCode.ExtensionSupportPlanClass_doc.title=Navn
+ExtensionCode.ExtensionSupportPlanClass_supporter=Supportleverandør
+ExtensionCode.ExtensionSupportPlanClass_summary=Resumé
+ExtensionCode.ExtensionSupportPlanClass_url=URL
+ExtensionCode.ExtensionSupportPlanClass_content=Detaljer
+ExtensionCode.ExtensionSupportPlanClass_active=Aktiv
+ExtensionCode.ExtensionSupportPlanClass_paying=Betalt
+
+## Extension sheet
+repository.extension.sheet.name=Navn
+repository.extension.sheet.project=Projekt
+repository.extension.sheet.type=Type
+repository.extension.sheet.category=Kategori
+repository.extension.sheet.summary=Resumé
+repository.extension.sheet.authors=Forfattere
+repository.extension.sheet.rating=Bedømmelse
+repository.extension.sheet.title=Udvidelsesside
+repository.extension.sheet.imported=Udvidelsen er importeret fra et repository
+repository.extension.sheet.updateExtension=Opdater udvidelse
+repository.extension.sheet.developedBy=Udviklet af
+repository.extension.sheet.unknown=Ukendt
+repository.extension.sheet.support=Support
+repository.extension.sheet.activeInstalls=Aktive installationer
+repository.extension.sheet.license=Licens
+repository.extension.sheet.installable=Kan installeres med Udvidelseshåndtering
+repository.extension.sheet.documentation=Dokumentation
+repository.extension.sheet.sources=Kildekode
+repository.extension.sheet.issues=Fejl og ønsker
+repository.extension.sheet.download=Hent v{0}
+repository.extension.sheet.toc=Indholdsfortegnelse
+repository.extension.sheet.documentationHelp=Hjælp til dokumentation
+repository.extension.sheet.rulesIntro=Her er nogle regler, du skal følge, når du bidrager med en udvidelse:
+repository.extension.sheet.ruleSummary=Brug et kort resumé. Det vises i livetabellen over udvidelser og bør helst ikke fylde mere end én linje i tabellen.
+repository.extension.sheet.ruleImported=Når en udvidelse importeres, har alt fra kilden forrang for indholdet på siden. Sørg derfor for at sætte pom.xml eller det andet format, du importerer fra, korrekt op, eller slå automatisk opdatering fra, så du selv kan vælge, hvornår importerede oplysninger skal opdateres og ændres
+repository.extension.sheet.autoSync=Synkroniser udvidelsens oplysninger automatisk
+repository.extension.sheet.source=Kilde
+repository.extension.sheet.iconLocation=Placering af visningsikon
+repository.extension.sheet.iconLocationSyntax=Syntaks:
+repository.extension.sheet.iconLocationLinkText=ikonnavn
+repository.extension.sheet.showActiveInstalls=Vis aktive installationer
+repository.extension.sheet.supportPlans=Supportaftaler
+repository.extension.sheet.description=Beskrivelse
+repository.extension.sheet.prerequisites=Forudsætninger og installationsvejledning
+repository.extension.sheet.customInstallationOnly=Kun brugerdefineret installation
+repository.extension.sheet.standardInstallationInstructions=Standardvejledning til installation
+repository.extension.sheet.customInstallationInstructions=Vejledning til brugerdefineret installation
+repository.extension.sheet.versions=Versioner
+repository.extension.sheet.releaseNotes=Udgivelsesnoter
+repository.extension.sheet.dependencies=Afhængigheder
+repository.extension.sheet.dependenciesIntro=Afhængigheder for denne udvidelse ({0}):
+repository.extension.sheet.currentDownloads=Aktuelle filer til hentning
+repository.extension.sheet.addDownloads=Tilføj filer til hentning
+repository.extension.sheet.addDownloadsSaveFirst=Hvis du vil tilføje oplysninger om hentning for denne udvidelse, skal du først gemme siden og derefter redigere den igen.
+repository.extension.sheet.addDownloadsWarning=Hvis du har ændret noget i formularen, så gem siden, før du klikker på linkene nedenfor. Ellers mister du de oplysninger, du har indtastet.
+repository.extension.sheet.addDownloadsProcess=Der er endnu ikke en god brugerflade til at tilføje nye versioner til hentning eller redigere eksisterende, så indtil videre foregår det i to trin:
+## Sentences that contain a link keep the whole sentence in a single key (so translators stay free
+## to reorder words and reposition the link). The link markup boundaries ([[ and &gt;&gt;target]]) are
+## passed as parameters {0}/{1} built by the sheet (trusted code) following the standard XWiki
+## pattern, and any untrusted data injected into the markup is escaped by the sheet.
+repository.extension.sheet.addDownloadsAttach=Hvis du leverer en ny fil til hentning, så {0}vedhæft den nye version til denne side som bilag{1}, og vend tilbage til siden. Sørg for, at versionen står i filnavnet (fx ubercoolmacro-1.0.xar).
+repository.extension.sheet.addDownloadsInfo=Tilføj oplysninger om hentning for det nye bilag ved at udfylde en ny {0}Extension Version{1}. Sørg for at udfylde dataene, især versionen og linket til bilaget. Du kan linke til et bilag med {2}.
+repository.extension.sheet.currentDependencies=Aktuelle afhængigheder
+repository.extension.sheet.addDependencies=Tilføj afhængigheder
+repository.extension.sheet.addDependenciesIntro=Du kan også knytte afhængigheder til hver version ved at udfylde følgende oplysninger i en ny {0}Dependency{1}:
+repository.extension.sheet.addDependenciesVersion=Udvidelsesversion er den version, som afhængigheden er knyttet til
+repository.extension.sheet.addDependenciesId=Afhængighedens id er id'et for den udvidelse, der er afhængighed, i det repository, hvor den ligger
+repository.extension.sheet.addDependenciesConstraint=Versionsbetingelsen for afhængigheden er oplysningerne om dens version. Det kan være en version (fx 1.0) eller et eller flere versionsintervaller i Mavens standardsyntaks (fx [1.0,), som betyder mindst 1.0)
+repository.extension.sheet.wrongObject=Denne visningsside skal anvendes på en side, der indeholder et ExtensionCode.ExtensionClass-objekt
+</content>
 </xwikidoc>

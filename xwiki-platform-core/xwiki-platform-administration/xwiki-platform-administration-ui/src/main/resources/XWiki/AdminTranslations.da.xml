@@ -1,0 +1,206 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.AdminTranslations" locale="da">
+  <web>XWiki</web>
+  <name>AdminTranslations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>AdminTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>administration.title=Administration
+administration.title.page=Administration af side
+administration.title.wiki=Administration af wiki
+administration.title.global=Global administration
+administration.sectionTitle=Administration: {0}
+administration.sectionTitle.page=Administration af side: {0}
+administration.sectionTitle.wiki=Administration af wiki: {0}
+administration.sectionTitle.global=Global administration: {0}
+administration.menu.label=Administrationens afsnit.
+administration.menu.search.hint=Søg efter...
+administration.menu.search.noResults=Ingen resultater.
+
+# Registration Section
+XWiki.XWikiPreferences_use_email_verification.hint=Hvis feltet er sat til "Ja", sendes der en e-mail til den e-mailadresse, der er angivet i registreringsformularen.
+XWiki.XWikiPreferences_validation_email_content.hint=Den e-mailskabelon, der sendes til brugere for at bekræfte deres e-mailadresse.
+XWiki.XWikiPreferences_confirmation_email_content.hint=Skabelonen for den e-mail, der sendes, når brugeren har bekræftet sin konto ved at klikke på bekræftelseslinket i den første e-mail.
+XWiki.XWikiPreferences_invitation_email_content.hint=Den e-mailskabelon, der sendes til brugere, som er inviteret til at registrere sig.
+XWiki.Registration_heading.hint=Linjen øverst på siden, som vises for personer, der er ved at registrere sig, og for personer, der lige har registreret sig. Du kan bruge Velocity og wikisyntaks.
+XWiki.Registration_welcomeMessage.hint=Vises kun, mens personen udfylder formularen. Du kan bruge Velocity og wikisyntaks.
+XWiki.Registration_loginButton_enabled.hint=Når brugeren har registreret sig, vises en knap, der sender brugernavnet og adgangskoden til login-handlingen, så brugeren bliver logget på med det samme. Det betyder dog, at brugernavnet og adgangskoden sendes tilbage i HTML-koden, hvilket kan være uacceptabelt afhængigt af jeres sikkerhedskrav.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Hvis login-knappen er slået til, kan et stykke JavaScript trykke på knappen for brugeren.
+XWiki.Registration_defaultRedirect.hint=Den URL, som brugeren omdirigeres til efter at have trykket på login-knappen, hvis parameteren xredirect ikke er angivet. Du kan bruge Velocity-kode.
+XWiki.Registration_requireCaptcha.hint=Sæt til true for at kræve, at brugeren løser en CAPTCHA for at kunne registrere sig.
+XWiki.Registration_registrationSuccessMessage.hint=Vises for brugeren, når registreringen er gennemført. Du kan bruge Velocity og wikisyntaks.
+XWiki.Registration_passwordLength.hint=Adgangskodens minimumslængde. En længere adgangskode er mere sikker; det anbefales at bruge mere end 6 tegn.
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=Hvis feltet er markeret, skal brugeren vælge en adgangskode med mindst ét lille bogstav.
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=Hvis feltet er markeret, skal brugeren vælge en adgangskode med mindst ét stort bogstav.
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=Hvis feltet er markeret, skal brugeren vælge en adgangskode med mindst ét tal.
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Hvis feltet er markeret, skal brugeren vælge en adgangskode med mindst ét specialtegn.
+
+# Look &amp; Feel Sections
+admin.themes=Temaer
+admin.themes.description=Tilpas farve- og ikontemaer, skin og logo.
+admin.colorthemes.local=Lokale
+admin.colorthemes.global=Globale
+XWiki.XWikiPreferences_showannotations.hint=Vis afsnittet med annoteringer i sidelayoutet.
+XWiki.XWikiPreferences_showcomments.hint=Vis afsnittet med kommentarer i sidelayoutet.
+XWiki.XWikiPreferences_showattachments.hint=Vis afsnittet med bilag i sidelayoutet.
+XWiki.XWikiPreferences_showhistory.hint=Vis afsnittet med historik i sidelayoutet.
+XWiki.XWikiPreferences_showinformation.hint=Vis afsnittet med oplysninger i sidelayoutet.
+XWiki.XWikiPreferences_title.hint=Angiv formatet for sidetitlen, som browseren viser den.
+XWiki.XWikiPreferences_meta.hint=Angiver de metadata, der medtages i HTML-headeren på hver side, herunder sidens beskrivelse, forfatter og nøgleord. Standardskabelonen meta.vm bruges, når feltet er tomt. Brug #template('meta.vm') som en del af feltets indhold for at få gavn af fremtidige forbedringer af standarddefinitionen.
+XWiki.XWikiPreferences_webcopyright.hint=Angiv de oplysninger, der vises i sidefodens afsnit om ophavsret.
+XWiki.XWikiPreferences_version.hint=Angiv de oplysninger, der vises i sidefodens afsnit om version.
+XWiki.XWikiPreferences_skin.hint=Angiv det skin, der bruges som standard. Det kan være et skin i filsystemet, fx "flamingo", eller et skin på en side, fx "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_iconTheme.hint=Angiv det ikontema, der bruges som standard.
+XWiki.XWikiPreferences_colorTheme.hint=Angiv det farvetema, der bruges som standard.
+
+# Editing Sections
+admin.edit=Redigering
+admin.edit.description=Konfigurer redigeringstilstanden, WYSIWYG-editoren og de tilgængelige syntakser.
+admin.title=Titel
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Forhindr brugerne i at oprette wikisider uden titel.
+XWiki.XWikiPreferences_editor.hint=Vælg, hvilken editor der som standard bruges til at redigere sidens indhold.
+XWiki.XWikiPreferences_editcomment.hint=Tillad, at der skrives en besked, når der oprettes en ny version af en side.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=Ved hver ændring gemmes siden først, når der er skrevet en versionsbeskrivelse.
+XWiki.XWikiPreferences_minoredit.hint=Tillad, at sider har større (x.1) og mindre (1.x) versioner. De mindre versioner kan ses med knappen "Vis mindre rettelser" i sidens historik.
+admin.wysiwyg.description=Vælg standard-WYSIWYG-editoren, og konfigurer den.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Den opmærkningssyntaks, der som standard bruges til sidens indhold, når der oprettes en ny wikiside.
+
+# Localization Section
+XWiki.XWikiPreferences_multilingual.hint=Slå flersproget tilstand til, hvis din wiki har indhold på flere sprog. Så kan brugerne oversætte wikisiderne og se brugerfladen på det sprog, de foretrækker.
+XWiki.XWikiPreferences_languages.hint=Vælg de sprog, der skal være tilgængelige i brugerfladen. Brugerne kan oversætte wikiens sider til alle disse sprog (hvis flersproget tilstand er slået til).
+XWiki.XWikiPreferences_default_language.hint=Vælg wikiens standardsprog
+XWiki.XWikiPreferences_dateformat.hint=Angiv det format, datoer vises i (fx sidens oprettelsesdato)
+XWiki.XWikiPreferences_timezone.hint=Angiv tidszonen for datoer globalt
+
+# Import Section
+administration.section.import.hint=Start med at overføre en ny pakke, eller vælg en på listen over tilgængelige pakker. Indholdet af den valgte pakke vises til højre sammen med importindstillingerne.
+
+# Export Section
+administration.section.export.pages=Sider
+administration.section.export.pages.all=Alle sider
+administration.section.export.withHistory.hint=Medtag sidehistorikken i eksporten. Ellers eksporteres kun den nyeste version af en side.
+administration.section.export.targetXWikiVersion=XWiki-version for målet
+administration.section.export.targetXWikiVersion.hint=Den version af XWiki, som du vil importere siderne i. Din nuværende version er {0}.
+administration.section.export.targetXWikiVersion.12plus=12.0 og nyere
+administration.section.export.targetXWikiVersion.below12=Ældre end 12.0
+administration.section.export.packageName.hint=Det filnavn, der bruges, når arkivet med de eksporterede wikisider dannes.
+administration.section.export.moreOptions=Flere indstillinger
+administration.section.export.lessOptions=Færre indstillinger
+administration.section.export.description.hint=Pakkens beskrivelse, som vises, når pakken importeres.
+administration.section.export.author.hint=Pakkens forfatter, som vises, når pakken importeres.
+administration.section.export.licence.hint=Indholdets licens, fx LGPL, GPLV2 osv.
+administration.section.export.version.hint=Pakkens version, som gemmes i pakkens beskrivelsesfil.
+administration.section.export.backupPack.hint=Bevar sidens forfatter, når siderne importeres. Indstillingen påvirker ikke det eksporterede indhold og kan ændres før importen.
+
+# Users Section
+administration.section.users.enableUser.inProgress=Aktiverer brugerkontoen...
+administration.section.users.enableUser.done=Brugerkontoen er aktiveret
+administration.section.users.enableUser.failed=Brugerkontoen kunne ikke aktiveres
+administration.section.users.disableUser.inProgress=Deaktiverer brugerkontoen...
+administration.section.users.disableUser.done=Brugerkontoen er deaktiveret
+administration.section.users.disableUser.failed=Brugerkontoen kunne ikke deaktiveres
+administration.section.users.deleteUser.confirmationMessage=Brugeren {0} bliver slettet og fjernet fra alle de {1}grupper{2}, vedkommende var med i. Er du sikker på, at du vil fortsætte?
+administration.section.users.deleteUser.programmingRightsWarning=Den bruger, du er ved at slette, har programmeringsrettigheder og er seneste forfatter til {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Hvis {1,choice,1#siden|1&lt;siderne} indeholder scripts, der kræver programmeringsrettigheder, holder disse scripts op med at virke, hvis du sletter brugeren uden at erstatte forfatteren.
+administration.section.users.deleteUser.scriptRightsWarning=Den bruger, du er ved at slette, har scriptrettigheder og er seneste forfatter til {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Scripts på {1,choice,1#siden|1&lt;siderne} kan holde op med at virke, hvis du sletter brugeren uden at erstatte forfatteren.
+administration.section.users.deleteUser.newAuthor=Ny forfatter
+administration.section.users.deleteUser.newAuthor.hint=Vælg en bruger med {0}rettigheder, eller lad feltet stå tomt, hvis du ikke vil erstatte forfatteren.
+administration.section.users.deleteUser.newAuthor.error=Den valgte bruger har ikke {0}rettigheder!
+administration.section.users.deleteUser.newAuthor.programming=programmerings
+administration.section.users.deleteUser.newAuthor.script=script
+admin.usersgroups.extensionrights=Udvidelsesrettigheder
+admin.usersgroups.extensionrights.space=Udvidelsesrettigheder: Side og undersider
+admin.usersgroups.extensionrights.page=Udvidelsesrettigheder: Side
+
+# Groups section
+administration.section.groups.deleteUserFromGroup.loading=Fjerner medlem fra gruppen
+administration.section.groups.deleteUserFromGroup.success=Medlemmet er fjernet fra gruppen
+administration.section.groups.deleteUserFromGroup.failure=Medlemmet kunne ikke fjernes fra gruppen
+
+# Rights for page section
+administration.section.pagerights.hint=Disse rettigheder gælder kun for denne side. De gælder ikke {0}undersiderne{1}.
+
+# Rights for page and children section
+administration.section.pageandchildrenrights.hint=Disse rettigheder gælder for denne side og {0}alle dens undersider{1}.
+
+# Other Category
+admin.other=Andet
+admin.other.description=Forskellige indstillinger for udvidelser.
+administration.section.analytics.status=Status
+administration.section.analytics.status.hint=Bestem, om sporingen i Google Analytics™ er slået til
+
+# Social category
+admin.social=Socialt
+admin.social.description=Indstillinger for sociale funktioner.
+
+# Network category
+admin.network=Netværk
+admin.network.description=Netværksrelaterede funktioner.
+
+# Configurable Class
+XWiki.ConfigurableClass_displayInSection=Vis i sektion
+XWiki.ConfigurableClass_heading=Overskrift
+XWiki.ConfigurableClass_configurationClass=Konfigurationsklasse
+XWiki.ConfigurableClass_linkPrefix=Linkpræfiks
+XWiki.ConfigurableClass_propertiesToShow=Egenskaber, der skal vises
+XWiki.ConfigurableClass_codeToExecute=Kode, der skal udføres
+XWiki.ConfigurableClass_iconAttachment=Bilag med ikon
+XWiki.ConfigurableClass_displayInCategory=Vis i kategori
+XWiki.ConfigurableClass_displayBeforeCategory=Vis før kategori
+XWiki.ConfigurableClass_categoryIcon=Kategoriikon
+XWiki.ConfigurableClass_scope=Omfang
+XWiki.ConfigurableClass_scope_WIKI=Wiki
+XWiki.ConfigurableClass_scope_SPACE=Aktuelt område
+XWiki.ConfigurableClass_scope_ALL_SPACES=Alle områder
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki og alle områder
+XWiki.ConfigurableClass_sectionOrder=Sektionsrækkefølge
+
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+XWiki.XWikiPreferences_auth_active_check.hint=Hvis feltet er sat til "Ja", kan brugerne ikke logge på uden at indtaste den kode, der tidligere er sendt pr. e-mail.
+administration.section.users.deleteUser.markInactiveMessage=I stedet for at slette brugeren kan du markere vedkommendes profil som inaktiv. Så kan brugeren ikke logge på, og adgangsrettighederne til de scripts, brugeren har skrevet, bevares.
+
+## Deprecated since 11.8RC1
+administration.section.users.deleteUser.markDisabledMessage=I stedet for at slette brugeren kan du markere vedkommendes profil som deaktiveret. Så kan brugeren ikke logge på, og adgangsrettighederne til de scripts, brugeren har skrevet, bevares.
+
+## Deprecated since 15.10RC1
+XWiki.Registration_liveValidation_enabled.hint=Sæt til false for at slå JavaScript-koden til validering undervejs fra (felterne valideres stadig på serveren).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Validering undervejs viser en meddelelse, der fortæller brugeren, at feltet er udfyldt korrekt. Dette er den meddelelse, der vises, hvis den ikke er tilsidesat for et bestemt felt. Du kan bruge Velocity-kode.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

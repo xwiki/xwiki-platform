@@ -1,0 +1,98 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="da">
+  <web>FlamingoThemesCode</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>FlamingoThemesCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.flamingo.themes.home.title=Temaer til Flamingo
+platform.flamingo.themes.home.currenttheme=Aktuelt tema
+platform.flamingo.themes.home.otherthemes=Andre tilgængelige temaer
+platform.flamingo.themes.home.warningOldColorThemeInstalled=Dette er programmet til at administrere Flamingo-temaer. Et Flamingo-tema er en tilpasselig variant af et skin, der bygger på Flamingo. Hvis du vil administrere farvetemaer til Colibri-baserede skins, skal du gå til {0}programmet til Colibri-farvetemaer{1}.
+platform.flamingo.themes.home.warningCurrentOldColorTheme=Det aktuelle tema er et Colibri-farvetema, som ikke er optimeret til et skin, der bygger på Flamingo. Vi har gjort vores bedste for at gøre det kompatibelt, men resultatet er måske ikke optimalt.
+platform.flamingo.themes.home.useThisTheme=Brug dette tema
+platform.flamingo.themes.home.newThemeName=Temanavn…
+platform.flamingo.themes.home.create=Opret nyt tema
+platform.flamingo.themes.home.create.invalid=Ugyldigt temanavn!
+platform.flamingo.themes.home.create.csrf=Af sikkerhedsgrunde skal du bekræfte, at du vil oprette et tema med navnet "{0}".
+platform.flamingo.themes.home.create.confirm=Bekræft
+platform.flamingo.themes.home.set.success=Temaet er sat til "{0}".
+platform.flamingo.themes.title.variables=Variabler
+platform.flamingo.themes.title.preview=Eksempel
+platform.flamingo.themes.autorefresh=Opdater automatisk
+platform.flamingo.themes.refresh=Opdater
+platform.flamingo.themes.refreshwarning=Opdateringen kan tage flere sekunder.
+platform.flamingo.themes.preview.iframe.label=Eksempel på farvetemaet.
+platform.flamingo.themes.loading=Indlæser...
+platform.flamingo.themes.category.logos=Logoer
+platform.flamingo.themes.category.base-colors=Grundfarver
+platform.flamingo.themes.category.typography=Typografi
+platform.flamingo.themes.category.forms=Formularer
+platform.flamingo.themes.category.buttons=Knapper
+platform.flamingo.themes.category.tables=Tabeller
+platform.flamingo.themes.category.navbar=Navigationslinje
+platform.flamingo.themes.category.dropdowns=Rullelister
+platform.flamingo.themes.category.panels=Paneler
+platform.flamingo.themes.category.breadcrumb=Brødkrummesti
+platform.flamingo.themes.category.advanced=Avanceret
+platform.flamingo.themes.defaultvalue=Standard
+platform.flamingo.themes.lessCode.description=I dette felt kan du skrive LESS-kode direkte, som føjes til skinnet.
+platform.flamingo.themes.local=Lokalt
+platform.flamingo.themes.global=Globalt
+FlamingoThemesCode.ThemeClass_logo-description_hint=Alternativ tekst til logoet. Den skal beskrive, hvad logoet betyder. Som standard bruges den oversatte værdi for nøglen "core.document.header.logo.image.text".
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
+platform.flamingo.themes.lessCode.warning=Feltet medtages desværre ikke i det levende eksempel.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=Eksemplet virker desværre ikke med denne version af Internet Explorer. Brug en nyere browser.
+
+#@deprecatedend
+</content>
+</xwikidoc>

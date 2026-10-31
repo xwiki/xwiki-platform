@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="PanelsCode.Translations" locale="da">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.panels.applications.helper=Her kan du vælge, hvilke programmer der vises i programbjælken (som standard til venstre). Nye programmer vises der automatisk. Hvis du vil fjerne nogle af dem, skal du blot trække ikonet fra det første felt til det andet. Du kan også ændre programmernes rækkefølge, som du vil. Husk at gemme dine ændringer!
+platform.panels.applications.displayedapps=Programmer i bjælken
+platform.panels.applications.blacklistedapps=Programmer, der ikke er i bjælken
+platform.panels.applications.save=Gem
+platform.panels.applications.revert=Nulstil
+platform.panels.applications.ajax.success=Konfigurationen er gemt.
+platform.panels.applications.ajax.csrf=CSRF-valideringen mislykkedes. Prøv at genindlæse siden.
+platform.panels.applications.ajax.noright=Du har ikke rettighed til at redigere PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.error=Dine ændringer kunne ikke gemmes.
+admin.panels.applications=Programpanel
+admin.panels.applications.description=Bestem, hvilke programmer der vises i programpanelet.
+admin.panels.navigation=Navigationspanel
+admin.panels.navigation.description=Bestem, hvilke sider der vises i navigationspanelet.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Udelad udvidelsers sider på øverste niveau
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Dette dynamiske filter fjerner de sider på øverste niveau, der hører til en installeret udvidelse, fra navigationstræet, hvis de ikke er beregnet til at blive ændret.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Udelad programmers sider på øverste niveau
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=Dette dynamiske filter fjerner de sider på øverste niveau, der hører til et program, som er lavet med App Within Minutes, fra navigationstræet.
+PanelsCode.NavigationConfigurationClass_exclusions=Udeladte
+PanelsCode.NavigationConfigurationClass_exclusions.hint=Listen over sider, der skal udelades af navigationstræet.
+PanelsCode.NavigationConfigurationClass_inclusions=Medtagne
+PanelsCode.NavigationConfigurationClass_inclusions.hint=Listen over sider, der skal medtages i navigationstræet, selv om et tidligere filter har udeladt dem.
+platform.panels.navigation.configuration.excludedPages=Udeladte sider
+platform.panels.navigation.configuration.excludedPages.hint=Træk og slip sider for at fjerne dem fra navigationstræet eller sætte dem tilbage.
+platform.panels.navigation.configuration.excludedPages.empty=Ingen
+platform.panels.navigation.configuration.topLevelExtensionPages=Udvidelsers sider på øverste niveau
+platform.panels.navigation.configuration.topLevelApplicationPages=Programmers sider på øverste niveau
+platform.panels.navigation.configuration.otherPages=Andre sider
+platform.panels.navigation.configuration.saveComment=Navigationspanelets konfiguration er opdateret fra administrationen
+</content>
+</xwikidoc>

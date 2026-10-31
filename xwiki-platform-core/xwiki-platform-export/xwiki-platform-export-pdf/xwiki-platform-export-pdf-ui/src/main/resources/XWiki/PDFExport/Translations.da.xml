@@ -1,0 +1,113 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.Translations" locale="da">
+  <web>XWiki.PDFExport</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>export.pdf.options.template=Skabelon
+export.pdf.options.template.hint=PDF-skabelonen bestemmer, hvilke oplysninger der vises på forsiden, i indholdsfortegnelsen og i sidehovedet og sidefoden på hver side.
+export.pdf.options.loadFailure=Indstillingerne for PDF-eksport kunne ikke indlæses.
+export.pdf.hint=Eksportér som PDF (Portable Document Format) med webbrowseren
+export.pdf.modal.close=Luk
+export.pdf.inProgress=Eksporterer som PDF...
+export.pdf.failed=Eksporten som PDF mislykkedes
+export.pdf.lastError=Loggen for PDF-eksporten indeholder fejl: {0}
+export.pdf.canceling=Annullerer PDF-eksporten...
+export.pdf.canceled=PDF-eksporten er annulleret
+export.pdf.cancelFailed=PDF-eksporten kunne ikke annulleres
+export.pdf.loading=Indlæser...
+export.pdf.pageReadyTimeout=Tidsgrænsen blev overskredet, mens der blev ventet på, at websiden var klar til udskrift.
+export.pdf.templates.default=Standardskabelon
+export.pdf.templates.default.versionInfo=Version {0} oprettet af {1} den {2}
+export.pdf.template.name=PDF-skabelon
+export.pdf.template.hint=Skabelon, der bruges til PDF-eksport
+export.pdf.template.provider=Udbyder af PDF-skabeloner
+export.pdf.template.skinExtensionInfo=CSS- og JavaScript-skinudvidelserne på denne side er også en del af PDF-skabelonen og indlæses derfor automatisk, når PDF-skabelonen bruges.
+admin.export.pdf=PDF-eksport
+admin.export.pdf.description=Konfigurer, hvordan wikisider eksporteres til PDF.
+export.pdf.admin.status=Status
+export.pdf.admin.configuration=Konfiguration
+export.pdf.admin.saveComment=Konfigurationen af PDF-eksporten er opdateret fra administrationen
+export.pdf.admin.reset=Nulstil
+export.pdf.admin.reset.hint=Gendan standardkonfigurationen
+export.pdf.admin.reset.confirmation=Er du sikker på, at du vil gendanne standardkonfigurationen? Alle dine ændringer går tabt.
+export.pdf.config.default=(standard)
+export.pdf.config.empty=(tom)
+export.pdf.generator.label=Generator
+export.pdf.generator.hint=Det værktøj, der laver PDF-filen.
+export.pdf.generator.checking=Kontrollerer, om PDF-generatoren er tilgængelig...
+export.pdf.generator.checkFailed=Det kunne ikke kontrolleres, om PDF-generatoren er tilgængelig.
+export.pdf.generator.available=Tilgængelig
+export.pdf.generator.unavailable=PDF-generatoren er ikke tilgængelig lige nu.
+export.pdf.generator.userBrowser.label=Brugerens browser
+export.pdf.generator.userBrowser.hint=PDF-filen laves hos brugeren med udskriftsfunktionen i brugerens egen webbrowser.
+export.pdf.generator.chromeDockerContainer.label=Chrome i Docker-container
+export.pdf.generator.chromeDockerContainer.hint=PDF-filen laves på serveren med en headless Chrome-webbrowser, der kører i en Docker-container på samme server som XWiki.
+export.pdf.generator.remoteChrome.label=Ekstern Chrome
+export.pdf.generator.remoteChrome.hint=PDF-filen laves på serveren med en ekstern Chrome-webbrowser, der kan køre på en anden server end XWiki.
+XWiki.PDFExport.TemplateClass_cover=Forside
+XWiki.PDFExport.TemplateClass_cover.hint=De oplysninger, der vises på første side, fx titlen og forfatteren
+XWiki.PDFExport.TemplateClass_toc=Indholdsfortegnelse
+XWiki.PDFExport.TemplateClass_toc.hint=Viser som regel overskrifterne i indholdet med deres sidetal.
+XWiki.PDFExport.TemplateClass_header=Sidehoved
+XWiki.PDFExport.TemplateClass_header.hint=De oplysninger, der vises øverst på hver side undtagen forsiden, fx titlen
+XWiki.PDFExport.TemplateClass_footer=Sidefod
+XWiki.PDFExport.TemplateClass_footer.hint=De oplysninger, der vises nederst på hver side undtagen forsiden, fx sidetallet
+XWiki.PDFExport.TemplateClass_metadata=Metadata
+XWiki.PDFExport.TemplateClass_metadata.hint=Det script, der køres for hver wikiside i PDF-eksporten for at danne de metadata, der vises i PDF-filens sidehoved eller sidefod. Metadataene angives med en særlig binding ved navn metadata, hvis værdi er en Map&lt;String, String&gt;. Metadataene ender i HTML-koden som attributter på den overskrift, der viser titlen på hver wikiside.
+XWiki.PDFExport.ConfigurationClass_templates=Skabeloner
+XWiki.PDFExport.ConfigurationClass_templates.hint=Listen over de PDF-skabeloner, brugeren kan vælge imellem, når wikisider eksporteres til PDF.
+XWiki.PDFExport.ConfigurationClass_serverSide=På serveren
+XWiki.PDFExport.ConfigurationClass_serverSide.hint=Om PDF-eksporten skal foregå på serveren, fx med en headless Chrome-webbrowser i en Docker-container, eller hos brugeren med brugerens webbrowser.
+XWiki.PDFExport.ConfigurationClass_chromeHost=Chrome-vært
+XWiki.PDFExport.ConfigurationClass_chromeHost.hint=Den vært, der kører den headless Chrome-webbrowser, angivet med navn eller IP-adresse.
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort=Port til fjernfejlfinding i Chrome
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort.hint=Det portnummer, der bruges til at kommunikere med den headless Chrome-webbrowser.
+XWiki.PDFExport.ConfigurationClass_xwikiURI=XWiki-URI
+XWiki.PDFExport.ConfigurationClass_xwikiURI.hint=Den basis-URI, som den headless Chrome-browser skal bruge for at få adgang til XWiki-installationen (fx siden med udskriftseksempel). Eksempler: localhost, localhost:9293, http://localhost, https://localhost:8080
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage=Docker-image til Chrome
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage.hint=Det Docker-image, der bruges til at oprette Docker-containeren med den headless Chrome-webbrowser.
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName=Navn på Chromes Docker-container
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName.hint=Navnet på den Docker-container, der kører den headless Chrome-webbrowser. Det er især nyttigt, når en eksisterende container genbruges.
+XWiki.PDFExport.ConfigurationClass_dockerNetwork=Docker-netværk
+XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=Navnet eller id'et på det Docker-netværk, som Chromes Docker-container skal føjes til. Det er nyttigt, når XWiki selv kører i en Docker-container, og Chrome-containeren skal være i samme netværk, så de kan kommunikere.
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout=Tidsgrænse for klar side
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=Antal sekunder, der ventes på, at websiden er klar til udskrift, før tidsgrænsen overskrides.
+XWiki.PDFExport.ConfigurationClass_maxContentSize=Maksimal indholdsstørrelse
+XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=Den maksimale størrelse på indholdet i kilobyte (KB), der kan medtages i én PDF-eksport. Brug 0 for at fjerne grænsen.
+XWiki.PDFExport.ConfigurationClass_replaceFOP=Erstat FOP
+XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Erstat den gamle PDF-eksport, der bygger på Apache Formatting Objects Processor (FOP).
+</content>
+</xwikidoc>

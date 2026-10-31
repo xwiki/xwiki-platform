@@ -1,0 +1,74 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.UserProfileTranslations" locale="da">
+  <web>XWiki</web>
+  <name>UserProfileTranslations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>User Profile Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Wikien indeholder sider, der ikke vises som standard. Disse skjulte sider er teknisk indhold som programklasser, konfigurationssider, makroer, typografier, scripts osv.
+XWiki.XWikiUsers_underline.hint=Vælg, om links skal være understreget.
+XWiki.XWikiUsers_timezone.hint=Brug en bestemt tidszone, så datoerne passer til din aktuelle placering.
+XWiki.XWikiUsers_editor.hint=Vælg, hvilken editor der skal være din standard. Den tilsidesætter den globale standardeditor. Hvis der ikke er valgt nogen, vælges en standardeditor afhængigt af, hvad der redigeres.
+XWiki.XWikiUsers_usertype.hint=Vælg, hvilken brugertype der skal være standard. Avancerede brugere har adgang til flere redigeringsfunktioner, oprettelse af slutsider osv.
+XWiki.XWikiUsers_extensionConflictSetup.hint=Angiv, om Udvidelseshåndtering skal bede dig bekræfte standardreglerne for løsning af konflikter (fx spørge dig, hvad der skal ske, hvis den side, der skal opgraderes, er fjernet fra wikien).
+userprofile.default=Standard
+user.profile.groups.title=Grupper
+user.profile.groups.description=Her er alle de grupper, din bruger er medlem af.
+user.profile.groups.table.group=Gruppe
+platform.core.profile.category.groups=Grupper
+user.profile.notifications=Notifikationer
+user.profile.network.unfollow.question=Er du sikker på, at du ikke længere vil følge denne bruger?
+user.profile.network.unfollow.question.yes=Ja, følg ikke længere
+user.profile.network.unfollow.question.no=Nej, annuller
+user.profile.network.following=Følger
+user.profile.network.notfollowing=Følger ikke
+user.profile.network.follow=Følg
+user.profile.network.unfollow=Følg ikke længere
+user.profile.network.done=Færdig
+user.profile.network.saving=Gemmer...
+user.profile.network.error=Notifikationsindstillingen kunne ikke gemmes
+user.profile.status.done=Færdig
+user.profile.status.saving=Gemmer...
+user.profile.status.error=Brugerstatus kunne ikke gemmes
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 16.3.0RC1
+XWiki.XWikiUsers_accessibility.hint=Ekstra tilgængelighed slår forskellige visuelle forbedringer til, fx større skrift og understregede links.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

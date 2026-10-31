@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="Tour.HomepageTour.Translations" locale="da">
+  <web>Tour.HomepageTour</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Tour.HomepageTour.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## Homepage Tour (by steps order)
+tour.homepageTour.welcome.title=Velkommen til XWiki
+tour.homepageTour.welcome.content=I løbet af de næste par minutter lærer du din wikis brugerflade og grundlæggende funktioner at kende.
+tour.homepageTour.panels.title=Paneler
+tour.homepageTour.panels.contentA=Med panelerne har du adgang til din wikis programmer og sider.
+tour.homepageTour.panels.contentB=Administratorer kan tilpasse dem og bestemme, hvilke paneler der vises.
+tour.homepageTour.breadcrumbs.title=Brødkrummesti
+tour.homepageTour.breadcrumbs.contentA=Brødkrummestien viser, hvor din side ligger, og lader dig navigere i hierarkiet.
+tour.homepageTour.breadcrumbs.contentB=Knappen {0} fører dig altid til wikiens forside.
+tour.homepageTour.pageContent.title=Sidens indhold
+tour.homepageTour.pageContent.contentA=Her vises indholdet af den aktuelle side.
+tour.homepageTour.pageContent.contentB=Rediger siden for at tilføje tabeller, lister, makroer og struktur, så du kan organisere din viden.
+tour.homepageTour.pageMenu.title=Sidemenu
+tour.homepageTour.pageMenu.contentA=Menuen indeholder handlinger for siden. Med de rette rettigheder kan du redigere, oprette, følge sider og meget mere.
+tour.homepageTour.pageMenu.contentB=Knappen {0} viser flere handlinger som Administrer, Kopiér/Flyt/Omdøb/Slet, Eksportér, Udskriv, Annotér og Del.
+tour.homepageTour.pageTabs.title=Sidens faner
+tour.homepageTour.pageTabs.contentA=Kommentarer er en god måde for brugerne at diskutere sidens indhold på.
+tour.homepageTour.pageTabs.contentB=Du kan også vedhæfte filer, sammenligne sideversioner eller se oplysninger om siden.
+tour.homepageTour.header.title=Sidehoved
+tour.homepageTour.header.contentA=Du kan søge efter indhold, se dine notifikationer eller gå til din brugerprofil.
+tour.homepageTour.header.contentB=Knappen {0} åbner en skuffe med handlinger for wikien som Administration og Indekser.
+tour.homepageTour.tourComplete.title=Rundvisningen er færdig
+tour.homepageTour.tourComplete.contentA=Hermed er rundvisningen i XWikis brugerflade og grundlæggende funktioner færdig.
+tour.homepageTour.tourComplete.contentB=Du kan læse mere om de enkelte funktioner i {0}dokumentationen{1}.
+</content>
+</xwikidoc>

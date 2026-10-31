@@ -37,61 +37,61 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Class fields
-### Missing: Menu.MenuClass_content1=
+Menu.MenuClass_content1=Menustruktur
 
 # Live table generic keys
-### Missing: menu.livetable.doc.title=
-### Missing: menu.livetable.doc.name=
-### Missing: menu.livetable.doc.location=
-### Missing: menu.livetable.doc.space=
-### Missing: menu.livetable.doc.fullname=
-### Missing: menu.livetable.doc.author=
-### Missing: menu.livetable.doc.creator=
-### Missing: menu.livetable.doc.date=
-### Missing: menu.livetable.doc.creationDate=
-### Missing: menu.livetable._avatar=
-### Missing: menu.livetable._images=
-### Missing: menu.livetable._attachments=
-### Missing: menu.livetable._actions=
-### Missing: menu.livetable._actions.edit=
-### Missing: menu.livetable._actions.delete=
-### Missing: menu.livetable.emptyvalue=
+menu.livetable.doc.title=Sidetitel
+menu.livetable.doc.name=Sidenavn
+menu.livetable.doc.location=Placering
+menu.livetable.doc.space=Område
+menu.livetable.doc.fullname=Sidens fulde navn
+menu.livetable.doc.author=Seneste forfatter
+menu.livetable.doc.creator=Oprettet af
+menu.livetable.doc.date=Opdateringsdato
+menu.livetable.doc.creationDate=Oprettelsesdato
+menu.livetable._avatar=Avatar
+menu.livetable._images=Billeder
+menu.livetable._attachments=Bilag
+menu.livetable._actions=Handlinger
+menu.livetable._actions.edit=Rediger
+menu.livetable._actions.delete=Slet
+menu.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: menu.livetable.content1=
+menu.livetable.content1=Menustruktur
 
 # Administration keys
-### Missing: admin.menu.name=
+admin.menu.name=Menuer
 
 # UIX keys
-### Missing: menu.uix.extensionPoint.label=
-### Missing: menu.uix.extensionPoint.hint=
-### Missing: menu.uix.extensionPoint.value.nowhere=
-### Missing: menu.uix.extensionPoint.value.template.header.after=
-### Missing: menu.uix.extensionPoint.value.panels.rightPanels=
-### Missing: menu.uix.extensionPoint.value.panels.leftPanels=
-### Missing: menu.uix.content.label=
-### Missing: menu.uix.content.hint=
-### Missing: menu.uix.scope.label=
-### Missing: menu.uix.scope.hint=
+menu.uix.extensionPoint.label=Menuens placering
+menu.uix.extensionPoint.hint=Angiver, hvor menuen vises. Menuen vises enten vandret eller lodret afhængigt af den valgte placering.
+menu.uix.extensionPoint.value.nowhere=Ingen steder
+menu.uix.extensionPoint.value.template.header.after=Efter sidehovedet
+menu.uix.extensionPoint.value.panels.rightPanels=I et højre panel
+menu.uix.extensionPoint.value.panels.leftPanels=I et venstre panel
+menu.uix.content.label=Indhold i UI-udvidelsen
+menu.uix.content.hint=Hvis du kan se dette, er JavaScript sandsynligvis slået fra. Vælg samme værdi som for menuens placering.
+menu.uix.scope.label=Menuens synlighed
+menu.uix.scope.hint=Angiver, i hvilken sammenhæng menuen er synlig.
 
 # Menu Macro
-### Missing: rendering.macro.menu.name=
-### Missing: rendering.macro.menu.description=
-### Missing: rendering.macro.menu.parameter.id.name=
-### Missing: rendering.macro.menu.parameter.id.description=
-### Missing: rendering.macro.menu.parameter.label.name=
-### Missing: rendering.macro.menu.parameter.label.description=
-### Missing: rendering.macro.menu.parameter.type.name=
-### Missing: rendering.macro.menu.parameter.type.description=
-### Missing: rendering.macro.menu.content.description=
+rendering.macro.menu.name=Menu
+rendering.macro.menu.description=Viser en menu, der er lavet med enkel wikisyntaks (indlejrede lister og links).
+rendering.macro.menu.parameter.id.name=Id
+rendering.macro.menu.parameter.id.description=Valgfrit id for menuen, som sættes på det HTML-element, der omslutter menuen. Du kan bruge id'et i JavaScript-kode til at få adgang til menuens DOM eller i funktionelle tests til at kontrollere menupunkterne.
+rendering.macro.menu.parameter.label.name=Etiket
+rendering.macro.menu.parameter.label.description=Valgfri etiket, der beskriver menuens indhold. Især vigtig for hjælpemidler og menuens tilgængelighed.
+rendering.macro.menu.parameter.type.name=Type
+rendering.macro.menu.parameter.type.description=Den valgfrie menutype bestemmer menuens udseende og opførsel. De understøttede værdier er: horizontal (standardværdi) og vertical.
+rendering.macro.menu.content.description=Definer menustrukturen med wikisyntaks. Hvert menupunkt skal være et listepunkt og indeholde menupunktets etiket eller link. Du kan bruge indlejrede lister til undermenupunkter.
 
 # Menu UI
-### Missing: menu.ui.openSubMenu=
-### Missing: menu.ui.closeSubMenu=
-### Missing: menu.ui.horizontal.toggler.description=
+menu.ui.openSubMenu=Åbn undermenuen.
+menu.ui.closeSubMenu=Luk undermenuen.
+menu.ui.horizontal.toggler.description=Vis eller skjul den vandrette menu.
 
 # Menu WebHome
-### Missing: menu.description=
+menu.description=Et enkelt program, der hjælper dig med at lave navigationsmenuer, som vises enten vandret som en bjælke efter sidehovedet eller lodret i et sidepanel.
 </content>
 </xwikidoc>

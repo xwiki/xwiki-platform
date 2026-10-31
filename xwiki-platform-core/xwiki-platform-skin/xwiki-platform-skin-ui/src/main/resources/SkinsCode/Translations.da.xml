@@ -36,20 +36,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>skin.sheet.title=Skin
-skin.sheet.properties=Skinnets egenskaber
-skin.sheet.properties.logo.warning=Logoet tilsidesættes som regel af logoet i farvetemaet. Hvis du vil ændre wikiens logo, så rediger hellere det aktuelle farvetema.
+  <content>skin.sheet.title=Tema
+skin.sheet.properties=Temaets egenskaber
+skin.sheet.properties.logo.warning=Logoet tilsidesættes som regel af logoet i farveskemaet. Hvis du vil ændre wikiens logo, så rediger hellere det aktuelle farveskema.
 skin.sheet.deprecatedProperties=Forældede egenskaber
 skin.sheet.overriddenTemplates=Tilsidesatte skabeloner
 skin.sheet.addTemplate=Tilføj en ny skabelon, der tilsidesætter
 skin.sheet.add=Tilføj
-skin.sheet.overrideTemplateWarning=Her kan du tilsidesætte en skabelon i skinnet. Det er teknisk, og du bør kende konsekvenserne.
+skin.sheet.overrideTemplateWarning=Her kan du tilsidesætte en skabelon i temaet. Det er teknisk, og du bør kende konsekvenserne.
 skin.sheet.deprecatedPropertiesWarning=Dette afsnit findes af hensyn til bagudkompatibilitet. Brug mekanismen med tilsidesatte skabeloner ovenfor.
 skin.sheet.nojs=Uden JavaScript kan du ikke bruge dette afsnit. Du kan i stedet bruge {0}objekteditoren{1} og tilføje {2}-objekter manuelt.
 skin.sheet.js.deleting=Sletter...
 skin.sheet.js.deletingDone=Skabelonen er slettet!
 skin.sheet.js.error.csrf=CSRF-valideringen mislykkedes under gemningen. Opdater browseren, og prøv igen.
-skin.sheet.js.error.rights=Skinnene kunne ikke gemmes på grund af manglende rettigheder.
+skin.sheet.js.error.rights=Temaerne kunne ikke gemmes på grund af manglende rettigheder.
 skin.sheet.js.deleteConfirmationText=Er du sikker på, at du vil slette denne skabelon?
 skin.sheet.js.deleteConfirmationYes=Ja, slet den
 skin.sheet.js.deleteConfirmationNo=Nej, annuller

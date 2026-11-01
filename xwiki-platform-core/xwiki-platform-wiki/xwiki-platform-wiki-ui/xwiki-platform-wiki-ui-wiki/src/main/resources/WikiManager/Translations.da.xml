@@ -123,14 +123,14 @@ platform.wiki.currentwiki.prop.secure.hint=Hvis aktiv vil alle wikiens eksterne 
 platform.wiki.currentwiki.invite.username.hint=Navn på bruger, der skal inviteres til wikien.
 platform.wiki.currentwiki.invite.message.hint=Besked til brugeren.
 platform.wiki.currentwiki.candidates.hint=Brugere som har anmodet om eller er inviteret til medlemskab i wikien.
-### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
+platform.wiki.currentwiki.candidates.empty=Ingen brugere har anmodet om eller er blevet inviteret til medlemskab af wikien.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Håndter indstillinger, såsom wiki navn, beskrivelse og medlemsskaber.
 admin.xwiki.workspaceusers.description=Håndter medlemskaber\: tilføj, fjern, invitér, godkend eller afvis wiki-medlemmer.
 admin.xwiki.usersconfiguration.title=Konfiguration
 admin.xwiki.members.title=Nuværende medlemmer
-### Missing: admin.xwiki.users.title=All Users
+admin.xwiki.users.title=Alle brugere
 
 # DRAWER ITEM
 ### Missing: platform.wiki.drawer.homeWiki=Home

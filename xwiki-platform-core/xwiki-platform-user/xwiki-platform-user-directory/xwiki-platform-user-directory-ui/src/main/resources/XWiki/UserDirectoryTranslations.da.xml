@@ -40,7 +40,7 @@
 XWiki.UserDirectoryPreferencesClass_columns_hint=Listen over kolonner, svarende til egenskaber i brugerklassen, der vises i brugerkataloget
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Skjul deaktiverede brugerprofiler
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Udelad brugere med deaktiveret profil fra brugerkataloget
-userdirectory.userScopeFilter=Brugere:
+userdirectory.userScopeFilter=Brugerområde:
 userdirectory.userScopeFilter.hint=Vælg, hvilken kategori af brugere du vil se.
 userdirectory.userScopeFilter.local=Lokale brugere
 userdirectory.userScopeFilter.global=Globale brugere, der er medlemmer af denne wiki

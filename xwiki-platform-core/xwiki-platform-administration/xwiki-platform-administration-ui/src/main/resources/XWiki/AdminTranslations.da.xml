@@ -36,161 +36,161 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: administration.title=Administration
-### Missing: administration.title.page=Page Administration
-### Missing: administration.title.wiki=Wiki Administration
-### Missing: administration.title.global=Global Administration
-### Missing: administration.sectionTitle=Administration: {0}
-### Missing: administration.sectionTitle.page=Page Administration: {0}
-### Missing: administration.sectionTitle.wiki=Wiki Administration: {0}
-### Missing: administration.sectionTitle.global=Global Administration: {0}
-### Missing: administration.menu.label=Administration sections.
-### Missing: administration.menu.search.hint=Search for...
-### Missing: administration.menu.search.noResults=No results.
+  <content>administration.title=Administration
+administration.title.page=Administration af side
+administration.title.wiki=Administration af wiki
+administration.title.global=Global administration
+administration.sectionTitle=Administration: {0}
+administration.sectionTitle.page=Administration af side: {0}
+administration.sectionTitle.wiki=Administration af wiki: {0}
+administration.sectionTitle.global=Global administration: {0}
+administration.menu.label=Administrationens afsnit.
+administration.menu.search.hint=Søg efter...
+administration.menu.search.noResults=Ingen resultater.
 
 # Registration Section
-### Missing: XWiki.XWikiPreferences_use_email_verification.hint=If set to "Yes" then an email will be sent to the email address provided when filling the registration form.
-### Missing: XWiki.XWikiPreferences_validation_email_content.hint=The email template that will be send to users in order to validate their email address.
-### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
-### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
-### Missing: XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
-### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
-### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
-### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
-### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
-### Missing: XWiki.Registration_requireCaptcha.hint=Set this true to require the user to solve a CAPTCHA in order to register.
-### Missing: XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
-### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
-### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
-### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
-### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
-### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
+XWiki.XWikiPreferences_use_email_verification.hint=Hvis feltet er sat til "Ja", sendes der en e-mail til den e-mailadresse, der er angivet i registreringsformularen.
+XWiki.XWikiPreferences_validation_email_content.hint=Den e-mailskabelon, der sendes til brugere for at bekræfte deres e-mailadresse.
+XWiki.XWikiPreferences_confirmation_email_content.hint=Skabelonen for den e-mail, der sendes, når brugeren har bekræftet sin konto ved at klikke på bekræftelseslinket i den første e-mail.
+XWiki.XWikiPreferences_invitation_email_content.hint=Den e-mailskabelon, der sendes til brugere, som er inviteret til at registrere sig.
+XWiki.Registration_heading.hint=Linjen øverst på siden, som vises for personer, der er ved at registrere sig, og for personer, der lige har registreret sig. Du kan bruge Velocity og wikisyntaks.
+XWiki.Registration_welcomeMessage.hint=Vises kun, mens personen udfylder formularen. Du kan bruge Velocity og wikisyntaks.
+XWiki.Registration_loginButton_enabled.hint=Når brugeren har registreret sig, vises en knap, der sender brugernavnet og adgangskoden til login-handlingen, så brugeren bliver logget på med det samme. Det betyder dog, at brugernavnet og adgangskoden sendes tilbage i HTML-koden, hvilket kan være uacceptabelt afhængigt af jeres sikkerhedskrav.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Hvis login-knappen er slået til, kan et stykke JavaScript trykke på knappen for brugeren.
+XWiki.Registration_defaultRedirect.hint=Den URL, som brugeren omdirigeres til efter at have trykket på login-knappen, hvis parameteren xredirect ikke er angivet. Du kan bruge Velocity-kode.
+XWiki.Registration_requireCaptcha.hint=Sæt til true for at kræve, at brugeren løser en CAPTCHA for at kunne registrere sig.
+XWiki.Registration_registrationSuccessMessage.hint=Vises for brugeren, når registreringen er gennemført. Du kan bruge Velocity og wikisyntaks.
+XWiki.Registration_passwordLength.hint=Adgangskodens minimumslængde. En længere adgangskode er mere sikker; det anbefales at bruge mere end 6 tegn.
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=Hvis feltet er markeret, skal brugeren vælge en adgangskode med mindst ét lille bogstav.
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=Hvis feltet er markeret, skal brugeren vælge en adgangskode med mindst ét stort bogstav.
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=Hvis feltet er markeret, skal brugeren vælge en adgangskode med mindst ét tal.
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Hvis feltet er markeret, skal brugeren vælge en adgangskode med mindst ét specialtegn.
 
 # Look &amp; Feel Sections
-### Missing: admin.themes=Themes
-### Missing: admin.themes.description=Customize the color and icon themes, skin and logo.
-### Missing: admin.colorthemes.local=Local
-### Missing: admin.colorthemes.global=Global
-### Missing: XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.
-### Missing: XWiki.XWikiPreferences_showcomments.hint=Display the comments section in the page layout.
-### Missing: XWiki.XWikiPreferences_showattachments.hint=Display the attachments section in the page layout.
-### Missing: XWiki.XWikiPreferences_showhistory.hint=Display the history section in the page layout.
-### Missing: XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
-### Missing: XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.
-### Missing: XWiki.XWikiPreferences_meta.hint=Specifies the metadata that is included in the HTML header of each page, including the page description, author, and keywords. The default meta.vm template is used when the meta field is blank. Use #template('meta.vm') as part of the field content to benefit from future enhancements to the default meta definition.
+admin.themes=Temaer
+admin.themes.description=Tilpas farveskemaer, ikontemaer, tema og logo.
+admin.colorthemes.local=Lokale
+admin.colorthemes.global=Globale
+XWiki.XWikiPreferences_showannotations.hint=Vis afsnittet med annoteringer i sidelayoutet.
+XWiki.XWikiPreferences_showcomments.hint=Vis afsnittet med kommentarer i sidelayoutet.
+XWiki.XWikiPreferences_showattachments.hint=Vis afsnittet med bilag i sidelayoutet.
+XWiki.XWikiPreferences_showhistory.hint=Vis afsnittet med historik i sidelayoutet.
+XWiki.XWikiPreferences_showinformation.hint=Vis afsnittet med oplysninger i sidelayoutet.
+XWiki.XWikiPreferences_title.hint=Angiv formatet for sidetitlen, som browseren viser den.
+XWiki.XWikiPreferences_meta.hint=Angiver de metadata, der medtages i HTML-headeren på hver side, herunder sidens beskrivelse, forfatter og nøgleord. Standardskabelonen meta.vm bruges, når feltet er tomt. Brug #template('meta.vm') som en del af feltets indhold for at få gavn af fremtidige forbedringer af standarddefinitionen.
 XWiki.XWikiPreferences_webcopyright.hint=Angiv de oplysninger, der vises i sidefodens afsnit om ophavsret.
 XWiki.XWikiPreferences_version.hint=Angiv de oplysninger, der vises i sidefodens afsnit om version.
-### Missing: XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
-### Missing: XWiki.XWikiPreferences_iconTheme.hint=Specify the icon theme to use by default.
-### Missing: XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
+XWiki.XWikiPreferences_skin.hint=Angiv det tema, der bruges som standard. Det kan være et tema i filsystemet, fx "flamingo", eller et tema på en side, fx "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_iconTheme.hint=Angiv det ikontema, der bruges som standard.
+XWiki.XWikiPreferences_colorTheme.hint=Angiv det farveskema, der bruges som standard.
 
 # Editing Sections
-### Missing: admin.edit=Editing
-### Missing: admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
-### Missing: admin.title=Title
-### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.
-### Missing: XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.
-### Missing: XWiki.XWikiPreferences_editcomment.hint=Allow entering a message when creating a new page version.
-### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
-### Missing: XWiki.XWikiPreferences_minoredit.hint=Allow pages to have major (x.1) and minor (1.x) versions. The minor versions can be seen using the "Show Minor Edits" button from the page History.
-### Missing: admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
-### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
+admin.edit=Redigering
+admin.edit.description=Konfigurer redigeringstilstanden, WYSIWYG-editoren og de tilgængelige syntakser.
+admin.title=Titel
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Forhindr brugerne i at oprette wikisider uden titel.
+XWiki.XWikiPreferences_editor.hint=Vælg, hvilken editor der som standard bruges til at redigere sidens indhold.
+XWiki.XWikiPreferences_editcomment.hint=Tillad, at der skrives en besked, når der oprettes en ny version af en side.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=Ved hver ændring gemmes siden først, når der er skrevet en versionsbeskrivelse.
+XWiki.XWikiPreferences_minoredit.hint=Tillad, at sider har større (x.1) og mindre (1.x) versioner. De mindre versioner kan ses med knappen "Vis mindre rettelser" i sidens historik.
+admin.wysiwyg.description=Vælg standard-WYSIWYG-editoren, og konfigurer den.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Den opmærkningssyntaks, der som standard bruges til sidens indhold, når der oprettes en ny wikiside.
 
 # Localization Section
-### Missing: XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
-### Missing: XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
-### Missing: XWiki.XWikiPreferences_default_language.hint=Select the default language of the wiki
-### Missing: XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
-### Missing: XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates
+XWiki.XWikiPreferences_multilingual.hint=Slå flersproget tilstand til, hvis din wiki har indhold på flere sprog. Så kan brugerne oversætte wikisiderne og se brugerfladen på det sprog, de foretrækker.
+XWiki.XWikiPreferences_languages.hint=Vælg de sprog, der skal være tilgængelige i brugerfladen. Brugerne kan oversætte wikiens sider til alle disse sprog (hvis flersproget tilstand er slået til).
+XWiki.XWikiPreferences_default_language.hint=Vælg wikiens standardsprog
+XWiki.XWikiPreferences_dateformat.hint=Angiv det format, datoer vises i (fx sidens oprettelsesdato)
+XWiki.XWikiPreferences_timezone.hint=Angiv tidszonen for datoer globalt
 
 # Import Section
-### Missing: administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+administration.section.import.hint=Start med at overføre en ny pakke, eller vælg en på listen over tilgængelige pakker. Indholdet af den valgte pakke vises til højre sammen med importindstillingerne.
 
 # Export Section
-### Missing: administration.section.export.pages=Pages
-### Missing: administration.section.export.pages.all=All pages
-### Missing: administration.section.export.withHistory.hint=Include the page history in the export. Only the latest version of a page is exported otherwise.
-### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
-### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
-### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
-### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
-### Missing: administration.section.export.packageName.hint=The file name used when generating the archive with the exported wiki pages.
-### Missing: administration.section.export.moreOptions=More options
-### Missing: administration.section.export.lessOptions=Less options
-### Missing: administration.section.export.description.hint=The package description, displayed when importing the package.
-### Missing: administration.section.export.author.hint=The package author, displayed when importing the package.
-### Missing: administration.section.export.licence.hint=The content license. E.g.: LGPL, GPLV2, etc.
-### Missing: administration.section.export.version.hint=The package version, stored in the package descriptor.
-### Missing: administration.section.export.backupPack.hint=Preserve the page author when importing the pages. This option has no effect on the exported content and can be changed before the import.
+administration.section.export.pages=Sider
+administration.section.export.pages.all=Alle sider
+administration.section.export.withHistory.hint=Medtag sidehistorikken i eksporten. Ellers eksporteres kun den nyeste version af en side.
+administration.section.export.targetXWikiVersion=XWiki-version for målet
+administration.section.export.targetXWikiVersion.hint=Den version af XWiki, som du vil importere siderne i. Din nuværende version er {0}.
+administration.section.export.targetXWikiVersion.12plus=12.0 og nyere
+administration.section.export.targetXWikiVersion.below12=Ældre end 12.0
+administration.section.export.packageName.hint=Det filnavn, der bruges, når arkivet med de eksporterede wikisider dannes.
+administration.section.export.moreOptions=Flere indstillinger
+administration.section.export.lessOptions=Færre indstillinger
+administration.section.export.description.hint=Pakkens beskrivelse, som vises, når pakken importeres.
+administration.section.export.author.hint=Pakkens forfatter, som vises, når pakken importeres.
+administration.section.export.licence.hint=Indholdets licens, fx LGPL, GPLV2 osv.
+administration.section.export.version.hint=Pakkens version, som gemmes i pakkens beskrivelsesfil.
+administration.section.export.backupPack.hint=Bevar sidens forfatter, når siderne importeres. Indstillingen påvirker ikke det eksporterede indhold og kan ændres før importen.
 
 # Users Section
-### Missing: administration.section.users.enableUser.inProgress=Enabling user account...
-### Missing: administration.section.users.enableUser.done=User account enabled
-### Missing: administration.section.users.enableUser.failed=Failed to enable the user account
-### Missing: administration.section.users.disableUser.inProgress=Disabling user account...
-### Missing: administration.section.users.disableUser.done=User account disabled
-### Missing: administration.section.users.disableUser.failed=Failed to disable the user account
-### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.newAuthor=New Author
-### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
-### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
-### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
-### Missing: administration.section.users.deleteUser.newAuthor.script=script
-### Missing: admin.usersgroups.extensionrights=Extension Rights
+administration.section.users.enableUser.inProgress=Aktiverer brugerkontoen...
+administration.section.users.enableUser.done=Brugerkontoen er aktiveret
+administration.section.users.enableUser.failed=Brugerkontoen kunne ikke aktiveres
+administration.section.users.disableUser.inProgress=Deaktiverer brugerkontoen...
+administration.section.users.disableUser.done=Brugerkontoen er deaktiveret
+administration.section.users.disableUser.failed=Brugerkontoen kunne ikke deaktiveres
+administration.section.users.deleteUser.confirmationMessage=Brugeren {0} bliver slettet og fjernet fra alle de {1}grupper{2}, vedkommende var med i. Er du sikker på, at du vil fortsætte?
+administration.section.users.deleteUser.programmingRightsWarning=Den bruger, du er ved at slette, har programmeringsrettigheder og er seneste forfatter til {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Hvis {1,choice,1#siden|1&lt;siderne} indeholder scripts, der kræver programmeringsrettigheder, holder disse scripts op med at virke, hvis du sletter brugeren uden at erstatte forfatteren.
+administration.section.users.deleteUser.scriptRightsWarning=Den bruger, du er ved at slette, har scriptrettigheder og er seneste forfatter til {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Scripts på {1,choice,1#siden|1&lt;siderne} kan holde op med at virke, hvis du sletter brugeren uden at erstatte forfatteren.
+administration.section.users.deleteUser.newAuthor=Ny forfatter
+administration.section.users.deleteUser.newAuthor.hint=Vælg en bruger med {0}rettigheder, eller lad feltet stå tomt, hvis du ikke vil erstatte forfatteren.
+administration.section.users.deleteUser.newAuthor.error=Den valgte bruger har ikke {0}rettigheder!
+administration.section.users.deleteUser.newAuthor.programming=programmerings
+administration.section.users.deleteUser.newAuthor.script=script
+admin.usersgroups.extensionrights=Udvidelsesrettigheder
 ### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
 ### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
-### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
-### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
-### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
+administration.section.groups.deleteUserFromGroup.loading=Fjerner medlem fra gruppen
+administration.section.groups.deleteUserFromGroup.success=Medlemmet er fjernet fra gruppen
+administration.section.groups.deleteUserFromGroup.failure=Medlemmet kunne ikke fjernes fra gruppen
 
 # Other Category
-### Missing: admin.other=Other
-### Missing: admin.other.description=Various configurations for extensions.
-### Missing: administration.section.analytics.status=Status
-### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not
+admin.other=Andet
+admin.other.description=Forskellige indstillinger for udvidelser.
+administration.section.analytics.status=Status
+administration.section.analytics.status.hint=Bestem, om sporingen i Google Analytics™ er slået til
 
 # Social category
-### Missing: admin.social=Social
-### Missing: admin.social.description=Configuration for social features.
+admin.social=Socialt
+admin.social.description=Indstillinger for sociale funktioner.
 
 # Network category
-### Missing: admin.network=Network
-### Missing: admin.network.description=Network related features.
+admin.network=Netværk
+admin.network.description=Netværksrelaterede funktioner.
 
 # Configurable Class
-### Missing: XWiki.ConfigurableClass_displayInSection=Display in section
-### Missing: XWiki.ConfigurableClass_heading=Heading
-### Missing: XWiki.ConfigurableClass_configurationClass=Configuration class
-### Missing: XWiki.ConfigurableClass_linkPrefix=Link prefix
-### Missing: XWiki.ConfigurableClass_propertiesToShow=Properties to show
-### Missing: XWiki.ConfigurableClass_codeToExecute=Code to execute
-### Missing: XWiki.ConfigurableClass_iconAttachment=Icon attachment
-### Missing: XWiki.ConfigurableClass_displayInCategory=Display in category
-### Missing: XWiki.ConfigurableClass_displayBeforeCategory=Display before category
-### Missing: XWiki.ConfigurableClass_categoryIcon=Category icon
-### Missing: XWiki.ConfigurableClass_scope=Scope
-### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
-### Missing: XWiki.ConfigurableClass_scope_SPACE=Current space
-### Missing: XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
-### Missing: XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
-### Missing: XWiki.ConfigurableClass_sectionOrder=Section order
+XWiki.ConfigurableClass_displayInSection=Vis i sektion
+XWiki.ConfigurableClass_heading=Overskrift
+XWiki.ConfigurableClass_configurationClass=Konfigurationsklasse
+XWiki.ConfigurableClass_linkPrefix=Linkpræfiks
+XWiki.ConfigurableClass_propertiesToShow=Egenskaber, der skal vises
+XWiki.ConfigurableClass_codeToExecute=Kode, der skal udføres
+XWiki.ConfigurableClass_iconAttachment=Bilag med ikon
+XWiki.ConfigurableClass_displayInCategory=Vis i kategori
+XWiki.ConfigurableClass_displayBeforeCategory=Vis før kategori
+XWiki.ConfigurableClass_categoryIcon=Kategoriikon
+XWiki.ConfigurableClass_scope=Omfang
+XWiki.ConfigurableClass_scope_WIKI=Wiki
+XWiki.ConfigurableClass_scope_SPACE=Aktuelt område
+XWiki.ConfigurableClass_scope_ALL_SPACES=Alle områder
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki og alle områder
+XWiki.ConfigurableClass_sectionOrder=Sektionsrækkefølge
 
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 
 ## Deprecated since 11.6RC1
-### Missing: XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
-### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+XWiki.XWikiPreferences_auth_active_check.hint=Hvis feltet er sat til "Ja", kan brugerne ikke logge på uden at indtaste den kode, der tidligere er sendt pr. e-mail.
+administration.section.users.deleteUser.markInactiveMessage=I stedet for at slette brugeren kan du markere vedkommendes profil som inaktiv. Så kan brugeren ikke logge på, og adgangsrettighederne til de scripts, brugeren har skrevet, bevares.
 
 ## Deprecated since 11.8RC1
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
-### Missing: XWiki.Registration_liveValidation_enabled.hint=Set this to false to disable the live validation JavaScript code (fields will still be validated at the server side).
-### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
+administration.section.users.deleteUser.markDisabledMessage=I stedet for at slette brugeren kan du markere vedkommendes profil som deaktiveret. Så kan brugeren ikke logge på, og adgangsrettighederne til de scripts, brugeren har skrevet, bevares.
+XWiki.Registration_liveValidation_enabled.hint=Sæt til false for at slå JavaScript-koden til validering undervejs fra (felterne valideres stadig på serveren).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Validering undervejs viser en meddelelse, der fortæller brugeren, at feltet er udfyldt korrekt. Dette er den meddelelse, der vises, hvis den ikke er tilsidesat for et bestemt felt. Du kan bruge Velocity-kode.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

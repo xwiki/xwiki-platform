@@ -280,7 +280,7 @@ platform.wiki.sheet.title.createnewalias=Opret nyt alias
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
+admin.wikis=Wikier
 ### Missing: admin.wikis.template=Wiki Template
 
 #######################################

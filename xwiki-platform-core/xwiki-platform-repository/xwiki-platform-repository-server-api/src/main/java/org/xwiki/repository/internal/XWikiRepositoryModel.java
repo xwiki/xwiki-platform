@@ -378,6 +378,8 @@ public final class XWikiRepositoryModel
     public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
         toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, SOLR_BOOLEAN);
 
+    public static final String SOLRPROP_LASTVERSION = toExtensionClassSolrPropertyName(PROP_LASTVERSION, SOLR_STRING);
+
     public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
 
     public static class ExtensionSolrField extends SolrField

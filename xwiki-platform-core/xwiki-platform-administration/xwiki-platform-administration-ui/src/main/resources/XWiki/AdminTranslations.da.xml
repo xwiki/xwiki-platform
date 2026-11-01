@@ -71,7 +71,7 @@ admin.themes=Temaer
 admin.themes.description=Tilpas farveskemaer, ikontemaer, tema og logo.
 admin.colorthemes.local=Lokale
 admin.colorthemes.global=Globale
-XWiki.XWikiPreferences_showannotations.hint=Vis afsnittet med annoteringer i sidelayoutet.
+XWiki.XWikiPreferences_showannotations.hint=Vis afsnittet med noter i sidelayoutet.
 XWiki.XWikiPreferences_showcomments.hint=Vis afsnittet med kommentarer i sidelayoutet.
 XWiki.XWikiPreferences_showattachments.hint=Vis afsnittet med bilag i sidelayoutet.
 XWiki.XWikiPreferences_showhistory.hint=Vis afsnittet med historik i sidelayoutet.
@@ -139,8 +139,8 @@ administration.section.users.deleteUser.newAuthor.error=Den valgte bruger har ik
 administration.section.users.deleteUser.newAuthor.programming=programmerings
 administration.section.users.deleteUser.newAuthor.script=script
 admin.usersgroups.extensionrights=Udvidelsesrettigheder
-### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
-### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
+admin.usersgroups.extensionrights.space=Udvidelsesrettigheder: Side og undersider
+admin.usersgroups.extensionrights.page=Udvidelsesrettigheder: Side
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Fjerner medlem fra gruppen

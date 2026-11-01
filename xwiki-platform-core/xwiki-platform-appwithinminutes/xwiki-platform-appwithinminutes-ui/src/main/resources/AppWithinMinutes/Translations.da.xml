@@ -54,16 +54,16 @@ platform.appwithinminutes.appPanelCreateEntry=Opret din egen!
 platform.appwithinminutes.wizardStepHeading=Trin {0} — {1}
 appWithinMinutes.wizardStep.name.name=Navn
 appWithinMinutes.wizardStep.name.title=Navngiv din Minut-app
-appWithinMinutes.wizardStep.name.description=Angiv et navn til denne Minut-app.
+appWithinMinutes.wizardStep.name.description=Vælg et navn til din Minut-app
 appWithinMinutes.wizardStep.structure.name=Struktur
 appWithinMinutes.wizardStep.structure.title=Strukturér dine data
-appWithinMinutes.wizardStep.structure.description=Bestem strukturen for din Minut-app ved at angive hvilke datafelter den skal indeholde.
+appWithinMinutes.wizardStep.structure.description=Beskriv dataene i din Minut-app
 ### Missing: appWithinMinutes.wizardStep.entries.name=Entries
 ### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
 ### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
 appWithinMinutes.wizardStep.presentation.name=Præsentation
 appWithinMinutes.wizardStep.presentation.title=Design din Minut-apps startside
-appWithinMinutes.wizardStep.presentation.description=Gør startsiden for din Minut-app personlig.
+appWithinMinutes.wizardStep.presentation.description=Tilpas startsiden for din Minut-app
 platform.appwithinminutes.wizardStepNextButtonLabel=Næste trin
 platform.appwithinminutes.wizardStepNextButtonTip=Gå til næste trin
 platform.appwithinminutes.wizardStepFinishButtonLabel=Afslut
@@ -88,7 +88,7 @@ platform.appwithinminutes.appNameHint=Navnet på værktøjet bestemmer hvilken U
 platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Startside for værktøj
 ### Missing: platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
 platform.appwithinminutes.appNameIsUsedWarning=Denne Minut-app findes allerede. Hvis du fortsætter ændrer du på den eksisterende klasse.
-platform.appwithinminutes.appNameEmptyError=Giv værktøjet et navn
+platform.appwithinminutes.appNameEmptyError=Angiv et navn til din Minut-app.
 
 ### Wizard Step 2: Application Structure
 platform.appwithinminutes.classEditorPaletteTitle=Felt-palette
@@ -163,25 +163,25 @@ platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generiske kolon
 platform.appwithinminutes.liveTableEditorHelpTitle=Tip
 platform.appwithinminutes.liveTableEditorHelpDescription=Generiske live-tabeller er uafhængige af din klasses struktur. De viser information om de sider, der indeholder fuktionerne.
 platform.appwithinminutes.liveTableEditorDocTitleColumnName=Sideoverskrift
-platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Viser overskriften på den side, der indeholder funktionen.
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Titlen på den side, der indeholder dataene i Minut-appen
 platform.appwithinminutes.liveTableEditorDocNameColumnName=Sidenavn
 platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Viser navnet på den side, der indeholder funktionen
 ### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
 ### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Rettet af
-platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Den bruger, der sidst har ændret i siden.
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Den bruger, der sidst har redigeret dataene i Minut-appen
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Oprettet af
-platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Den bruger, der har oprettet siden.
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Den bruger, der har oprettet dataene i Minut-appen
 platform.appwithinminutes.liveTableEditorDocDateColumnName=Ændret
 platform.appwithinminutes.liveTableEditorDocDateColumnDescription=Tidspunktet for den seneste ændring
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Oprettet
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=Tidspunktet for oprettelse
 platform.appwithinminutes.liveTableEditorActionsColumnName=Handlinger
-platform.appwithinminutes.liveTableEditorActionsColumnDescription=Liste af handlinger, der kan udføres på avendelseslinien, f.eks. redigér eller slet.
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=En liste over handlinger, der kan udføres på dataene i Minut-appen, fx redigering og sletning
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Bilag
-platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Særlig kolonne med henvisninger til bilag for anvendelsessiden.
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=En særlig kolonne, der viser links til bilagene på en dataside
 platform.appwithinminutes.liveTableEditorImagesColumnName=Billeder
-platform.appwithinminutes.liveTableEditorImagesColumnDescription=Særlig kolonne med henvisninger til billeder for funktionen.
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=En særlig kolonne, der viser de billeder, der er vedhæftet en dataside
 platform.appwithinminutes.liveTableEditorAvatarColumnName=Logo
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Særlig kolonne til at vise brugerlogo (avatar). Virker kun for klasser bundet til XWiki.Xwikiusers
 ### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
@@ -246,26 +246,26 @@ platform.appwithinminutes.appNamePreviewDataSpaceLabel=Dataområde for Minut-app
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Område
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Navn på det område, der indeholder funktionen
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sidens fulde navn
-platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Navnet på siden, der indeholder funktion, med områdets navn foran.
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Navnet på den side, der indeholder posten i Minut-appen, med områdets navn foran
 
 #@deprecated appWithinMinutes.wizardStep.name.name
 platform.appwithinminutes.wizardStep1Name=Navn
 #@deprecated appWithinMinutes.wizardStep.name.title
 platform.appwithinminutes.wizardStep1Title=Navngiv din Minut-app
 #@deprecated appWithinMinutes.wizardStep.name.description
-platform.appwithinminutes.wizardStep1Description=Angiv et navn til denne Minut-app.
+platform.appwithinminutes.wizardStep1Description=Vælg et navn til din Minut-app
 #@deprecated appWithinMinutes.wizardStep.structure.name
 platform.appwithinminutes.wizardStep2Name=Struktur
 #@deprecated appWithinMinutes.wizardStep.structure.title
 platform.appwithinminutes.wizardStep2Title=Definér struktur for dine data
 #@deprecated appWithinMinutes.wizardStep.structure.description
-platform.appwithinminutes.wizardStep2Description=Specificér strukturen for din Minut-app ved at angive hvilke datafelter den skal indeholde.
+platform.appwithinminutes.wizardStep2Description=Beskriv dataene i din Minut-app
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=Præsentation
 #@deprecated appWithinMinutes.wizardStep.presentation.title
 platform.appwithinminutes.wizardStep3Title=Design din Minut-apps startside
 #@deprecated appWithinMinutes.wizardStep.presentation.description
-platform.appwithinminutes.wizardStep3Description=Gør startsiden for din Minut-app personlig.
+platform.appwithinminutes.wizardStep3Description=Tilpas startsiden for din Minut-app
 
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Minut-app navn

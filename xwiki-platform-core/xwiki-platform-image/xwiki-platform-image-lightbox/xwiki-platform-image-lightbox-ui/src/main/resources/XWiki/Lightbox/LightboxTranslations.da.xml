@@ -37,27 +37,27 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Admin section
-### Missing: admin.lightbox=
-### Missing: admin.lightbox.description=
-### Missing: XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=
-### Missing: XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=
+admin.lightbox=Lightbox
+admin.lightbox.description=Konfigurer billedgalleriet Lightbox
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=Slå Lightbox til
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=Gør det muligt at åbne billeder i indholdet i en lightbox.
 
 # Gallery template
-### Missing: image.lightbox.autoPlay.title=
-### Missing: image.lightbox.caption.label=
-### Missing: image.lightbox.imageId.title=
-### Missing: image.lightbox.imageId.copy.title=
-### Missing: image.lightbox.imageId.copy.copied=
-### Missing: image.lightbox.imageId.permalink=
-### Missing: image.lightbox.date.label=
-### Missing: image.lightbox.download.title=
-### Missing: image.lightbox.escape.title=
-### Missing: image.lightbox.fileName.label=
-### Missing: image.lightbox.fullscreen.title=
-### Missing: image.lightbox.gallery.title=
-### Missing: image.lightbox.nextSlide.title=
-### Missing: image.lightbox.prevSlide.title=
-### Missing: image.lightbox.publisher.label=
-### Missing: image.lightbox.toggler.label=
+image.lightbox.autoPlay.title=Diasshow
+image.lightbox.caption.label=Billedtekst
+image.lightbox.imageId.title=Billed-id
+image.lightbox.imageId.copy.title=Kopiér billed-id
+image.lightbox.imageId.copy.copied=Kopieret til udklipsholderen
+image.lightbox.imageId.permalink=Permanent link
+image.lightbox.date.label=Dato
+image.lightbox.download.title=Hent
+image.lightbox.escape.title=Luk
+image.lightbox.fileName.label=Filnavn
+image.lightbox.fullscreen.title=Fuld skærm
+image.lightbox.gallery.title=Billedgalleri
+image.lightbox.nextSlide.title=Næste billede
+image.lightbox.prevSlide.title=Forrige billede
+image.lightbox.publisher.label=Billedets udgiver
+image.lightbox.toggler.label=Åbn billedhandlingerne
 </content>
 </xwikidoc>

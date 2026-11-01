@@ -41,12 +41,12 @@
 extension.repository.name=Navn
 extension.repository.summary=Resume
 extension.repository.type=Type
-### Missing: extension.repository.category=Category
+extension.repository.category=Kategori
 extension.repository.authors=Forfattere
 extension.repository.doc.creationDate=Opretttet
 extension.repository.doc.date=Senest rettet
-### Missing: extension.repository.rating=Rating
-### Missing: extension.repository.installedCount=Installs
+extension.repository.rating=Bedømmelse
+extension.repository.installedCount=Installationer
 
 ## Administration UI
 admin.repository=Repository for udvidelser

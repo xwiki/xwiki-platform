@@ -36,24 +36,24 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: XWiki.UserDirectoryPreferencesClass_columns=
-### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=
-### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=
-### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=
-### Missing: userdirectory.userScopeFilter=
-### Missing: userdirectory.userScopeFilter.hint=
-### Missing: userdirectory.userScopeFilter.local=
-### Missing: userdirectory.userScopeFilter.global=
-### Missing: userdirectory.configuration.title=
-### Missing: userdirectory.configuration.columns.editHint=
-### Missing: platform.userdirectory.customizeNotAllowed=
-### Missing: platform.userdirectory.configTitle=
-### Missing: platform.userdirectory.configSheetTitle=
-### Missing: platform.userdirectory.configSheetApplyOnConfiguration=
-### Missing: platform.userdirectory.isCustomizedWarning=
-### Missing: platform.userdirectory.canCustomizeInfo=
-### Missing: platform.userdirectory.canCustomizeInfoGuest=
-### Missing: platform.userdirectory.customizeButton=
-### Missing: platform.userdirectory.resetButton=
+  <content>XWiki.UserDirectoryPreferencesClass_columns=Kolonner, der vises
+XWiki.UserDirectoryPreferencesClass_columns_hint=Listen over kolonner, svarende til egenskaber i brugerklassen, der vises i brugerkataloget
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Skjul deaktiverede brugerprofiler
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Udelad brugere med deaktiveret profil fra brugerkataloget
+userdirectory.userScopeFilter=Brugere:
+userdirectory.userScopeFilter.hint=Vælg, hvilken kategori af brugere du vil se.
+userdirectory.userScopeFilter.local=Lokale brugere
+userdirectory.userScopeFilter.global=Globale brugere, der er medlemmer af denne wiki
+userdirectory.configuration.title=Indstillinger
+userdirectory.configuration.columns.editHint=Klik for at vælge kolonnerne
+platform.userdirectory.customizeNotAllowed=Du har ikke tilladelse til at tilpasse dette brugerkatalog.
+platform.userdirectory.configTitle=Konfiguration af brugerkataloget
+platform.userdirectory.configSheetTitle=Visningsside for konfigurationen af brugerkataloget
+platform.userdirectory.configSheetApplyOnConfiguration=Denne visningsside skal anvendes på siden med brugerkatalogets konfiguration.
+platform.userdirectory.isCustomizedWarning=Du ser et tilpasset brugerkatalog. Du kan nulstille det til standard eller tilpasse det yderligere.
+platform.userdirectory.canCustomizeInfo=Brugerkataloget kan tilpasses, så det viser de kolonner, du vil se.
+platform.userdirectory.canCustomizeInfoGuest=Brugerkataloget kan tilpasses, så det viser de kolonner, du vil se, men du skal først logge på.
+platform.userdirectory.customizeButton=Tilpas
+platform.userdirectory.resetButton=Nulstil
 </content>
 </xwikidoc>

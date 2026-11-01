@@ -37,19 +37,19 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## keys for the admin section navigation
-### Missing: admin.indexinguser=
-### Missing: admin.indexinguser.description=
+admin.indexinguser=Indekseringsbruger
+admin.indexinguser.description=Vælg en bruger, som wikiens indhold skal indekseres med.
 
 ## keys use on the admin "indexing user" page itself
-### Missing: admin.indexinguser.explanation.part1=
-### Missing: admin.indexinguser.explanation.part2=
-### Missing: admin.indexinguser.explanation.security.head=
-### Missing: admin.indexinguser.explanation.security.content=
-### Missing: admin.indexinguser.explanation.part3=
-### Missing: admin.indexinguser.explanation.mainwikionly=
+admin.indexinguser.explanation.part1=Indekseringen kører som et baggrundsjob, normalt uden en tilknyttet bruger. For sider, hvis titel beregnes af en visningsside ("sheet"), vises den beregnede titel ikke, hvis visningssiden ikke er synlig for anonyme brugere. Det gælder især, hvis wikien er lukket. Så vises fx søgeresultater for brugerprofiler ikke med deres beregnede titel «Profil for "fornavn" "efternavn"», men kun med sidenavnet (normalt «login»).
+admin.indexinguser.explanation.part2=For at kunne vise samme titel i søgeresultaterne skal indekseringen have en bruger med adgang til visningssiderne. Det anbefales at oprette en særskilt, låst brugerkonto uden særlige rettigheder.
+admin.indexinguser.explanation.security.head=Sikkerhedsbemærkning:
+admin.indexinguser.explanation.security.content=Hvis du bruger en konto med flere læserettigheder end andre brugere, kan titler fra sider, som disse brugere normalt ikke kan se, blive lækket.
+admin.indexinguser.explanation.part3=Ændringer af indstillingen gælder kun sider, der indekseres efter ændringen. En fuld genindeksering anbefales, så ændringen gælder ensartet.
+admin.indexinguser.explanation.mainwikionly=Indstillingen kan kun foretages i hovedwikien, da Solr-indekseringen kører fra hovedwikien.
 
 ## keys used by the configuration class
-### Missing: XWiki.SolrSearchAdminIndexingUser_indexer.description=
-### Missing: XWiki.SolrSearchAdminIndexingUser_indexer.hint=
+XWiki.SolrSearchAdminIndexingUser_indexer.description=Indekseringsbruger
+XWiki.SolrSearchAdminIndexingUser_indexer.hint=Den XWiki-brugerkonto, der bruges til at indeksere sider i baggrunden.
 </content>
 </xwikidoc>

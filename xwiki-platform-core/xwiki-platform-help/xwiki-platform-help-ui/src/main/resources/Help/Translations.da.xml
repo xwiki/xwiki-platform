@@ -36,21 +36,21 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: help.tipsPanel.title=
-### Missing: help.tipsPanel.noTipMessage=
-### Missing: help.tipsPanel.gettingStartedTip=
-### Missing: help.tipsPanel.jumpToPageTip=
-### Missing: help.tipsPanel.improveXWikiTip=
-### Missing: help.tipsPanel.breadcrumbsTip=
-### Missing: help.tipsPanel.advancedHiddenShortcutTip=
-### Missing: help.tipsPanel.linkAutocompleteWYSIWYGTip=
-### Missing: help.tipsPanel.WYSIWYGEditorTip=
-### Missing: help.macroList.title=
-### Missing: help.macroList.id=
-### Missing: help.macroList.name=
-### Missing: help.macroList.categories=
-### Missing: help.macroList.description=
-### Missing: help.macroList.visibility=
+  <content>help.tipsPanel.title=Tips
+help.tipsPanel.noTipMessage=Der er ingen tip!
+help.tipsPanel.gettingStartedTip=Hvis du er ny XWiki-bruger, så læs [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]].
+help.tipsPanel.jumpToPageTip=Gå til en hvilken som helst side i wikien med Ctrl+G eller Meta+G.\nSe [[flere genveje&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=Vidste du, at du kan forbedre XWiki? Brug 5 minutter på at [[udfylde denne undersøgelse&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]], og hjælp dette open source-projekt!
+help.tipsPanel.breadcrumbsTip=Du kan klikke på pilene ud for elementerne i brødkrummestien for hurtigt at gå til sider på samme niveau og undersider.
+help.tipsPanel.advancedHiddenShortcutTip=Tryk på tastekombinationen x+x+x+a for at slå [[avanceret tilstand&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] til og fra og x+x+x+h for at vise eller skjule [[skjulte sider&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+help.tipsPanel.linkAutocompleteWYSIWYGTip=Når du redigerer i WYSIWYG-editoren, kan du skrive ##[## og derefter begynde at skrive bogstaver for at få forslag til et link.
+help.tipsPanel.WYSIWYGEditorTip=Når du redigerer i WYSIWYG-tilstand, åbner genvejen {0}Alt + 0{1} ({0}⌥0{1} på macOS) en hjælpedialog med oplysninger om at navigere i editoren med tastaturet.
+help.macroList.title=Tilgængelige makroer
+help.macroList.id=Id
+help.macroList.name=Navn
+help.macroList.categories=Kategorier
+help.macroList.description=Beskrivelse
+help.macroList.visibility=Synlighed
 
 ###############################################################################
 ## Deprecated
@@ -60,7 +60,7 @@
 #@deprecatedstart
 
 ## until 14.6RC1
-### Missing: help.macroList.category=
+help.macroList.category=Kategori
 
 #@deprecatedend
 </content>

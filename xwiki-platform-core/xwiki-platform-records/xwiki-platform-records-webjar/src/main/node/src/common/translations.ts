@@ -67,6 +67,7 @@ function defineTranslationKeys(): void {
       "picker.problem.notFilterable",
       "picker.problem.valueDoesNotFit",
       "picker.problem.unreadable",
+      "picker.creation.columnsMissing",
     ],
   }));
 }

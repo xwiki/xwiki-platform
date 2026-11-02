@@ -350,6 +350,7 @@ export {
   dataTypeName,
   findDataTypeInput,
   findDataTypeLabel,
+  findMessage,
   findScope,
   hasValue,
   resetDerivedParameters,

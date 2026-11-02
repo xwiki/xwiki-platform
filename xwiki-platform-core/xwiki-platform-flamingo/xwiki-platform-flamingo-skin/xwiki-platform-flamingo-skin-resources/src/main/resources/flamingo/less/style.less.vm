@@ -25,7 +25,6 @@
 @import "bootstrap/bootstrap.less"; // Bootstrap
 @import "variables"; // Bootstrap variables overrided by flamingo
 @import "mixins"; // Mixins defined by flamingo
-@import "accordion";
 @import "action-menus";
 @import "admin";
 @import "buttons";

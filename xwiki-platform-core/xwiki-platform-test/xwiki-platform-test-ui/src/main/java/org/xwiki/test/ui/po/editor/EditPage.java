@@ -484,9 +484,36 @@ public class EditPage extends BasePage
         this.cancelCSRFWarningButton.click();
     }
 
+    /**
+     * Clicks the button that forces the save after a CSRF warning, without waiting for anything. The force save is
+     * an asynchronous request, so the click returns before the document is saved. Use it after a Save &amp; Continue,
+     * where the editor stays displayed, and wait for the "Saved" notification afterwards. After a Save &amp; View, the
+     * force save is followed by a redirect to the view page: use {@link #clickForceSaveAndViewCSRFButton()}, which
+     * waits for it.
+     */
     public void clickForceSaveCSRFButton()
     {
         this.forceSaveCSRFButton.click();
+    }
+
+    /**
+     * Clicks the button that forces the save after a CSRF warning raised by a Save &amp; View, and waits for the
+     * redirect to the view page. The force save is an asynchronous request followed by a redirect, so the click
+     * returns while the edit page is still displayed. Use {@link #clickForceSaveCSRFButton()} after a Save &amp;
+     * Continue instead: no redirect happens there, and this method would wait for it until the timeout.
+     *
+     * @return the view page displayed after the save
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
+     */
+    public ViewPage clickForceSaveAndViewCSRFButton()
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        this.forceSaveCSRFButton.click();
+        getDriver().waitUntilPageIsReloaded();
+
+        return new ViewPage();
     }
 
     /**

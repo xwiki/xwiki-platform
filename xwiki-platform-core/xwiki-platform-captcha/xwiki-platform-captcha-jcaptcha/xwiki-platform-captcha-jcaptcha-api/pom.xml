@@ -69,7 +69,7 @@
     <dependency>
       <groupId>com.octo.captcha</groupId>
       <artifactId>jcaptcha-api</artifactId>
-      <version>2.0-alpha-1-SNAPSHOT-500</version>
+      <version>2.0-alpha-1</version>
     </dependency>
     <!-- Jcaptcha -->
     <dependency>

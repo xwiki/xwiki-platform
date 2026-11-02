@@ -24,7 +24,6 @@
     "@xwiki/platform-dsapi": "workspace:*",
     "@xwiki/platform-editors-blocknote-headless": "workspace:*",
     "@xwiki/platform-editors-blocknote-react": "workspace:*",
-    "@xwiki/platform-link-modal-ui": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
     "@xwiki/platform-link-suggest-xwiki": "workspace:*",
     "@xwiki/platform-markdown-syntax-config": "workspace:*",

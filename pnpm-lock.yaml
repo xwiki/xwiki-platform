@@ -398,9 +398,6 @@ importers:
       '@xwiki/platform-editors-blocknote-react':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/editors/blocknote-react
-      '@xwiki/platform-link-modal-ui':
-        specifier: workspace:*
-        version: link:../../../../../xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui
       '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
@@ -3820,6 +3817,9 @@ importers:
       '@xwiki/platform-icons':
         specifier: workspace:*
         version: link:../../core/icons
+      '@xwiki/platform-link-modal-ui':
+        specifier: workspace:*
+        version: link:../../core/link-modal/link-modal-ui
       '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../../core/link-suggest/link-suggest-api
@@ -3857,9 +3857,6 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
-      '@xwiki/platform-link-modal-ui':
-        specifier: workspace:*
-        version: link:../../core/link-modal/link-modal-ui
       '@xwiki/platform-syntaxes-config':
         specifier: workspace:*
         version: link:../../core/syntaxes/syntaxes-config

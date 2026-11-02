@@ -219,6 +219,9 @@ catalogs:
     rimraf:
       specifier: 6.1.3
       version: 6.1.3
+    semver:
+      specifier: 7.7.4
+      version: 7.7.4
     sinon:
       specifier: 21.1.2
       version: 21.1.2
@@ -705,6 +708,9 @@ importers:
       publint:
         specifier: 'catalog:'
         version: 0.3.19
+      semver:
+        specifier: 'catalog:'
+        version: 7.7.4
       vite:
         specifier: 'catalog:'
         version: 7.3.7(@types/node@26.5.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.8.2)

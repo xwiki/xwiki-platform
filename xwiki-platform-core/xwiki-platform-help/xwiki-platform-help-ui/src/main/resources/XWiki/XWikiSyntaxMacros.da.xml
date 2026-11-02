@@ -40,46 +40,48 @@
 
 == Makroer ==
 
-=== 1.0 Makroer ===
+=== 1.0 Macros ===
 
-Der er to slags makroer i XWiki Syntax 1.0:
+Der findes to slags makroer i XWiki Syntax 1.0:
 
-* Velocity makoer (kaldt med ###makronavn(param1 ... paramN)## syntaks)
-* Radeox makroer (kaldt med ##{makronavn:param1=value1|...|paramN=valueN}## syntaks)
+* Velocity-makroer (kaldes med syntaksen ###macroname(param1 ... paramN)##)
+* Radeox-makroer (kaldes med syntaksen ##{macroname:param1=value1|...|paramN=valueN}##)
 
-{{info}}For en fuld liste af makroer, se [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
+{{info}}
+Den fulde liste over tilgængelige makroer finder du i [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
 |=Funktion|=XWiki Syntax 1.0
-|Velocity Makro|(((
-{{{#info("Noget tekst")}}}
+|Velocity-makro|(((
+{{{#info("Some text")}}}
 )))
-|Radeox Makro|(((
+|Radeox-makro|(((
 {{{{code:java}
-java-kode
+java content
 {code}
 }}}
 )))
 
-=== 2.0 Makroer ===
-Der er kun en slags makroer i XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, som kaldes med syntaks ##{{{{{macroname param1="value1" ... paramN="valueN"}}...{{/macroname}}}}}##. For makroer uden indhold er der en kort notation: ##{{{{{macroname param1="value1" ... paramN="valueN"/}}}}}##
+=== 2.0 Macros ===
+
+Der findes kun én slags makro i XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, og den kaldes med syntaksen: ##{{{{{macroname param1="value1" ... paramN="valueN"}}...{{/macroname}}}}}##. Makroer uden indhold har en kort skrivemåde: ##{{{{{macroname param1="value1" ... paramN="valueN"/}}}}}##
 
 |=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
-|Vise Makro med indhold|(((
+|Makro med indhold|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");
 {{/code}}
 }}}
 )))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
-|Vise macro uden indhold|(((
+|Makro uden indhold|(((
 {{{{{include reference="Space.Page"/}}}}}
-)))|Indhold fra referet side vises i siden
+)))|Den side, der henvises til, indsættes i den aktuelle side
 
 {{info}}
-Radeox makroer kan ikke bruges i XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}. De er omskrevet til visnings-makroer.
+Den fulde liste over tilgængelige makroer finder du i [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
-{{info}}
-For en komplet liste af makroer, check  [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
-{{/info}}</content>
+==== Makroer i denne wiki ====
+
+{{include reference="XWiki.XWikiSyntaxMacrosList"/}}</content>
 </xwikidoc>

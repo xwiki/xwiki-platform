@@ -55,9 +55,9 @@ platform.wiki.currentwiki.joinNeedToLogin=For at blive medlem i denne wiki, skal
 platform.wiki.currentwiki.currentUserNotMember=Du er ikke medlem i denne wiki.
 platform.wiki.currentwiki.currentuserCanJoin=Hvis du ønsker det, kan du {0}blive medlem i denne wiki{1}.
 platform.wiki.currentwiki.currentUserIsMember=Du er medlem i denne wiki.
-platform.wiki.currentwiki.currentUserCanLeave=Du kan {0}forlade denne wiki{1}, hvis du vil
+platform.wiki.currentwiki.currentUserCanLeave=Du kan {0}forlade denne wiki{1}, hvis du vil.
 platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=For at se den fulde liste af wiki-deltagere, brug {0}medlemskabsoversigtsiden{1}.
-platform.wiki.currentwiki.invitationPendingForCurrentWiki=Du er inviteret til at blive medlem i denne wiki
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Du er inviteret til at blive medlem af denne wiki.
 platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Du har tilmeldt dig denne wiki.
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Din tilmelding til wiki "{0}" er modtaget.
 platform.wiki.currentwiki.joinRequestRejectedNotification=Din tilmelding til wiki "{0}" er blevet afslået.
@@ -74,7 +74,7 @@ platform.wiki.currentwiki.inviteSuccess={0} er inviteret.
 platform.wiki.currentwiki.invitationCancelSaveComment=Afviste invitation {0} ({1}
 platform.wiki.currentwiki.invitationCancelNotification=Din invitation er blevet afvist og ikke længere aktiv.
 platform.wiki.currentwiki.invitationCancelSuccess=Invitation er afvist.
-platform.wiki.currentwiki.invitationCancelFailure=Fejl - du kan ikke afvise denne invitation
+platform.wiki.currentwiki.invitationCancelFailure=Fejl: Du kan ikke annullere denne invitation.
 platform.wiki.currentwiki.candidateReviewFailure=Fejl - Du kan ikke afvise denne invitation.
 
 # LABELS
@@ -85,7 +85,7 @@ platform.wiki.currentwiki.prop.membershipType.label=Medlemskabs type
 platform.wiki.currentwiki.prop.secure.label=Sikker (SSL)
 platform.wiki.currentwiki.member.add=Tilføj eller inviter brugere til wiki
 platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki information
-platform.wiki.currentwiki.gadget.topActiveUsers.label=Mest aktive bidragydere.
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Mest aktive bidragydere
 platform.wiki.currentwiki.panel.information.name.label=Navn
 platform.wiki.currentwiki.panel.information.description.label=Beskrivelse
 platform.wiki.currentwiki.panel.information.members.label=Medlemmer
@@ -115,7 +115,7 @@ WikiManager.WikiCandidateMemberClass_type_request=Anmodning
 WikiManager.WikiCandidateMemberClass_type_invitation=Invitation
 
 # HINTS
-platform.wiki.currentwiki.prop.wikiprettyname.hint=Wikiens officielle navn
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Wikiens visningsnavn.
 platform.wiki.currentwiki.prop.description.hint=En kort beskrivelse af wikien og dens formål.
 platform.wiki.currentwiki.prop.owner.hint=En bruger som har alle rettigheder over wikien.
 platform.wiki.currentwiki.prop.membershipType.hint=Hvordan en bruger kan tilmelde sig denne wiki.
@@ -123,15 +123,16 @@ platform.wiki.currentwiki.prop.secure.hint=Hvis aktiv vil alle wikiens eksterne 
 platform.wiki.currentwiki.invite.username.hint=Navn på bruger, der skal inviteres til wikien.
 platform.wiki.currentwiki.invite.message.hint=Besked til brugeren.
 platform.wiki.currentwiki.candidates.hint=Brugere som har anmodet om eller er inviteret til medlemskab i wikien.
-### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
+platform.wiki.currentwiki.candidates.empty=Ingen brugere har anmodet om eller er blevet inviteret til medlemskab af wikien.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Håndter indstillinger, såsom wiki navn, beskrivelse og medlemsskaber.
 admin.xwiki.workspaceusers.description=Håndter medlemskaber\: tilføj, fjern, invitér, godkend eller afvis wiki-medlemmer.
 admin.xwiki.usersconfiguration.title=Konfiguration
 admin.xwiki.members.title=Nuværende medlemmer
-### Missing: admin.xwiki.users.title=All Users
-    
+admin.xwiki.users.title=Alle brugere
+
 # DRAWER ITEM
-### Missing: platform.wiki.drawer.homeWiki=Home</content>
+### Missing: platform.wiki.drawer.homeWiki=Home
+</content>
 </xwikidoc>

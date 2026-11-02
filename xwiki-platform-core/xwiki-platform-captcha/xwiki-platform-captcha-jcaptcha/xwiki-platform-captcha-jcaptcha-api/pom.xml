@@ -75,7 +75,7 @@
     <dependency>
       <groupId>com.octo.captcha</groupId>
       <artifactId>jcaptcha</artifactId>
-      <version>2.0-alpha-1-SNAPSHOT-500</version>
+      <version>2.0-alpha-1</version>
     </dependency>
 
     <!-- For sound CAPTCHA integration -->

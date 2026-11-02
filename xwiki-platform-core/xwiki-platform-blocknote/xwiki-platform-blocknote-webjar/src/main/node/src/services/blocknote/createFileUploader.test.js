@@ -22,7 +22,6 @@ import { DefaultBlockNoteIterator } from "./DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./XWikiBlockNoteProcessor";
 import { createFileUploader } from "./createFileUploader";
 import { extractLinkId, stripLinkId } from "./linkId";
-import { EntityType } from "@xwiki/platform-model-api";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 function file(name, type) {
@@ -38,23 +37,13 @@ function paste(eventTarget) {
 function container(saveAttachments) {
   const components = {
     StorageProvider: { get: () => ({ saveAttachments }) },
-    ModelReferenceParserProvider: {
-      get: () => ({
-        parse: (reference) => ({
-          type: EntityType.ATTACHMENT,
-          name: reference,
-          reference,
-        }),
-      }),
-    },
-    RemoteURLSerializerProvider: {
-      get: () => ({
-        serialize: (entityReference) =>
-          `/xwiki/bin/download/Space/Page/${entityReference.reference}`,
-      }),
-    },
   };
   return { get: (name) => components[name] };
+}
+
+// What the storage returns for an uploaded file: the attachment, described as the REST API describes attachments.
+function uploadedAttachment(name) {
+  return { reference: name, href: `/xwiki/bin/download/Space/Page/${name}` };
 }
 
 describe("createFileUploader", () => {
@@ -84,8 +73,9 @@ describe("createFileUploader", () => {
     temporary = false;
     registerTemporaryAttachment = vi.fn();
     notifyUploadFailed = vi.fn();
-    // The storage returns the reference of the created attachment.
-    saveAttachments = vi.fn(async (page, files) => [files[0].name]);
+    saveAttachments = vi.fn(async (page, files) => [
+      uploadedAttachment(files[0].name),
+    ]);
     fileUploader = createFileUploader(
       container(saveAttachments),
       dependencies(),
@@ -127,6 +117,14 @@ describe("createFileUploader", () => {
 
       expect(saveAttachments).toHaveBeenCalledTimes(1);
       expect(saveAttachments.mock.calls[0][0]).toBe("Space.Page");
+    });
+
+    it("escapes a file name the reference syntax would otherwise split", async () => {
+      await uploadFile(file("logo@2x.png", "image/png"), blockId);
+
+      expect(
+        blockNoteDocument.getMetadata(blockId).xwikiReference.reference,
+      ).toBe("logo\\@2x.png");
     });
   });
 
@@ -329,7 +327,7 @@ describe("createFileUploader", () => {
     it("registers the name the upload end-point gave the file", async () => {
       temporary = true;
       // The end-point can rename the file (e.g. when the name it was given is not acceptable).
-      saveAttachments.mockResolvedValue(["sanitized.png"]);
+      saveAttachments.mockResolvedValue([uploadedAttachment("sanitized.png")]);
 
       await uploadFile(file("photo.png", "image/png"), "id");
 
@@ -361,7 +359,7 @@ describe("createFileUploader", () => {
       "the storage throws": () => {
         saveAttachments.mockRejectedValue(new Error("Upload failed"));
       },
-      "the storage returns no reference": () => {
+      "the storage returns no attachment": () => {
         saveAttachments.mockResolvedValue([undefined]);
       },
     };

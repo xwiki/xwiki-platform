@@ -20,12 +20,15 @@
 import { injectLinkId } from "./linkId";
 import { trackPaste } from "../attachments/pasteTracker";
 import { withUniqueName } from "../attachments/uniqueFileName";
-import { EntityType } from "@xwiki/platform-model-api";
+import {
+  AttachmentReference,
+  EntityType,
+  Model,
+} from "@xwiki/platform-xwiki-model-api";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteDocument } from "./BlockNoteProcessor";
+import type { PageAttachment } from "@xwiki/platform-api";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
-import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
-import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Container } from "inversify";
 
@@ -65,26 +68,6 @@ type FileUploader = {
 
 const EMPTY_PARAGRAPH: UploadResult = { type: "paragraph", content: [] };
 
-function attachmentReference(
-  reference: string,
-  typed: boolean,
-): ResourceReference {
-  return { type: "attach", typed, reference, parameters: {} };
-}
-
-// The components the uploader needs, so that the editor doesn't have to know about them.
-function getComponents(container: Container) {
-  return {
-    storageProvider: container.get<StorageProvider>("StorageProvider"),
-    modelReferenceParser: container
-      .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-      .get()!,
-    remoteURLSerializer: container
-      .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-      .get()!,
-  };
-}
-
 /**
  * @param container - the component container the storage and the model components are taken from
  * @param dependencies - what only the editor knows
@@ -103,62 +86,71 @@ function createFileUploader(
     notifyUploadFailed,
   } = dependencies;
 
-  const { storageProvider, modelReferenceParser, remoteURLSerializer } =
-    getComponents(container);
+  const storageProvider = container.get<StorageProvider>("StorageProvider");
 
   // Pasted files are renamed, so we need to know how the file reached the editor.
   const pasteTracker = trackPaste(eventTarget);
 
-  async function attach(file: File): Promise<string> {
+  // The file is attached to the edited document, so its reference is serialized relative to that document, as the
+  // WYSIWYG editors save it, which also escapes a name the reference syntax would otherwise split (e.g. logo@2x.png).
+  function attachmentReference(
+    name: string,
+    typed: boolean,
+  ): ResourceReference {
+    const documentReference = Model.resolve(
+      getDocumentReference(),
+      EntityType.DOCUMENT,
+    );
+    const reference = documentReference
+      ? Model.serialize(
+          new AttachmentReference(name, documentReference),
+          documentReference,
+        )
+      : name;
+    return { type: "attach", typed, reference, parameters: {} };
+  }
+
+  async function attach(file: File): Promise<PageAttachment> {
     const temporary = isTemporaryUpload();
     const result = await storageProvider
       .get()
       .saveAttachments(getDocumentReference(), [file], { temporary });
-    const reference = result?.[0];
-    if (!reference) {
+    const attachment = result?.[0];
+    if (!attachment) {
       throw new Error(`Failed to attach [${file.name}].`);
     }
     if (temporary) {
-      registerTemporaryAttachment(attachmentName(reference) ?? file.name);
+      // The upload end-point can rename the file, so the name to commit is the one it reports rather than the one we
+      // sent.
+      registerTemporaryAttachment(attachment.reference);
     }
-    return reference;
+    return attachment;
   }
 
-  // The upload end-point can rename the file, so the name to commit is the one of the returned reference rather than
-  // the one we sent.
-  function attachmentName(reference: string): string | undefined {
-    const parsed = modelReferenceParser.parse(reference, {
-      type: EntityType.ATTACHMENT,
-    });
-    return parsed.type === EntityType.ATTACHMENT ? parsed.name : undefined;
-  }
-
-  function getDownloadURL(reference: string): string {
-    return (
-      remoteURLSerializer.serialize(
-        modelReferenceParser.parse(reference, { type: EntityType.ATTACHMENT }),
-      ) ?? ""
-    );
-  }
-
-  function toImageBlock(reference: string, blockId?: string): UploadResult {
+  function toImageBlock(
+    attachment: PageAttachment,
+    blockId?: string,
+  ): UploadResult {
     if (blockId) {
       getBlockNoteDocument()!.getMetadata(blockId, true)!.xwikiReference =
-        attachmentReference(reference, false);
+        attachmentReference(attachment.reference, false);
     }
     // Empty name, otherwise BlockNote saves it as the alt text of the image (||alt="image.gif"), and for a pasted
     // file that is the name the browser made up rather than the attachment we uploaded. XWikiImageBlock displays a
     // label instead, without saving one.
-    return { props: { url: getDownloadURL(reference), name: "" } };
+    return { props: { url: attachment.href, name: "" } };
   }
 
   // The file, video and audio blocks are saved as macro calls, but those macros don't exist yet, so such a file
   // becomes a link to the attachment instead. The link metadata hangs off a synthetic id carried in the href,
   // because links have no id of their own.
-  function toAttachmentLink(reference: string, label: string): UploadResult {
+  function toAttachmentLink(
+    attachment: PageAttachment,
+    label: string,
+  ): UploadResult {
     const linkId = uuidv4();
     const metadata = getBlockNoteDocument()!.getMetadata(linkId, true)!;
-    metadata.xwikiReference = attachmentReference(reference, true);
+    metadata.xwikiReference = attachmentReference(attachment.reference, true);
     // Don't add xwikiFreestanding here: it saves the link without its [[ ]], and then it stops being a link
     // the next time the page is edited.
     metadata.xwikiGeneratedLabel = label;
@@ -167,7 +159,7 @@ function createFileUploader(
       content: [
         {
           type: "link",
-          href: injectLinkId(getDownloadURL(reference), linkId),
+          href: injectLinkId(attachment.href, linkId),
           content: label,
         },
       ],
@@ -178,10 +170,10 @@ function createFileUploader(
     const toUpload =
       pasteTracker.isPaste() || !file.name ? withUniqueName(file) : file;
     try {
-      const reference = await attach(toUpload);
+      const attachment = await attach(toUpload);
       return file.type.startsWith("image/")
-        ? toImageBlock(reference, blockId)
-        : toAttachmentLink(reference, toUpload.name);
+        ? toImageBlock(attachment, blockId)
+        : toAttachmentLink(attachment, toUpload.name);
     } catch (error) {
       // BlockNote doesn't catch our errors and updates the inserted block as soon as we return, so rejecting would
       // leave an unhandled rejection and an orphan block.

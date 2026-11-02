@@ -416,7 +416,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(2)
+    @Order(9)
     void insertImageFromSuggestions(TestUtils setup, TestReference testReference) throws Exception
     {
         // Start fresh, with a page holding an image, and wait for the image to be indexed, since the image suggestions
@@ -453,7 +453,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(3)
+    @Order(10)
     void insertImageFromImageWizard(TestUtils setup, TestReference testReference) throws Exception
     {
         // Start fresh.

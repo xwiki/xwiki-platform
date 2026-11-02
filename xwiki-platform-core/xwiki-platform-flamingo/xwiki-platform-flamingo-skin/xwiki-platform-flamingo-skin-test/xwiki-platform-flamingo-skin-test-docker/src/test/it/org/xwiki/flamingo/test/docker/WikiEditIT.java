@@ -378,10 +378,7 @@ class WikiEditIT
             // check with save and view
             editWiki.clickSaveAndView(false);
             assertTrue(editWiki.isCSRFWarningDisplayed());
-            editWiki.clickForceSaveCSRFButton();
-
-            // Ensure the page is properly loaded after a save and view
-            ViewPage viewPage = new ViewPage();
+            ViewPage viewPage = editWiki.clickForceSaveAndViewCSRFButton();
             assertEquals("Foo bar", viewPage.getContent());
 
             // check with preview

@@ -27,18 +27,25 @@ test("Options should appear", async ({ mount }) => {
     "Some great initial value",
   );
 
+  // The options match the initial value, which is the only search performed at the opening.
   await expect(
     component.locator(
       ".mantine-Popover-dropdown .mantine-Combobox-option:nth-child(1)",
     ),
-  ).toHaveText("Suggestion title: Some great suggestion title starting with ");
+  ).toHaveText(
+    "Suggestion title: Some great suggestion title starting with Some great initial value",
+  );
 
   await expect(
     component.locator(
       ".mantine-Popover-dropdown .mantine-Combobox-option:nth-child(2)",
     ),
   ).toHaveText(
-    "Suggestion title: Another great suggestion title starting with ",
+    "Suggestion title: Another great suggestion title starting with Some great initial value",
+  );
+
+  await expect(component.locator('[data-test="searchedQueries"]')).toHaveText(
+    JSON.stringify(["Some great initial value"]),
   );
 });
 

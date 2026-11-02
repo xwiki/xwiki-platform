@@ -22,6 +22,7 @@ package org.xwiki.blocknote.test.ui;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -50,6 +51,9 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ForceEditLockModal;
 import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -1087,6 +1091,88 @@ class CollaborationIT extends AbstractBlockNoteIT
         multiUserSetup.switchToBrowserTab(secondTabHandle);
         secondToolbar.waitUntilEditingAlone();
         assertEquals("one\ntwo\nthree\nfour", secondEditPage.done().getContent());
+    }
+
+    @Test
+    @Order(13)
+    void macroOutputIsNotShared(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh. The macro output depends on the current user, and it's not supposed to be shared with the other
+        // users editing the page.
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference);
+        setup.createPage(testReference, """
+            Hello {{velocity}}$xcontext.userReference.name{{/velocity}}!
+
+            {{velocity}}
+            Welcome $xcontext.userReference.name
+            {{/velocity}}
+            """, "");
+
+        // Edit the page as superadmin, who starts the collaboration session. We use the standalone editor because
+        // superadmin doesn't have a preferred editor (i.e. in-place editing would use the wiki editor).
+        BlockNoteStandaloneEditPage firstEditPage = BlockNoteStandaloneEditPage.gotoPage(testReference);
+        BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
+        firstTextArea.waitUntilTextContains("Welcome superadmin");
+        assertThat(firstTextArea.getText(), containsString("Hello superadmin!"));
+
+        //
+        // Second Tab
+        //
+
+        // Join the collaboration session as John. The superadmin content author has script right, but John doesn't.
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsJohn(setup);
+        BlockNoteInplaceEditPage secondEditPage = BlockNoteInplaceEditPage.gotoPage(testReference);
+        joinSessionConfirmingRequiredRightsWarning(secondEditPage);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        // John gets the macro calls but not their output (which was rendered for superadmin).
+        secondTextArea.waitUntilTextContains("Hello macro:velocity!");
+        String secondText = secondTextArea.getText();
+        assertMacroOutputNotShared(secondText);
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Superadmin keeps seeing the macro output while editing.
+        firstTextArea.appendParagraph("end").waitUntilTextContains("end");
+        String firstText = firstTextArea.getText();
+        assertThat(firstText, containsString("Hello superadmin!"));
+        assertThat(firstText, containsString("Welcome superadmin"));
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilTextContains("end");
+        assertMacroOutputNotShared(secondTextArea.getText());
+        // Leave without making changes, so that superadmin remains the effective author of the collaboration session.
+        secondEditPage.cancel();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstEditPage.getToolbar().waitUntilEditingAlone();
+        // The macro calls are saved even though the macro output is not part of the edited content.
+        assertEquals("Hello superadmin!\nWelcome superadmin\nend", firstEditPage.clickDone().getContent());
+    }
+
+    private void assertMacroOutputNotShared(String text)
+    {
+        // We can't simply check that the text doesn't contain "superadmin" because the text includes the labels of the
+        // coeditor carets.
+        assertEquals(2, StringUtils.countMatches(text, "macro:velocity"), "Unexpected content: " + text);
+        assertThat(text, not(containsString("Hello superadmin")));
+        assertThat(text, not(containsString("Welcome superadmin")));
     }
 
     /**

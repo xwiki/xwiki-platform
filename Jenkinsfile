@@ -84,12 +84,6 @@ def builds = [
       pom: 'xwiki-platform-distribution-flavor-test-data/pom.xml',
     )
   },
-  'Flavor Test - Storage': {
-    buildFunctionalTest(
-      name: 'Flavor Test - Storage',
-      pom: 'xwiki-platform-distribution-flavor-test-storage/pom.xml'
-    )
-  },
   'Flavor Test - Escaping' : {
     buildFunctionalTest(
       name: 'Flavor Test - Escaping',
@@ -193,10 +187,6 @@ private void buildStandardAll(builds)
             'flavor-test-data': {
               // Run the Flavor Data tests
               builds['Flavor Test - Data'].call()
-            },
-            'flavor-test-storage': {
-              // Run the Flavor Storage tests
-              builds['Flavor Test - Storage'].call()
             },
             'flavor-test-escaping': {
               // Run the Flavor Escaping tests

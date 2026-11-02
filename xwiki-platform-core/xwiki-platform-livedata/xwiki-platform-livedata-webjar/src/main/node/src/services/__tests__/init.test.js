@@ -17,8 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+const createApp = vi.fn();
+vi.mock("vue", async (importOriginal) => ({ ...(await importOriginal()), createApp }));
 vi.mock("@xwiki/platform-livedata-ui", () => ({ XWikiLivedata: {} }));
 vi.mock("@xwiki/platform-livedata-xwiki", () => ({
   XWikiLiveDataSource: class {},
@@ -29,6 +31,45 @@ vi.mock("xwiki-platform-localization-webjar", () => ({ resolver: {} }));
 const { init } = await import("../init.js");
 
 describe("init", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    createApp.mockReset();
+  });
+
+  /**
+   * Display the given live data markup and return the contentTrusted property passed to the live data component.
+   */
+  function getContentTrusted(markup) {
+    // A minimal application, that is never mounted for real.
+    const app = {};
+    app.mixin = app.provide = app.use = app.mount = () => app;
+    createApp.mockReturnValue(app);
+
+    document.body.innerHTML = markup;
+    init(document.querySelector(".liveData"), undefined);
+
+    return createApp.mock.calls[0][1].contentTrusted;
+  }
+
+  it("trusts the content when the Live Data macro says so", () => {
+    expect(getContentTrusted('<div class="liveData" data-config="{}">' +
+      '<script type="application/json" data-config-content-trusted="true"></script></div>')).toBe(true);
+  });
+
+  it("doesn't trust the content when the Live Data macro says so", () => {
+    expect(getContentTrusted('<div class="liveData" data-config="{}">' +
+      '<script type="application/json" data-config-content-trusted="false"></script></div>')).toBe(false);
+  });
+
+  it("doesn't trust the content silently when the trust script is missing", () => {
+    const consoleError = vi.spyOn(console, "error");
+
+    // The WYSIWYG editor replaces the script elements from the macro output with comments.
+    expect(getContentTrusted('<div class="liveData" data-config="{}"><!--{cke_protected}%3Cscript%20type%3D%22' +
+      'application%2Fjson%22%20data-config-content-trusted%3D%22true%22%3E%3C%2Fscript%3E--></div>')).toBe(false);
+    expect(consoleError).not.toHaveBeenCalled();
+  });
+
   it("leaves the element untouched when it has no configuration", async () => {
     document.body.innerHTML = '<div class="liveData"><table id="displayed"></table></div>';
     const element = document.querySelector(".liveData");

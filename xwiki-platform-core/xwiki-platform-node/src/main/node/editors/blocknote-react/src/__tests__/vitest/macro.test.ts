@@ -21,22 +21,34 @@
 
 import { createBlockNoteSchema } from "../../blocknote";
 import { MacroOutput } from "../../blocknote/macroOutput";
+import { MacrosContext } from "../../contexts";
 import { BlockNoteEditor } from "@blocknote/core";
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { beforeAll, describe, expect, test } from "vitest";
-import type { MacroCall } from "../../blocknote/utils";
+import type { ContextForMacros, MacroCall } from "../../blocknote/utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Nodes = any[];
 
 /** Renders a macro output through {@link MacroOutput} into a detached container and returns it for DOM assertions. */
-function render(nodes: Nodes, call: MacroCall, inline = false): HTMLElement {
+function render(
+  nodes: Nodes,
+  call: MacroCall,
+  inline = false,
+  macros: ContextForMacros | null = null,
+): HTMLElement {
   const container = document.createElement("div");
   const root = createRoot(container);
   flushSync(() => {
-    root.render(createElement(MacroOutput, { nodes, call, inline }));
+    root.render(
+      createElement(
+        MacrosContext.Provider,
+        { value: macros },
+        createElement(MacroOutput, { nodes, call, inline }),
+      ),
+    );
   });
   return container;
 }
@@ -311,6 +323,79 @@ describe("MacroOutput (nested macros)", () => {
     const output = [{ type: "xwikiEditable" }];
 
     expect(() => render(output, call)).not.toThrow();
+  });
+});
+
+describe("MacroOutput (nested macro output lookup)", () => {
+  // The output of a macro nested in the content of another macro call is not part of the edited content (it is
+  // rendered for the current user) so it is retrieved by id, but only while the nested macro call is unchanged.
+  const errorCall = { name: "error", parameters: {}, content: "test" };
+  const errorOutput = [
+    {
+      type: "xwikiGroup",
+      props: { xwikiParameters: { class: "box errormessage" } },
+      children: [{ type: "xwikiEditable" }],
+    },
+  ];
+  const editableOutput = [{ type: "xwikiEditable" }];
+  const outputLookup: ContextForMacros = {
+    getMacroOutput: (id, macroCall) =>
+      id === "nested-1" && macroCall === JSON.stringify(errorCall)
+        ? errorOutput
+        : undefined,
+  };
+
+  /** @returns an info macro call whose content holds an error macro call, without its output */
+  function infoCallWithNestedError(nestedCall: MacroCall): MacroCall {
+    return {
+      name: "info",
+      parameters: {},
+      content: [
+        {
+          type: "xwikiMacroBlock",
+          props: { call: nestedCall, id: "nested-1" },
+        },
+      ],
+    };
+  }
+
+  test("retrieves the output of a macro nested in the macro content through the macro context", () => {
+    const container = render(
+      editableOutput,
+      infoCallWithNestedError(errorCall),
+      false,
+      outputLookup,
+    );
+
+    const nested = container.querySelector<HTMLElement>(
+      '[data-macro-name="error"]',
+    );
+    expect(nested!.querySelector("div.box.errormessage")).not.toBeNull();
+    expect(nested!.textContent).toBe("test");
+  });
+
+  test("displays a placeholder for a nested macro without output when there is no macro context", () => {
+    const container = render(
+      editableOutput,
+      infoCallWithNestedError(errorCall),
+    );
+
+    expect(
+      container.querySelector('[data-macro-name="error"]')!.textContent,
+    ).toBe("macro:error");
+  });
+
+  test("displays a placeholder for a nested macro whose call was modified after its output was rendered", () => {
+    const container = render(
+      editableOutput,
+      infoCallWithNestedError({ ...errorCall, content: "changed" }),
+      false,
+      outputLookup,
+    );
+
+    expect(
+      container.querySelector('[data-macro-name="error"]')!.textContent,
+    ).toBe("macro:error");
   });
 });
 

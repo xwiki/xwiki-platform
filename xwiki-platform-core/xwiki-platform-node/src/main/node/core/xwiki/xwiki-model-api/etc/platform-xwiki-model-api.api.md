@@ -84,9 +84,11 @@ export class EntityReferenceResolver {
 // @beta
 export class EntityReferenceSerializer {
     // (undocumented)
-    serialize(entityReference?: EntityReference | null): string;
+    serialize(entityReference?: EntityReference | null, baseReference?: EntityReference | null): string;
     // @internal (undocumented)
     _serializeComponent(entityReference: EntityReference): string;
+    // @internal (undocumented)
+    _serializeName(entityReference: EntityReference): string;
 }
 
 // @beta
@@ -159,7 +161,7 @@ export interface ModelApi {
     // (undocumented)
     resolve(representation?: string | null, entityType?: number | string | null, defaultValueProvider?: DefaultValueProvider): EntityReference | null | undefined;
     // (undocumented)
-    serialize(entityReference?: EntityReference | null): string;
+    serialize(entityReference?: EntityReference | null, baseReference?: EntityReference | null): string;
 }
 
 // @beta

@@ -19,6 +19,7 @@
     "globals": "catalog:",
     "jquery": "catalog:",
     "qunit": "catalog:",
+    "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:"
   }

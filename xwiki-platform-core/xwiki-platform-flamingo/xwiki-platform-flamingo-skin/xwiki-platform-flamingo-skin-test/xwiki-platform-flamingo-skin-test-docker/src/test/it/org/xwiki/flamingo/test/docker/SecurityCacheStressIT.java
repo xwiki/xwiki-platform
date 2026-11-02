@@ -57,12 +57,12 @@ class SecurityCacheStressIT
     @Test
     void stressTest(TestUtils testUtils, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
-        // The test saves the rights of a space twice in a row, adding then removing a rights object, while the Solr
-        // indexer loads the document saved first: when the second save deletes the object between the listing of its
-        // properties and their loading, the store logs that the properties of the rights object have no data.
-        logCaptureConfiguration.registerExcludeRegexes(
-            "^.*\\[XWiki Solr index thread\\] ERROR \\S*XWikiHibernateStore\\s+- No data for property "
-                + "\\[(levels|groups|users|allow)\\] of object id \\[-?\\d+\\]\\s*$");
+        // The test saves the rights of a space twice in a row, adding then removing a rights object, while background
+        // threads (e.g. the Solr indexer or the links indexing task) load the document saved first: when the second
+        // save deletes the object between the listing of its properties and their loading, the store logs that the
+        // properties of the rights object have no data.
+        logCaptureConfiguration.registerExcludeRegexes("^.*ERROR \\S*XWikiHibernateStore\\s+- No data for property "
+            + "\\[(levels|groups|users|allow)\\] of object id \\[-?\\d+\\]\\s*$");
 
         testUtils.loginAsSuperAdmin();
 

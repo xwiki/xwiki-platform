@@ -806,7 +806,7 @@ class DeletePageIT
         // Verify that there is no redirect and the links were not altered.
         assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
-        assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
+        assertEquals(LOGGED_USERNAME, deleteOutcome.getDeletedPagesEntries().get(0).getDeleter());
         assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
         assertEquals(backlinkDocContent, testUtils.rest().<Page>get(backlinkDocReference).getContent());
     }

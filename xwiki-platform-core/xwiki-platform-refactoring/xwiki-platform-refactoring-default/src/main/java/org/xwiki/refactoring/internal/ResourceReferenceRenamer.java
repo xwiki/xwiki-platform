@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -147,13 +149,13 @@ public class ResourceReferenceRenamer
     {
         boolean result = false;
 
-        // FIXME: the root cause of XWIKI-18634 is related to this call.
         EntityReference linkEntityReference =
-            this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
+            resolveBeforeRename(resourceReference, oldReference, newReference, currentDocumentReference);
 
         DocumentReference linkTargetDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
-        EntityReference absoluteResolvedEntityReference = this.entityReferenceResolver.resolve(resourceReference, null);
+        EntityReference absoluteResolvedEntityReference =
+            resolveBeforeRename(resourceReference, oldReference, newReference, null);
 
         // If the link targets the old (renamed) document reference and it's an absolute reference
         // (i.e. its resolution without any given parameter gives same result than its resolution with the
@@ -173,6 +175,33 @@ public class ResourceReferenceRenamer
             result = true;
         }
         return result;
+    }
+
+    /**
+     * Resolve the given resource reference the way it was resolved before the old document was renamed.
+     * <p>
+     * The entity targeted by a document or attachment resource reference depends on the existence of documents: for
+     * example {@code Space.Page@image.png} targets the terminal document {@code Space.Page} when it exists, and the
+     * space home page {@code Space.Page.WebHome} otherwise. When the backlinks of the renamed document are updated,
+     * the old document doesn't exist anymore and the new one does, so the reference is resolved as if it was still
+     * the opposite.
+     *
+     * @param resourceReference the resource reference to resolve
+     * @param oldReference the reference of the renamed document
+     * @param newReference the new reference of the renamed document
+     * @param baseReference the reference relative to which the resource reference is resolved, or {@code null} to
+     *     use the current document
+     * @return the entity the resource reference was targeting before the old document was renamed
+     */
+    private EntityReference resolveBeforeRename(ResourceReference resourceReference, DocumentReference oldReference,
+        DocumentReference newReference, EntityReference baseReference)
+    {
+        Map<DocumentReference, Boolean> existence = new HashMap<>();
+        existence.put(newReference, false);
+        existence.put(oldReference, true);
+
+        return this.entityReferenceResolver.resolve(resourceReference, null, baseReference,
+            new DocumentExistenceOverride(existence));
     }
 
     /**
@@ -332,7 +361,6 @@ public class ResourceReferenceRenamer
     {
         boolean result = false;
 
-        // FIXME: the root cause of XWIKI-18634 is related to this call.
         EntityReference linkEntityReference =
             this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
 

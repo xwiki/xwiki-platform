@@ -89,6 +89,7 @@
 
 <script setup lang="ts">
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
+import { toRelativeAttachmentResourceReference } from "../services/blocknote/attachmentResourceReference";
 import { createFileUploader } from "../services/blocknote/createFileUploader";
 import {
   extractLinkId,
@@ -131,7 +132,9 @@ import type {
   BlockNoteViewWrapperProps,
   BlockType,
   EditorLanguage,
+  ImageEditionHooks,
   ImageEditionOverrideFn,
+  ImageInsertionOverrideFn,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
@@ -166,6 +169,7 @@ const {
   collaborationURL = undefined,
   documentReference = Model.serialize(XWiki.currentDocument.documentReference),
   locale,
+  startupFocus = undefined,
 } = defineProps<{
   // The key used to submit the edited content.
   name?: string;
@@ -202,9 +206,14 @@ const {
    * reference doesn't specify a locale.
    */
   locale?: string;
+
+  // Whether to focus the editor when it's created. It's a string when it comes from an HTML attribute.
+  startupFocus?: boolean | string;
 }>();
 
 const actualLocale = locale || xwikiMeta.locale;
+const editedDocumentReference =
+  Model.resolve(documentReference, EntityType.DOCUMENT) ?? undefined;
 
 //
 // Data
@@ -239,7 +248,49 @@ const imageEdition: ImageEditionOverrideFn = (block, update) => {
       },
       cancel: () => update({ type: "aborted" }),
     },
+    { documentReference: editedDocumentReference },
   );
+};
+
+const imageInsertion: ImageInsertionOverrideFn = (insert) => {
+  const imageWizard: ImageWizard = container.get("ImageWizard");
+  // The image wizard lets the user select the image to insert (among the existing images, or by uploading a new one)
+  // and set its properties. The resource reference of the selected image is stored by the image edition hooks.
+  imageWizard.insert(
+    {
+      submit: ({ reference, ...props }) =>
+        insert({ type: "insert", props, reference }),
+      cancel: () => insert({ type: "aborted" }),
+    },
+    { documentReference: editedDocumentReference },
+  );
+};
+
+const imageEditionHooks: ImageEditionHooks = {
+  // Runs right after an image is inserted or its source is changed (e.g. from the image suggestions or by uploading
+  // it). The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so that the image is
+  // saved with the reference provided by the server rather than with its URL, relative to the edited document. An image
+  // known only by its URL is saved with that URL, so we drop the reference of the previous image source.
+  afterUpdate: (block, reference) => {
+    const metadata = blockNoteDocument?.getMetadata(block.id, !!reference);
+    if (reference?.type === "attach") {
+      metadata!.xwikiReference = {
+        ...(editedDocumentReference
+          ? toRelativeAttachmentResourceReference(
+              reference,
+              editedDocumentReference,
+            )
+          : reference),
+        // Untyped, like the image references written by the WYSIWYG editors (an image points to an attachment by
+        // default).
+        typed: false,
+      };
+    } else if (reference) {
+      metadata!.xwikiReference = reference;
+    } else if (metadata) {
+      delete metadata.xwikiReference;
+    }
+  },
 };
 
 const linkEdition: LinkEditionHooks = {
@@ -376,14 +427,21 @@ const editorProps = shallowRef<
     // consistency between edit and view modes.
     defaultStyles: false,
     uploadFile,
+    // Put the caret at the start of the content when the editor is focused on creation.
+    autofocus:
+      startupFocus === true || startupFocus === "true" ? "start" : false,
   },
   theme: "light",
   lang: (actualLocale || "en") as EditorLanguage,
+  // The images uploaded from the editor are attached to the edited document.
+  documentReference,
   // Style the code blocks like the code macro output in view mode.
   codeBlockClassName: "box code",
   label: defaultLabel,
   overrides: {
     imageEdition,
+    imageEditionHooks,
+    imageInsertion,
     linkEdition,
   },
   syntax,
@@ -492,8 +550,7 @@ function getEditedDocument(): XWikiDocument {
     return XWikiDocument.currentDocument(xwikiMeta);
   }
   return new XWikiDocument({
-    documentReference:
-      Model.resolve(documentReference, EntityType.DOCUMENT) ?? undefined,
+    documentReference: editedDocumentReference,
     language: actualLocale,
   });
 }
@@ -503,6 +560,10 @@ function getEditedDocument(): XWikiDocument {
 // resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
 const macros: BlockNoteViewWrapperProps["macros"] = {
   ctx: {
+    // The macro output is kept outside the edited content (which is shared with the other users when editing in
+    // realtime) because it was rendered for the current user.
+    getMacroOutput: (id, call) => blockNoteDocument?.getMacroOutput(id, call),
+
     openParamsEditor: async (invocation, update) => {
       try {
         const macroWizard: BlockNoteMacroWizard = container.get(

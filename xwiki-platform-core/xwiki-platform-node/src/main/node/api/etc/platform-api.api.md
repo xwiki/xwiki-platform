@@ -435,7 +435,7 @@ interface Storage_2 {
     }>;
     save(page: string, title: string, content: string, syntax: string): Promise<unknown>;
     // (undocumented)
-    saveAttachments(page: string, files: File[], options?: SaveAttachmentsOptions): Promise<undefined | (undefined | string)[]>;
+    saveAttachments(page: string, files: File[], options?: SaveAttachmentsOptions): Promise<undefined | (undefined | PageAttachment)[]>;
     // (undocumented)
     setWikiConfig(config: WikiConfig): void;
 }

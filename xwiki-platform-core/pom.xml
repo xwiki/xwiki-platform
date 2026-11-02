@@ -170,21 +170,6 @@
             </revapi.differences>
             <revapi.differences>
               <justification>
-                Fetching a live data entry might require an optional list of properties to fetch, which was missing.
-                The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
-                parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.
-              </justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <code>java.method.numberOfParametersChanged</code>
-                  <old>method org.xwiki.livedata.rest.model.jaxb.Entry org.xwiki.livedata.rest.LiveDataEntryResource::getEntry(java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
-                  <new>method org.xwiki.livedata.rest.model.jaxb.Entry org.xwiki.livedata.rest.LiveDataEntryResource::getEntry(java.lang.String, java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;) throws java.lang.Exception</new>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>
                 Modifying xobjects through REST needs a way to set the version comment, and deleting an xobject needs
                 a way to create a minor version. The REST API shouldn't be called directly from Java but through HTTP
                 requests. Adding a new query string parameter to an existing REST resource doesn't break existing code
@@ -264,6 +249,21 @@
                   <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
                   <new>method void org.xwiki.search.solr.Solr::deleteIndex(org.xwiki.search.solr.XWikiSolrCore) throws org.xwiki.search.solr.SolrException</new>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
+                This class should have never been exposed as an API as it's an internal component implementation.
+                It has been moved to an internal package following the vote performed on
+                https://forum.xwiki.org/t/move-defaultauthorizationmanager-to-an-internal-package/15926.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.DefaultAuthorizationManager</old>
                 </item>
               </differences>
             </revapi.differences>

@@ -97,7 +97,7 @@ class XWikiStorage extends AbstractStorage {
     page: string,
     files: File[],
     options?: SaveAttachmentsOptions,
-  ): Promise<undefined | (undefined | string)[]> {
+  ): Promise<undefined | (undefined | PageAttachment)[]> {
     return Promise.all(
       files.map((file) => this.saveAttachment(page, file, options)),
     );
@@ -107,7 +107,7 @@ class XWikiStorage extends AbstractStorage {
     page: string,
     file: File,
     options?: SaveAttachmentsOptions,
-  ): Promise<undefined | (undefined | string)> {
+  ): Promise<undefined | PageAttachment> {
     const uploadURL = this.getUploadURL(page, "filebrowser");
     const response = await fetch(uploadURL, {
       method: "POST",
@@ -122,7 +122,17 @@ class XWikiStorage extends AbstractStorage {
     // read it even when the status says the request failed.
     const result = await response.json().catch(() => undefined);
     if (result?.uploaded) {
-      return result.message.resourceReference.reference;
+      // The upload response describes the uploaded attachment like the REST API describes attachments.
+      const { id, name, mimeType, size, date, author } = result.attachment;
+      return {
+        id,
+        reference: name,
+        mimetype: mimeType,
+        href: result.url,
+        size,
+        date: new Date(date),
+        author,
+      };
     }
     throw new Error(
       `Upload failed: ${result?.error?.message ?? response.statusText}`,

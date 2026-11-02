@@ -29,6 +29,10 @@ type Link = {
   url: string;
   reference: string;
   label: string;
+  /**
+   * Additional information displayed next to the label, to distinguish links with the same label (the URL isn't
+   * normally displayed), e.g. the location of the linked page or attachment. Empty when there's none.
+   */
   hint: string;
   type: LinkType;
 };

@@ -23,6 +23,7 @@ import { Container, inject, injectable } from "inversify";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteIterator, NodeType } from "./BlockNoteIterator";
 import type { BlockNoteProcessor } from "./BlockNoteProcessor";
+import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 
 /**
  * XWik specific implementation of a BlockNoteProcessor.
@@ -95,7 +96,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   ): boolean {
     if (typeof node === "object") {
       if (this.isMacroNode(node)) {
-        this.loadMacro(node as { props?: unknown });
+        this.loadMacro(node as Record<string, unknown>, blockNoteDocument);
         return true;
       } else if (node.type === "link") {
         this.normalizeLinkContent(node);
@@ -130,18 +131,100 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   /**
-   * By default, BlockNote supports only primitive values for block and inline content properties. To overcome this
-   * limitation, we need to pre-process the macro properties (both block and inline macros) to convert the call and
-   * output objects into strings (JSON serialization).
+   * Pre-processes a macro node (block or inline macro):
+   * <ul>
+   * <li>By default, BlockNote supports only primitive values for block and inline content properties, so the macro call
+   * object is converted into a string (JSON serialization).</li>
+   * <li>The macro output is moved to the document metadata. The macro output can contain information that only the
+   * current user is allowed to view (macros are rendered server-side with the rights of the current user) so it must
+   * not be part of the edited content, which is shared with the other users when editing in realtime. The same goes
+   * for the output of the macros nested in the macro parameters or content (i.e. the parameters or the content that
+   * are editable in-place).</li>
+   * </ul>
    *
    * @param macroNode - the macro node to pre-process
+   * @param blockNoteDocument - the BlockNote document where to backup the macro output
+   * @param nested - whether the macro is nested in the parameters or content of another macro call
    */
-  private loadMacro(macroNode: { props?: unknown }): void {
+  private loadMacro(
+    macroNode: Record<string, unknown>,
+    blockNoteDocument: BlockNoteDocument,
+    nested = false,
+  ): void {
     const props = macroNode.props as Record<string, unknown>;
-    props.call = JSON.stringify(props.call);
-    if (props.output) {
-      props.output = JSON.stringify(props.output);
+    this.visitNestedMacros(props.call, (nestedMacro) =>
+      this.loadMacro(nestedMacro, blockNoteDocument, true),
+    );
+    const call = JSON.stringify(props.call);
+    if (!nested) {
+      props.call = call;
     }
+
+    const output = props.output;
+    delete props.output;
+    if (Array.isArray(output) && output.length) {
+      blockNoteDocument.setMacroOutput(
+        this.getMacroId(macroNode, nested),
+        call,
+        output,
+      );
+    }
+  }
+
+  /**
+   * @param macroNode - a macro node
+   * @param nested - whether the macro is nested in the parameters or content of another macro call
+   * @returns the id used to associate the macro output with the given macro node, generated if needed
+   */
+  private getMacroId(
+    macroNode: Record<string, unknown>,
+    nested: boolean,
+  ): string {
+    if (!nested && macroNode.type === "xwikiMacroBlock") {
+      // BlockNote preserves the block id.
+      macroNode.id = macroNode.id ?? uuidv4();
+      return macroNode.id as string;
+    }
+    // Inline content and nested macros don't have an id that BlockNote preserves so we use a dedicated property.
+    const props = macroNode.props as Record<string, unknown>;
+    props.id = uuidv4();
+    return props.id as string;
+  }
+
+  /**
+   * Calls the given function for each macro node found in the parameters or the content of the given macro call (the
+   * parameters and the content that are editable in-place are BlockNote fragments that can contain macro calls). The
+   * macros nested in the found macros are not visited.
+   *
+   * @param call - the macro call object
+   * @param visit - the function to call for each nested macro node
+   */
+  private visitNestedMacros(
+    call: unknown,
+    visit: (macroNode: Record<string, unknown>) => void,
+  ): void {
+    if (call === null || typeof call !== "object") {
+      return;
+    }
+    const { parameters, content } = call as {
+      parameters?: Record<string, unknown>;
+      content?: unknown;
+    };
+    [...Object.values(parameters ?? {}), content]
+      .filter((value) => value !== null && typeof value === "object")
+      .forEach((fragment) => {
+        const nodes = Array.isArray(fragment) ? fragment : [fragment];
+        // A fragment can also hold inline content, which the iterator handles as well.
+        this.iterator.iterate(nodes as BlockType[], {
+          visit: (node) => {
+            if (typeof node === "object" && this.isMacroNode(node)) {
+              visit(node as Record<string, unknown>);
+              return true;
+            }
+            return false;
+          },
+        });
+      });
   }
 
   /**
@@ -333,7 +416,8 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   /**
-   * Reverses the changes made by the loadMacro method.
+   * Reverses the changes made by the loadMacro method. The macro output is not restored because it isn't needed
+   * server-side (it is ignored when parsing the BlockNote content).
    *
    * @param macroNode - the macro node to post-process
    */
@@ -342,9 +426,11 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     if (typeof props.call === "string") {
       props.call = JSON.parse(props.call);
     }
-    if (typeof props.output === "string") {
-      props.output = JSON.parse(props.output);
-    }
+    // The id used to look up the macro output.
+    delete props.id;
+    this.visitNestedMacros(props.call, (nestedMacro) =>
+      this.saveMacro(nestedMacro),
+    );
   }
 
   /**

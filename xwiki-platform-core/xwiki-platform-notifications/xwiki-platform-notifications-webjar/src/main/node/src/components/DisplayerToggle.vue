@@ -127,6 +127,15 @@ export default {
           await loadById("xwiki-bootstrap-switch");
 
           const jQuery = this.jQuery;
+          // The switch otherwise has no accessible name: its visible content is a decorative icon, and the spans
+          // Bootstrap Switch draws around the input are aria-hidden as they only duplicate the checkbox state,
+          // see XWIKI-22198. Skip an unknown name, since an empty aria-label reads as an explicit "unlabelled".
+          if (this.propertyDescriptor?.name) {
+            this.$refs.input.setAttribute(
+              "aria-label",
+              this.propertyDescriptor.name,
+            );
+          }
           jQuery(this.$refs.input).bootstrapSwitch({
             size: "mini",
             state: component.innerChecked,

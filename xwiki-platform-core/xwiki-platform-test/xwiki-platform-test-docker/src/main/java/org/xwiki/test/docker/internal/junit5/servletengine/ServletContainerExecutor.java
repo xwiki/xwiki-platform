@@ -713,7 +713,6 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
      */
     public void stop() throws Exception
     {
-        // Nothing else to do, TestContainers automatically stops the container
         if (ServletEngine.JETTY_STANDALONE == this.testConfiguration.getServletEngine()) {
             this.jettyStandaloneExecutor.stop();
         }
@@ -724,6 +723,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         {
             this.servletContainer.copyFileFromContainer(CLOVER_DATABASE, CLOVER_DATABASE);
         }
+
+        stopContainers();
     }
 
     private void addJava17AddOpens(List<String> list)

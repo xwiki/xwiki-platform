@@ -83,6 +83,22 @@ public class SlashMenu extends BaseElement
     }
 
     /**
+     * Clicks the menu item with the given title and whose subtitle contains the given text, e.g. to pick one of
+     * several suggestions with the same title, told apart by their location.
+     *
+     * @param title the menu item title
+     * @param subtitleFragment a fragment of the menu item subtitle
+     * @since 18.10.0RC1
+     */
+    public void clickItem(String title, String subtitleFragment)
+    {
+        getDriver().findElement(By.xpath("//div[contains(@class, 'bn-suggestion-menu-item') and "
+            + ".//p[contains(@class, 'bn-mt-suggestion-menu-item-title') and text()='" + title + "'] and "
+            + ".//p[contains(@class, 'bn-mt-suggestion-menu-item-subtitle') and contains(., '" + subtitleFragment
+            + "')]]")).click();
+    }
+
+    /**
      * Waits for the drop-down menu to be updated as a result of an item being submitted. Note that we don't wait for
      * the drop down to disappear because submitting an item can open a new drop down menu (e.g. the link quick action
      * opens the link auto-complete drop down).

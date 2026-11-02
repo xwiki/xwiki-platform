@@ -321,23 +321,20 @@ describe("Resolver", () => {
   });
 });
 
-describe("Misc", () => {
-  function attach(serializedReference: string): XWiki.EntityReference {
-    return XWiki.Model.resolve(
-      serializedReference,
-      XWiki.EntityType.ATTACHMENT,
-    )!;
-  }
-  function doc(serializedReference: string): XWiki.EntityReference {
-    return XWiki.Model.resolve(serializedReference, XWiki.EntityType.DOCUMENT)!;
-  }
-  function space(serializedReference: string): XWiki.EntityReference {
-    return XWiki.Model.resolve(serializedReference, XWiki.EntityType.SPACE)!;
-  }
-  function wiki(wikiName: string): XWiki.EntityReference {
-    return new XWiki.WikiReference(wikiName);
-  }
+function attach(serializedReference: string): XWiki.EntityReference {
+  return XWiki.Model.resolve(serializedReference, XWiki.EntityType.ATTACHMENT)!;
+}
+function doc(serializedReference: string): XWiki.EntityReference {
+  return XWiki.Model.resolve(serializedReference, XWiki.EntityType.DOCUMENT)!;
+}
+function space(serializedReference: string): XWiki.EntityReference {
+  return XWiki.Model.resolve(serializedReference, XWiki.EntityType.SPACE)!;
+}
+function wiki(wikiName: string): XWiki.EntityReference {
+  return new XWiki.WikiReference(wikiName);
+}
 
+describe("Misc", () => {
   it("relativeTo", () => {
     const cases: [XWiki.EntityReference, XWiki.EntityReference, string][] = [
       // Absolute base reference.
@@ -459,5 +456,97 @@ describe("Misc", () => {
       documentReference.hasParent(new XWiki.SpaceReference("wiki", "To")),
     ).toBe(false);
     expect(documentReference.hasParent(null)).toBe(false);
+  });
+});
+
+describe("Serialize relative to a base reference", () => {
+  it("omits the entities in common with the base reference", () => {
+    const cases: [XWiki.EntityReference, XWiki.EntityReference, string][] = [
+      // Same results as the server-side compact serializer.
+      [attach("wiki:space.page@file"), doc("wiki:space.page"), "file"],
+      [attach("wiki:space.page@file"), doc("wiki:space.other"), "page@file"],
+      [
+        attach("wiki:space.page@file"),
+        doc("otherwiki:space.page"),
+        "wiki:space.page@file",
+      ],
+      [
+        doc("wiki:space.nested.page"),
+        doc("wiki:space.page"),
+        "space.nested.page",
+      ],
+      [doc("wiki:space.page"), doc("wiki:space.page"), "page"],
+      [space("wiki:space"), doc("wiki:space.page"), "space"],
+
+      // The spaces of a nested space are either all omitted or all kept.
+      [attach("xwiki:A.B.WebHome@x.png"), doc("xwiki:A.B.WebHome"), "x.png"],
+      [attach("xwiki:A.B.Page@x.png"), doc("xwiki:A.B.WebHome"), "Page@x.png"],
+      [
+        attach("xwiki:A.C.WebHome@x.png"),
+        doc("xwiki:A.B.WebHome"),
+        "A.C.WebHome@x.png",
+      ],
+      [
+        attach("xwiki:A.B.C.WebHome@x.png"),
+        doc("xwiki:A.B.WebHome"),
+        "A.B.C.WebHome@x.png",
+      ],
+      [
+        attach("xwiki:A.B.WebHome@x.png"),
+        doc("xwiki:A.B.C.WebHome"),
+        "A.B.WebHome@x.png",
+      ],
+      [
+        attach("xwiki:A.B.WebHome@x.png"),
+        doc("xwiki:A.WebHome"),
+        "A.B.WebHome@x.png",
+      ],
+      // Unlike the server-side compact serializer, a nested space isn't confused with the base nested space it ends
+      // with.
+      [
+        attach("xwiki:X.A.B.Page@x.png"),
+        doc("xwiki:A.B.WebHome"),
+        "X.A.B.Page@x.png",
+      ],
+
+      // The entities missing from the base reference are kept.
+      [doc("wiki:space.page"), wiki("wiki"), "space.page"],
+      [doc("wiki:space.page"), space("space"), "wiki:space.page"],
+
+      // The escaped characters are kept.
+      [
+        attach("xwiki:Space.Page@a\\@b:c.png"),
+        doc("xwiki:Space.Page"),
+        "a\\@b:c.png",
+      ],
+      [
+        attach("xwiki:Sp\\.ace.Page@x.png"),
+        doc("xwiki:Other.Page"),
+        "Sp\\.ace.Page@x.png",
+      ],
+    ];
+    for (const [reference, baseReference, expected] of cases) {
+      const actual = XWiki.Model.serialize(reference, baseReference);
+      expect(actual, `[${reference}] relative to [${baseReference}]`).toEqual(
+        expected,
+      );
+      // The result resolves back to the serialized entity.
+      expect(
+        XWiki.Model.resolve(actual, reference.type, baseReference)?.equals(
+          reference,
+        ),
+        `[${actual}] resolved relative to [${baseReference}]`,
+      ).toBe(true);
+    }
+  });
+
+  it("fully serializes without a base reference", () => {
+    const reference = attach("xwiki:A.B.WebHome@x.png");
+    expect(XWiki.Model.serialize(reference, null)).toEqual(
+      "xwiki:A.B.WebHome@x.png",
+    );
+    expect(XWiki.Model.serialize(reference, undefined)).toEqual(
+      "xwiki:A.B.WebHome@x.png",
+    );
   });
 });

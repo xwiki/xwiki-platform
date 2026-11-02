@@ -1,0 +1,102 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="TourCode.TourTranslations" locale="da">
+  <web>TourCode</web>
+  <name>TourTranslations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>TourCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># App name
+tour.app.name=Rundvisning
+
+# Class fields
+TourCode.TourClass_description=Beskrivelse
+TourCode.TourClass_isActive=Aktiv
+TourCode.TourClass_targetPage=Målside
+
+# Live table generic keys
+tour.livetable.doc.title=Rundvisningens navn
+tour.livetable._actions=Handlinger
+tour.livetable._actions.edit=Rediger
+tour.livetable._actions.delete=Slet
+tour.livetable._actions.launch=Start
+tour.livetable.emptyvalue=-
+
+# Live table specific keys
+tour.livetable.description=Beskrivelse
+tour.livetable.isActive=Aktiv
+tour.livetable.targetPage=Målside
+tour.livetable.targetClass=Målklasse
+
+# Tour popover
+tour.popover.previous=« Forrige
+tour.popover.next=Næste »
+tour.popover.end=Afslut rundvisningen
+tour.popover.quit=Forlad rundvisningen
+tour.popover.show=Vis rundvisningen
+tour.popover.show.hint=Du kan til enhver tid starte rundvisningen forfra ved at klikke på denne knap
+
+# Steps
+TourCode.StepClass_order=Rækkefølge
+TourCode.StepClass_element=Element (CSS-selektor, der identificerer et element)
+TourCode.StepClass_title=Titel
+TourCode.StepClass_content=Indhold
+TourCode.StepClass_backdrop=Baggrundsdæmpning
+TourCode.StepClass_placement=Placering
+TourCode.StepClass_targetPage=Målside
+TourCode.StepClass_action=Målhandling
+TourCode.StepClass_queryString=Forespørgselsstreng
+TourCode.StepClass_reflex=Reflex
+tour.steps=Trin
+tour.steps.new_step=Nyt trin
+tour.steps.add_step=Tilføj trin
+tour.steps.edit_step=Rediger trin
+tour.steps.save_step=Gem
+tour.steps.delete_confirm=Er du sikker på, at du vil slette trinnet?
+tour.steps.delete_done=Trinnet er slettet!
+tour.steps.deleting=Sletter trin...
+tour.steps.yes=Ja
+tour.steps.no=Nej
+tour.steps.edit=Rediger
+tour.steps.delete=Slet
+
+# Upgrade
+tour.upgrade.title=Opgrader
+tour.upgrade.successList=Følgende sider er konverteret:
+tour.upgrade.successNothing=Der er intet at opgradere!
+
+# Template
+tour.template.name=Rundvisning
+tour.template.description=Rundvisning trin for trin
+</content>
+</xwikidoc>

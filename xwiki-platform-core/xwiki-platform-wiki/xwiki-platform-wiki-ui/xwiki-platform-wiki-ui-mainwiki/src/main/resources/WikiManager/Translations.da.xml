@@ -73,200 +73,196 @@
 ## Menus
 ### Missing: platform.wiki.menu.wikiindex=Wiki Index
 ### Missing: platform.wiki.menu.deletewiki=Delete wiki
-### Missing: platform.wiki.menu.userwikis=Wikis
+platform.wiki.menu.userwikis=Wikier
 
 ## Dependencies
-### Missing: platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.wiki.missing=Java-komponenten "Wiki" er ikke installeret. Denne side vil ikke fungere korrekt. Sørg for, at udvidelserne "Wiki API" og "Wiki Script" er installeret (med Udvidelseshåndtering), eller at filerne 'xwiki-platform-wiki-api-&lt;version&gt;.jar' og 'xwiki-platform-wiki-script-&lt;version&gt;.jar' ligger i webprogrammets mappe 'WEB-INF/lib/' (ved manuel installation).
+platform.wiki.dependencies.template.missing=Java-komponenten "Wiki Template" er ikke installeret. Denne side vil ikke fungere korrekt. Sørg for, at udvidelserne "Wiki Template API" og "Wiki Template Script" er installeret (med Udvidelseshåndtering), eller at filerne 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' og 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' ligger i webprogrammets mappe 'WEB-INF/lib/' (ved manuel installation).
+platform.wiki.dependencies.user.missing=Java-komponenten "Wiki User" er ikke installeret. Denne side vil ikke fungere korrekt. Sørg for, at udvidelserne "Wiki User API" og "Wiki User Script" er installeret (med Udvidelseshåndtering), eller at filerne 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' og 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' ligger i webprogrammets mappe 'WEB-INF/lib/' (ved manuel installation).
 
 ## Create
-### Missing: platform.wiki.create.button=Create Wiki
-### Missing: platform.wiki.create.title=Create a new wiki
+platform.wiki.create.button=Opret wiki
+platform.wiki.create.title=Opret en ny wiki
 ### Missing: platform.wiki.create.members=MEMBERS
-### Missing: platform.wiki.create.prettyname.empty=Pretty name must not be empty
-### Missing: platform.wiki.create.error=Wiki \"{0}\" creation failed: {1}.
-### Missing: platform.wiki.create.error.wikiname.databasealreadyexists=A database with this identifier already exists
-### Missing: platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
-### Missing: platform.wiki.create.error.wikiname.empty=Identifier can't be empty
+platform.wiki.create.prettyname.empty=Visningsnavnet må ikke være tomt
+platform.wiki.create.error=Oprettelsen af wikien "{0}" mislykkedes: {1}.
+platform.wiki.create.error.wikiname.databasealreadyexists=Der findes allerede en database med dette id
+platform.wiki.create.error.wikiname.wikialreadyexists=Dette id er allerede i brug
+platform.wiki.create.error.wikiname.empty=Id'et må ikke være tomt
 
 ## Common errors and messages
-### Missing: platform.wiki.error.wikidoesnotexist=Wiki [{0}] does not exist
-### Missing: platform.wiki.error.oneParameterNotSpecified=The ''{0}'' parameter was not specified.
-### Missing: platform.wiki.error.parameterAcceptsMultipleValues=Multiple values accepted.
-### Missing: platform.wiki.error.exceptionWithMessage=Exception: {0}
-### Missing: platform.wiki.form.requiredField=Required
-### Missing: platform.wiki.csrf.error=Invalid security token. Please retry your operation.
+platform.wiki.error.wikidoesnotexist=Wikien [{0}] findes ikke
+platform.wiki.error.oneParameterNotSpecified=Parameteren ''{0}'' er ikke angivet.
+platform.wiki.error.parameterAcceptsMultipleValues=Flere værdier tilladt.
+platform.wiki.error.exceptionWithMessage=Undtagelse: {0}
+platform.wiki.form.requiredField=Obligatorisk
+platform.wiki.csrf.error=Ugyldigt sikkerhedstoken. Prøv handlingen igen.
 
 ## Users
-### Missing: platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
-platform.wiki.users.invitation.userAcceptedNotification=Bruger ''{0}'' ({1}) har accepteret invitation til at deltage i arbejdsområde ''{2}'' ({3}).
-platform.wiki.users.invitation.userAcceptedSuccess=Bruger {0}{1}{2} har accepteret invitationen og er medlem i arbejdsområde {3}{4}{5}.
-platform.wiki.users.invitation.userRejectedSuccess=Bruger {0}{1}{2} afviste invitationen til arbejdsområde {3}{4}{5}.
-platform.wiki.users.join.error.needInvitation=Deltagelse i dette arbejdsområde er kun efter invitation. For at deltage skal du modtage en invitation fra en af administratorerne.
-platform.wiki.users.join.request.pendingRequestExists=Bruger {0}{1}{2} har allerede en ansøgning liggende til arbejdsområdet {3}{4}{5}. Vent venligst på at en administrator behandler det.
-platform.wiki.users.join.request.cancelConfirmation=Er du sikker på du vil slette ønsket om optagelse i arbejdsområde {0}{1}{2}?
+platform.wiki.users.userAlreadyMemberOfWiki=Brugeren {0}{1}{2} er allerede medlem af wikien {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=Brugeren {0}{1}{2} er ikke medlem af wikien {3}{4}{5}.
+platform.wiki.users.logInToContinue=For at fortsætte skal du først {0}logge på{1}.
+platform.wiki.users.invitation.userAcceptedNotification=Brugeren ''{0}'' ({1}) har accepteret invitationen til at blive medlem af wikien ''{2}'' ({3}).
+platform.wiki.users.invitation.userAcceptedSuccess=Brugeren {0}{1}{2} har accepteret invitationen og er blevet medlem af wikien {3}{4}{5}.
+platform.wiki.users.invitation.userRejectedSuccess=Brugeren {0}{1}{2} har afvist invitationen til at blive medlem af wikien {3}{4}{5}.
+platform.wiki.users.join.error.needInvitation=Denne wiki kræver invitation. Du skal have en invitation fra en af wikiens administratorer.
+platform.wiki.users.join.request.pendingRequestExists=Brugeren {0}{1}{2} har allerede en ventende anmodning om medlemskab af wikien {3}{4}{5}. Vent, til en administrator af wikien har gennemgået den.
+platform.wiki.users.join.request.cancelConfirmation=Er du sikker på, at du vil annullere anmodningen om medlemskab af wikien {0}{1}{2}?
 platform.wiki.users.join.request.cancelYes=Ja
 platform.wiki.users.join.request.cancelNo=Nej
-platform.wiki.users.join.request.cancelSuccess=Bruger {0}{1}{2} har trukket sit ønske om optagelse i arbejdsområde {3}{4}{5} tilbage.
-platform.wiki.users.join.request.saveNotification=Bruger ''{0}'' ({1}) ønsker medlemskab i arbejdsområde ''{2}'' ({3}).
-platform.wiki.users.join.request.success=Bruger {0}{1}{2} har sendt ansøgning om medlemskab i arbejdsområde {3}{4}{5}.
-platform.wiki.users.join.confirmation=Er du sikker på du vil deltage i arbejdsområde {0}{1}{2}?
+platform.wiki.users.join.request.cancelSuccess=Brugeren {0}{1}{2} har annulleret anmodningen om medlemskab af wikien {3}{4}{5}.
+platform.wiki.users.join.request.saveNotification=Brugeren ''{0}'' ({1}) har anmodet om medlemskab af wikien ''{2}'' ({3}).
+platform.wiki.users.join.request.success=Brugeren {0}{1}{2} har sendt en anmodning om medlemskab af wikien {3}{4}{5}.
+platform.wiki.users.join.confirmation=Er du sikker på, at du vil blive medlem af wikien {0}{1}{2}?
 platform.wiki.users.join.yes=Ja
 platform.wiki.users.join.no=Nej
-platform.wiki.users.join.success=Bruger {0}{1}{2} er blevet medlem i arbejdsområde {3}{4}{5}.
-platform.wiki.users.leave.error.userIsOwner=Bruger {0}{1}{2} er ejer af arbejdsområde {3}{4}{5}. Ejeren af et arbejdsområde må ikke forlade det før det enten er slettet eller at en ny ejer er angivet.
-platform.wiki.users.leave.confirmation=Er du sikker på du vil forlade arbejdsområde {0}{1}{2}.
-### Missing: platform.wiki.users.leave.confirmation.yes=Yes
+platform.wiki.users.join.success=Brugeren {0}{1}{2} er blevet medlem af wikien {3}{4}{5}.
+platform.wiki.users.leave.error.userIsOwner=Brugeren {0}{1}{2} er ejer af wikien {3}{4}{5}. Ejeren af en wiki kan ikke forlade den, medmindre wikien slettes, eller der vælges en ny ejer.
+platform.wiki.users.leave.confirmation=Er du sikker på, at du vil forlade wikien {0}{1}{2}?
+platform.wiki.users.leave.confirmation.yes=Ja
 platform.wiki.users.leave.confirmation.no=Nej
-### Missing: platform.wiki.users.leave.success=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
+platform.wiki.users.leave.success=Brugeren {0}{1}{2} har forladt wikien {3}{4}{5}.
 ### Missing: platform.wiki.users.join.title=Join Wiki
-### Missing: platform.wiki.users.leave.title=Leave Wiki "{0}"
-### Missing: platform.wiki.users.leave.empty=Leave Wiki
+platform.wiki.users.leave.title=Forlad wikien "{0}"
+platform.wiki.users.leave.empty=Forlad wikien
 ### Missing: platform.wiki.users.delete.title=Delete Wiki "{0}"
 ### Missing: platform.wiki.users.delete.empty=Delete Wiki
 platform.wiki.users.invitation.reply.hint=Et besked som svar, som administratorer kan læse og hvor i du kan begrunde din beslutning.
-platform.wiki.users.join.request.hint=For at deltage i arbejdsområde {0}{1}{2}, skal du først oprette en ansøgning. Derefter vil en administrator læse ans
-platform.wiki.users.join.request.message.hint=Besked som arbejdsområde-administorer kan læse og hvori du kan motivere din ansøgning.
-platform.wiki.users.invitation.title=Du er inviteteret til at deltage i arbejdsområde {0}{1}{2}.
+platform.wiki.users.join.request.hint=For at blive medlem af wikien {0}{1}{2} skal du først sende en anmodning om medlemskab. Derefter vil en administrator af wikien gennemgå din anmodning.
+platform.wiki.users.join.request.message.hint=En besked til wikiens administrator, hvor du kan begrunde din anmodning om medlemskab.
+platform.wiki.users.invitation.title=Du er inviteret til at blive medlem af wikien {0}{1}{2}.
 platform.wiki.users.invitation.message.label=Invitationsbesked
 platform.wiki.users.invitation.reply.title=Svar
-platform.wiki.users.invitation.accept.label=Accept
+platform.wiki.users.invitation.accept.label=Accepter
 platform.wiki.users.invitation.reject.label=Afvis
-### Missing: platform.wiki.users.invitation.postpone.label=Later
+platform.wiki.users.invitation.postpone.label=Senere
 ### Missing: platform.wiki.users.join.request.message.label=Message
-### Missing: platform.wiki.users.join.request.send.label=Send Request
-### Missing: platform.wiki.users.join.request.cancel.label=Back
+platform.wiki.users.join.request.send.label=Send anmodning
+platform.wiki.users.join.request.cancel.label=Tilbage
 
 ## User profile
-### Missing: platform.wiki.users.profile.joinedwikis.label=Joined wikis
-### Missing: platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=You are not a member of any wiki yet.
-### Missing: platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=The user is not a member of any wiki yet.
-### Missing: platform.wiki.users.profile.activity.title=Activity of wiki {0}
-### Missing: platform.wiki.users.profile.activity.hint=Generates an activity stream for the given wiki(s).
-### Missing: platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
-### Missing: platform.wiki.users.profile.activity.show=show activity
+platform.wiki.users.profile.joinedwikis.label=Wikier, du er medlem af
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Du er endnu ikke medlem af nogen wiki.
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=Brugeren er endnu ikke medlem af nogen wiki.
+platform.wiki.users.profile.activity.title=Aktivitet i wikien {0}
+platform.wiki.users.profile.activity.hint=Viser aktiviteterne i de angivne wikier.
+platform.wiki.users.profile.activity.multipletitle=Aktivitet i wikierne {0}
+platform.wiki.users.profile.activity.show=vis aktivitet
 
 ## Wiki Deletion
-### Missing: platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
-### Missing: platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
-### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
-### Missing: platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
+platform.wiki.delete.confirmation=Er du sikker på, at du vil slette wikien {0}{1}{2}? Handlingen kan ikke fortrydes!
+platform.wiki.delete.confirmation.retypeWikiId=Gentag wikiens id her:
+platform.wiki.delete.error.wikiIdDoesNotMatch=Skriv det nøjagtige id på den wiki, der skal slettes.
+platform.wiki.delete.success=Brugeren {0}{1}{2} har slettet wikien ''{3}''.
 
 ## Wiki macro
-### Missing: platform.wiki.macro.noWikis=There are currently no wikis created (except the main one).
+platform.wiki.macro.noWikis=Der er endnu ikke oprettet nogen wikier (ud over hovedwikien).
 ### Missing: rendering.macro.wikis.name=Wikis
-### Missing: rendering.macro.wikis.description=List all wikis
+rendering.macro.wikis.description=Vis alle wikier
 
 ## LegacyWorkspaces macro
-### Missing: rendering.macro.workspaces.name=Workspaces (Legacy)
-### Missing: rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
-
-## Browse
-### Missing: platform.wiki.browse=Browse Wikis
+rendering.macro.workspaces.name=Arbejdsområder (forældet)
+rendering.macro.workspaces.description=Forældet makro, der kun findes af hensyn til kompatibilitet og ikke bør bruges. Brug makroen "wikis" i stedet.
 ### Missing: platform.wiki.browse.emptyvalue=N/A
 ### Missing: platform.wiki.browse.wikiprettyname=Name
 ### Missing: platform.wiki.browse.description=Description
-### Missing: platform.wiki.browse.owner=Owner
-### Missing: platform.wiki.browse.membershipType=Membership Type
+platform.wiki.browse.owner=Ejer
+platform.wiki.browse.membershipType=Medlemskabstype
 ### Missing: platform.wiki.browse.doc.creationDate=Creation Date
 ### Missing: platform.wiki.browse._actions=Actions
 ### Missing: platform.wiki.browse._actions.join=Join
-### Missing: platform.wiki.browse._actions.requestJoin=Request Join
-### Missing: platform.wiki.browse._actions.viewInvitation=View Invitation
-### Missing: platform.wiki.browse._actions.cancelJoinRequest=Cancel Request
-### Missing: platform.wiki.browse._actions.leave=Leave
+platform.wiki.browse._actions.requestJoin=Anmod om medlemskab
+platform.wiki.browse._actions.viewInvitation=Vis invitation
+platform.wiki.browse._actions.cancelJoinRequest=Annuller anmodning
+platform.wiki.browse._actions.leave=Forlad
 ### Missing: platform.wiki.browse._actions.delete=Delete
 
 ## Classes
-### Missing: WikiManager.WikiUserClass_membershipType_open=Open for any user to join
-### Missing: WikiManager.WikiUserClass_membershipType_request=Any global user can request to join but an admin must accept
-### Missing: WikiManager.WikiUserClass_membershipType_invite=Only an admin can send invitations to join this wiki
-### Missing: WikiManager.WikiUserClass_userScope_local_only=Only local users are available in the wiki
-### Missing: WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki
-### Missing: WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
-### Missing: platform.wiki.prop.wikiname=Wiki Identifier
-### Missing: platform.wiki.prop.wikiprettyname=Pretty Name
+WikiManager.WikiUserClass_membershipType_open=Åben for alle brugere
+WikiManager.WikiUserClass_membershipType_request=Alle globale brugere kan anmode om medlemskab, men en administrator skal godkende
+WikiManager.WikiUserClass_membershipType_invite=Kun en administrator kan invitere til denne wiki
+WikiManager.WikiUserClass_userScope_local_only=Kun lokale brugere er tilgængelige i wikien
+WikiManager.WikiUserClass_userScope_global_only=Kun globale brugere er tilgængelige i wikien
+WikiManager.WikiUserClass_userScope_local_and_global=Både globale og lokale brugere er tilgængelige i wikien
+platform.wiki.prop.wikiname=Wikiens id
+platform.wiki.prop.wikiprettyname=Visningsnavn
 ### Missing: platform.wiki.prop.wikialias=Alias
 ### Missing: platform.wiki.prop.description=Description
-### Missing: platform.wiki.prop.owner=Owner
-### Missing: platform.wiki.prop.membershipType.label=Membership Type
-### Missing: platform.wiki.prop.membershipType.hint=The way users can join this wiki.
+platform.wiki.prop.owner=Ejer
+platform.wiki.prop.membershipType.label=Medlemskabstype
+platform.wiki.prop.membershipType.hint=Den måde, brugerne kan blive medlem af denne wiki på.
 
 ## Wizard
-### Missing: platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
-### Missing: platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
-### Missing: platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
-### Missing: platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all pages will be cloned).
-### Missing: platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
-### Missing: platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independent of the rights configured in the Administration.
-### Missing: platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
-### Missing: platform.wiki.create.wizard.step.nameAndType=Step 1 — Choose a name
+platform.wiki.create.wizard.desc.wikiname=Den nye wikis entydige id.
+platform.wiki.create.wizard.desc.wikiprettyname=Wikiens visningsnavn.
+platform.wiki.create.wizard.desc.wikialias=Det domænenavn, der skal pege på wikien.
+platform.wiki.create.wizard.desc.newTemplateHint=Den skabelon, der skal bruges til den nye wiki (alle sider kopieres).
+platform.wiki.create.wizard.desc.description=En kort beskrivelse af wikien og dens formål.
+platform.wiki.create.wizard.desc.owner=En bruger, som altid har alle rettigheder til denne wiki, uanset hvilke rettigheder der er konfigureret under Administration.
+platform.wiki.create.wizard.desc.members=De brugere, der kan deltage i wikien.
+platform.wiki.create.wizard.step.nameAndType=Trin 1 — Vælg et navn
 ### Missing: platform.wiki.create.wizard.step.nameAndType.shortname=Name
-### Missing: platform.wiki.create.wizard.step.users=Step 2 — Choose members
-### Missing: platform.wiki.create.wizard.step.users.shortname=Users
-### Missing: platform.wiki.create.wizard.step.cleaningUp=Cleaning Up
-### Missing: platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete this wiki
-### Missing: platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningUp.confirmmessage=You are about to delete wiki {0}. Please confirm.
-### Missing: platform.wiki.create.wizard.step.cleaningUp.confirm=Confirm
-### Missing: platform.wiki.create.wizard.setAsTemplate.label=This wiki will be a template
+platform.wiki.create.wizard.step.users=Trin 2 — Vælg medlemmer
+platform.wiki.create.wizard.step.users.shortname=Brugere
+platform.wiki.create.wizard.step.cleaningUp=Rydder op
+platform.wiki.create.wizard.step.provisioning.cleanUp=Ryd op, og slet denne wiki
+platform.wiki.create.wizard.step.cleaningup.success=Wikien {0} er slettet.
+platform.wiki.create.wizard.step.cleaningup.error=Fejl: Wikien {0} er ikke blevet slettet.
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Du er ved at slette wikien {0}. Bekræft.
+platform.wiki.create.wizard.step.cleaningUp.confirm=Bekræft
+platform.wiki.create.wizard.setAsTemplate.label=Denne wiki bliver en skabelon
 ### Missing: platform.wiki.create.wizard.template.noTemplate=No template (default)
-### Missing: platform.wiki.create.wizard.userScope.label=User Scope
-### Missing: platform.wiki.create.wizard.userScope.hint=Select what kind of users can access the wiki
+platform.wiki.create.wizard.userScope.label=Brugerområde
+platform.wiki.create.wizard.userScope.hint=Vælg, hvilke slags brugere der har adgang til wikien
 ### Missing: platform.wiki.create.wizard.template.label=Template
-### Missing: platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
-### Missing: platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
-### Missing: platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
+platform.wiki.create.wizard.flavortemplate.label=Variant/skabelon
+platform.wiki.create.wizard.flavortemplate.hint=Den variant eller skabelon, der skal bruges som startindhold i den nye wiki
+platform.wiki.create.wizard.flavortemplate.flavorTab=Variant
 ### Missing: platform.wiki.create.wizard.flavortemplate.templateTab=Template
-### Missing: platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created and the Distribution Wizard will be started in order to help you initialize your wiki. If you skip the wizard, your wiki will be empty.
-### Missing: platform.wiki.create.wizard.step.previous=Previous Step
-### Missing: platform.wiki.create.wizard.step.next=Next step
-### Missing: platform.wiki.create.wizard.step.create=Create
-
+platform.wiki.create.wizard.step.dw=Når du klikker på knappen "Opret", oprettes wikien, og distributionsguiden starter, så du kan klargøre din wiki. Hvis du springer guiden over, er din wiki tom.
+platform.wiki.create.wizard.step.previous=Forrige trin
+platform.wiki.create.wizard.step.next=Næste trin
+platform.wiki.create.wizard.step.create=Opret
 ### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
-### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
-### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=However, error(s) have been generated during that process and you might want to review them.
-### Missing: platform.wiki.create.wizard.step.creation.error=The creation of the wiki {0} failed. It''s recommended to delete it.
+platform.wiki.create.wizard.step.creation.wait=Vent, til wikien er oprettet.
+platform.wiki.create.wizard.step.creation.complete=Wikien {0} er oprettet. Du kan nu åbne den.
+platform.wiki.create.wizard.step.creation.errorlog=Der opstod dog fejl undervejs, som du måske vil gennemgå.
+platform.wiki.create.wizard.step.creation.error=Oprettelsen af wikien {0} mislykkedes. Det anbefales at slette den.
 ### Missing: platform.wiki.create.wizard.step.creation.go=Go to the wiki
 
 ## Admin
-### Missing: admin.wikis.description=Wikis management.
-### Missing: admin.wikis.templates=Wiki Templates
-### Missing: admin.wikis.templates.description=Manage the wiki templates
-### Missing: admin.wikis.templates.hint=A template is a wiki that will be considered as a model to create new wikis. When a user selects a template to create a new wiki, all the content of the template is copied in the new wiki.
+admin.wikis.description=Administration af wikier.
+admin.wikis.templates=Wikiskabeloner
+admin.wikis.templates.description=Administrer wikiskabelonerne
+admin.wikis.templates.hint=En skabelon er en wiki, der bruges som model, når der oprettes nye wikier. Når en bruger vælger en skabelon til en ny wiki, kopieres alt indholdet i skabelonen til den nye wiki.
 ### Missing: admin.wikis.rights=Creation Right
 
 ## XWikiServer Sheet
-### Missing: platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
-### Missing: platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exist.
+platform.wiki.sheet.title=Beskrivelse af wikien "{0}"
+platform.wiki.sheet.erroraliasalreadynotexists=Wikialiasset "{0}" findes allerede.
+platform.wiki.sheet.erroraliasdoesnotexists=Wikialiasset "{0}" findes ikke.
 ### Missing: platform.wiki.sheet.title.settings=Wiki properties
 platform.wiki.sheet.title.createnewalias=Opret nyt alias
 ### Missing: platform.wiki.sheet.title.viewaliases=View aliases
-### Missing: platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
-### Missing: platform.wiki.sheet.desc.owner=A user who will have all the rights on this wiki.
-### Missing: platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with \"https\".
-### Missing: platform.wiki.sheet.desc.port=The port to use for all this wiki's generated externals URLs. If not set it's inherited from the configuration and the main wiki. Only taken into account for domain based URLs.
-### Missing: platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be used as a template when creating a new wiki.
-### Missing: platform.wiki.sheet.desc.server=The alias used to access the wiki.
-### Missing: platform.wiki.sheet.desc.description=A brief wiki description.
+platform.wiki.sheet.desc.wikiprettyname=Wikiens visningsnavn.
+platform.wiki.sheet.desc.owner=En bruger, som har alle rettigheder til denne wiki.
+platform.wiki.sheet.desc.secure=Hvis indstillingen er slået til, starter alle eksterne URL'er, som wikien danner, med "https".
+platform.wiki.sheet.desc.port=Den port, der skal bruges til alle eksterne URL'er, som wikien danner. Hvis den ikke er angivet, arves den fra konfigurationen og hovedwikien. Bruges kun til domænebaserede URL'er.
+platform.wiki.sheet.desc.iswikitemplate=Angiver, om denne wiki kan bruges som skabelon, når der oprettes en ny wiki.
+platform.wiki.sheet.desc.server=Det alias, der bruges til at åbne wikien.
+platform.wiki.sheet.desc.description=En kort beskrivelse af wikien.
 ### Missing: platform.wiki.sheet.desc.homepage=The homepage of the wiki.
-### Missing: platform.wiki.sheet.prop.wikiprettyname=Pretty name
-### Missing: platform.wiki.sheet.prop.owner=Owner
-### Missing: platform.wiki.sheet.prop.secure=Secure (SSL)
+platform.wiki.sheet.prop.wikiprettyname=Visningsnavn
+platform.wiki.sheet.prop.owner=Ejer
+platform.wiki.sheet.prop.secure=Sikker (SSL)
 ### Missing: platform.wiki.sheet.prop.port=Port
 ### Missing: platform.wiki.sheet.prop.description=Description
 ### Missing: platform.wiki.sheet.prop.server=Alias
 ### Missing: platform.wiki.sheet.prop.homepage=Homepage
 ### Missing: platform.wiki.sheet.prop.iswikitemplate=Wiki template
-### Missing: platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
+platform.wiki.sheet.descriptor=Denne side angiver, hvordan wikien "{0}" åbnes, og nogle af dens egenskaber. Flere indstillinger finder du på
 ### Missing: platform.wiki.sheet.descriptor.admin=administration page of the wiki.
-### Missing: platform.wiki.sheet.aliases=An alias is another name for the wiki. You can add aliases to create different URLs for the wiki.
+platform.wiki.sheet.aliases=Et alias er et andet navn til wikien. Du kan tilføje aliasser for at give wikien flere URL'er.
 
 ###############################################################################
 ## Deprecated
@@ -279,29 +275,33 @@ platform.wiki.sheet.title.createnewalias=Opret nyt alias
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing={0}Application Manager Plugin{1} er ikke installeret. Installer det, og prøv igen.
 
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
+admin.wikis=Wikier
 ### Missing: admin.wikis.template=Wiki Template
 
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning=Systemet klargør wikien.
+platform.wiki.create.wizard.step.provisioning.wait=Vent, mens systemet klargør wikien.
+platform.wiki.create.wizard.step.provisioning.complete=Wikien er næsten klar. Klik på "Afslut" for at udføre den sidste handling.
+platform.wiki.create.wizard.step.provisioning.error=Wikien {0} er oprettet, men nogle af siderne i skabelonen er ikke kopieret. Du bør nok slette den.
+platform.wiki.create.wizard.step.provisioning.finalize=Afslut
 
 #######################################
 ## until 9.5-rc-1
 #######################################
-### Missing: platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
-### Missing: platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.confirmation.yes=Ja, slet denne wiki!
+platform.wiki.delete.confirmation.no=Nej, tag mig tilbage!
+
+## Browse
+platform.wiki.browse=Gennemse wikier
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

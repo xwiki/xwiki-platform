@@ -101,6 +101,7 @@ platform.appwithinminutes.classEditorUpdateSheetLabel=Update the sheet
 platform.appwithinminutes.classEditorUpdateSheetHint=The sheet ({0}) is used to display and edit the structured data.
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Update the translation
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
+platform.appwithinminutes.classEditorCreatePageTitle=Create page: {0}
 
 platform.appwithinminutes.classEditorMultipleSheetsWarning=This class has multiple sheets.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=The class has two fields with the same name: {0}

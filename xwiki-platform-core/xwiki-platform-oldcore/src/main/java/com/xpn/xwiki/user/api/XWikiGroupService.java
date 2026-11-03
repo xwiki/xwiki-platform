@@ -133,6 +133,8 @@ public interface XWikiGroupService
      * @since 1.1.2
      * @since 1.2M2
      */
+    // The element type depends on the withdetails parameter (String or XWikiDocument), as the Javadoc states.
+    @SuppressWarnings("java:S1452")
     List<?> getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
         XWikiContext context) throws XWikiException;
 
@@ -162,6 +164,8 @@ public interface XWikiGroupService
      * @since 1.1.2
      * @since 1.2M2
      */
+    // The element type depends on the withdetails parameter (String or XWikiDocument), as the Javadoc states.
+    @SuppressWarnings("java:S1452")
     List<?> getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
         XWikiContext context) throws XWikiException;
 

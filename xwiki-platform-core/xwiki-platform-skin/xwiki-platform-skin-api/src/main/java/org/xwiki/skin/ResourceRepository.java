@@ -42,6 +42,8 @@ public interface ResourceRepository
      * @param resourceName the name of the resource to search
      * @return the found resource, null if none could be found
      */
+    // The resource type depends on the repository implementation, so its input source type cannot be named.
+    @SuppressWarnings("java:S1452")
     Resource<?> getResource(String resourceName);
 
     /**
@@ -50,5 +52,7 @@ public interface ResourceRepository
      * @param resourceName the name of the resource to search
      * @return the found resource, null if none could be found
      */
+    // The resource type depends on the repository implementation, so its input source type cannot be named.
+    @SuppressWarnings("java:S1452")
     Resource<?> getLocalResource(String resourceName);
 }

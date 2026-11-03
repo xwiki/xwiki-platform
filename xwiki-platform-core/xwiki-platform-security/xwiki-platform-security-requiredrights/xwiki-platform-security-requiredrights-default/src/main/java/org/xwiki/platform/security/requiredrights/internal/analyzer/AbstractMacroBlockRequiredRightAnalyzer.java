@@ -106,6 +106,9 @@ public abstract class AbstractMacroBlockRequiredRightAnalyzer
      * @param macroBlock the MacroBlock to get the macro for
      * @return the Macro object, or null if the macro is not found
      */
+    // The macro is looked up by id, so its parameters bean type is unknown: MacroManager#getMacro returns
+    // Macro<?> as well.
+    @SuppressWarnings("java:S1452")
     protected Macro<?> getMacro(MacroBlock macroBlock)
     {
         Syntax syntax = macroBlock.getSyntaxMetadata().orElse(this.renderingContext.getDefaultSyntax());

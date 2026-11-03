@@ -927,5 +927,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      * @return List of all {@link DataMigration} for this manager
      * @throws DataMigrationException if any error
      */
+    // Implementations return a list of a DataMigration subtype (HibernateDataMigrationManager returns a
+    // List<HibernateDataMigration>), which is not assignable to List<DataMigration>.
+    @SuppressWarnings("java:S1452")
     protected abstract List<? extends DataMigration> getAllMigrations() throws DataMigrationException;
 }

@@ -583,6 +583,8 @@ public class XWikiStatsReader
      * @deprecated use {@link #getRefererStatistics(String, Scope, Period, Range, XWikiContext)} instead.
      */
     @Deprecated
+    // The statistics rows are built by the store and their type varies, so there is no element type to name.
+    @SuppressWarnings("java:S1452")
     public List<?> getRefMonthStats(String docName, Date month, XWikiContext context) throws XWikiException
     {
         XWikiHibernateStore store = context.getWiki().getHibernateStore();

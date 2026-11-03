@@ -79,12 +79,6 @@ public class BasePage extends BaseElement
     @FindBy(id = "xwikimaincontainer")
     private WebElement mainContainerDiv;
 
-    /**
-     * The top floating content menu bar.
-     */
-    @FindBy(id = "contentmenu")
-    private WebElement contentMenuBar;
-
     @FindBy(xpath = "//li[@id='tmCreate']/a[contains(@class, 'btn')]")
     private WebElement tmCreate;
 
@@ -94,9 +88,6 @@ public class BasePage extends BaseElement
     @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
     private WebElement watchDocumentLink;
 
-    @FindBy(id = "tmPage")
-    private WebElement pageMenu;
-
     @FindBys({@FindBy(id = "tmRegister"), @FindBy(tagName = "a")})
     private WebElement registerLink;
 
@@ -105,9 +96,6 @@ public class BasePage extends BaseElement
 
     @FindBy(xpath = "//a[@id='tmUser']")
     private WebElement userLink;
-
-    @FindBy(xpath = "//li[contains(@class, 'navbar-avatar')]//img[contains(@class, 'avatar')]")
-    private WebElement userAvatarImage;
 
     @FindBy(id = "document-title")
     private WebElement documentTitle;

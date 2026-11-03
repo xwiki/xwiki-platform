@@ -22,9 +22,7 @@ package org.xwiki.tool.utils;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.time.Duration;
-import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -39,10 +37,8 @@ import org.xwiki.test.junit5.XWikiTempDirExtension;
 
 import com.xpn.xwiki.XWiki;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.IThrowableProxy;
-
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link OldCoreHelper}, starting a real XWiki instance on an in-memory HSQLDB database.
@@ -63,8 +59,9 @@ class OldCoreHelperTest
     {
         WeakReference<XWiki> xwiki = createAndCloseOldCoreHelper();
 
-        // The embedded Solr implementation isn't in the test classpath, so the components requiring it fail to load.
-        this.logCapture.ignoreAllMessages(List.of(OldCoreHelperTest::isCausedByMissingSolr));
+        // The embedded Solr server is part of the Solr API module, so it starts with XWiki and warns that it isn't
+        // secured, which doesn't matter for the packager since it never exposes Solr.
+        assertTrue(this.logCapture.getMessage(0).startsWith("Not all security plugins configured!"));
 
         // The packager runs inside the Maven JVM: anything still referencing the XWiki instance once the packager is
         // done (e.g., a thread started by XWiki and never stopped) keeps it in memory until the end of the build.
@@ -77,18 +74,6 @@ class OldCoreHelperTest
                 System.gc();
                 return xwiki.get() == null;
             });
-    }
-
-    private static boolean isCausedByMissingSolr(ILoggingEvent event)
-    {
-        for (IThrowableProxy throwable = event.getThrowableProxy(); throwable != null;
-            throwable = throwable.getCause()) {
-            if (StringUtils.contains(throwable.getMessage(), "org.xwiki.search.solr")) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

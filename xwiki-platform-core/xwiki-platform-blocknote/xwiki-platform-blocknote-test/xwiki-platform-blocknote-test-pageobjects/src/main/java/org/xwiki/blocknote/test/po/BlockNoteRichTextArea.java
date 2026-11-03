@@ -35,6 +35,7 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfNestedElementLocatedBy;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNestedElementsLocatedBy;
 
 /**
@@ -565,8 +566,7 @@ public class BlockNoteRichTextArea extends BaseElement
     public WebElement waitUntilLinkIsPresent(String label)
     {
         By locator = By.xpath(".//a[normalize-space(.) = " + getUtil().escapeXPath(label) + "]");
-        getDriver().waitUntilCondition(driver -> !this.container.findElements(locator).isEmpty());
-        return this.container.findElement(locator);
+        return getDriver().waitUntilCondition(presenceOfNestedElementLocatedBy(this.container, locator));
     }
 
     /**

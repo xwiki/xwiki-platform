@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -28,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -40,7 +42,10 @@ import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
@@ -54,9 +59,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
@@ -103,6 +110,14 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
 
     @Inject
     private LocalizationManager localizationManager;
+
+    @Inject
+    @Named("explicit")
+    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
+
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     @FunctionalInterface
     private interface RenameLambda
@@ -168,41 +183,109 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         return false;
     }
 
-    private boolean renameLinks(BaseObject xobject, XWikiDocument document, BlockRenderer renderer,
-        XWikiContext xcontext, boolean relative, RenameLambda renameLambda)
+    private boolean renameLinks(BaseObject xobject, XWikiDocument document, BlockRenderer renderer, boolean relative,
+        EntityReference oldTarget, EntityReference newTarget, RenameLambda renameLambda)
     {
         boolean modified = false;
 
-        BaseClass xclass = xobject.getXClass(xcontext);
+        BaseClass xclass = xobject.getXClass(this.xcontextProvider.get());
 
         for (Object fieldClass : xclass.getProperties()) {
             // Wiki content stored in xobjects
             if (fieldClass instanceof TextAreaClass textAreaClass && textAreaClass.isWikiContent()) {
-                PropertyInterface field = xobject.getField(textAreaClass.getName());
-
-                // Make sure the field is the right type (might happen while a document is being migrated)
-                if (field instanceof LargeStringProperty largeField) {
-                    try {
-                        // Parse property content
-                        XDOM xdom = this.contentParser.parse(largeField.getValue(), document.getSyntax(),
-                            document.getDocumentReference());
-
-                        // Rename references
-                        if (renameLambda.call(xdom, document.getDocumentReference(), relative)) {
-                            // Serialize property content
-                            largeField.setValue(renderXDOM(xdom, renderer));
-
-                            modified = true;
-                        }
-                    } catch (Exception e) {
-                        this.logger.warn("Failed to rename links from xobject property [{}], skipping it. Error: [{}]",
-                            largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
-                    }
-                }
+                modified |= renameLinks(xobject, textAreaClass, document, renderer, relative, renameLambda);
+            } else if (fieldClass instanceof DBListClass dbListClass) {
+                // Document references stored in database list xobject properties
+                modified |= renameLinks(xobject, dbListClass, document, relative, oldTarget, newTarget);
             }
         }
 
         return modified;
+    }
+
+    private boolean renameLinks(BaseObject xobject, TextAreaClass textAreaClass, XWikiDocument document,
+        BlockRenderer renderer, boolean relative, RenameLambda renameLambda)
+    {
+        PropertyInterface field = xobject.getField(textAreaClass.getName());
+
+        // Make sure the field is the right type (might happen while a document is being migrated)
+        if (field instanceof LargeStringProperty largeField) {
+            try {
+                // Parse property content
+                XDOM xdom = this.contentParser.parse(largeField.getValue(), document.getSyntax(),
+                    document.getDocumentReference());
+
+                // Rename references
+                if (renameLambda.call(xdom, document.getDocumentReference(), relative)) {
+                    // Serialize property content
+                    largeField.setValue(renderXDOM(xdom, renderer));
+
+                    return true;
+                }
+            } catch (Exception e) {
+                this.logger.warn("Failed to rename links from xobject property [{}], skipping it. Error: [{}]",
+                    largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
+        return false;
+    }
+
+    private boolean renameLinks(BaseObject xobject, DBListClass dbListClass, XWikiDocument document, boolean relative,
+        EntityReference oldTarget, EntityReference newTarget)
+    {
+        // Nothing is done in relative mode, which is used when the updated document is the moved one. The values of a
+        // database list are document full names local to the wiki of the document, and not relative to its space, so
+        // after a move inside the same wiki they keep pointing to the same pages. After a move to another wiki the
+        // values are kept as they are on purpose: a value is the key of an option returned by a query that runs in the
+        // wiki the document is in, so rewriting it to a reference to the previous wiki would store a value the list can
+        // neither display nor select. Only document targets are supported.
+        if (relative || !(oldTarget instanceof DocumentReference oldDocumentReference)
+            || !(newTarget instanceof DocumentReference newDocumentReference)
+            || !dbListClass.isDocumentReferenceList()) {
+            return false;
+        }
+
+        PropertyInterface field = xobject.getField(dbListClass.getName());
+
+        if (!(field instanceof BaseProperty<?> property) || property.getValue() == null) {
+            return false;
+        }
+
+        // The values are produced by a query that runs in the wiki of the document, so they are resolved against that
+        // wiki and not against the space of the document.
+        WikiReference wikiReference = document.getDocumentReference().getWikiReference();
+        DocumentReference oldTargetWithoutLocale = oldDocumentReference.withoutLocale();
+        // The new value is local when the new target is in the wiki of the document, and full otherwise.
+        String newValue =
+            this.compactWikiEntityReferenceSerializer.serialize(newDocumentReference.withoutLocale(), wikiReference);
+        List<String> values = new ArrayList<>(dbListClass.toList(property));
+        boolean modified = false;
+        for (int i = 0; i < values.size(); i++) {
+            if (oldTargetWithoutLocale.equals(resolveDBListValue(values.get(i), wikiReference))) {
+                values.set(i, newValue);
+                modified = true;
+            }
+        }
+
+        if (modified) {
+            dbListClass.fromList(property, values);
+        }
+
+        return modified;
+    }
+
+    private DocumentReference resolveDBListValue(String value, WikiReference wikiReference)
+    {
+        if (StringUtils.isNotBlank(value)) {
+            try {
+                return this.explicitDocumentReferenceResolver.resolve(value, wikiReference);
+            } catch (IllegalArgumentException e) {
+                // The value doesn't hold a complete document reference, it cannot target the renamed document.
+            }
+        }
+
+        return null;
     }
 
     private void info(String format, Object... arguments)
@@ -240,7 +323,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
     }
 
     private void renameLinks(XWikiDocument document, EntityReference oldTarget, EntityReference newTarget,
-        XWikiContext xcontext, boolean relative, RenameLambda renameLambda) throws XWikiException
+        boolean relative, RenameLambda renameLambda) throws XWikiException
     {
         DocumentReference currentDocumentReference = document.getDocumentReference();
 
@@ -282,7 +365,8 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         for (List<BaseObject> xobjects : documentToModify.getXObjects().values()) {
             for (BaseObject xobject : xobjects) {
                 if (xobject != null) {
-                    modified |= renameLinks(xobject, documentToModify, renderer, xcontext, relative, renameLambda);
+                    modified |= renameLinks(xobject, documentToModify, renderer, relative, oldTarget, newTarget,
+                        renameLambda);
                 }
             }
         }
@@ -324,7 +408,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
 
             // Update the default locale instance.
             this.progressManager.startStep(this);
-            renameLinks(document, oldLinkTarget, newLinkTarget, xcontext, relative, renameLambda);
+            renameLinks(document, oldLinkTarget, newLinkTarget, relative, renameLambda);
             this.progressManager.endStep(this);
 
             // Update the translations.
@@ -332,7 +416,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
                 for (Locale locale : locales) {
                     this.progressManager.startStep(this);
                     renameLinks(document.getTranslatedDocument(locale, xcontext), oldLinkTarget, newLinkTarget,
-                        xcontext, relative, renameLambda);
+                        relative, renameLambda);
                     this.progressManager.endStep(this);
                 }
             }

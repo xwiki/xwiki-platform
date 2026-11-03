@@ -200,6 +200,7 @@ import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
@@ -5931,6 +5932,37 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     } catch (XWikiException e) {
                         LOGGER.warn("Failed to extract links from xobject property [{}], skipping it. Error: [{}]",
                             largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
+                    }
+                }
+            } else if (fieldClass instanceof DBListClass dbListClass) {
+                // Document references stored in database list xobject properties
+                getUniqueLinkedDocumentReferences(xobject, dbListClass, entityTypes, references);
+            }
+        }
+    }
+
+    private void getUniqueLinkedDocumentReferences(BaseObject xobject, DBListClass dbListClass,
+        Map<EntityType, Set<ResourceType>> entityTypes, Set<EntityReference> references)
+    {
+        // Only document references can be stored in a database list.
+        if (!entityTypes.containsKey(EntityType.DOCUMENT) || !dbListClass.isDocumentReferenceList()) {
+            return;
+        }
+
+        PropertyInterface field = xobject.getField(dbListClass.getName());
+
+        if (field instanceof BaseProperty<?> property && property.getValue() != null) {
+            // The values are produced by a query that runs in the wiki of the document, so they are resolved against
+            // that wiki and not against the space of the document.
+            WikiReference wikiReference = getDocumentReference().getWikiReference();
+            for (String value : dbListClass.toList(property)) {
+                if (StringUtils.isNotBlank(value)) {
+                    try {
+                        references.add(getExplicitDocumentReferenceResolver().resolve(value, wikiReference));
+                    } catch (IllegalArgumentException e) {
+                        // The value doesn't hold a complete document reference, it cannot be a link.
+                        LOGGER.debug("Skipping the database list value [{}] of [{}] which is not a document reference.",
+                            value, property.getReference(), e);
                     }
                 }
             }

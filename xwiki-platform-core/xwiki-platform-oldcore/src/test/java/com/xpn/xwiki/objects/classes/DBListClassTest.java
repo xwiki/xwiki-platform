@@ -289,6 +289,31 @@ class DBListClassTest
             dblc.getQuery(this.oldcore.getXWikiContext()));
     }
 
+    @ParameterizedTest
+    @CsvSource({
+        "'', '', '', '', false",
+        "'', XWiki.XWikiUsers, '', '', true",
+        "select doc.fullName from XWikiDocument doc, '', '', '', false",
+        "'', '', doc.fullName, '', true",
+        "'', '', '', doc.fullName, true",
+        "'', '', doc.fullName, doc.title, true",
+        "'', '', doc.name, doc.fullName, false",
+        "'', '', obj.name, '', false",
+        "'', '', fullName, '', true",
+        "'', XWiki.XWikiUsers, doc.fullName, '', true",
+        "'', XWiki.XWikiUsers, fullName, '', false"
+    })
+    void isDocumentReferenceList(String sql, String classname, String idField, String valueField, boolean expected)
+    {
+        DBListClass dblc = new DBListClass();
+        dblc.setSql(sql);
+        dblc.setClassname(classname);
+        dblc.setIdField(idField);
+        dblc.setValueField(valueField);
+
+        assertEquals(expected, dblc.isDocumentReferenceList());
+    }
+
     /** Tests that {@link DBListClass#getList} returns values sorted according to the property's sort option. */
     @Test
     void testGetListIsSorted()

@@ -122,6 +122,7 @@
       'officeImporter': {'label': 'xwiki-office.importer.title', 'icon': 'pastefromword'},
 
       'infoBox': {
+        'label': 'xwiki-macro.name.info',
         'command': 'xwiki-macro-insert',
         'data': {
           'name': 'info',
@@ -129,6 +130,7 @@
         }
       },
       'successBox': {
+        'label': 'xwiki-macro.name.success',
         'command': 'xwiki-macro-insert',
         'data': {
           'name': 'success',
@@ -136,6 +138,7 @@
         }
       },
       'warningBox': {
+        'label': 'xwiki-macro.name.warning',
         'command': 'xwiki-macro-insert',
         'data': {
           'name': 'warning',
@@ -143,6 +146,7 @@
         }
       },
       'errorBox': {
+        'label': 'xwiki-macro.name.error',
         'command': 'xwiki-macro-insert',
         'data': {
           'name': 'error',
@@ -150,14 +154,17 @@
         }
       },
       'toc': {
+        'label': 'xwiki-macro.name.toc',
         'command': 'xwiki-macro-insert',
         'data': {'name': 'toc'}
       },
       'include': {
+        'label': 'xwiki-macro.name.include',
         'command': 'xwiki-macro',
         'data': {'name': 'include'}
       },
       'code': {
+        'label': 'xwiki-macro.name.code',
         'command': 'xwiki-macro',
         'data': {'name': 'code'}
       },

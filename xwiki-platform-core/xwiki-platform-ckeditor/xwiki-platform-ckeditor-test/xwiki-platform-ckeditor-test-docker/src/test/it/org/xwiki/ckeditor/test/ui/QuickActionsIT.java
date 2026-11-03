@@ -281,7 +281,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(11)
     void infoBox()
     {
-        textArea.insertMacro("/inf", "Info Box");
+        textArea.insertMacro("/info message", "Info Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -294,7 +294,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(12)
     void successBox()
     {
-        textArea.insertMacro("/suc", "Success Box");
+        textArea.insertMacro("/success message", "Success Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -307,7 +307,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(13)
     void warningBox()
     {
-        textArea.insertMacro("/war", "Warning Box");
+        textArea.insertMacro("/warning message", "Warning Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -320,7 +320,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(14)
     void errorBox()
     {
-        textArea.insertMacro("/err", "Error Box");
+        textArea.insertMacro("/error message", "Error Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -404,7 +404,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         testUtils.rest().savePage(new DocumentReference("xwiki", "QuickActionsIT", "TestInclude"), "Test include",
             "Test include");
-        MacroDialogEditModal macroDialogEditModal = textArea.insertMacroWithRequiredParameters("/inc", "Include Page");
+        MacroDialogEditModal macroDialogEditModal = textArea.insertMacroWithRequiredParameters("/inc", "Include");
         SuggestInputElement reference =
             new SuggestInputElement(macroDialogEditModal.getMacroParameterInput("reference"));
         reference.sendKeys("TestInclude")
@@ -419,7 +419,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     void code()
     {
         // Empty form
-        textArea.insertMacroWithRequiredParameters("/cod", "Code Snippet").clickSubmit();
+        textArea.insertMacroWithRequiredParameters("/cod", "Code").clickSubmit();
 
         assertSourceEquals("{{code}}{{/code}}");
     }
@@ -428,7 +428,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(22)
     void toc()
     {
-        textArea.insertMacro("/toc", "Table of Contents");
+        textArea.insertMacro("/toc", "Table of contents");
 
         assertSourceEquals("{{toc/}}\n\n ");
     }
@@ -498,7 +498,7 @@ class QuickActionsIT extends AbstractCKEditorIT
         // Remove the 4 characters we just typed
         textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE,  Keys.BACK_SPACE, Keys.BACK_SPACE);
         textArea.sendKeys(" ");
-        textArea.insertMacro("/inf", "Info Box");
+        textArea.insertMacro("/info message", "Info Message");
 
         // Note that we didn't modify the default info message because inline macros are not editable in-place.
         assertSourceEquals("before {{info}}Type your information message here.{{/info}} after");

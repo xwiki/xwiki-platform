@@ -137,7 +137,7 @@ def var = "whatever"
 
 === 2.0 Scripts ===
 
-{{info}}XWiki [[supports several scripting languages&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Scripting/]].{{/info}}
+{{info}}XWiki [[supports several scripting languages&gt;&gt;https://www.xwiki.org/xwiki/bin/view/documentation/xs/dev/get-started/scripts/]].{{/info}}
 
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
 |Velocity script|((({{{

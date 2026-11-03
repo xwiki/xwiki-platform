@@ -39,13 +39,12 @@
   <content>{{include reference="Help.Code.VelocityMacros" /}}
 
 {{velocity output="false"}}
-#set ($featuresPrefix = 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features')
-#set ($exoPrefix = 'https://extensions.xwiki.org/xwiki/bin/view/Extension')
+#set ($docPrefix = 'https://www.xwiki.org/xwiki/bin/view/documentation')
 #set ($actionCards = [{
   'title': $services.localization.render('help.templates.useTemplates.title'),
   'description': $services.localization.render('help.templates.useTemplates.description'),
   'tip': $services.localization.render('help.templates.useTemplates.tip',
-    ["&lt;a href='$featuresPrefix/DocumentLifecycle#HCreate' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
+    ["&lt;a href='$docPrefix/xs/user/base/page/create/' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
   'thumbnail': 'Template',
   'actions': [{
     'label': $services.localization.render('help.try.label'),
@@ -58,11 +57,11 @@
   'title': $services.localization.render('help.templates.create.title'),
   'description': $services.localization.render('help.templates.create.description'),
   'tip': $services.localization.render('help.templates.create.tip',
-    ["&lt;a href='$exoPrefix/Administration+Application#HCreatetheTemplateProvider' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
+    ["&lt;a href='$docPrefix/xs/admin/page-templates/create-page-template/' class='wikiexternallink'&gt;",'&lt;/a&gt;']),
   'thumbnail': 'Administration',
   'actions': [{
     'label': $services.localization.render('help.more.label'),
-    'url': "$exoPrefix/Administration+Application#HCreatetheTemplateProvider"
+    'url': "$docPrefix/xs/admin/page-templates/create-page-template/"
   }]
 }])
 
@@ -79,7 +78,7 @@
     #set ($outputCard = {
       'title': $inputCard.title,
       'description': $inputCard.description,
-      'documentation': "$exoPrefix/Templates+Application/",
+      'documentation': "$docPrefix/xs/admin/page-templates/",
       'thumbnail': $inputCard.thumbnail
     })
     #else
@@ -135,7 +134,7 @@
     &lt;/li&gt;
   #end
 &lt;/ul&gt;
-&lt;p&gt;&lt;a href="$exoPrefix/Templates+Application/" class="wikiexternallink"&gt;$services.localization.render('help.templates.more')&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="$docPrefix/xs/admin/page-templates/" class="wikiexternallink"&gt;$services.localization.render('help.templates.more')&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>
   <attachment>

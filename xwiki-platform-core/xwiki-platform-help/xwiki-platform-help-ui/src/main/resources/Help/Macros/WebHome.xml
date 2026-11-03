@@ -70,7 +70,7 @@
     'url': $browseMacrosURL
   }, {
     'label': $services.localization.render('help.more.label'),
-    'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Tutorials/WritingMacros/WikiMacroTutorial/'
+    'url': 'https://www.xwiki.org/xwiki/bin/view/documentation/xs/dev/rendering-macros/wiki-macros/'
   }]
 }])
 
@@ -107,7 +107,7 @@
 }, {
   'title': $services.localization.render('help.macros.notifications.title') ,
   'description': $services.localization.render('help.macros.notifications.description'),
-  'documentation': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Notifications%20Application/#HNotificationsMacro',
+  'documentation': 'https://www.xwiki.org/xwiki/bin/view/documentation/xs/user/notifications/macro/',
   'examples': 'Help.Macros.Notifications.WebHome',
   'thumbnail': 'Help.Macros.Notifications.WebHome@notifications.png'
 }])

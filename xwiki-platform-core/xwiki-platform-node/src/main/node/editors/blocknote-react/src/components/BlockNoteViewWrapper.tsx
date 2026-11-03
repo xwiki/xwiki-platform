@@ -39,6 +39,7 @@ import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
+import "./BlockNoteViewWrapper.css";
 import {
   FilePanelController,
   FormattingToolbar,

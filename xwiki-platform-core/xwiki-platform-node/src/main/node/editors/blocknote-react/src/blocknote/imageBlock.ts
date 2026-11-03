@@ -50,6 +50,8 @@ function getLabelFromURL(url: string): string {
  * editor it makes a broken image indistinguishable from an empty block. The fallback is only displayed, never stored:
  * the alt text is saved only when the user sets it explicitly.
  *
+ * TODO: drop this block once https://github.com/TypeCellOS/BlockNote/issues/3295 is fixed upstream.
+ *
  * @returns the image block specification
  */
 function XWikiImageBlock(): ImageBlockSpec {

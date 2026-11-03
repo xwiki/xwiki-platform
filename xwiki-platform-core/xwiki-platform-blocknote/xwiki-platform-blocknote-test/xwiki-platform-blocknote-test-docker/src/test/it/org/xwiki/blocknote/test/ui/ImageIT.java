@@ -406,7 +406,7 @@ class ImageIT extends AbstractBlockNoteIT
 
         textArea.click().moveCaretTo(2);
         textArea.pasteFile("/notes.txt");
-        textArea.waitUntilAttachmentLinkIsPresent();
+        textArea.waitUntilLinkIsPresent();
 
         page.save();
 

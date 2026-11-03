@@ -570,17 +570,15 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Waits for the link a pasted file is turned into. Its label is the name the attachment was created with, which
-     * is generated for a pasted file, so the test can't ask for it by label.
+     * Waits for a link, whatever its label. Needed when the label can't be predicted, e.g. the generated name a
+     * pasted file is attached under.
      *
      * @return the link element
      * @since 18.10.0RC1
      */
-    public WebElement waitUntilAttachmentLinkIsPresent()
+    public WebElement waitUntilLinkIsPresent()
     {
-        By locator = By.xpath(".//a");
-        getDriver().waitUntilCondition(driver -> !this.container.findElements(locator).isEmpty());
-        return this.container.findElement(locator);
+        return getDriver().waitUntilCondition(presenceOfNestedElementLocatedBy(this.container, By.xpath(".//a")));
     }
 
 }

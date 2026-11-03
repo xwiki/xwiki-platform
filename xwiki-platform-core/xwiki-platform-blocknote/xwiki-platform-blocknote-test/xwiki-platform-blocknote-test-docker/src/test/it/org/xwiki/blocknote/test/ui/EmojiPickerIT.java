@@ -31,9 +31,11 @@ import org.xwiki.test.ui.TestUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Verify the two ways of inserting an emoji: the quick action from the slash menu and typing a colon.
+ * Verify the two ways of inserting an emoji (the quick action from the slash menu and typing a colon) and the
+ * case where the typed text matches no emoji.
  *
  * @version $Id$
  * @since 18.10.0RC1
@@ -66,6 +68,23 @@ class EmojiPickerIT extends AbstractBlockNoteIT
 
         page.save();
         assertThat(page.editWiki().getContent(), containsString(emoji));
+    }
+
+    @Test
+    void typeColonWithoutMatchingEmoji(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        // BlockNote closes the picker once the query grows more than 3 characters past the last one that matched, so
+        // the query has to stay short: "xyz" matches no emoji yet is never long enough to close the picker.
+        textArea.click().sendKeys(":");
+        textArea.sendKeys("xyz");
+        assertEquals("No items found", new EmojiPicker().getNoResultsMessage());
     }
 
     @Test

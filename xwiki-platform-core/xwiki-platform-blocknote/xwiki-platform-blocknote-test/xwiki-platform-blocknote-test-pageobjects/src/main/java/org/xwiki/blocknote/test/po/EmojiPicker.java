@@ -34,13 +34,15 @@ public class EmojiPicker extends BaseElement
 {
     private static final By SELECTED_EMOJI = By.cssSelector(".bn-grid-suggestion-menu-item[aria-selected=\"true\"]");
 
+    private static final By NO_RESULTS = By.className("bn-grid-suggestion-menu-empty-item");
+
     /**
-     * Waits for the emoji picker to show its suggestions. The emoji data is loaded lazily, so the picker is first
-     * displayed empty, with only a loading indicator.
+     * Waits for the emoji picker to show either its suggestions or the "no results" message. The emoji data is loaded
+     * lazily, so the picker is first displayed empty, with only a loading indicator.
      */
     public EmojiPicker()
     {
-        getDriver().waitUntilElementIsVisible(SELECTED_EMOJI);
+        getDriver().waitUntilElementsAreVisible(new By[] {SELECTED_EMOJI, NO_RESULTS}, false);
     }
 
     /**
@@ -49,5 +51,13 @@ public class EmojiPicker extends BaseElement
     public String getSelectedEmoji()
     {
         return getDriver().findElement(SELECTED_EMOJI).getText();
+    }
+
+    /**
+     * @return the message displayed when no emoji matches the typed text
+     */
+    public String getNoResultsMessage()
+    {
+        return getDriver().findElement(NO_RESULTS).getText();
     }
 }

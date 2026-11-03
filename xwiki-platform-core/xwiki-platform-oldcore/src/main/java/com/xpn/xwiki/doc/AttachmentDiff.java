@@ -31,12 +31,24 @@ public class AttachmentDiff
 
     private XWikiAttachment newAttachment;
 
+    /**
+     * @deprecated use {@link #origAttachment} instead
+     */
     @Deprecated
     private String origVersion;
 
+    /**
+     * @deprecated use {@link #newAttachment} instead
+     */
     @Deprecated
     private String newVersion;
 
+    /**
+     * @param fileName the name of the attachment
+     * @param origVersion the version of the original attachment
+     * @param newVersion the version of the new attachment
+     * @deprecated use {@link #AttachmentDiff(String, Delta.Type, XWikiAttachment, XWikiAttachment)} instead
+     */
     @Deprecated
     public AttachmentDiff(String fileName, String origVersion, String newVersion)
     {
@@ -96,24 +108,40 @@ public class AttachmentDiff
         return this.newAttachment;
     }
 
+    /**
+     * @return the version of the original attachment
+     * @deprecated use {@link #getOrigAttachment()} instead
+     */
     @Deprecated
     public String getOrigVersion()
     {
         return this.origVersion;
     }
 
+    /**
+     * @param origVersion the version of the original attachment
+     * @deprecated use {@link #AttachmentDiff(String, Delta.Type, XWikiAttachment, XWikiAttachment)} instead
+     */
     @Deprecated
     public void setOrigVersion(String origVersion)
     {
         this.origVersion = origVersion;
     }
 
+    /**
+     * @return the version of the new attachment
+     * @deprecated use {@link #getNewAttachment()} instead
+     */
     @Deprecated
     public String getNewVersion()
     {
         return this.newVersion;
     }
 
+    /**
+     * @param newVersion the version of the new attachment
+     * @deprecated use {@link #AttachmentDiff(String, Delta.Type, XWikiAttachment, XWikiAttachment)} instead
+     */
     @Deprecated
     public void setNewVersion(String newVersion)
     {

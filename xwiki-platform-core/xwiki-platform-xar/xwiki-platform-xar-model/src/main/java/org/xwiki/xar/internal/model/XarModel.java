@@ -53,6 +53,9 @@ public class XarModel
 
     public static final String ELEMENT_FILES_FILE = "file";
 
+    /**
+     * @deprecated use {@link #ELEMENT_FILES_FILE} instead
+     */
     @Deprecated
     public static final String ELEMENT_FILES_FILES = ELEMENT_FILES_FILE;
 

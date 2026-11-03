@@ -84,6 +84,12 @@ public class DefaultRemoteObservationManagerConfiguration
     }
 
     @Override
+    public int getSingletonPriority()
+    {
+        return this.configurationSource.getProperty("observation.remote.singletonPriority", 0);
+    }
+
+    @Override
     public String getId()
     {
         return this.id;

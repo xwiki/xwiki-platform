@@ -174,6 +174,14 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
         // Register the channel
         this.channels.getChannels().put(getId(), this);
 
+        // Carry the singleton priority of this instance in its address, so that the other members know it as soon as
+        // they know the address (they all elect the same singleton node from the view, without exchanging messages).
+        // The address stays a standard one when no priority is configured.
+        int singletonPriority = this.configuration.getSingletonPriority();
+        if (singletonPriority != 0) {
+            this.jchannel.addAddressGenerator(JGroupsNetworkMember.createAddressGenerator(singletonPriority));
+        }
+
         // Register the member handler dispatcher
         this.memberIdDispatcher = new MessageDispatcher(this.jchannel, new JGroupsMemberHandler());
         this.memberIdDispatcher.setReceiver(this);
@@ -492,7 +500,10 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
     @Override
     public Collection<NetworkMember> getMembers()
     {
-        return (Collection) this.members.values();
+        Map<String, JGroupsNetworkMember> currentMembers = this.members;
+
+        // The members are not known until the channel is connected
+        return currentMembers != null ? (Collection) currentMembers.values() : List.of();
     }
 
     /**
@@ -505,5 +516,31 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
     public NetworkMember getLeader()
     {
         return this.leader;
+    }
+
+    /**
+     * Gives the members of the current JGroups view, including the members whose XWiki identifier is not known yet
+     * (contrary to {@link #getMembers()}, the result does not depend on the exchange of the identifiers).
+     *
+     * @return the members of the current JGroups view, from the oldest to the youngest, with a {@code null}
+     *         identifier when it's not known yet, or an empty list if the channel is not connected
+     * @since 18.10.0RC1
+     */
+    public List<JGroupsNetworkMember> getViewMembers()
+    {
+        JChannel currentChannel = this.jchannel;
+        View view = currentChannel != null ? currentChannel.getView() : null;
+        if (view == null) {
+            return List.of();
+        }
+
+        Map<String, JGroupsNetworkMember> currentMembers = this.members;
+        Collection<JGroupsNetworkMember> knownMembers = currentMembers != null ? currentMembers.values() : List.of();
+
+        return view.getMembers().stream()
+            .map(address -> new JGroupsNetworkMember(this, knownMembers.stream()
+                .filter(member -> address.equals(member.getAddress())).map(JGroupsNetworkMember::getId).findFirst()
+                .orElse(null), address))
+            .toList();
     }
 }

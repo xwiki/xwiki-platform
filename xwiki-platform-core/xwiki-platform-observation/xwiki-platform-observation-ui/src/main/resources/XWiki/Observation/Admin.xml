@@ -268,7 +268,7 @@
 
 {{velocity}}
 #macro(displayMember $member)
-$member.id#if ($member.id == $remoteObservation.id) //({{translation key="observation.remote.admin.channel.leader.current"/}})//#end
+$member.id {{translation key="observation.remote.admin.channel.member.priority" parameters="$member.singletonPriority"/}}#if ($member.local) //({{translation key="observation.remote.admin.channel.leader.current"/}})//#end
 
 #end
 #set($remoteObservation = $services.observation.remote)
@@ -276,6 +276,8 @@ $member.id#if ($member.id == $remoteObservation.id) //({{translation key="observ
 : $services.rendering.escape($remoteObservation.id, 'xwiki/2.1')
 ; {{translation key="observation.remote.admin.networkAdapter"/}}
 : {{translation key="observation.remote.admin.networkAdapter.${remoteObservation.adapterId}.name"/}}
+; {{translation key="observation.remote.admin.singletonNode"/}}
+: {{translation key="observation.remote.admin.singletonNode.${remoteObservation.singletonNode}"/}}
 
 #set($channels = $remoteObservation.channels)
 #if ($channels)

@@ -229,7 +229,7 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
         byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
-        textArea.click().pasteFile("/image.gif");
+        textArea.click().moveCaretTo(2).pasteFile("/image.gif");
         // Shown only once uploaded, since that's when the URL is known.
         textArea.waitUntilImageIsLoaded(0);
 
@@ -237,8 +237,8 @@ class ImageIT extends AbstractBlockNoteIT
         String savedContent = page.editWiki().getContent();
 
         // Untyped reference, and renamed: browsers name a pasted file after its media type, so a second paste would
-        // otherwise overwrite this attachment. A block of its own, after the paragraph that held the caret, since
-        // BlockNote inserts the file block after the current block instead of splitting it.
+        // otherwise overwrite this attachment. The caret was in the middle of "before", yet the image goes after the
+        // whole paragraph, since BlockNote inserts the file block after the current block instead of splitting it.
         assertThat(savedContent, matchesPattern("before\n\n\\[\\[image:\\d+-\\d+\\.gif\\]\\]"));
 
         String attachmentName = savedContent.replaceAll("(?s).*\\[\\[image:([^\\]]+)\\]\\].*", "$1");
@@ -375,7 +375,7 @@ class ImageIT extends AbstractBlockNoteIT
 
     @Test
     @Order(7)
-    void pasteImageInsideText(TestUtils setup, TestReference testReference) throws Exception
+    void pasteFile(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
         setup.createPage(testReference, "before");
@@ -383,40 +383,18 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
-        textArea.click().moveCaretTo(2);
-        textArea.pasteFile("/image.gif");
-        textArea.waitUntilImageIsLoaded(0);
-
-        page.save();
-
-        // The caret was in the middle of "before", yet the image goes after the whole paragraph.
-        assertThat(page.editWiki().getContent(),
-            matchesPattern("before\n\n\\[\\[image:\\d+-\\d+\\.gif\\]\\]"));
-    }
-
-    @Test
-    @Order(8)
-    void pasteFileInsideText(TestUtils setup, TestReference testReference) throws Exception
-    {
-        setup.deletePage(testReference);
-        setup.createPage(testReference, "before");
-
-        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
-        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
-
-        textArea.click().moveCaretTo(2);
-        textArea.pasteFile("/notes.txt");
+        textArea.click().moveCaretTo(2).pasteFile("/notes.txt");
         textArea.waitUntilLinkIsPresent();
 
         page.save();
 
-        // Same for the link: the caret was inside the text, the link lands in a paragraph of its own.
+        // Renamed like a pasted image, and like it the link lands after the paragraph that held the caret.
         assertThat(page.editWiki().getContent(),
             matchesPattern("before\n\n\\[\\[attach:\\d+-\\d+\\.txt\\]\\]"));
     }
 
     @Test
-    @Order(9)
+    @Order(8)
     void insertImageFromSuggestions(TestUtils setup, TestReference testReference) throws Exception
     {
         // Start fresh, with a page holding an image, and wait for the image to be indexed, since the image suggestions
@@ -453,7 +431,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(10)
+    @Order(9)
     void insertImageFromImageWizard(TestUtils setup, TestReference testReference) throws Exception
     {
         // Start fresh.

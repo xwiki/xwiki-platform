@@ -88,7 +88,7 @@
         <span class="dropdown-header">{{
           $t("livedata.dropdownMenu.layouts")
         }}</span>
-        <ul>
+        <ul class="livedata-dropdown-layouts">
           <!-- Layout options -->
           <li
             v-for="layout in data.meta.layouts"

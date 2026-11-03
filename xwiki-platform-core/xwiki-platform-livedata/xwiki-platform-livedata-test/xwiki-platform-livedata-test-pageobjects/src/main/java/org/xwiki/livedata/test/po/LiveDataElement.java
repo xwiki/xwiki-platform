@@ -49,6 +49,8 @@ public class LiveDataElement extends BaseElement
      */
     private static final int READY_TIMEOUT_SECONDS = 20;
 
+    private static final By LAYOUT_LINKS = By.cssSelector(".livedata-dropdown-layouts > li > a");
+
     // TODO: add the operations to switch between the layouts.
 
     private final String id;
@@ -82,6 +84,46 @@ public class LiveDataElement extends BaseElement
     public CardLayoutElement getCardLayout()
     {
         return new CardLayoutElement(this.id);
+    }
+
+    /**
+     * @return a list layout page object for the live data
+     * @since 18.10.0RC1
+     */
+    public ListLayoutElement getListLayout()
+    {
+        ListLayoutElement listLayoutElement = new ListLayoutElement(this);
+        listLayoutElement.waitUntilReady();
+        return listLayoutElement;
+    }
+
+    /**
+     * @return the names of the layouts offered by the actions menu, in the order they are offered
+     * @since 18.10.0RC1
+     */
+    public List<String> getLayoutNames()
+    {
+        WebElement dropdownMenu = openDropDownMenu();
+        List<String> names = dropdownMenu.findElements(LAYOUT_LINKS).stream().map(WebElement::getText).toList();
+        // Close the dropdown menu back so it doesn't overlap the layout.
+        dropdownMenu.findElement(By.cssSelector(".dropdown-toggle")).click();
+        return names;
+    }
+
+    /**
+     * Switch to another layout from the actions menu. Use the getter of the layout page object to wait for it.
+     *
+     * @param layoutName the name of the layout to switch to, as offered by the actions menu (e.g., "Table")
+     * @since 18.10.0RC1
+     */
+    public void switchLayout(String layoutName)
+    {
+        openDropDownMenu().findElements(LAYOUT_LINKS).stream()
+            .filter(link -> layoutName.equals(link.getText()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                String.format("The actions menu does not offer any layout named [%s].", layoutName)))
+            .click();
     }
 
     /**

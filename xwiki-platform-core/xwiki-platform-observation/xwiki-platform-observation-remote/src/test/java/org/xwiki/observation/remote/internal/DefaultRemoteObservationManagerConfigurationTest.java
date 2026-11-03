@@ -21,7 +21,10 @@ package org.xwiki.observation.remote.internal;
 
 import java.io.File;
 
+import jakarta.inject.Named;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -48,12 +51,18 @@ class DefaultRemoteObservationManagerConfigurationTest
     @MockComponent
     private Environment environment;
 
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource configurationSource;
+
     @XWikiTempDir
     private File tmpDir;
 
     @BeforeComponent
     public void configure()
     {
+        when(this.configurationSource.getProperty("observation.remote.reclaimDelay", 900L)).thenReturn(900L);
+        when(this.configurationSource.getProperty("observation.remote.reclaimMaxAge", 86400L)).thenReturn(86400L);
         // getPermanentDirectory needs to be mocked before on remoteObservationManagerConfiguration during the component
         // initialization.
         when(this.environment.getPermanentDirectory()).thenReturn(this.tmpDir);
@@ -67,5 +76,18 @@ class DefaultRemoteObservationManagerConfigurationTest
         // Simulate a restart by re-initializing.
         this.remoteObservationManagerConfiguration.initialize();
         assertEquals(firstInitId, this.remoteObservationManagerConfiguration.getId());
+    }
+
+    @Test
+    void getReclaimDelayAndMaxAge()
+    {
+        assertEquals(900L, this.remoteObservationManagerConfiguration.getReclaimDelay());
+        assertEquals(86400L, this.remoteObservationManagerConfiguration.getReclaimMaxAge());
+
+        when(this.configurationSource.getProperty("observation.remote.reclaimDelay", 900L)).thenReturn(120L);
+        when(this.configurationSource.getProperty("observation.remote.reclaimMaxAge", 86400L)).thenReturn(-1L);
+
+        assertEquals(120L, this.remoteObservationManagerConfiguration.getReclaimDelay());
+        assertEquals(-1L, this.remoteObservationManagerConfiguration.getReclaimMaxAge());
     }
 }

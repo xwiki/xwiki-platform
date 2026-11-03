@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import jakarta.inject.Inject;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.observation.remote.ClusterSingletonManager;
 import org.xwiki.observation.remote.NetworkChannel;
 import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
@@ -61,6 +62,9 @@ public class RemoteObservationScriptService implements ScriptService
     @Inject
     private ContextualAuthorizationManager authorization;
 
+    @Inject
+    private ClusterSingletonManager singletonManager;
+
     /**
      * @return the unique identifier of the instance in the cluster
      */
@@ -83,6 +87,20 @@ public class RemoteObservationScriptService implements ScriptService
     public String getAdapterId()
     {
         return this.configuration.getNetworkAdapter();
+    }
+
+    /**
+     * Indicates if the current instance is the one which runs the tasks executed only once in the cluster (see
+     * {@link ClusterSingletonManager}).
+     *
+     * @return {@code true} if the current instance is the cluster singleton node, always {@code true} when remote
+     *         observation is disabled
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public boolean isSingletonNode()
+    {
+        return this.singletonManager.isSingletonNode();
     }
 
     /**

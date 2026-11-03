@@ -40,12 +40,16 @@
 observation.remote.admin.id=Observation identifier
 observation.remote.admin.networkAdapter=Network adapter
 observation.remote.admin.networkAdapter.jgroups.name=JGroups
+observation.remote.admin.singletonNode=Runs the tasks executed only once in the cluster
+observation.remote.admin.singletonNode.true=Yes
+observation.remote.admin.singletonNode.false=No
 observation.remote.admin.channels=Channels
 observation.remote.admin.channels.none=No channel is enabled.
 observation.remote.admin.channel.id=Channel identifier
 observation.remote.admin.channel.leader=Leader
 observation.remote.admin.channel.leader.current=Current instance
-observation.remote.admin.channel.members=Members</content>
+observation.remote.admin.channel.members=Members
+observation.remote.admin.channel.member.priority=(singleton priority: {0})</content>
   <object>
     <name>XWiki.Observation.Translations</name>
     <number>0</number>

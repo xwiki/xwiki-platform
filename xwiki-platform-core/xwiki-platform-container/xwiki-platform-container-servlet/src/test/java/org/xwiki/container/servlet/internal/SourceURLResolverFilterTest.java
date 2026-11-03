@@ -136,6 +136,23 @@ class SourceURLResolverFilterTest
     }
 
     @Test
+    void getServerPortWhenPortOmittedInURL() throws IOException, ServletException
+    {
+        HttpServletRequest customRequest = mock();
+        when(customRequest.getScheme()).thenReturn("http");
+        when(customRequest.getServerName()).thenReturn("localhost");
+        when(customRequest.getServerPort()).thenReturn(8080);
+        when(customRequest.getHeader("x-forwarded-proto")).thenReturn("https");
+        when(customRequest.getHeader("x-forwarded-host")).thenReturn("servername");
+        when(customRequest.getRequestURI()).thenReturn("/path");
+        when(customRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/path"));
+
+        this.filter.doFilter(customRequest, this.response, this.filterChain);
+
+        assertEquals(443, this.filteredRequest.getServerPort());
+    }
+
+    @Test
     void getRequestURL()
     {
         assertEquals(REQUEST_URL.toString(), this.filteredRequest.getRequestURL().toString());

@@ -58,7 +58,7 @@ public abstract class AbstractDocumentStringUserReferenceResolver extends Abstra
                 baseEntityReference = USER_SPACE_REFERENCE;
             }
             DocumentReference documentReference = getDocumentReferenceResolver().resolve(userName, baseEntityReference);
-            UserReference resolvedReference = resolveName(documentReference.getName());
+            UserReference resolvedReference = resolveVirtualUser(documentReference);
             if (resolvedReference == null) {
                 boolean isGlobal = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)
                     .equals(documentReference.getWikiReference());

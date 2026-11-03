@@ -35,6 +35,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.user.SuperAdminUserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -252,7 +253,7 @@ public class UserIterator<T> implements Iterator<T>
         // If the reference is not in the excluded list (else skip it!)
         if (!this.excludedUserAndGroupReferences.contains(currentReference)) {
             // If it's not a virtual user (guest or superadmin user), then load the document
-            if (isSuperAdmin(currentReference)) {
+            if (SuperAdminUserReference.isSuperAdminReference(currentReference)) {
                 currentValue = this.userDataExtractor.extractFromSuperadmin(currentReference);
             } else if (isGuest(currentReference)) {
                 currentValue = this.userDataExtractor.extractFromGuest(currentReference);
@@ -267,12 +268,6 @@ public class UserIterator<T> implements Iterator<T>
 
         cleanStackIfNeeded();
         return currentValue;
-    }
-
-    private boolean isSuperAdmin(DocumentReference reference)
-    {
-        return reference.getLastSpaceReference().getName().equals(RightsManager.DEFAULT_USERORGROUP_SPACE)
-            && reference.getName().equalsIgnoreCase(XWikiRightService.SUPERADMIN_USER);
     }
 
     private boolean isGuest(DocumentReference reference)

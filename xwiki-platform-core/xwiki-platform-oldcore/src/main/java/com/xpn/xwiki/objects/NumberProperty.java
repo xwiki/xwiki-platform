@@ -104,11 +104,11 @@ public abstract class NumberProperty<N extends Number> extends BaseProperty
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null) {
+        if (!(obj instanceof NumberProperty numberProperty)) {
             return false;
         }
 
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(getValue(), ((NumberProperty) obj).getValue())
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(getValue(), numberProperty.getValue())
             .isEquals();
     }
 

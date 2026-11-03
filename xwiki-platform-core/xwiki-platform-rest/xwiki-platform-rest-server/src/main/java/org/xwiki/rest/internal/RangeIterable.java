@@ -21,6 +21,7 @@ package org.xwiki.rest.internal;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * <p>
@@ -106,6 +107,10 @@ public class RangeIterable<T> implements Iterable<T>
             @Override
             public T next()
             {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+
                 T result = list.get(i + start);
                 i++;
 

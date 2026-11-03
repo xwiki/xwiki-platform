@@ -304,6 +304,10 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         // Nothing to do: the user document is entirely written by beginUser().
     }
 
+    /**
+     * @deprecated because it's conflicting with Rendering Listener events, use
+     *             {@link #beginGroupContainer(String, FilterEventParameters)} instead
+     */
     @Override
     @Deprecated
     public void beginGroup(String name, FilterEventParameters parameters) throws FilterException
@@ -335,6 +339,10 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         memberObject.setStringValue(MEMBER, member);
     }
 
+    /**
+     * @deprecated because it's conflicting with Rendering Listener events, use
+     *             {@link #endGroupContainer(String, FilterEventParameters)} instead
+     */
     @Override
     @Deprecated
     public void endGroup(String name, FilterEventParameters parameters) throws FilterException

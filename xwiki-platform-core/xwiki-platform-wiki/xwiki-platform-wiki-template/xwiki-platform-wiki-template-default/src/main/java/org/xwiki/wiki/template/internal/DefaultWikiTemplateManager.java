@@ -145,6 +145,10 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
         }
     }
 
+    /**
+     * @deprecated use {@code org.xwiki.platform.wiki.creationjob.WikiCreator#createWiki(WikiCreationRequest
+     *             request)} instead
+     */
     @Override
     @Deprecated
     public WikiProvisioningJob createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId,

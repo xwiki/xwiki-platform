@@ -95,11 +95,54 @@ describe("XWikiStorage", () => {
     });
 
     it("fails when the upload is rejected", async () => {
-      mockUploadResponse({ uploaded: 0, error: "Not allowed" });
+      // The end-point reports a rejected upload in the response body, with a status that says the request failed.
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue({
+          ok: false,
+          statusText: "Forbidden",
+          json: async () => ({
+            uploaded: 0,
+            error: { number: 403, message: "Not allowed" },
+          }),
+        }),
+      );
 
       await expect(
         storage.saveAttachments("Space.Page", [new File([""], "cat.png")]),
       ).rejects.toThrow("Upload failed: Not allowed");
+    });
+
+    it("falls back on the response status when the body can't be read", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue({
+          ok: false,
+          statusText: "Internal Server Error",
+          json: async () => {
+            throw new Error("Not JSON");
+          },
+        }),
+      );
+
+      await expect(
+        storage.saveAttachments("Space.Page", [new File([""], "cat.png")]),
+      ).rejects.toThrow("Upload failed: Internal Server Error");
+    });
+
+    it("keeps the file in the temporary store when asked to", async () => {
+      mockUploadResponse({ uploaded: 1, url: "", attachment: {} });
+
+      await storage.saveAttachments("Space.Page", [new File([""], "cat.png")], {
+        temporary: true,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          headers: { "X-XWiki-Temporary-Attachment-Support": "true" },
+        }),
+      );
     });
   });
 });

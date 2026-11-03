@@ -24,6 +24,7 @@ import type {
   Logger,
   PageAttachment,
   PageData,
+  SaveAttachmentsOptions,
   Storage,
   WikiConfig,
 } from "@xwiki/platform-api";
@@ -120,6 +121,7 @@ export abstract class AbstractStorage implements Storage {
   /**
    * @param page - the serialized reference of the page
    * @param files - the list of files to upload
+   * @param options - (since 18.10.0RC1) how to upload the files
    * @returns the uploaded attachments, in the same order as the provided files (since 18.10.0RC1, rather than their
    *   URL); the list, or some of its items, can be undefined when the storage doesn't describe the uploaded attachments,
    *   in which case they are assumed to be named after the uploaded files, with the URL resolved from their file name
@@ -130,6 +132,7 @@ export abstract class AbstractStorage implements Storage {
   abstract saveAttachments(
     page: string,
     files: File[],
+    options?: SaveAttachmentsOptions,
   ): Promise<undefined | (PageAttachment | undefined)[]>;
 
   /**

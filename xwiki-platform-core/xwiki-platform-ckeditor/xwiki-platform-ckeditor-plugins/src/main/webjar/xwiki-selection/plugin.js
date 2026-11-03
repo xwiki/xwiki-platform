@@ -76,6 +76,10 @@
         // window. This is especially important when running functional tests were we have to switch between the browser
         // tabs but we want to simulate multiple users editing.
         editor._.textSelection.restoreFocus = this.isEditingAreaFocused(editor);
+        // The saved selection is scrolled into view when restored only if the content is overwritten after this point
+        // (see the setData listener below). The text selection is reused, so we have to clear the flag that a previous
+        // overwrite may have set, otherwise every following restore would scroll the selection into view.
+        editor._.textSelection.contentOverwritten = false;
       } else {
         delete editor._.textSelection;
       }

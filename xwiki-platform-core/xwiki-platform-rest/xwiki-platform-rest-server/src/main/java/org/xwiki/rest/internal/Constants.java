@@ -23,7 +23,7 @@ package org.xwiki.rest.internal;
  * @version $Id$
  */
 // Old interface not describing a type, hard to remove for backward-compatibility reasons.
-@SuppressWarnings("checkstyle:InterfaceIsType")
+@SuppressWarnings({"checkstyle:InterfaceIsType", "java:S1214"})
 public interface Constants
 {
     /**

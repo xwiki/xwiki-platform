@@ -257,6 +257,9 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         return response;
     }
 
+    // warn/error are always enabled in XWiki's default logging configuration, so guarding this call
+    // could never skip the evaluation of its arguments.
+    @SuppressWarnings("java:S2629")
     private ResponseBuilder downloadRemoteExtension(ExtensionResourceReference extensionResource)
         throws ResolveException, IOException, XWikiException
     {

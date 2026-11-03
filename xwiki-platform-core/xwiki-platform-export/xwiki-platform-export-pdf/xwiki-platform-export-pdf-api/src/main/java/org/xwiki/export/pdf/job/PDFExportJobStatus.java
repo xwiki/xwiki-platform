@@ -54,6 +54,10 @@ public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
         /**
          * Don't serialize the XDOM because it can lead to a huge XML.
          */
+        // 'transient' is deliberate here, for the reason the Javadoc above states: the job status store
+        // serializes this class with XStream, which honours 'transient' independently of
+        // java.io.Serializable.
+        @SuppressWarnings("java:S2065")
         private final transient XDOM xdom;
 
         private final String html;

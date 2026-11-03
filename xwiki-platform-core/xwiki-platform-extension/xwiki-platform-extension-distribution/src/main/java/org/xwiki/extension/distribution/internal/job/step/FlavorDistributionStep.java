@@ -48,6 +48,10 @@ public class FlavorDistributionStep extends AbstractDistributionStep
      * The flavor manager.
      */
     @Inject
+    // 'transient' is deliberate here: DistributionJobStatus holds the step list and the job status
+    // store serializes it with XStream, which honours 'transient' independently of
+    // java.io.Serializable. Removing it would write the injected components into the stored status.
+    @SuppressWarnings("java:S2065")
     private transient FlavorManager flavorManager;
 
     /**

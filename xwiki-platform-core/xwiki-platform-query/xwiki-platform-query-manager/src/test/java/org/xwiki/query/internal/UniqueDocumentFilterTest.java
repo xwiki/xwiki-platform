@@ -83,7 +83,7 @@ class UniqueDocumentFilterTest
         assertEquals("select distinct doc.fullName, doc.name from XWikiDocument doc order by doc.name asc",
             this.filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name asc", Query.HQL));
 
-        List<Object[]> results = this.filter.filterResults(
+        List<Object> results = this.filter.filterResults(
             Arrays.asList(new Object[] { "full1", "name1" }, new Object[] { "full2", "name2" }));
         assertEquals(2, results.size());
         assertEquals("full1", results.get(0));

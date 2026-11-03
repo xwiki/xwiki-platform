@@ -517,8 +517,22 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default remote event distribution implementation is using JGroups and you'll need to either use embedded
 #-# JGroups configuration files or drop your custom configuration in the WEB-INF/observation/remote/jgroups/ directory.
 #-# There's a README file in that directory with more information.
+#-#
+#-# [Since 18.9.0RC1] XWiki ships a "kubernetes" channel (TCP transport, members discovered through the DNS records of
+#-# a headless Service with publishNotReadyAddresses enabled). It requires the system property jgroups.dns.dns_query
+#-# (the DNS name of the Service) and accepts jgroups.bind_addr, jgroups.bind_port (default 7800), jgroups.port_range
+#-# (default 0) and jgroups.join_timeout (default 3s). The pods must accept TCP connections on the JGroups port and on
+#-# the failure detection port (JGroups port + 50000).
 #-# 
 # observation.remote.channels = public, cluster
+
+#-# [Since 18.9.0RC1]
+#-# The name of the cluster to join. It must be identical on every member of the cluster. Instances sharing the same
+#-# network (or the same discovery mechanism) but using a different cluster name don't see each other, so set a name
+#-# specific to each XWiki installation when several of them are reachable from each other.
+#-# 
+#-# The default is:
+# observation.remote.clusterName = event
 
 #-# [Since 2.0M4]
 #-# The implementation of network adapter to use.

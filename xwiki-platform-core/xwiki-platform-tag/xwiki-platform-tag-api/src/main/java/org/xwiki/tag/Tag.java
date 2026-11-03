@@ -19,10 +19,10 @@
  */
 package org.xwiki.tag;
 
-import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -34,7 +34,7 @@ import org.xwiki.stability.Unstable;
  * @since 18.10.0RC1
  */
 @Unstable
-public record Tag(String name) implements Serializable
+public record Tag(String name)
 {
     /**
      * @return the name of the tag, so that a tag is displayed as its name
@@ -59,6 +59,6 @@ public record Tag(String name) implements Serializable
 
     private static String normalize(String name)
     {
-        return name == null ? null : name.toLowerCase(Locale.ROOT);
+        return StringUtils.lowerCase(name, Locale.ROOT);
     }
 }

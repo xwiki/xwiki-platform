@@ -120,6 +120,7 @@ com.xpn.xwiki.internal.objects.classes.ImplicitlyAllowedValuesPageQueryBuilder
 com.xpn.xwiki.internal.objects.classes.UsedValuesListQueryBuilder
 com.xpn.xwiki.internal.objects.classes.ViewableAllowedDBListValueFilter
 com.xpn.xwiki.internal.objects.classes.XClassMigratorListener
+com.xpn.xwiki.internal.objects.classes.XClassMigratorJob
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter

@@ -19,46 +19,24 @@
  */
 package com.xpn.xwiki.internal.objects.classes;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.ClassPropertyReference;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XClassUpdatedEvent;
-import com.xpn.xwiki.internal.store.PropertyConverter;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-
-import static com.xpn.xwiki.internal.event.XClassUpdatedEvent.PropertyUpdate;
 
 /**
  * Listen to classes modifications and automatically update objects accordingly when needed.
- * <p>
- * The actual conversion is done in {@link PropertyConverter}.
  *
  * @version $Id$
  * @since 7.1RC1
@@ -70,28 +48,10 @@ import static com.xpn.xwiki.internal.event.XClassUpdatedEvent.PropertyUpdate;
 public class XClassMigratorListener extends AbstractEventListener
 {
     @Inject
-    @Named("local")
-    private EntityReferenceSerializer<String> localSerializer;
-
-    @Inject
-    private DocumentReferenceResolver<String> resolver;
-
-    @Inject
-    private QueryManager queryManager;
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    /**
-     * Used for migrating the property values after a class is modified.
-     */
-    @Inject
-    private PropertyConverter propertyConverter;
-
-    @Inject
     private Logger logger;
 
-    private record PropertyToUpdate(PropertyClass newPropertyClass, BaseProperty<?> newProperty) { }
+    @Inject
+    private JobExecutor jobExecutor;
 
     /**
      * Set up the listener.
@@ -105,187 +65,19 @@ public class XClassMigratorListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof XClassUpdatedEvent ev && data instanceof Collection<?> updatedProperties) {
-            onEvent(ev, updatedProperties);
+            XClassMigratorRequest request = new XClassMigratorRequest();
+            request.setClassToMigrate(ev.getReference());
+            request.setUpdatedProperties(updatedProperties);
+            request.setId("classMigration",
+                String.format("%d-%d", System.currentTimeMillis(), ThreadLocalRandom.current().nextInt(100, 1000)));
+            try {
+                this.jobExecutor.execute(XClassMigratorJob.JOB_TYPE, request);
+            } catch (JobException e) {
+                logger.error("Migration of class [{}] failed", ev.getReference(), e);
+            }
         } else {
             logger.error("Unexpected event of type [{}] or unexpected data of type [{}], this should not happen",
                     event == null ? null : event.getClass(), data == null ? null : data.getClass());
         }
-    }
-
-    private void onEvent(XClassUpdatedEvent ev, Collection<?> updatedProperties)
-    {
-        List<PropertyToUpdate> propertiesToUpdate = new ArrayList<>(updatedProperties.size());
-        for (Object p : updatedProperties) {
-            if (p instanceof PropertyUpdate(PropertyInterface oldProp, PropertyInterface newProp)) {
-                if ((oldProp instanceof PropertyClass || oldProp == null)
-                            && (newProp instanceof PropertyClass || newProp == null)
-                ) {
-                    maybeAddPropertyToUpdate((PropertyClass) newProp, (PropertyClass) oldProp, propertiesToUpdate);
-                }
-            } else {
-                logger.error("Unexpected entry of type [{}], this should not happen",
-                        p == null ? null : p.getClass());
-                return;
-            }
-        }
-
-        updateProperties(ev.getReference(), propertiesToUpdate);
-    }
-
-    private void maybeAddPropertyToUpdate(PropertyClass newPropertyClass, PropertyClass previousPropertyClass,
-        List<PropertyToUpdate> propertiesToUpdate)
-    {
-        boolean migrate = false;
-        if (newPropertyClass != null) {
-            BaseProperty<?> newProperty = newPropertyClass.newProperty();
-
-            if (newProperty == null) {
-                migrate = false;                
-            } else if (previousPropertyClass != null) {
-                BaseProperty<?> previousProperty = previousPropertyClass.newProperty();
-
-                // New and previous class property generate different kind of properties
-                migrate = previousProperty == null || newProperty.getClass() != previousProperty.getClass();
-            } else {
-                migrate = true;
-            }
-
-            if (migrate) {
-                propertiesToUpdate.add(new PropertyToUpdate(newPropertyClass, newProperty));
-            }
-        }
-    }
-
-    private void updateProperties(DocumentReference classReference, List<PropertyToUpdate> propertiesToUpdate)
-    {
-        if (propertiesToUpdate.isEmpty()) {
-            // no property to update in the end
-            // this happens for property deletions for instance
-            return;
-        }
-
-        // Get all the documents containing at least one object of the modified class
-        List<String> documents;
-        String className = this.localSerializer.serialize(classReference);
-        String wikiName = classReference.getWikiReference().getName();
-        this.logger.info("Migrating objects in the [{}] wiki after the update of the [{}] class", wikiName, className);
-        try {
-            Query query = this.queryManager.createQuery(
-                    "select distinct obj.name from BaseObject as obj where obj.className = :className", Query.HQL);
-            query.bindValue("className", className);
-            query.setWiki(wikiName);
-            documents = query.execute();
-            if (documents.isEmpty()) {
-                this.logger.info("No documents to migrate after the update of class [{}] in the [{}] wiki",
-                        className, wikiName);
-            } else {
-                this.logger.info("[{}] documents will be migrated in the [{}] wiki after the [{}] class update",
-                        documents.size(), wikiName, className);
-                migrateDocuments(documents, propertiesToUpdate, classReference);
-                this.logger.info("Migration of the [{}] class finished in the [{}] wiki", className, wikiName);
-            }
-        } catch (QueryException e) {
-            this.logger.error("Failed to get the documents to migrate after the update of class [{}] in the [{}] wiki",
-                    className, wikiName, e);
-        }
-    }
-
-    private void migrateDocuments(List<String> documents, List<PropertyToUpdate> propertiesToUpdate,
-            DocumentReference classReference)
-    {
-        XWikiContext context = xcontextProvider.get();
-        XWiki wiki = context.getWiki();
-        String currentWikiId = context.getWikiId();
-        String className = this.localSerializer.serialize(classReference);
-        try {
-            // Switch to class wiki to be safer
-            context.setWikiId(classReference.getWikiReference().getName());
-            for (String documentName : documents) {
-                try {
-                    DocumentReference ref = this.resolver.resolve(documentName, classReference);
-                    XWikiDocument document = wiki.getDocument(ref, context);
-                    if (!document.isNew()) {
-                        // Avoid modifying the cached document
-                        document = document.clone();
-                        migrate(document, propertiesToUpdate, className);
-                    }
-                } catch (XWikiException e) {
-                    this.logger.error("Failed to get document [{}] to apply the update of class [{}]",
-                            documentName, className, e);
-                }
-            }
-        } finally {
-            // Restore context wiki
-            context.setWikiId(currentWikiId);
-        }
-    }
-
-    void migrate(XWikiDocument document, List<PropertyToUpdate> propertiesToUpdate, String className)
-    {
-        boolean modified = false;
-        for (PropertyToUpdate p : propertiesToUpdate) {
-            modified = updateProperty(document, p.newPropertyClass, p.newProperty) || modified;
-        }
-
-        if (modified) {
-            XWikiContext context = xcontextProvider.get();
-            try {
-                context.getWiki().saveDocument(document, "Migrated class [" + className + "]", context);
-            } catch (XWikiException e) {
-                this.logger.error("Failed to migrate document [{}] after update of class [{}]",
-                        document.getDocumentReference(), className, e);
-            }
-        }
-    }
-
-    private boolean updateProperty(XWikiDocument document, PropertyClass newPropertyClass,
-        BaseProperty<?> newProperty)
-    {
-        ClassPropertyReference propertyReference = newPropertyClass.getReference();
-        EntityReference classReference = propertyReference.extractReference(EntityType.DOCUMENT);
-
-        boolean modified = false;
-
-        for (BaseObject xobject : document.getXObjects(classReference)) {
-            if (xobject != null) {
-                BaseProperty<?> property = (BaseProperty<?>) xobject.getField(propertyReference.getName());
-
-                // If the existing field is of different kind than what is produced by the new class property
-                if (property != null) {
-                    modified = convert(xobject, property, newProperty, newPropertyClass);
-                } else {
-                    modified = add(xobject, newPropertyClass);
-                }
-            }
-        }
-
-        return modified;
-    }
-
-    private boolean add(BaseObject xobject, PropertyClass newPropertyClass)
-    {
-        xobject.safeput(newPropertyClass.getName(), newPropertyClass.newProperty());
-
-        return true;
-    }
-
-    private boolean convert(BaseObject xobject, BaseProperty<?> property, BaseProperty<?> newProperty,
-        PropertyClass newPropertyClass)
-    {
-        if (newProperty != null && property.getClass() != newProperty.getClass()) {
-            BaseProperty<?> convertedProperty = this.propertyConverter.convertProperty(property, newPropertyClass);
-
-            // Set new field
-            if (convertedProperty != null) {
-                // Mark old field for removal, only if the conversion was successful, to avoid losing data.
-                xobject.removeField(newPropertyClass.getName());
-
-                xobject.safeput(newPropertyClass.getName(), convertedProperty);
-
-                return true;
-            }
-        }
-
-        return false;
     }
 }

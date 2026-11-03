@@ -33,6 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.icon.IconManagerScriptServiceComponentList;
@@ -379,6 +380,36 @@ class AttachmentSelectorPageTest extends PageTest
         var div = document.select(".attachment-picker > p > .displayed.x-attachment");
 
         assertEquals("displayed x-attachment test ]] {{noscript/}}", div.attr("class"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "false, __blank",
+        "true, lightbox"
+    })
+    void attachmentSelectorMacroLink(String displayImage, String expectedRel) throws Exception
+    {
+        loadWikiMacro(this, this.componentManager, ATTACHMENT_SELECTOR_DOCUMENT_REFERENCE);
+
+        String fileName = PAYLOAD + ".png";
+        XWikiDocument xwikiDocument = commonFixup(fileName);
+
+        xwikiDocument.setContent(String.format("""
+            {{attachmentSelector
+                classname="Space.Test"
+                property="avatar"
+                savemode="direct"
+                displayImage="%s"
+                link="true"
+            /}}
+            """, displayImage));
+
+        Document document = renderHTMLPage(xwikiDocument);
+        Elements links = document.select(".attachment-picker .displayed.x-attachment a");
+
+        assertEquals(1, links.size());
+        assertEquals(String.format("attach:Space.Test@%s", fileName), links.attr("href"));
+        assertEquals(expectedRel, links.attr("rel"));
     }
 
     @ParameterizedTest

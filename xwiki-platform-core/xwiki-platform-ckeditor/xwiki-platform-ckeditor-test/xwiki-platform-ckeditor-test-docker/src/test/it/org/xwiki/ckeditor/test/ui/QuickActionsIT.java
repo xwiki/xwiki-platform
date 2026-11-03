@@ -281,6 +281,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(11)
     void infoBox()
     {
+        assertQuickActionSelected("/inf", "Info Message");
         textArea.insertMacro("/info message", "Info Message");
 
         // Delete the default message text.
@@ -294,6 +295,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(12)
     void successBox()
     {
+        assertQuickActionSelected("/suc", "Success Message");
         textArea.insertMacro("/success message", "Success Message");
 
         // Delete the default message text.
@@ -307,6 +309,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(13)
     void warningBox()
     {
+        assertQuickActionSelected("/war", "Warning Message");
         textArea.insertMacro("/warning message", "Warning Message");
 
         // Delete the default message text.
@@ -320,6 +323,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(14)
     void errorBox()
     {
+        assertQuickActionSelected("/err", "Error Message");
         textArea.insertMacro("/error message", "Error Message");
 
         // Delete the default message text.
@@ -404,7 +408,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         testUtils.rest().savePage(new DocumentReference("xwiki", "QuickActionsIT", "TestInclude"), "Test include",
             "Test include");
-        MacroDialogEditModal macroDialogEditModal = textArea.insertMacroWithRequiredParameters("/inc", "Include");
+        assertQuickActionSelected("/inc", "Include");
+        MacroDialogEditModal macroDialogEditModal = textArea.insertMacroWithRequiredParameters("/include", "Include");
         SuggestInputElement reference =
             new SuggestInputElement(macroDialogEditModal.getMacroParameterInput("reference"));
         reference.sendKeys("TestInclude")
@@ -419,7 +424,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     void code()
     {
         // Empty form
-        textArea.insertMacroWithRequiredParameters("/cod", "Code").clickSubmit();
+        assertQuickActionSelected("/cod", "Code");
+        textArea.insertMacroWithRequiredParameters("/code", "Code").clickSubmit();
 
         assertSourceEquals("{{code}}{{/code}}");
     }
@@ -428,7 +434,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(22)
     void toc()
     {
-        textArea.insertMacro("/toc", "Table of contents");
+        assertQuickActionSelected("/toc", "Table of contents");
+        textArea.insertMacro("/table of contents", "Table of contents");
 
         assertSourceEquals("{{toc/}}\n\n ");
     }
@@ -498,6 +505,7 @@ class QuickActionsIT extends AbstractCKEditorIT
         // Remove the 4 characters we just typed
         textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE,  Keys.BACK_SPACE, Keys.BACK_SPACE);
         textArea.sendKeys(" ");
+        assertQuickActionSelected("/inf", "Info Message");
         textArea.insertMacro("/info message", "Info Message");
 
         // Note that we didn't modify the default info message because inline macros are not editable in-place.
@@ -519,5 +527,18 @@ class QuickActionsIT extends AbstractCKEditorIT
         macroEditModal.clickSubmit();
 
         assertSourceEquals("one {{velocity}}test{{/velocity}} two");
+    }
+
+    /**
+     * Types the given query, checks that it selects the quick action with the given label, then removes the query.
+     *
+     * @param query the quick action query, starting with {@code /}
+     * @param label the label of the quick action that the query is expected to select
+     */
+    private void assertQuickActionSelected(String query, String label)
+    {
+        textArea.sendKeys(query);
+        new AutocompleteDropdown().waitForItemSelected(query, label);
+        textArea.sendKeys(Keys.BACK_SPACE.toString().repeat(query.length()));
     }
 }

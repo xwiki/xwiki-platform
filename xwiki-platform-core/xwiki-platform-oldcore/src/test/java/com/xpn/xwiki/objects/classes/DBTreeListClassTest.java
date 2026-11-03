@@ -40,6 +40,8 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -77,6 +79,19 @@ class DBTreeListClassTest
             .when(this.oldcore.getSpyXWiki()).parseContent(any(), any(XWikiContext.class));
 
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument());
+    }
+
+    @Test
+    void displayEditSetsAriaLabel()
+    {
+        DBTreeListClass dbtlc = new DBTreeListClass();
+        dbtlc.setPrettyName("Category tree");
+        BaseObject object = new BaseObject();
+        StringBuffer buffer = new StringBuffer();
+
+        dbtlc.displayEdit(buffer, "category", "prefix_", object, this.oldcore.getXWikiContext());
+
+        assertThat(buffer.toString(), containsString("aria-label='Category tree'"));
     }
 
     @Test
@@ -506,7 +521,7 @@ class DBTreeListClassTest
         // The picker is disabled by default, so this displays the select input and not the tree widget.
         dbtlc.displayEdit(buffer, "prop", "", object, this.oldcore.getXWikiContext());
 
-        assertEquals("<select id='prop' name='prop' size='1'>"
+        assertEquals("<select size='1' id='prop' aria-label='DB Tree List' name='prop'>"
             + "<option value='root&#39;id' label='Root &#38; &#60;b&#62;'>Root &#38; &#60;b&#62;</option>"
             + "<option selected='selected' value='child'"
             + " label='\u00A0&#123;&#123;macro}}Child&#60;em&#62;'>"

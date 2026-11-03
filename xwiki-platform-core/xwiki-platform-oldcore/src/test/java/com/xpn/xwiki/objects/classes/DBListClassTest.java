@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
@@ -36,11 +37,14 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -71,6 +75,9 @@ class DBListClassTest
     @MockComponent
     private AuthorExecutor authorExecutor;
 
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
+
     @BeforeEach
     void before()
     {
@@ -78,6 +85,19 @@ class DBListClassTest
             .when(this.oldcore.getSpyXWiki()).parseContent(any(), any(XWikiContext.class));
 
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument());
+    }
+
+    @Test
+    void displayEditSetsAriaLabel()
+    {
+        DBListClass dblc = new DBListClass();
+        dblc.setPrettyName("Related pages");
+        BaseObject object = new BaseObject();
+        StringBuffer buffer = new StringBuffer();
+
+        dblc.displayEdit(buffer, "related", "prefix_", object, this.oldcore.getXWikiContext());
+
+        assertThat(buffer.toString(), containsString("aria-label='Related pages'"));
     }
 
     @Test

@@ -45,6 +45,9 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
  *
  * @version $Id$
  */
+// The hiding is deliberate: this static gives group lists their own parsing defaults, and callers pick it
+// explicitly through GroupsClass. It is public API of oldcore, so it cannot be renamed either.
+@SuppressWarnings("java:S9149")
 public class GroupsClass extends ListClass
 {
     /**

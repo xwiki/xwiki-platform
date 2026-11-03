@@ -77,11 +77,13 @@ public class LiveDataElement extends BaseElement
     }
 
     /**
-     * @return a cart layout page object for the live data
+     * @return a card layout page object for the live data, once the cards are loaded
      */
     public CardLayoutElement getCardLayout()
     {
-        return new CardLayoutElement(this.id);
+        CardLayoutElement cardLayoutElement = new CardLayoutElement(this.id);
+        cardLayoutElement.waitUntilReady();
+        return cardLayoutElement;
     }
 
     /**

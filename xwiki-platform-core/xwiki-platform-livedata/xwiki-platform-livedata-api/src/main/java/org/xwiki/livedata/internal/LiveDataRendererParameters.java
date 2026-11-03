@@ -54,6 +54,8 @@ public class LiveDataRendererParameters
 
     private String description;
 
+    private String coverProperty;
+
     /**
      * @return the Live Data instance id
      */
@@ -276,6 +278,26 @@ public class LiveDataRendererParameters
         this.description = description;
     }
 
+    /**
+     * @return the id of the property used as the cover of the cards, when the Live Data is displayed with the cards
+     *     layout
+     * @since 18.10.0RC1
+     */
+    public String getCoverProperty()
+    {
+        return this.coverProperty;
+    }
+
+    /**
+     * @param coverProperty the id of the property used as the cover of the cards, when the Live Data is displayed
+     *     with the cards layout
+     * @since 18.10.0RC1
+     */
+    public void setCoverProperty(String coverProperty)
+    {
+        this.coverProperty = coverProperty;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -302,6 +324,7 @@ public class LiveDataRendererParameters
             .append(this.showPageSizeDropdown, that.showPageSizeDropdown)
             .append(this.pageSizes, that.pageSizes)
             .append(this.description, that.description)
+            .append(this.coverProperty, that.coverProperty)
             .isEquals();
     }
 
@@ -321,6 +344,7 @@ public class LiveDataRendererParameters
             .append(this.showPageSizeDropdown)
             .append(this.pageSizes)
             .append(this.description)
+            .append(this.coverProperty)
             .toHashCode();
     }
 }

@@ -28,7 +28,7 @@ import {
 } from "@xwiki/platform-link-modal-ui";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
-import { inject, ref, watch } from "vue";
+import { inject } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkPageConfig } from "../data/linkType";
 import type {
@@ -99,20 +99,6 @@ function trySelectRaw(query: string): boolean {
 }
 
 const { t } = useI18n({ messages: translations });
-
-const query = ref("");
-const suggestions = ref<LinkSuggestion[]>([]);
-const loadingSuggestions = ref(false);
-
-watch(query, async (query) => {
-  if (!linkSuggestor) {
-    return;
-  }
-
-  loadingSuggestions.value = true;
-  suggestions.value = await linkSuggestor({ query, type: LinkType.PAGE });
-  loadingSuggestions.value = false;
-});
 </script>
 
 <template>

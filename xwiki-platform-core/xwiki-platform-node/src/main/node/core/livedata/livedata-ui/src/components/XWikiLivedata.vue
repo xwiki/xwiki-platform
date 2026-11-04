@@ -38,9 +38,11 @@ import {
   inject,
   nextTick,
   onMounted,
+  onUnmounted,
   provide,
   ref,
   useTemplateRef,
+  watch,
 } from "vue";
 import type { LiveDataSource, Logic } from "@xwiki/platform-livedata-api";
 import type { Query, Translations } from "@xwiki/platform-localization-api";
@@ -74,6 +76,61 @@ const translationsLoaded = ref(false);
 
 const dataId = computed(() => logic.data?.id);
 const layoutId = computed(() => logic.currentLayoutId?.value);
+const maximized = computed(() => logic.isMaximized());
+
+// Escape should allow to exit maximized mode,
+// unless it's already handled by another component (e.g., editor).
+function onEscape(event: KeyboardEvent) {
+  if (event.key === "Escape" && maximized.value) {
+    logic.toggleMaximized();
+  }
+}
+
+// The elements we made inert, so that only those are restored afterwards. An element already
+// inert before the Live Data was maximized must stay inert once the normal view is back.
+let inertElements: Element[] = [];
+
+// The maximized view is painted over the page, so the content it hides must not stay reachable
+// with the keyboard nor exposed to assistive technologies. Everything becomes inert except the
+// ancestors of the Live Data, which are the only path leading to it.
+function setPageInert(inert: boolean) {
+  if (inert) {
+    for (
+      let node = element.value as Element | null;
+      node && node !== document.body && node.parentElement;
+      node = node.parentElement
+    ) {
+      for (const sibling of Array.from(node.parentElement.children)) {
+        if (sibling !== node && !sibling.hasAttribute("inert")) {
+          sibling.setAttribute("inert", "");
+          inertElements.push(sibling);
+        }
+      }
+    }
+  } else {
+    for (const inertElement of inertElements) {
+      inertElement.removeAttribute("inert");
+    }
+    inertElements = [];
+  }
+}
+
+// We only set the escape listener when we're actually in maximized mode.
+watch(maximized, (isMaximized) => {
+  setPageInert(isMaximized);
+  if (isMaximized) {
+    document.addEventListener("keydown", onEscape);
+  } else {
+    document.removeEventListener("keydown", onEscape);
+  }
+});
+
+// Unmounting while maximized removes the view without toggling it back, so the rest of the page
+// must be restored here too.
+onUnmounted(() => {
+  document.removeEventListener("keydown", onEscape);
+  setPageInert(false);
+});
 
 // eslint-disable-next-line max-statements
 onMounted(async () => {
@@ -81,13 +138,14 @@ onMounted(async () => {
   logic.setElement(elementValue);
   // Register the logic on the parent of the root element to make its API accessible publicly.
   jQuery(elementValue).parent().data("liveData", logic);
-  // Waits for the layout to be (lazily) loaded before hiding the loader. The promise is rejected when no layout
-  // can be loaded at all, so that we never wait for one indefinitely.
-  const layoutReady = new Promise<void>((resolve, reject) => {
+  // Waits for the layout to be (lazily) loaded before hiding the loader. The promise resolves with the error when no
+  // layout can be loaded at all, so that we never wait for one indefinitely. It never rejects because it is awaited
+  // only at the end, after the translations and the entries, and a rejection would be reported as unhandled meanwhile.
+  const layoutReady = new Promise<unknown>((resolve) => {
     logic.onEvent("layoutLoaded", (event) => {
       const { error } = (event as CustomEvent).detail;
       if (error) {
-        reject(error);
+        resolve(error);
       } else {
         // Hide the loader and show the footnotes only when a layout was actually loaded. When none could be
         // loaded the loader keeps running: there is nothing to display in its place yet, and it is also what
@@ -95,13 +153,10 @@ onMounted(async () => {
         // TODO: XWIKI-24835: The Live Data displays an endless loading animation instead of an error when no
         // layout can be loaded
         layoutLoaded.value = true;
-        resolve();
+        resolve(undefined);
       }
     });
   });
-  // We await this promise only at the end, after the translations and the entries, so we register the rejection
-  // handler right away to keep the failure from being reported as unhandled meanwhile.
-  layoutReady.catch(() => {});
 
   let error: unknown;
   try {
@@ -162,7 +217,10 @@ onMounted(async () => {
 
     // The layout is loaded in parallel with the entries so we have to wait for it too, and for
     // the tick that renders it, before the live data can be considered fully displayed.
-    await layoutReady;
+    const layoutError = await layoutReady;
+    if (layoutError) {
+      throw layoutError;
+    }
     await nextTick();
   } catch (e) {
     error = e;
@@ -177,7 +235,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="xwiki-livedata" ref="rootElement">
+  <div
+    class="xwiki-livedata"
+    :class="{ 'livedata-maximized': maximized }"
+    ref="rootElement"
+  >
     <!-- Import the Livedata advanced configuration panels -->
     <LivedataAdvancedPanels />
 
@@ -194,3 +256,17 @@ onMounted(async () => {
     <div v-if="!layoutLoaded" class="loading"></div>
   </div>
 </template>
+
+<style>
+.xwiki-livedata.livedata-maximized {
+  position: fixed;
+  inset: 0;
+  /*
+   * We use the same z-index as the gallery application, which maximizes the same way.
+   */
+  z-index: 1001;
+  overflow: auto;
+  padding: 0 var(--grid-gutter-width);
+  background-color: var(--body-bg);
+}
+</style>

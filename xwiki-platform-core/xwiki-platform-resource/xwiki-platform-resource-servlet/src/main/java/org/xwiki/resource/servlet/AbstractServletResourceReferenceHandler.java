@@ -46,6 +46,7 @@ import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.stability.Unstable;
 import org.xwiki.tika.internal.TikaUtils;
 
 /**
@@ -148,6 +149,28 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
     }
 
     /**
+     * Indicates whether a cacheable resource can be stored by any cache (including shared ones, e.g. proxies) and
+     * reused without asking the server for a long time. Only resources whose content is the same for all users and that
+     * every user is allowed to access should be public. Other cacheable resources can only be stored by the browser,
+     * which has to check with the server before each reuse, so that their access rights are verified each time
+     * (the browser cache is shared by all the users of the browser, and access rights can change).
+     *
+     * @param resourceReference the reference of the resource to serve
+     * @return {@code true} if the resource can be stored by any cache and reused without checking with the server,
+     *         {@code false} (the default) if only the browser can store it and it has to check with the server before
+     *         each reuse
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
+     * @since 16.10.20
+     */
+    @Unstable
+    protected boolean isResourceCachePublic(R resourceReference)
+    {
+        return false;
+    }
+
+    /**
      * @param resourceReference the reference of the requested resource
      * @return the stream that can be used to read the resource
      */
@@ -169,14 +192,12 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
     private void serveResource(R resourceReference, InputStream rawResourceStream)
         throws ResourceReferenceHandlerException
     {
-        InputStream resourceStream = rawResourceStream;
-
-        // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
-        // content type without affecting the stream (Tika may need to read a few bytes from the start of the
-        // stream, in which case it will mark & reset the stream).
-        if (!resourceStream.markSupported()) {
-            resourceStream = new BufferedInputStream(resourceStream);
-        }
+        // Detecting the content type consumes the beginning of the resource: Tika reads ahead into a buffer of its
+        // own and restores only the position of the stream it buffered, leaving the stream it was given advanced. A
+        // BufferedInputStream keeps those bytes in its own buffer and replays them, so read the resource through one
+        // and serve that same wrapper, otherwise the client gets the resource without its first bytes (and an empty
+        // response for a resource smaller than Tika's read-ahead).
+        InputStream resourceStream = new BufferedInputStream(rawResourceStream);
 
         try {
             Response response = this.container.getResponse();
@@ -232,8 +253,14 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
 
         // Cache the resource if possible.
         if (isResourceCacheable(resourceReference)) {
-            httpResponse.setHeader(HttpHeaders.CACHE_CONTROL, "public");
-            httpResponse.setDateHeader(HttpHeaders.EXPIRES, new Date().getTime() + CACHE_DURATION);
+            if (isResourceCachePublic(resourceReference)) {
+                httpResponse.setHeader(HttpHeaders.CACHE_CONTROL, "public");
+                httpResponse.setDateHeader(HttpHeaders.EXPIRES, new Date().getTime() + CACHE_DURATION);
+            } else {
+                // Only the browser may store the resource, and it has to revalidate it before each reuse. The access
+                // rights are checked before answering the revalidation request with a 304 Not Modified.
+                httpResponse.setHeader(HttpHeaders.CACHE_CONTROL, "private, no-cache");
+            }
             // Even if the resource is cached permanently, most browsers are still sending a request if the user reloads
             // the page using F5. We send back the "Last-Modified" header in the response so that the browser will send
             // us an "If-Modified-Since" request for any subsequent call for this static resource. When this happens we

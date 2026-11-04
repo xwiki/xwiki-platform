@@ -303,7 +303,7 @@ xwiki.inactiveuser.allowedpages=
 #-# security breach if it were set and you forgot about it. Should only be enabled
 #-# for recovering the Wiki when the rights are completely messed.
 #-# [Since 18.8.0RC1] Instead of plain text password, you can use a hashed password string using
-the format {hashAlgorithm}hash where the hash algorithm is an algorithm supported by PasswordClass.
+#-# the format {hashAlgorithm}hash where the hash algorithm is an algorithm supported by PasswordClass.
 #-# e.g., generated using htpasswd -bnBC 10 "" yourpassword | tr -d ':\n'
 #if ($xwikiCfgSuperadminPassword)
 xwiki.superadminpassword=$xwikiCfgSuperadminPassword
@@ -319,7 +319,13 @@ xwiki.superadminpassword=$xwikiCfgSuperadminPassword
 #-# 1: the authentication is done for each request.
 # xwiki.authentication.always=0
 
-#-# Cookie encryption keys. They are randomly generated and stored when not specified.
+#-# Cookie encryption keys. They are randomly generated and stored in the permanent directory when not specified.
+#-# In a cluster, the same values must be set on all the nodes, otherwise users are logged out when they are sent to
+#-# another node.
+#-# [Since 17.5.0] Like any property of this file, they can also be set without editing it (for example from a secret
+#-# store) with the environment variables XCONF_xwikicfg_xwiki_authentication_validationKey and
+#-# XCONF_xwikicfg_xwiki_authentication_encryptionKey, or the Java system properties
+#-# xconf.xwikicfg.xwiki.authentication.validationKey and xconf.xwikicfg.xwiki.authentication.encryptionKey.
 # xwiki.authentication.validationKey=totototototototototototototototo
 # xwiki.authentication.encryptionKey=titititititititititititititititi
 
@@ -452,6 +458,16 @@ xwiki.plugins=$!xwikiCfgPlugins
 #
 
 xwiki.plugin.image.cache.capacity=30
+
+#-# The compression quality used when an image is resized on the server side (e.g. an image inserted with a width,
+#-# see the "rendering.imageDimensionsIncludedInImageURL" configuration parameter in xwiki.properties) and no "quality"
+#-# parameter is specified in the image URL. The value must be between 0 (lowest quality, smallest file) and 1 (highest
+#-# quality, largest file); values outside this range are clamped. It only has a visible effect on lossy image formats,
+#-# such as JPEG. Increase it if resized images look blurry or show compression artifacts.
+#-# Blur on high-density (HiDPI) screens is better addressed by setting
+#-# "rendering.imageDimensionsIncludedInImageURL" to false in xwiki.properties.
+#-# The default value is 0.5.
+# xwiki.plugin.image.defaultQuality=0.5
 
 #---------------------------------------
 # Watchlist Plugin

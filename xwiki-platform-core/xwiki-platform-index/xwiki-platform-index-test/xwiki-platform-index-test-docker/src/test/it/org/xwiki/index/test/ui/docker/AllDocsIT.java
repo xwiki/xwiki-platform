@@ -21,6 +21,7 @@ package org.xwiki.index.test.ui.docker;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -30,12 +31,13 @@ import org.xwiki.index.test.po.AllDocsPage;
 import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.CopyPage;
+import org.xwiki.test.ui.po.DeletePageConfirmationPage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.EditRightsPane;
 import org.xwiki.test.ui.po.RenamePage;
@@ -66,6 +68,12 @@ class AllDocsIT
     private static final String DATE_COLUMN_LABEL = "Date";
 
     private static final String AUTHOR_COLUMN_LABEL = "Author";
+
+    private static final String TITLE_COLUMN_LABEL = "Title";
+
+    private static final String FOOTNOTE_COMPUTED_TITLE =
+        "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
+            + "pages.";
 
     @Test
     @Order(1)
@@ -255,6 +263,58 @@ class AllDocsIT
     }
 
     /**
+     * Filter the Index tab on the location and the title of nested pages.
+     */
+    @Test
+    @Order(6)
+    void filterNestedDocuments(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference, true);
+
+        // Create the nested pages "1", "1/2" and "1/2/3", plus a page with a computed title next to "2".
+        SpaceReference level1 = testReference.getLastSpaceReference();
+        SpaceReference level2 = new SpaceReference("Level2", level1);
+        setup.createPage(testReference, "", "Level 1");
+        setup.createPage(new DocumentReference("WebHome", level2), "", "Level 2");
+        setup.createPage(new DocumentReference("WebHome", new SpaceReference("Level3", level2)), "", "Level 3");
+        setup.createPage(new DocumentReference("WebHome", new SpaceReference("Computed", level1)), "",
+            "Level $mathtool.add(4, 0)");
+
+        AllDocsLiveData liveData = AllDocsPage.gotoPage().clickIndexTab();
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+
+        // The "/" of the location filter matches any level: the pages below "1/2" are listed, and the WebHome of a
+        // nested page is matched on its parent location, so "1/2/" doesn't list "2" itself.
+        String level1Name = level1.getName();
+        liveData.filterColumn(LOCATION_COLUMN_LABEL, level1Name + "/Level2");
+        assertEquals(List.of("Level 2", "Level 3"), getTitles(tableLayout));
+        liveData.filterColumn(LOCATION_COLUMN_LABEL, level1Name + "/Level2/");
+        assertEquals(List.of("Level 3"), getTitles(tableLayout));
+
+        // All the pages, with the computed title marked and explained in a footnote.
+        liveData.filterColumn(LOCATION_COLUMN_LABEL, level1Name);
+        assertEquals(List.of("Level 1", "Level 2", "Level 3", "Level 4 1"), getTitles(tableLayout));
+        assertEquals(List.of(FOOTNOTE_COMPUTED_TITLE), liveData.getFootnotesText());
+
+        // Filter by title, among the pages of this test. The filter applies to the stored title, which is why the
+        // computed title doesn't use the digits 1, 2 and 3.
+        liveData.filterColumn(TITLE_COLUMN_LABEL, "1");
+        assertEquals(List.of("Level 1"), getTitles(tableLayout));
+        assertEquals(0, liveData.countFootnotes());
+        liveData.filterColumn(TITLE_COLUMN_LABEL, "2");
+        assertEquals(List.of("Level 2"), getTitles(tableLayout));
+        liveData.filterColumn(TITLE_COLUMN_LABEL, "3");
+        assertEquals(List.of("Level 3"), getTitles(tableLayout));
+    }
+
+    private List<String> getTitles(TableLayoutElement tableLayout)
+    {
+        // Sorted, since the order of the rows isn't what this test is about.
+        return tableLayout.getColumnValues(TITLE_COLUMN_LABEL).stream().sorted().toList();
+    }
+
+    /**
      * Verify that the Action column is displayed only for logged in users.
      */
     private void validateActionsAndGuest(TestUtils setup)
@@ -384,7 +444,7 @@ class AllDocsIT
 
         // click on the copy action link.
         livetable.clickAction(1, "delete");
-        ConfirmationPage confirmationPage = new ConfirmationPage();
+        DeletePageConfirmationPage confirmationPage = new DeletePageConfirmationPage();
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilFinished();
         page = AllDocsPage.gotoPage();

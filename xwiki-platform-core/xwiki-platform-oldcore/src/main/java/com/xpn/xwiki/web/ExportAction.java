@@ -25,11 +25,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.export.ExportFormatHandler;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
@@ -72,15 +77,27 @@ public class ExportAction extends XWikiAction
 {
     private static final String EXCEPTION = "exception";
 
+    private static final String HTTP_METHOD_POST = "POST";
+
     /**
-     * Define the different format supported by the export.
+     * The export format used when the request doesn't specify one.
      */
-    private enum ExportFormat
-    {
-        XAR,
-        HTML,
-        OTHER
-    }
+    private static final String DEFAULT_FORMAT = "xar";
+
+    /**
+     * Not taken from a servlet API constant, so that this stays identical on the branches where oldcore has only the
+     * javax namespace and on those where it has only the jakarta one.
+     */
+    private static final int STATUS_METHOD_NOT_ALLOWED = 405;
+
+    /**
+     * Template listing the parameters of an export that was requested with a method the action doesn't export on, and
+     * offering to submit that same export again with a POST request.
+     */
+    private static final String RESUBMIT_TEMPLATE = "exportresubmit";
+
+    @Inject
+    private Logger logger;
 
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -90,10 +107,15 @@ public class ExportAction extends XWikiAction
         try {
             XWikiRequest request = context.getRequest();
             String format = request.get("format");
+            ExportFormatHandler formatHandler = getExportFormatHandler(format);
 
-            if (!validateExportRequest(request)) {
-                return "docdoesnotexist";
-            } else if (format == null || "xar".equals(format)) {
+            if (!validateExportRequest(context, formatHandler)) {
+                refuseExportRequest(context);
+                return RESUBMIT_TEMPLATE;
+            } else if (formatHandler != null) {
+                handleRevision(context);
+                defaultPage = formatHandler.export(context);
+            } else if (format == null || DEFAULT_FORMAT.equals(format)) {
                 defaultPage = exportXAR(context);
             } else if ("html".equals(format)) {
                 defaultPage = exportHTML(context);
@@ -112,31 +134,62 @@ public class ExportAction extends XWikiAction
      * Checks if the given request is intended to perform an export. We need this check because large exports require
      * many resources and we want to allocate those resources only when there is a clear intent.
      *
-     * @param request the export request to validate
-     * @return {@code true} if the request is a valid (e.g. the user intended to perform an export), {@code false} otherwise
+     * @param context the XWiki context, holding the export request to validate
+     * @param formatHandler the component that handles the requested export format, {@code null} if the export format
+     *            is handled by this action
+     * @return {@code true} if the request is a valid export request (e.g. the user intended to perform an export),
+     *         {@code false} otherwise
      */
-    private boolean validateExportRequest(XWikiRequest request)
+    private boolean validateExportRequest(XWikiContext context, ExportFormatHandler formatHandler)
     {
-        // We used to consider all requests to the /export/ action as export requests but this was causing problems with
-        // the PDF export where resources loaded by the print preview page using relative URLs ended up targeting the
-        // export action and thus triggering a backup XAR export. See XWIKI-23768: Missing RequireJS module can slow
-        // down or even block the PDF export
-        //
-        // Ideally we should ask for a CSRF token, but this would break backwards compatibility. We can't rely on the
-        // Accept HTTP header either because it includes */* most of the time, even when the request originates from a
-        // script or image HTML tag. The best option seems to be to rely on the Sec-Fetch-Dest header which is set by
-        // modern browsers to indicate the context in which the request is made.
-        // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest
-        //
-        // As such, we validate the export request if:
-        String secFetchDest = request.getHeader("Sec-Fetch-Dest");
-        return
-            // either the Sec-Fetch-Dest header is missing, which is a sign that the request was made by a non-browser
-            // user agent (e.g. curl, wget),
-            secFetchDest == null
-            // or the Sec-Fetch-Dest header is set to "document", which is a sign that the export request is the result
-            // of a user navigating to an export URL (e.g. by clicking on a link or submitting a form).
-            || "document".equals(secFetchDest);
+        // A GET request to this action can be triggered without any user intent, for instance by a resource loaded
+        // with a relative URL from a page that is itself served by the export action (this is the case of the PDF
+        // export print preview), and an unintended backup XAR export is very expensive. Requiring POST means an export
+        // can only be started by submitting one of the export forms. Requests that are refused here get the
+        // RESUBMIT_TEMPLATE, from which the user can start the same export again with a POST request. Export format
+        // handlers validate the request themselves, because those that only render a page (e.g. the PDF export print
+        // preview, loaded with GET by the browser that generates the PDF) can accept GET requests.
+        if (formatHandler != null) {
+            return formatHandler.validate(this.container.getRequest());
+        }
+        return HTTP_METHOD_POST.equalsIgnoreCase(context.getRequest().getMethod());
+    }
+
+    /**
+     * @param format the requested export format, {@code null} for the default (XAR) export format
+     * @return the component that handles the given export format, {@code null} if there's none (or if it fails to be
+     *         initialized), in which case the export format is handled by this action (if supported)
+     */
+    private ExportFormatHandler getExportFormatHandler(String format)
+    {
+        String hint = format == null ? DEFAULT_FORMAT : format;
+        if (this.componentManager.hasComponent(ExportFormatHandler.class, hint)) {
+            try {
+                return this.componentManager.getInstance(ExportFormatHandler.class, hint);
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Failed to load the handler for the [{}] export format. Root cause is: [{}].", hint,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Describes on the response why the export was not performed. These headers belong to the refused export request
+     * rather than to {@link #RESUBMIT_TEMPLATE}, which is plain markup and is also rendered on its own, through
+     * actions for which they would be wrong.
+     *
+     * @param context the context carrying the response to describe the refusal on
+     */
+    private void refuseExportRequest(XWikiContext context)
+    {
+        XWikiResponse response = context.getResponse();
+        response.setStatus(STATUS_METHOD_NOT_ALLOWED);
+        response.addHeader("Allow", HTTP_METHOD_POST);
+        // Submitting the resubmission form starts an operation that can consume a lot of resources, so the page must
+        // not be displayed in an IFRAME, where the user could be tricked into submitting it.
+        response.addHeader("X-FRAME-OPTIONS", "DENY");
     }
 
     /**

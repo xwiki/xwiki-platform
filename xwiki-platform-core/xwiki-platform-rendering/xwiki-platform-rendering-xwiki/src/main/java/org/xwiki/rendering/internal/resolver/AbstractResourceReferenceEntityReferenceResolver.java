@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.resolver;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +38,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 
 /**
  * Base class helper for EntityReferenceResolver<ResourceReference> implementations.
@@ -98,24 +100,45 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         }
 
         EntityReference baseReference = getBaseReference(resourceReference, parameters);
+        DocumentExistenceOverride existenceOverride = getExistenceOverride(parameters);
 
         EntityReference entityReference;
 
         if (resourceReference.isTyped()) {
-            entityReference = resolveTyped(resourceReference, baseReference);
+            entityReference = resolveTyped(resourceReference, baseReference, existenceOverride);
         } else {
-            entityReference = resolveUntyped(resourceReference, baseReference);
+            entityReference = resolveUntyped(resourceReference, baseReference, existenceOverride);
         }
 
         return convertReference(entityReference, entityType);
     }
 
-    protected EntityReference resolveUntyped(ResourceReference resourceReference, EntityReference baseReference)
+    protected EntityReference resolveUntyped(ResourceReference resourceReference, EntityReference baseReference,
+        DocumentExistenceOverride existenceOverride)
     {
-        return resolveTyped(resourceReference, baseReference);
+        return resolveTyped(resourceReference, baseReference, existenceOverride);
     }
 
-    protected abstract EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference);
+    /**
+     * @param resourceReference the resource reference to resolve
+     * @param baseReference the reference relative to which the resource reference is resolved
+     * @param existenceOverride the existence to assume for some documents, or
+     *     {@link DocumentExistenceOverride#NONE} to use their actual state
+     * @return the resolved entity reference
+     */
+    protected abstract EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference,
+        DocumentExistenceOverride existenceOverride);
+
+    private DocumentExistenceOverride getExistenceOverride(Object... parameters)
+    {
+        for (Object parameter : parameters) {
+            if (parameter instanceof DocumentExistenceOverride existenceOverride) {
+                return existenceOverride;
+            }
+        }
+
+        return DocumentExistenceOverride.NONE;
+    }
 
     protected EntityReference getBaseReference(ResourceReference resourceReference, Object... parameters)
     {
@@ -157,7 +180,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     }
 
     protected DocumentReference resolveDocumentReference(EntityReference sourceReference, DocumentReference reference,
-        EntityReference baseReference)
+        EntityReference baseReference, DocumentExistenceOverride existenceOverride)
     {
         DocumentReference finalReference = reference;
 
@@ -168,7 +191,8 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
                 this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
             if (!reference.getName().equals(defaultDocumentName)) {
                 finalReference =
-                    resolveDocumentReference(sourceReference, finalReference, baseReference, true, defaultDocumentName);
+                    resolveDocumentReference(sourceReference, finalReference, baseReference, true, defaultDocumentName,
+                        existenceOverride);
             }
         }
 
@@ -176,28 +200,30 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     }
 
     protected DocumentReference resolveDocumentReference(EntityReference sourceReference, DocumentReference reference,
-        EntityReference baseReference, boolean trySpaceSibling, String defaultDocumentName)
+        EntityReference baseReference, boolean trySpaceSibling, String defaultDocumentName,
+        DocumentExistenceOverride existenceOverride)
     {
         DocumentReference finalReference = reference;
 
-        if (!exists(reference)) {
+        if (!exists(reference, existenceOverride)) {
             // It does not exist, make it a space home page.
             SpaceReference spaceReference =
                 new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
             finalReference = new DocumentReference(defaultDocumentName, spaceReference);
 
             if (sourceReference != null && trySpaceSibling
-                && trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName)) {
+                && trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName,
+                    existenceOverride)) {
                 // Try as a space sibling.
                 DocumentReference siblingReference =
                     resolveSiblingSpaceDocumentReference(sourceReference, reference, baseReference,
-                    defaultDocumentName);
+                    defaultDocumentName, existenceOverride);
 
                 // We accept the resolved sibling reference only if it is a terminal document (i.e. an exists check was
                 // already performed for it) OR, in the case of a non-terminal document, if it actually exists (by
                 // performing the exists check now). Otherwise, the default will remain the child non-terminal document.
                 if (!siblingReference.getName().equals(defaultDocumentName)
-                    || exists(siblingReference)) {
+                    || exists(siblingReference, existenceOverride)) {
                     finalReference = siblingReference;
                 }
             }
@@ -207,7 +233,8 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     }
 
     protected DocumentReference resolveSiblingSpaceDocumentReference(EntityReference sourceReference,
-        DocumentReference reference, EntityReference baseReference, String defaultDocumentName)
+        DocumentReference reference, EntityReference baseReference, String defaultDocumentName,
+        DocumentExistenceOverride existenceOverride)
     {
         DocumentReference finalReference;
 
@@ -217,7 +244,8 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
             finalReference = new DocumentReference(reference.getName(), spaceReference);
 
             finalReference =
-                resolveDocumentReference(sourceReference, finalReference, baseReference, false, defaultDocumentName);
+                resolveDocumentReference(sourceReference, finalReference, baseReference, false, defaultDocumentName,
+                    existenceOverride);
         } else {
             SpaceReference spaceReference = new SpaceReference(reference.getName(), (WikiReference) parentReference);
             finalReference = new DocumentReference(defaultDocumentName, spaceReference);
@@ -227,17 +255,22 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     }
 
     protected boolean trySpaceSiblingFallback(EntityReference sourceReference, DocumentReference finalReference,
-        EntityReference baseReference, String defaultDocumentName)
+        EntityReference baseReference, String defaultDocumentName, DocumentExistenceOverride existenceOverride)
     {
         // If not relative, no space sibling fallback
         // If base reference not a space home page, no space sibling fallback
         // If finalReference exist, no space sibling fallback
         return sourceReference.getParent() == null && baseReference != null
-            && baseReference.getName().equals(defaultDocumentName) && !exists(finalReference);
+            && baseReference.getName().equals(defaultDocumentName) && !exists(finalReference, existenceOverride);
     }
 
-    private boolean exists(DocumentReference documentReference)
+    private boolean exists(DocumentReference documentReference, DocumentExistenceOverride existenceOverride)
     {
+        Optional<Boolean> existence = existenceOverride.getExistence(documentReference);
+        if (existence.isPresent()) {
+            return existence.get();
+        }
+
         try {
             return this.documentAccessBridge.exists(documentReference);
         } catch (Exception e) {

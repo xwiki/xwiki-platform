@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "xwiki-platform-ckeditor-plugins",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "test:unit": "vitest --run"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@xwiki/platform-test-requirejs": "workspace:*",
+    "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "diff-dom": "catalog:",
+    "eslint": "catalog:",
+    "jiti": "catalog:",
+    "jsdom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

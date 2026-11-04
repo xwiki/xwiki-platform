@@ -18,8 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { XWikiCodeBlock } from "./codeBlock";
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
+import { XWikiImageBlock } from "./imageBlock";
 import { XWikiInlineMacro, XWikiMacroBlock } from "./macro";
 import { XWikiRawBlock } from "./raw";
 import {
@@ -29,6 +31,7 @@ import {
   XWikiParametersStyle,
 } from "./styles";
 import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
+import { openImageSuggestionMenu } from "../components/images/imageSuggestionMenu";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -58,7 +61,10 @@ import type { useTranslation } from "react-i18next";
  *
  * @returns The created schema
  */
-function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
+function createBlockNoteSchema(
+  macros: BlockNoteConcreteMacro[],
+  options?: { codeBlockClassName?: string },
+) {
   macros = [
     ...macros.sort((a, b) =>
       a.macro.infos.name.localeCompare(b.macro.infos.name),
@@ -68,6 +74,8 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
       ...defaultBlockSpecs,
+      codeBlock: XWikiCodeBlock({ className: options?.codeBlockClassName }),
+      image: XWikiImageBlock(),
       xwikiDefinitionListItem: DefinitionListItemBlock(),
       xwikiGroup: XWikiGroupBlock(),
       xwikiMacroBlock: XWikiMacroBlock(),
@@ -179,6 +187,15 @@ function querySuggestionsMenuItems({
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
 
+  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
+  // eslint-disable-next-line import-x/namespace
+  const locale = locales[lang].slash_menu;
+
+  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
+    candidates.some(
+      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
+    );
+
   // A single generic "Link" entry that opens the link wizard.
   // Only enabled if the syntax supports it
   const genericLinkItem: DefaultReactSuggestionItem[] = inlineSupport.links
@@ -231,7 +248,13 @@ function querySuggestionsMenuItems({
 
   let items = filterSuggestionItems(
     combineByGroup(
-      getDefaultReactSlashMenuItems(editor),
+      getDefaultReactSlashMenuItems(editor).map((item) =>
+        // The image quick action suggests images to insert, in addition to uploading or browsing
+        // images, instead of inserting an empty image block.
+        isLocale(item.title, ["image"])
+          ? { ...item, onItemClick: () => openImageSuggestionMenu(editor) }
+          : item,
+      ),
 
       // Block macros
       blocksSupport.macros
@@ -257,15 +280,6 @@ function querySuggestionsMenuItems({
     ),
     query,
   );
-
-  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
-  // eslint-disable-next-line import-x/namespace
-  const locale = locales[lang].slash_menu;
-
-  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
-    candidates.some(
-      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
-    );
 
   if (!blocksSupport.headings.levels1To3) {
     items = items.filter(

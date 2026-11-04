@@ -65,7 +65,7 @@ class PDFExportIT
         // title contains Velocity code that isn't wrapped in a Velocity macro so it is printed as is if not rendered in
         // the right context.
         URL pdfURL = new URL(createURL("bin/export/Dashboard/WebHome?format=pdf"));
-        try (PDFDocument document = new PDFDocument(pdfURL)) {
+        try (PDFDocument document = PDFDocument.post(pdfURL)) {
             String text = document.getText();
             // Note: This is the title of the Pages gadget when it's working
             assertTrue(text.contains("Pages"), "Invalid content");
@@ -83,7 +83,7 @@ class PDFExportIT
     void exportContentWithAttachmentLink() throws Exception
     {
         URL pdfURL = new URL(createURL("bin/export/Sandbox/WebHome?format=pdf"));
-        try (PDFDocument document = new PDFDocument(pdfURL)) {
+        try (PDFDocument document = PDFDocument.post(pdfURL)) {
             Map<String, String> links = document.getLinks();
             assertTrue(links.containsKey("XWikiLogo.png"));
             assertEquals(createURL("bin/download/Sandbox/WebHome/XWikiLogo.png?rev=1.1"),
@@ -105,7 +105,7 @@ class PDFExportIT
     {
         URL pdfURL =
             new URL(createURL("bin/export/Sandbox/WebHome?format=pdf&pdftoc=1&attachments=1&pdfcover=0"));
-        try (PDFDocument document = new PDFDocument(pdfURL)) {
+        try (PDFDocument document = PDFDocument.post(pdfURL)) {
             Map<String, String> links = document.getLinksFromPage(0, false);
             // Make sure we have a Table of Contents.
             assertTrue(links.containsKey("Mixed list"));

@@ -449,7 +449,7 @@ class ImageIT extends AbstractCKEditorIT
         // currently have to select a link target. See XWIKI-24860: Preselect the image resource reference as link
         // target when creating a link from an image selection
         linkDialog.getResourceSuggestInput().waitForSuggestions()
-            .sendKeys(testReference.getLastSpaceReference().getName()).waitForSuggestions().selectByIndex(0);
+            .sendKeys(testReference.getLastSpaceReference().getName()).selectByIndex(0);
         linkDialog.submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
@@ -645,10 +645,7 @@ class ImageIT extends AbstractCKEditorIT
         edit(setup, testReference, false);
         
         // Run the image quick action.
-        textArea.sendKeys("/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        textArea.executeQuickAction("/image", "Image");
         
         // Select the newly uploaded image.
         textArea.sendKeys("image");
@@ -683,10 +680,7 @@ class ImageIT extends AbstractCKEditorIT
         edit(setup, testReference, false);
         
         // Run the image quick action.
-        textArea.sendKeys("/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        textArea.executeQuickAction("/image", "Image");
         
         // With the query "image", the image from the current page should be first.
         textArea.sendKeys("image");
@@ -728,10 +722,7 @@ class ImageIT extends AbstractCKEditorIT
         edit(setup, testReference, false);
         
         // Run the image quick action.
-        textArea.sendKeys("/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        textArea.executeQuickAction("/image", "Image");
         
         // Since there is no image on the current page, the image from the subwiki should be first.
         textArea.sendKeys("image");
@@ -1121,10 +1112,8 @@ class ImageIT extends AbstractCKEditorIT
         this.textArea.sendKeys("12 3");
 
         // Insert the image.
-        this.textArea.sendKeys(Keys.LEFT, "/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        this.textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        this.textArea.sendKeys(Keys.LEFT);
+        this.textArea.executeQuickAction("/image", "Image");
         this.textArea.sendKeys("other");
         AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
         this.textArea.sendKeys(Keys.ENTER);
@@ -1166,10 +1155,7 @@ class ImageIT extends AbstractCKEditorIT
         WYSIWYGEditPage editPage = edit(setup, testReference);
 
         // Insert the image.
-        this.textArea.sendKeys("/image");
-        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
-        this.textArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
+        this.textArea.executeQuickAction("/image", "Image");
         this.textArea.sendKeys("other");
         AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
         this.textArea.sendKeys(Keys.ENTER);
@@ -1232,6 +1218,45 @@ class ImageIT extends AbstractCKEditorIT
             setup.deleteObject("XWiki", "XWikiPreferences",
                 "XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass", 0);
         }
+    }
+
+    @Test
+    @Order(27)
+    void imageWithLinkInCaption(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        loginStandardUser(setup);
+        uploadAttachment(setup, testReference, "image.gif");
+
+        // Write the captioned image in Source mode, with a link inside the caption.
+        WYSIWYGEditPage editPage = edit(setup, testReference, false);
+        setSource("[[Powered by ~[~[XWiki~>~>https://www.xwiki.org~]~]>>image:image.gif]]");
+
+        // Modify the caption in-line, below the image.
+        this.textArea.clickImageCaption(0);
+        this.textArea.sendKeys(Keys.HOME, "Proudly ");
+        assertSourceEquals("[[Proudly Powered by ~[~[XWiki~>~>https://www.xwiki.org~]~]>>image:image.gif]]");
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertEquals("Proudly Powered by XWiki", viewPage.getImageCaption("image.gif"));
+        assertEquals("https://www.xwiki.org", viewPage.getContentLinkTarget("XWiki"));
+        assertEquals("Proudly Powered by XWiki", viewPage.getContent());
+    }
+
+    @Test
+    @Order(28)
+    void dropWebPImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        loginStandardUser(setup);
+        WYSIWYGEditPage editPage = edit(setup, testReference);
+
+        // Dropping a WebP image uploads it as an attachment and inserts it as an image (not as a link).
+        this.textArea.dropFile("/image.webp");
+        assertSourceEquals("[[image:image.webp]]");
+
+        editPage.clickSaveAndView();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("image.webp"));
     }
 
     /**

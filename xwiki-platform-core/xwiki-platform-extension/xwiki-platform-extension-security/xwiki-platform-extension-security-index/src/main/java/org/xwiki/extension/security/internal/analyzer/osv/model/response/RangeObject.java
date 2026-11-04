@@ -78,6 +78,17 @@ public class RangeObject
             .orElse(null);
     }
 
+    /**
+     * Indicate whether the version returned by {@link #getEnd()} is affected. A {@code fixed} event is exclusive (the
+     * fixed version is not affected) while a {@code last_affected} event is inclusive.
+     *
+     * @return {@code false} when {@link #getEnd()} is a {@code fixed} event, {@code true} otherwise
+     */
+    public boolean isEndInclusive()
+    {
+        return getFirst(EventObject::getFixed).isEmpty();
+    }
+
     private Optional<String> getFirst(Function<EventObject, String> getFixed)
     {
         return this.events.stream()

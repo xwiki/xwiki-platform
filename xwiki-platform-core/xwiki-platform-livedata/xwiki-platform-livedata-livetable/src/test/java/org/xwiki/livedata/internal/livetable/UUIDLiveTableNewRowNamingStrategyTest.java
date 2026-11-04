@@ -20,6 +20,8 @@
 package org.xwiki.livedata.internal.livetable;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Named;
@@ -28,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -62,10 +63,6 @@ class UUIDLiveTableNewRowNamingStrategyTest
 
     @MockComponent
     @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    @MockComponent
-    @Named("current")
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
 
     @MockComponent
@@ -79,13 +76,14 @@ class UUIDLiveTableNewRowNamingStrategyTest
     void generate() throws Exception
     {
         Map<String, Object> parameters = Map.of("newRowLocation", "NewRows");
-        DocumentReference candidate = new DocumentReference("wiki", "NewRows", UUID_VALUE_STRING);
-        when(this.currentDocumentReferenceResolver.resolve("NewRows." + UUID_VALUE_STRING)).thenReturn(candidate);
+        SpaceReference space = new SpaceReference("wiki", "NewRows");
+        when(this.currentSpaceReferenceResolver.resolve("NewRows")).thenReturn(space);
+        DocumentReference candidate = new DocumentReference(UUID_VALUE_STRING, space);
         when(this.modelBridge.exists(candidate)).thenReturn(false);
 
         try (MockedStatic<UUID> uuidStatic = mockStatic(UUID.class)) {
             uuidStatic.when(UUID::randomUUID).thenReturn(UUID_VALUE);
-            assertEquals(candidate, this.strategy.generate(parameters));
+            assertEquals(candidate, this.strategy.generate(parameters, Map.of()));
         }
     }
 
@@ -93,7 +91,7 @@ class UUIDLiveTableNewRowNamingStrategyTest
     void generateWithMissingLocation()
     {
         LiveDataException exception =
-            assertThrows(LiveDataException.class, () -> this.strategy.generate(Map.of()));
+            assertThrows(LiveDataException.class, () -> this.strategy.generate(Map.of(), Map.of()));
         assertEquals("Missing location for row creation.", exception.getMessage());
     }
 
@@ -101,16 +99,23 @@ class UUIDLiveTableNewRowNamingStrategyTest
     void generateWhenPageAlreadyExists() throws XWikiException
     {
         Map<String, Object> parameters = Map.of("newRowLocation", "NewRows");
-        DocumentReference candidate = new DocumentReference("wiki", "NewRows", UUID_VALUE_STRING);
-        when(this.currentDocumentReferenceResolver.resolve("NewRows." + UUID_VALUE_STRING)).thenReturn(candidate);
+        SpaceReference space = new SpaceReference("wiki", "NewRows");
+        when(this.currentSpaceReferenceResolver.resolve("NewRows")).thenReturn(space);
+        DocumentReference candidate = new DocumentReference(UUID_VALUE_STRING, space);
         when(this.modelBridge.exists(candidate)).thenReturn(true);
 
         try (MockedStatic<UUID> uuidStatic = mockStatic(UUID.class)) {
             uuidStatic.when(UUID::randomUUID).thenReturn(UUID_VALUE);
             LiveDataException exception =
-                assertThrows(LiveDataException.class, () -> this.strategy.generate(parameters));
+                assertThrows(LiveDataException.class, () -> this.strategy.generate(parameters, Map.of()));
             assertEquals(String.format("The page [%s] already exists.", candidate), exception.getMessage());
         }
+    }
+
+    @Test
+    void getMandatoryProperties()
+    {
+        assertEquals(Set.of(), this.strategy.getMandatoryProperties(Map.of("newRowLocation", "NewRows")));
     }
 
     @Test
@@ -139,5 +144,20 @@ class UUIDLiveTableNewRowNamingStrategyTest
     void isCreationAllowedWithMissingLocation()
     {
         assertFalse(this.strategy.isCreationAllowed(Map.of()));
+    }
+
+    @Test
+    void getNewEntryLocation()
+    {
+        SpaceReference space = new SpaceReference("wiki", "NewRows");
+        when(this.currentSpaceReferenceResolver.resolve("NewRows")).thenReturn(space);
+
+        assertEquals(Optional.of(space), this.strategy.getNewEntryLocation(Map.of("newRowLocation", "NewRows")));
+    }
+
+    @Test
+    void getNewEntryLocationWithMissingLocation()
+    {
+        assertEquals(Optional.empty(), this.strategy.getNewEntryLocation(Map.of()));
     }
 }

@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Objects;
@@ -47,6 +47,9 @@ import com.xpn.xwiki.objects.BaseObject;
 @Named("org.xwiki.rest.internal.resources.objects.AllObjectsForClassNameResourceImpl")
 public class AllObjectsForClassNameResourceImpl extends XWikiResource implements AllObjectsForClassNameResource
 {
+    @Inject
+    private ModelFactory factory;
+
     @Inject
     private ContextualAuthorizationManager authorization;
 
@@ -90,10 +93,8 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
 
                     BaseObject xwikiObject = (BaseObject) fields[1];
 
-                    ObjectSummary objectSummary = DomainObjectFactory
-                        .createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                            componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager),
-                            withPrettyNames);
+                    ObjectSummary objectSummary = this.factory.toRestObjectSummary(uriInfo.getBaseUri(), doc,
+                        xwikiObject, false, withPrettyNames);
 
                     objects.getObjectSummaries().add(objectSummary);
                 }

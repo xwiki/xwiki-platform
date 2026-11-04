@@ -18,8 +18,15 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script>
+import "tippy.js/dist/tippy.css";
+import "tippy.js/themes/light-border.css";
+import XWikiIcon from "../utilities/XWikiIcon.vue";
+import { directive as tippy } from "vue-tippy";
+
 export default {
   name: "LivedataFootnotes",
+  components: { XWikiIcon },
+  directives: { tippy },
   inject: ["logic"],
   data() {
     return {
@@ -38,6 +45,21 @@ export default {
     >
       (<small>{{ footnote.symbol }}</small
       >) {{ $t(footnote.translationKey) }}
+    </div>
+    <div v-if="logic.isViewFrozen()" class="box infomessage footnote">
+      {{ $t("livedata.footnotes.frozenEntries") }}
+      <span
+        v-tippy="{
+          content: $t('livedata.footnotes.frozenEntries.hint'),
+          trigger: 'mouseenter focus click',
+          theme: 'light-border',
+        }"
+        tabindex="0"
+        role="img"
+        :aria-label="$t('livedata.footnotes.hintLabel')"
+      >
+        <XWikiIcon :icon-descriptor="{ name: 'info' }" />
+      </span>
     </div>
   </div>
 </template>

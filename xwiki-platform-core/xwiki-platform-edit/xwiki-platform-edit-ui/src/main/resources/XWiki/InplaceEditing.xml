@@ -278,7 +278,7 @@ define('xwiki-document-api', [
           renderedContent: isContentRenderedToHTML ? contentWrapper.html() : contentWrapper.text()
         });
       }).catch(() =&gt; {
-        new XWiki.widgets.Notification(l10n['edit.inplace.page.renderFailed'], 'error');
+        XWiki.widgets.Notification.show(l10n['edit.inplace.page.renderFailed'], 'error');
         return Promise.reject(this);
       });
     }
@@ -567,7 +567,7 @@ define('editInPlace', [
             return Promise.reject(xwikiDocument);
           });
       } else {
-        new XWiki.widgets.Notification(l10n['edit.inplace.page.lockFailed'], 'error');
+        XWiki.widgets.Notification.show(l10n['edit.inplace.page.lockFailed'], 'error');
         return Promise.reject(xwikiDocument);
       }
     });
@@ -579,7 +579,7 @@ define('editInPlace', [
       xwikiDocument.backup();
       return xwikiDocument;
     }).catch(xwikiDocument =&gt; {
-      new XWiki.widgets.Notification(l10n['edit.inplace.page.loadFailed'], 'error');
+      XWiki.widgets.Notification.show(l10n['edit.inplace.page.loadFailed'], 'error');
       return Promise.reject(xwikiDocument);
     // Render the document for edit, using the provided rendering configuration, which may depend on the editor used to
     // edit the content.
@@ -914,7 +914,7 @@ define('editInPlace', [
         });
       });
     }).catch(() =&gt; {
-      new XWiki.widgets.Notification(l10n['edit.inplace.actionButtons.loadFailed'], 'error');
+      XWiki.widgets.Notification.show(l10n['edit.inplace.actionButtons.loadFailed'], 'error');
     });
   };
 
@@ -967,6 +967,10 @@ define('editInPlace', [
       .text(l10n['core.editors.content.titleField.label']);
     var input = $('&lt;input type="text" id="document-title-input" name="title" form="inplace-editing" /&gt;')
       .val(xwikiDocument.rawTitle);
+    // Prevent entering a title that the store would fail to save.
+    if (config.titleMaxLength &gt; 0) {
+      input.attr('maxlength', config.titleMaxLength);
+    }
     if (config.titleIsMandatory) {
       input.attr({
         'required': '',
@@ -1189,6 +1193,10 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
     // creating a new translation the meta shouldn't point to the default translation).
     updateMeta(xwikiDocument);
     previousPlainTitle = xwikiDocument.getPlainTitle();
+    // The in-place editor always edits the current version of the document, even when the user started from an older
+    // revision, so the warning saying that the document is displayed in restricted mode because it's not the current
+    // version doesn't apply anymore.
+    $('.restricted-mode-warning').remove();
   });
 
   // Update the UI after each editing session.
@@ -1664,6 +1672,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'l10n': $l10n
     })
     #set ($inplaceEditingConfig.titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
+    #set ($inplaceEditingConfig.titleMaxLength = $xwiki.documentTitleMaxLength)
     &lt;div class="hidden" data-inplace-editing-config="$escapetool.xml($jsontool.serialize($inplaceEditingConfig))"&gt;&lt;/div&gt;
     ## We didn't move this to the file system because it uses LESS and we didn't want to include it in the skin.
     #set ($discard = $xwiki.ssx.use('XWiki.InplaceEditing'))

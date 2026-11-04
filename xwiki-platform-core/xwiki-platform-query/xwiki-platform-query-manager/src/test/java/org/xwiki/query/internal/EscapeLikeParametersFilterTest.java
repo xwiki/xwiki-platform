@@ -175,6 +175,25 @@ class EscapeLikeParametersFilterTest
     }
 
     @Test
+    void filterWithGlobalAlias()
+    {
+        Query query = mock(Query.class);
+        when(query.getLanguage()).thenReturn(Query.HQL);
+        when(query.getStatement())
+            .thenReturn("select global.XWS_NAME from xwikistrings as global where global.XWS_VALUE like :value");
+
+        Map<String, Object> parameters = new LinkedHashMap<>();
+        parameters.put("value", new DefaultQueryParameter(query).literal("some!thing"));
+        when(query.getNamedParameters()).thenReturn(parameters);
+
+        Query filteredQuery = this.filter.filterQuery(query);
+        assertEquals(
+            "SELECT global.XWS_NAME FROM xwikistrings AS global WHERE global.XWS_VALUE LIKE :value ESCAPE '!'",
+            filteredQuery.getStatement());
+        assertEquals("some!!thing", filteredQuery.getNamedParameters().get("value"));
+    }
+
+    @Test
     void namedParametersLikeAPICustomEscape()
     {
         String statement = "select doc.fullName from XWikiDocument doc where "

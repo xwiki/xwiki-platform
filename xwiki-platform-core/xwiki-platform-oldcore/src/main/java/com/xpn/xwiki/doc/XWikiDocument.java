@@ -2919,15 +2919,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * @deprecated use {@link #getXObject()} instead
-     */
-    @Deprecated(since = "2.2M1")
-    public BaseObject getxWikiObject()
-    {
-        return getXObject(getDocumentReference());
-    }
-
-    /**
      * @since 2.2M1
      */
     public List<BaseClass> getXClasses(XWikiContext context)
@@ -3468,15 +3459,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * @deprecated use {@link #mergeXClass(XWikiDocument)} instead
-     */
-    @Deprecated(since = "2.2M1")
-    public void mergexWikiClass(XWikiDocument templatedoc)
-    {
-        mergeXClass(templatedoc);
-    }
-
-    /**
      * @since 2.2M1
      */
     public void mergeXObjects(XWikiDocument templateDoc)
@@ -3498,15 +3480,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 }
             }
         }
-    }
-
-    /**
-     * @deprecated use {@link #mergeXObjects(XWikiDocument)} instead
-     */
-    @Deprecated(since = "2.2M1")
-    public void mergexWikiObjects(XWikiDocument templatedoc)
-    {
-        mergeXObjects(templatedoc);
     }
 
     /**
@@ -7777,10 +7750,40 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntax() need to create a
         // XWikiDocument object to get preferences from wiki preferences pages and would thus generate an infinite loop
         if (isNew() && this.content.syntax == null) {
-            this.content.syntax = getDefaultDocumentSyntax();
+            this.content.syntax = getNewDocumentSyntax();
         }
 
         return this.content.syntax;
+    }
+
+    /**
+     * A new translation is displayed with its own syntax, so it takes the syntax of the document it translates: its
+     * content usually starts as a copy of the original content. This matters for the code that creates a translation
+     * without setting its syntax (in-place editing, REST, scripts), which would otherwise save it with the default
+     * syntax of the wiki.
+     *
+     * @return the syntax to give to a new document that has none
+     */
+    private Syntax getNewDocumentSyntax()
+    {
+        if (!Locale.ROOT.equals(getLocale()) && getDocumentReference() != null) {
+            XWikiContext xcontext = getXWikiContext();
+            if (xcontext != null && xcontext.getWiki() != null) {
+                try {
+                    XWikiDocument defaultLocaleDocument =
+                        xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
+                    if (!defaultLocaleDocument.isNew()) {
+                        return defaultLocaleDocument.getSyntax();
+                    }
+                } catch (XWikiException e) {
+                    LOGGER.warn("Failed to load the original document of the new translation [{}] to get its syntax,"
+                        + " using the default syntax instead. Root cause is [{}].", getDocumentReferenceWithLocale(),
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+        }
+
+        return getDefaultDocumentSyntax();
     }
 
     /**
@@ -9648,18 +9651,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         return null;
-    }
-
-    /**
-     * Compute and return the maximum authorized length for the full name (i.e. the serialized reference of the
-     * document) based on the current store limitation.
-     *
-     * @return the maximum authorized length for a document full name.
-     * @since 11.4RC1
-     */
-    public int getLocalReferenceMaxLength()
-    {
-        return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");
     }
 
     @Override

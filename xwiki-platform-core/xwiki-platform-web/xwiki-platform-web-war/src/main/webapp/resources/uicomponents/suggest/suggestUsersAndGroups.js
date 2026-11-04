@@ -62,11 +62,19 @@ define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectiz
   var getSelectizeOptions = function(select) {
     return {
       create: true,
+      // Disabled users are suggested only if the picker explicitly asks for them. This setting can be overwritten when
+      // creating the picker.
+      includeInactiveUsers: select[0].dataset.includeInactiveUsers === 'true',
       load: function(text, callback) {
-        loadUsers(select.attr('data-userScope'), {
-          'input': text,
-          'limit': 10,
-        }).then(callback, callback);
+        const params = {
+          input: text,
+          limit: 10
+        };
+        // The picker settings are available through the TomSelect instance, which is the context of this function.
+        if (this.settings.includeInactiveUsers) {
+          params.includeInactiveUsers = true;
+        }
+        loadUsers(select.attr('data-userScope'), params).then(callback, callback);
       },
       loadSelected: function(text, callback) {
         loadUsers(select.attr('data-userScope'), {

@@ -73,6 +73,13 @@
             "
           >
             <span class="property-name">{{ property.name }}</span>
+            <!-- Only shown in edit mode, which is where entries are created. -->
+            <span
+              v-if="logic.isEditMode() && property.mandatory"
+              class="property-mandatory"
+            >
+              {{ $t("livedata.property.mandatory") }}
+            </span>
             <!--
               Sort icon
               Only show the icon for the first-level sort property
@@ -101,7 +108,7 @@
           @keydown.left="keyboardResizeColumn($event, -10)"
           @keydown.right="keyboardResizeColumn($event, 10)"
           @dblclick="resetColumnSize"
-          @keydown.esc="resetColumnSize"
+          @keydown.esc.stop="resetColumnSize"
         ></button>
       </th>
     </template>
@@ -164,10 +171,12 @@ export default {
       return this.firstSortLevel.property === property.id;
     },
 
-    sort(property) {
-      this.logic.sort(property.id, 0).catch((err) => {
+    async sort(property) {
+      try {
+        await this.logic.sort(property.id, 0);
+      } catch (err) {
         console.warn(err);
-      });
+      }
     },
 
     reorderProperty(e) {
@@ -398,6 +407,13 @@ export default {
 .layout-table .draggable-item .property-name {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.layout-table .property-mandatory {
+  color: var(--text-muted);
+  font-weight: var(--font-weight-regular);
+  padding-left: var(--table-cell-padding);
+  white-space: nowrap;
 }
 
 .layout-table .sort-icon {

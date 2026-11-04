@@ -21,13 +21,19 @@ package org.xwiki.administration.test.ui;
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.BasePage;
+import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,10 +46,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class AdministrationIT
 {
+    private static final String LOCK_USER_NAME = "AdministrationLockUser";
+
+    private static final String LOCK_USER_PASSWORD = "password";
+
     /**
      * Validate the presence of default sections for Administration UIs (Global, Page).
      */
     @Test
+    @Order(1)
     void verifyAdministrationSections(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
@@ -93,5 +104,37 @@ class AdministrationIT
             "Editing", "emailSend", "emailStatus", "emailGeneral")
             .forEach(sectionId -> assertTrue(pageAdministrationPage.hasNotSection(sectionId),
                 String.format("Menu section [%s] shouldn't be present.", sectionId)));
+    }
+
+    /**
+     * Validate the notice displayed instead of the administration when another user holds the lock of the
+     * administration page. The name of that user is a link inside the notice text, which the WCAG validation checks.
+     */
+    @Test
+    @Order(2)
+    void lockedAdministration(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.createUser(LOCK_USER_NAME, LOCK_USER_PASSWORD, null);
+        // Locking the page administration requires to be allowed to edit it, which only admins are.
+        setup.setRightsOnSpace(testReference.getLastSpaceReference(), null, "XWiki." + LOCK_USER_NAME, "admin",
+            true);
+        DocumentReference webPreferencesReference =
+            new DocumentReference("WebPreferences", testReference.getLastSpaceReference());
+
+        // Lock the page administration as the test user, without opening an editor that would release the lock when
+        // the page is left.
+        setup.login(LOCK_USER_NAME, LOCK_USER_PASSWORD);
+        setup.gotoPage(webPreferencesReference, "lock");
+
+        setup.loginAsSuperAdmin();
+        setup.gotoPage(webPreferencesReference, "admin");
+        String notice = new BasePage().getXWikiMessageContent();
+        assertThat(notice, containsString("This page is currently locked by " + LOCK_USER_NAME));
+
+        // The editor shows a similar notice, from a different template.
+        setup.gotoPage(webPreferencesReference, "edit");
+        String editNotice = new ForceEditLockPage().getBody();
+        assertThat(editNotice, containsString("This page is currently locked by " + LOCK_USER_NAME));
     }
 }

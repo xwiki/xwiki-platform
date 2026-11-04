@@ -132,17 +132,13 @@ public class ExpressionNodeToHQLConverter
 
     private String parseBlock(ExpressionNode node, HQLQuery result)
     {
-        if (node instanceof AbstractValueNode valueNode) {
-            return parseValue(valueNode, result);
-        } else if (node instanceof AbstractUnaryOperatorNode unaryNode) {
-            return parseUnaryOperator(unaryNode, result);
-        } else if (node instanceof AbstractBinaryOperatorNode binaryNode) {
-            return parseBinaryOperator(binaryNode, result);
-        } else if (node instanceof AbstractOperatorNode operatorNode) {
-            return parseOtherOperation(operatorNode, result);
-        } else {
-            return StringUtils.EMPTY;
-        }
+        return switch (node) {
+            case AbstractValueNode valueNode -> parseValue(valueNode, result);
+            case AbstractUnaryOperatorNode unaryNode -> parseUnaryOperator(unaryNode, result);
+            case AbstractBinaryOperatorNode binaryNode -> parseBinaryOperator(binaryNode, result);
+            case AbstractOperatorNode operatorNode -> parseOtherOperation(operatorNode, result);
+            case null, default -> StringUtils.EMPTY;
+        };
     }
 
     private String parseValue(AbstractValueNode value, HQLQuery result)
@@ -160,7 +156,7 @@ public class ExpressionNodeToHQLConverter
                 returnValue = StringUtils.EMPTY;
             }
         } else if (value instanceof StringValueNode valueNode) {
-            // If we’re dealing with raw values, we have to put them in the queryParameters map
+            // If we’re dealing with raw values, we have to put them in the queryParameters map
             String nodeContent = (escape) ? escape(valueNode.getContent()) : valueNode.getContent();
 
             // In order to lower the probability of having collisions in the query parameters provided by other

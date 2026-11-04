@@ -27,8 +27,6 @@
     'xwiki-livedata': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'main.es.js')
   },
   'css': {
-    'liveDataLessVariables': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'variables.less', {'evaluate': true}),
     'liveDataLessReactive': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'reactive.less', {'evaluate': true}),
     'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css')
@@ -91,9 +89,6 @@
   });
 
   loadModule(paths.module["xwiki-livedata"]);
-  // Load a small less file with the declarations of a few LESS values that are not exported
-  // elsewhere
-  loadCSS(paths.css.liveDataLessVariables);
   loadCSS(paths.css.liveDataLessReactive);
 
 // End JavaScript-only code.

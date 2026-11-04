@@ -73,6 +73,9 @@
 ## @since 18.6.0RC1
 #addMetaAttribute($metaAttributes, 'user-advanced', $isAdvancedUser)
 #addMetaAttribute($metaAttributes, 'action', "$xcontext.action")
+## The format used to display dates on the client side (Java SimpleDateFormat syntax).
+## @since 18.9.0RC1
+#addMetaAttribute($metaAttributes, 'date-format', $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()" $stringtool.join($metaAttributes, ' ')>
   <head>

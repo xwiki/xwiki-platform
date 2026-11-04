@@ -72,37 +72,44 @@ define("xwiki-l10n", (() => {
           };
         }
 
-        resolver
-          .resolve(query)
-          .then(
-            (resolvedTranslations: TranslationsWithMissed) =>
-              buildModule(resolvedTranslations.translations),
-            (err: unknown) => {
-              console.error(
-                `An issue occurred during the resolution of localization query ${JSON.stringify(query)}`,
-                err,
-              );
-              // Degrade to the untranslated keys so that the dependent modules still initialize and merely display
-              // the keys instead of their translations.
-              return buildModule(
-                Object.fromEntries(
-                  resolvedKeys.map((key) => [
-                    key,
-                    key.substring(queryPrefix.length),
-                  ]),
-                ),
-              );
-            },
-          )
-          // onLoad is called outside of the handlers above so that an error thrown by a dependent module is not
-          // reported as a translation resolution failure.
-          .then(onLoad)
-          .catch((err: unknown) => {
+        /**
+         * Resolve the translations of the query and build the module from them.
+         */
+        async function resolveModule() {
+          let resolvedTranslations: TranslationsWithMissed;
+          try {
+            resolvedTranslations = await resolver.resolve(query);
+          } catch (err: unknown) {
+            console.error(
+              `An issue occurred during the resolution of localization query ${JSON.stringify(query)}`,
+              err,
+            );
+            // Degrade to the untranslated keys so that the dependent modules still initialize and merely display
+            // the keys instead of their translations.
+            return buildModule(
+              Object.fromEntries(
+                resolvedKeys.map((key) => [
+                  key,
+                  key.substring(queryPrefix.length),
+                ]),
+              ),
+            );
+          }
+          return buildModule(resolvedTranslations.translations);
+        }
+
+        void (async () => {
+          try {
+            // onLoad is called outside of resolveModule so that an error thrown by a dependent module is not
+            // reported as a translation resolution failure.
+            onLoad(await resolveModule());
+          } catch (err: unknown) {
             console.error(
               `An issue occurred while initializing a module depending on the localization query ${JSON.stringify(query)}`,
               err,
             );
-          });
+          }
+        })();
       });
     },
   };

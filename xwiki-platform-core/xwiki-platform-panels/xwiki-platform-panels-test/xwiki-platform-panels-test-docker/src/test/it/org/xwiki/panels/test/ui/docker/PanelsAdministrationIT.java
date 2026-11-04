@@ -19,6 +19,8 @@
  */
 package org.xwiki.panels.test.ui.docker;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -230,5 +233,40 @@ class PanelsAdministrationIT
         // Clean up the page created by this test because its top level page interferes with the navigation panel
         // administration test (which asserts the exact list of top level pages).
         setup.deletePage(testReference);
+    }
+
+    @Order(7)
+    @Test
+    void changePanelOrder(TestUtils setup) throws Exception
+    {
+        // Start with a left column holding the Applications panel above the Navigation panel.
+        setup.setWikiPreference("showLeftPanels", "1");
+        setup.setWikiPreference("leftPanels", "Panels.Applications,Panels.Navigation");
+        setup.setWikiPreference("showRightPanels", "0");
+        setup.setWikiPreference("rightPanels", "");
+
+        PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
+        PageLayoutTabContent pageLayoutTabContent = panelsAdminPage.selectPageLayout();
+        assertEquals("Panels.Applications,Panels.Navigation", pageLayoutTabContent.getLeftPanels());
+
+        // Move the Applications panel below the Navigation panel.
+        pageLayoutTabContent.dragPanelBelow("Applications", "Navigation", PageLayoutTabContent.Column.LEFT);
+        assertEquals(List.of("Navigation", "Applications"),
+            new PageWithPanels().getPanelTitles(PageWithPanels.Column.LEFT));
+        panelsAdminPage.clickSave();
+
+        // The new order is used when displaying the panels on the other pages.
+        setup.gotoPage("Main", "WebHome");
+        assertEquals(List.of("Navigation", "Applications"),
+            new PageWithPanels().getPanelTitles(PageWithPanels.Column.LEFT));
+
+        // The new order is saved.
+        panelsAdminPage = PanelsAdministrationPage.gotoPage();
+        assertEquals("Panels.Navigation,Panels.Applications", panelsAdminPage.selectPageLayout().getLeftPanels());
+
+        // Restore the default page layout since the wiki is shared by all the panels tests.
+        setup.setWikiPreference("showLeftPanels", "0");
+        setup.setWikiPreference("leftPanels", "");
+        setup.setWikiPreference("showRightPanels", "1");
     }
 }

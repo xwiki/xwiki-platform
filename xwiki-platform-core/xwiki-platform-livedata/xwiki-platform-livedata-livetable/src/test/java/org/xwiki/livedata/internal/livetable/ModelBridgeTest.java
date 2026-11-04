@@ -63,6 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -150,6 +151,44 @@ class ModelBridgeTest
     }
 
     @Test
+    void updateAllCreateAddsTheObjectWhenOnlyDocumentFieldsAreSet() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "newdoc");
+        DocumentReference classReference = new DocumentReference("xwiki", "MyApp", "MyClass");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(true);
+        when(this.document.getAuthors()).thenReturn(this.documentAuthors);
+        when(this.document.getXObject(classReference, 0)).thenReturn(null);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("doc.title", "Some title");
+
+        this.modelBridge.updateAll(properties, documentReference, classReference, Map.of(), 0, true);
+
+        // Without the object the new page would not be an entry of the live data at all.
+        verify(this.document).newXObject(classReference, this.xcontext);
+        verify(this.document).setTitle("Some title");
+    }
+
+    @Test
+    void updateAllDoesNotAddTheObjectWhenUpdatingAnExistingEntry() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+        DocumentReference classReference = new DocumentReference("xwiki", "MyApp", "MyClass");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(false);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("doc.title", "Some title");
+
+        this.modelBridge.updateAll(properties, documentReference, classReference, Map.of(), 0, false);
+
+        verify(this.document, never()).newXObject(any(DocumentReference.class), any(XWikiContext.class));
+    }
+
+    @Test
     void updateAllCreateWhenDocumentAlreadyExists() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "newdoc");
@@ -161,6 +200,44 @@ class ModelBridgeTest
             () -> this.modelBridge.updateAll(new HashMap<>(), documentReference, null, Map.of(), 0, true));
         assertEquals(String.format("Cannot create the page [%s] because it already exists.", documentReference),
             liveDataException.getMessage());
+    }
+
+    @Test
+    void delete() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(false);
+
+        this.modelBridge.delete(documentReference);
+
+        verify(this.authorization).checkAccess(Right.DELETE, documentReference);
+        verify(this.xwiki).deleteDocument(this.document, this.xcontext);
+    }
+
+    @Test
+    void deleteNewDocument() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+        when(this.document.isNew()).thenReturn(true);
+
+        this.modelBridge.delete(documentReference);
+
+        verify(this.xwiki, never()).deleteDocument(any(XWikiDocument.class), any(XWikiContext.class));
+    }
+
+    @Test
+    void deleteWhenDeleteIsDisallowed() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+
+        doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.DELETE, documentReference);
+
+        assertThrows(AccessDeniedException.class, () -> this.modelBridge.delete(documentReference));
+        verifyNoInteractions(this.xcontextProvider);
     }
 
     @Test

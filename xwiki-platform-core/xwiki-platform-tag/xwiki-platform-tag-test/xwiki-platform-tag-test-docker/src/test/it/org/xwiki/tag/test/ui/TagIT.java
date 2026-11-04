@@ -20,13 +20,16 @@
 package org.xwiki.tag.test.ui;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.tag.test.po.AddTagsPane;
+import org.xwiki.tag.test.po.TagCloudPage;
 import org.xwiki.tag.test.po.TagPage;
 import org.xwiki.tag.test.po.TaggablePage;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -34,6 +37,9 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.apache.commons.lang3.RandomStringUtils.secure;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -110,7 +116,7 @@ class TagIT
     }
 
     /**
-     * Add many tags and remove one of them.
+     * Add many tags, check that editing the page inline preserves them, and remove one of them.
      */
     @Test
     @Order(3)
@@ -125,6 +131,12 @@ class TagIT
         AddTagsPane addTagsPane = taggablePage.addTags();
         addTagsPane.setTags(firstTag + "," + secondTag);
         assertTrue(addTagsPane.add());
+        assertTrue(taggablePage.hasTag(firstTag));
+        assertTrue(taggablePage.hasTag(secondTag));
+
+        // Editing the page inline preserves its tags.
+        taggablePage.editInline().clickSaveAndView();
+        taggablePage = new TaggablePage();
         assertTrue(taggablePage.hasTag(firstTag));
         assertTrue(taggablePage.hasTag(secondTag));
 
@@ -290,5 +302,70 @@ class TagIT
         this.tagPage.clickDeleteButton();
         this.tagPage.clickConfirmDeleteTag();
         assertTrue(this.tagPage.hasConfirmationMessage());
+    }
+
+    /**
+     * Checks the tags returned by the default (exhaustive) right check strategy, which orders them by tag so that the
+     * pages of an already returned tag don't need to be checked for the view right. Also checks that the
+     * {@code suggest} template suggests these tags when called on a document that doesn't exist, since the template
+     * queries the database with its own rights and not those of the context document.
+     */
+    @Test
+    @Order(10)
+    void getAllTags(TestUtils setup) throws Exception
+    {
+        DocumentReference page = new DocumentReference("xwiki", List.of("TagITAllTags"), "Page1");
+        setup.rest().delete(page);
+        setup.rest().addObject(page, "XWiki.TagClass", "tags", "AllTagsAlpha|AllTagsBeta");
+
+        assertEquals("alpha=[true] beta=[true] missing=[false]", setup.executeWikiPlain(
+            "{{velocity}}#set ($allTags = $xwiki.tag.getAllTags())"
+            + "alpha=[$allTags.contains('AllTagsAlpha')] beta=[$allTags.contains('AllTagsBeta')] "
+            + "missing=[$allTags.contains('NoSuchTag')]{{/velocity}}", Syntax.XWIKI_2_1));
+
+        DocumentReference nonExistingPage = new DocumentReference("xwiki", List.of("TagITAllTags"), "NonExisting");
+        String suggestions = setup.getString(setup.getPath(nonExistingPage, "view", null),
+            Map.of("xpage", "suggest", "classname", "XWiki.TagClass", "fieldname", "tags", "firCol", "-",
+                "secCol", "-", "input", "alltags"));
+        // Type 3 is the result type of the suggestions for a property stored in a relational way, as the tags are.
+        assertThat(suggestions, containsString("<results type=\"3\">"));
+        assertThat(suggestions, containsString(">AllTagsAlpha</rs>"));
+        assertThat(suggestions, containsString(">AllTagsBeta</rs>"));
+    }
+
+    /**
+     * Tags a nested page and a terminal page and checks that the tag cloud of {@code Main.Tags} lists all their tags,
+     * and that a tag shared by both pages lists both of them.
+     */
+    @Test
+    @Order(11)
+    void tagCloudListsNestedAndTerminalTags(TestUtils setup, TestReference testReference) throws Exception
+    {
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        String terminalPageTitle = "Terminal";
+        DocumentReference terminalPage = new DocumentReference(terminalPageTitle, testSpace);
+        setup.rest().savePage(terminalPage, "", terminalPageTitle);
+
+        String nestedTag = "Nested" + secure().nextAlphanumeric(4);
+        String terminalTag = "Terminal" + secure().nextAlphanumeric(4);
+        String sharedTag = "Shared" + secure().nextAlphanumeric(4);
+
+        // The test reference is a nested page (WebHome) while its sibling is a terminal page.
+        TaggablePage taggablePage = TaggablePage.gotoPage(testReference);
+        AddTagsPane addTagsPane = taggablePage.addTags();
+        addTagsPane.setTags(nestedTag + "," + sharedTag);
+        assertTrue(addTagsPane.add());
+
+        taggablePage = TaggablePage.gotoPage(terminalPage);
+        addTagsPane = taggablePage.addTags();
+        addTagsPane.setTags(terminalTag + "," + sharedTag);
+        assertTrue(addTagsPane.add());
+
+        TagCloudPage tagCloudPage = TagCloudPage.gotoPage();
+        assertThat(tagCloudPage.getTags(), hasItems(nestedTag, terminalTag, sharedTag));
+
+        TagPage sharedTagPage = tagCloudPage.clickTag(sharedTag);
+        assertEquals(List.of(terminalPageTitle, testSpace.getName()),
+            sharedTagPage.getTaggedPages().stream().sorted().toList());
     }
 }

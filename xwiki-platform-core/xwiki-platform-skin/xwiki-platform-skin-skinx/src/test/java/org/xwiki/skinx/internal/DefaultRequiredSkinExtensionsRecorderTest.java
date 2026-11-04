@@ -53,14 +53,15 @@ class DefaultRequiredSkinExtensionsRecorderTest
     @CsvSource({
         "before, after, after",
         "'before', 'before\nafter', after",
-        "'first\nthird', 'first\nsecond\nthird', second"
+        "'first\nthird', 'first\nsecond\nthird', second",
+        "'first', 'first\nsecond\nthird', 'second third'"
     })
     void startStop(String before, String after, String expected)
     {
-        XWikiContext xcontext = mock(XWikiContext.class);
+        XWikiContext xcontext = mock();
         when(this.xcontextProvider.get()).thenReturn(xcontext);
 
-        XWiki xwiki = mock(XWiki.class);
+        XWiki xwiki = mock();
         when(xcontext.getWiki()).thenReturn(xwiki);
 
         SkinExtensionPluginApi jsx = mock(SkinExtensionPluginApi.class, "jsx");

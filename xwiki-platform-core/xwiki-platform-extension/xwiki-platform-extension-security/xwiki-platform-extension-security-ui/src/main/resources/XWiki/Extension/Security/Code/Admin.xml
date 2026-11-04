@@ -90,6 +90,7 @@
   ## We use the velocity macro here instead of the XWiki macro, in order to keep HTML in the content
   ## With the XWiki macro, the progress bar is not properly rendered.
   #define ($infoMessageContent)
+    &lt;div class="extension-security-scan-status"&gt;
     #if ($indexJobStatus.state != 'FINISHED')
       $escapetool.xml($services.localization.render('extension.security.indexed.started', [$xwiki.formatDate($indexJobStatus.startDate)]))
       #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
@@ -104,6 +105,7 @@
     #else
       $escapetool.xml($services.localization.render('extension.security.indexed.on', [$xwiki.formatDate($indexJobStatus.startDate)]))
     #end
+    &lt;/div&gt;
   #end
   #info($infoMessageContent)
   #else

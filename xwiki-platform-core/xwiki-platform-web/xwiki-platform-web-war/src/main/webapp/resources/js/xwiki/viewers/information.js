@@ -60,7 +60,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
   $(document).on('click', '#button-paste', function() {
     $('#reference-value').select();
     document.execCommand("copy");
-    new XWiki.widgets.Notification(l10n['core.viewers.information.pageReference.copied'], 'info');
+    XWiki.widgets.Notification.show(l10n['core.viewers.information.pageReference.copied'], 'info');
   });
 });
 

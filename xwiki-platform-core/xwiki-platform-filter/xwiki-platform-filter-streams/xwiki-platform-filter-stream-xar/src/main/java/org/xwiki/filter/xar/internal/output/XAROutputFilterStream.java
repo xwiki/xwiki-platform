@@ -87,7 +87,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
     /**
      * the size of the chunks used when attachments are streamed. As the attachment data is base64 encoded in the
-     * process, this size must be a multiple of three to prevent padding between the chunks; see XWIKI-9830
+     * process, this size must be a multiple of three to prevent padding between the chunks; see XWIKI-9830. For the
+     * same reason, every chunk except the last one must be completely filled.
      */
     private static final int ATTACHMENT_BUFFER_CHUNK_SIZE = 4095;
 
@@ -144,19 +145,13 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
     private String toString(Object obj)
     {
-        String result;
-        if (obj instanceof String objString) {
-            result = objString;
-        } else if (obj instanceof Date objDate) {
-            result = toString(objDate);
-        } else if (obj instanceof Syntax objSyntax) {
-            result = toString(objSyntax);
-        } else if (obj instanceof EntityReference objEntityReference) {
-            result = toString(objEntityReference);
-        } else {
-            result = Objects.toString(obj, null);
-        }
-        return result;
+        return switch (obj) {
+            case String objString -> objString;
+            case Date objDate -> toString(objDate);
+            case Syntax objSyntax -> toString(objSyntax);
+            case EntityReference objEntityReference -> toString(objEntityReference);
+            case null, default -> Objects.toString(obj, null);
+        };
     }
 
     private String toString(Date date)
@@ -548,7 +543,10 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
             int readSize;
             do {
                 try {
-                    readSize = stream.read(buffer, 0, ATTACHMENT_BUFFER_CHUNK_SIZE);
+                    // A single read may return fewer bytes than requested before the end of the stream (for example
+                    // when the content comes from the network), so make sure to fill the whole chunk: only the last
+                    // chunk can be shorter.
+                    readSize = stream.readNBytes(buffer, 0, ATTACHMENT_BUFFER_CHUNK_SIZE);
                 } catch (IOException e) {
                     throw new FilterException("Failed to read content stream", e);
                 }

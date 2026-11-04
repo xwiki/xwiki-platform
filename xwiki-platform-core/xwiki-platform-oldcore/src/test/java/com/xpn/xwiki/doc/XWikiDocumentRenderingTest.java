@@ -53,6 +53,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -258,8 +259,8 @@ class XWikiDocumentRenderingTest
             header 1 content
             == header 2==
             header 2 content""");
-        assertThat(this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()),
-            startsWith("<span class=\"xwikirenderingerror\">Failed to execute the [groovy] macro."));
+        // The macro cannot be executed, and a rendering error is not used as a title, so the document name is used.
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -291,6 +292,36 @@ class XWikiDocumentRenderingTest
             == header 2==
             header 2 content""");
         assertEquals("value", this.document.getRenderedTitle(Syntax.PLAIN_1_0, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void getRenderedTitleExtractedFromContentUsesContentAuthorOfTheDocument()
+    {
+        // Configure XWiki to extract title from content
+        this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
+
+        DocumentReference scriptAuthor = new DocumentReference(DOCWIKI, "XWiki", "ScriptAuthor");
+        // Only the author of the document that is currently being rendered is allowed to execute scripts.
+        doAnswer(invocation -> {
+            if (List.of(Right.SCRIPT, Right.PROGRAM).contains(invocation.getArgument(0))) {
+                return scriptAuthor.equals(this.oldcore.getXWikiContext().getAuthorReference());
+            } else {
+                return true;
+            }
+        }).when(this.oldcore.getMockContextualAuthorizationManager()).hasAccess(any());
+
+        // The document whose title is displayed has been written by a user who isn't allowed to execute scripts.
+        this.document.setContent("= {{groovy}}print \"executed\"{{/groovy}}");
+        this.document.setContentAuthorReference(new DocumentReference(DOCWIKI, "XWiki", "NoScriptAuthor"));
+
+        // The title is displayed while another document, written by an author allowed to execute scripts, is being
+        // rendered.
+        XWikiDocument renderedDocument = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, "Other"));
+        renderedDocument.setContentAuthorReference(scriptAuthor);
+        this.oldcore.getXWikiContext().setDoc(renderedDocument);
+
+        // The macro is not executed, so the title falls back to the document name instead of printing "executed".
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -377,18 +408,19 @@ class XWikiDocumentRenderingTest
         assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
 
         // Create a translation and set the current language to be that of the translation to verify that the rendered
-        // content is that of the translated document
-        // Note that this also verifies that the translation can have a different syntax than the default doc.
+        // content is that of the translated document.
+        // Note that the translation has a syntax of its own, to verify that its content is rendered with that syntax
+        // and not with the one of the default document: "**bold**" is bold in xwiki/2.0 but plain text in plain/1.0.
         XWikiDocument translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
-        translatedDocument.setContent("//italic//");
-        translatedDocument.setSyntax(Syntax.XWIKI_1_0);
+        translatedDocument.setContent("**bold**");
+        translatedDocument.setSyntax(Syntax.PLAIN_1_0);
         translatedDocument.setNew(false);
 
         doReturn(Locale.FRENCH.toString()).when(this.xwiki).getLanguagePreference(any());
         doReturn(translatedDocument).when(this.xwiki).getDocument(
             eq(new DocumentReference(translatedDocument.getDocumentReference(), translatedDocument.getLocale())),
             any());
-        assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
+        assertEquals("<p>**bold**</p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
 
         assertEquals("<p><strong>bold</strong></p>", this.document.displayDocument(this.oldcore.getXWikiContext()));
     }

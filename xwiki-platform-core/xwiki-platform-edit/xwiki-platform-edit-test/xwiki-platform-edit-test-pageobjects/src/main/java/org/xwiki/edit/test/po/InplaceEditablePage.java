@@ -20,6 +20,7 @@
 package org.xwiki.edit.test.po;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -39,6 +40,8 @@ public class InplaceEditablePage extends ViewPage
     private static final By TITLE_INPUT = By.id("document-title-input");
 
     private static final By EDIT_LOCK_CONFIRMATION = By.cssSelector(".force-edit-lock-modal.in .modal-body");
+
+    private static final String ARIA_DESCRIBEDBY = "aria-describedby";
 
     @FindBy(id = "commentinput")
     private WebElement versionSummaryInput;
@@ -83,6 +86,8 @@ public class InplaceEditablePage extends ViewPage
      * another user and thus the edit lock confirmation is expected instead.
      * 
      * @return this page object
+     * @since 17.10.15
+     * @since 18.4.8
      * @since 18.8.0RC1
      */
     public InplaceEditablePage clickTranslate()
@@ -95,6 +100,8 @@ public class InplaceEditablePage extends ViewPage
      * Wait for the modal asking the user to confirm that they want to take over the edit lock held by another user.
      * 
      * @return the message displayed by the edit lock confirmation modal
+     * @since 17.10.15
+     * @since 18.4.8
      * @since 18.8.0RC1
      */
     public String waitForEditLockConfirmation()
@@ -104,12 +111,68 @@ public class InplaceEditablePage extends ViewPage
     }
 
     /**
+     * Hover the Translate button and wait for its popover.
+     *
+     * @return the title of the popover displayed when hovering the Translate button, i.e. the button tooltip
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public String getTranslateButtonHint()
+    {
+        getDriver().createActions().moveToElement(getTranslateButton()).perform();
+        return getPopoverOf(getTranslateButton()).findElement(By.className("popover-title")).getText();
+    }
+
+    /**
+     * Wait for the popover displayed below the page title input when starting to translate the page.
+     *
+     * @return the hint displayed below the page title input
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public String getDocumentTitleHint()
+    {
+        return getPopoverOf(getDriver().findElement(TITLE_INPUT)).findElement(By.className("popover-content"))
+            .getText();
+    }
+
+    private WebElement getPopoverOf(WebElement element)
+    {
+        // Bootstrap links the element to its popover once the popover is shown.
+        getDriver().waitUntilCondition(driver -> element.getDomAttribute(ARIA_DESCRIBEDBY) != null);
+        By popover = By.id(element.getDomAttribute(ARIA_DESCRIBEDBY));
+        getDriver().waitUntilElementIsVisible(popover);
+        return getDriver().findElement(popover);
+    }
+
+    /**
+     * Switch to the given locale using the Languages menu of the drawer, and wait for the page to be reloaded.
+     *
+     * @param locale the locale to switch to
+     * @return the page object for the reloaded page
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public InplaceEditablePage switchToLocale(Locale locale)
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        clickLocale(locale);
+        getDriver().waitUntilPageIsReloaded();
+        return new InplaceEditablePage();
+    }
+
+    /**
      * Wait until the in-place editor is editing the document translation for the given locale. Needed when switching
      * from editing one translation to editing another (e.g. from the original translation to a new one), because
      * {@link #waitForInplaceEditor()} returns right away in that case, while the editor is still switching.
      * 
      * @param locale the locale of the translation being edited, the empty string for the default translation
      * @return this page object
+     * @since 17.10.15
+     * @since 18.4.8
      * @since 18.8.0RC1
      */
     public InplaceEditablePage waitForEditedLocale(String locale)
@@ -144,6 +207,18 @@ public class InplaceEditablePage extends ViewPage
         WebElement titleInput = getDriver().findElement(TITLE_INPUT);
         titleInput.clear();
         titleInput.sendKeys(title);
+        return this;
+    }
+
+    /**
+     * Moves the focus to the page title input, e.g. to take the focus away from the content editor.
+     *
+     * @return this page object
+     * @since 18.9.0RC1
+     */
+    public InplaceEditablePage focusDocumentTitle()
+    {
+        getDriver().findElement(TITLE_INPUT).click();
         return this;
     }
 

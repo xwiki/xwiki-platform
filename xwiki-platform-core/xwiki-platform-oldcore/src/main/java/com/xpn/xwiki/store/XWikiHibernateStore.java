@@ -2025,17 +2025,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         return executeRead(inputxcontext, session -> {
             try {
-                XWikiLock lock = null;
-
-                Query<Long> query = session
-                    .createQuery("select lock.docId from XWikiLock as lock where lock.docId = :docId", Long.class);
-                query.setParameter(DOC_ID, docId);
-                if (query.uniqueResult() != null) {
-                    lock = new XWikiLock();
-                    session.load(lock, Long.valueOf(docId));
-                }
-
-                return lock;
+                // Read the lock with a single statement. Checking first that the lock exists and then loading it would
+                // fail if the lock was removed concurrently in between, which can happen when the transaction isolation
+                // level is READ COMMITTED (each statement sees the latest committed data).
+                return session.get(XWikiLock.class, docId);
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_LOCK, "Exception while loading lock", e);

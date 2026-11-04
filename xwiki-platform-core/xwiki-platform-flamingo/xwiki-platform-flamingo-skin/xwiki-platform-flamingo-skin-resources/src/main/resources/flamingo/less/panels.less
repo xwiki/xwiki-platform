@@ -9,6 +9,9 @@
 
 h1.xwikipaneltitle, h2.xwikipaneltitle {
   .panel-title;
+  // Panels headings are the same size as the content's h5 headings.
+  font-size: @font-size-h5;
+  font-weight: ~"var(--font-weight-semibold)";
   margin: @padding-small-vertical @padding-large-horizontal @padding-large-vertical;
   padding: 0 0 @padding-large-vertical;
   color: @panel-header-text;
@@ -58,4 +61,58 @@ a.panel-collapse-carret {
 .panel-radio {
   float: left;
   padding: 15px
+}
+
+// Navigation panel rules ==========================
+
+// .panels and .PanelsNavigation parents to isolate the rules
+.panels { 
+  .PanelsNavigation {
+    .jstree {
+      ul.jstree-children {
+        width: 100%;
+      }
+
+      &.jstree-xwiki {
+        .jstree-node {
+          display: flex;
+          gap: 4px;
+          // Allows sub-lists (ul) to drop down to the next line 
+          flex-flow: row wrap; 
+          align-items: flex-start;
+
+          .jstree-ocl {
+            padding: 2px;
+            // Prevents the expand/collapse button from shrinking
+            flex-shrink: 0;
+          }
+
+          a {
+            // Makes the link flex to align inner icon + text
+            display: flex;
+            // Aligns the file icon with the 1st line of text
+            align-items: flex-start;
+            // Takes up all remaining space on the line
+            flex: 1;
+            width: 100%;
+            // Allows the link to grow vertically if text wraps
+            height: auto;
+            min-height: 24px;
+            padding: 2px 4px;
+            // Prevents long words from overflowing the layout
+            word-break: break-word; 
+
+            &.jstree-clicked {
+              text-shadow: 0 0 0.5px currentColor, 0 0 0.5px currentColor;
+            }
+          }
+
+          // Ensures sub-lists (ul) occupy a full line below the parent node
+          > ul.jstree-children {
+            flex: 0 0 100%;
+          }
+        }
+      }
+    }
+  }
 }

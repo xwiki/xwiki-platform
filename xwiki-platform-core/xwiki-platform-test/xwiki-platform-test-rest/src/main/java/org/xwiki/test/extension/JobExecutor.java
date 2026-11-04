@@ -21,6 +21,7 @@ package org.xwiki.test.extension;
 
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
@@ -49,6 +50,13 @@ import org.xwiki.rest.model.jaxb.JobStatus;
 public class JobExecutor
 {
     /**
+     * The connection and socket timeout to use. Installing a flavor is a long running operation and it's executed
+     * synchronously (see the {@code async=false} parameter below), so the request can legitimately take a lot of time,
+     * especially on a loaded CI agent. The default timeout of the HTTP client is only 3 minutes, which is not enough.
+     */
+    private static final int TIMEOUT = (int) Duration.ofMinutes(15).toMillis();
+
+    /**
      * @param jobType the type of job to execute
      * @param request the Job request to send
      * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhsot:8080/xwiki/rest})
@@ -65,25 +73,26 @@ public class JobExecutor
         StringWriter writer = new StringWriter();
         marshaller.marshal(request, writer);
 
-        XWikiHTTPClient httpClient = new XWikiHTTPClient();
-        httpClient.setDefaultCredentials(credentials);
+        try (XWikiHTTPClient httpClient = new XWikiHTTPClient("XWiki", TIMEOUT)) {
+            httpClient.setDefaultCredentials(credentials);
 
-        String uri = String.format("%s/jobs?jobType=%s&async=false", xwikiRESTURL, jobType);
+            String uri = String.format("%s/jobs?jobType=%s&async=false", xwikiRESTURL, jobType);
 
-        HttpPut putMethod = new HttpPut(uri);
-        putMethod.addHeader("Accept", MediaType.APPLICATION_XML);
-        putMethod.setEntity(
-            new StringEntity(writer.toString(), ContentType.APPLICATION_XML.withCharset(StandardCharsets.UTF_8)));
+            HttpPut putMethod = new HttpPut(uri);
+            putMethod.addHeader("Accept", MediaType.APPLICATION_XML);
+            putMethod.setEntity(
+                new StringEntity(writer.toString(), ContentType.APPLICATION_XML.withCharset(StandardCharsets.UTF_8)));
 
-        httpClient.execute(putMethod, (response, context) -> {
-            try {
-                handleResponse(response, unmarshaller);
-            } catch (Exception e) {
-                throw new HttpException("Failed to handle response", e);
-            }
+            httpClient.execute(putMethod, (response, context) -> {
+                try {
+                    handleResponse(response, unmarshaller);
+                } catch (Exception e) {
+                    throw new HttpException("Failed to handle response", e);
+                }
 
-            return null;
-        });
+                return null;
+            });
+        }
     }
 
     private void handleResponse(ClassicHttpResponse response, Unmarshaller unmarshaller) throws Exception

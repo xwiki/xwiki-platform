@@ -61,4 +61,11 @@ public class PostgreSQLHibernateAdapter extends AbstractHibernateAdapter
 
         return super.isCatalog();
     }
+
+    @Override
+    public String getColumnName(String columnName)
+    {
+        // PostgreSQL stores the unquoted column names in lower case
+        return columnName != null ? columnName.toLowerCase() : null;
+    }
 }

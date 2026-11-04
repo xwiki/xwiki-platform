@@ -49,6 +49,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -3052,6 +3053,28 @@ public class XWiki extends Api
     public boolean isTitleInCompatibilityMode()
     {
         return this.xwiki.isTitleInCompatibilityMode();
+    }
+
+    /**
+     * @return the maximum authorized length for a document title (see {@link Document#getTitle()}), based on the
+     *         current store limitation
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public int getDocumentTitleMaxLength()
+    {
+        return this.xwiki.getDocumentTitleMaxLength(getXWikiContext());
+    }
+
+    /**
+     * @return the maximum authorized length for a document local reference (see {@link Document#getFullName()}),
+     *         based on the current store limitation
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    public int getDocumentLocalReferenceMaxLength()
+    {
+        return this.xwiki.getDocumentLocalReferenceMaxLength(getXWikiContext());
     }
 
     /**

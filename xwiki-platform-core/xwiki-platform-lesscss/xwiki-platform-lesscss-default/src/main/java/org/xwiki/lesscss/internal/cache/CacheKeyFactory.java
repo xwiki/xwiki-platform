@@ -83,7 +83,7 @@ public class CacheKeyFactory
             List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
                 XWiki.CACHE_VERSION);
             if (request instanceof ServletRequest servletRequest) {
-                Map<String, String[]> parameters = servletRequest.getHttpServletRequest().getParameterMap();
+                Map<String, String[]> parameters = servletRequest.getRequest().getParameterMap();
                 StringBuilder resultBuilder = new StringBuilder(result);
                 for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
                     if (!excludes.contains(entry.getKey())) {

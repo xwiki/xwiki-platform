@@ -6,7 +6,8 @@
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "global.d.ts"
   ],
   "exclude": [
     "**/*.test.*",

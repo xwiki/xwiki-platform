@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-web</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-web-war</artifactId>
   <name>XWiki Platform - Web - WAR</name>
@@ -95,6 +95,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -120,6 +126,32 @@
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
+            </configuration>
+          </execution>
+          <!-- Extract Prototype.js for the JavaScript unit tests located in src/test/node, which load it the way the
+               browser does before loading the legacy JavaScript code that depends on it. Prototype.js isn't published
+               on npm, so it can't be a dependency of the Node package holding those tests. -->
+          <execution>
+            <id>unpack-prototype-for-javascript-tests</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>prototype</artifactId>
+                  <type>jar</type>
+                  <includes>**/prototype.js</includes>
+                  <!-- Drop the "META-INF/resources/webjars/prototype/<version>" prefix so that the tests don't need to
+                       know the version. -->
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+                  </fileMappers>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/test-webjars</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -263,6 +295,62 @@
             </licenseSet>
           </licenseSets>
         </configuration>
+      </plugin>
+      <plugin>
+        <!-- Run the JavaScript unit tests, located in src/test/node. The JavaScript code is not built with Node, so
+          contrary to the webjar-node packaging, only the tests and the linter are executed. -->
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <configuration>
+          <workingDirectory>${basedir}/src/test/node</workingDirectory>
+          <installDirectory>${basedir}/target</installDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install-node-and-pnpm</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>install-node-and-pnpm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>${node.version}</nodeVersion>
+              <pnpmVersion>${pnpm.version}</pnpmVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-install</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+              <environmentVariables>
+                <CI>true</CI>
+              </environmentVariables>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run test:unit</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-lint</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run lint</arguments>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

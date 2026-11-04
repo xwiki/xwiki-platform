@@ -19,6 +19,7 @@
  */
 package org.xwiki.livedata;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,6 +42,23 @@ public interface LiveDataEntryStore
     Optional<Map<String, Object>> get(Object entryId) throws LiveDataException;
 
     /**
+     * Returns an entry that includes the specified properties.
+     * This method should be overridden for stores that have entries with dynamic columns
+     * (i.e., for which {@link #get(Object)} might not contain all the expected properties).
+     * The default implementation behaves the same as {@link #get(Object)}.
+     *
+     * @param entryId identifies the entry to return
+     * @param properties the properties the returned entry must include
+     * @return the specified entry, as a map from property id to value, possibly holding more properties than requested
+     * @throws LiveDataException if retrieving the specified entry fails
+     * @since 18.9.0RC1
+     */
+    default Optional<Map<String, Object>> get(Object entryId, List<String> properties) throws LiveDataException
+    {
+        return get(entryId);
+    }
+
+    /**
      * @param entryId identifies the entry whose property value to return
      * @param property the property whose value to return
      * @return the value of the specified property from the specified live data entry
@@ -48,7 +66,7 @@ public interface LiveDataEntryStore
      */
     default Optional<Object> get(Object entryId, String property) throws LiveDataException
     {
-        Optional<Map<String, Object>> values = get(entryId);
+        Optional<Map<String, Object>> values = get(entryId, List.of(property));
         if (values.isPresent()) {
             Object value = values.get().get(property);
             if (value != null) {

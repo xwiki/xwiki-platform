@@ -19,7 +19,7 @@
  */
 package org.xwiki.tag.internal.selector;
 
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -98,11 +98,12 @@ public class UnsafeTagsSelector extends AbstractTagsSelector
     private Map<String, Integer> internalGetTagCountForQuery(String fromHql, String whereHql, Object parameters)
         throws TagException
     {
-        List<String> results;
-        Map<String, Integer> tagCount = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        List<Object[]> results;
 
-        String from = "select elements(prop.list) from XWikiDocument as doc, BaseObject as tagobject, "
-            + "DBStringListProperty as prop";
+        // The cardinality is computed by the database so that a single row is returned per distinct tag value instead
+        // of one row per (document, tag) pair, which doesn't scale on wikis with a lot of tagged documents.
+        String from = "select item, count(*) from XWikiDocument as doc, BaseObject as tagobject, "
+            + "DBStringListProperty as prop join prop.list item";
         String where = " where tagobject.name=doc.fullName and tagobject.className='XWiki.TagClass' and "
             + "tagobject.id=prop.id.id and prop.id.name='tags' and doc.translation=0";
 
@@ -114,7 +115,7 @@ public class UnsafeTagsSelector extends AbstractTagsSelector
             where += " and " + whereHql;
         }
 
-        String hql = from + where;
+        String hql = from + where + " group by item";
 
         try {
             Query query = this.contextProvider.get().getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
@@ -132,20 +133,17 @@ public class UnsafeTagsSelector extends AbstractTagsSelector
                 String.format("Failed to get tag count for query [%s], with parameters [%s]", hql, parameters), e);
         }
 
-        results.sort(String.CASE_INSENSITIVE_ORDER);
-        Map<String, String> processedTags = new HashMap<>();
+        // The collation is required to be binary on all supported databases, so the database groups the values by
+        // their exact case and the case variants of a same tag still need to be merged here. Merging them in the
+        // query instead would make the returned variant depend on the database's own case mapping, and would only
+        // save a handful of rows. Sorting first makes the variant that is kept as the returned tag deterministic.
+        results.sort(Comparator.comparing(row -> (String) row[0], String.CASE_INSENSITIVE_ORDER));
 
-        // We have to manually build a cardinality map since we have to ignore tags case.
-        for (String result : results) {
-            // This key allows to keep track of the case variants we've encountered.
-            String lowerTag = result.toLowerCase();
-
-            // We store the first case variant to reuse it in the final result set.
-            processedTags.putIfAbsent(lowerTag, result);
-
-            String tagCountKey = processedTags.get(lowerTag);
-
-            tagCount.compute(tagCountKey, (s, count) -> count == null ? 1 : count + 1);
+        // The map ignores the case, so merging on a tag whose case variant has already been inserted keeps that first
+        // variant as the key and sums the counts.
+        Map<String, Integer> tagCount = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (Object[] result : results) {
+            tagCount.merge((String) result[0], ((Number) result[1]).intValue(), Integer::sum);
         }
 
         return tagCount;

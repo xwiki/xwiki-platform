@@ -74,7 +74,7 @@ XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ConfirmationBox,
           if (this.progressNotification) {
             this.progressNotification.replace(new XWiki.widgets.Notification(this.interactionParameters.successMessageText, "done"));
           } else {
-            new XWiki.widgets.Notification(this.interactionParameters.successMessageText, "done");
+            XWiki.widgets.Notification.show(this.interactionParameters.successMessageText, "done");
           }
         } else if (this.progressNotification) {
           this.progressNotification.hide();
@@ -89,7 +89,7 @@ XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ConfirmationBox,
           if (this.progressNotification) {
             this.progressNotification.replace(new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error"));
           } else {
-            new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error");
+            XWiki.widgets.Notification.show(this.interactionParameters.failureMessageText + failureReason, "error");
           }
         } else if (this.progressNotification) {
           this.progressNotification.hide();

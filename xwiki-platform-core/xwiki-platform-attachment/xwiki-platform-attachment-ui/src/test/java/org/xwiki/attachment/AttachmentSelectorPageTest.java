@@ -35,6 +35,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.container.Container;
 import org.xwiki.icon.IconManagerScriptServiceComponentList;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.AttachmentReference;
@@ -107,6 +108,12 @@ class AttachmentSelectorPageTest extends PageTest
      */
     @MockComponent
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    /**
+     * Required by {@link TemporaryAttachmentsScriptService}.
+     */
+    @MockComponent
+    private Container container;
 
     @BeforeEach
     void setUp() throws Exception

@@ -40,6 +40,8 @@ public class RestoreDocumentConfirmationModal extends ConfirmationModal
 
     public ViewPage clickReplace()
     {
+        // The marker is needed for waitUntilPageIsReloaded() to wait for the redirect at all.
+        getDriver().addPageNotYetReloadedMarker();
         getDriver().findElementWithoutWaiting(this.container,
             By.cssSelector(".modal-footer .btn-primary, .modal-footer .btn-danger")).click();
         // We need to wait for the deletion of the old page before the redirect to the restored one will occur.

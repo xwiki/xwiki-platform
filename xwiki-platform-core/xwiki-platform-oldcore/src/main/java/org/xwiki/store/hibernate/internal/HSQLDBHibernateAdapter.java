@@ -56,6 +56,13 @@ public class HSQLDBHibernateAdapter extends AbstractHibernateAdapter
     }
 
     @Override
+    public String getColumnName(String columnName)
+    {
+        // HSQLDB stores the unquoted column names in upper case
+        return columnName != null ? columnName.toUpperCase() : null;
+    }
+
+    @Override
     protected String cleanDatabaseName(String name)
     {
         // HSQLDB generally needs the schema name to be upper case

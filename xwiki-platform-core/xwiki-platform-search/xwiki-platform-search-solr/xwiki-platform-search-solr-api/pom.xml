@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
@@ -34,9 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.45</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <xwiki.jacoco.instructionRatio>0.52</xwiki.jacoco.instructionRatio>
 
     <!-- The Solr framework is designed to be shared for the whole farm -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
@@ -46,6 +44,11 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
+    </dependency>
+    <!-- Used to stream large Solr responses -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
     </dependency>
     <!-- Apache Commons -->
     <dependency>

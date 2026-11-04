@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -35,6 +36,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -66,9 +70,8 @@ class HTMLExportIT
         {
             if (entry.getName().equals("pages/xwiki/TopPage/WebHome.html")) {
                 String content = IOUtils.toString(zis, Charset.defaultCharset());
-                assertTrue(content.contains("Top content"), "Title should have contained 'Top content'");
-                assertTrue(content.contains("Top title: Creator"),
-                    "Content should have contained 'Top title: Creator'");
+                assertThat(content, containsString("Top content"));
+                assertThat(content, containsString("Top title: Creator"));
                 this.result = true;
             }
         }
@@ -89,9 +92,9 @@ class HTMLExportIT
         {
             if (entry.getName().equals("pages/xwiki/TopPage/NestedPage/WebHome.html")) {
                 String content = IOUtils.toString(zis, Charset.defaultCharset());
-                assertTrue(
-                    content.contains("<a href=\"../../../../pages/xwiki/TopPage/WebHome.html\">top</a>"),
-                    "Content should have contained a local link to the Top page");
+                // The link to the Top page is exported as a local link because that page is part of the export.
+                assertThat(content,
+                    containsString("<a href=\"../../../../pages/xwiki/TopPage/WebHome.html\">top</a>"));
                 this.result = true;
             }
         }
@@ -135,10 +138,37 @@ class HTMLExportIT
             List.of(new TopPageValidator(), new NestedPageValidator()));
     }
 
+    @Test
+    void exportHTMLWithGet() throws Exception
+    {
+        // An export requested with GET is not performed. The export action answers with a page listing the requested
+        // export parameters, from which the user can start that same export again with a POST request.
+        URL url = new URL(this.baseURL + "bin/export/TopPage/WebHome?format=html&name=My+Export");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        assertEquals(HttpURLConnection.HTTP_BAD_METHOD, connection.getResponseCode());
+        assertEquals("POST", connection.getHeaderField("Allow"));
+
+        String content = IOUtils.toString(connection.getErrorStream(), StandardCharsets.UTF_8);
+        // The requested export parameters are displayed...
+        assertThat(content, containsString("<dt>format</dt>"));
+        assertThat(content, containsString("<dd>html</dd>"));
+        assertThat(content, containsString("<dt>name</dt>"));
+        assertThat(content, containsString("<dd>My Export</dd>"));
+        // ...and submitted again by the form, together with a CSRF token.
+        assertThat(content, containsString("id=\"exportResubmit\""));
+        assertThat(content, containsString("method=\"post\""));
+        assertThat(content, containsString("name=\"format\" value=\"html\""));
+        assertThat(content, containsString("name=\"name\" value=\"My Export\""));
+        assertThat(content, containsString("name=\"form_token\""));
+    }
+
     private void assertHTMLExportURL(String htmlExportURL, List<PageValidator> validators) throws Exception
     {
         URL url = new URL(htmlExportURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        // The export action only performs an export on POST requests.
+        connection.setRequestMethod("POST");
         InputStream is = connection.getInputStream();
         ZipInputStream zis = new ZipInputStream(is);
 
@@ -191,7 +221,7 @@ class HTMLExportIT
 
     private void assertSkinIsActive(List<String> content)
     {
-        assertTrue(StringUtils.join(content.toArray()).contains("skin-flamingo"),
-            "style.min.css is not the one output by the flamingo skin");
+        assertThat("style.min.css is not the one output by the flamingo skin",
+            StringUtils.join(content.toArray()), containsString("skin-flamingo"));
     }
 }

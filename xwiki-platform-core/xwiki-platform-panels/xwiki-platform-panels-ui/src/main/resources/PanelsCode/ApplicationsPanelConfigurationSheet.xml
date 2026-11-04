@@ -248,16 +248,16 @@ require([
       orderlist: JSON.stringify(displaylistOrder)
     }).then(data =&gt; {
       if (data === 'SUCCESS') {
-        new XWiki.widgets.Notification(l10n['success'], 'done');
+        XWiki.widgets.Notification.show(l10n['success'], 'done');
       } else if (data === 'BAD CSRF') {
-        new XWiki.widgets.Notification(l10n['csrf'], 'error');
+        XWiki.widgets.Notification.show(l10n['csrf'], 'error');
       } else if (data === 'NO RIGHT') {
-        new XWiki.widgets.Notification(l10n['noright'], 'error');
+        XWiki.widgets.Notification.show(l10n['noright'], 'error');
       } else {
-        new XWiki.widgets.Notification(l10n['error'], 'error');
+        XWiki.widgets.Notification.show(l10n['error'], 'error');
       }
     }).catch(() =&gt; {
-      new XWiki.widgets.Notification(l10n['error'], 'error');
+      XWiki.widgets.Notification.show(l10n['error'], 'error');
     });
   };
 

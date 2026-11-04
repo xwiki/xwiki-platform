@@ -37,14 +37,28 @@ import org.xwiki.test.ui.po.ConfirmationModal;
  */
 public class RealtimeEditToolbar extends BaseElement
 {
+    private static final By TOOLBAR = By.className("realtime-edit-toolbar");
+
     private static final By ALLOW_REALTIME = By.cssSelector(".sticky-buttons .realtime-allow");
 
-    private static final By SAVE_STATUS = By.cssSelector(".realtime-edit-toolbar realtime-status.realtime-save-status");
+    private static final By SAVE_STATUS = By.cssSelector(".realtime-edit-toolbar .realtime-save-status");
 
     private static final By SUMMARIZE_AND_DONE_ACTION =
         By.cssSelector(".realtime-edit-toolbar-left .realtime-action-summarize");
 
     private static final By DONE_ACTION = By.cssSelector(".realtime-edit-toolbar .realtime-action-done");
+
+    private static final String CONNECTION_STATUS_SELECTOR = ".realtime-edit-toolbar .realtime-connection-status";
+
+    /**
+     * The attribute that holds the connection and save status.
+     */
+    private static final String STATUS_ATTRIBUTE = "data-status";
+
+    /**
+     * The value of the connection status when connected.
+     */
+    private static final String CONNECTED = "clean";
 
     private static final By VISIBLE_COEDITORS =
         By.cssSelector(".realtime-edit-toolbar .realtime-users .realtime-user");
@@ -56,10 +70,79 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public RealtimeEditToolbar waitUntilConnected()
     {
-        getDriver().waitUntilCondition(ExpectedConditions.attributeToBe(
-            By.cssSelector(".realtime-edit-toolbar realtime-status.realtime-connection-status"), ATTRIBUTE_VALUE,
-            "clean"));
+        getDriver().waitUntilCondition(
+            ExpectedConditions.attributeToBe(By.cssSelector(CONNECTION_STATUS_SELECTOR), STATUS_ATTRIBUTE, CONNECTED));
         return this;
+    }
+
+    /**
+     * Waits until the toolbar is displayed, without waiting for the user to be connected to the realtime editing
+     * session.
+     *
+     * @return this instance
+     * @since 18.9.0
+     */
+    public RealtimeEditToolbar waitUntilDisplayed()
+    {
+        getDriver().waitUntilElementIsVisible(TOOLBAR);
+        return this;
+    }
+
+    /**
+     * @return {@code true} if the user is connected to the realtime editing session, {@code false} if the user is
+     *         disconnected or the connection is being established
+     * @since 18.9.0
+     */
+    public boolean isConnected()
+    {
+        return CONNECTED.equals(
+            getDriver().findElement(By.cssSelector(CONNECTION_STATUS_SELECTOR)).getDomAttribute(STATUS_ATTRIBUTE));
+    }
+
+    /**
+     * Simulates a temporary loss of the network connection, which closes the WebSocket connection used by the realtime
+     * editing session, and waits for the editor to reconnect. The browser stays online, so the connection is restored
+     * right away.
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
+     *
+     * @return this instance
+     * @since 18.9.0RC1
+     */
+    public RealtimeEditToolbar simulateConnectionLoss()
+    {
+        return simulateConnectionLoss(true);
+    }
+
+    /**
+     * Simulates a temporary loss of the network connection, which closes the WebSocket connection used by the realtime
+     * editing session. The browser stays online, so the editor tries to reconnect right away.
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
+     *
+     * @param waitForReconnect whether to wait for the editor to reconnect; pass {@code false} when the reconnection is
+     *            expected to fail
+     * @return this instance
+     * @since 18.9.0RC1
+     */
+    public RealtimeEditToolbar simulateConnectionLoss(boolean waitForReconnect)
+    {
+        waitUntilConnected();
+        // The realtime WebSocket client closes the connection when the browser goes offline (unless XWiki is accessed
+        // from localhost) and the editor shows that it's disconnected right away. The toolbar is updated
+        // asynchronously, but before any reconnection, so we read the connection status after the pending updates.
+        String connectionStatus = (String) getDriver().executeAsyncScript(
+            "const [selector, statusAttribute, callback] = arguments;"
+                + "window.dispatchEvent(new Event('offline'));"
+                + "Promise.resolve().then(() => {"
+                + "  callback(document.querySelector(selector).getAttribute(statusAttribute));"
+                + "});",
+            CONNECTION_STATUS_SELECTOR, STATUS_ATTRIBUTE);
+        if (CONNECTED.equals(connectionStatus)) {
+            throw new IllegalStateException("The realtime editor didn't notice the connection loss. "
+                + "Note that the connection loss can't be simulated when XWiki is accessed from localhost.");
+        }
+        return waitForReconnect ? waitUntilConnected() : this;
     }
 
     /**
@@ -72,6 +155,8 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
+     *
      * @return {code true} if it is possible to join the realtime editing session, {@code false} otherwise
      */
     public boolean canJoinCollaboration()
@@ -82,7 +167,9 @@ public class RealtimeEditToolbar extends BaseElement
 
     /**
      * Join the realtime editing session.
-     * 
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
+     *
      * @return this instance
      */
     public RealtimeEditToolbar joinCollaboration()
@@ -94,16 +181,22 @@ public class RealtimeEditToolbar extends BaseElement
 
     /**
      * Leave the realtime editing session.
-     * 
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
+     *
      * @return this instance
      */
     public RealtimeEditToolbar leaveCollaboration()
     {
         openDoneDropdown();
-        ConfirmationModal confirmationModal = new ConfirmationModal(By.id("realtime-leave-modal"));
+        By leaveModal = By.id("realtime-leave-modal");
+        // Remove the fade effect.
+        new ConfirmationModal(leaveModal);
         getDriver().findElement(By.cssSelector(".realtime-edit-toolbar .realtime-action-leave")).click();
-        // Confirm leaving the realtime editing session.
-        confirmationModal.clickOk();
+        // Confirm leaving the realtime editing session. The modal is removed along with the realtime toolbar, once
+        // closed, so we can't rely on ConfirmationModal#clickOk() which waits for the modal element to be hidden.
+        getDriver().findElement(By.cssSelector("#realtime-leave-modal .modal-footer .btn-primary")).click();
+        getDriver().waitUntilElementDisappears(leaveModal);
         getDriver()
             .waitUntilCondition(ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(ALLOW_REALTIME),
                 ExpectedConditions.elementSelectionStateToBe(ALLOW_REALTIME, false)));
@@ -154,7 +247,7 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public String getUserId()
     {
-        return getDriver().findElement(By.className("realtime-edit-toolbar")).getDomAttribute("data-user-id");
+        return getDriver().findElement(TOOLBAR).getDomAttribute("data-user-id");
     }
 
     /**
@@ -218,6 +311,19 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
+     * Waits until the current user is the only one editing the document in realtime, e.g. after the other coeditors
+     * left the realtime editing session.
+     *
+     * @return this instance
+     * @since 18.9.0RC1
+     */
+    public RealtimeEditToolbar waitUntilEditingAlone()
+    {
+        getDriver().waitUntilCondition(driver -> isEditingAlone());
+        return this;
+    }
+
+    /**
      * @return the dropdown listing all the users editing the current document in realtime
      */
     public CoeditorsDropdown getCoeditorsDropdown()
@@ -230,7 +336,7 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public SaveStatus getSaveStatus()
     {
-        return SaveStatus.fromValue(getDriver().findElement(SAVE_STATUS).getDomAttribute(ATTRIBUTE_VALUE));
+        return SaveStatus.fromValue(getDriver().findElement(SAVE_STATUS).getDomAttribute(STATUS_ATTRIBUTE));
     }
 
     /**
@@ -246,7 +352,7 @@ public class RealtimeEditToolbar extends BaseElement
         int timeout = (int) (status == SaveStatus.SAVED ? 100
             : getDriver().manage().timeouts().getImplicitWaitTimeout().toSeconds());
         getDriver().waitUntilCondition(
-            ExpectedConditions.attributeToBe(SAVE_STATUS, ATTRIBUTE_VALUE, status.getValue()), timeout);
+            ExpectedConditions.attributeToBe(SAVE_STATUS, STATUS_ATTRIBUTE, status.getValue()), timeout);
         return this;
     }
 
@@ -269,7 +375,7 @@ public class RealtimeEditToolbar extends BaseElement
         if (wait) {
             getDriver().waitUntilCondition(ExpectedConditions.and(
                 // Wait for the content to be saved.
-                ExpectedConditions.attributeToBe(SAVE_STATUS, ATTRIBUTE_VALUE, SaveStatus.SAVED.getValue()),
+                ExpectedConditions.attributeToBe(SAVE_STATUS, STATUS_ATTRIBUTE, SaveStatus.SAVED.getValue()),
                 // Wait for the edit form to be re-enabled.
                 ExpectedConditions.elementToBeClickable(DONE_ACTION)));
         }
@@ -278,6 +384,8 @@ public class RealtimeEditToolbar extends BaseElement
     /**
      * Wait for the warning that informs the user that they, or some other user, are editing the same page outside the
      * realtime collaboration session, which may lead to merge conflicts on save.
+     * <p>
+     * Applies only to the editors using ChainPad / Netflux for realtime synchronization (CKEditor, wiki editor).
      *
      * @return this instance
      * @since 17.8.0

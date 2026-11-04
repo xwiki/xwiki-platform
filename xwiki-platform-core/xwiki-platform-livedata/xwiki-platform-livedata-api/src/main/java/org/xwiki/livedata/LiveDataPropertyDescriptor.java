@@ -317,6 +317,11 @@ public class LiveDataPropertyDescriptor implements InitializableLiveDataElement
     private Boolean editable;
 
     /**
+     * Whether a value is required for this property before a new entry can be created.
+     */
+    private Boolean mandatory;
+
+    /**
      * Displayer configuration, specifies how the property value should be displayed or edited.
      */
     private DisplayerDescriptor displayer;
@@ -559,6 +564,28 @@ public class LiveDataPropertyDescriptor implements InitializableLiveDataElement
         this.editable = editable;
     }
 
+    /**
+     * @return whether a value is required for this property before a new entry can be created; {@code false} or
+     *         {@code null} when the property is not required
+     * @since 18.10.0RC1
+     */
+    public Boolean isMandatory()
+    {
+        return this.mandatory;
+    }
+
+    /**
+     * Sets whether a value is required for this property before a new entry can be created.
+     *
+     * @param mandatory {@code true} if a new entry can only be created once this property has a value, {@code false}
+     *            or {@code null} otherwise
+     * @since 18.10.0RC1
+     */
+    public void setMandatory(Boolean mandatory)
+    {
+        this.mandatory = mandatory;
+    }
+
     @Override
     public void initialize()
     {
@@ -592,16 +619,16 @@ public class LiveDataPropertyDescriptor implements InitializableLiveDataElement
         return new EqualsBuilder().append(id, that.id).append(name, that.name)
             .append(description, that.description).append(icon, that.icon).append(type, that.type)
             .append(sortable, that.sortable).append(visible, that.visible).append(filterable, that.filterable)
-            .append(editable, that.editable).append(displayer, that.displayer).append(filter, that.filter)
-            .append(styleName, that.styleName).isEquals();
+            .append(editable, that.editable).append(mandatory, that.mandatory).append(displayer, that.displayer)
+            .append(filter, that.filter).append(styleName, that.styleName).isEquals();
     }
 
     @Override
     public int hashCode()
     {
         return new HashCodeBuilder(27, 37).append(id).append(name).append(description).append(icon).append(type)
-            .append(sortable).append(visible).append(filterable).append(editable).append(displayer).append(filter)
-            .append(styleName).toHashCode();
+            .append(sortable).append(visible).append(filterable).append(editable).append(mandatory).append(displayer)
+            .append(filter).append(styleName).toHashCode();
     }
 
     @Override
@@ -618,6 +645,7 @@ public class LiveDataPropertyDescriptor implements InitializableLiveDataElement
             .append("visible", visible)
             .append("filterable", filterable)
             .append("editable", editable)
+            .append("mandatory", mandatory)
             .append("displayer", displayer)
             .append("filter", filter)
             .append("styleName", styleName)

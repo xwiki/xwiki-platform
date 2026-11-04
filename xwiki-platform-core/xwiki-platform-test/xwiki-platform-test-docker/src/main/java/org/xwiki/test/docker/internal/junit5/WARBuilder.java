@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -277,8 +278,18 @@ public class WARBuilder
 
     private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception
     {
-        File targetXEDFile =
-            new File(targetDirectory, artifact.getArtifactId() + '-' + artifact.getBaseVersion() + ".xed");
+        // The XED file must be named exactly like the JAR file it describes (minus the extension) since this is how
+        // the core extension scanner locates it at runtime. This includes the classifier, when there is one.
+        StringBuilder xedName = new StringBuilder();
+        xedName.append(artifact.getArtifactId());
+        xedName.append('-');
+        xedName.append(artifact.getBaseVersion());
+        if (StringUtils.isNotEmpty(artifact.getClassifier())) {
+            xedName.append('-');
+            xedName.append(artifact.getClassifier());
+        }
+        xedName.append(".xed");
+        File targetXEDFile = new File(targetDirectory, xedName.toString());
         generateXED(artifact, targetXEDFile, resolver);
     }
 

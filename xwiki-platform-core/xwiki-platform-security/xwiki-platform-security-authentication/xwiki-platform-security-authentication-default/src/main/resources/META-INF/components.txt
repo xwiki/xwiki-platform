@@ -3,6 +3,7 @@ org.xwiki.security.authentication.internal.resource.AuthenticationResourceRefere
 org.xwiki.security.authentication.internal.resource.AuthenticationResourceReferenceSerializer
 org.xwiki.security.authentication.internal.AuthenticationConfigurationSource
 org.xwiki.security.authentication.internal.AuthenticationFailureLoggerListener
+org.xwiki.security.authentication.internal.AuthenticationKeysCheckerListener
 org.xwiki.security.authentication.internal.AuthenticationMailSender
 org.xwiki.security.authentication.internal.CaptchaAuthenticationFailureStrategy
 org.xwiki.security.authentication.internal.DefaultAuthenticationConfiguration

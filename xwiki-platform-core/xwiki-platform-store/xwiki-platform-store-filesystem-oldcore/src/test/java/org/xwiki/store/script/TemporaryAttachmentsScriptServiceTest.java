@@ -25,8 +25,10 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.inject.Provider;
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.TemporaryAttachmentException;
@@ -52,7 +56,6 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.XWikiRequest;
 
 import ch.qos.logback.classic.Level;
 
@@ -90,11 +93,14 @@ class TemporaryAttachmentsScriptServiceTest
     @MockComponent
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
+    @MockComponent
+    private Container container;
+
     @Mock
     private XWikiContext context;
 
     @Mock
-    private XWikiRequest request;
+    private HttpServletRequest request;
 
     @Mock
     private Part part;
@@ -112,7 +118,7 @@ class TemporaryAttachmentsScriptServiceTest
     void setUp() throws Exception
     {
         when(this.contextProvider.get()).thenReturn(this.context);
-        when(this.context.getRequest()).thenReturn(this.request);
+        when(this.container.getRequest()).thenReturn(new ServletRequest(this.request));
         when(this.context.getWiki()).thenReturn(this.wiki);
         when(this.wiki.getDocument(DOCUMENT_REFERENCE, this.context)).thenReturn(this.xWikiDocument);
         XWikiRightService xWikiRightService = mock(XWikiRightService.class);

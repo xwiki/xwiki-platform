@@ -19,8 +19,22 @@
  */
 import type { Collaborator } from "./collaborator";
 import type { ConnectionStatus } from "./connectionStatus";
+import type { Saver } from "@xwiki/platform-autosave-api";
 import type { Ref } from "vue";
 import type { Doc } from "yjs";
+
+/**
+ * A problem with the collaboration session that the user should be warned about:
+ *
+ * - `sessionReplaced`: the collaboration session was replaced, while we were disconnected, by a new session that doesn't
+ *   share its history with ours (e.g. all the other participants left and someone started a new session from the saved
+ *   document). The synchronization is stopped, in order to avoid duplicating the content, so the local changes are kept
+ *   but not shared anymore.
+ *
+ * @since 18.9.0
+ * @beta
+ */
+type CollaborationWarning = "sessionReplaced";
 
 /**
  * Holds information about a collaboration session.
@@ -28,7 +42,7 @@ import type { Doc } from "yjs";
  * @since 18.4.0RC1
  * @beta
  */
-export type Collaboration = {
+type Collaboration = {
   /**
    * Specifies whether the current user is connected, connecting or disconnected from this collaboration. The connection
    * status is reactive and will be updated when the connection status changes. Note that the collaboration provider
@@ -41,6 +55,14 @@ export type Collaboration = {
    * leave the collaboration.
    */
   collaborators: Ref<Collaborator[]>;
+
+  /**
+   * The problems the user should be warned about. The list is reactive and will be updated when problems occur or are
+   * resolved. Undefined when the collaboration provider doesn't report any problems.
+   *
+   * @since 18.9.0
+   */
+  warnings?: Ref<CollaborationWarning[]>;
 
   /**
    * Information on how the current user has presented itself to the other collaborators. This information doesn't
@@ -59,4 +81,14 @@ export type Collaboration = {
    * The shared Yjs document that is synchronized by the collaboration provider between the collaborators.
    */
   doc: Doc;
+
+  /**
+   * The auto-saver shared by every editor taking part in this collaboration session. Building one requires knowing
+   * how the edited content is saved, which the collaboration manager has no way of telling, so the first editor
+   * that joins creates it and the manager only stops it when the session is left.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  saver?: Saver<any>;
 };
+
+export type { Collaboration, CollaborationWarning };

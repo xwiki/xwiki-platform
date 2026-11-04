@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +40,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
@@ -59,7 +61,9 @@ import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -82,6 +86,8 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -106,6 +112,9 @@ class DocumentSolrMetadataExtractorTest
 {
     @InjectMockComponents
     private DocumentSolrMetadataExtractor metadataExtractor;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
@@ -664,6 +673,45 @@ class DocumentSolrMetadataExtractorTest
     }
 
     @Test
+    void getDocumentWithAttachmentDeletedWhileIndexing() throws Exception
+    {
+        XWikiAttachment attachment = createMockAttachment("deleted.txt", "text/plain", new Date(), "", "Alice",
+            "Shy Alice");
+        when(attachment.getContentInputStream(this.xcontext)).thenThrow(new XWikiException());
+        when(this.document.getAttachmentList()).thenReturn(List.of(attachment));
+        // The stored document doesn't have the attachment anymore.
+        when(this.document.getAttachment("deleted.txt")).thenReturn(null);
+
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
+
+        assertNull(solrDocument.getFieldValue("attcontent_en_US"));
+        // Nothing is reported since the deletion of the attachment updates the index anyway.
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void getDocumentWithMissingAttachmentContent() throws Exception
+    {
+        XWikiAttachment attachment = createMockAttachment("missing.txt", "text/plain", new Date(), "", "Alice",
+            "Shy Alice");
+        when(attachment.getContentInputStream(this.xcontext)).thenThrow(
+            new XWikiException("Failed to load", new IOException("The attachment could not be found")));
+        when(this.document.getAttachmentList()).thenReturn(List.of(attachment));
+        when(this.document.getAttachment("missing.txt")).thenReturn(attachment);
+
+        SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(this.documentReference);
+
+        assertNull(solrDocument.getFieldValue("attcontent_en_US"));
+        // The attachment still exists, but it could be about to be deleted, so it's only a warning, with the root
+        // cause.
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("Failed to retrieve the content of attachment [Attachment wiki:Path.To.Page.WebHome@missing.txt],"
+            + " which might be because it's being deleted at the same time. Root cause is"
+            + " [IOException: The attachment could not be found].", this.logCapture.getMessage(0));
+        assertNull(this.logCapture.getLogEvent(0).getThrowableProxy());
+    }
+
+    @Test
     void testAttachmentExtractFromTxt() throws Exception
     {
         assertAttachmentExtract("text content\n", "txt.txt");
@@ -674,6 +722,9 @@ class DocumentSolrMetadataExtractorTest
     {
         assertAttachmentExtract("MS Office 97 content\n\n", "msoffice97.doc");
 
+        // Apache POI warns about the format of the test file.
+        assertEquals("Since FIB.nFib == 0x0101 value of FIB.cswNew MUST be 0x0002, not 0x0",
+            this.logCapture.getMessage(0));
     }
 
     @Test

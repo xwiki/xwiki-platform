@@ -100,7 +100,29 @@ class DeleteJobTest extends AbstractEntityJobTest
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
             eq(Map.of(documentReference, new EntitySelection(documentReference))));
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).delete(documentReference, false);
+        verify(this.modelBridge).delete(documentReference, false, false);
+    }
+
+    @Test
+    void deleteDocumentWithRightsCheck() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.modelBridge.exists(documentReference)).thenReturn(true);
+
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        when(this.authorization.hasAccess(Right.DELETE, userReference, documentReference)).thenReturn(true);
+
+        EntityRequest request = createRequest(documentReference);
+        request.setCheckRights(true);
+        request.setCheckAuthorRights(false);
+        request.setUserReference(userReference);
+
+        run(request);
+
+        verify(this.modelBridge).setContextUserReference(userReference);
+        // The delete must be considered as done by the context user, so that the protections applied to such a
+        // delete (e.g. on rights objects) are enforced
+        verify(this.modelBridge).delete(documentReference, false, true);
     }
 
     @Test
@@ -126,7 +148,7 @@ class DeleteJobTest extends AbstractEntityJobTest
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
             eq(Map.of(documentReference, new EntitySelection(documentReference))));
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).delete(documentReference, false);
+        verify(this.modelBridge).delete(documentReference, false, false);
         verify(this.modelBridge).createRedirect(documentReference, redirectReference);
     }
 
@@ -153,7 +175,7 @@ class DeleteJobTest extends AbstractEntityJobTest
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
             eq(Map.of(documentReference, new EntitySelection(documentReference))));
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).delete(documentReference, true);
+        verify(this.modelBridge).delete(documentReference, true, false);
     }
 
     @Test
@@ -166,7 +188,7 @@ class DeleteJobTest extends AbstractEntityJobTest
         assertEquals(1, getLogCapture().size());
         assertEquals(Level.WARN, getLogCapture().getLogEvent(0).getLevel());
         assertEquals("Skipping [wiki:Space.Page] because it doesn't exist.", getLogCapture().getMessage(0));
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class), anyBoolean());
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), anyBoolean(), anyBoolean());
     }
 
     @Test
@@ -192,7 +214,7 @@ class DeleteJobTest extends AbstractEntityJobTest
         assertEquals(1, getLogCapture().size());
         assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
         assertEquals("You are not allowed to delete [wiki:Space.Page].", getLogCapture().getMessage(0));
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class), anyBoolean());
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), anyBoolean(), anyBoolean());
     }
 
     @Test
@@ -218,7 +240,7 @@ class DeleteJobTest extends AbstractEntityJobTest
         assertEquals(1, getLogCapture().size());
         assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
         assertEquals("You are not allowed to delete [wiki:Space.Page].", getLogCapture().getMessage(0));
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), anyBoolean(), anyBoolean());
     }
 
     @Test
@@ -265,7 +287,7 @@ class DeleteJobTest extends AbstractEntityJobTest
         assertEquals(Level.ERROR, getLogCapture().getLogEvent(1).getLevel());
         assertEquals("Unsupported entity type [WIKI].", getLogCapture().getMessage(0));
         assertEquals("Unsupported entity type [WIKI].", getLogCapture().getMessage(1));
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), anyBoolean(), anyBoolean());
     }
 
     private void run(EntityRequest request) throws Exception

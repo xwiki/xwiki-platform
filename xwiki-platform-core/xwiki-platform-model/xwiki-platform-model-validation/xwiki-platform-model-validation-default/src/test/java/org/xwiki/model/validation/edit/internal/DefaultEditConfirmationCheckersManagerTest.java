@@ -27,7 +27,6 @@ import java.util.TreeMap;
 
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +34,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.Container;
+import org.xwiki.container.Session;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
@@ -49,7 +50,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.XWikiRequest;
 
 import static ch.qos.logback.classic.Level.WARN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -93,6 +93,9 @@ class DefaultEditConfirmationCheckersManagerTest
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @MockComponent
+    private Container container;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
@@ -112,10 +115,7 @@ class DefaultEditConfirmationCheckersManagerTest
     private XWikiDocument xWikiDocument;
 
     @Mock
-    private XWikiRequest request;
-
-    @Mock
-    private HttpSession session;
+    private Session session;
 
     @BeforeEach
     void setUp()
@@ -127,8 +127,7 @@ class DefaultEditConfirmationCheckersManagerTest
         when(this.context.getDoc()).thenReturn(this.xWikiDocument);
         when(this.xWikiDocument.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
         when(this.entityReferenceSerializer.serialize(DOCUMENT_REFERENCE)).thenReturn("xwiki:Page.Space");
-        when(this.context.getRequest()).thenReturn(this.request);
-        when(this.request.getSession()).thenReturn(this.session);
+        when(this.container.getSession()).thenReturn(this.session);
     }
 
     @Test

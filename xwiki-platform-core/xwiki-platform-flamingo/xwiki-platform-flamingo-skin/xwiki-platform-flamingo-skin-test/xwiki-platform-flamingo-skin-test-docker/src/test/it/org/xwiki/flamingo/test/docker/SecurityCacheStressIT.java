@@ -22,12 +22,16 @@ package org.xwiki.flamingo.test.docker;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.http.internal.XWikiCredentials;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.text.StringUtils;
 
@@ -51,8 +55,15 @@ class SecurityCacheStressIT
     private static final String QUOTE = "\"";
 
     @Test
-    void stressTest(TestUtils testUtils) throws Exception
+    void stressTest(TestUtils testUtils, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
+        // The test saves the rights of a space twice in a row, adding then removing a rights object, while background
+        // threads (e.g. the Solr indexer or the links indexing task) load the document saved first: when the second
+        // save deletes the object between the listing of its properties and their loading, the store logs that the
+        // properties of the rights object have no data.
+        logCaptureConfiguration.registerExcludeRegexes("^.*ERROR \\S*XWikiHibernateStore\\s+- No data for property "
+            + "\\[(levels|groups|users|allow)\\] of object id \\[-?\\d+\\]\\s*$");
+
         testUtils.loginAsSuperAdmin();
 
         // Create 20 users.
@@ -60,22 +71,24 @@ class SecurityCacheStressIT
             .mapToObj(i -> "SecurityCacheStressITUser" + i)
             .toList();
         for (String user : users) {
-            testUtils.createUser(user, user, null);
+            testUtils.rest().createUser(new XWikiCredentials(user, user));
         }
 
         String usersParameter =
             "[" + users.stream().map(u -> QUOTE + u + QUOTE).collect(Collectors.joining(", ")) + "]";
 
-        // Set the page load timeout to 10 minutes, but first get the current one to set it back after the test.
-        Duration currentTimeout = testUtils.getDriver().manage().timeouts().getPageLoadTimeout();
-        testUtils.getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMinutes(10));
-        try {
-            String result = testUtils.executeWiki(STRESS_TEST_SCRIPT.formatted(usersParameter), Syntax.XWIKI_2_1,
-                Map.of("outputSyntax", "plain"));
+        // Don't use TestUtils#executeWiki(): it loads the page in the browser and the stress test can run
+        // longer than the 3 minutes after which the Selenium HTTP client gives up on the "get" command (a timeout
+        // that, unlike the page load timeout, cannot be changed on an existing driver). Request the page over HTTP
+        // instead, straight from the test JVM, with a timeout that is longer than the default one of 3 minutes.
+        LocalDocumentReference reference =
+            new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
+        testUtils.rest().savePageAs(testUtils.getPrivilegedCredentials(), reference,
+            STRESS_TEST_SCRIPT.formatted(usersParameter), Syntax.XWIKI_2_1.toIdString(), null, null, false);
 
-            assertTrue(StringUtils.isBlank(result), result);
-        } finally {
-            testUtils.getDriver().manage().timeouts().pageLoadTimeout(currentTimeout);
-        }
+        String result = testUtils.getString(testUtils.getBaseBinPath(null) + "get/Test/Execute/" + reference.getName(),
+            Map.of("outputSyntax", "plain"), Duration.ofMinutes(10));
+
+        assertTrue(StringUtils.isBlank(result), result);
     }
 }

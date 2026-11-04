@@ -109,40 +109,38 @@ export default {
   watch: {
     layoutId: {
       immediate: true,
-      handler(layoutId, previousLayoutId) {
-        // Try to load layout
-        this.loadLayout(this.layoutId)
-          // eslint-disable-next-line promise/always-return
-          .then((layoutComponent) => {
-            // dispatch events
+      async handler(layoutId, previousLayoutId) {
+        try {
+          // Try to load layout
+          const layoutComponent = await this.loadLayout(this.layoutId);
+          // dispatch events
+          this.logic.triggerEvent("layoutLoaded", {
+            layoutId,
+            previousLayoutId,
+            component: layoutComponent,
+          });
+        } catch (err) {
+          const defaultLayout = this.data.meta.defaultLayout;
+          // Fall back on the default layout, unless it's the one that just failed or it isn't declared, in which
+          // case changing the layout would be a no-op.
+          const canFallBack =
+            this.layoutId &&
+            this.layoutId !== defaultLayout &&
+            this.logic.getLayoutDescriptor(defaultLayout);
+          if (canFallBack) {
+            console.warn(err);
+            this.logic.changeLayout(defaultLayout);
+          } else {
+            console.error(err);
+            // There's no layout left to try, so report the failure to the listeners waiting for a layout,
+            // instead of making them wait indefinitely.
             this.logic.triggerEvent("layoutLoaded", {
               layoutId,
               previousLayoutId,
-              component: layoutComponent,
+              error: err,
             });
-          })
-          .catch((err) => {
-            const defaultLayout = this.data.meta.defaultLayout;
-            // Fall back on the default layout, unless it's the one that just failed or it isn't declared, in which
-            // case changing the layout would be a no-op.
-            const canFallBack =
-              this.layoutId &&
-              this.layoutId !== defaultLayout &&
-              this.logic.getLayoutDescriptor(defaultLayout);
-            if (canFallBack) {
-              console.warn(err);
-              this.logic.changeLayout(defaultLayout);
-            } else {
-              console.error(err);
-              // There's no layout left to try, so report the failure to the listeners waiting for a layout,
-              // instead of making them wait indefinitely.
-              this.logic.triggerEvent("layoutLoaded", {
-                layoutId,
-                previousLayoutId,
-                error: err,
-              });
-            }
-          });
+          }
+        }
       },
     },
   },

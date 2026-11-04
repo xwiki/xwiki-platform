@@ -22,6 +22,7 @@ package org.xwiki.flamingo.test.docker;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,7 +30,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.model.reference.DocumentReference;
@@ -37,8 +37,8 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.panels.test.po.DocumentInformationPanel;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -55,6 +55,7 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.PreviewEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -234,6 +235,19 @@ class WikiEditIT
         testToolBarButton(setup, reference, "Internal Link", "[[%s]]", "Link Example");
         testToolBarButton(setup, reference, "Horizontal ruler", "\n----\n", "");
         testToolBarButton(setup, reference, "Attached Image", "[[image:%s]]", "example.jpg");
+
+        // Bold applied from the toolbar is rendered in bold once saved, on a nested and on a terminal page.
+        DocumentReference terminalReference = new DocumentReference("Terminal", reference.getLastSpaceReference());
+        for (DocumentReference pageReference : List.of(reference, terminalReference)) {
+            setup.deletePage(pageReference);
+            WikiEditPage wikiEditPage = WikiEditPage.gotoPage(pageReference);
+            wikiEditPage.sendKeys("Some bold text");
+            wikiEditPage.sendKeysWithAction(Keys.SHIFT, Keys.HOME);
+            wikiEditPage.clickToolbarButton("Bold");
+            assertEquals("**Some bold text**", wikiEditPage.getExactContent());
+            ViewPage viewPage = wikiEditPage.clickSaveAndView();
+            assertEquals(List.of("Some bold text"), viewPage.getBoldTexts());
+        }
     }
 
     /**
@@ -317,22 +331,26 @@ class WikiEditIT
         assertEquals(setup.getURL(reference, "view", ""), setup.getDriver().getCurrentUrl() + "WebHome");
     }
 
+    /**
+     * Replace the CSRF token sent by the edit form with an invalid value, so that the server rejects the next request.
+     */
+    private void tamperCSRFToken(TestUtils setup)
+    {
+        setup.getDriver().executeJavascript(
+            "document.querySelectorAll('input[name=form_token]').forEach(input => input.value = 'invalid');");
+    }
+
     @Test
     @Order(7)
     void allowForceSaveWhenCSRFIssue(TestUtils setup, TestReference testReference)
     {
         try {
-            DocumentReference invalidateCSRF = new DocumentReference("InvalidateCSRF",
-                testReference.getLastSpaceReference());
-            String invalidateCSRFContent = "{{velocity}}$services.csrf.clearToken(){{/velocity}}";
-            setup.createPage(invalidateCSRF, invalidateCSRFContent, "InvalidateCSRF");
             setup.createPage(testReference, "", testReference.getLastSpaceReference().getName());
 
             WikiEditPage editWiki = setup.gotoPage(testReference).editWiki();
 
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
 
             editWiki.setContent("Some content 42");
             editWiki.clickSaveAndContinue(false);
@@ -353,26 +371,21 @@ class WikiEditIT
             editWiki = setup.gotoPage(testReference).editWiki();
             assertEquals("Another content 42", editWiki.getContent());
 
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
 
             editWiki.setContent("Foo bar");
 
             // check with save and view
             editWiki.clickSaveAndView(false);
             assertTrue(editWiki.isCSRFWarningDisplayed());
-            editWiki.clickForceSaveCSRFButton();
-
-            // Ensure the page is properly loaded after a save and view
-            ViewPage viewPage = new ViewPage();
+            ViewPage viewPage = editWiki.clickForceSaveAndViewCSRFButton();
             assertEquals("Foo bar", viewPage.getContent());
 
             // check with preview
             editWiki = setup.gotoPage(testReference).editWiki();
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
             editWiki.setContent("Preview test & cancel");
             editWiki.getPreviewButton().click();
             ResubmissionPage resubmissionPage = new ResubmissionPage();
@@ -386,9 +399,8 @@ class WikiEditIT
             assertEquals("Foo bar", viewPage.getContent());
 
             editWiki = setup.gotoPage(testReference).editWiki();
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
             editWiki.setContent("Preview test & back to editor");
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
@@ -406,9 +418,8 @@ class WikiEditIT
             assertEquals("Foo bar 2", viewPage.getContent());
 
             editWiki = setup.gotoPage(testReference).editWiki();
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
             editWiki.setContent("Preview test & save&continue");
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
@@ -427,9 +438,8 @@ class WikiEditIT
             assertEquals("Preview test & save&continue", viewPage.getContent());
 
             editWiki = setup.gotoPage(testReference).editWiki();
-            // we clear the token and navigate back to the editor
-            setup.gotoPage(invalidateCSRF);
-            setup.getDriver().navigate().back();
+            // we invalidate the token sent by the editor
+            tamperCSRFToken(setup);
             editWiki.setContent("Preview test & save&view");
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
@@ -875,8 +885,7 @@ class WikiEditIT
 
     @Test
     @Order(11)
-    void editTitle768Characters(TestUtils setup, TestConfiguration testConfiguration,
-        TestReference testReference, LogCaptureConfiguration logCaptureConfiguration)
+    void editTitle768Characters(TestUtils setup, TestReference testReference)
     {
         setup.deletePage(testReference);
 
@@ -891,66 +900,23 @@ class WikiEditIT
             + "Hodor hodor; hodor hodor - hodor, hodor, hodor hodor. Hodor, hodor. Hodor. Hodor, hodor hodor hodor "
             + "hodor hodor hodor hodor hodor Hodor hodor!";
 
-        // Right now error messages from the server are different if we are using Save&View or Save&Continue.
-        // This needs to be fixed as part of XWIKI-16425.
-        String saveErrorMessage = "Failed to save the page. Reason: An error occurred while saving: Error number"
-            + " 3201 in 3: Exception while saving document " + setup.serializeReference(testReference) + ".";
+        // The title input is limited to the size of the database column storing the title (768 characters), so
+        // that users can't enter a title that would fail to be saved.
+        String truncatedTitle = veryLongTitle.substring(0, 768);
 
-        // try with save and continue
+        // Try with save and continue.
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
         wikiEditPage.setTitle(veryLongTitle);
-        wikiEditPage.clickSaveAndContinue(false);
-        //wikiEditPage.waitForNotificationErrorMessage(saveContinueErrorMessage);
-        waitForSaveError(setup, saveErrorMessage);
-        wikiEditPage.setTitle("Lorem Ipsum");
+        assertEquals(truncatedTitle, wikiEditPage.getTitle());
         wikiEditPage.clickSaveAndContinue();
 
-        // try with save and view
-        wikiEditPage.setTitle(veryLongTitle);
-        wikiEditPage.clickSaveAndView(false);
-        //wikiEditPage.waitForNotificationErrorMessage(saveViewErrorMessage);
-        waitForSaveError(setup, saveErrorMessage);
-        wikiEditPage.setTitle("Lorem Ipsum version 2");
+        // Try with save and view.
+        String otherVeryLongTitle = "Lorem Ipsum " + veryLongTitle;
+        String otherTruncatedTitle = otherVeryLongTitle.substring(0, 768);
+        wikiEditPage.setTitle(otherVeryLongTitle);
+        assertEquals(otherTruncatedTitle, wikiEditPage.getTitle());
         ViewPage viewPage = wikiEditPage.clickSaveAndView();
-        assertEquals("Lorem Ipsum version 2", viewPage.getDocumentTitle());
-
-        // Logs generated because of the >768 characters title error.
-        logCaptureConfiguration.registerExpected(
-            "JDBCExceptionReporter",
-            "Error number 3201 in 3",
-            "org.hibernate.HibernateException",
-            "org.hibernate.exception.DataException",
-            "java.sql.BatchUpdateException: data exception: string data, right truncation",
-            "SQL Error: 1406, SQLState: 22001",
-            "Data truncation: Data too long for column 'XWD_TITLE' at row 1",
-            "SQL Error: 3401, SQLState: 22001",
-            "SQL Error: -3401, SQLState: 22001",
-            "SQL Error: 0, SQLState: 22001",
-            "data exception: string data, right truncation",
-            "SQL Error: 12899, SQLState: 72000",
-            "ORA-12899: value too large for column \"XWIKI\".\"XWIKIDOC\".\"XWD_TITLE\" (actual: 800, maximum: 768)",
-            // PostgreSQL specific log
-            "value too long for type character varying(768)"
-        );
-    }
-
-    // FIXME: remove when https://jira.xwiki.org/browse/XWIKI-18513 is fixed
-    private void waitForSaveError(TestUtils setup, String mainError)
-    {
-        String fallbackError = "Failed to save the page. Reason: Server not responding";
-
-        By notificationMessageLocator =
-            By.xpath(String.format("//div[contains(@class,'xnotification-error') and "
-                + "(contains(., '%s') or contains(., '%s'))]", mainError, fallbackError));
-        setup.getDriver().waitUntilElementIsVisible(notificationMessageLocator);
-        // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
-        // this method always waits for the last notification message of the specified level.
-        try {
-            setup.getDriver().findElementWithoutWaiting(notificationMessageLocator).click();
-        } catch (WebDriverException e) {
-            // The notification message may disappear before we get to click on it and thus we ignore in case there's
-            // an error.
-        }
+        assertEquals(otherTruncatedTitle, viewPage.getDocumentTitle());
     }
 
     @Test
@@ -1173,5 +1139,22 @@ class WikiEditIT
         } finally {
             setup.setWikiPreference("xwiki.title.mandatory", "0");
         }
+    }
+
+    /**
+     * Verify that the edit form can save a large content: servlet containers limit the size of the form data they
+     * accept (200 KB by default for Jetty), so XWiki must raise that limit.
+     */
+    @Test
+    @Order(16)
+    void saveLargeContent(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+
+        String content = secure().nextAlphanumeric(300000);
+        assertEquals(200, setup.submitForm(testReference, "save", Map.of("content", content)));
+
+        Page page = setup.rest().get(testReference);
+        assertEquals(content, page.getContent());
     }
 }

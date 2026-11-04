@@ -132,7 +132,10 @@ public abstract class AbstractCachedCompiler<T>
                 }
             }
 
-            // Either the result was in the cache or the force flag is set to true, we need to compile
+            // Either the result was in the cache or the force flag is set to true, we need to compile.
+            // Read the cache version before reading the content to compile, so that the result is not cached when the
+            // content changes during the compilation.
+            long cacheVersion = cache.getVersion();
             try {
                 result = compiler.compute(lessResourceReference, includeSkinStyle, useVelocity, true, skin);
             } catch (LESSCompilerException e) {
@@ -141,8 +144,8 @@ public abstract class AbstractCachedCompiler<T>
                 // again (the compilation will still fail until the LESS resource is updated so it useless to retry).
                 result = exceptionAsResult(e);
             } finally {
-                // Put the result in the cache
-                cache.set(lessResourceReference, skinReference, colorThemeReference, result);
+                // Put the result in the cache, unless the cache was cleared during the compilation
+                cache.set(lessResourceReference, skinReference, colorThemeReference, result, cacheVersion);
             }
         }
 

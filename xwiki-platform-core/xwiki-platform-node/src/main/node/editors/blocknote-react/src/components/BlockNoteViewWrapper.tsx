@@ -19,7 +19,9 @@
  */
 
 import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
+import { centerOnFirstLine } from "./SideMenu/centerOnFirstLine";
 import { FilePanel } from "./files/FilePanel";
+import { ImageSuggestionController } from "./images/ImageSuggestionController";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import {
   createBlockNoteSchema,
@@ -28,20 +30,27 @@ import {
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
-import { DepsContainerContext, MacrosContext } from "../contexts";
+import {
+  DepsContainerContext,
+  EditedDocumentContext,
+  MacrosContext,
+} from "../contexts";
+import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
+import "./BlockNoteViewWrapper.css";
 import {
   FilePanelController,
   FormattingToolbar,
   FormattingToolbarController,
   LinkToolbarController,
+  SideMenuController,
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
-import { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
+import { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type {
@@ -58,16 +67,15 @@ import type {
   ContextForMacros,
 } from "../blocknote/utils";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
+import type { ImageEditionHooks } from "./images/imageEditionHooks";
+import type { ImageInsertionOverrideFn } from "./images/imageInsertionOverride";
 import type { LinkEditionHandler } from "./links/linkEdition";
 import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type {
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { Container } from "inversify";
 
@@ -119,6 +127,14 @@ type BlockNoteViewWrapperProps = {
    * @since 18.3.0RC1
    */
   label: string;
+
+  /**
+   * The serialized reference of the edited document, e.g. to upload files to. The current document (as provided by the
+   * `DocumentService`) is edited when not specified.
+   *
+   * @since 18.10.0RC1
+   */
+  documentReference?: string;
 
   /**
    * The editor's initial content
@@ -192,6 +208,20 @@ type BlockNoteViewWrapperProps = {
     imageEdition?: ImageEditionOverrideFn;
 
     /**
+     * Hooks to intercept the image insertion / edition flow.
+     *
+     * @since 18.10.0RC1
+     */
+    imageEditionHooks?: ImageEditionHooks;
+
+    /**
+     * Intercept the image insertion mechanism (i.e. browsing the images to insert, from the image quick action)
+     *
+     * @since 18.10.0RC1
+     */
+    imageInsertion?: ImageInsertionOverrideFn;
+
+    /**
      * Hooks to intercept the link creation / edition flow.
      *
      * @since 18.7.0RC1
@@ -210,11 +240,30 @@ type BlockNoteViewWrapperProps = {
   syntax: SyntaxConfig;
 
   /**
+   * The CSS classes (space separated) to add to the code blocks, e.g. to style them like the code snippets displayed in
+   * view mode.
+   *
+   * @since 18.9.0RC1
+   * @beta
+   */
+  codeBlockClassName?: string;
+
+  /**
    * Make the wrapper forward some data through references
    */
   refs?: {
     setEditor?: (editor: EditorType) => void;
   };
+};
+
+/**
+ * Replaces the middleware BlockNote uses to center the side menu vertically on the hovered block, which offsets the
+ * menu by a fixed amount per block type that only matches BlockNote's own styling.
+ */
+const SIDE_MENU_FLOATING_OPTIONS = {
+  useFloatingOptions: {
+    middleware: [centerOnFirstLine()],
+  },
 };
 
 /**
@@ -225,6 +274,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   blockNoteOptions,
   name = "content",
   theme,
+  documentReference,
   content,
   macros,
   collaboration,
@@ -235,6 +285,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   overrides,
   label,
   syntax,
+  codeBlockClassName,
   refs: { setEditor } = {},
   // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
@@ -243,11 +294,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
   if (macros) {
-    const macroAstToReactJsxConverter = new MacrosAstToReactJsxConverter(
-      depsContainer
-        .get<RemoteURLParserProvider>("RemoteURLParserProvider")
-        .get()!,
-
+    const uniAstToReactJsxConverter = new UniAstToReactJsxConverter(
       depsContainer
         .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
         .get()!,
@@ -255,12 +302,12 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
     for (const macro of macros.list ?? []) {
       builtMacros.push(
-        adaptMacroForBlockNote(macro, macros.ctx, macroAstToReactJsxConverter),
+        adaptMacroForBlockNote(macro, macros.ctx, uniAstToReactJsxConverter),
       );
     }
   }
 
-  const schema = createBlockNoteSchema(builtMacros);
+  const schema = createBlockNoteSchema(builtMacros, { codeBlockClassName });
 
   // When realtime collaboration is enabled, the initial content is set through the shared document. Moreover, BlockNote
   // doesn't support empty content, as in an empty array of blocks, so instead of passing an empty array we don't pass
@@ -289,6 +336,8 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     initialContent,
     // Editor's schema, with custom blocks definition
     schema,
+    // Highlight the code blocks based on their language.
+    extensions: [...(blockNoteOptions?.extensions ?? []), syntaxHighlighter],
     // Use the provided language for the dictionary
     dictionary: createDictionary(lang),
     // The default drop cursor only shows up above and below blocks - we replace
@@ -344,72 +393,89 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // Renders the editor instance using a React component.
   return (
     <DepsContainerContext.Provider value={depsContainer}>
-      <MacrosContext.Provider value={macros ? macros.ctx : null}>
-        <BlockNoteView
-          editor={editor}
-          theme={theme}
-          // Override some builtin components
-          formattingToolbar={false}
-          linkToolbar={false}
-          filePanel={false}
-          slashMenu={false}
-          onChange={(editor) => onChange?.(editor)}
-        >
-          <SuggestionMenuController
-            triggerCharacter={"/"}
-            getItems={async (query) =>
-              querySuggestionsMenuItems({
-                editor,
-                query,
-                macros: builtMacros,
-                syntax,
-                lang,
-                t,
-                linkEditionHandler,
-                openMacroInsertionEditor: macros
-                  ? macros.ctx.openInsertionEditor
-                  : undefined,
-              })
-            }
-          />
+      <EditedDocumentContext.Provider value={documentReference}>
+        <MacrosContext.Provider value={macros ? macros.ctx : null}>
+          <BlockNoteView
+            editor={editor}
+            theme={theme}
+            // Override some builtin components
+            formattingToolbar={false}
+            linkToolbar={false}
+            filePanel={false}
+            slashMenu={false}
+            sideMenu={false}
+            onChange={(editor) => onChange?.(editor)}
+          >
+            {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
+            <SideMenuController
+              floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS}
+            />
 
-          {/* TODO: suggestions menu for inline macros */}
+            <SuggestionMenuController
+              triggerCharacter={"/"}
+              getItems={async (query) =>
+                querySuggestionsMenuItems({
+                  editor,
+                  query,
+                  macros: builtMacros,
+                  syntax,
+                  lang,
+                  t,
+                  linkEditionHandler,
+                  openMacroInsertionEditor: macros
+                    ? macros.ctx.openInsertionEditor
+                    : undefined,
+                })
+              }
+            />
 
-          <FormattingToolbarController
-            formattingToolbar={(props) => (
-              <CustomFormattingToolbar
-                formattingToolbarProps={props}
-                imageEditionOverrideFn={overrides?.imageEdition}
-                linkEditionHandler={linkEditionHandler}
-                linkEditionHooks={overrides?.linkEdition}
-                additionalBlockTypes={filterMap(
-                  builtMacros,
-                  (built) => built.dropdownTransformItem,
-                )}
-                macros={macros}
+            {syntax.features.blocks.images.basicImages && (
+              <ImageSuggestionController
+                maxSuggestions={5}
+                imageEditionHooks={overrides?.imageEditionHooks}
+                imageInsertionOverrideFn={overrides?.imageInsertion}
               />
             )}
-          />
 
-          <LinkToolbarController
-            linkToolbar={(props) => (
-              <FormattingToolbar>
-                <CustomLinkToolbar
-                  linkToolbarProps={props}
+            {/* TODO: suggestions menu for inline macros */}
+
+            <FormattingToolbarController
+              formattingToolbar={(props) => (
+                <CustomFormattingToolbar
+                  formattingToolbarProps={props}
+                  imageEditionOverrideFn={overrides?.imageEdition}
+                  imageEditionHooks={overrides?.imageEditionHooks}
                   linkEditionHandler={linkEditionHandler}
                   linkEditionHooks={overrides?.linkEdition}
+                  additionalBlockTypes={filterMap(
+                    builtMacros,
+                    (built) => built.dropdownTransformItem,
+                  )}
+                  macros={macros}
                 />
-              </FormattingToolbar>
-            )}
-          />
+              )}
+            />
 
-          <FilePanelController
-            filePanel={({ blockId }) => (
-              <FilePanel blockId={blockId} editor={editor} />
-            )}
-          />
-        </BlockNoteView>
-      </MacrosContext.Provider>
+            <LinkToolbarController
+              linkToolbar={(props) => (
+                <FormattingToolbar>
+                  <CustomLinkToolbar
+                    linkToolbarProps={props}
+                    linkEditionHandler={linkEditionHandler}
+                    linkEditionHooks={overrides?.linkEdition}
+                  />
+                </FormattingToolbar>
+              )}
+            />
+
+            <FilePanelController
+              filePanel={({ blockId }) => (
+                <FilePanel blockId={blockId} editor={editor} />
+              )}
+            />
+          </BlockNoteView>
+        </MacrosContext.Provider>
+      </EditedDocumentContext.Provider>
     </DepsContainerContext.Provider>
   );
 };

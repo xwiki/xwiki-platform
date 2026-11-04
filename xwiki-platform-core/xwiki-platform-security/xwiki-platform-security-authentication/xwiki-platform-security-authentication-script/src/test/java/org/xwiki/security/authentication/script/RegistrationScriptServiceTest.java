@@ -21,8 +21,13 @@ package org.xwiki.security.authentication.script;
 
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.security.authentication.RegistrationConfiguration;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -45,6 +50,20 @@ class RegistrationScriptServiceTest
 
     @MockComponent
     private RegistrationConfiguration registrationConfiguration;
+
+    @MockComponent
+    private ContextualAuthorizationManager authorization;
+
+    @MockComponent
+    private Execution execution;
+
+    private final ExecutionContext executionContext = new ExecutionContext();
+
+    @BeforeEach
+    void setUp()
+    {
+        when(this.execution.getContext()).thenReturn(this.executionContext);
+    }
 
     @Test
     void getPasswordMinimumLength()
@@ -93,5 +112,41 @@ class RegistrationScriptServiceTest
         when(registrationConfiguration.isLoginEnabled()).thenReturn(true);
         assertTrue(scriptService.isLoginEnabled());
         verify(registrationConfiguration).isLoginEnabled();
+    }
+
+    @Test
+    void claimInvitedRegistrationOnceWhenAllowedWithProgrammingRight()
+    {
+        when(this.authorization.hasAccess(Right.PROGRAM)).thenReturn(true);
+
+        assertTrue(this.scriptService.allowInvitedRegistration());
+
+        assertTrue(this.scriptService.claimInvitedRegistration());
+        // The permission applies to a single display of the registration page.
+        assertFalse(this.scriptService.claimInvitedRegistration());
+    }
+
+    @Test
+    void allowInvitedRegistrationWithoutProgrammingRight()
+    {
+        assertFalse(this.scriptService.allowInvitedRegistration());
+
+        assertFalse(this.scriptService.claimInvitedRegistration());
+    }
+
+    @Test
+    void claimInvitedRegistrationWhenNotAllowed()
+    {
+        assertFalse(this.scriptService.claimInvitedRegistration());
+    }
+
+    @Test
+    void invitedRegistrationWithoutExecutionContext()
+    {
+        when(this.execution.getContext()).thenReturn(null);
+        when(this.authorization.hasAccess(Right.PROGRAM)).thenReturn(true);
+
+        assertFalse(this.scriptService.allowInvitedRegistration());
+        assertFalse(this.scriptService.claimInvitedRegistration());
     }
 }

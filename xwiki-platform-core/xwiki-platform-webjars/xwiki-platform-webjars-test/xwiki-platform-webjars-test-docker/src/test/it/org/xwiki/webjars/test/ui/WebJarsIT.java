@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -76,8 +77,11 @@ class WebJarsIT
     }
 
     @Test
-    void pathTraversal(TestUtils setup) throws Exception
+    void pathTraversal(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
+        // The resource requested outside of the WebJars is refused and the refusal is logged.
+        logCaptureConfiguration.registerExpected("Failed to serve the resource [../../../../../WEB-INF/xwiki.cfg]");
+
         URI uri = new URI(Strings.CS.removeEnd(setup.rest().getBaseURL(), "rest")
             + "webjars/wiki%3Axwiki/..%2F..%2F..%2F..%2F..%2FWEB-INF%2Fxwiki.cfg");
 

@@ -84,6 +84,7 @@ private void buildDocker(buildType)
   def dockerConfigurationList
   def dockerModuleList
   def customJobProperties
+  def upgradeModulePaths = []
   node() {
     // Checkout platform to find all docker configurations and test modules so that we can then parallelize executions
     // of configs and modules across Jenkins agents.
@@ -95,16 +96,40 @@ private void buildDocker(buildType)
       dockerModuleList = dockerModules()
     }
     customJobProperties = getCustomJobProperties()
+    // Discover the flavor upgrade sub-modules while we have a checkout (only needed for the daily 'docker-latest' run).
+    if (buildType == 'docker-latest') {
+      upgradeModulePaths = findFiles(glob:
+        "${getFlavorTestPrefix()}/xwiki-platform-distribution-flavor-test-upgrade/xwiki-platform-distribution-flavor-test-upgrade-*/pom.xml"
+      ).collect { it.path }
+    }
   }
 
-  xwikiDockerBuild {
-    configurations = dockerConfigurationList
-    modules = dockerModuleList
-    // Set the next execution date/time
-    jobProperties = customJobProperties
-    label = 'environment'
-    type = buildType
-  }
+  parallel(
+    'docker': {
+      xwikiDockerBuild {
+        configurations = dockerConfigurationList
+        modules = dockerModuleList
+        // Set the next execution date/time
+        jobProperties = customJobProperties
+        label = 'environment'
+        type = buildType
+      }
+    },
+    // The flavor upgrade tests are config-independent and heavy, so they run here as part of the daily environment
+    // tests rather than in the per-commit standard build. They are split into two parallel groups (~6 versions each,
+    // ~45 min per group), which is enough since the environment build is already compute-constrained by the docker
+    // matrix (see xwikiFlavorUpgradeBuild).
+    'flavor-upgrade': {
+      if (buildType == 'docker-latest' && upgradeModulePaths) {
+        xwikiFlavorUpgradeBuild {
+          modules = upgradeModulePaths
+          batches = 2
+          // Pass the same job properties as the docker build so a racing properties() call can't wipe the cron.
+          jobProperties = customJobProperties
+        }
+      }
+    }
+  )
 }
 
 private def getCustomJobProperties()

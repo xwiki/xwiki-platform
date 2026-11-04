@@ -11,6 +11,7 @@ import { Ref } from 'vue';
 export interface ActionDescriptor {
     allowProperty?: string;
     id: string;
+    location?: string;
 }
 
 // @beta
@@ -50,8 +51,10 @@ export interface LayoutDescriptor {
 
 // @beta
 export interface LiveDataSource {
-    addEntry(source: Source, values: unknown): Promise<void>;
+    addEntry(source: Source, values: unknown): Promise<Values | undefined>;
     getEntries(query: Query): Promise<Data>;
+    getEntry(source: Source, entryId: string, properties: string[]): Promise<Values | undefined>;
+    removeEntry(source: Source, entryId: string): Promise<void>;
     updateEntry(source: Source, entryId: string, values: unknown): Promise<void>;
     updateEntryProperty(source: Source, entryId: string, propertyId: string, value: unknown): Promise<void>;
 }
@@ -63,6 +66,7 @@ export interface Logic {
     changeLayout(layoutId: string): void;
     currentLayoutId?: Ref<string>;
     data?: Reactive<LogicData>;
+    deleteEntry(entry: Values): Promise<void>;
     filter(property: string, index: number, filterEntry: {
         index: number;
     }, input: {
@@ -70,8 +74,11 @@ export interface Logic {
         skipFetch?: boolean;
     }): Promise<void>;
     getEntryId(entry: Values): string | undefined;
+    getEntryKey(entry: Values): string;
+    getEntryKeys(entries: Values[]): string[];
     getPageCount(): number;
     isContentTrusted(): boolean;
+    isMaximized(): boolean;
     onEvent(event: string, callback: (e: Event) => void): void;
     onEventWhere(eventName: string, condition: object | ((p: unknown) => boolean), callback: (e: Event) => void): void;
     registerPanel(panel: Panel): void;
@@ -84,6 +91,7 @@ export interface Logic {
         values: unknown;
     }): Promise<unknown>;
     sort(property: string, level: number, descending?: boolean): Promise<void>;
+    toggleMaximized(): void;
     translationsLoaded(): Promise<boolean>;
     triggerEvent(eventName: string, eventData?: object): void;
     updateEntries(): Promise<void>;
@@ -137,6 +145,7 @@ interface PropertyDescriptor_2 {
     filter: Filter;
     filterable?: boolean;
     id: string;
+    mandatory?: boolean;
     sortable?: boolean;
     type: string;
     visible?: boolean;

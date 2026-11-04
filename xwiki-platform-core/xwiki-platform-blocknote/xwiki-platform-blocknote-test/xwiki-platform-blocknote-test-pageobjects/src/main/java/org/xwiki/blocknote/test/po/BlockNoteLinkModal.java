@@ -19,8 +19,11 @@
  */
 package org.xwiki.blocknote.test.po;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -244,19 +247,45 @@ public class BlockNoteLinkModal extends BaseElement
         // the search can return no results even though the Solr indexing queue was observed empty right before
         // typing the query. Retry the search (by retyping the query, which is required to trigger a new one) for up
         // to 30 seconds instead of just waiting longer for the initial search to eventually return the suggestion,
-        // since the widget doesn't retry searches on its own.
+        // since the widget doesn't retry searches on its own. Retyping the query is also how we recover when the
+        // suggestion is lost while we're trying to click it (see #selectSuggestion(By)).
         long deadline = System.currentTimeMillis() + 30000;
         while (true) {
             setSuggestBoxQuery(dataTest, query);
             try {
                 getDriver().waitUntilElementIsVisible(suggestionLocator, 5);
-                break;
-            } catch (TimeoutException e) {
+                selectSuggestion(suggestionLocator);
+                return;
+            } catch (TimeoutException | StaleElementReferenceException e) {
                 if (System.currentTimeMillis() >= deadline) {
                     throw e;
                 }
             }
         }
-        getDriver().findElement(suggestionLocator).click();
+    }
+
+    /**
+     * Clicks the suggestion matching the given locator, once the suggestion list has stopped changing.
+     *
+     * @param suggestionLocator the locator of the suggestion to select
+     */
+    private void selectSuggestion(By suggestionLocator)
+    {
+        // The search box starts a new search for each character typed in the query input and renders the results of
+        // each of them as they come back, so the suggestion list can still be re-rendered after the expected
+        // suggestion showed up. Clicking during such a re-render either loses the suggestion (stale element
+        // reference) or sends the click where the suggestion no longer is, which is outside the link modal and thus
+        // closes it. Wait for the suggestion element to be the same across two consecutive checks before clicking it.
+        AtomicReference<WebElement> previousSuggestion = new AtomicReference<>();
+        WebElement suggestion = getDriver().waitUntilCondition(driver -> {
+            WebElement currentSuggestion =
+                driver.findElements(suggestionLocator).stream().findFirst().orElse(null);
+            WebElement stableSuggestion =
+                currentSuggestion != null && currentSuggestion.equals(previousSuggestion.get())
+                    ? currentSuggestion : null;
+            previousSuggestion.set(currentSuggestion);
+            return stableSuggestion;
+        });
+        suggestion.click();
     }
 }

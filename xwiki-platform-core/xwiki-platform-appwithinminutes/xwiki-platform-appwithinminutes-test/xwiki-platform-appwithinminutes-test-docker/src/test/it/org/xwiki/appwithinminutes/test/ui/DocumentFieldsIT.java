@@ -83,8 +83,9 @@ class DocumentFieldsIT
         appCreatePage.setApplicationName(this.appName);
         ApplicationClassEditPage classEditPage = appCreatePage.clickNextStep();
 
-        // Add a standard field.
+        // Add standard fields.
         ClassFieldEditPane numberField = classEditPage.addField("Number");
+        classEditPage.addField("Short Text");
 
         // Add the Title and Content fields.
         ClassFieldEditPane titleField = classEditPage.addField("Title");
@@ -113,6 +114,7 @@ class DocumentFieldsIT
         entryNamePane.setName("Test");
         EntryEditPage entryEditPage = entryNamePane.clickAdd();
         assertEquals("13", entryEditPage.getValue("number1"));
+        entryEditPage.setValue("shortText1", "Alpha");
         // The page name is used as the default value for the title field.
         assertEquals("Test", entryEditPage.getDocumentTitle());
         assertEquals("Test", entryEditPage.getTitle());
@@ -126,11 +128,28 @@ class DocumentFieldsIT
         assertTrue(entryViewPage.getContent().contains("Bar"));
 
         // Verify that we can edit the document fields in-place.
-        String propertyReference = String.format("%s.Code.%1$sClass[0].title1", this.appName);
-        EditablePropertyPane<String> titleProperty = new EditablePropertyPane<>(propertyReference);
+        String objectReference = String.format("%s.Code.%1$sClass[0]", this.appName);
+        EditablePropertyPane<String> titleProperty = new EditablePropertyPane<>(objectReference + ".title1");
         assertEquals("Foo", titleProperty.clickEdit().getValue());
         titleProperty.setValue("Book").clickSave();
         assertEquals("Book", titleProperty.getDisplayValue());
+
+        // Verify that we can edit the standard fields in-place too.
+        EditablePropertyPane<String> numberProperty = new EditablePropertyPane<>(objectReference + ".number1");
+        assertEquals("13", numberProperty.clickEdit().getValue());
+        numberProperty.setValue("42").clickSave();
+        assertEquals("42", numberProperty.getDisplayValue());
+        EditablePropertyPane<String> shortTextProperty = new EditablePropertyPane<>(objectReference + ".shortText1");
+        assertEquals("Alpha", shortTextProperty.clickEdit().getValue());
+        shortTextProperty.setValue("Beta").clickSave();
+        assertEquals("Beta", shortTextProperty.getDisplayValue());
+
+        // Verify that the in-place changes have been saved.
+        entryViewPage.reloadPage();
+        entryViewPage = new ViewPage();
+        assertEquals("Book", new EditablePropertyPane<String>(objectReference + ".title1").getDisplayValue());
+        assertEquals("42", new EditablePropertyPane<String>(objectReference + ".number1").getDisplayValue());
+        assertEquals("Beta", new EditablePropertyPane<String>(objectReference + ".shortText1").getDisplayValue());
 
         // Check the entries live table.
         entryViewPage.clickBreadcrumbLink(this.appName);

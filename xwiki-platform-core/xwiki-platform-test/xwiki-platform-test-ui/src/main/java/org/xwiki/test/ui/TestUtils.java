@@ -30,7 +30,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,20 +67,27 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.opentest4j.AssertionFailedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,28 +147,6 @@ public class TestUtils
     public static final XWikiCredentials SUPER_ADMIN_CREDENTIALS = new XWikiCredentials("superadmin", "pass");
 
     /**
-     * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
-     */
-    @Deprecated
-    public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT
-        + XWikiExecutor.DEFAULT_CONTEXT + "/";
-
-    /**
-     * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseBinURL()} instead
-     */
-    @Deprecated
-    public static final String BASE_BIN_URL = BASE_URL + "bin/";
-
-    /**
-     * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
-     */
-    @Deprecated
-    public static final String BASE_REST_URL = BASE_URL + "rest/";
-
-    /**
      * @since 7.3M1
      */
     public static final int[] STATUS_OK_NOT_FOUND =
@@ -202,6 +189,11 @@ public class TestUtils
     private static final String MAIN_WIKI_NAME = "xwiki";
 
     private static final String USER_CLASS_NAME = "XWiki.XWikiUsers";
+
+    private static final String GROUP_CLASS_NAME = "XWiki.XWikiGroups";
+
+    private static final LocalDocumentReference ALL_GROUP_REFERENCE =
+        new LocalDocumentReference("XWiki", "XWikiAllGroup");
 
     private static final String SERVER_CLASS_NAME = "XWiki.XWikiServerClass";
 
@@ -258,6 +250,14 @@ public class TestUtils
     private String currentWiki = "xwiki";
 
     private RestTestUtils rest;
+
+    /**
+     * The credentials of a user that has full rights on the wiki under test, used for the REST calls that the test
+     * framework performs on behalf of the tests. Defaults to the superadmin, but not every wiki under test has one:
+     * the distribution enables it only when {@code xwiki.superadminpassword} is set in {@code xwiki.cfg}, which the
+     * shipped configuration doesn't do.
+     */
+    private XWikiCredentials privilegedCredentials = SUPER_ADMIN_CREDENTIALS;
 
     /**
      * The host/port the main wiki descriptor currently points to, to avoid updating it when it's already the expected
@@ -319,6 +319,33 @@ public class TestUtils
     public XWikiWebDriver getDriver()
     {
         return TestUtils.context.getDriver();
+    }
+
+    /**
+     * Resizes the browser window to the specified width, e.g. to display the page as on a small screen, and waits for
+     * the page to be laid out at that width. Call {@link #maximizeBrowserWindow()} afterwards, since the browser is
+     * shared by the tests.
+     *
+     * @param width the width of the browser window, in pixels, which is a bit larger than the width available to the
+     *            page
+     * @since 18.10.0RC1
+     */
+    public void setBrowserWindowWidth(int width)
+    {
+        XWikiWebDriver driver = getDriver();
+        int height = driver.manage().window().getSize().getHeight();
+        driver.manage().window().setSize(new Dimension(width, height));
+        driver.waitUntilCondition(d -> ((Number) driver.executeScript("return window.innerWidth")).intValue() <= width);
+    }
+
+    /**
+     * Restores the size of the browser window after a call to {@link #setBrowserWindowWidth(int)}.
+     *
+     * @since 18.10.0RC1
+     */
+    public void maximizeBrowserWindow()
+    {
+        getDriver().manage().window().maximize();
     }
 
     /**
@@ -389,6 +416,28 @@ public class TestUtils
     public XWikiCredentials getDefaultCredentials()
     {
         return this.httpClient.getDefaultCredentials();
+    }
+
+    /**
+     * @return the credentials of a user that has full rights on the wiki under test
+     * @since 18.8.0RC1
+     */
+    public XWikiCredentials getPrivilegedCredentials()
+    {
+        return this.privilegedCredentials;
+    }
+
+    /**
+     * Declare which user the test framework has to authenticate as for the REST calls it performs on behalf of the
+     * tests when they need full rights on the wiki, typically to save a page whose content is executed as a script.
+     * The superadmin is used by default, so this only needs to be called for a wiki that doesn't have one.
+     *
+     * @param privilegedCredentials the credentials of a user that has full rights on the wiki under test
+     * @since 18.8.0RC1
+     */
+    public void setPrivilegedCredentials(XWikiCredentials privilegedCredentials)
+    {
+        this.privilegedCredentials = privilegedCredentials;
     }
 
     public void loginAsSuperAdmin()
@@ -1499,7 +1548,8 @@ public class TestUtils
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        rest().savePageAs(SUPER_ADMIN_CREDENTIALS, reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
+        rest().savePageAs(getPrivilegedCredentials(), reference, wikiContent, wikiSyntax.toIdString(), null, null,
+            false);
 
         // Execute the content and return the result
         return executeAndGetBodyAsString(reference, queryParameters);
@@ -2463,7 +2513,7 @@ public class TestUtils
 
         // Note: the test may have logged in as another user, and thus have changed the credentials used for REST
         // calls.
-        XWikiCredentials previousCredentials = setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
+        XWikiCredentials previousCredentials = setDefaultCredentials(getPrivilegedCredentials());
         try {
             org.xwiki.rest.model.jaxb.Object descriptorObject = rest().object(MAIN_WIKI_DESCRIPTOR, SERVER_CLASS_NAME);
             descriptorObject.withProperties(RestTestUtils.property("server", host),
@@ -2575,6 +2625,25 @@ public class TestUtils
     }
 
     /**
+     * Same as {@link #getString(String, Map)} but waits for the response at most the given time instead of the default
+     * socket timeout of the HTTP client (3 minutes), for requests that take long to be processed on the server.
+     *
+     * @param path the path to request, relative to the base URL of the HTTP client
+     * @param queryParams additional query parameters added to the computed URL
+     * @param timeout how long to wait for the response
+     * @return the content of the computed URL
+     * @throws Exception in case of error when executing the request
+     * @since 18.8.0
+     */
+    public String getString(String path, Map<String, ?> queryParams, Duration timeout) throws Exception
+    {
+        String url = getURL(getCurrentExecutor().getHttpClientBaseURL(), path, queryParams);
+        try (InputStream inputStream = executeGet(url, timeout, Status.OK.getStatusCode()).getEntity().getContent()) {
+            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
      * Extended version to work in a docker context.
      *
      * @param baseURL the base url
@@ -2592,6 +2661,13 @@ public class TestUtils
 
     public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
         throws Exception
+    {
+        String url = getURL(prefix, path, queryParams, elements);
+
+        return executeGet(url, Status.OK.getStatusCode()).getEntity().getContent();
+    }
+
+    private String getURL(String prefix, String path, Map<String, ?> queryParams, Object... elements)
     {
         String cleanPrefix = Strings.CS.removeEnd(prefix, "/");
         if (path.startsWith(cleanPrefix)) {
@@ -2611,9 +2687,7 @@ public class TestUtils
             }
         }
 
-        String url = builder.build(elements).toString();
-
-        return executeGet(url, Status.OK.getStatusCode()).getEntity().getContent();
+        return builder.build(elements).toString();
     }
 
     protected CloseableHttpResponse executeGet(String uri) throws Exception
@@ -2632,6 +2706,26 @@ public class TestUtils
     protected CloseableHttpResponse executeGet(String uri, boolean release, int... expectedCodes) throws Exception
     {
         return assertStatusCodes(executeGet(uri), release, expectedCodes);
+    }
+
+    /**
+     * Execute a GET request, waiting for the response at most the given time instead of the default socket timeout of
+     * the HTTP client (3 minutes).
+     *
+     * @param uri the URI to request
+     * @param timeout how long to wait for the response
+     * @param expectedCodes the accepted status codes of the response
+     * @return the response, which the caller is responsible for closing
+     * @throws Exception when failing to execute the request or when the response has an unexpected status code
+     * @since 18.8.0
+     */
+    protected CloseableHttpResponse executeGet(String uri, Duration timeout, int... expectedCodes) throws Exception
+    {
+        HttpGet request = new HttpGet(uri);
+        // The response timeout replaces the socket timeout of the connection for this request.
+        request.setConfig(RequestConfig.custom().setResponseTimeout(Timeout.of(timeout)).build());
+
+        return assertStatusCodes(execute(request), false, expectedCodes);
     }
 
     /**
@@ -2710,6 +2804,31 @@ public class TestUtils
     {
         return this.httpClient.getClient().execute(request,
             this.httpClient.getHttpClientContext(request, getDefaultCredentials()));
+    }
+
+    /**
+     * Submit a form to an action of a document with the HTTP client (so without the browser), using the default
+     * credentials and adding the cached anti-CSRF token to the form fields. Useful for form data too big to be typed
+     * in the browser in a reasonable time or to be passed in the URL of a GET request.
+     *
+     * @param reference the document to submit the form to
+     * @param action the action handling the form (e.g. {@code save})
+     * @param fields the form fields
+     * @return the status code of the response
+     * @throws IOException when failing to execute the request
+     * @since 18.10.0RC1
+     */
+    public int submitForm(EntityReference reference, String action, Map<String, String> fields) throws IOException
+    {
+        List<NameValuePair> parameters = new ArrayList<>();
+        fields.forEach((name, value) -> parameters.add(new BasicNameValuePair(name, value)));
+        parameters.add(new BasicNameValuePair("form_token", getSecretToken()));
+
+        HttpPost request = new HttpPost(getCurrentExecutor().getHttpClientBaseURL() + getPath(reference, action, ""));
+        request.setEntity(new UrlEncodedFormEntity(parameters, StandardCharsets.UTF_8));
+        try (CloseableHttpResponse response = execute(request)) {
+            return response.getCode();
+        }
     }
 
     // REST
@@ -3226,7 +3345,8 @@ public class TestUtils
         /**
          * Create a user, without going through the browser as {@link TestUtils#createUser(String, String, String,
          * Object...)} does. The user is created active, and its password is hashed by the class' password property
-         * when it is set, so that the user can log in with it.
+         * when it is set, so that the user can log in with it. It is added to {@code XWiki.XWikiAllGroup}, like the
+         * registration does, so that it gets the rights that are granted to that group.
          * <p>
          * The user must not exist yet: this adds a new user object, it does not update an existing one.
          *
@@ -3239,8 +3359,34 @@ public class TestUtils
          */
         public void createUser(XWikiCredentials credentials, Object... properties) throws Exception
         {
-            addObject(new LocalDocumentReference("XWiki", credentials.getUserName()), USER_CLASS_NAME,
+            String userName = credentials.getUserName();
+
+            addObject(new LocalDocumentReference("XWiki", userName), USER_CLASS_NAME,
                 ArrayUtils.addAll(new Object[] {"password", credentials.getPassword(), "active", "1"}, properties));
+
+            // The registration adds the new user to XWikiAllGroup, see XWiki#setUserDefaultGroup(). A lot of rights
+            // are usually granted to that group, so a user created here would otherwise be less privileged than a
+            // registered one.
+            addUserToAllGroup(userName);
+        }
+
+        private void addUserToAllGroup(String userName) throws Exception
+        {
+            String member = "XWiki." + userName;
+
+            // Don't add the user twice, like XWiki#addUserToGroup() does: the group document outlives the user
+            // documents, so the membership can still be there when a user of the same name is created again.
+            org.xwiki.rest.model.jaxb.Objects objects = get(ObjectsResource.class, ALL_GROUP_REFERENCE, false);
+            // The headline of an object summary is the value of the first property of the object, which is the
+            // member for XWiki.XWikiGroups as that's the only property of that class.
+            boolean isMember = objects != null
+                && objects.getObjectSummaries().stream()
+                    .anyMatch(object -> GROUP_CLASS_NAME.equals(object.getClassName())
+                        && member.equals(object.getHeadline()));
+
+            if (!isMember) {
+                addObject(ALL_GROUP_REFERENCE, GROUP_CLASS_NAME, "member", member);
+            }
         }
 
         /**
@@ -3332,6 +3478,36 @@ public class TestUtils
         public <T> T get(EntityReference reference) throws Exception
         {
             return get(reference, true);
+        }
+
+        /**
+         * Wait for the version of the given document to differ from the given one, whatever changes it (e.g. a save
+         * made in the background by an editor, a rollback or the deletion of a version). The document is polled over
+         * REST, so this works whichever browser tab (if any) changes it.
+         *
+         * @param reference the reference of the document to watch
+         * @param fromVersion the version the document has before the change
+         * @param timeout how long to wait, in seconds
+         * @return the version of the document after the change
+         * @throws org.openqa.selenium.TimeoutException if the document still has the given version after the timeout
+         * @since 18.9.0RC1
+         */
+        public String waitForVersionChange(EntityReference reference, String fromVersion, int timeout)
+        {
+            return new FluentWait<>(reference).withTimeout(Duration.ofSeconds(timeout))
+                .pollingEvery(Duration.ofMillis(500)).until(documentReference -> {
+                    String currentVersion = getPage(documentReference).getVersion();
+                    return fromVersion.equals(currentVersion) ? null : currentVersion;
+                });
+        }
+
+        private Page getPage(EntityReference documentReference)
+        {
+            try {
+                return get(documentReference);
+            } catch (Exception e) {
+                throw new RuntimeException(String.format("Failed to get the document [%s].", documentReference), e);
+            }
         }
 
         /**

@@ -22,14 +22,17 @@ package com.xpn.xwiki.pdf.impl;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.Right;
@@ -45,11 +48,15 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -167,5 +174,41 @@ class FileSystemURLFactoryTest
 
         assertEquals("User [xwiki:XWiki.Alice] doesn't have access to attachment "
             + "[Attachment xwiki:space.document@test.txt] so it won't be exported", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void createResourceAndSkinURLs(@TempDir File exportDir) throws Exception
+    {
+        // The environment does not return resources located outside of the requested prefix.
+        Environment environment = this.oldcore.getMocker().registerMockComponent(Environment.class);
+        when(environment.getResourceAsStream("/resources/", "js/test.js"))
+            .thenReturn(new ByteArrayInputStream("resource".getBytes(StandardCharsets.UTF_8)));
+        when(environment.getResourceAsStream("/skins/", "flamingo/style.css"))
+            .thenReturn(new ByteArrayInputStream("skin".getBytes(StandardCharsets.UTF_8)));
+
+        XWikiResponse response = mock(XWikiResponse.class);
+        when(response.encodeURL(anyString())).then(invocation -> invocation.getArgument(0));
+        this.oldcore.getXWikiContext().setResponse(response);
+
+        this.oldcore.getXWikiContext().put("pdfexport-file-mapping", new HashMap<>());
+        this.oldcore.getXWikiContext().put("pdfexportdir", exportDir);
+
+        FileSystemURLFactory urlFactory = new FileSystemURLFactory();
+        urlFactory.init(this.oldcore.getXWikiContext());
+
+        URL url = urlFactory.createResourceURL("js/test.js", false, this.oldcore.getXWikiContext());
+        assertEquals("resource", FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8));
+        url = urlFactory.createSkinURL("style.css", "flamingo", this.oldcore.getXWikiContext());
+        assertEquals("skin", FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8));
+
+        // Path traversal attempts fallback on standard URLs.
+        assertEquals("http", urlFactory
+            .createResourceURL("../WEB-INF/xwiki.cfg", false, this.oldcore.getXWikiContext()).getProtocol());
+        assertEquals("http", urlFactory
+            .createSkinURL("../../WEB-INF/xwiki.cfg", "flamingo", this.oldcore.getXWikiContext()).getProtocol());
+
+        verify(environment).getResourceAsStream("/resources/", "../WEB-INF/xwiki.cfg");
+        verify(environment).getResourceAsStream("/skins/", "flamingo/../../WEB-INF/xwiki.cfg");
+        verify(environment, never()).getResourceAsStream(anyString());
     }
 }

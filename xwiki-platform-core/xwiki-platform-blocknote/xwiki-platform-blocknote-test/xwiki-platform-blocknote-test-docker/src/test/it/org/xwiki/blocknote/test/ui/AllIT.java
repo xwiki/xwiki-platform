@@ -51,6 +51,26 @@ class AllIT
     {
     }
 
+    @Nested
+    class NestedAutoSaveIT extends AutoSaveIT
+    {
+    }
+
+    @Nested
+    class NestedSideMenuIT extends SideMenuIT
+    {
+    }
+
+    @Nested
+    class NestedCommentIT extends CommentIT
+    {
+    }
+
+    @Nested
+    class NestedEmojiPickerIT extends EmojiPickerIT
+    {
+    }
+
     // CollaborationIT's multi-user scenario triggers a ClassCastException in DocumentUserReferenceModelSerializer
     // (superadmin isn't handled) when resolving a collaborator's user details, which the collaboration manager
     // doesn't catch. This can leave the shared browser/server session degraded, so this class must run last to

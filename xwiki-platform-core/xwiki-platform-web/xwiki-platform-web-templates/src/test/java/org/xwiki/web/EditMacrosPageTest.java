@@ -25,7 +25,8 @@ import java.util.Optional;
 
 import javax.inject.Named;
 import javax.script.ScriptContext;
-import javax.servlet.http.HttpSession;
+
+import jakarta.servlet.http.HttpSession;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,6 +35,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
 import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.model.reference.DocumentReference;
@@ -100,13 +103,16 @@ class EditMacrosPageTest extends PageTest
     @Named("csrf")
     private ScriptService csrfScriptService;
 
+    @MockComponent
+    private Container container;
+
     @Mock
     private HttpSession httpSession;
 
     @BeforeEach
     void setUp()
     {
-        this.request.setSession(this.httpSession);
+        when(this.container.getSession()).thenReturn(new ServletSession(this.httpSession));
         when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
             .then(invocationOnMock -> { return invocationOnMock.getArgument(0) + "Icon";});
     }

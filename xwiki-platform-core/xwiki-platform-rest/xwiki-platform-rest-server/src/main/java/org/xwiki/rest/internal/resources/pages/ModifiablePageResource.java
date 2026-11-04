@@ -108,7 +108,7 @@ public class ModifiablePageResource extends XWikiResource
             // Permanently delete the page, bypassing the recycle bin.
             XWikiContext xcontext = getXWikiContext();
             XWiki xwiki = xcontext.getWiki();
-            xwiki.deleteDocument(xwiki.getDocument(documentReference, xcontext), false, xcontext);
+            xwiki.deleteDocument(xwiki.getDocument(documentReference, xcontext), false, true, xcontext);
         } else {
             doc.delete();
         }

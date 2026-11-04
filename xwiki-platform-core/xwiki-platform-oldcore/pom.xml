@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -35,7 +35,7 @@
     <xwiki.extension.features>${xwiki.platform.oldcore.extension.features}</xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.45</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
@@ -209,7 +209,7 @@
     <dependency>
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
-      <version>13.0</version>
+      <version>13.1</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -477,6 +477,12 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-logging-logback</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed to test the detection of the client closing the connection on Jetty -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-io</artifactId>
       <scope>test</scope>
     </dependency>
 

@@ -118,6 +118,10 @@ class MailIT
         logCaptureConfiguration.registerExcludes(
             "meta.js?cache-version="
         );
+
+        // The mail of type "Test Not Sent" is made to fail by the test mail listener on purpose (see
+        // sendMailWithPrepareSuccessState).
+        logCaptureConfiguration.registerExpected("Failure during preparation phase of thread");
     }
 
     @Test

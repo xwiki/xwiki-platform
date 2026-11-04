@@ -71,7 +71,7 @@ class DefaultLiveDataConfigurationProviderTest
 
         Optional<LiveDataPropertyDescriptor> docAuthor = config.getMeta().getPropertyDescriptors().stream()
             .filter(property -> "doc.author".equals(property.getId())).findFirst();
-        assertEquals("?xpage=uorgsuggest&uorg=user&input={encodedQuery}&media=json",
+        assertEquals("?xpage=uorgsuggest&uorg=user&input={encodedQuery}&media=json&includeInactiveUsers=true",
             docAuthor.get().getFilter().getParameters().get("searchURL"));
     }
 }

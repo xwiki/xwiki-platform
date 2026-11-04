@@ -293,7 +293,7 @@ var PreviousUIForm = Class.create({
       },
       onFailure: function() {
         this.form.enable();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRequestFailed'))", 'error');
+        XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRequestFailed'))", 'error');
       }.bind(this)
     });
   },

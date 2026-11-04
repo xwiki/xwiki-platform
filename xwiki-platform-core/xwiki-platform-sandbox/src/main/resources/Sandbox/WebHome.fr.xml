@@ -36,11 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>Le Bac à sable contient des pages que vous pouvez librement modifier. Son but est de vous familiariser à la contribution au wiki. Grâce à lui vous découvrirez comment créer et modifier des pages. Pour commencer, cliquez tout simplement sur "Modifier".
+  <content>Le Bac à sable contient des pages que vous pouvez librement modifier. Son but est de vous familiariser à la contribution au wiki. Grâce à lui, vous découvrirez comment créer et modifier des pages. Pour commencer, cliquez tout simplement sur "Modifier".
 
-{{info}}Ne vous souciez pas d'écraser ou de perdre des informations lors de la modification de la page car vous pouvez toujours revenir aux versions précédentes du document via l'onglet "Historique" en bas de page.{{/info}}
+{{info}}Ne vous souciez pas d'écraser ou de perdre des informations lors de la modification de la page, car vous pouvez toujours revenir aux versions précédentes du document via l'onglet "Historique" en bas de page.{{/info}}
 
-Il existe trois pages de test :
+Si vous voulez jeter un œil à la [[Syntaxe XWiki&gt;&gt;XWiki.XWikiSyntax]] sous le capot, vous pouvez cliquer sur "Code source" dans le menu de page, ou cliquer sur le bouton "Source" en mode édition.
+
+Il existe trois pages de test :
 
 * [[Page de Test 1&gt;&gt;Sandbox.TestPage1]]
 * [[Page de Test 2&gt;&gt;Sandbox.TestPage2]]
@@ -48,7 +50,7 @@ Il existe trois pages de test :
 
 == Titres ==
 
-XWiki vous offre 6 niveaux pour les titres que vous pouvez utiliser afin d'organiser le contenu de vos pages. 
+XWiki vous offre 6 niveaux pour les titres que vous pouvez utiliser afin d'organiser le contenu de vos pages.
 
 == Titre 2 ==
 
@@ -60,9 +62,16 @@ XWiki vous offre 6 niveaux pour les titres que vous pouvez utiliser afin d'organ
 
 ====== Titre 6 ======
 
+{{info title="Recommandations en terme d'accessibilité"}}
+
+Afin d'offrir la meilleure expérience possible pour les utilisateurs de technologie d'assistance, vous devriez éviter d'utiliser le premier niveau de titre dans le contenu d'une page.
+
+{{/info}}
+
+
 == Styles ==
 
-XWiki supporte les styles de base suivants :
+XWiki supporte les styles de base suivants :
 
 * **Texte Gras**
 * //Texte Italique//
@@ -71,9 +80,9 @@ XWiki supporte les styles de base suivants :
 * Texte en ,,indice,,
 * Texte en ^^exposant^^
 
-== Liste ==
+== Listes ==
 
-Vous pouvez créer divers types de listes dans vos pages wiki:
+Vous pouvez créer divers types de listes dans vos pages wiki :
 
 === Liste à puces ===
 
@@ -100,7 +109,7 @@ Vous pouvez créer divers types de listes dans vos pages wiki:
 
 == Tableaux ==
 
-Vous pouvez créer des tableaux directement dans vos pages wiki :
+Vous pouvez créer des tableaux directement dans vos pages wiki :
 
 === Tableau avec en-tête en première ligne ===
 
@@ -117,33 +126,33 @@ Vous pouvez créer des tableaux directement dans vos pages wiki :
 
 == Liens ==
 
-XWiki vous permet de créer des liens vers d'autres documents wiki ou vers des pages Web :
+XWiki vous permet de créer des liens vers d'autres documents wiki ou vers des pages Web :
 
 * [[WebHome]] -&gt; lien vers la page d'accueil de l'espace courant
 * [[Sandbox Home&gt;&gt;WebHome]] -&gt; les liens peuvent contenir des titres
-* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; un lien peut utiliser le format NomEspace.NomPage pour renvoyer vers une page d'un autre espace. 
+* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; un lien peut utiliser le format NomEspace.NomPage pour renvoyer vers une page d'un autre espace.
 * [[http://www.xwiki.org]] -&gt; vous pouvez également indiquer des pages wiki ou des sites Web externes
 * [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; les titres des liens fonctionnent également pour les liens externes.
 
 == Images ==
 
-Vous pouvez ajouter des images dans vos pages wiki:
+Vous pouvez ajouter des images dans vos pages wiki :
 
 [[image:XWikiLogo.png]]
 
 == Macros ==
 
-Les macros vous permettent de personnaliser l'aspect du contenu du wiki ainsi que d'y ajouter des fonctionnalités. Ci-dessous vous avez 2 exemples d'usage des macros dans les pages wiki :
+Les macros vous permettent de personnaliser l'aspect du contenu du wiki ainsi que d'y ajouter des fonctionnalités. Vous trouverez ci-dessous 2 exemples d'usage de macros dans des pages wiki :
 
 === La macro d'avertissement ===
 
-Cette macro vous permet d'attirer l'attention des utilisateurs :
+Cette macro vous permet d'attirer l'attention des utilisateurs :
 
-{{warning}}Salut à tous!{{/warning}}
+{{warning}}Salut à tous !{{/warning}}
 
-=== Table de matières ===
+=== Table des matières ===
 
-Cette macro génère automatiquement une table des matières à partir des niveaux de titres présents dans le contenu de votre page wiki :
+Cette macro génère automatiquement une table des matières à partir des niveaux de titres présents dans le contenu de votre page wiki :
 
 {{toc/}}</content>
 </xwikidoc>

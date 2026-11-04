@@ -1056,7 +1056,10 @@ $namespace##
               </span>
             </$supporterElementName>
           #else
-            <$supporterElementName class="supporter support-multi-plan dropdown">
+            ## The supporter element holds the support plans dialog, which contains block content (heading, flex
+            ## container), so it must be a div even when the supporters are displayed inline (a span can only hold
+            ## phrasing content). The inline display is then obtained through CSS.
+            <div class="supporter support-multi-plan dropdown#if (!$supporterList) supporter-inline#end">
               <button class="supporter-name support-multi-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 $escapetool.xml($extensionSupporter.name)
                 <span class="caret"></span>
@@ -1072,7 +1075,7 @@ $namespace##
                   #end
                 </div>
               </div>
-            </$supporterElementName>
+            </div>
           #end
         #end
       </div>
@@ -1556,20 +1559,22 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
 #end
 
 #macro (computeXBack)
-  #set ($xback = "$!{request.xback}")
-  #if ($xback == '')
-    #set ($params = '')
+  ## The requested URL to get back is used as a link target so it must be sanitized. The sanitized URL is XML-escaped
+  ## while $xback is escaped (or URL-encoded) where it is used, so we keep the requested URL, but only if it was
+  ## accepted unchanged: a malformed URL can be modified before being checked, and browsers could still interpret the
+  ## original URL differently.
+  #getSanitizedURLAttributeValue('a', 'href', "$!request.xback", '', $safeXBack)
+  #if ("$!safeXBack" != '' && $safeXBack == $escapetool.xml($request.xback))
+    #set ($xback = $request.xback)
+  #else
+    ## Get back to the current page, without the extension parameters.
+    #set ($backParameters = {})
     #foreach ($parameterName in $request.parameterNames)
-      #if (!$parameterName.startsWith('extension'))
-        #foreach ($value in $request.getParameterValues($parameterName))
-          #set ($params = "${params}&${parameterName}=${value}")
-        #end
+      #if (!$parameterName.startsWith('extension') && $parameterName != 'xback')
+        #set ($discard = $backParameters.put($parameterName, $request.getParameterValues($parameterName)))
       #end
     #end
-    #if ($params.length() > 0)
-      #set ($params = $params.substring(1))
-    #end
-    #set ($xback = $doc.getURL($xcontext.action, $params))
+    #set ($xback = $doc.getURL($xcontext.action, $escapetool.url($backParameters)))
   #end
 #end
 

@@ -146,6 +146,8 @@ public abstract class AbstractExtensionTestUtils
      * @param extensionId the id of the extension to install
      * @param namespace the namespace on which to install the extension, {@code null} to install it on the main wiki
      *     and {@link Namespace#ROOT} to install it on the root namespace
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.7.0RC1
      */
     public void install(ExtensionId extensionId, Namespace namespace) throws Exception

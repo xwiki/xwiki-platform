@@ -34,8 +34,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.observation.event.Event;
 
@@ -43,6 +43,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Keep the project page up to date.
+ * <p>
+ * Only local events are handled: the cluster member where the change happened takes care of it, while a remote
+ * member could save the project page from an outdated cached version, losing the most recent modifications.
  * 
  * @version $Id$
  * @since 18.7.0RC1
@@ -51,7 +54,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named(ProjectUpdaterListener.NAME)
 @Singleton
-public class ProjectUpdaterListener extends AbstractEventListener
+public class ProjectUpdaterListener extends AbstractLocalEventListener
 {
     /**
      * The name of the listener.
@@ -82,7 +85,7 @@ public class ProjectUpdaterListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
         XWikiDocument document = (XWikiDocument) source;
 

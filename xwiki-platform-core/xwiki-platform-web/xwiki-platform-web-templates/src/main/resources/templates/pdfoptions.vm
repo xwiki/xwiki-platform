@@ -38,7 +38,7 @@
   ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
   <main id="mainContentArea">
     <div id="document-title"><h1>$services.localization.render('core.export.pdf.options.title')</h1></div>
-    <form id="pdfExportOptions" class="xform half" action="$escapetool.xml($doc.getURL('export'))">
+    <form id="pdfExportOptions" class="xform half" method="post" action="$escapetool.xml($doc.getURL('export'))">
       <div class="hidden">
         <input type="hidden" name="format" value="pdf" />
       </div>

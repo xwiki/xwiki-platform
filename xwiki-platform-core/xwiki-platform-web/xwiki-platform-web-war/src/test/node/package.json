@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "name": "xwiki-platform-web-war",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "test:unit": "vitest --run"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@xwiki/platform-test-requirejs": "workspace:*",
+    "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "eslint": "catalog:",
+    "jiti": "catalog:",
+    "jquery": "catalog:",
+    "jsdom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "xwiki-platform-web-webjar": "workspace:*"
+  }
+}

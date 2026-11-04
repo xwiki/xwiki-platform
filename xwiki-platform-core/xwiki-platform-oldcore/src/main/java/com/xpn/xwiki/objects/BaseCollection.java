@@ -379,7 +379,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     @Unstable
     public void setPasswordValue(String name, String value)
     {
-        PasswordProperty property = (PasswordProperty) safeget(name);
+        PropertyInterface property = safeget(name);
+        PasswordProperty passwordProperty;
 
         if (!(property instanceof PasswordProperty)) {
             if (property != null) {
@@ -387,13 +388,15 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 removeField(name);
             }
 
-            property = new PasswordProperty();
+            passwordProperty = new PasswordProperty();
+        } else {
+            passwordProperty = (PasswordProperty) property;
         }
 
-        property.setName(name);
-        property.setValue(new PasswordClass().getPasswordHash(value));
+        passwordProperty.setName(name);
+        passwordProperty.setValue(new PasswordClass().getPasswordHash(value));
 
-        safeput(name, property);
+        safeput(name, passwordProperty);
     }
 
     /**
@@ -653,7 +656,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * checking the password is delegated to {@link PasswordClass#arePasswordsMatching}.
      * @param passwordFieldName the name of the password property
      * @param rawPassword the password to check
-     * @return {@code true} if the password matches the password value set in the given password property.
+     * @return {@code true} if the password matches the password value set in the given password property. Always
+     * returns {@code false} if the given raw password is empty without any check.
      * @since 18.8.0RC1
      * @since 18.4.5
      */
@@ -662,25 +666,28 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         PropertyInterface property = safeget(passwordFieldName);
         boolean result = false;
-        if (property instanceof PasswordProperty passwordProperty) {
-            PropertyClass propertyClass = passwordProperty.getPropertyClass(getXWikiContext());
-            if (propertyClass == null) {
-                propertyClass = new PasswordClass();
-            }
-            if (propertyClass instanceof PasswordClass passwordClass) {
-                result = passwordClass.arePasswordsMatching(rawPassword, passwordProperty.getValue());
-            }
-        } else if (property instanceof StringProperty stringProperty) {
-            // Legacy fallback if the property is a StringProperty,
-            // in such case we check if the value matches a hash password or not to know if the perform was stored in
-            // clear or not and how we should compare it.
-            String passwordValue = stringProperty.getValue();
-            if (PasswordClass.isPasswordHashed(passwordValue)) {
-                result = new PasswordClass().arePasswordsMatching(rawPassword, passwordValue);
-            } else {
-                result = Strings.CI.equals(passwordValue, rawPassword);
+        if (StringUtils.isNotEmpty(rawPassword)) {
+            if (property instanceof PasswordProperty passwordProperty) {
+                PropertyClass propertyClass = passwordProperty.getPropertyClass(getXWikiContext());
+                if (propertyClass == null) {
+                    propertyClass = new PasswordClass();
+                }
+                if (propertyClass instanceof PasswordClass passwordClass) {
+                    result = passwordClass.arePasswordsMatching(rawPassword, passwordProperty.getValue());
+                }
+            } else if (property instanceof StringProperty stringProperty) {
+                // Legacy fallback if the property is a StringProperty,
+                // in such case we check if the value matches a hash password or not to know if the perform was stored
+                // in clear or not and how we should compare it.
+                String passwordValue = stringProperty.getValue();
+                if (PasswordClass.isPasswordHashed(passwordValue)) {
+                    result = new PasswordClass().arePasswordsMatching(rawPassword, passwordValue);
+                } else {
+                    result = Strings.CS.equals(passwordValue, rawPassword);
+                }
             }
         }
+
         return result;
     }
 

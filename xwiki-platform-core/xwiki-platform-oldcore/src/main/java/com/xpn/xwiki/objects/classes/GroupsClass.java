@@ -62,12 +62,6 @@ public class GroupsClass extends ListClass
     private static final String COMMA = ",";
 
     /**
-     * The meta property that specifies if the list box that is used to select the groups should be filled with all the
-     * available groups. This property should not be set when the number of groups is very large.
-     */
-    private static final String META_PROPERTY_USES_LIST = "usesList";
-
-    /**
      * Creates a new Groups List property that is described by the given meta class.
      *
      * @param metaClass the meta class that defines the list of meta properties associated with this property type
@@ -111,31 +105,6 @@ public class GroupsClass extends ListClass
     public Map<String, ListItem> getMap(XWikiContext context)
     {
         return new HashMap<>();
-    }
-
-    /**
-     * @return {@code true} if the list box that is used to select the groups should be filled with all the available
-     *         groups, {@code false} otherwise
-     * @deprecated this meta property is not used anymore because we changed the default displayer
-     */
-    @Deprecated(since = "4.3M2")
-    public boolean isUsesList()
-    {
-        return getIntValue(META_PROPERTY_USES_LIST) == 1;
-    }
-
-    /**
-     * Sets whether to list all the available groups in the list box used to select the groups. This property should not
-     * be set when the number of groups is very large.
-     *
-     * @param usesList {@code true} to fill the list box that is used to select the groups with all the available
-     *            groups, {@code false} otherwise
-     * @deprecated this meta property is not used anymore because we changed the default displayer
-     */
-    @Deprecated(since = "4.3M2")
-    public void setUsesList(boolean usesList)
-    {
-        setIntValue(META_PROPERTY_USES_LIST, usesList ? 1 : 0);
     }
 
     @Override

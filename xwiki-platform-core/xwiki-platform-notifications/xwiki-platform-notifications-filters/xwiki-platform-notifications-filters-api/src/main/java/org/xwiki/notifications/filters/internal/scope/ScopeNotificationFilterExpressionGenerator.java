@@ -269,7 +269,7 @@ public class ScopeNotificationFilterExpressionGenerator
             NotificationFormat format, NotificationFilterType type, DocumentReference user)
     {
         // Of course, we don't inject this sub query if there is no preference at all that match the criteria.
-        if (!filterPreferences.stream().anyMatch(
+        if (filterPreferences.stream().noneMatch(
                 isAPageOnlyFilterPreferenceThatConcernAllEvents(format, type))) {
             return null;
         }

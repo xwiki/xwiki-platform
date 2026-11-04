@@ -61,18 +61,18 @@ public class ListXarObjectPropertySerializer implements XarObjectPropertySeriali
         StringBuilder content = new StringBuilder();
 
         for (int eventType = reader.next(); eventType != XMLStreamConstants.END_ELEMENT; eventType = reader.next()) {
-            if (eventType == XMLStreamConstants.CHARACTERS || eventType == XMLStreamConstants.CDATA
-                || eventType == XMLStreamConstants.SPACE || eventType == XMLStreamConstants.ENTITY_REFERENCE) {
-                content.append(reader.getText());
-            } else if (eventType == XMLStreamConstants.PROCESSING_INSTRUCTION
-                || eventType == XMLStreamConstants.COMMENT) {
-                // skipping
-            } else if (eventType == XMLStreamConstants.END_DOCUMENT) {
-                throw new XMLStreamException("unexpected end of document when reading element text content");
-            } else if (eventType == XMLStreamConstants.START_ELEMENT) {
-                return readList(reader);
-            } else {
-                throw new XMLStreamException("Unexpected event type " + eventType, reader.getLocation());
+            switch (eventType) {
+                case XMLStreamConstants.CHARACTERS, XMLStreamConstants.CDATA, XMLStreamConstants.SPACE,
+                    XMLStreamConstants.ENTITY_REFERENCE -> content.append(reader.getText());
+                case XMLStreamConstants.PROCESSING_INSTRUCTION, XMLStreamConstants.COMMENT -> {
+                    // skipping
+                }
+                case XMLStreamConstants.END_DOCUMENT ->
+                    throw new XMLStreamException("unexpected end of document when reading element text content");
+                case XMLStreamConstants.START_ELEMENT -> {
+                    return readList(reader);
+                }
+                default -> throw new XMLStreamException("Unexpected event type " + eventType, reader.getLocation());
             }
         }
 

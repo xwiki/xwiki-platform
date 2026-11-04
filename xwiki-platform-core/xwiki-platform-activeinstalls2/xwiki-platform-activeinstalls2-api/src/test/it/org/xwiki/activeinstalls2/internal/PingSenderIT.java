@@ -28,7 +28,8 @@ import java.util.SequencedMap;
 import java.util.UUID;
 
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
+
+import jakarta.servlet.ServletContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

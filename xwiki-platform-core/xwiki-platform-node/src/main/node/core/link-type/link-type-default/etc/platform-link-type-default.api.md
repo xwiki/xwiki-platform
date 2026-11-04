@@ -22,7 +22,7 @@ export class AttachmentLinkTargetType implements LinkTargetTypeExtension<LinkAtt
     // (undocumented)
     createDefaultConfig(): LinkAttachmentConfig;
     // (undocumented)
-    getLabel: (locale: string) => string;
+    getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order = 100;
     // (undocumented)
@@ -49,7 +49,7 @@ export class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailCon
     // (undocumented)
     createDefaultConfig(): LinkEmailConfig;
     // (undocumented)
-    getLabel: (locale: string) => string;
+    getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order = 200;
     // (undocumented)
@@ -96,7 +96,7 @@ export class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfi
     // (undocumented)
     createDefaultConfig(): LinkPageConfig;
     // (undocumented)
-    getLabel: (locale: string) => string;
+    getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order = 0;
     // (undocumented)
@@ -118,7 +118,7 @@ export class URLLinkTargetType implements LinkTargetTypeExtension<LinkURLConfig>
     // (undocumented)
     createDefaultConfig(): LinkURLConfig;
     // (undocumented)
-    getLabel: (locale: string) => string;
+    getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order: number;
     // (undocumented)

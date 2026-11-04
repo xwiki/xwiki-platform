@@ -97,12 +97,18 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
   readonly order?: number;
 
   /**
+   * Each extension resolves its own label, since there is no mechanism for an extension to register its translations
+   * where the link modal could find them. Implementations cannot rely on the Vue composition API (`useI18n()`) since
+   * they are plain objects, not Vue component instances: they can resolve the label from translations bundled with
+   * the extension, or fetch it from the server (hence the promise). The label is only displayed: the link type
+   * selector identifies the selected link target type by its {@link LinkTargetTypeExtension."type"}, so labels don't
+   * have to be unique.
+   *
    * @param locale - the locale to resolve the label for (e.g., `"en"`)
-   * @returns a localized, human-readable label for this link target type, displayed in the link type selector.
-   *   Implementations cannot rely on the Vue composition API (`useI18n()`) since they are plain objects, not Vue
-   *   component instances — resolve the label from the extension's own bundled translations instead.
+   * @returns a promise resolving to a localized, human-readable label for this link target type, displayed in the
+   *   link type selector
    */
-  getLabel(locale: string): string;
+  getLabel(locale: string): Promise<string>;
 
   /**
    * @returns a fresh default configuration, used when the user switches the link type selector to this type.

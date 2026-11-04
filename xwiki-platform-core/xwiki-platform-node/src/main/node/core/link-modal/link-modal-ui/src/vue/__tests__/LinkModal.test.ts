@@ -56,7 +56,7 @@ function fakeExtension(
 ): LinkTargetTypeExtension {
   return {
     type,
-    getLabel: () => label,
+    getLabel: async () => label,
     createDefaultConfig: () => ({}),
     component: () => component,
     tryParseURL: () => null,

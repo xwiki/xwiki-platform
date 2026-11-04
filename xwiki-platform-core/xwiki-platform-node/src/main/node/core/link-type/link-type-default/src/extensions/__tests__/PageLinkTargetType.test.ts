@@ -39,9 +39,9 @@ const documentRef = {
 describe("PageLinkTargetType", () => {
   const extension = new PageLinkTargetType();
 
-  it("has the expected identity", () => {
+  it("has the expected identity", async () => {
     expect(extension.type).toBe("page");
-    expect(extension.getLabel("en")).toBe("Page");
+    await expect(extension.getLabel("en")).resolves.toBe("Page");
     expect(extension.component()).toBe(PageConfig);
   });
 

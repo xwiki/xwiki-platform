@@ -24,9 +24,9 @@ import { describe, expect, it } from "vitest";
 describe("EmailLinkTargetType", () => {
   const extension = new EmailLinkTargetType();
 
-  it("has the expected identity", () => {
+  it("has the expected identity", async () => {
     expect(extension.type).toBe("email");
-    expect(extension.getLabel("en")).toBe("E-mail");
+    await expect(extension.getLabel("en")).resolves.toBe("E-mail");
     expect(extension.component()).toBe(EmailConfig);
   });
 

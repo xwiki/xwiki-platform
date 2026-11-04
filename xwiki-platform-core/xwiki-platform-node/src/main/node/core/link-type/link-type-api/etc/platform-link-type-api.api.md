@@ -41,8 +41,7 @@ export interface LinkTargetTypeExtension<TConfig = unknown> {
     configToReference?(config: TConfig, ctx: LinkTargetReferenceContext): ResourceReference | undefined;
     // (undocumented)
     createDefaultConfig(): TConfig;
-    // (undocumented)
-    getLabel(locale: string): string;
+    getLabel(locale: string): Promise<string>;
     readonly order?: number;
     serializeURL(config: TConfig, ctx: LinkTargetURLContext): string;
     // (undocumented)

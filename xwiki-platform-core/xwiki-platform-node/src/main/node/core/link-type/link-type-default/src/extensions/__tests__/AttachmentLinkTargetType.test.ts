@@ -39,9 +39,9 @@ const attachmentRef = {
 describe("AttachmentLinkTargetType", () => {
   const extension = new AttachmentLinkTargetType();
 
-  it("has the expected identity", () => {
+  it("has the expected identity", async () => {
     expect(extension.type).toBe("attachment");
-    expect(extension.getLabel("en")).toBe("Attachment");
+    await expect(extension.getLabel("en")).resolves.toBe("Attachment");
     expect(extension.component()).toBe(AttachmentConfig);
   });
 

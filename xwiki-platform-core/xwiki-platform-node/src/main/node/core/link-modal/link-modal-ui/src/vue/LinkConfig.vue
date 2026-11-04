@@ -19,7 +19,15 @@
 -->
 <script setup lang="ts">
 import { translations } from "../translations";
-import { inject, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
+import {
+  computed,
+  inject,
+  nextTick,
+  onMounted,
+  ref,
+  useTemplateRef,
+  watch,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import type {
   LinkData,
@@ -44,28 +52,53 @@ const extensions = inject<LinkTargetTypeExtension[]>(
 
 const linkData = ref(props.linkData);
 
-// Here we depend on the label as there's no other choice: the selection happens with the <x-select>,
-// which doesn't allow specifying a value that differs from the label.
-//
-// So we rely on the label selected by the user to choose the extension.
-const linkTargetTypeSelect = ref(
-  extensions
-    .find((extension) => extension.type === linkData.value.target.type)
-    ?.getLabel(locale.value) ?? "",
+// The link type selector identifies the link target types by their type, the labels are only displayed. Selecting
+// another type resets the target to that type's default configuration.
+const linkTargetType = computed({
+  get: () => linkData.value.target.type,
+  set: (type: string) => {
+    const extension = extensions.find((extension) => extension.type === type);
+
+    if (extension) {
+      linkData.value.target = {
+        type: extension.type,
+        config: extension.createDefaultConfig(),
+      };
+    }
+  },
+});
+
+// The labels are resolved asynchronously (an extension may fetch its label from the server), so the type is displayed
+// until its label is resolved, or when it fails to resolve.
+const labels = ref<Record<string, string>>({});
+
+watch(
+  locale,
+  async (locale, _, onCleanup) => {
+    let superseded = false;
+    onCleanup(() => (superseded = true));
+
+    const resolvedLabels = await Promise.all(
+      extensions.map(async (extension) => [
+        extension.type,
+        await extension.getLabel(locale).catch(() => extension.type),
+      ]),
+    );
+
+    // Ignore the labels resolved for a locale that changed in the meantime.
+    if (!superseded) {
+      labels.value = Object.fromEntries(resolvedLabels);
+    }
+  },
+  { immediate: true },
 );
 
-watch(linkTargetTypeSelect, (label) => {
-  const extension = extensions.find(
-    (extension) => extension.getLabel(locale.value) === label,
-  );
-
-  if (extension) {
-    linkData.value.target = {
-      type: extension.type,
-      config: extension.createDefaultConfig(),
-    };
-  }
-});
+const linkTargetTypeItems = computed(() =>
+  extensions.map((extension) => ({
+    value: extension.type,
+    label: labels.value[extension.type] ?? extension.type,
+  })),
+);
 
 const displayTextField = useTemplateRef("displayTextField");
 
@@ -100,8 +133,8 @@ onMounted(() => {
   <x-select
     v-bind="{ 'data-test': 'linkTargetType' }"
     :label="t('link-modal.config.target-type')"
-    v-model="linkTargetTypeSelect"
-    :items="extensions.map((extension) => extension.getLabel(locale))"
+    v-model="linkTargetType"
+    :items="linkTargetTypeItems"
     required
   />
 

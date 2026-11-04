@@ -44,7 +44,7 @@ describe("ComponentInit", () => {
     @injectable()
     class CustomLinkTargetType implements LinkTargetTypeExtension {
       readonly type = "custom";
-      getLabel = () => "Custom";
+      getLabel = async () => "Custom";
       createDefaultConfig = () => undefined;
       component = (): never => {
         throw new Error("not used in this test");

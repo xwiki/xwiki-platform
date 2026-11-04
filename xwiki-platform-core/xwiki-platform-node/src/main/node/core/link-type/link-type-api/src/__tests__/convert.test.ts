@@ -52,7 +52,7 @@ const referenceCtx = {
 class CatchAllExtension implements LinkTargetTypeExtension<{ url: string }> {
   readonly type = "url";
   readonly order = Number.MAX_SAFE_INTEGER;
-  getLabel = () => "URL";
+  getLabel = async () => "URL";
   createDefaultConfig = () => ({ url: "" });
   component = () => {
     throw new Error("not used in this test");
@@ -74,7 +74,7 @@ class CatchAllExtension implements LinkTargetTypeExtension<{ url: string }> {
 class PageExtension implements LinkTargetTypeExtension<{ ref: string }> {
   readonly type = "page";
   readonly order = 0;
-  getLabel = () => "Page";
+  getLabel = async () => "Page";
   createDefaultConfig = () => ({ ref: "" });
   component = () => {
     throw new Error("not used in this test");
@@ -100,7 +100,7 @@ class NoReferenceSupportExtension
 {
   readonly type = "no-reference-support";
   readonly order = 50;
-  getLabel = () => "No reference support";
+  getLabel = async () => "No reference support";
   createDefaultConfig = () => ({ ref: "" });
   component = () => {
     throw new Error("not used in this test");

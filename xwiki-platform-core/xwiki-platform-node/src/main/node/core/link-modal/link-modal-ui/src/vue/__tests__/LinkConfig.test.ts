@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import LinkConfig from "../LinkConfig.vue";
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, describe, expect, test } from "vitest";
 import { defineComponent, nextTick } from "vue";
 import { createI18n } from "vue-i18n";
@@ -51,7 +51,7 @@ const XSelectStub = defineComponent({
   template: `
     <select v-bind="$attrs" :value="modelValue"
       @change="$emit('update:modelValue', $event.target.value)">
-      <option v-for="item in items" :key="item" :value="item">{{ item }}</option>
+      <option v-for="item in items" :key="item.value" :value="item.value">{{ item.label }}</option>
     </select>
   `,
 });
@@ -66,17 +66,24 @@ const XCheckboxStub = defineComponent({
   `,
 });
 
-// LinkConfig.vue only needs the registered link target types to resolve the labels of the type selector, so a
-// single stand-in matching the type used by buildLinkData() below is enough; the parsing/serializing part of the
-// contract is never exercised here.
-const urlExtensionStub: LinkTargetTypeExtension = {
-  type: "url",
-  getLabel: () => "URL",
-  createDefaultConfig: () => ({ url: "" }),
-  component: () => defineComponent({ template: "<div />" }),
-  tryParseURL: () => null,
-  serializeURL: () => "",
-};
+// LinkConfig.vue only uses the registered link target types to fill the type selector and to reset the link target
+// when another type is selected; the parsing/serializing part of the contract is never exercised here.
+function extensionStub(
+  type: string,
+  getLabel: LinkTargetTypeExtension["getLabel"],
+  defaultConfig: unknown = {},
+): LinkTargetTypeExtension {
+  return {
+    type,
+    getLabel,
+    createDefaultConfig: () => defaultConfig,
+    component: () => defineComponent({ template: "<div />" }),
+    tryParseURL: () => null,
+    serializeURL: () => "",
+  };
+}
+
+const urlExtensionStub = extensionStub("url", async () => "URL", { url: "" });
 
 function buildLinkData(): LinkData {
   return {
@@ -94,19 +101,22 @@ async function settle(): Promise<void> {
   );
 }
 
-function mountLinkConfig() {
+function mountLinkConfig(
+  extensions: LinkTargetTypeExtension[] = [urlExtensionStub],
+  linkData: LinkData = buildLinkData(),
+) {
   // LinkConfig.vue calls useI18n() with its own local `messages`, but vue-i18n still requires a global instance to
   // be installed for that local scope to be created against.
   const i18n = createI18n({ legacy: false, locale: "en", messages: {} });
 
   return mount(LinkConfig, {
-    props: { linkData: buildLinkData() },
+    props: { linkData },
     attachTo: document.body,
     global: {
       plugins: [i18n],
       // Normally provided by LinkModal.vue, which resolves the registered link target types out of the
       // depsContainer before rendering LinkConfig.
-      provide: { linkTargetTypeExtensions: [urlExtensionStub] },
+      provide: { linkTargetTypeExtensions: extensions },
       components: {
         "x-text-field": XTextFieldStub,
         "x-select": XSelectStub,
@@ -145,5 +155,73 @@ describe("LinkConfig.vue", () => {
 
     const input = wrapper.get('[data-test="linkDisplayText"]').element;
     expect(document.activeElement).toBe(input);
+  });
+
+  test("identifies the link target types by their type, even when they have the same label", async () => {
+    const wrapper = mountLinkConfig([
+      urlExtensionStub,
+      extensionStub("first", async () => "Same label"),
+      extensionStub("second", async () => "Same label"),
+    ]);
+
+    await flushPromises();
+
+    const options = wrapper
+      .get('[data-test="linkTargetType"]')
+      .findAll("option")
+      .map((option) => [option.attributes("value"), option.text()]);
+    expect(options).toEqual([
+      ["url", "URL"],
+      ["first", "Same label"],
+      ["second", "Same label"],
+    ]);
+  });
+
+  test("displays the type of a link target type until its label is resolved, or when it fails to resolve", async () => {
+    let resolveLabel: (label: string) => void = () => {};
+    const wrapper = mountLinkConfig([
+      extensionStub(
+        "url",
+        () => new Promise((resolve) => (resolveLabel = resolve)),
+      ),
+      extensionStub("broken", async () => {
+        throw new Error("Failed to load the translation");
+      }),
+    ]);
+    const optionTexts = () =>
+      wrapper
+        .get('[data-test="linkTargetType"]')
+        .findAll("option")
+        .map((option) => option.text());
+
+    await flushPromises();
+    expect(optionTexts()).toEqual(["url", "broken"]);
+
+    resolveLabel("URL");
+    await flushPromises();
+    expect(optionTexts()).toEqual(["URL", "broken"]);
+  });
+
+  test("resets the link target to the default configuration of the selected type", async () => {
+    const linkData: LinkData = {
+      displayText: "",
+      target: { type: "url", config: { url: "https://www.xwiki.org" } },
+    };
+    const wrapper = mountLinkConfig(
+      [
+        urlExtensionStub,
+        extensionStub("first", async () => "Same label", { first: true }),
+        extensionStub("second", async () => "Same label", { second: true }),
+      ],
+      linkData,
+    );
+    await flushPromises();
+
+    await wrapper.get('[data-test="linkTargetType"]').setValue("second");
+
+    expect(linkData.target).toEqual({
+      type: "second",
+      config: { second: true },
+    });
   });
 });

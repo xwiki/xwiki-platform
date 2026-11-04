@@ -25,10 +25,13 @@ import { translations } from "../translations";
  * Vue composition API (`useI18n()`) to resolve their own label.
  *
  * @param key - the translation key to resolve
- * @returns a function resolving the translated label for a given locale, falling back to English
+ * @returns a function resolving the translated label for a given locale, falling back to English; it resolves
+ *   immediately, since the translations are bundled
  */
-function labelFromTranslations(key: string): (locale: string) => string {
-  return (locale: string): string =>
+function labelFromTranslations(
+  key: string,
+): (locale: string) => Promise<string> {
+  return async (locale: string): Promise<string> =>
     translations[locale]?.[key] ?? translations.en[key] ?? key;
 }
 

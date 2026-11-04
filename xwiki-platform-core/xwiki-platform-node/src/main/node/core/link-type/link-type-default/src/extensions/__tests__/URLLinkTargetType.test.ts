@@ -24,10 +24,10 @@ import { describe, expect, it } from "vitest";
 describe("URLLinkTargetType", () => {
   const extension = new URLLinkTargetType();
 
-  it("has the expected identity, and the lowest possible priority (highest order)", () => {
+  it("has the expected identity, and the lowest possible priority (highest order)", async () => {
     expect(extension.type).toBe("url");
     expect(extension.order).toBe(Number.MAX_SAFE_INTEGER);
-    expect(extension.getLabel("en")).toBe("URL");
+    await expect(extension.getLabel("en")).resolves.toBe("URL");
     expect(extension.component()).toBe(URLConfig);
   });
 

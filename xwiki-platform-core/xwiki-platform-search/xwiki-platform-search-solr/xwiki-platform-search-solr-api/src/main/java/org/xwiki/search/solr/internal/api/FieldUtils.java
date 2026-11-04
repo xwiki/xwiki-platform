@@ -150,6 +150,14 @@ public final class FieldUtils
     public static final String LINKS_EXTENDED = "links_extended";
 
     /**
+     * The documents whose existence the resolution of the links found in the entity depends on: creating or deleting
+     * one of them can change the target of the links.
+     * 
+     * @since 18.10.0RC1
+     */
+    public static final String LINKS_EXISTENCE = "links_existence";
+
+    /**
      * Name of the document.
      */
     public static final String NAME = "name";

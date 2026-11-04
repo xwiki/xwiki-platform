@@ -21,7 +21,9 @@ package org.xwiki.search.solr.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -48,11 +50,13 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.IndexingUserConfig;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -61,6 +65,7 @@ import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.job.IndexerJob;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
+import org.xwiki.search.solr.internal.metadata.SolrLinkExistenceDependencies;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 import org.xwiki.search.solr.internal.metadata.XWikiSolrInputDocument;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
@@ -69,6 +74,7 @@ import org.xwiki.store.StoreStoppedException;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
@@ -153,6 +159,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                     break;
                 case DELETE:
                     str = "DELETE " + this.deleteQuery;
+                    break;
+                case INDEX_EXISTENCE_DEPENDENTS:
+                    str = "INDEX_EXISTENCE_DEPENDENTS " + this.reference;
                     break;
                 case STOP:
                     str = "STOP";
@@ -374,6 +383,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Inject
     private EntityReferenceFactory entityReferenceFactory;
 
+    @Inject
+    private SolrLinkExistenceDependencies linkExistenceDependencies;
+
     /**
      * The queue of index operation to perform.
      */
@@ -444,6 +456,17 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * The size of the batch that is currently being sent and committed.
      */
     private volatile int committingBatchSize;
+
+    /**
+     * The documents created or deleted since the documents whose links depend on their existence were last indexed.
+     * Only accessed by the indexer thread.
+     */
+    private final Set<EntityReference> existenceChanges = new LinkedHashSet<>();
+
+    /**
+     * The number of created or deleted documents whose dependents are not indexed yet, which are part of the queue.
+     */
+    private volatile int existenceChangesSize;
 
     @Override
     public void initialize() throws InitializationException
@@ -550,6 +573,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         for (IndexQueueEntry batchEntry = queueEntry; batchEntry != null; batchEntry = this.indexQueue.poll()) {
             this.indexQueueRemovalCounter.incrementAndGet();
 
+            if (batchEntry.operation == IndexOperation.READY_MARKER) {
+                // Indexing the documents depending on the existence changes queued before the marker is part of what
+                // the marker waits for.
+                indexExistenceDependents(solrDocuments);
+            }
+
             if (batchEntry == INDEX_QUEUE_ENTRY_STOP) {
                 // Handle the shutdown of the executor here to avoid that the executor is shut down before the batch
                 // processing finished.
@@ -560,19 +589,15 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
             // For the current contiguous operations queue, group the changes
             try {
-                ExecutionContext executionContext = new ExecutionContext();
-                this.ecim.initialize(executionContext);
-                XWikiContext xcontext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-                xcontext.setUserReference(indexingUserConfig.getIndexingUserReference());
+                initializeExecutionContext();
 
                 switch (batchEntry.operation) {
                     case INDEX:
-                        XWikiSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
-                        if (solrDocument != null) {
-                            solrDocuments.add(solrDocument);
-                            this.batchLength += solrDocument.getLength();
-                            ++this.batchSize;
-                        }
+                        addSolrDocument(batchEntry.reference, solrDocuments);
+                        break;
+                    case INDEX_EXISTENCE_DEPENDENTS:
+                        this.existenceChanges.add(batchEntry.reference);
+                        this.existenceChangesSize = this.existenceChanges.size();
                         break;
                     case DELETE:
                         // Ensure that all queued additions are processed before any deletions are processed.
@@ -604,12 +629,93 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             }
         }
 
+        indexExistenceDependents(solrDocuments);
+
         // Commit what's left
         if (this.batchSize > 0) {
             commit(solrDocuments);
         }
 
         return true;
+    }
+
+    private void initializeExecutionContext() throws ExecutionContextException, XWikiException
+    {
+        ExecutionContext executionContext = new ExecutionContext();
+        this.ecim.initialize(executionContext);
+        XWikiContext xcontext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        xcontext.setUserReference(this.indexingUserConfig.getIndexingUserReference());
+    }
+
+    private void addSolrDocument(EntityReference reference, List<SolrInputDocument> solrDocuments)
+        throws SolrIndexerException
+    {
+        XWikiSolrInputDocument solrDocument = getSolrDocument(reference);
+        if (solrDocument != null) {
+            solrDocuments.add(solrDocument);
+            this.batchLength += solrDocument.getLength();
+            ++this.batchSize;
+        }
+    }
+
+    /**
+     * Index the documents containing links whose target depends on the existence of the documents created or deleted
+     * since the last call.
+     *
+     * @param solrDocuments the documents of the current batch
+     */
+    private void indexExistenceDependents(List<SolrInputDocument> solrDocuments)
+    {
+        if (this.existenceChanges.isEmpty()) {
+            return;
+        }
+
+        try {
+            // A document indexed before the existence change resolved its links with the previous existence: make
+            // sure it is visible to the search, otherwise it would be missed and keep its outdated links.
+            commit(solrDocuments);
+            waitForCommit();
+
+            Set<EntityReference> changes = new LinkedHashSet<>(this.existenceChanges);
+            this.existenceChanges.clear();
+
+            Set<DocumentReference> dependents;
+            try {
+                dependents = this.linkExistenceDependencies.getDependents(changes);
+            } catch (SolrIndexerException e) {
+                this.logger.error("Failed to search the documents to index after the creation or deletion of [{}]",
+                    changes, e);
+
+                return;
+            }
+
+            for (DocumentReference dependent : dependents) {
+                indexExistenceDependent(dependent, solrDocuments);
+            }
+        } finally {
+            // The extracted dependents are now part of the batch size.
+            this.existenceChangesSize = 0;
+        }
+    }
+
+    // Catching Throwable on purpose: this runs in the indexer thread, which must keep indexing the other documents
+    // whatever the failure of the extraction of one of them (as for the other entries of the queue).
+    @SuppressWarnings("java:S1181")
+    private void indexExistenceDependent(DocumentReference dependent, List<SolrInputDocument> solrDocuments)
+    {
+        try {
+            initializeExecutionContext();
+
+            addSolrDocument(dependent, solrDocuments);
+        } catch (Throwable e) {
+            this.logger.error("Failed to index document [{}]", dependent, e);
+        } finally {
+            this.execution.removeContext();
+        }
+
+        if (shouldCommit(this.batchLength, this.batchSize)) {
+            commit(solrDocuments);
+        }
     }
 
     private void applyDeletion(IndexQueueEntry queueEntry) throws SolrIndexerException
@@ -660,13 +766,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     private void commit(List<SolrInputDocument> documents)
     {
         flushDocuments(documents);
-        if (this.commitFuture != null) {
-            try {
-                Uninterruptibles.getUninterruptibly(this.commitFuture);
-            } catch (ExecutionException e) {
-                this.logger.error("Failed to commit index changes to the Solr server", e);
-            }
-        }
+        waitForCommit();
 
         // At this point, we can be sure that there is no more commit in the queue - so we can safely store the size
         // of the next commit.
@@ -691,6 +791,17 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         });
         this.batchSize = 0;
         this.batchLength = 0;
+    }
+
+    private void waitForCommit()
+    {
+        if (this.commitFuture != null) {
+            try {
+                Uninterruptibles.getUninterruptibly(this.commitFuture);
+            } catch (ExecutionException e) {
+                this.logger.error("Failed to commit index changes to the Solr server", e);
+            }
+        }
     }
 
     /**
@@ -797,9 +908,16 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     }
 
     @Override
+    public void indexExistenceDependents(DocumentReference documentReference)
+    {
+        addToQueue(documentReference.withoutLocale(), false, IndexOperation.INDEX_EXISTENCE_DEPENDENTS);
+    }
+
+    @Override
     public int getQueueSize()
     {
-        return this.indexQueue.size() + this.pendingResolveItems.get() + this.batchSize + this.committingBatchSize;
+        return this.indexQueue.size() + this.pendingResolveItems.get() + this.existenceChangesSize + this.batchSize
+            + this.committingBatchSize;
     }
 
     @Override

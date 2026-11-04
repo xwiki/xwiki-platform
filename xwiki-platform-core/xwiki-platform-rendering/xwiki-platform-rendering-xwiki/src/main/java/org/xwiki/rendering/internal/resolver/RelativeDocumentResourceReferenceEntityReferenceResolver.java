@@ -33,7 +33,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.resolver.DocumentExistenceOverride;
 
 /**
  * Convert document resource reference into entity reference.
@@ -70,11 +69,11 @@ public class RelativeDocumentResourceReferenceEntityReferenceResolver
 
     @Override
     protected EntityReference resolveUntyped(ResourceReference resourceReference, EntityReference baseReference,
-        DocumentExistenceOverride existenceOverride)
+        DocumentExistenceChecker existenceChecker)
     {
         // If the reference is empty fallback on typed logic
         if (StringUtils.isEmpty(resourceReference.getReference())) {
-            return resolveTyped(resourceReference, baseReference, existenceOverride);
+            return resolveTyped(resourceReference, baseReference, existenceChecker);
         }
 
         // Get relative reference
@@ -92,7 +91,7 @@ public class RelativeDocumentResourceReferenceEntityReferenceResolver
             reference =
                 this.defaultStringDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
             // Take care of fallback if needed
-            return resolveDocumentReference(relativeReference, reference, baseReference, existenceOverride);
+            return resolveDocumentReference(relativeReference, reference, baseReference, existenceChecker);
         }
     }
 

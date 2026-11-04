@@ -68,15 +68,25 @@ class SolrIndexEventListenerTest
         when(document.getOriginalDocument()).thenReturn(document);
         when(document.getDocumentReferenceWithLocale()).thenReturn(documentReference);
         when(document.getRealLocale()).thenReturn(Locale.FRENCH);
+        when(document.getLocale()).thenReturn(Locale.ROOT);
+        DocumentReference documentReferenceWithoutLocale = new DocumentReference("aWiki", "aSpace", "aPage");
+        when(document.getDocumentReference()).thenReturn(documentReferenceWithoutLocale);
 
         this.listener.onEvent(new DocumentDeletedEvent(), document, null);
 
         verify(this.indexer).delete(documentReference, false);
+        // The links to the deleted document may now target another document.
+        verify(this.indexer).indexExistenceDependents(documentReferenceWithoutLocale);
 
         documentReference = new DocumentReference("aWiki", "aSpace", "aPage", Locale.GERMAN);
         when(document.getDocumentReferenceWithLocale()).thenReturn(documentReference);
+        when(document.getLocale()).thenReturn(Locale.GERMAN);
 
         this.listener.onEvent(new DocumentDeletedEvent(), document, null);
+
+        verify(this.indexer).delete(documentReference, false);
+        // Deleting a translation doesn't change the existence of the document.
+        verify(this.indexer).indexExistenceDependents(any());
     }
 
     @Test
@@ -136,6 +146,9 @@ class SolrIndexEventListenerTest
         verify(this.indexer).index(documentReference, false);
         verify(this.indexer).index(new DocumentReference(documentReference, Locale.FRENCH), false);
         verify(this.indexer).index(new DocumentReference(documentReference, Locale.GERMAN), false);
+        // Only the creation of the default translation can change the target of links to the document.
+        verify(this.indexer, times(isDefaultTranslation ? 1 : 0)).indexExistenceDependents(documentReference);
+        verify(this.indexer, times(isDefaultTranslation ? 1 : 0)).indexExistenceDependents(any());
     }
 
     @Test

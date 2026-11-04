@@ -116,7 +116,8 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
   createDefaultConfig(): TConfig;
 
   /**
-   * @returns the Vue component rendering this type's fields in the link modal.
+   * @returns the Vue component rendering the link form for this type in the link modal, usually by wrapping this
+   *   type's fields with the `LinkForm` component of `@xwiki/platform-link-modal-ui`.
    */
   component(): Component;
 

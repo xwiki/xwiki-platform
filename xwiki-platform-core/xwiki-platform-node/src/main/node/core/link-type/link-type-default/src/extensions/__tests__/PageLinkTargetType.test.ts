@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import PageConfig from "../../vue/PageConfig.vue";
+import PageLinkTargetForm from "../../vue/PageLinkTargetForm.vue";
 import { PageLinkTargetType } from "../PageLinkTargetType";
 import { EntityType } from "@xwiki/platform-model-api";
 import { describe, expect, it } from "vitest";
@@ -42,7 +42,7 @@ describe("PageLinkTargetType", () => {
   it("has the expected identity", async () => {
     expect(extension.type).toBe("page");
     await expect(extension.getLabel("en")).resolves.toBe("Page");
-    expect(extension.component()).toBe(PageConfig);
+    expect(extension.component()).toBe(PageLinkTargetForm);
   });
 
   it("parses an empty URL as a page link with no reference selected yet", () => {

@@ -19,14 +19,14 @@
 -->
 <script setup lang="ts">
 import { translations } from "../translations";
-import { LinkConfig } from "@xwiki/platform-link-modal-ui";
+import { LinkForm } from "@xwiki/platform-link-modal-ui";
 import { useI18n } from "vue-i18n";
-import type { LinkEmailConfig } from "../data/linkType";
+import type { EmailLinkTargetConfig } from "../data/linkType";
 import type { LinkData } from "@xwiki/platform-link-type-api";
 
 defineProps<{ linkData: LinkData }>();
 
-const model = defineModel<LinkEmailConfig>({
+const model = defineModel<EmailLinkTargetConfig>({
   required: true,
 });
 
@@ -34,7 +34,7 @@ const { t } = useI18n({ messages: translations });
 </script>
 
 <template>
-  <LinkConfig :link-data>
+  <LinkForm :link-data>
     <template #config>
       <x-text-field
         v-bind="{ 'data-test': 'linkEmailAddress' }"
@@ -58,5 +58,5 @@ const { t } = useI18n({ messages: translations });
         v-model="model.messageBody"
       />
     </template>
-  </LinkConfig>
+  </LinkForm>
 </template>

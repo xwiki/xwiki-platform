@@ -14,23 +14,29 @@ import { LinkTargetURLContext } from '@xwiki/platform-link-type-api';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
 
 // @beta
-export class AttachmentLinkTargetType implements LinkTargetTypeExtension<LinkAttachmentConfig> {
+export type AttachmentLinkTargetConfig = {
+    ref: AttachmentReference | null;
+    queryString?: string;
+};
+
+// @beta
+export class AttachmentLinkTargetType implements LinkTargetTypeExtension<AttachmentLinkTargetConfig> {
     // (undocumented)
     component(): Component;
     // (undocumented)
-    configToReference(input: LinkAttachmentConfig, input2: LinkTargetReferenceContext): ResourceReference | undefined;
+    configToReference(input: AttachmentLinkTargetConfig, input2: LinkTargetReferenceContext): ResourceReference | undefined;
     // (undocumented)
-    createDefaultConfig(): LinkAttachmentConfig;
+    createDefaultConfig(): AttachmentLinkTargetConfig;
     // (undocumented)
     getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order = 100;
     // (undocumented)
-    serializeURL(input: LinkAttachmentConfig, input2: LinkTargetURLContext): string;
+    serializeURL(input: AttachmentLinkTargetConfig, input2: LinkTargetURLContext): string;
     // (undocumented)
-    tryParseReference(reference: ResourceReference, input: LinkTargetReferenceContext): LinkAttachmentConfig | null;
+    tryParseReference(reference: ResourceReference, input: LinkTargetReferenceContext): AttachmentLinkTargetConfig | null;
     // (undocumented)
-    tryParseURL(url: string, input: LinkTargetURLContext): LinkAttachmentConfig | null;
+    tryParseURL(url: string, input: LinkTargetURLContext): AttachmentLinkTargetConfig | null;
     // (undocumented)
     readonly type = "attachment";
 }
@@ -41,91 +47,85 @@ export class ComponentInit {
 }
 
 // @beta
-export class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
-    // (undocumented)
-    component(): Component;
-    // (undocumented)
-    configToReference(input: LinkEmailConfig): ResourceReference | undefined;
-    // (undocumented)
-    createDefaultConfig(): LinkEmailConfig;
-    // (undocumented)
-    getLabel: (locale: string) => Promise<string>;
-    // (undocumented)
-    readonly order = 200;
-    // (undocumented)
-    serializeURL(input: LinkEmailConfig): string;
-    // (undocumented)
-    tryParseReference(reference: ResourceReference): LinkEmailConfig | null;
-    // (undocumented)
-    tryParseURL(url: string): LinkEmailConfig | null;
-    // (undocumented)
-    readonly type = "email";
-}
-
-// @beta
-export type LinkAttachmentConfig = {
-    ref: AttachmentReference | null;
-    queryString?: string;
-};
-
-// @beta
-export type LinkEmailConfig = {
+export type EmailLinkTargetConfig = {
     address: string;
     messageSubject?: string;
     messageBody?: string;
 };
 
 // @beta
-export type LinkPageConfig = {
+export class EmailLinkTargetType implements LinkTargetTypeExtension<EmailLinkTargetConfig> {
+    // (undocumented)
+    component(): Component;
+    // (undocumented)
+    configToReference(input: EmailLinkTargetConfig): ResourceReference | undefined;
+    // (undocumented)
+    createDefaultConfig(): EmailLinkTargetConfig;
+    // (undocumented)
+    getLabel: (locale: string) => Promise<string>;
+    // (undocumented)
+    readonly order = 200;
+    // (undocumented)
+    serializeURL(input: EmailLinkTargetConfig): string;
+    // (undocumented)
+    tryParseReference(reference: ResourceReference): EmailLinkTargetConfig | null;
+    // (undocumented)
+    tryParseURL(url: string): EmailLinkTargetConfig | null;
+    // (undocumented)
+    readonly type = "email";
+}
+
+// @beta
+export type PageLinkTargetConfig = {
     ref: DocumentReference | null;
     queryString?: string;
     anchor?: string;
 };
 
 // @beta
-export type LinkURLConfig = {
-    url: string;
-};
-
-// @beta
-export class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
+export class PageLinkTargetType implements LinkTargetTypeExtension<PageLinkTargetConfig> {
     // (undocumented)
     component(): Component;
     // (undocumented)
-    configToReference(input: LinkPageConfig, input2: LinkTargetReferenceContext): ResourceReference | undefined;
+    configToReference(input: PageLinkTargetConfig, input2: LinkTargetReferenceContext): ResourceReference | undefined;
     // (undocumented)
-    createDefaultConfig(): LinkPageConfig;
+    createDefaultConfig(): PageLinkTargetConfig;
     // (undocumented)
     getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order = 0;
     // (undocumented)
-    serializeURL(input: LinkPageConfig, input2: LinkTargetURLContext): string;
+    serializeURL(input: PageLinkTargetConfig, input2: LinkTargetURLContext): string;
     // (undocumented)
-    tryParseReference(reference: ResourceReference, input: LinkTargetReferenceContext): LinkPageConfig | null;
+    tryParseReference(reference: ResourceReference, input: LinkTargetReferenceContext): PageLinkTargetConfig | null;
     // (undocumented)
-    tryParseURL(url: string, input: LinkTargetURLContext): LinkPageConfig | null;
+    tryParseURL(url: string, input: LinkTargetURLContext): PageLinkTargetConfig | null;
     // (undocumented)
     readonly type = "page";
 }
 
 // @beta
-export class URLLinkTargetType implements LinkTargetTypeExtension<LinkURLConfig> {
+export type URLLinkTargetConfig = {
+    url: string;
+};
+
+// @beta
+export class URLLinkTargetType implements LinkTargetTypeExtension<URLLinkTargetConfig> {
     // (undocumented)
     component(): Component;
     // (undocumented)
-    configToReference(input: LinkURLConfig): ResourceReference | undefined;
+    configToReference(input: URLLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
-    createDefaultConfig(): LinkURLConfig;
+    createDefaultConfig(): URLLinkTargetConfig;
     // (undocumented)
     getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order: number;
     // (undocumented)
-    serializeURL(input: LinkURLConfig): string;
-    tryParseReference(reference: ResourceReference): LinkURLConfig | null;
+    serializeURL(input: URLLinkTargetConfig): string;
+    tryParseReference(reference: ResourceReference): URLLinkTargetConfig | null;
     // (undocumented)
-    tryParseURL(url: string): LinkURLConfig | null;
+    tryParseURL(url: string): URLLinkTargetConfig | null;
     // (undocumented)
     readonly type = "url";
 }

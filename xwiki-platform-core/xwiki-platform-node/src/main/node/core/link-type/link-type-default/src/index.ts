@@ -26,8 +26,8 @@ export { EmailLinkTargetType } from "./extensions/EmailLinkTargetType";
 export { URLLinkTargetType } from "./extensions/URLLinkTargetType";
 
 export type {
-  LinkAttachmentConfig,
-  LinkEmailConfig,
-  LinkPageConfig,
-  LinkURLConfig,
+  AttachmentLinkTargetConfig,
+  EmailLinkTargetConfig,
+  PageLinkTargetConfig,
+  URLLinkTargetConfig,
 } from "./data/linkType";

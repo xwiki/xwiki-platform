@@ -22,50 +22,46 @@ import { suggestLinks } from "../linkSuggestions";
 import { translations } from "../translations";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { CIcon, Size } from "@xwiki/platform-icons";
-import { LinkConfig, SearchBox } from "@xwiki/platform-link-modal-ui";
+import { LinkForm, SearchBox } from "@xwiki/platform-link-modal-ui";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
 import { inject } from "vue";
 import { useI18n } from "vue-i18n";
-import type { LinkAttachmentConfig } from "../data/linkType";
+import type { PageLinkTargetConfig } from "../data/linkType";
 import type {
   LinkEditionContext,
   SearchBoxSource,
 } from "@xwiki/platform-link-modal-ui";
 import type { Link } from "@xwiki/platform-link-suggest-api";
 import type { LinkData } from "@xwiki/platform-link-type-api";
-import type { AttachmentReference } from "@xwiki/platform-model-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
 
 defineProps<{ linkData: LinkData }>();
 
-const model = defineModel<LinkAttachmentConfig>({
+const model = defineModel<PageLinkTargetConfig>({
   required: true,
 });
 
 const linkEditionCtx = inject<LinkEditionContext>("linkEditionCtx")!;
 
-const getSuggestions: SearchBoxSource<AttachmentReference, Link> = (query) =>
-  suggestLinks(linkEditionCtx, query, LinkType.ATTACHMENT, (link) => {
+const getSuggestions: SearchBoxSource<DocumentReference, Link> = (query) =>
+  suggestLinks(linkEditionCtx, query, LinkType.PAGE, (link) => {
     const ref = tryFallible(() =>
-      linkEditionCtx.modelReferenceParser.parse(link.reference, {
-        type: EntityType.ATTACHMENT,
-      }),
+      linkEditionCtx.modelReferenceParser.parse(link.reference),
     );
-    return ref?.type === EntityType.ATTACHMENT ? ref : null;
+    return ref?.type === EntityType.DOCUMENT ? ref : null;
   });
 
-function submit(ref: AttachmentReference) {
-  model.value = { ref, queryString: undefined };
+function submit(ref: DocumentReference) {
+  model.value = { ref, anchor: undefined, queryString: undefined };
 }
 
 function trySelectRaw(query: string): boolean {
   const ref = tryFallible(() =>
-    linkEditionCtx.modelReferenceParser.parse(query, {
-      type: EntityType.ATTACHMENT,
-    }),
+    linkEditionCtx.modelReferenceParser.parse(query),
   );
 
-  if (ref?.type !== EntityType.ATTACHMENT) {
+  if (ref?.type !== EntityType.DOCUMENT) {
     return false;
   }
 
@@ -77,11 +73,11 @@ const { t } = useI18n({ messages: translations });
 </script>
 
 <template>
-  <link-config :link-data>
+  <link-form :link-data>
     <template #config>
       <search-box
-        v-bind="{ 'data-test': 'linkAttachmentReference' }"
-        :label="t('link-type.target-types.attachment.reference')"
+        v-bind="{ 'data-test': 'linkPageReference' }"
+        :label="t('link-type.target-types.page.reference')"
         :initial-value="
           model.ref !== null
             ? linkEditionCtx.modelReferenceSerializer.serialize(model.ref)!
@@ -103,12 +99,18 @@ const { t } = useI18n({ messages: translations });
 
     <template #options>
       <x-text-field
-        v-bind="{ 'data-test': 'linkAttachmentQueryString' }"
-        :label="t('link-type.target-types.attachment.query-string')"
+        v-bind="{ 'data-test': 'linkPageQueryString' }"
+        :label="t('link-type.target-types.page.query-string')"
         v-model="model.queryString"
       />
+
+      <x-text-field
+        v-bind="{ 'data-test': 'linkPageAnchor' }"
+        :label="t('link-type.target-types.page.anchor')"
+        v-model="model.anchor"
+      />
     </template>
-  </link-config>
+  </link-form>
 </template>
 
 <style scoped>

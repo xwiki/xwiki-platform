@@ -33,7 +33,19 @@ import { VNode } from 'vue';
 import { VNodeProps } from 'vue';
 
 // @beta
-export const LinkConfig: {
+export type LinkEditionContext = {
+    linkSuggestService: LinkSuggestService | null;
+    modelReferenceParser: ModelReferenceParser;
+    modelReferenceSerializer: ModelReferenceSerializer;
+    modelReferenceHandler: ModelReferenceHandler;
+    remoteURLParser: RemoteURLParser;
+    remoteURLSerializer: RemoteURLSerializer;
+    attachmentsService: AttachmentsService;
+    documentService: DocumentService;
+};
+
+// @beta
+export const LinkForm: {
     new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<{
     linkData: LinkData;
     }> & Readonly<{}>, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, PublicProps, {}, false, {}, {}, GlobalComponents, GlobalDirectives, string, {
@@ -75,18 +87,6 @@ linkData: LinkData;
         options(): void;
     };
 });
-
-// @beta
-export type LinkEditionContext = {
-    linkSuggestService: LinkSuggestService | null;
-    modelReferenceParser: ModelReferenceParser;
-    modelReferenceSerializer: ModelReferenceSerializer;
-    modelReferenceHandler: ModelReferenceHandler;
-    remoteURLParser: RemoteURLParser;
-    remoteURLSerializer: RemoteURLSerializer;
-    attachmentsService: AttachmentsService;
-    documentService: DocumentService;
-};
 
 // @beta
 export const LinkModal: DefineComponent<    {

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import LinkConfig from "../LinkConfig.vue";
+import LinkForm from "../LinkForm.vue";
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, describe, expect, test } from "vitest";
 import { defineComponent, nextTick } from "vue";
@@ -27,10 +27,10 @@ import type {
   LinkTargetTypeExtension,
 } from "@xwiki/platform-link-type-api";
 
-// Minimal stand-ins for the design system components used by LinkConfig.vue. XTextFieldStub mirrors the contract
+// Minimal stand-ins for the design system components used by LinkForm.vue. XTextFieldStub mirrors the contract
 // the real component (and the one used by the blocknote-headless Playwright fixtures) must honor: a *single* root
 // element (inheritAttrs: false, so a stray attribute doesn't land twice) wrapping the actual focusable input -- this
-// is exactly the shape LinkConfig.vue's onMounted hook relies on via `$el.querySelector("input, textarea, select")`.
+// is exactly the shape LinkForm.vue's onMounted hook relies on via `$el.querySelector("input, textarea, select")`.
 const XTextFieldStub = defineComponent({
   inheritAttrs: false,
   props: ["modelValue", "label"],
@@ -66,7 +66,7 @@ const XCheckboxStub = defineComponent({
   `,
 });
 
-// LinkConfig.vue only uses the registered link target types to fill the type selector and to reset the link target
+// LinkForm.vue only uses the registered link target types to fill the type selector and to reset the link target
 // when another type is selected; the parsing/serializing part of the contract is never exercised here.
 function extensionStub(
   type: string,
@@ -93,7 +93,7 @@ function buildLinkData(): LinkData {
   };
 }
 
-/** Waits past the double requestAnimationFrame used by LinkConfig.vue's onMounted focus logic. */
+/** Waits past the double requestAnimationFrame used by LinkForm.vue's onMounted focus logic. */
 async function settle(): Promise<void> {
   await nextTick();
   await new Promise<void>((resolve) =>
@@ -105,17 +105,17 @@ function mountLinkConfig(
   extensions: LinkTargetTypeExtension[] = [urlExtensionStub],
   linkData: LinkData = buildLinkData(),
 ) {
-  // LinkConfig.vue calls useI18n() with its own local `messages`, but vue-i18n still requires a global instance to
+  // LinkForm.vue calls useI18n() with its own local `messages`, but vue-i18n still requires a global instance to
   // be installed for that local scope to be created against.
   const i18n = createI18n({ legacy: false, locale: "en", messages: {} });
 
-  return mount(LinkConfig, {
+  return mount(LinkForm, {
     props: { linkData },
     attachTo: document.body,
     global: {
       plugins: [i18n],
       // Normally provided by LinkModal.vue, which resolves the registered link target types out of the
-      // depsContainer before rendering LinkConfig.
+      // depsContainer before rendering LinkForm.
       provide: { linkTargetTypeExtensions: extensions },
       components: {
         "x-text-field": XTextFieldStub,
@@ -126,7 +126,7 @@ function mountLinkConfig(
   });
 }
 
-describe("LinkConfig.vue", () => {
+describe("LinkForm.vue", () => {
   afterEach(() => {
     document.body.innerHTML = "";
   });

@@ -19,10 +19,10 @@
  */
 import { labelFromTranslations } from "./labels";
 import { untypedResourceReference } from "./referenceHelpers";
-import URLConfig from "../vue/URLConfig.vue";
+import URLLinkTargetForm from "../vue/URLLinkTargetForm.vue";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { LinkURLConfig } from "../data/linkType";
+import type { URLLinkTargetConfig } from "../data/linkType";
 import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
@@ -36,25 +36,27 @@ import type { Component } from "vue";
  * @beta
  */
 @injectable()
-class URLLinkTargetType implements LinkTargetTypeExtension<LinkURLConfig> {
+class URLLinkTargetType
+  implements LinkTargetTypeExtension<URLLinkTargetConfig>
+{
   readonly type = "url";
   readonly order = Number.MAX_SAFE_INTEGER;
 
   getLabel = labelFromTranslations("link-type.target-types.url.label");
 
-  createDefaultConfig(): LinkURLConfig {
+  createDefaultConfig(): URLLinkTargetConfig {
     return { url: "" };
   }
 
   component(): Component {
-    return URLConfig;
+    return URLLinkTargetForm;
   }
 
-  tryParseURL(url: string): LinkURLConfig | null {
+  tryParseURL(url: string): URLLinkTargetConfig | null {
     return { url };
   }
 
-  serializeURL({ url }: LinkURLConfig): string {
+  serializeURL({ url }: URLLinkTargetConfig): string {
     return url;
   }
 
@@ -64,7 +66,7 @@ class URLLinkTargetType implements LinkTargetTypeExtension<LinkURLConfig> {
    * through to `undefined` (and the caller to {@link parseLinkTarget}) for resource types with no
    * matching link target (e.g. interwiki, space, user).
    */
-  tryParseReference(reference: ResourceReference): LinkURLConfig | null {
+  tryParseReference(reference: ResourceReference): URLLinkTargetConfig | null {
     switch (reference.type) {
       case ResourceType.URL:
       case ResourceType.PATH:
@@ -76,7 +78,9 @@ class URLLinkTargetType implements LinkTargetTypeExtension<LinkURLConfig> {
     }
   }
 
-  configToReference({ url }: LinkURLConfig): ResourceReference | undefined {
+  configToReference({
+    url,
+  }: URLLinkTargetConfig): ResourceReference | undefined {
     return url.trim() === ""
       ? undefined
       : untypedResourceReference(ResourceType.URL, url);

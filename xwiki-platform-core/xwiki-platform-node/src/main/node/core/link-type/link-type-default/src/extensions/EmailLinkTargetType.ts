@@ -19,11 +19,11 @@
  */
 import { labelFromTranslations } from "./labels";
 import { typedResourceReference } from "./referenceHelpers";
-import EmailConfig from "../vue/EmailConfig.vue";
+import EmailLinkTargetForm from "../vue/EmailLinkTargetForm.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { LinkEmailConfig } from "../data/linkType";
+import type { EmailLinkTargetConfig } from "../data/linkType";
 import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
@@ -35,21 +35,23 @@ import type { Component } from "vue";
  * @beta
  */
 @injectable()
-class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
+class EmailLinkTargetType
+  implements LinkTargetTypeExtension<EmailLinkTargetConfig>
+{
   readonly type = "email";
   readonly order = 200;
 
   getLabel = labelFromTranslations("link-type.target-types.email.label");
 
-  createDefaultConfig(): LinkEmailConfig {
+  createDefaultConfig(): EmailLinkTargetConfig {
     return { address: "" };
   }
 
   component(): Component {
-    return EmailConfig;
+    return EmailLinkTargetForm;
   }
 
-  tryParseURL(url: string): LinkEmailConfig | null {
+  tryParseURL(url: string): EmailLinkTargetConfig | null {
     const parsedURL = tryFallible(() => new URL(url));
 
     if (parsedURL?.protocol !== "mailto:") {
@@ -67,7 +69,7 @@ class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
     address,
     messageSubject,
     messageBody,
-  }: LinkEmailConfig): string {
+  }: EmailLinkTargetConfig): string {
     const url = new URL(`mailto:${address}`);
 
     if (messageSubject) {
@@ -81,7 +83,9 @@ class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
     return url.toString();
   }
 
-  tryParseReference(reference: ResourceReference): LinkEmailConfig | null {
+  tryParseReference(
+    reference: ResourceReference,
+  ): EmailLinkTargetConfig | null {
     return reference.type === ResourceType.MAILTO
       ? { address: reference.reference }
       : null;
@@ -89,7 +93,7 @@ class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
 
   configToReference({
     address,
-  }: LinkEmailConfig): ResourceReference | undefined {
+  }: EmailLinkTargetConfig): ResourceReference | undefined {
     return address.trim() === ""
       ? undefined
       : typedResourceReference(ResourceType.MAILTO, address);

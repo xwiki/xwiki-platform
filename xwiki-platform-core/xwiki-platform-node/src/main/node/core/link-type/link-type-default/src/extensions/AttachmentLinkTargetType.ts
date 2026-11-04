@@ -22,12 +22,12 @@ import {
   entityResourceReference,
   parseEntityReference,
 } from "./referenceHelpers";
-import AttachmentConfig from "../vue/AttachmentConfig.vue";
+import AttachmentLinkTargetForm from "../vue/AttachmentLinkTargetForm.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { LinkAttachmentConfig } from "../data/linkType";
+import type { AttachmentLinkTargetConfig } from "../data/linkType";
 import type {
   LinkTargetReferenceContext,
   LinkTargetTypeExtension,
@@ -44,25 +44,25 @@ import type { Component } from "vue";
  */
 @injectable()
 class AttachmentLinkTargetType
-  implements LinkTargetTypeExtension<LinkAttachmentConfig>
+  implements LinkTargetTypeExtension<AttachmentLinkTargetConfig>
 {
   readonly type = "attachment";
   readonly order = 100;
 
   getLabel = labelFromTranslations("link-type.target-types.attachment.label");
 
-  createDefaultConfig(): LinkAttachmentConfig {
+  createDefaultConfig(): AttachmentLinkTargetConfig {
     return { ref: null };
   }
 
   component(): Component {
-    return AttachmentConfig;
+    return AttachmentLinkTargetForm;
   }
 
   tryParseURL(
     url: string,
     { remoteURLParser }: LinkTargetURLContext,
-  ): LinkAttachmentConfig | null {
+  ): AttachmentLinkTargetConfig | null {
     const ref = tryFallible(() => remoteURLParser.parse(url));
 
     if (ref?.type !== EntityType.ATTACHMENT) {
@@ -78,7 +78,7 @@ class AttachmentLinkTargetType
   }
 
   serializeURL(
-    { ref, queryString }: LinkAttachmentConfig,
+    { ref, queryString }: AttachmentLinkTargetConfig,
     { remoteURLSerializer }: LinkTargetURLContext,
   ): string {
     const base = remoteURLSerializer.serialize(ref ?? undefined);
@@ -89,7 +89,7 @@ class AttachmentLinkTargetType
   tryParseReference(
     reference: ResourceReference,
     { modelReferenceParser }: LinkTargetReferenceContext,
-  ): LinkAttachmentConfig | null {
+  ): AttachmentLinkTargetConfig | null {
     if (reference.type !== ResourceType.ATTACHMENT) {
       return null;
     }
@@ -104,7 +104,7 @@ class AttachmentLinkTargetType
   }
 
   configToReference(
-    { ref }: LinkAttachmentConfig,
+    { ref }: AttachmentLinkTargetConfig,
     { modelReferenceSerializer }: LinkTargetReferenceContext,
   ): ResourceReference | undefined {
     return entityResourceReference(

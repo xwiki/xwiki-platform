@@ -22,12 +22,12 @@ import {
   entityResourceReference,
   parseEntityReference,
 } from "./referenceHelpers";
-import PageConfig from "../vue/PageConfig.vue";
+import PageLinkTargetForm from "../vue/PageLinkTargetForm.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { LinkPageConfig } from "../data/linkType";
+import type { PageLinkTargetConfig } from "../data/linkType";
 import type {
   LinkTargetReferenceContext,
   LinkTargetTypeExtension,
@@ -43,24 +43,26 @@ import type { Component } from "vue";
  * @beta
  */
 @injectable()
-class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
+class PageLinkTargetType
+  implements LinkTargetTypeExtension<PageLinkTargetConfig>
+{
   readonly type = "page";
   readonly order = 0;
 
   getLabel = labelFromTranslations("link-type.target-types.page.label");
 
-  createDefaultConfig(): LinkPageConfig {
+  createDefaultConfig(): PageLinkTargetConfig {
     return { ref: null };
   }
 
   component(): Component {
-    return PageConfig;
+    return PageLinkTargetForm;
   }
 
   tryParseURL(
     url: string,
     { remoteURLParser }: LinkTargetURLContext,
-  ): LinkPageConfig | null {
+  ): PageLinkTargetConfig | null {
     if (url.trim() === "") {
       return { ref: null };
     }
@@ -81,7 +83,7 @@ class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
   }
 
   serializeURL(
-    { ref, queryString, anchor }: LinkPageConfig,
+    { ref, queryString, anchor }: PageLinkTargetConfig,
     { remoteURLSerializer }: LinkTargetURLContext,
   ): string {
     const base = remoteURLSerializer.serialize(ref ?? undefined);
@@ -92,7 +94,7 @@ class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
   tryParseReference(
     reference: ResourceReference,
     { modelReferenceParser }: LinkTargetReferenceContext,
-  ): LinkPageConfig | null {
+  ): PageLinkTargetConfig | null {
     if (reference.type !== ResourceType.DOCUMENT) {
       return null;
     }
@@ -107,7 +109,7 @@ class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
   }
 
   configToReference(
-    { ref }: LinkPageConfig,
+    { ref }: PageLinkTargetConfig,
     { modelReferenceSerializer }: LinkTargetReferenceContext,
   ): ResourceReference | undefined {
     return entityResourceReference(

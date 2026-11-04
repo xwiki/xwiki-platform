@@ -28,7 +28,7 @@ import type {
  * @since 18.10.0RC1
  * @beta
  */
-type LinkPageConfig = {
+type PageLinkTargetConfig = {
   ref: DocumentReference | null;
   queryString?: string;
   anchor?: string;
@@ -40,7 +40,7 @@ type LinkPageConfig = {
  * @since 18.10.0RC1
  * @beta
  */
-type LinkAttachmentConfig = {
+type AttachmentLinkTargetConfig = {
   ref: AttachmentReference | null;
   queryString?: string;
 };
@@ -51,7 +51,7 @@ type LinkAttachmentConfig = {
  * @since 18.10.0RC1
  * @beta
  */
-type LinkURLConfig = {
+type URLLinkTargetConfig = {
   url: string;
 };
 
@@ -61,15 +61,15 @@ type LinkURLConfig = {
  * @since 18.10.0RC1
  * @beta
  */
-type LinkEmailConfig = {
+type EmailLinkTargetConfig = {
   address: string;
   messageSubject?: string;
   messageBody?: string;
 };
 
 export type {
-  LinkAttachmentConfig,
-  LinkEmailConfig,
-  LinkPageConfig,
-  LinkURLConfig,
+  AttachmentLinkTargetConfig,
+  EmailLinkTargetConfig,
+  PageLinkTargetConfig,
+  URLLinkTargetConfig,
 };

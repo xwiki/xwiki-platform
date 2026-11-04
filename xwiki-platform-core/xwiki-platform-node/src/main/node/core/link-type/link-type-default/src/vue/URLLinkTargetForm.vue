@@ -19,14 +19,14 @@
 -->
 <script setup lang="ts">
 import { translations } from "../translations";
-import { LinkConfig } from "@xwiki/platform-link-modal-ui";
+import { LinkForm } from "@xwiki/platform-link-modal-ui";
 import { useI18n } from "vue-i18n";
-import type { LinkURLConfig } from "../data/linkType";
+import type { URLLinkTargetConfig } from "../data/linkType";
 import type { LinkData } from "@xwiki/platform-link-type-api";
 
 defineProps<{ linkData: LinkData }>();
 
-const model = defineModel<LinkURLConfig>({
+const model = defineModel<URLLinkTargetConfig>({
   required: true,
 });
 
@@ -34,7 +34,7 @@ const { t } = useI18n({ messages: translations });
 </script>
 
 <template>
-  <LinkConfig :link-data>
+  <LinkForm :link-data>
     <template #config>
       <x-text-field
         v-bind="{ 'data-test': 'linkUrl' }"
@@ -44,5 +44,5 @@ const { t } = useI18n({ messages: translations });
         required
       />
     </template>
-  </LinkConfig>
+  </LinkForm>
 </template>

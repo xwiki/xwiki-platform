@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { default as _LinkConfig } from "./vue/LinkConfig.vue";
+import { default as _LinkForm } from "./vue/LinkForm.vue";
 import { default as _LinkModal } from "./vue/LinkModal.vue";
 import { default as _SearchBox } from "./vue/SearchBox.vue";
 
@@ -31,14 +31,16 @@ import { default as _SearchBox } from "./vue/SearchBox.vue";
 const LinkModal = _LinkModal;
 
 /**
- * Shared "chrome" rendered by every link target type's configuration component: the display-text field, the
- * link type selector, and the "Options" section. Re-exported so that link target type extensions defined in
- * other packages (e.g., `@xwiki/platform-link-type-default`) can wrap their own configuration component with it.
+ * The part of the link form shared by all the link target types: the display-text field, the link type selector, and
+ * the "Options" section. The form of each link target type (see `LinkTargetTypeExtension.component()` in
+ * `@xwiki/platform-link-type-api`) wraps its own fields with it, using its `config` and `options` slots, so that link
+ * target type extensions defined in other packages (e.g., `@xwiki/platform-link-type-default`) render a complete link
+ * form.
  *
  * @since 18.10.0RC1
  * @beta
  */
-const LinkConfig = _LinkConfig;
+const LinkForm = _LinkForm;
 
 /**
  * Generic search/typeahead input, used by link target types backed by a suggestion service (e.g., the built-in
@@ -49,7 +51,7 @@ const LinkConfig = _LinkConfig;
  */
 const SearchBox = _SearchBox;
 
-export { LinkConfig, LinkModal, SearchBox };
+export { LinkForm, LinkModal, SearchBox };
 
 export type { SearchBoxItem, SearchBoxSource } from "./vue/SearchBox.vue";
 export type { LinkEditionContext } from "./linkEditionContext";

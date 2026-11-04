@@ -55,9 +55,9 @@
     <!-- xwiki-platform is directly released on the configured distributionManagement -->
     <releaseProfiles>release</releaseProfiles>
 
-    <!-- Every webjar-node module embeds an SBOM of the npm packages it bundles (the webjar-node lifecycle generates it),
-         so a release of a webjar-node module without it, or depending on one without it, must fail rather than publish
-         an SBOM missing these packages. -->
+    <!-- Every webjar-node module embeds an SBOM of the npm packages it bundles (the webjar-node lifecycle generates
+         it), so a release of a webjar-node module without it, or depending on one without it, must fail rather than
+         publish an SBOM missing these packages. It also applies to the extensions inheriting this POM. -->
     <xwiki.sbom.failOnMissingEmbeddedSBOM>true</xwiki.sbom.failOnMissingEmbeddedSBOM>
 
     <!-- Dependencies versions -->

@@ -474,7 +474,7 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Pastes a file over the rich text area.
+     * Pastes a file over the rich text area, where the caret is.
      *
      * @param filePath the path of the file to paste, relative to the test resources
      * @return this rich text area instance
@@ -483,20 +483,21 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea pasteFile(String filePath) throws URISyntaxException
     {
-        return insertFile("paste", filePath);
+        return insertFile("paste", filePath, 0);
     }
 
     /**
-     * Drops a file over the rich text area.
+     * Drops a file over the rich text area, at the given offset of its first line.
      *
      * @param filePath the path of the file to drop, relative to the test resources
+     * @param offset how far from the start of the first line the file is dropped
      * @return this rich text area instance
      * @throws URISyntaxException if the given file can't be located
      * @since 18.10.0RC1
      */
-    public BlockNoteRichTextArea dropFile(String filePath) throws URISyntaxException
+    public BlockNoteRichTextArea dropFile(String filePath, int offset) throws URISyntaxException
     {
-        return insertFile("drop", filePath);
+        return insertFile("drop", filePath, offset);
     }
 
     /**
@@ -505,29 +506,38 @@ public class BlockNoteRichTextArea extends BaseElement
      *
      * @param eventType either {@code paste} or {@code drop}
      * @param filePath the path of the file to insert, relative to the test resources
+     * @param offset where a drop lands, as an offset of the first line; ignored for a paste
      * @return this rich text area instance
      * @throws URISyntaxException if the given file can't be located
      */
-    private BlockNoteRichTextArea insertFile(String eventType, String filePath) throws URISyntaxException
+    private BlockNoteRichTextArea insertFile(String eventType, String filePath, int offset)
+        throws URISyntaxException
     {
         WebElement fileInput = loadFile(filePath);
         String script = """
-            const [editor, fileInput, eventType] = arguments;
+            const [editor, fileInput, eventType, offset] = arguments;
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(fileInput.files[0]);
-            const {left, top, width, height} = editor.getBoundingClientRect();
-            const eventInit = {bubbles: true, cancelable: true, clientX: left + width / 2, clientY: top + height / 2};
+            const eventInit = {bubbles: true, cancelable: true};
             if (eventType === 'paste') {
                 const paste = new ClipboardEvent('paste', eventInit);
                 // Firefox ignores clipboardData passed to the constructor, so define it as an own property instead.
                 Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
                 editor.dispatchEvent(paste);
             } else {
-                editor.dispatchEvent(new DragEvent('drop', {...eventInit, dataTransfer}));
+                // A drop lands where the pointer is rather than where the caret is, so point at the given offset.
+                // A collapsed range has no rectangle, so measure one character and take the edge next to the offset.
+                const text = editor.querySelector('p').firstChild;
+                const range = document.createRange();
+                range.setStart(text, Math.max(offset - 1, 0));
+                range.setEnd(text, Math.max(offset, 1));
+                const {left, right, top, height} = range.getBoundingClientRect();
+                editor.dispatchEvent(new DragEvent('drop', {...eventInit, clientX: offset > 0 ? right : left,
+                    clientY: top + height / 2, dataTransfer}));
             }
             fileInput.remove();
             """;
-        getDriver().executeScript(script, this.container, fileInput, eventType);
+        getDriver().executeScript(script, this.container, fileInput, eventType, offset);
         return this;
     }
 

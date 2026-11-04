@@ -27,8 +27,4 @@ export {
   serializeLinkTarget,
 } from "./convert";
 export { linkTargetTypeExtensionRole } from "./linkTargetType";
-export type {
-  LinkTargetReferenceContext,
-  LinkTargetTypeExtension,
-  LinkTargetURLContext,
-} from "./linkTargetType";
+export type { LinkTargetTypeExtension } from "./linkTargetType";

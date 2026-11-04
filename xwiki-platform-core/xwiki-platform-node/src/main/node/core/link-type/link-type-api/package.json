@@ -38,8 +38,6 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-model-reference-api": "workspace:*",
-    "@xwiki/platform-model-remote-url-api": "workspace:*",
     "@xwiki/platform-rendering-api": "workspace:*"
   },
   "peerDependencies": {

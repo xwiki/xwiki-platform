@@ -6,10 +6,6 @@
 
 import { Component } from 'vue';
 import { Container } from 'inversify';
-import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
-import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
-import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
-import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
 
 // @beta
@@ -26,51 +22,39 @@ export type LinkTarget = {
 };
 
 // @beta
-export type LinkTargetReferenceContext = {
-    modelReferenceParser: ModelReferenceParser;
-    modelReferenceSerializer: ModelReferenceSerializer;
-};
-
-// @beta
-export function linkTargetToResourceReference(target: LinkTarget, container: Container, ctx: LinkTargetReferenceContext): ResourceReference | undefined;
+export function linkTargetToResourceReference(target: LinkTarget, container: Container): ResourceReference | undefined;
 
 // @beta
 export interface LinkTargetTypeExtension<TConfig = unknown> {
     // (undocumented)
     component(): Component;
-    configToReference?(config: TConfig, ctx: LinkTargetReferenceContext): ResourceReference | undefined;
+    configToReference?(config: TConfig): ResourceReference | undefined;
     // (undocumented)
     createDefaultConfig(): TConfig;
     getLabel(locale: string): Promise<string>;
     readonly order?: number;
-    serializeURL(config: TConfig, ctx: LinkTargetURLContext): string;
+    serializeURL(config: TConfig): string;
     // (undocumented)
-    tryParseReference?(reference: ResourceReference, ctx: LinkTargetReferenceContext): TConfig | null;
+    tryParseReference?(reference: ResourceReference): TConfig | null;
     // (undocumented)
-    tryParseURL(url: string, ctx: LinkTargetURLContext): TConfig | null;
+    tryParseURL(url: string): TConfig | null;
     readonly type: string;
 }
 
 // @beta
 export const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
 
-// @beta
-export type LinkTargetURLContext = {
-    remoteURLParser: RemoteURLParser;
-    remoteURLSerializer: RemoteURLSerializer;
-};
-
 // @beta (undocumented)
 export function listLinkTargetTypeExtensions(container: Container): LinkTargetTypeExtension[];
 
 // @beta
-export function parseLinkTarget(url: string, container: Container, ctx: LinkTargetURLContext): LinkTarget;
+export function parseLinkTarget(url: string, container: Container): LinkTarget;
 
 // @beta
-export function resourceReferenceToLinkTarget(reference: ResourceReference, container: Container, ctx: LinkTargetReferenceContext): LinkTarget | undefined;
+export function resourceReferenceToLinkTarget(reference: ResourceReference, container: Container): LinkTarget | undefined;
 
 // @beta
-export function serializeLinkTarget(target: LinkTarget, container: Container, ctx: LinkTargetURLContext): string;
+export function serializeLinkTarget(target: LinkTarget, container: Container): string;
 
 // (No @packageDocumentation comment for this package)
 

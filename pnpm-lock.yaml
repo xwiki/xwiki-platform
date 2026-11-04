@@ -2387,12 +2387,6 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-type/link-type-api:
     dependencies:
-      '@xwiki/platform-model-reference-api':
-        specifier: workspace:*
-        version: link:../../model/model-reference/model-reference-api
-      '@xwiki/platform-model-remote-url-api':
-        specifier: workspace:*
-        version: link:../../model/model-remote-url/model-remote-url-api
       '@xwiki/platform-rendering-api':
         specifier: workspace:*
         version: link:../../rendering/rendering-api

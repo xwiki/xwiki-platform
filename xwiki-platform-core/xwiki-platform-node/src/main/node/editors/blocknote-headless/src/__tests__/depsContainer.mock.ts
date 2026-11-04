@@ -155,11 +155,20 @@ export function depsContainerMock(): Container {
 function withBuiltInLinkTargetTypes(
   container: MockProxy<Container>,
 ): Container {
+  // The page and attachment link target types inject the same providers that the container mock returns.
+  const providers = [
+    container.get<RemoteURLParserProvider>("RemoteURLParserProvider"),
+    container.get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider"),
+    container.get<ModelReferenceParserProvider>("ModelReferenceParserProvider"),
+    container.get<ModelReferenceSerializerProvider>(
+      "ModelReferenceSerializerProvider",
+    ),
+  ] as const;
   container.getAll
     .calledWith(linkTargetTypeExtensionRole)
     .mockReturnValue([
-      new PageLinkTargetType(),
-      new AttachmentLinkTargetType(),
+      new PageLinkTargetType(...providers),
+      new AttachmentLinkTargetType(...providers),
       new EmailLinkTargetType(),
       new URLLinkTargetType(),
     ]);

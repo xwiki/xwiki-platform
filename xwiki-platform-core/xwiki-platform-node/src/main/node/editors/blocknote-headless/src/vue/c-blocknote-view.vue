@@ -50,14 +50,6 @@ import type {
 } from "@xwiki/platform-editors-blocknote-react";
 import type { LinkData, LinkTarget } from "@xwiki/platform-link-type-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type {
-  ModelReferenceParserProvider,
-  ModelReferenceSerializerProvider,
-} from "@xwiki/platform-model-reference-api";
-import type {
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
 
 type Props = {
   /** Main properties for the BlockNote editor */
@@ -117,22 +109,6 @@ const emit = defineEmits<{
   "local-instant-change": [];
 }>();
 
-const remoteURLParser = depsContainer
-  .get<RemoteURLParserProvider>("RemoteURLParserProvider")
-  .get()!;
-
-const remoteURLSerializer = depsContainer
-  .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-  .get()!;
-
-const modelReferenceParser = depsContainer
-  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-  .get()!;
-
-const modelReferenceSerializer = depsContainer
-  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
-  .get()!;
-
 function getContent(): BlockType[] {
   return editorRef.value!.document;
 }
@@ -181,17 +157,8 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
 };
 
 const submitEditedLink = ({ displayText, target }: LinkData) => {
-  const referenceCtx = { modelReferenceParser, modelReferenceSerializer };
-
-  const url = serializeLinkTarget(target, depsContainer, {
-    remoteURLParser,
-    remoteURLSerializer,
-  });
-  const reference = linkTargetToResourceReference(
-    target,
-    depsContainer,
-    referenceCtx,
-  );
+  const url = serializeLinkTarget(target, depsContainer);
+  const reference = linkTargetToResourceReference(target, depsContainer);
 
   editingLink.value?.onSubmit({
     title: displayText,
@@ -215,23 +182,11 @@ const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
  * integration provides one, and fall back on reverse-engineering the URL otherwise.
  */
 function currentLinkTarget(current: LinkEditionData): LinkTarget {
-  const referenceCtx = { modelReferenceParser, modelReferenceSerializer };
-
   const target =
     current.reference &&
-    resourceReferenceToLinkTarget(
-      current.reference,
-      depsContainer,
-      referenceCtx,
-    );
+    resourceReferenceToLinkTarget(current.reference, depsContainer);
 
-  return (
-    target ??
-    parseLinkTarget(current.url, depsContainer, {
-      remoteURLParser,
-      remoteURLSerializer,
-    })
-  );
+  return target ?? parseLinkTarget(current.url, depsContainer);
 }
 
 const currentLinkData = computed<LinkData | null>(() => {

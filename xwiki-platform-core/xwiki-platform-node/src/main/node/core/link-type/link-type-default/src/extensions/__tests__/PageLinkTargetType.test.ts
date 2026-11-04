@@ -20,8 +20,8 @@
 import PageLinkTargetForm from "../../vue/PageLinkTargetForm.vue";
 import { PageLinkTargetType } from "../PageLinkTargetType";
 import { EntityType } from "@xwiki/platform-model-api";
-import { describe, expect, it } from "vitest";
-import { mock } from "vitest-mock-extended";
+import { beforeEach, describe, expect, it } from "vitest";
+import { mock, mockReset } from "vitest-mock-extended";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParser,
@@ -36,8 +36,26 @@ const documentRef = {
   type: EntityType.DOCUMENT,
 } as unknown as DocumentReference;
 
+// The extension resolves its services through the providers each time it uses them, so the mocks can be reset
+// between the tests.
+const remoteURLParser = mock<RemoteURLParser>();
+const remoteURLSerializer = mock<RemoteURLSerializer>();
+const modelReferenceParser = mock<ModelReferenceParser>();
+const modelReferenceSerializer = mock<ModelReferenceSerializer>();
+const extension = new PageLinkTargetType(
+  { get: () => remoteURLParser },
+  { get: () => remoteURLSerializer },
+  { get: () => modelReferenceParser },
+  { get: () => modelReferenceSerializer },
+);
+
 describe("PageLinkTargetType", () => {
-  const extension = new PageLinkTargetType();
+  beforeEach(() => {
+    mockReset(remoteURLParser);
+    mockReset(remoteURLSerializer);
+    mockReset(modelReferenceParser);
+    mockReset(modelReferenceSerializer);
+  });
 
   it("has the expected identity", async () => {
     expect(extension.type).toBe("page");
@@ -46,22 +64,14 @@ describe("PageLinkTargetType", () => {
   });
 
   it("parses an empty URL as a page link with no reference selected yet", () => {
-    const remoteURLParser = mock<RemoteURLParser>();
-    const remoteURLSerializer = mock<RemoteURLSerializer>();
-
-    expect(
-      extension.tryParseURL("", { remoteURLParser, remoteURLSerializer }),
-    ).toEqual({ ref: null });
+    expect(extension.tryParseURL("")).toEqual({ ref: null });
   });
 
   it("parses a document URL, including its query string and anchor", () => {
-    const remoteURLParser = mock<RemoteURLParser>();
     remoteURLParser.parse.mockReturnValue(documentRef);
-    const remoteURLSerializer = mock<RemoteURLSerializer>();
 
     const config = extension.tryParseURL(
       "https://xwiki.org/xwiki/bin/view/Some/Page?foo=bar#Anchor",
-      { remoteURLParser, remoteURLSerializer },
     );
 
     expect(config).toEqual({
@@ -72,29 +82,21 @@ describe("PageLinkTargetType", () => {
   });
 
   it("does not match a non-document URL", () => {
-    const remoteURLParser = mock<RemoteURLParser>();
     remoteURLParser.parse.mockReturnValue(undefined);
-    const remoteURLSerializer = mock<RemoteURLSerializer>();
 
-    expect(
-      extension.tryParseURL("https://example.org", {
-        remoteURLParser,
-        remoteURLSerializer,
-      }),
-    ).toBeNull();
+    expect(extension.tryParseURL("https://example.org")).toBeNull();
   });
 
   it("serializes a page config back into a URL, including query string and anchor", () => {
-    const remoteURLParser = mock<RemoteURLParser>();
-    const remoteURLSerializer = mock<RemoteURLSerializer>();
     remoteURLSerializer.serialize.mockReturnValue(
       "https://xwiki.org/xwiki/bin/view/Some/Page",
     );
 
-    const url = extension.serializeURL(
-      { ref: documentRef, queryString: "?foo=bar", anchor: "#Anchor" },
-      { remoteURLParser, remoteURLSerializer },
-    );
+    const url = extension.serializeURL({
+      ref: documentRef,
+      queryString: "?foo=bar",
+      anchor: "#Anchor",
+    });
 
     expect(url).toBe(
       "https://xwiki.org/xwiki/bin/view/Some/Page?foo=bar#Anchor",
@@ -102,44 +104,33 @@ describe("PageLinkTargetType", () => {
   });
 
   it("parses a document reference", () => {
-    const modelReferenceParser = mock<ModelReferenceParser>();
     modelReferenceParser.parse.mockReturnValue(documentRef);
-    const modelReferenceSerializer = mock<ModelReferenceSerializer>();
 
-    const config = extension.tryParseReference?.(
-      { type: "doc", typed: true, reference: "Some.Page", parameters: {} },
-      { modelReferenceParser, modelReferenceSerializer },
-    );
+    const config = extension.tryParseReference?.({
+      type: "doc",
+      typed: true,
+      reference: "Some.Page",
+      parameters: {},
+    });
 
     expect(config).toEqual({ ref: documentRef });
   });
 
   it("does not match a non-document reference", () => {
-    const modelReferenceParser = mock<ModelReferenceParser>();
-    const modelReferenceSerializer = mock<ModelReferenceSerializer>();
-
     expect(
-      extension.tryParseReference?.(
-        {
-          type: "attach",
-          typed: true,
-          reference: "Some.Page@file.png",
-          parameters: {},
-        },
-        { modelReferenceParser, modelReferenceSerializer },
-      ),
+      extension.tryParseReference?.({
+        type: "attach",
+        typed: true,
+        reference: "Some.Page@file.png",
+        parameters: {},
+      }),
     ).toBeNull();
   });
 
   it("converts a page config back into a reference, dropping the type prefix added by the serializer", () => {
-    const modelReferenceParser = mock<ModelReferenceParser>();
-    const modelReferenceSerializer = mock<ModelReferenceSerializer>();
     modelReferenceSerializer.serialize.mockReturnValue("doc:Some.Page");
 
-    const reference = extension.configToReference?.(
-      { ref: documentRef },
-      { modelReferenceParser, modelReferenceSerializer },
-    );
+    const reference = extension.configToReference?.({ ref: documentRef });
 
     expect(reference).toEqual({
       type: "doc",
@@ -150,14 +141,33 @@ describe("PageLinkTargetType", () => {
   });
 
   it("returns undefined when converting to a reference with no page selected", () => {
-    const modelReferenceParser = mock<ModelReferenceParser>();
-    const modelReferenceSerializer = mock<ModelReferenceSerializer>();
+    expect(extension.configToReference?.({ ref: null })).toBeUndefined();
+  });
+});
+
+describe("PageLinkTargetType without the services of the current wiki", () => {
+  it("matches nothing when the current wiki has no model or remote URL service", () => {
+    const noServices = { get: () => undefined };
+    const extensionWithoutServices = new PageLinkTargetType(
+      noServices,
+      noServices,
+      noServices,
+      noServices,
+    );
 
     expect(
-      extension.configToReference?.(
-        { ref: null },
-        { modelReferenceParser, modelReferenceSerializer },
-      ),
+      extensionWithoutServices.tryParseURL("https://example.org/Some/Page"),
+    ).toBeNull();
+    expect(
+      extensionWithoutServices.tryParseReference({
+        type: "doc",
+        typed: true,
+        reference: "Some.Page",
+        parameters: {},
+      }),
+    ).toBeNull();
+    expect(
+      extensionWithoutServices.configToReference({ ref: documentRef }),
     ).toBeUndefined();
   });
 });

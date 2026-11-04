@@ -26,13 +26,17 @@ import AttachmentLinkTargetForm from "../vue/AttachmentLinkTargetForm.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import type { AttachmentLinkTargetConfig } from "../data/linkType";
+import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 import type {
-  LinkTargetReferenceContext,
-  LinkTargetTypeExtension,
-  LinkTargetURLContext,
-} from "@xwiki/platform-link-type-api";
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
 
@@ -49,6 +53,17 @@ class AttachmentLinkTargetType
   readonly type = "attachment";
   readonly order = 100;
 
+  constructor(
+    @inject("RemoteURLParserProvider")
+    private readonly remoteURLParserProvider: RemoteURLParserProvider,
+    @inject("RemoteURLSerializerProvider")
+    private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
+    @inject("ModelReferenceParserProvider")
+    private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
+    @inject("ModelReferenceSerializerProvider")
+    private readonly modelReferenceSerializerProvider: ModelReferenceSerializerProvider,
+  ) {}
+
   getLabel = labelFromTranslations("link-type.target-types.attachment.label");
 
   createDefaultConfig(): AttachmentLinkTargetConfig {
@@ -59,11 +74,10 @@ class AttachmentLinkTargetType
     return AttachmentLinkTargetForm;
   }
 
-  tryParseURL(
-    url: string,
-    { remoteURLParser }: LinkTargetURLContext,
-  ): AttachmentLinkTargetConfig | null {
-    const ref = tryFallible(() => remoteURLParser.parse(url));
+  tryParseURL(url: string): AttachmentLinkTargetConfig | null {
+    const ref = tryFallible(() =>
+      this.remoteURLParserProvider.get()?.parse(url),
+    );
 
     if (ref?.type !== EntityType.ATTACHMENT) {
       return null;
@@ -77,18 +91,16 @@ class AttachmentLinkTargetType
     };
   }
 
-  serializeURL(
-    { ref, queryString }: AttachmentLinkTargetConfig,
-    { remoteURLSerializer }: LinkTargetURLContext,
-  ): string {
-    const base = remoteURLSerializer.serialize(ref ?? undefined);
+  serializeURL({ ref, queryString }: AttachmentLinkTargetConfig): string {
+    const base = this.remoteURLSerializerProvider
+      .get()
+      ?.serialize(ref ?? undefined);
 
     return `${base ?? ""}${queryString ?? ""}`;
   }
 
   tryParseReference(
     reference: ResourceReference,
-    { modelReferenceParser }: LinkTargetReferenceContext,
   ): AttachmentLinkTargetConfig | null {
     if (reference.type !== ResourceType.ATTACHMENT) {
       return null;
@@ -97,20 +109,19 @@ class AttachmentLinkTargetType
     const ref = parseEntityReference(
       reference.reference,
       EntityType.ATTACHMENT,
-      modelReferenceParser,
+      this.modelReferenceParserProvider,
     );
 
     return ref?.type === EntityType.ATTACHMENT ? { ref } : null;
   }
 
-  configToReference(
-    { ref }: AttachmentLinkTargetConfig,
-    { modelReferenceSerializer }: LinkTargetReferenceContext,
-  ): ResourceReference | undefined {
+  configToReference({
+    ref,
+  }: AttachmentLinkTargetConfig): ResourceReference | undefined {
     return entityResourceReference(
       ResourceType.ATTACHMENT,
       ref,
-      modelReferenceSerializer,
+      this.modelReferenceSerializerProvider,
     );
   }
 }

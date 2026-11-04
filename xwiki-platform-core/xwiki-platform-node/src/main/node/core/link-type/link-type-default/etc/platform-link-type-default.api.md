@@ -8,9 +8,11 @@ import { AttachmentReference } from '@xwiki/platform-model-api';
 import { Component } from 'vue';
 import { Container } from 'inversify';
 import { DocumentReference } from '@xwiki/platform-model-api';
-import { LinkTargetReferenceContext } from '@xwiki/platform-link-type-api';
 import { LinkTargetTypeExtension } from '@xwiki/platform-link-type-api';
-import { LinkTargetURLContext } from '@xwiki/platform-link-type-api';
+import { ModelReferenceParserProvider } from '@xwiki/platform-model-reference-api';
+import { ModelReferenceSerializerProvider } from '@xwiki/platform-model-reference-api';
+import { RemoteURLParserProvider } from '@xwiki/platform-model-remote-url-api';
+import { RemoteURLSerializerProvider } from '@xwiki/platform-model-remote-url-api';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
 
 // @beta
@@ -21,10 +23,11 @@ export type AttachmentLinkTargetConfig = {
 
 // @beta
 export class AttachmentLinkTargetType implements LinkTargetTypeExtension<AttachmentLinkTargetConfig> {
+    constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
     // (undocumented)
     component(): Component;
     // (undocumented)
-    configToReference(input: AttachmentLinkTargetConfig, input2: LinkTargetReferenceContext): ResourceReference | undefined;
+    configToReference(input: AttachmentLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
     createDefaultConfig(): AttachmentLinkTargetConfig;
     // (undocumented)
@@ -32,11 +35,11 @@ export class AttachmentLinkTargetType implements LinkTargetTypeExtension<Attachm
     // (undocumented)
     readonly order = 100;
     // (undocumented)
-    serializeURL(input: AttachmentLinkTargetConfig, input2: LinkTargetURLContext): string;
+    serializeURL(input: AttachmentLinkTargetConfig): string;
     // (undocumented)
-    tryParseReference(reference: ResourceReference, input: LinkTargetReferenceContext): AttachmentLinkTargetConfig | null;
+    tryParseReference(reference: ResourceReference): AttachmentLinkTargetConfig | null;
     // (undocumented)
-    tryParseURL(url: string, input: LinkTargetURLContext): AttachmentLinkTargetConfig | null;
+    tryParseURL(url: string): AttachmentLinkTargetConfig | null;
     // (undocumented)
     readonly type = "attachment";
 }
@@ -84,10 +87,11 @@ export type PageLinkTargetConfig = {
 
 // @beta
 export class PageLinkTargetType implements LinkTargetTypeExtension<PageLinkTargetConfig> {
+    constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
     // (undocumented)
     component(): Component;
     // (undocumented)
-    configToReference(input: PageLinkTargetConfig, input2: LinkTargetReferenceContext): ResourceReference | undefined;
+    configToReference(input: PageLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
     createDefaultConfig(): PageLinkTargetConfig;
     // (undocumented)
@@ -95,11 +99,11 @@ export class PageLinkTargetType implements LinkTargetTypeExtension<PageLinkTarge
     // (undocumented)
     readonly order = 0;
     // (undocumented)
-    serializeURL(input: PageLinkTargetConfig, input2: LinkTargetURLContext): string;
+    serializeURL(input: PageLinkTargetConfig): string;
     // (undocumented)
-    tryParseReference(reference: ResourceReference, input: LinkTargetReferenceContext): PageLinkTargetConfig | null;
+    tryParseReference(reference: ResourceReference): PageLinkTargetConfig | null;
     // (undocumented)
-    tryParseURL(url: string, input: LinkTargetURLContext): PageLinkTargetConfig | null;
+    tryParseURL(url: string): PageLinkTargetConfig | null;
     // (undocumented)
     readonly type = "page";
 }

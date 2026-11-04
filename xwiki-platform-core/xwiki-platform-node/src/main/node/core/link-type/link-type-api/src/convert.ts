@@ -19,11 +19,7 @@
  */
 import { linkTargetTypeExtensionRole } from "./linkTargetType";
 import type { LinkTarget } from "./data/linkType";
-import type {
-  LinkTargetReferenceContext,
-  LinkTargetTypeExtension,
-  LinkTargetURLContext,
-} from "./linkTargetType";
+import type { LinkTargetTypeExtension } from "./linkTargetType";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Container } from "inversify";
 
@@ -51,7 +47,6 @@ function listLinkTargetTypeExtensions(
  *
  * @param url - the URL to parse
  * @param container - the `depsContainer` to look up registered link target types from
- * @param ctx - services needed by extensions to inspect the URL
  *
  * @returns the parsed link target
  *
@@ -61,15 +56,11 @@ function listLinkTargetTypeExtensions(
  * @since 18.10.0RC1
  * @beta
  */
-function parseLinkTarget(
-  url: string,
-  container: Container,
-  ctx: LinkTargetURLContext,
-): LinkTarget {
+function parseLinkTarget(url: string, container: Container): LinkTarget {
   const extensions = listLinkTargetTypeExtensions(container);
 
   for (const extension of extensions) {
-    const config = extension.tryParseURL(url, ctx);
+    const config = extension.tryParseURL(url);
 
     if (config !== null) {
       return { type: extension.type, config };
@@ -87,7 +78,6 @@ function parseLinkTarget(
  *
  * @param target - the link target to serialize
  * @param container - the `depsContainer` to look up registered link target types from
- * @param ctx - services needed by extensions to build the URL
  *
  * @returns the serialized URL
  *
@@ -96,11 +86,7 @@ function parseLinkTarget(
  * @since 18.10.0RC1
  * @beta
  */
-function serializeLinkTarget(
-  target: LinkTarget,
-  container: Container,
-  ctx: LinkTargetURLContext,
-): string {
+function serializeLinkTarget(target: LinkTarget, container: Container): string {
   const extensions = listLinkTargetTypeExtensions(container);
   const extension = extensions.find((e) => e.type === target.type);
 
@@ -110,7 +96,7 @@ function serializeLinkTarget(
     );
   }
 
-  return extension.serializeURL(target.config, ctx);
+  return extension.serializeURL(target.config);
 }
 
 /**
@@ -121,7 +107,6 @@ function serializeLinkTarget(
  *
  * @param reference - the reference of the linked resource
  * @param container - the `depsContainer` to look up registered link target types from
- * @param ctx - services needed by extensions to inspect the reference
  *
  * @returns the matching link target, or `undefined` when no registered extension claims this resource
  *   type, so that the caller can fall back on {@link parseLinkTarget}
@@ -132,12 +117,11 @@ function serializeLinkTarget(
 function resourceReferenceToLinkTarget(
   reference: ResourceReference,
   container: Container,
-  ctx: LinkTargetReferenceContext,
 ): LinkTarget | undefined {
   const extensions = listLinkTargetTypeExtensions(container);
 
   for (const extension of extensions) {
-    const config = extension.tryParseReference?.(reference, ctx) ?? null;
+    const config = extension.tryParseReference?.(reference) ?? null;
 
     if (config !== null) {
       return { type: extension.type, config };
@@ -154,7 +138,6 @@ function resourceReferenceToLinkTarget(
  *
  * @param target - the link target to convert
  * @param container - the `depsContainer` to look up registered link target types from
- * @param ctx - services needed by extensions to build the reference
  *
  * @returns the reference of the linked resource, or `undefined` when no registered extension matches
  *   `target.type`, or when the matching extension doesn't implement
@@ -167,12 +150,11 @@ function resourceReferenceToLinkTarget(
 function linkTargetToResourceReference(
   target: LinkTarget,
   container: Container,
-  ctx: LinkTargetReferenceContext,
 ): ResourceReference | undefined {
   const extensions = listLinkTargetTypeExtensions(container);
   const extension = extensions.find((e) => e.type === target.type);
 
-  return extension?.configToReference?.(target.config, ctx);
+  return extension?.configToReference?.(target.config);
 }
 
 export {

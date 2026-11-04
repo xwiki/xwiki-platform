@@ -17,14 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type {
-  ModelReferenceParser,
-  ModelReferenceSerializer,
-} from "@xwiki/platform-model-reference-api";
-import type {
-  RemoteURLParser,
-  RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
 
@@ -43,37 +35,13 @@ import type { Component } from "vue";
 const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
 
 /**
- * Services required to parse a plain URL into a link target's configuration, and to serialize it back into one.
- * Passed explicitly at call time, rather than through constructor injection, so that implementations stay
- * decoupled from exactly which services the caller happens to have on hand.
- *
- * @since 18.10.0RC1
- * @beta
- */
-type LinkTargetURLContext = {
-  remoteURLParser: RemoteURLParser;
-  remoteURLSerializer: RemoteURLSerializer;
-};
-
-/**
- * Services required to convert a link target's configuration into the reference of the resource it
- * designates, and to convert such a reference back into a configuration. Kept separate from
- * {@link LinkTargetURLContext} since it is a distinct, optional concern (resource-reference
- * round-tripping) needing different services, so that implementations/callers only depend on the
- * subset of services their supported operations actually need.
- *
- * @since 18.10.0RC1
- * @beta
- */
-type LinkTargetReferenceContext = {
-  modelReferenceParser: ModelReferenceParser;
-  modelReferenceSerializer: ModelReferenceSerializer;
-};
-
-/**
  * Contract implemented by a link target type, i.e., a kind of link that can be created and edited from the link
  * modal (e.g., a link to a page, to an attachment, to an URL, to an e-mail address, or any other kind contributed
  * by an extension).
+ *
+ * Implementations are components, instantiated by the container they are registered in: they get the services they
+ * need through constructor injection. Services that depend on the current wiki (e.g. the model reference parser)
+ * should be resolved through their provider (e.g. `ModelReferenceParserProvider`) each time they are used.
  *
  * @typeParam TConfig - the shape of this link target type's configuration
  *
@@ -123,23 +91,20 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
 
   /**
    * @param url - a raw URL, as found in a link
-   * @param ctx - services needed to inspect the URL
    * @returns the parsed configuration if `url` belongs to this link target type, `null` otherwise
    */
-  tryParseURL(url: string, ctx: LinkTargetURLContext): TConfig | null;
+  tryParseURL(url: string): TConfig | null;
 
   /**
    * The reverse operation of {@link tryParseURL}: turns a configuration of this type back into a raw URL.
    *
    * @param config - this type's configuration
-   * @param ctx - services needed to build the URL
    * @returns the serialized URL
    */
-  serializeURL(config: TConfig, ctx: LinkTargetURLContext): string;
+  serializeURL(config: TConfig): string;
 
   /**
    * @param reference - the reference of a linked resource
-   * @param ctx - services needed to inspect the reference
    * @returns the parsed configuration if `reference` belongs to this link target type, `null` otherwise.
    *   Unlike {@link tryParseURL}, implementations MUST NOT act as a catch-all here: they must only claim
    *   the specific resource type(s) they actually represent, so that `resourceReferenceToLinkTarget` can
@@ -148,10 +113,7 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
    *
    * Optional: extensions that don't implement it are simply skipped by `resourceReferenceToLinkTarget`.
    */
-  tryParseReference?(
-    reference: ResourceReference,
-    ctx: LinkTargetReferenceContext,
-  ): TConfig | null;
+  tryParseReference?(reference: ResourceReference): TConfig | null;
 
   /**
    * The reverse of {@link tryParseReference}. Returns `undefined`, not a placeholder reference, when the
@@ -159,17 +121,9 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
    * same reason as {@link tryParseReference}.
    *
    * @param config - this type's configuration
-   * @param ctx - services needed to build the reference
    */
-  configToReference?(
-    config: TConfig,
-    ctx: LinkTargetReferenceContext,
-  ): ResourceReference | undefined;
+  configToReference?(config: TConfig): ResourceReference | undefined;
 }
 
 export { linkTargetTypeExtensionRole };
-export type {
-  LinkTargetReferenceContext,
-  LinkTargetTypeExtension,
-  LinkTargetURLContext,
-};
+export type { LinkTargetTypeExtension };

@@ -26,27 +26,8 @@ import {
 import { linkTargetTypeExtensionRole } from "../linkTargetType";
 import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
-import { mock } from "vitest-mock-extended";
 import type { LinkTargetTypeExtension } from "../linkTargetType";
-import type {
-  ModelReferenceParser,
-  ModelReferenceSerializer,
-} from "@xwiki/platform-model-reference-api";
-import type {
-  RemoteURLParser,
-  RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
-
-const ctx = {
-  remoteURLParser: mock<RemoteURLParser>(),
-  remoteURLSerializer: mock<RemoteURLSerializer>(),
-};
-
-const referenceCtx = {
-  modelReferenceParser: mock<ModelReferenceParser>(),
-  modelReferenceSerializer: mock<ModelReferenceSerializer>(),
-};
 
 @injectable()
 class CatchAllExtension implements LinkTargetTypeExtension<{ url: string }> {
@@ -125,7 +106,7 @@ describe("parseLinkTarget", () => {
   it("returns the type contributed by the first matching extension, in order", () => {
     const container = buildContainer([CatchAllExtension, PageExtension]);
 
-    const target = parseLinkTarget("page:Some.Page", container, ctx);
+    const target = parseLinkTarget("page:Some.Page", container);
 
     expect(target).toEqual({ type: "page", config: { ref: "Some.Page" } });
   });
@@ -133,7 +114,7 @@ describe("parseLinkTarget", () => {
   it("falls back to the catch-all (lowest order) when nothing else matches", () => {
     const container = buildContainer([CatchAllExtension, PageExtension]);
 
-    const target = parseLinkTarget("https://example.org", container, ctx);
+    const target = parseLinkTarget("https://example.org", container);
 
     expect(target).toEqual({
       type: "url",
@@ -144,9 +125,7 @@ describe("parseLinkTarget", () => {
   it("throws when no registered extension matches", () => {
     const container = buildContainer([PageExtension]);
 
-    expect(() =>
-      parseLinkTarget("https://example.org", container, ctx),
-    ).toThrow();
+    expect(() => parseLinkTarget("https://example.org", container)).toThrow();
   });
 });
 
@@ -157,7 +136,6 @@ describe("serializeLinkTarget", () => {
     const url = serializeLinkTarget(
       { type: "page", config: { ref: "Some.Page" } },
       container,
-      ctx,
     );
 
     expect(url).toBe("page:Some.Page");
@@ -167,7 +145,7 @@ describe("serializeLinkTarget", () => {
     const container = buildContainer([PageExtension]);
 
     expect(() =>
-      serializeLinkTarget({ type: "email", config: {} }, container, ctx),
+      serializeLinkTarget({ type: "email", config: {} }, container),
     ).toThrow();
   });
 });
@@ -179,7 +157,6 @@ describe("resourceReferenceToLinkTarget", () => {
     const target = resourceReferenceToLinkTarget(
       { type: "doc", typed: true, reference: "Some.Page", parameters: {} },
       container,
-      referenceCtx,
     );
 
     expect(target).toEqual({ type: "page", config: { ref: "Some.Page" } });
@@ -194,7 +171,6 @@ describe("resourceReferenceToLinkTarget", () => {
     const target = resourceReferenceToLinkTarget(
       { type: "doc", typed: true, reference: "Some.Page", parameters: {} },
       container,
-      referenceCtx,
     );
 
     expect(target).toEqual({ type: "page", config: { ref: "Some.Page" } });
@@ -211,7 +187,6 @@ describe("resourceReferenceToLinkTarget", () => {
         parameters: {},
       },
       container,
-      referenceCtx,
     );
 
     expect(target).toBeUndefined();
@@ -225,7 +200,6 @@ describe("linkTargetToResourceReference", () => {
     const reference = linkTargetToResourceReference(
       { type: "page", config: { ref: "Some.Page" } },
       container,
-      referenceCtx,
     );
 
     expect(reference).toEqual({
@@ -242,7 +216,6 @@ describe("linkTargetToResourceReference", () => {
     const reference = linkTargetToResourceReference(
       { type: "no-reference-support", config: { ref: "x" } },
       container,
-      referenceCtx,
     );
 
     expect(reference).toBeUndefined();
@@ -254,7 +227,6 @@ describe("linkTargetToResourceReference", () => {
     const reference = linkTargetToResourceReference(
       { type: "email", config: {} },
       container,
-      referenceCtx,
     );
 
     expect(reference).toBeUndefined();

@@ -23,9 +23,26 @@ import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
 import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 
+/**
+ * The built-in page and attachment link target types inject the providers of the model reference and remote URL
+ * services, which must then be registered in the container they are resolved from.
+ */
+function containerWithModelServices(): Container {
+  const container = new Container();
+  for (const provider of [
+    "ModelReferenceParserProvider",
+    "ModelReferenceSerializerProvider",
+    "RemoteURLParserProvider",
+    "RemoteURLSerializerProvider",
+  ]) {
+    container.bind(provider).toConstantValue({ get: () => undefined });
+  }
+  return container;
+}
+
 describe("ComponentInit", () => {
   it("registers exactly the 4 built-in link target types", () => {
-    const container = new Container();
+    const container = containerWithModelServices();
     new ComponentInit(container);
 
     const extensions = container.getAll<LinkTargetTypeExtension>(
@@ -53,7 +70,7 @@ describe("ComponentInit", () => {
       serializeURL = () => "";
     }
 
-    const container = new Container();
+    const container = containerWithModelServices();
     new ComponentInit(container);
     container.bind(linkTargetTypeExtensionRole).to(CustomLinkTargetType);
 

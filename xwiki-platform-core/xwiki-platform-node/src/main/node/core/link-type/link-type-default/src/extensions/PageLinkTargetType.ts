@@ -26,13 +26,17 @@ import PageLinkTargetForm from "../vue/PageLinkTargetForm.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import type { PageLinkTargetConfig } from "../data/linkType";
+import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 import type {
-  LinkTargetReferenceContext,
-  LinkTargetTypeExtension,
-  LinkTargetURLContext,
-} from "@xwiki/platform-link-type-api";
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
 
@@ -49,6 +53,17 @@ class PageLinkTargetType
   readonly type = "page";
   readonly order = 0;
 
+  constructor(
+    @inject("RemoteURLParserProvider")
+    private readonly remoteURLParserProvider: RemoteURLParserProvider,
+    @inject("RemoteURLSerializerProvider")
+    private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
+    @inject("ModelReferenceParserProvider")
+    private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
+    @inject("ModelReferenceSerializerProvider")
+    private readonly modelReferenceSerializerProvider: ModelReferenceSerializerProvider,
+  ) {}
+
   getLabel = labelFromTranslations("link-type.target-types.page.label");
 
   createDefaultConfig(): PageLinkTargetConfig {
@@ -59,15 +74,14 @@ class PageLinkTargetType
     return PageLinkTargetForm;
   }
 
-  tryParseURL(
-    url: string,
-    { remoteURLParser }: LinkTargetURLContext,
-  ): PageLinkTargetConfig | null {
+  tryParseURL(url: string): PageLinkTargetConfig | null {
     if (url.trim() === "") {
       return { ref: null };
     }
 
-    const ref = tryFallible(() => remoteURLParser.parse(url));
+    const ref = tryFallible(() =>
+      this.remoteURLParserProvider.get()?.parse(url),
+    );
 
     if (ref?.type !== EntityType.DOCUMENT) {
       return null;
@@ -82,19 +96,15 @@ class PageLinkTargetType
     };
   }
 
-  serializeURL(
-    { ref, queryString, anchor }: PageLinkTargetConfig,
-    { remoteURLSerializer }: LinkTargetURLContext,
-  ): string {
-    const base = remoteURLSerializer.serialize(ref ?? undefined);
+  serializeURL({ ref, queryString, anchor }: PageLinkTargetConfig): string {
+    const base = this.remoteURLSerializerProvider
+      .get()
+      ?.serialize(ref ?? undefined);
 
     return `${base ?? ""}${queryString ?? ""}${anchor ?? ""}`;
   }
 
-  tryParseReference(
-    reference: ResourceReference,
-    { modelReferenceParser }: LinkTargetReferenceContext,
-  ): PageLinkTargetConfig | null {
+  tryParseReference(reference: ResourceReference): PageLinkTargetConfig | null {
     if (reference.type !== ResourceType.DOCUMENT) {
       return null;
     }
@@ -102,20 +112,19 @@ class PageLinkTargetType
     const ref = parseEntityReference(
       reference.reference,
       EntityType.DOCUMENT,
-      modelReferenceParser,
+      this.modelReferenceParserProvider,
     );
 
     return ref?.type === EntityType.DOCUMENT ? { ref } : null;
   }
 
-  configToReference(
-    { ref }: PageLinkTargetConfig,
-    { modelReferenceSerializer }: LinkTargetReferenceContext,
-  ): ResourceReference | undefined {
+  configToReference({
+    ref,
+  }: PageLinkTargetConfig): ResourceReference | undefined {
     return entityResourceReference(
       ResourceType.DOCUMENT,
       ref,
-      modelReferenceSerializer,
+      this.modelReferenceSerializerProvider,
     );
   }
 }

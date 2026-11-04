@@ -21,8 +21,8 @@ import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type {
-  ModelReferenceParser,
-  ModelReferenceSerializer,
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
@@ -36,10 +36,12 @@ import type { ResourceReference } from "@xwiki/platform-rendering-api";
 function entityResourceReference(
   type: string,
   ref: EntityReference | null,
-  modelReferenceSerializer: ModelReferenceSerializer,
+  modelReferenceSerializerProvider: ModelReferenceSerializerProvider,
 ): ResourceReference | undefined {
   const serialized =
-    ref === null ? undefined : modelReferenceSerializer.serialize(ref);
+    ref === null
+      ? undefined
+      : modelReferenceSerializerProvider.get()?.serialize(ref);
   if (!serialized) {
     return undefined;
   }
@@ -69,9 +71,13 @@ function untypedResourceReference(
 function parseEntityReference(
   reference: string,
   type: EntityType,
-  modelReferenceParser: ModelReferenceParser,
+  modelReferenceParserProvider: ModelReferenceParserProvider,
 ): EntityReference | null {
-  return tryFallible(() => modelReferenceParser.parse(reference, { type }));
+  return (
+    tryFallible(() =>
+      modelReferenceParserProvider.get()?.parse(reference, { type }),
+    ) ?? null
+  );
 }
 
 export {

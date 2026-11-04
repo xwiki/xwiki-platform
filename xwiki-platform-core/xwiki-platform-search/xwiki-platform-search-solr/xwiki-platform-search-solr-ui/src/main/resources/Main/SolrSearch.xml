@@ -181,9 +181,11 @@
     $(this).before(checkBox)
   };
 
-  function addFacetTitle() {
-    const facetTitle = $(this).attr('title') || $(this).text().trim();
-    $(this).attr('title', facetTitle);
+  function maybeAddFacetTitle() {
+    // Keep the title if the server already provides one (it's not the case now, but can change later).
+    if ($(this).attr('title') === undefined) {
+      $(this).attr('title', $(this).text().trim());
+    }
   }
 
   var enhanceSearchFacets = function() {

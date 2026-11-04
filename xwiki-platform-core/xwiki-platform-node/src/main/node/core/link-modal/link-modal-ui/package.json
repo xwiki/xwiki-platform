@@ -44,7 +44,6 @@
     "@xwiki/platform-dsapi": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
     "@xwiki/platform-link-type-api": "workspace:*",
-    "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
     "@xwiki/platform-rendering-api": "workspace:*",

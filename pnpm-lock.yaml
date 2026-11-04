@@ -2213,9 +2213,6 @@ importers:
       '@xwiki/platform-link-type-api':
         specifier: workspace:*
         version: link:../../link-type/link-type-api
-      '@xwiki/platform-model-api':
-        specifier: workspace:*
-        version: link:../../model/model-api
       '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api

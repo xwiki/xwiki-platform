@@ -23,25 +23,49 @@
 // to a separate file would mean more code scatter.
 
 /**
+ * An item listed by the search box, i.e. one of the results of a search.
+ *
+ * @typeParam T - the type of the value emitted when the item is selected
+ * @typeParam U - the type of the data used to render the item
  * @since 18.10.0RC1
  * @beta
  */
-type SearchLinkSuggestion<T, U> = {
+type SearchBoxItem<T, U> = {
+  /**
+   * The value emitted when the item is selected.
+   */
   value: T;
+
+  /**
+   * The data passed to the slot rendering the item.
+   */
   renderingData: U;
+
+  /**
+   * Identifies the item among the search results.
+   */
   key: string;
+
+  /**
+   * The text written in the search field when the item is selected.
+   */
   equivalentQuery: string;
 };
 
 /**
+ * Searches the items matching a query.
+ *
+ * @typeParam T - the type of the value emitted when an item is selected
+ * @typeParam U - the type of the data used to render an item
+ * @returns the items matching the query, or `false` when searching is not supported
  * @since 18.10.0RC1
  * @beta
  */
-type SearchLinkSuggestor<T, U> = (
+type SearchBoxSource<T, U> = (
   query: string,
-) => Promise<SearchLinkSuggestion<T, U>[] | false>;
+) => Promise<SearchBoxItem<T, U>[] | false>;
 
-export type { SearchLinkSuggestion, SearchLinkSuggestor };
+export type { SearchBoxItem, SearchBoxSource };
 </script>
 
 <script setup lang="ts" generic="T, U">
@@ -73,7 +97,7 @@ const { initialValue, getSuggestions, trySubmitRaw } = defineProps<{
    *
    * @returns Suggestions matching the provided query
    */
-  getSuggestions: SearchLinkSuggestor<T, U>;
+  getSuggestions: SearchBoxSource<T, U>;
 
   /**
    * Triggered when the user tries to submit a raw input (e.g. an URL)
@@ -89,7 +113,7 @@ defineSlots<{
   /**
    * Render a single suggestion
    */
-  renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+  renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
 }>();
 
 const emit = defineEmits<{
@@ -111,7 +135,7 @@ const suggestions = shallowRef<
   | { status: "uninitialized" }
   | {
       status: "resolved";
-      results: SearchLinkSuggestion<T, U>[];
+      results: SearchBoxItem<T, U>[];
     }
   | {
       status: "backendSearchUnsupported";
@@ -141,7 +165,7 @@ const performSearch = debounce(async (search: string) => {
       : { status: "resolved", results: results };
 });
 
-function selectSuggestion(suggestion: SearchLinkSuggestion<T, U>): void {
+function selectSuggestion(suggestion: SearchBoxItem<T, U>): void {
   justDynamicallyUpdatedQuery.value = true;
   query.value = suggestion.equivalentQuery;
   closeSuggestions();

@@ -51,14 +51,5 @@ const SearchBox = _SearchBox;
 
 export { LinkConfig, LinkModal, SearchBox };
 
-export type {
-  SearchLinkSuggestion,
-  SearchLinkSuggestor,
-} from "./vue/SearchBox.vue";
-
-export { createLinkSuggestor } from "./linkSuggest";
-export type {
-  LinkEditionContext,
-  LinkSuggestion,
-  LinkSuggestor,
-} from "./linkSuggest";
+export type { SearchBoxItem, SearchBoxSource } from "./vue/SearchBox.vue";
+export type { LinkEditionContext } from "./linkEditionContext";

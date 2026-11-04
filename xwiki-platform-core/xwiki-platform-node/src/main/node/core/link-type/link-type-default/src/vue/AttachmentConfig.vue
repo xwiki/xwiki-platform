@@ -18,14 +18,11 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { suggestLinks } from "../linkSuggestions";
 import { translations } from "../translations";
-import { filterMap, tryFallible } from "@xwiki/platform-fn-utils";
+import { tryFallible } from "@xwiki/platform-fn-utils";
 import { CIcon, Size } from "@xwiki/platform-icons";
-import {
-  LinkConfig,
-  SearchBox,
-  createLinkSuggestor,
-} from "@xwiki/platform-link-modal-ui";
+import { LinkConfig, SearchBox } from "@xwiki/platform-link-modal-ui";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
 import { inject } from "vue";
@@ -33,9 +30,9 @@ import { useI18n } from "vue-i18n";
 import type { LinkAttachmentConfig } from "../data/linkType";
 import type {
   LinkEditionContext,
-  LinkSuggestion,
-  SearchLinkSuggestor,
+  SearchBoxSource,
 } from "@xwiki/platform-link-modal-ui";
+import type { Link } from "@xwiki/platform-link-suggest-api";
 import type { LinkData } from "@xwiki/platform-link-type-api";
 import type { AttachmentReference } from "@xwiki/platform-model-api";
 
@@ -46,42 +43,16 @@ const model = defineModel<LinkAttachmentConfig>({
 });
 
 const linkEditionCtx = inject<LinkEditionContext>("linkEditionCtx")!;
-const linkSuggestor = createLinkSuggestor(linkEditionCtx);
 
-const getSuggestions: SearchLinkSuggestor<
-  AttachmentReference,
-  LinkSuggestion
-> = async (query) => {
-  if (!linkSuggestor) {
-    return false;
-  }
-
-  return filterMap(
-    await linkSuggestor({ query, type: LinkType.ATTACHMENT }),
-    (result) => {
-      if (result.type !== LinkType.ATTACHMENT) {
-        return null;
-      }
-
-      const ref = tryFallible(() =>
-        linkEditionCtx.modelReferenceParser.parse(result.reference, {
-          type: EntityType.ATTACHMENT,
-        }),
-      );
-
-      if (ref?.type !== EntityType.ATTACHMENT) {
-        return null;
-      }
-
-      return {
-        key: result.url,
-        value: ref,
-        renderingData: result,
-        equivalentQuery: result.reference,
-      };
-    },
-  );
-};
+const getSuggestions: SearchBoxSource<AttachmentReference, Link> = (query) =>
+  suggestLinks(linkEditionCtx, query, LinkType.ATTACHMENT, (link) => {
+    const ref = tryFallible(() =>
+      linkEditionCtx.modelReferenceParser.parse(link.reference, {
+        type: EntityType.ATTACHMENT,
+      }),
+    );
+    return ref?.type === EntityType.ATTACHMENT ? ref : null;
+  });
 
 function submit(ref: AttachmentReference) {
   model.value = { ref, queryString: undefined };
@@ -120,27 +91,12 @@ const { t } = useI18n({ messages: translations });
         @select="submit"
         :try-submit-raw="trySelectRaw"
       >
-        <template
-          #renderSuggestion="{ renderingData: { reference, title, segments } }"
-        >
+        <template #renderSuggestion="{ renderingData: { label, hint } }">
           <div class="suggestion-label">
             <c-icon name="file-earmark" :size="Size.Small" />
-            <span class="suggestion-title">
-              {{ reference.substring(reference.lastIndexOf("@") + 1) }}
-            </span>
+            <span class="suggestion-title">{{ label }}</span>
           </div>
-          <div class="suggestion-hint">
-            <!-- TODO: 'WebHome' is treated as a special hardcoded value for now, until https://jira.xwiki.org/browse/XWIKI-24366 -->
-            <span
-              v-for="segment in title !== 'WebHome'
-                ? segments.concat([title])
-                : segments"
-              :key="segment"
-              class="segment"
-            >
-              {{ segment }}
-            </span>
-          </div>
+          <div class="suggestion-hint" v-if="hint">{{ hint }}</div>
         </template>
       </search-box>
     </template>
@@ -156,13 +112,7 @@ const { t } = useI18n({ messages: translations });
 </template>
 
 <style scoped>
-.segment {
+.suggestion-hint {
   color: var(--cr-color-neutral-500);
-  padding-right: 0.5rem;
-
-  &:not(:last-child)::after {
-    padding-left: 0.5rem;
-    content: ">";
-  }
 }
 </style>

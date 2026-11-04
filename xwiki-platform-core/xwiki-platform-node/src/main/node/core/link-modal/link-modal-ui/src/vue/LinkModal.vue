@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { createLinkEditionContext } from "../linkSuggest.js";
+import { createLinkEditionContext } from "../linkEditionContext";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
 import { listLinkTargetTypeExtensions } from "@xwiki/platform-link-type-api";

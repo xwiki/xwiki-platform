@@ -20,7 +20,6 @@ import { GlobalDirectives } from 'vue';
 import { InputHTMLAttributes } from 'vue';
 import { LinkData } from '@xwiki/platform-link-type-api';
 import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
-import { LinkType } from '@xwiki/platform-link-suggest-api';
 import { MethodOptions } from 'vue';
 import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
@@ -32,9 +31,6 @@ import { ShallowUnwrapRef } from 'vue';
 import { TextFieldProps } from '@xwiki/platform-dsapi';
 import { VNode } from 'vue';
 import { VNodeProps } from 'vue';
-
-// @beta
-export function createLinkSuggestor(input: LinkEditionContext): LinkSuggestor | null;
 
 // @beta
 export const LinkConfig: {
@@ -108,26 +104,11 @@ onCancel?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLDivElement>;
 
 // @beta
-export type LinkSuggestion = {
-    title: string;
-    segments: string[];
-    reference: string;
-    url: string;
-    type: LinkType;
-};
-
-// @beta
-export type LinkSuggestor = (params: {
-    query: string;
-    type?: LinkType;
-}) => Promise<LinkSuggestion[]>;
-
-// @beta
 export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_setup>>["props"], __VLS_ctx?: {
     slots: Readonly<{
-        renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+        renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
     }> & {
-        renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+        renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
     };
     attrs: any;
     emit: (evt: "select", suggestion: T) => void;
@@ -137,31 +118,31 @@ export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_set
         label: string;
         initialValue: string | null;
         placeholder?: string | undefined;
-        getSuggestions: SearchLinkSuggestor<T, U>;
+        getSuggestions: SearchBoxSource<T, U>;
         trySubmitRaw?: ((raw: string) => boolean) | undefined;
     } & PublicProps;
     expose(exposed: ShallowUnwrapRef<    {}>): void;
     attrs: any;
     slots: Readonly<{
-        renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+        renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
     }> & {
-        renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+        renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
     };
     emit: (evt: "select", suggestion: T) => void;
 }>) => VNode & {
     __ctx?: Awaited<typeof __VLS_setup>;
 };
 
-// @beta (undocumented)
-export type SearchLinkSuggestion<T, U> = {
+// @beta
+export type SearchBoxItem<T, U> = {
     value: T;
     renderingData: U;
     key: string;
     equivalentQuery: string;
 };
 
-// @beta (undocumented)
-export type SearchLinkSuggestor<T, U> = (query: string) => Promise<SearchLinkSuggestion<T, U>[] | false>;
+// @beta
+export type SearchBoxSource<T, U> = (query: string) => Promise<SearchBoxItem<T, U>[] | false>;
 
 // (No @packageDocumentation comment for this package)
 

@@ -7,6 +7,8 @@
   "link-modal.config.options": "Options",
   "link-modal.config.open-new-tab": "Open in a new tab",
 
+  "link-modal.unsupported.reference": "Reference",
+
   "link-modal.search-box.backend-unsupported": "Backend search is unsupported.",
   "link-modal.search-box.loading": "Loading...",
   "link-modal.search-box.no-result": "No result found"

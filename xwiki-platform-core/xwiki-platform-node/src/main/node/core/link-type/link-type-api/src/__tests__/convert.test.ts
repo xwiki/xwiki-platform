@@ -24,6 +24,7 @@ import {
   serializeLinkTarget,
 } from "../convert";
 import { linkTargetTypeExtensionRole } from "../linkTargetType";
+import { unsupportedLinkTargetType } from "../unsupportedLinkTarget";
 import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
 import type { LinkTargetTypeExtension } from "../linkTargetType";
@@ -176,20 +177,34 @@ describe("resourceReferenceToLinkTarget", () => {
     expect(target).toEqual({ type: "page", config: { ref: "Some.Page" } });
   });
 
-  it("returns undefined, not throwing, when no registered extension claims the resource type", () => {
+  it("returns an unsupported target holding a copy of the reference when no extension claims its type", () => {
     const container = buildContainer([PageExtension]);
+    const reference = {
+      type: "interwiki",
+      typed: true,
+      reference: "wikipedia:XWiki",
+      parameters: { anchor: "History" },
+    };
 
-    const target = resourceReferenceToLinkTarget(
-      {
-        type: "interwiki",
-        typed: true,
-        reference: "wiki:Space.Page",
-        parameters: {},
-      },
-      container,
-    );
+    const target = resourceReferenceToLinkTarget(reference, container);
 
-    expect(target).toBeUndefined();
+    expect(target).toEqual({
+      type: unsupportedLinkTargetType,
+      config: { reference },
+    });
+
+    // Editing the target must not modify the reference of the edited link.
+    const { reference: copy } = target.config as {
+      reference: typeof reference;
+    };
+    copy.reference = "wikipedia:Wiki";
+    copy.parameters.anchor = "Features";
+    expect(reference).toEqual({
+      type: "interwiki",
+      typed: true,
+      reference: "wikipedia:XWiki",
+      parameters: { anchor: "History" },
+    });
   });
 });
 
@@ -219,6 +234,44 @@ describe("linkTargetToResourceReference", () => {
     );
 
     expect(reference).toBeUndefined();
+  });
+
+  it("returns the reference held by an unsupported target, keeping its type, typed flag and parameters", () => {
+    const container = buildContainer([PageExtension]);
+    const reference = {
+      type: "interwiki",
+      typed: false,
+      reference: "wikipedia:Wiki",
+      parameters: { anchor: "History" },
+    };
+
+    expect(
+      linkTargetToResourceReference(
+        { type: unsupportedLinkTargetType, config: { reference } },
+        container,
+      ),
+    ).toBe(reference);
+  });
+
+  it("returns undefined for an unsupported target with an empty reference", () => {
+    const container = buildContainer([PageExtension]);
+
+    expect(
+      linkTargetToResourceReference(
+        {
+          type: unsupportedLinkTargetType,
+          config: {
+            reference: {
+              type: "interwiki",
+              typed: true,
+              reference: " ",
+              parameters: {},
+            },
+          },
+        },
+        container,
+      ),
+    ).toBeUndefined();
   });
 
   it("returns undefined when no registered extension matches the target's type", () => {

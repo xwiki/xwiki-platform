@@ -51,10 +51,18 @@ export function listLinkTargetTypeExtensions(container: Container): LinkTargetTy
 export function parseLinkTarget(url: string, container: Container): LinkTarget;
 
 // @beta
-export function resourceReferenceToLinkTarget(reference: ResourceReference, container: Container): LinkTarget | undefined;
+export function resourceReferenceToLinkTarget(reference: ResourceReference, container: Container): LinkTarget;
 
 // @beta
 export function serializeLinkTarget(target: LinkTarget, container: Container): string;
+
+// @beta
+export type UnsupportedLinkTargetConfig = {
+    reference: ResourceReference;
+};
+
+// @beta
+export const unsupportedLinkTargetType = "unsupported";
 
 // (No @packageDocumentation comment for this package)
 

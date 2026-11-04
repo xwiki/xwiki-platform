@@ -26,6 +26,7 @@ import {
   parseLinkTarget,
   resourceReferenceToLinkTarget,
   serializeLinkTarget,
+  unsupportedLinkTargetType,
 } from "@xwiki/platform-link-type-api";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
@@ -157,7 +158,12 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
 };
 
 const submitEditedLink = ({ displayText, target }: LinkData) => {
-  const url = serializeLinkTarget(target, depsContainer);
+  // The URL of a resource that no link target type supports can't be computed client-side, so keep the URL of the
+  // edited link. It's only a preview anyway: the link is saved from its reference.
+  const url =
+    target.type === unsupportedLinkTargetType
+      ? (editingLink.value?.current.url ?? "")
+      : serializeLinkTarget(target, depsContainer);
   const reference = linkTargetToResourceReference(target, depsContainer);
 
   editingLink.value?.onSubmit({
@@ -179,14 +185,13 @@ const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
 /**
  * The reference of the linked resource is the authoritative link target (the URL is only a rendering
  * of it), so build the target to configure in the link modal from that reference when the
- * integration provides one, and fall back on reverse-engineering the URL otherwise.
+ * integration provides one, even when no link target type supports it (the reference is then edited as
+ * is), and fall back on reverse-engineering the URL otherwise.
  */
 function currentLinkTarget(current: LinkEditionData): LinkTarget {
-  const target =
-    current.reference &&
-    resourceReferenceToLinkTarget(current.reference, depsContainer);
-
-  return target ?? parseLinkTarget(current.url, depsContainer);
+  return current.reference
+    ? resourceReferenceToLinkTarget(current.reference, depsContainer)
+    : parseLinkTarget(current.url, depsContainer);
 }
 
 const currentLinkData = computed<LinkData | null>(() => {

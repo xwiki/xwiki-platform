@@ -17,54 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { dsComponentStubs } from "./dsStubs";
 import LinkForm from "../LinkForm.vue";
 import { flushPromises, mount } from "@vue/test-utils";
+import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
 import { afterEach, describe, expect, test } from "vitest";
 import { defineComponent, nextTick } from "vue";
 import { createI18n } from "vue-i18n";
 import type {
   LinkData,
+  LinkTarget,
   LinkTargetTypeExtension,
 } from "@xwiki/platform-link-type-api";
-
-// Minimal stand-ins for the design system components used by LinkForm.vue. XTextFieldStub mirrors the contract
-// the real component (and the one used by the blocknote-headless Playwright fixtures) must honor: a *single* root
-// element (inheritAttrs: false, so a stray attribute doesn't land twice) wrapping the actual focusable input -- this
-// is exactly the shape LinkForm.vue's onMounted hook relies on via `$el.querySelector("input, textarea, select")`.
-const XTextFieldStub = defineComponent({
-  inheritAttrs: false,
-  props: ["modelValue", "label"],
-  emits: ["update:modelValue"],
-  template: `
-    <div>
-      <label>{{ label }}</label>
-      <input v-bind="$attrs" :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)" />
-    </div>
-  `,
-});
-
-const XSelectStub = defineComponent({
-  inheritAttrs: false,
-  props: ["modelValue", "label", "items"],
-  emits: ["update:modelValue"],
-  template: `
-    <select v-bind="$attrs" :value="modelValue"
-      @change="$emit('update:modelValue', $event.target.value)">
-      <option v-for="item in items" :key="item.value" :value="item.value">{{ item.label }}</option>
-    </select>
-  `,
-});
-
-const XCheckboxStub = defineComponent({
-  inheritAttrs: false,
-  props: ["modelValue", "label"],
-  emits: ["update:modelValue"],
-  template: `
-    <input type="checkbox" v-bind="$attrs" :checked="modelValue"
-      @change="$emit('update:modelValue', $event.target.checked)" />
-  `,
-});
 
 // LinkForm.vue only uses the registered link target types to fill the type selector and to reset the link target
 // when another type is selected; the parsing/serializing part of the contract is never exercised here.
@@ -101,9 +65,10 @@ async function settle(): Promise<void> {
   );
 }
 
-function mountLinkConfig(
+function mountLinkForm(
   extensions: LinkTargetTypeExtension[] = [urlExtensionStub],
   linkData: LinkData = buildLinkData(),
+  unsupportedLinkTarget: LinkTarget | null = null,
 ) {
   // LinkForm.vue calls useI18n() with its own local `messages`, but vue-i18n still requires a global instance to
   // be installed for that local scope to be created against.
@@ -116,12 +81,8 @@ function mountLinkConfig(
       plugins: [i18n],
       // Normally provided by LinkModal.vue, which resolves the registered link target types out of the
       // depsContainer before rendering LinkForm.
-      provide: { linkTargetTypeExtensions: extensions },
-      components: {
-        "x-text-field": XTextFieldStub,
-        "x-select": XSelectStub,
-        "x-checkbox": XCheckboxStub,
-      },
+      provide: { linkTargetTypeExtensions: extensions, unsupportedLinkTarget },
+      components: dsComponentStubs,
     },
   });
 }
@@ -132,7 +93,7 @@ describe("LinkForm.vue", () => {
   });
 
   test("focuses the display text field once mounted", async () => {
-    const wrapper = mountLinkConfig();
+    const wrapper = mountLinkForm();
 
     await settle();
 
@@ -147,7 +108,7 @@ describe("LinkForm.vue", () => {
     editorStandIn.tabIndex = 0;
     document.body.appendChild(editorStandIn);
 
-    const wrapper = mountLinkConfig();
+    const wrapper = mountLinkForm();
     editorStandIn.focus();
     expect(document.activeElement).toBe(editorStandIn);
 
@@ -158,7 +119,7 @@ describe("LinkForm.vue", () => {
   });
 
   test("identifies the link target types by their type, even when they have the same label", async () => {
-    const wrapper = mountLinkConfig([
+    const wrapper = mountLinkForm([
       urlExtensionStub,
       extensionStub("first", async () => "Same label"),
       extensionStub("second", async () => "Same label"),
@@ -179,7 +140,7 @@ describe("LinkForm.vue", () => {
 
   test("displays the type of a link target type until its label is resolved, or when it fails to resolve", async () => {
     let resolveLabel: (label: string) => void = () => {};
-    const wrapper = mountLinkConfig([
+    const wrapper = mountLinkForm([
       extensionStub(
         "url",
         () => new Promise((resolve) => (resolveLabel = resolve)),
@@ -207,7 +168,7 @@ describe("LinkForm.vue", () => {
       displayText: "",
       target: { type: "url", config: { url: "https://www.xwiki.org" } },
     };
-    const wrapper = mountLinkConfig(
+    const wrapper = mountLinkForm(
       [
         urlExtensionStub,
         extensionStub("first", async () => "Same label", { first: true }),
@@ -223,5 +184,46 @@ describe("LinkForm.vue", () => {
       type: "second",
       config: { second: true },
     });
+  });
+
+  test("offers an unsupported link type as is, and restores its target when selected again", async () => {
+    const unsupportedLinkTarget: LinkTarget = {
+      type: unsupportedLinkTargetType,
+      config: {
+        reference: {
+          type: "interwiki",
+          typed: true,
+          reference: "wikipedia:XWiki",
+          parameters: {},
+        },
+      },
+    };
+    const linkData: LinkData = {
+      displayText: "",
+      target: structuredClone(unsupportedLinkTarget),
+    };
+    const select = mountLinkForm(
+      [urlExtensionStub],
+      linkData,
+      unsupportedLinkTarget,
+    ).get('[data-test="linkTargetType"]');
+    await flushPromises();
+
+    expect(
+      select
+        .findAll("option")
+        .map((option) => [option.attributes("value"), option.text()]),
+    ).toEqual([
+      [unsupportedLinkTargetType, "interwiki"],
+      ["url", "URL"],
+    ]);
+
+    await select.setValue("url");
+    expect(linkData.target).toEqual({ type: "url", config: { url: "" } });
+
+    await select.setValue(unsupportedLinkTargetType);
+    expect(linkData.target).toEqual(unsupportedLinkTarget);
+    // A copy, so that editing it doesn't modify the original target, which can be restored again.
+    expect(linkData.target.config).not.toBe(unsupportedLinkTarget.config);
   });
 });

@@ -18,13 +18,18 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import UnsupportedLinkTargetForm from "./UnsupportedLinkTargetForm.vue";
 import { createLinkEditionContext } from "../linkEditionContext";
 import { translations } from "../translations";
+import { copyUnsupportedLinkTarget } from "../unsupportedLinkTarget";
 import { typedRef } from "../utils";
-import { listLinkTargetTypeExtensions } from "@xwiki/platform-link-type-api";
+import {
+  listLinkTargetTypeExtensions,
+  unsupportedLinkTargetType,
+} from "@xwiki/platform-link-type-api";
 import { computed, markRaw, provide } from "vue";
 import { useI18n } from "vue-i18n";
-import type { LinkData } from "@xwiki/platform-link-type-api";
+import type { LinkData, LinkTarget } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 
 const props = defineProps<{
@@ -42,10 +47,25 @@ const linkExtensions = listLinkTargetTypeExtensions(props.depsContainer);
 
 provide("linkTargetTypeExtensions", linkExtensions);
 
+// When the edited link points to a resource that no link target type supports, the link type selector offers that
+// target too, so that the user can switch back to it (restoring the original reference) after selecting another type.
+// The form of each link target type renders its own selector, which is created again on each switch, so the original
+// target is kept here, for the whole edition.
+const unsupportedLinkTarget: LinkTarget | null =
+  props.current.target.type === unsupportedLinkTargetType
+    ? copyUnsupportedLinkTarget(props.current.target)
+    : null;
+
+provide("unsupportedLinkTarget", unsupportedLinkTarget);
+
 // The configuration component for the currently selected link target type. `markRaw()` excludes it from Vue's
 // reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use of `markRaw()` for the same reason, for a
 // dynamically registered component).
 const activeConfigComponent = computed(() => {
+  if (linkData.value.target.type === unsupportedLinkTargetType) {
+    return UnsupportedLinkTargetForm;
+  }
+
   const extension = linkExtensions.find(
     (e) => e.type === linkData.value.target.type,
   );

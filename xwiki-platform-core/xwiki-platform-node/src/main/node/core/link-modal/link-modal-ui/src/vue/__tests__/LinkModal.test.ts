@@ -17,8 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { dsComponentStubs } from "./dsStubs";
 import LinkModal from "../LinkModal.vue";
 import { flushPromises, mount } from "@vue/test-utils";
+import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
 import { describe, expect, it } from "vitest";
 import { defineComponent, reactive } from "vue";
 import { createI18n } from "vue-i18n";
@@ -72,7 +74,7 @@ function mountLinkModal(
 
   return mount(LinkModal, {
     props: { current, depsContainer: fakeDepsContainer(extensions) },
-    global: { plugins: [i18n] },
+    global: { plugins: [i18n], components: dsComponentStubs },
   });
 }
 
@@ -153,5 +155,48 @@ describe("LinkModal", () => {
     await wrapper.find("[data-test='linkSubmit']").trigger("click");
 
     expect(wrapper.emitted("submit")).toEqual([[current]]);
+  });
+
+  it("edits the reference of a link to an unsupported resource as plain text, keeping its type", async () => {
+    const current: LinkData = {
+      displayText: "XWiki",
+      target: {
+        type: unsupportedLinkTargetType,
+        config: {
+          reference: {
+            type: "interwiki",
+            typed: true,
+            reference: "wikipedia:XWiki",
+            parameters: { anchor: "History" },
+          },
+        },
+      },
+    };
+    const wrapper = mountLinkModal(current, [
+      fakeExtension(
+        "a",
+        "A",
+        defineComponent({ template: "<div>component-a</div>" }),
+      ),
+    ]);
+
+    await wrapper.get("[data-test='linkReference']").setValue("wikipedia:Wiki");
+    await wrapper.find("[data-test='linkSubmit']").trigger("click");
+
+    expect(wrapper.text()).not.toContain("component-a");
+    expect(wrapper.emitted("submit")?.[0]?.[0]).toEqual({
+      displayText: "XWiki",
+      target: {
+        type: unsupportedLinkTargetType,
+        config: {
+          reference: {
+            type: "interwiki",
+            typed: true,
+            reference: "wikipedia:Wiki",
+            parameters: { anchor: "History" },
+          },
+        },
+      },
+    });
   });
 });

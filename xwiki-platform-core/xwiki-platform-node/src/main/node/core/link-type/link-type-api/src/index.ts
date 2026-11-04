@@ -28,3 +28,5 @@ export {
 } from "./convert";
 export { linkTargetTypeExtensionRole } from "./linkTargetType";
 export type { LinkTargetTypeExtension } from "./linkTargetType";
+export { unsupportedLinkTargetType } from "./unsupportedLinkTarget";
+export type { UnsupportedLinkTargetConfig } from "./unsupportedLinkTarget";

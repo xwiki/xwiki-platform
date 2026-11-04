@@ -20,16 +20,20 @@
 <script setup lang="ts">
 import CBlockNoteView from "../../vue/c-blocknote-view.vue";
 import { depsContainerMock } from "../depsContainer.mock";
-import { useTemplateRef } from "vue";
+import { ref, useTemplateRef } from "vue";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
   BlockType,
   ContextForMacros,
+  LinkEditionData,
+  LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 
-defineProps<{
+type ResourceReference = NonNullable<LinkEditionData["reference"]>;
+
+const props = defineProps<{
   editorProps: Omit<
     BlockNoteViewWrapperProps,
     | "depsContainer"
@@ -49,6 +53,12 @@ defineProps<{
   editorContent: BlockType[];
 
   collaboration?: Collaboration;
+
+  /**
+   * The references of the linked resources, indexed by link URL. The editor provides them to the link modal when
+   * editing the corresponding links, like the XWiki integration does from the link metadata.
+   */
+  linkReferences?: Record<string, ResourceReference>;
 }>();
 
 defineEmits<{
@@ -62,6 +72,25 @@ defineEmits<{
 // passed as a prop would lose all its behavior once it reaches the browser.
 const depsContainer = depsContainerMock();
 
+// The reference of the last submitted link, rendered so that the tests can check it.
+const lastSubmittedLinkReference = ref<ResourceReference>();
+
+const linkEdition: LinkEditionHooks = {
+  beforeEdit: (linkData) => {
+    const reference = props.linkReferences?.[linkData.url];
+    return reference ? { ...linkData, reference } : linkData;
+  },
+  beforeUpdate: (linkData) => {
+    lastSubmittedLinkReference.value = linkData.reference;
+    return linkData;
+  },
+};
+
+const editorPropsWithLinkEdition = {
+  ...props.editorProps,
+  overrides: { ...props.editorProps.overrides, linkEdition },
+};
+
 const innerRef = useTemplateRef<InstanceType<typeof CBlockNoteView>>("inner");
 
 defineExpose({
@@ -70,11 +99,23 @@ defineExpose({
 </script>
 
 <template>
-  <CBlockNoteView
-    ref="inner"
-    v-bind="$props"
-    :deps-container="depsContainer"
-    @instant-change="$emit('instant-change')"
-    @debounced-change="(content) => $emit('debounced-change', content)"
-  />
+  <div>
+    <CBlockNoteView
+      ref="inner"
+      :editor-props="editorPropsWithLinkEdition"
+      :macros
+      :editor-content
+      :collaboration
+      :deps-container="depsContainer"
+      @instant-change="$emit('instant-change')"
+      @debounced-change="(content) => $emit('debounced-change', content)"
+    />
+    <!-- Rendered only once a link with a reference is submitted, so that it doesn't change the text of the component
+         checked by the other tests. -->
+    <output
+      v-if="lastSubmittedLinkReference"
+      data-test="submittedLinkReference"
+      >{{ JSON.stringify(lastSubmittedLinkReference) }}</output
+    >
+  </div>
 </template>

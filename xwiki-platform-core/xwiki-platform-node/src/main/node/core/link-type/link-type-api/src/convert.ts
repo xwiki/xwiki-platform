@@ -18,8 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { linkTargetTypeExtensionRole } from "./linkTargetType";
+import { unsupportedLinkTargetType } from "./unsupportedLinkTarget";
 import type { LinkTarget } from "./data/linkType";
 import type { LinkTargetTypeExtension } from "./linkTargetType";
+import type { UnsupportedLinkTargetConfig } from "./unsupportedLinkTarget";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Container } from "inversify";
 
@@ -81,7 +83,8 @@ function parseLinkTarget(url: string, container: Container): LinkTarget {
  *
  * @returns the serialized URL
  *
- * @throws {@link Error} when no registered extension matches `target.type`
+ * @throws {@link Error} when no registered extension matches `target.type`, which is also the case for a target of
+ *   the {@link unsupportedLinkTargetType} type: the URL of an unsupported resource can't be computed client-side
  *
  * @since 18.10.0RC1
  * @beta
@@ -108,8 +111,9 @@ function serializeLinkTarget(target: LinkTarget, container: Container): string {
  * @param reference - the reference of the linked resource
  * @param container - the `depsContainer` to look up registered link target types from
  *
- * @returns the matching link target, or `undefined` when no registered extension claims this resource
- *   type, so that the caller can fall back on {@link parseLinkTarget}
+ * @returns the matching link target, or a target of the {@link unsupportedLinkTargetType} type holding a copy of the
+ *   reference when no registered extension claims this resource type, so that the link can be edited without
+ *   changing the type of the linked resource
  *
  * @since 18.10.0RC1
  * @beta
@@ -117,7 +121,7 @@ function serializeLinkTarget(target: LinkTarget, container: Container): string {
 function resourceReferenceToLinkTarget(
   reference: ResourceReference,
   container: Container,
-): LinkTarget | undefined {
+): LinkTarget {
   const extensions = listLinkTargetTypeExtensions(container);
 
   for (const extension of extensions) {
@@ -128,7 +132,11 @@ function resourceReferenceToLinkTarget(
     }
   }
 
-  return undefined;
+  // Copy the reference, so that editing the link target doesn't modify the reference of the edited link.
+  const config: UnsupportedLinkTargetConfig = {
+    reference: { ...reference, parameters: { ...reference.parameters } },
+  };
+  return { type: unsupportedLinkTargetType, config };
 }
 
 /**
@@ -142,7 +150,8 @@ function resourceReferenceToLinkTarget(
  * @returns the reference of the linked resource, or `undefined` when no registered extension matches
  *   `target.type`, or when the matching extension doesn't implement
  *   {@link LinkTargetTypeExtension.configToReference}, or when it does but the configuration doesn't
- *   designate a resource yet (e.g. no page selected, empty URL)
+ *   designate a resource yet (e.g. no page selected, empty URL). A target of the {@link unsupportedLinkTargetType}
+ *   type is converted to the reference it holds, unless that reference is empty.
  *
  * @since 18.10.0RC1
  * @beta
@@ -151,6 +160,11 @@ function linkTargetToResourceReference(
   target: LinkTarget,
   container: Container,
 ): ResourceReference | undefined {
+  if (target.type === unsupportedLinkTargetType) {
+    const { reference } = target.config as UnsupportedLinkTargetConfig;
+    return reference.reference.trim() === "" ? undefined : reference;
+  }
+
   const extensions = listLinkTargetTypeExtensions(container);
   const extension = extensions.find((e) => e.type === target.type);
 

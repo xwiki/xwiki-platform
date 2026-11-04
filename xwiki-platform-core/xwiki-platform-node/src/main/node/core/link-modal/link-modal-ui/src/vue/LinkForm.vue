@@ -19,6 +19,8 @@
 -->
 <script setup lang="ts">
 import { translations } from "../translations";
+import { copyUnsupportedLinkTarget } from "../unsupportedLinkTarget";
+import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
 import {
   computed,
   inject,
@@ -31,7 +33,9 @@ import {
 import { useI18n } from "vue-i18n";
 import type {
   LinkData,
+  LinkTarget,
   LinkTargetTypeExtension,
+  UnsupportedLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
 
 const props = defineProps<{ linkData: LinkData }>();
@@ -50,13 +54,25 @@ const extensions = inject<LinkTargetTypeExtension[]>(
   "linkTargetTypeExtensions",
 )!;
 
+// Provided by `LinkModal.vue` when the edited link points to a resource that no link target type supports.
+const unsupportedLinkTarget = inject<LinkTarget | null>(
+  "unsupportedLinkTarget",
+  null,
+);
+
 const linkData = ref(props.linkData);
 
 // The link type selector identifies the link target types by their type, the labels are only displayed. Selecting
-// another type resets the target to that type's default configuration.
+// another type resets the target to that type's default configuration, or to the original target of the edited link
+// when it points to a resource that no link target type supports.
 const linkTargetType = computed({
   get: () => linkData.value.target.type,
   set: (type: string) => {
+    if (type === unsupportedLinkTargetType && unsupportedLinkTarget) {
+      linkData.value.target = copyUnsupportedLinkTarget(unsupportedLinkTarget);
+      return;
+    }
+
     const extension = extensions.find((extension) => extension.type === type);
 
     if (extension) {
@@ -93,12 +109,22 @@ watch(
   { immediate: true },
 );
 
-const linkTargetTypeItems = computed(() =>
-  extensions.map((extension) => ({
+const linkTargetTypeItems = computed(() => {
+  const items = extensions.map((extension) => ({
     value: extension.type,
     label: labels.value[extension.type] ?? extension.type,
-  })),
-);
+  }));
+
+  // The type of a resource that no link target type supports has no translation, so it is displayed as is (e.g.
+  // "interwiki").
+  if (unsupportedLinkTarget) {
+    const { reference } =
+      unsupportedLinkTarget.config as UnsupportedLinkTargetConfig;
+    items.unshift({ value: unsupportedLinkTargetType, label: reference.type });
+  }
+
+  return items;
+});
 
 const displayTextField = useTemplateRef("displayTextField");
 

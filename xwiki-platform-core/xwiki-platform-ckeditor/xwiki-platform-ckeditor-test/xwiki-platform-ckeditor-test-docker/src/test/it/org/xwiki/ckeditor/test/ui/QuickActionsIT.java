@@ -281,8 +281,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(11)
     void infoBox()
     {
-        assertQuickActionSelected("/inf", "Info Message");
-        textArea.insertMacro("/info message", "Info Message");
+        assertQuickActionSelected("/info message", "Info Message");
+        textArea.insertMacro("/inf", "Info Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -295,8 +295,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(12)
     void successBox()
     {
-        assertQuickActionSelected("/suc", "Success Message");
-        textArea.insertMacro("/success message", "Success Message");
+        assertQuickActionSelected("/success message", "Success Message");
+        textArea.insertMacro("/suc", "Success Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -309,8 +309,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(13)
     void warningBox()
     {
-        assertQuickActionSelected("/war", "Warning Message");
-        textArea.insertMacro("/warning message", "Warning Message");
+        assertQuickActionSelected("/warning message", "Warning Message");
+        textArea.insertMacro("/war", "Warning Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -323,8 +323,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(14)
     void errorBox()
     {
-        assertQuickActionSelected("/err", "Error Message");
-        textArea.insertMacro("/error message", "Error Message");
+        assertQuickActionSelected("/error message", "Error Message");
+        textArea.insertMacro("/err", "Error Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -408,8 +408,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         testUtils.rest().savePage(new DocumentReference("xwiki", "QuickActionsIT", "TestInclude"), "Test include",
             "Test include");
-        assertQuickActionSelected("/inc", "Include");
-        MacroDialogEditModal macroDialogEditModal = textArea.insertMacroWithRequiredParameters("/include", "Include");
+        assertQuickActionSelected("/include", "Include");
+        MacroDialogEditModal macroDialogEditModal = textArea.insertMacroWithRequiredParameters("/inc", "Include");
         SuggestInputElement reference =
             new SuggestInputElement(macroDialogEditModal.getMacroParameterInput("reference"));
         reference.sendKeys("TestInclude")
@@ -424,8 +424,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     void code()
     {
         // Empty form
-        assertQuickActionSelected("/cod", "Code");
-        textArea.insertMacroWithRequiredParameters("/code", "Code").clickSubmit();
+        assertQuickActionSelected("/code", "Code");
+        textArea.insertMacroWithRequiredParameters("/cod", "Code").clickSubmit();
 
         assertSourceEquals("{{code}}{{/code}}");
     }
@@ -434,8 +434,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(22)
     void toc()
     {
-        assertQuickActionSelected("/toc", "Table of contents");
-        textArea.insertMacro("/table of contents", "Table of contents");
+        assertQuickActionSelected("/table of contents", "Table of contents");
+        textArea.insertMacro("/toc", "Table of contents");
 
         assertSourceEquals("{{toc/}}\n\n ");
     }
@@ -505,8 +505,8 @@ class QuickActionsIT extends AbstractCKEditorIT
         // Remove the 4 characters we just typed
         textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE,  Keys.BACK_SPACE, Keys.BACK_SPACE);
         textArea.sendKeys(" ");
-        assertQuickActionSelected("/inf", "Info Message");
-        textArea.insertMacro("/info message", "Info Message");
+        assertQuickActionSelected("/info message", "Info Message");
+        textArea.insertMacro("/inf", "Info Message");
 
         // Note that we didn't modify the default info message because inline macros are not editable in-place.
         assertSourceEquals("before {{info}}Type your information message here.{{/info}} after");

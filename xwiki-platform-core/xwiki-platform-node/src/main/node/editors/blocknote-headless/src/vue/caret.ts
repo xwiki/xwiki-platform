@@ -47,6 +47,11 @@ function moveCaretTo(
   const caret = caretAt(coordinates.left, coordinates.top);
   if (caret && editor.prosemirrorView.dom.contains(caret[0])) {
     document.getSelection()?.collapse(...caret);
+    // ProseMirror notices a selection it didn't make itself only on a delayed flush of its DOM observer, and what is
+    // inserted next goes where the selection it still holds is, so make it read ours now.
+    (
+      editor.prosemirrorView as unknown as { domObserver: { flush(): void } }
+    ).domObserver.flush();
   }
 }
 

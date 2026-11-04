@@ -24,6 +24,7 @@ import type { EditorType } from "@xwiki/platform-editors-blocknote-react";
 describe("moveCaretTo", () => {
   let editor: EditorType;
   let text: Node;
+  let flush: ReturnType<typeof vi.fn>;
 
   // Only what moving the caret touches: the focus and the editor's own DOM element.
   function editorStub(): EditorType {
@@ -32,9 +33,10 @@ describe("moveCaretTo", () => {
     // The caret is set through the DOM selection, which needs the node to be in the document.
     document.body.append(dom);
     text = dom.firstChild!;
+    flush = vi.fn();
     return {
       focus: vi.fn(),
-      prosemirrorView: { dom },
+      prosemirrorView: { dom, domObserver: { flush } },
     } as unknown as EditorType;
   }
 
@@ -62,6 +64,8 @@ describe("moveCaretTo", () => {
     expect(editor.focus).toHaveBeenCalled();
     expect(document.getSelection()?.anchorNode).toBe(text);
     expect(document.getSelection()?.anchorOffset).toBe(2);
+    // Otherwise ProseMirror inserts at the selection it still holds, up to 20ms later.
+    expect(flush).toHaveBeenCalled();
   });
 
   it("falls back on caretRangeFromPoint, which is all WebKit has", () => {
@@ -85,6 +89,7 @@ describe("moveCaretTo", () => {
     moveCaretTo(editor, { left: 5, top: 9 });
 
     expect(selection.collapse).not.toHaveBeenCalled();
+    expect(flush).not.toHaveBeenCalled();
   });
 
   it("leaves the caret alone when there is no position under the pointer", () => {

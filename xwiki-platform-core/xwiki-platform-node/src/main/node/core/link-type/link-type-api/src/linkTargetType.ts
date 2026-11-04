@@ -37,7 +37,7 @@ import type { Component } from "vue";
  * (see `@xwiki/platform-syntaxes-config`): an unconstrained (no `.whenNamed()`/`.whenDefault()`) multi-binding,
  * disambiguated by a plain `type` field on each resolved object rather than by an Inversify name/tag.
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
@@ -47,10 +47,10 @@ const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
  * Passed explicitly at call time, rather than through constructor injection, so that implementations stay
  * decoupled from exactly which services the caller happens to have on hand.
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
-type LinkTargetUrlContext = {
+type LinkTargetURLContext = {
   remoteURLParser: RemoteURLParser;
   remoteURLSerializer: RemoteURLSerializer;
 };
@@ -58,11 +58,11 @@ type LinkTargetUrlContext = {
 /**
  * Services required to convert a link target's configuration into the reference of the resource it
  * designates, and to convert such a reference back into a configuration. Kept separate from
- * {@link LinkTargetUrlContext} since it is a distinct, optional concern (resource-reference
+ * {@link LinkTargetURLContext} since it is a distinct, optional concern (resource-reference
  * round-tripping) needing different services, so that implementations/callers only depend on the
  * subset of services their supported operations actually need.
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 type LinkTargetReferenceContext = {
@@ -77,7 +77,7 @@ type LinkTargetReferenceContext = {
  *
  * @typeParam TConfig - the shape of this link target type's configuration
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 interface LinkTargetTypeExtension<TConfig = unknown> {
@@ -90,7 +90,7 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
 
   /**
    * Ordering hint, used both to sort the link type selector and to decide in which order
-   * {@link LinkTargetTypeExtension.tryParseUrl} is attempted against a raw URL (lower runs/shows first). Defaults
+   * {@link LinkTargetTypeExtension.tryParseURL} is attempted against a raw URL (lower runs/shows first). Defaults
    * to `1000` when unset. A permissive catch-all implementation (e.g., the built-in `"url"` type) should use a
    * very high value so it is only ever picked once every other type has failed to match.
    */
@@ -119,22 +119,22 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
    * @param ctx - services needed to inspect the URL
    * @returns the parsed configuration if `url` belongs to this link target type, `null` otherwise
    */
-  tryParseUrl(url: string, ctx: LinkTargetUrlContext): TConfig | null;
+  tryParseURL(url: string, ctx: LinkTargetURLContext): TConfig | null;
 
   /**
-   * The reverse operation of {@link tryParseUrl}: turns a configuration of this type back into a raw URL.
+   * The reverse operation of {@link tryParseURL}: turns a configuration of this type back into a raw URL.
    *
    * @param config - this type's configuration
    * @param ctx - services needed to build the URL
    * @returns the serialized URL
    */
-  serializeUrl(config: TConfig, ctx: LinkTargetUrlContext): string;
+  serializeURL(config: TConfig, ctx: LinkTargetURLContext): string;
 
   /**
    * @param reference - the reference of a linked resource
    * @param ctx - services needed to inspect the reference
    * @returns the parsed configuration if `reference` belongs to this link target type, `null` otherwise.
-   *   Unlike {@link tryParseUrl}, implementations MUST NOT act as a catch-all here: they must only claim
+   *   Unlike {@link tryParseURL}, implementations MUST NOT act as a catch-all here: they must only claim
    *   the specific resource type(s) they actually represent, so that `resourceReferenceToLinkTarget` can
    *   return `undefined` for resource types with no matching link target and let the caller fall back to
    *   {@link parseLinkTarget}.
@@ -164,5 +164,5 @@ export { linkTargetTypeExtensionRole };
 export type {
   LinkTargetReferenceContext,
   LinkTargetTypeExtension,
-  LinkTargetUrlContext,
+  LinkTargetURLContext,
 };

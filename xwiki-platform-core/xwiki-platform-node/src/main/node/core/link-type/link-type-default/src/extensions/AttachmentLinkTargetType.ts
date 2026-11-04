@@ -31,7 +31,7 @@ import type { LinkAttachmentConfig } from "../data/linkType";
 import type {
   LinkTargetReferenceContext,
   LinkTargetTypeExtension,
-  LinkTargetUrlContext,
+  LinkTargetURLContext,
 } from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
@@ -39,7 +39,7 @@ import type { Component } from "vue";
 /**
  * Built-in link target type for links to an attachment.
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 @injectable()
@@ -59,9 +59,9 @@ class AttachmentLinkTargetType
     return AttachmentConfig;
   }
 
-  tryParseUrl(
+  tryParseURL(
     url: string,
-    { remoteURLParser }: LinkTargetUrlContext,
+    { remoteURLParser }: LinkTargetURLContext,
   ): LinkAttachmentConfig | null {
     const ref = tryFallible(() => remoteURLParser.parse(url));
 
@@ -69,17 +69,17 @@ class AttachmentLinkTargetType
       return null;
     }
 
-    const parsedUrl = tryFallible(() => new URL(url));
+    const parsedURL = tryFallible(() => new URL(url));
 
     return {
       ref,
-      queryString: parsedUrl?.search,
+      queryString: parsedURL?.search,
     };
   }
 
-  serializeUrl(
+  serializeURL(
     { ref, queryString }: LinkAttachmentConfig,
-    { remoteURLSerializer }: LinkTargetUrlContext,
+    { remoteURLSerializer }: LinkTargetURLContext,
   ): string {
     const base = remoteURLSerializer.serialize(ref ?? undefined);
 

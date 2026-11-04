@@ -31,7 +31,7 @@ import type { Component } from "vue";
 /**
  * Built-in link target type for `mailto:` links.
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 @injectable()
@@ -49,21 +49,21 @@ class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
     return EmailConfig;
   }
 
-  tryParseUrl(url: string): LinkEmailConfig | null {
-    const parsedUrl = tryFallible(() => new URL(url));
+  tryParseURL(url: string): LinkEmailConfig | null {
+    const parsedURL = tryFallible(() => new URL(url));
 
-    if (parsedUrl?.protocol !== "mailto:") {
+    if (parsedURL?.protocol !== "mailto:") {
       return null;
     }
 
     return {
-      address: parsedUrl.pathname,
-      messageSubject: parsedUrl.searchParams.get("subject") ?? undefined,
-      messageBody: parsedUrl.searchParams.get("body") ?? undefined,
+      address: parsedURL.pathname,
+      messageSubject: parsedURL.searchParams.get("subject") ?? undefined,
+      messageBody: parsedURL.searchParams.get("body") ?? undefined,
     };
   }
 
-  serializeUrl({
+  serializeURL({
     address,
     messageSubject,
     messageBody,

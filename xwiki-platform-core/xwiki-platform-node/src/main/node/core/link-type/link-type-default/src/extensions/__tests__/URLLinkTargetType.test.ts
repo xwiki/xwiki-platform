@@ -17,30 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import UrlConfig from "../../vue/UrlConfig.vue";
-import { UrlLinkTargetType } from "../UrlLinkTargetType";
+import URLConfig from "../../vue/URLConfig.vue";
+import { URLLinkTargetType } from "../URLLinkTargetType";
 import { describe, expect, it } from "vitest";
 
-describe("UrlLinkTargetType", () => {
-  const extension = new UrlLinkTargetType();
+describe("URLLinkTargetType", () => {
+  const extension = new URLLinkTargetType();
 
   it("has the expected identity, and the lowest possible priority (highest order)", () => {
     expect(extension.type).toBe("url");
     expect(extension.order).toBe(Number.MAX_SAFE_INTEGER);
     expect(extension.getLabel("en")).toBe("URL");
-    expect(extension.component()).toBe(UrlConfig);
+    expect(extension.component()).toBe(URLConfig);
   });
 
   it("matches any URL, unconditionally", () => {
     expect(
-      extension.tryParseUrl("anything at all, not even a valid URL"),
+      extension.tryParseURL("anything at all, not even a valid URL"),
     ).toEqual({
       url: "anything at all, not even a valid URL",
     });
   });
 
   it("serializes back to the exact same URL", () => {
-    expect(extension.serializeUrl({ url: "https://example.org" })).toBe(
+    expect(extension.serializeURL({ url: "https://example.org" })).toBe(
       "https://example.org",
     );
   });
@@ -58,7 +58,7 @@ describe("UrlLinkTargetType", () => {
     });
   });
 
-  it("does not match resource types with their own dedicated link target, unlike tryParseUrl", () => {
+  it("does not match resource types with their own dedicated link target, unlike tryParseURL", () => {
     ["doc", "attach", "mailto", "interwiki", "space", "user"].forEach(
       (type) => {
         expect(

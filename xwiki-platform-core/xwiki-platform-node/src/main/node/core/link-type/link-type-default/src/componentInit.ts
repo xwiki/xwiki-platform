@@ -20,7 +20,7 @@
 import { AttachmentLinkTargetType } from "./extensions/AttachmentLinkTargetType";
 import { EmailLinkTargetType } from "./extensions/EmailLinkTargetType";
 import { PageLinkTargetType } from "./extensions/PageLinkTargetType";
-import { UrlLinkTargetType } from "./extensions/UrlLinkTargetType";
+import { URLLinkTargetType } from "./extensions/URLLinkTargetType";
 import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 
@@ -33,7 +33,7 @@ import type { Container } from "inversify";
  * A consumer that does not want one (or several) of the built-in link target types (e.g. to offer a reduced set)
  * should simply not instantiate this class, and instead register only the extensions it wants, the same way.
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 class ComponentInit {
@@ -41,7 +41,7 @@ class ComponentInit {
     container.bind(linkTargetTypeExtensionRole).to(PageLinkTargetType);
     container.bind(linkTargetTypeExtensionRole).to(AttachmentLinkTargetType);
     container.bind(linkTargetTypeExtensionRole).to(EmailLinkTargetType);
-    container.bind(linkTargetTypeExtensionRole).to(UrlLinkTargetType);
+    container.bind(linkTargetTypeExtensionRole).to(URLLinkTargetType);
   }
 }
 

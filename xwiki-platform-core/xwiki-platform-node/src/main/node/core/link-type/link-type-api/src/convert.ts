@@ -22,7 +22,7 @@ import type { LinkTarget } from "./data/linkType";
 import type {
   LinkTargetReferenceContext,
   LinkTargetTypeExtension,
-  LinkTargetUrlContext,
+  LinkTargetURLContext,
 } from "./linkTargetType";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Container } from "inversify";
@@ -31,7 +31,7 @@ import type { Container } from "inversify";
  * @param container - the `depsContainer` to look up registered {@link LinkTargetTypeExtension}s from
  * @returns every registered link target type extension, sorted by ascending {@link LinkTargetTypeExtension.order}
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 function listLinkTargetTypeExtensions(
@@ -47,7 +47,7 @@ function listLinkTargetTypeExtensions(
 /**
  * Parse a link target from a raw URL, by trying each registered {@link LinkTargetTypeExtension} in ascending
  * {@link LinkTargetTypeExtension.order}, and keeping the first one that matches (see
- * {@link LinkTargetTypeExtension.tryParseUrl}).
+ * {@link LinkTargetTypeExtension.tryParseURL}).
  *
  * @param url - the URL to parse
  * @param container - the `depsContainer` to look up registered link target types from
@@ -58,18 +58,18 @@ function listLinkTargetTypeExtensions(
  * @throws {@link Error} when no registered extension matches the URL (should not happen as long as a
  *   permissive catch-all extension, such as the built-in `"url"` type, is registered)
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 function parseLinkTarget(
   url: string,
   container: Container,
-  ctx: LinkTargetUrlContext,
+  ctx: LinkTargetURLContext,
 ): LinkTarget {
   const extensions = listLinkTargetTypeExtensions(container);
 
   for (const extension of extensions) {
-    const config = extension.tryParseUrl(url, ctx);
+    const config = extension.tryParseURL(url, ctx);
 
     if (config !== null) {
       return { type: extension.type, config };
@@ -93,13 +93,13 @@ function parseLinkTarget(
  *
  * @throws {@link Error} when no registered extension matches `target.type`
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 function serializeLinkTarget(
   target: LinkTarget,
   container: Container,
-  ctx: LinkTargetUrlContext,
+  ctx: LinkTargetURLContext,
 ): string {
   const extensions = listLinkTargetTypeExtensions(container);
   const extension = extensions.find((e) => e.type === target.type);
@@ -110,7 +110,7 @@ function serializeLinkTarget(
     );
   }
 
-  return extension.serializeUrl(target.config, ctx);
+  return extension.serializeURL(target.config, ctx);
 }
 
 /**
@@ -126,7 +126,7 @@ function serializeLinkTarget(
  * @returns the matching link target, or `undefined` when no registered extension claims this resource
  *   type, so that the caller can fall back on {@link parseLinkTarget}
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 function resourceReferenceToLinkTarget(
@@ -161,7 +161,7 @@ function resourceReferenceToLinkTarget(
  *   {@link LinkTargetTypeExtension.configToReference}, or when it does but the configuration doesn't
  *   designate a resource yet (e.g. no page selected, empty URL)
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 function linkTargetToResourceReference(

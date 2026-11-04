@@ -57,9 +57,9 @@ class CatchAllExtension implements LinkTargetTypeExtension<{ url: string }> {
   component = () => {
     throw new Error("not used in this test");
   };
-  tryParseUrl = (url: string) => ({ url });
-  serializeUrl = (config: { url: string }) => config.url;
-  // Unlike tryParseUrl, this is deliberately NOT a catch-all — see UrlLinkTargetType.
+  tryParseURL = (url: string) => ({ url });
+  serializeURL = (config: { url: string }) => config.url;
+  // Unlike tryParseURL, this is deliberately NOT a catch-all — see URLLinkTargetType.
   tryParseReference = (reference: ResourceReference) =>
     reference.type === "url" ? { url: reference.reference } : null;
   configToReference = (config: { url: string }): ResourceReference => ({
@@ -79,9 +79,9 @@ class PageExtension implements LinkTargetTypeExtension<{ ref: string }> {
   component = () => {
     throw new Error("not used in this test");
   };
-  tryParseUrl = (url: string) =>
+  tryParseURL = (url: string) =>
     url.startsWith("page:") ? { ref: url.slice("page:".length) } : null;
-  serializeUrl = (config: { ref: string }) => `page:${config.ref}`;
+  serializeURL = (config: { ref: string }) => `page:${config.ref}`;
   tryParseReference = (reference: ResourceReference) =>
     reference.type === "doc" ? { ref: reference.reference } : null;
   configToReference = (config: { ref: string }): ResourceReference => ({
@@ -105,8 +105,8 @@ class NoReferenceSupportExtension
   component = () => {
     throw new Error("not used in this test");
   };
-  tryParseUrl = () => null;
-  serializeUrl = (config: { ref: string }) => config.ref;
+  tryParseURL = () => null;
+  serializeURL = (config: { ref: string }) => config.ref;
 }
 
 function buildContainer(

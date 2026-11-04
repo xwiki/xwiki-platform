@@ -74,8 +74,8 @@ const urlExtensionStub: LinkTargetTypeExtension = {
   getLabel: () => "URL",
   createDefaultConfig: () => ({ url: "" }),
   component: () => defineComponent({ template: "<div />" }),
-  tryParseUrl: () => null,
-  serializeUrl: () => "",
+  tryParseURL: () => null,
+  serializeURL: () => "",
 };
 
 function buildLinkData(): LinkData {

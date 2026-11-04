@@ -19,10 +19,10 @@
  */
 import { labelFromTranslations } from "./labels";
 import { untypedResourceReference } from "./referenceHelpers";
-import UrlConfig from "../vue/UrlConfig.vue";
+import URLConfig from "../vue/URLConfig.vue";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { LinkUrlConfig } from "../data/linkType";
+import type { LinkURLConfig } from "../data/linkType";
 import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
@@ -32,39 +32,39 @@ import type { Component } from "vue";
  * registered with the lowest priority (highest {@link order} value) among all registered link target types, so
  * that every other, more specific type gets a chance to match first.
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 @injectable()
-class UrlLinkTargetType implements LinkTargetTypeExtension<LinkUrlConfig> {
+class URLLinkTargetType implements LinkTargetTypeExtension<LinkURLConfig> {
   readonly type = "url";
   readonly order = Number.MAX_SAFE_INTEGER;
 
   getLabel = labelFromTranslations("link-type.target-types.url.label");
 
-  createDefaultConfig(): LinkUrlConfig {
+  createDefaultConfig(): LinkURLConfig {
     return { url: "" };
   }
 
   component(): Component {
-    return UrlConfig;
+    return URLConfig;
   }
 
-  tryParseUrl(url: string): LinkUrlConfig | null {
+  tryParseURL(url: string): LinkURLConfig | null {
     return { url };
   }
 
-  serializeUrl({ url }: LinkUrlConfig): string {
+  serializeURL({ url }: LinkURLConfig): string {
     return url;
   }
 
   /**
-   * Unlike {@link tryParseUrl}, this is NOT a catch-all: it only claims the resource types that
+   * Unlike {@link tryParseURL}, this is NOT a catch-all: it only claims the resource types that
    * genuinely designate a bare URL, so that {@link resourceReferenceToLinkTarget} correctly falls
    * through to `undefined` (and the caller to {@link parseLinkTarget}) for resource types with no
    * matching link target (e.g. interwiki, space, user).
    */
-  tryParseReference(reference: ResourceReference): LinkUrlConfig | null {
+  tryParseReference(reference: ResourceReference): LinkURLConfig | null {
     switch (reference.type) {
       case ResourceType.URL:
       case ResourceType.PATH:
@@ -76,11 +76,11 @@ class UrlLinkTargetType implements LinkTargetTypeExtension<LinkUrlConfig> {
     }
   }
 
-  configToReference({ url }: LinkUrlConfig): ResourceReference | undefined {
+  configToReference({ url }: LinkURLConfig): ResourceReference | undefined {
     return url.trim() === ""
       ? undefined
       : untypedResourceReference(ResourceType.URL, url);
   }
 }
 
-export { UrlLinkTargetType };
+export { URLLinkTargetType };

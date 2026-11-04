@@ -49,8 +49,8 @@ describe("ComponentInit", () => {
       component = (): never => {
         throw new Error("not used in this test");
       };
-      tryParseUrl = () => null;
-      serializeUrl = () => "";
+      tryParseURL = () => null;
+      serializeURL = () => "";
     }
 
     const container = new Container();

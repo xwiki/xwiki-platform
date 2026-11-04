@@ -21,12 +21,12 @@
 import { translations } from "../translations";
 import { LinkConfig } from "@xwiki/platform-link-modal-ui";
 import { useI18n } from "vue-i18n";
-import type { LinkUrlConfig } from "../data/linkType";
+import type { LinkURLConfig } from "../data/linkType";
 import type { LinkData } from "@xwiki/platform-link-type-api";
 
 defineProps<{ linkData: LinkData }>();
 
-const model = defineModel<LinkUrlConfig>({
+const model = defineModel<LinkURLConfig>({
   required: true,
 });
 

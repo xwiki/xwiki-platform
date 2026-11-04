@@ -10,7 +10,7 @@ import { Container } from 'inversify';
 import { DocumentReference } from '@xwiki/platform-model-api';
 import { LinkTargetReferenceContext } from '@xwiki/platform-link-type-api';
 import { LinkTargetTypeExtension } from '@xwiki/platform-link-type-api';
-import { LinkTargetUrlContext } from '@xwiki/platform-link-type-api';
+import { LinkTargetURLContext } from '@xwiki/platform-link-type-api';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
 
 // @beta
@@ -26,11 +26,11 @@ export class AttachmentLinkTargetType implements LinkTargetTypeExtension<LinkAtt
     // (undocumented)
     readonly order = 100;
     // (undocumented)
-    serializeUrl(input: LinkAttachmentConfig, input2: LinkTargetUrlContext): string;
+    serializeURL(input: LinkAttachmentConfig, input2: LinkTargetURLContext): string;
     // (undocumented)
     tryParseReference(reference: ResourceReference, input: LinkTargetReferenceContext): LinkAttachmentConfig | null;
     // (undocumented)
-    tryParseUrl(url: string, input: LinkTargetUrlContext): LinkAttachmentConfig | null;
+    tryParseURL(url: string, input: LinkTargetURLContext): LinkAttachmentConfig | null;
     // (undocumented)
     readonly type = "attachment";
 }
@@ -53,11 +53,11 @@ export class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailCon
     // (undocumented)
     readonly order = 200;
     // (undocumented)
-    serializeUrl(input: LinkEmailConfig): string;
+    serializeURL(input: LinkEmailConfig): string;
     // (undocumented)
     tryParseReference(reference: ResourceReference): LinkEmailConfig | null;
     // (undocumented)
-    tryParseUrl(url: string): LinkEmailConfig | null;
+    tryParseURL(url: string): LinkEmailConfig | null;
     // (undocumented)
     readonly type = "email";
 }
@@ -83,7 +83,7 @@ export type LinkPageConfig = {
 };
 
 // @beta
-export type LinkUrlConfig = {
+export type LinkURLConfig = {
     url: string;
 };
 
@@ -100,32 +100,32 @@ export class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfi
     // (undocumented)
     readonly order = 0;
     // (undocumented)
-    serializeUrl(input: LinkPageConfig, input2: LinkTargetUrlContext): string;
+    serializeURL(input: LinkPageConfig, input2: LinkTargetURLContext): string;
     // (undocumented)
     tryParseReference(reference: ResourceReference, input: LinkTargetReferenceContext): LinkPageConfig | null;
     // (undocumented)
-    tryParseUrl(url: string, input: LinkTargetUrlContext): LinkPageConfig | null;
+    tryParseURL(url: string, input: LinkTargetURLContext): LinkPageConfig | null;
     // (undocumented)
     readonly type = "page";
 }
 
 // @beta
-export class UrlLinkTargetType implements LinkTargetTypeExtension<LinkUrlConfig> {
+export class URLLinkTargetType implements LinkTargetTypeExtension<LinkURLConfig> {
     // (undocumented)
     component(): Component;
     // (undocumented)
-    configToReference(input: LinkUrlConfig): ResourceReference | undefined;
+    configToReference(input: LinkURLConfig): ResourceReference | undefined;
     // (undocumented)
-    createDefaultConfig(): LinkUrlConfig;
+    createDefaultConfig(): LinkURLConfig;
     // (undocumented)
     getLabel: (locale: string) => string;
     // (undocumented)
     readonly order: number;
     // (undocumented)
-    serializeUrl(input: LinkUrlConfig): string;
-    tryParseReference(reference: ResourceReference): LinkUrlConfig | null;
+    serializeURL(input: LinkURLConfig): string;
+    tryParseReference(reference: ResourceReference): LinkURLConfig | null;
     // (undocumented)
-    tryParseUrl(url: string): LinkUrlConfig | null;
+    tryParseURL(url: string): LinkURLConfig | null;
     // (undocumented)
     readonly type = "url";
 }

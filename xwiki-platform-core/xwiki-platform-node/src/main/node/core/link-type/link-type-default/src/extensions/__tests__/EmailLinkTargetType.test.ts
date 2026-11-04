@@ -31,7 +31,7 @@ describe("EmailLinkTargetType", () => {
   });
 
   it("parses a mailto: URL, including its subject and body", () => {
-    const config = extension.tryParseUrl(
+    const config = extension.tryParseURL(
       "mailto:jdoe@example.org?subject=Hello&body=Hi%20there",
     );
 
@@ -43,7 +43,7 @@ describe("EmailLinkTargetType", () => {
   });
 
   it("parses a mailto: URL with no subject/body as undefined, not empty string", () => {
-    const config = extension.tryParseUrl("mailto:jdoe@example.org");
+    const config = extension.tryParseURL("mailto:jdoe@example.org");
 
     expect(config).toEqual({
       address: "jdoe@example.org",
@@ -53,11 +53,11 @@ describe("EmailLinkTargetType", () => {
   });
 
   it("does not match a non-mailto: URL", () => {
-    expect(extension.tryParseUrl("https://example.org")).toBeNull();
+    expect(extension.tryParseURL("https://example.org")).toBeNull();
   });
 
   it("round-trips address, subject and body when serializing", () => {
-    const url = extension.serializeUrl({
+    const url = extension.serializeURL({
       address: "jdoe@example.org",
       messageSubject: "Hello",
       messageBody: "Hi there",
@@ -67,7 +67,7 @@ describe("EmailLinkTargetType", () => {
   });
 
   it("omits subject/body from the URL when unset", () => {
-    const url = extension.serializeUrl({ address: "jdoe@example.org" });
+    const url = extension.serializeURL({ address: "jdoe@example.org" });
 
     expect(url).toBe("mailto:jdoe@example.org");
   });

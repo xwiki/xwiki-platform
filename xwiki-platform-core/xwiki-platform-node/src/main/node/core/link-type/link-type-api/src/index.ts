@@ -30,5 +30,5 @@ export { linkTargetTypeExtensionRole } from "./linkTargetType";
 export type {
   LinkTargetReferenceContext,
   LinkTargetTypeExtension,
-  LinkTargetUrlContext,
+  LinkTargetURLContext,
 } from "./linkTargetType";

@@ -50,7 +50,7 @@ describe("AttachmentLinkTargetType", () => {
     remoteURLParser.parse.mockReturnValue(attachmentRef);
     const remoteURLSerializer = mock<RemoteURLSerializer>();
 
-    const config = extension.tryParseUrl(
+    const config = extension.tryParseURL(
       "https://xwiki.org/xwiki/bin/download/Some/Page/file.png?foo=bar",
       { remoteURLParser, remoteURLSerializer },
     );
@@ -64,7 +64,7 @@ describe("AttachmentLinkTargetType", () => {
     const remoteURLSerializer = mock<RemoteURLSerializer>();
 
     expect(
-      extension.tryParseUrl("https://example.org", {
+      extension.tryParseURL("https://example.org", {
         remoteURLParser,
         remoteURLSerializer,
       }),
@@ -78,7 +78,7 @@ describe("AttachmentLinkTargetType", () => {
       "https://xwiki.org/xwiki/bin/download/Some/Page/file.png",
     );
 
-    const url = extension.serializeUrl(
+    const url = extension.serializeURL(
       { ref: attachmentRef, queryString: "?foo=bar" },
       { remoteURLParser, remoteURLSerializer },
     );

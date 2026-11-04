@@ -50,7 +50,7 @@ describe("PageLinkTargetType", () => {
     const remoteURLSerializer = mock<RemoteURLSerializer>();
 
     expect(
-      extension.tryParseUrl("", { remoteURLParser, remoteURLSerializer }),
+      extension.tryParseURL("", { remoteURLParser, remoteURLSerializer }),
     ).toEqual({ ref: null });
   });
 
@@ -59,7 +59,7 @@ describe("PageLinkTargetType", () => {
     remoteURLParser.parse.mockReturnValue(documentRef);
     const remoteURLSerializer = mock<RemoteURLSerializer>();
 
-    const config = extension.tryParseUrl(
+    const config = extension.tryParseURL(
       "https://xwiki.org/xwiki/bin/view/Some/Page?foo=bar#Anchor",
       { remoteURLParser, remoteURLSerializer },
     );
@@ -77,7 +77,7 @@ describe("PageLinkTargetType", () => {
     const remoteURLSerializer = mock<RemoteURLSerializer>();
 
     expect(
-      extension.tryParseUrl("https://example.org", {
+      extension.tryParseURL("https://example.org", {
         remoteURLParser,
         remoteURLSerializer,
       }),
@@ -91,7 +91,7 @@ describe("PageLinkTargetType", () => {
       "https://xwiki.org/xwiki/bin/view/Some/Page",
     );
 
-    const url = extension.serializeUrl(
+    const url = extension.serializeURL(
       { ref: documentRef, queryString: "?foo=bar", anchor: "#Anchor" },
       { remoteURLParser, remoteURLSerializer },
     );

@@ -59,8 +59,8 @@ function fakeExtension(
     getLabel: () => label,
     createDefaultConfig: () => ({}),
     component: () => component,
-    tryParseUrl: () => null,
-    serializeUrl: () => "",
+    tryParseURL: () => null,
+    serializeURL: () => "",
   };
 }
 

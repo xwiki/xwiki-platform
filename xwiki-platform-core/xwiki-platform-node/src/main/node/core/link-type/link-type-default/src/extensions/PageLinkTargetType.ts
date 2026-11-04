@@ -31,7 +31,7 @@ import type { LinkPageConfig } from "../data/linkType";
 import type {
   LinkTargetReferenceContext,
   LinkTargetTypeExtension,
-  LinkTargetUrlContext,
+  LinkTargetURLContext,
 } from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
@@ -39,7 +39,7 @@ import type { Component } from "vue";
 /**
  * Built-in link target type for links to an internal wiki page.
  *
- * @since 18.8.0RC1
+ * @since 18.10.0RC1
  * @beta
  */
 @injectable()
@@ -57,9 +57,9 @@ class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
     return PageConfig;
   }
 
-  tryParseUrl(
+  tryParseURL(
     url: string,
-    { remoteURLParser }: LinkTargetUrlContext,
+    { remoteURLParser }: LinkTargetURLContext,
   ): LinkPageConfig | null {
     if (url.trim() === "") {
       return { ref: null };
@@ -71,18 +71,18 @@ class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
       return null;
     }
 
-    const parsedUrl = tryFallible(() => new URL(url));
+    const parsedURL = tryFallible(() => new URL(url));
 
     return {
       ref,
-      anchor: parsedUrl?.hash,
-      queryString: parsedUrl?.search,
+      anchor: parsedURL?.hash,
+      queryString: parsedURL?.search,
     };
   }
 
-  serializeUrl(
+  serializeURL(
     { ref, queryString, anchor }: LinkPageConfig,
-    { remoteURLSerializer }: LinkTargetUrlContext,
+    { remoteURLSerializer }: LinkTargetURLContext,
   ): string {
     const base = remoteURLSerializer.serialize(ref ?? undefined);
 

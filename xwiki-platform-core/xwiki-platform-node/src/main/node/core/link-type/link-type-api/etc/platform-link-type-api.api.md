@@ -44,11 +44,11 @@ export interface LinkTargetTypeExtension<TConfig = unknown> {
     // (undocumented)
     getLabel(locale: string): string;
     readonly order?: number;
-    serializeUrl(config: TConfig, ctx: LinkTargetUrlContext): string;
+    serializeURL(config: TConfig, ctx: LinkTargetURLContext): string;
     // (undocumented)
     tryParseReference?(reference: ResourceReference, ctx: LinkTargetReferenceContext): TConfig | null;
     // (undocumented)
-    tryParseUrl(url: string, ctx: LinkTargetUrlContext): TConfig | null;
+    tryParseURL(url: string, ctx: LinkTargetURLContext): TConfig | null;
     readonly type: string;
 }
 
@@ -56,7 +56,7 @@ export interface LinkTargetTypeExtension<TConfig = unknown> {
 export const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
 
 // @beta
-export type LinkTargetUrlContext = {
+export type LinkTargetURLContext = {
     remoteURLParser: RemoteURLParser;
     remoteURLSerializer: RemoteURLSerializer;
 };
@@ -65,13 +65,13 @@ export type LinkTargetUrlContext = {
 export function listLinkTargetTypeExtensions(container: Container): LinkTargetTypeExtension[];
 
 // @beta
-export function parseLinkTarget(url: string, container: Container, ctx: LinkTargetUrlContext): LinkTarget;
+export function parseLinkTarget(url: string, container: Container, ctx: LinkTargetURLContext): LinkTarget;
 
 // @beta
 export function resourceReferenceToLinkTarget(reference: ResourceReference, container: Container, ctx: LinkTargetReferenceContext): LinkTarget | undefined;
 
 // @beta
-export function serializeLinkTarget(target: LinkTarget, container: Container, ctx: LinkTargetUrlContext): string;
+export function serializeLinkTarget(target: LinkTarget, container: Container, ctx: LinkTargetURLContext): string;
 
 // (No @packageDocumentation comment for this package)
 

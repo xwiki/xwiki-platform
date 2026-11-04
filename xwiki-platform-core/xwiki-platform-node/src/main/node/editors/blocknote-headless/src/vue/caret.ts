@@ -19,7 +19,7 @@
  */
 import type { EditorType } from "@xwiki/platform-editors-blocknote-react";
 
-// WebKit and older Chrome have only the earlier caretRangeFromPoint.
+// caretPositionFromPoint is the standard one, which WebKit and older Chrome lack.
 function caretAt(left: number, top: number): [Node, number] | undefined {
   const position = document.caretPositionFromPoint?.(left, top);
   if (position) {
@@ -30,9 +30,9 @@ function caretAt(left: number, top: number): [Node, number] | undefined {
 }
 
 /**
- * Moves the caret under the pointer, for a drop, which leaves it where it was. The selection is set in the DOM
- * because BlockNote only places the caret at a block boundary, which would put the insertion at the end of the block
- * the pointer is over.
+ * Moves the caret under the pointer. A drop leaves the caret where it was, which is rarely where the file landed.
+ * The selection is set in the DOM because BlockNote only places the caret at a block boundary, which would put the
+ * insertion at the end of the block the pointer is over.
  *
  * @param editor - the editor to move the caret in
  * @param coordinates - where the pointer is, in viewport coordinates
@@ -45,8 +45,7 @@ function moveCaretTo(
   const caret = caretAt(coordinates.left, coordinates.top);
   if (caret && editor.prosemirrorView.dom.contains(caret[0])) {
     document.getSelection()?.collapse(...caret);
-    // ProseMirror reads a selection it didn't make itself only on a delayed flush, and what is inserted next goes
-    // where the selection it still holds is.
+    // ProseMirror reads a selection it didn't make only on a delayed flush, and would insert at the one it holds.
     (
       editor.prosemirrorView as unknown as { domObserver: { flush(): void } }
     ).domObserver.flush();

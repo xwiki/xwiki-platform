@@ -137,7 +137,8 @@ function getContent(): BlockType[] {
  * through BlockNote.
  *
  * @param content - what to insert
- * @param coordinates - where the pointer is, when the insertion follows a drop, which leaves the caret behind
+ * @param coordinates - where the pointer is, for an insertion that follows a drop, since a drop leaves the caret
+ *   behind
  */
 function insertInlineContent(
   content: Parameters<EditorType["insertInlineContent"]>[0],
@@ -150,7 +151,7 @@ function insertInlineContent(
   if (coordinates) {
     moveCaretTo(editor, coordinates);
   }
-  // Moving the selection along leaves the caret after the content, so a second insertion lines up behind the first.
+  // updateSelection leaves the caret after the content, so a second insertion lines up behind the first.
   editor.insertInlineContent(content, { updateSelection: true });
 }
 

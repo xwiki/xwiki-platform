@@ -525,8 +525,7 @@ public class BlockNoteRichTextArea extends BaseElement
                 Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
                 editor.dispatchEvent(paste);
             } else {
-                // A drop lands where the pointer is rather than where the caret is, so point at the given offset.
-                // A collapsed range has no rectangle, so measure one character and take the edge next to the offset.
+                // A collapsed range has no rectangle, so measure one character and take the edge at the offset.
                 const text = editor.querySelector('p').firstChild;
                 const range = document.createRange();
                 range.setStart(text, Math.max(offset - 1, 0));

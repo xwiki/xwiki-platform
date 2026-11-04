@@ -31,7 +31,6 @@ function link(label) {
 describe("takeOverFileTransfers", () => {
   let insertInlineContent, linkFor, takeOver;
 
-  // The tracker passes the files it saw, with the drop coordinates for a drop.
   function transfer(files, coordinates) {
     return { paste: !coordinates, files, coordinates };
   }

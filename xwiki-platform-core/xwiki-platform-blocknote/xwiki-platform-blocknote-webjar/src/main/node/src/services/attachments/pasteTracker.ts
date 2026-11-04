@@ -19,12 +19,11 @@
  */
 
 type FileTransfer = {
-  // Whether the files were pasted rather than dropped.
   paste: boolean;
 
   files: File[];
 
-  // Where the files were dropped, since a drop leaves the caret where it was. Undefined for a paste.
+  // A drop leaves the caret where it was, so where it landed is the only clue to where its files belong.
   coordinates?: { left: number; top: number };
 };
 
@@ -40,8 +39,8 @@ type PasteTracker = {
  * after another, so all but the first are read after the paste event is over. Dispose with the editor.
  *
  * @param target - the editor element, so that two editors on the same page don't see each other's transfers
- * @param takeOver - offered every transfer that carries files; returning true stops the event, which keeps it from
- *   reaching BlockNote, so the caller inserts those files itself
+ * @param takeOver - offered every transfer that carries files; returning true stops the event, so that it never
+ *   reaches BlockNote
  * @returns the tracker
  */
 function trackPaste(
@@ -65,7 +64,6 @@ function trackPaste(
     const { dataTransfer, clientX, clientY } = event as DragEvent;
     offer(event, {
       files: Array.from(dataTransfer?.files ?? []),
-      // A drop leaves the caret where it was, so where it landed is the only clue to where its files belong.
       coordinates: { left: clientX, top: clientY },
     });
   };

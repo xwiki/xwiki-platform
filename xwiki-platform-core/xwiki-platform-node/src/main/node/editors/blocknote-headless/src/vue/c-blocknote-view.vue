@@ -133,8 +133,8 @@ function getContent(): BlockType[] {
 }
 
 /**
- * Inserts inline content where the user is, for the integrations that insert content of their own rather than through
- * BlockNote. Nothing happens before the editor is created, which is also before anyone can paste or drop into it.
+ * Inserts inline content where the user is, for the integrations that insert content of their own rather than
+ * through BlockNote.
  *
  * @param content - what to insert
  * @param coordinates - where the pointer is, when the insertion follows a drop, which leaves the caret behind

@@ -19,17 +19,15 @@
  */
 import type { FileTransfer } from "../attachments/pasteTracker";
 
-// The inline link to an attachment, as BlockNote takes it.
 type InlineLink = {
   type: "link";
   href: string;
   content: string;
 };
 
-// Attaches a pasted or dropped file to the edited document and returns the link to it.
 type LinkFor = (file: File, paste: boolean) => Promise<InlineLink | undefined>;
 
-// Inserts inline content where the user is: under the pointer when the files were dropped, at the caret otherwise.
+// Under the pointer for a drop, at the caret otherwise.
 type InsertInlineContent = (
   content: InlineLink[],
   coordinates?: { left: number; top: number },
@@ -40,8 +38,8 @@ function isImage(file: File): boolean {
 }
 
 /**
- * Links the files of a transfer where they landed, which is what the CKEditor integration does, rather than leaving
- * them to BlockNote: it gives each file a block of its own, so the link would end up alone in a paragraph.
+ * Links the files where they landed: BlockNote gives each of them a block of its own, so the link would end up alone
+ * in a paragraph.
  */
 async function insertFilesInline(
   insertInlineContent: InsertInlineContent,
@@ -51,8 +49,7 @@ async function insertFilesInline(
   for (const file of files) {
     const link = await linkFor(file, paste);
     if (link) {
-      // Only the first insertion has to look for the drop position: it leaves the caret after the link, which is
-      // where the next file of the transfer belongs.
+      // The first insertion leaves the caret after the link, which is where the next file belongs.
       insertInlineContent([link], coordinates);
       coordinates = undefined;
     }
@@ -60,11 +57,11 @@ async function insertFilesInline(
 }
 
 /**
- * Decides which transfers to insert rather than leave to BlockNote. A transfer that mixes images with other files is
- * left to it as a whole, rather than being split over two code paths.
+ * Decides which transfers to insert rather than leave to BlockNote. One mixing images with other files is left to it
+ * as a whole, rather than being split over two code paths.
  *
  * @param insertInlineContent - inserts the links in the editor
- * @param linkFor - attaches a file to the edited document and returns the link to it, or nothing if that failed
+ * @param linkFor - attaches a file and returns the link to it, or nothing if that failed
  * @returns what the paste tracker calls to offer a transfer, which takes it over by returning true
  */
 function takeOverFileTransfers(

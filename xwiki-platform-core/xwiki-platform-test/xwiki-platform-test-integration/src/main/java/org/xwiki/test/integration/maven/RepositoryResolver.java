@@ -153,9 +153,7 @@ public class RepositoryResolver
 
         // Use the proxy configured for the JVM (the http(s).proxyHost, http(s).proxyPort and http.nonProxyHosts system
         // properties, or the system proxies when java.net.useSystemProxies is true), since this resolver doesn't read
-        // the proxies from the Maven settings. Without this, the artifacts are downloaded without proxy even when the
-        // JVM (and thus Maven itself) is configured to use one, which fails when the remote repositories can only be
-        // reached through it.
+        // the proxies from the Maven settings.
         session.setProxySelector(new JreProxySelector());
 
         return session;

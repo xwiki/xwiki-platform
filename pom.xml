@@ -55,9 +55,9 @@
     <!-- xwiki-platform is directly released on the configured distributionManagement -->
     <releaseProfiles>release</releaseProfiles>
 
-    <!-- Every webjar-node module embeds an SBOM of the npm packages it bundles (see the npm-sbom profile), so a release
-         of a webjar-node module without it, or depending on one without it, must fail rather than publish an SBOM
-         missing these packages. -->
+    <!-- Every webjar-node module embeds an SBOM of the npm packages it bundles (the webjar-node lifecycle generates it),
+         so a release of a webjar-node module without it, or depending on one without it, must fail rather than publish
+         an SBOM missing these packages. -->
     <xwiki.sbom.failOnMissingEmbeddedSBOM>true</xwiki.sbom.failOnMissingEmbeddedSBOM>
 
     <!-- Dependencies versions -->
@@ -1234,11 +1234,6 @@
           <version>${commons.version}</version>
         </plugin>
         <plugin>
-          <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-tool-sbom-plugin</artifactId>
-          <version>${commons.version}</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
@@ -1899,83 +1894,6 @@
             </plugin>
           </plugins>
         </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <!-- Embed in the JAR of each module building JavaScript code with pnpm (i.e. the webjar-node modules) a CycloneDX
-           SBOM of the npm packages it bundles. These packages are not Maven dependencies, so without it they would be
-           missing from the SBOM of the module and of every artifact depending on it (up to the WAR), and vulnerability
-           scanners couldn't report the advisories affecting them. The SBOM generation of the release build reads the
-           CycloneDX SBOMs found in META-INF/sbom/ to add their components to the artifact SBOM.
-           The list comes from the pnpm lockfile, limited to the production dependencies of the module package: it may
-           include packages that the bundler tree-shakes or keeps external, but it misses any bundled package that is
-           only a devDependency. So every package bundled in a webjar must be a (direct or transitive) dependency of
-           its package, not a devDependency.
-           It runs in every build (it takes less than a second) so that it's verified by the CI and not only at release
-           time. A module building JavaScript code without the webjar-node lifecycle (e.g. with npm, or without pnpm
-           installed in target/) can skip it by setting the xwiki.sbom.npm.skip property to true, and then also needs
-           to set xwiki.sbom.failOnMissingEmbeddedSBOM to false if its packaging is webjar-node. -->
-      <id>npm-sbom</id>
-      <activation>
-        <file>
-          <exists>${project.basedir}/src/main/node/package.json</exists>
-        </file>
-      </activation>
-      <properties>
-        <xwiki.sbom.npm.skip>false</xwiki.sbom.npm.skip>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.github.eirslett</groupId>
-            <artifactId>frontend-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>npm-sbom</id>
-                <!-- After "pnpm install" (which the store-based SBOM needs to get the package licenses) and before the
-                     JAR is packaged. -->
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>pnpm</goal>
-                </goals>
-                <configuration>
-                  <!-- "filter ." selects the workspace package of the module. Use the same CycloneDX specification
-                       version as the Maven SBOM. The output path is relative to the working directory, as the output
-                       directory of the webjar-node build, since an absolute path could contain spaces, and the plugin
-                       passes the quotes around an argument to pnpm. -->
-                  <arguments>
-                    sbom --sbom-format cyclonedx --sbom-spec-version 1.6 --prod --filter .
-                    --out ../../../target/npm-sbom/bom.json
-                  </arguments>
-                  <workingDirectory>${project.basedir}/src/main/node</workingDirectory>
-                  <installDirectory>${project.basedir}/target</installDirectory>
-                  <skip>${xwiki.sbom.npm.skip}</skip>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.xwiki.commons</groupId>
-            <artifactId>xwiki-commons-tool-sbom-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>npm-sbom</id>
-                <!-- Make the SBOM reproducible, like the rest of the build (pnpm sets the current date, a random serial
-                     number, and its component order and dependency graph vary from one run to the next) and embed it
-                     where the SBOM generation of the release build looks for it. When pnpm didn't generate it (e.g.
-                     skipped), any SBOM embedded by a previous build is removed. -->
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>normalize</goal>
-                </goals>
-                <configuration>
-                  <sourceFile>${project.basedir}/target/npm-sbom/bom.json</sourceFile>
-                  <targetFile>${project.build.outputDirectory}/META-INF/sbom/npm.cdx.json</targetFile>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
       </build>
     </profile>
     <profile>

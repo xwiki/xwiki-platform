@@ -27,7 +27,7 @@ type InlineLink = {
 
 type LinkFor = (file: File, paste: boolean) => Promise<InlineLink | undefined>;
 
-// Under the pointer for a drop, at the caret otherwise.
+// Inserts at the caret, or under the pointer when given coordinates, as a drop is.
 type InsertInlineContent = (
   content: InlineLink[],
   coordinates?: { left: number; top: number },
@@ -38,8 +38,8 @@ function isImage(file: File): boolean {
 }
 
 /**
- * Links the files where they landed: BlockNote gives each of them a block of its own, so the link would end up alone
- * in a paragraph.
+ * Inserts the link of each file where the user is, rather than leaving the files to BlockNote, which gives each of
+ * them a block of its own and would leave the link alone in a paragraph.
  */
 async function insertFilesInline(
   insertInlineContent: InsertInlineContent,
@@ -49,7 +49,7 @@ async function insertFilesInline(
   for (const file of files) {
     const link = await linkFor(file, paste);
     if (link) {
-      // The first insertion leaves the caret after the link, which is where the next file belongs.
+      // Only the first file goes to the drop point: each insertion leaves the caret where the next one belongs.
       insertInlineContent([link], coordinates);
       coordinates = undefined;
     }
@@ -57,12 +57,13 @@ async function insertFilesInline(
 }
 
 /**
- * Decides which transfers to insert rather than leave to BlockNote. One mixing images with other files is left to it
- * as a whole, rather than being split over two code paths.
+ * Decides which transfers to insert rather than leave to BlockNote. A transfer that mixes images with other files
+ * is left to BlockNote as a whole, rather than being split over two code paths.
  *
  * @param insertInlineContent - inserts the links in the editor
  * @param linkFor - attaches a file and returns the link to it, or nothing if that failed
- * @returns what the paste tracker calls to offer a transfer, which takes it over by returning true
+ * @returns the function the paste tracker calls to offer a transfer; it returns true when it takes that transfer
+ *   over
  */
 function takeOverFileTransfers(
   insertInlineContent: InsertInlineContent,

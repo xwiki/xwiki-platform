@@ -265,8 +265,8 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
         byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
-        // The caret stays at the start of the line on purpose: a drop goes where the pointer is, not where the
-        // caret is. Unlike a pasted file, a dropped file keeps the name the user gave it.
+        // A drop goes where the pointer is, so the caret stays at the start of the line to prove it.
+        // Unlike a pasted file, a dropped file keeps the name the user gave it.
         textArea.click().moveCaretTo(0).dropFile("/notes.txt", OFFSET);
         // The link replaces the inserted block only once uploaded.
         textArea.waitUntilLinkIsPresent("notes.txt");

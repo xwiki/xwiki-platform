@@ -472,7 +472,7 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Pastes a file over the rich text area, where the caret is.
+     * Pastes a file into the rich text area, at the caret.
      *
      * @param filePath the path of the file to paste, relative to the test resources
      * @return this rich text area instance
@@ -488,7 +488,7 @@ public class BlockNoteRichTextArea extends BaseElement
      * Drops a file over the rich text area, at the given offset of its first line.
      *
      * @param filePath the path of the file to drop, relative to the test resources
-     * @param offset how far from the start of the first line the file is dropped
+     * @param offset how far from the start of the first line the file lands
      * @return this rich text area instance
      * @throws URISyntaxException if the given file can't be located
      * @since 18.10.0RC1
@@ -523,7 +523,8 @@ public class BlockNoteRichTextArea extends BaseElement
                 Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
                 editor.dispatchEvent(paste);
             } else {
-                // A collapsed range has no rectangle, so measure one character and take the edge at the offset.
+                // Only a DOM range can turn the offset into the pixels the drop event needs.
+                // An empty one has no rectangle, so measure a neighbouring character and take the edge at it.
                 const text = editor.querySelector('p').firstChild;
                 const range = document.createRange();
                 range.setStart(text, Math.max(offset - 1, 0));

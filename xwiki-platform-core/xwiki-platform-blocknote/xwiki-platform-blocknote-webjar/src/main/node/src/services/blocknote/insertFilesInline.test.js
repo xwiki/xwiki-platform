@@ -77,7 +77,7 @@ describe("takeOverFileTransfers", () => {
         file("second.pdf", "application/pdf"),
       );
 
-      // The caret follows the first link, so the rest are inserted there rather than back at the drop position.
+      // The caret follows the first link, so later files go after it rather than back at the drop point.
       expect(insertInlineContent.mock.calls).toEqual([
         [[link("first.pdf")], { left: 5, top: 9 }],
         [[link("second.pdf")], undefined],

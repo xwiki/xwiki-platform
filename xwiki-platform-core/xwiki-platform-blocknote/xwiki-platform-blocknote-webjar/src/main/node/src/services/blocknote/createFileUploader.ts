@@ -186,8 +186,8 @@ function createFileUploader(
       if (file.type.startsWith("image/")) {
         return toImageBlock(attachment, blockId);
       }
-      // Only files of a transfer that also carries an image get here, so this replaces the block BlockNote
-      // inserted for them, paragraph and all.
+      // Only files of a transfer that also carries an image reach this: BlockNote did insert a block for them,
+      // so the link goes back as a paragraph, to replace it.
       return {
         type: "paragraph",
         content: [linkTo(attachment, toUpload.name)],

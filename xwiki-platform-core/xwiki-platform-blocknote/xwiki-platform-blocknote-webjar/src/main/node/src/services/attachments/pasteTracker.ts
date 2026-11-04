@@ -23,7 +23,7 @@ type FileTransfer = {
 
   files: File[];
 
-  // A drop leaves the caret where it was, so where it landed is the only clue to where its files belong.
+  // Where the files were dropped: a drop leaves the caret where it was, so nothing else says where they belong.
   coordinates?: { left: number; top: number };
 };
 
@@ -38,9 +38,9 @@ type PasteTracker = {
  * the opposite event rather than being cleared once the upload starts, because BlockNote uploads the pasted files one
  * after another, so all but the first are read after the paste event is over. Dispose with the editor.
  *
- * @param target - the editor element, so that two editors on the same page don't see each other's transfers
- * @param takeOver - offered every transfer that carries files; returning true stops the event, so that it never
- *   reaches BlockNote
+ * @param target - the editor element, so that two editors on the same page don't see each other's pastes and drops
+ * @param takeOver - called for each paste or drop that carries files; returning true stops that event, so that
+ *   BlockNote never sees it and the caller inserts the files itself
  * @returns the tracker
  */
 function trackPaste(

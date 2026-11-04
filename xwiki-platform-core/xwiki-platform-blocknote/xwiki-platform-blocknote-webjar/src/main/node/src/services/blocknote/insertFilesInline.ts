@@ -46,13 +46,21 @@ async function insertFilesInline(
   { files, paste, coordinates }: FileTransfer,
   linkFor: LinkFor,
 ): Promise<void> {
-  for (const file of files) {
-    const link = await linkFor(file, paste);
-    if (link) {
-      // Only the first file goes to the drop point: each insertion leaves the caret where the next one belongs.
-      insertInlineContent([link], coordinates);
-      coordinates = undefined;
+  try {
+    for (const file of files) {
+      const link = await linkFor(file, paste);
+      if (link) {
+        // Only the first file goes to the drop point: each insertion leaves the caret where the next one belongs.
+        insertInlineContent([link], coordinates);
+        coordinates = undefined;
+      }
     }
+  } catch (error) {
+    // A failed upload is already reported to the user by linkFor, so anything caught here is a bug.
+    console.error(
+      "Failed to insert the links of the pasted or dropped files.",
+      error,
+    );
   }
 }
 
@@ -69,12 +77,12 @@ function takeOverFileTransfers(
   linkFor: LinkFor,
 ): (transfer: FileTransfer) => boolean {
   return function takeOver(transfer) {
-    if (transfer.files.some(isImage)) {
-      return false;
+    const ours = !transfer.files.some(isImage);
+    if (ours) {
+      // Not awaited: the handler has to answer while the event is still live, the uploads take far longer.
+      void insertFilesInline(insertInlineContent, transfer, linkFor);
     }
-    // The answer has to be synchronous, for the caller to stop the event, but the uploads cannot be.
-    void insertFilesInline(insertInlineContent, transfer, linkFor);
-    return true;
+    return ours;
   };
 }
 

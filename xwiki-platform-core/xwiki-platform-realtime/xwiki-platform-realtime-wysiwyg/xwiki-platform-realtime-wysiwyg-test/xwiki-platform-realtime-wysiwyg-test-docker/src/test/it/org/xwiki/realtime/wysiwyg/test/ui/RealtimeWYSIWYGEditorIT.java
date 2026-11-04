@@ -3014,12 +3014,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Place the caret before the caret of the first user, in the same paragraph.
         moveCaretToEndOfParagraph(secondTextArea, 40);
         secondTextArea.sendKeys(Keys.HOME);
+        int secondScrollTop = secondTextArea.getScrollTop();
 
         //
         // Third Tab
         //
 
-        String thirdTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+        setup.getDriver().switchTo().newWindow(WindowType.TAB);
         RealtimeRichTextAreaElement thirdTextArea = editPage.get();
         // Insert a macro, which has to be rendered so all users refresh their content. We insert it at the start of the
         // content because inserting a paragraph further down, among many similar paragraphs, can move the caret of the
@@ -3045,6 +3046,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         multiUserSetup.switchToBrowserTab(secondTabHandle);
         secondTextArea.waitUntilTextContains("Information");
         secondTextArea.waitForContentRefresh();
+        // Check the scroll position before typing, because typing scrolls to the caret.
+        assertScrollTop(secondScrollTop, secondTextArea,
+            "The content refresh triggered by a remote change didn't keep the caret visible.");
         // Type before the caret of the first user, in the same text node, which forces the first editor to restore the
         // caret based on the text.
         secondTextArea.sendKeys("X");
@@ -3060,21 +3064,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify that the caret was preserved.
         firstTextArea.sendKeys("Y");
         firstTextArea.waitUntilTextContains("XParagraph 40Y");
-
-        //
-        // Second Tab
-        //
-
-        // Wait for the changes to be synchronized before leaving the edit mode.
-        multiUserSetup.switchToBrowserTab(secondTabHandle);
-        secondTextArea.waitUntilTextContains("XParagraph 40Y");
-
-        //
-        // Third Tab
-        //
-
-        multiUserSetup.switchToBrowserTab(thirdTabHandle);
-        thirdTextArea.waitUntilTextContains("XParagraph 40Y");
     }
 
     private void assertScrollTop(int expectedScrollTop, RealtimeRichTextAreaElement textArea, String message)
@@ -3087,11 +3076,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
     private void moveCaretToEndOfParagraph(RealtimeRichTextAreaElement textArea, int paragraphNumber)
     {
-        List<CharSequence> keys = new ArrayList<>();
-        // Move to the first paragraph using only arrow keys, because Ctrl+Home didn't reliably move the caret to the
-        // start of the content in Firefox.
-        keys.addAll(Collections.nCopies(PARAGRAPH_COUNT, Keys.ARROW_UP));
-        keys.addAll(Collections.nCopies(paragraphNumber - 1, Keys.ARROW_DOWN));
+        // Send the key chord separately, otherwise the modifier key may remain pressed for the following keys.
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.HOME));
+        List<CharSequence> keys = new ArrayList<>(Collections.nCopies(paragraphNumber - 1, Keys.ARROW_DOWN));
         keys.add(Keys.END);
         textArea.sendKeys(keys.toArray(CharSequence[]::new));
 

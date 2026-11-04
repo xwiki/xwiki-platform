@@ -62,17 +62,17 @@ async function insertFilesInline(
  *
  * @param insertInlineContent - inserts the links in the editor
  * @param linkFor - attaches a file and returns the link to it, or nothing if that failed
- * @returns the function the paste tracker calls to offer a transfer; it returns true when it takes that transfer
- *   over
+ * @returns the handler the paste tracker calls to offer a transfer, true meaning that the transfer is ours now
  */
 function takeOverFileTransfers(
   insertInlineContent: InsertInlineContent,
   linkFor: LinkFor,
 ): (transfer: FileTransfer) => boolean {
-  return (transfer) => {
+  return function takeOver(transfer) {
     if (transfer.files.some(isImage)) {
       return false;
     }
+    // The answer has to be synchronous, for the caller to stop the event, but the uploads cannot be.
     void insertFilesInline(insertInlineContent, transfer, linkFor);
     return true;
   };

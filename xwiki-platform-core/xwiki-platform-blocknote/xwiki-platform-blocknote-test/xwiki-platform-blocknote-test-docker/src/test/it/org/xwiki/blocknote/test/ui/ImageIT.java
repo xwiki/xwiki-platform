@@ -87,10 +87,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 )
 class ImageIT extends AbstractBlockNoteIT
 {
-    // Long enough that a link landing inside it is unmistakable, with words on both sides of the insertion point.
     private static final String SENTENCE = "Please review before the meeting.";
 
-    // Right after "review", so the file is pasted or dropped in the middle of the sentence rather than at its end.
+    // Right after "review", so that the file lands in the middle of the sentence rather than at its end.
     private static final int OFFSET = 13;
 
     private static final String SENTENCE_WITH_LINK = "Please review[[attach:notes.txt]] before the meeting.";
@@ -266,7 +265,7 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
         byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
-        // The caret is left at the start of the line on purpose: a drop goes where the pointer is, not where the
+        // The caret stays at the start of the line on purpose: a drop goes where the pointer is, not where the
         // caret is. Unlike a pasted file, a dropped file keeps the name the user gave it.
         textArea.click().moveCaretTo(0).dropFile("/notes.txt", OFFSET);
         // The link replaces the inserted block only once uploaded.

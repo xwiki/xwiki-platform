@@ -19,8 +19,7 @@
  */
 import type { EditorType } from "@xwiki/platform-editors-blocknote-react";
 
-// The DOM position under the pointer. Firefox and recent Chrome have caretPositionFromPoint, WebKit and older Chrome
-// only the earlier caretRangeFromPoint.
+// WebKit and older Chrome have only the earlier caretRangeFromPoint.
 function caretAt(left: number, top: number): [Node, number] | undefined {
   const position = document.caretPositionFromPoint?.(left, top);
   if (position) {
@@ -31,10 +30,9 @@ function caretAt(left: number, top: number): [Node, number] | undefined {
 }
 
 /**
- * Moves the caret under the pointer, for a drop, which leaves it where it was, rarely where the file landed. The
- * selection is set in the DOM because BlockNote only places the caret at a block boundary, which would put whatever
- * is inserted at the end of the block the pointer is over. The editor has to be focused for ProseMirror to adopt the
- * new selection, and it reads it on the next tick.
+ * Moves the caret under the pointer, for a drop, which leaves it where it was. The selection is set in the DOM
+ * because BlockNote only places the caret at a block boundary, which would put the insertion at the end of the block
+ * the pointer is over.
  *
  * @param editor - the editor to move the caret in
  * @param coordinates - where the pointer is, in viewport coordinates
@@ -47,8 +45,8 @@ function moveCaretTo(
   const caret = caretAt(coordinates.left, coordinates.top);
   if (caret && editor.prosemirrorView.dom.contains(caret[0])) {
     document.getSelection()?.collapse(...caret);
-    // ProseMirror notices a selection it didn't make itself only on a delayed flush of its DOM observer, and what is
-    // inserted next goes where the selection it still holds is, so make it read ours now.
+    // ProseMirror reads a selection it didn't make itself only on a delayed flush, and what is inserted next goes
+    // where the selection it still holds is.
     (
       editor.prosemirrorView as unknown as { domObserver: { flush(): void } }
     ).domObserver.flush();

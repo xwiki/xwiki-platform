@@ -26,7 +26,7 @@ describe("moveCaretTo", () => {
   let text: Node;
   let flush: ReturnType<typeof vi.fn>;
 
-  // Only what moving the caret touches: the focus and the editor's own DOM element.
+  // Only what moving the caret touches.
   function editorStub(): EditorType {
     const dom = document.createElement("div");
     dom.append("before");

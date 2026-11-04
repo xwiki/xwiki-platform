@@ -46,7 +46,6 @@ type FileUploaderDependencies = {
   getDocumentReference: () => string;
   getBlockNoteDocument: () => BlockNoteDocument | undefined;
 
-  // Puts the links of the files taken over from BlockNote in the editor.
   insertInlineContent: InsertInlineContent;
 
   // Whether the files are uploaded to the temporary store of the user session, from where the save request attaches
@@ -73,8 +72,7 @@ type FileUploader = {
 
 const EMPTY_PARAGRAPH: UploadResult = { type: "paragraph", content: [] };
 
-// The browser names a pasted file after its media type, so a second paste would overwrite the first. A file with no
-// name at all gets one too, rather than being attached as "".
+// The browser names a pasted file after its media type, so a second paste would overwrite the first.
 function toAttach(file: File, paste: boolean): File {
   return paste || !file.name ? withUniqueName(file) : file;
 }
@@ -100,9 +98,7 @@ function createFileUploader(
 
   const storageProvider = container.get<StorageProvider>("StorageProvider");
 
-  // Pasted files are renamed, so we need to know how the file reached the editor. A transfer of files that are not
-  // images is taken over, because BlockNote would give each of them a block of its own and the link would end up
-  // alone in a paragraph. One mixing images with other files is left to BlockNote rather than split over two paths.
+  // Pasted files are renamed, so we need to know how the file reached the editor.
   const pasteTracker = trackPaste(
     eventTarget,
     takeOverFileTransfers(insertInlineContent, async (file, paste) => {
@@ -166,9 +162,9 @@ function createFileUploader(
     return { props: { url: attachment.href, name: "" } };
   }
 
-  // The file, video and audio blocks are saved as macro calls, but those macros don't exist yet, so a file that
-  // isn't an image becomes a link to the attachment instead, as in the CKEditor integration. The link metadata hangs
-  // off a synthetic id carried in the href, because links have no id of their own.
+  // The file, video and audio blocks are saved as macro calls, but those macros don't exist yet, so such a file
+  // becomes a link to the attachment instead. The link metadata hangs off a synthetic id carried in the href,
+  // because links have no id of their own.
   function linkTo(attachment: PageAttachment, label: string): InlineLink {
     const linkId = uuidv4();
     const metadata = getBlockNoteDocument()!.getMetadata(linkId, true)!;
@@ -190,8 +186,8 @@ function createFileUploader(
       if (file.type.startsWith("image/")) {
         return toImageBlock(attachment, blockId);
       }
-      // Only the files of a transfer that also carries an image get here, so their link does end up alone in a
-      // paragraph: this replaces the block BlockNote inserted for them.
+      // Only files of a transfer that also carries an image get here, so this replaces the block BlockNote
+      // inserted for them, paragraph and all.
       return {
         type: "paragraph",
         content: [linkTo(attachment, toUpload.name)],

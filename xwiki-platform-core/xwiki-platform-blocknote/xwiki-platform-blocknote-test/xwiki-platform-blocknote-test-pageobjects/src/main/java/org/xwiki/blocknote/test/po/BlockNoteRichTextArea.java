@@ -21,6 +21,8 @@ package org.xwiki.blocknote.test.po;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
@@ -483,7 +485,7 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea pasteFile(String filePath) throws URISyntaxException
     {
-        return insertFile("paste", filePath, 0);
+        return insertFiles("paste", 0, filePath);
     }
 
     /**
@@ -497,27 +499,44 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea dropFile(String filePath, int offset) throws URISyntaxException
     {
-        return insertFile("drop", filePath, offset);
+        return insertFiles("drop", offset, filePath);
     }
 
     /**
-     * Inserts a file using a synthetic event, because WebDriver can drag and drop DOM elements but not files, and
+     * Drops several files at once over the rich text area, as one transfer, at the given offset of its first line.
+     *
+     * @param offset how far from the start of the first line the files land
+     * @param filePaths the paths of the files to drop, relative to the test resources
+     * @return this rich text area instance
+     * @throws URISyntaxException if one of the given files can't be located
+     * @since 18.10.0RC1
+     */
+    public BlockNoteRichTextArea dropFiles(int offset, String... filePaths) throws URISyntaxException
+    {
+        return insertFiles("drop", offset, filePaths);
+    }
+
+    /**
+     * Inserts files using a synthetic event, because WebDriver can drag and drop DOM elements but not files, and
      * can't put one on the clipboard at all.
      *
      * @param eventType either {@code paste} or {@code drop}
-     * @param filePath the path of the file to insert, relative to the test resources
      * @param offset where a drop lands, as an offset of the first line; ignored for a paste
+     * @param filePaths the paths of the files to insert, relative to the test resources
      * @return this rich text area instance
-     * @throws URISyntaxException if the given file can't be located
+     * @throws URISyntaxException if one of the given files can't be located
      */
-    private BlockNoteRichTextArea insertFile(String eventType, String filePath, int offset)
+    private BlockNoteRichTextArea insertFiles(String eventType, int offset, String... filePaths)
         throws URISyntaxException
     {
-        WebElement fileInput = loadFile(filePath);
+        List<WebElement> fileInputs = new ArrayList<>();
+        for (String filePath : filePaths) {
+            fileInputs.add(loadFile(filePath));
+        }
         String script = """
-            const [editor, fileInput, eventType, offset] = arguments;
+            const [editor, eventType, offset, fileInputs] = arguments;
             const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(fileInput.files[0]);
+            fileInputs.forEach((fileInput) => dataTransfer.items.add(fileInput.files[0]));
             const eventInit = {bubbles: true, cancelable: true};
             if (eventType === 'paste') {
                 const paste = new ClipboardEvent('paste', eventInit);
@@ -535,9 +554,9 @@ public class BlockNoteRichTextArea extends BaseElement
                 editor.dispatchEvent(new DragEvent('drop', {...eventInit, clientX: offset > 0 ? right : left,
                     clientY: top + height / 2, dataTransfer}));
             }
-            fileInput.remove();
+            fileInputs.forEach((fileInput) => fileInput.remove());
             """;
-        getDriver().executeScript(script, this.container, fileInput, eventType, offset);
+        getDriver().executeScript(script, this.container, eventType, offset, fileInputs);
         return this;
     }
 

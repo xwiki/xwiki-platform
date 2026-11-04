@@ -22,6 +22,7 @@ package org.xwiki.blocknote.test.ui;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
@@ -463,5 +464,30 @@ class ImageIT extends AbstractBlockNoteIT
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("[[image:image.gif]]", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(10)
+    void dropFiles(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt", "/agenda.txt");
+        // The last one to be uploaded, so waiting for it waits for both.
+        textArea.waitUntilLinkIsPresent("agenda.txt");
+
+        page.save();
+
+        // The links keep the order of the transfer, each one after the previous, rather than all at the drop point.
+        assertEquals("Please review[[attach:notes.txt]][[attach:agenda.txt]] before the meeting.",
+            page.editWiki().getContent());
+
+        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
+        assertEquals(List.of("agenda.txt", "notes.txt"),
+            attachments.getAttachments().stream().map(Attachment::getName).sorted().toList());
     }
 }

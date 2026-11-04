@@ -25,6 +25,8 @@
 
   ul {
     margin-left: 0;
+    /* Expanded from the Bootstrap list-group mixin, keeping only the rules that apply to the menu markup.
+       Use a CSS mixin instead once they are supported, see https://drafts.csswg.org/css-mixins-1/ */
     padding-left: 0;
     margin-bottom: 20px;
 
@@ -34,6 +36,8 @@
       font-size: round(up, var(--font-size-small), 1px);
 
       .group {
+        /* Expanded from the Bootstrap list-group-item mixin, keeping only the rules that apply to the menu markup.
+           Use a CSS mixin instead once they are supported, see https://drafts.csswg.org/css-mixins-1/ */
         position: relative;
         display: block;
         margin-bottom: -1px;
@@ -72,6 +76,8 @@
         margin-left: 0;
 
         li {
+          /* Expanded from the Bootstrap list-group-item mixin, keeping only the rules that apply to the menu markup.
+             Use a CSS mixin instead once they are supported, see https://drafts.csswg.org/css-mixins-1/ */
           position: relative;
           margin-bottom: -1px;
           border: 1px solid var(--list-group-border);

@@ -59,17 +59,17 @@ public class DefaultHTMLCleaner implements HTMLCleaner
     @Override
     public String clean(String dirtyHTML)
     {
-        // Sort the list of specific filters based on their priority.
-        specificFilters.sort(Comparator.comparingInt(HTMLFilter::getPriority));
-
         // We have to remove or replace the HTML elements that were added by the WYSIWYG editor only for internal
         // reasons, before any cleaning filter is applied. Otherwise cleaning filters might transform these
         // WYSIWYG-specific HTML elements making their removal difficult. We cannot transform the WYSIWYG output on the
         // client side because the editor is a widget that can be used independently inside or outside an HTML form and
         // thus it doesn't know when its current value is submitted.
         HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
-        List<org.xwiki.xml.html.filter.HTMLFilter> filters = new ArrayList<>();
-        filters.addAll(specificFilters);
+        // Sort the specific filters based on their priority. This component is called concurrently (e.g. when all the
+        // users of a realtime editing session refresh their content at the same time) so we must not sort the injected
+        // list in place.
+        List<org.xwiki.xml.html.filter.HTMLFilter> filters = new ArrayList<>(
+            specificFilters.stream().sorted(Comparator.comparingInt(HTMLFilter::getPriority)).toList());
         filters.addAll(config.getFilters());
         config.setFilters(filters);
         Map<String, String> parameters = new HashMap<>(config.getParameters());

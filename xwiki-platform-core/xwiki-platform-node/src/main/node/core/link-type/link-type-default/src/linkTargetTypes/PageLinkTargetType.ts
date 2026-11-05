@@ -26,8 +26,8 @@ import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { inject, injectable } from "inversify";
-import type { PageLinkTargetConfig } from "../data/linkType";
 import type { LinkTargetType } from "@xwiki/platform-link-type-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
@@ -37,6 +37,18 @@ import type {
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
+
+/**
+ * Configuration for a page link
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type PageLinkTargetConfig = {
+  ref: DocumentReference | null;
+  queryString?: string;
+  anchor?: string;
+};
 
 /**
  * Built-in link target type for links to an internal wiki page.
@@ -120,3 +132,4 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
 }
 
 export { PageLinkTargetType };
+export type { PageLinkTargetConfig };

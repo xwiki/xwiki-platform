@@ -20,7 +20,7 @@
 import { linkTargetTypeRole } from "./linkTargetType";
 import { unsupportedLinkTargetType } from "./unsupportedLinkTarget";
 import { injectable, multiInject, optional } from "inversify";
-import type { LinkTarget } from "./data/linkType";
+import type { LinkTarget } from "./linkData";
 import type { LinkTargetType } from "./linkTargetType";
 import type { LinkTargetTypeManager } from "./linkTargetTypeManager";
 import type { UnsupportedLinkTargetConfig } from "./unsupportedLinkTarget";

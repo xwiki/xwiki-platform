@@ -92,15 +92,15 @@ export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_set
         renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
     };
     attrs: any;
-    emit: (evt: "select", suggestion: T) => void;
+    emit: (evt: "select", value: T) => void;
 }, __VLS_expose?: NonNullable<Awaited<typeof __VLS_setup>>["expose"], __VLS_setup?: Promise<{
     props: {
-        readonly onSelect?: ((suggestion: T) => any) | undefined;
+        readonly onSelect?: ((value: T) => any) | undefined;
         label: string;
         initialValue: string | null;
         placeholder?: string | undefined;
         getSuggestions: SearchBoxSource<T, U>;
-        trySubmitRaw?: ((raw: string) => boolean) | undefined;
+        parseQuery?: ((query: string) => T | null) | undefined;
     } & PublicProps;
     expose(exposed: ShallowUnwrapRef<    {}>): void;
     attrs: any;
@@ -109,7 +109,7 @@ export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_set
     }> & {
         renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
     };
-    emit: (evt: "select", suggestion: T) => void;
+    emit: (evt: "select", value: T) => void;
 }>) => VNode & {
     __ctx?: Awaited<typeof __VLS_setup>;
 };

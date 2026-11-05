@@ -44,33 +44,26 @@ const model = defineModel<AttachmentLinkTargetConfig>({
 
 const linkEditionCtx = inject<LinkEditionContext>("linkEditionCtx")!;
 
-const getSuggestions: SearchBoxSource<AttachmentReference, Link> = (query) =>
-  suggestLinks(linkEditionCtx, query, LinkType.ATTACHMENT, (link) => {
-    const ref = tryFallible(() =>
-      linkEditionCtx.modelReferenceParser.parse(link.reference, {
-        type: EntityType.ATTACHMENT,
-      }),
-    );
-    return ref?.type === EntityType.ATTACHMENT ? ref : null;
-  });
-
-function submit(ref: AttachmentReference) {
-  model.value = { ref, queryString: undefined };
-}
-
-function trySelectRaw(query: string): boolean {
+/**
+ * @param reference - a serialized attachment reference, typed by the user or held by a link suggestion
+ * @returns the parsed attachment reference, or `null` when it doesn't designate an attachment
+ */
+function parseReference(reference: string): AttachmentReference | null {
   const ref = tryFallible(() =>
-    linkEditionCtx.modelReferenceParser.parse(query, {
+    linkEditionCtx.modelReferenceParser.parse(reference, {
       type: EntityType.ATTACHMENT,
     }),
   );
+  return ref?.type === EntityType.ATTACHMENT ? ref : null;
+}
 
-  if (ref?.type !== EntityType.ATTACHMENT) {
-    return false;
-  }
+const getSuggestions: SearchBoxSource<AttachmentReference, Link> = (query) =>
+  suggestLinks(linkEditionCtx, query, LinkType.ATTACHMENT, (link) =>
+    parseReference(link.reference),
+  );
 
-  submit(ref);
-  return true;
+function select(ref: AttachmentReference) {
+  model.value = { ref, queryString: undefined };
 }
 
 const { t } = useI18n({ messages: translations });
@@ -86,8 +79,8 @@ const { t } = useI18n({ messages: translations });
         : null
     "
     :get-suggestions
-    @select="submit"
-    :try-submit-raw="trySelectRaw"
+    :parse-query="parseReference"
+    @select="select"
   >
     <template #renderSuggestion="{ renderingData: { label, hint } }">
       <div class="suggestion-label">

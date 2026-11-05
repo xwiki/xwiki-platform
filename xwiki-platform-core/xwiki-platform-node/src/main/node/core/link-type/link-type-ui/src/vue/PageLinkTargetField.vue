@@ -44,29 +44,24 @@ const model = defineModel<PageLinkTargetConfig>({
 
 const linkEditionCtx = inject<LinkEditionContext>("linkEditionCtx")!;
 
-const getSuggestions: SearchBoxSource<DocumentReference, Link> = (query) =>
-  suggestLinks(linkEditionCtx, query, LinkType.PAGE, (link) => {
-    const ref = tryFallible(() =>
-      linkEditionCtx.modelReferenceParser.parse(link.reference),
-    );
-    return ref?.type === EntityType.DOCUMENT ? ref : null;
-  });
-
-function submit(ref: DocumentReference) {
-  model.value = { ref, anchor: undefined, queryString: undefined };
+/**
+ * @param reference - a serialized page reference, typed by the user or held by a link suggestion
+ * @returns the parsed page reference, or `null` when it doesn't designate a page
+ */
+function parseReference(reference: string): DocumentReference | null {
+  const ref = tryFallible(() =>
+    linkEditionCtx.modelReferenceParser.parse(reference),
+  );
+  return ref?.type === EntityType.DOCUMENT ? ref : null;
 }
 
-function trySelectRaw(query: string): boolean {
-  const ref = tryFallible(() =>
-    linkEditionCtx.modelReferenceParser.parse(query),
+const getSuggestions: SearchBoxSource<DocumentReference, Link> = (query) =>
+  suggestLinks(linkEditionCtx, query, LinkType.PAGE, (link) =>
+    parseReference(link.reference),
   );
 
-  if (ref?.type !== EntityType.DOCUMENT) {
-    return false;
-  }
-
-  submit(ref);
-  return true;
+function select(ref: DocumentReference) {
+  model.value = { ref, anchor: undefined, queryString: undefined };
 }
 
 const { t } = useI18n({ messages: translations });
@@ -82,8 +77,8 @@ const { t } = useI18n({ messages: translations });
         : null
     "
     :get-suggestions
-    @select="submit"
-    :try-submit-raw="trySelectRaw"
+    :parse-query="parseReference"
+    @select="select"
   >
     <template #renderSuggestion="{ renderingData: { label, hint } }">
       <div class="suggestion-label">

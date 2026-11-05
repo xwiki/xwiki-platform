@@ -74,7 +74,7 @@ import { debounce } from "lodash-es";
 import { ref, shallowRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-const { initialValue, getSuggestions, trySubmitRaw } = defineProps<{
+const { initialValue, getSuggestions, parseQuery } = defineProps<{
   /**
    * Input field label
    */
@@ -100,13 +100,14 @@ const { initialValue, getSuggestions, trySubmitRaw } = defineProps<{
   getSuggestions: SearchBoxSource<T, U>;
 
   /**
-   * Triggered when the user tries to submit a raw input (e.g. an URL)
+   * Convert the text typed in the search field into a value, when the user presses Enter without picking a
+   * suggestion (e.g. to select a reference typed by hand). Without it, pressing Enter does nothing in that case.
    *
-   * @param raw - The raw input text field
+   * @param query - The text typed in the search field
    *
-   * @returns `true` in case of valid input, `false` to keep the list open
+   * @returns The value to select, or `null` when the text doesn't designate one, to keep the suggestions open
    */
-  trySubmitRaw?: (raw: string) => boolean;
+  parseQuery?: (query: string) => T | null;
 }>();
 
 defineSlots<{
@@ -118,9 +119,10 @@ defineSlots<{
 
 const emit = defineEmits<{
   /**
-   * Triggered when a result is selected in the list of suggestions
+   * Triggered when a value is selected: either a suggestion picked from the list, or the text typed in the search
+   * field, converted by `parseQuery`
    */
-  select: [suggestion: T];
+  select: [value: T];
 }>();
 
 const { t } = useI18n({ messages: translations });
@@ -231,8 +233,16 @@ function onEnterKey(): void {
     }
 
     selectSuggestion(suggestion);
-  } else if (trySubmitRaw?.(query.value)) {
+  } else {
+    selectQuery();
+  }
+}
+
+function selectQuery(): void {
+  const value = parseQuery?.(query.value) ?? null;
+  if (value !== null) {
     closeSuggestions();
+    emit("select", value);
   }
 }
 

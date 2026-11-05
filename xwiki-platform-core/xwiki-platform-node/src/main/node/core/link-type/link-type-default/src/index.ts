@@ -27,8 +27,6 @@ export { PathLinkTargetType } from "./linkTargetTypes/PathLinkTargetType";
 export { UNCLinkTargetType } from "./linkTargetTypes/UNCLinkTargetType";
 export { URLLinkTargetType } from "./linkTargetTypes/URLLinkTargetType";
 
-export type {
-  AttachmentLinkTargetConfig,
-  EmailLinkTargetConfig,
-  PageLinkTargetConfig,
-} from "./data/linkType";
+export type { AttachmentLinkTargetConfig } from "./linkTargetTypes/AttachmentLinkTargetType";
+export type { EmailLinkTargetConfig } from "./linkTargetTypes/EmailLinkTargetType";
+export type { PageLinkTargetConfig } from "./linkTargetTypes/PageLinkTargetType";

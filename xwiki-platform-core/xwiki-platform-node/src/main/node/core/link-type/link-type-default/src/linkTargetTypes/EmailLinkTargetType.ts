@@ -22,9 +22,20 @@ import { typedResourceReference } from "./referenceHelpers";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { EmailLinkTargetConfig } from "../data/linkType";
 import type { LinkTargetType } from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
+
+/**
+ * Configuration for an e-mail link
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type EmailLinkTargetConfig = {
+  address: string;
+  messageSubject?: string;
+  messageBody?: string;
+};
 
 /**
  * Built-in link target type for `mailto:` links.
@@ -91,3 +102,4 @@ class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
 }
 
 export { EmailLinkTargetType };
+export type { EmailLinkTargetConfig };

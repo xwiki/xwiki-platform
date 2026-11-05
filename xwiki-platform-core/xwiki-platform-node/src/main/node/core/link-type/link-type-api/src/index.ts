@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-export type { LinkData, LinkTarget } from "./data/linkType";
+export type { LinkData, LinkTarget } from "./linkData";
 export { ComponentInit } from "./componentInit";
 export { linkTargetTypeManagerRole } from "./linkTargetTypeManager";
 export type { LinkTargetTypeManager } from "./linkTargetTypeManager";

@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { dsComponentStubs } from "./dsStubs";
+import LinkForm from "../LinkForm.vue";
 import LinkModal from "../LinkModal.vue";
 import { flushPromises, mount } from "@vue/test-utils";
 import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
@@ -76,6 +77,36 @@ function mountLinkModal(
     props: { current, depsContainer: fakeDepsContainer(extensions) },
     global: { plugins: [i18n], components: dsComponentStubs },
   });
+}
+
+/**
+ * @returns the data of a link to a resource that no link target type supports
+ */
+function unsupportedLinkData(): LinkData {
+  return {
+    displayText: "XWiki",
+    target: {
+      type: unsupportedLinkTargetType,
+      config: {
+        reference: {
+          type: "interwiki",
+          typed: true,
+          reference: "wikipedia:XWiki",
+          parameters: { anchor: "History" },
+        },
+      },
+    },
+  };
+}
+
+/**
+ * @returns the value and the label of each option of the link type selector
+ */
+function linkTypeOptions(wrapper: ReturnType<typeof mountLinkModal>) {
+  return wrapper
+    .get("[data-test='linkTargetType']")
+    .findAll("option")
+    .map((option) => [option.attributes("value"), option.text()]);
 }
 
 describe("LinkModal", () => {
@@ -158,21 +189,7 @@ describe("LinkModal", () => {
   });
 
   it("edits the reference of a link to an unsupported resource as plain text, keeping its type", async () => {
-    const current: LinkData = {
-      displayText: "XWiki",
-      target: {
-        type: unsupportedLinkTargetType,
-        config: {
-          reference: {
-            type: "interwiki",
-            typed: true,
-            reference: "wikipedia:XWiki",
-            parameters: { anchor: "History" },
-          },
-        },
-      },
-    };
-    const wrapper = mountLinkModal(current, [
+    const wrapper = mountLinkModal(unsupportedLinkData(), [
       fakeExtension(
         "a",
         "A",
@@ -198,5 +215,36 @@ describe("LinkModal", () => {
         },
       },
     });
+  });
+
+  it("offers an unsupported resource type first, as is, and restores its reference when reselected", async () => {
+    // A link target type whose form renders the link type selector, to switch back to the unsupported type.
+    const wrapper = mountLinkModal(unsupportedLinkData(), [
+      fakeExtension(
+        "a",
+        "A",
+        defineComponent({
+          components: { LinkForm },
+          props: ["linkData"],
+          template: '<LinkForm :link-data="linkData" />',
+        }),
+      ),
+    ]);
+    await flushPromises();
+    expect(linkTypeOptions(wrapper)).toEqual([
+      [unsupportedLinkTargetType, "interwiki"],
+      ["a", "A"],
+    ]);
+
+    await wrapper.get("[data-test='linkReference']").setValue("wikipedia:Wiki");
+    await wrapper.get("[data-test='linkTargetType']").setValue("a");
+    await wrapper
+      .get("[data-test='linkTargetType']")
+      .setValue(unsupportedLinkTargetType);
+
+    expect(
+      (wrapper.get("[data-test='linkReference']").element as HTMLInputElement)
+        .value,
+    ).toBe("wikipedia:XWiki");
   });
 });

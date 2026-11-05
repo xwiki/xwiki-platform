@@ -132,9 +132,11 @@ function resourceReferenceToLinkTarget(
     }
   }
 
-  // Copy the reference, so that editing the link target doesn't modify the reference of the edited link.
+  // Copy the reference, so that editing the link target (which the link modal does in place) doesn't modify the
+  // reference of the edited link. A JSON round trip is enough because a resource reference is plain JSON data, and
+  // unlike structuredClone() it also accepts a Vue reactive proxy.
   const config: UnsupportedLinkTargetConfig = {
-    reference: { ...reference, parameters: { ...reference.parameters } },
+    reference: JSON.parse(JSON.stringify(reference)),
   };
   return { type: unsupportedLinkTargetType, config };
 }

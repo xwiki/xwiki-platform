@@ -20,13 +20,11 @@
 import { dsComponentStubs } from "./dsStubs";
 import LinkForm from "../LinkForm.vue";
 import { flushPromises, mount } from "@vue/test-utils";
-import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
 import { afterEach, describe, expect, test } from "vitest";
 import { defineComponent, nextTick } from "vue";
 import { createI18n } from "vue-i18n";
 import type {
   LinkData,
-  LinkTarget,
   LinkTargetTypeExtension,
 } from "@xwiki/platform-link-type-api";
 
@@ -68,7 +66,6 @@ async function settle(): Promise<void> {
 function mountLinkForm(
   extensions: LinkTargetTypeExtension[] = [urlExtensionStub],
   linkData: LinkData = buildLinkData(),
-  unsupportedLinkTarget: LinkTarget | null = null,
 ) {
   // LinkForm.vue calls useI18n() with its own local `messages`, but vue-i18n still requires a global instance to
   // be installed for that local scope to be created against.
@@ -81,7 +78,7 @@ function mountLinkForm(
       plugins: [i18n],
       // Normally provided by LinkModal.vue, which resolves the registered link target types out of the
       // depsContainer before rendering LinkForm.
-      provide: { linkTargetTypeExtensions: extensions, unsupportedLinkTarget },
+      provide: { linkTargetTypeExtensions: extensions },
       components: dsComponentStubs,
     },
   });
@@ -184,46 +181,5 @@ describe("LinkForm.vue", () => {
       type: "second",
       config: { second: true },
     });
-  });
-
-  test("offers an unsupported link type as is, and restores its target when selected again", async () => {
-    const unsupportedLinkTarget: LinkTarget = {
-      type: unsupportedLinkTargetType,
-      config: {
-        reference: {
-          type: "interwiki",
-          typed: true,
-          reference: "wikipedia:XWiki",
-          parameters: {},
-        },
-      },
-    };
-    const linkData: LinkData = {
-      displayText: "",
-      target: structuredClone(unsupportedLinkTarget),
-    };
-    const select = mountLinkForm(
-      [urlExtensionStub],
-      linkData,
-      unsupportedLinkTarget,
-    ).get('[data-test="linkTargetType"]');
-    await flushPromises();
-
-    expect(
-      select
-        .findAll("option")
-        .map((option) => [option.attributes("value"), option.text()]),
-    ).toEqual([
-      [unsupportedLinkTargetType, "interwiki"],
-      ["url", "URL"],
-    ]);
-
-    await select.setValue("url");
-    expect(linkData.target).toEqual({ type: "url", config: { url: "" } });
-
-    await select.setValue(unsupportedLinkTargetType);
-    expect(linkData.target).toEqual(unsupportedLinkTarget);
-    // A copy, so that editing it doesn't modify the original target, which can be restored again.
-    expect(linkData.target.config).not.toBe(unsupportedLinkTarget.config);
   });
 });

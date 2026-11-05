@@ -155,6 +155,40 @@
             -->
             <revapi.differences>
               <justification>
+                These methods (deprecated for a long time) don't exist anymore in Servlet 6.0, which these stubs
+                implement.
+              </justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String org.xwiki.container.servlet.HttpServletRequestStub::getRealPath(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean org.xwiki.container.servlet.HttpServletRequestStub::isRequestedSessionIdFromUrl()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String org.xwiki.container.servlet.HttpServletResponseStub::encodeUrl(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String org.xwiki.container.servlet.HttpServletResponseStub::encodeRedirectUrl(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.container.servlet.HttpServletResponseStub::setStatus(int, java.lang.String)</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
                 The live table new row naming strategies now receive the values the entry is created with, so that a
                 strategy can name the entry after one of them. This API is still @Unstable.
               </justification>
